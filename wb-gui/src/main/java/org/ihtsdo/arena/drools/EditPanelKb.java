@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.CountDownLatch;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -18,6 +19,7 @@ import org.drools.io.ResourceFactory;
 import org.drools.logger.KnowledgeRuntimeLogger;
 import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.log.AceLog;
@@ -27,18 +29,27 @@ import org.ihtsdo.tk.drools.IsKindOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.SatisfiesConstraintEvaluatorDefinition;
 import org.ihtsdo.tk.spec.SpecBI;
 
-public class EditPanelKb {
+public class EditPanelKb implements Runnable {
 
 	private KnowledgeBase kbase;
 	private I_ConfigAceFrame config;
+	private String drlFileStr = "org/ihtsdo/arena/drools/TkApiRules.drl";
+	private CountDownLatch kbLatch = new CountDownLatch(1);
 
 	public EditPanelKb(I_ConfigAceFrame config) {
 		super();
 		this.config = config;
-		// setupKb();
+		ACE.threadPool.execute(this);
+	}
+	
+	@Override
+	public void run() {
+		kbase = setupKb(drlFileStr);
+		kbLatch.countDown();
 	}
 
-	private void setupKb(String testResource) {
+
+	public static KnowledgeBase setupKb(String testResource) {
 
 		HashMap<Resource, ResourceType> resources = new HashMap<Resource, ResourceType>();
 
@@ -53,7 +64,7 @@ public class EditPanelKb {
 		builderConfig.setOption(EvaluatorOption.get(
 				SatisfiesConstraintEvaluatorDefinition.SATISFIES_CONSTRAINT.getOperatorString(),
 				new SatisfiesConstraintEvaluatorDefinition()));
-		kbase = KnowledgeBaseFactory.newKnowledgeBase();
+		KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
 
 		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory
 				.newKnowledgeBuilder(kbase, builderConfig);
@@ -64,6 +75,7 @@ public class EditPanelKb {
 			throw new RuntimeException(kbuilder.getErrors().toString());
 		}
 		kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+		return kbase;
 	}
 
 	public Map<SpecBI, Integer> setConcept(I_GetConceptData c) {
@@ -75,8 +87,11 @@ public class EditPanelKb {
 			}
 		});
 		
+		if (c == null) {
+			return templates;
+		}
 		try {
-			setupKb("org/ihtsdo/arena/drools/TkApiRules.drl");
+			kbLatch.await();
 			StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 			boolean uselogger = false;
 			
@@ -112,11 +127,9 @@ public class EditPanelKb {
 				.newConsoleLogger(ksession);
 
 		ksession.setGlobal("editPaths", config.getEditingPathSetReadOnly());
-		ksession
-				.setGlobal("viewPositions", config.getViewPositionSetReadOnly());
+		ksession.setGlobal("viewPositions", config.getViewPositionSetReadOnly());
 		ksession.setGlobal("precedence", config.getPrecedence());
-		ksession.setGlobal("contradictionMgr", config
-				.getConflictResolutionStrategy());
+		ksession.setGlobal("contradictionMgr", config.getConflictResolutionStrategy());
 		ksession.setGlobal("allowedStatus", config.getAllowedStatus());
 		ksession.setGlobal("allowedDescTypes", null);
 		ksession.setGlobal("allowedSrcRelTypes", null);
@@ -126,5 +139,6 @@ public class EditPanelKb {
 		logger.close();
 
 	}
+
 
 }

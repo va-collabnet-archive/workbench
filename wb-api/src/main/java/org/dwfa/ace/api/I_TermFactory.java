@@ -151,7 +151,7 @@ public interface I_TermFactory {
             I_GetConceptData descType, I_ConfigAceFrame aceFrameConfig) throws TerminologyException, IOException;
 
     I_DescriptionVersioned newDescription(UUID newDescriptionId, I_GetConceptData concept, String lang, String text,
-            I_GetConceptData descType, I_ConfigAceFrame aceFrameConfig, I_GetConceptData status, long effectiveData)
+            I_GetConceptData descType, I_ConfigAceFrame aceFrameConfig, I_GetConceptData status, long effectiveDate)
             throws TerminologyException, IOException;
 
     /**
@@ -623,6 +623,10 @@ public interface I_TermFactory {
      */
     public I_RelVersioned newRelationshipNoCheck(UUID newRelUid, I_GetConceptData concept, int relTypeNid, int c2Nid,
             int relCharacteristicNid, int relRefinabilityNid, int relStatusNid, int group, int pathNid,
+            long effectiveDate) throws TerminologyException, IOException;
+
+    public I_RelVersioned newRelationshipNoCheck(UUID newRelUid, I_GetConceptData concept, int relTypeNid, int c2Nid,
+            int relCharacteristicNid, int relRefinabilityNid, int group, int relStatusNid, int authorNid, int pathNid,
             long effectiveDate) throws TerminologyException, IOException;
 
     public void setCheckCreationDataEnabled(boolean enabled);

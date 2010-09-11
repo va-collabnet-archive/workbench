@@ -8,4 +8,6 @@ public interface ComponentChroncileBI<T extends ComponentVersionBI> extends Comp
 	public Collection<? extends T> getVersions(Coordinate c);
 	public Collection<? extends T> getVersions();
 
+	public boolean isUncommitted();
+
 }

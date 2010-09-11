@@ -16,13 +16,16 @@
  */
 package org.dwfa.ace.list;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.io.IOException;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -53,9 +56,30 @@ public class AceListRenderer extends DefaultListCellRenderer {
             if (I_GetConceptData.class.isAssignableFrom(value.getClass())) {
                 try {
                     I_GetConceptData concept = (I_GetConceptData) value;
+                    boolean uncommitted = concept.isUncommitted();
+                    
                     I_DescriptionTuple desc = concept.getDescTuple(config.getShortLabelDescPreferenceList(), config);
                     if (desc != null) {
-                        renderComponent.setText(desc.getText());
+                    	if (uncommitted) {
+                            renderComponent.setText(desc.getText());
+                            renderComponent.setOpaque(true);
+                            if (!isSelected) {
+                                renderComponent.setBackground(Color.YELLOW);
+                            } else {
+                            	Border b = renderComponent.getBorder();
+                            	if (b == null) {
+                            		b = BorderFactory.createEmptyBorder();
+                            	}
+                        		renderComponent.setBorder(BorderFactory.createCompoundBorder(
+                        				BorderFactory.createMatteBorder(0, 6, 0, 6, Color.YELLOW), b));
+                            }
+                    	} else {
+                            renderComponent.setText(desc.getText());
+                            renderComponent.setOpaque(true);
+                            if (!isSelected) {
+                                renderComponent.setBackground(Color.WHITE);
+                            }
+                    	}
                     } else {
                         AceLog.getAppLog().info("element: " + index + " descTuple is null: " + concept.getConceptNid());
                         renderComponent.setText("removing concept with null descTuple: " + concept.getConceptNid());

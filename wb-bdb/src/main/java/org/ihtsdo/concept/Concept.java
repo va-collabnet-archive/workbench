@@ -46,7 +46,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.concept.component.ComponentList;
-import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.description.Description.Version;
@@ -67,6 +66,7 @@ import org.ihtsdo.db.util.NidPairForRel;
 import org.ihtsdo.db.util.ReferenceType;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.LuceneManager;
+import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -466,16 +466,24 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return new ArrayList<UUID>();
 	}
 
-	public List<UUID> getUUIDs() throws IOException {
-		if (getConceptAttributes() != null) {
-			return getConceptAttributes().getUUIDs();
+	public List<UUID> getUUIDs() {
+		try {
+			if (getConceptAttributes() != null) {
+				return getConceptAttributes().getUUIDs();
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 		return new ArrayList<UUID>();
 	}
 
-	public UUID getPrimUuid() throws IOException {
-		if (getConceptAttributes() != null) {
-			return getConceptAttributes().getPrimUuid();
+	public UUID getPrimUuid() {
+		try {
+			if (getConceptAttributes() != null) {
+				return getConceptAttributes().getPrimUuid();
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 		return null;
 	}
@@ -1051,6 +1059,18 @@ public class Concept implements I_Transact, I_GetConceptData {
         }
     }
 
+    public String toUserString() {
+        try {
+            if (!isCanceled()) {
+                return getInitialText();
+            }
+            return "canceled concept";
+        } catch (Exception ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+            return ex.toString();
+        }
+    }
+
     /**
      * Returns a longer - more complete - string representation of the object.
      * 
@@ -1114,7 +1134,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		}
 	}
 
-	public ConceptComponent<?, ?> getComponent(int nid) throws IOException {
+	public ComponentChroncileBI<?> getComponent(int nid) throws IOException {
 		return data.getComponent(nid);
 	}
 
@@ -1462,8 +1482,6 @@ public class Concept implements I_Transact, I_GetConceptData {
 			results.add(new RelGroupChronicle(this, groupEntry.getKey(), groupEntry.getValue()));
 		}
 		return results;
-		
-		
 	}
 
 }

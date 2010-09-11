@@ -535,6 +535,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 
     public void setFrozen(boolean frozen) {
         this.frozen = frozen;
+        getDropTarget().setActive(!frozen);
     }
 
 	@Override

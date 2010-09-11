@@ -2,16 +2,12 @@ package org.ihtsdo.arena.conceptview;
 
 import java.awt.LayoutManager;
 import java.awt.datatransfer.DataFlavor;
-import java.util.Collection;
 
-import javax.swing.Action;
 import javax.swing.TransferHandler;
 
-import org.dwfa.ace.api.I_DescriptionTuple;
-import org.ihtsdo.arena.context.action.I_HandleContext;
-import org.ihtsdo.tk.api.ComponentBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
-public class DragPanelDescription extends DragPanel<I_DescriptionTuple> {
+public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionVersionBI> {
 
 	/**
 	 * 
@@ -19,12 +15,12 @@ public class DragPanelDescription extends DragPanel<I_DescriptionTuple> {
 	private static final long serialVersionUID = 1L;
 
 	
-	public DragPanelDescription(I_HandleContext context) {
-		super(context);
+	public DragPanelDescription(ConceptViewSettings settings) {
+		super(settings);
 	}
 
-	public DragPanelDescription(LayoutManager layout, I_HandleContext context) {
-		super(layout, context);
+	public DragPanelDescription(LayoutManager layout, ConceptViewSettings settings) {
+		super(layout, settings);
 	}
 
 	@Override
@@ -47,12 +43,16 @@ public class DragPanelDescription extends DragPanel<I_DescriptionTuple> {
 		return TransferHandler.COPY;
 	}
 	
-	public I_DescriptionTuple getThingToDrag() {
+	public DescriptionVersionBI getThingToDrag() {
 		return thingToDrag;
 	}
-	@Override
-	protected Collection<Action> getActions(ComponentBI targetComponent, ComponentBI droppedComponent) {
-		return context.dropOnDesc(targetComponent.getNid(), droppedComponent.getNid());
+	
+	public DescriptionVersionBI getDraggedThing() {
+		return thingToDrag;
+	}
+
+	public void setDraggedThing(DescriptionVersionBI desc) {
+		// handle drop...;
 	}
 
 }

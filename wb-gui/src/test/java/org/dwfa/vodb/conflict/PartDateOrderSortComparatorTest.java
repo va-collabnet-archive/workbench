@@ -19,7 +19,6 @@
  */
 package org.dwfa.vodb.conflict;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,7 +53,7 @@ public class PartDateOrderSortComparatorTest {
 		}
 
 		@Override
-		public List<UUID> getUUIDs() throws IOException {
+		public List<UUID> getUUIDs() {
             throw new UnsupportedOperationException();
 		}
 
@@ -155,6 +154,16 @@ public class PartDateOrderSortComparatorTest {
 		@Override
 		public int getNid() {
 		     throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public UUID getPrimUuid() {
+		     throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public String toUserString() {
+		       throw new UnsupportedOperationException();
 		}
     }
 

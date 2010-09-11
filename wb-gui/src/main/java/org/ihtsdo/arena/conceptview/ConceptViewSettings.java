@@ -91,11 +91,16 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 		}
 		
 	}
+	public ConceptView getView() {
+		return view;
+	}
+
 	@Override
 	public ConceptView makeComponent(I_ConfigAceFrame config) {
 		if (view == null) {
 			view = new ConceptView(config, this);
 			addHostListener(new ConceptChangedListener());
+			view.layoutConcept((I_GetConceptData) getHost().getTermComponent());
 		}
 		return view;
 	}
@@ -276,5 +281,10 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 			templateNode.add(new PreferencesNode("lab test", new JCheckBox("lab test: ")));
 		}
 		return componentNode;
+	}
+
+	@Override
+	public I_GetConceptData getConcept() {
+		return (I_GetConceptData) getHost().getTermComponent();
 	}
 }

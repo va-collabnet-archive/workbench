@@ -51,4 +51,16 @@ public class RelSpec implements SpecBI {
     	return new RelConstraintIncoming(originSpec, relTypeSpec, destinationSpec);
     }
 
+	public void setOriginSpec(ConceptSpec originSpec) {
+		this.originSpec = originSpec;
+	}
+
+	public void setRelTypeSpec(ConceptSpec relTypeSpec) {
+		this.relTypeSpec = relTypeSpec;
+	}
+
+	public void setDestinationSpec(ConceptSpec destinationSpec) {
+		this.destinationSpec = destinationSpec;
+	}
+
 }

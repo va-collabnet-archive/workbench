@@ -889,4 +889,13 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		return returnTuples;
 	}
 
+    @Override
+	public String toUserString() {
+        StringBuffer buf = new StringBuffer();
+        ConceptComponent.addTextToBuffer(buf, typeNid);
+        buf.append(": ");
+        ConceptComponent.addTextToBuffer(buf, c2Nid);
+        return buf.toString();
+	}
+
 }

@@ -288,6 +288,15 @@ public class Description
     }
 
     @Override
+	public String toUserString() {
+        StringBuffer buf = new StringBuffer();
+        ConceptComponent.addTextToBuffer(buf, typeNid);
+        buf.append(": ");
+        buf.append("'" + this.getText() + "'");
+        return buf.toString();
+	}
+
+	@Override
     public boolean fieldsEqual(ConceptComponent<DescriptionRevision, Description> obj) {
         if (Description.class.isAssignableFrom(obj.getClass())) {
             Description another = (Description) obj;

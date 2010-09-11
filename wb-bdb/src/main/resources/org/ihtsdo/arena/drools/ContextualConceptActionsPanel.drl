@@ -1,0 +1,45 @@
+#created on: Aug 15, 2010
+package org.ihtsdo.arena.drools
+
+#list any import classes here.
+import java.io.File;
+import java.lang.String;
+import java.util.Collection;
+
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+
+import org.ihtsdo.arena.context.action.BpActionFactory;
+import org.ihtsdo.arena.context.action.CopyDescAction;
+import org.ihtsdo.arena.context.action.MoveDescAction;
+
+import org.ihtsdo.tk.spec.DescriptionSpec;
+
+import org.ihtsdo.tk.example.binding.Snomed;
+import org.ihtsdo.tk.example.binding.SnomedConstraints;
+import org.ihtsdo.tk.example.binding.SnomedRelType;
+import org.ihtsdo.tk.example.binding.SnomedRelSpec;
+import org.ihtsdo.tk.example.binding.Taxonomies;
+import org.ihtsdo.tk.example.binding.WbDescType;
+
+
+
+#declare any global variables here
+
+global Collection actions;
+global BpActionFactory actionFactory;
+
+rule "add from directory"
+	when
+		$c : ConceptVersionBI();
+	then 
+		actions.addAll(actionFactory.fromDir("plugins/component"));
+end
+
+rule "add if null concept in host"
+	when
+		String(this == "null concept");
+	then 
+		actions.add(actionFactory.make(new File("plugins/component/new_concept.bp")));
+end
+

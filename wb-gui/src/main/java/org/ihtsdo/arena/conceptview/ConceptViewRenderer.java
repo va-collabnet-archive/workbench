@@ -3,8 +3,10 @@ package org.ihtsdo.arena.conceptview;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.ComponentOrientation;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -16,7 +18,11 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -25,10 +31,23 @@ import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
+import org.drools.KnowledgeBase;
+import org.drools.logger.KnowledgeRuntimeLogger;
+import org.drools.logger.KnowledgeRuntimeLoggerFactory;
+import org.drools.runtime.StatefulKnowledgeSession;
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.arena.ScrollablePanel;
+import org.ihtsdo.arena.context.action.BpActionFactory;
+import org.ihtsdo.arena.drools.EditPanelKb;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.util.swing.GuiUtil;
 
 import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
@@ -110,10 +129,17 @@ public class ConceptViewRenderer extends JLayeredPane
 
 	private ConceptViewTitle title;
 
-	private JPanel workflowPanel = new JPanel();
+	private ScrollablePanel workflowPanel = new ScrollablePanel(new FlowLayout(FlowLayout.LEADING, 10, 10));
+	private JScrollPane workflowScrollPane = new JScrollPane(workflowPanel, 
+			ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+			ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+	private KnowledgeBase contextualConceptActionsKBase;
 
 
 	private JScrollPane scrollPane;
+
+
+	private JToggleButton workflowToggleButton;
 
 		
     /**
@@ -122,6 +148,9 @@ public class ConceptViewRenderer extends JLayeredPane
     public ConceptViewRenderer(Object cellObj,
             final mxGraphComponent graphContainer, ACE ace)
     {
+    	
+		contextualConceptActionsKBase = EditPanelKb.setupKb("org/ihtsdo/arena/drools/ContextualConceptActionsPanel.drl");
+		workflowPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
         this.cell = (mxCell) cellObj;
         this.graphContainer = graphContainer;
         this.graph = graphContainer.getGraph();
@@ -177,7 +206,8 @@ public class ConceptViewRenderer extends JLayeredPane
 
                 
         gbc.gridx++;
-        JToggleButton workflowToggleButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/16x16/plain/media_step_forward.png")));
+        workflowToggleButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/16x16/plain/media_step_forward.png")));
+        workflowToggleButton.setToolTipText("show context sensitive actions available for this concept...");
         workflowToggleButton.setSelected(false);
         
         workflowToggleButton.addActionListener(new ActionListener() {
@@ -187,14 +217,31 @@ public class ConceptViewRenderer extends JLayeredPane
 				JToggleButton button = (JToggleButton) e.getSource();
 				if (button.isSelected()) {
 		            remove(scrollPane);
-		            add(workflowPanel, BorderLayout.CENTER);
-					workflowPanel.setBackground(new Color(242, 172, 167, 128));
-					workflowPanel.setBorder(BorderFactory.createLineBorder(Color.red));
-					workflowPanel.setVisible(true);
+		            Collection<Action> actions = getKbActions();
+		            workflowPanel.removeAll();
+		            for (Action a: actions) {
+		            	JButton actionButton = new JButton(a);
+		            	actionButton.setHorizontalTextPosition(SwingConstants.CENTER);
+		            	actionButton.setVerticalTextPosition(SwingConstants.BOTTOM);
+		            	actionButton.addActionListener(new ActionListener() {
+							
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								workflowToggleButton.doClick();
+							}
+						});
+		            	workflowPanel.add(actionButton);
+		            }
+		            add(workflowScrollPane, BorderLayout.CENTER);
+					// Populate here...
+
+		            workflowPanel.setVisible(true);
 					scrollPane.setVisible(false);
+					GuiUtil.tickle(ConceptViewRenderer.this);
+
 				} else {
 					workflowPanel.setVisible(false);
-		            remove(workflowPanel);
+		            remove(workflowScrollPane);
 		            add(scrollPane, BorderLayout.CENTER);
 					scrollPane.setVisible(true);
 				}
@@ -213,12 +260,14 @@ public class ConceptViewRenderer extends JLayeredPane
         gbc.weightx = 0;
         gbc.gridx++;
         JButton cancelButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/delete.png")));
+        cancelButton.setToolTipText("cancel changes to concept");
         cancelButton.addActionListener(new CancelActionListener());
         cancelButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
         footerPanel.add(cancelButton, gbc);
         
         gbc.gridx++;
         JButton commitButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/check.png")));
+        commitButton.setToolTipText("commit changes to concept");
         commitButton.addActionListener(new CommitActionListener());
         commitButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
         footerPanel.add(commitButton, gbc);
@@ -238,12 +287,50 @@ public class ConceptViewRenderer extends JLayeredPane
         addComponentListener(rca);
     }
 
-
     private void updateLabel() {
     	title.updateTitle();
     }
 
+	private Collection<Action> getKbActions() {
+		Collection<Action> actions = new ArrayList<Action>();
+		
+		try {
+			StatefulKnowledgeSession ksession = contextualConceptActionsKBase.newStatefulKnowledgeSession();
+			boolean uselogger = false;
+			
+			KnowledgeRuntimeLogger logger = null;
+			if (uselogger) {
+				logger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+			}
+			try {
+				
+				Coordinate coordinate = new Coordinate(settings.getConfig().getPrecedence(),
+						settings.getConfig().getViewPositionSetReadOnly(), settings.getConfig()
+								.getAllowedStatus(), settings.getConfig().getDestRelTypes(),
+								settings.getConfig().getConflictResolutionStrategy());
+				ksession.setGlobal("actions", actions);
+				ksession.setGlobal("actionFactory", new BpActionFactory(settings.getConfig(), 
+						settings.getHost()));
+				if (settings.getConcept() != null) {
+					ksession.insert(Ts.get().getConceptVersion(coordinate, settings.getConcept().getNid()));
+				} else {
+					ksession.insert("null concept");
+				}
+				ksession.fireAllRules();
+			} catch (IOException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			} finally {
+				if (logger != null) {
+					logger.close();
+				}
+			}
+		} catch (Throwable e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+		return actions;
+	}
 
+	
 
     /**
      * 

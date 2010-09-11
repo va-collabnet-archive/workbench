@@ -265,4 +265,12 @@ public class RelationshipRevision
 		return primordialComponent.getVersions(c);
 	}		
 
+    @Override
+	public String toUserString() {
+        StringBuffer buf = new StringBuffer();
+        ConceptComponent.addTextToBuffer(buf, typeNid);
+        buf.append(": ");
+        ConceptComponent.addTextToBuffer(buf, primordialComponent.getDestinationNid());
+        return buf.toString();
+	}
 }

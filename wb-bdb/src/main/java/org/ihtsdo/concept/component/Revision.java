@@ -27,6 +27,10 @@ public abstract class Revision<V extends Revision<V, C>,
 	public int sapNid = Integer.MAX_VALUE;
 	public C primordialComponent;
 
+	public UUID getPrimUuid() {
+		return primordialComponent.getPrimUuid();
+	}
+
 	public final List<UUID> getUUIDs() {
 		return primordialComponent.getUUIDs();
 	}
@@ -307,5 +311,12 @@ public abstract class Revision<V extends Revision<V, C>,
 	public int getConceptNid() {
 		return primordialComponent.enclosingConceptNid;
 	}
+
+    public abstract String toUserString();
+    
+     public boolean isUncommitted() {
+    	return getTime() == Long.MAX_VALUE;
+    }
+
 
 }

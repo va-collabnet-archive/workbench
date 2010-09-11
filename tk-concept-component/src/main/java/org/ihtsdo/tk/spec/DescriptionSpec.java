@@ -29,8 +29,17 @@ public class DescriptionSpec implements SpecBI {
 	private UUID[] descUuids;
 
 	private String descText;
+	private String langText = "en";
 
 	private ConceptSpec conceptSpec;
+
+	public void setConceptSpec(ConceptSpec conceptSpec) {
+		this.conceptSpec = conceptSpec;
+	}
+
+	public void setDescTypeSpec(ConceptSpec descTypeSpec) {
+		this.descTypeSpec = descTypeSpec;
+	}
 
 	private ConceptSpec descTypeSpec;
 
@@ -81,7 +90,19 @@ public class DescriptionSpec implements SpecBI {
 	public DescriptionSpec(String description, UUID uuid, ConceptSpec concept, ConceptSpec descType) {
 		this(new UUID[] { uuid }, concept, descType, description);
 	}
+
+	public void setDescText(String extractText) {
+		descText = extractText;
+	}
 	
-	
+	public String getLangText() {
+		return langText;
+	}
+
+	public void setLangText(String langText) {
+		this.langText = langText;
+	}
+
+
 
 }

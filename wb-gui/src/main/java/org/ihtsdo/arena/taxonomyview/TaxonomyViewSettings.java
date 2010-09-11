@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.tree.JTreeWithDragImage;
@@ -84,6 +85,11 @@ public class TaxonomyViewSettings extends ArenaComponentSettings {
 	protected void setupSubtypes() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public I_GetConceptData getConcept() {
+		return null;
 	}
 
 }

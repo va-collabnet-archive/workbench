@@ -4,8 +4,10 @@ import java.awt.datatransfer.DataFlavor;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 
 public class DragPanelDataFlavors {
 	
@@ -15,6 +17,8 @@ public class DragPanelDataFlavors {
 	
 	public static DataFlavor relVersionFlavor;
 	
+	public static DataFlavor conceptFlavor;
+	
 	public static DataFlavor[] dragPanelFlavors;
 
 	public static Set<DataFlavor> dragPanelFlavorSet;
@@ -23,14 +27,18 @@ public class DragPanelDataFlavors {
 		try {
 			relGroupFlavor = new DataFlavor(
 					"application/x-java-jvm-local-objectref;class=" + 
-						RelGroupForDragPanel.class.getName()) ;
+					RelGroupVersionBI.class.getName()) ;
 			descVersionFlavor = new DataFlavor(
 					"application/x-java-jvm-local-objectref;class=" + 
-						I_DescriptionTuple.class.getName());
+					DescriptionVersionBI.class.getName());
 			relVersionFlavor = new DataFlavor(
 					"application/x-java-jvm-local-objectref;class=" + 
-						I_RelTuple.class.getName());
-			dragPanelFlavors = new DataFlavor[] { relGroupFlavor, descVersionFlavor, relVersionFlavor };
+						RelationshipVersionBI.class.getName());
+			conceptFlavor = new DataFlavor(
+					"application/x-java-jvm-local-objectref;class=" + 
+					I_GetConceptData.class.getName());
+			
+			dragPanelFlavors = new DataFlavor[] { relGroupFlavor, descVersionFlavor, relVersionFlavor, conceptFlavor };
 			
 			dragPanelFlavorSet = new HashSet<DataFlavor>();
 			for (DataFlavor f: dragPanelFlavors) {

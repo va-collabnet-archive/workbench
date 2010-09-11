@@ -587,4 +587,17 @@ public class ConceptAttributes
 		return returnTuples;
 	}
 
+    @Override
+	public String toUserString() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("concept ");
+        if (defined) {
+            buf.append("is fully defined");
+        }
+        if (defined) {
+            buf.append("is primitive");
+        }
+        return buf.toString();
+	}
+
 }

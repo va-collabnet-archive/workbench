@@ -145,6 +145,7 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.lucene.CheckAndProcessLuceneMatch;
 import org.ihtsdo.lucene.LuceneManager;
+import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
@@ -477,7 +478,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     public I_Identify getId(int nid) throws TerminologyException, IOException {
         Concept concept = Bdb.getConceptForComponent(nid);
         if (concept != null) {
-            return concept.getComponent(nid);
+            return (I_Identify) concept.getComponent(nid);
         }
 
         return null;
@@ -608,7 +609,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         if (descId == Integer.MIN_VALUE || descId > Bdb.getUuidsToNidMap().getCurrentMaxNid()) {
             return false;
         }
-        I_AmTermComponent c = Bdb.getComponent(descId);
+        ComponentBI c = Bdb.getComponent(descId);
         if (c == null) {
             return false;
         }
@@ -620,7 +621,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         if (memberId == Integer.MIN_VALUE || memberId > Bdb.getUuidsToNidMap().getCurrentMaxNid()) {
             return false;
         }
-        I_AmTermComponent c = Bdb.getComponent(memberId);
+        ComponentBI c = Bdb.getComponent(memberId);
         if (c == null) {
             return false;
         }
@@ -647,7 +648,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         if (imageId == Integer.MIN_VALUE || imageId > Bdb.getUuidsToNidMap().getCurrentMaxNid()) {
             return false;
         }
-        I_AmTermComponent c = Bdb.getComponent(imageId);
+        ComponentBI c = Bdb.getComponent(imageId);
         if (c == null) {
             return false;
         }
@@ -671,7 +672,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         if (relId == Integer.MIN_VALUE || relId > Bdb.getUuidsToNidMap().getCurrentMaxNid()) {
             return false;
         }
-        I_AmTermComponent c = Bdb.getComponent(relId);
+        ComponentBI c = Bdb.getComponent(relId);
         if (c == null) {
             return false;
         }
@@ -817,7 +818,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             int statusNid, long time) throws TerminologyException, IOException {
         canEdit(aceFrameConfig);
         int cNid = Bdb.uuidToNid(newConceptUuid);
-        Bdb.getNidCNidMap().setCidForNid(cNid, cNid);
+        Bdb.getNidCNidMap().setCNidForNid(cNid, cNid);
         Concept newC = Concept.get(cNid);
         ConceptAttributes a = new ConceptAttributes();
         a.nid = cNid;
@@ -887,7 +888,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         Bdb.gVersion.incrementAndGet();
         d.enclosingConceptNid = c.getNid();
         d.nid = Bdb.uuidToNid(descUuid);
-        Bdb.getNidCNidMap().setCidForNid(c.getNid(), d.nid);
+        Bdb.getNidCNidMap().setCNidForNid(c.getNid(), d.nid);
         d.primordialUNid = Bdb.getUuidsToNidMap().getUNid(descUuid);
         d.setLang(lang);
         d.setText(text);
@@ -921,7 +922,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             Class<? extends I_ExtendByRefPart> partType) throws IOException {
         Concept refsetConcept = Concept.get(refsetId);
         I_ConfigAceFrame config = getActiveAceFrameConfig();
-        Bdb.getNidCNidMap().setCidForNid(refsetId, memberId);
+        Bdb.getNidCNidMap().setCNidForNid(refsetId, memberId);
 
         RefsetMember<?, ?> member =
                 createMember(memberId, componentId, EConcept.REFSET_TYPES.classToType(partType), refsetConcept, config);
@@ -1055,7 +1056,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         assert config.getEditingPathSet() != null : "Config edit path set cannot be null.";
         member.enclosingConceptNid = refsetConcept.getNid();
         member.nid = Bdb.uuidToNid(primordialUuid);
-        Bdb.getNidCNidMap().setCidForNid(refsetConcept.getNid(), member.nid);
+        Bdb.getNidCNidMap().setCNidForNid(refsetConcept.getNid(), member.nid);
         member.referencedComponentNid = referencedComponentNid;
         member.primordialUNid = Bdb.getUuidsToNidMap().getUNid(primordialUuid);
         member.primordialSapNid = Integer.MIN_VALUE;
@@ -1174,7 +1175,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         Bdb.gVersion.incrementAndGet();
         r.enclosingConceptNid = c.getNid();
         r.nid = Bdb.uuidToNid(newRelUid);
-        Bdb.getNidCNidMap().setCidForNid(c.getNid(), r.nid);
+        Bdb.getNidCNidMap().setCNidForNid(c.getNid(), r.nid);
         r.primordialUNid = Bdb.getUuidsToNidMap().getUNid(newRelUid);
         int parentId = relDestination.getNid();
         r.setC2Id(parentId);
@@ -1216,7 +1217,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         Bdb.gVersion.incrementAndGet();
         r.enclosingConceptNid = c.getNid();
         r.nid = Bdb.uuidToNid(newRelUid);
-        Bdb.getNidCNidMap().setCidForNid(c.getNid(), r.nid);
+        Bdb.getNidCNidMap().setCNidForNid(c.getNid(), r.nid);
         r.primordialUNid = Bdb.getUuidsToNidMap().getUNid(newRelUid);
         r.setC2Id(c2Nid);
         r.setTypeId(relTypeNid);
@@ -1229,8 +1230,36 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         c.getSourceRels().add(r);
         return r;
     }
+    
+    
 
     @Override
+	public I_RelVersioned newRelationshipNoCheck(UUID newRelUid,
+			I_GetConceptData concept, int relTypeNid, int c2Nid,
+			int relCharacteristicNid, int relRefinabilityNid, int group,
+			int relStatusNid, int authorNid, int pathNid, long effectiveDate)
+			throws TerminologyException, IOException {
+        // NO CHECK PERFORMED
+        Concept c = (Concept) concept;
+        Relationship r = new Relationship();
+        Bdb.gVersion.incrementAndGet();
+        r.enclosingConceptNid = c.getNid();
+        r.nid = Bdb.uuidToNid(newRelUid);
+        Bdb.getNidCNidMap().setCNidForNid(c.getNid(), r.nid);
+        r.primordialUNid = Bdb.getUuidsToNidMap().getUNid(newRelUid);
+        r.setC2Id(c2Nid);
+        r.setTypeId(relTypeNid);
+        r.setRefinabilityId(relRefinabilityNid);
+        r.setCharacteristicId(relCharacteristicNid);
+        r.setGroup(group);
+        r.primordialSapNid = Bdb.getSapDb().getSapNid(relStatusNid, 
+        		authorNid,
+        		pathNid, effectiveDate);
+        c.getSourceRels().add(r);
+        return r;
+	}
+
+	@Override
     public void removeChangeSetReader(I_ReadChangeSet reader) {
         throw new UnsupportedOperationException();
     }
@@ -1803,7 +1832,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         img.nid = uuidToNative(imageUuid);
         img.primordialUNid = Bdb.getUuidsToNidMap().getUNid(imageUuid);
         img.enclosingConceptNid = c.getNid();
-        Bdb.getNidCNidMap().setCidForNid(conceptNid, img.nid);
+        Bdb.getNidCNidMap().setCNidForNid(conceptNid, img.nid);
         img.setImage(image);
         img.setFormat(format);
         img.setTextDescription(textDescription);

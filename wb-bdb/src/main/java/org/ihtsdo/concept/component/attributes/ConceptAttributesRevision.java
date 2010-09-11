@@ -150,5 +150,17 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
 		return primordialComponent.getVersions(c);
 	}		
 
+    @Override
+	public String toUserString() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("concept ");
+        if (defined) {
+            buf.append("is fully defined");
+        }
+        if (defined) {
+            buf.append("is primitive");
+        }
+        return buf.toString();
+	}    
 
 }

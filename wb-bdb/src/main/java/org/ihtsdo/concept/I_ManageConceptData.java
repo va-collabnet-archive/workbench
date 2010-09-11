@@ -8,12 +8,12 @@ import java.util.concurrent.ExecutionException;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.ihtsdo.concept.component.ComponentList;
-import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.image.Image;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.concept.component.relationship.Relationship;
+import org.ihtsdo.tk.api.ComponentChroncileBI;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -68,7 +68,7 @@ public interface I_ManageConceptData {
 	
 	public TupleInput getReadWriteTupleInput() throws IOException;
 
-	public ConceptComponent<?, ?> getComponent(int nid) throws IOException;
+	public ComponentChroncileBI<?> getComponent(int nid) throws IOException;
 
 	public Set<Integer> getDescNidsReadOnly() throws IOException;
 

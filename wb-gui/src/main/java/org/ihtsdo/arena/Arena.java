@@ -18,7 +18,8 @@ public class Arena extends JPanel {
     public Arena(ACE ace) throws IOException {
         super(new BorderLayout());
         ArenaEditor editor = new ArenaEditor(ace);
-        add(editor, BorderLayout.CENTER);    
+        add(editor, BorderLayout.CENTER);   
+
     }
     
 }

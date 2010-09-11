@@ -312,7 +312,7 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 		setC3Nid(c3id);
 	}
 	@SuppressWarnings("unchecked")
-	protected List<Version> getVersions() {
+	public List<Version> getVersions() {
 		if (versions == null) {
 			int count = 1;
 			if (revisions != null) {

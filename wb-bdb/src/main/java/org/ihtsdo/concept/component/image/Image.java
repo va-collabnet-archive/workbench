@@ -659,4 +659,15 @@ public class Image
 		return returnTuples;
 	}
 
+    @Override
+	public String toUserString() {
+        StringBuffer buf = new StringBuffer();
+        ConceptComponent.addTextToBuffer(buf, typeNid);
+        buf.append("; ");
+        buf.append(format);
+        buf.append(": ");
+        buf.append(textDescription);
+        return buf.toString();
+	}
+
 }

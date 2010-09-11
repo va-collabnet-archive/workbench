@@ -1285,12 +1285,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private TerminologyListModel viewerHistoryTableModel = new TerminologyListModel();
 
-    private TerminologyListModel uncommittedTableModel = new TerminologyListModel();
-
-    private TerminologyListModel commitHistoryTableModel = new TerminologyListModel();
-
-    private TerminologyListModel importHistoryTableModel = new TerminologyListModel();
-
     private TerminologyListModel favoritesTableModel = new TerminologyListModel();
 
     private JToggleButton showPreferencesButton;
@@ -2688,14 +2682,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         TerminologyList favorites = new TerminologyList(favoritesTableModel, true, false, aceFrameConfig);
 
         tabs.addTab("favorites", new JScrollPane(favorites));
-        if (editMode) {
-            TerminologyList uncommittedList = new TerminologyList(uncommittedTableModel, false, false, aceFrameConfig);
-            tabs.addTab("uncommitted", new JScrollPane(uncommittedList));
-            TerminologyList commitList = new TerminologyList(commitHistoryTableModel, false, false, aceFrameConfig);
-            tabs.addTab("changed", new JScrollPane(commitList));
-            TerminologyList importList = new TerminologyList(importHistoryTableModel, false, false, aceFrameConfig);
-            tabs.addTab("imported", new JScrollPane(importList));
-        }
         historyPalette.add(tabs, BorderLayout.CENTER);
         historyPalette.setBorder(BorderFactory.createRaisedBevelBorder());
         layers.add(historyPalette, JLayeredPane.PALETTE_LAYER);
@@ -3111,14 +3097,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             treeHelper.updateHierarchyView(evt.getPropertyName());
         } else if (evt.getPropertyName().equals("commit")) {
             treeHelper.updateHierarchyView(evt.getPropertyName());
-            for (int i = 0; i < uncommittedTableModel.getSize(); i++) {
-                commitHistoryTableModel.addElement(uncommittedTableModel.getElementAt(i));
-            }
-            uncommittedTableModel.clear();
             removeConfigPalette();
-            while (commitHistoryTableModel.getSize() > maxHistoryListSize) {
-                commitHistoryTableModel.removeElement(commitHistoryTableModel.getSize() - 1);
-            }
         } else if (evt.getPropertyName().equals("commitEnabled")) {
             if (commitButton != null) {
                 commitButton.setEnabled(aceFrameConfig.isCommitEnabled());
@@ -3140,23 +3119,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 viewerHistoryTableModel.removeElement(viewerHistoryTableModel.getSize() - 1);
             }
         } else if (evt.getPropertyName().equals("uncommitted")) {
-            if (uncommittedTableModel != null) {
-                uncommittedTableModel.clear();
-                for (I_Transact t : uncommitted) {
-                    if (t != null) {
-                        if (I_GetConceptData.class.isAssignableFrom(t.getClass())) {
-                            uncommittedTableModel.addElement((I_GetConceptData) t);
-                        }
-                    }
-                }
-            }
+        	// Nothing to do...
         } else if (evt.getPropertyName().equals("imported")) {
-            importHistoryTableModel.clear();
-            for (I_Transact t : imported) {
-                if (I_GetConceptData.class.isAssignableFrom(t.getClass())) {
-                    importHistoryTableModel.addElement((I_GetConceptData) t);
-                }
-            }
+           	// Nothing to do...
         } else if (evt.getPropertyName().equals("roots")) {
             try {
                 treeHelper.setRoots();

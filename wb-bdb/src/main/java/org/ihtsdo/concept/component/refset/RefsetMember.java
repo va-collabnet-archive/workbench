@@ -27,6 +27,9 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRefset;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -40,7 +43,7 @@ import com.sleepycat.bind.tuple.TupleOutput;
 public abstract class RefsetMember<R extends RefsetRevision<R, C>, 
 								   C extends RefsetMember<R, C>> 
 			extends ConceptComponent<R, C> 
-			implements I_ExtendByRef {
+			implements I_ExtendByRef, ComponentChroncileBI<RefsetMember<?,?>.Version> {
 
 
 	public int referencedComponentNid;
@@ -187,6 +190,14 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 			throw new UnsupportedOperationException("subclass must override");
 		}
 
+		public RefsetMember<R,C>.Version getVersion(Coordinate c)
+				throws ContraditionException {
+			return RefsetMember.this.getVersion(c);
+		}
+
+		public Collection<RefsetMember<R,C>.Version> getVersions(Coordinate c) {
+			return RefsetMember.this.getVersions(c);
+		}		
 				
 	}
 
@@ -421,7 +432,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 		return Collections.unmodifiableList(new ArrayList<Version>(getVersions()));
 	}
 
-	protected List<? extends Version> getVersions() {
+	public List<? extends Version> getVersions() {
 		if (versions == null) {
 			int count = 1;
 			if (revisions != null) {
@@ -522,6 +533,28 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 
 
 	@Override
+	public RefsetMember<R,C>.Version getVersion(Coordinate c)
+			throws ContraditionException {
+		List<RefsetMember<R,C>.Version> vForC = getVersions(c);
+		if (vForC.size() == 0) {
+			return null;
+		}
+		if (vForC.size() > 1) {
+			throw new ContraditionException(vForC.toString());
+		}
+		return vForC.get(0);
+	}
+
+	@Override
+	public List<RefsetMember<R,C>.Version> getVersions(Coordinate c) {
+		List<RefsetMember<R,C>.Version> returnTuples = new ArrayList<RefsetMember<R,C>.Version>(2);
+		getVersionComputer().addSpecifiedVersions(c.getAllowedStatusNids(), (NidSetBI) null, c.getPositionSet(),
+				returnTuples, getVersions(), c.getPrecedence(), c.getContradictionManager());
+		return returnTuples;
+	}
+
+
+	@Override
 	protected void clearVersions() {
 		versions = null;
 	}
@@ -529,5 +562,9 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
     public boolean hasExtensions() throws IOException {
          return getEnclosingConcept().hasExtensionsForComponent(nid);
      }
+    @Override
+	public String toUserString() {
+        return toString();
+	}
 
 }

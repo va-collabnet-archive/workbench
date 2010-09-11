@@ -17,7 +17,6 @@ import javax.swing.JFrame;
 
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
-import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
@@ -30,7 +29,6 @@ import org.ihtsdo.concept.BdbLegacyFixedFactory;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.ConceptBdb;
 import org.ihtsdo.concept.OFFSETS;
-import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.db.bdb.id.UuidBdb;
@@ -44,6 +42,8 @@ import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ComponentBI;
+import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 import com.sleepycat.je.CheckpointConfig;
@@ -440,7 +440,7 @@ public class Bdb {
 		return uuidDb;
 	}
 
-	public static I_AmTermComponent getComponent(int nid) throws IOException {
+	public static ComponentBI getComponent(int nid) throws IOException {
 		int cNid = Bdb.getConceptNid(nid);
         if (cNid == Integer.MAX_VALUE) {
             return null;
@@ -524,7 +524,7 @@ public class Bdb {
 		int cNid = Bdb.getConceptNid(nid);
 		assert cNid != Integer.MAX_VALUE: "No cNid for nid: " + nid;
 		Concept c = Concept.get(cNid);
-		ConceptComponent<?, ?> component = c.getComponent(nid);
+		ComponentChroncileBI<?> component = c.getComponent(nid);
 		if (component != null) {
 	        return component.getPrimUuid();
 		}

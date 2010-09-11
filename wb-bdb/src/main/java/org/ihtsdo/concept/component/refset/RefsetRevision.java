@@ -95,4 +95,10 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>,
     }
     
     public abstract V makeAnalog();
+    
+    @Override
+	public String toUserString() {
+        return toString();
+	}
+
 }

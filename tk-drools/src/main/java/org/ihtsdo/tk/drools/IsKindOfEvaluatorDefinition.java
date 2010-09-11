@@ -32,6 +32,7 @@ import org.drools.spi.FieldValue;
 import org.drools.spi.InternalReadAccessor;
 import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 
@@ -60,7 +61,14 @@ public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
 
 		private boolean testKindOf(final Object value1, final Object value2) {
 			try {
-				ConceptVersionBI possibleKind = (ConceptVersionBI) value1;
+				ConceptVersionBI possibleKind = null;
+				if (ConceptVersionBI.class.isAssignableFrom(value1.getClass())) {
+					possibleKind = (ConceptVersionBI) value1;
+				} else if (ConceptFact.class.isAssignableFrom(value1.getClass())) {
+					possibleKind = ((ConceptFact) value1).getConcept();
+				} else {
+					throw new UnsupportedOperationException("Can't convert: " + value1);
+				}
 				Coordinate coordinate = possibleKind.getCoordinate();	
 				ConceptVersionBI parentKind = null;
 				
@@ -68,6 +76,9 @@ public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
 					parentKind = (ConceptVersionBI) value2;
 				} else if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
 					parentKind = ((ConceptSpec) value2).get(coordinate);
+				} else if (ConceptFact.class.isAssignableFrom(value2.getClass())) {
+					ConceptFact fact = (ConceptFact) value2;
+					parentKind = (ConceptVersionBI) fact.getConcept();
 				}
 				return this.getOperator().isNegated() ^ (possibleKind.isKindOf(parentKind));
 			} catch (IOException e) {

@@ -244,7 +244,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
     }
     
 	@SuppressWarnings("unchecked")
-	protected List<Version> getVersions() {
+	public List<Version> getVersions() {
 		if (versions == null) {
 			int count = 1;
 			if (revisions != null) {

@@ -97,7 +97,7 @@ public class ConceptBdb extends ComponentBdb {
         NidCNidMapBdb nidCidMap = Bdb.getNidCNidMap();
         for (int nid : nids) {
             assert nid != 0 : "nid is 0: " + nids;
-            nidCidMap.setCidForNid(cNid, nid);
+            nidCidMap.setCNidForNid(cNid, nid);
         }
     }
 

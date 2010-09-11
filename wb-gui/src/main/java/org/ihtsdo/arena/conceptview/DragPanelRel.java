@@ -2,17 +2,12 @@ package org.ihtsdo.arena.conceptview;
 
 import java.awt.LayoutManager;
 import java.awt.datatransfer.DataFlavor;
-import java.util.Collection;
 
-import javax.swing.Action;
 import javax.swing.TransferHandler;
 
-import org.dwfa.ace.api.I_RelTuple;
-import org.ihtsdo.arena.context.action.I_HandleContext;
-import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
-public class DragPanelRel extends DragPanel<RelationshipVersionBI> {
+public class DragPanelRel extends ComponentVersionDragPanel<RelationshipVersionBI> {
 
 	/**
 	 * 
@@ -20,12 +15,12 @@ public class DragPanelRel extends DragPanel<RelationshipVersionBI> {
 	private static final long serialVersionUID = 1L;
 
 	
-	public DragPanelRel(I_HandleContext context) {
-		super(context);
+	public DragPanelRel(ConceptViewSettings settings) {
+		super(settings);
 	}
 
-	public DragPanelRel(LayoutManager layout, I_HandleContext context) {
-		super(layout, context);
+	public DragPanelRel(LayoutManager layout, ConceptViewSettings settings) {
+		super(layout, settings);
 	}
 
 	@Override
@@ -52,17 +47,12 @@ public class DragPanelRel extends DragPanel<RelationshipVersionBI> {
 		return thingToDrag;
 	}
 
-	public RelationshipVersionBI getDraggedRel() {
+	public RelationshipVersionBI getDraggedThing() {
 		return thingToDrag;
 	}
 	
-	public void setDraggedRel(I_RelTuple rel) {
-		setDraggedThing(rel);
-	}
 
-	@Override
-	protected Collection<Action> getActions(ComponentBI targetComponent, ComponentBI droppedComponent) {
-		return context.dropOnRel(targetComponent.getNid(), droppedComponent.getNid());
+	public void setDraggedThing(RelationshipVersionBI rel) {
+		// TODO handle drop.
 	}
-
 }

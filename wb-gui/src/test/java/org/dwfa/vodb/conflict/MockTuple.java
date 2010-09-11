@@ -52,11 +52,7 @@ public class MockTuple implements I_AmTuple {
     public I_AmTermComponent getFixedPart() {
         return new I_AmTermComponent() {
 
-            public int getTermComponentId() {
-                return id;
-            }
-
-            public int getNid() {
+             public int getNid() {
                 return id;
             }
 
@@ -81,7 +77,18 @@ public class MockTuple implements I_AmTuple {
 			}
 
 			@Override
-			public List<UUID> getUUIDs() throws IOException {
+			public List<UUID> getUUIDs() {
+                throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public UUID getPrimUuid() {
+                throw new UnsupportedOperationException();
+			}
+
+
+			@Override
+			public String toUserString() {
                 throw new UnsupportedOperationException();
 			}
 
@@ -220,8 +227,18 @@ public class MockTuple implements I_AmTuple {
 	}
 
 	@Override
-	public List<UUID> getUUIDs() throws IOException {
+	public List<UUID> getUUIDs() {
         throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public UUID getPrimUuid() {
+	       throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public String toUserString() {
+	       throw new UnsupportedOperationException();
 	}
 
 }

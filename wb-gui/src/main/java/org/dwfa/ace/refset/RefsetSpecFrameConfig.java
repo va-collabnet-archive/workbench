@@ -74,6 +74,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -83,7 +84,11 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
     I_ConfigAceFrame frameConfig;
 
-    public Set<PathBI> getPromotionPathSet() {
+    public Coordinate getCoordinate() {
+		return frameConfig.getCoordinate();
+	}
+
+	public Set<PathBI> getPromotionPathSet() {
 		return frameConfig.getPromotionPathSet();
 	}
 

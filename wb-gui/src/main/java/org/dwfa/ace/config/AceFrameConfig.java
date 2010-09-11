@@ -123,6 +123,7 @@ import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
+import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -3051,4 +3052,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setShowPromotionTab(Boolean show) {
         aceFrame.getCdePanel().setShowPromotionTab(show);
     }
+
+	@Override
+	public Coordinate getCoordinate() {
+		return  new Coordinate(getPrecedence(), getViewPositionSetReadOnly(), 
+				getAllowedStatus(), getDestRelTypes(), getConflictResolutionStrategy());
+	}
 }

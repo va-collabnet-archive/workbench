@@ -263,7 +263,7 @@ public class CidIntMember extends RefsetMember<CidIntRevision, CidIntMember> imp
 		setC1Nid(c1id);
 	}
 	@SuppressWarnings("unchecked")
-	protected List<Version> getVersions() {
+	public List<Version> getVersions() {
 		if (versions == null) {
 			int count = 1;
 			if (revisions != null) {

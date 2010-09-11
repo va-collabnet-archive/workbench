@@ -12,6 +12,11 @@ public class Coordinate {
 			NidSetBI allowedStatusNids, NidSetBI isaTypeNids, 
 			ContradictionManagerBI contradictionManager) {
 		super();
+		assert precedence != null;
+		assert positionSet != null;
+		assert allowedStatusNids != null;
+		assert isaTypeNids != null;
+		assert contradictionManager != null;
 		this.precedence = precedence;
 		this.positionSet = positionSet;
 		this.allowedStatusNids = allowedStatusNids;

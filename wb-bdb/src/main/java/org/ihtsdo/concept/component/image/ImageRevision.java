@@ -6,6 +6,7 @@ import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.Terms;
+import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.api.ContraditionException;
@@ -218,5 +219,16 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 			Coordinate c) {
 		return primordialComponent.getVersions(c);
 	}		
+
+    @Override
+	public String toUserString() {
+        StringBuffer buf = new StringBuffer();
+        ConceptComponent.addTextToBuffer(buf, typeNid);
+        buf.append("; ");
+        buf.append(primordialComponent.getFormat());
+        buf.append(": ");
+        buf.append(textDescription);
+        return buf.toString();
+	}
 
 }

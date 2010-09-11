@@ -1,78 +1,340 @@
 package org.ihtsdo.arena.conceptview;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.ComponentOrientation;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
+import java.awt.GridLayout;
 import java.awt.HeadlessException;
+import java.awt.Image;
 import java.awt.LayoutManager;
 import java.awt.MouseInfo;
 import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceDropEvent;
+import java.awt.dnd.DragSourceEvent;
+import java.awt.dnd.DragSourceListener;
+import java.awt.dnd.InvalidDnDOperationException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.awt.image.FilteredImageSource;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
+import java.util.TooManyListenersException;
+import java.util.logging.Level;
 
 import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.BoundedRangeModel;
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.TransferHandler;
 
+import org.drools.KnowledgeBase;
+import org.drools.logger.KnowledgeRuntimeLogger;
+import org.drools.logger.KnowledgeRuntimeLoggerFactory;
+import org.drools.runtime.StatefulKnowledgeSession;
+import org.dwfa.ace.TermLabelMaker;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.arena.context.action.I_HandleContext;
-import org.ihtsdo.tk.api.ComponentBI;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
-import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
+import org.ihtsdo.arena.ScrollablePanel;
+import org.ihtsdo.arena.ScrollablePanel.ScrollDirection;
+import org.ihtsdo.arena.context.action.DropActionPanel;
+import org.ihtsdo.arena.drools.EditPanelKb;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.drools.facts.Context;
+import org.ihtsdo.tk.drools.facts.FactFactory;
+import org.ihtsdo.tk.spec.SpecBI;
 
-public abstract class DragPanel<T extends ComponentBI> extends JPanel implements Transferable {
-	protected class DragPanelTransferHandler extends TransferHandler {
+import sun.awt.dnd.SunDragSourceContextPeer;
 
+public abstract class  DragPanel<T extends Object> extends JPanel implements Transferable {
+	
+	private class DragPanelDragSourceListener implements DragSourceListener {
+
+        public void dragDropEnd(DragSourceDropEvent dsde) {}
+
+        public void dragEnter(DragSourceDragEvent dsde) {}
+
+        public void dragExit(DragSourceEvent dse) {}
+
+        public void dragOver(DragSourceDragEvent dsde) {}
+
+        public void dropActionChanged(DragSourceDragEvent dsde) {}
+    }
+
+    private class DragGestureListenerWithImage implements DragGestureListener {
+
+        DragSourceListener dsl;
+
+        public DragGestureListenerWithImage(DragSourceListener dsl) {
+            super();
+            this.dsl = dsl;
+        }
+
+        public void dragGestureRecognized(DragGestureEvent dge) {
+            Image dragImage = getDragImage();
+            Point imageOffset = new Point(0, 0);
+            try {
+				dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, 
+						transferHandler.createTransferable(DragPanel.this), dsl);
+			} catch (InvalidDnDOperationException e) {
+                AceLog.getAppLog().log(Level.WARNING, e.getMessage(), e);
+                AceLog.getAppLog().log(Level.INFO, "Resetting SunDragSourceContextPeer [1]");
+                SunDragSourceContextPeer.setDragDropInProgress(false);
+			}
+        }
+    }
+
+	
+	public class DropPanelActionManager implements ActionListener, I_DispatchDragStatus  {
 		
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
+		
+		private Timer timer;
+		private boolean dragging = false;
+		private JComponent dropPanel = new JLabel("dropPanel");
+		private boolean panelAdded = false;
+		private JScrollPane sfpScroller;
+		private boolean gridLayout = true;
+		private JPanel sfp;
+		private Collection<JComponent> addedDropComponents = new ArrayList<JComponent>();
+		private JLayeredPane rootLayers;
+		
+		public DropPanelActionManager() {
+			super();
+			new DropPanelProxy(this);
+			timer = new Timer(50, this);
+		}
+		public void dragStarted() {
+			
+			if (thingToDrag == null) {
+				return;
+			}
+			LayoutManager layout = new FlowLayout(FlowLayout.LEADING, 5, 5);
+			sfp = new ScrollablePanel(layout, ScrollDirection.LEFT_TO_RIGHT);
+			if (gridLayout) {
+				layout = new GridLayout(1, 0, 5, 5);
+				sfp = new JPanel(layout);
+			}
+			sfp.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+			dropPanel = new JPanel(new BorderLayout());
+			JPanel dropTargetPanels = new JPanel(new GridLayout(1, 1));
+			JLabel dropPanelLabel = new JLabel("    " + getUserString(thingToDrag));
+			dropPanelLabel.setFont(dropPanelLabel.getFont().deriveFont(settings.getFontSize()));
+			dropPanelLabel.setOpaque(true);
+			dropPanelLabel.setBackground(ConceptViewTitle.TITLE_COLOR);
+			dropPanel.add(dropPanelLabel, BorderLayout.PAGE_START);
+			dropPanel.add(dropTargetPanels, BorderLayout.CENTER);
+			sfpScroller = new JScrollPane(sfp);
+			sfpScroller.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+			sfpScroller.setAutoscrolls(true);
+			sfpScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+			sfpScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+			dropTargetPanels.add(sfpScroller);
+			dragging = true;
+			timer.start();
+		}
+		public void dragFinished() {
+			timer.stop();
+			dragging = false;
+        	setDragPanelVisible(false);
+        	dropPanel = null;
+        	anotherDragging = false;
+        	addedDropComponents.clear();
+        	dropComponents.clear();
+        	actionList.clear();
+        	lastThingBeingDropped = null;
+		}
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (DragPanel.this.isShowing() == false) {
+				return;
+			}
+			if (dragging) {
+				if (addedDropComponents.equals(dropComponents) == false) {
+					sfp.removeAll();
+					addedDropComponents = new ArrayList<JComponent>();
+					for (JComponent c: dropComponents) {
+						addedDropComponents.add(c);
+						sfp.add(c);
+					}
+				}
+				
+				if (addedDropComponents.size() == 0) {
+					return;
+				}
+				
+				Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
+				Point mouseLocationForDragPanel = mouseLocation.getLocation();
+	            SwingUtilities.convertPointFromScreen(mouseLocationForDragPanel, DragPanel.this);
+	            if (DragPanel.this.contains(mouseLocationForDragPanel)) {
+	    			if (DragPanel.this.isInGroup()) {
+			            setDragPanelVisible(true);
+		            } else if (!anotherDragging && DragPanel.this.isShowing()) {
+			            anotherDragging = true;
+			            setDragPanelVisible(true);
+		            } else if (DragPanelRelGroup.class.isAssignableFrom(DragPanel.this.getClass())) {
+			            setDragPanelVisible(true);
+		            }
+				
 
+	            } else {
+					Point mouseLocationForDropPanel = mouseLocation.getLocation();
+    	            SwingUtilities.convertPointFromScreen(mouseLocationForDropPanel, dropPanel);
+	            	if (dropPanel.contains(mouseLocationForDropPanel) && panelAdded) {
+	            		if (mouseLocationForDropPanel.x < 10) {
+	            			BoundedRangeModel scrollerModel = sfpScroller.getHorizontalScrollBar().getModel();
+	            			scrollerModel.setExtent(1);
+	            			if (scrollerModel.getValue() > scrollerModel.getMinimum()) {
+	            				int newValue = Math.max(scrollerModel.getValue() - 5, 0);
+	            				//AceLog.getAppLog().info("setting 1: " + newValue + " max: " + scrollerModel.getMaximum());
+	            				scrollerModel.setValue(newValue);
+	            			}
+	            		} else if (dropPanel.getWidth() - mouseLocationForDropPanel.x < 10) {
+	            			BoundedRangeModel scrollerModel = sfpScroller.getHorizontalScrollBar().getModel();
+	            			scrollerModel.setExtent(1);
+	            			if (scrollerModel.getValue() < scrollerModel.getMaximum()) {
+	            				int newValue = Math.min(scrollerModel.getValue() + 5, scrollerModel.getMaximum());
+	            				//AceLog.getAppLog().info("setting 2: " + newValue + " max: " + scrollerModel.getMaximum());
+	            				scrollerModel.setValue(newValue);
+	            			}
+	            		}
+	            	} else {
+		            	setDragPanelVisible(false);
+	            	}
+	            	
+	            }
+			} else {
+            	setDragPanelVisible(false);
+ 			}
+		}
+		
+		private void setDragPanelVisible(boolean visible) {
+			if (visible) {
+				if (!panelAdded) {
+					if (DragPanel.this.isReallyVisible()) {
+						panelAdded = true;
+						sfpScroller.getHorizontalScrollBar().setValue(0);
+						sfpScroller.getVerticalScrollBar().setValue(0);
+						Point loc = DragPanel.this.getLocationOnScreen();
+						rootLayers = DragPanel.this.getRootPane().getLayeredPane();
+						rootLayers.add(dropPanel, JLayeredPane.PALETTE_LAYER);
+						if (DragPanelRelGroup.class.isAssignableFrom(DragPanel.this.getClass())) {
+							rootLayers.setLayer(dropPanel, JLayeredPane.PALETTE_LAYER, -1);
+						} else {
+							rootLayers.setLayer(dropPanel, JLayeredPane.PALETTE_LAYER, 1);
+						}
+						SwingUtilities.convertPointFromScreen(loc, rootLayers);
+						dropPanel.setSize(DragPanel.this.getWidth() - getDropPopupInset(), 48);
+						dropPanel.setLocation(loc.x + getDropPopupInset(), loc.y - dropPanel.getHeight());
+						dropPanel.setVisible(true);
+						dropPanel.setBorder(BorderFactory.createLineBorder(Color.gray));
+					}
+				}
+			} else {
+				if (panelAdded) {
+					if (!DragPanel.this.isInGroup()) {
+						anotherDragging = false;
+					}
+					panelAdded = false;
+					dropPanel.setVisible(false);
+					if (rootLayers != null) {
+						rootLayers.remove(dropPanel);
+					}
+				}
+			}
+		}
+
+	}
+
+	protected class DragPanelTransferHandler extends TransferHandler {
+		private static final long serialVersionUID = 1L;
+		
+		
 		public DragPanelTransferHandler(String propName) {
 			super(propName);
 		}
 
 		@Override
 		public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
-			for (DataFlavor f: transferFlavors) {
-				if (getSupportedImportFlavors().contains(f)) {
-					return true;
-				}
-			}
-			return false;
+			throw new UnsupportedOperationException();
 		}
 
 		@Override
 		public boolean canImport(TransferSupport support) {
-			if (super.canImport(support)) {
-				try {
-					for (DataFlavor f: getSupportedImportFlavors()) {
-						if (support.getTransferable().isDataFlavorSupported(f)) {
-							Object transferData = support.getTransferable().getTransferData(f);
-							T thingBeingDragged = getThingToDrag();
-							if (transferData != thingBeingDragged) {
-								return true;
+			try {
+				Object thingBeingDropped = null;
+				if (support.isDataFlavorSupported(DragPanelDataFlavors.conceptFlavor)) {
+					thingBeingDropped = (I_GetConceptData) 
+						support.getTransferable().getTransferData(DragPanelDataFlavors.conceptFlavor);
+				} else if (support.isDataFlavorSupported(DragPanelDataFlavors.descVersionFlavor)) {
+					thingBeingDropped = (DescriptionVersionBI) 
+						support.getTransferable().getTransferData(DragPanelDataFlavors.descVersionFlavor);
+				} else if (support.isDataFlavorSupported(DragPanelDataFlavors.relGroupFlavor)) {
+					thingBeingDropped = (RelGroupVersionBI) 
+						support.getTransferable().getTransferData(DragPanelDataFlavors.relGroupFlavor);
+				} else if (support.isDataFlavorSupported(DragPanelDataFlavors.relVersionFlavor)) {
+					thingBeingDropped = (RelationshipVersionBI) 
+						support.getTransferable().getTransferData(DragPanelDataFlavors.relVersionFlavor);
+				} else if (support.getComponent() == DragPanel.this) {
+					thingBeingDropped = DragPanel.this.thingToDrag;
+				}
+				
+				if (thingBeingDropped != null) {
+					if (lastThingBeingDropped == null || 
+							thingBeingDropped.equals(lastThingBeingDropped) == false) {
+						lastThingBeingDropped = thingBeingDropped;
+						actionList.clear();
+						getKbActions(thingBeingDropped);
+						dropComponents.clear();
+						if (actionList.size() > -1) {					
+							for (Action a: actionList) {
+								try {
+									dropComponents.add(new DropActionPanel(a));
+								} catch (TooManyListenersException e) {
+									AceLog.getAppLog().alertAndLogException(e);
+								}
 							}
+							return true;
 						}
 					}
-					
-				} catch (UnsupportedFlavorException e) {
-					AceLog.getAppLog().alertAndLogException(e);
-				} catch (IOException e) {
-					AceLog.getAppLog().alertAndLogException(e);
+				} else {
+					System.out.println("Changing to null");
+					actionList.clear();
+					dropComponents.clear();
 				}
+			} catch (UnsupportedFlavorException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			} catch (IOException e) {
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 			return false;
 		}
@@ -123,19 +385,86 @@ public abstract class DragPanel<T extends ComponentBI> extends JPanel implements
 
 	private boolean dragEnabled;
 	
+	private I_DispatchDragStatus dropPanelMgr = new DropPanelActionManager();
+	
+	private ConceptViewSettings settings;
+	
+	private Collection<Action> actionList = Collections.synchronizedCollection(new ArrayList<Action>());
+
+	private Collection<JComponent> dropComponents = Collections.synchronizedList(new ArrayList<JComponent>());
+
+	private Object lastThingBeingDropped;
+
+
+	private static boolean anotherDragging = false;
+	
 	@SuppressWarnings("unused")
 	private Set<DataFlavor> supportedImportFlavors = null;
 	
-	protected I_HandleContext context;
+	protected boolean inGroup;
 	
-	public DragPanel(I_HandleContext context) {
-		super();
-		this.context = context;
+	private static KnowledgeBase kbase;
+	
+
+	public boolean isInGroup() {
+		return inGroup;
 	}
 
-	public DragPanel(LayoutManager layout, I_HandleContext context) {
+	public void setInGroup(boolean inGroup) {
+		this.inGroup = inGroup;
+	}
+
+	public DragPanel(ConceptViewSettings settings) {
+		super();
+		setup(settings);
+	}
+
+	public DragPanel(LayoutManager layout, ConceptViewSettings settings) {
 		super(layout);
-		this.context = context;
+		setup(settings);
+	}
+
+	private void setup(ConceptViewSettings settings) {
+		this.settings = settings;
+		if (kbase == null) {
+			kbase = EditPanelKb.setupKb("org/ihtsdo/arena/drools/ContextualDropActions.drl");
+		}
+	}
+
+	private void getKbActions(Object thingToDrop) {
+		settings.getView().setupDrop(thingToDrop);
+		try {
+			actionList.clear();
+			if (I_GetConceptData.class.isAssignableFrom(thingToDrop.getClass())) {
+				I_GetConceptData conceptToDrop = (I_GetConceptData) thingToDrop;
+				thingToDrop = Ts.get().getConceptVersion(settings.getConfig().getCoordinate(), conceptToDrop.getConceptNid());
+			} else if (ComponentVersionBI.class.isAssignableFrom(thingToDrop.getClass()) ||
+					SpecBI.class.isAssignableFrom(thingToDrop.getClass())) {
+				StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
+				boolean uselogger = false;
+				
+				KnowledgeRuntimeLogger logger = null;
+				if (uselogger) {
+					logger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+				}
+				try {
+					ksession.setGlobal("actions", actionList);
+					if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+						AceLog.getAppLog().fine("dropTarget: " + thingToDrag);
+						AceLog.getAppLog().fine("thingToDrop: " + thingToDrop);
+					}			
+					ksession.insert(FactFactory.get(Context.DROP_OBJECT, thingToDrop));
+					ksession.insert(FactFactory.get(Context.DROP_TARGET, thingToDrag));
+					ksession.fireAllRules();
+				} finally {
+					if (logger != null) {
+						logger.close();
+					}
+				}
+			}
+		} catch (Throwable e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
 	}
 
 	public T getThingToDrag() {
@@ -145,53 +474,21 @@ public abstract class DragPanel<T extends ComponentBI> extends JPanel implements
 	public Set<DataFlavor> getSupportedImportFlavors() {
 		return DragPanelDataFlavors.dragPanelFlavorSet;
 	}
-	
-	public void setDraggedThing(Object draggedThing) {
-		JPopupMenu popup = new JPopupMenu();
-		
-		if (ComponentBI.class.isAssignableFrom(draggedThing.getClass())) {
-			ComponentBI component = (ComponentBI) draggedThing;
-	     	for (Action a: getActions(thingToDrag, component)) {
-	    		popup.add(a);
-	    	}
-		}
-		
-		if (DescriptionChronicleBI.class.isAssignableFrom(draggedThing.getClass())) {
-			DescriptionChronicleBI desc = (DescriptionChronicleBI) draggedThing;
-	     	for (Action a: context.dropOnDesc(desc.getConceptNid(), desc.getNid())) {
-	    		popup.add(a);
-	    	}
-		} else if (RelationshipChronicleBI.class.isAssignableFrom(draggedThing.getClass())) {
-			
-		} else if (ConceptChronicleBI.class.isAssignableFrom(draggedThing.getClass())) {
-			
-		}
 
-		if (popup.getComponentCount() > 0) {
-			Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
-	        SwingUtilities.convertPointFromScreen(mouseLocation, this);
-	        popup.show(this, mouseLocation.x, mouseLocation.y);
-		}
-	}
+	DragPanelTransferHandler transferHandler;
 
-	protected abstract Collection<Action> getActions(ComponentBI targetComponent, ComponentBI droppedComponent);
-
+	private int dropPopupInset = 20;
 	public void setupDrag(T thingToDrag) {
 		// I_RelTuple r
 		// List<I_RelTuple> group
 		// I_DescriptionVersioned desc
 		this.thingToDrag = thingToDrag;
-		this.setTransferHandler(new DragPanelTransferHandler("draggedThing"));
-		this.addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent e) {
-				int mode = getTransferMode(); 
-				JComponent comp = (JComponent) e.getSource();
-				TransferHandler th = comp.getTransferHandler();
-				th.exportAsDrag(comp, e, mode);
-				System.out.println("Drag started: " + e.getClickCount());
-				e.consume();
-			}
-		});
+		if (this.transferHandler == null) {
+			this.transferHandler = new DragPanelTransferHandler("draggedThing");
+			this.setTransferHandler(this.transferHandler);
+	        DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY,
+	                new DragGestureListenerWithImage(new DragPanelDragSourceListener()));
+		}
 	}
 
 	public void setDragEnabled(boolean b) {
@@ -222,4 +519,41 @@ public abstract class DragPanel<T extends ComponentBI> extends JPanel implements
 
 	public abstract DataFlavor getNativeDataFlavor();
 
+    public Image getDragImage() {
+        Image image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
+        Graphics g = image.getGraphics();
+        paint(g);
+        FilteredImageSource fis = new FilteredImageSource(image.getSource(), TermLabelMaker.getTransparentFilter());
+        image = Toolkit.getDefaultToolkit().createImage(fis);
+        return image;
+    }
+
+    public int getDropPopupInset() {
+    	return this.dropPopupInset;
+    }
+    public void setDropPopupInset(int inset) {
+    	this.dropPopupInset  = inset;
+    }
+    
+    public boolean isReallyVisible() {
+    	if (!isVisible()) {
+    		return false;
+    	} 
+		Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
+    	Container parent = getParent();
+    	while (parent != null) {
+    		Point parentLoc = new Point(0,0);
+    		SwingUtilities.convertPointToScreen(parentLoc, parent);
+    		Rectangle parentBounds = parent.getBounds();
+    		parentBounds.x = parentLoc.x;
+    		parentBounds.y = parentLoc.y;
+    		if (!parentBounds.contains(mouseLocation)) {
+    			return false;
+    		}
+    		parent = parent.getParent();
+    	}
+    	return true;
+    }
+    
+    public abstract String getUserString(T obj);
 }

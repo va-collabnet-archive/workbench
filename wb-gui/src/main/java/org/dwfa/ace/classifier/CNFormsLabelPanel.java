@@ -96,7 +96,15 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
     public static class ConceptAttrVersion implements I_ConceptAttributeTuple {
         I_ConceptAttributeVersioned core;
 
-        public List<UUID> getUUIDs() throws IOException {
+        public boolean isUncommitted() {
+			return core.isUncommitted();
+		}
+
+		public String toUserString() {
+			return core.toUserString();
+		}
+
+		public List<UUID> getUUIDs() {
 			return core.getUUIDs();
 		}
 
@@ -323,13 +331,26 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 		public int getConceptNid() {
 			return part.getConceptNid();
 		}
+
+		@Override
+		public UUID getPrimUuid() {
+			return core.getPrimUuid();
+		}
     }
 
     
     private static class RelVersion implements I_RelTuple {
 
         I_RelVersioned fixedPart;
-        public List<UUID> getUUIDs() throws IOException {
+        public boolean isUncommitted() {
+			return fixedPart.isUncommitted();
+		}
+
+		public String toUserString() {
+			return fixedPart.toUserString();
+		}
+
+		public List<UUID> getUUIDs() {
 			return fixedPart.getUUIDs();
 		}
 
@@ -381,6 +402,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
 		public void setRefinabilityNid(int nid) {
 			fixedPart.setRefinabilityNid(nid);
+		}
+
+		@Override
+		public UUID getPrimUuid() {
+			return fixedPart.getPrimUuid();
 		}
 
 		I_RelPart part;

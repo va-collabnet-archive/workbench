@@ -37,11 +37,19 @@ import org.ihtsdo.tk.spec.ConceptSpec;
 public class ConceptVersion implements ConceptVersionBI {
 	
 	private Concept concept;
+	public boolean isUncommitted() {
+		return concept.isUncommitted();
+	}
+
+	public UUID getPrimUuid() {
+		return concept.getPrimUuid();
+	}
+
 	public int getConceptNid() {
 		return concept.getConceptNid();
 	}
 
-	public List<UUID> getUUIDs() throws IOException {
+	public List<UUID> getUUIDs() {
 		return concept.getUUIDs();
 	}
 
@@ -324,6 +332,12 @@ public class ConceptVersion implements ConceptVersionBI {
 		return "ConceptVersion coordinate: " + coordinate + 
 			"\nConcept: " + concept.toString();
 	}
+	
+	@Override
+	public String toUserString() {
+		return concept.toString();
+	}
+
 
 	@Override
 	public boolean satisfies(ConstraintBI constraint,
@@ -461,6 +475,42 @@ public class ConceptVersion implements ConceptVersionBI {
 			}
 		}
 		return results;
+	}
+
+	@Override
+	public int getAuthorNid() {
+		try {
+			return getConAttrs().getAuthorNid();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public int getPathNid() {
+		try {
+			return getConAttrs().getPathNid();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public int getStatusNid() {
+		try {
+			return getConAttrs().getStatusNid();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public long getTime() {
+		try {
+			return getConAttrs().getTime();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

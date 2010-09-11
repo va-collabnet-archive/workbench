@@ -8,6 +8,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 import org.ihtsdo.tk.spec.DescriptionSpec;
+import org.ihtsdo.tk.spec.SpecFactory;
 
 import org.ihtsdo.tk.example.binding.Snomed;
 import org.ihtsdo.tk.example.binding.SnomedConstraints;
@@ -51,7 +52,7 @@ rule "FSN not satisfies desc constraint"
 
 		   for (DescriptionVersionBI $d : $c.getDescsActive(WbDescType.FULLY_SPECIFIED.getNid())) {
    		    	templates.put(new DescriptionSpec(null, 
-   		    									  null, 
+   		    									  SpecFactory.get($c), 
    		    									  WbDescType.FULLY_SPECIFIED, 
    		    									  $d.getText() + " (ADD TAG)"), 
    		    									  $d.getNid());
@@ -69,7 +70,7 @@ rule "no FSN"
 
 		for (DescriptionVersionBI $d : $c.getDescsActive(WbDescType.PREFERRED.getNid())) {
    		    	templates.put(new DescriptionSpec(null, 
-   		    									  null, 
+   		    									  SpecFactory.get($c), 
    		    									  WbDescType.FULLY_SPECIFIED, 
    		    									  $d.getText() + " (ADD TAG)"), 
    		    									  $d.getNid());

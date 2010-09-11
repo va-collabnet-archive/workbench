@@ -162,19 +162,19 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
                 return new StringWithDescTuple(Boolean.toString(desc.isInitialCaseSignificant()), desc, false,
                     inConflict);
             case STATUS:
-                     return new StringWithDescTuple(getPrefText(desc.getStatusId()), desc, false, inConflict);
+                     return new StringWithDescTuple(getPrefText(desc.getStatusNid()), desc, false, inConflict);
              case TYPE:
-                   return new StringWithDescTuple(getPrefText(desc.getTypeId()), desc, false, inConflict);
+                   return new StringWithDescTuple(getPrefText(desc.getTypeNid()), desc, false, inConflict);
             case VERSION:
-                if (desc.getVersion() == Integer.MAX_VALUE) {
+                if (desc.getTime() == Long.MAX_VALUE) {
                     return new StringWithDescTuple(ThinVersionHelper.uncommittedHtml(), desc, false, inConflict);
                 }
                 return new StringWithDescTuple(ThinVersionHelper.format(desc.getVersion()), desc, false, inConflict);
             case PATH:
                 try {
-                    return new StringWithDescTuple(getPrefText(desc.getPathId()), desc, false, inConflict);
+                    return new StringWithDescTuple(getPrefText(desc.getPathNid()), desc, false, inConflict);
                 } catch (Exception e) {
-                    return new StringWithDescTuple(Integer.toString(desc.getPathId()) + " no pref desc...", desc,
+                    return new StringWithDescTuple(Integer.toString(desc.getPathNid()) + " no pref desc...", desc,
                         false, inConflict);
                 }
             }
@@ -215,7 +215,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
         try {
             I_DescriptionTuple desc = getDescription(row);
             boolean changed = false;
-            if (desc.getVersion() == Integer.MAX_VALUE) {
+            if (desc.getTime() == Long.MAX_VALUE) {
                 switch (columns[col]) {
                 case DESC_ID:
                     break;
@@ -235,12 +235,12 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
                     break;
                 case STATUS:
                     Integer statusId = (Integer) value;
-                    desc.setStatusId(statusId);
+                    desc.setStatusNid(statusId);
                     changed = true;
                     break;
                 case TYPE:
                     Integer typeId = (Integer) value;
-                    desc.setTypeId(typeId);
+                    desc.setTypeNid(typeId);
                     changed = true;
                     break;
                 case VERSION:

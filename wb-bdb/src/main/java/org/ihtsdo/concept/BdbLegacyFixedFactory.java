@@ -16,8 +16,8 @@ import org.dwfa.tapi.I_ManifestLocally;
 import org.dwfa.tapi.I_RelateConceptsLocally;
 import org.dwfa.tapi.I_StoreLocalFixedTerminology;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.tk.api.ComponentChroncileBI;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -121,9 +121,9 @@ public class BdbLegacyFixedFactory implements I_StoreLocalFixedTerminology {
         	int cNid = Bdb.getConceptNid(nid);
         	Concept c = Bdb.getConceptDb().getConcept(cNid);
         	if (cNid == nid) {
-        		return c.getUids();
+        		return c.getUUIDs();
         	}
-        	ConceptComponent<?, ?> cc = c.getComponent(nid);
+        	ComponentChroncileBI<?> cc = c.getComponent(nid);
             return cc.getUUIDs();
         } catch (DatabaseException e) {
             throw new ToIoException(e);

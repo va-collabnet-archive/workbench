@@ -238,7 +238,7 @@ public class BdbCommitManager {
                 Collection<Integer> nids = concept.getAllNids();
                 NidCNidMapBdb nidCidMap = Bdb.getNidCNidMap();
                 for (int nid : nids) {
-                    nidCidMap.setCidForNid(concept.getNid(), nid);
+                    nidCidMap.setCNidForNid(concept.getNid(), nid);
                 }
             } catch (IOException e) {
                AceLog.getAppLog().alertAndLogException(e);

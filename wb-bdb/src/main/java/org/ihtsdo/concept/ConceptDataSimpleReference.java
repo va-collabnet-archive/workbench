@@ -35,6 +35,8 @@ import org.ihtsdo.db.bdb.I_GetNidData;
 import org.ihtsdo.db.bdb.NidDataFromBdb;
 import org.ihtsdo.db.bdb.NidDataInMemory;
 import org.ihtsdo.db.util.NidPairForRel;
+import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -444,7 +446,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
 
     @Override
-    public ConceptComponent<?, ?> getComponent(int nid) throws IOException {
+    public ComponentChroncileBI<?> getComponent(int nid) throws IOException {
         if (getConceptAttributes() != null && getConceptAttributes().nid == nid) {
             return getConceptAttributes();
         }
@@ -476,6 +478,12 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                     return r;
                 }
             }
+        }
+        
+        for (RelGroupChronicleBI group: enclosingConcept.getRelGroups()) {
+        	if (group.getNid() == nid) {
+        		return group;
+        	}
         }
         return null;
     }

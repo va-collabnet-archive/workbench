@@ -66,6 +66,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
+import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -82,6 +83,10 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     I_ConfigAceFrame baseFrame;
+
+	public Coordinate getCoordinate() {
+		return baseFrame.getCoordinate();
+	}
 
 	public Set<PathBI> getPromotionPathSet() {
 		return baseFrame.getPromotionPathSet();

@@ -1,16 +1,19 @@
 package org.ihtsdo.tk.api;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
 
 public interface ComponentBI {
 
-	public List<UUID> getUUIDs() throws IOException;
+	public UUID getPrimUuid();
+	
+	public List<UUID> getUUIDs();
 
 	public int getNid();
 	
 	public int getConceptNid();
+	
+	public String toUserString();
 
 }

@@ -312,7 +312,7 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
 		throw new UnsupportedOperationException();
 	}
 	@SuppressWarnings("unchecked")
-	protected List<Version> getVersions() {
+	public List<Version> getVersions() {
 		if (versions == null) {
 			int count = 1;
 			if (revisions != null) {

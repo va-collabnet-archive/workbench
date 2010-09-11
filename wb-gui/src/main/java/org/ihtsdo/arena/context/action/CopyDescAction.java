@@ -7,6 +7,8 @@ import javax.swing.Icon;
 
 public class CopyDescAction extends AbstractAction {
 
+	private static final long serialVersionUID = 1L;
+
 	public CopyDescAction() {
 	}
 

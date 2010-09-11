@@ -17,6 +17,7 @@ import org.drools.spi.InternalReadAccessor;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.constraint.ConstraintBI;
 import org.ihtsdo.tk.api.constraint.ConstraintCheckType;
+import org.ihtsdo.tk.drools.facts.ConceptFact;
 
 public class SatisfiesConstraintEvaluatorDefinition implements EvaluatorDefinition {
 	
@@ -56,7 +57,14 @@ public class SatisfiesConstraintEvaluatorDefinition implements EvaluatorDefiniti
 
 		private boolean testSatisfiesConstraint(final Object value1, final Object value2) {
 			try {
-				ConceptVersionBI conceptVersion = (ConceptVersionBI) value1;
+				ConceptVersionBI conceptVersion = null;
+				if (ConceptVersionBI.class.isAssignableFrom(value1.getClass())) {
+					conceptVersion = (ConceptVersionBI) value1;
+				} else if (ConceptFact.class.isAssignableFrom(value1.getClass())) {
+					conceptVersion = ((ConceptFact) value1).getConcept();
+				} else {
+					throw new UnsupportedOperationException("Can't convert: " + value1);
+				}
 				ConstraintBI constraint = (ConstraintBI) value2;				
 				return this.getOperator().isNegated() ^ (conceptVersion.satisfies(constraint, subjectCheck, propertyCheck, valueCheck));
 			} catch (Exception e) {

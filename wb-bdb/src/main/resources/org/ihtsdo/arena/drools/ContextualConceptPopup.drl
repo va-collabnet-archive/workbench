@@ -1,0 +1,36 @@
+#created on: Aug 15, 2010
+package org.ihtsdo.arena.drools
+
+#list any import classes here.
+import java.util.Collection;
+
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+
+import org.ihtsdo.arena.context.action.CopyDescAction;
+import org.ihtsdo.arena.context.action.MoveDescAction;
+
+import org.ihtsdo.tk.spec.DescriptionSpec;
+
+import org.ihtsdo.tk.example.binding.Snomed;
+import org.ihtsdo.tk.example.binding.SnomedConstraints;
+import org.ihtsdo.tk.example.binding.SnomedRelType;
+import org.ihtsdo.tk.example.binding.SnomedRelSpec;
+import org.ihtsdo.tk.example.binding.Taxonomies;
+import org.ihtsdo.tk.example.binding.WbDescType;
+
+
+
+#declare any global variables here
+
+global Collection actions;
+
+rule "add simple actions"
+	
+	when
+		$c : ConceptVersionBI();
+	then 
+		actions.add(new CopyDescAction("Copy to Concept"));
+		actions.add(new MoveDescAction("Move to Concept"));
+end
+

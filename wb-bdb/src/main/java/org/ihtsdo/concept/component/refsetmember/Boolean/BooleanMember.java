@@ -125,7 +125,7 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
 
     
 	@SuppressWarnings("unchecked")
-	protected List<Version> getVersions() {
+	public List<Version> getVersions() {
 		if (versions == null) {
 			int count = 1;
 			if (revisions != null) {

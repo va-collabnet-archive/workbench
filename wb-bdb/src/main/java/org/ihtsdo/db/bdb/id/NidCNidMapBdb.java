@@ -191,7 +191,7 @@ public class NidCNidMapBdb extends ComponentBdb {
 		return nidCNidMaps.get()[mapIndex][indexInMap];
 	}
 	
-	public void setCidForNid(int cNid, int nid) throws IOException {
+	public void setCNidForNid(int cNid, int nid) throws IOException {
         assert cNid != Integer.MAX_VALUE;
         int mapIndex = (nid  - Integer.MIN_VALUE) / NID_CNID_MAP_SIZE;
         assert mapIndex >= 0: "cNid: " + cNid + " nid: " + nid + " mapIndex: " + mapIndex;

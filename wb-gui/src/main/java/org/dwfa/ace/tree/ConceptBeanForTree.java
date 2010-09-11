@@ -64,12 +64,24 @@ import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 
 public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<ConceptBeanForTree> {
     I_GetConceptData bean;
-    public Collection<? extends RelGroupChronicleBI> getRelGroups()
+    public boolean isUncommitted() {
+		return bean.isUncommitted();
+	}
+
+	public String toUserString() {
+		return bean.toUserString();
+	}
+
+	public UUID getPrimUuid() {
+		return bean.getPrimUuid();
+	}
+
+	public Collection<? extends RelGroupChronicleBI> getRelGroups()
 			throws IOException, ContraditionException {
 		return bean.getRelGroups();
 	}
 
-	public List<UUID> getUUIDs() throws IOException {
+	public List<UUID> getUUIDs() {
 		return bean.getUUIDs();
 	}
 

@@ -32,7 +32,7 @@ public class NidCNidMapBdbTest {
 			}
 			Assert.assertEquals(nid, i - firstDiff);
 			try {
-				Bdb.getNidCNidMap().setCidForNid(Integer.MIN_VALUE + i, nid);
+				Bdb.getNidCNidMap().setCNidForNid(Integer.MIN_VALUE + i, nid);
 			} catch (IOException e) {
 				Assert.fail(e.getLocalizedMessage());
 			}

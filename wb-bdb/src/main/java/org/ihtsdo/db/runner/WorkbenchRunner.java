@@ -47,6 +47,7 @@ import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.config.AceLoginDialog;
 import org.dwfa.ace.config.AceProtocols;
+import org.dwfa.ace.dnd.DragMonitor;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.svn.SvnPrompter;
 import org.dwfa.ace.tree.ExpandNodeSwingWorker;
@@ -94,6 +95,7 @@ public class WorkbenchRunner {
 	public WorkbenchRunner(String[] args, LifeCycle lc) {
 		try {
 			AceProtocols.setupExtraProtocols();
+			DragMonitor.setup();
 
 			/*
 			 * from http://lists.apple.com/archives/java-dev/2004/oct/msg00591.html

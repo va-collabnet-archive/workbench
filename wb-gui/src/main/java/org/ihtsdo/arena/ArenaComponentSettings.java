@@ -40,6 +40,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.ihtsdo.arena.conceptview.ConceptViewRenderer;
 
@@ -51,8 +52,6 @@ import com.mxgraph.view.mxGraph;
 
 public abstract class ArenaComponentSettings implements Serializable,
 		ComponentListener, HierarchyBoundsListener {
-
-
 
 	/**
 	 * 
@@ -182,6 +181,9 @@ public abstract class ArenaComponentSettings implements Serializable,
 	protected abstract JComponent makeComponent(I_ConfigAceFrame config);
 
 	public abstract String getTitle();
+	
+	public abstract I_GetConceptData getConcept();
+
 
 	public JComponent getComponent(I_ConfigAceFrame config) {
 		JComponent c = makeComponent(config);

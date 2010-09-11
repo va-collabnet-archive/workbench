@@ -3,8 +3,9 @@ package org.ihtsdo.arena.conceptview;
 
 import java.awt.datatransfer.DataFlavor;
 
-import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_RelTuple;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
+import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,14 +19,17 @@ public class DragPanelDataFlavorsTest {
 	@Test
 	public void test() throws Exception {
 		@SuppressWarnings("unused")
-		DataFlavor relGroupFlavor = new DataFlavor("application/x-java-jvm-local-objectref;class=" + 
-				RelGroupForDragPanel.class.getName()) ;
+		DataFlavor relGroupFlavor = new DataFlavor(
+				"application/x-java-jvm-local-objectref;class=" + 
+					RelGroupChronicleBI.class.getName()) ;
 		@SuppressWarnings("unused")
-		DataFlavor descVersionFlavor = new DataFlavor("application/x-java-jvm-local-objectref;class=" + 
-				I_DescriptionTuple.class.getName());
+		DataFlavor descVersionFlavor = new DataFlavor(
+				"application/x-java-jvm-local-objectref;class=" + 
+					DescriptionChronicleBI.class.getName());
 		@SuppressWarnings("unused")
-		DataFlavor relVersionFlavor = new DataFlavor("application/x-java-jvm-local-objectref;class=" + 
-				I_RelTuple.class.getName());
+		DataFlavor relVersionFlavor = new DataFlavor(
+				"application/x-java-jvm-local-objectref;class=" + 
+					RelationshipChronicleBI.class.getName());
 	}
 	
 

@@ -54,6 +54,20 @@ import com.sleepycat.bind.tuple.TupleOutput;
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>> implements
         I_AmTermComponent, I_AmPart, I_AmTuple, I_Identify, I_IdPart, I_IdVersion, I_HandleFutureStatusAtPositionSetup {
 
+	public static void addTextToBuffer(StringBuffer buf, int nidToConvert) {
+        try {
+            if (nidToConvert != 0 && Terms.get().hasConcept(nidToConvert)) {
+                buf.append(Terms.get().getConcept(nidToConvert).getInitialText());
+             } else {
+                buf.append(nidToConvert);
+            }
+        } catch (IOException e) {
+            buf.append(e.getLocalizedMessage());
+        } catch (TerminologyException e) {
+            buf.append(e.getLocalizedMessage());
+        }
+    }
+
 	public static void addNidToBuffer(StringBuffer buf, int nidToConvert) {
         try {
             if (nidToConvert != 0 && Terms.get().hasConcept(nidToConvert)) {
@@ -204,6 +218,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         protected int index = -1;
         private boolean dup = false;
 
+        public boolean isUncommitted() {
+        	return getTime() == Long.MAX_VALUE;
+        }
+        
         @Override
         public boolean hasExtensions() throws IOException {
             return ConceptComponent.this.hasExtensions();
@@ -332,6 +350,13 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 return "Version: " + revisions.get(index).toString();
             }
             return "Version: " + ConceptComponent.this.toString();
+        }
+
+        public String toUserString() {
+            if (index >= 0) {
+                return revisions.get(index).toUserString();
+            }
+            return ConceptComponent.this.toUserString();
         }
 
         public List<IdentifierVersion> getAdditionalIdentifierParts() {
@@ -687,7 +712,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
     }
     
-    public boolean removeRevision(R r) {
+    public abstract String toUserString();
+
+	public boolean removeRevision(R r) {
         boolean changed = false;
         if (revisions != null) {
             synchronized (revisions) {
@@ -782,7 +809,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         assert enclosingConcept != null;
         this.enclosingConceptNid = enclosingConcept.getNid();
         readComponentFromBdb(input);
-        Bdb.getNidCNidMap().setCidForNid(this.enclosingConceptNid, this.nid);
+        Bdb.getNidCNidMap().setCNidForNid(this.enclosingConceptNid, this.nid);
         assert this.primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConcept.getNid();
         assert nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConcept.getNid();
         assert nid != Integer.MIN_VALUE : "Processing nid: " + enclosingConcept.getNid();
@@ -798,7 +825,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         this.nid = Bdb.uuidToNid(eComponent.primordialUuid);
         assert this.nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConcept.getNid();
         this.enclosingConceptNid = enclosingConcept.getNid();
-        Bdb.getNidCNidMap().setCidForNid(this.enclosingConceptNid, this.nid);
+        Bdb.getNidCNidMap().setCNidForNid(this.enclosingConceptNid, this.nid);
         this.primordialSapNid = Bdb.getSapNid(eComponent);
         this.primordialUNid = Bdb.getUuidsToNidMap().getUNid(eComponent.getPrimordialComponentUuid());
         convertId(eComponent.additionalIds);
@@ -1152,6 +1179,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         } else if (revisions.size() == 0) {
             returnValue = revisions.add(r);
         } else if (revisions.get(revisions.size() - 1) != r) {
+        	assert revisions.get(revisions.size() - 1).equals(r) == false;
             returnValue = revisions.add(r);
         }
         r.primordialComponent = (C) this;

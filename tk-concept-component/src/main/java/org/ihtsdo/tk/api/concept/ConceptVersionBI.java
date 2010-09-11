@@ -3,7 +3,7 @@ package org.ihtsdo.tk.api.concept;
 import java.io.IOException;
 import java.util.Collection;
 
-import org.ihtsdo.tk.api.ComponentBI;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSetBI;
@@ -15,7 +15,7 @@ import org.ihtsdo.tk.api.media.MediaVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 
-public interface ConceptVersionBI extends ComponentBI, ConceptChronicleBI {
+public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI {
 	
 	public Coordinate getCoordinate();
 	

@@ -64,6 +64,7 @@ import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -72,6 +73,10 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 public class EditOnPromotePath implements I_ConfigAceFrame {
     I_ConfigAceFrame config;
 
+
+	public Coordinate getCoordinate() {
+		return config.getCoordinate();
+	}
 
 	public Set<PathBI> getPromotionPathSet() {
 		return config.getPromotionPathSet();
