@@ -11,7 +11,7 @@
 	<description>Workbench Maven Java Objects (mojo)</description>
 	<properties>
 		<src.dir>${project.build.directory}/generated-resources</src.dir>
-        <org.ihtsdo.wb-icons.version>1.0.1-SNAPSHOT</org.ihtsdo.wb-icons.version>
+        <org.ihtsdo.wb-icons.version>1.0.1</org.ihtsdo.wb-icons.version>
 	</properties>
 	<dependencies>
 		<dependency>
