@@ -14,7 +14,7 @@
     <description>multi-module build for the Workbench modules (dwfa-pom, foundation, 
                  dwfa-mojo, core, ace-api, vodb and term-mojo)</description>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-2.6.0-trek-</connection>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-2.6.0-trek</connection>
         <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-2.6.0-trek</developerConnection>
         <url>https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-2.6.0-trek</url>
     </scm>
