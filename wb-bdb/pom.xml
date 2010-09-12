@@ -3,7 +3,7 @@
         <parent>
             <groupId>org.ihtsdo</groupId>
             <artifactId>wb-mmb</artifactId>
-        	<version>2.6.0-trek-3</version>
+        	<version>2.6.0-trek-4-SNAPSHOT</version>
         </parent>
 	<artifactId>wb-bdb</artifactId>
 	<name>Workbench Berkeley Database</name>
