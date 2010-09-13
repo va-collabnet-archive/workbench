@@ -807,23 +807,27 @@ public class Concept implements I_Transact, I_GetConceptData {
     }
 
     public String getInitialText() throws IOException {
-    	String prefix = "";
+        String prefix = "";
         if (isCanceled()) {
-        	prefix = "canceled: ";
+            prefix = "canceled: ";
         }
 
         try {
             if ((AceConfig.config != null) && (AceConfig.config.aceFrames.get(0) != null)) {
-                PositionMapper mapper =
-                        Bdb.getSapDb().getMapper(
-                            AceConfig.config.aceFrames.get(0).getViewPositionSet().iterator().next());
-                if (mapper.isSetup()) {
-                    I_DescriptionTuple tuple =
-                            this.getDescTuple(AceConfig.config.aceFrames.get(0).getShortLabelDescPreferenceList(),
-                                AceConfig.config.getAceFrames().get(0));
-                    if (tuple != null) {
-                        return prefix + tuple.getText();
+                if (AceConfig.config.aceFrames.get(0).getViewPositionSet().iterator().hasNext()) {
+                    PositionMapper mapper =
+                            Bdb.getSapDb().getMapper(
+                                AceConfig.config.aceFrames.get(0).getViewPositionSet().iterator().next());
+                    if (mapper.isSetup()) {
+                        I_DescriptionTuple tuple =
+                                this.getDescTuple(AceConfig.config.aceFrames.get(0).getShortLabelDescPreferenceList(),
+                                    AceConfig.config.getAceFrames().get(0));
+                        if (tuple != null) {
+                            return prefix + tuple.getText();
+                        }
                     }
+                } else {
+                    throw new IndexOutOfBoundsException("No view positions set");
                 }
             }
             return prefix + getText();
@@ -884,22 +888,21 @@ public class Concept implements I_Transact, I_GetConceptData {
     }
 
     @Override
-    public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config, 
-    		I_ShowActivity activity) throws IOException {
+    public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config, I_ShowActivity activity)
+            throws IOException {
         I_IntSet isATypes = config.getDestRelTypes();
         I_RepresentIdSet possibleKindOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
         possibleKindOfConcepts.setMember(getNid());
         for (NidPair pair : this.getData().getDestRelNidTypeNidList()) {
-        	if (activity.isCanceled()) {
-        		
-        	}
+            if (activity.isCanceled()) {
+
+            }
             int relNid = pair.getNid1();
             int typeNid = pair.getNid2();
             if (isATypes.contains(typeNid)) {
                 possibleKindOfConcepts.setMember(Bdb.getNidCNidMap().getCNid(relNid));
                 Concept origin = Bdb.getConceptForComponent(relNid);
-                origin.addPossibleKindOfConcepts(possibleKindOfConcepts, 
-                		isATypes, activity);
+                origin.addPossibleKindOfConcepts(possibleKindOfConcepts, isATypes, activity);
             }
         }
         return possibleKindOfConcepts;
@@ -934,14 +937,13 @@ public class Concept implements I_Transact, I_GetConceptData {
         return possibleChildOfConcepts;
     }
 
-    private void addPossibleKindOfConcepts(I_RepresentIdSet possibleKindOfConcepts, 
-    		I_IntSet isATypes, I_ShowActivity activity)
-            throws IOException {
+    private void addPossibleKindOfConcepts(I_RepresentIdSet possibleKindOfConcepts, I_IntSet isATypes,
+            I_ShowActivity activity) throws IOException {
         possibleKindOfConcepts.setMember(getNid());
         for (NidPair pair : this.getData().getDestRelNidTypeNidList()) {
-        	if (activity.isCanceled()) {
-        		return;
-        	}
+            if (activity.isCanceled()) {
+                return;
+            }
             int relNid = pair.getNid1();
             int typeNid = pair.getNid2();
             if (isATypes.contains(typeNid)) {
@@ -955,8 +957,7 @@ public class Concept implements I_Transact, I_GetConceptData {
         }
     }
 
-    private void addPossibleKindOfConcepts(I_RepresentIdSet possibleKindOfConcepts, 
-    		I_IntSet isATypes)
+    private void addPossibleKindOfConcepts(I_RepresentIdSet possibleKindOfConcepts, I_IntSet isATypes)
             throws IOException {
         possibleKindOfConcepts.setMember(getNid());
         for (NidPair pair : this.getData().getDestRelNidTypeNidList()) {
@@ -1059,18 +1060,16 @@ public class Concept implements I_Transact, I_GetConceptData {
         return data.isLeafByDestRels(aceConfig);
     }
 
-    
     @Override
-	public boolean promote(I_TestComponent test, I_Position viewPosition,
-			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
-			PRECEDENCE precedence) throws IOException, TerminologyException {
-		if (test.result(this, viewPosition, pomotionPaths, allowedStatus, precedence)) {
-			return promote(viewPosition, pomotionPaths, allowedStatus, precedence);
-		}
-		return false;
-	}
+    public boolean promote(I_TestComponent test, I_Position viewPosition, PathSetReadOnly pomotionPaths,
+            I_IntSet allowedStatus, PRECEDENCE precedence) throws IOException, TerminologyException {
+        if (test.result(this, viewPosition, pomotionPaths, allowedStatus, precedence)) {
+            return promote(viewPosition, pomotionPaths, allowedStatus, precedence);
+        }
+        return false;
+    }
 
-	public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
+    public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
             PRECEDENCE precedence) throws IOException, TerminologyException {
         boolean promotedAnything = false;
 
@@ -1148,7 +1147,7 @@ public class Concept implements I_Transact, I_GetConceptData {
             synchronized (relNidTypeNidlist) {
                 for (NidPair pair : invalidPairs) {
                     if (relNidTypeNidlist.forget(pair)) {
-                    	BdbCommitManager.writeImmediate(this);
+                        BdbCommitManager.writeImmediate(this);
                     }
                 }
             }
