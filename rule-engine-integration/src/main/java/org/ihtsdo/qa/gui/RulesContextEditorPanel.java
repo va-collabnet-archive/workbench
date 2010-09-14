@@ -93,10 +93,23 @@ public class RulesContextEditorPanel extends JPanel {
 
 					for (Rule rule : selectedPackage.getRules()) {
 						//System.out.println("** rule: " + rule.getName());
-						String ruleUid = rule.getMetaAttribute("UID");
-						String description = rule.getMetaAttribute("DESCRIPTION");
+						String ruleUid = null;
+						String description =  null;
+						String ditaUid = null;
+						
+						try {
+							//ruleUid = (String) rule.getMetaData().get("UID");
+							ruleUid = rule.getMetaAttribute("UID");
+							//description = (String) rule.getMetaData().get("DESCRIPTION");
+							description = rule.getMetaAttribute("DESCRIPTION");
+							//ditaUid = (String) rule.getMetaData().get("DITA_UID");
+							ditaUid = rule.getMetaAttribute("DITA_UID");
+						} catch (Exception e) {
+							// problem retrieving metadata, do nothing
+							System.out.println("Malformed metadata..");
+						}
+						
 						if (description == null) description = "";
-						String ditaUid = rule.getMetaAttribute("DITA_UID");
 						if (ditaUid == null) ditaUid = "";
 
 						List<Object> row = new ArrayList<Object>();

@@ -66,7 +66,8 @@ public class RulesBrowserPanel extends JPanel {
 			for (Rule rule : kpackg.getRules()) {
 				//System.out.println("**** " + rule.getName());
 				boolean excluded = false;
-				String ruleUid = rule.getMetaAttribute("UID");
+				//String ruleUid = (String) rule.getMetaData().get("UID");
+				String ruleUid = (String) rule.getMetaAttribute("UID");
 				if (ruleUid != null) {
 					if (agenda.getExcludedRules().containsKey(UUID.fromString(ruleUid))) {
 						excluded = true;
