@@ -22,6 +22,7 @@ import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
+import org.ihtsdo.tk.helper.ResultsItem;
 
 
 
@@ -94,8 +95,9 @@ public class TestListPanel extends JPanel {
 			I_GetConceptData context = (I_GetConceptData) comboBox1.getSelectedItem();
 			try {
 				ResultsCollectorWorkBench results = RulesLibrary.checkConcept(loopConcept, context, false, config);
-				for (int errorCode : results.getErrorCodes().keySet()) {
-					table1Model.addRow(new String[] {loopConcept.toString(), "[" + errorCode + "] " + results.getErrorCodes().get(errorCode)});
+				for (ResultsItem resultsItem : results.getErrorCodes()) {
+					table1Model.addRow(
+							new String[] {loopConcept.toString(), "[" + resultsItem.getErrorCode() + "] " + resultsItem.getMessage()});
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
