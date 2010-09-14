@@ -55,11 +55,14 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.helper.ResultsItem;
 
 /**
  * The Class RulesLibrary.
@@ -106,7 +109,7 @@ public class RulesLibrary {
 		}
 		return kbase;
 	}
-	
+
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
 			boolean onlyUncommittedContent, I_ConfigAceFrame config) 
 	throws Exception {
@@ -115,17 +118,66 @@ public class RulesLibrary {
 		StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 		ksession.setGlobal("resultsCollector", new ResultsCollectorWorkBench());
 		ksession.setGlobal("transitiveClosureHelper", new TransitiveClosureHelperWorkbench());
-		
-		EConcept testConcept = new EConcept(concept);
-		ksession.insert(testConcept);
+
+		//EConcept testConcept = new EConcept(concept);
+		//ksession.insert(testConcept);
+
+		ConceptVersionBI conceptBi = Ts.get().getConceptVersion(new Coordinate(config.getPrecedence(),
+				config.getViewPositionSetReadOnly(), config.getAllowedStatus(), config.getDestRelTypes(),
+				config.getConflictResolutionStrategy()), concept.getNid());
+		ksession.insert(conceptBi);
+
+//		I_TermFactory tf = Terms.get();
+//
+//		ConAttrVersionBI attributeTuple = conceptBi.getConAttrsActive();
+//		TkConceptAttributes loopAttribute = new TkConceptAttributes();
+//		loopAttribute.setAuthorUuid(tf.nidToUuid(attributeTuple.getAuthorNid()));
+//		loopAttribute.setDefined(attributeTuple.isDefined());
+//		loopAttribute.setPathUuid(tf.nidToUuid(attributeTuple.getPathNid()));
+//		loopAttribute.setPrimordialComponentUuid(attributeTuple.getPrimUuid());
+//		loopAttribute.setStatusUuid(tf.nidToUuid(attributeTuple.getStatusNid()));
+//		loopAttribute.setTime(attributeTuple.getTime());
+//		ksession.insert(loopAttribute);
+//
+//		for (DescriptionVersionBI descriptionVersion : conceptBi.getDescsActive()) {
+//			TkDescription loopDescription = new TkDescription();
+//			loopDescription.setAuthorUuid(tf.nidToUuid(descriptionVersion.getAuthorNid()));
+//			loopDescription.setConceptUuid(tf.nidToUuid(descriptionVersion.getConceptNid()));
+//			loopDescription.setInitialCaseSignificant(descriptionVersion.isInitialCaseSignificant());
+//			loopDescription.setLang(descriptionVersion.getLang());
+//			loopDescription.setText(descriptionVersion.getText());
+//			loopDescription.setTime(descriptionVersion.getTime());
+//			loopDescription.setStatusUuid(tf.nidToUuid(descriptionVersion.getStatusNid()));
+//			loopDescription.setPathUuid(tf.nidToUuid(descriptionVersion.getPathNid()));
+//			loopDescription.setPrimordialComponentUuid(descriptionVersion.getPrimUuid());
+//			loopDescription.setTypeUuid(tf.nidToUuid(descriptionVersion.getTypeNid()));
+//			ksession.insert(loopDescription);
+//		}
+//
+//		for (RelationshipVersionBI relTuple : conceptBi.getRelsOutgoingActive()) {
+//			TkRelationship loopRel = new TkRelationship();
+//			loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()));
+//			loopRel.setC1Uuid(tf.nidToUuid(relTuple.getOriginNid()));
+//			loopRel.setC2Uuid(tf.nidToUuid(relTuple.getDestinationNid()));
+//			loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()));
+//			loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()));
+//			loopRel.setPrimordialComponentUuid(relTuple.getPrimUuid());
+//			loopRel.setRefinabilityUuid(tf.nidToUuid(relTuple.getRefinabilityNid()));
+//			loopRel.setRelGroup(relTuple.getGroup());
+//			loopRel.setStatusUuid(tf.nidToUuid(relTuple.getStatusNid()));
+//			loopRel.setTime(relTuple.getTime());
+//			loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()));
+//			ksession.insert(loopRel);
+//		}
 
 		ksession.fireAllRules();
 
 		ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
 
-		for (int errorCode : results.getErrorCodes().keySet() ) {
-			results.getAlertList().add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.ERROR, 
-					results.getErrorCodes().get(errorCode), 
+		for (ResultsItem resultsItem : results.getErrorCodes() ) {
+			results.getAlertList().add(new AlertToDataConstraintFailure(
+					AlertToDataConstraintFailure.ALERT_TYPE.ERROR, 
+					resultsItem.getErrorCode() + " - " + resultsItem.getMessage(), 
 					concept));
 		}
 
@@ -209,17 +261,18 @@ public class RulesLibrary {
 
 		ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
 
-		for (int errorCode : results.getErrorCodes().keySet() ) {
-			results.getAlertList().add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.ERROR, 
-					results.getErrorCodes().get(errorCode), 
-					concept));
-		}
+		//		for (int errorCode : results.getErrorCodes().keySet() ) {
+		//			results.getAlertList().add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.ERROR, 
+		//					results.getErrorCodes().get(errorCode), 
+		//					concept));
+		//		}
 
 		ksession.dispose();
 
 		return results;
 	}
 
+	@Deprecated
 	public static ResultsCollectorWorkBench checkObjects(List<Object> objects, int kbId) throws Exception {
 		KnowledgeBase kbase = getKnowledgeBase(kbId);
 
@@ -239,6 +292,7 @@ public class RulesLibrary {
 		return results;
 	}
 
+	@Deprecated
 	public static ResultsCollectorWorkBench checkObjectsTestModel(List<Object> objects, int kbId) throws Exception {
 		KnowledgeBase kbase = getKnowledgeBase(kbId);
 
@@ -413,7 +467,7 @@ public class RulesLibrary {
 		}
 		return (kbase != null);
 	}
-	
+
 	public static boolean isPackageOnLine(byte[] bytes) {
 		KnowledgeBase kbase= null;
 		try {
