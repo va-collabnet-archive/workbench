@@ -58,7 +58,8 @@ public class RulesDeploymentPackageReference {
 		buff.append("		<add>");
 		buff.append("			<resource source='");
 		buff.append(url);
-		buff.append("' type='PKG' />");
+		//TODO: implement full authentication
+		buff.append("' type='PKG' basicAuthentication='enabled' username='empty' password='empty'/>");
 		buff.append("		</add>");
 		buff.append("</change-set>");
 
