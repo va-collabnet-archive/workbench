@@ -16,7 +16,8 @@
  */
 package org.ihtsdo.tk.helper;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The Class ResultsCollector.
@@ -25,7 +26,7 @@ public class ResultsCollector {
 	
 	/** The alert list. */
 	//private List<AlertToDataConstraintFailure> alertList;
-	private HashMap<Integer, String> errorCodes;
+	private List<ResultsItem> errorCodes;
 	
 	
 	/**
@@ -38,43 +39,18 @@ public class ResultsCollector {
 	public ResultsCollector() {
 		super();
 		//this.alertList = new ArrayList<AlertToDataConstraintFailure>();
-		this.errorCodes = new HashMap<Integer, String>();
-	}
-	
-	public ResultsCollector(HashMap<Integer, String> errorCodes) {
-		super();
-		this.errorCodes = errorCodes;
+		this.errorCodes = new ArrayList<ResultsItem>();
 	}
 
-	
-//	/**
-//	 * Gets the alert list.
-//	 * 
-//	 * @return the alert list
-//	 */
-//	public List<AlertToDataConstraintFailure> getAlertList() {
-//		return alertList;
-//	}
-//	
-//	/**
-//	 * Sets the alert list.
-//	 * 
-//	 * @param alertList the new alert list
-//	 */
-//	public void setAlertList(List<AlertToDataConstraintFailure> alertList) {
-//		this.alertList = alertList;
-//	}
-
-	public HashMap<Integer, String> getErrorCodes() {
+	public List<ResultsItem> getErrorCodes() {
 		return errorCodes;
 	}
 
-	public void setErrorCodes(HashMap<Integer, String> errorCodes) {
+	public void setErrorCodes(List<ResultsItem> errorCodes) {
 		this.errorCodes = errorCodes;
 	}
 	
-	public void addError(Integer code, String messsage) {
-		errorCodes.put(code, messsage);
+	public void addErrorCode(ResultsItem resultsItem) {
+		this.errorCodes.add(resultsItem);
 	}
-	
 }
