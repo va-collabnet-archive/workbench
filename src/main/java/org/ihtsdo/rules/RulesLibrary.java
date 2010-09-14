@@ -95,7 +95,8 @@ public class RulesLibrary {
 		for (KnowledgePackage kpackg : kbase.getKnowledgePackages()) {
 			for (Rule rule : kpackg.getRules()) {
 				boolean excluded = false;
-				String ruleUid = rule.getMetaAttribute("UID");
+				//String ruleUid = (String) rule.getMetaData().get("UID");
+				String ruleUid = (String) rule.getMetaAttribute("UID");
 				if (ruleUid != null) {
 					I_GetConceptData role = contextHelper.getRoleInContext(ruleUid, context);
 					if (role != null && role.getConceptNid() == excludeClause.getConceptNid()) {
