@@ -40,9 +40,12 @@ public class Test_tk_model extends TestCase {
 		
 		UUID conceptUuid = UUID.randomUUID();
 		UUID currentUuid = UUID.randomUUID();
+		@SuppressWarnings("unused")
 		UUID retiredUuid = UUID.randomUUID();
+		@SuppressWarnings("unused")
 		UUID prefUuid = UUID.randomUUID();
 		UUID fsnUuid = UUID.randomUUID();
+		@SuppressWarnings("unused")
 		UUID synonymUuid = UUID.randomUUID();
 		
 		TkDescription description = new TkDescription();

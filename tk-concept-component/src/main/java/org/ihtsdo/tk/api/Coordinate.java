@@ -7,10 +7,12 @@ public class Coordinate {
 	private NidSetBI   allowedStatusNids;
 	private NidSetBI   isaTypeNids;
 	private ContradictionManagerBI contradictionManager;
-	
+	private int languageNid;
+
 	public Coordinate(Precedence precedence, PositionSetBI positionSet,
 			NidSetBI allowedStatusNids, NidSetBI isaTypeNids, 
-			ContradictionManagerBI contradictionManager) {
+			ContradictionManagerBI contradictionManager, 
+			int languageNid) {
 		super();
 		assert precedence != null;
 		assert positionSet != null;
@@ -22,6 +24,7 @@ public class Coordinate {
 		this.allowedStatusNids = allowedStatusNids;
 		this.isaTypeNids = isaTypeNids;
 		this.contradictionManager = contradictionManager;
+		this.languageNid = languageNid;
 	}
 	
 	public PositionSetBI getPositionSet() {
@@ -42,6 +45,10 @@ public class Coordinate {
 
 	public ContradictionManagerBI getContradictionManager() {
 		return contradictionManager;
+	}
+	
+	public int getLanguageNid() {
+		return languageNid;
 	}
 
 }

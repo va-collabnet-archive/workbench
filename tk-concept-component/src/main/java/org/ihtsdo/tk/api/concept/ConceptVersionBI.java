@@ -21,6 +21,10 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
 	
 	public ConAttrVersionBI getConAttrsActive() throws IOException, ContraditionException;
 	
+	public DescriptionVersionBI getPreferredDescription() throws IOException, ContraditionException;
+	public DescriptionVersionBI getFullySpecifiedDescription() throws IOException, ContraditionException;
+	public Collection<? extends DescriptionVersionBI> getSynonyms() throws IOException;
+
 	public Collection<? extends DescriptionVersionBI> getDescsActive() throws IOException, ContraditionException;
 	public Collection<? extends DescriptionVersionBI> getDescsActive(int typeNid) throws IOException, ContraditionException;
 	public Collection<? extends DescriptionVersionBI> getDescsActive(NidSetBI typeNids) throws IOException, ContraditionException;

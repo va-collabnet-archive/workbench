@@ -26,9 +26,7 @@ import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.util.Version;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
@@ -145,6 +143,7 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.lucene.CheckAndProcessLuceneMatch;
 import org.ihtsdo.lucene.LuceneManager;
+import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -264,8 +263,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public Hits doLuceneSearch(String query) throws IOException, org.apache.lucene.queryParser.ParseException {
-        Query q = new QueryParser("desc", new StandardAnalyzer()).parse(query);
+    public SearchResult doLuceneSearch(String query) throws IOException, org.apache.lucene.queryParser.ParseException {
+        Query q = new QueryParser(LuceneManager.version, "desc", new StandardAnalyzer(LuceneManager.version)).parse(query);
         return LuceneManager.search(q);
     }
 
@@ -1396,7 +1395,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
         private CountDownLatch conceptLatch;
         private I_TrackContinuation tracker;
-        private Semaphore checkSemaphore;
         private List<I_TestSearchResults> checkList;
         private I_ConfigAceFrame config;
         private I_RepresentIdSet matches;
@@ -1462,7 +1460,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         ;
         timer.start();
         try {
-            Query q = new QueryParser("desc", new StandardAnalyzer(Version.LUCENE_29)).parse(query);
+            Query q = new QueryParser(LuceneManager.version, "desc", new StandardAnalyzer(LuceneManager.version)).parse(query);
             if (LuceneManager.indexExists() == false) {
                 updater.setProgressInfo("Making lucene index -- this may take a while...");
                 LuceneManager.createLuceneDescriptionIndex();
@@ -1472,28 +1470,28 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             long startTime = System.currentTimeMillis();
             updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime)
                 + " ms.");
-            Hits hits = LuceneManager.search(q);
+            SearchResult result = LuceneManager.search(q);
 
-            if (hits.length() > 0) {
-                AceLog.getAppLog().info("StandardAnalyzer query returned " + hits.length() + " hits");
+            if (result.topDocs.totalHits > 0) {
+                AceLog.getAppLog().info("StandardAnalyzer query returned " + result.topDocs.totalHits + " hits");
             } else {
                 updater.setProgressInfo("Starting WhitespaceAnalyzer lucene query...");
                 AceLog.getAppLog().info(
                     "StandardAnalyzer query returned no results. Now trying WhitespaceAnalyzer query");
-                q = new QueryParser("desc", new WhitespaceAnalyzer()).parse(query);
-                hits = LuceneManager.search(q);
+                q = new QueryParser(LuceneManager.version, "desc", new WhitespaceAnalyzer()).parse(query);
+                result = LuceneManager.search(q);
             }
 
             updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime)
-                + " ms. Hits: " + hits.length());
+                + " ms. Hits: " + result.topDocs.totalHits);
 
-            CountDownLatch hitLatch = new CountDownLatch(hits.length());
-            updater.setHits(hits.length());
+            CountDownLatch hitLatch = new CountDownLatch(result.topDocs.totalHits);
+            updater.setHits(result.topDocs.totalHits);
             updater.setIndeterminate(false);
 
-            for (int i = 0; i < hits.length(); i++) {
-                Document doc = hits.doc(i);
-                float score = hits.score(i);
+            for (int i = 0; i < result.topDocs.totalHits; i++) {
+                Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
+                float score = result.topDocs.scoreDocs[i].score;
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                     AceLog.getAppLog().fine("Hit: " + doc + " Score: " + score);
                 }

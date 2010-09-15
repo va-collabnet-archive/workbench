@@ -219,7 +219,7 @@ public class LoadBdb extends AbstractMojo {
 
 	
     public void createLuceneDescriptionIndex() throws Exception {
-        LuceneManager.setLuceneDirFile(luceneDir);
+        LuceneManager.setDbRootDir(luceneDir);
         LuceneManager.createLuceneDescriptionIndex();
     }
 }

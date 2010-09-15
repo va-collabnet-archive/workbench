@@ -21,14 +21,12 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.search.Hit;
-import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.ScoreDoc;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -40,6 +38,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.time.TimeUtil;
 
 /**
@@ -286,20 +285,17 @@ public class DescStatement extends RefsetSpecStatement {
                 possibleDescriptions.or(parentPossibleDescriptions);
             } else {
                 String queryConstraintString = (String) queryConstraint;
-                Hits hits;
                 try {
-                    hits = termFactory.doLuceneSearch(queryConstraintString);
+                    SearchResult results = termFactory.doLuceneSearch(queryConstraintString);
 
-                    if (hits == null || hits.length() == 0) {
+                    if (results == null || results.topDocs.totalHits == 0) {
                         possibleDescriptions.or(parentPossibleDescriptions);
                         break;
                     }
                     possibleLuceneConcMatches = Terms.get().getEmptyIdSet();
                     possibleLuceneDescMatches = Terms.get().getEmptyIdSet();
-                    Iterator iterator = hits.iterator();
-                    while (iterator.hasNext()) {
-                        Hit next = (Hit) iterator.next();
-                        Document doc = next.getDocument();
+                    for (ScoreDoc scoreDoc: results.topDocs.scoreDocs) {
+                        Document doc = results.searcher.doc(scoreDoc.doc);
 
                         int cnid = Integer.parseInt(doc.get("cnid"));
                         int dnid = Integer.parseInt(doc.get("dnid"));
@@ -338,7 +334,7 @@ public class DescStatement extends RefsetSpecStatement {
 
     private boolean descriptionTypeIs(I_GetConceptData requiredDescriptionType,
             I_DescriptionTuple descriptionBeingTested) {
-        return descriptionBeingTested.getTypeId() == requiredDescriptionType.getConceptNid();
+        return descriptionBeingTested.getTypeNid() == requiredDescriptionType.getConceptNid();
     }
 
     /**
@@ -349,7 +345,7 @@ public class DescStatement extends RefsetSpecStatement {
     private boolean descriptionTypeIsKindOf(I_DescriptionTuple descriptionBeingChecked) throws IOException,
             TerminologyException {
 
-        I_GetConceptData descTypeBeingChecked = termFactory.getConcept(descriptionBeingChecked.getTypeId());
+        I_GetConceptData descTypeBeingChecked = termFactory.getConcept(descriptionBeingChecked.getTypeNid());
 
         return (((I_GetConceptData) queryConstraint).isParentOfOrEqualTo(descTypeBeingChecked, currentStatuses,
             allowedTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config
@@ -368,7 +364,7 @@ public class DescStatement extends RefsetSpecStatement {
     private boolean descriptionTypeIsDescendentOf(I_GetConceptData requiredType,
             I_DescriptionTuple descriptionBeingChecked) throws IOException, TerminologyException {
 
-        I_GetConceptData descTypeBeingChecked = termFactory.getConcept(descriptionBeingChecked.getTypeId());
+        I_GetConceptData descTypeBeingChecked = termFactory.getConcept(descriptionBeingChecked.getTypeNid());
 
         return (((I_GetConceptData) queryConstraint).isParentOf(descTypeBeingChecked, currentStatuses, allowedTypes,
             config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy()));
@@ -403,12 +399,12 @@ public class DescStatement extends RefsetSpecStatement {
     }
 
     private boolean descriptionStatusIs(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException {
-        return descriptionBeingChecked.getStatusId() == ((I_GetConceptData) queryConstraint).getConceptNid();
+        return descriptionBeingChecked.getStatusNid() == ((I_GetConceptData) queryConstraint).getConceptNid();
     }
 
     private boolean descriptionStatusIs(I_GetConceptData requiredStatus, I_DescriptionTuple descriptionBeingChecked)
             throws TerminologyException {
-        return descriptionBeingChecked.getStatusId() == requiredStatus.getConceptNid();
+        return descriptionBeingChecked.getStatusNid() == requiredStatus.getConceptNid();
     }
 
     private boolean descriptionStatusIsChildOf(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException,
@@ -440,7 +436,7 @@ public class DescStatement extends RefsetSpecStatement {
     private boolean descriptionStatusIsDescendentOf(I_GetConceptData requiredStatus,
             I_DescriptionTuple descriptionBeingChecked) throws TerminologyException, IOException {
 
-        I_GetConceptData statusBeingChecked = termFactory.getConcept(descriptionBeingChecked.getStatusId());
+        I_GetConceptData statusBeingChecked = termFactory.getConcept(descriptionBeingChecked.getStatusNid());
 
         return (((I_GetConceptData) queryConstraint).isParentOf(statusBeingChecked, currentStatuses, allowedTypes,
             config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy()));
@@ -449,7 +445,7 @@ public class DescStatement extends RefsetSpecStatement {
 
     private boolean descriptionStatusIsKindOf(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException,
             IOException {
-        I_GetConceptData statusBeingChecked = termFactory.getConcept(descriptionBeingChecked.getStatusId());
+        I_GetConceptData statusBeingChecked = termFactory.getConcept(descriptionBeingChecked.getStatusNid());
 
         return (((I_GetConceptData) queryConstraint).isParentOfOrEqualTo(statusBeingChecked, currentStatuses,
             allowedTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config
@@ -475,24 +471,21 @@ public class DescStatement extends RefsetSpecStatement {
         }
     }
 
-    @SuppressWarnings( { "deprecation", "unchecked" })
     private boolean descriptionLuceneMatch(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException {
         if (possibleLuceneDescMatches != null) {
             return possibleLuceneDescMatches.isMember(descriptionBeingChecked.getDescId());
         }
         String queryConstraintString = (String) queryConstraint;
-        Hits hits;
+        SearchResult results;
         try {
-            hits = termFactory.doLuceneSearch(queryConstraintString);
+        	results = termFactory.doLuceneSearch(queryConstraintString);
 
-            if (hits == null || hits.length() == 0) {
+            if (results == null || results.topDocs.totalHits == 0) {
                 return false;
             } else {
 
-                Iterator iterator = hits.iterator();
-                while (iterator.hasNext()) {
-                    Hit next = (Hit) iterator.next();
-                    Document doc = next.getDocument();
+                 for (ScoreDoc scoreDoc: results.topDocs.scoreDocs) {
+                    Document doc = results.searcher.doc(scoreDoc.doc);
                     int dnid = Integer.parseInt(doc.get("dnid"));
                     int cnid = Integer.parseInt(doc.get("cnid"));
 

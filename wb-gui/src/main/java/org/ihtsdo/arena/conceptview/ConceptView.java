@@ -121,7 +121,7 @@ public class ConceptView extends JPanel {
 						}
 						
 						Coordinate coordinate = new Coordinate(config.getPrecedence(), config.getViewPositionSetReadOnly(), 
-								config.getAllowedStatus(), config.getDestRelTypes(), config.getConflictResolutionStrategy());
+								config.getAllowedStatus(), config.getDestRelTypes(), config.getConflictResolutionStrategy(), config.getLanguagePreferenceList().get(0));
 						
 						
 						CollapsePanel  cpr = new CollapsePanel("relationships", settings);
@@ -701,7 +701,7 @@ public class ConceptView extends JPanel {
 		Coordinate coordinate = new Coordinate(config.getPrecedence(),
 				config.getViewPositionSetReadOnly(), config
 						.getAllowedStatus(), config.getDestRelTypes(),
-				config.getConflictResolutionStrategy());
+				config.getConflictResolutionStrategy(), config.getLanguagePreferenceList().get(0));
 		DragPanelRelTemplate relPanel = new DragPanelRelTemplate(new GridBagLayout(), settings);
 		relPanel.setupDrag(spec);
 		relPanel.setBorder(BorderFactory.createRaisedBevelBorder());

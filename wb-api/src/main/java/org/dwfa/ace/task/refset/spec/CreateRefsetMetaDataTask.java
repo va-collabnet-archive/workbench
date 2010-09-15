@@ -26,7 +26,6 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.search.Hits;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -49,6 +48,7 @@ import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.lucene.SearchResult;
 
 /**
  * Creates meta data required for a new refset.
@@ -403,17 +403,17 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             // remove all non-alphanumeric characters and replace with a space - this is to stop these characters
             // causing issues with the lucene search
             filteredDescription = filteredDescription.replaceAll("[^a-zA-Z0-9]", " ");
-            Hits hits = termFactory.doLuceneSearch(filteredDescription);
-            for (int i = 0; i < hits.length(); i++) {
-                Document doc = hits.doc(i);
+            SearchResult result = termFactory.doLuceneSearch(filteredDescription);
+            for (int i = 0; i < result.topDocs.totalHits; i++) {
+                Document doc = result.searcher.doc(i);
                 int cnid = Integer.parseInt(doc.get("cnid"));
                 int dnid = Integer.parseInt(doc.get("dnid"));
                 if (cnid == concept.getConceptNid())
                     continue;
                 I_DescriptionVersioned potential_fsn = termFactory.getDescription(dnid, cnid);
                 for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
-                    if (actives.contains(part_search.getStatusId())
-                        && part_search.getTypeId() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
+                    if (actives.contains(part_search.getStatusNid())
+                        && part_search.getTypeNid() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
                             .localize().getNid() && part_search.getText().equals(description)) {
                         throw new TerminologyException("Concept already exists in database with FSN: " + description);
                     }

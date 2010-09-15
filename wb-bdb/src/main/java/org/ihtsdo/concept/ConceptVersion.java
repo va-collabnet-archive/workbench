@@ -513,4 +513,22 @@ public class ConceptVersion implements ConceptVersionBI {
 		}
 	}
 
+	@Override
+	public DescriptionVersionBI getFullySpecifiedDescription()
+			throws IOException, ContraditionException {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public DescriptionVersionBI getPreferredDescription() throws IOException,
+			ContraditionException {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Collection<? extends DescriptionVersionBI> getSynonyms()
+			throws IOException {
+		throw new UnsupportedOperationException();
+	}
+
 }

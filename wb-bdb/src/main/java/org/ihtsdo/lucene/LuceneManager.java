@@ -1,6 +1,7 @@
 package org.ihtsdo.lucene;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -13,10 +14,12 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.IndexWriter.MaxFieldLength;
-import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.ParallelMultiSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.util.Version;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -27,21 +30,21 @@ import org.dwfa.bpa.util.Stopwatch;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
+import org.ihtsdo.tk.Ts;
 
 public class LuceneManager {
 	
-	public static File luceneDirFile = new File("target/berkeley-db/lucene");
-	public static File getLuceneDirFile() {
-        return luceneDirFile;
-    }
-    public static void setLuceneDirFile(File luceneDirFile) {
-        LuceneManager.luceneDirFile = luceneDirFile;
-    }
-    public static Directory luceneDir;
+	public static Version version = Version.LUCENE_30;
+	
+	public static File luceneMutableDirFile = new File("target/berkeley-db/mutable/lucene");
+	public static File luceneReadOnlyDirFile = new File("target/berkeley-db/read-only/lucene");
+    public static Directory luceneMutableDir;
+    public static Directory luceneReadOnlyDir;
 
     private static IndexWriter writer;
 
-	private static IndexSearcher searcher;
+	private static ParallelMultiSearcher searcher;
 	
 	private static int matchLimit = 10000;
 	
@@ -67,35 +70,56 @@ public class LuceneManager {
 	    }
 	}
 	public static void init() throws IOException {
-		if (luceneDir == null) {
-			if (luceneDirFile.exists()) {
-				luceneDir = new SimpleFSDirectory(luceneDirFile);
-				luceneDir.clearLock("write.lock");
-				if (new File(luceneDirFile, "segments.gen").exists()) {
-		            writer = new IndexWriter(luceneDir, new StandardAnalyzer(Version.LUCENE_29), false, 
-		            		MaxFieldLength.UNLIMITED);
-				} else {
-		            writer = new IndexWriter(luceneDir, new StandardAnalyzer(Version.LUCENE_29), true, 
-		            		MaxFieldLength.UNLIMITED);
-				}
-			} else {
-				luceneDirFile.mkdirs();
-				luceneDir = new SimpleFSDirectory(luceneDirFile);
-				luceneDir.clearLock("write.lock");
-	            writer = new IndexWriter(luceneDir, new StandardAnalyzer(Version.LUCENE_29), true, 
-	            		MaxFieldLength.UNLIMITED);
+		luceneReadOnlyDir = initDirectory(luceneReadOnlyDirFile, false);
+		luceneMutableDir = initDirectory(luceneMutableDirFile, false);
+	}
+
+	private static Directory initDirectory(File luceneDirFile, boolean mutable)
+			throws IOException, CorruptIndexException,
+			LockObtainFailedException {
+		Directory luceneDir = null;
+		if (luceneDirFile.exists()) {
+			luceneDir = new SimpleFSDirectory(luceneDirFile);
+			if (mutable) {
+				setupWriter(luceneDirFile, luceneDir);
+			}
+		} else {
+			luceneDirFile.mkdirs();
+			luceneDir = new SimpleFSDirectory(luceneDirFile);
+			if (mutable) {
+				setupWriter(luceneDirFile, luceneDir);
 			}
 		}
+		return luceneDir;
+	}
+	private static Directory setupWriter(File luceneDirFile, Directory luceneDir)
+			throws IOException, CorruptIndexException,
+			LockObtainFailedException {
+		if (luceneDir == null) {
+			luceneDir = new SimpleFSDirectory(luceneDirFile);
+		}
+		luceneDir.clearLock("write.lock");
+		if (new File(luceneDirFile, "segments.gen").exists()) {
+			writer = new IndexWriter(luceneDir, new StandardAnalyzer(version), false, 
+					MaxFieldLength.UNLIMITED);
+		} else {
+			writer = new IndexWriter(luceneDir, new StandardAnalyzer(version), true, 
+					MaxFieldLength.UNLIMITED);
+		}
+		return luceneDir;
 	}
 	public static boolean indexExists() {
-		return luceneDirFile.exists();
+		return luceneMutableDirFile.exists();
 	}
 
     public static void createLuceneDescriptionIndex() throws Exception {
     	init();
         Stopwatch timer = new Stopwatch();
         timer.start();
-        luceneDirFile.mkdirs();
+        luceneMutableDirFile.mkdirs();
+        if (writer == null) {
+			luceneMutableDir = setupWriter(luceneMutableDirFile, luceneMutableDir);
+        }
         writer.setUseCompoundFile(true);
         writer.setMergeFactor(15);
         writer.setMaxMergeDocs(Integer.MAX_VALUE);
@@ -118,22 +142,7 @@ public class LuceneManager {
     	init();
         try {
         	rwl.writeLock().lock();
-        	IndexWriter writerCopy = writer;
-        	if (writerCopy != null) {
-                for (Description desc: descriptions) {
-                    if (desc != null) {
-                        writerCopy.deleteDocuments(new Term("dnid", Integer.toString(desc.getDescId())));
-                        writerCopy.addDocument(createDoc(desc));
-                    }
-                }
-                writerCopy.commit();
-        	}
-            
-            if (searcher != null) {
-            	searcher.close();
-                AceLog.getAppLog().info("Closing lucene searcher");
-            }
-            searcher = null;
+        	writeToLuceneNoLock(descriptions);
         	rwl.writeLock().unlock();
         } catch (CorruptIndexException e) {
         	rwl.writeLock().unlock();
@@ -143,11 +152,30 @@ public class LuceneManager {
             throw new IOException(e);
         }
     }
+	private static void writeToLuceneNoLock(Collection<Description> descriptions)
+			throws CorruptIndexException, IOException {
+		IndexWriter writerCopy = writer;
+		if (writerCopy != null) {
+		    for (Description desc: descriptions) {
+		        if (desc != null) {
+		            writerCopy.deleteDocuments(new Term("dnid", Integer.toString(desc.getDescId())));
+		            writerCopy.addDocument(createDoc(desc));
+		        }
+		    }
+		    writerCopy.commit();
+		}
+		
+		if (searcher != null) {
+			searcher.close();
+		    AceLog.getAppLog().info("Closing lucene searcher");
+		}
+		searcher = null;
+	}
 	public static Document createDoc(Description desc)
 			throws IOException {
         Document doc = new Document();
-		doc.add(new Field("dnid", Integer.toString(desc.getDescId()), Field.Store.YES, Field.Index.UN_TOKENIZED));
-		doc.add(new Field("cnid", Integer.toString(desc.getConceptNid()), Field.Store.YES, Field.Index.UN_TOKENIZED));
+		doc.add(new Field("dnid", Integer.toString(desc.getDescId()), Field.Store.YES, Field.Index.NOT_ANALYZED));
+		doc.add(new Field("cnid", Integer.toString(desc.getConceptNid()), Field.Store.YES, Field.Index.NOT_ANALYZED));
 		addIdsToIndex(doc, desc);
 		addIdsToIndex(doc, Concept.get(desc.getConceptNid()).getConceptAttributes());
 
@@ -158,34 +186,42 @@ public class LuceneManager {
 		            AceLog.getAppLog().fine(
 		                "Adding to index. dnid:  " + desc.getDescId() + " desc: " + tuple.getText());
 		        }
-		        doc.add(new Field("desc", tuple.getText(), Field.Store.NO, Field.Index.TOKENIZED));
+		        doc.add(new Field("desc", tuple.getText(), Field.Store.NO, Field.Index.ANALYZED));
 		    }
 		}
 		return doc;
 	}
 
-
     private static  void addIdsToIndex(Document doc, I_Identify did) {
     	if (did != null) {
     		for (I_IdPart p : did.getMutableIdParts()) {
     			doc.add(new Field("desc", p.getDenotation().toString(), Field.Store.NO, 
-    					Field.Index.UN_TOKENIZED));
+    					Field.Index.NOT_ANALYZED));
     		}
     	} else {
     		AceLog.getAppLog().alertAndLogException(new Exception("Identifier is null"));
     	}
 	}
 
-	public static Hits search(Query q) throws CorruptIndexException, IOException {
+	public static SearchResult search(Query q) throws CorruptIndexException, IOException {
     	init();
 		rwl.readLock().lock();
 		try {
-			IndexSearcher searcherCopy = searcher;
+			ParallelMultiSearcher searcherCopy = searcher;
 			if (searcherCopy == null) {
-				searcherCopy = new IndexSearcher(luceneDir, true);
+				IndexSearcher readOnlySearcher = new IndexSearcher(luceneReadOnlyDir, true);
+				IndexSearcher mutableSearcher = null;
+				try {
+					mutableSearcher = new IndexSearcher(luceneMutableDir, true);
+				} catch (FileNotFoundException e) {
+					AceLog.getAppLog().warning("Search result: " + e.getLocalizedMessage());
+					luceneMutableDir = setupWriter(luceneMutableDirFile, luceneMutableDir);
+					writeToLuceneNoLock((Collection<Description>) Ts.get().getConcept(ReferenceConcepts.AUX_IS_A.getNid()).getDescs());
+				}
+				searcherCopy = new ParallelMultiSearcher(readOnlySearcher, mutableSearcher);
 				searcher = searcherCopy;
 			}
-			return searcherCopy.search(q);
+			return new SearchResult(searcherCopy.search(q, null, matchLimit), searcherCopy);
 		} finally {
 			rwl.readLock().unlock();
 		}
@@ -195,6 +231,11 @@ public class LuceneManager {
 	}
 	public static void setMatchLimit(int matchLimit) {
 		LuceneManager.matchLimit = matchLimit;
+	}
+	
+	public static void setDbRootDir(File root) {
+		luceneMutableDirFile = new File(root, "mutable/lucene");
+		luceneReadOnlyDirFile = new File(root, "read-only/lucene");
 	}
 
 }

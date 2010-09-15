@@ -24,6 +24,9 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriter.MaxFieldLength;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -31,7 +34,8 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_ProcessDescriptions;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
+import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.mojo.maven.MojoUtil;
 
 public class VodbCreateLuceneIndex extends AbstractMojo {
@@ -53,7 +57,7 @@ public class VodbCreateLuceneIndex extends AbstractMojo {
      *            "${project.build.directory}/generated-resources/berkeley-db/lucene-custom"
      * @required
      */
-    private File luceneDir;
+    private File luceneDirFile;
 
     /**
      * Location of the build directory.
@@ -69,15 +73,18 @@ public class VodbCreateLuceneIndex extends AbstractMojo {
 
         public Indexer() throws IOException {
             super();
-            luceneDir.mkdirs();
-
+            luceneDirFile.mkdirs();
+			Directory luceneDir = new SimpleFSDirectory(luceneDirFile);
+			
             switch (indexType) {
             case Standard:
             case Fuzzy:
-                writer = new IndexWriter(luceneDir, new StandardAnalyzer(), true);
+                writer = new IndexWriter(luceneDir, new StandardAnalyzer(LuceneManager.version), false, 
+	            		MaxFieldLength.UNLIMITED);
                 break;
             case Snowball:
-                writer = new IndexWriter(luceneDir, new StandardAnalyzer(), true);
+                writer = new IndexWriter(luceneDir, new StandardAnalyzer(LuceneManager.version), false, 
+	            		MaxFieldLength.UNLIMITED);
                 break;
             }
 
@@ -87,14 +94,14 @@ public class VodbCreateLuceneIndex extends AbstractMojo {
 
         public void processDescription(I_DescriptionVersioned desc) throws Exception {
             Document doc = new Document();
-            doc.add(new Field("dnid", Integer.toString(desc.getDescId()), Field.Store.YES, Field.Index.UN_TOKENIZED));
-            doc.add(new Field("cnid", Integer.toString(desc.getConceptNid()), Field.Store.YES, Field.Index.UN_TOKENIZED));
-            doc.add(new Field("tnid", Integer.toString(desc.getFirstTuple().getTypeId()), Field.Store.YES,
-                Field.Index.UN_TOKENIZED));
+            doc.add(new Field("dnid", Integer.toString(desc.getDescId()), Field.Store.YES, Field.Index.NOT_ANALYZED));
+            doc.add(new Field("cnid", Integer.toString(desc.getConceptNid()), Field.Store.YES, Field.Index.NOT_ANALYZED));
+            doc.add(new Field("tnid", Integer.toString(desc.getFirstTuple().getTypeNid()), Field.Store.YES,
+                Field.Index.NOT_ANALYZED));
             String lastDesc = null;
             for (I_DescriptionTuple tuple : desc.getTuples()) {
                 if (lastDesc == null || lastDesc.equals(tuple.getText()) == false) {
-                    doc.add(new Field("desc", tuple.getText(), Field.Store.NO, Field.Index.TOKENIZED));
+                    doc.add(new Field("desc", tuple.getText(), Field.Store.NO, Field.Index.ANALYZED));
                 }
 
             }
@@ -110,7 +117,7 @@ public class VodbCreateLuceneIndex extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + luceneDir.getCanonicalPath(),
+            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + luceneDirFile.getCanonicalPath(),
                 this.getClass(), targetDirectory)) {
                 return;
             }
@@ -119,7 +126,7 @@ public class VodbCreateLuceneIndex extends AbstractMojo {
         } catch (IOException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
-        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        I_TermFactory termFactory = Terms.get();
 
         try {
             Indexer descIndexer = new Indexer();

@@ -36,7 +36,9 @@ end
 rule "not satisfies FINDING_SITE_OUT constraint"
 	
 	when
-		$c : ConceptVersionBI(this not satisfiesConstraint[x,e,k] SnomedConstraints.FINDING_SITE_OUT);
+		$c : ConceptVersionBI(
+				this isKindOf Snomed.FINDING_SITE,
+				this not satisfiesConstraint[k,e,k] SnomedConstraints.FINDING_SITE_OUT);
 	then 
    		System.out.println("concept failing FINDING_SITE_OUT constraint found: \n" + $c.toString());
    		templates.put(SnomedRelSpec.FINDING_SITE, $c.getNid());	

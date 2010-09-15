@@ -30,7 +30,6 @@ import javax.swing.JComponent;
 import javax.swing.TransferHandler;
 
 import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.search.Hits;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
@@ -48,6 +47,7 @@ import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.SuppressDataChecks;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
+import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 
@@ -373,7 +373,7 @@ public interface I_TermFactory {
      */
     void iterateExtByRefs(I_ProcessExtByRef processor) throws Exception;
 
-    Hits doLuceneSearch(String query) throws IOException, ParseException;
+    SearchResult doLuceneSearch(String query) throws IOException, ParseException;
 
     int convertToThinVersion(long time);
 

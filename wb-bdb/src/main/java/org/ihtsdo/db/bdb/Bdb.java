@@ -139,7 +139,7 @@ public class Bdb {
 			}
 			File bdbDirectory = new File(dbRoot);
 			bdbDirectory.mkdirs();
-			LuceneManager.luceneDirFile = new File(bdbDirectory, "lucene");
+			LuceneManager.setDbRootDir(bdbDirectory);
 			inform(activity, "Setting up database environment...");
 			mutable = new Bdb(false, new File(bdbDirectory, "mutable"));
 			File readOnlyDir = new File(bdbDirectory, "read-only");

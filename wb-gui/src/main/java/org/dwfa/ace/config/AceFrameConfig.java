@@ -3056,6 +3056,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	@Override
 	public Coordinate getCoordinate() {
 		return  new Coordinate(getPrecedence(), getViewPositionSetReadOnly(), 
-				getAllowedStatus(), getDestRelTypes(), getConflictResolutionStrategy());
+				getAllowedStatus(), getDestRelTypes(), getConflictResolutionStrategy(), languagePreferenceList.get(0));
 	}
 }
