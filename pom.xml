@@ -20,7 +20,7 @@
   </scm>
   <properties>
     <!-- must be trek as it has the required wb-mojo changes -->
-    <wb-toolkit.version>2.6.0-trek-2-SNAPSHOT</wb-toolkit.version>
+    <wb-toolkit.version>2.6.0-trek-4-SNAPSHOT</wb-toolkit.version>
     <org.dwfa.jini.version>2.1</org.dwfa.jini.version>
     <org.apache.lucene.version>2.9.3</org.apache.lucene.version>
     <svnkit.version>1.3.0.5847</svnkit.version>
