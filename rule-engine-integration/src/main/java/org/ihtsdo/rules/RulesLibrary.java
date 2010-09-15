@@ -40,6 +40,7 @@ import org.drools.definition.KnowledgePackage;
 import org.drools.definition.rule.Rule;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
+import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -59,6 +60,7 @@ import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
+import org.ihtsdo.testmodel.DrConcept;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -95,8 +97,8 @@ public class RulesLibrary {
 		for (KnowledgePackage kpackg : kbase.getKnowledgePackages()) {
 			for (Rule rule : kpackg.getRules()) {
 				boolean excluded = false;
-				//String ruleUid = (String) rule.getMetaData().get("UID");
-				String ruleUid = (String) rule.getMetaAttribute("UID");
+				String ruleUid = (String) rule.getMetaData().get("UID");
+				//String ruleUid = (String) rule.getMetaAttribute("UID");
 				if (ruleUid != null) {
 					I_GetConceptData role = contextHelper.getRoleInContext(ruleUid, context);
 					if (role != null && role.getConceptNid() == excludeClause.getConceptNid()) {
@@ -117,65 +119,27 @@ public class RulesLibrary {
 		KnowledgeBase kbase = getKnowledgeBaseForContext(context, config);
 
 		StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
-		ksession.setGlobal("resultsCollector", new ResultsCollectorWorkBench());
+		
+		//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+		
+		ResultsCollectorWorkBench results = new ResultsCollectorWorkBench();
+			
+		ksession.setGlobal("resultsCollector", results);
 		ksession.setGlobal("transitiveClosureHelper", new TransitiveClosureHelperWorkbench());
-
-		//EConcept testConcept = new EConcept(concept);
-		//ksession.insert(testConcept);
-
+		
 		ConceptVersionBI conceptBi = Ts.get().getConceptVersion(new Coordinate(config.getPrecedence(),
 				config.getViewPositionSetReadOnly(), config.getAllowedStatus(), config.getDestRelTypes(),
 				config.getConflictResolutionStrategy()), concept.getNid());
-		ksession.insert(conceptBi);
+		
+		DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version");
 
-//		I_TermFactory tf = Terms.get();
-//
-//		ConAttrVersionBI attributeTuple = conceptBi.getConAttrsActive();
-//		TkConceptAttributes loopAttribute = new TkConceptAttributes();
-//		loopAttribute.setAuthorUuid(tf.nidToUuid(attributeTuple.getAuthorNid()));
-//		loopAttribute.setDefined(attributeTuple.isDefined());
-//		loopAttribute.setPathUuid(tf.nidToUuid(attributeTuple.getPathNid()));
-//		loopAttribute.setPrimordialComponentUuid(attributeTuple.getPrimUuid());
-//		loopAttribute.setStatusUuid(tf.nidToUuid(attributeTuple.getStatusNid()));
-//		loopAttribute.setTime(attributeTuple.getTime());
-//		ksession.insert(loopAttribute);
-//
-//		for (DescriptionVersionBI descriptionVersion : conceptBi.getDescsActive()) {
-//			TkDescription loopDescription = new TkDescription();
-//			loopDescription.setAuthorUuid(tf.nidToUuid(descriptionVersion.getAuthorNid()));
-//			loopDescription.setConceptUuid(tf.nidToUuid(descriptionVersion.getConceptNid()));
-//			loopDescription.setInitialCaseSignificant(descriptionVersion.isInitialCaseSignificant());
-//			loopDescription.setLang(descriptionVersion.getLang());
-//			loopDescription.setText(descriptionVersion.getText());
-//			loopDescription.setTime(descriptionVersion.getTime());
-//			loopDescription.setStatusUuid(tf.nidToUuid(descriptionVersion.getStatusNid()));
-//			loopDescription.setPathUuid(tf.nidToUuid(descriptionVersion.getPathNid()));
-//			loopDescription.setPrimordialComponentUuid(descriptionVersion.getPrimUuid());
-//			loopDescription.setTypeUuid(tf.nidToUuid(descriptionVersion.getTypeNid()));
-//			ksession.insert(loopDescription);
-//		}
-//
-//		for (RelationshipVersionBI relTuple : conceptBi.getRelsOutgoingActive()) {
-//			TkRelationship loopRel = new TkRelationship();
-//			loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()));
-//			loopRel.setC1Uuid(tf.nidToUuid(relTuple.getOriginNid()));
-//			loopRel.setC2Uuid(tf.nidToUuid(relTuple.getDestinationNid()));
-//			loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()));
-//			loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()));
-//			loopRel.setPrimordialComponentUuid(relTuple.getPrimUuid());
-//			loopRel.setRefinabilityUuid(tf.nidToUuid(relTuple.getRefinabilityNid()));
-//			loopRel.setRelGroup(relTuple.getGroup());
-//			loopRel.setStatusUuid(tf.nidToUuid(relTuple.getStatusNid()));
-//			loopRel.setTime(relTuple.getTime());
-//			loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()));
-//			ksession.insert(loopRel);
-//		}
-
+		ksession.insert(testConcept);
+		
 		ksession.fireAllRules();
 
-		ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
+		//ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
 
-		for (ResultsItem resultsItem : results.getErrorCodes() ) {
+		for (ResultsItem resultsItem : results.getResultsItems() ) {
 			results.getAlertList().add(new AlertToDataConstraintFailure(
 					AlertToDataConstraintFailure.ALERT_TYPE.ERROR, 
 					resultsItem.getErrorCode() + " - " + resultsItem.getMessage(), 

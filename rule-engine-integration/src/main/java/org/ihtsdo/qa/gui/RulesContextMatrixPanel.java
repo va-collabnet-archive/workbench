@@ -99,12 +99,12 @@ public class RulesContextMatrixPanel extends JPanel {
 						String ditaUid = null;
 						
 						try {
-							//ruleUid = (String) rule.getMetaData().get("UID");
-							ruleUid = rule.getMetaAttribute("UID");
-							//description = (String) rule.getMetaData().get("DESCRIPTION");
-							description = rule.getMetaAttribute("DESCRIPTION");
-							//ditaUid = (String) rule.getMetaData().get("DITA_UID");
-							ditaUid = rule.getMetaAttribute("DITA_UID");
+							ruleUid = (String) rule.getMetaData().get("UID");
+							//ruleUid = rule.getMetaAttribute("UID");
+							description = (String) rule.getMetaData().get("DESCRIPTION");
+							//description = rule.getMetaAttribute("DESCRIPTION");
+							ditaUid = (String) rule.getMetaData().get("DITA_UID");
+							//ditaUid = rule.getMetaAttribute("DITA_UID");
 						} catch (Exception e) {
 							// problem retrieving metadata, do nothing
 							System.out.println("Malformed metadata..");
