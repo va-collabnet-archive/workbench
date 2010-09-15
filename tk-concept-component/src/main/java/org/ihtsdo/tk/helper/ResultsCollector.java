@@ -26,8 +26,7 @@ public class ResultsCollector {
 	
 	/** The alert list. */
 	//private List<AlertToDataConstraintFailure> alertList;
-	private List<ResultsItem> errorCodes;
-	
+	private List<ResultsItem> resultsItems;
 	
 	/**
 	 * Instantiates a new results collector.
@@ -39,18 +38,18 @@ public class ResultsCollector {
 	public ResultsCollector() {
 		super();
 		//this.alertList = new ArrayList<AlertToDataConstraintFailure>();
-		this.errorCodes = new ArrayList<ResultsItem>();
+		this.resultsItems = new ArrayList<ResultsItem>();
 	}
 
-	public List<ResultsItem> getErrorCodes() {
-		return errorCodes;
+	public void addResultsItem(ResultsItem resultsItem) {
+		this.resultsItems.add(resultsItem);
 	}
 
-	public void setErrorCodes(List<ResultsItem> errorCodes) {
-		this.errorCodes = errorCodes;
+	public List<ResultsItem> getResultsItems() {
+		return resultsItems;
 	}
-	
-	public void addErrorCode(ResultsItem resultsItem) {
-		this.errorCodes.add(resultsItem);
+
+	public void setResultsItems(List<ResultsItem> resultsItems) {
+		this.resultsItems = resultsItems;
 	}
 }
