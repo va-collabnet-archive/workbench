@@ -7,9 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dwfa.ace.api.I_Identify;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -51,7 +50,7 @@ public class ERefsetLongMember extends ERefsetMember<ERefsetLongRevision> {
     public ERefsetLongMember() {
         super();
     }
-    
+
     public ERefsetLongMember(I_ExtendByRefVersion m) throws TerminologyException, IOException {
         if (I_Identify.class.isAssignableFrom(m.getClass())) {
             convert((I_Identify) m);
@@ -96,7 +95,7 @@ public class ERefsetLongMember extends ERefsetMember<ERefsetLongRevision> {
 
     @Override
     public REFSET_TYPES getType() {
-        return REFSET_TYPES.INT;
+        return REFSET_TYPES.LONG;
     }
 
     public List<ERefsetLongRevision> getRevisionList() {
@@ -107,7 +106,7 @@ public class ERefsetLongMember extends ERefsetMember<ERefsetLongRevision> {
         return longValue;
     }
 
-    public void setIntValue(long longValue) {
+    public void setLongValue(long longValue) {
         this.longValue = longValue;
     }
 
@@ -123,7 +122,7 @@ public class ERefsetLongMember extends ERefsetMember<ERefsetLongRevision> {
         buff.append(super.toString());
         return buff.toString();
     }
-    
+
     /**
      * Returns a hash code for this <code>ERefsetLongMember</code>.
      * 
@@ -134,14 +133,12 @@ public class ERefsetLongMember extends ERefsetMember<ERefsetLongRevision> {
     }
 
     /**
-     * Compares this object to the specified object. The result is <tt>true</tt>
-     * if and only if the argument is not <tt>null</tt>, is a
-     * <tt>ERefsetLongMember</tt> object, and contains the same values, field by field, 
+     * Compares this object to the specified object. The result is <tt>true</tt> if and only if the argument is not
+     * <tt>null</tt>, is a <tt>ERefsetLongMember</tt> object, and contains the same values, field by field,
      * as this <tt>ERefsetLongMember</tt>.
      * 
      * @param obj the object to compare with.
-     * @return <code>true</code> if the objects are the same; 
-     *         <code>false</code> otherwise.
+     * @return <code>true</code> if the objects are the same; <code>false</code> otherwise.
      */
     public boolean equals(Object obj) {
         if (obj == null)
