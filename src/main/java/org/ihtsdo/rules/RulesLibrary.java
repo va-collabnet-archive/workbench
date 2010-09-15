@@ -127,9 +127,7 @@ public class RulesLibrary {
 		ksession.setGlobal("resultsCollector", results);
 		ksession.setGlobal("transitiveClosureHelper", new TransitiveClosureHelperWorkbench());
 		
-		ConceptVersionBI conceptBi = Ts.get().getConceptVersion(new Coordinate(config.getPrecedence(),
-				config.getViewPositionSetReadOnly(), config.getAllowedStatus(), config.getDestRelTypes(),
-				config.getConflictResolutionStrategy()), concept.getNid());
+		ConceptVersionBI conceptBi = Ts.get().getConceptVersion(config.getCoordinate(), concept.getNid());
 		
 		DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version");
 
