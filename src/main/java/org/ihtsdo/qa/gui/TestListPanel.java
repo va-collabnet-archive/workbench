@@ -95,7 +95,7 @@ public class TestListPanel extends JPanel {
 			I_GetConceptData context = (I_GetConceptData) comboBox1.getSelectedItem();
 			try {
 				ResultsCollectorWorkBench results = RulesLibrary.checkConcept(loopConcept, context, false, config);
-				for (ResultsItem resultsItem : results.getErrorCodes()) {
+				for (ResultsItem resultsItem : results.getResultsItems()) {
 					table1Model.addRow(
 							new String[] {loopConcept.toString(), "[" + resultsItem.getErrorCode() + "] " + resultsItem.getMessage()});
 				}

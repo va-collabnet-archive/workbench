@@ -91,7 +91,7 @@ public class TestObjectCheck extends TestCase {
 			ResultsCollectorWorkBench results = RulesLibrary.checkObjects(objects, 
 					RulesLibrary.CONCEPT_MODEL_PKG);
 			System.out.println("Done...");
-			System.out.println("Results size: " + results.getErrorCodes().size());
+			System.out.println("Results size: " + results.getResultsItems().size());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

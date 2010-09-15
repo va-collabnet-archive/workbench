@@ -94,7 +94,7 @@ public class DroolsUncommittedAgentKnowledgeBaseTest extends TestCase {
 			ResultsCollector results = RulesLibrary.checkObjectsTestModel(objects, 
 					RulesLibrary.CONCEPT_MODEL_PKG);
 			System.out.println("Done...");
-			System.out.println("Results size: " + results.getErrorCodes().size());
+			System.out.println("Results size: " + results.getResultsItems().size());
 			
 //			for (int errorCode : results.getErrorCodes().keySet() ) {
 //				System.out.println(errorCode + " - " + results.getErrorCodes().get(errorCode));

@@ -210,21 +210,21 @@ public class TestContexts extends TestCase {
 		}
 		
 		ResultsCollectorWorkBench results = RulesLibrary.checkConcept(testConcept, context1, false, config);
-		assertEquals(1,results.getErrorCodes().size());
+		assertEquals(1,results.getResultsItems().size());
 		
 		contextHelper.setRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context1, includeClause);
 		assertEquals(includeClause.getConceptNid(), 
 				contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context1).getConceptNid());
 
 		results = RulesLibrary.checkConcept(testConcept, context1, false, config);
-		assertEquals(2,results.getErrorCodes().size());
+		assertEquals(2,results.getResultsItems().size());
 		
 		contextHelper.setRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context1, excludeClause);
 		assertEquals(excludeClause.getConceptNid(), 
 				contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context1).getConceptNid());
 		
 		results = RulesLibrary.checkConcept(testConcept, context1, false, config);
-		assertEquals(1,results.getErrorCodes().size());
+		assertEquals(1,results.getResultsItems().size());
 		
 		System.out.println("End!");
 

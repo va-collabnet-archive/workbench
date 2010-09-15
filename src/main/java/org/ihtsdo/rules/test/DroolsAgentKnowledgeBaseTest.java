@@ -27,8 +27,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
-import org.ihtsdo.rules.RulesLibrary;
-import org.ihtsdo.tk.helper.ResultsCollector;
 
 /**
  * The Class DomainModelTestCheck.
@@ -71,10 +69,10 @@ public class DroolsAgentKnowledgeBaseTest extends TestCase {
 	 */
 	public void testStateFull() {
 		try {
-			System.out.println("Updating knowledge base...");
-			RulesLibrary.getKnowledgeBase(RulesLibrary.CONCEPT_MODEL_PKG, 
-					"rules/change-set.xml", true);
-			System.out.println("Knowledge base updated");
+//			System.out.println("Updating knowledge base...");
+//			RulesLibrary.getKnowledgeBase(RulesLibrary.CONCEPT_MODEL_PKG, 
+//					"rules/change-set.xml", true);
+//			System.out.println("Knowledge base updated");
 			
 //			UUID conceptUUID = UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8");
 //			Concept concept = new Concept(conceptUUID, null, true, null, false);
@@ -92,10 +90,10 @@ public class DroolsAgentKnowledgeBaseTest extends TestCase {
 //			description.setId(UUID.randomUUID());
 //			objects.add(description);
 //			objects.add(relationship);
-			ResultsCollector results = RulesLibrary.checkObjectsTestModel(objects, 
-					RulesLibrary.CONCEPT_MODEL_PKG);
-			System.out.println("Done...");
-			System.out.println("Results size: " + results.getErrorCodes().size());
+//			ResultsCollector results = RulesLibrary.checkObjectsTestModel(objects, 
+//					RulesLibrary.CONCEPT_MODEL_PKG);
+//			System.out.println("Done...");
+//			System.out.println("Results size: " + results.getResultsItems().size());
 			
 //			for (int errorCode : results.getErrorCodes().keySet() ) {
 //				System.out.println(errorCode + " - " + results.getErrorCodes().get(errorCode));
