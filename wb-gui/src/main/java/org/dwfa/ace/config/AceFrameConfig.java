@@ -3055,7 +3055,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
 	@Override
 	public Coordinate getCoordinate() {
-		return  new Coordinate(getPrecedence(), getViewPositionSetReadOnly(), 
-				getAllowedStatus(), getDestRelTypes(), getConflictResolutionStrategy(), languagePreferenceList.get(0));
+		if (languagePreferenceList != null && languagePreferenceList.size()>1) {
+			return  new Coordinate(getPrecedence(), getViewPositionSetReadOnly(), 
+					getAllowedStatus(), getDestRelTypes(), getConflictResolutionStrategy(), languagePreferenceList.get(0));
+		} else {
+			return  new Coordinate(getPrecedence(), getViewPositionSetReadOnly(), 
+					getAllowedStatus(), getDestRelTypes(), getConflictResolutionStrategy(), Integer.MAX_VALUE);
+		}
 	}
 }

@@ -100,10 +100,7 @@ public class EditPanelKb implements Runnable {
 				logger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 			}
 			try {
-				Coordinate coordinate = new Coordinate(config.getPrecedence(),
-						config.getViewPositionSetReadOnly(), config
-								.getAllowedStatus(), config.getDestRelTypes(),
-						config.getConflictResolutionStrategy(), config.getLanguagePreferenceList().get(0));
+				Coordinate coordinate = config.getCoordinate();
 				ksession.setGlobal("templates", templates);
 				ksession.insert(Ts.get().getConceptVersion(coordinate, c.getNid()));
 				ksession.fireAllRules();

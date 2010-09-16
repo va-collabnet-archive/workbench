@@ -120,9 +120,7 @@ public class ConceptView extends JPanel {
 							gbc.gridy++;
 						}
 						
-						Coordinate coordinate = new Coordinate(config.getPrecedence(), config.getViewPositionSetReadOnly(), 
-								config.getAllowedStatus(), config.getDestRelTypes(), config.getConflictResolutionStrategy(), config.getLanguagePreferenceList().get(0));
-						
+						Coordinate coordinate = config.getCoordinate();
 						
 						CollapsePanel  cpr = new CollapsePanel("relationships", settings);
 						boolean cprAdded = false;
