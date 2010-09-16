@@ -52,7 +52,7 @@ public interface I_Path extends PathBI {
      * origins of the
      * additional paths provided.
      */
-    public Set<? extends PositionBI> getNormalisedOrigins(Collection<I_Path> paths);
+    public Set<? extends PositionBI> getNormalisedOrigins(Collection<PathBI> paths);
 
     public void convertIds(I_MapNativeToNative jarToDbNativeMap);
 
