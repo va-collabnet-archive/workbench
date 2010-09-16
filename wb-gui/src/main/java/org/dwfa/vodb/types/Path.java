@@ -31,6 +31,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAcePath;
@@ -41,7 +42,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 
-public class Path implements PathBI {
+public class Path implements PathBI, I_Path {
     /**
 	 * 
 	 */
@@ -60,7 +61,7 @@ public class Path implements PathBI {
             this.origins = new HashSet<PositionBI>(0);
         }
     }
-
+    
     public boolean equals(PathBI another) {
         return (conceptNid == another.getConceptNid());
     }
@@ -111,7 +112,7 @@ public class Path implements PathBI {
     public Set<PositionBI> getNormalisedOrigins() {
         return getNormalisedOrigins(null);
     }
-
+    
     public Set<PositionBI> getNormalisedOrigins(Collection<PathBI> paths) {
         final Set<PositionBI> inheritedOrigins = getInheritedOrigins();
         if (paths != null) {
