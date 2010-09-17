@@ -1,17 +1,25 @@
 package org.ihtsdo.mojo.mojo;
 
 import java.io.File;
+import java.util.Collection;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.dwfa.ace.api.DatabaseSetupConfig;
+import org.dwfa.ace.api.I_ImplementTermFactory;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.util.io.FileIO;
+import org.ihtsdo.concept.component.description.Description;
+import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
+import org.ihtsdo.lucene.LuceneManager;
+import org.ihtsdo.tk.Ts;
 
 /**
  * Goal which loads an EConcept.jbin file into a bdb.
  * 
- * @goal load-econcepts-multi
+ * @goal vodb-mutable-to-readonly
  * 
- * @phase vodb-mutable-to-readonly
+ * @phase process-resources
  */
 
 public class VodbMutableToReadOnly extends AbstractMojo {
@@ -19,7 +27,7 @@ public class VodbMutableToReadOnly extends AbstractMojo {
     /**
      * Berkeley directory.
      * 
-     * @parameter expression="${project.build.directory}/classes/berkeley-db"
+     * @parameter expression="${project.build.directory}/berkeley-db"
      * @required
      */
     private File berkeleyDir;
@@ -34,6 +42,13 @@ public class VodbMutableToReadOnly extends AbstractMojo {
             FileIO.recursiveDelete(new File(berkeleyDir, "read-only"));
             File dirToMove = new File(berkeleyDir, "mutable");
             dirToMove.renameTo(new File(berkeleyDir, "read-only"));
+            new File(berkeleyDir, "mutable").mkdir();
+            LuceneManager.setDbRootDir(berkeleyDir);
+            Terms.createFactory(berkeleyDir, false, 0L, new DatabaseSetupConfig());
+            LuceneManager.writeToLucene((Collection<Description>) Ts.get().getConcept(ReferenceConcepts.CURRENT.getNid()).getDescs());
+            I_ImplementTermFactory termFactoryImpl = (I_ImplementTermFactory) Terms.get();
+            termFactoryImpl.close();
+
         } catch (Exception ex) {
             throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
         } catch (Throwable ex) {
