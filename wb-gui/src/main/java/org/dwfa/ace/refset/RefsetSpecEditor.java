@@ -381,7 +381,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                     } else {
                         Long lastComputeTime = spec.getLastComputeTime();
                         if (lastComputeTime == null) {
-                            computeStatusValueLabel.setText("spec has never been computed");
+                            computeStatusValueLabel
+                                .setText("spec is new (yet to be modified) and has never been computed");
                             computeStatusValueLabel.setForeground(Color.black);
                         } else {
                             computeStatusValueLabel.setText("spec unmodified since last compute");
