@@ -36,7 +36,7 @@
       <dependency>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-icons</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.1</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>

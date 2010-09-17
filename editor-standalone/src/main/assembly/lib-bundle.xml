@@ -35,6 +35,7 @@
         <include>org.tmatesoft.svnkit:svnkit</include>
         <include>org.tmatesoft.svnkit:svnkit-javahl</include>
         <include>com.sun.jna:jna</include>
+        <include>com.sun:jaccess</include>
         <include>com.trilead:trilead-ssh2</include>
         <include>commons-primitives:commons-primitives</include>
         <include>au.csiro:snorocket-bridge</include>

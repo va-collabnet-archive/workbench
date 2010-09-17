@@ -5,8 +5,8 @@
   <fileSets>
     <fileSet>
       <!-- Ideally, the plugins would generate into a clearer output, such as target/berkley-db -->
-      <directory>target/classes</directory>
-      <outputDirectory>/</outputDirectory>
+      <directory>target/berkeley-db</directory>
+      <outputDirectory>/berkeley-db</outputDirectory>
     </fileSet>
   </fileSets>
   <includeBaseDirectory>false</includeBaseDirectory>

@@ -93,7 +93,7 @@
 							<goal>vodb-open</goal>
 						</goals>
 						<configuration>
-							<vodbDirectory>${project.build.directory}/classes/berkeley-db
+							<vodbDirectory>${project.build.directory}/berkeley-db
 							</vodbDirectory>
 						</configuration>
 					</execution>
@@ -479,6 +479,13 @@
 							<goal>vodb-close</goal>
 						</goals>
 					</execution>
+					<execution>
+						<id>vodb-mutable-to-readonly</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>vodb-mutable-to-readonly</goal>
+						</goals>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>
@@ -492,8 +499,8 @@
 							<goal>load-econcepts-multi</goal>
 						</goals>
 						<configuration>
-							<generatedResources>${project.build.directory}/generated-resources/jbin
-							</generatedResources>
+							<generatedResources>${project.build.directory}/generated-resources/jbin</generatedResources>
+							<moveToReadOnly>false</moveToReadOnly>
 							<conceptsFileNames>
 								<String>cement.jbin</String>
 								<String>sctSiEConcepts.jbin</String>
