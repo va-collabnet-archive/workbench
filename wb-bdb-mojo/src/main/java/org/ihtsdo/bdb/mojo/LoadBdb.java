@@ -63,22 +63,20 @@ public class LoadBdb extends AbstractMojo {
 	 * @required
 	 */
 	private String generatedResources;
-	
-	/**
-	 * Generated resources directory.
-	 * 
-	 * @parameter expression="${project.build.directory}/classes/berkeley-db/lucene"
-	 * @required
-	 */
-    private File luceneDir;
-    
+	    
     /**
      * Generated resources directory.
      * 
-     * @parameter expression="${project.build.directory}/classes/berkeley-db"
+     * @parameter expression="${project.build.directory}/berkeley-db"
      * @required
      */
     private File berkeleyDir;
+    
+	/**
+	 * 
+	 * @parameter default-value=true
+	 */
+    private boolean moveToReadOnly;
 
 
 	AtomicInteger conceptsRead = new AtomicInteger();
@@ -155,9 +153,11 @@ public class LoadBdb extends AbstractMojo {
 			getLog().info("elapsed time: "
 									+ (System.currentTimeMillis() - startTime));
 
-			FileIO.recursiveDelete(new File(berkeleyDir, "read-only"));
-			File dirToMove = new File(berkeleyDir, "mutable");
-			dirToMove.renameTo(new File(berkeleyDir, "read-only"));
+			if (moveToReadOnly) {
+				FileIO.recursiveDelete(new File(berkeleyDir, "read-only"));
+				File dirToMove = new File(berkeleyDir, "mutable");
+				dirToMove.renameTo(new File(berkeleyDir, "read-only"));
+			}
 		} catch (Exception ex) {
 			throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
 		} catch (Throwable ex) {
@@ -219,7 +219,7 @@ public class LoadBdb extends AbstractMojo {
 
 	
     public void createLuceneDescriptionIndex() throws Exception {
-        LuceneManager.setDbRootDir(luceneDir);
+        LuceneManager.setDbRootDir(berkeleyDir);
         LuceneManager.createLuceneDescriptionIndex();
     }
 }

@@ -71,7 +71,7 @@ public class LuceneManager {
 	}
 	public static void init() throws IOException {
 		luceneReadOnlyDir = initDirectory(luceneReadOnlyDirFile, false);
-		luceneMutableDir = initDirectory(luceneMutableDirFile, false);
+		luceneMutableDir = initDirectory(luceneMutableDirFile, true);
 	}
 
 	private static Directory initDirectory(File luceneDirFile, boolean mutable)
@@ -210,14 +210,7 @@ public class LuceneManager {
 			ParallelMultiSearcher searcherCopy = searcher;
 			if (searcherCopy == null) {
 				IndexSearcher readOnlySearcher = new IndexSearcher(luceneReadOnlyDir, true);
-				IndexSearcher mutableSearcher = null;
-				try {
-					mutableSearcher = new IndexSearcher(luceneMutableDir, true);
-				} catch (FileNotFoundException e) {
-					AceLog.getAppLog().warning("Search result: " + e.getLocalizedMessage());
-					luceneMutableDir = setupWriter(luceneMutableDirFile, luceneMutableDir);
-					writeToLuceneNoLock((Collection<Description>) Ts.get().getConcept(ReferenceConcepts.AUX_IS_A.getNid()).getDescs());
-				}
+				IndexSearcher mutableSearcher  = new IndexSearcher(luceneMutableDir, true);
 				searcherCopy = new ParallelMultiSearcher(readOnlySearcher, mutableSearcher);
 				searcher = searcherCopy;
 			}

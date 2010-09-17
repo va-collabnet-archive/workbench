@@ -64,20 +64,18 @@ public class LoadBdbMulti extends AbstractMojo {
     private String generatedResources;
 
     /**
-     * Lucene directory.
-     * 
-     * @parameter expression="${project.build.directory}/classes/berkeley-db/lucene"
-     * @required
-     */
-    private File luceneDir;
-
-    /**
      * Berkeley directory.
      * 
-     * @parameter expression="${project.build.directory}/classes/berkeley-db"
+     * @parameter expression="${project.build.directory}/berkeley-db"
      * @required
      */
     private File berkeleyDir;
+
+	/**
+	 * 
+	 * @parameter default-value=true
+	 */
+    private boolean moveToReadOnly;
 
     AtomicInteger conceptsRead = new AtomicInteger();
     AtomicInteger conceptsProcessed = new AtomicInteger();
@@ -88,11 +86,11 @@ public class LoadBdbMulti extends AbstractMojo {
     private int converterSize = 1;
 
     public void execute() throws MojoExecutionException {
-        executeMojo(conceptsFileNames, generatedResources, luceneDir, berkeleyDir);
+        executeMojo(conceptsFileNames, generatedResources, berkeleyDir);
 
     }
 
-    void executeMojo(String[] conceptsFileNames, String generatedResources, File luceneDir,
+    void executeMojo(String[] conceptsFileNames, String generatedResources,
             File berkeleyDir) throws MojoExecutionException {
         try {
             for (int i = 0; i < converterSize; i++) {
@@ -157,9 +155,11 @@ public class LoadBdbMulti extends AbstractMojo {
             getLog().info("db closed");
             getLog().info("elapsed time: " + (System.currentTimeMillis() - startTime));
 
-            FileIO.recursiveDelete(new File(berkeleyDir, "read-only"));
-            File dirToMove = new File(berkeleyDir, "mutable");
-            dirToMove.renameTo(new File(berkeleyDir, "read-only"));
+			if (moveToReadOnly) {
+				FileIO.recursiveDelete(new File(berkeleyDir, "read-only"));
+				File dirToMove = new File(berkeleyDir, "mutable");
+				dirToMove.renameTo(new File(berkeleyDir, "read-only"));
+			}
         } catch (Exception ex) {
             throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
         } catch (Throwable ex) {
@@ -220,7 +220,7 @@ public class LoadBdbMulti extends AbstractMojo {
     }
 
     public void createLuceneDescriptionIndex() throws Exception {
-        LuceneManager.setDbRootDir(luceneDir);
+        LuceneManager.setDbRootDir(berkeleyDir);
         LuceneManager.createLuceneDescriptionIndex();
     }
 }
