@@ -146,6 +146,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             AceLog.getAppLog().info("Start execution of refset spec : " + refsetSpec.getInitialText());
 
             Condition condition = Terms.get().computeRefset(refset.getNid(), query, configFrame);
+            Terms.get().getActiveAceFrameConfig().refreshRefsetTab();
 
             if (cancelComputation || condition == Condition.ITEM_CANCELED) {
                 Terms.get().cancel();
