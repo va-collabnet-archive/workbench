@@ -1,9 +1,11 @@
 package org.ihtsdo.lucene;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 
@@ -17,8 +19,9 @@ import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ParallelMultiSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.util.Version;
@@ -30,8 +33,6 @@ import org.dwfa.bpa.util.Stopwatch;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
-import org.ihtsdo.tk.Ts;
 
 public class LuceneManager {
 	
@@ -70,8 +71,12 @@ public class LuceneManager {
 	    }
 	}
 	public static void init() throws IOException {
-		luceneReadOnlyDir = initDirectory(luceneReadOnlyDirFile, false);
-		luceneMutableDir = initDirectory(luceneMutableDirFile, true);
+		if (luceneReadOnlyDir == null) {
+			luceneReadOnlyDir = initDirectory(luceneReadOnlyDirFile, false);
+		}
+		if (luceneMutableDir == null) {
+			luceneMutableDir = initDirectory(luceneMutableDirFile, true);
+		}
 	}
 
 	private static Directory initDirectory(File luceneDirFile, boolean mutable)
@@ -143,13 +148,12 @@ public class LuceneManager {
         try {
         	rwl.writeLock().lock();
         	writeToLuceneNoLock(descriptions);
-        	rwl.writeLock().unlock();
         } catch (CorruptIndexException e) {
-        	rwl.writeLock().unlock();
             throw new IOException(e);
         } catch (IOException e) {
-        	rwl.writeLock().unlock();
             throw new IOException(e);
+        } finally {
+        	rwl.writeLock().unlock();
         }
     }
 	private static void writeToLuceneNoLock(Collection<Description> descriptions)
@@ -214,7 +218,33 @@ public class LuceneManager {
 				searcherCopy = new ParallelMultiSearcher(readOnlySearcher, mutableSearcher);
 				searcher = searcherCopy;
 			}
-			return new SearchResult(searcherCopy.search(q, null, matchLimit), searcherCopy);
+			TopDocs topDocs = searcherCopy.search(q, null, matchLimit);
+			
+			// Suppress duplicates in the read-only index 
+			List<ScoreDoc> newDocs = new ArrayList<ScoreDoc>(topDocs.scoreDocs.length);
+			HashSet<Integer> dids = new HashSet<Integer>(topDocs.scoreDocs.length);
+			for (ScoreDoc sd: topDocs.scoreDocs) {
+				int index = searcherCopy.subSearcher(sd.doc);
+				if (index == 1) {
+					newDocs.add(sd);
+					Document d = searcher.doc(sd.doc);
+		            int nid = Integer.parseInt(d.get("dnid"));
+		            dids.add(nid);
+				}
+			}
+			for (ScoreDoc sd: topDocs.scoreDocs) {
+				int index = searcherCopy.subSearcher(sd.doc);
+				if (index == 0) {
+					Document d = searcher.doc(sd.doc);
+		            int nid = Integer.parseInt(d.get("dnid"));
+		            if (!dids.contains(nid)) {
+						newDocs.add(sd);
+		            }
+				}
+			}
+			topDocs.scoreDocs = newDocs.toArray(new ScoreDoc[newDocs.size()]);
+			topDocs.totalHits = topDocs.scoreDocs.length;
+			return new SearchResult(topDocs, searcherCopy);
 		} finally {
 			rwl.readLock().unlock();
 		}
