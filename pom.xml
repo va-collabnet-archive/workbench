@@ -111,6 +111,7 @@
     <module>sct-mini-release</module>
     <module>ihtsdo-generate-econcepts-trek</module>
     <module>database</module>
+    <module>database-synchronized</module>
     <module>java-binding</module>
     <module>profiles</module>
     <module>editor-standalone</module>
