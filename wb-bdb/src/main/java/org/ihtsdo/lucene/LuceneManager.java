@@ -158,6 +158,13 @@ public class LuceneManager {
     }
 	private static void writeToLuceneNoLock(Collection<Description> descriptions)
 			throws CorruptIndexException, IOException {
+        if (writer == null) {
+			luceneMutableDir = setupWriter(luceneMutableDirFile, luceneMutableDir);
+	        writer.setUseCompoundFile(true);
+	        writer.setMergeFactor(15);
+	        writer.setMaxMergeDocs(Integer.MAX_VALUE);
+	        writer.setMaxBufferedDocs(1000);
+        }
 		IndexWriter writerCopy = writer;
 		if (writerCopy != null) {
 		    for (Description desc: descriptions) {

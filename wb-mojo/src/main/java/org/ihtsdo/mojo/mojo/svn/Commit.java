@@ -24,9 +24,9 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_HandleSubversion;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.svn.Svn;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.mojo.maven.MojoUtil;
 import org.tigris.subversion.javahl.PromptUserPassword3;
@@ -88,8 +88,10 @@ public class Commit extends AbstractMojo implements PromptUserPassword3 {
             } else {
                 workingCopyStr = System.getProperty("user.dir");
             }
-            I_HandleSubversion svn = LocalVersionedTerminology.get().getSvnHandler();
+            Svn.setConnectedToSvn(true);
+            I_HandleSubversion svn = new Svn();
             SubversionData svd = new SubversionData(repositoryUrlStr, workingCopyStr);
+            getLog().info("Connecting to: " + repositoryUrlStr + " as: " + username);
             svd.setUsername(username);
             svd.setPassword(password);
             svn.svnCommit(svd, this, false);

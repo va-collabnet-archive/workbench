@@ -533,7 +533,7 @@ public class Bdb {
 		return null;
 	}
 	public static Concept getConcept(int cNid) throws IOException {
-		assert cNid == Bdb.getConceptNid(cNid): " Not a concept nid: " + cNid;
+		assert cNid == Bdb.getConceptNid(cNid): " Not a concept nid: " + cNid + " Bdb cNid:"+ Bdb.getConceptNid(cNid);
 		return conceptDb.getConcept(cNid);
 	}
 

@@ -28,12 +28,14 @@ import java.util.logging.Level;
 import javax.swing.JOptionPane;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.activity.UpperInfoOnlyConsoleMonitor;
 import org.dwfa.ace.api.I_HandleSubversion;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.svn.SvnPrompter;
+import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.queue.ObjectServerCore;
 import org.dwfa.tapi.ComputationCanceled;
@@ -237,6 +239,9 @@ public class Svn implements I_HandleSubversion {
 
 	public static I_ShowActivity setupActivityPanel(String message)
 			throws TaskFailedException {
+		if (DwfaEnv.isHeadless()) {
+			return new UpperInfoOnlyConsoleMonitor();
+		}
 		try {
 			I_ShowActivity activity = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig(), message, false);
 			activity.setIndeterminate(true);
