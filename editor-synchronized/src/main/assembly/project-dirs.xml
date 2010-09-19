@@ -39,23 +39,13 @@
             <directoryMode>0755</directoryMode>
         </fileSet>
         <fileSet>
-            <directory>src/main/berkeley-db/</directory>
+            <directory>target/generated-resources/berkeley-db/read-only</directory>
             <lineEnding>keep</lineEnding>
             <filtered>false</filtered>
             <useStrictFiltering>false</useStrictFiltering>
             <useDefaultExcludes>true</useDefaultExcludes>
-            <outputDirectory>berkeley-db</outputDirectory>
+            <outputDirectory>berkeley-db/read-only</outputDirectory>
             <fileMode>0644</fileMode>
-            <directoryMode>0755</directoryMode>
-        </fileSet>
-        <fileSet>
-            <directory>target/generated-resources/berkeley-db/</directory>
-            <lineEnding>keep</lineEnding>
-            <filtered>false</filtered>
-            <useStrictFiltering>false</useStrictFiltering>
-            <useDefaultExcludes>true</useDefaultExcludes>
-            <outputDirectory>berkeley-db</outputDirectory>
-             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>
         </fileSet>
         <fileSet>
