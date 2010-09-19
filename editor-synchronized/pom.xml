@@ -326,7 +326,7 @@
 			</build>
 		</profile>
 		<profile>
-			<id>install4j</id>
+			<id>install4jx</id>
 			<build>
 				<plugins>
 					<plugin>

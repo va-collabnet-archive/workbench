@@ -8,7 +8,7 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<packaging>pom</packaging>
-	<artifactId>database-sync</artifactId>
+	<artifactId>database-syncronized</artifactId>
 	<name>Workbench Synchronized Database</name>
 	<description>Workbench Synchronized Database</description>
 	<dependencies>
@@ -39,15 +39,20 @@
 					</execution>
 				</executions>
 			</plugin>
-
 		</plugins>
 	</build>
 	<profiles>
 		<profile>
+			<id>generate-db-profile</id>
 			<activation>
+				<activeByDefault>false</activeByDefault>
+				<!-- 
+					maven 2.X bug prevents activation this from working properly. Will have to manage by hand till upgrade. 
+					http://jira.codehaus.org/browse/MNG-2363
 				<file>
 					<missing>src/main/berkeley-db</missing>
 				</file>
+				-->
 			</activation>
 			<build>
 				<plugins>

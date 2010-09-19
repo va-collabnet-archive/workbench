@@ -101,7 +101,7 @@
             <stagingDirectory>${user.home}/Sites/</stagingDirectory>
             <visibility>priv</visibility>
             <cubitProject>cement</cubitProject>
-            <siteRoot>${artifactId}</siteRoot>
+            <siteRoot>${project.artifactId}</siteRoot>
           </configuration>
         </plugin>
       </plugins>
@@ -111,7 +111,6 @@
     <module>sct-mini-release</module>
     <module>ihtsdo-generate-econcepts-trek</module>
     <module>database</module>
-    <module>database-synchronized</module>
     <module>java-binding</module>
     <module>profiles</module>
     <module>editor-standalone</module>
@@ -145,8 +144,9 @@
       </modules>
     </profile>
     <profile>
-      <id>synchronized</id>
+      <id>sync</id>
       <modules>
+        <module>database-synchronized</module>
         <module>editor-synchronized</module>
       </modules>
     </profile>
