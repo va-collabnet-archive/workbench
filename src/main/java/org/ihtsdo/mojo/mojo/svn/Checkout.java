@@ -1,19 +1,3 @@
-/**
- * Copyright (c) 2009 International Health Terminology Standards Development
- * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.ihtsdo.mojo.mojo.svn;
 
 import java.io.File;
@@ -31,16 +15,16 @@ import org.dwfa.util.io.FileIO;
 import org.ihtsdo.mojo.maven.MojoUtil;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
+
 /**
- * Commit the changes to svn.
+ * Update with svn changes.
  * 
- * @goal svn-commit
+ * @goal svn-checkout
  * 
  * @phase process-resources
  * @requiresDependencyResolution compile
  */
-
-public class Commit extends AbstractMojo implements PromptUserPassword3 {
+public class Checkout extends AbstractMojo implements PromptUserPassword3 {
     /**
      * Location of the svn working copy
      * 
@@ -89,12 +73,12 @@ public class Commit extends AbstractMojo implements PromptUserPassword3 {
                 workingCopyStr = System.getProperty("user.dir");
             }
             Svn.setConnectedToSvn(true);
-            Svn svn = new Svn();
+            I_HandleSubversion svn = new Svn();
             SubversionData svd = new SubversionData(repositoryUrlStr, workingCopyStr);
             getLog().info("Connecting to: " + repositoryUrlStr + " as: " + username);
             svd.setUsername(username);
             svd.setPassword(password);
-            svn.svnCommit(svd, this, false);
+            svn.svnCheckout(svd, this, false);
         } catch (NoSuchAlgorithmException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         } catch (IOException e) {
