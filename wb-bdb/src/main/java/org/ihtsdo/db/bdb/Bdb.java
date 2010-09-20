@@ -72,8 +72,7 @@ public class Bdb {
 	private static ThreadGroup dbdThreadGroup  = 
 		new ThreadGroup("db threads");
 
-	private static ExecutorService syncService = Executors.newFixedThreadPool(1, new NamedThreadFactory(dbdThreadGroup,
-	"Sync service"));
+	private static ExecutorService syncService;
 	
 	public static ConcurrentHashMap<Integer, Integer> watchList = 
 		new ConcurrentHashMap<Integer, Integer>();
@@ -132,6 +131,9 @@ public class Bdb {
 	public static void setup(String dbRoot, ActivityPanel activity) {
 		try {
 			closed = false;
+			syncService = Executors.newFixedThreadPool(1, 
+					new NamedThreadFactory(dbdThreadGroup, "Sync service"));
+			
 			BdbCommitManager.reset();
 			NidDataFromBdb.resetExecutorPool();
 			for (@SuppressWarnings("unused") OFFSETS o: OFFSETS.values()) {
