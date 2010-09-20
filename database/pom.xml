@@ -17,6 +17,12 @@
 			<version>2008-01-31</version>
 			<type>zip</type>
 		</dependency>
+		<dependency>
+			<groupId>org.ihtsdo.sample</groupId>
+			<artifactId>profiles</artifactId>
+			<version>${project.version}</version>
+			<type>zip</type>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -65,6 +71,19 @@
 							<targetSubDir>generated-resources/jbin</targetSubDir>
 							<runtimeArtifacts>
 								<runtimeArtifact>org.ihtsdo:ihtsdo-generate-econcepts</runtimeArtifact>
+							</runtimeArtifacts>
+						</configuration>
+					</execution>
+					<execution>
+						<id>write-change-set-directories</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>write-directories</goal>
+						</goals>
+						<configuration>
+							<targetSubDir>change-sets</targetSubDir>
+							<runtimeArtifacts>
+								<runtimeArtifact>org.ihtsdo.sample:profiles</runtimeArtifact>
 							</runtimeArtifacts>
 						</configuration>
 					</execution>

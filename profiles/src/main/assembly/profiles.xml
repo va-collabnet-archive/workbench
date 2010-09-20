@@ -7,9 +7,7 @@
       <directory>src/main/profiles</directory>
       <outputDirectory>/profiles</outputDirectory>
       <includes>
-        <include>**/*.ace</include>
-        <include>**/*.bp</include>
-        <include>**/*.xls</include>
+        <include>**/*.eccs</include>
       </includes>
     </fileSet>
   </fileSets>
