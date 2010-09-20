@@ -98,7 +98,9 @@ public class AddSubversionEntry extends AbstractTask {
             if (svd == null) {
                 svd = new SubversionData(repoUrl, workingCopy);
             }
-
+            if (svd.getRepositoryUrlStr() == null) {
+            	config.svnCompleteRepoInfo(svd);
+            }
             Prompter p = new Prompter();
             p.prompt(prompt, keyName, svd.getRepositoryUrlStr(), svd.getWorkingCopyStr(), svd.getUsername(),
                 svd.getPassword());

@@ -34,10 +34,10 @@ public class SubversionData implements Serializable {
     private String preferredReadRepository = null;
     
     private void fixDataErrors() {
-    	if (workingCopyStr.contains("\\")) {
+    	if (workingCopyStr != null && workingCopyStr.contains("\\")) {
     		workingCopyStr = workingCopyStr.replace('\\', '/');
     	}
-        if (repositoryUrlStr.startsWith("scm:svn:")) {
+        if (repositoryUrlStr != null && repositoryUrlStr.startsWith("scm:svn:")) {
         	repositoryUrlStr = repositoryUrlStr.substring("scm:svn:".length());
         }
     }
