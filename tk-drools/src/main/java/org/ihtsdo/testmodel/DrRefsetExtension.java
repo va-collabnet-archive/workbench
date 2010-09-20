@@ -5,24 +5,27 @@ import java.util.List;
 
 public class DrRefsetExtension {
 	private String primordialUuid;
-	
+
+	private String refsetUuid;
+	private String componentUuid;
+
 	private String c1Uuid;
 	private String c2Uuid;
-    private String c3Uuid;
-    private String strValue;
-    private boolean booleanValue;
-    private float floatValue;
-    private int intValue;
-    private long longValue;
-    private RefsetType refsetType;
-    
-    private List<DrIdentifier> identifiers;
+	private String c3Uuid;
+	private String strValue;
+	private boolean booleanValue;
+	private float floatValue;
+	private int intValue;
+	private long longValue;
+	private RefsetType refsetType;
+
+	private List<DrIdentifier> identifiers;
 
 	private String statusUuid;
 	private String pathUuid;
 	private String authorUuid;
 	private Long time;
-	
+
 	private String factContextName;
 
 	public DrRefsetExtension() {
@@ -155,6 +158,22 @@ public class DrRefsetExtension {
 
 	public void setFactContextName(String factContextName) {
 		this.factContextName = factContextName;
+	}
+
+	public String getRefsetUuid() {
+		return refsetUuid;
+	}
+
+	public void setRefsetUuid(String refsetUuid) {
+		this.refsetUuid = refsetUuid;
+	}
+
+	public String getComponentUuid() {
+		return componentUuid;
+	}
+
+	public void setComponentUuid(String componentUuid) {
+		this.componentUuid = componentUuid;
 	}
 
 }
