@@ -246,7 +246,7 @@
 							<goal>svn-checkout</goal>
 						</goals>
 						<configuration>
-							<workingCopyStr>target/wb-bundle/berkeley-db/mutable/</workingCopyStr>
+							<workingCopyStr>${project.build.directory}/wb-bundle/berkeley-db/mutable/</workingCopyStr>
 							<repositoryUrlStr>https://csfe.aceworkspace.net/svn/repos/workbench/wb-sample-pa/trunk/database-synchronized/src/main/berkeley-db/mutable/</repositoryUrlStr>
 							<username>${demo.sync.ci.user}</username>
 							<password>${demo.sync.ci.pwd}</password>
