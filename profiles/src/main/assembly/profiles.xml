@@ -8,6 +8,7 @@
       <outputDirectory>/profiles</outputDirectory>
       <includes>
         <include>**/*.eccs</include>
+        <include>**/*.ace</include>
       </includes>
     </fileSet>
   </fileSets>
