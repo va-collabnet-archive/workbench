@@ -44,6 +44,7 @@ import org.dwfa.maven.sctid.UuidSnomedDbMapHandler;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
+import org.dwfa.mojo.ConceptConstants;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
@@ -92,6 +93,8 @@ public abstract class AbstractComponentDtoUpdater {
     private final I_GetConceptData fullySpecifiedDescriptionType;
     /** Synonym description type. */
     private final I_GetConceptData synonymDescriptionType;
+    /** Synonym description type. */
+    private final I_GetConceptData conceptNonCurrentStatus;
     protected StatusChecker check;
 
     public AbstractComponentDtoUpdater(NAMESPACE defaultNamespace, PROJECT defaultProject) throws Exception {
@@ -120,6 +123,8 @@ public abstract class AbstractComponentDtoUpdater {
                 ArchitectonicAuxiliary.Concept.SNOMED_CORE.localize().getUids().iterator().next());
 
         aceLimitedStatusNId = ArchitectonicAuxiliary.Concept.LIMITED.localize().getNid();
+
+        conceptNonCurrentStatus = termFactory.getConcept(ConceptConstants.CONCEPT_NON_CURRENT.localize().getNid());
 
         currentConcept = termFactory.getConcept(
                 ArchitectonicAuxiliary.Concept.CURRENT.localize().getUids().iterator().next());
@@ -441,6 +446,14 @@ public abstract class AbstractComponentDtoUpdater {
 
         getBaseConceptDto(descriptionDto, tuple, idParts, latest);
         descriptionDto.setActive(check.isDescriptionActive(tuple.getStatusId()));
+        descriptionDto.setStatusCode(ArchitectonicAuxiliary.getSnomedDescriptionStatusId(
+                termFactory.getConcept(tuple.getStatusId()).getUids()) + "");
+
+		if (descriptionDto.getStatusCode() == "-1") {
+			if (tuple.getStatusId() == conceptNonCurrentStatus.getNid()) {
+				descriptionDto.setStatusCode("8");
+			}
+		}
 
         addUuidSctIdIndentifierToConceptDto(descriptionDto, tuple, idParts, TYPE.DESCRIPTION, tuple.getDescId(), latest);
 

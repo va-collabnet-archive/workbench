@@ -96,6 +96,9 @@ public class ConceptConstants {
     public static final ConceptSpec ACTIVE_VALUE = new ConceptSpec("Active value",
         "5b28ff9a-0770-4bbc-8e24-6279c5d3eb23");
 
+	public static final ConceptSpec CONCEPT_NON_CURRENT = new ConceptSpec("Concept non-current (foundation metadata concept)",
+			"5843b855-c94e-43e4-9d6a-414652cd800a");
+
     //TODO
 //    public static final ConceptSpec MAY_BE_A_HISTORY_REFSET = new ConceptSpec(
 //        "MOVED FROM association reference set (foundation metadata concept)", "76765f82-f9cb-349c-88b0-8261e4b46421");

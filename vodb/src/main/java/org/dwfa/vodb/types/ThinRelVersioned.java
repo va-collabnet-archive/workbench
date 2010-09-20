@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,16 +28,14 @@ import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionPart;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
-import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
@@ -73,13 +71,13 @@ public class ThinRelVersioned implements I_RelVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
-     * 
-     * 
-     * 
-     * 
-     * 
+     *
+     *
+     *
+     *
+     *
      * org.dwfa.vodb.types.I_RelVersioned#addVersion(org.dwfa.vodb.types.I_RelPart
      * )
      */
@@ -89,7 +87,7 @@ public class ThinRelVersioned implements I_RelVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.types.I_RelVersioned#addVersionNoRedundancyCheck(org.dwfa
      * .vodb.types.ThinRelPart)
@@ -100,7 +98,7 @@ public class ThinRelVersioned implements I_RelVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelVersioned#getVersions()
      */
     public List<I_RelPart> getVersions() {
@@ -121,7 +119,7 @@ public class ThinRelVersioned implements I_RelVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelVersioned#versionCount()
      */
     public int versionCount() {
@@ -130,7 +128,7 @@ public class ThinRelVersioned implements I_RelVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelVersioned#addRetiredRec(int[], int)
      */
     public boolean addRetiredRec(int[] releases, int retiredStatusId) {
@@ -181,7 +179,7 @@ public class ThinRelVersioned implements I_RelVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelVersioned#removeRedundantRecs()
      */
     public boolean removeRedundantRecs() {
@@ -227,12 +225,12 @@ public class ThinRelVersioned implements I_RelVersioned {
             System.err.println("Unable to convert nid to text. "+ e.getMessage());
         }
         return Integer.toString(nid);
-        
+
     }
-    
+
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelVersioned#getC1Id()
      */
     public int getC1Id() {
@@ -241,7 +239,7 @@ public class ThinRelVersioned implements I_RelVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelVersioned#getC2Id()
      */
     public int getC2Id() {
@@ -250,7 +248,7 @@ public class ThinRelVersioned implements I_RelVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelVersioned#getRelId()
      */
     public int getRelId() {
@@ -263,7 +261,7 @@ public class ThinRelVersioned implements I_RelVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelVersioned#getTuples()
      */
     public List<I_RelTuple> getTuples() {
@@ -285,7 +283,7 @@ public class ThinRelVersioned implements I_RelVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelVersioned#getFirstTuple()
      */
     public I_RelTuple getFirstTuple() {
@@ -294,7 +292,7 @@ public class ThinRelVersioned implements I_RelVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelVersioned#getLastTuple()
      */
     public I_RelTuple getLastTuple() {
@@ -325,9 +323,9 @@ public class ThinRelVersioned implements I_RelVersioned {
 
         List<I_RelTuple> tuples = new ArrayList<I_RelTuple>();
 
-        addTuples(null, allowedTypes, positions, tuples, addUncommitted);
-
         if (returnConflictResolvedLatestState) {
+            addTuples(null, allowedTypes, positions, tuples, addUncommitted);
+
             I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
             I_ManageConflict conflictResolutionStrategy;
             if (config == null) {
@@ -337,18 +335,15 @@ public class ThinRelVersioned implements I_RelVersioned {
             }
 
             tuples = conflictResolutionStrategy.resolveTuples(tuples);
-        }
-
-        if (allowedStatus != null) {
-            for (I_RelTuple relTuple : tuples) {
-                // filter by allowed status
-                if (allowedStatus.contains(relTuple.getStatusId())) {
-                    returnRels.add(relTuple);
-                }
-            }
+            List<I_RelPart> versions = new ArrayList<I_RelPart>();
+            for (I_RelTuple tuple : tuples) {
+            	versions.add(tuple.getPart());
+			}
+            adder.addTuples(allowedStatus, allowedTypes, positions, returnRels, addUncommitted, versions, this);
         } else {
+        	addTuples(allowedStatus, allowedTypes, positions, tuples, addUncommitted);
             returnRels.addAll(tuples);
-        }        
+        }
     }
 
     public void addTuples(I_IntSet allowedTypes, List<I_RelTuple> returnRels, boolean addUncommitted,
@@ -361,7 +356,7 @@ public class ThinRelVersioned implements I_RelVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @seeorg.dwfa.vodb.types.I_RelVersioned#convertIds(org.dwfa.vodb.jar.
      * I_MapNativeToNative)
      */
@@ -377,7 +372,7 @@ public class ThinRelVersioned implements I_RelVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelVersioned#getTimePathSet()
      */
     public Set<TimePathId> getTimePathSet() {
@@ -390,7 +385,7 @@ public class ThinRelVersioned implements I_RelVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelVersioned#setC2Id(int)
      */
     public void setC2Id(int destId) {
@@ -468,13 +463,13 @@ public class ThinRelVersioned implements I_RelVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
-     * 
-     * 
-     * 
-     * 
-     * 
+     *
+     *
+     *
+     *
+     *
      * org.dwfa.vodb.types.I_RelVersioned#merge(org.dwfa.vodb.types.ThinRelVersioned
      * )
      */

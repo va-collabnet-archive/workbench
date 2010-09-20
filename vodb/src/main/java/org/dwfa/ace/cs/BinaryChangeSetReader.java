@@ -204,6 +204,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                 nextCommit = Long.MAX_VALUE;
                 getVodb().setProperty(changeSetFile.getName(), Long.toString(changeSetFile.length()));
             } catch (Exception e) {
+                AceLog.getEditLog().severe("Error in file " + changeSetFile.getName(), e);
                 throw new IOException(e);
             }
         }

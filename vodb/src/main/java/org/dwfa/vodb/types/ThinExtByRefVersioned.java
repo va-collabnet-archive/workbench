@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,6 +26,8 @@ import java.util.logging.Level;
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_ImagePart;
+import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.I_Path;
@@ -60,13 +62,13 @@ import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 /**
  * @todo add version to vodb -> added as getProperty...
  * @todo add imported change set info to vodb, need to set theProperty...
- * 
+ *
  * @todo have change sets automatically increment as size increases over a
  *       certain size. Added increment to change set file name format.
  * @todo add extension ability
- * 
+ *
  * @author kec
- * 
+ *
  */
 public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
@@ -96,7 +98,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#getMemberId()
      */
     public int getMemberId() {
@@ -109,7 +111,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#getComponentId()
      */
     public int getComponentId() {
@@ -118,7 +120,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#getTypeId()
      */
     public int getTypeId() {
@@ -127,7 +129,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#getVersions()
      */
     public List<? extends I_ThinExtByRefPart> getVersions() {
@@ -136,7 +138,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#getRefsetId()
      */
     public int getRefsetId() {
@@ -187,7 +189,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.types.I_ThinExtByRefVersioned#addVersion(org.dwfa.vodb.
      * types.ThinExtByRefPart)
@@ -202,7 +204,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#setRefsetId(int)
      */
     public void setRefsetId(int refsetId) {
@@ -211,7 +213,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#setTypeId(int)
      */
     public void setTypeId(int typeId) {
@@ -367,9 +369,8 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
         List<I_ThinExtByRefTuple> tuples = new ArrayList<I_ThinExtByRefTuple>();
 
-        addTuples(null, positions, tuples, addUncommitted);
-
         if (returnConflictResolvedLatestState) {
+            addTuples(null, positions, tuples, addUncommitted);
             I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
             I_ManageConflict conflictResolutionStrategy;
             if (config == null) {
@@ -379,19 +380,15 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
             }
 
             tuples = conflictResolutionStrategy.resolveTuples(tuples);
-        }
-
-        if (allowedStatus != null) {
-            for (I_ThinExtByRefTuple extTuple : tuples) {
-                // filter by allowed status
-                if (allowedStatus.contains(extTuple.getStatusId())) {
-                    returnTuples.add(extTuple);
-                }
-            }
+            List<I_ThinExtByRefPart> versions = new ArrayList<I_ThinExtByRefPart>();
+            for (I_ThinExtByRefTuple tuple : tuples) {
+            	versions.add(tuple.getPart());
+			}
+            adder.addTuples(allowedStatus, null, positions, returnTuples, addUncommitted, versions, this);
         } else {
+            addTuples(allowedStatus, positions, tuples, addUncommitted);
             returnTuples.addAll(tuples);
-        }        
-
+        }
     }
 
     public void addTuples(List<I_ThinExtByRefTuple> returnTuples, boolean addUncommitted,
@@ -446,7 +443,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
         }
         return promotedAnything;
     }
-	
+
     public I_ThinExtByRefPart getLatestVersion() {
         I_ThinExtByRefPart latestVersion = null;
         for (I_ThinExtByRefPart part : getVersions()) {

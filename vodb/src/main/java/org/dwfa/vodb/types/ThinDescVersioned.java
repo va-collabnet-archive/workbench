@@ -28,6 +28,8 @@ import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.table.TupleAdder;
 import org.dwfa.ace.utypes.UniversalAceDescription;
@@ -234,9 +236,8 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 
         List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
 
-        addTuples(null, allowedTypes, positionSet, tuples, addUncommitted);
-
         if (returnConflictResolvedLatestState) {
+            addTuples(null, allowedTypes, positionSet, tuples, addUncommitted);
             I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
             I_ManageConflict conflictResolutionStrategy;
             if (config == null) {
@@ -246,17 +247,14 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
             }
 
             tuples = conflictResolutionStrategy.resolveTuples(tuples);
-        }
-
-        if (allowedStatus != null) {
-            for (I_DescriptionTuple descTuple : tuples) {
-                // filter by allowed status
-                if (allowedStatus.contains(descTuple.getStatusId())) {
-                    matchingTuples.add(descTuple);
-                }
-            }
+            List<I_DescriptionPart> versions = new ArrayList<I_DescriptionPart>();
+            for (I_DescriptionTuple tuple : tuples) {
+            	versions.add(tuple.getPart());
+			}
+            adder.addTuples(allowedStatus, allowedTypes, positionSet, matchingTuples, addUncommitted, versions, this);
         } else {
-            matchingTuples.addAll(tuples);
+        	addTuples(allowedStatus, allowedTypes, positionSet, tuples, addUncommitted);
+        	matchingTuples.addAll(tuples);
         }
     }
 

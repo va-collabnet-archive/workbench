@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,6 +35,8 @@ import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_RelPart;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.table.TupleAdder;
@@ -71,7 +73,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImageVersioned#getImage()
      */
     public byte[] getImage() {
@@ -80,7 +82,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImageVersioned#getImageId()
      */
     public int getImageId() {
@@ -93,7 +95,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImageVersioned#getVersions()
      */
     public List<I_ImagePart> getVersions() {
@@ -102,7 +104,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @seeorg.dwfa.vodb.types.I_ImageVersioned#addVersion(org.dwfa.vodb.types.
      * ThinImagePart)
      */
@@ -112,7 +114,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImageVersioned#getFormat()
      */
     public String getFormat() {
@@ -121,7 +123,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImageVersioned#getConceptId()
      */
     public int getConceptId() {
@@ -130,7 +132,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImageVersioned#getLastTuple()
      */
     public I_ImageTuple getLastTuple() {
@@ -139,7 +141,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImageVersioned#getTuples()
      */
     public List<I_ImageTuple> getTuples() {
@@ -152,7 +154,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @seeorg.dwfa.vodb.types.I_ImageVersioned#convertIds(org.dwfa.vodb.jar.
      * I_MapNativeToNative)
      */
@@ -167,7 +169,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @seeorg.dwfa.vodb.types.I_ImageVersioned#merge(org.dwfa.vodb.types.
      * ThinImageVersioned)
      */
@@ -185,7 +187,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImageVersioned#getTimePathSet()
      */
     public Set<TimePathId> getTimePathSet() {
@@ -218,9 +220,8 @@ public class ThinImageVersioned implements I_ImageVersioned {
 
         List<I_ImageTuple> tuples = new ArrayList<I_ImageTuple>();
 
-        addTuples(null, allowedTypes, positions, tuples);
-
         if (returnConflictResolvedLatestState) {
+        	addTuples(null, allowedTypes, positions, tuples);
             I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
             I_ManageConflict conflictResolutionStrategy;
             if (config == null) {
@@ -230,20 +231,17 @@ public class ThinImageVersioned implements I_ImageVersioned {
             }
 
             tuples = conflictResolutionStrategy.resolveTuples(tuples);
-        }
-
-        if (allowedStatus != null) {
-            for (I_ImageTuple imgTuple : tuples) {
-                // filter by allowed status
-                if (allowedStatus.contains(imgTuple.getStatusId())) {
-                    matchingTuples.add(imgTuple);
-                }
-            }
+            List<I_ImagePart> versions = new ArrayList<I_ImagePart>();
+            for (I_ImageTuple tuple : tuples) {
+            	versions.add(tuple.getPart());
+			}
+            adder.addTuples(allowedStatus, allowedTypes, positions, matchingTuples, true, versions, this);
         } else {
+        	addTuples(allowedStatus, allowedTypes, positions, tuples);
             matchingTuples.addAll(tuples);
         }
-    }    
-    
+    }
+
     private static Collection<UUID> getUids(int id) throws IOException, TerminologyException {
         return LocalFixedTerminology.getStore().getUids(id);
     }
