@@ -121,7 +121,6 @@ import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
@@ -186,6 +185,7 @@ import org.ihtsdo.arena.Arena;
 import org.ihtsdo.custom.statics.CustomStatics;
 import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.thread.NamedThreadFactory;
+import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 
 public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActions {
@@ -2000,7 +2000,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         JTabbedPane pathPanes = new JTabbedPane();
         pathPanes.addTab("configure", new SelectPathAndPositionPanelWithCombo(false, "for view", aceFrameConfig,
             new PropertySetListenerGlue("removeViewPosition", "addViewPosition", "replaceViewPosition",
-                "getViewPositionSet", I_Position.class, aceFrameConfig)));
+                "getViewPositionSet", PositionBI.class, aceFrameConfig)));
         pathPanes.addTab("create", new CreatePathPanel(aceFrameConfig));
         preferencesTab.addTab("path", pathPanes);
         preferencesTab.addTab("refset", makeRefsetConfig());
