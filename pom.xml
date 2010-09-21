@@ -114,6 +114,7 @@
     <module>java-binding</module>
     <module>profiles</module>
     <module>editor-standalone</module>
+    <module>queues</module>
   </modules>
   <profiles>
     <profile>
