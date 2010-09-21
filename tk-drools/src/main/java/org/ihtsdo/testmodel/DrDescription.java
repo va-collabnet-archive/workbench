@@ -11,6 +11,8 @@ public class DrDescription {
 	private boolean initialCaseSignificant;
 	private String lang;
 	private String typeUuid;
+	private String acceptabilityUuid;
+	private String languageRefsetUuid;
 	
 	private List<DrIdentifier> identifiers;
 	private List<DrRefsetExtension> extensions;
@@ -19,7 +21,6 @@ public class DrDescription {
 	private String pathUuid;
 	private String authorUuid;
 	private Long time;
-	private String languageRefsetUuid;
 	
 	private String factContextName;
 	
@@ -138,6 +139,14 @@ public class DrDescription {
 
 	public void setFactContextName(String factContextName) {
 		this.factContextName = factContextName;
+	}
+
+	public String getAcceptabilityUuid() {
+		return acceptabilityUuid;
+	}
+
+	public void setAcceptabilityUuid(String acceptabilityUuid) {
+		this.acceptabilityUuid = acceptabilityUuid;
 	}
 
 }
