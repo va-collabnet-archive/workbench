@@ -8,9 +8,9 @@
   </parent>
   <groupId>org.ihtsdo</groupId>
   <artifactId>sct-mini-release</artifactId>
-  <version>2008-01-31</version>
+  <version>2010-07-31</version>
   <packaging>pom</packaging>
-  <name>Sample mini relese of SNOMED CT (~3,000 concepts from July 2008 release)</name>
+  <name>Sample mini relese of SNOMED CT (~3,000 concepts) includes january 2008 release and July 2010 release)</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>

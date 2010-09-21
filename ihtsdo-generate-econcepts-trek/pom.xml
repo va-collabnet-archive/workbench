@@ -8,6 +8,7 @@
 	</parent>
 	<groupId>org.ihtsdo</groupId>
 	<artifactId>ihtsdo-generate-econcepts</artifactId>
+	<version>2010-07-31</version>
 	<packaging>pom</packaging>
 	<name>ihtsdo-generate-econcepts -- Convert SNOMED Stated and Inferred to eConcepts</name>
 	<description>Convert SNOMED SCT RF1 Inferred release to eConcepts</description>
@@ -28,7 +29,7 @@
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>sct-mini-release</artifactId>
 			<type>zip</type>
-			<version>2008-01-31</version>
+			<version>2010-07-31</version>
 		</dependency>
 	</dependencies>
   	<build>
