@@ -55,6 +55,15 @@ public class SvnHelper {
 	private List<File> changeLocations = new ArrayList<File>();
 	private Class<?> jiniClass;
 	private static boolean connectToSubversion = false;
+	private Map<String, SubversionData> subversionMap = new HashMap<String, SubversionData>();
+
+	public Map<String, SubversionData> getSubversionMap() {
+		return subversionMap;
+	}
+
+	public void setSubversionMap(Map<String, SubversionData> subversionMap) {
+		this.subversionMap = subversionMap;
+	}
 
 	public SvnHelper(Class<?> jiniClassToSet, Configuration jiniConfigToSet) throws ConfigurationException {
 		jiniClass = jiniClassToSet;
@@ -239,7 +248,10 @@ public class SvnHelper {
 		}
 		String svnProfilePath = checkoutBuffer.toString();
 		SubversionData svnCheckoutData = new SubversionData(svnProfilePath, "profiles/" + selectedProfile);
+		subversionMap.put(svnCheckoutData.getWorkingCopyStr(), svnCheckoutData);
 		aceProperties.setProperty("last-profile-dir", "profiles/" + selectedProfile);
+		
+		
 		String moduleName = svnCheckoutData.getRepositoryUrlStr();
 		String destPath = svnCheckoutData.getWorkingCopyStr();
 		Revision revision = Revision.HEAD;
@@ -268,6 +280,7 @@ public class SvnHelper {
 
 			// do the checkout...
 			AceLog.getAppLog().info("svn checkout " + specParts[server] + " to: " + specParts[local]);
+			subversionMap.put(specParts[local], new SubversionData(specParts[server], specParts[local]));
 			String moduleName = specParts[server];
 			String destPath = specParts[local];
 			Revision revision = Revision.HEAD;

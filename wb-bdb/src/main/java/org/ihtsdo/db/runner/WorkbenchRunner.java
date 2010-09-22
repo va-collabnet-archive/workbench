@@ -225,9 +225,10 @@ public class WorkbenchRunner {
 				initialized = Boolean.parseBoolean((String) wbProperties
 						.get("initialized"));
 			}
+			SvnHelper svnHelper =  new SvnHelper(WorkbenchRunner.class, jiniConfig);;
 			if (acePropertiesFileExists == false || initialized == false) {
 				try {
-					new SvnHelper(WorkbenchRunner.class, jiniConfig)
+					svnHelper
 							.initialSubversionOperationsAndChangeSetImport(wbPropertiesFile);
 				} catch (Exception ex) {
 					AceLog.getAppLog().alertAndLogException(ex);
@@ -258,13 +259,13 @@ public class WorkbenchRunner {
 			if ((profileDir.exists() == false && initializeFromSubversion)
 					|| (svnUpdateOnStart != null)) {
 	            Svn.setConnectedToSvn(true);
-				new SvnHelper(WorkbenchRunner.class, jiniConfig)
+	            svnHelper
 						.initialSubversionOperationsAndChangeSetImport(new File(
 								"config", WB_PROPERTIES));
 			} else if (profileDir.exists()) {
 				ArrayList<File> profileLoc = new ArrayList<File>();
 				profileLoc.add(profileDir);
-				new SvnHelper(WorkbenchRunner.class, jiniConfig)
+				svnHelper
 						.doChangeSetImport(profileLoc);
 			}
 
@@ -402,6 +403,9 @@ public class WorkbenchRunner {
 							} else {
 								login = false;
 								successCount++;
+								if (successCount == 1 && svnHelper != null) {
+									ace.getSubversionMap().putAll(svnHelper.getSubversionMap());
+								}
 								handleNormalFrame(ace);
 							}
 						} else {
