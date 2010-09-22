@@ -328,9 +328,11 @@ public class SvnHelper {
 
 			AceLog.getAppLog().info("Finished eccs import");
 			BdbPathManager.get().resetPathMap(); 
-			Terms.get().resumeChangeSetWriters();
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
+		} finally {
+		    // resume change-sets writers even if we've an exception
+		    Terms.get().resumeChangeSetWriters();
 		}
 	}
 }
