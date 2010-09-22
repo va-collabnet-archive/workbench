@@ -133,6 +133,7 @@ import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetReader;
+import org.ihtsdo.db.bdb.commit.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.refset.MarkedParentRefsetHelper;
 import org.ihtsdo.db.bdb.computer.refset.MemberRefsetConflictCalculator;
@@ -155,10 +156,10 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     private File envHome;
 
-    public static void canEdit(I_ConfigAceFrame aceFrameConfig) throws TerminologyException {
+    public static void canEdit(final I_ConfigAceFrame aceFrameConfig) throws TerminologyException {
         if (aceFrameConfig.getEditingPathSet().size() == 0) {
             throw new TerminologyException(
-                "<br><br>You must select an editing path before editing...<br><br>No editing path selected.");
+            "<br><br>You must select an editing path before editing...<br><br>No editing path selected.");
         }
     }
 
@@ -166,7 +167,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         return DwfaEnv.isHeadless();
     }
 
-    public static void setHeadless(Boolean headless) {
+    public static void setHeadless(final Boolean headless) {
         DwfaEnv.setHeadless(headless);
     }
 
@@ -175,42 +176,42 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         try {
             Bdb.close();
             Terms.close(this);
-        } catch (DatabaseException e) {
+        } catch (final DatabaseException e) {
             throw new IOException(e);
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             throw new IOException(e);
-        } catch (ExecutionException e) {
+        } catch (final ExecutionException e) {
             throw new IOException(e);
         }
     }
 
     @Override
-    public void addChangeSetReader(I_ReadChangeSet reader) {
+    public void addChangeSetReader(final I_ReadChangeSet reader) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void addChangeSetWriter(I_WriteChangeSet writer) {
+    public void addChangeSetWriter(final I_WriteChangeSet writer) {
         ChangeSetWriterHandler.addWriter(writer);
     }
 
     @Override
-    public void addUncommitted(I_GetConceptData concept) {
+    public void addUncommitted(final I_GetConceptData concept) {
         BdbCommitManager.addUncommitted(concept);
     }
 
     @Override
-    public void addUncommitted(I_ExtendByRef extension) {
+    public void addUncommitted(final I_ExtendByRef extension) {
         BdbCommitManager.addUncommitted(extension);
     }
 
     @Override
-    public void addUncommittedNoChecks(I_GetConceptData concept) {
+    public void addUncommittedNoChecks(final I_GetConceptData concept) {
         BdbCommitManager.addUncommittedNoChecks(concept);
     }
 
     @Override
-    public void addUncommittedNoChecks(I_ExtendByRef extension) {
+    public void addUncommittedNoChecks(final I_ExtendByRef extension) {
         BdbCommitManager.addUncommittedNoChecks(extension);
     }
 
@@ -235,8 +236,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public void commit(ChangeSetPolicy changeSetPolicy, ChangeSetWriterThreading changeSetWriterThreading)
-            throws Exception {
+    public void commit(final ChangeSetPolicy changeSetPolicy, final ChangeSetWriterThreading changeSetWriterThreading)
+    throws Exception {
         BdbCommitManager.commit(changeSetPolicy, changeSetWriterThreading);
     }
 
@@ -246,46 +247,46 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public long convertToThickVersion(int version) {
+    public long convertToThickVersion(final int version) {
         return ThinVersionHelper.convert(version);
     }
 
     @Override
-    public int convertToThinVersion(long time) {
+    public int convertToThinVersion(final long time) {
         return ThinVersionHelper.convert(time);
     }
 
     @Override
-    public int convertToThinVersion(String dateStr) throws ParseException {
+    public int convertToThinVersion(final String dateStr) throws ParseException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Hits doLuceneSearch(String query) throws IOException, org.apache.lucene.queryParser.ParseException {
-        Query q = new QueryParser("desc", new StandardAnalyzer()).parse(query);
+    public Hits doLuceneSearch(final String query) throws IOException, org.apache.lucene.queryParser.ParseException {
+        final Query q = new QueryParser("desc", new StandardAnalyzer()).parse(query);
         return LuceneManager.search(q);
     }
 
     @Override
-    public void forget(I_GetConceptData concept) throws IOException {
+    public void forget(final I_GetConceptData concept) throws IOException {
         BdbCommitManager.forget(concept);
     }
 
     @Override
-    public void forget(I_DescriptionVersioned desc) throws IOException {
+    public void forget(final I_DescriptionVersioned desc) throws IOException {
         BdbCommitManager.forget(desc);
     }
 
     @Override
-    public void forget(I_RelVersioned rel) throws IOException {
+    public void forget(final I_RelVersioned rel) throws IOException {
         BdbCommitManager.forget(rel);
     }
 
-    public void forget(I_ExtendByRef extension) throws IOException {
+    public void forget(final I_ExtendByRef extension) throws IOException {
         BdbCommitManager.forget(extension);
     }
 
-    public void forget(I_ConceptAttributeVersioned attr) throws IOException {
+    public void forget(final I_ConceptAttributeVersioned attr) throws IOException {
         BdbCommitManager.forget(attr);
     }
 
@@ -293,55 +294,55 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public I_ConfigAceFrame getActiveAceFrameConfig() throws IOException {
-        return activeAceFrameConfig;
+        return this.activeAceFrameConfig;
     }
 
     @Override
-    public void setActiveAceFrameConfig(I_ConfigAceFrame activeAceFrameConfig) throws TerminologyException, IOException {
+    public void setActiveAceFrameConfig(final I_ConfigAceFrame activeAceFrameConfig) throws TerminologyException, IOException {
         this.activeAceFrameConfig = activeAceFrameConfig;
     }
 
     @Override
-    public List<? extends I_ExtendByRef> getAllExtensionsForComponent(int nid) throws IOException {
-    	List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
+    public List<? extends I_ExtendByRef> getAllExtensionsForComponent(final int nid) throws IOException {
+        final List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
         if (pairs == null || pairs.size() == 0) {
             return new ArrayList<I_ExtendByRef>(0);
         }
-        List<I_ExtendByRef> returnValues = 
-        	new ArrayList<I_ExtendByRef>(pairs.size());
-        for (NidPairForRefset pair: pairs) {
-        	I_ExtendByRef ext = (I_ExtendByRef) Bdb.getComponent(pair.getMemberNid());
-        	if (ext != null) {
-        		returnValues.add(ext);
-        	}
-        }
-        return returnValues;
+        final List<I_ExtendByRef> returnValues =
+            new ArrayList<I_ExtendByRef>(pairs.size());
+            for (final NidPairForRefset pair: pairs) {
+                final I_ExtendByRef ext = (I_ExtendByRef) Bdb.getComponent(pair.getMemberNid());
+                if (ext != null) {
+                    returnValues.add(ext);
+                }
+            }
+            return returnValues;
     }
 
-     public List<? extends I_ExtendByRef> getRefsetExtensionsForComponent(int refsetNid, 
-    		 int nid) throws IOException {
-    	List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
+    public List<? extends I_ExtendByRef> getRefsetExtensionsForComponent(final int refsetNid,
+            final int nid) throws IOException {
+        final List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
         if (pairs == null || pairs.size() == 0) {
             return new ArrayList<I_ExtendByRef>(0);
         }
-        List<I_ExtendByRef> returnValues = 
-        	new ArrayList<I_ExtendByRef>(pairs.size());
-        for (NidPairForRefset pair: pairs) {
-        	if (pair.getRefsetNid() == refsetNid) {
-            	I_ExtendByRef ext = (I_ExtendByRef) Bdb.getComponent(pair.getMemberNid());
-            	if (ext != null) {
-            		returnValues.add(ext);
-            	}
-        	}
-        }
-        return returnValues;
+        final List<I_ExtendByRef> returnValues =
+            new ArrayList<I_ExtendByRef>(pairs.size());
+            for (final NidPairForRefset pair: pairs) {
+                if (pair.getRefsetNid() == refsetNid) {
+                    final I_ExtendByRef ext = (I_ExtendByRef) Bdb.getComponent(pair.getMemberNid());
+                    if (ext != null) {
+                        returnValues.add(ext);
+                    }
+                }
+            }
+            return returnValues;
     }
 
     @Override
     @Deprecated
-    public List<? extends I_ExtendByRef> getAllExtensionsForComponent(int nid, boolean addUncommitted)
+    public List<? extends I_ExtendByRef> getAllExtensionsForComponent(final int nid, final boolean addUncommitted)
             throws IOException {
-        return getAllExtensionsForComponent(nid);
+        return this.getAllExtensionsForComponent(nid);
     }
 
     @Override
@@ -365,36 +366,36 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public I_GetConceptData getConcept(Collection<UUID> ids) throws TerminologyException, IOException {
+    public I_GetConceptData getConcept(final Collection<UUID> ids) throws TerminologyException, IOException {
         return Bdb.getConceptDb().getConcept(Bdb.uuidsToNid(ids));
     }
 
     @Override
-    public I_GetConceptData getConcept(UUID... ids) throws TerminologyException, IOException {
+    public I_GetConceptData getConcept(final UUID... ids) throws TerminologyException, IOException {
         return Bdb.getConceptDb().getConcept(Bdb.uuidToNid(ids));
     }
 
     @Override
-    public I_GetConceptData getConcept(int nid) throws TerminologyException, IOException {
+    public I_GetConceptData getConcept(final int nid) throws TerminologyException, IOException {
         assert nid != Integer.MAX_VALUE;
         return Bdb.getConceptDb().getConcept(nid);
     }
 
     @Override
-    public I_GetConceptData getConcept(String conceptId, int sourceId) throws TerminologyException,
-            org.apache.lucene.queryParser.ParseException, IOException {
+    public I_GetConceptData getConcept(final String conceptId, final int sourceId) throws TerminologyException,
+    org.apache.lucene.queryParser.ParseException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Set<I_GetConceptData> getConcept(String conceptId) throws TerminologyException,
-            org.apache.lucene.queryParser.ParseException, IOException {
+    public Set<I_GetConceptData> getConcept(final String conceptId) throws TerminologyException,
+    org.apache.lucene.queryParser.ParseException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public int getConceptCount() throws IOException {
-        return (int) Bdb.getConceptDb().getCount();
+        return Bdb.getConceptDb().getCount();
     }
 
     @Override
@@ -413,20 +414,20 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public I_DescriptionVersioned getDescription(int dNid, int cNid) throws TerminologyException, IOException {
-        if (hasConcept(cNid)) {
+    public I_DescriptionVersioned getDescription(final int dNid, final int cNid) throws TerminologyException, IOException {
+        if (this.hasConcept(cNid)) {
             return Bdb.getConcept(cNid).getDescription(dNid);
         }
         return null;
     }
 
     @Override
-    public I_DescriptionVersioned getDescription(int dNid) throws TerminologyException, IOException {
-        return getDescription(dNid, Bdb.getConceptNid(dNid));
+    public I_DescriptionVersioned getDescription(final int dNid) throws TerminologyException, IOException {
+        return this.getDescription(dNid, Bdb.getConceptNid(dNid));
     }
 
     @Override
-    public I_RelVersioned getRelationship(int rNid) throws IOException {
+    public I_RelVersioned getRelationship(final int rNid) throws IOException {
         if (Bdb.getNidCNidMap().hasMap(rNid)) {
             return Bdb.getConcept(Bdb.getConceptNid(rNid)).getSourceRel(rNid);
         }
@@ -435,11 +436,11 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public I_RepresentIdSet getDescriptionIdSet() throws IOException {
-        I_RepresentIdSet descriptionIdSet = new IdentifierSet();
-        I_IterateIds iterator = getConceptIdSet().iterator();
+        final I_RepresentIdSet descriptionIdSet = new IdentifierSet();
+        final I_IterateIds iterator = this.getConceptIdSet().iterator();
         while (iterator.next()) {
-            Concept concept = Bdb.getConcept(iterator.nid());
-            for (Description description : concept.getDescriptions()) {
+            final Concept concept = Bdb.getConcept(iterator.nid());
+            for (final Description description : concept.getDescriptions()) {
                 descriptionIdSet.setMember(description.getDescId());
             }
         }
@@ -467,13 +468,13 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public I_ExtendByRef getExtension(int memberId) throws IOException {
+    public I_ExtendByRef getExtension(final int memberId) throws IOException {
         return (I_ExtendByRef) Bdb.getConceptForComponent(memberId).getComponent(memberId);
     }
 
     @Override
-    public I_Identify getId(int nid) throws TerminologyException, IOException {
-        Concept concept = Bdb.getConceptForComponent(nid);
+    public I_Identify getId(final int nid) throws TerminologyException, IOException {
+        final Concept concept = Bdb.getConceptForComponent(nid);
         if (concept != null) {
             return concept.getComponent(nid);
         }
@@ -482,52 +483,52 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public I_Identify getId(UUID uuid) throws TerminologyException, IOException {
-        return getId(Bdb.uuidToNid(uuid));
+    public I_Identify getId(final UUID uuid) throws TerminologyException, IOException {
+        return this.getId(Bdb.uuidToNid(uuid));
     }
 
     @Override
-    public I_Identify getId(Collection<UUID> uids) throws TerminologyException, IOException {
-        return getId(Bdb.uuidsToNid(uids));
+    public I_Identify getId(final Collection<UUID> uids) throws TerminologyException, IOException {
+        return this.getId(Bdb.uuidsToNid(uids));
     }
 
     @Override
-    public I_RepresentIdSet getIdSetFromIntCollection(Collection<Integer> ids) throws IOException {
-        I_RepresentIdSet newSet = getEmptyIdSet();
-        for (int nid : ids) {
+    public I_RepresentIdSet getIdSetFromIntCollection(final Collection<Integer> ids) throws IOException {
+        final I_RepresentIdSet newSet = this.getEmptyIdSet();
+        for (final int nid : ids) {
             newSet.setMember(nid);
         }
         return newSet;
     }
 
     @Override
-    public I_RepresentIdSet getIdSetfromTermCollection(Collection<? extends I_AmTermComponent> components)
-            throws IOException {
-        I_RepresentIdSet newSet = getEmptyIdSet();
-        for (I_AmTermComponent component : components) {
+    public I_RepresentIdSet getIdSetfromTermCollection(final Collection<? extends I_AmTermComponent> components)
+    throws IOException {
+        final I_RepresentIdSet newSet = this.getEmptyIdSet();
+        for (final I_AmTermComponent component : components) {
             newSet.setMember(component.getNid());
         }
         return newSet;
     }
 
     @Override
-    public I_Path getPath(Collection<UUID> uids) throws TerminologyException, IOException {
-        return pathManager.get(uuidToNative(uids));
+    public I_Path getPath(final Collection<UUID> uids) throws TerminologyException, IOException {
+        return this.pathManager.get(this.uuidToNative(uids));
     }
 
     @Override
-    public I_Path getPath(UUID... ids) throws TerminologyException, IOException {
-        return pathManager.get(Bdb.uuidToNid(ids));
+    public I_Path getPath(final UUID... ids) throws TerminologyException, IOException {
+        return this.pathManager.get(Bdb.uuidToNid(ids));
     }
 
     @Override
-    public I_Path getPath(int nid) throws TerminologyException, IOException {
-        return pathManager.get(nid);
+    public I_Path getPath(final int nid) throws TerminologyException, IOException {
+        return this.pathManager.get(nid);
     }
 
     @Override
     public List<I_Path> getPaths() throws Exception {
-        return new ArrayList<I_Path>(pathManager.getAll());
+        return new ArrayList<I_Path>(this.pathManager.getAll());
     }
 
     @Override
@@ -541,7 +542,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public String getProperty(String key) throws IOException {
+    public String getProperty(final String key) throws IOException {
         return Bdb.getProperty(key);
     }
 
@@ -551,7 +552,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public Collection<RefsetMember<?, ?>> getRefsetExtensionMembers(int refsetId) throws IOException {
+    public Collection<RefsetMember<?, ?>> getRefsetExtensionMembers(final int refsetId) throws IOException {
         return Concept.get(refsetId).getExtensions();
     }
 
@@ -581,8 +582,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public Collection<UUID> getUids(int nid) throws TerminologyException, IOException {
-        return getId(nid).getUUIDs();
+    public Collection<UUID> getUids(final int nid) throws TerminologyException, IOException {
+        return this.getId(nid).getUUIDs();
     }
 
     @Override
@@ -591,7 +592,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public boolean hasConcept(int conceptId) throws IOException {
+    public boolean hasConcept(final int conceptId) throws IOException {
         if (conceptId == Integer.MIN_VALUE || conceptId > Bdb.getUuidsToNidMap().getCurrentMaxNid()) {
             return false;
         }
@@ -602,11 +603,11 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public boolean hasDescription(int descId, int conceptId) throws IOException {
+    public boolean hasDescription(final int descId, final int conceptId) throws IOException {
         if (descId == Integer.MIN_VALUE || descId > Bdb.getUuidsToNidMap().getCurrentMaxNid()) {
             return false;
         }
-        I_AmTermComponent c = Bdb.getComponent(descId);
+        final I_AmTermComponent c = Bdb.getComponent(descId);
         if (c == null) {
             return false;
         }
@@ -614,11 +615,11 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public boolean hasExtension(int memberId) throws IOException {
+    public boolean hasExtension(final int memberId) throws IOException {
         if (memberId == Integer.MIN_VALUE || memberId > Bdb.getUuidsToNidMap().getCurrentMaxNid()) {
             return false;
         }
-        I_AmTermComponent c = Bdb.getComponent(memberId);
+        final I_AmTermComponent c = Bdb.getComponent(memberId);
         if (c == null) {
             return false;
         }
@@ -626,8 +627,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public boolean hasId(Collection<UUID> uuids) throws IOException {
-        for (UUID uuid : uuids) {
+    public boolean hasId(final Collection<UUID> uuids) throws IOException {
+        for (final UUID uuid : uuids) {
             if (Bdb.hasUuid(uuid)) {
                 return true;
             }
@@ -636,16 +637,16 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public boolean hasId(UUID uuid) throws IOException {
+    public boolean hasId(final UUID uuid) throws IOException {
         return Bdb.hasUuid(uuid);
     }
 
     @Override
-    public boolean hasImage(int imageId) throws IOException {
+    public boolean hasImage(final int imageId) throws IOException {
         if (imageId == Integer.MIN_VALUE || imageId > Bdb.getUuidsToNidMap().getCurrentMaxNid()) {
             return false;
         }
-        I_AmTermComponent c = Bdb.getComponent(imageId);
+        final I_AmTermComponent c = Bdb.getComponent(imageId);
         if (c == null) {
             return false;
         }
@@ -653,23 +654,23 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public boolean hasPath(int nid) throws IOException {
+    public boolean hasPath(final int nid) throws IOException {
         try {
-            return pathManager.get(nid) != null;
-        } catch (PathNotExistsException e) {
+            return this.pathManager.get(nid) != null;
+        } catch (final PathNotExistsException e) {
             return false;
-        } catch (TerminologyException e) {
+        } catch (final TerminologyException e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
         return false;
     }
 
     @Override
-    public boolean hasRel(int relId, int conceptId) throws IOException {
+    public boolean hasRel(final int relId, final int conceptId) throws IOException {
         if (relId == Integer.MIN_VALUE || relId > Bdb.getUuidsToNidMap().getCurrentMaxNid()) {
             return false;
         }
-        I_AmTermComponent c = Bdb.getComponent(relId);
+        final I_AmTermComponent c = Bdb.getComponent(relId);
         if (c == null) {
             return false;
         }
@@ -677,16 +678,16 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     private class IterateConceptsAdaptor implements I_ProcessConceptData {
-        private I_ProcessConcepts processor;
+        private final I_ProcessConcepts processor;
 
-        public IterateConceptsAdaptor(I_ProcessConcepts procesor) {
+        public IterateConceptsAdaptor(final I_ProcessConcepts procesor) {
             super();
             this.processor = procesor;
         }
 
         @Override
-        public void processConceptData(Concept concept) throws Exception {
-            processor.processConcept(concept);
+        public void processConceptData(final Concept concept) throws Exception {
+            this.processor.processConcept(concept);
         }
 
         @Override
@@ -696,32 +697,32 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public void iterateConcepts(I_ProcessConcepts procesor) throws Exception {
+    public void iterateConcepts(final I_ProcessConcepts procesor) throws Exception {
         Bdb.getConceptDb().iterateConceptDataInSequence(new IterateConceptsAdaptor(procesor));
     }
 
     @Override
-    public void iterateDescriptions(I_ProcessDescriptions processor) throws Exception {
+    public void iterateDescriptions(final I_ProcessDescriptions processor) throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void iterateExtByRefs(I_ProcessExtByRef processor) throws Exception {
+    public void iterateExtByRefs(final I_ProcessExtByRef processor) throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void loadFromDirectory(File dataDir, String encoding) throws Exception {
+    public void loadFromDirectory(final File dataDir, final String encoding) throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void loadFromSingleJar(String jarFile, String dataPrefix) throws Exception {
+    public void loadFromSingleJar(final String jarFile, final String dataPrefix) throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public TransferHandler makeTerminologyTransferHandler(JComponent thisComponent) {
+    public TransferHandler makeTerminologyTransferHandler(final JComponent thisComponent) {
         return new TerminologyTransferHandler(thisComponent);
     }
 
@@ -729,32 +730,32 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         I_ConfigAceFrame frameConfig;
         Exception ex;
 
-        public MakeNewAceFrame(I_ConfigAceFrame frameConfig) {
+        public MakeNewAceFrame(final I_ConfigAceFrame frameConfig) {
             super();
             this.frameConfig = frameConfig;
         }
 
         public void run() {
             try {
-                AceFrame newFrame = new AceFrame(WorkbenchRunner.args, WorkbenchRunner.lc, frameConfig, false);
+                final AceFrame newFrame = new AceFrame(WorkbenchRunner.args, WorkbenchRunner.lc, this.frameConfig, false);
                 newFrame.setVisible(true);
-                AceFrameConfig nativeConfig = (AceFrameConfig) frameConfig;
+                final AceFrameConfig nativeConfig = (AceFrameConfig) this.frameConfig;
                 nativeConfig.setAceFrame(newFrame);
-            } catch (Exception e) {
-                ex = e;
+            } catch (final Exception e) {
+                this.ex = e;
             }
         }
 
         public void check() throws Exception {
-            if (ex != null) {
-                throw ex;
+            if (this.ex != null) {
+                throw this.ex;
             }
         }
     }
 
     @Override
-    public void newAceFrame(I_ConfigAceFrame frameConfig) throws Exception {
-        MakeNewAceFrame maker = new MakeNewAceFrame(frameConfig);
+    public void newAceFrame(final I_ConfigAceFrame frameConfig) throws Exception {
+        final MakeNewAceFrame maker = new MakeNewAceFrame(frameConfig);
         SwingUtilities.invokeAndWait(maker);
         maker.check();
     }
@@ -765,19 +766,19 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public I_ShowActivity newActivityPanel(boolean displayInViewer, I_ConfigAceFrame aceFrameConfig,
-            String firstUpperInfo, boolean showStop) {
+    public I_ShowActivity newActivityPanel(final boolean displayInViewer, final I_ConfigAceFrame aceFrameConfig,
+            final String firstUpperInfo, final boolean showStop) {
         if (isHeadless()) {
             return new UpperInfoOnlyConsoleMonitor();
         } else {
-            ActivityPanel ap = new ActivityPanel(aceFrameConfig, showStop);
+            final ActivityPanel ap = new ActivityPanel(aceFrameConfig, showStop);
             ap.setIndeterminate(true);
             ap.setProgressInfoUpper(firstUpperInfo);
             ap.setProgressInfoLower("");
             if (displayInViewer) {
                 try {
                     ActivityViewer.addActivity(ap);
-                } catch (Exception e1) {
+                } catch (final Exception e1) {
                     AceLog.getAppLog().alertAndLogException(e1);
                 }
             }
@@ -786,45 +787,45 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public I_ReadChangeSet newBinaryChangeSetReader(File changeSetFile) throws IOException {
-        EConceptChangeSetReader ecr = new EConceptChangeSetReader();
+    public I_ReadChangeSet newBinaryChangeSetReader(final File changeSetFile) throws IOException {
+        final EConceptChangeSetReader ecr = new EConceptChangeSetReader();
         ecr.setChangeSetFile(changeSetFile);
         return ecr;
     }
 
     @Override
-    public I_WriteChangeSet newBinaryChangeSetWriter(File changeSetFile) throws IOException {
+    public I_WriteChangeSet newBinaryChangeSetWriter(final File changeSetFile) throws IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public I_GetConceptData newConcept(UUID newConceptUuid, boolean defined, I_ConfigAceFrame aceFrameConfig)
-            throws TerminologyException, IOException {
-        int statusNid = aceFrameConfig.getDefaultStatus().getNid();
-        return newConcept(newConceptUuid, defined, aceFrameConfig, statusNid);
+    public I_GetConceptData newConcept(final UUID newConceptUuid, final boolean defined, final I_ConfigAceFrame aceFrameConfig)
+    throws TerminologyException, IOException {
+        final int statusNid = aceFrameConfig.getDefaultStatus().getNid();
+        return this.newConcept(newConceptUuid, defined, aceFrameConfig, statusNid);
     }
 
     @Override
-    public I_GetConceptData newConcept(UUID newConceptUuid, boolean defined, I_ConfigAceFrame aceFrameConfig,
-            int statusNid) throws TerminologyException, IOException {
-        return newConcept(newConceptUuid, defined, aceFrameConfig, statusNid, Long.MAX_VALUE);
+    public I_GetConceptData newConcept(final UUID newConceptUuid, final boolean defined, final I_ConfigAceFrame aceFrameConfig,
+            final int statusNid) throws TerminologyException, IOException {
+        return this.newConcept(newConceptUuid, defined, aceFrameConfig, statusNid, Long.MAX_VALUE);
     }
 
     @Override
-    public I_GetConceptData newConcept(UUID newConceptUuid, boolean isDefined, I_ConfigAceFrame aceFrameConfig,
-            int statusNid, long time) throws TerminologyException, IOException {
+    public I_GetConceptData newConcept(final UUID newConceptUuid, final boolean isDefined, final I_ConfigAceFrame aceFrameConfig,
+            final int statusNid, final long time) throws TerminologyException, IOException {
         canEdit(aceFrameConfig);
-        int cNid = Bdb.uuidToNid(newConceptUuid);
+        final int cNid = Bdb.uuidToNid(newConceptUuid);
         Bdb.getNidCNidMap().setCidForNid(cNid, cNid);
-        Concept newC = Concept.get(cNid);
-        ConceptAttributes a = new ConceptAttributes();
+        final Concept newC = Concept.get(cNid);
+        final ConceptAttributes a = new ConceptAttributes();
         a.nid = cNid;
         a.enclosingConceptNid = cNid;
         newC.setConceptAttributes(a);
         a.setDefined(isDefined);
         a.primordialUNid = Bdb.getUuidsToNidMap().getUNid(newConceptUuid);
         a.primordialSapNid = Integer.MIN_VALUE;
-        for (I_Path p : aceFrameConfig.getEditingPathSet()) {
+        for (final I_Path p : aceFrameConfig.getEditingPathSet()) {
             if (a.primordialSapNid == Integer.MIN_VALUE) {
                 a.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, p.getConceptId(), time);
             } else {
@@ -843,35 +844,35 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public Description newDescription(UUID newDescriptionId, I_GetConceptData concept, String lang, String text,
-            I_ConceptualizeLocally descType, I_ConfigAceFrame aceFrameConfig) throws TerminologyException, IOException {
-        return newDescription(newDescriptionId, concept, lang, text, Terms.get().getConcept(descType.getNid()),
-            aceFrameConfig);
+    public Description newDescription(final UUID newDescriptionId, final I_GetConceptData concept, final String lang, final String text,
+            final I_ConceptualizeLocally descType, final I_ConfigAceFrame aceFrameConfig) throws TerminologyException, IOException {
+        return this.newDescription(newDescriptionId, concept, lang, text, Terms.get().getConcept(descType.getNid()),
+                aceFrameConfig);
     }
 
     @Override
-    public Description newDescription(UUID descUuid, I_GetConceptData concept, String lang, String text,
-            I_GetConceptData descType, I_ConfigAceFrame aceFrameConfig) throws TerminologyException, IOException {
+    public Description newDescription(final UUID descUuid, final I_GetConceptData concept, final String lang, final String text,
+            final I_GetConceptData descType, final I_ConfigAceFrame aceFrameConfig) throws TerminologyException, IOException {
 
-        int statusNid = aceFrameConfig.getDefaultStatus().getNid();
-        return newDescription(descUuid, concept, lang, text, descType, aceFrameConfig, statusNid);
+        final int statusNid = aceFrameConfig.getDefaultStatus().getNid();
+        return this.newDescription(descUuid, concept, lang, text, descType, aceFrameConfig, statusNid);
     }
 
-    public Description newDescription(UUID descUuid, I_GetConceptData concept, String lang, String text,
-            I_GetConceptData descriptionType, I_ConfigAceFrame aceFrameConfig, int statusNid)
-            throws TerminologyException, IOException {
-        return newDescription(descUuid, concept, lang, text, descriptionType, aceFrameConfig,
-            Bdb.getConcept(statusNid), Long.MAX_VALUE);
+    public Description newDescription(final UUID descUuid, final I_GetConceptData concept, final String lang, final String text,
+            final I_GetConceptData descriptionType, final I_ConfigAceFrame aceFrameConfig, final int statusNid)
+    throws TerminologyException, IOException {
+        return this.newDescription(descUuid, concept, lang, text, descriptionType, aceFrameConfig,
+                Bdb.getConcept(statusNid), Long.MAX_VALUE);
     }
 
     @Override
-    public Description newDescription(UUID descUuid, I_GetConceptData concept, String lang, String text,
-            I_GetConceptData descType, I_ConfigAceFrame aceFrameConfig, I_GetConceptData status, long effectiveDate)
-            throws TerminologyException, IOException {
+    public Description newDescription(final UUID descUuid, final I_GetConceptData concept, final String lang, final String text,
+            final I_GetConceptData descType, final I_ConfigAceFrame aceFrameConfig, final I_GetConceptData status, final long effectiveDate)
+    throws TerminologyException, IOException {
 
         canEdit(aceFrameConfig);
-        Concept c = (Concept) concept;
-        Description d = new Description();
+        final Concept c = (Concept) concept;
+        final Description d = new Description();
         Bdb.gVersion.incrementAndGet();
         d.enclosingConceptNid = c.getNid();
         d.nid = Bdb.uuidToNid(descUuid);
@@ -882,7 +883,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         d.setInitialCaseSignificant(false);
         d.setTypeId(descType.getNid());
         d.primordialSapNid = Integer.MIN_VALUE;
-        for (I_Path p : aceFrameConfig.getEditingPathSet()) {
+        for (final I_Path p : aceFrameConfig.getEditingPathSet()) {
             if (d.primordialSapNid == Integer.MIN_VALUE) {
                 d.primordialSapNid = Bdb.getSapDb().getSapNid(status.getNid(), p.getConceptId(), effectiveDate);
             } else {
@@ -903,39 +904,39 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     @Deprecated
-    public I_ExtendByRef newExtension(int refsetId, int memberId, int componentId,
-            Class<? extends I_ExtendByRefPart> partType) throws IOException {
-        Concept refsetConcept = Concept.get(refsetId);
-        I_ConfigAceFrame config = getActiveAceFrameConfig();
+    public I_ExtendByRef newExtension(final int refsetId, final int memberId, final int componentId,
+            final Class<? extends I_ExtendByRefPart> partType) throws IOException {
+        final Concept refsetConcept = Concept.get(refsetId);
+        final I_ConfigAceFrame config = this.getActiveAceFrameConfig();
         Bdb.getNidCNidMap().setCidForNid(refsetId, memberId);
 
-        RefsetMember<?, ?> member =
-                createMember(memberId, componentId, EConcept.REFSET_TYPES.classToType(partType), refsetConcept, config);
-        addUncommitted(refsetConcept);
+        final RefsetMember<?, ?> member =
+            createMember(memberId, componentId, EConcept.REFSET_TYPES.classToType(partType), refsetConcept, config);
+        this.addUncommitted(refsetConcept);
         return member;
     }
 
     @Override
-    public I_ExtendByRef newExtension(int refsetId, UUID memberPrimUuid, int componentId, int typeId)
-            throws IOException {
-        Concept refsetConcept = Concept.get(refsetId);
-        I_ConfigAceFrame config = getActiveAceFrameConfig();
-        RefsetMember<?, ?> member =
-                createMember(memberPrimUuid, componentId, EConcept.REFSET_TYPES.nidToType(typeId), refsetConcept,
+    public I_ExtendByRef newExtension(final int refsetId, final UUID memberPrimUuid, final int componentId, final int typeId)
+    throws IOException {
+        final Concept refsetConcept = Concept.get(refsetId);
+        final I_ConfigAceFrame config = this.getActiveAceFrameConfig();
+        final RefsetMember<?, ?> member =
+            createMember(memberPrimUuid, componentId, EConcept.REFSET_TYPES.nidToType(typeId), refsetConcept,
                     config, new RefsetPropertyMap());
-        addUncommitted(refsetConcept);
+        this.addUncommitted(refsetConcept);
         return member;
     }
 
     @Override
-    public I_ExtendByRef newExtension(int refsetId, UUID memberPrimUuid, int componentId,
-            Class<? extends I_ExtendByRefPart> partType) throws IOException {
-        Concept refsetConcept = Concept.get(refsetId);
-        I_ConfigAceFrame config = getActiveAceFrameConfig();
-        RefsetMember<?, ?> member =
-                createMember(memberPrimUuid, componentId, EConcept.REFSET_TYPES.classToType(partType), refsetConcept,
+    public I_ExtendByRef newExtension(final int refsetId, final UUID memberPrimUuid, final int componentId,
+            final Class<? extends I_ExtendByRefPart> partType) throws IOException {
+        final Concept refsetConcept = Concept.get(refsetId);
+        final I_ConfigAceFrame config = this.getActiveAceFrameConfig();
+        final RefsetMember<?, ?> member =
+            createMember(memberPrimUuid, componentId, EConcept.REFSET_TYPES.classToType(partType), refsetConcept,
                     config, new RefsetPropertyMap());
-        addUncommitted(refsetConcept);
+        this.addUncommitted(refsetConcept);
         return member;
     }
 
@@ -949,82 +950,82 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
      * @throws IOException
      */
     @Deprecated
-    public static RefsetMember<?, ?> createMember(int memberId, int referencedComponentNid, EConcept.REFSET_TYPES type,
-            Concept refsetConcept, I_ConfigAceFrame config) throws IOException {
-        UUID primordialUuid = Bdb.getUuidsToNidMap().getUuidsForNid(memberId).iterator().next();
+    public static RefsetMember<?, ?> createMember(final int memberId, final int referencedComponentNid, final EConcept.REFSET_TYPES type,
+            final Concept refsetConcept, final I_ConfigAceFrame config) throws IOException {
+        final UUID primordialUuid = Bdb.getUuidsToNidMap().getUuidsForNid(memberId).iterator().next();
         return createMember(primordialUuid, referencedComponentNid, type, refsetConcept, config,
-            new RefsetPropertyMap());
+                new RefsetPropertyMap());
     }
 
-    public static RefsetMember<?, ?> createMember(UUID primordialUuid, int referencedComponentNid,
-            EConcept.REFSET_TYPES type, Concept refsetConcept, I_ConfigAceFrame config, RefsetPropertyMap propMap)
+    public static RefsetMember<?, ?> createMember(final UUID primordialUuid, final int referencedComponentNid,
+            final EConcept.REFSET_TYPES type, final Concept refsetConcept, final I_ConfigAceFrame config, final RefsetPropertyMap propMap)
             throws IOException {
         assert referencedComponentNid != 0 : " invalid referencedComponentNid for refset: " + refsetConcept;
         RefsetMember<?, ?> member = null;
         switch (type) {
         case BOOLEAN:
             member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new BooleanMember(),
+                setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new BooleanMember(),
                         propMap);
             break;
         case CID:
             member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidMember(),
+                setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidMember(),
                         propMap);
             break;
         case CID_CID:
             member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidCidMember(),
+                setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidCidMember(),
                         propMap);
             break;
         case CID_CID_CID:
             member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config,
+                setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config,
                         new CidCidCidMember(), propMap);
             break;
         case CID_CID_STR:
             member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config,
+                setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config,
                         new CidCidStrMember(), propMap);
             break;
         case CID_FLOAT:
             member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidFloatMember(),
+                setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidFloatMember(),
                         propMap);
             break;
         case CID_INT:
             member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidIntMember(),
+                setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidIntMember(),
                         propMap);
             break;
         case CID_LONG:
             member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidLongMember(),
+                setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidLongMember(),
                         propMap);
             break;
         case CID_STR:
             member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidStrMember(),
+                setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidStrMember(),
                         propMap);
             break;
         case INT:
             member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new IntMember(),
+                setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new IntMember(),
                         propMap);
             break;
         case LONG:
             member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new LongMember(),
+                setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new LongMember(),
                         propMap);
             break;
         case MEMBER:
             member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config,
+                setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config,
                         new MembershipMember(), propMap);
             break;
         case STR:
             member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new StrMember(),
+                setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new StrMember(),
                         propMap);
             break;
         default:
@@ -1033,8 +1034,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         return member;
     }
 
-    private static RefsetMember<?, ?> setupNewMember(UUID primordialUuid, int referencedComponentNid,
-            Concept refsetConcept, I_ConfigAceFrame config, RefsetMember<?, ?> member, RefsetPropertyMap propMap)
+    private static RefsetMember<?, ?> setupNewMember(final UUID primordialUuid, final int referencedComponentNid,
+            final Concept refsetConcept, final I_ConfigAceFrame config, final RefsetMember<?, ?> member, final RefsetPropertyMap propMap)
             throws IOException {
 
         assert config != null : "Config cannot be null.";
@@ -1054,12 +1055,12 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             statusNid = propMap.getInt(REFSET_PROPERTY.STATUS);
         }
         assert config.getEditingPathSet().size() > 0 : "Empty editing path set. Must have at least one editing path.";
-        for (I_Path p : config.getEditingPathSet()) {
+        for (final I_Path p : config.getEditingPathSet()) {
             if (member.primordialSapNid == Integer.MIN_VALUE) {
                 member.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, p.getConceptId(), time);
                 propMap.setPropertiesExceptSap((I_ExtendByRefPart) member);
             } else {
-                I_ExtendByRefPart revision = (I_ExtendByRefPart) member.makeAnalog(statusNid, p.getConceptId(), time);
+                final I_ExtendByRefPart revision = (I_ExtendByRefPart) member.makeAnalog(statusNid, p.getConceptId(), time);
                 propMap.setProperties(revision);
                 member.addVersion(revision);
             }
@@ -1069,18 +1070,18 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public I_ExtendByRef newExtensionNoChecks(int refsetId, int memberId, int componentId, int typeId)
-            throws IOException {
-        Concept refsetConcept = Concept.get(refsetId);
-        I_ConfigAceFrame config = getActiveAceFrameConfig();
-        RefsetMember<?, ?> member =
-                createMember(memberId, componentId, REFSET_TYPES.nidToType(typeId), refsetConcept, config);
-        addUncommittedNoChecks(refsetConcept);
+    public I_ExtendByRef newExtensionNoChecks(final int refsetId, final int memberId, final int componentId, final int typeId)
+    throws IOException {
+        final Concept refsetConcept = Concept.get(refsetId);
+        final I_ConfigAceFrame config = this.getActiveAceFrameConfig();
+        final RefsetMember<?, ?> member =
+            createMember(memberId, componentId, REFSET_TYPES.nidToType(typeId), refsetConcept, config);
+        this.addUncommittedNoChecks(refsetConcept);
         return member;
     }
 
     @Override
-    public <T extends I_ExtendByRefPart> T newExtensionPart(Class<T> t) {
+    public <T extends I_ExtendByRefPart> T newExtensionPart(final Class<T> t) {
         throw new UnsupportedOperationException();
     }
 
@@ -1096,27 +1097,27 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     @Deprecated
-    public I_Path newPath(Set<I_Position> origins, I_GetConceptData pathConcept) throws TerminologyException,
-            IOException {
-        return newPath(origins, pathConcept, getActiveAceFrameConfig());
+    public I_Path newPath(final Set<I_Position> origins, final I_GetConceptData pathConcept) throws TerminologyException,
+    IOException {
+        return this.newPath(origins, pathConcept, this.getActiveAceFrameConfig());
     }
 
     @Override
-    public I_Path newPath(Collection<I_Position> origins, I_GetConceptData pathConcept, I_ConfigAceFrame commitConfig)
-            throws TerminologyException, IOException {
+    public I_Path newPath(final Collection<I_Position> origins, final I_GetConceptData pathConcept, final I_ConfigAceFrame commitConfig)
+    throws TerminologyException, IOException {
         assert pathConcept != null && pathConcept.getConceptId() != 0;
-        ArrayList<I_Position> originList = new ArrayList<I_Position>();
+        final ArrayList<I_Position> originList = new ArrayList<I_Position>();
         if (origins != null) {
             originList.addAll(origins);
         }
-        Path newPath = new Path(pathConcept.getConceptId(), originList);
+        final Path newPath = new Path(pathConcept.getConceptId(), originList);
         AceLog.getEditLog().fine("writing new path: \n" + newPath);
-        pathManager.write(newPath, commitConfig);
+        this.pathManager.write(newPath, commitConfig);
         return newPath;
     }
 
     @Override
-    public I_Position newPosition(I_Path path, int version) throws TerminologyException, IOException {
+    public I_Position newPosition(final I_Path path, final int version) throws TerminologyException, IOException {
         return new Position(version, path);
     }
 
@@ -1126,61 +1127,61 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public Relationship newRelationship(UUID newRelUid, I_GetConceptData concept, I_ConfigAceFrame aceFrameConfig)
-            throws TerminologyException, IOException {
-        return newRelationship(newRelUid, concept, aceFrameConfig.getDefaultRelationshipType(), aceFrameConfig
-            .getHierarchySelection(), aceFrameConfig.getDefaultRelationshipCharacteristic(), aceFrameConfig
-            .getDefaultRelationshipRefinability(), aceFrameConfig.getDefaultStatus(), 0, aceFrameConfig);
+    public Relationship newRelationship(final UUID newRelUid, final I_GetConceptData concept, final I_ConfigAceFrame aceFrameConfig)
+    throws TerminologyException, IOException {
+        return this.newRelationship(newRelUid, concept, aceFrameConfig.getDefaultRelationshipType(), aceFrameConfig
+                .getHierarchySelection(), aceFrameConfig.getDefaultRelationshipCharacteristic(), aceFrameConfig
+                .getDefaultRelationshipRefinability(), aceFrameConfig.getDefaultStatus(), 0, aceFrameConfig);
     }
 
     @Override
-    public Relationship newRelationship(UUID newRelUid, I_GetConceptData concept, I_GetConceptData relType,
-            I_GetConceptData relDestination, I_GetConceptData relCharacteristic, I_GetConceptData relRefinability,
-            I_GetConceptData relStatus, int relGroup, I_ConfigAceFrame aceFrameConfig) throws TerminologyException,
+    public Relationship newRelationship(final UUID newRelUid, final I_GetConceptData concept, final I_GetConceptData relType,
+            final I_GetConceptData relDestination, final I_GetConceptData relCharacteristic, final I_GetConceptData relRefinability,
+            final I_GetConceptData relStatus, final int relGroup, final I_ConfigAceFrame aceFrameConfig) throws TerminologyException,
             IOException {
-        return newRelationship(newRelUid, concept, relType, relDestination, relCharacteristic, relRefinability,
-            relStatus, relGroup, aceFrameConfig, Long.MAX_VALUE);
+        return this.newRelationship(newRelUid, concept, relType, relDestination, relCharacteristic, relRefinability,
+                relStatus, relGroup, aceFrameConfig, Long.MAX_VALUE);
     }
 
     @Override
-    public Relationship newRelationship(UUID newRelUid, I_GetConceptData concept, I_GetConceptData relType,
-            I_GetConceptData relDestination, I_GetConceptData relCharacteristic, I_GetConceptData relRefinability,
-            I_GetConceptData relStatus, int group, I_ConfigAceFrame aceFrameConfig, long effectiveDate)
-            throws TerminologyException, IOException {
+    public Relationship newRelationship(final UUID newRelUid, final I_GetConceptData concept, final I_GetConceptData relType,
+            final I_GetConceptData relDestination, final I_GetConceptData relCharacteristic, final I_GetConceptData relRefinability,
+            final I_GetConceptData relStatus, final int group, final I_ConfigAceFrame aceFrameConfig, final long effectiveDate)
+    throws TerminologyException, IOException {
         canEdit(aceFrameConfig);
         if (concept == null) {
             AceLog.getAppLog().alertAndLogException(
-                new Exception("Cannot add a relationship while the component viewer is empty..."));
+                    new Exception("Cannot add a relationship while the component viewer is empty..."));
             return null;
         }
-        Concept c = (Concept) concept;
-        Relationship r = new Relationship();
+        final Concept c = (Concept) concept;
+        final Relationship r = new Relationship();
         Bdb.gVersion.incrementAndGet();
         r.enclosingConceptNid = c.getNid();
         r.nid = Bdb.uuidToNid(newRelUid);
         Bdb.getNidCNidMap().setCidForNid(c.getNid(), r.nid);
         r.primordialUNid = Bdb.getUuidsToNidMap().getUNid(newRelUid);
-        int parentId = relDestination.getNid();
+        final int parentId = relDestination.getNid();
         r.setC2Id(parentId);
         r.setTypeId(relType.getNid());
         r.setRefinabilityId(relRefinability.getNid());
         r.setCharacteristicId(relCharacteristic.getNid());
         r.primordialSapNid = Integer.MIN_VALUE;
         r.setGroup(group);
-        int statusNid = relStatus.getNid();
-        for (I_Path p : aceFrameConfig.getEditingPathSet()) {
+        final int statusNid = relStatus.getNid();
+        for (final I_Path p : aceFrameConfig.getEditingPathSet()) {
             if (r.primordialSapNid == Integer.MIN_VALUE) {
                 r.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, p.getConceptId(), effectiveDate);
             } else {
                 if (r.revisions == null) {
                     r.revisions = new CopyOnWriteArrayList<RelationshipRevision>();
                 }
-                r.revisions.add((RelationshipRevision) r.makeAnalog(statusNid, p.getConceptId(), effectiveDate));
+                r.revisions.add(r.makeAnalog(statusNid, p.getConceptId(), effectiveDate));
             }
         }
         c.getSourceRels().add(r);
-       // AceLog.getAppLog().info("BDBTF newRelationship r ="+r );
-       // AceLog.getAppLog().info("BDBTF newRelationship c ="+c.toLongString() );
+        // AceLog.getAppLog().info("BDBTF newRelationship r ="+r );
+        // AceLog.getAppLog().info("BDBTF newRelationship c ="+c.toLongString() );
         return r;
     }
 
@@ -1191,12 +1192,12 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
      * as part of the classifier setup.
      */
     @Override
-    public Relationship newRelationshipNoCheck(UUID newRelUid, I_GetConceptData concept, int relTypeNid, int c2Nid,
-            int relCharacteristicNid, int relRefinabilityNid, int relStatusNid, int group, int pathNid,
-            long effectiveDate) throws TerminologyException, IOException {
+    public Relationship newRelationshipNoCheck(final UUID newRelUid, final I_GetConceptData concept, final int relTypeNid, final int c2Nid,
+            final int relCharacteristicNid, final int relRefinabilityNid, final int relStatusNid, final int group, final int pathNid,
+            final long effectiveDate) throws TerminologyException, IOException {
         // NO CHECK PERFORMED
-        Concept c = (Concept) concept;
-        Relationship r = new Relationship();
+        final Concept c = (Concept) concept;
+        final Relationship r = new Relationship();
         Bdb.gVersion.incrementAndGet();
         r.enclosingConceptNid = c.getNid();
         r.nid = Bdb.uuidToNid(newRelUid);
@@ -1213,17 +1214,17 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public void removeChangeSetReader(I_ReadChangeSet reader) {
+    public void removeChangeSetReader(final I_ReadChangeSet reader) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void removeChangeSetWriter(I_WriteChangeSet writer) {
+    public void removeChangeSetWriter(final I_WriteChangeSet writer) {
         ChangeSetWriterHandler.removeWriter(writer);
     }
 
     @Override
-    public void removeFromCacheAndRollbackTransaction(int memberId) throws IOException {
+    public void removeFromCacheAndRollbackTransaction(final int memberId) throws IOException {
         throw new UnsupportedOperationException();
     }
 
@@ -1233,7 +1234,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public void setProperty(String key, String value) throws IOException {
+    public void setProperty(final String key, final String value) throws IOException {
         Bdb.setProperty(key, value);
     }
 
@@ -1248,47 +1249,47 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public int uuidToNative(UUID... uid) throws TerminologyException, IOException {
+    public int uuidToNative(final UUID... uid) throws TerminologyException, IOException {
         return Bdb.uuidToNid(uid);
     }
 
     @Override
-    public int uuidToNative(Collection<UUID> uids) throws TerminologyException, IOException {
+    public int uuidToNative(final Collection<UUID> uids) throws TerminologyException, IOException {
         return Bdb.uuidsToNid(uids);
     }
 
     @Override
     @Deprecated
-    public void writeId(I_Identify versioned) throws IOException {
+    public void writeId(final I_Identify versioned) throws IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void writePath(I_Path p, I_ConfigAceFrame config) throws IOException {
+    public void writePath(final I_Path p, final I_ConfigAceFrame config) throws IOException {
         try {
-            pathManager.write(p, config);
-        } catch (TerminologyException e) {
+            this.pathManager.write(p, config);
+        } catch (final TerminologyException e) {
             throw new IOException(e);
         }
     }
 
     @Override
-    public List<Path> getPathChildren(int nid) throws TerminologyException {
-        return pathManager.getPathChildren(nid);
+    public List<Path> getPathChildren(final int nid) throws TerminologyException {
+        return this.pathManager.getPathChildren(nid);
     }
 
     @Override
-    public void writePathOrigin(I_Path path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException {
-        pathManager.writeOrigin(path, origin, config);
+    public void writePathOrigin(final I_Path path, final I_Position origin, final I_ConfigAceFrame config) throws TerminologyException {
+        this.pathManager.writeOrigin(path, origin, config);
     }
 
-    public void setPathManager(BdbPathManager pathManager) {
+    public void setPathManager(final BdbPathManager pathManager) {
         this.pathManager = pathManager;
     }
 
     @Override
-    public List<UUID> nativeToUuid(int nid) throws IOException {
-        Concept concept = Bdb.getConceptForComponent(nid);
+    public List<UUID> nativeToUuid(final int nid) throws IOException {
+        final Concept concept = Bdb.getConceptForComponent(nid);
         if (concept != null && concept.isCanceled() == false) {
             return concept.getUidsForComponent(nid);
         }
@@ -1296,12 +1297,12 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public I_ImageVersioned getImage(UUID uuid) throws IOException {
-        return getImage(Bdb.uuidToNid(uuid));
+    public I_ImageVersioned getImage(final UUID uuid) throws IOException {
+        return this.getImage(Bdb.uuidToNid(uuid));
     }
 
     @Override
-    public I_ImageVersioned getImage(int nid) throws IOException {
+    public I_ImageVersioned getImage(final int nid) throws IOException {
         return (I_ImageVersioned) Bdb.getConceptForComponent(nid).getComponent(nid);
     }
 
@@ -1309,49 +1310,49 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     public void checkpoint() throws IOException {
         try {
             Bdb.sync();
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             throw new IOException(e);
-        } catch (ExecutionException e) {
+        } catch (final ExecutionException e) {
             throw new IOException(e);
-        } catch (TerminologyException e) {
+        } catch (final TerminologyException e) {
             throw new IOException(e);
         }
     }
 
     @Override
-    public void compress(int minUtilization) throws IOException {
+    public void compress(final int minUtilization) throws IOException {
         Bdb.compress(minUtilization);
     }
 
     @Override
     public I_ConfigAceDb newAceDbConfig() {
-        return new AceConfig(envHome, false);
+        return new AceConfig(this.envHome, false);
     }
 
     @Override
-    public void setup(Object envHome, boolean readOnly, Long cacheSize) throws IOException {
-        File homeFile = (File) envHome;
+    public void setup(final Object envHome, final boolean readOnly, final Long cacheSize) throws IOException {
+        final File homeFile = (File) envHome;
         Bdb.setup(homeFile.getAbsolutePath());
     }
 
     @Override
-    public void setup(Object envHome, boolean readOnly, Long cacheSize, DatabaseSetupConfig databaseSetupConfig)
-            throws IOException {
-        File homeFile = (File) envHome;
+    public void setup(final Object envHome, final boolean readOnly, final Long cacheSize, final DatabaseSetupConfig databaseSetupConfig)
+    throws IOException {
+        final File homeFile = (File) envHome;
         Bdb.setup(homeFile.getAbsolutePath());
     }
 
     private static class ConceptSearcher implements I_ProcessConceptData {
 
-        private CountDownLatch conceptLatch;
-        private I_TrackContinuation tracker;
+        private final CountDownLatch conceptLatch;
+        private final I_TrackContinuation tracker;
         private Semaphore checkSemaphore;
-        private List<I_TestSearchResults> checkList;
-        private I_ConfigAceFrame config;
-        private I_RepresentIdSet matches;
+        private final List<I_TestSearchResults> checkList;
+        private final I_ConfigAceFrame config;
+        private final I_RepresentIdSet matches;
 
-        public ConceptSearcher(CountDownLatch conceptLatch, I_TrackContinuation tracker,
-                List<I_TestSearchResults> checkList, I_ConfigAceFrame config, I_RepresentIdSet matches) {
+        public ConceptSearcher(final CountDownLatch conceptLatch, final I_TrackContinuation tracker,
+                final List<I_TestSearchResults> checkList, final I_ConfigAceFrame config, final I_RepresentIdSet matches) {
             super();
             this.conceptLatch = conceptLatch;
             this.tracker = tracker;
@@ -1361,53 +1362,53 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         }
 
         @Override
-        public void processConceptData(Concept concept) throws Exception {
+        public void processConceptData(final Concept concept) throws Exception {
 
-            if (tracker.continueWork()) {
+            if (this.tracker.continueWork()) {
                 boolean failed = false;
-                for (I_TestSearchResults test : checkList) {
-                    if (test.test(concept, config) == false) {
+                for (final I_TestSearchResults test : this.checkList) {
+                    if (test.test(concept, this.config) == false) {
                         failed = true;
                         break;
                     }
                 }
                 if (!failed) {
-                    matches.setMember(concept.getNid());
+                    this.matches.setMember(concept.getNid());
                 }
 
-                conceptLatch.countDown();
+                this.conceptLatch.countDown();
             } else {
-                while (conceptLatch.getCount() > 0) {
-                    conceptLatch.countDown();
+                while (this.conceptLatch.getCount() > 0) {
+                    this.conceptLatch.countDown();
                 }
             }
         }
 
         @Override
         public boolean continueWork() {
-            return tracker.continueWork();
+            return this.tracker.continueWork();
         }
     }
 
     @Override
-    public void searchConcepts(I_TrackContinuation tracker, I_RepresentIdSet matches, CountDownLatch latch,
-            List<I_TestSearchResults> checkList, I_ConfigAceFrame config) throws DatabaseException, IOException,
+    public void searchConcepts(final I_TrackContinuation tracker, final I_RepresentIdSet matches, final CountDownLatch latch,
+            final List<I_TestSearchResults> checkList, final I_ConfigAceFrame config) throws DatabaseException, IOException,
             org.apache.lucene.queryParser.ParseException {
-        ConceptSearcher searcher = new ConceptSearcher(latch, tracker, checkList, config, matches);
+        final ConceptSearcher searcher = new ConceptSearcher(latch, tracker, checkList, config, matches);
         try {
             Bdb.getConceptDb().iterateConceptDataInParallel(searcher);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new IOException();
         }
 
     }
 
     @Override
-    public CountDownLatch searchLucene(I_TrackContinuation tracker, String query, Collection<LuceneMatch> matches,
-            CountDownLatch latch, List<I_TestSearchResults> checkList, I_ConfigAceFrame config,
-            LuceneProgressUpdator updater) throws DatabaseException, IOException,
+    public CountDownLatch searchLucene(final I_TrackContinuation tracker, final String query, final Collection<LuceneMatch> matches,
+            final CountDownLatch latch, final List<I_TestSearchResults> checkList, final I_ConfigAceFrame config,
+            final LuceneProgressUpdator updater) throws DatabaseException, IOException,
             org.apache.lucene.queryParser.ParseException {
-        Stopwatch timer = new Stopwatch();
+        final Stopwatch timer = new Stopwatch();
         ;
         timer.start();
         try {
@@ -1418,9 +1419,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
             updater.setIndeterminate(true);
             updater.setProgressInfo("Starting StandardAnalyzer lucene query...");
-            long startTime = System.currentTimeMillis();
+            final long startTime = System.currentTimeMillis();
             updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime)
-                + " ms.");
+                    + " ms.");
             Hits hits = LuceneManager.search(q);
 
             if (hits.length() > 0) {
@@ -1428,27 +1429,27 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             } else {
                 updater.setProgressInfo("Starting WhitespaceAnalyzer lucene query...");
                 AceLog.getAppLog().info(
-                    "StandardAnalyzer query returned no results. Now trying WhitespaceAnalyzer query");
+                "StandardAnalyzer query returned no results. Now trying WhitespaceAnalyzer query");
                 q = new QueryParser("desc", new WhitespaceAnalyzer()).parse(query);
                 hits = LuceneManager.search(q);
             }
 
             updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime)
-                + " ms. Hits: " + hits.length());
+                    + " ms. Hits: " + hits.length());
 
-            CountDownLatch hitLatch = new CountDownLatch(hits.length());
+            final CountDownLatch hitLatch = new CountDownLatch(hits.length());
             updater.setHits(hits.length());
             updater.setIndeterminate(false);
 
             for (int i = 0; i < hits.length(); i++) {
-                Document doc = hits.doc(i);
-                float score = hits.score(i);
+                final Document doc = hits.doc(i);
+                final float score = hits.score(i);
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                     AceLog.getAppLog().fine("Hit: " + doc + " Score: " + score);
                 }
 
                 ACE.threadPool.execute(new CheckAndProcessLuceneMatch(hitLatch, updater, doc, score, matches,
-                    checkList, config));
+                        checkList, config));
             }
             if (AceLog.getAppLog().isLoggable(Level.INFO)) {
                 if (tracker.continueWork()) {
@@ -1459,14 +1460,14 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
             timer.stop();
             return hitLatch;
-        } catch (ParseException pe) {
+        } catch (final ParseException pe) {
             AceLog.getAppLog().alertAndLogException(pe);
             timer.stop();
             updater.setProgressInfo("Query malformed: " + query);
             updater.setIndeterminate(false);
             updater.setHits(0);
             return new CountDownLatch(0);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
             timer.stop();
             updater.setProgressInfo("Exception during query: " + e.getLocalizedMessage());
@@ -1478,17 +1479,17 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     private static class RegexSearcher implements I_ProcessConceptData {
 
-        private CountDownLatch conceptLatch;
-        private I_TrackContinuation tracker;
-        private Semaphore checkSemaphore;
-        private List<I_TestSearchResults> checkList;
-        private I_ConfigAceFrame config;
-        private Pattern p;
+        private final CountDownLatch conceptLatch;
+        private final I_TrackContinuation tracker;
+        private final Semaphore checkSemaphore;
+        private final List<I_TestSearchResults> checkList;
+        private final I_ConfigAceFrame config;
+        private final Pattern p;
         Collection<I_DescriptionVersioned> matches;
 
-        public RegexSearcher(CountDownLatch conceptLatch, I_TrackContinuation tracker, Semaphore checkSemaphore,
-                List<I_TestSearchResults> checkList, I_ConfigAceFrame config, Pattern p,
-                Collection<I_DescriptionVersioned> matches) {
+        public RegexSearcher(final CountDownLatch conceptLatch, final I_TrackContinuation tracker, final Semaphore checkSemaphore,
+                final List<I_TestSearchResults> checkList, final I_ConfigAceFrame config, final Pattern p,
+                final Collection<I_DescriptionVersioned> matches) {
             super();
             this.conceptLatch = conceptLatch;
             this.tracker = tracker;
@@ -1500,58 +1501,58 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         }
 
         @Override
-        public void processConceptData(Concept concept) throws Exception {
+        public void processConceptData(final Concept concept) throws Exception {
 
-            if (tracker.continueWork()) {
-                Collection<? extends I_DescriptionVersioned> descriptions = concept.getDescriptions();
-                CountDownLatch descriptionLatch = new CountDownLatch(descriptions.size());
-                for (I_DescriptionVersioned descV : descriptions) {
+            if (this.tracker.continueWork()) {
+                final Collection<? extends I_DescriptionVersioned> descriptions = concept.getDescriptions();
+                final CountDownLatch descriptionLatch = new CountDownLatch(descriptions.size());
+                for (final I_DescriptionVersioned descV : descriptions) {
                     try {
-                        checkSemaphore.acquire();
-                    } catch (InterruptedException e) {
+                        this.checkSemaphore.acquire();
+                    } catch (final InterruptedException e) {
                         AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
                     }
-                    ACE.threadPool.execute(new CheckAndProcessRegexMatch(descriptionLatch, checkSemaphore, p, matches,
-                        descV, checkList, config));
+                    ACE.threadPool.execute(new CheckAndProcessRegexMatch(descriptionLatch, this.checkSemaphore, this.p, this.matches,
+                            descV, this.checkList, this.config));
                 }
                 try {
                     descriptionLatch.await();
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                     AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
                 }
-                conceptLatch.countDown();
+                this.conceptLatch.countDown();
             } else {
-                while (conceptLatch.getCount() > 0) {
-                    conceptLatch.countDown();
+                while (this.conceptLatch.getCount() > 0) {
+                    this.conceptLatch.countDown();
                 }
             }
         }
 
         @Override
         public boolean continueWork() {
-            return tracker.continueWork();
+            return this.tracker.continueWork();
         }
     }
 
     @Override
-    public void searchRegex(I_TrackContinuation tracker, Pattern p, Collection<I_DescriptionVersioned> matches,
-            CountDownLatch conceptLatch, List<I_TestSearchResults> checkList, I_ConfigAceFrame config)
-            throws DatabaseException, IOException {
+    public void searchRegex(final I_TrackContinuation tracker, final Pattern p, final Collection<I_DescriptionVersioned> matches,
+            final CountDownLatch conceptLatch, final List<I_TestSearchResults> checkList, final I_ConfigAceFrame config)
+    throws DatabaseException, IOException {
         Stopwatch timer = null;
         if (AceLog.getAppLog().isLoggable(Level.INFO)) {
             timer = new Stopwatch();
             timer.start();
         }
 
-        Semaphore checkSemaphore = new Semaphore(15);
-        RegexSearcher searcher =
-                new RegexSearcher(conceptLatch, tracker, checkSemaphore, checkList, config, p, matches);
+        final Semaphore checkSemaphore = new Semaphore(15);
+        final RegexSearcher searcher =
+            new RegexSearcher(conceptLatch, tracker, checkSemaphore, checkList, config, p, matches);
         assert conceptLatch.getCount() == Bdb.getConceptDb().getCount() : " counts do not match. Latch count: "
             + conceptLatch.getCount() + " Db count: " + Bdb.getConceptDb().getCount();
         try {
             Bdb.getConceptDb().iterateConceptDataInParallel(searcher);
             conceptLatch.await();
-        } catch (Exception e1) {
+        } catch (final Exception e1) {
             AceLog.getAppLog().log(Level.WARNING, e1.getLocalizedMessage(), e1);
             while (conceptLatch.getCount() > 0) {
                 conceptLatch.countDown();
@@ -1568,84 +1569,84 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public void addToWatchList(I_GetConceptData c) {
+    public void addToWatchList(final I_GetConceptData c) {
         Bdb.addToWatchList(c);
     }
 
     @Override
-    public void removeFromWatchList(I_GetConceptData c) {
+    public void removeFromWatchList(final I_GetConceptData c) {
         Bdb.removeFromWatchList(c);
     }
 
     SpecRefsetHelper specRefsetHelper;
 
     @Override
-    public I_HelpSpecRefset getSpecRefsetHelper(I_ConfigAceFrame config) throws Exception {
-        if (specRefsetHelper == null || specRefsetHelper.getConfig() != config) {
-            specRefsetHelper = new SpecRefsetHelper(config);
+    public I_HelpSpecRefset getSpecRefsetHelper(final I_ConfigAceFrame config) throws Exception {
+        if (this.specRefsetHelper == null || this.specRefsetHelper.getConfig() != config) {
+            this.specRefsetHelper = new SpecRefsetHelper(config);
         }
-        return specRefsetHelper;
+        return this.specRefsetHelper;
     }
 
     @Override
-    public I_HelpMarkedParentRefsets getMarkedParentRefsetHelper(I_ConfigAceFrame config, int memberRefsetId,
-            int memberTypeId) throws Exception {
+    public I_HelpMarkedParentRefsets getMarkedParentRefsetHelper(final I_ConfigAceFrame config, final int memberRefsetId,
+            final int memberTypeId) throws Exception {
         return new MarkedParentRefsetHelper(config, memberRefsetId, memberTypeId);
     }
 
     @Override
-    public I_HelpMemberRefsetsCalculateConflicts getMemberRefsetConflictCalculator(I_ConfigAceFrame config)
-            throws Exception {
+    public I_HelpMemberRefsetsCalculateConflicts getMemberRefsetConflictCalculator(final I_ConfigAceFrame config)
+    throws Exception {
         return new MemberRefsetConflictCalculator(config);
     }
 
     @Override
-    public I_HelpMemberRefsets getMemberRefsetHelper(I_ConfigAceFrame config, int memberRefsetId, int memberTypeId)
-            throws Exception {
+    public I_HelpMemberRefsets getMemberRefsetHelper(final I_ConfigAceFrame config, final int memberRefsetId, final int memberTypeId)
+    throws Exception {
         return new MemberRefsetHelper(config, memberRefsetId, memberTypeId);
     }
 
     @Override
-    public I_HelpRefsets getRefsetHelper(I_ConfigAceFrame config) {
+    public I_HelpRefsets getRefsetHelper(final I_ConfigAceFrame config) {
         return new RefsetHelper(config);
     }
 
     @Override
-    public boolean pathExists(int pathConceptId) throws TerminologyException, IOException {
-        return pathManager.exists(pathConceptId);
+    public boolean pathExists(final int pathConceptId) throws TerminologyException, IOException {
+        return this.pathManager.exists(pathConceptId);
     }
 
     @Override
-    public boolean pathExistsFast(int pathConceptId) throws TerminologyException, IOException {
-        return pathManager.existsFast(pathConceptId);
+    public boolean pathExistsFast(final int pathConceptId) throws TerminologyException, IOException {
+        return this.pathManager.existsFast(pathConceptId);
     }
 
     @Override
-    public Object getComponent(int nid) throws TerminologyException, IOException {
+    public Object getComponent(final int nid) throws TerminologyException, IOException {
         return Bdb.getComponent(nid);
     }
 
     @Override
-    public Condition computeRefset(int refsetNid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig) throws Exception {
+    public Condition computeRefset(final int refsetNid, final RefsetSpecQuery query, final I_ConfigAceFrame frameConfig) throws Exception {
         AceLog.getAppLog().info(">>>>>>>>>> Computing RefsetSpecQuery: " + query);
-        List<String> dangleWarnings = RefsetQueryFactory.removeDangles(query);
-        for (String warning : dangleWarnings) {
+        final List<String> dangleWarnings = RefsetQueryFactory.removeDangles(query);
+        for (final String warning : dangleWarnings) {
             AceLog.getAppLog().info(warning + "\nClause removed from computation: ");
         }
 
-        SpecRefsetHelper refsetHelper = new SpecRefsetHelper(frameConfig);
-        Concept refsetConcept = Concept.get(refsetNid);
-        RefsetSpec specHelper = new RefsetSpec(refsetConcept, true, frameConfig);
-        ComponentList<RefsetMember<?, ?>> members = refsetConcept.getData().getRefsetMembers();
+        final SpecRefsetHelper refsetHelper = new SpecRefsetHelper(frameConfig);
+        final Concept refsetConcept = Concept.get(refsetNid);
+        final RefsetSpec specHelper = new RefsetSpec(refsetConcept, true, frameConfig);
+        final ComponentList<RefsetMember<?, ?>> members = refsetConcept.getData().getRefsetMembers();
 
-        HashSet<Integer> currentMembersList = new HashSet<Integer>();
-        for (RefsetMember<?, ?> v : members) {
+        final HashSet<Integer> currentMembersList = new HashSet<Integer>();
+        for (final RefsetMember<?, ?> v : members) {
             if (refsetHelper.hasCurrentRefsetExtension(refsetNid, v.getComponentId(), ReferenceConcepts.NORMAL_MEMBER
-                .getNid())) {
+                    .getNid())) {
                 if (Terms.get().hasConcept(v.getComponentId())) {
                     currentMembersList.add(v.getComponentId());
                 } else { // assume it is a description member
-                    I_DescriptionVersioned desc = Terms.get().getDescription(v.getComponentId());
+                    final I_DescriptionVersioned desc = Terms.get().getDescription(v.getComponentId());
                     if (desc != null) {
                         currentMembersList.add(desc.getConceptId());
                     }
@@ -1653,7 +1654,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
         }
 
-        HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
+        final HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
         RefsetComputer computer;
         try {
             I_RepresentIdSet possibleIds;
@@ -1669,7 +1670,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
 
             // add the current members to the list of possible concepts to check (in case some need to be retired)
-            possibleIds.or(getIdSetFromIntCollection(currentMembersList));
+            possibleIds.or(this.getIdSetFromIntCollection(currentMembersList));
             AceLog.getAppLog().info(">>>>>>>>>> Search space (concept count): " + possibleIds.cardinality());
 
             computer = new RefsetComputer(refsetNid, query, frameConfig, possibleIds, activities);
@@ -1678,8 +1679,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                 Bdb.getConceptDb().iterateConceptDataInParallel(computer);
             } else {
                 AceLog.getAppLog().info(">>>>>>>>> Iterating concepts in sequence.");
-                I_IterateIds possibleItr = possibleIds.iterator();
-                ConceptFetcher fetcher = new ConceptFetcher();
+                final I_IterateIds possibleItr = possibleIds.iterator();
+                final ConceptFetcher fetcher = new ConceptFetcher();
                 while (possibleItr.next()) {
                     fetcher.setConcept(Concept.get(possibleItr.nid()));
                     computer.processUnfetchedConceptData(possibleItr.nid(), fetcher);
@@ -1703,9 +1704,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
             AceLog.getAppLog().info(">>>>>>>>> Finished computing spec - committing.");
             BdbCommitManager.commit(frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy(), frameConfig
-                .getDbConfig().getChangeSetWriterThreading());
+                    .getDbConfig().getChangeSetWriterThreading());
             if (!computer.continueWork()) {
-                for (I_ShowActivity a : activities) {
+                for (final I_ShowActivity a : activities) {
                     a.cancel();
                     a.setProgressInfoLower("Cancelled.");
                 }
@@ -1713,28 +1714,28 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             } else {
                 return Condition.ITEM_COMPLETE;
             }
-        } catch (ComputationCanceled e) {
-            for (I_ShowActivity a : activities) {
+        } catch (final ComputationCanceled e) {
+            for (final I_ShowActivity a : activities) {
                 a.cancel();
                 a.setProgressInfoLower("Cancelled.");
             }
-        } catch (InterruptedException e) {
-            for (I_ShowActivity a : activities) {
+        } catch (final InterruptedException e) {
+            for (final I_ShowActivity a : activities) {
                 a.cancel();
                 a.setProgressInfoLower("Cancelled.");
             }
-        } catch (ExecutionException e) {
-            for (I_ShowActivity a : activities) {
+        } catch (final ExecutionException e) {
+            for (final I_ShowActivity a : activities) {
                 a.cancel();
                 a.setProgressInfoLower("Cancelled.");
             }
-            if (getRootCause(e) instanceof TerminologyException) {
+            if (this.getRootCause(e) instanceof TerminologyException) {
                 throw new TerminologyException(e.getMessage());
-            } else if (getRootCause(e) instanceof IOException) {
+            } else if (this.getRootCause(e) instanceof IOException) {
                 throw new IOException(e.getMessage());
-            } else if (getRootCause(e) instanceof ComputationCanceled) {
+            } else if (this.getRootCause(e) instanceof ComputationCanceled) {
                 // Nothing to do
-            } else if (getRootCause(e) instanceof InterruptedException) {
+            } else if (this.getRootCause(e) instanceof InterruptedException) {
                 // Nothing to do
             } else {
 
@@ -1747,7 +1748,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         return Condition.ITEM_CANCELED;
     }
 
-    private Throwable getRootCause(Exception e) {
+    private Throwable getRootCause(final Exception e) {
         Throwable prevCause = e;
         Throwable rootCause = e.getCause();
         while (rootCause != null) {
@@ -1761,24 +1762,24 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     private static class ConceptFetcher implements I_FetchConceptFromCursor {
         Concept concept;
 
-        public void setConcept(Concept concept) {
+        public void setConcept(final Concept concept) {
             this.concept = concept;
         }
 
         @Override
         public Concept fetch() {
-            return concept;
+            return this.concept;
         }
 
     }
 
     @Override
-    public I_ImageVersioned newImage(UUID imageUuid, int conceptNid, int typeNid, byte[] image, String textDescription,
-            String format, I_ConfigAceFrame aceConfig) throws IOException, TerminologyException {
+    public I_ImageVersioned newImage(final UUID imageUuid, final int conceptNid, final int typeNid, final byte[] image, final String textDescription,
+            final String format, final I_ConfigAceFrame aceConfig) throws IOException, TerminologyException {
 
-        Concept c = Concept.get(conceptNid);
-        Image img = new Image();
-        img.nid = uuidToNative(imageUuid);
+        final Concept c = Concept.get(conceptNid);
+        final Image img = new Image();
+        img.nid = this.uuidToNative(imageUuid);
         img.primordialUNid = Bdb.getUuidsToNidMap().getUNid(imageUuid);
         img.enclosingConceptNid = c.getNid();
         Bdb.getNidCNidMap().setCidForNid(conceptNid, img.nid);
@@ -1787,8 +1788,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         img.setTextDescription(textDescription);
         img.setTypeNid(typeNid);
         img.primordialSapNid = Integer.MIN_VALUE;
-        int statusNid = aceConfig.getDefaultStatus().getNid();
-        for (I_Path p : aceConfig.getEditingPathSet()) {
+        final int statusNid = aceConfig.getDefaultStatus().getNid();
+        for (final I_Path p : aceConfig.getEditingPathSet()) {
             if (img.primordialSapNid == Integer.MIN_VALUE) {
                 img.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, p.getConceptId(), Long.MAX_VALUE);
             } else {
@@ -1814,12 +1815,12 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public void setCheckCreationDataEnabled(boolean enabled) {
+    public void setCheckCreationDataEnabled(final boolean enabled) {
         BdbCommitManager.setCheckCreationDataEnabled(enabled);
     }
 
     @Override
-    public void setCheckCommitDataEnabled(boolean enabled) {
+    public void setCheckCommitDataEnabled(final boolean enabled) {
         BdbCommitManager.setCheckCommitDataEnabled(enabled);
     }
 
@@ -1827,7 +1828,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         Bdb.getSapDb().clearMapperCache();
     }
 
-    public void setCacheSize(String cacheSize) {
+    public void setCacheSize(final String cacheSize) {
         Bdb.setCacheSize(cacheSize);
     }
 
@@ -1835,7 +1836,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         return Bdb.getCacheSize();
     }
 
-    public void setCachePercent(String cachePercent) {
+    public void setCachePercent(final String cachePercent) {
         Bdb.setCachePercent(cachePercent);
     }
 
@@ -1844,12 +1845,12 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public void removeOrigin(I_Path path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException {
-        pathManager.removeOrigin(path, origin, config);
+    public void removeOrigin(final I_Path path, final I_Position origin, final I_ConfigAceFrame config) throws TerminologyException {
+        this.pathManager.removeOrigin(path, origin, config);
     }
 
     @Override
-    public I_GetConceptData getConceptForNid(int componentNid) throws IOException {
+    public I_GetConceptData getConceptForNid(final int componentNid) throws IOException {
         return Bdb.getConceptForComponent(componentNid);
     }
 
