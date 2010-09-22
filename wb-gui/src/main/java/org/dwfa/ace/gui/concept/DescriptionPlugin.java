@@ -127,8 +127,8 @@ public class DescriptionPlugin extends AbstractPlugin implements TableModelListe
                 createPluginComponent(getHost());
             }
 
-            PropertyChangeEvent evt = new PropertyChangeEvent(getHost(), "termComponent", null,
-                getHost().getTermComponent());
+            PropertyChangeEvent evt =
+                    new PropertyChangeEvent(getHost(), "termComponent", null, getHost().getTermComponent());
             DESC_FIELD[] columnEnums = getDescColumns(getHost());
             descTableModel.setColumns(columnEnums);
             for (int i = 0; i < descTableModel.getColumnCount(); i++) {
@@ -263,7 +263,7 @@ public class DescriptionPlugin extends AbstractPlugin implements TableModelListe
 
         descTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        DESC_FIELD[] columnEnums = descTableModel.getColumnEnums();
+        DESC_FIELD[] columnEnums = descTableModel.getColumnEnums(); // TODO
 
         for (int i = 0; i < descTable.getColumnCount(); i++) {
             TableColumn column = descTable.getColumnModel().getColumn(i);
@@ -275,8 +275,7 @@ public class DescriptionPlugin extends AbstractPlugin implements TableModelListe
         }
 
         // Set up tool tips for column headers.
-        descTable.getTableHeader().setToolTipText(
-            "Click to specify sorting");
+        descTable.getTableHeader().setToolTipText("Click to specify sorting");
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1.0;
         descPanel.add(descTable.getTableHeader(), c);

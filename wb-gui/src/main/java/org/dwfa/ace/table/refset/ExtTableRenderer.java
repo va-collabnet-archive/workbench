@@ -22,6 +22,9 @@ import java.io.IOException;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.UIManager;
+import javax.swing.plaf.basic.BasicHTML;
+import javax.swing.table.TableColumn;
+import javax.swing.text.View;
 
 import org.dwfa.ace.table.AceTableRenderer;
 
@@ -34,14 +37,15 @@ public class ExtTableRenderer extends AceTableRenderer {
 
     public ExtTableRenderer() {
         super();
+        setVerticalAlignment(TOP);
         setIgnoreExtensions(true);
     }
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
             int row, int column) {
-        JLabel renderComponent = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
-            column);
+        JLabel renderComponent =
+                (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         boolean same = false;
         if (value != null) {
             if (StringWithExtTuple.class.isAssignableFrom(value.getClass())) {
@@ -66,6 +70,32 @@ public class ExtTableRenderer extends AceTableRenderer {
                     }
                 } else {
                     setBorder(column, this, false, uncommitted, hasExtensions);
+                }
+
+                TableColumn c = table.getColumnModel().getColumn(column);
+                if (swt.getWrapLines()) {
+                    if (BasicHTML.isHTMLString(renderComponent.getText())) {
+                        View v = BasicHTML.createHTMLView(renderComponent, swt.getCellText());
+                        v.setSize(c.getWidth(), 0);
+                        float prefYSpan = v.getPreferredSpan(View.Y_AXIS);
+                        if (prefYSpan > table.getRowHeight(row)) {
+                            table.setRowHeight(row, (int) (prefYSpan + 4));
+                        }
+                    } else {
+                        View v = BasicHTML.createHTMLView(renderComponent, "<html>" + swt.getCellText());
+                        v.setSize(c.getWidth(), 0);
+                        float prefYSpan = v.getPreferredSpan(View.Y_AXIS);
+                        if (prefYSpan > table.getRowHeight(row)) {
+                            table.setRowHeight(row, (int) (prefYSpan + 4));
+                            if (isSelected) {
+                                renderComponent.setText("<html>Y" + swt.getCellText());
+                            }
+                        }
+                        if (table.getRowHeight(row) > 16) {
+                            renderComponent.setText("<html>" + swt.getCellText());
+                        }
+                    }
+                    renderComponent.setToolTipText(swt.getCellText());
                 }
             } else {
                 renderComponent.setText(value.toString());
