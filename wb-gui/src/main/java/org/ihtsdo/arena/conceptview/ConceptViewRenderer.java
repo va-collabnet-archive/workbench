@@ -304,11 +304,7 @@ public class ConceptViewRenderer extends JLayeredPane
 			}
 			try {
 				
-				Coordinate coordinate = new Coordinate(settings.getConfig().getPrecedence(),
-						settings.getConfig().getViewPositionSetReadOnly(), settings.getConfig()
-								.getAllowedStatus(), settings.getConfig().getDestRelTypes(),
-								settings.getConfig().getConflictResolutionStrategy(), 
-								settings.getConfig().getLanguagePreferenceList().get(0));
+				Coordinate coordinate = settings.getConfig().getCoordinate();
 				ksession.setGlobal("actions", actions);
 				ksession.setGlobal("actionFactory", new BpActionFactory(settings.getConfig(), 
 						settings.getHost()));
