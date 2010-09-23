@@ -11,14 +11,14 @@ public class TransitiveClosureHelperMock extends AbstractTransitiveClosureHelper
 	/* (non-Javadoc)
 	 * @see org.ihtsdo.rules.I_TransitiveClosureHelper#isParentOf(java.util.UUID, java.util.UUID)
 	 */
-	public boolean isParentOf(UUID parent, UUID subtype) throws Exception {
+	public boolean isParentOf(String parent, String subtype) throws Exception {
 		return (parent.equals(subtype));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.ihtsdo.rules.I_TransitiveClosureHelper#isParentOfOrEqualTo(java.util.UUID, java.util.UUID)
 	 */
-	public boolean isParentOfOrEqualTo(UUID parent, UUID subtype) throws Exception {
+	public boolean isParentOfOrEqualTo(String parent, String subtype) throws Exception {
 		//System.out.println("Comparing: " + parent + " to " + subtype);
 		return (parent.equals(subtype));
 	}
