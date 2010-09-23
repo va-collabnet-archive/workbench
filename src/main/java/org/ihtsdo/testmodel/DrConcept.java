@@ -3,7 +3,7 @@ package org.ihtsdo.testmodel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DrConcept {
+public class DrConcept extends DrComponent{
 	private String primordialUuid;
 	
 	private boolean defined;
