@@ -2,7 +2,7 @@ package org.ihtsdo.testmodel;
 
 import java.util.List;
 
-public class DrRelationship {
+public class DrRelationship extends DrComponent{
 	private String primordialUuid;
 	
 	private String c1Uuid;

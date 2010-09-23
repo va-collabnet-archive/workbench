@@ -3,7 +3,7 @@ package org.ihtsdo.testmodel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DrRefsetExtension {
+public class DrRefsetExtension extends DrComponent{
 	private String primordialUuid;
 
 	private String refsetUuid;
