@@ -15,6 +15,7 @@ import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
@@ -44,13 +45,12 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 								   C extends RefsetMember<R, C>> 
 			extends ConceptComponent<R, C> 
 			implements I_ExtendByRef, ComponentChroncileBI<RefsetMember<?,?>.Version> {
-
-
+    
 	public int referencedComponentNid;
 
 	public class Version 
 	extends ConceptComponent<R, C>.Version 
-	implements I_ExtendByRefVersion, I_ExtendByRefPart {
+	implements I_ExtendByRefVersion, I_ExtendByRefPart { 
 
 		public Version() {
 			super();
@@ -114,7 +114,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 		public int getMemberId() {
 			return nid;
 		}
-
+		
 		@Override
 		public int getRefsetId() {
 			return enclosingConceptNid;
@@ -566,5 +566,6 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 	public String toUserString() {
         return toString();
 	}
+
 
 }

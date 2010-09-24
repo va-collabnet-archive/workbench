@@ -40,6 +40,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 public class AddTopLevelOr extends AbstractTask {
 
     private String refsetPropName = ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey();
+
     public String getRefsetPropName() {
         return refsetPropName;
     }
@@ -156,7 +157,6 @@ public class AddTopLevelOr extends AbstractTask {
                  }
              }
 
-            
             if (SwingUtilities.isEventDispatchThread()) {
                 doRun(process, worker);
             } else {
@@ -198,10 +198,15 @@ public class AddTopLevelOr extends AbstractTask {
                 I_TermFactory tf = Terms.get();
                 I_HelpRefsets refsetHelper = tf.getRefsetHelper(configFrame);
                 RefsetPropertyMap propMap = getRefsetPropertyMap(tf, configFrame);
-                I_ExtendByRef ext = refsetHelper.getOrCreateRefsetExtension(specRefsetId, componentId,
-                    propMap.getMemberType(), propMap, UUID.randomUUID());
+                I_ExtendByRef ext =
+                        refsetHelper.getOrCreateRefsetExtension(specRefsetId, componentId, propMap.getMemberType(),
+                            propMap, UUID.randomUUID());
                 tf.addUncommitted(ext);
+
+                RefsetSpec refsetSpecHelper = new RefsetSpec(Terms.get().getConcept(specRefsetId), configFrame);
+                refsetSpecHelper.setLastEditTime(System.currentTimeMillis());
                 configFrame.fireRefsetSpecChanged(ext);
+                configFrame.refreshRefsetTab();
             }
             returnCondition = Condition.CONTINUE;
         } catch (Exception e) {
@@ -214,7 +219,8 @@ public class AddTopLevelOr extends AbstractTask {
         return typeId;
     }
 
-    protected RefsetPropertyMap getRefsetPropertyMap(I_TermFactory tf, I_ConfigAceFrame configFrame) throws IOException, TerminologyException {
+    protected RefsetPropertyMap getRefsetPropertyMap(I_TermFactory tf, I_ConfigAceFrame configFrame)
+            throws IOException, TerminologyException {
         RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.CID_CID);
         if (getClauseIsTrue()) {
             refsetMap.put(REFSET_PROPERTY.CID_ONE, trueNid);

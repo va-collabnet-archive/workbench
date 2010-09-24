@@ -744,6 +744,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		try {
 			if ((AceConfig.config != null)
 					&& (AceConfig.config.aceFrames.get(0) != null)) {
+                if (AceConfig.config.aceFrames.get(0).getViewPositionSet().iterator().hasNext()) {
 				PositionMapper mapper = 
 					Bdb.getSapDb().getMapper(
 							AceConfig.config.aceFrames.get(0).
@@ -757,8 +758,11 @@ public class Concept implements I_Transact, I_GetConceptData {
 						return tuple.getText();
 					}
 				}
+                } else {
+                    throw new IndexOutOfBoundsException("No view positions set");
 			}
-			return getText();
+            }
+            return getText();
 		} catch (IndexOutOfBoundsException e) {
 			try {
 				return getText();
@@ -901,7 +905,6 @@ public class Concept implements I_Transact, I_GetConceptData {
 	    return data.isLeafByDestRels(aceConfig);
 	}
 
-    
     @Override
 	public boolean promote(I_TestComponent test, I_Position viewPosition,
 			PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,

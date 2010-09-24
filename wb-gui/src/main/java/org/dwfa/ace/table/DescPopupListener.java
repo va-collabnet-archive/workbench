@@ -107,10 +107,10 @@ public class DescPopupListener extends MouseAdapter {
     private class ChangeFieldActionListener implements ActionListener {
         private int nid = Integer.MIN_VALUE;
         
-
         private FieldToChange field;
 
-        public ChangeFieldActionListener(Collection<UUID> ids, FieldToChange field) throws TerminologyException, IOException {
+        public ChangeFieldActionListener(Collection<UUID> ids, FieldToChange field) throws TerminologyException,
+                IOException {
             super();
             this.nid = AceConfig.getVodb().uuidToNative(ids);
             this.field = field;
@@ -134,20 +134,18 @@ public class DescPopupListener extends MouseAdapter {
                         break;
                     case TYPE:
                         newPart.setTypeId(nid);
+                        newPart.setStatusId(config.getDefaultStatus().getConceptNid());
                         break;
                     default:
                     }
 
-                    model.referencedConcepts.put(newPart.getStatusId(), 
-                    		Terms.get().getConcept(newPart.getStatusId()));
-                    model.referencedConcepts.put(newPart.getTypeId(), 
-                    		Terms.get().getConcept(newPart.getTypeId()));
+                    model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
+                    model.referencedConcepts.put(newPart.getTypeId(), Terms.get().getConcept(newPart.getTypeId()));
                 }
                 Terms.get().addUncommitted(concept);
                 model.allTuples = null;
                 model.fireTableDataChanged();
-                model.propertyChange(new PropertyChangeEvent(this, 
-                		I_ContainTermComponent.TERM_COMPONENT, null,
+                model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null,
                 		model.host.getTermComponent()));
             } catch (Exception ex) {
                 AceLog.getAppLog().alertAndLogException(ex);

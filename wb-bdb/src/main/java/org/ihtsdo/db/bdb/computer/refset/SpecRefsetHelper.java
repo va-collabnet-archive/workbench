@@ -31,6 +31,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.refset.spec.I_HelpMemberRefset;
@@ -466,6 +467,32 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         return false;
     }
 
+    public boolean hasCurrentLongRefsetExtension(int refsetId, int componentId) throws Exception {
+
+        for (I_ExtendByRef extension : Terms.get().getAllExtensionsForComponent(componentId, true)) {
+
+            if (extension.getRefsetId() == refsetId) {
+
+                // get the latest version
+                I_ExtendByRefPart latestPart = null;
+                for (I_ExtendByRefPart part : extension.getMutableParts()) {
+                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
+                        latestPart = part;
+                    }
+                }
+
+                // confirm its the right extension value and its status is
+                // current
+                if (getCurrentStatusIds().contains(latestPart.getStatusId())) {
+                    if (latestPart instanceof I_ExtendByRefPartLong) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     /*
      * (non-Javadoc)
      * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#newRefsetExtension(int,
@@ -832,6 +859,25 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         return true;
     }
 
+    public boolean newLongRefsetExtension(int refsetId, int componentId, long extLongValue) throws Exception {
+
+        UUID memberUuid = UUID.randomUUID();
+
+        // create a new extension (with a part for each path the user is
+        // editing)
+        RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.LONG);
+        refsetMap.put(REFSET_PROPERTY.LONG_VALUE, extLongValue);
+        refsetMap.put(REFSET_PROPERTY.TIME, Long.MAX_VALUE);
+        I_ExtendByRef newExtension =
+                getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.LONG, refsetMap, memberUuid);
+        if (isAutocommitActive()) {
+            Terms.get().addUncommittedNoChecks(newExtension);
+            Terms.get().commit();
+        }
+
+        return true;
+    }
+
     /*
      * (non-Javadoc)
      * @seeorg.dwfa.ace.refset.spec.I_HelpSpecRefset#
@@ -967,8 +1013,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             throws Exception {
 
         ITERATE_CHILDREN: for (I_RelTuple childTuple : parent.getDestRelTuples(allowedStatuses, allowedTypes,
-            positions, 
-            getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
+            positions, getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
             I_GetConceptData childConcept = Terms.get().getConcept(childTuple.getC1Id());
             if (childConcept.getConceptNid() == parent.getConceptNid()) {
                 continue ITERATE_CHILDREN;
@@ -1012,8 +1057,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             throws Exception {
 
         ITERATE_PARENTS: for (I_RelTuple childTuple : child.getSourceRelTuples(allowedStatuses, allowedTypes,
-            positions, 
-            getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
+            positions, getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
             I_GetConceptData parentConcept = Terms.get().getConcept(childTuple.getC2Id());
             if (parentConcept.getConceptNid() == child.getConceptNid()) {
                 continue ITERATE_PARENTS;
@@ -1304,8 +1348,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
     private I_ExtendByRefPart getLatestCurrentPart(I_ExtendByRef memberExtension) throws TerminologyException,
             IOException {
         I_ExtendByRefPart latestPart = null;
-        List<? extends I_ExtendByRefVersion> original = memberExtension.getTuples(null, null, 
-                        getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
+        List<? extends I_ExtendByRefVersion> original =
+                memberExtension.getTuples(null, null, getConfig().getPrecedence(), getConfig()
+                    .getConflictResolutionStrategy());
 
         for (I_ExtendByRefVersion part : original) {
             if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
@@ -1388,8 +1433,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
         final Set<? extends I_GetConceptData> allUsers =
                 userParent.getDestRelOrigins(allowedStatuses, allowedTypes, Terms.get().getActiveAceFrameConfig()
-                    .getViewPositionSetReadOnly(), 
-                    getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
+                    .getViewPositionSetReadOnly(), getConfig().getPrecedence(), getConfig()
+                    .getConflictResolutionStrategy());
 
         Set<I_GetConceptData> allValidUsers = new HashSet<I_GetConceptData>();
         for (I_GetConceptData user : allUsers) {
@@ -1419,8 +1464,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
         List<? extends I_DescriptionTuple> descriptionResults =
                 concept.getDescriptionTuples(activeStatuses, allowedTypes, Terms.get().getActiveAceFrameConfig()
-                    .getViewPositionSetReadOnly(),
-                    getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
+                    .getViewPositionSetReadOnly(), getConfig().getPrecedence(), getConfig()
+                    .getConflictResolutionStrategy());
         for (I_DescriptionTuple descriptionTuple : descriptionResults) {
             if (descriptionTuple.getTime() > latestVersion) {
                 latestVersion = descriptionTuple.getTime();

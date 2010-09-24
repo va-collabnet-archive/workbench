@@ -14,6 +14,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
+import org.ihtsdo.concept.component.attributes.ConceptAttributes.Version;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetStrMember;

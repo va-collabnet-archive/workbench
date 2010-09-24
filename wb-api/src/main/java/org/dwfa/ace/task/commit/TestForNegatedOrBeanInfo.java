@@ -14,26 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dwfa.ace.actions;
+package org.dwfa.ace.task.commit;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
+import java.beans.BeanDescriptor;
+import java.beans.PropertyDescriptor;
+import java.beans.SimpleBeanInfo;
 
-import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.log.AceLog;
-import org.dwfa.tapi.TerminologyException;
+public class TestForNegatedOrBeanInfo extends SimpleBeanInfo {
 
-public class Abort implements ActionListener {
+    public PropertyDescriptor[] getPropertyDescriptors() {
 
-    public void actionPerformed(ActionEvent e) {
-        try {
-            Terms.get().cancel();
-            Terms.get().getActiveAceFrameConfig().refreshRefsetTab();
-        } catch (IOException e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
-        } catch (TerminologyException e2) {
-            AceLog.getAppLog().alertAndLogException(e2);
-        }
+        PropertyDescriptor rv[] = {};
+        return rv;
+
+    }
+
+    /**
+     * @see java.beans.BeanInfo#getBeanDescriptor()
+     */
+    public BeanDescriptor getBeanDescriptor() {
+        BeanDescriptor bd = new BeanDescriptor(TestForNegatedOr.class);
+        bd.setDisplayName("<html><font color='green'><center>Test for<br>negated OR");
+        return bd;
     }
 }

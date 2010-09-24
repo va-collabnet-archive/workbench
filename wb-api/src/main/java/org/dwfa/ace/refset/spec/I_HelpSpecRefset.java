@@ -62,6 +62,8 @@ public interface I_HelpSpecRefset extends I_HelpRefsets {
     public boolean hasCurrentConceptConceptStringRefsetExtension(int refsetId, int conceptId, int c1Id, int c2Id,
             String stringInput, int statusId) throws Exception;
 
+    public boolean hasCurrentLongRefsetExtension(int refsetId, int componentId) throws Exception;
+
     /**
      * Add a concept to a refset (if it doesn't already exist)
      * 
@@ -108,6 +110,8 @@ public interface I_HelpSpecRefset extends I_HelpRefsets {
 
     public boolean newConceptConceptStringRefsetExtension(int refsetId, int componentId, int c1Id, int c2Id,
             String stringValue, UUID memberUuid, UUID pathUuid, UUID statusUuid, long effectiveTime) throws Exception;
+
+    public boolean newLongRefsetExtension(int refsetId, int componentId, long extLongValue) throws Exception;
 
     /**
      * Remove a concept from a refset

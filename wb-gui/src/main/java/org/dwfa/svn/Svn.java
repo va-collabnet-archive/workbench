@@ -351,14 +351,19 @@ public class Svn implements I_HandleSubversion {
                             boolean delete = true;
                             if (s.getPath().endsWith(".bp")) {
                                 String pathNameNoExtension = s.getPath().substring(0, s.getPath().lastIndexOf(".bp"));
-                                File directory = new File(s.getPath());
-                                for (String fileStr : directory.list()) {
-                                    File file = new File(fileStr);
-                                    if (file.getPath().contains(pathNameNoExtension + ".bp.write-pending")
-                                        || file.getPath().contains(pathNameNoExtension + ".bp.take-pending")) {
-                                        // don't delete the .bp as we need to keep a copy while the bp is executing
-                                        delete = false;
+
+                                File directory = new File(s.getPath()).getParentFile();
+                                if (directory != null && directory.list() != null) {
+                                    for (String fileStr : directory.list()) {
+                                        File file = new File(fileStr);
+                                        if (file.getPath().contains(pathNameNoExtension + ".bp.write-pending")
+                                            || file.getPath().contains(pathNameNoExtension + ".bp.take-pending")) {
+                                            // don't delete the .bp as we need to keep a copy while the bp is executing
+                                            delete = false;
+                                        }
                                     }
+                                } else {
+                                	SvnLog.info("** trying to access directory that does not exist: " + directory.getAbsolutePath());
                                 }
                             }
 

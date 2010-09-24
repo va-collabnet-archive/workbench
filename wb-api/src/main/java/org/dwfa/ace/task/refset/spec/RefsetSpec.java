@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.task.refset.spec;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -29,9 +30,11 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.TerminologyException;
 
 public class RefsetSpec {
 
@@ -57,8 +60,7 @@ public class RefsetSpec {
      * @param concept
      * @param memberRefsetInputted
      */
-    public RefsetSpec(I_GetConceptData concept, boolean memberRefsetInputted, 
-            I_ConfigAceFrame config) {
+    public RefsetSpec(I_GetConceptData concept, boolean memberRefsetInputted, I_ConfigAceFrame config) {
         termFactory = Terms.get();
         this.config = config;
         if (memberRefsetInputted) {
@@ -251,9 +253,9 @@ public class RefsetSpec {
 
         if (concept != null) {
             //TODO should use the version computer/handle contradiction better. 
-            List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, 
-                config.getViewPositionSetReadOnly(), 
-                config.getPrecedence(), config.getConflictResolutionStrategy());
+            List<? extends I_RelTuple> relationships =
+                    concept.getSourceRelTuples(null, allowedTypes, config.getViewPositionSetReadOnly(), config
+                        .getPrecedence(), config.getConflictResolutionStrategy());
             for (I_RelTuple rel : relationships) {
                 if (rel.getVersion() > latestVersion) {
                     latestVersion = rel.getVersion();
@@ -283,9 +285,9 @@ public class RefsetSpec {
 
         if (concept != null) {
             //TODO should use the version computer/handle contradiction differently
-            List<? extends I_RelTuple> relationships = concept.getDestRelTuples(null, allowedTypes, 
-                config.getViewPositionSetReadOnly(), 
-                config.getPrecedence(), config.getConflictResolutionStrategy());
+            List<? extends I_RelTuple> relationships =
+                    concept.getDestRelTuples(null, allowedTypes, config.getViewPositionSetReadOnly(), config
+                        .getPrecedence(), config.getConflictResolutionStrategy());
             for (I_RelTuple rel : relationships) {
                 if (rel.getVersion() > latestVersion) {
                     latestVersion = rel.getVersion();
@@ -314,9 +316,9 @@ public class RefsetSpec {
         allowedTypes.add(relationshipType.getConceptNid());
 
         if (concept != null) {
-            List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, 
-                config.getViewPositionSetReadOnly(), 
-                config.getPrecedence(), config.getConflictResolutionStrategy());
+            List<? extends I_RelTuple> relationships =
+                    concept.getSourceRelTuples(null, allowedTypes, config.getViewPositionSetReadOnly(), config
+                        .getPrecedence(), config.getConflictResolutionStrategy());
             //TODO should use the version computer/handle contradiction differently. 
            for (I_RelTuple rel : relationships) {
                 if (rel.getVersion() > latestVersion) {
@@ -423,4 +425,140 @@ public class RefsetSpec {
             throw new Exception("Error modifying the overall status of the refset : " + e.getLocalizedMessage());
         }
     }
+
+    public void setLastComputeTime(Long time) throws Exception {
+        try {
+
+            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            boolean prevAutoCommit = helper.isAutocommitActive();
+            helper.setAutocommitActive(false);
+            I_GetConceptData specConcept = getRefsetSpecConcept();
+            I_GetConceptData lastComputeTimeConcept = getComputeConcept();
+
+            if (specConcept != null && lastComputeTimeConcept != null) {
+                helper.newLongRefsetExtension(lastComputeTimeConcept.getConceptNid(), specConcept.getConceptNid(), time);
+}
+            helper.setAutocommitActive(prevAutoCommit);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Error setting the last compute time of refset : " + e.getLocalizedMessage());
+        }
+    }
+
+    public I_GetConceptData getEditConcept() throws TerminologyException, IOException {
+        try {
+            I_GetConceptData editTimeRel = termFactory.getConcept(RefsetAuxiliary.Concept.EDIT_TIME_REL.getUids());
+            I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
+            if (memberRefsetConcept == null) {
+                return null;
+            }
+
+            return getLatestSourceRelationshipTarget(memberRefsetConcept, editTimeRel);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public I_GetConceptData getComputeConcept() throws TerminologyException, IOException {
+        try {
+            I_GetConceptData computeTimeRel =
+                    termFactory.getConcept(RefsetAuxiliary.Concept.COMPUTE_TIME_REL.getUids());
+            I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
+            if (memberRefsetConcept == null) {
+                return null;
+            }
+
+            return getLatestSourceRelationshipTarget(memberRefsetConcept, computeTimeRel);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void setLastEditTime(Long time) throws Exception {
+        try {
+
+            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            boolean prevAutoCommit = helper.isAutocommitActive();
+            helper.setAutocommitActive(false);
+            I_GetConceptData specConcept = getRefsetSpecConcept();
+            I_GetConceptData lastEditTimeConcept = getEditConcept();
+
+            if (specConcept != null && lastEditTimeConcept != null) {
+                helper.newLongRefsetExtension(lastEditTimeConcept.getConceptNid(), specConcept.getConceptNid(), time);
+            }
+            helper.setAutocommitActive(prevAutoCommit);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Error setting the last edit time of refset : " + e.getLocalizedMessage());
+        }
+    }
+
+    public Long getLastComputeTime() throws TerminologyException, IOException {
+        I_GetConceptData specConcept = getRefsetSpecConcept();
+        I_GetConceptData lastComputeTimeConcept = getComputeConcept();
+        I_ExtendByRefPart latestPart = null;
+        for (I_ExtendByRef extension : Terms.get().getAllExtensionsForComponent(specConcept.getConceptNid(), true)) {
+
+            if (extension.getRefsetId() == lastComputeTimeConcept.getConceptNid()) {
+
+                // get the latest version
+
+                for (I_ExtendByRefPart part : extension.getMutableParts()) {
+                    if (part instanceof I_ExtendByRefPartLong) {
+                        if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
+                            latestPart = part;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (latestPart != null) {
+            return ((I_ExtendByRefPartLong) latestPart).getLongValue();
+        } else {
+            return null;
+        }
+    }
+
+    private Long getLastEditTime() throws TerminologyException, IOException {
+        I_GetConceptData specConcept = getRefsetSpecConcept();
+        I_GetConceptData lastEditTimeConcept = getEditConcept();
+        I_ExtendByRefPart latestPart = null;
+        for (I_ExtendByRef extension : Terms.get().getAllExtensionsForComponent(specConcept.getConceptNid(), true)) {
+
+            if (extension.getRefsetId() == lastEditTimeConcept.getConceptNid()) {
+
+                // get the latest version
+
+                for (I_ExtendByRefPart part : extension.getMutableParts()) {
+                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())
+                        && (part instanceof I_ExtendByRefPartLong)) {
+                        latestPart = part;
+                    }
+                }
+            }
+        }
+
+        if (latestPart != null) {
+            return ((I_ExtendByRefPartLong) latestPart).getLongValue();
+        } else {
+            return null;
+        }
+    }
+
+    public boolean needsCompute() throws TerminologyException, IOException {
+        Long lastComputeTime = getLastComputeTime();
+        Long lastEditTime = getLastEditTime();
+        if (lastEditTime == null) {
+            return false; // hasn't ever been edited i.e. empty spec
+        }
+        if (lastComputeTime == null) {
+            return true; // hasn't ever been computed, but it has been edited
+        }
+
+        return lastEditTime > lastComputeTime;
+    }
+
 }

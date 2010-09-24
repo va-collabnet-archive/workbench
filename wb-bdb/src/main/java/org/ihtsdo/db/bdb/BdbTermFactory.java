@@ -1740,6 +1740,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
 
             AceLog.getAppLog().info(">>>>>>>>> Finished computing spec - adding uncommitted.");
+            specHelper.setLastComputeTime(System.currentTimeMillis());
+
             computer.addUncommitted();
             if (frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy() == null) {
                 frameConfig.getDbConfig().setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);

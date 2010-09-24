@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Position;
@@ -235,8 +236,8 @@ public class Position implements I_Position {
                 out.writeObject(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
             }
         } catch (TerminologyException e) {
-			throw new IOException(e);
-		}
+            throw new IOException(e);
+        }
         out.writeInt(p.getPath().getOrigins().size());
         for (PositionBI origin : p.getPath().getOrigins()) {
             writePosition(out, origin);
@@ -274,72 +275,72 @@ public class Position implements I_Position {
         Set<PositionBI> positions = Collections.synchronizedSet(new HashSet<PositionBI>(size));
         for (int i = 0; i < size; i++) {
             try {
-            	PositionBI position = readPosition(in);
+                PositionBI position = readPosition(in);
                 I_GetConceptData pathConcept = Terms.get().getConcept(
                     position.getPath().getConceptNid());
                 PathBI path = Terms.get().getPath(pathConcept.getUids());
                 positions.add(Terms.get().newPosition(path, position.getVersion()));
             } catch (IOException ex) {
-                if (ex.getCause() != null && NoMappingException.class.isAssignableFrom(ex.getCause().getClass())) {
-                    AceLog.getAppLog().alertAndLogException(ex.getCause());
-                } else {
-                    throw ex;
-                }
-            } catch (TerminologyException ex) {
-                if (ex.getCause() != null && NoMappingException.class.isAssignableFrom(ex.getCause().getClass())) {
-                    AceLog.getAppLog().alertAndLogException(ex.getCause());
-                } else {
-                    throw new IOException(ex);
-                }
+            if (ex.getCause() != null && NoMappingException.class.isAssignableFrom(ex.getCause().getClass())) {
+                AceLog.getAppLog().alertAndLogException(ex.getCause());
+            } else {
+                throw ex;
+            }
+        } catch (TerminologyException ex) {
+            if (ex.getCause() != null && NoMappingException.class.isAssignableFrom(ex.getCause().getClass())) {
+                AceLog.getAppLog().alertAndLogException(ex.getCause());
+            } else {
+                throw new IOException(ex);
             }
         }
-        return positions;
     }
+    return positions;
+}
 
-    public static void writePositionSet(ObjectOutputStream out, Set<PositionBI> viewPositions) throws IOException {
-        out.writeInt(viewPositions.size());
-        for (PositionBI p : viewPositions) {
-            writePosition(out, p);
-        }
+public static void writePositionSet(ObjectOutputStream out, Set<PositionBI> viewPositions) throws IOException {
+    out.writeInt(viewPositions.size());
+    for (PositionBI p : viewPositions) {
+        writePosition(out, p);
     }
+}
 
-    static SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
+static SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
 
-    public String toString() {
-        StringBuffer buff = new StringBuffer();
-        try {
-            I_GetConceptData cb = Terms.get().getConcept(path.getConceptNid());
-            buff.append(cb.getInitialText());
-        } catch (IOException e) {
-            buff.append(e.getMessage());
-            AceLog.getAppLog().alertAndLogException(e);
-        } catch (TerminologyException e) {
-            buff.append(e.getMessage());
-            AceLog.getAppLog().alertAndLogException(e);
-		}
-        buff.append(": ");
-        if (version == Integer.MAX_VALUE) {
-            buff.append("Latest");
-        } else if (version == Integer.MIN_VALUE) {
-            buff.append("BOT");
-        } else {
-            Date positionDate = new Date(Terms.get().convertToThickVersion(version));
-            buff.append(dateFormatter.format(positionDate));
-        }
-        return buff.toString();
-
+public String toString() {
+    StringBuffer buff = new StringBuffer();
+    try {
+        I_GetConceptData cb = Terms.get().getConcept(path.getConceptNid());
+        buff.append(cb.getInitialText());
+    } catch (IOException e) {
+        buff.append(e.getMessage());
+        AceLog.getAppLog().alertAndLogException(e);
+    } catch (TerminologyException e) {
+        buff.append(e.getMessage());
+        AceLog.getAppLog().alertAndLogException(e);
     }
-
-    public int getPositionId() {
-        throw new UnsupportedOperationException();
+    buff.append(": ");
+    if (version == Integer.MAX_VALUE) {
+        buff.append("Latest");
+    } else if (version == Integer.MIN_VALUE) {
+        buff.append("BOT");
+    } else {
+        Date positionDate = new Date(Terms.get().convertToThickVersion(version));
+        buff.append(dateFormatter.format(positionDate));
     }
+    return buff.toString();
 
-    public Collection<I_Position> getAllOrigins() {
-        throw new UnsupportedOperationException();
-    }
+}
 
-    public long getTime() {
-        return Terms.get().convertToThickVersion(version);
-    }
+public int getPositionId() {
+    throw new UnsupportedOperationException();
+}
+
+public Collection<I_Position> getAllOrigins() {
+    throw new UnsupportedOperationException();
+}
+
+public long getTime() {
+    return Terms.get().convertToThickVersion(version);
+}
 
 }

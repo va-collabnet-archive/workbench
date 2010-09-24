@@ -1180,7 +1180,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    JOptionPane.showMessageDialog(aceFrame, "<html>Selecting to many view positions may <br>"+
+                    JOptionPane.showMessageDialog(aceFrame, "<html>Selecting too many view positions may <br>"+
                                                                   "cause the application to run out of memory.",
                         "warning",
                         JOptionPane.WARNING_MESSAGE);

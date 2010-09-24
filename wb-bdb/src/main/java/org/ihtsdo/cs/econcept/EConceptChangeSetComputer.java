@@ -78,7 +78,6 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.ihtsdo.cs.I_ComputeEConceptForChangeSet#getEConcept(org.ihtsdo.concept
      * .Concept)

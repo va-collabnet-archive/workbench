@@ -258,6 +258,9 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             I_GetConceptData refsetEditorRel = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_EDITOR.getUids());
             I_GetConceptData promotionRel = termFactory.getConcept(RefsetAuxiliary.Concept.PROMOTION_REL.getUids());
             I_GetConceptData commentsRel = termFactory.getConcept(RefsetAuxiliary.Concept.COMMENTS_REL.getUids());
+            I_GetConceptData editTimeRel = termFactory.getConcept(RefsetAuxiliary.Concept.EDIT_TIME_REL.getUids());
+            I_GetConceptData computeTimeRel =
+                    termFactory.getConcept(RefsetAuxiliary.Concept.COMPUTE_TIME_REL.getUids());
             I_GetConceptData purposeRel = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
             I_GetConceptData refsetComputeTypeRel =
                     termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_COMPUTE_TYPE_REL.getUids());
@@ -269,6 +272,8 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
                     termFactory.getConcept(RefsetAuxiliary.Concept.ENUMERATED_ANNOTATION_PURPOSE.getUids());
             I_GetConceptData specAnnotation =
                     termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_SPECIFICATION.getUids());
+            I_GetConceptData ancillaryDataAnnotation =
+                    termFactory.getConcept(RefsetAuxiliary.Concept.ANCILLARY_DATA.getUids());
 
             // check that the name isn't null or empty etc
             if (name == null || name.trim().equals("")) {
@@ -280,6 +285,8 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             String markedParentName = name + " marked parent";
             String promotionName = name + " promotion refset";
             String commentsName = name + " comments refset";
+            String editTimeName = name + " edit time refset";
+            String computeTimeName = name + " compute time refset";
 
             // create new concepts
             I_GetConceptData memberRefset = newConcept(aceConfig);
@@ -287,6 +294,8 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             I_GetConceptData markedParent = newConcept(aceConfig);
             I_GetConceptData promotionRefset = newConcept(aceConfig);
             I_GetConceptData commentsRefset = newConcept(aceConfig);
+            I_GetConceptData editTimeRefset = newConcept(aceConfig);
+            I_GetConceptData computeTimeRefset = newConcept(aceConfig);
 
             // create FSN and PT for each
             try {
@@ -304,6 +313,12 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 
                 newDescription(commentsRefset, fsnConcept, commentsName, aceConfig);
                 newDescription(commentsRefset, ptConcept, commentsName, aceConfig);
+
+                newDescription(editTimeRefset, fsnConcept, editTimeName, aceConfig);
+                newDescription(editTimeRefset, ptConcept, editTimeName, aceConfig);
+
+                newDescription(computeTimeRefset, fsnConcept, computeTimeName, aceConfig);
+                newDescription(computeTimeRefset, ptConcept, computeTimeName, aceConfig);
             } catch (TerminologyException e) {
                 termFactory.cancel();
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Refset wizard cannot be completed. "
@@ -325,6 +340,8 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             newRelationship(markedParent, isA, supportingRefset, aceConfig);
             newRelationship(promotionRefset, isA, supportingRefset, aceConfig);
             newRelationship(commentsRefset, isA, supportingRefset, aceConfig);
+            newRelationship(editTimeRefset, isA, supportingRefset, aceConfig);
+            newRelationship(computeTimeRefset, isA, supportingRefset, aceConfig);
 
             newRelationship(memberRefset, refsetOwnerRel, owner, aceConfig);
             newRelationship(memberRefset, refsetEditorRel, editor, aceConfig);
@@ -337,6 +354,8 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 
             newRelationship(memberRefset, promotionRel, promotionRefset, aceConfig);
             newRelationship(memberRefset, commentsRel, commentsRefset, aceConfig);
+            newRelationship(memberRefset, editTimeRel, editTimeRefset, aceConfig);
+            newRelationship(memberRefset, computeTimeRel, computeTimeRefset, aceConfig);
 
             newRelationship(refsetSpec, refsetComputeTypeRel, refsetComputeType, aceConfig);
 
@@ -345,6 +364,8 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             newRelationship(markedParent, purposeRel, markedParentAnnotation, aceConfig);
             newRelationship(promotionRefset, purposeRel, enumeratedAnnotation, aceConfig);
             newRelationship(refsetSpec, purposeRel, specAnnotation, aceConfig);
+            newRelationship(editTimeRefset, purposeRel, ancillaryDataAnnotation, aceConfig);
+            newRelationship(computeTimeRefset, purposeRel, ancillaryDataAnnotation, aceConfig);
 
             // set the overall refset status to the specified status
             RefsetSpec spec = new RefsetSpec(refsetSpec, aceConfig);
@@ -363,6 +384,8 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             termFactory.addUncommittedNoChecks(markedParent);
             termFactory.addUncommittedNoChecks(promotionRefset);
             termFactory.addUncommittedNoChecks(commentsRefset);
+            termFactory.addUncommittedNoChecks(editTimeRefset);
+            termFactory.addUncommittedNoChecks(computeTimeRefset);
 
         } catch (Exception e) {
             e.printStackTrace();
