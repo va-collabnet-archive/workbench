@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import javax.swing.JOptionPane;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.UpperInfoOnlyConsoleMonitor;
 import org.dwfa.ace.api.I_HandleSubversion;
 import org.dwfa.ace.api.I_ShowActivity;
@@ -243,7 +244,13 @@ public class Svn implements I_HandleSubversion {
 			return new UpperInfoOnlyConsoleMonitor();
 		}
 		try {
-			I_ShowActivity activity = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig(), message, false);
+			I_ShowActivity activity = null;
+			if (Terms.get() != null) {
+				activity = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig(), message, false);
+			} else {
+				activity = new ActivityPanel(null, true);
+				activity.setProgressInfoUpper(message);
+			}
 			activity.setIndeterminate(true);
 			activity.setProgressInfoLower("Performing subversion operation...");
 			return activity;
@@ -685,15 +692,38 @@ public class Svn implements I_HandleSubversion {
 			SvnLog.info("starting database update");
 			Svn.getSvnClient().setPrompt(authenticator);
 			try {
+				
+				try {
+					Terms.get().close();
+				} catch (IOException e) {
+					throw new TaskFailedException(e);
+				}
 				Svn.getSvnClient().revert(svd.getWorkingCopyStr(), Depth.infinity, null);
 				SvnLog.info(" reverted: " + svd.getWorkingCopyStr());
+				int depth = Depth.unknown;
+				boolean getAll = false;
+				boolean noIgnore = false;
+				boolean ignoreExternals = false;
+				String[] changelists = null;
+				HandleStatus statusHandler = new HandleStatus();
+				Svn.getSvnClient().status(svd.getWorkingCopyStr(), depth, false, getAll, noIgnore, ignoreExternals,
+						changelists, statusHandler);
+				for (Status s : statusHandler.getStatusList()) {
+					SvnLog.info("Managed: " + s.isManaged() + " status: " + s.getTextStatusDescription() + " "
+							+ s.getPath());
+					if (s.getPath().endsWith(".jdb") && s.isManaged() == false) {
+						new File(s.getPath()).delete();
+					}
+					if (s.getPath().endsWith(".cfs") && s.isManaged() == false) {
+						new File(s.getPath()).delete();
+					}
+				}
+
 				if (interactive) {
 					handleAuthentication(authenticator);
 				}
 				switchToReadOnlyMirror(svd);
-				int depth = Depth.unknown;
 				boolean depthIsSticky = false;
-				boolean ignoreExternals = false;
 				boolean allowUnverObstructions = false;
 				Svn.getSvnClient().update(svd.getWorkingCopyStr(), Revision.HEAD, depth, depthIsSticky, ignoreExternals,
 						allowUnverObstructions);

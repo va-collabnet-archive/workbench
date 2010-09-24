@@ -630,5 +630,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     
     public Coordinate getCoordinate();
     
+    public void quit();
+    
     
 }

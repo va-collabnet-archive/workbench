@@ -74,6 +74,10 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
     I_ConfigAceFrame config;
 
 
+	public void quit() {
+		config.quit();
+	}
+
 	public Coordinate getCoordinate() {
 		return config.getCoordinate();
 	}

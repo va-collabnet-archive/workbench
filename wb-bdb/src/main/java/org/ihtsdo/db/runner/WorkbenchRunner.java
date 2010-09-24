@@ -160,37 +160,6 @@ public class WorkbenchRunner {
 			});
 			ActivityViewer.addActivity(activity);
 
-			Bdb.setup("berkeley-db", activity);
-			activity.setProgressInfoLower("complete");
-			activity.complete();
-			long loadTime = System.currentTimeMillis() - startTime;
-			AceLog.getAppLog().info("### Load time: " + loadTime + " ms");
-			AceLog.getAppLog().info("Adding bdb shutdown hook. ");
-			Runtime.getRuntime().addShutdownHook(new Thread() {
-
-				/**
-				 * TODO For some reason, this thread does not seem to run in
-				 * normal shutdown (only on ^c). Need to figure out why and make
-				 * sure that we never fail to gracefully shutdown the database.
-				 */
-				@Override
-				public void run() {
-					try {
-						System.out.println("Starting bdb shutdown from shutdown hook...");
-						System.out.flush();
-						Bdb.close();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					} catch (ExecutionException e) {
-						e.printStackTrace();
-					}
-					System.out.println("Finished bdb shutdown from shutdown hook...");
-					System.out.flush();
-				}
-			});
-
-			setupLookAndFeel();
-			setupSwingExpansionTimerLogging();
 			
 			if (System.getProperty("viewer") != null && System.getProperty("viewer").toLowerCase().startsWith("t")) {
 			    ACE.editMode = false;
@@ -259,14 +228,12 @@ public class WorkbenchRunner {
 			if ((profileDir.exists() == false && initializeFromSubversion)
 					|| (svnUpdateOnStart != null)) {
 	            Svn.setConnectedToSvn(true);
-	            svnHelper
-						.initialSubversionOperationsAndChangeSetImport(new File(
+	            svnHelper.initialSubversionOperationsAndChangeSetImport(new File(
 								"config", WB_PROPERTIES));
 			} else if (profileDir.exists()) {
 				ArrayList<File> profileLoc = new ArrayList<File>();
 				profileLoc.add(profileDir);
-				svnHelper
-						.doChangeSetImport(profileLoc);
+				svnHelper.doChangeSetImport(profileLoc);
 			}
 
 			if (wbConfigFile == null || !wbConfigFile.exists()) {
@@ -303,6 +270,38 @@ public class WorkbenchRunner {
 				}
 			}
 
+			Bdb.setup("berkeley-db", activity);
+			activity.setProgressInfoLower("complete");
+			activity.complete();
+			long loadTime = System.currentTimeMillis() - startTime;
+			AceLog.getAppLog().info("### Load time: " + loadTime + " ms");
+			AceLog.getAppLog().info("Adding bdb shutdown hook. ");
+			Runtime.getRuntime().addShutdownHook(new Thread() {
+
+				/**
+				 * TODO For some reason, this thread does not seem to run in
+				 * normal shutdown (only on ^c). Need to figure out why and make
+				 * sure that we never fail to gracefully shutdown the database.
+				 */
+				@Override
+				public void run() {
+					try {
+						System.out.println("Starting bdb shutdown from shutdown hook...");
+						System.out.flush();
+						Bdb.close();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					} catch (ExecutionException e) {
+						e.printStackTrace();
+					}
+					System.out.println("Finished bdb shutdown from shutdown hook...");
+					System.out.flush();
+				}
+			});
+
+			setupLookAndFeel();
+			setupSwingExpansionTimerLogging();
+
 			if (wbConfigFile != null && wbConfigFile.exists()
 					&& wbPropertiesFile.exists()) {
 
@@ -319,6 +318,8 @@ public class WorkbenchRunner {
 							.getDbFolder(), "je.properties");
 					FileIO.copyFile(jeUserPropertiesFile, jeDbPropertiesFile);
 				}
+				
+				
 				ObjectInputStream ois = new ObjectInputStream(
 						new BufferedInputStream(
 								new FileInputStream(userProfile)));
@@ -348,6 +349,9 @@ public class WorkbenchRunner {
 			}
 			wbProperties.storeToXML(new FileOutputStream(wbPropertiesFile),
 					null);
+			if (svnHelper != null) {
+				svnHelper.doChangeSetImport();
+			}
 			ACE.setAceConfig(AceConfig.config);
 			// TODO. Get config to work with new change sets AceConfig.config.addChangeSetWriters();
 			String writerName = AceConfig.config.getChangeSetWriterFileName();

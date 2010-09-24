@@ -27,10 +27,12 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.log.AceLog;
@@ -41,7 +43,7 @@ import org.dwfa.log.HtmlHandler;
 public class SvnPanel extends JPanel {
 
     private JCheckBox svnConnectCheckBox;
-
+    
     private class PreferredReadOnlyListener implements ActionListener {
         SubversionData svd;
 
@@ -123,7 +125,15 @@ public class SvnPanel extends JPanel {
 
         public void actionPerformed(ActionEvent arg0) {
             try {
-                Svn.updateDatabase(svd, authenticator, true);
+            	int n = JOptionPane.showConfirmDialog(
+            		    SvnPanel.this,
+            		    "Do you wish to continue?",
+            		    "To update the database, the application must quit.",
+            		    JOptionPane.YES_NO_OPTION);
+            	if (n== JOptionPane.YES_OPTION) {
+                    Svn.updateDatabase(svd, authenticator, true);
+                    aceFrameConfig.quit();
+            	}
             } catch (TaskFailedException e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }
@@ -227,9 +237,11 @@ public class SvnPanel extends JPanel {
     private static final long serialVersionUID = 1L;
     private SvnPrompter authenticator;
 
+	private I_ConfigAceFrame aceFrameConfig;
+
     public SvnPanel(I_ConfigAceFrame aceFrameConfig, String tabName) throws Exception {
         super(new GridBagLayout());
-        database = tabName.equalsIgnoreCase("database");
+        database = tabName.equalsIgnoreCase(I_ConfigAceDb.MUTABLE_DB_LOC);
         authenticator = new SvnPrompter();
         authenticator.setParentContainer(this);
         authenticator.setUsername(aceFrameConfig.getUsername());
@@ -253,6 +265,7 @@ public class SvnPanel extends JPanel {
         c.gridwidth = 7;
         c.anchor = GridBagConstraints.WEST;
         SubversionData svd = aceFrameConfig.getSubversionMap().get(tabName);
+        this.aceFrameConfig  = aceFrameConfig;
         JTextField repository = new JTextField(svd.getRepositoryUrlStr());
         repository.setEditable(false);
         this.add(repository, c);
@@ -279,9 +292,9 @@ public class SvnPanel extends JPanel {
         this.add(status, c);
         c.gridx++;
         if (database) {
-            JButton update = new JButton("update database");
-            update.addActionListener(new UpdateDatabaseListener(svd));
-            this.add(update, c);
+           // JButton update = new JButton("update database");
+           // update.addActionListener(new UpdateDatabaseListener(svd));
+           // this.add(update, c);
             c.gridx++;
             JButton cleanup = new JButton("cleanup");
             cleanup.addActionListener(new CleanupListener(svd));

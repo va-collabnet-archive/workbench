@@ -27,6 +27,8 @@ import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 
 public interface I_ConfigAceDb {
 
+    public static final String MUTABLE_DB_LOC = "berkeley-db/mutable";
+
     public List<I_ConfigAceFrame> getAceFrames();
 
     public String getAceRiverConfigFile();

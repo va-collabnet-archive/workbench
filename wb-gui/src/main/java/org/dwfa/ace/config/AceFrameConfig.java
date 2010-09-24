@@ -2587,7 +2587,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public BundleType getBundleType() {
         if (bundleType == null) {
             File profileDirSvn = new File("profiles" + File.separator + ".svn");
-            if (profileDirSvn.exists()) {
+            File dbDirSvn = new File("berkeley-db" + File.separator + "mutable" + File.separator + ".svn");
+            if (dbDirSvn.exists()) {
+                bundleType = BundleType.DB_UPDATE;
+            } else if (profileDirSvn.exists()) {
                 bundleType = BundleType.CHANGE_SET_UPDATE;
             } else {
                 bundleType = BundleType.STAND_ALONE;
@@ -2770,6 +2773,13 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public I_IntList getLanguagePreferenceList() {
         if (languagePreferenceList == null) {
             languagePreferenceList = new IntList();
+        } 
+        if (languagePreferenceList.size() == 0) {
+        	try {
+				languagePreferenceList.add(ArchitectonicAuxiliary.Concept.EN_US.localize().getNid());
+			} catch (Exception e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
         }
         return languagePreferenceList;
     }
@@ -3062,5 +3072,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 			return  new Coordinate(getPrecedence(), getViewPositionSetReadOnly(), 
 					getAllowedStatus(), getDestRelTypes(), getConflictResolutionStrategy(), Integer.MAX_VALUE);
 		}
+	}
+
+	@Override
+	public void quit() {
+		aceFrame.getCdePanel().quit();
 	}
 }

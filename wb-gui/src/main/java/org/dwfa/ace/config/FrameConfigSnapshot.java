@@ -84,6 +84,10 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     I_ConfigAceFrame baseFrame;
 
+	public void quit() {
+		baseFrame.quit();
+	}
+
 	public Coordinate getCoordinate() {
 		return baseFrame.getCoordinate();
 	}

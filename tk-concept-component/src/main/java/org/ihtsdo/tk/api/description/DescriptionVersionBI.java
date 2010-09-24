@@ -13,5 +13,5 @@ public interface DescriptionVersionBI
     public boolean isInitialCaseSignificant();
 
     public String getLang();
-
+    
 }

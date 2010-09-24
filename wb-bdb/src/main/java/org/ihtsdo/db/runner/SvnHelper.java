@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
 
+import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.Terms;
@@ -131,7 +132,7 @@ public class SvnHelper {
 					}
 				}
 				if (changeLocations.size() > 0) {
-					doChangeSetImport(changeLocations);
+					doChangeSetImport();
 				}
 				aceProperties.storeToXML(new FileOutputStream(acePropertiesFile), null);
 			} else {
@@ -140,7 +141,7 @@ public class SvnHelper {
 				}
 			}
 		} else if (changeLocations.size() > 0) {
-			doChangeSetImport(changeLocations);
+			doChangeSetImport();
 		}
 	}
 
@@ -194,7 +195,7 @@ public class SvnHelper {
 					}
 				}
 				if (changeLocations.size() > 0) {
-					doChangeSetImport(changeLocations);
+					doChangeSetImport();
 				}
 				wbProperties.storeToXML(new FileOutputStream(acePropertiesFile), null);
 			} else {
@@ -203,7 +204,7 @@ public class SvnHelper {
 				}
 			}
 		} else if (changeLocations.size() > 0) {
-			doChangeSetImport(changeLocations);
+			doChangeSetImport();
 		}
 	}
 
@@ -276,6 +277,7 @@ public class SvnHelper {
 		if (checkoutLocation.exists()) {
 			// already checked out
 			AceLog.getAppLog().info(specParts[server] + " already checked out to: " + specParts[local]);
+			subversionMap.put(specParts[local], new SubversionData(specParts[server], specParts[local]));
 		} else {
 
 			// do the checkout...
@@ -302,16 +304,30 @@ public class SvnHelper {
 			boolean depthIsSticky = false;
 			boolean ignoreExternals = false;
 			boolean allowUnverObstructions = false;
+			if (path.equalsIgnoreCase(I_ConfigAceDb.MUTABLE_DB_LOC)) {
+				AceLog.getAppLog().info("Starting svn revert for: " + path);
+				Svn.getSvnClient().revert(path, Depth.infinity, null);
+				changeLocations.add(new File("profiles"));
+			} 
 			AceLog.getAppLog().info("Starting svn update for: " + path);
 			Svn.getSvnClient().update(path, revision, depth, depthIsSticky, ignoreExternals, allowUnverObstructions);
 			AceLog.getAppLog().info("Finished svn update for: " + path);
 			changeLocations.add(new File(path));
+
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
+	public void doChangeSetImport() {
+		doChangeSetImport(changeLocations);
+		changeLocations.clear();
+	}
 
 	public void doChangeSetImport(List<File> changeLocations) {
+		if (Terms.get() == null) {
+			AceLog.getAppLog().info("Database not setup for eccs import");
+			return;
+		}
 		// import any change sets that may be downloaded
 		// from svn...
 		try {

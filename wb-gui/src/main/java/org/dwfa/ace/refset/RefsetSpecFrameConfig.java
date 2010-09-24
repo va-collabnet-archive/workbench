@@ -84,7 +84,11 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
     I_ConfigAceFrame frameConfig;
 
-    public Coordinate getCoordinate() {
+    public void quit() {
+		frameConfig.quit();
+	}
+
+	public Coordinate getCoordinate() {
 		return frameConfig.getCoordinate();
 	}
 

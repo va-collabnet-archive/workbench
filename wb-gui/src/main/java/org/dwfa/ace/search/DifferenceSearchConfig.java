@@ -75,6 +75,11 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
     I_ConfigAceFrame frameConfig;
 
 
+	public void quit() {
+		frameConfig.quit();
+	}
+
+
 	public Coordinate getCoordinate() {
 		return frameConfig.getCoordinate();
 	}
