@@ -62,13 +62,13 @@ public class DescPopupListener extends MouseAdapter {
 
         public void actionPerformed(ActionEvent e) {
             I_GetConceptData sourceBean;
-			try {
-				sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConceptId());
-			} catch (TerminologyException e1) {
-				throw new RuntimeException(e1);
-			} catch (IOException e1) {
-				throw new RuntimeException(e1);
-			}
+            try {
+                sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConceptId());
+            } catch (TerminologyException e1) {
+                throw new RuntimeException(e1);
+            } catch (IOException e1) {
+                throw new RuntimeException(e1);
+            }
             for (I_Path p : config.getEditingPathSet()) {
                 I_DescriptionPart current = (I_DescriptionPart) selectedObject.getTuple().getMutablePart();
                 I_DescriptionPart newPart =
@@ -88,29 +88,29 @@ public class DescPopupListener extends MouseAdapter {
         }
 
         public void actionPerformed(ActionEvent e) {
-			try {
-			    I_GetConceptData sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConceptId());
-	            I_DescriptionTuple tuple = selectedObject.getTuple();
-	            I_DescriptionVersioned versioned = tuple.getDescVersioned();
-	            Terms.get().forget(versioned);
-	            Terms.get().addUncommitted(sourceBean);
-	            model.allTuples = null;
-	            model.fireTableDataChanged();
-			} catch (TerminologyException e1) {
-				throw new RuntimeException(e1);
-			} catch (IOException e1) {
-				throw new RuntimeException(e1);
-			}
+            try {
+                I_GetConceptData sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConceptId());
+                I_DescriptionTuple tuple = selectedObject.getTuple();
+                I_DescriptionVersioned versioned = tuple.getDescVersioned();
+                Terms.get().forget(versioned);
+                Terms.get().addUncommitted(sourceBean);
+                model.allTuples = null;
+                model.fireTableDataChanged();
+            } catch (TerminologyException e1) {
+                throw new RuntimeException(e1);
+            } catch (IOException e1) {
+                throw new RuntimeException(e1);
+            }
         }
     }
 
     private class ChangeFieldActionListener implements ActionListener {
         private int nid = Integer.MIN_VALUE;
-        
 
         private FieldToChange field;
 
-        public ChangeFieldActionListener(Collection<UUID> ids, FieldToChange field) throws TerminologyException, IOException {
+        public ChangeFieldActionListener(Collection<UUID> ids, FieldToChange field) throws TerminologyException,
+                IOException {
             super();
             this.nid = AceConfig.getVodb().uuidToNative(ids);
             this.field = field;
@@ -122,33 +122,31 @@ public class DescPopupListener extends MouseAdapter {
                 for (I_Path p : config.getEditingPathSet()) {
                     I_DescriptionPart newPart = selectedObject.getTuple().getMutablePart();
                     if (newPart.getTime() != Long.MAX_VALUE) {
-                        I_DescriptionPart currentPart = (I_DescriptionPart) 
-                    			selectedObject.getTuple().getMutablePart();
-                        newPart = (I_DescriptionPart) 
-                    		currentPart.makeAnalog(nid, p.getConceptId(), Long.MAX_VALUE);
+                        I_DescriptionPart currentPart = (I_DescriptionPart) selectedObject.getTuple().getMutablePart();
+                        newPart =
+                                (I_DescriptionPart) currentPart.makeAnalog(currentPart.getStatusId(), p.getConceptId(),
+                                    Long.MAX_VALUE);
                         selectedObject.getTuple().getDescVersioned().addVersion(newPart);
-                	}
+                    }
                     switch (field) {
                     case STATUS:
-                		newPart.setStatusId(nid);
+                        newPart.setStatusId(nid);
                         break;
                     case TYPE:
                         newPart.setTypeId(nid);
+                        newPart.setStatusId(config.getDefaultStatus().getConceptId());
                         break;
                     default:
                     }
 
-                    model.referencedConcepts.put(newPart.getStatusId(), 
-                    		Terms.get().getConcept(newPart.getStatusId()));
-                    model.referencedConcepts.put(newPart.getTypeId(), 
-                    		Terms.get().getConcept(newPart.getTypeId()));
+                    model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
+                    model.referencedConcepts.put(newPart.getTypeId(), Terms.get().getConcept(newPart.getTypeId()));
                 }
                 Terms.get().addUncommitted(concept);
                 model.allTuples = null;
                 model.fireTableDataChanged();
-                model.propertyChange(new PropertyChangeEvent(this, 
-                		I_ContainTermComponent.TERM_COMPONENT, null,
-                		model.host.getTermComponent()));
+                model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null,
+                    model.host.getTermComponent()));
             } catch (Exception ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
@@ -242,7 +240,7 @@ public class DescPopupListener extends MouseAdapter {
                         popup.show(e.getComponent(), e.getX(), e.getY());
                     }
                 }
-             } else {
+            } else {
                 JOptionPane.showMessageDialog(table.getTopLevelAncestor(),
                     "You must select at least one path to edit on...");
             }

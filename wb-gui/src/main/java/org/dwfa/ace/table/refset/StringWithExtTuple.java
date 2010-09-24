@@ -19,19 +19,38 @@ package org.dwfa.ace.table.refset;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.table.StringWithTuple;
 
-public class StringWithExtTuple extends StringWithTuple<StringWithExtTuple>  {
+public class StringWithExtTuple extends StringWithTuple<StringWithExtTuple> {
 
     private I_ExtendByRefVersion tuple;
     private int id;
+    private boolean wrapLines;
 
     public StringWithExtTuple(String cellText, I_ExtendByRefVersion tuple, int id) {
         this(cellText, tuple, id, false);
+        wrapLines = false;
     }
 
     public StringWithExtTuple(String cellText, I_ExtendByRefVersion tuple, int id, boolean isInConflict) {
         super(cellText, isInConflict);
         this.tuple = tuple;
         this.id = id;
+        wrapLines = false;
+    }
+
+    public StringWithExtTuple(String cellText, I_ExtendByRefVersion tuple, int id, boolean isInConflict,
+            boolean wrapLines) {
+        super(cellText, isInConflict);
+        this.tuple = tuple;
+        this.id = id;
+        this.wrapLines = wrapLines;
+    }
+
+    public boolean getWrapLines() {
+        return wrapLines;
+    }
+
+    public void setWrapLines(boolean wrapLines) {
+        this.wrapLines = wrapLines;
     }
 
     public I_ExtendByRefVersion getTuple() {

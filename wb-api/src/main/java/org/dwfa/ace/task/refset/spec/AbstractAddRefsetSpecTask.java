@@ -225,7 +225,10 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
                             }
                         }
                     }
+                    RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec, configFrame);
+                    refsetSpecHelper.setLastEditTime(System.currentTimeMillis());
                     configFrame.fireRefsetSpecChanged(ext);
+                    configFrame.refreshRefsetTab();
                 } else {
                     String msg = "Unable to add to spec. Selected parent must be a branching spec.";
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), msg);

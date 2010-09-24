@@ -74,7 +74,6 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.ihtsdo.cs.I_ComputeEConceptForChangeSet#getEConcept(org.ihtsdo.concept
      * .Concept)
@@ -250,14 +249,14 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
     }
 
 	@SuppressWarnings("unchecked")
-	private void setupFirstVersion(EComponent ec,
-			ConceptComponent<?, ?>.Version v) throws IOException {
+    private void setupFirstVersion(EComponent ec, ConceptComponent<?, ?>.Version v) throws IOException {
 		ec.primordialUuid = v.getPrimUuid();
 		ec.setPathUuid(Bdb.getPrimUuidForConcept(v.getPathId()));
 		ec.setStatusUuid(Bdb.getPrimUuidForConcept(v.getStatusId()));
 		ec.setTime(v.getTime());
 		if (v.getAdditionalIdentifierParts() != null) {
-			List<EIdentifier> additionalIdComponents = new ArrayList<EIdentifier>(v.getAdditionalIdentifierParts().size());
+            List<EIdentifier> additionalIdComponents =
+                    new ArrayList<EIdentifier>(v.getAdditionalIdentifierParts().size());
 			for (IdentifierVersion idv : v.getAdditionalIdentifierParts()) {
 				EIdentifier eIdv = null;
 				if (idv.getSapNid() >= minSapNid && idv.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE) {

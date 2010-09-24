@@ -34,7 +34,7 @@ import org.dwfa.tapi.TerminologyException;
 public class LineageHelper implements I_HelpLineage {
 
     private Logger logger = Logger.getLogger(LineageHelper.class.getName());
-	private I_ConfigAceFrame config;
+	protected I_ConfigAceFrame config;
 	private long lastAccess = System.currentTimeMillis();
 	private boolean clone = false;
 

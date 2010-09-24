@@ -59,6 +59,13 @@ public class ToUserSelectedQueue extends AbstractTask {
     private TermEntry queueType = TermEntry.getQueueType();
 
     private transient I_QueueProcesses q;
+    
+    /**
+     * 
+     */
+    public ToUserSelectedQueue() {
+        super();
+    }
 
     /**
      * @return Returns the queueType.

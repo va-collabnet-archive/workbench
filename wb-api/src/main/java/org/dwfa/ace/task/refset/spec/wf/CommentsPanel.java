@@ -111,4 +111,9 @@ public class CommentsPanel extends JPanel {
             return result;
         }
     }
+
+    public void setComments(String commentStr) {
+        commentsTextField.setText(commentStr);
+    }
+
 }

@@ -232,13 +232,13 @@ public class RefsetSpecPanel extends JPanel {
         columns.add(column1);
 
         ReflexiveRefsetFieldData column2 = new ReflexiveRefsetFieldData();
-        column2.setColumnName("comment");
+        column2.setColumnName("comments");
         column2.setCreationEditable(true);
         column2.setUpdateEditable(true);
         column2.setFieldClass(StringWithExtTuple.class);
         column2.setMin(5);
-        column2.setPref(150);
-        column2.setMax(1000);
+        column2.setPref(300);
+        column2.setMax(2000);
         column2.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
         column2.setReadMethod(REFSET_TYPES.STRING.getPartClass().getMethod("getStringValue"));
         column2.setWriteMethod(REFSET_TYPES.STRING.getPartClass().getMethod("setStringValue", String.class));

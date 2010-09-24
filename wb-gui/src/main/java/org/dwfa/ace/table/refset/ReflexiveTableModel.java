@@ -337,7 +337,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         }
         return columns.length;
     }
-    
+
     public int getFixedColumnCount() {
         return columns.length;
     }
@@ -362,9 +362,10 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
 
     public void setPromotionFilterId(Integer promotionFilterId) {
         // clear any checked rows if we've switched to a different promotion filter
-        if ((this.promotionFilterId == null && promotionFilterId != null) ||
-                (this.promotionFilterId != null && promotionFilterId == null) ||
-                (this.promotionFilterId != null && promotionFilterId != null && !this.promotionFilterId.equals(promotionFilterId))) {
+        if ((this.promotionFilterId == null && promotionFilterId != null)
+            || (this.promotionFilterId != null && promotionFilterId == null)
+            || (this.promotionFilterId != null && promotionFilterId != null && !this.promotionFilterId
+                .equals(promotionFilterId))) {
             this.checkedRows.clear();
         }
         this.promotionFilterId = promotionFilterId;
@@ -520,8 +521,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                         I_ConfigAceFrame config = (I_ConfigAceFrame) columns[columnIndex].readParamaters[1];
                         List<I_ExtendByRefVersion> tuples =
                                 (List<I_ExtendByRefVersion>) ext.getTuples(config.getAllowedStatus(), config
-                                    .getViewPositionSetReadOnly(), 
-                                config.getPrecedence(), config.getConflictResolutionStrategy());
+                                    .getViewPositionSetReadOnly(), config.getPrecedence(), config
+                                    .getConflictResolutionStrategy());
                         if (tuples.size() > 0) {
                             I_ExtendByRefVersion obj = tuples.iterator().next();
                             I_GetConceptData componentRefset = Terms.get().getConcept(obj.getRefsetId());
@@ -545,8 +546,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                         } else {
                             tuples =
                                     (List<I_ExtendByRefVersion>) ext.getTuples(null, config
-                                        .getViewPositionSetReadOnly(), config.getPrecedence(), 
-                                        config.getConflictResolutionStrategy());
+                                        .getViewPositionSetReadOnly(), config.getPrecedence(), config
+                                        .getConflictResolutionStrategy());
                             if (tuples.size() > 0) {
                                 I_ExtendByRefVersion obj = tuples.iterator().next();
                                 I_GetConceptData componentRefset = Terms.get().getConcept(obj.getRefsetId());
@@ -592,7 +593,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
 
                 // String extension
             case STRING:
-                return new StringWithExtTuple((String) value, tuple, id);
+                return new StringWithExtTuple((String) value, tuple, id, false, true);
             }
 
             AceLog.getAppLog().alertAndLogException(new Exception("Can't handle column type: " + columns[columnIndex]));

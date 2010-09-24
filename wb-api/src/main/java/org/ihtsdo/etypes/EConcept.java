@@ -64,7 +64,7 @@ public class EConcept implements I_AmChangeSetObject {
         CID_STR(10, RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION, I_ExtendByRefPartStr.class), 
         CID_FLOAT(11, RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION, null), //TODO add interface for refset
         CID_LONG(12, RefsetAuxiliary.Concept.CID_LONG_EXTENSION, I_ExtendByRefPartCidLong.class), 
-        LONG(13, RefsetAuxiliary.Concept.LONG_EXTENSION, null); //TODO add interface for refset
+        LONG(13, RefsetAuxiliary.Concept.LONG_EXTENSION, I_ExtendByRefPartLong.class);
 
         private int externalizedToken;
         private int typeNid;
@@ -122,8 +122,7 @@ public class EConcept implements I_AmChangeSetObject {
 					} catch (TerminologyException e) {
 						throw new IOException(e);
 					}
-                	throw new IOException("Unknown refset type: " + nid + 
-                			" concept: " + typeConcept.getInitialText());
+                    throw new IOException("Unknown refset type: " + nid + " concept: " + typeConcept.getInitialText());
             	} else {
                 	throw new IOException("Unknown refset type: " + nid);
             	}
@@ -175,6 +174,8 @@ public class EConcept implements I_AmChangeSetObject {
                 return CID_FLOAT;
             case 12:
                 return CID_LONG;
+            case 13:
+                return LONG;
             }
             throw new UnsupportedOperationException();
         }
@@ -286,6 +287,9 @@ public class EConcept implements I_AmChangeSetObject {
                 case CID_STR:
                     refsetMembers.add(new ERefsetCidStrMember(in));
                     break;
+                case LONG:
+                    refsetMembers.add(new ERefsetLongMember(in));
+                    break;
                 default:
                     throw new UnsupportedOperationException("Can't handle refset type: " + type);
                 }
@@ -293,48 +297,42 @@ public class EConcept implements I_AmChangeSetObject {
         }
         int destRelNidTypeNidsCount = in.readInt();
         if (destRelNidTypeNidsCount > 0) {
-        	destRelUuidTypeUuids = new ArrayList<UUID>(
-        			destRelNidTypeNidsCount);
+            destRelUuidTypeUuids = new ArrayList<UUID>(destRelNidTypeNidsCount);
         	for (int i = 0; i < destRelNidTypeNidsCount; i++) {
         		destRelUuidTypeUuids.add(new UUID(in.readLong(), in.readLong()));
         	}
         }
         int refsetUuidMemberUuidForConceptCount = in.readInt();
         if (refsetUuidMemberUuidForConceptCount > 0) {
-        	refsetUuidMemberUuidForConcept = new ArrayList<UUID>(
-        			refsetUuidMemberUuidForConceptCount);
+            refsetUuidMemberUuidForConcept = new ArrayList<UUID>(refsetUuidMemberUuidForConceptCount);
         	for (int i = 0; i < refsetUuidMemberUuidForConceptCount; i++) {
         		refsetUuidMemberUuidForConcept.add(new UUID(in.readLong(), in.readLong()));
         	}
         }
         int refsetUuidMemberUuidForDescsCount = in.readInt();
         if (refsetUuidMemberUuidForDescsCount > 0) {
-        	refsetUuidMemberUuidForDescriptions = new ArrayList<UUID>(
-        			refsetUuidMemberUuidForDescsCount);
+            refsetUuidMemberUuidForDescriptions = new ArrayList<UUID>(refsetUuidMemberUuidForDescsCount);
         	for (int i = 0; i < refsetUuidMemberUuidForDescsCount; i++) {
         		refsetUuidMemberUuidForDescriptions.add(new UUID(in.readLong(), in.readLong()));
         	}
         }
         int refsetUuidMemberUuidForRelsCount = in.readInt();
         if (refsetUuidMemberUuidForRelsCount > 0) {
-        	refsetUuidMemberUuidForRels = new ArrayList<UUID>(
-        			refsetUuidMemberUuidForRelsCount);
+            refsetUuidMemberUuidForRels = new ArrayList<UUID>(refsetUuidMemberUuidForRelsCount);
         	for (int i = 0; i < refsetUuidMemberUuidForRelsCount; i++) {
         		refsetUuidMemberUuidForRels.add(new UUID(in.readLong(), in.readLong()));
         	}
         }
         int refsetUuidMemberUuidForImagesCount = in.readInt();
         if (refsetUuidMemberUuidForImagesCount > 0) {
-        	refsetUuidMemberUuidForImages = new ArrayList<UUID>(
-        			refsetUuidMemberUuidForImagesCount);
+            refsetUuidMemberUuidForImages = new ArrayList<UUID>(refsetUuidMemberUuidForImagesCount);
         	for (int i = 0; i < refsetUuidMemberUuidForImagesCount; i++) {
         		refsetUuidMemberUuidForImages.add(new UUID(in.readLong(), in.readLong()));
         	}
         }
         int refsetUuidMemberUuidForRefsetMembersCount = in.readInt();
         if (refsetUuidMemberUuidForRefsetMembersCount > 0) {
-        	refsetUuidMemberUuidForRefsetMembers = new ArrayList<UUID>(
-        			refsetUuidMemberUuidForRefsetMembersCount);
+            refsetUuidMemberUuidForRefsetMembers = new ArrayList<UUID>(refsetUuidMemberUuidForRefsetMembersCount);
         	for (int i = 0; i < refsetUuidMemberUuidForRefsetMembersCount; i++) {
         		refsetUuidMemberUuidForRefsetMembers.add(new UUID(in.readLong(), in.readLong()));
         	}
@@ -391,8 +389,7 @@ public class EConcept implements I_AmChangeSetObject {
             out.writeInt(0);
         } else {
             out.writeInt(destRelUuidTypeUuids.size());
-            assert destRelUuidTypeUuids.size() % 2 == 0: 
-            	"Illegal size: " + destRelUuidTypeUuids.size();
+            assert destRelUuidTypeUuids.size() % 2 == 0 : "Illegal size: " + destRelUuidTypeUuids.size();
             for (UUID uuid : destRelUuidTypeUuids) {
                 out.writeLong(uuid.getMostSignificantBits());
                 out.writeLong(uuid.getLeastSignificantBits());
@@ -402,8 +399,8 @@ public class EConcept implements I_AmChangeSetObject {
             out.writeInt(0);
         } else {
             out.writeInt(refsetUuidMemberUuidForConcept.size());
-            assert refsetUuidMemberUuidForConcept.size() % 2 == 0: 
-            	"Illegal size: " + refsetUuidMemberUuidForConcept.size();
+            assert refsetUuidMemberUuidForConcept.size() % 2 == 0 : "Illegal size: "
+                + refsetUuidMemberUuidForConcept.size();
             for (UUID uuid : refsetUuidMemberUuidForConcept) {
                 out.writeLong(uuid.getMostSignificantBits());
                 out.writeLong(uuid.getLeastSignificantBits());
@@ -413,8 +410,8 @@ public class EConcept implements I_AmChangeSetObject {
             out.writeInt(0);
         } else {
             out.writeInt(refsetUuidMemberUuidForDescriptions.size());
-            assert refsetUuidMemberUuidForDescriptions.size() % 2 == 0: 
-            	"Illegal size: " + refsetUuidMemberUuidForDescriptions.size();
+            assert refsetUuidMemberUuidForDescriptions.size() % 2 == 0 : "Illegal size: "
+                + refsetUuidMemberUuidForDescriptions.size();
             for (UUID uuid : refsetUuidMemberUuidForDescriptions) {
                 out.writeLong(uuid.getMostSignificantBits());
                 out.writeLong(uuid.getLeastSignificantBits());
@@ -424,8 +421,7 @@ public class EConcept implements I_AmChangeSetObject {
             out.writeInt(0);
         } else {
             out.writeInt(refsetUuidMemberUuidForRels.size());
-            assert refsetUuidMemberUuidForRels.size() % 2 == 0: 
-            	"Illegal size: " + refsetUuidMemberUuidForRels.size();
+            assert refsetUuidMemberUuidForRels.size() % 2 == 0 : "Illegal size: " + refsetUuidMemberUuidForRels.size();
             for (UUID uuid : refsetUuidMemberUuidForRels) {
                 out.writeLong(uuid.getMostSignificantBits());
                 out.writeLong(uuid.getLeastSignificantBits());
@@ -435,8 +431,8 @@ public class EConcept implements I_AmChangeSetObject {
             out.writeInt(0);
         } else {
             out.writeInt(refsetUuidMemberUuidForImages.size());
-            assert refsetUuidMemberUuidForImages.size() % 2 == 0: 
-            	"Illegal size: " + refsetUuidMemberUuidForImages.size();
+            assert refsetUuidMemberUuidForImages.size() % 2 == 0 : "Illegal size: "
+                + refsetUuidMemberUuidForImages.size();
             for (UUID uuid : refsetUuidMemberUuidForImages) {
                 out.writeLong(uuid.getMostSignificantBits());
                 out.writeLong(uuid.getLeastSignificantBits());
@@ -446,8 +442,8 @@ public class EConcept implements I_AmChangeSetObject {
             out.writeInt(0);
         } else {
             out.writeInt(refsetUuidMemberUuidForRefsetMembers.size());
-            assert refsetUuidMemberUuidForRefsetMembers.size() % 2 == 0: 
-            	"Illegal size: " + refsetUuidMemberUuidForRefsetMembers.size();
+            assert refsetUuidMemberUuidForRefsetMembers.size() % 2 == 0 : "Illegal size: "
+                + refsetUuidMemberUuidForRefsetMembers.size();
             for (UUID uuid : refsetUuidMemberUuidForRefsetMembers) {
                 out.writeLong(uuid.getMostSignificantBits());
                 out.writeLong(uuid.getLeastSignificantBits());
@@ -601,12 +597,12 @@ public class EConcept implements I_AmChangeSetObject {
 
         Collection<? extends I_ExtendByRef> conceptMembers = componentRefsetMap.get(c.getNid());
         if (conceptMembers != null) {
-        	ArrayList<ERefsetMember<?>> refsetMemberForComponent = new ArrayList<ERefsetMember<?>>(conceptMembers.size());
+            ArrayList<ERefsetMember<?>> refsetMemberForComponent =
+                    new ArrayList<ERefsetMember<?>>(conceptMembers.size());
         	refsetUuidMemberUuidForConcept = new ArrayList<UUID>(refsetMemberForComponent.size() * 2);
         	for (I_ExtendByRef m : conceptMembers) {
-        		assert m.getComponentId() == c.getNid() : 
-        			"getRefsetMembersForComponent query error: componentId: " + m.getComponentId() + 
-        			" conceptId: " + c.getNid();
+                assert m.getComponentId() == c.getNid() : "getRefsetMembersForComponent query error: componentId: "
+                    + m.getComponentId() + " conceptId: " + c.getNid();
                 UUID refsetUuid = ERevision.nidToUuid(m.getRefsetId());
                 refsetUuidMemberUuidForConcept.add(refsetUuid);
                 UUID memberUuid = ERevision.nidToUuid(m.getNid());
@@ -614,18 +610,15 @@ public class EConcept implements I_AmChangeSetObject {
             }
         }
 
-        Collection<I_ExtendByRef> descriptionMembers = 
-        	new ArrayList<I_ExtendByRef>();
+        Collection<I_ExtendByRef> descriptionMembers = new ArrayList<I_ExtendByRef>();
         for (I_DescriptionVersioned desc: c.getDescriptions()) {
-        	Collection<? extends I_ExtendByRef> componentMembers = 
-        		componentRefsetMap.get(desc.getNid());
+            Collection<? extends I_ExtendByRef> componentMembers = componentRefsetMap.get(desc.getNid());
         	if (componentMembers != null) {
         		descriptionMembers.addAll(componentMembers);
         	}
         }
         if (descriptionMembers.size() > 0) {
-        	refsetUuidMemberUuidForDescriptions = 
-        		new ArrayList<UUID>(descriptionMembers.size() * 2);
+            refsetUuidMemberUuidForDescriptions = new ArrayList<UUID>(descriptionMembers.size() * 2);
         	for (I_ExtendByRef m : descriptionMembers) {
         		System.out.println("Found description extension: " + m + " for component: " + this);
                 UUID refsetUuid = ERevision.nidToUuid(m.getRefsetId());
@@ -635,11 +628,9 @@ public class EConcept implements I_AmChangeSetObject {
             }
         }
 
-        Collection<I_ExtendByRef> relMembers = 
-        	new ArrayList<I_ExtendByRef>();
+        Collection<I_ExtendByRef> relMembers = new ArrayList<I_ExtendByRef>();
         for (I_RelVersioned r: c.getSourceRels()) {
-        	Collection<? extends I_ExtendByRef> componentMembers = 
-        		componentRefsetMap.get(r.getNid());
+            Collection<? extends I_ExtendByRef> componentMembers = componentRefsetMap.get(r.getNid());
         	if (componentMembers != null) {
         		relMembers.addAll(componentMembers);
         	}
@@ -655,11 +646,9 @@ public class EConcept implements I_AmChangeSetObject {
             }
         }
         
-        Collection<I_ExtendByRef> imageMembers = 
-        	new ArrayList<I_ExtendByRef>();
+        Collection<I_ExtendByRef> imageMembers = new ArrayList<I_ExtendByRef>();
         for (I_ImageVersioned img: c.getImages()) {
-        	Collection<? extends I_ExtendByRef> componentMembers = 
-        		componentRefsetMap.get(img.getNid());
+            Collection<? extends I_ExtendByRef> componentMembers = componentRefsetMap.get(img.getNid());
         	if (componentMembers != null) {
         		imageMembers.addAll(componentMembers);
         	}
@@ -747,8 +736,7 @@ public class EConcept implements I_AmChangeSetObject {
 		return refsetUuidMemberUuidForConcept;
 	}
 
-	public void setRefsetUuidMemberUuidForConcept(
-			List<UUID> refsetUuidMemberUuidForConcept) {
+    public void setRefsetUuidMemberUuidForConcept(List<UUID> refsetUuidMemberUuidForConcept) {
 		this.refsetUuidMemberUuidForConcept = refsetUuidMemberUuidForConcept;
 	}
 
@@ -756,8 +744,7 @@ public class EConcept implements I_AmChangeSetObject {
 		return refsetUuidMemberUuidForDescriptions;
 	}
 
-	public void setRefsetUuidMemberUuidForDescriptions(
-			List<UUID> refsetUuidMemberUuidForDescriptions) {
+    public void setRefsetUuidMemberUuidForDescriptions(List<UUID> refsetUuidMemberUuidForDescriptions) {
 		this.refsetUuidMemberUuidForDescriptions = refsetUuidMemberUuidForDescriptions;
 	}
 
@@ -765,8 +752,7 @@ public class EConcept implements I_AmChangeSetObject {
 		return refsetUuidMemberUuidForRels;
 	}
 
-	public void setRefsetUuidMemberUuidForRels(
-			List<UUID> refsetUuidMemberUuidForRels) {
+    public void setRefsetUuidMemberUuidForRels(List<UUID> refsetUuidMemberUuidForRels) {
 		this.refsetUuidMemberUuidForRels = refsetUuidMemberUuidForRels;
 	}
 	
@@ -780,14 +766,12 @@ public class EConcept implements I_AmChangeSetObject {
     }
 
     /**
-     * Compares this object to the specified object. The result is <tt>true</tt>
-     * if and only if the argument is not <tt>null</tt>, is a
-     * <tt>EConcept</tt> object, and contains the same values, field by field, 
+     * Compares this object to the specified object. The result is <tt>true</tt> if and only if the argument is not
+     * <tt>null</tt>, is a <tt>EConcept</tt> object, and contains the same values, field by field,
      * as this <tt>EConcept</tt>.
      * 
      * @param obj the object to compare with.
-     * @return <code>true</code> if the objects are the same; 
-     *         <code>false</code> otherwise.
+     * @return <code>true</code> if the objects are the same; <code>false</code> otherwise.
      */
     public boolean equals(Object obj) {
         if (obj == null)
@@ -888,8 +872,7 @@ public class EConcept implements I_AmChangeSetObject {
 		return refsetUuidMemberUuidForImages;
 	}
 
-	public void setRefsetUuidMemberUuidForImages(
-			List<UUID> refsetUuidMemberUuidForImages) {
+    public void setRefsetUuidMemberUuidForImages(List<UUID> refsetUuidMemberUuidForImages) {
 		this.refsetUuidMemberUuidForImages = refsetUuidMemberUuidForImages;
 	}
 
@@ -897,8 +880,7 @@ public class EConcept implements I_AmChangeSetObject {
 		return refsetUuidMemberUuidForRefsetMembers;
 	}
 
-	public void setRefsetUuidMemberUuidForRefsetMembers(
-			List<UUID> refsetUuidMemberUuidForRefsetMembers) {
+    public void setRefsetUuidMemberUuidForRefsetMembers(List<UUID> refsetUuidMemberUuidForRefsetMembers) {
 		this.refsetUuidMemberUuidForRefsetMembers = refsetUuidMemberUuidForRefsetMembers;
 	}
 
@@ -909,7 +891,5 @@ public class EConcept implements I_AmChangeSetObject {
 	public void setPrimordialUuid(UUID primordialUuid) {
 		this.primordialUuid = primordialUuid;
 	}
-
-
 
 }

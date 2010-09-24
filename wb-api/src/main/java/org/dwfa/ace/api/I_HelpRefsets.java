@@ -116,6 +116,10 @@ public interface I_HelpRefsets extends I_HelpLineage {
 			I_GetConceptData refsetIdentityConcept, I_ConfigAceFrame config)
 			throws IOException, TerminologyException;
 	
+	public Set<? extends I_GetConceptData> getComputeTimeRefsetForRefset(I_GetConceptData refsetToPromote, I_ConfigAceFrame config) throws IOException, TerminologyException;
+	
+	public Set<? extends I_GetConceptData> getEditTimeRefsetForRefset(I_GetConceptData refsetToPromote, I_ConfigAceFrame config) throws IOException, TerminologyException;
+	
 	public Set<Integer> getMemberRefsets() throws Exception;
 
 	public List<Integer> getSpecificationRefsets() throws Exception;
@@ -130,5 +134,7 @@ public interface I_HelpRefsets extends I_HelpLineage {
 	public boolean isAutocommitActive();
 
 	public void setAutocommitActive(boolean autocommitActive);
+
+    
 
 }

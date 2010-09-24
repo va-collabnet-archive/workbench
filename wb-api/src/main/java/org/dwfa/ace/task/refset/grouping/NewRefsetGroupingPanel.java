@@ -34,6 +34,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
+import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.task.util.DynamicWidthComboBox;
 import org.dwfa.cement.RefsetAuxiliary;
 
@@ -187,12 +188,15 @@ public class NewRefsetGroupingPanel extends JPanel {
 
             Set<? extends I_GetConceptData> children =
                     parent.getDestRelOrigins(currentStatuses, allowedTypes, Terms.get().getActiveAceFrameConfig()
-                        .getViewPositionSetReadOnly(),
-                        config.getPrecedence(), config.getConflictResolutionStrategy());
+                        .getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
 
             for (I_GetConceptData child : children) {
-                results.add(child);
-                results.addAll(getChildren(child));
+                RefsetSpec spec = new RefsetSpec(child, true, config);
+                if (spec.getRefsetSpecConcept() == null) {
+                    // only add the children if this is a grouping concept and not an actual refset
+                    results.add(child);
+                    results.addAll(getChildren(child));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -60,15 +60,18 @@ public class SvnHelper {
 		jiniClass = jiniClassToSet;
 		jiniConfig = jiniConfigToSet;
 		if (jiniConfig != null) {
-			svnCheckoutProfileOnStart = (String) jiniConfig.getEntry(jiniClass.getName(), "svnCheckoutProfileOnStart",
-					String.class, "");
+            svnCheckoutProfileOnStart =
+                    (String) jiniConfig.getEntry(jiniClass.getName(), "svnCheckoutProfileOnStart", String.class, "");
 
-			svnCheckoutOnStart = (String[]) jiniConfig.getEntry(jiniClass.getName(), "svnCheckoutOnStart",
-					String[].class, new String[] {});
-			svnUpdateOnStart = (String[]) jiniConfig.getEntry(jiniClass.getName(), "svnUpdateOnStart", String[].class,
+            svnCheckoutOnStart =
+                    (String[]) jiniConfig.getEntry(jiniClass.getName(), "svnCheckoutOnStart", String[].class,
 					new String[] {});
-			csImportOnStart = (String[]) jiniConfig.getEntry(jiniClass.getName(), "csImportOnStart", String[].class,
+            svnUpdateOnStart =
+                    (String[]) jiniConfig.getEntry(jiniClass.getName(), "svnUpdateOnStart", String[].class,
 					new String[] {});
+            csImportOnStart =
+                    (String[]) jiniConfig.getEntry(jiniClass.getName(), "csImportOnStart", String[].class,
+                        new String[] {});
 			if (csImportOnStart != null) {
 				for (String importLoc : csImportOnStart) {
 					changeLocations.add(new File(importLoc));
@@ -113,8 +116,7 @@ public class SvnHelper {
 					Svn.rwl.release(Svn.SEMAPHORE_PERMITS);
 					try {
 						long elapsedTime = System.currentTimeMillis() - startTime;
-						String elapsed = "Elapsed time: " + 
-						TimeUtil.getElapsedTimeString(elapsedTime);
+                        String elapsed = "Elapsed time: " + TimeUtil.getElapsedTimeString(elapsedTime);
 						activity.setProgressInfoLower(elapsed);
 						activity.complete();
 					} catch (ComputationCanceled e) {
@@ -145,11 +147,13 @@ public class SvnHelper {
 				|| (svnUpdateOnStart != null && svnUpdateOnStart.length > 0)
 				|| (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0)) {
 			if (connectToSubversion == false) {
-				connectToSubversion = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
-						LogWithAlerts.getActiveFrame(null), "Would you like to connect over the network to Subversion?",
-						"Confirm network operation", JOptionPane.YES_NO_OPTION));
+                connectToSubversion =
+                        (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(LogWithAlerts.getActiveFrame(null),
+                            "Would you like to connect over the network to Subversion?", "Confirm network operation",
+                            JOptionPane.YES_NO_OPTION));
 			}
 			Svn.setConnectedToSvn(connectToSubversion);
+            try {
 			if (connectToSubversion) {
 				long startTime = System.currentTimeMillis();
 				I_ShowActivity activity = Svn.setupActivityPanel("Subversion startup operation");
@@ -176,8 +180,7 @@ public class SvnHelper {
 					Svn.rwl.release(Svn.SEMAPHORE_PERMITS);
 					try {
 						long elapsedTime = System.currentTimeMillis() - startTime;
-						String elapsed = "Elapsed time: " + 
-						TimeUtil.getElapsedTimeString(elapsedTime);
+                            String elapsed = "Elapsed time: " + TimeUtil.getElapsedTimeString(elapsedTime);
 						activity.setProgressInfoLower(elapsed);
 						activity.complete();
 					} catch (ComputationCanceled e) {
@@ -193,6 +196,13 @@ public class SvnHelper {
 					throw new TaskFailedException("User did not want to connect to Subversion.");
 				}
 			}
+            } catch (ClientException e) {
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                    "Unable to connect to Subversion - please check network connection and try again.",
+                    "Unable to connect", JOptionPane.INFORMATION_MESSAGE);
+                connectToSubversion = false;
+                Svn.setConnectedToSvn(connectToSubversion);
+            }
 		} else if (changeLocations.size() > 0) {
 			doChangeSetImport(changeLocations);
 		}
@@ -209,8 +219,9 @@ public class SvnHelper {
 		}
 		SortedSet<String> sortedProfiles = new TreeSet<String>(profileMap.keySet());
 		JFrame emptyFrame = new JFrame();
-		String selectedProfile = (String) SelectObjectDialog.showDialog(emptyFrame, emptyFrame,
-				"Select profile to checkout:", "Checkout profile:", sortedProfiles.toArray(), null, null);
+        String selectedProfile =
+                (String) SelectObjectDialog.showDialog(emptyFrame, emptyFrame, "Select profile to checkout:",
+                    "Checkout profile:", sortedProfiles.toArray(), null, null);
 		String selectedPath = profileMap.get(selectedProfile);
 		if (selectedPath.startsWith("/")) {
 			selectedPath = selectedPath.substring(1);
@@ -255,7 +266,8 @@ public class SvnHelper {
 	private void handleSvnCheckout(List<File> changeLocations, String svnSpec) throws TaskFailedException,
 	ClientException {
 		AceLog.getAppLog().info("Got svn checkout spec: " + svnSpec);
-		String[] specParts = new String[] { svnSpec.substring(0, svnSpec.lastIndexOf("|")),
+        String[] specParts =
+                new String[] { svnSpec.substring(0, svnSpec.lastIndexOf("|")),
 				svnSpec.substring(svnSpec.lastIndexOf("|") + 1) };
 		int server = 0;
 		int local = 1;
@@ -317,13 +329,13 @@ public class SvnHelper {
 			};
 
 			for (File checkoutLocation : changeLocations) {
-				jcsImporter.importAllChangeSets(AceLog.getAppLog().getLogger(), null,
-						checkoutLocation.getAbsolutePath(), false, ".eccs", "bootstrap.init");
+                jcsImporter.importAllChangeSets(AceLog.getAppLog().getLogger(), null, checkoutLocation
+                    .getAbsolutePath(), false, ".eccs", "bootstrap.init");
 			}
 
 			for (File checkoutLocation : changeLocations) {
-				jcsImporter.importAllChangeSets(AceLog.getAppLog().getLogger(), null,
-						checkoutLocation.getAbsolutePath(), false, ".eccs");
+                jcsImporter.importAllChangeSets(AceLog.getAppLog().getLogger(), null, checkoutLocation
+                    .getAbsolutePath(), false, ".eccs");
 			}
 
 			AceLog.getAppLog().info("Finished eccs import");

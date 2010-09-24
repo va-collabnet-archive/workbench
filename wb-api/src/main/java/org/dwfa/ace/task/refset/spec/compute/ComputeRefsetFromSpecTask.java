@@ -146,6 +146,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             AceLog.getAppLog().info("Start execution of refset spec : " + refsetSpec.getInitialText());
 
             Condition condition = Terms.get().computeRefset(refset.getNid(), query, configFrame);
+            Terms.get().getActiveAceFrameConfig().refreshRefsetTab();
 
             if (cancelComputation || condition == Condition.ITEM_CANCELED) {
                 Terms.get().cancel();
@@ -210,9 +211,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         try {
             I_GetConceptData refset = configFrame.getRefsetInSpecEditor();
             boolean showActivityPanel = true;
-            excludedRefsets = new HashSet<Integer>(); // no excluded refsets
-            // when running as part
-            // of a task
+            excludedRefsets = new HashSet<Integer>(); // no excluded refsets when running as part of a task
             nestedRefsets = new HashSet<Integer>();
             Condition condition = computeRefset(configFrame, refset, showActivityPanel);
             configFrame.setCommitAbortButtonsVisible(true);

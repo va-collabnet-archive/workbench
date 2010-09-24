@@ -54,8 +54,8 @@ public class DescriptionTableRenderer extends AceTableRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
             int row, int column) {
-        JLabel renderComponent = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
-            column);
+        JLabel renderComponent =
+                (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         boolean same = false;
         if (isSelected == false) {
             if (renderInactive) {

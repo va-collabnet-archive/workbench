@@ -632,6 +632,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 
         try {
             if ((AceConfig.config != null) && (AceConfig.config.aceFrames.get(0) != null)) {
+                if (AceConfig.config.aceFrames.get(0).getViewPositionSet().iterator().hasNext()) {
                 PositionMapper mapper =
                         Bdb.getSapDb().getMapper(
                             AceConfig.config.aceFrames.get(0).getViewPositionSet().iterator().next());
@@ -643,6 +644,9 @@ public class Concept implements I_Transact, I_GetConceptData {
                         return prefix + tuple.getText();
                     }
                 }
+                } else {
+                    throw new IndexOutOfBoundsException("No view positions set");
+            }
             }
             return prefix + getText();
         } catch (IndexOutOfBoundsException e) {
@@ -702,8 +706,8 @@ public class Concept implements I_Transact, I_GetConceptData {
     }
 
     @Override
-    public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config, 
-    		I_ShowActivity activity) throws IOException {
+    public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config, I_ShowActivity activity)
+            throws IOException {
         I_IntSet isATypes = config.getDestRelTypes();
         I_RepresentIdSet possibleKindOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
         possibleKindOfConcepts.setMember(getNid());
@@ -714,8 +718,7 @@ public class Concept implements I_Transact, I_GetConceptData {
             if (isATypes.contains(pair.getTypeNid())) {
                 possibleKindOfConcepts.setMember(Bdb.getNidCNidMap().getCNid(pair.getRelNid()));
                 Concept origin = Bdb.getConceptForComponent(pair.getRelNid());
-                origin.addPossibleKindOfConcepts(possibleKindOfConcepts, 
-                		isATypes, activity);
+                origin.addPossibleKindOfConcepts(possibleKindOfConcepts, isATypes, activity);
             }
         }
         return possibleKindOfConcepts;
@@ -747,9 +750,8 @@ public class Concept implements I_Transact, I_GetConceptData {
         return possibleChildOfConcepts;
     }
 
-    private void addPossibleKindOfConcepts(I_RepresentIdSet possibleKindOfConcepts, 
-    		I_IntSet isATypes, I_ShowActivity activity)
-            throws IOException {
+    private void addPossibleKindOfConcepts(I_RepresentIdSet possibleKindOfConcepts, I_IntSet isATypes,
+            I_ShowActivity activity) throws IOException {
         possibleKindOfConcepts.setMember(getNid());
         for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
         	if (activity.isCanceled()) {
@@ -766,8 +768,7 @@ public class Concept implements I_Transact, I_GetConceptData {
         }
     }
 
-    private void addPossibleKindOfConcepts(I_RepresentIdSet possibleKindOfConcepts, 
-    		I_IntSet isATypes)
+    private void addPossibleKindOfConcepts(I_RepresentIdSet possibleKindOfConcepts, I_IntSet isATypes)
             throws IOException {
         possibleKindOfConcepts.setMember(getNid());
         for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
@@ -866,11 +867,9 @@ public class Concept implements I_Transact, I_GetConceptData {
         return data.isLeafByDestRels(aceConfig);
     }
 
-    
     @Override
-	public boolean promote(I_TestComponent test, I_Position viewPosition,
-			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
-			PRECEDENCE precedence) throws IOException, TerminologyException {
+    public boolean promote(I_TestComponent test, I_Position viewPosition, PathSetReadOnly pomotionPaths,
+            I_IntSet allowedStatus, PRECEDENCE precedence) throws IOException, TerminologyException {
 		if (test.result(this, viewPosition, pomotionPaths, allowedStatus, precedence)) {
 			return promote(viewPosition, pomotionPaths, allowedStatus, precedence);
 		}

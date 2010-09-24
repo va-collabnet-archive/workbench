@@ -40,6 +40,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 public class AddTopLevelOr extends AbstractTask {
 
     private String refsetPropName = ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey();
+
     public String getRefsetPropName() {
         return refsetPropName;
     }
@@ -59,7 +60,7 @@ public class AddTopLevelOr extends AbstractTask {
     private transient Exception ex = null;
     private transient Condition returnCondition = Condition.CONTINUE;
     protected I_DescriptionVersioned c3Description;
-    
+
     private transient I_ConfigAceFrame configFrame;
     private transient I_GetConceptData refsetConcept;
     private transient I_GetConceptData refsetInEditor;
@@ -82,13 +83,13 @@ public class AddTopLevelOr extends AbstractTask {
             if (objDataVersion < 5) {
                 if (objDataVersion >= 2) {
                     in.readBoolean();
-                } 
+                }
                 if (objDataVersion == 3) {
                     in.readObject();
-                } 
+                }
                 if (objDataVersion >= 4) {
                     in.readObject();
-                } 
+                }
             }
             if (objDataVersion < 5) {
                 refsetPropName = ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey();
@@ -122,41 +123,40 @@ public class AddTopLevelOr extends AbstractTask {
 
             ex = null;
 
-            //TODO pass in frame configuration
+            // TODO pass in frame configuration
             configFrame = Terms.get().getActiveAceFrameConfig();
-             if (configFrame.getEditingPathSet().size() == 0) {
-                 String msg = "Unable to add spec. Editing path set is empty.";
-                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), msg);
-                 throw new TaskFailedException(msg);
-             }
+            if (configFrame.getEditingPathSet().size() == 0) {
+                String msg = "Unable to add spec. Editing path set is empty.";
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), msg);
+                throw new TaskFailedException(msg);
+            }
 
-             UUID refsetUuid = (UUID) process.getProperty(refsetPropName);
+            UUID refsetUuid = (UUID) process.getProperty(refsetPropName);
 
-             refsetConcept = Terms.get().getConcept(refsetUuid);
-             configFrame.setRefsetInSpecEditor(refsetConcept);
-             Thread.sleep(200);
-             
-             refsetInEditor = configFrame.getRefsetInSpecEditor();
-             
-             while (refsetInEditor != refsetConcept) {
-                 Thread.sleep(500);
-                 SwingUtilities.invokeAndWait(new Runnable() {
-                     public void run() {
-                         try {
+            refsetConcept = Terms.get().getConcept(refsetUuid);
+            configFrame.setRefsetInSpecEditor(refsetConcept);
+            Thread.sleep(200);
+
+            refsetInEditor = configFrame.getRefsetInSpecEditor();
+
+            while (refsetInEditor != refsetConcept) {
+                Thread.sleep(500);
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    public void run() {
+                        try {
                             refsetInEditor = configFrame.getRefsetSpecInSpecEditor();
                         } catch (IOException e) {
                             ex = e;
                         } catch (TerminologyException e) {
                             ex = e;
                         }
-                     }
-                 });
-                 if (ex != null) {
-                     throw new TaskFailedException(ex);
-                 }
-             }
+                    }
+                });
+                if (ex != null) {
+                    throw new TaskFailedException(ex);
+                }
+            }
 
-            
             if (SwingUtilities.isEventDispatchThread()) {
                 doRun(process, worker);
             } else {
@@ -193,15 +193,22 @@ public class AddTopLevelOr extends AbstractTask {
             DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) specTree.getModel().getRoot();
             if (rootNode.getChildCount() == 0) {
                 ;
-                int specRefsetId = Terms.get().getRefsetHelper(configFrame).getSpecificationRefsetForRefset(refsetConcept, configFrame).iterator().next().getConceptId();
+                int specRefsetId =
+                        Terms.get().getRefsetHelper(configFrame).getSpecificationRefsetForRefset(refsetConcept,
+                            configFrame).iterator().next().getConceptId();
                 int componentId = specRefsetId;
                 I_TermFactory tf = Terms.get();
                 I_HelpRefsets refsetHelper = tf.getRefsetHelper(configFrame);
                 RefsetPropertyMap propMap = getRefsetPropertyMap(tf, configFrame);
-                I_ExtendByRef ext = refsetHelper.getOrCreateRefsetExtension(specRefsetId, componentId,
-                    propMap.getMemberType(), propMap, UUID.randomUUID());
+                I_ExtendByRef ext =
+                        refsetHelper.getOrCreateRefsetExtension(specRefsetId, componentId, propMap.getMemberType(),
+                            propMap, UUID.randomUUID());
                 tf.addUncommitted(ext);
+
+                RefsetSpec refsetSpecHelper = new RefsetSpec(Terms.get().getConcept(specRefsetId), configFrame);
+                refsetSpecHelper.setLastEditTime(System.currentTimeMillis());
                 configFrame.fireRefsetSpecChanged(ext);
+                configFrame.refreshRefsetTab();
             }
             returnCondition = Condition.CONTINUE;
         } catch (Exception e) {
@@ -214,7 +221,8 @@ public class AddTopLevelOr extends AbstractTask {
         return typeId;
     }
 
-    protected RefsetPropertyMap getRefsetPropertyMap(I_TermFactory tf, I_ConfigAceFrame configFrame) throws IOException, TerminologyException {
+    protected RefsetPropertyMap getRefsetPropertyMap(I_TermFactory tf, I_ConfigAceFrame configFrame)
+            throws IOException, TerminologyException {
         RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.CID_CID);
         if (getClauseIsTrue()) {
             refsetMap.put(REFSET_PROPERTY.CID_ONE, trueNid);
@@ -225,7 +233,7 @@ public class AddTopLevelOr extends AbstractTask {
         refsetMap.put(REFSET_PROPERTY.STATUS, configFrame.getDefaultStatus().getNid());
         return refsetMap;
     }
-    
+
     public int[] getDataContainerIds() {
         return new int[] {};
     }

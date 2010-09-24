@@ -339,8 +339,9 @@ public class Svn implements I_HandleSubversion {
                             boolean delete = true;
                             if (s.getPath().endsWith(".bp")) {
                                 String pathNameNoExtension = s.getPath().substring(0, s.getPath().lastIndexOf(".bp"));
-                                File directory = new File(s.getPath());
-                                if (directory.list() != null) {
+
+                                File directory = new File(s.getPath()).getParentFile();
+                                if (directory != null && directory.list() != null) {
                                     for (String fileStr : directory.list()) {
                                         File file = new File(fileStr);
                                         if (file.getPath().contains(pathNameNoExtension + ".bp.write-pending")
