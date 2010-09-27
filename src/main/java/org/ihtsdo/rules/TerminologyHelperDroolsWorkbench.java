@@ -3,10 +3,19 @@ package org.ihtsdo.rules;
 import java.io.IOException;
 import java.util.UUID;
 
+import org.apache.lucene.document.Document;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 
 public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
@@ -53,4 +62,43 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		}
 		return result;
 	}
+	
+	public boolean isFsnDuplicated(String fsn, String conceptUuid) throws Exception{
+		boolean result = false;
+		I_TermFactory tf = Terms.get();
+		try {
+			I_GetConceptData fsnType = tf.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+
+			SearchResult results = tf.doLuceneSearch(fsn);
+			TopDocs topDocs = results.topDocs;
+			ScoreDoc[] docs = topDocs.scoreDocs;
+			for (int i = 0 ; i < docs.length  ; i++) {
+				try{
+					Document doc = results.searcher.doc(i);
+					int cnid = Integer.parseInt(doc.get("cnid"));
+                    int dnid = Integer.parseInt(doc.get("dnid"));
+                    I_DescriptionVersioned potential_fsn = Terms.get().getDescription(dnid, cnid);
+                    if (potential_fsn != null) {
+                        for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
+                            if (part_search.getTypeNid() == fsnType.getConceptNid()
+                                && !part_search.getText().equals(fsn)
+                                && !part_search.getLang().equals(potential_fsn.getLang())) {
+                            	result = true;
+                            }
+                        }
+                    }
+				}catch(Exception e){
+					//Do Nothing
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
 }
