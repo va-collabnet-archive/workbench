@@ -21,5 +21,13 @@ public class TerminologyHelperDrools {
 	public boolean isParentOfOrEqualTo(String parent, String subtype) throws Exception {
 		return (parent.equals(subtype));
 	}
+	
+	public boolean isFsnRepited(String fsn, String conceptUuid) throws Exception{
+		return false;
+	}
+	
+	public boolean isValidSemtag(String semtag){
+		return false;
+	}
 
 }
