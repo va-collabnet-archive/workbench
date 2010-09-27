@@ -16,6 +16,8 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.lucene.SearchResult;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 
 public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
@@ -50,7 +52,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	}
 
 	public boolean isParentOfOrEqualTo(String parents, UUID subtype)
-			throws Exception {
+	throws Exception {
 		//TODO add config as parameter
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 		boolean result = false;
@@ -62,7 +64,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		}
 		return result;
 	}
-	
+
 	public boolean isFsnDuplicated(String fsn, String conceptUuid) throws Exception{
 		boolean result = false;
 		I_TermFactory tf = Terms.get();
@@ -76,17 +78,19 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 				try{
 					Document doc = results.searcher.doc(i);
 					int cnid = Integer.parseInt(doc.get("cnid"));
-                    int dnid = Integer.parseInt(doc.get("dnid"));
-                    I_DescriptionVersioned potential_fsn = Terms.get().getDescription(dnid, cnid);
-                    if (potential_fsn != null) {
-                        for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
-                            if (part_search.getTypeNid() == fsnType.getConceptNid()
-                                && !part_search.getText().equals(fsn)
-                                && !part_search.getLang().equals(potential_fsn.getLang())) {
-                            	result = true;
-                            }
-                        }
-                    }
+					int dnid = Integer.parseInt(doc.get("dnid"));
+					I_DescriptionVersioned potential_fsn = Terms.get().getDescription(dnid, cnid);
+					if (potential_fsn != null) {
+						
+						DescriptionVersionBI description = (DescriptionVersionBI) 
+						Ts.get().getComponentVersion(Terms.get().getActiveAceFrameConfig().getCoordinate(), dnid);
+						
+						if (description.getTypeNid() == fsnType.getConceptNid()
+								&& description.getText().equals(fsn)
+								&& description.getLang().equals(potential_fsn.getLang())) {
+							result = true;
+						}
+					}
 				}catch(Exception e){
 					//Do Nothing
 				}
@@ -100,5 +104,5 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		}
 		return result;
 	}
-	
+
 }
