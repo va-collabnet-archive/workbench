@@ -3,6 +3,7 @@ package org.ihtsdo.db.bdb.computer.version;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Formatter;
@@ -20,7 +21,6 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.cern.colt.bitvector.BitMatrix;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.Revision;
@@ -164,7 +164,7 @@ public class PositionMapper {
 			return RELATIVE_POSITION.BEFORE;
 		}
 		if (onRoute(v1) && onRoute(v2)) {
-			if (conflictMatrix.get(v1.getSapNid(), v2.getSapNid())) {
+			if (inConflict(v1.getSapNid(), v2.getSapNid())) {
 				return RELATIVE_POSITION.CONTRADICTION;
 			} else if (positionDistance[v1.getSapNid()] > 
 					positionDistance[v2.getSapNid()]) {
@@ -195,19 +195,19 @@ public class PositionMapper {
 		// Forms a barrier to ensure that the setup is complete prior to use
 		try {
 			completeLatch.await();
-			assert part1.getSapNid() < conflictMatrix.rows():
+			assert part1.getSapNid() < conflictMatrix.length:
 				"SapNid: " + part1.getSapNid() + " out of range; " + 
-				  " rows: " + conflictMatrix.rows() + 
-				  " columns: " + conflictMatrix.columns() +
+				  " rows: " + conflictMatrix.length + 
+				  " columns: " + conflictMatrix.length +
 				  " time: " + new Date(Bdb.getSapDb().getTime(part1.getSapNid())) +
 				  " status: " + Concept.get(Bdb.getSapDb().getStatusNid(part1.getSapNid())) +
 				  " path: " + Concept.get(Bdb.getSapDb().getPathNid(part1.getSapNid())) + 
 				  " destination: " + destination + " latch: " + completeLatch.getCount() +
 				  " positionCount: " + positionCount;
-			assert part2.getSapNid() < conflictMatrix.rows():
+			assert part2.getSapNid() < conflictMatrix.length:
 				"SapNid: " + part2.getSapNid() + " out of range; " + 
-				  " rows: " + conflictMatrix.rows() + 
-				  " columns: " + conflictMatrix.columns() + 
+				  " rows: " + conflictMatrix.length + 
+				  " columns: " + conflictMatrix.length + 
 				  " time: " + new Date(Bdb.getSapDb().getTime(part2.getSapNid())) +
 				  " status: " + Concept.get(Bdb.getSapDb().getStatusNid(part2.getSapNid())) +
 				  " path: " + Concept.get(Bdb.getSapDb().getPathNid(part2.getSapNid())) + 
@@ -220,7 +220,7 @@ public class PositionMapper {
 		}
 		switch (precedencePolicy) {
         case PATH:
-            if (conflictMatrix.get(part1.getSapNid(), part2.getSapNid())) {
+            if (inConflict(part1.getSapNid(), part2.getSapNid())) {
                 return RELATIVE_POSITION.CONTRADICTION;
             } else if (positionDistance[part1.getSapNid()] > 
                 positionDistance[part2.getSapNid()]) {
@@ -247,7 +247,7 @@ public class PositionMapper {
 	 * unreachable from each other. Hence, these combinations result in a
 	 * conflict.
 	 */
-	private BitMatrix conflictMatrix;
+	private BitSet[] conflictMatrix;
 
 	/**
 	 * The position this class uses to determining if another position is on
@@ -342,7 +342,7 @@ public class PositionMapper {
 				Arrays.fill(positionDistance, Integer.MIN_VALUE);
 				BigInteger[] positionComputedDistance = new BigInteger[positionCount];
 				Arrays.fill(positionComputedDistance, BIG_MINUS_ONE);
-				conflictMatrix = new BitMatrix(positionCount, positionCount);
+				conflictMatrix = new BitSet[positionCount];
 				for (int p1index = 0; p1index < positionCount; p1index++) {
 					try {
                         I_Position p1 = Bdb.getSapDb().getPosition(p1index);
@@ -360,12 +360,9 @@ public class PositionMapper {
                         		if (p1.getTime() <= destination.getTime()) {
                         			positionComputedDistance[p1index] = timeUpperBound.subtract(BigInteger.valueOf(p1.getTime()));
                         		} else {
-                        			positionNotReachable(positionComputedDistance, p1index);
+                            		conflictMatrix[p1index] = null;
                         		}
-                        		for (int p2index = 0; p2index < positionCount; p2index++) {
-                        			// no conflicts with any position
-                        			conflictMatrix.putQuick(p1index, p2index, false);
-                        		}
+                        		conflictMatrix[p1index] = null;
                         	} else {
                         		// On a different path than the destination
                         		// compute the distance to the destination
@@ -382,19 +379,34 @@ public class PositionMapper {
                         							.getTime()) {
                         			    Set<Integer> p2PrecedingPathIdSet = precedingPathIdMap.get(p2pathId);
                         				if (precedingPathIdSet.contains(p2pathId) || p2PrecedingPathIdSet.contains(p1pathId)) {
-                        					conflictMatrix
-                        							.putQuick(p1index, p2index, false);
+                        					if (conflictMatrix[p1index] != null) {
+                        						// technically not required as default is to false. 
+                        						conflictMatrix[p1index].set(p2index, false);
+                        					}
+                        					if (conflictMatrix[p2index] != null) {
+                        						// technically not required as default is to false. 
+                        						conflictMatrix[p2index].set(p1index, false);
+                        					}
                         				} else {
-                        					conflictMatrix.putQuick(p1index, p2index, true);
+                        					if (p1index < p2index) {
+                            					if (conflictMatrix[p1index] == null) {
+                            						conflictMatrix[p1index] = new BitSet(positionCount);
+                            					}
+                            					conflictMatrix[p1index].set(p2index, true);
+                        					} else {
+                            					if (conflictMatrix[p2index] == null) {
+                            						conflictMatrix[p2index] = new BitSet(positionCount);
+                            					}
+                            					conflictMatrix[p2index].set(p1index, true);
+                        					}
                         				}
                         			} else {
-                        				positionNotReachable(positionComputedDistance,
-                        						p1index);
+                                		conflictMatrix[p1index] = null;
                         			}
                         		}
                         	}
                         } else {
-                        	positionNotReachable(positionComputedDistance, p1index);
+                    		conflictMatrix[p1index] = null;
                         }
                     } catch (Exception e) {
                         AceLog.getAppLog().alertAndLogException(e);
@@ -445,22 +457,6 @@ public class PositionMapper {
 		writeLock.unlock();
 	}
 
-	/**
-	 * Set the data structures to indicate that the position is not reachable.
-	 * 
-	 * @param positionCount
-	 * @param positionComputedDistance
-	 *            array to put the distance into
-	 * @param positionIndex
-	 *            index of the path that is not reachable
-	 */
-	private void positionNotReachable(BigInteger[] positionComputedDistance,
-			int positionIndex) {
-		for (int p2index = 0; p2index < positionComputedDistance.length; p2index++) {
-			// No conflicts can arise from an unreachable path
-			conflictMatrix.putQuick(positionIndex, p2index, false);
-		}
-	}
 
 	/**
 	 * 
@@ -574,7 +570,7 @@ public class PositionMapper {
 			f.format("%1$2d ", i);
 			for (int j = 0; j < lengthToPrint && j < positionDistance.length; j++) {
 				buf.append(" ");
-				buf.append(Boolean.toString(conflictMatrix.get(i, j)).charAt(0));
+				buf.append(Boolean.toString(inConflict(i, j)).charAt(0));
 				buf.append(" ");
 			}
 			buf.append("\n");
@@ -590,5 +586,17 @@ public class PositionMapper {
 		return lastRequestTime;
 	}
 	
-	
+	private boolean inConflict(int sap1, int sap2) {
+		if (sap1 < sap2) {
+			if (conflictMatrix[sap1] != null) {
+				return conflictMatrix[sap1].get(sap2);
+			}
+			return false;
+		}
+		if (conflictMatrix[sap2] != null) {
+			return conflictMatrix[sap2].get(sap1);
+		}
+		return false;
+
+	}
 }
