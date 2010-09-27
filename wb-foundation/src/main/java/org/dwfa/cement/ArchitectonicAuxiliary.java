@@ -391,6 +391,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                           new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
                   CHANGE_COMMENT("change comment (description type)",
                           new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                  GUVNOR_ENUM_PROPERTY_DESC_TYPE("guvnor enumeration property (description type)",
+                		  new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
         RELATIONSHIP("relationship",
                 new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
             IS_A_REL(PrimordialId.IS_A_REL_ID, new String[] {"is a (relationship type)"}, null,
