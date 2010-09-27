@@ -7,14 +7,10 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.helper.TransitiveClosureHelperMock;
+import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 
-public class TransitiveClosureHelperWorkbench extends TransitiveClosureHelperMock {
+public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
-	public TransitiveClosureHelperWorkbench() {
-		super();
-	}
-	
 	public boolean isParentOf(UUID parent, UUID subtype) throws TerminologyException, IOException {
 		//TODO add config as parameter
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -57,5 +53,4 @@ public class TransitiveClosureHelperWorkbench extends TransitiveClosureHelperMoc
 		}
 		return result;
 	}
-
 }

@@ -40,7 +40,6 @@ import org.drools.definition.KnowledgePackage;
 import org.drools.definition.rule.Rule;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
-import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -62,7 +61,6 @@ import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.testmodel.DrConcept;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.helper.ResultsItem;
 
@@ -117,15 +115,15 @@ public class RulesLibrary {
 			boolean onlyUncommittedContent, I_ConfigAceFrame config) 
 	throws Exception {
 		KnowledgeBase kbase = getKnowledgeBaseForContext(context, config);
-
+		
 		StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 		
 		//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 		
 		ResultsCollectorWorkBench results = new ResultsCollectorWorkBench();
-			
+		
 		ksession.setGlobal("resultsCollector", results);
-		ksession.setGlobal("transitiveClosureHelper", new TransitiveClosureHelperWorkbench());
+		ksession.setGlobal("terminologyHelper", new TerminologyHelperDroolsWorkbench());
 		
 		ConceptVersionBI conceptBi = Ts.get().getConceptVersion(config.getCoordinate(), concept.getNid());
 		
@@ -199,7 +197,7 @@ public class RulesLibrary {
 
 		StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 		ksession.setGlobal("resultsCollector", new ResultsCollectorWorkBench());
-		ksession.setGlobal("transitiveClosureHelper", new TransitiveClosureHelperWorkbench());
+		ksession.setGlobal("terminologyHelper", new TerminologyHelperDroolsWorkbench());
 
 		//TODO: convert to tk model
 		//		List<TerminologyComponent> termComponents =  new ArrayList<TerminologyComponent>();
@@ -272,7 +270,7 @@ public class RulesLibrary {
 
 		StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 		ksession.setGlobal("resultsCollector", new ResultsCollectorWorkBench());
-		ksession.setGlobal("transitiveClosureHelper", new TransitiveClosureHelperWorkbench());
+		ksession.setGlobal("terminologyHelper", new TerminologyHelperDroolsWorkbench());
 
 		//ksession.insert(new TransitiveClosureHelperMock());
 
