@@ -17,6 +17,7 @@ public class DrDescription extends DrComponent{
 	private List<DrIdentifier> identifiers;
 	private List<DrRefsetExtension> extensions;
 
+	//Inferred properties
 	private String referToConceptUuid; //null if has no refer to concept extension
 	private String caseSignificantCategory;
 	private boolean variantGenerationCandidate;

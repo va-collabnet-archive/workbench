@@ -385,7 +385,7 @@ public class TerminologyHelperDrools {
 		return (parent.equals(subtype));
 	}
 	
-	public boolean isFsnRepited(String fsn, String conceptUuid) throws Exception{
+	public boolean isFsnTextNotUnique(String fsn, String conceptUuid) throws Exception{
 		return false;
 	}
 	

@@ -13,6 +13,9 @@ public class DrRelationship extends DrComponent{
 	private String typeUuid;
 	
 	private List<DrIdentifier> identifiers;
+	
+	//Inferred properties
+	// none yet
 
 	public DrRelationship() {
 	}

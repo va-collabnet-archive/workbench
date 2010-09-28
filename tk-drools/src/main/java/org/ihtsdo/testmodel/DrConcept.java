@@ -13,8 +13,8 @@ public class DrConcept extends DrComponent{
 	private List<DrRefsetExtension> extensions;
 	private List<DrIdentifier> identifiers;
 	
+	//Inferred properties
 	private String specialConceptCategory;
-	
 	private int numberOfStatedParents;
 	private boolean parentOfStatedChildren;
 	private boolean sourceOfDefiningRole;
@@ -22,6 +22,8 @@ public class DrConcept extends DrComponent{
 	private boolean targetOfHistoricalAssociation;
 	private String semanticTag;
 	private boolean variantEvaluationCandidate;
+	private List<String> listOfDomainsUuids;
+	private String effectiveDomain;
 	
 	
 	public DrConcept() {
@@ -159,4 +161,21 @@ public class DrConcept extends DrComponent{
 	public void setVariantEvaluationCandidate(boolean variantEvaluationCandidate) {
 		this.variantEvaluationCandidate = variantEvaluationCandidate;
 	}
+
+	public List<String> getListOfDomainsUuids() {
+		return listOfDomainsUuids;
+	}
+
+	public void setListOfDomainsUuids(List<String> listOfDomainsUuids) {
+		this.listOfDomainsUuids = listOfDomainsUuids;
+	}
+
+	public String getEffectiveDomain() {
+		return effectiveDomain;
+	}
+
+	public void setEffectiveDomain(String effectiveDomain) {
+		this.effectiveDomain = effectiveDomain;
+	}
+
 }

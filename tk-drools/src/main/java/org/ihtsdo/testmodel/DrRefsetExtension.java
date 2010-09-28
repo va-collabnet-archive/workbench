@@ -20,6 +20,9 @@ public class DrRefsetExtension extends DrComponent{
 	private RefsetType refsetType;
 
 	private List<DrIdentifier> identifiers;
+	
+	//Inferred properties
+	// none yet
 
 	public DrRefsetExtension() {
 		identifiers = new ArrayList<DrIdentifier>();
