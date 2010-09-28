@@ -3,9 +3,11 @@ package org.ihtsdo.db.bdb;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -223,6 +225,7 @@ public class Bdb {
 		}
 	}
 
+	private static ConcurrentHashMap<String, Integer> sapNidCache = new ConcurrentHashMap<String, Integer>();
 	
 	public static int getSapNid(TkRevision version) {
 		assert version.getTime() != 0: "Time is 0; was it initialized?";
@@ -230,11 +233,28 @@ public class Bdb {
 		assert version.getStatusUuid() != null: "Status is null; was it initialized?";
 		assert version.getPathUuid() != null: "Path is null; was it initialized?";
 		assert version.getAuthorUuid() != null: "Author is null; was it initialized?";
-		return statusAtPositionDb.getSapNid(
+		
+		String sapNidKey = version.getStatusUuid().toString() + version.getAuthorUuid() + version.getPathUuid() + version.getTime();
+		Integer sapNid = sapNidCache.get(sapNidKey);
+		if (sapNid != null) {
+			return sapNid;
+		}
+		sapNid = statusAtPositionDb.getSapNid(
 				uuidToNid(version.getStatusUuid()), 
 				uuidToNid(version.getAuthorUuid()),
 				uuidToNid(version.getPathUuid()), 
 				version.getTime());
+		
+		if (sapNidCache.size() > 10) {
+			Iterator<Entry<String, Integer>> cacheIterator =  sapNidCache.entrySet().iterator();
+			while (sapNidCache.size() > 5) {
+				cacheIterator.next();
+				cacheIterator.remove();
+			}
+			
+		}
+		sapNidCache.put(sapNidKey, sapNid);
+		return sapNid;
 	}
 
 	public static int getSapNid(int statusNid, int authorNid, int pathNid, long time) {

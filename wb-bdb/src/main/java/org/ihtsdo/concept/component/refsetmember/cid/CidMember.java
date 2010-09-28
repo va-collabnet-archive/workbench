@@ -105,10 +105,11 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 		super(refsetMember, enclosingConcept);
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		if (refsetMember.getRevisionList() != null) {
-			revisions = new CopyOnWriteArrayList<CidRevision>();
+			ArrayList<CidRevision> tmpRevisions = new ArrayList<CidRevision>();
 			for (TkRefsetCidRevision eVersion: refsetMember.getRevisionList()) {
-				revisions.add(new CidRevision(eVersion, this));
+				tmpRevisions.add(new CidRevision(eVersion, this));
 			}
+			revisions = new CopyOnWriteArrayList<CidRevision>(tmpRevisions);
 		}
 	}
 

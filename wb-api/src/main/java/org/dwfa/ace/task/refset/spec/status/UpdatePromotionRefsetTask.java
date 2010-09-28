@@ -216,7 +216,7 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
         int size = memberExtensions.size();
         Map<Integer, I_ExtendByRef> promotionExtMap = new HashMap<Integer, I_ExtendByRef>(promotionExtensions.size());
         for (I_ExtendByRef promotionExtension: promotionExtensions) {
-            promotionExtMap.put(promotionExtension.getComponentId(), promotionExtension);
+            promotionExtMap.put(promotionExtension.getComponentNid(), promotionExtension);
         }
 
         for (I_ExtendByRef memberExtension : memberExtensions) {
@@ -229,11 +229,11 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
             if (latestMemberPart == null) {
                 AceLog.getAppLog().warning("Member extension exists with no parts: " + memberExtension);
             } else {
-                if (latestMemberPart.getStatusId() == currentStatusConcept.getConceptNid()
-                    || latestMemberPart.getStatusId() == unreviewedStatusConcept.getConceptNid()
-                    || latestMemberPart.getStatusId() == readyToPromoteStatusConcept.getConceptNid()
-                    || latestMemberPart.getStatusId() == promotedStatusConcept.getConceptNid()
-                    || latestMemberPart.getStatusId() == activeStatusConcept.getConceptNid()) {
+                if (latestMemberPart.getStatusNid() == currentStatusConcept.getConceptNid()
+                    || latestMemberPart.getStatusNid() == unreviewedStatusConcept.getConceptNid()
+                    || latestMemberPart.getStatusNid() == readyToPromoteStatusConcept.getConceptNid()
+                    || latestMemberPart.getStatusNid() == promotedStatusConcept.getConceptNid()
+                    || latestMemberPart.getStatusNid() == activeStatusConcept.getConceptNid()) {
                     if (promotionStatus == null) {
                         // add a new promotion refset member with value
                         // unreviewed addition
@@ -253,7 +253,7 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
                             currentStatusConcept.getConceptNid());
                     }
 
-                } else if (latestMemberPart.getStatusId() == retiredStatusConcept.getConceptNid()) {
+                } else if (latestMemberPart.getStatusNid() == retiredStatusConcept.getConceptNid()) {
                     if (promotionStatus == null) {
                         // add a new promotion refset member with value
                         // unreviewed deletion
@@ -274,7 +274,7 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
                     }
                 } else {
                     throw new Exception("Don't know how to handle status : "
-                        + termFactory.getConcept(latestMemberPart.getStatusId()).getInitialText());
+                        + termFactory.getConcept(latestMemberPart.getStatusNid()).getInitialText());
                 }
             }
             if (processed % 50 == 0) {
