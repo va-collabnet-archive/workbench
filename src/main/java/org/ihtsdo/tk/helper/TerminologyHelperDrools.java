@@ -40,8 +40,13 @@ public class TerminologyHelperDrools {
 		wordsLoaded=false;
 	}
 
-	public String checkWordInList(String word){
+	public String getICSCategory(String term){
 		String retString="0";
+		String word;
+        if (term.indexOf(" ")>0)
+            word=term.substring(0,term.indexOf(" "));
+        else
+            word=term;
 		try{
 			String aLine=null;
 

@@ -26,6 +26,7 @@ public class DrDescription extends DrComponent{
 	public DrDescription() {
 		identifiers = new ArrayList<DrIdentifier>();
 		extensions = new ArrayList<DrRefsetExtension>();
+		referToConceptUuid=null;
 	}
 
 	public String getPrimordialUuid() {
