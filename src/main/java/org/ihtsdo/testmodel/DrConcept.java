@@ -21,6 +21,7 @@ public class DrConcept extends DrComponent{
 	private boolean targetOfDefiningRole;
 	private boolean targetOfHistoricalAssociation;
 	private String semanticTag;
+	private boolean variantEvaluationCandidate;
 	
 	
 	public DrConcept() {
@@ -29,6 +30,7 @@ public class DrConcept extends DrComponent{
 		outgoingRelationships = new ArrayList<DrRelationship>();
 		extensions = new ArrayList<DrRefsetExtension>();
 		identifiers = new ArrayList<DrIdentifier>();
+		variantEvaluationCandidate=true;
 	}
 
 	public String getPrimordialUuid() {
@@ -142,5 +144,13 @@ public class DrConcept extends DrComponent{
 
 	public void setSemanticTag(String semanticTag) {
 		this.semanticTag = semanticTag;
+	}
+
+	public boolean isVariantEvaluationCandidate() {
+		return variantEvaluationCandidate;
+	}
+
+	public void setVariantEvaluationCandidate(boolean variantEvaluationCandidate) {
+		this.variantEvaluationCandidate = variantEvaluationCandidate;
 	}
 }

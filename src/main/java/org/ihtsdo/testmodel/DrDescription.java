@@ -20,7 +20,6 @@ public class DrDescription extends DrComponent{
 	private String referToConceptUuid; //null if has no refer to concept extension
 	private String caseSignificantCategory;
 	private boolean variantGenerationCandidate;
-	private boolean variantEvaluationCandidate;
 	
 	
 	public DrDescription() {
@@ -131,14 +130,6 @@ public class DrDescription extends DrComponent{
 
 	public void setVariantGenerationCandidate(boolean variantGenerationCandidate) {
 		this.variantGenerationCandidate = variantGenerationCandidate;
-	}
-
-	public boolean isVariantEvaluationCandidate() {
-		return variantEvaluationCandidate;
-	}
-
-	public void setVariantEvaluationCandidate(boolean variantEvaluationCandidate) {
-		this.variantEvaluationCandidate = variantEvaluationCandidate;
 	}
 
 }
