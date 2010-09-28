@@ -10,6 +10,8 @@ public class DrConcept extends DrComponent{
 	private List<DrDescription> descriptions;
 	private List<DrRelationship> incomingRelationships;
 	private List<DrRelationship> outgoingRelationships;
+	private List<DrDefiningRolesSet> definingRoleSets;
+	private List<DrLanguageDesignationSet> languageDesignationSets;
 	private List<DrRefsetExtension> extensions;
 	private List<DrIdentifier> identifiers;
 	
@@ -30,6 +32,8 @@ public class DrConcept extends DrComponent{
 		descriptions = new ArrayList<DrDescription>();
 		incomingRelationships = new ArrayList<DrRelationship>();
 		outgoingRelationships = new ArrayList<DrRelationship>();
+		definingRoleSets = new ArrayList<DrDefiningRolesSet>();
+		languageDesignationSets = new ArrayList<DrLanguageDesignationSet>();
 		extensions = new ArrayList<DrRefsetExtension>();
 		identifiers = new ArrayList<DrIdentifier>();
 		numberOfStatedParents=0;
@@ -176,6 +180,23 @@ public class DrConcept extends DrComponent{
 
 	public void setEffectiveDomain(String effectiveDomain) {
 		this.effectiveDomain = effectiveDomain;
+	}
+
+	public List<DrDefiningRolesSet> getDefiningRoleSets() {
+		return definingRoleSets;
+	}
+
+	public void setDefiningRolesSets(List<DrDefiningRolesSet> definingRoleSets) {
+		this.definingRoleSets = definingRoleSets;
+	}
+
+	public List<DrLanguageDesignationSet> getLanguageDesignationSets() {
+		return languageDesignationSets;
+	}
+
+	public void setLanguageDesignationSets(
+			List<DrLanguageDesignationSet> languageDesignationSets) {
+		this.languageDesignationSets = languageDesignationSets;
 	}
 
 }
