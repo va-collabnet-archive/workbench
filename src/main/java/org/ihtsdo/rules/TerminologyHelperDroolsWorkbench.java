@@ -8,7 +8,6 @@ import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -65,7 +64,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		return result;
 	}
 
-	public boolean isFsnDuplicated(String fsn, String conceptUuid) throws Exception{
+	public boolean isFsnTextNotUnique(String fsn, String conceptUuid) throws Exception{
 		boolean result = false;
 		I_TermFactory tf = Terms.get();
 		try {

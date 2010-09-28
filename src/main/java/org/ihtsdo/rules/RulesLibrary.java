@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import javax.swing.JOptionPane;
+
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.agent.KnowledgeAgent;
@@ -48,14 +50,23 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
+import org.dwfa.ace.task.refset.spec.RefsetSpec;
+import org.dwfa.ace.task.refset.spec.compute.RefsetComputeType;
+import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
+import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
+import org.dwfa.app.DwfaEnv;
+import org.dwfa.bpa.process.Condition;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.id.Type3UuidFactory;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
@@ -713,5 +724,75 @@ public class RulesLibrary {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static boolean isIncludedInRefsetSpec(I_GetConceptData refset, I_GetConceptData candidateConcept, I_ConfigAceFrame config) {
+		boolean result = false;
+		
+		try {
+            RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, config);
+            I_GetConceptData refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
+            AceLog.getAppLog().info("Refset: " + refset.getInitialText() + " " + refset.getUids().get(0));
+            AceLog.getAppLog().info("Refset spec: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
+            RefsetComputeType computeType = RefsetComputeType.CONCEPT; // default
+            if (refsetSpecHelper.isDescriptionComputeType()) {
+                computeType = RefsetComputeType.DESCRIPTION;
+            } else if (refsetSpecHelper.isRelationshipComputeType()) {
+                AceLog.getAppLog().info("Invalid refset spec to compute - relationship compute types not supported.");
+                if (!DwfaEnv.isHeadless()) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "Invalid refset spec to compute - relationship compute types not supported.", "",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            }
+
+            // verify a valid refset spec construction
+            if (refsetSpec == null) {
+                AceLog.getAppLog().info(
+                    "Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.");
+                if (!DwfaEnv.isHeadless()) {
+                    JOptionPane
+                        .showMessageDialog(
+                            LogWithAlerts.getActiveFrame(null),
+                            "Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.",
+                            "", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            // Step 1: create the query object, based on the refset spec
+            RefsetSpecQuery query =
+                    RefsetQueryFactory.createQuery(config, Terms.get(), refsetSpec, refset, computeType);
+
+            // check validity of query
+            if (!query.isValidQuery() && query.getTotalStatementCount() != 0) {
+            	AceLog.getAppLog().info("Refset spec has dangling AND/OR. These must have sub-statements.");
+                if (!DwfaEnv.isHeadless()) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "Refset spec has dangling AND/OR. These must have sub-statements.", "",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            
+            I_GetConceptData selectedConcept = candidateConcept;
+            
+            System.out.println("************ Starting test computation *****************");
+            System.out.println("Refset spec = " + refsetSpec.toString());
+            System.out.println("Refset = " + refset.toString());
+            System.out.println("Concept to test = " + selectedConcept.toString());
+            
+            List<I_ShowActivity> activities = new ArrayList<I_ShowActivity>();
+             result = query.execute(selectedConcept, activities);
+            
+            System.out.println("++++++++++++++ Result = " + result);
+            System.out.println("************ Finished test computation *****************");
+		 } catch (Exception e) {
+	            AceLog.getAppLog().alertAndLogException(e);
+	            try {
+	                Terms.get().cancel();
+	            } catch (IOException ioException) {
+	                ioException.printStackTrace();
+	            }
+	        }
+		
+		return result;
 	}
 }
