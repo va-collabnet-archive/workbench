@@ -226,6 +226,10 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
 	public int getTypeId() {
 		return REFSET_TYPES.BOOLEAN.getTypeNid();
 	}
+	@Override
+	public int getTypeNid() {
+		return REFSET_TYPES.BOOLEAN.getTypeNid();
+	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()

@@ -206,7 +206,6 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 		return REFSET_TYPES.CID.getTypeNid();
 	}
 
-
 	@Override
 	@Deprecated
 	public int getC1id() {

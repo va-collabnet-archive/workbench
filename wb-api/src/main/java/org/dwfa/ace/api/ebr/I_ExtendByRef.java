@@ -36,17 +36,21 @@ public interface I_ExtendByRef extends I_AmTermComponent {
      */
     public int getMemberId();
 
+    @Deprecated
+    public int getComponentId();
     /**
      * @return <code><b>int</b></code> -- native identifier (nid) of the component which this reference set member extends.<br> 
      *         The component extended by this <code>I_ExtendByRef</code> may be a concept, description or relationship.<br> 
      */
-    public int getComponentId();
+    public int getComponentNid();
 
+    @Deprecated
+    public int getTypeId();
     /**
      * @return <code><b>int</b></code> -- native identifier (nid) for the concept which represent this reference set member's extension type.<br> 
      *         Example types which this <code>I_ExtendByRef</code> reference set member type are boolean, String, Concept and so on...<br> 
      */
-    public int getTypeId();
+    public int getTypeNid();
 
     public List<? extends I_ExtendByRefPart> getMutableParts();
 

@@ -213,7 +213,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 	 * When the number of refset members are greater than this value, use a map
 	 * for looking up members instead of iterating through a list.
 	 */
-	protected static int useMemberMapThreshold = 5;
+	protected static int useMemberMapThreshold = 15;
 
 	protected Concept enclosingConcept;
 	protected I_GetNidData nidData;

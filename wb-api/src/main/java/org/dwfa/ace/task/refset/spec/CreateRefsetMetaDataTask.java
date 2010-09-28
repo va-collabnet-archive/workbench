@@ -425,7 +425,9 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             String filteredDescription = description;
             // remove all non-alphanumeric characters and replace with a space - this is to stop these characters
             // causing issues with the lucene search
+            filteredDescription = filteredDescription.replaceAll("[\\s]", " AND ");
             filteredDescription = filteredDescription.replaceAll("[^a-zA-Z0-9]", " ");
+
             SearchResult result = termFactory.doLuceneSearch(filteredDescription);
             for (int i = 0; i < result.topDocs.totalHits; i++) {
                 Document doc = result.searcher.doc(i);

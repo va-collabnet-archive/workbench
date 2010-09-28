@@ -15,7 +15,6 @@ import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
@@ -131,7 +130,11 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 
 		@Override
 		public int getTypeId() {
-			return RefsetMember.this.getTypeId();
+			return RefsetMember.this.getTypeNid();
+		}
+
+		public int getTypeNid() {
+			return RefsetMember.this.getTypeNid();
 		}
 
 		@Override
@@ -369,6 +372,14 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 	@Override
 	public int getComponentId() {
 		return referencedComponentNid;
+	}
+
+	@Override
+	public int getComponentNid() {
+		return referencedComponentNid;
+	}
+	public int getTypeNid() {
+		return getTypeId();
 	}
 
 

@@ -40,6 +40,8 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
+import org.ihtsdo.concept.Concept;
+import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -82,7 +84,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
             // confirm its the right extension value and its status is current
             for (Integer currentStatus : getCurrentStatusIds()) {
-                if (latestPart != null && latestPart.getStatusId() == currentStatus) {
+                if (latestPart != null && latestPart.getStatusNid() == currentStatus) {
                     return latestPart;
                 }
             }
@@ -96,34 +98,18 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
      * org.dwfa.ace.refset.spec.I_HelpSpecRefset#hasCurrentRefsetExtension(int,
      * int, int)
      */
-    public boolean hasCurrentRefsetExtension(int refsetId, int conceptId, int memberTypeId) throws Exception {
-        for (I_ExtendByRef extension : Terms.get().getAllExtensionsForComponent(conceptId, true)) {
-
-            if (extension.getRefsetId() == refsetId) {
-
-                // get the latest version
-                I_ExtendByRefPart latestPart = null;
-                for (I_ExtendByRefPart part : extension.getMutableParts()) {
-                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
-                        latestPart = part;
-                    }
-                }
-
-                // confirm its the right extension value and its status is
-                // current
-                for (Integer currentStatus : getCurrentStatusIds()) {
-                    if (latestPart.getStatusId() == currentStatus) {
-                        if (latestPart instanceof I_ExtendByRefPartCid) {
-                            int partValue = ((I_ExtendByRefPartCid) latestPart).getC1id();
-                            if (partValue == memberTypeId) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return false;
+    public boolean hasCurrentRefsetExtension(int refsetId, int componentNid, int memberTypeId) throws Exception {
+    	Concept refsetConcept = Bdb.getConcept(refsetId);
+    	RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
+    	if (extension != null) {
+    		List<RefsetMember<?,?>.Version> extVersions = extension.getVersions(config.getCoordinate());
+    		for (RefsetMember<?,?>.Version v: extVersions) {
+    			if (config.getAllowedStatus().contains(v.getStatusNid())) {
+    				return true;
+    			}
+    		}
+    	}
+    	return false;
     }
 
     /*
@@ -251,7 +237,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
                 // confirm its the right extension value and its status is
                 // current
-                if (latestPart.getStatusId() == statusId) {
+                if (latestPart.getStatusNid() == statusId) {
                     if (latestPart instanceof I_ExtendByRefPartCidCid) {
                         int c1Value = ((I_ExtendByRefPartCidCid) latestPart).getC1id();
                         int c2Value = ((I_ExtendByRefPartCidCid) latestPart).getC2id();
@@ -271,33 +257,23 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
      * org.dwfa.ace.refset.spec.I_HelpSpecRefset#hasCurrentConceptRefsetExtension
      * (int, int, int, int)
      */
-    public boolean hasCurrentConceptRefsetExtension(int refsetId, int componentId, int conceptId, int statusId)
+    public boolean hasCurrentConceptRefsetExtension(int refsetId, int componentNid, int conceptId, int statusNid)
             throws Exception {
-        for (I_ExtendByRef extension : Terms.get().getAllExtensionsForComponent(componentId, true)) {
-
-            if (extension.getRefsetId() == refsetId) {
-
-                // get the latest version
-                I_ExtendByRefPart latestPart = null;
-                for (I_ExtendByRefPart part : extension.getMutableParts()) {
-                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
-                        latestPart = part;
-                    }
-                }
-
-                // confirm its the right extension value and its status is
-                // current
-                if (latestPart.getStatusId() == statusId) {
-                    if (latestPart instanceof I_ExtendByRefPartCid) {
-                        int cValue = ((I_ExtendByRefPartCid) latestPart).getC1id();
-                        if (cValue == conceptId) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
+    	Concept refsetConcept = Bdb.getConcept(refsetId);
+    	RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
+    	if (extension != null) {
+    		List<RefsetMember<?,?>.Version> extVersions = extension.getVersions(config.getCoordinate());
+    		for (RefsetMember<?,?>.Version v: extVersions) {
+    			if (v.getStatusNid() == statusNid) {
+    				if (v.getTypeNid() == REFSET_TYPES.CID.getTypeNid()) {
+    					if (((I_ExtendByRefPartCid) v).getC1id() == conceptId) {
+            				return true;
+    					}
+    				}
+    			}
+    		}
+    	}
+    	return false;
     }
 
     private boolean hasCurrentConceptStringRefsetExtension(int refsetId, int componentId, int conceptId,
@@ -316,7 +292,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
                 // confirm its the right extension value and its status is
                 // current
-                if (latestPart.getStatusId() == statusId) {
+                if (latestPart.getStatusNid() == statusId) {
                     if (latestPart instanceof I_ExtendByRefPartCidString) {
                         String extensionString = ((I_ExtendByRefPartCidString) latestPart).getStringValue();
                         int currentc1Id = ((I_ExtendByRefPartCidString) latestPart).getC1id();
@@ -346,7 +322,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
                 // confirm its the right extension value and its status is
                 // current
-                if (latestPart.getStatusId() == statusId) {
+                if (latestPart.getStatusNid() == statusId) {
                     if (latestPart instanceof I_ExtendByRefPartStr) {
                         String extensionString = ((I_ExtendByRefPartStr) latestPart).getStringValue();
                         if (extString.equals(extensionString)) {
@@ -381,7 +357,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
                 // confirm its the right extension value and its status is
                 // current
-                if (latestPart.getStatusId() == statusId) {
+                if (latestPart.getStatusNid() == statusId) {
                     if (latestPart instanceof I_ExtendByRefPartInt) {
                         int currentValue = ((I_ExtendByRefPartInt) latestPart).getIntValue();
                         if (currentValue == value) {
@@ -415,7 +391,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
                 // confirm its the right extension value and its status is
                 // current
-                if (latestPart.getStatusId() == statusId) {
+                if (latestPart.getStatusNid() == statusId) {
                     if (latestPart instanceof I_ExtendByRefPartCidCidCid) {
                         int c1Value = ((I_ExtendByRefPartCidCidCid) latestPart).getC1id();
                         int c2Value = ((I_ExtendByRefPartCidCidCid) latestPart).getC2id();
@@ -452,7 +428,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
                 // confirm its the right extension value and its status is
                 // current
-                if (latestPart.getStatusId() == statusId) {
+                if (latestPart.getStatusNid() == statusId) {
                     if (latestPart instanceof I_ExtendByRefPartCidCidString) {
                         int c1Value = ((I_ExtendByRefPartCidCidString) latestPart).getC1id();
                         int c2Value = ((I_ExtendByRefPartCidCidString) latestPart).getC2id();
@@ -483,7 +459,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
                 // confirm its the right extension value and its status is
                 // current
-                if (getCurrentStatusIds().contains(latestPart.getStatusId())) {
+                if (getCurrentStatusIds().contains(latestPart.getStatusNid())) {
                     if (latestPart instanceof I_ExtendByRefPartLong) {
                         return true;
                     }
@@ -1496,7 +1472,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 // confirm its the right extension value and its status is
                 // current
                 for (Integer currentStatus : getCurrentStatusIds()) {
-                    if (latestPart.getStatusId() == currentStatus) {
+                    if (latestPart.getStatusNid() == currentStatus) {
                         if (latestPart instanceof I_ExtendByRefPartCid) {
                             return true;
                         }

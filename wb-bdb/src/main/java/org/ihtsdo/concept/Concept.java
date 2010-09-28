@@ -711,6 +711,14 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return data.getRefsetMembers();
 	}
 
+	public RefsetMember<?, ?> getExtension(int componentNid) throws IOException {
+		if (isCanceled()) {
+			return null;
+		}
+
+		return data.getRefsetMemberForComponent(componentNid);
+	}
+
 	public List<I_ImageTuple> getImageTuples() throws IOException,
 			TerminologyException {
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();

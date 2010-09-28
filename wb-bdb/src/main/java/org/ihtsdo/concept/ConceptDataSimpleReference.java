@@ -60,7 +60,9 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     private AtomicReference<CopyOnWriteArraySet<Integer>> memberNids =
             new AtomicReference<CopyOnWriteArraySet<Integer>>();
     private AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>> refsetMembersMap =
-            new AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>>();
+        new AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>>();
+    private AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>> refsetComponentMap =
+        new AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>>();
 
     public ConceptDataSimpleReference(Concept enclosingConcept) throws IOException {
         super(new NidDataFromBdb(enclosingConcept.getNid()));
@@ -403,21 +405,64 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             }
             return null;
         }
-        if (refsetMembersMap.get() == null) {
-            setupMemberMap(refsetMemberList);
+        ConcurrentHashMap<Integer, RefsetMember<?, ?>> mmap = refsetMembersMap.get();
+        ConcurrentHashMap<Integer, RefsetMember<?, ?>> cmap = refsetComponentMap.get();
+        if (mmap == null || cmap == null) {
+        	Maps m = setupMemberMap(refsetMemberList);
+        	mmap = m.memberMap;
+        	cmap = m.componentMap;
         }
-        return refsetMembersMap.get().get(memberNid);
+        return cmap.get(memberNid);
     }
 
-    private synchronized void setupMemberMap(Collection<RefsetMember<?, ?>> refsetMemberList) {
-        if (refsetMembersMap.get() == null) {
-            ConcurrentHashMap<Integer, RefsetMember<?, ?>> temp =
-                    new ConcurrentHashMap<Integer, RefsetMember<?, ?>>(refsetMemberList.size(), 0.75f, 2);
-            for (RefsetMember<?, ?> m : refsetMemberList) {
-                temp.put(m.nid, m);
+    @Override
+    public RefsetMember<?, ?> getRefsetMemberForComponent(int componentNid) throws IOException {
+        Collection<RefsetMember<?, ?>> refsetMemberList = getRefsetMembers();
+        if (refsetMemberList.size() < useMemberMapThreshold) {
+            for (RefsetMember<?, ?> member : refsetMemberList) {
+                if (member.getComponentNid() == componentNid) {
+                    return member;
+                }
             }
-            refsetMembersMap.compareAndSet(null, temp);
+            return null;
         }
+        ConcurrentHashMap<Integer, RefsetMember<?, ?>> mmap = refsetMembersMap.get();
+        ConcurrentHashMap<Integer, RefsetMember<?, ?>> cmap = refsetComponentMap.get();
+        if (mmap == null || cmap == null) {
+        	Maps m = setupMemberMap(refsetMemberList);
+        	mmap = m.memberMap;
+        	cmap = m.componentMap;
+        }
+         return mmap.get(componentNid);
+    }
+    private class Maps {
+    	ConcurrentHashMap<Integer, RefsetMember<?, ?>> memberMap;
+    	ConcurrentHashMap<Integer, RefsetMember<?, ?>> componentMap;
+    	
+		public Maps(ConcurrentHashMap<Integer, RefsetMember<?, ?>> memberMap,
+				ConcurrentHashMap<Integer, RefsetMember<?, ?>> componentMap) {
+			super();
+			this.memberMap = memberMap;
+			this.componentMap = componentMap;
+		}
+    }
+
+    private synchronized Maps setupMemberMap(Collection<RefsetMember<?, ?>> refsetMemberList) {
+        if (refsetMembersMap.get() == null || refsetComponentMap.get() == null) {
+            ConcurrentHashMap<Integer, RefsetMember<?, ?>> memberMap =
+                new ConcurrentHashMap<Integer, RefsetMember<?, ?>>(refsetMemberList.size(), 0.75f, 2);
+            ConcurrentHashMap<Integer, RefsetMember<?, ?>> componentMap =
+                new ConcurrentHashMap<Integer, RefsetMember<?, ?>>(refsetMemberList.size(), 0.75f, 2);
+            Maps returnMaps = new Maps(memberMap, componentMap);
+            for (RefsetMember<?, ?> m : refsetMemberList) {
+                memberMap.put(m.nid, m);
+                componentMap.put(m.getComponentNid(), m);
+            }
+            refsetMembersMap.compareAndSet(null, memberMap);
+            refsetComponentMap.compareAndSet(null, componentMap);
+            return returnMaps;
+        }
+        return new Maps(refsetMembersMap.get(), refsetComponentMap.get());
     }
 
     @Override
@@ -491,6 +536,9 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     protected void addToMemberMap(RefsetMember<?, ?> refsetMember) {
         if (refsetMembersMap.get() != null) {
             refsetMembersMap.get().put(refsetMember.nid, refsetMember);
+        }
+        if (refsetComponentMap.get() != null) {
+        	refsetComponentMap.get().put(refsetMember.referencedComponentNid, refsetMember);
         }
     }
 

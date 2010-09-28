@@ -35,6 +35,7 @@ public interface I_ManageConceptData {
 	public ConceptAttributes getConceptAttributes() throws IOException;
 	public ConceptAttributes getConceptAttributesIfChanged() throws IOException;
 
+	public RefsetMember<?, ?> getRefsetMemberForComponent(int componentNid) throws IOException;
 	public ComponentList<RefsetMember<?, ?>> getRefsetMembers() throws IOException;
 	public ComponentList<RefsetMember<?, ?>> getRefsetMembersIfChanged() throws IOException;
 
