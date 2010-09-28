@@ -45,6 +45,7 @@ import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 
 @AllowDataCheckSuppression
@@ -474,12 +475,12 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
      * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#newRefsetExtension(int,
      * int, int, boolean)
      */
-    public boolean newRefsetExtension(int refsetId, int conceptId, int memberTypeId, boolean checkNotExists)
+    public boolean newRefsetExtension(int refsetId, int componentId, int memberTypeId, boolean checkNotExists)
             throws Exception {
 
         if (checkNotExists) {
             // check subject is not already a member
-            if (hasCurrentRefsetExtension(refsetId, conceptId, memberTypeId)) {
+            if (hasCurrentRefsetExtension(refsetId, componentId, memberTypeId)) {
                 if (logger.isLoggable(Level.FINE)) {
                     String extValueDesc = Terms.get().getConcept(memberTypeId).getInitialText();
                     logger.fine("Concept is already a '" + extValueDesc + "' of the refset. Skipping.");
@@ -493,12 +494,12 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         // generate a UUID based on this refset's input data so that it is
         // stable in future executions
         UUID memberUuid =
-                generateUuid(Terms.get().getUids(refsetId).iterator().next(), Terms.get().getUids(conceptId).iterator()
-                    .next(), Terms.get().getUids(memberTypeId).iterator().next());
+                generateUuid(Ts.get().getUuidsForNid(refsetId).get(0), Ts.get().getUuidsForNid(componentId).get(0), 
+                		Ts.get().getUuidsForNid(memberTypeId).get(0));
 
         RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.CID);
         refsetMap.put(REFSET_PROPERTY.CID_ONE, memberTypeId);
-        I_ExtendByRef newExtension = makeMemberAndSetup(refsetId, conceptId, REFSET_TYPES.CID, refsetMap, memberUuid);
+        I_ExtendByRef newExtension = makeMemberAndSetup(refsetId, componentId, REFSET_TYPES.CID, refsetMap, memberUuid);
         if (isAutocommitActive()) {
             Terms.get().addUncommittedNoChecks(newExtension);
         }
