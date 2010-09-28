@@ -67,29 +67,19 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
      * org.dwfa.ace.refset.spec.I_HelpSpecRefset#getCurrentRefsetExtension(int,
      * int)
      */
-    public I_ExtendByRefPartCid getCurrentRefsetExtension(int refsetId, int conceptId) throws Exception {
-
-        for (I_ExtendByRef extension : Terms.get().getAllExtensionsForComponent(conceptId)) {
-
-            I_ExtendByRefPartCid latestPart = null;
-            if (extension.getRefsetId() == refsetId) {
-                // get the latest version
-                for (I_ExtendByRefPart part : extension.getMutableParts()) {
-                    if (part instanceof I_ExtendByRefPartCid && (latestPart == null)
-                        || (part.getTime() >= latestPart.getTime())) {
-                        latestPart = (I_ExtendByRefPartCid) part;
-                    }
-                }
-            }
-
-            // confirm its the right extension value and its status is current
-            for (Integer currentStatus : getCurrentStatusIds()) {
-                if (latestPart != null && latestPart.getStatusNid() == currentStatus) {
-                    return latestPart;
-                }
-            }
-        }
-        return null;
+    public I_ExtendByRefPartCid getCurrentRefsetExtension(int refsetId, int componentNid) throws Exception {
+    	Concept refsetConcept = Bdb.getConcept(refsetId);
+    	RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
+    	if (extension != null) {
+    		List<RefsetMember<?,?>.Version> extVersions = extension.getVersions(config.getCoordinate());
+    		for (RefsetMember<?,?>.Version v: extVersions) {
+    			if (config.getAllowedStatus().contains(v.getStatusNid()) &&
+    					v.getTypeNid() == REFSET_TYPES.CID.getTypeNid()) {
+    				return (I_ExtendByRefPartCid) v;
+    			}
+    		}
+    	}
+    	return null;
     }
 
     /*
@@ -104,7 +94,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
     	if (extension != null) {
     		List<RefsetMember<?,?>.Version> extVersions = extension.getVersions(config.getCoordinate());
     		for (RefsetMember<?,?>.Version v: extVersions) {
-    			if (config.getAllowedStatus().contains(v.getStatusNid())) {
+    			if (config.getAllowedStatus().contains(v.getStatusNid()) &&
+    					v.getTypeNid() == memberTypeId) {
     				return true;
     			}
     		}
