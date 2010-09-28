@@ -2,6 +2,7 @@ package org.ihtsdo.db.bdb;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.ihtsdo.concept.ConceptVersion;
@@ -130,6 +131,11 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 	@Override
 	public int uuidsToNid(Collection<UUID> uuids) throws IOException {
 		return Bdb.uuidsToNid(uuids);
+	}
+
+	@Override
+	public List<UUID> getUuidsForNid(int nid) {
+		return Bdb.getUuidsToNidMap().getUuidsForNid(nid);
 	}
 
 }
