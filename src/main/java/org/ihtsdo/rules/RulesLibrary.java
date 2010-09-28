@@ -50,6 +50,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -61,8 +62,12 @@ import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.testmodel.DrConcept;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.helper.ResultsItem;
+
+import com.googlecode.sardine.Sardine;
+import com.googlecode.sardine.SardineFactory;
 
 /**
  * The Class RulesLibrary.
@@ -655,5 +660,55 @@ public class RulesLibrary {
 		}
 
 		return details;
+	}
+	
+	public static void updateGuvnorEnumerations(I_GetConceptData refset, RulesDeploymentPackageReference kPack, I_ConfigAceFrame config) {
+		try {
+			ConceptVersionBI refsetBI = Ts.get().getConceptVersion(config.getCoordinate(), refset.getUids());
+			String propertyName = "";
+			int guvnorDescriptionsSize = refsetBI.getDescsActive(ArchitectonicAuxiliary.Concept.GUVNOR_ENUM_PROPERTY_DESC_TYPE.localize().getNid()).size();
+			if (guvnorDescriptionsSize < 1 || guvnorDescriptionsSize > 1) {
+				throw new Exception("Wrong number of guvnor property descriptions: " + guvnorDescriptionsSize);
+			}
+			propertyName = refsetBI.getDescsActive(ArchitectonicAuxiliary.Concept.GUVNOR_ENUM_PROPERTY_DESC_TYPE.localize().getNid()).iterator().next().getText();
+			
+			String guvnorEnumerationText = "'" + propertyName + "' : [";
+			for (I_ExtendByRef loopMember : Terms.get().getRefsetExtensionMembers(refset.getConceptNid())) {
+				
+				ConceptVersionBI loopConcept = Ts.get().getConceptVersion(config.getCoordinate(),loopMember.getMemberId());
+				
+				String name = "";
+				
+				if (loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).size() > 0) {
+					name = loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).iterator().next().getText();
+				} else if (loopConcept.getDescsActive().size() > 0){
+					name = loopConcept.getDescsActive().iterator().next().getText();
+				} else {
+					name = "no description found";
+				}
+				
+				guvnorEnumerationText = guvnorEnumerationText + "'" + loopConcept.getPrimUuid();
+				guvnorEnumerationText = guvnorEnumerationText + "=" + name;
+				guvnorEnumerationText = guvnorEnumerationText + "',";
+			}
+			guvnorEnumerationText = guvnorEnumerationText.substring(0, guvnorEnumerationText.length()-1) + "]";
+			System.out.println(guvnorEnumerationText);
+			
+			Sardine sardine = SardineFactory.begin("username", "password");
+			
+			String pkgUrl = kPack.getUrl().substring(0, kPack.getUrl().indexOf(".Guvnor") + 7) + "/webdav/packages/";
+			pkgUrl = pkgUrl + kPack.getUrl().substring(kPack.getUrl().indexOf("/package/") + 9, kPack.getUrl().indexOf("/", kPack.getUrl().indexOf("/package/") + 10));
+			pkgUrl = pkgUrl + "/" + propertyName + ".enumeration";
+			//"http://208.109.105.1:8080/drools-guvnor/org.drools.guvnor.Guvnor/package/qa4/qa4Demo"
+			sardine.put(pkgUrl, guvnorEnumerationText.getBytes());
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ContraditionException e) {
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

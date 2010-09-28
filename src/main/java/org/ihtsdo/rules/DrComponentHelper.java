@@ -54,7 +54,6 @@ public class DrComponentHelper {
 				loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()).toString());
 				loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
 				loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
-				loopRel.setRefinabilityUuid(tf.nidToUuid(relTuple.getRefinabilityNid()).toString());
 				loopRel.setRelGroup(relTuple.getGroup());
 				loopRel.setStatusUuid(tf.nidToUuid(relTuple.getStatusNid()).toString());
 				loopRel.setTime(relTuple.getTime());
@@ -71,7 +70,6 @@ public class DrComponentHelper {
 				loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()).toString());
 				loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
 				loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
-				loopRel.setRefinabilityUuid(tf.nidToUuid(relTuple.getRefinabilityNid()).toString());
 				loopRel.setRelGroup(relTuple.getGroup());
 				loopRel.setStatusUuid(tf.nidToUuid(relTuple.getStatusNid()).toString());
 				loopRel.setTime(relTuple.getTime());
