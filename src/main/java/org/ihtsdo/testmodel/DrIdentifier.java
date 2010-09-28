@@ -1,6 +1,7 @@
 package org.ihtsdo.testmodel;
 
-public class DrIdentifier {
+public class DrIdentifier extends DrComponent {
+	
 	private String primordialUuid;
 	
 	private String componentUuid;
