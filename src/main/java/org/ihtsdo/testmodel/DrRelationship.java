@@ -73,4 +73,12 @@ public class DrRelationship extends DrComponent{
 		this.identifiers = identifiers;
 	}
 
+	public String getModifierUuid() {
+		return modifierUuid;
+	}
+
+	public void setModifierUuid(String modifierUuid) {
+		this.modifierUuid = modifierUuid;
+	}
+
 }
