@@ -392,5 +392,9 @@ public class TerminologyHelperDrools {
 	public boolean isValidSemtag(String semtag){
 		return false;
 	}
+	
+	public boolean isParentOfStatedChildren(String conceptUuid){
+		return true;
+	}
 
 }
