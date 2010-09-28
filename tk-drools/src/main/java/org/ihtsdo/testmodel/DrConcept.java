@@ -30,7 +30,13 @@ public class DrConcept extends DrComponent{
 		outgoingRelationships = new ArrayList<DrRelationship>();
 		extensions = new ArrayList<DrRefsetExtension>();
 		identifiers = new ArrayList<DrIdentifier>();
+		numberOfStatedParents=0;
 		variantEvaluationCandidate=true;
+		parentOfStatedChildren=false;
+		sourceOfDefiningRole=false;
+		targetOfHistoricalAssociation=false;
+		targetOfDefiningRole=false;
+		
 	}
 
 	public String getPrimordialUuid() {
