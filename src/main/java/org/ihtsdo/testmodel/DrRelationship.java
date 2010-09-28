@@ -5,12 +5,12 @@ import java.util.List;
 public class DrRelationship extends DrComponent{
 	private String primordialUuid;
 	
-	private String c1Uuid;
-	private String c2Uuid;
+	private String sourceUuid;
+	private String typeUuid;
+	private String targetUuid;
 	private String characteristicUuid;
 	private String modifierUuid;
 	private int relGroup;
-	private String typeUuid;
 	
 	private List<DrIdentifier> identifiers;
 	
@@ -26,22 +26,6 @@ public class DrRelationship extends DrComponent{
 
 	public void setPrimordialUuid(String primordialUuid) {
 		this.primordialUuid = primordialUuid;
-	}
-
-	public String getC1Uuid() {
-		return c1Uuid;
-	}
-
-	public void setC1Uuid(String uuid) {
-		c1Uuid = uuid;
-	}
-
-	public String getC2Uuid() {
-		return c2Uuid;
-	}
-
-	public void setC2Uuid(String uuid) {
-		c2Uuid = uuid;
 	}
 
 	public String getCharacteristicUuid() {
@@ -82,6 +66,22 @@ public class DrRelationship extends DrComponent{
 
 	public void setModifierUuid(String modifierUuid) {
 		this.modifierUuid = modifierUuid;
+	}
+
+	public String getSourceUuid() {
+		return sourceUuid;
+	}
+
+	public void setSourceUuid(String sourceUuid) {
+		this.sourceUuid = sourceUuid;
+	}
+
+	public String getTargetUuid() {
+		return targetUuid;
+	}
+
+	public void setTargetUuid(String targetUuid) {
+		this.targetUuid = targetUuid;
 	}
 
 }
