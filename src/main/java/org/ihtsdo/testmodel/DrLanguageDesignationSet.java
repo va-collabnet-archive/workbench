@@ -6,11 +6,13 @@ import java.util.Set;
 public class DrLanguageDesignationSet {
 	
 	Set<DrDescription> descriptions;
+	String languageRefsetUuid;
+	
+	//Inferred properties
 	int size;
 	int preferredTermOccurrence;
 	int preferredFsnOccurrence;
 	boolean hasDuplicates; 
-	String languageRefsetUuid;
 	
 	public DrLanguageDesignationSet(){
 		descriptions=new HashSet<DrDescription>();

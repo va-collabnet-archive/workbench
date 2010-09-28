@@ -9,6 +9,9 @@ public class DrIdentifier extends DrComponent {
 	private String authorityUuid;
 	private String denotation;
 	
+	//Inferred properties
+	//none yet
+	
 	public DrIdentifier() {
 		// TODO Auto-generated constructor stub
 	}

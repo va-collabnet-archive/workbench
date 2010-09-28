@@ -9,6 +9,7 @@ public abstract class DrComponent {
 	
 	private String factContextName;
 	
+	//Inferred properties
 	private boolean published;
 	private boolean extensionComponent;
 	private String extensionId; //TODO: should be UUID?
