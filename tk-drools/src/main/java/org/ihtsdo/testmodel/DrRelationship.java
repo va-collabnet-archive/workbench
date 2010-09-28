@@ -8,18 +8,11 @@ public class DrRelationship extends DrComponent{
 	private String c1Uuid;
 	private String c2Uuid;
 	private String characteristicUuid;
-	private String refinabilityUuid;
+	private String modifierUuid;
 	private int relGroup;
 	private String typeUuid;
 	
 	private List<DrIdentifier> identifiers;
-
-	private String statusUuid;
-	private String pathUuid;
-	private String authorUuid;
-	private Long time;
-	
-	private String factContextName;
 
 	public DrRelationship() {
 	}
@@ -56,14 +49,6 @@ public class DrRelationship extends DrComponent{
 		this.characteristicUuid = characteristicUuid;
 	}
 
-	public String getRefinabilityUuid() {
-		return refinabilityUuid;
-	}
-
-	public void setRefinabilityUuid(String refinabilityUuid) {
-		this.refinabilityUuid = refinabilityUuid;
-	}
-
 	public int getRelGroup() {
 		return relGroup;
 	}
@@ -86,46 +71,6 @@ public class DrRelationship extends DrComponent{
 
 	public void setIdentifiers(List<DrIdentifier> identifiers) {
 		this.identifiers = identifiers;
-	}
-
-	public String getStatusUuid() {
-		return statusUuid;
-	}
-
-	public void setStatusUuid(String statusUuid) {
-		this.statusUuid = statusUuid;
-	}
-
-	public String getPathUuid() {
-		return pathUuid;
-	}
-
-	public void setPathUuid(String pathUuid) {
-		this.pathUuid = pathUuid;
-	}
-
-	public String getAuthorUuid() {
-		return authorUuid;
-	}
-
-	public void setAuthorUuid(String authorUuid) {
-		this.authorUuid = authorUuid;
-	}
-
-	public Long getTime() {
-		return time;
-	}
-
-	public void setTime(Long time) {
-		this.time = time;
-	}
-
-	public String getFactContextName() {
-		return factContextName;
-	}
-
-	public void setFactContextName(String factContextName) {
-		this.factContextName = factContextName;
 	}
 
 }

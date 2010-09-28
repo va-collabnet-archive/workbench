@@ -13,13 +13,15 @@ public class DrConcept extends DrComponent{
 	private List<DrRefsetExtension> extensions;
 	private List<DrIdentifier> identifiers;
 	
-	private String statusUuid;
-	private String pathUuid;
-	private String authorUuid;
-	private Long time;
-	private String languageRefsetUuid;
+	private String specialConceptCategory;
 	
-	private String factContextName;
+	private int numberOfStatedParents;
+	private boolean parentOfStatedChildren;
+	private boolean sourceOfDefiningRole;
+	private boolean targetOfDefiningRole;
+	private boolean targetOfHistoricalAssociation;
+	private String semanticTag;
+	
 	
 	public DrConcept() {
 		descriptions = new ArrayList<DrDescription>();
@@ -77,59 +79,11 @@ public class DrConcept extends DrComponent{
 		this.extensions = extensions;
 	}
 
-	public String getStatusUuid() {
-		return statusUuid;
-	}
-
-	public void setStatusUuid(String statusUuid) {
-		this.statusUuid = statusUuid;
-	}
-
-	public String getPathUuid() {
-		return pathUuid;
-	}
-
-	public void setPathUuid(String pathUuid) {
-		this.pathUuid = pathUuid;
-	}
-
-	public String getAuthorUuid() {
-		return authorUuid;
-	}
-
-	public void setAuthorUuid(String authorUuid) {
-		this.authorUuid = authorUuid;
-	}
-
-	public Long getTime() {
-		return time;
-	}
-
-	public void setTime(Long time) {
-		this.time = time;
-	}
-
-	public String getLanguageRefsetUuid() {
-		return languageRefsetUuid;
-	}
-
-	public void setLanguageRefsetUuid(String languageRefsetUuid) {
-		this.languageRefsetUuid = languageRefsetUuid;
-	}
-
 	public List<DrIdentifier> getIdentifiers() {
 		return identifiers;
 	}
 
 	public void setIdentifiers(List<DrIdentifier> identifiers) {
 		this.identifiers = identifiers;
-	}
-
-	public String getFactContextName() {
-		return factContextName;
-	}
-
-	public void setFactContextName(String factContextName) {
-		this.factContextName = factContextName;
 	}
 }

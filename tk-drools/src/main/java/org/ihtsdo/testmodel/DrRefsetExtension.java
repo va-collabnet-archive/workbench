@@ -21,13 +21,6 @@ public class DrRefsetExtension extends DrComponent{
 
 	private List<DrIdentifier> identifiers;
 
-	private String statusUuid;
-	private String pathUuid;
-	private String authorUuid;
-	private Long time;
-
-	private String factContextName;
-
 	public DrRefsetExtension() {
 		identifiers = new ArrayList<DrIdentifier>();
 	}
@@ -112,52 +105,12 @@ public class DrRefsetExtension extends DrComponent{
 		this.identifiers = identifiers;
 	}
 
-	public String getStatusUuid() {
-		return statusUuid;
-	}
-
-	public void setStatusUuid(String statusUuid) {
-		this.statusUuid = statusUuid;
-	}
-
-	public String getPathUuid() {
-		return pathUuid;
-	}
-
-	public void setPathUuid(String pathUuid) {
-		this.pathUuid = pathUuid;
-	}
-
-	public String getAuthorUuid() {
-		return authorUuid;
-	}
-
-	public void setAuthorUuid(String authorUuid) {
-		this.authorUuid = authorUuid;
-	}
-
-	public Long getTime() {
-		return time;
-	}
-
-	public void setTime(Long time) {
-		this.time = time;
-	}
-
 	public RefsetType getRefsetType() {
 		return refsetType;
 	}
 
 	public void setRefsetType(RefsetType refsetType) {
 		this.refsetType = refsetType;
-	}
-
-	public String getFactContextName() {
-		return factContextName;
-	}
-
-	public void setFactContextName(String factContextName) {
-		this.factContextName = factContextName;
 	}
 
 	public String getRefsetUuid() {
