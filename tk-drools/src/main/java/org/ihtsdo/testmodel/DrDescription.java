@@ -108,4 +108,36 @@ public class DrDescription extends DrComponent{
 		this.acceptabilityUuid = acceptabilityUuid;
 	}
 
+	public String getReferToConceptUuid() {
+		return referToConceptUuid;
+	}
+
+	public void setReferToConceptUuid(String referToConceptUuid) {
+		this.referToConceptUuid = referToConceptUuid;
+	}
+
+	public String getCaseSignificantCategory() {
+		return caseSignificantCategory;
+	}
+
+	public void setCaseSignificantCategory(String caseSignificantCategory) {
+		this.caseSignificantCategory = caseSignificantCategory;
+	}
+
+	public boolean isVariantGenerationCandidate() {
+		return variantGenerationCandidate;
+	}
+
+	public void setVariantGenerationCandidate(boolean variantGenerationCandidate) {
+		this.variantGenerationCandidate = variantGenerationCandidate;
+	}
+
+	public boolean isVariantEvaluationCandidate() {
+		return variantEvaluationCandidate;
+	}
+
+	public void setVariantEvaluationCandidate(boolean variantEvaluationCandidate) {
+		this.variantEvaluationCandidate = variantEvaluationCandidate;
+	}
+
 }

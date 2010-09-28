@@ -55,4 +55,36 @@ public abstract class DrComponent {
 		this.factContextName = factContextName;
 	}
 
+	public boolean isPublished() {
+		return published;
+	}
+
+	public void setPublished(boolean published) {
+		this.published = published;
+	}
+
+	public boolean isExtensionComponent() {
+		return extensionComponent;
+	}
+
+	public void setExtensionComponent(boolean extensionComponent) {
+		this.extensionComponent = extensionComponent;
+	}
+
+	public String getExtensionId() {
+		return extensionId;
+	}
+
+	public void setExtensionId(String extensionId) {
+		this.extensionId = extensionId;
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
 }

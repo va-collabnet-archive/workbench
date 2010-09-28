@@ -86,4 +86,61 @@ public class DrConcept extends DrComponent{
 	public void setIdentifiers(List<DrIdentifier> identifiers) {
 		this.identifiers = identifiers;
 	}
+
+	public String getSpecialConceptCategory() {
+		return specialConceptCategory;
+	}
+
+	public void setSpecialConceptCategory(String specialConceptCategory) {
+		this.specialConceptCategory = specialConceptCategory;
+	}
+
+	public int getNumberOfStatedParents() {
+		return numberOfStatedParents;
+	}
+
+	public void setNumberOfStatedParents(int numberOfStatedParents) {
+		this.numberOfStatedParents = numberOfStatedParents;
+	}
+
+	public boolean isParentOfStatedChildren() {
+		return parentOfStatedChildren;
+	}
+
+	public void setParentOfStatedChildren(boolean parentOfStatedChildren) {
+		this.parentOfStatedChildren = parentOfStatedChildren;
+	}
+
+	public boolean isSourceOfDefiningRole() {
+		return sourceOfDefiningRole;
+	}
+
+	public void setSourceOfDefiningRole(boolean sourceOfDefiningRole) {
+		this.sourceOfDefiningRole = sourceOfDefiningRole;
+	}
+
+	public boolean isTargetOfDefiningRole() {
+		return targetOfDefiningRole;
+	}
+
+	public void setTargetOfDefiningRole(boolean targetOfDefiningRole) {
+		this.targetOfDefiningRole = targetOfDefiningRole;
+	}
+
+	public boolean isTargetOfHistoricalAssociation() {
+		return targetOfHistoricalAssociation;
+	}
+
+	public void setTargetOfHistoricalAssociation(
+			boolean targetOfHistoricalAssociation) {
+		this.targetOfHistoricalAssociation = targetOfHistoricalAssociation;
+	}
+
+	public String getSemanticTag() {
+		return semanticTag;
+	}
+
+	public void setSemanticTag(String semanticTag) {
+		this.semanticTag = semanticTag;
+	}
 }
