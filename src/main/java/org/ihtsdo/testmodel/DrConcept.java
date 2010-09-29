@@ -186,7 +186,7 @@ public class DrConcept extends DrComponent{
 		return definingRoleSets;
 	}
 
-	public void setDefiningRolesSets(List<DrDefiningRolesSet> definingRoleSets) {
+	public void setDefiningRoleSets(List<DrDefiningRolesSet> definingRoleSets) {
 		this.definingRoleSets = definingRoleSets;
 	}
 
