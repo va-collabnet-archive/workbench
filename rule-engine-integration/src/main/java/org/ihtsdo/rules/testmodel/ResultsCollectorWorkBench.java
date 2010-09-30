@@ -18,9 +18,11 @@ package org.ihtsdo.rules.testmodel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.ihtsdo.tk.helper.ResultsCollector;
+import org.ihtsdo.tk.spec.SpecBI;
 
 /**
  * The Class ResultsCollectorWorkBench.
@@ -29,14 +31,10 @@ public class ResultsCollectorWorkBench extends ResultsCollector{
 	
 	/** The alert list. */
 	private List<AlertToDataConstraintFailure> alertList;
-	
+	private Map<SpecBI, Integer> wbTemplates;
 	
 	/**
 	 * Instantiates a new results collector.
-	 * 
-	 * @param alertList the alert list
-	 * @param approvedRels the approved rels
-	 * @param messagesSet the messages set
 	 */
 	public ResultsCollectorWorkBench() {
 		super();
@@ -59,5 +57,13 @@ public class ResultsCollectorWorkBench extends ResultsCollector{
 	 */
 	public void setAlertList(List<AlertToDataConstraintFailure> alertList) {
 		this.alertList = alertList;
+	}
+
+	public Map<SpecBI, Integer> getWbTemplates() {
+		return wbTemplates;
+	}
+
+	public void setWbTemplates(Map<SpecBI, Integer> wbTemplates) {
+		this.wbTemplates = wbTemplates;
 	}
 }
