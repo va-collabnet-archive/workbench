@@ -274,7 +274,7 @@ public abstract class AbstractComponentDtoUpdater {
             sctIdPart.setVersion(tuple.getVersion());
         }
 
-        setIdentifier(conceptDto, tuple, idVersions, type, uuid, sctIdPart, latest);
+        setIdentifier(conceptDto, idVersions, type, uuid, sctIdPart, latest);
     }
 
     /**
@@ -366,7 +366,6 @@ public abstract class AbstractComponentDtoUpdater {
      * Sets the id mapping for the UUID to SCTID
      *
      * @param conceptDto ConceptDto to add the identifier to.
-     * @param tuple I_AmPart
      * @param idVersions List of I_IdPart
      * @param type TYPE
      * @param uuid UUID
@@ -374,13 +373,13 @@ public abstract class AbstractComponentDtoUpdater {
      * @throws IOException
      * @throws TerminologyException
      */
-    private void setIdentifier(ConceptDto conceptDto, I_AmPart tuple, List<I_IdPart> idVersions, TYPE type,
+    private void setIdentifier(ConceptDto conceptDto, List<I_IdPart> idVersions, TYPE type,
             UUID uuid, I_IdPart sctIdPart, boolean latest) throws IOException, TerminologyException {
         Map<UUID, Long> idMap = new HashMap<UUID, Long>();
 
         IdentifierDto identifierDto = new IdentifierDto();
 
-        getBaseConceptDto(identifierDto, tuple, idVersions, latest);
+        getBaseConceptDto(identifierDto, sctIdPart, idVersions, latest);
 
         idMap.put(uuid, Long.valueOf(sctIdPart.getSourceId().toString()));
         identifierDto.setConceptId(idMap);
@@ -449,7 +448,7 @@ public abstract class AbstractComponentDtoUpdater {
         descriptionDto.setStatusCode(ArchitectonicAuxiliary.getSnomedDescriptionStatusId(
                 termFactory.getConcept(tuple.getStatusId()).getUids()) + "");
 
-		if (descriptionDto.getStatusCode() == "-1") {
+		if ("-1".equals(descriptionDto.getStatusCode())) {
 			if (tuple.getStatusId() == conceptNonCurrentStatus.getNid()) {
 				descriptionDto.setStatusCode("8");
 			}

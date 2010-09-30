@@ -1,12 +1,12 @@
 /*
  *  Copyright 2010 International Health Terminology Standards Development  *  Organisation..
- * 
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- * 
+ *
  *       http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -82,7 +83,7 @@ public abstract class AbstractExportSpecification implements ExportSpecification
     protected final I_IntSet snomedIsATypeIntSet = new IntSet();
     /** primitive INT set of FSN type. */
     protected final I_IntSet currentActiveStatusIntSet = new IntSet();
- 
+
     /** inactivation indicators. */
     protected final int descriptionInactivationIndicatorNid;
     protected final int relationshipInactivationIndicatorNid;
@@ -96,12 +97,13 @@ public abstract class AbstractExportSpecification implements ExportSpecification
     protected ExtensionProcessor<I_ThinExtByRefPart> extensionProcessor;
     protected final int aceLimitedStatusNId;
     protected final int aceMovedElsewhereStatusNId;
+    protected final int snomedIntId;
     protected final boolean fullExport = false;
     /** The active concept. */
     protected final I_GetConceptData currentConcept;
     /** The in active concept. */
     protected final I_GetConceptData inActiveConcept;
-    
+
     protected AbstractComponentDtoUpdater updater;
 
     protected DatabaseExportUtility utility;
@@ -119,11 +121,12 @@ public abstract class AbstractExportSpecification implements ExportSpecification
         this.defaultProject = defaultProject;
         this.aceLimitedStatusNId = ArchitectonicAuxiliary.Concept.LIMITED.localize().getNid();
         this.aceMovedElsewhereStatusNId = ArchitectonicAuxiliary.Concept.MOVED_ELSEWHERE.localize().getNid();
+        this.snomedIntId = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid();
 
         activeConcept = termFactory.getConcept(
                 ArchitectonicAuxiliary.Concept.ACTIVE.localize().getUids().iterator().next());
 
-       
+
 
        this.currentConcept = termFactory.getConcept(
             ArchitectonicAuxiliary.Concept.CURRENT.localize().getUids().iterator().next());
@@ -134,7 +137,7 @@ public abstract class AbstractExportSpecification implements ExportSpecification
         descriptionInactivationIndicatorNid = ConceptConstants.DESCRIPTION_INACTIVATION_INDICATOR.localize().getNid();
         relationshipInactivationIndicatorNid = ConceptConstants.RELATIONSHIP_INACTIVATION_INDICATOR.localize().getNid();
         conceptInactivationIndicatorNid = ConceptConstants.CONCEPT_INACTIVATION_INDICATOR.localize().getNid();
-       
+
         unspecifiedUuid = termFactory.getConcept(
                 ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getUids().iterator().next());
 
@@ -421,6 +424,7 @@ public abstract class AbstractExportSpecification implements ExportSpecification
 
             if (thinExtByRefVersioned.getMemberId() != 0) {
                 idParts = termFactory.getId(thinExtByRefVersioned.getMemberId()).getVersions();
+                fixIdTimeAndModule(tuple, idParts);
             } else {
                 idParts = new ArrayList<I_IdPart>(1);
                 idParts.add(getIdUuidSctIdPart(thinExtByRefVersioned, tuple));
@@ -443,6 +447,37 @@ public abstract class AbstractExportSpecification implements ExportSpecification
 
             return extensionDto;
         }
+
+        /**
+         * Fixes the id part that have been set to a version after the extension was exported.
+         *
+         * @param tuple I_ThinExtByRefPart
+         * @param idParts list of I_IdPart
+         * @throws TerminologyException
+         * @throws IOException
+         */
+		private void fixIdTimeAndModule(I_ThinExtByRefPart tuple,
+				List<I_IdPart> idParts) throws TerminologyException,
+				IOException {
+			I_IdPart latestIdPart = null;
+
+			for (I_IdPart iIdPart : idParts) {
+				if (iIdPart.getSource() == snomedIntId
+						&& (latestIdPart == null || (latestIdPart != null && iIdPart
+								.getVersion() > latestIdPart.getVersion()))) {
+					latestIdPart = iIdPart;
+				}
+			}
+			if (latestIdPart != null
+					&& tuple.getVersion() < latestIdPart.getVersion()) {
+				I_IdPart fixedPart = latestIdPart.duplicate();
+				fixedPart.setVersion(tuple.getVersion());
+				fixedPart.setPathId(tuple.getPathId());
+
+				idParts.add(fixedPart);
+				idParts.remove(latestIdPart);
+			}
+		}
 
         /**
          * Create a UUID id part for export. The member UUID will based on the refset id and concept 1 id.
