@@ -49,16 +49,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
-			<artifactId>wb-gui</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.ihtsdo</groupId>
-			<artifactId>wb-bdb</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.ihtsdo</groupId>
 			<artifactId>tk-concept-component</artifactId>
 			<version>${project.version}</version>
 		</dependency>

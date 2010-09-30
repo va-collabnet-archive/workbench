@@ -17,8 +17,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.config.AceFrame;
-import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.tapi.TerminologyException;
 
 /**
@@ -43,29 +41,31 @@ public class QAManager extends JPanel {
 	}
 
 	private void button1ActionPerformed() {
-		AceFrameConfig config;
-		try {
-			config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
-			AceFrame ace=config.getAceFrame();
-			JTabbedPane tp=ace.getCdePanel().getConceptTabs();
-			if (tp!=null){
-				int tabCount=tp.getTabCount();
-				for (int i=0;i<tabCount;i++){
-					if (tp.getTitleAt(i).equals(QA_MANAGER)){
-						tp.remove(i);
-						tp.repaint();
-						tp.revalidate();
-					}
-
-				}
-			}
-		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		Close not possible without dependency from wb-gui
+//		
+//		AceFrameConfig config;
+//		try {
+//			config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
+//			AceFrame ace=config.getAceFrame();
+//			JTabbedPane tp=ace.getCdePanel().getConceptTabs();
+//			if (tp!=null){
+//				int tabCount=tp.getTabCount();
+//				for (int i=0;i<tabCount;i++){
+//					if (tp.getTitleAt(i).equals(QA_MANAGER)){
+//						tp.remove(i);
+//						tp.repaint();
+//						tp.revalidate();
+//					}
+//
+//				}
+//			}
+//		} catch (TerminologyException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 	private void initComponents() {

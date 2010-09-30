@@ -6,36 +6,27 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
 import junit.framework.TestCase;
 
-import org.drools.definition.rule.Rule;
 import org.dwfa.ace.api.DatabaseSetupConfig;
-import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.cs.ChangeSetPolicy;
-import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.BdbTermFactory;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
-import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.tk.api.Precedence;
 
 public class TestEnums extends TestCase {
@@ -167,15 +158,15 @@ public class TestEnums extends TestCase {
 			config.getAllowedStatus().add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
 			config.getDestRelTypes().add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
 
-			BdbTermFactory tfb = (BdbTermFactory) tf;
-			I_ConfigAceDb newDbProfile = tfb.newAceDbConfig();
-			newDbProfile.setUsername("username");
-			newDbProfile.setUserConcept(tf.getConcept(UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c")));
-			newDbProfile.setClassifierChangesChangeSetPolicy(ChangeSetPolicy.OFF);
-			newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
-			newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.INCREMENTAL);
-			newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
-			config.setDbConfig(newDbProfile);
+//			BdbTermFactory tfb = (BdbTermFactory) tf;
+//			I_ConfigAceDb newDbProfile = tfb.newAceDbConfig();
+//			newDbProfile.setUsername("username");
+//			newDbProfile.setUserConcept(tf.getConcept(UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c")));
+//			newDbProfile.setClassifierChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+//			newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+//			newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.INCREMENTAL);
+//			newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
+//			config.setDbConfig(newDbProfile);
 
 			config.setPrecedence(Precedence.TIME);
 
