@@ -3,7 +3,9 @@ package org.ihtsdo.tk.helper;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.ihtsdo.testmodel.DrComponent;
 import org.ihtsdo.testmodel.DrConcept;
@@ -23,6 +25,10 @@ public class TerminologyHelperDrools {
 	private Hashtable<String,String> words ;
 	private boolean wordsLoaded;
 	private InputStream fisW;
+	
+	private String conceptDomain;
+	private String roleRange;
+	private String groupCondition;
 	
 	public TerminologyHelperDrools() {
 		fis=(InputStream) TerminologyHelperDrools.class.getResourceAsStream("GB-US-spellingdiffs.txt");
@@ -395,6 +401,37 @@ public class TerminologyHelperDrools {
 	
 	public boolean isParentOfStatedChildren(String conceptUuid){
 		return true;
+	}
+	
+	public List<String> getListOfDomainsUuids(String conceptUuid) {
+		List<String> domains = new ArrayList<String>();
+		domains.add("clinicalFindingUuid");
+		domains.add("procedureUuid");
+		return domains;
+	}
+
+	public String getConceptDomain() {
+		return conceptDomain;
+	}
+
+	public void setConceptDomain(String conceptDomain) {
+		this.conceptDomain = conceptDomain;
+	}
+
+	public String getRoleRange() {
+		return roleRange;
+	}
+
+	public void setRoleRange(String roleRange) {
+		this.roleRange = roleRange;
+	}
+
+	public String getGroupCondition() {
+		return groupCondition;
+	}
+
+	public void setGroupCondition(String groupCondition) {
+		this.groupCondition = groupCondition;
 	}
 
 }
