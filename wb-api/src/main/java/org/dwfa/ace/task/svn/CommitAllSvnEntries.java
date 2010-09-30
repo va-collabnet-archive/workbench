@@ -21,6 +21,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import org.dwfa.ace.api.BundleType;
+import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.I_ConfigAceFrame.SPECIAL_SVN_ENTRIES;
@@ -64,7 +65,11 @@ public class CommitAllSvnEntries extends AbstractAllSvnEntriesTask {
                     break;
 
                 case CHANGE_SET_UPDATE:
-                    config.svnCommit(svd);
+                	if (taskKey.equalsIgnoreCase(I_ConfigAceDb.MUTABLE_DB_LOC)) {
+                        // -- only handled at startup...
+                	} else {
+                        config.svnCommit(svd);
+                	}
                     break;
                 default:
                     throw new TaskFailedException("Can't handle: " + bundleType);

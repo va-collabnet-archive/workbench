@@ -486,6 +486,7 @@ public class WorkbenchRunner {
 										+ queuesToRemove));
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			AceLog.getAppLog().alertAndLogException(e);
 			System.exit(0);
 		}
