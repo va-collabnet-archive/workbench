@@ -19,6 +19,8 @@ package org.ihtsdo.tk.helper;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ihtsdo.tk.helper.templates.AbstractTemplate;
+
 /**
  * The Class ResultsCollector.
  */
@@ -27,6 +29,7 @@ public class ResultsCollector {
 	/** The alert list. */
 	//private List<AlertToDataConstraintFailure> alertList;
 	private List<ResultsItem> resultsItems;
+	private List<AbstractTemplate> templates;
 	
 	/**
 	 * Instantiates a new results collector.
@@ -51,5 +54,17 @@ public class ResultsCollector {
 
 	public void setResultsItems(List<ResultsItem> resultsItems) {
 		this.resultsItems = resultsItems;
+	}
+
+	public List<AbstractTemplate> getTemplates() {
+		return templates;
+	}
+
+	public void setTemplates(List<AbstractTemplate> templates) {
+		this.templates = templates;
+	}
+	
+	public void addTemplate(AbstractTemplate template) {
+		this.templates.add(template);
 	}
 }

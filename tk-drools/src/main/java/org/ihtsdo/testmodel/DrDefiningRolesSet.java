@@ -33,5 +33,21 @@ public class DrDefiningRolesSet {
 	public void setNumberOfIsas(int numberOfIsas) {
 		this.numberOfIsas = numberOfIsas;
 	}
+	
+	// GroupCondition options = 'any','ungrouped','same group'
+	public boolean checkCardinality(String typeUuid, int min, int max, String groupCondition) {
+		boolean result = false;
+		int counter = 0;
+		for (DrRelationship loopRel : relationships) {
+			if (loopRel.getTypeUuid().equals(typeUuid)) {
+				counter++;
+				//TODO:use groupCondition
+			}
+		}
+		if (counter >= min && counter <= max) {
+			result = true;
+		}
+		return result;
+	}
 
 }
