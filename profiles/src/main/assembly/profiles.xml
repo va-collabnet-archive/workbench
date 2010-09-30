@@ -9,6 +9,8 @@
       <includes>
         <include>**/*.eccs</include>
         <include>**/*.ace</include>
+        <include>**/*.config</include>
+        <include>**/*.oos</include>
       </includes>
     </fileSet>
   </fileSets>
