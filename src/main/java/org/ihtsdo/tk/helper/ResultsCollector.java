@@ -40,8 +40,8 @@ public class ResultsCollector {
 	 */
 	public ResultsCollector() {
 		super();
-		//this.alertList = new ArrayList<AlertToDataConstraintFailure>();
 		this.resultsItems = new ArrayList<ResultsItem>();
+		this.templates = new ArrayList<AbstractTemplate>();
 	}
 
 	public void addResultsItem(ResultsItem resultsItem) {
