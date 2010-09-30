@@ -62,7 +62,6 @@ import org.dwfa.ace.task.refset.spec.compute.RefsetComputeType;
 import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
 import org.dwfa.app.DwfaEnv;
-import org.dwfa.bpa.process.Condition;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -72,11 +71,18 @@ import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
+import org.ihtsdo.rules.testmodel.TerminologyHelperDroolsWorkbench;
 import org.ihtsdo.testmodel.DrConcept;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.helper.ResultsItem;
+import org.ihtsdo.tk.helper.templates.AbstractTemplate;
+import org.ihtsdo.tk.helper.templates.DescriptionTemplate;
+import org.ihtsdo.tk.helper.templates.AbstractTemplate.TemplateType;
+import org.ihtsdo.tk.spec.DescriptionSpec;
+import org.ihtsdo.tk.spec.SpecFactory;
 
 import com.googlecode.sardine.Sardine;
 import com.googlecode.sardine.SardineFactory;
@@ -112,7 +118,7 @@ public class RulesLibrary {
 		for (KnowledgePackage kpackg : kbase.getKnowledgePackages()) {
 			for (Rule rule : kpackg.getRules()) {
 				boolean excluded = false;
-				String ruleUid = (String) rule.getMetaData().get("UID");
+				String ruleUid = (String) rule.getMetaData().get("UUID");
 				//String ruleUid = (String) rule.getMetaAttribute("UID");
 				if (ruleUid != null) {
 					I_GetConceptData role = contextHelper.getRoleInContext(ruleUid, context);
@@ -157,6 +163,21 @@ public class RulesLibrary {
 					AlertToDataConstraintFailure.ALERT_TYPE.ERROR, 
 					resultsItem.getErrorCode() + " - " + resultsItem.getMessage(), 
 					concept));
+		}
+		
+		for (AbstractTemplate template : results.getTemplates()) {
+			if (template.getType().equals(TemplateType.DESCRIPTION)) {
+				DescriptionTemplate dtemplate = (DescriptionTemplate) template;
+				DescriptionVersionBI description = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getCoordinate(),
+						UUID.fromString(dtemplate.getComponentUuid()));
+				DescriptionSpec dSpec = SpecFactory.get(description);
+				if (dtemplate.getText() != null) {
+					dSpec.setDescText(dtemplate.getText());
+				}
+				//TODO: implement other properties
+				results.getWbTemplates().put(dSpec, description.getNid());
+			}
+			//TODO: implement other templates
 		}
 
 		ksession.dispose();

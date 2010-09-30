@@ -1,4 +1,4 @@
-package org.ihtsdo.rules;
+package org.ihtsdo.rules.testmodel;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -15,11 +15,27 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.lucene.SearchResult;
+import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 
 public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
+	
+	public boolean isMemberOf(String conceptUUID, String refsetUUID) {
+		boolean result = false;
+		try {
+			I_TermFactory tf = Terms.get();
+			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
+			result = RulesLibrary.isIncludedInRefsetSpec(tf.getConcept(UUID.fromString(refsetUUID)), 
+					tf.getConcept(UUID.fromString(conceptUUID)), config);
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
 
 	public boolean isParentOf(UUID parent, UUID subtype) throws TerminologyException, IOException {
 		//TODO add config as parameter

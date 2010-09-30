@@ -99,7 +99,7 @@ public class RulesContextMatrixPanel extends JPanel {
 						String ditaUid = null;
 						
 						try {
-							ruleUid = (String) rule.getMetaData().get("UID");
+							ruleUid = (String) rule.getMetaData().get("UUID");
 							//ruleUid = rule.getMetaAttribute("UID");
 							description = (String) rule.getMetaData().get("DESCRIPTION");
 							//description = rule.getMetaAttribute("DESCRIPTION");

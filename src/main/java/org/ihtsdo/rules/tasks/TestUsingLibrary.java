@@ -20,10 +20,15 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.commit.AbstractConceptTest;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -82,18 +87,10 @@ public class TestUsingLibrary extends AbstractConceptTest {
 	public List<AlertToDataConstraintFailure> test(I_GetConceptData concept,
 			boolean forCommit) throws TaskFailedException {
 		try {
-//			HashMap<Resource, ResourceType> resources = new HashMap<Resource, ResourceType>();
-//			resources.put( ResourceFactory.newFileResource("rules/sample-descriptions-rules.drl"), ResourceType.DRL );
-			//resources.put( ResourceFactory.newFileResource("rules/sample-relationships-rules.drl"), ResourceType.DRL );
-			RulesLibrary.getKnowledgeBase(RulesLibrary.CONCEPT_MODEL_PKG, 
-					"rules/change-set.xml", false);
-			RulesLibrary.getKnowledgeBase(RulesLibrary.CONCEPT_MODEL_PKG);
-			I_GetConceptData spanishLanguageRefset = null;
-			
-			spanishLanguageRefset = null; //TODO: migrate to core 
-						//Terms.get().getConcept(RefsetAuxiliary.Concept.LANGUAGE_REFSET_ES.getUids());
-			
-			return RulesLibrary.checkConcept(concept, RulesLibrary.CONCEPT_MODEL_PKG, spanishLanguageRefset, true).getAlertList();
+			I_TermFactory tf = Terms.get();
+			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
+			return RulesLibrary.checkConcept(concept, 
+					tf.getConcept(RefsetAuxiliary.Concept.REALTIME_QA_CONTEXT.getUids()), false, config).getAlertList();
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
 		}

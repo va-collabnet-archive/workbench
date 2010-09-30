@@ -31,6 +31,7 @@ import javax.swing.JPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.Condition;
@@ -38,6 +39,7 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -106,6 +108,9 @@ public class TestListUsingLibrary extends AbstractTask {
 				new HashMap<I_GetConceptData, List<AlertToDataConstraintFailure>>();
 			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
 			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+			if (config == null) {
+				config = Terms.get().getActiveAceFrameConfig();
+			}
 			config.setStatusMessage("Testing list...");
 			JPanel signpostPanel = config.getSignpostPanel();
 			Component[] components = signpostPanel.getComponents();
@@ -116,25 +121,14 @@ public class TestListUsingLibrary extends AbstractTask {
 
 			JList conceptList = config.getBatchConceptList();
 			I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
-			RulesLibrary.getKnowledgeBase(RulesLibrary.CONCEPT_MODEL_PKG, 
-					"rules/change-set.xml", false);
-
 			for (int i = 0; i < model.getSize(); i++) {
 				I_GetConceptData conceptInList = model.getElementAt(i);
 				
-				I_GetConceptData spanishLanguageRefset = null;
-				spanishLanguageRefset = null; //TODO: migrate to core
-					//Terms.get().getConcept(RefsetAuxiliary.Concept.LANGUAGE_REFSET_ES.getUids());
-				
 				ResultsCollectorWorkBench resultsCollector = RulesLibrary.checkConcept(conceptInList, 
-						RulesLibrary.CONCEPT_MODEL_PKG, spanishLanguageRefset, false);
+						Terms.get().getConcept(RefsetAuxiliary.Concept.BATCH_QA_CONTEXT.getUids()), false, config);
 
 				results.put(conceptInList, resultsCollector.getAlertList());
 				
-//				for (int errorCode : resultsCollector.getErrorCodes().keySet() ) {
-//					System.out.println(conceptInList.toString() + " - " + 
-//							errorCode + " - " + resultsCollector.getErrorCodes().get(errorCode));
-//				}
 			}
 
 			config.setStatusMessage("Testing complete...");
