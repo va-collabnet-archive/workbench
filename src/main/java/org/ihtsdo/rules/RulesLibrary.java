@@ -42,6 +42,7 @@ import org.drools.definition.KnowledgePackage;
 import org.drools.definition.rule.Rule;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
+import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -141,7 +142,7 @@ public class RulesLibrary {
 		
 		StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 		
-		//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+		KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 		
 		ResultsCollectorWorkBench results = new ResultsCollectorWorkBench();
 		
