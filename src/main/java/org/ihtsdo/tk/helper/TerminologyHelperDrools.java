@@ -409,6 +409,10 @@ public class TerminologyHelperDrools {
 		domains.add("procedureUuid");
 		return domains;
 	}
+	
+	public String checkWordInList(String text) {
+		return "ICSCategory";
+	}
 
 	public String getConceptDomain() {
 		return conceptDomain;
