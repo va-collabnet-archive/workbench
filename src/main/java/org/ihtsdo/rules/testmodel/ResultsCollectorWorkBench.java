@@ -17,6 +17,7 @@
 package org.ihtsdo.rules.testmodel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +40,7 @@ public class ResultsCollectorWorkBench extends ResultsCollector{
 	public ResultsCollectorWorkBench() {
 		super();
 		this.alertList = new ArrayList<AlertToDataConstraintFailure>();
+		this.wbTemplates = new HashMap<SpecBI, Integer>();
 	}
 	
 	/**
