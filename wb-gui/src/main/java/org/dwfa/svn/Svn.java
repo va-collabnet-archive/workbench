@@ -381,6 +381,7 @@ public class Svn implements I_HandleSubversion {
 					} else if (s.isModified()) {
 						if (s.getRepositoryTextStatus() == StatusKind.modified) {
 							// Conflict exists. 
+							AceLog.getAppLog().warning("File has been modified locally and on server: " + s.getPath());
 							StringBuffer msg = new StringBuffer();
 							msg.append("<html>File has been modified locally and on server: <br><br>&nbsp;>&nbsp;>&nbsp;>&nbsp;");
 							msg.append(s.getPath());

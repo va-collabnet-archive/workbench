@@ -219,6 +219,10 @@ public class SvnHelper {
 	}
 
 	void handleSvnProfileCheckout(Properties aceProperties) throws ClientException, TaskFailedException {
+		if (new File("profiles").exists()) {
+			// A checkout has previously completed. 
+			return;
+		}
 		SubversionData svd = new SubversionData(svnCheckoutProfileOnStart, null);
 		List<String> listing = Svn.list(svd);
 		Map<String, String> profileMap = new HashMap<String, String>();
@@ -233,6 +237,9 @@ public class SvnHelper {
                 (String) SelectObjectDialog.showDialog(emptyFrame, emptyFrame, "Select profile to checkout:",
                     "Checkout profile:", sortedProfiles.toArray(), null, null);
 		String selectedPath = profileMap.get(selectedProfile);
+		if (selectedPath == null) {
+			return;
+		}
 		if (selectedPath.startsWith("/")) {
 			selectedPath = selectedPath.substring(1);
 		}

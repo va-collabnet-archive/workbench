@@ -247,7 +247,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
      * org.dwfa.ace.refset.spec.I_HelpSpecRefset#hasCurrentConceptRefsetExtension
      * (int, int, int, int)
      */
-    public boolean hasCurrentConceptRefsetExtension(int refsetId, int componentNid, int conceptId, int statusNid)
+    @SuppressWarnings("unchecked")
+	public boolean hasCurrentConceptRefsetExtension(int refsetId, int componentNid, int conceptId, int statusNid)
             throws Exception {
     	Concept refsetConcept = Bdb.getConcept(refsetId);
     	RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);

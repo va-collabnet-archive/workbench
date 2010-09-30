@@ -194,11 +194,10 @@ public class WorkbenchRunner {
 				initialized = Boolean.parseBoolean((String) wbProperties
 						.get("initialized"));
 			}
-			SvnHelper svnHelper =  new SvnHelper(WorkbenchRunner.class, jiniConfig);;
+			SvnHelper svnHelper =  new SvnHelper(WorkbenchRunner.class, jiniConfig);
 			if (acePropertiesFileExists == false || initialized == false) {
 				try {
-					svnHelper
-							.initialSubversionOperationsAndChangeSetImport(wbPropertiesFile);
+					svnHelper.initialSubversionOperationsAndChangeSetImport(wbPropertiesFile);
 				} catch (Exception ex) {
 					AceLog.getAppLog().alertAndLogException(ex);
 					System.exit(0);
@@ -230,10 +229,6 @@ public class WorkbenchRunner {
 	            Svn.setConnectedToSvn(true);
 	            svnHelper.initialSubversionOperationsAndChangeSetImport(new File(
 								"config", WB_PROPERTIES));
-			} else if (profileDir.exists()) {
-				ArrayList<File> profileLoc = new ArrayList<File>();
-				profileLoc.add(profileDir);
-				svnHelper.doChangeSetImport(profileLoc);
 			}
 
 			if (wbConfigFile == null || !wbConfigFile.exists()) {

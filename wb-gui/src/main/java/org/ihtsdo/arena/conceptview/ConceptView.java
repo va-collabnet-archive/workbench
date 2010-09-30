@@ -840,7 +840,9 @@ public class ConceptView extends JPanel {
 			if (I_GetConceptData.class.isAssignableFrom(thingToDrop.getClass())) {
 				I_GetConceptData conceptToDrop = (I_GetConceptData) thingToDrop;
 				thingToDrop = Ts.get().getConceptVersion(config.getCoordinate(), conceptToDrop.getConceptNid());
-			} else if (ComponentVersionBI.class.isAssignableFrom(thingToDrop.getClass()) ||
+			}
+			
+			if (ComponentVersionBI.class.isAssignableFrom(thingToDrop.getClass()) ||
 					SpecBI.class.isAssignableFrom(thingToDrop.getClass())) {
 				StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 				boolean uselogger = false;
