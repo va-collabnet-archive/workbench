@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic2" xml:lang="en">
+<topic id="e_launching" xml:lang="en">
   <title>Launching the IHTSDO Workbench</title>
 
   <body>
     <section>The IHTSDO Workbench is launched from the self-launching icon,
     which can be found in the IHTSDO Workbench folder on your computer hard
     drive, or in the Start menu (on Windows-based PCs.) The IHTSDO Workbench
-    icon is shown in <xref format="dita" href="#topic2/ag944824"
+    icon is shown in <xref format="dita" href="#e_launching/ag944824"
     type="fig"/>.</section>
 
     <fig id="ag944824">
@@ -20,7 +20,7 @@
 
     <section>Click (or double-click) on the icon to launch IHTSDO Workbench.
     The next screen will prompt you to select your user profile, as shown in
-    <xref format="dita" href="#topic2/ag944805" type="fig"/>.</section>
+    <xref format="dita" href="#e_launching/ag944805" type="fig"/>.</section>
 
     <fig id="ag944805">
       <title>Profile Selection Screen</title>
@@ -32,7 +32,7 @@
     <section>Click on the “boostrap.ace” or other appropriate profile and
     click Open. The Activity Viewer, which displays a graphic as the concepts
     and other system components are loaded, will display, as shown in <xref
-    format="dita" href="#topic2/ag935964" type="fig"/>.</section>
+    format="dita" href="#e_launching/ag935964" type="fig"/>.</section>
 
     <fig id="ag935964">
       <title>IHTSDO Workbench Activity Viewer</title>
@@ -42,7 +42,7 @@
     </fig>
 
     <section>When loading activity is finished, the Config dialog, shown in
-    <xref format="dita" href="#topic2/ag932286" type="fig"/> will
+    <xref format="dita" href="#e_launching/ag932286" type="fig"/> will
     display.</section>
 
     <fig id="ag932286">
@@ -54,7 +54,7 @@
 
     <section>Enter your user name and password and click OK. The IHTSDO
     Workbench Editor window will display, as shown in <xref format="dita"
-    href="#topic2/ag932300" type="fig"/>.</section>
+    href="#e_launching/ag932300" type="fig"/>.</section>
 
     <fig id="ag932300">
       <title>IHTSDO Workbench IDE main editor window</title>
@@ -137,7 +137,7 @@
 
     <section>Displays or hides the Hierarchy View area and uses the entire
     width of the window to display the concept (as shown in the Concept Work
-    Area), as shown <xref format="dita" href="#topic2/ag931441"
+    Area), as shown <xref format="dita" href="#e_launching/ag931441"
     type="fig"/>.</section>
 
     <fig id="ag931441">
@@ -154,7 +154,7 @@
     id="image_3f1ff2a5-28b6-4de4-aa01-7191ce623412"/></p>
 
     <p>Displays or hides the hierarchy view of the concept as shown <xref
-    format="dita" href="#topic2/ag931462" type="fig"/>.</p>
+    format="dita" href="#e_launching/ag931462" type="fig"/>.</p>
 
     <fig id="ag931462">
       <title>Component view toggle on, hierachy view toggled off</title>
@@ -199,9 +199,9 @@
     href="../images/Using_The_ACE_Editor_Images/icon_process_builder_small.png"/></p>
     <p>Displays or hides the Process Builder, where you can create or execute
     business processes using the concepts you modify, as shown <xref
-    format="dita" href="#topic2/ag935782" type="fig"/>. For more information
-    about building processes, see <xref format="dita"
-    href="../Workflow/process_creation.dita#topic4" type="topic"/>.</p> <fig
+    format="dita" href="#e_launching/ag935782" type="fig"/>. For more
+    information about building processes, see <xref format="dita"
+    href="../Workflow/process_creation.dita" type="topic"/>.</p> <fig
         id="ag935782">
         <title>Process Builder Toggle View On</title>
 

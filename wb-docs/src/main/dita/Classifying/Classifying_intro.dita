@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic1" xml:lang="en-us">
+<topic id="classifying_intro" xml:lang="en-us">
   <title>Using the Classifier</title>
 
   <prolog>
@@ -19,21 +19,22 @@
     (the IHTSDO Classifier ) for validating the inferred relationships
     inherent in the terminology, according to the Description Logics upon
     which SNOMED CT concepts are inter-related. <xref format="dita"
-    href="#topic1/ar1003160" scope="local" type="fn"/>. The IHTSDO Classifier
-    is a highly optimised module for performing complete or incremental
-    classification of SNOMED CT and which can be configured through business
-    process plugins in a number of ways. The IHTSDO Classifier is based on the
-    SnoRocket classifier developed by the Australian E-Health Research
-    Centre.<fn id="ar1003160"><xref format="html" href="http://e-hrc.net "
-    scope="external"> from The Australian E-Health Research Centre. (
-    http://e-hrc.net .)</xref></fn> Additional information on configuration
-    and performance characteristics for developers can be found in <xref
-    format="dita"
-    href="../Classifier/Classifier_intro.dita#topic1">Integrating the IHTSDO
+    href="#classifying_intro/ar1003160" scope="local" type="fn"/>. The IHTSDO
+    Classifier is a highly optimised module for performing complete or
+    incremental classification of SNOMED CT and which can be configured
+    through business process plugins in a number of ways. The IHTSDO
+    Classifier is based on the SnoRocket classifier developed by the
+    Australian E-Health Research Centre.<fn id="ar1003160"><xref format="html"
+    href="http://e-hrc.net " scope="external"> from The Australian E-Health
+    Research Centre. ( http://e-hrc.net .)</xref></fn> Additional information
+    on configuration and performance characteristics for developers can be
+    found in <xref format="dita"
+    href="../Classifier/Classifier_intro.dita">Integrating the IHTSDO
     Classifier </xref>.</section>
 
     <section>In most releases, the Workbench IDE is bundled with a Classifier
-    plugin, accessable via the <b>Tasks</b> section of the Editor's main menu.
-    The following sections illustrate its use.</section>
+    plugin, accessible via the <b>Tasks</b> section of the Editor's main menu.
+    The following sections illustrate its use, including a simple <xref
+    href="Classifying_example1.dita">example</xref>.</section>
   </body>
 </topic>

@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
-<map id="MavenPlugins" xml:lang="en-us" title="Maven Plug-ins">
- 
- <title>Maven Plugins</title>
- <topicref href="plugins_intro.dita#topic1" type="topic" navtitle="Maven Plug-ins">
-  <topicref href="dwfa_plugins.dita#topic2" type="topic" navtitle="DWFA Maven Plug-ins">
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
+<map id="MavenPlugins" title="Maven Plug-ins" xml:lang="en-us">
+  <title>Maven Plugins</title>
+
+  <topicref href="plugins_intro.dita" navtitle="Maven Plug-ins" type="topic">
+    <topicref href="dwfa_plugins.dita" navtitle="DWFA Maven Plug-ins"
+              type="topic"/>
   </topicref>
- </topicref>
 </map>

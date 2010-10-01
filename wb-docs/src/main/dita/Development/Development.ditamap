@@ -1,25 +1,30 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
-<map id="Development" xml:lang="en-us" title="Development">
- <title>Development</title>
- <topicref href="development_intro.dita#topic1" type="topic"
-  navtitle="The IHTSDO Workbench Development Environment">
-  <topicref href="development_extending.dita#topic2" type="topic"
-   navtitle="Extending the IHTSDO Workbench IDE programatically">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
+<map id="Development" title="Development" xml:lang="en-us">
+  <title>Development</title>
+
+  <topicref href="development_intro.dita"
+            navtitle="The IHTSDO Workbench Development Environment"
+            type="topic">
+    <topicref href="development_extending.dita"
+              navtitle="Extending the IHTSDO Workbench IDE programatically"
+              type="topic"/>
+
+    <topicref href="development_key_concepts.dita" navtitle="Key Concepts"
+              type="topic"/>
+
+    <topicref href="development_principles.dita"
+              navtitle="Development Principles" type="topic"/>
+
+    <topicref href="development_modeller.dita"
+              navtitle="The Terminology Modeller's Environment" type="topic"/>
+
+    <topicref href="development_validator.dita"
+              navtitle="The Terminology Validator Role" type="topic"/>
+
+    <topicref href="development_eclipse.dita"
+              navtitle="Setting up Eclipse for IHTSDO Workbench Development"
+              type="topic"/>
   </topicref>
-  <topicref href="development_key_concepts.dita#topic3" type="topic" navtitle="Key Concepts">
-  </topicref>
-  <topicref href="development_principles.dita#topic4" type="topic" navtitle="Development Principles"
-   >
-  </topicref>
-  <topicref href="development_modeller.dita#topic5" type="topic"
-   navtitle="The Terminology Modeller's Environment">
-  </topicref>
-  <topicref href="development_validator.dita#topic6" type="topic"
-   navtitle="The Terminology Validator Role">
-  </topicref>
-  <topicref href="development_eclipse.dita#topic7" type="topic"
-   navtitle="Setting up Eclipse for IHTSDO Workbench Development">
-  </topicref>
- </topicref>
 </map>

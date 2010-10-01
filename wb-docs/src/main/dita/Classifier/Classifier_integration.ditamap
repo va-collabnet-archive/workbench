@@ -4,15 +4,15 @@
 <map id="Classifier_integration" title="IHTSDO Classifier" xml:lang="en-us">
   <title>The IHTSDO Classifier</title>
 
-  <topicref href="Classifier_intro.dita#topic1"
+  <topicref href="Classifier_intro.dita"
             navtitle="Integrating the IHTSDO Classifier " type="topic">
-    <topicref href="Classifier_structure.dita#topic2"
+    <topicref href="Classifier_structure.dita"
               navtitle="Classifier Structure " type="topic"/>
 
-    <topicref href="Classifier_in_eclipse.dita#topic3"
+    <topicref href="Classifier_in_eclipse.dita"
               navtitle="Creating Snorocket in Eclipse " type="topic"/>
 
-    <topicref href="Classifier_integration.dita#topic4"
+    <topicref href="Classifier_integration.dita"
               navtitle="Integrating with the Workbench Build " type="topic"/>
   </topicref>
 </map>

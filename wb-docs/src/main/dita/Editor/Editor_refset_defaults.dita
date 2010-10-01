@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic16" xml:lang="en">
+<topic id="e_refset_defaults" xml:lang="en">
   <title>Changing the Refset Default Values</title>
 
   <body>
@@ -10,7 +10,7 @@
     the Ref Set tab, under the sub-tabs Concept/concept/defaults. To change a
     default value, drag and drop the new value from the hierarchy panel to the
     default to be changed, as shown in <xref format="dita"
-    href="#topic16/ag942252" type="fig"/>.</section>
+    href="#e_refset_defaults/ag942252" type="fig"/>.</section>
 
     <fig id="ag942252">
       <title>Drag and Drop to Modify Refset Default Values</title>
@@ -25,11 +25,11 @@
     <section>When linking a concept to a refset, IHTSDO IDE initially
     specifies a default refset to link to (which can be changed afterwards if
     desired - see <xref format="dita"
-    href="Editor_adding_to_spec_refset.dita#topic13" type="topic"/>.) To set a
+    href="./Editor_adding_to_spec_refset.dita" type="topic"/>.) To set a
     different default refset, drag and drop a refset name from the hierarchy
     view to the Default refset field of the tab shown in <xref format="dita"
-    href="#topic16/ag942252" type="fig"/>. The new value will overwrite the
-    previous one.</section>
+    href="#e_refset_defaults/ag942252" type="fig"/>. The new value will
+    overwrite the previous one.</section>
 
     <section id="ag942359"><title>Changing the Default
     Status</title></section>
@@ -37,7 +37,7 @@
     <section>When a concept is linked to a refset, its initial status is
     normally set as current. To change this default value, drag and drop
     another status value from the hierarchy view to the Default status field
-    of the tab shown in <xref format="dita" href="#topic16/ag942252"
+    of the tab shown in <xref format="dita" href="#e_refset_defaults/ag942252"
     type="fig"/>.</section>
 
     <section id="ag942385"><title>Changing the Concept Inclusion Type
@@ -45,20 +45,21 @@
 
     <section>When a concept is linked to a refset, IHTSDO IDE initially
     specifies an inclusion type (which can be modfied later as described in
-    <xref format="dita" href="Editor_adding_to_spec_refset.dita#topic13"
+    <xref format="dita" href="Editor_adding_to_spec_refset.dita"
     type="topic"/>). To choose a different default inclusion type, drag and
     drop your selection from the hierarchy view to the Default concept field
-    of the tab shown in <xref format="dita" href="#topic16/ag942252"
+    of the tab shown in <xref format="dita" href="#e_refset_defaults/ag942252"
     type="fig"/>. The new value will overwrite the previoius one.</section>
 
     <section id="ag942417"><title>Using Refset Type Tab</title></section>
 
     <section>The refset types tab, as shown in <xref format="dita"
-    href="#topic16/ag942435" type="fig"/> is used to identify the refsets that
-    will be available for selection when adding a concept to a refset. To add
-    a refset to the list, click and drag refset values from the terminology
-    pane (under Refset Auxiliary concept/refset) onto the tab. To delete a
-    refset from the list, highlight it and press the Delete button.</section>
+    href="#e_refset_defaults/ag942435" type="fig"/> is used to identify the
+    refsets that will be available for selection when adding a concept to a
+    refset. To add a refset to the list, click and drag refset values from the
+    terminology pane (under Refset Auxiliary concept/refset) onto the tab. To
+    delete a refset from the list, highlight it and press the Delete
+    button.</section>
 
     <fig id="ag942435">
       <title>Refset Types Tab</title>
@@ -71,11 +72,12 @@
     <section id="ag942476"><title>Status Types </title></section>
 
     <section>The status types tab, as shown in <xref format="dita"
-    href="#topic16/ag942498" type="fig"/> sets the status values that will be
-    available when adding a concept to a refset. To add a status to the list,
-    click and drag status type values from the terminology pane (under
-    Terminology Auxiliary Concept/status) onto the tab. To delete a status
-    type from the list, highlight it and press the Delete button.</section>
+    href="#e_refset_defaults/ag942498" type="fig"/> sets the status values
+    that will be available when adding a concept to a refset. To add a status
+    to the list, click and drag status type values from the terminology pane
+    (under Terminology Auxiliary Concept/status) onto the tab. To delete a
+    status type from the list, highlight it and press the Delete
+    button.</section>
 
     <fig id="ag942498">
       <title>Status Types Tab</title>
@@ -89,11 +91,11 @@
     types </indexterm> </ph></title></section>
 
     <section>The concept types tab, as shown in <xref format="dita"
-    href="#topic16/ag942551" type="fig"/> sets the concept values that will be
-    available when adding a concept to a refset. To add a concept to the list
-    for a concept refset, click and drag concept type values from the
-    terminology pane (under Refset Auxiliary Concept/refset) onto the tab. To
-    delete a refset from the list, highlight it and press the Delete
+    href="#e_refset_defaults/ag942551" type="fig"/> sets the concept values
+    that will be available when adding a concept to a refset. To add a concept
+    to the list for a concept refset, click and drag concept type values from
+    the terminology pane (under Refset Auxiliary Concept/refset) onto the tab.
+    To delete a refset from the list, highlight it and press the Delete
     button.</section>
 
     <fig id="ag942551">

@@ -1,17 +1,15 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/ditabase.dtd">
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/ditabase.dtd">
 <dita>
+  <topic id="process_exercise2" xml:lang="en">
+    <title>Test Yourself: Create Another Process</title>
 
-
-<topic id="topic9" xml:lang="en">
-<title>Test Yourself: Create Another Process</title>
-<body>
-<section>Following the instructions in the section <xref
- href="process_exercise_1.dita#topic8" type="topic" format="dita"></xref>, create another process that
-checks for diastolic blood pressure greater than 95 Hg/mml.</section>
-</body>
-</topic>
-
-
+    <body>
+      <section>Following the instructions in the section <xref format="dita"
+      href="process_exercise_1.dita" type="topic"/>, create another process
+      that checks for diastolic blood pressure greater than 95
+      Hg/mml.</section>
+    </body>
+  </topic>
 </dita>

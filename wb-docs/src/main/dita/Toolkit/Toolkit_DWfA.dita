@@ -1,141 +1,192 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic5" xml:lang="en">
- <title>Distributed Workflow Automation Layer</title>
- <prolog>
-  <metadata>
-   <keywords><indexterm>workflow </indexterm></keywords>
-  </metadata>
- </prolog>
- <body>
-  <section>Coordination of activities is critical within and between organizations that want to work
-   together to develop SNOMED CT. </section>
-  <section id="ad999987">IHTSDO Workbench provides a JavaBeans based Distributed Workflow Automation
-   (DWFA) framework that is open and extensible, that has been developed specifically to support
-   loosely coupled activities that occur when disconnected from the network, yet that can also
-   coordinate with others via transport layer independent means.<indexterm>Distributed Workflow
-    Automation </indexterm><indexterm>DWFA </indexterm></section>
-  <section>As the number of participants in an activity grows, the resources required for
-   coordination–and the risks associated with failure of coordination–may overwhelmingly increase.
-   Workflow automation can simplify coordination of activities across time and space, enabling
-   productivity increases and resource sharing that is not otherwise possible.</section>
-  <lq><i>“By closely combining the unprecedented information communication capabilities of the
-    Internet with the strategic business process automation and integration capabilities of workflow
-    [...], significant changes will be realized. These will enable a real acceleration of
-    productivity improvement within information-related activities...”</i><p>—Workflow
-    Management Coalition</p></lq>
-  <section>Using workflow automation can increase productivity and improve the quality of SNOMED CT
-   development by ensuring that tasks are automatically dispatched to the right worker, and by
-   providing detailed reports of activities in progress, their status, and the workers
-   responsible.</section>
-  <section>Workflow is the automation of a business process, in whole or part, during which
-   documents, information, or tasks are passed from one participant to another for action, according
-   to a set of procedural rules (Workflow Management Coalition 1999).</section>
-  <section>Using workflow, IHTSDO Workbench enables increased productivity and improved quality of
-   operations by ensuring that tasks are automatically dispatched to the right worker at the right
-   location, and by providing detailed reports of activities in progress, their status, and the
-   workers responsible. Processes that have completed will report the statistics necessary to
-   analyze workloads, costs, quality, and efficiency of operations, and the results of this analysis
-   can be rapidly transformed into redesigned processes, resulting in higher-quality and greater
-   efficiency.</section>
-  <section>Workflow processes form a major portion of the application functionality providing
-   :</section>
-  <section>
-   <title>scripted interaction with the end user</title>
-   <p>binding from system processes to human interaction</p>
-  </section>
-  <p>The intent of the workflow system is to guide the user interaction to improve data quality and
-   control quality processes such as dual independent review.</p>
-  <section id="ad1000099">Workflow processes are an aggregation of tasks, which can be performed and
-   configured graphically. Once constructed and configured, these processes are stored in a file,
-   synchronized to the repository, and distributed via Subversion synchronization to all other
-   nodes. Workflow processes are deserialised and executed on the target user's machine when the
-   user selects to execute the task from their inbox queue.<indexterm>Subversion
-   </indexterm></section>
-  <p>Workflows tasks are the building blocks of workflow processes. Tasks interact with the IHTSDO
-   Workbench API for user prompting and input as well as access to the underlying data store. Tasks
-   may also gain access to panes in the IHTSDO Workbench GUI with full access at a Swing API level
-   to perform any action required.</p>
-  <p>The relatively tight interaction between the workflow processes and the IHTSDO Workbench API
-   gives a high degree of flexibility and richness for controlling interaction with the user.</p>
-  <p>A feature built into the workflow processes is an “aging queue”. Processes can therefore be
-   delivered and not execute for a specified amount of time. This enables, among other things,
-   setting a timeout for execution of a workflow process by creating a task on the aging queue to
-   intervene if the workflow has not executed within a specified time period.</p>
-  <p id="ad1000152">Workflow queues are used to assign work to individual users and track incomplete
-   work. These queues are implemented as version controlled directories containing serialized
-   JavaBeans that are synchronized via Subversion.<indexterm>Subversion </indexterm></p>
-  <p>When required for execution a process is deserialized from the queue and executed. Storage of
-   processes in queues or moving between queues is performed via an ACID compliant transactional
-   API. Execution failure will cause roll-back and reappearance of the workflow task.</p>
-  <section>
-   <title>Flow of Control</title>
-   <p>Flow of control determines which tasks in a business process are executed in which order. The
-    IHTSDO Workbench DWFA framework has the following flow of control tasks:</p>
-   <ul>
-    <li>Branch Task: An unconditional branching into an arbitrary number of concurrent threads of
-     execution. </li>
-    <li>Conditional Branch Task: A conditional branching into an arbitrary number of concurrent
-     threads of execution based on a conditional test. While the conditional branch function is
-     generic in nature, the conditional tests themselves incorporate business logic, and therefore
-     are implemented as subclasses of the Conditional Branch Task. </li>
-    <li>End Branch: Unconditional end of a thread of execution. </li>
-    <li>Synchronization Task: Provides a checkpoint to ensure that a specified set of concurrent
-     threads has completed—and execution data from those execution threads have been
-     collected—before continuing past the synchronization point. This task works in coordination
-     with the Check Synchronization Task, which is called by each concurrent thread of execution
-     when it completes. This task allows for synchronization of an arbitrary number of concurrent
-     threads of execution. </li>
-    <li>Check Synchronization Task: Determines if conditions of the Synchronization Task have been
-     met, and updates the business process held by the Synchronization Task with any tasks completed
-     and registered with the Synchronization Task.</li>
-   </ul>
-   <p>Together, these flow-of-control tasks implement all the flow of control methods defined by the
-    workflow management consortium. How the workflow management coalition defines these methods and
-    how these flow of control methods are implemented in the DWFA framework, are presented in the
-    remainder of this section. </p>
-  </section>
-  <section><title>Sequential Routing</title><indexterm>sequential routing </indexterm>
-   <p>A segment of a process instance under enactment by a workflow management system in which
-    several activities are executed in sequence under a single thread of execution.</p><p>Sequential
-    routing is the ordinary execution policy of workflow processes. All task are executed in a
-    sequential order unless a Conditional Branch Task or a Branch Task is encountered during
-    execution of a business process.</p></section>
-  <section><title>Parallel Routing</title><indexterm>parallel routing </indexterm>
-   <p>A segment or process instance under enactment by a workflow management system, where two or
-    more activity instances are executing in parallel within the workflow, giving rise to multiple
-    threads of control. </p><p>Parallel routing occurs whenever a Conditional Branch Task or a
-    Branch Task that specifies two or more branches of execution is encountered during execution of
-    a business process. </p></section>
-  <section><title>AND-Split</title><indexterm>AND-Split </indexterm>
-   <p>A point within the workflow where a single thread of control splits into two or more threads,
-    which are executed in parallel within the workflow, allowing multiple activities to be executed
-    simultaneously.</p><p>An AND-Split occurs whenever a Branch Task that specifies two or more
-    branches is encountered during execution of a business process. </p></section>
-  <section><title>AND-Join</title><indexterm>AND-Join </indexterm>
-   <p>A point in the workflow where two or more parallel executing activities converge into a single
-    common thread of control. </p><p>An AND-Join occurs when the Check Synchronization task confirms
-    that all necessary conditions defined by the Synchronization Task have been met. Business
-    process execution then continues using the thread of control that successfully performed the
-    Check Synchronization task. </p></section>
-  <section><title>OR-Split</title><indexterm>OR-Split </indexterm>
-   <p>A point in the workflow where a single thread of control makes a decision about which branch
-    to take when encountered with multiple alternative workflow branches. </p><p>An OR-Split occurs
-    whenever a Conditional Branch Task—with a single branch for each possible value of the
-    conditional test—is encountered during execution of a business process.</p></section>
-  <section><title> OR-Join</title><indexterm>OR-Join </indexterm>
-   <p>A point within the workflow where two or more alternative activity’s workflow branches
-    re-converge to a single common activity as the next step within the workflow.</p><p>An OR-Join
-    occurs when each of the possible branches of execution from an OR-Split, terminate with a Branch
-    Task that all converge on a single task in the business process. </p></section>
-  <section>
-   <title>Iteration</title>
-   <p>A workflow activity cycle involving the repetitive execution of one or more workflow tasks
-    until a condition is met.</p>
-   <p>Iteration is supported by a Conditional Branch Task that can branch to the beginning of the
-    cycle until a conditional test is met and then when the conditional test is met, execution
-    continues on one or more independent threads of execution. </p>
-  </section>
- </body>
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="tk_dwfa" xml:lang="en">
+  <title>Distributed Workflow Automation Layer</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>workflow</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section>Coordination of activities is critical within and between
+    organizations that want to work together to develop SNOMED CT.</section>
+
+    <section id="ad999987">IHTSDO Workbench provides a JavaBeans based
+    Distributed Workflow Automation (DWFA) framework that is open and
+    extensible, that has been developed specifically to support loosely
+    coupled activities that occur when disconnected from the network, yet that
+    can also coordinate with others via transport layer independent
+    means.<indexterm>Distributed Workflow Automation
+    </indexterm><indexterm>DWFA </indexterm></section>
+
+    <section>As the number of participants in an activity grows, the resources
+    required for coordination–and the risks associated with failure of
+    coordination–may overwhelmingly increase. Workflow automation can simplify
+    coordination of activities across time and space, enabling productivity
+    increases and resource sharing that is not otherwise possible.</section>
+
+    <lq><i>“By closely combining the unprecedented information communication
+    capabilities of the Internet with the strategic business process
+    automation and integration capabilities of workflow [...], significant
+    changes will be realized. These will enable a real acceleration of
+    productivity improvement within information-related
+    activities...”</i><p>—Workflow Management Coalition</p></lq>
+
+    <section>Using workflow automation can increase productivity and improve
+    the quality of SNOMED CT development by ensuring that tasks are
+    automatically dispatched to the right worker, and by providing detailed
+    reports of activities in progress, their status, and the workers
+    responsible.</section>
+
+    <section>Workflow is the automation of a business process, in whole or
+    part, during which documents, information, or tasks are passed from one
+    participant to another for action, according to a set of procedural rules
+    (Workflow Management Coalition 1999).</section>
+
+    <section>Using workflow, IHTSDO Workbench enables increased productivity
+    and improved quality of operations by ensuring that tasks are
+    automatically dispatched to the right worker at the right location, and by
+    providing detailed reports of activities in progress, their status, and
+    the workers responsible. Processes that have completed will report the
+    statistics necessary to analyze workloads, costs, quality, and efficiency
+    of operations, and the results of this analysis can be rapidly transformed
+    into redesigned processes, resulting in higher-quality and greater
+    efficiency.</section>
+
+    <section>Workflow processes form a major portion of the application
+    functionality providing :</section>
+
+    <section><title>scripted interaction with the end user</title> <p>binding
+    from system processes to human interaction</p></section>
+
+    <p>The intent of the workflow system is to guide the user interaction to
+    improve data quality and control quality processes such as dual
+    independent review.</p>
+
+    <section id="ad1000099">Workflow processes are an aggregation of tasks,
+    which can be performed and configured graphically. Once constructed and
+    configured, these processes are stored in a file, synchronized to the
+    repository, and distributed via Subversion synchronization to all other
+    nodes. Workflow processes are deserialised and executed on the target
+    user's machine when the user selects to execute the task from their inbox
+    queue.<indexterm>Subversion </indexterm></section>
+
+    <p>Workflows tasks are the building blocks of workflow processes. Tasks
+    interact with the IHTSDO Workbench API for user prompting and input as
+    well as access to the underlying data store. Tasks may also gain access to
+    panes in the IHTSDO Workbench GUI with full access at a Swing API level to
+    perform any action required.</p>
+
+    <p>The relatively tight interaction between the workflow processes and the
+    IHTSDO Workbench API gives a high degree of flexibility and richness for
+    controlling interaction with the user.</p>
+
+    <p>A feature built into the workflow processes is an “aging queue”.
+    Processes can therefore be delivered and not execute for a specified
+    amount of time. This enables, among other things, setting a timeout for
+    execution of a workflow process by creating a task on the aging queue to
+    intervene if the workflow has not executed within a specified time
+    period.</p>
+
+    <p id="ad1000152">Workflow queues are used to assign work to individual
+    users and track incomplete work. These queues are implemented as version
+    controlled directories containing serialized JavaBeans that are
+    synchronized via Subversion.<indexterm>Subversion </indexterm></p>
+
+    <p>When required for execution a process is deserialized from the queue
+    and executed. Storage of processes in queues or moving between queues is
+    performed via an ACID compliant transactional API. Execution failure will
+    cause roll-back and reappearance of the workflow task.</p>
+
+    <section><title>Flow of Control</title> <p>Flow of control determines
+    which tasks in a business process are executed in which order. The IHTSDO
+    Workbench DWFA framework has the following flow of control tasks:</p> <ul>
+        <li>Branch Task: An unconditional branching into an arbitrary number
+        of concurrent threads of execution.</li>
+
+        <li>Conditional Branch Task: A conditional branching into an arbitrary
+        number of concurrent threads of execution based on a conditional test.
+        While the conditional branch function is generic in nature, the
+        conditional tests themselves incorporate business logic, and therefore
+        are implemented as subclasses of the Conditional Branch Task.</li>
+
+        <li>End Branch: Unconditional end of a thread of execution.</li>
+
+        <li>Synchronization Task: Provides a checkpoint to ensure that a
+        specified set of concurrent threads has completed—and execution data
+        from those execution threads have been collected—before continuing
+        past the synchronization point. This task works in coordination with
+        the Check Synchronization Task, which is called by each concurrent
+        thread of execution when it completes. This task allows for
+        synchronization of an arbitrary number of concurrent threads of
+        execution.</li>
+
+        <li>Check Synchronization Task: Determines if conditions of the
+        Synchronization Task have been met, and updates the business process
+        held by the Synchronization Task with any tasks completed and
+        registered with the Synchronization Task.</li>
+      </ul> <p>Together, these flow-of-control tasks implement all the flow of
+    control methods defined by the workflow management consortium. How the
+    workflow management coalition defines these methods and how these flow of
+    control methods are implemented in the DWFA framework, are presented in
+    the remainder of this section. </p></section>
+
+    <section><title>Sequential Routing</title><indexterm>sequential routing
+    </indexterm> <p>A segment of a process instance under enactment by a
+    workflow management system in which several activities are executed in
+    sequence under a single thread of execution.</p><p>Sequential routing is
+    the ordinary execution policy of workflow processes. All task are executed
+    in a sequential order unless a Conditional Branch Task or a Branch Task is
+    encountered during execution of a business process.</p></section>
+
+    <section><title>Parallel Routing</title><indexterm>parallel routing
+    </indexterm> <p>A segment or process instance under enactment by a
+    workflow management system, where two or more activity instances are
+    executing in parallel within the workflow, giving rise to multiple threads
+    of control. </p><p>Parallel routing occurs whenever a Conditional Branch
+    Task or a Branch Task that specifies two or more branches of execution is
+    encountered during execution of a business process. </p></section>
+
+    <section><title>AND-Split</title><indexterm>AND-Split </indexterm> <p>A
+    point within the workflow where a single thread of control splits into two
+    or more threads, which are executed in parallel within the workflow,
+    allowing multiple activities to be executed simultaneously.</p><p>An
+    AND-Split occurs whenever a Branch Task that specifies two or more
+    branches is encountered during execution of a business process.
+    </p></section>
+
+    <section><title>AND-Join</title><indexterm>AND-Join </indexterm> <p>A
+    point in the workflow where two or more parallel executing activities
+    converge into a single common thread of control. </p><p>An AND-Join occurs
+    when the Check Synchronization task confirms that all necessary conditions
+    defined by the Synchronization Task have been met. Business process
+    execution then continues using the thread of control that successfully
+    performed the Check Synchronization task. </p></section>
+
+    <section><title>OR-Split</title><indexterm>OR-Split </indexterm> <p>A
+    point in the workflow where a single thread of control makes a decision
+    about which branch to take when encountered with multiple alternative
+    workflow branches. </p><p>An OR-Split occurs whenever a Conditional Branch
+    Task—with a single branch for each possible value of the conditional
+    test—is encountered during execution of a business process.</p></section>
+
+    <section><title> OR-Join</title><indexterm>OR-Join </indexterm> <p>A point
+    within the workflow where two or more alternative activity’s workflow
+    branches re-converge to a single common activity as the next step within
+    the workflow.</p><p>An OR-Join occurs when each of the possible branches
+    of execution from an OR-Split, terminate with a Branch Task that all
+    converge on a single task in the business process. </p></section>
+
+    <section><title>Iteration</title> <p>A workflow activity cycle involving
+    the repetitive execution of one or more workflow tasks until a condition
+    is met.</p> <p>Iteration is supported by a Conditional Branch Task that
+    can branch to the beginning of the cycle until a conditional test is met
+    and then when the conditional test is met, execution continues on one or
+    more independent threads of execution. </p></section>
+  </body>
 </topic>

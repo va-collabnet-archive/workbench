@@ -1,16 +1,13 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-
-
-
- <topic id="topic11" xml:lang="en">
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="e_changeset" xml:lang="en">
   <title>Submitting a Change Set to the IHTSDO Workspace</title>
+
   <body>
-   <section>All of the items related to a concept are called a Change Set. Changes to concepts,
-    source and destination relationships are not logged in the IHTSDO workspace until they are
-    committed into the Subversion version control system. </section>
+    <section>All of the items related to a concept are called a Change Set.
+    Changes to concepts, source and destination relationships are not logged
+    in the IHTSDO workspace until they are committed into the Subversion
+    version control system.</section>
   </body>
- </topic>
-
-
+</topic>

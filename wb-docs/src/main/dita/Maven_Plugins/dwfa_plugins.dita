@@ -1,261 +1,203 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic2" xml:lang="en">
-  <title>DWFA Maven Plug-ins</title>
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="plugins_mojos" xml:lang="en">
+  <title>IHTSDO Maven Plug-ins</title>
+
   <prolog>
     <metadata>
-      <keywords><indexterm>Maven </indexterm></keywords>
+      <keywords>
+        <indexterm>Maven</indexterm>
+      </keywords>
     </metadata>
   </prolog>
-  <body><section>DWFA plug-ins from Informatics Inc. provide support for terminology data
-      transforms, process reports and graphs.</section>
-    <data>
-      <title>Table 8.1: Key DWFA Maven Mojos<ph>
-          <indexterm>Maven </indexterm>
-        </ph></title>
-    </data>
+
+  <body>
+    <section>IHTSDO plug-ins from Informatics Inc. provide support for
+    terminology data transforms, process reports and graphs.</section>
+
+    <data><title>Table 8.1: Key IHTSDO Maven Mojos<ph> <indexterm>Maven
+    </indexterm> </ph></title></data>
+
     <table id="ax1048407">
       <tgroup cols="3">
-        <colspec colnum="1" colname="col1" colwidth="123*"/>
-        <colspec colnum="2" colname="col2" colwidth="95*"/>
-        <colspec colnum="3" colname="col3" colwidth="80*"/>
+        <colspec colname="col1" colnum="1" colwidth="123*"/>
+
+        <colspec colname="col2" colnum="2" colwidth="95*"/>
+
+        <colspec colname="col3" colnum="3" colwidth="80*"/>
+
         <tbody>
           <row>
-            <entry colname="col1">
-              <p>mojo</p>
-            </entry>
-            <entry colname="col2">
-              <p>phase</p>
-            </entry>
-            <entry colname="col3">
-              <p>goals</p>
-            </entry>
+            <entry colname="col1"><p>mojo</p></entry>
+
+            <entry colname="col2"><p>phase</p></entry>
+
+            <entry colname="col3"><p>goals</p></entry>
           </row>
+
           <row>
-            <entry colname="col1">
-              <p>DwfaSetLog</p>
-            </entry>
+            <entry colname="col1"><p>DwfaSetLog</p></entry>
+
             <entry colname="col2"/>
-            <entry colname="col3">
-              <p>dwfa-set-logs</p>
-            </entry>
+
+            <entry colname="col3"><p>dwfa-set-logs</p></entry>
           </row>
+
           <row>
-            <entry namest="col1" nameend="col3">
-              <p>
-                <i>specifications to apply to the specified logs. If you want to specify the root
-                  log, use the logger name of "root".</i>
-              </p>
-            </entry>
+            <entry nameend="col3" namest="col1"><p> <i>specifications to apply
+            to the specified logs. If you want to specify the root log, use
+            the logger name of "root".</i> </p></entry>
           </row>
+
           <row>
-            <entry colname="col1">
-              <p>
-                <ph>ExecuteMain</ph>
-              </p>
-            </entry>
-            <entry colname="col2">
-              <p>
-                <ph>process-resources</ph>
-              </p>
-            </entry>
-            <entry colname="col3">
-              <p>
-                <ph>execute-main</ph>
-              </p>
-            </entry>
+            <entry colname="col1"><p> <ph>ExecuteMain</ph> </p></entry>
+
+            <entry colname="col2"><p> <ph>process-resources</ph> </p></entry>
+
+            <entry colname="col3"><p> <ph>execute-main</ph> </p></entry>
           </row>
+
           <row>
-            <entry namest="col1" nameend="col3">
-              <p>
-                <i>executes sql commands to generate a database or perform other such tasks</i>
-              </p>
-            </entry>
+            <entry nameend="col3" namest="col1"><p> <i>executes sql commands
+            to generate a database or perform other such tasks</i>
+            </p></entry>
           </row>
+
           <row>
-            <entry colname="col1">
-              <p>
-                <ph>ExportAnnotatedBeans</ph>
-              </p>
-            </entry>
+            <entry colname="col1"><p> <ph>ExportAnnotatedBeans</ph>
+            </p></entry>
+
             <entry colname="col2"/>
-            <entry colname="col3">
-              <p>
-                <ph>export-beans</ph>
-              </p>
-            </entry>
+
+            <entry colname="col3"><p> <ph>export-beans</ph> </p></entry>
           </row>
+
           <row>
-            <entry namest="col1" nameend="col3">
-              <p>
-                <i>Goal which writes tasks as java beans for the builder application. This goal
-                  exports beans using the same annotations as the export-annotated-beans goal, but
-                  relies on standard </i>
-                <i>maven class loader, instead of a custom class loader that is installed on top of
-                </i>
-                <i>maven class loader. Since this goal does not rely on a custom class loader, it
-                  can automatically manage the transitive dependencies, and they do not have to be
-                  declared in the project dependency section. However, the primary dependencies must
-                  be declared as part of the dwfa-mojo plugin entry so that the </i>
-                <i>maven class loader can load the dependencies prior to efforts to export the
-                  beans. </i>
-                <indexterm>maven </indexterm>
-                <indexterm>maven </indexterm>
-                <indexterm>maven </indexterm>
-              </p>
-            </entry>
+            <entry nameend="col3" namest="col1"><p> <i>Goal which writes tasks
+            as java beans for the builder application. This goal exports beans
+            using the same annotations as the export-annotated-beans goal, but
+            relies on standard </i> <i>maven class loader, instead of a custom
+            class loader that is installed on top of </i> <i>maven class
+            loader. Since this goal does not rely on a custom class loader, it
+            can automatically manage the transitive dependencies, and they do
+            not have to be declared in the project dependency section.
+            However, the primary dependencies must be declared as part of the
+            dwfa-mojo plugin entry so that the </i> <i>maven class loader can
+            load the dependencies prior to efforts to export the beans. </i>
+            <indexterm>maven </indexterm> <indexterm>maven </indexterm>
+            <indexterm>maven </indexterm> </p></entry>
           </row>
+
           <row>
-            <entry colname="col1">
-              <p>
-                <ph>ExtractAndProcessFiles</ph>
-              </p>
-            </entry>
+            <entry colname="col1"><p> <ph>ExtractAndProcessFiles</ph>
+            </p></entry>
+
             <entry colname="col2"/>
-            <entry colname="col3">
-              <p>process-config</p>
-            </entry>
+
+            <entry colname="col3"><p>process-config</p></entry>
           </row>
+
           <row>
-            <entry namest="col1" nameend="col3">
-              <p>
-                <i>Goal which writes configuration files to the output directory.</i>
-              </p>
-            </entry>
+            <entry nameend="col3" namest="col1"><p> <i>Goal which writes
+            configuration files to the output directory.</i> </p></entry>
           </row>
+
           <row>
-            <entry colname="col1">
-              <p>
-                <ph>GenerateScripts</ph>
-              </p>
-            </entry>
+            <entry colname="col1"><p> <ph>GenerateScripts</ph> </p></entry>
+
             <entry colname="col2"/>
-            <entry colname="col3">
-              <p>generate-scripts</p>
-            </entry>
+
+            <entry colname="col3"><p>generate-scripts</p></entry>
           </row>
+
           <row>
-            <entry namest="col1" nameend="col3">
-              <p>
-                <i>Goal which generates shell scripts to start the dwfa bundle.</i>
-              </p>
-            </entry>
+            <entry nameend="col3" namest="col1"><p> <i>Goal which generates
+            shell scripts to start the Workbench bundle.</i> </p></entry>
           </row>
+
           <row>
-            <entry colname="col1">
-              <p>
-                <ph>Join</ph>
-              </p>
-            </entry>
-            <entry colname="col2">
-              <p>generate-resources</p>
-            </entry>
-            <entry colname="col3">
-              <p>join</p>
-            </entry>
+            <entry colname="col1"><p> <ph>Join</ph> </p></entry>
+
+            <entry colname="col2"><p>generate-resources</p></entry>
+
+            <entry colname="col3"><p>join</p></entry>
           </row>
+
           <row>
-            <entry namest="col1" nameend="col3">
-              <p>
-                <i>joins two data files with a given key. The first file is primary, in that it is
-                  read in and establishes the hash map against which the second file is joined.</i>
-              </p>
-            </entry>
+            <entry nameend="col3" namest="col1"><p> <i>joins two data files
+            with a given key. The first file is primary, in that it is read in
+            and establishes the hash map against which the second file is
+            joined.</i> </p></entry>
           </row>
+
           <row>
-            <entry colname="col1">
-              <p>
-                <ph>ProcessProjectDirectories</ph>
-              </p>
-            </entry>
+            <entry colname="col1"><p> <ph>ProcessProjectDirectories</ph>
+            </p></entry>
+
             <entry colname="col2"/>
-            <entry colname="col3">
-              <p>process-project-dirs</p>
-            </entry>
+
+            <entry colname="col3"><p>process-project-dirs</p></entry>
           </row>
+
           <row>
-            <entry namest="col1" nameend="col3">
-              <p>
-                <i>writes configuration files to the output directory</i>
-              </p>
-            </entry>
+            <entry nameend="col3" namest="col1"><p> <i>writes configuration
+            files to the output directory</i> </p></entry>
           </row>
+
           <row>
-            <entry colname="col1">
-              <p>
-                <ph>Transform</ph>
-              </p>
-            </entry>
-            <entry colname="col2">
-              <p>generate-resources</p>
-            </entry>
-            <entry colname="col3">
-              <p>transform</p>
-            </entry>
+            <entry colname="col1"><p> <ph>Transform</ph> </p></entry>
+
+            <entry colname="col2"><p>generate-resources</p></entry>
+
+            <entry colname="col3"><p>transform</p></entry>
           </row>
+
           <row>
-            <entry namest="col1" nameend="col3">
-              <p>
-                <i>transforms source files and puts them in generated resources.</i>
-              </p>
-            </entry>
+            <entry nameend="col3" namest="col1"><p> <i>transforms source files
+            and puts them in generated resources.</i> </p></entry>
           </row>
+
           <row>
-            <entry colname="col1">
-              <p>
-                <ph>WriteBeans</ph>
-              </p>
-            </entry>
+            <entry colname="col1"><p> <ph>WriteBeans</ph> </p></entry>
+
             <entry colname="col2"/>
-            <entry colname="col3">
-              <p>write-beans</p>
-            </entry>
+
+            <entry colname="col3"><p>write-beans</p></entry>
           </row>
+
           <row>
-            <entry namest="col1" nameend="col3">
-              <p>
-                <i>writes tasks as java beans for the builder application.</i>
-              </p>
-            </entry>
+            <entry nameend="col3" namest="col1"><p> <i>writes tasks as java
+            beans for the builder application.</i> </p></entry>
           </row>
+
           <row>
-            <entry colname="col1">
-              <p>
-                <ph>WriteConfigFile</ph>
-              </p>
-            </entry>
+            <entry colname="col1"><p> <ph>WriteConfigFile</ph> </p></entry>
+
             <entry colname="col2"/>
-            <entry colname="col3">
-              <p>write-config</p>
-            </entry>
+
+            <entry colname="col3"><p>write-config</p></entry>
           </row>
+
           <row>
-            <entry namest="col1" nameend="col3">
-              <p>
-                <i>writes a default startup config file.</i>
-              </p>
-            </entry>
+            <entry nameend="col3" namest="col1"><p> <i>writes a default
+            startup config file.</i> </p></entry>
           </row>
+
           <row>
-            <entry colname="col1">
-              <p>
-                <ph>WriteDirectories</ph>
-              </p>
-            </entry>
+            <entry colname="col1"><p> <ph>WriteDirectories</ph> </p></entry>
+
             <entry colname="col2"/>
-            <entry colname="col3">
-              <p>write-directories</p>
-            </entry>
+
+            <entry colname="col3"><p>write-directories</p></entry>
           </row>
+
           <row>
-            <entry namest="col1" nameend="col3">
-              <p>
-                <i>writes configuration files to the output directory.</i>
-              </p>
-            </entry>
+            <entry nameend="col3" namest="col1"><p> <i>writes configuration
+            files to the output directory.</i> </p></entry>
           </row>
         </tbody>
       </tgroup>
-    </table></body>
+    </table>
+  </body>
 </topic>

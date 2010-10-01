@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic3" xml:lang="en">
+<topic id="classifier_eclipse" xml:lang="en">
   <title>Creating a Classifier project in Eclipse</title>
 
   <prolog>

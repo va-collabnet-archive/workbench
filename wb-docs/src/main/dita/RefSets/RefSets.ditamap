@@ -31,20 +31,6 @@
 
     <topicref href="RefSets_query_language.dita" type="topic"/>
 
-    <topicref href="RefSets_export_import.dita"/>
-
-    <topicref href="RefSets_export.dita" type="topic"/>
-
-    <topicref href="Refsets_export-maven.dita"/>
-
-    <topicref href="RefSets_import.dita" type="topic"/>
-
-    <topicref href="Subsets_export-maven.dita"/>
-
-    <topicref href="RefSets_report_intro.dita" type="topic"/>
-
-    <topicref href="RefSets_report_tasks.dita" type="task"/>
-
     <topicref href="RefSets_create_manually.dita" type="topic"/>
 
     <topicref href="RefSets_create_parent_member.dita" type="topic"/>

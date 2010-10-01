@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic1" xml:lang="en-us">
+<topic id="refsets_intro" xml:lang="en-us">
   <title>Reference Sets</title>
 
   <prolog>
@@ -37,7 +37,7 @@
     <section id="refsets"><title>SNOMED CT Refsets</title><p>During 2008 and
     2009 IHTSDO evolved their Refset specification and aligned it with the
     SNOMED Release Format version 2. The Refset Specification is designed to
-    replace the earlier <xref format="dita" href="#topic1/subsets"/>
+    replace the earlier <xref format="dita" href="#refsets_intro/subsets"/>
     specification developed by the College of American
     Pathologists.</p></section>
 
@@ -48,7 +48,8 @@
     for the creation and management of Refsets, it now also supports the
     ability to import legacy SNOMED CT Subsets for conversion to Refsets. It
     is also possible to export Subsets using the Maven build tool, as
-    described in <xref href="Subsets_export-maven.dita#subset_export-maven"
-    id="S"/> </note></section>
+    described in the <xref
+    href="../RefSets-advanced/Subsets_export-maven.dita">Workbench Developers
+    Guide</xref> </note></section>
   </body>
 </topic>

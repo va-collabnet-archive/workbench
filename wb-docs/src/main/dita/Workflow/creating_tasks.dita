@@ -1,33 +1,46 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic3" xml:lang="en">
- <title>Steps to Create A Task</title>
- <body>
-  <section>There are three steps to creating a task:</section>
-  <section> 1. <ph>Create the task class</ph> by extending <codeph>org.dwfa.bpa.tasks.AbstractTask</codeph>. Put the
-   code to execute the tasks desired action in the evaluate method of your class. Pattern your class
-   after one of the existing example tasks, then add new functionality as desired. The <codeph
-    >org.dwfa.bpa.tasks.web.FetchFromWeb</codeph> task and the <codeph
-    >org.dwfa.bpa.tasks.dialog.ShowInfoDialog</codeph> tasks provide simple examples.</section>
-  <section> 2. <ph>Create a </ph><ph>BeanInfo</ph><fn id="av1057301"> see <xref
-     href="http://java.sun.com/j2se/1.5.0/docs/api/java/beans/BeanInfo.html" scope="external"
-     format="html">
-     <ph>http://java.sun.com/j2se/1.5.0/docs/api/java/beans/BeanInfo.html</ph>
-    </xref></fn><xref href="#topic3/av1057301" scope="local" type="fn" format="dita"/><ph>
-    class</ph> for your task. This BeanInfo class controls how the task is presented in the process
-   builder, and how its properties are edited within the process builder. More information about how
-   to program the BeanInfo class can be found at <ph>here</ph>. Your BeanInfo class must be named
-   following standard conventions where the first part of the name is identical to the name of your
-   task class, followed by "<ph>BeanInfo</ph>". Your BeanInfo class must be in the same package as
-   your task class.</section>
-  <section> 3. <ph>Add an entry to the </ph><codeph>pom.xml</codeph> to write the task to disk as a
-   JavaBean, and include this task in the <codeph>ed-sct-bundle</codeph> application bundle so it can be
-   accessed from the process builder. The generation of JavaBeans during the Maven build process is
-   managed by the <codeph>dwfa-maven-plugin</codeph> module. The syntax for including a new JavaBean
-   specification for this plugin is to add a beanSpec entry such as this entry for the FetchFromWeb
-   task:</section>
-  <codeblock>
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="tasks_creating" xml:lang="en">
+  <title>Steps to Create A Task</title>
+
+  <body>
+    <section>There are three steps to creating a task:</section>
+
+    <section>1. <ph>Create the task class</ph> by extending
+    <codeph>org.dwfa.bpa.tasks.AbstractTask</codeph>. Put the code to execute
+    the tasks desired action in the evaluate method of your class. Pattern
+    your class after one of the existing example tasks, then add new
+    functionality as desired. The
+    <codeph>org.dwfa.bpa.tasks.web.FetchFromWeb</codeph> task and the
+    <codeph>org.dwfa.bpa.tasks.dialog.ShowInfoDialog</codeph> tasks provide
+    simple examples.</section>
+
+    <section>2. <ph>Create a </ph><ph>BeanInfo</ph><fn id="av1057301"> see
+    <xref format="html"
+    href="http://java.sun.com/j2se/1.5.0/docs/api/java/beans/BeanInfo.html"
+    scope="external">
+    <ph>http://java.sun.com/j2se/1.5.0/docs/api/java/beans/BeanInfo.html</ph>
+    </xref></fn><xref format="dita" href="#tasks_creating/av1057301"
+    scope="local" type="fn"/><ph> class</ph> for your task. This BeanInfo
+    class controls how the task is presented in the process builder, and how
+    its properties are edited within the process builder. More information
+    about how to program the BeanInfo class can be found at <ph>here</ph>.
+    Your BeanInfo class must be named following standard conventions where the
+    first part of the name is identical to the name of your task class,
+    followed by "<ph>BeanInfo</ph>". Your BeanInfo class must be in the same
+    package as your task class.</section>
+
+    <section>3. <ph>Add an entry to the </ph><codeph>pom.xml</codeph> to write
+    the task to disk as a JavaBean, and include this task in the
+    <codeph>ed-sct-bundle</codeph> application bundle so it can be accessed
+    from the process builder. The generation of JavaBeans during the Maven
+    build process is managed by the <codeph>dwfa-maven-plugin</codeph> module.
+    The syntax for including a new JavaBean specification for this plugin is
+    to add a beanSpec entry such as this entry for the FetchFromWeb
+    task:</section>
+
+    <codeblock>
    <codeph> &lt;plugin&gt;</codeph>
    <codeph> &lt;groupId&gt;org.dwfa.maven&lt;/groupId&gt;</codeph>
    <codeph> &lt;artifactId&gt;dwfa-maven-plugin&lt;/artifactId&gt;</codeph>
@@ -44,19 +57,29 @@
    <codeph> &lt;configuration&gt;</codeph>
    <codeph> &lt;plugin&gt;</codeph>
   </codeblock>
-  <section> Additional bean specifications can be specified by adding additional beanSpec entries to
-   the plugin configuration.</section>
-  <section><title>Step by Step Example</title></section>
-  <section>The following steps will create a simple "hello world!" task from within
-   eclipse:</section>
-  <section>1. If you have not already done so, follow the steps described in Eclipse Integration to
-   import the process module into your eclipse environment.</section>
-  <section>2. Within eclipse, select the <ph>org.dwfa.bpa.tasks.dialog</ph> package. Right click on
-   this package, and select New &gt; Class. Name the new class HelloWorldDialog, and set the
-   Superclass to be <ph>org.dwfa.bpa.tasks.AbstractTask</ph>, and select the checkbox labeled
-   "Inherited abstract methods". Now commit this dialog, and create the class.</section>
-  <section>3. Change the method:</section>
-  <codeblock>
+
+    <section>Additional bean specifications can be specified by adding
+    additional beanSpec entries to the plugin configuration.</section>
+
+    <section><title>Step by Step Example</title></section>
+
+    <section>The following steps will create a simple "hello world!" task from
+    within eclipse:</section>
+
+    <section>1. If you have not already done so, follow the steps described in
+    Eclipse Integration to import the process module into your eclipse
+    environment.</section>
+
+    <section>2. Within eclipse, select the <ph>org.dwfa.bpa.tasks.dialog</ph>
+    package. Right click on this package, and select New &gt; Class. Name the
+    new class HelloWorldDialog, and set the Superclass to be
+    <ph>org.dwfa.bpa.tasks.AbstractTask</ph>, and select the checkbox labeled
+    "Inherited abstract methods". Now commit this dialog, and create the
+    class.</section>
+
+    <section>3. Change the method:</section>
+
+    <codeblock>
    <codeph> public int[] getDataContainerIds() {</codeph>
    <codeph> // TODO Auto-generated method stub</codeph>
    <codeph> return null;</codeph>
@@ -66,27 +89,38 @@
    <codeph> return new int[] {};</codeph>
    <codeph> }</codeph>
   </codeblock>
-  <section> This method will be deprecated in future versions of the architecture.</section>
-  <section>4. Change the method:</section>
-  <codeblock>
+
+    <section>This method will be deprecated in future versions of the
+    architecture.</section>
+
+    <section>4. Change the method:</section>
+
+    <codeblock>
    <codeph> public Collection&lt;Condition&gt; getConditions() {</codeph>
    <codeph> // TODO Auto-generated method stub</codeph>
    <codeph> return null;</codeph>
    <codeph> }</codeph>
   </codeblock>
-  <section> to the following:</section>
-  <codeblock>
+
+    <section>to the following:</section>
+
+    <codeblock>
    <codeph> public Collection&lt;Condition&gt; getConditions() {</codeph>
    <codeph> return CONTINUE_CONDITION;</codeph>
    <codeph> }</codeph>
   </codeblock>
-  <section>This method defines the possible valid exit conditions for this task. In this case, we
-   just want the environment to continue with the next task after executing this task, hence the
-   CONTINUE_CONDITION specification. Other tasks may allow for branching conditions, or other exit
-   conditions, and may define a different collection of exit conditions.</section>
-  <section>5. Add the following fields and methods to control the serialization of this
-   task:</section>
-  <codeblock>
+
+    <section>This method defines the possible valid exit conditions for this
+    task. In this case, we just want the environment to continue with the next
+    task after executing this task, hence the CONTINUE_CONDITION
+    specification. Other tasks may allow for branching conditions, or other
+    exit conditions, and may define a different collection of exit
+    conditions.</section>
+
+    <section>5. Add the following fields and methods to control the
+    serialization of this task:</section>
+
+    <codeblock>
    <codeph>private static final long serialVersionUID = 1;</codeph>
    <codeph>private static final int dataVersion = 1;</codeph>
    <codeph>private void writeObject(ObjectOutputStream out) throws</codeph>
@@ -104,12 +138,16 @@
    <codeph> }</codeph>
    <codeph>}</codeph>
   </codeblock>
-  <note> Although this task is very simple, other tasks may have more complicated data structures
-   which are set at design time using standard JavaBean editing conventions. By implementing the
-   serialization methods, and by explicitly defining the serialVersionUID and dataVersion, we are
-   providing a foundation for supporting task evolution over time.</note>
-  <section> 6. Change this method:</section>
-   <codeblock> <codeph>public Condition evaluate(I_EncodeBusinessProcess process,</codeph>
+
+    <note>Although this task is very simple, other tasks may have more
+    complicated data structures which are set at design time using standard
+    JavaBean editing conventions. By implementing the serialization methods,
+    and by explicitly defining the serialVersionUID and dataVersion, we are
+    providing a foundation for supporting task evolution over time.</note>
+
+    <section>6. Change this method:</section>
+
+    <codeblock> <codeph>public Condition evaluate(I_EncodeBusinessProcess process,</codeph>
   <codeph> I_Work worker)</codeph>
   <codeph> throws TaskFailedException {</codeph>
 
@@ -117,23 +155,32 @@
    <codeph> return null;</codeph>
    <codeph>}</codeph>
   </codeblock>
-  <section> to the following:</section>
-  <codeblock>
+
+    <section>to the following:</section>
+
+    <codeblock>
    <codeph>public Condition evaluate(I_EncodeBusinessProcess process,</codeph>
    <codeph> I_Work worker) throws TaskFailedException {</codeph>
    <codeph> JOptionPane.showMessageDialog(new JFrame(), "Hello World!");</codeph>
    <codeph> return Condition.CONTINUE;</codeph>
    <codeph>}</codeph>
   </codeblock>
-  <section>The task is now fully functional. To use the task from within the Process Builder, (see
-   the Clinic Demonstration for an introduction to runing the bundled environment, and the Process
-   Builder), we must create a BeanInfo class for this task.</section>
-  <section> 7. Create the BeanInfo class by extending java.beans.SimpleBeanInfo. Within eclipse,
-   select the org.dwfa.bpa.tasks.dialog package. Right click on this package, and select New &gt;
-   Class. Name the new class HelloWorldDialogBeanInfo, and set the Superclass to be
-   java.beans.SimpleBeanInfo. Now commit this dialog, and create the class.</section>
-  <section> 8. Add the following method to this class:</section>
-  <codeblock>
+
+    <section>The task is now fully functional. To use the task from within the
+    Process Builder, (see the Clinic Demonstration for an introduction to
+    runing the bundled environment, and the Process Builder), we must create a
+    BeanInfo class for this task.</section>
+
+    <section>7. Create the BeanInfo class by extending
+    java.beans.SimpleBeanInfo. Within eclipse, select the
+    org.dwfa.bpa.tasks.dialog package. Right click on this package, and select
+    New &gt; Class. Name the new class HelloWorldDialogBeanInfo, and set the
+    Superclass to be java.beans.SimpleBeanInfo. Now commit this dialog, and
+    create the class.</section>
+
+    <section>8. Add the following method to this class:</section>
+
+    <codeblock>
    <codeph>public BeanDescriptor getBeanDescriptor() {</codeph>
    <codeph> BeanDescriptor bd =</codeph>
    <codeph> newBeanDescriptor( HelloWorldDialog.class);</codeph>
@@ -142,13 +189,18 @@
    <codeph> return bd;</codeph>
    <codeph>}</codeph>
   </codeblock>
-  <section>Now that the Task has a BeanInfo class to describe it, it can be made available to the
-   process builder by writing the task bean to disk. This step is managed by adding an entry to the
-   Maven pom.xml file as follows.</section>
-  <section> 9. Open the process pom.xml file from within eclipse, and add the following entry below
-   the entry for org.dwfa.bpa.tasks.dialog.ShowInfoDialog (you can use eclipse to search the file to
-   find this entry):</section>
-  <codeblock>
+
+    <section>Now that the Task has a BeanInfo class to describe it, it can be
+    made available to the process builder by writing the task bean to disk.
+    This step is managed by adding an entry to the Maven pom.xml file as
+    follows.</section>
+
+    <section>9. Open the process pom.xml file from within eclipse, and add the
+    following entry below the entry for
+    org.dwfa.bpa.tasks.dialog.ShowInfoDialog (you can use eclipse to search
+    the file to find this entry):</section>
+
+    <codeblock>
    <codeph> &lt;beanSpec&gt;</codeph>
    <codeph> &lt;sourceName&gt;</codeph>
    <codeph> org.dwfa.bpa.tasks.dialog.HelloWorldDialog</codeph>
@@ -156,17 +208,24 @@
    <codeph> &lt;dirName&gt;dialog&lt;/dirName&gt;</codeph>
    <codeph> &lt;/beanSpec&gt;</codeph>
   </codeblock>
-  <section> 10. Generate a new "bundle" using maven by navigating to the dev/bundle directory and
-   executing either mkbundle.sh (unix) or mkbundle.bat (windows). This command causes all the
-   modules to be built, and bundled in a directory. This directory will be located inside the
-   dev/bundle/target/dwfa-bundle.dir/dwfa when the build is complete. Go stretch for awhile :-) It
-   takes 40 minutes to do this complete bundle build on our development machines.</section>
-  <section> 11. Once the bundle build is complete, you can execute the resulting bundle by executing
-   the startClinic.sh (unix) or startClinic.bat (windows) file located inside of the
-   dev/bundle/target/dwfa-bundle.dir/dwfa directory.</section>
-  <section> 12. After launching the clinic bundle, you should be able to locate the new task from
-   within the Process Builder by selecting the "dialog" folder in the upper left panel of the
-   window, and the new task should be displayed in the lower left panel, and can be dragged onto the
-   process panel on the right.</section>
- </body>
+
+    <section>10. Generate a new "bundle" using maven by navigating to the
+    dev/bundle directory and executing either mkbundle.sh (unix) or
+    mkbundle.bat (windows). This command causes all the modules to be built,
+    and bundled in a directory. This directory will be located inside the
+    dev/bundle/target/dwfa-bundle.dir/dwfa when the build is complete. Go
+    stretch for awhile :-) It takes 40 minutes to do this complete bundle
+    build on our development machines.</section>
+
+    <section>11. Once the bundle build is complete, you can execute the
+    resulting bundle by executing the startClinic.sh (unix) or startClinic.bat
+    (windows) file located inside of the
+    dev/bundle/target/dwfa-bundle.dir/dwfa directory.</section>
+
+    <section>12. After launching the clinic bundle, you should be able to
+    locate the new task from within the Process Builder by selecting the
+    "dialog" folder in the upper left panel of the window, and the new task
+    should be displayed in the lower left panel, and can be dragged onto the
+    process panel on the right.</section>
+  </body>
 </topic>

@@ -2,21 +2,21 @@
 <!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/ditabase.dtd">
 <dita>
-  <topic id="topic10" xml:lang="en">
+  <topic id="process_term_viewer" xml:lang="en">
     <title>Using the Terminology Viewer in Processes</title>
 
     <body>
       <section>Processes can include terminology from the Terminology Viewer
       to, for example, place a process in a queue. To use a terminology
       concept, add a process step that incorporates a concept that can be
-      derived from the Termi­nology Viewer.</section>
+      derived from the Terminology Viewer.</section>
 
       <section>To begin, add a task to the process from, for example, the
       queue tasks, by double-clicking on the queue task in the task list. The
       queue tasks directory will display as shown in <xref format="dita"
-      href="#topic10/ai941621" type="fig"/>. Drag and drop (or cut and paste
-      using Ctrl/C and Ctrl/V) a queue task into the process and link it to
-      the task above (if appropriate).</section>
+      href="#process_term_viewer/ai941621" type="fig"/>. Drag and drop (or cut
+      and paste using Ctrl/C and Ctrl/V) a queue task into the process and
+      link it to the task above (if appropriate).</section>
 
       <fig id="ai941621">
         <title>Adding a Terminology Task from the Queue Directory</title>
@@ -28,17 +28,17 @@
       <section>In the example above, the queue task “To Queue” was added to
       the process. The process will need a specific queue type destination in
       order to send the process to the appropriate queue. You can retrieve the
-      queue type from the Terminology Viewer.</section>
+      queue type from the Terminology Viewer's taxonomy panel.</section>
 
       <section>For ease of use, divide the display screen so that you can view
-      the Termi­nology Viewer and the Process Builder windows at the same
-      time.</section>
+      the taxonomy and the Process Builder windows at the same time.</section>
 
-      <section>In the Terminology Viewer, locate the terminology concept, such
-      as Queue Type, and click on the lever to open the list of queue types.
-      Drag and drop the desired queue type, such as “inbox queue” to the box
-      under “Queue Type” in the process diagram, as shown in <xref
-      format="dita" href="#topic10/ai941745" type="fig"/>.</section>
+      <section>In the taxonomy panel, locate the terminology concept, such as
+      Queue Type under the Terminology Auxiliary concept root, and click on
+      the lever to open the list of queue types. Drag and drop the desired
+      queue type, such as “inbox queue” to the box under “Queue Type” in the
+      process diagram, as shown in <xref format="dita"
+      href="#process_term_viewer/ai941745" type="fig"/>.</section>
 
       <fig id="ai941745">
         <title>Copying from the Terminology Viewer to the Process

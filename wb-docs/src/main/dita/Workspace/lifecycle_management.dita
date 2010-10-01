@@ -1,218 +1,280 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="ws_lifecycle_mgt" xml:lang="en">
+  <title>Application Lifecycle Management — CollabNet SourceForge</title>
 
-<topic id="topic5" xml:lang="en">
- <title>Application Lifecycle Management — CollabNet SourceForge</title>
- <body>
-  <section id="au1000281">IHTSDO Workbench uses CollabNet SourceForge Enterprise®(CSFE) for
-   application management. Built around Subversion, SourceForge is the leading platform for
-   globally distributed software development. From anywhere in the world, all team members can
-   securely access and manage the source code, issues, releases, documents, discussion forums,
-   wikis, reports, and other artifacts related to their projects. <indexterm>SourceForge
-    </indexterm><indexterm>CSFE </indexterm></section>
-  <section>Using SourceForge, administrators can centrally provision all users and assign project
-   asset and tool access permissions based on project role. They can also automate and manage
-   processes with custom workflows, audit logs, and automated monitoring and notification
-   features.</section>
-  <section id="au1000308">CollabNet SourceForge Enterprise is an integrated suite of Web-based SCM,
-   issue tracking, project management, and collaboration tools that empowers teams to build
-   escalation and notification features so stakeholders can be proactively notified of
-   user-specified events such as overdue tasks and status changes. By centralizing management of
-   users, projects, processes, and assets, CSFE dramatically reduces costs, increases productivity,
-   and improves project visibility.<indexterm>CollabNet </indexterm><indexterm>SourceForge
-   </indexterm></section>
-  <section id="au1000327">CSFE was created for improving and enabling distributed development and is
-   built around Subversion. CSFE improves productivity with the integrated software configuration
-   management, file release management, issue tracking, and project management tools such as task
-   and tracker reports.<indexterm>Subversion </indexterm></section>
-  <section>CSFE enables sharing of information through discussion forums, mailing lists, and
-   documentation management that support versioning, role-based access and universal
-   search.</section>
-  <fig id="au1000357">
-   <title>CollabNet SourceForge Edition Project Tools</title>
-   <image href="../images/Workspace_Images/workspace_img_12.jpg" placement="break" width="458"
-    height="332"/>
-  </fig>
-  <section>CSFE was developed to improve productivity and drive reuse with an integrated suite of
-   development and collaboration tools, securely manage projects with centralized access controls
-   and custom workflows, improve project governance with end-to-end lifecycle management, and
-   leverage existing tools, expertise, and assets with the industry’s most open and flexible
-   platform.</section>
-  <section id="au1000379">CollabNet SourceForge Enterprise 5.0 offers numerous benefits to
-   developers and project managers. <indexterm>CollabNet </indexterm><indexterm>SourceForge
-   </indexterm></section>
-  <section>By coordinating the entire lifecycle with complete Application Lifecycle Management
-   (ALM), CSFE improves visibility and establishes end-to-end traceability. It accomplishes this by
-   associating source code with requirements, issues, tasks, documents, discussions and other
-   artifacts. </section>
-  <section>Further, CSFE models the ALM process with customizable project pages and dynamic
-   portlet-like components. Its project templates allow users to capture and share workflows, best
-   practices, and other project content to promote process standardization. </section>
-  <section>CSFE simplifies management and security with common user and project administration. It
-   supports easy modeling and enforcement of organizational structures and relationships (such as
-   outsourced development or QA teams, partner co-development) with a rich role-based access
-   framework. With CSFE, you can map specific tool- or resource-access levels (for example, bug and
-   feature databases, source code repositories, mailing lists, wikis, document folders, or file
-   releases) to the needs of a particular role or group to comply with security policies. In
-   addition, you can validate users against existing LDAP systems for centralized access
-   control.</section>
-  <section>CSFE provides tools to easily create and manage project workspaces, allowing you to
-   standardize or customize project resources, content, and organization. The entire site can be
-   customized to align community and corporate identities.</section>
-  <section id="au1000457">CSFE enables distributed SCM with Subversion and file release systems by
-   establishing a secure, central artifact and project content inventory. As a result, it simplifies
-   SCM repository creation, configuration and browsing. Issues, requirements, and other artifacts
-   are associated with commits in one or multiple SCM repositories. These capabilities allow you to
-   publish and manage approved file release packages easily and confidently.<indexterm>CSFE
-   </indexterm></section>
-  <section>Issues and other development artifacts are tracked and managed with CSFE’s integrated
-   change management.With this functionality, you can establish workflows between any artifacts,
-   including requirements, feature requests, defects, issues and tasks. Stakeholders receive
-   automatic notification of changes. </section>
-  <section>With CSFE, project management visibility is improved, allowing greater insight into
-   project plans, deliverables and development status. Activity metrics support real-time evaluation
-   of project activity. Data is summarized into convenient dashboard views of graphical reports and
-   trends. </section>
-  <section>Collaborating with integrated forums, mailing lists, wikis, and document management is
-   streamlined. CSFE supports global searching across all project communications. You can capture
-   and archive forum and mailing list history and automatically generate a knowledge base. CSFE’s
-   ability to maintain a complete history and versioning of documents and wikis provides team
-   members with valuable information. In addition, document reviews – including comments, approvals,
-   and publications – are easily initiated and managed. CSFE enables instant notification of
-   changes to monitored discussions, wikis, documents, or artifacts.</section>
-  <section>Lastly, CSFE project tools enable interoperability and extensibility with Open Web
-   Services APIs.</section>
-  <section>CSFE Tool Integration – CSFE provides a single, common view into the data held by all
-   tools that are integrated with the CSFE platform. This includes CSFE tools, and
-   third-partydeveloped tools. Integration is achieved through pre-built CSFE tool integrations or
-   via well-documented APIs and the CSFE SDK that supports SOAP XML Web Services and Java RMI
-   APIs.</section>
-  <fig id="au1000731">
-   <title>CollabNet SourceForge Edition Architecture</title>
-   <image href="../images/Workspace_Images/workspace_img_16.jpg" placement="break" width="378"
-    height="241"/>
-  </fig>
-  <section id="au1000740">
-   <title>Enterprise-class architecture</title>
-  </section>
-  <section>CollabNet SourceForge Enterprise Edition is built using a highly scalable and extensible
-   Java 2 Enterprise Edition (J2EE) architecture. The scalability of CSFE has been proven with
-   several real-world deployments of over 10,000 users. It features a comprehensive, open API based
-   on SOAP web services together with a complementary SDK to facilitate easy integration and
-   extensibility with external systems and tools. The ability of SourceForge to integrate
-   seamlessly with external technologies in a straightforward and non-disruptive fashion is
-   instrumental in protecting and extending investments in existing tools, training and
-   expertise.</section>
-  <section id="au1000765">
-   <title>Three-Tiered Web Services Oriented Architecture</title>
-  </section>
-  <section>CSFE was architected and built explicitly for enterprise integration and extensibility.
-   This will allow terminology developers to use this framework to integrate with many different
-   partner solutions. The CollabNet SDK is downloadable from the <xref
-    href="http://www.open.collab.net" scope="external" format="html">
-    <ph>www.open.collab.net</ph>
-   </xref> website, available for all customer and partners. </section>
-  <section id="au1000790">
-   <title>Role Based Security</title>
-  </section>
-  <section id="au1000802">CSFE helps protect all assets via secure, role-based access controls and
-   operations. These access controls allow authorized personnel to set secure, fine-grained
-   permission on what users can see, access and change at all levels, both project and
+  <body>
+    <section id="au1000281">IHTSDO Workbench uses CollabNet SourceForge
+    Enterprise®(CSFE) for application management. Built around Subversion,
+    SourceForge is the leading platform for globally distributed software
+    development. From anywhere in the world, all team members can securely
+    access and manage the source code, issues, releases, documents, discussion
+    forums, wikis, reports, and other artifacts related to their projects.
+    <indexterm>SourceForge </indexterm><indexterm>CSFE </indexterm></section>
+
+    <section>Using SourceForge, administrators can centrally provision all
+    users and assign project asset and tool access permissions based on
+    project role. They can also automate and manage processes with custom
+    workflows, audit logs, and automated monitoring and notification
+    features.</section>
+
+    <section id="au1000308">CollabNet SourceForge Enterprise is an integrated
+    suite of Web-based SCM, issue tracking, project management, and
+    collaboration tools that empowers teams to build escalation and
+    notification features so stakeholders can be proactively notified of
+    user-specified events such as overdue tasks and status changes. By
+    centralizing management of users, projects, processes, and assets, CSFE
+    dramatically reduces costs, increases productivity, and improves project
+    visibility.<indexterm>CollabNet </indexterm><indexterm>SourceForge
+    </indexterm></section>
+
+    <section id="au1000327">CSFE was created for improving and enabling
+    distributed development and is built around Subversion. CSFE improves
+    productivity with the integrated software configuration management, file
+    release management, issue tracking, and project management tools such as
+    task and tracker reports.<indexterm>Subversion </indexterm></section>
+
+    <section>CSFE enables sharing of information through discussion forums,
+    mailing lists, and documentation management that support versioning,
+    role-based access and universal search.</section>
+
+    <fig id="au1000357">
+      <title>CollabNet SourceForge Edition Project Tools</title>
+
+      <image height="332"
+             href="../images/Workspace_Images/workspace_img_12.jpg"
+             placement="break" width="458"/>
+    </fig>
+
+    <section>CSFE was developed to improve productivity and drive reuse with
+    an integrated suite of development and collaboration tools, securely
+    manage projects with centralized access controls and custom workflows,
+    improve project governance with end-to-end lifecycle management, and
+    leverage existing tools, expertise, and assets with the industry’s most
+    open and flexible platform.</section>
+
+    <section id="au1000379">CollabNet SourceForge Enterprise 5.0 offers
+    numerous benefits to developers and project managers. <indexterm>CollabNet
+    </indexterm><indexterm>SourceForge </indexterm></section>
+
+    <section>By coordinating the entire lifecycle with complete Application
+    Lifecycle Management (ALM), CSFE improves visibility and establishes
+    end-to-end traceability. It accomplishes this by associating source code
+    with requirements, issues, tasks, documents, discussions and other
+    artifacts.</section>
+
+    <section>Further, CSFE models the ALM process with customizable project
+    pages and dynamic portlet-like components. Its project templates allow
+    users to capture and share workflows, best practices, and other project
+    content to promote process standardization.</section>
+
+    <section>CSFE simplifies management and security with common user and
+    project administration. It supports easy modeling and enforcement of
+    organizational structures and relationships (such as outsourced
+    development or QA teams, partner co-development) with a rich role-based
+    access framework. With CSFE, you can map specific tool- or resource-access
+    levels (for example, bug and feature databases, source code repositories,
+    mailing lists, wikis, document folders, or file releases) to the needs of
+    a particular role or group to comply with security policies. In addition,
+    you can validate users against existing LDAP systems for centralized
+    access control.</section>
+
+    <section>CSFE provides tools to easily create and manage project
+    workspaces, allowing you to standardize or customize project resources,
+    content, and organization. The entire site can be customized to align
+    community and corporate identities.</section>
+
+    <section id="au1000457">CSFE enables distributed SCM with Subversion and
+    file release systems by establishing a secure, central artifact and
+    project content inventory. As a result, it simplifies SCM repository
+    creation, configuration and browsing. Issues, requirements, and other
+    artifacts are associated with commits in one or multiple SCM repositories.
+    These capabilities allow you to publish and manage approved file release
+    packages easily and confidently.<indexterm>CSFE </indexterm></section>
+
+    <section>Issues and other development artifacts are tracked and managed
+    with CSFE’s integrated change management.With this functionality, you can
+    establish workflows between any artifacts, including requirements, feature
+    requests, defects, issues and tasks. Stakeholders receive automatic
+    notification of changes.</section>
+
+    <section>With CSFE, project management visibility is improved, allowing
+    greater insight into project plans, deliverables and development status.
+    Activity metrics support real-time evaluation of project activity. Data is
+    summarized into convenient dashboard views of graphical reports and
+    trends.</section>
+
+    <section>Collaborating with integrated forums, mailing lists, wikis, and
+    document management is streamlined. CSFE supports global searching across
+    all project communications. You can capture and archive forum and mailing
+    list history and automatically generate a knowledge base. CSFE’s ability
+    to maintain a complete history and versioning of documents and wikis
+    provides team members with valuable information. In addition, document
+    reviews – including comments, approvals, and publications – are easily
+    initiated and managed. CSFE enables instant notification of changes to
+    monitored discussions, wikis, documents, or artifacts.</section>
+
+    <section>Lastly, CSFE project tools enable interoperability and
+    extensibility with Open Web Services APIs.</section>
+
+    <section>CSFE Tool Integration – CSFE provides a single, common view into
+    the data held by all tools that are integrated with the CSFE platform.
+    This includes CSFE tools, and third-partydeveloped tools. Integration is
+    achieved through pre-built CSFE tool integrations or via well-documented
+    APIs and the CSFE SDK that supports SOAP XML Web Services and Java RMI
+    APIs.</section>
+
+    <fig id="au1000731">
+      <title>CollabNet SourceForge Edition Architecture</title>
+
+      <image height="241"
+             href="../images/Workspace_Images/workspace_img_16.jpg"
+             placement="break" width="378"/>
+    </fig>
+
+    <section id="au1000740"><title>Enterprise-class
+    architecture</title></section>
+
+    <section>CollabNet SourceForge Enterprise Edition is built using a highly
+    scalable and extensible Java 2 Enterprise Edition (J2EE) architecture. The
+    scalability of CSFE has been proven with several real-world deployments of
+    over 10,000 users. It features a comprehensive, open API based on SOAP web
+    services together with a complementary SDK to facilitate easy integration
+    and extensibility with external systems and tools. The ability of
+    SourceForge to integrate seamlessly with external technologies in a
+    straightforward and non-disruptive fashion is instrumental in protecting
+    and extending investments in existing tools, training and
+    expertise.</section>
+
+    <section id="au1000765"><title>Three-Tiered Web Services Oriented
+    Architecture</title></section>
+
+    <section>CSFE was architected and built explicitly for enterprise
+    integration and extensibility. This will allow terminology developers to
+    use this framework to integrate with many different partner solutions. The
+    CollabNet SDK is downloadable from the <xref format="html"
+    href="http://www.open.collab.net" scope="external">
+    <ph>www.open.collab.net</ph> </xref> website, available for all customer
+    and partners.</section>
+
+    <section id="au1000790"><title>Role Based Security</title></section>
+
+    <section id="au1000802">CSFE helps protect all assets via secure,
+    role-based access controls and operations. These access controls allow
+    authorized personnel to set secure, fine-grained permission on what users
+    can see, access and change at all levels, both project and
     tools.<indexterm>CSFE </indexterm></section>
-  <section id="au1000812">
-   <title>SourceForge Explorer</title>
-  </section>
-  <section>CSFE also includes a .NET application that communicates via SOAP API with CSFE.</section>
-  <section id="au1000834">
-   <title>Project Management</title>
-  </section>
-  <section>CSFE integrates bi-directionally with Microsoft Project (and other project management
-   tools). Project plans created in MS Project can be easily loaded into CSFE, allowing staff and
-   managers to assign tasks, track status, rapidly identify problems and dependencies, and maintain
-   a complete project audit trail within CSFE, together with the ability to re-sync data with MS
-   Project at anytime.</section>
-  <section id="au1000864">
-   <title>Project Dashboard</title>
-  </section>
-  <section>Staff at every level of the organization (subject to their role and permissions status
-   within CSFE Enterprise Edition) can open their browser and view the high-level, real-time status
-   of every project. They can instantly see which projects are on track and which are not and where
-   problems exist. Project managers will spend less time gathering data and looking for problems and
-   more time solving them. CSFE even provides automated monitoring, escalation, and notification
-   features so stakeholders can be proactively notified of user-specified events such as overdue
-   tasks, status changes, and more.</section>
-  <section id="au1000899">
-   <title>Collaboration</title>
-  </section>
-  <section>Collaboration tools and capabilities within CSFE will make it easier for team members and
-   organizations to work together, no matter where they are located. Favored collaboration methods
-   such as email are supported in CSFE via mailing lists, list management and the archiving of all
-   e-mail in threaded discussion forums. In addition, CSFE provides discussion forums, centralized
-   news, and project status reporting that helps keep everyone on the same page. Support for
-   asynchronous, written collaboration methods such as email and discussion forums are particularly
-   useful for distributed organizations. Time-zone differences sometimes make phone calls and
-   instant messaging impractical. Emails and forums give people time to research and understand
-   issues, frame responses, and ask clarifying questions.</section>
-  <section>Project communications and other project artifacts (documents, issues, tasks, code, etc.)
-   may be associated with each other inside CSFE. This allows relevant links to be made between
-   materials submitted by different users and also helps team members quickly understand the context
-   of issues and activities to which they are assigned. They spend less time “reverse-engineering”
-   information from multiple sources and systems and more time making productive contributions. </section>
-  <section id="au1000955">
-   <title>Document Management</title>
-  </section>
-  <section>CSFE includes an easy-to-use document management system that enables users to store,
-   share, collaborate, and manage documents in virtually any file format. The system includes a
-   straightforward, configurable workflow mechanism for managing document review, approval, comment,
-   and publication. It also provides full document versioning and comment history. All documents
-   stored in the CSFE Document Manager are indexed for the purposes of searching and can be
-   associated with one or more project artifacts to add context and clarity. </section>
-  <section id="au1000983">
-   <title>Requirements Management</title>
-  </section>
-  <section>CSFE has native tool support for Requirements Management. This enables
-   project/applications requirements to be developed, refined, documented, and managed within a
-   common development platform. Requirements that are in the “formative stages” in MS Word documents
-   and spreadsheets can be managed with the CSFE document manager until their subsequent entry into
-   the requirements management system. </section>
-  <section id="au1001019">
-   <title>Developer Management</title>
-  </section>
-  <section>As a common global development platform, CSFE provides the underlying workspace, or
-   “backbone”, that unifies application project activity regardless of the type of IDE<fn
-    id="au1001787"/><xref href="#topic5/au1001787" scope="local" type="fn" format="dita"/> used by
-   individual developers. Developer access to versioned assets, discussion forums, mailing lists,
-   and centralized build and test environments can all be managed through the IHTSDO
-   Workspace.</section>
-  <section id="au1001049">
-   <title>Change Management</title>
-  </section>
-  <section>As a global development platform, CSFE integrates with a wide range of change management
-   systems. We are recommending CollabNet SourceForge as the repository foundation. However, CSFE
-   can integrate with other change management systems.</section>
-  <section id="au1001075">
-   <title>“ALM” Templates<ph>
-     <indexterm>ALM </indexterm>
-    </ph></title>
-  </section>
-  <section>CSFE supports the use of project templates as blueprints to quickly create new projects
-   with pre-defined project structure, content, Tracker artifact types with embedded workflows, and
-   Tracker queries. </section>
-  <section>This feature includes being able to import and customize ALM templates when creating new
-   projects to establish local or global process and workflow standards. </section>
-  <section id="au1001110">
-   <title>Issue Tracker</title>
-  </section>
-  <section>SourceForge includes a sophisticated, highly configurable, easy-to-use issue tracker. The
-   Tracker is general purpose and can be configured for automatic capture, management, communication
-   and resolution of defects/bugs, requirements, change requests, incidents, support requests and
-   more. </section>
-  <section id="au1001132">
-   <title>Help</title>
-  </section>
-  <section>Online help is available for all CSFE tools. CollabNet also offers many web based
-   training modules that will be available. </section>
- </body>
-</topic>
 
+    <section id="au1000812"><title>SourceForge Explorer</title></section>
+
+    <section>CSFE also includes a .NET application that communicates via SOAP
+    API with CSFE.</section>
+
+    <section id="au1000834"><title>Project Management</title></section>
+
+    <section>CSFE integrates bi-directionally with Microsoft Project (and
+    other project management tools). Project plans created in MS Project can
+    be easily loaded into CSFE, allowing staff and managers to assign tasks,
+    track status, rapidly identify problems and dependencies, and maintain a
+    complete project audit trail within CSFE, together with the ability to
+    re-sync data with MS Project at anytime.</section>
+
+    <section id="au1000864"><title>Project Dashboard</title></section>
+
+    <section>Staff at every level of the organization (subject to their role
+    and permissions status within CSFE Enterprise Edition) can open their
+    browser and view the high-level, real-time status of every project. They
+    can instantly see which projects are on track and which are not and where
+    problems exist. Project managers will spend less time gathering data and
+    looking for problems and more time solving them. CSFE even provides
+    automated monitoring, escalation, and notification features so
+    stakeholders can be proactively notified of user-specified events such as
+    overdue tasks, status changes, and more.</section>
+
+    <section id="au1000899"><title>Collaboration</title></section>
+
+    <section>Collaboration tools and capabilities within CSFE will make it
+    easier for team members and organizations to work together, no matter
+    where they are located. Favored collaboration methods such as email are
+    supported in CSFE via mailing lists, list management and the archiving of
+    all e-mail in threaded discussion forums. In addition, CSFE provides
+    discussion forums, centralized news, and project status reporting that
+    helps keep everyone on the same page. Support for asynchronous, written
+    collaboration methods such as email and discussion forums are particularly
+    useful for distributed organizations. Time-zone differences sometimes make
+    phone calls and instant messaging impractical. Emails and forums give
+    people time to research and understand issues, frame responses, and ask
+    clarifying questions.</section>
+
+    <section>Project communications and other project artifacts (documents,
+    issues, tasks, code, etc.) may be associated with each other inside CSFE.
+    This allows relevant links to be made between materials submitted by
+    different users and also helps team members quickly understand the context
+    of issues and activities to which they are assigned. They spend less time
+    “reverse-engineering” information from multiple sources and systems and
+    more time making productive contributions.</section>
+
+    <section id="au1000955"><title>Document Management</title></section>
+
+    <section>CSFE includes an easy-to-use document management system that
+    enables users to store, share, collaborate, and manage documents in
+    virtually any file format. The system includes a straightforward,
+    configurable workflow mechanism for managing document review, approval,
+    comment, and publication. It also provides full document versioning and
+    comment history. All documents stored in the CSFE Document Manager are
+    indexed for the purposes of searching and can be associated with one or
+    more project artifacts to add context and clarity.</section>
+
+    <section id="au1000983"><title>Requirements Management</title></section>
+
+    <section>CSFE has native tool support for Requirements Management. This
+    enables project/applications requirements to be developed, refined,
+    documented, and managed within a common development platform. Requirements
+    that are in the “formative stages” in MS Word documents and spreadsheets
+    can be managed with the CSFE document manager until their subsequent entry
+    into the requirements management system.</section>
+
+    <section id="au1001019"><title>Developer Management</title></section>
+
+    <section>As a common global development platform, CSFE provides the
+    underlying workspace, or “backbone”, that unifies application project
+    activity regardless of the type of IDE<fn id="au1001787"/><xref
+    format="dita" href="#ws_lifecycle_mgt/au1001787" scope="local" type="fn"/>
+    used by individual developers. Developer access to versioned assets,
+    discussion forums, mailing lists, and centralized build and test
+    environments can all be managed through the IHTSDO Workspace.</section>
+
+    <section id="au1001049"><title>Change Management</title></section>
+
+    <section>As a global development platform, CSFE integrates with a wide
+    range of change management systems. We are recommending CollabNet
+    SourceForge as the repository foundation. However, CSFE can integrate with
+    other change management systems.</section>
+
+    <section id="au1001075"><title>“ALM” Templates<ph> <indexterm>ALM
+    </indexterm> </ph></title></section>
+
+    <section>CSFE supports the use of project templates as blueprints to
+    quickly create new projects with pre-defined project structure, content,
+    Tracker artifact types with embedded workflows, and Tracker
+    queries.</section>
+
+    <section>This feature includes being able to import and customize ALM
+    templates when creating new projects to establish local or global process
+    and workflow standards.</section>
+
+    <section id="au1001110"><title>Issue Tracker</title></section>
+
+    <section>SourceForge includes a sophisticated, highly configurable,
+    easy-to-use issue tracker. The Tracker is general purpose and can be
+    configured for automatic capture, management, communication and resolution
+    of defects/bugs, requirements, change requests, incidents, support
+    requests and more.</section>
+
+    <section id="au1001132"><title>Help</title></section>
+
+    <section>Online help is available for all CSFE tools. CollabNet also
+    offers many web based training modules that will be available.</section>
+  </body>
+</topic>

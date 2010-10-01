@@ -27,7 +27,7 @@
       <prodname>IHTSDO Workbench</prodname>
 
       <vrmlist>
-        <vrm version="1.9a"/>
+        <vrm version="2.0"/>
       </vrmlist>
     </prodinfo>
 
@@ -132,6 +132,10 @@
 
   <chapter format="ditamap" href="../Managing_Data/ManagingData.ditamap"
            navtitle="Data Import"/>
+
+  <chapter format="ditamap"
+           href="../RefSets-advanced/RefSets-advanced.ditamap"
+           navtitle="Advanced Refset processing"/>
 
   <chapter format="ditamap" href="../FAQ/FAQ.ditamap"
            navtitle="Toolkit Support and Troubleshooting"/>

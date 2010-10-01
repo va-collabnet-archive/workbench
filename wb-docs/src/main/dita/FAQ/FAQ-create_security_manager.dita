@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN"
 "http://docs.oasis-open.org/dita/dtd/topic.dtd">
-<topic id="namespace_ID_allocation">
+<topic id="security_manager">
   <title>Why do I get "access denied" for the runtimePermission
   <i>createSecurityManager</i>?</title>
 

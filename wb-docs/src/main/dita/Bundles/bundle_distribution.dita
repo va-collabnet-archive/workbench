@@ -1,13 +1,16 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"   "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="bundle_continuum" xml:lang="en">
+  <title>Distribution and update via Continuum</title>
 
-
-<topic id="topic4" xml:lang="en">
-<title>Distribution and update via Continuum</title>
-<body>
-<section>Continuum is an Apache product for managing automatic updates and synchronisation
-of deployments in a distributed environment. </section>
-
-</body>
+  <body>
+    <section>Continuum is an Apache product for managing automatic updates and
+    synchronisation of deployments in a distributed environment. It provides
+    for "continuous integration" when changes are made to source code or
+    features of the workbench. There is a dedicated IHTSDO continuous
+    integration server. National Release Centres and other organisations
+    augmenting or adapting the workbench may run their own integration
+    server(s).</section>
+  </body>
 </topic>
-

@@ -15,10 +15,10 @@
   <body>
     <note>The preferred method for creating reference sets is via
     specification refsets as described in <xref
-    href="RefSets_concepts_autocreation.dita#autogenerating_concepts"/>. For
-    large refsets, this method usually involves fewer steps and is easier to
-    maintain. The following describes the method for creating refset members
-    directly manually.</note>
+    href="RefSets_concepts_autocreation.dita"/>. For large refsets, this
+    method usually involves fewer steps and is easier to maintain. The
+    following describes the method for creating refset members directly
+    manually.</note>
 
     <section>Create a member refset concept first, before creating its
     corresponding specification refset. This is to ensure that a destination
@@ -31,8 +31,10 @@
     qualified name and a preferred name. The Terminology Workbench IDE already
     has a <i>refset</i> node in in the concept hierarchy under the <i>Refset
     Auxilliary Concept</i> hierarchy, to which the concept should have a
-    source <codeph>IS-A</codeph> relationship. Use either the <i>add new
-    concept</i> <image
+    source <codeph>IS-A</codeph> <indexterm>IS-A<indexterm>refset manual
+    creation<index-see-also>is a</index-see-also><index-see-also>Is
+    a</index-see-also></indexterm></indexterm>relationship. Use either the
+    <i>add new concept</i> <image
     href="../images/Using_The_ACE_Editor_Images/icon_new_concept.png"
     id="image_4724a867-8bfb-44ef-9457-fc3519e1dd6a"/>button, or the <i>clone
     concept</i> <image

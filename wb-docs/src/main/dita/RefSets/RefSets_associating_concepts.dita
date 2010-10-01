@@ -1,84 +1,107 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic4" xml:lang="en">
- <title>Associating Concepts with a Specification Reference Set</title>
- <prolog>
-  <author/>
-  <metadata>
-   <keywords>
-    <indexterm>Specification Refset<indexterm>constructing</indexterm><indexterm
-      >modifying</indexterm></indexterm>
-   </keywords>
-  </metadata>
- </prolog>
- <body>
-  <section>To create a reference set, you must specify which concepts will be members (and which
-   will not) in the specification refset. This entails constructing a specification expression based
-   on the inbuilt query language components ( see <xref href="RefSets_query_language.dita#topic9"
-    format="dita">Query Language</xref> ) and can be performed using the graphical user interface
-   without any programming. A query component can be selected from the pop-up dialog actived by
-   right mouse-click in the refset construction pane of the right-hand component panel as shown in
-    <xref href="#topic4/add_specification_clause" format="dita"/>. <note>Most expression components
-    reference an existing concept. Either the concept is included or excluded, or the concept points
-    to a taxonomy branch or refset that in turn is included or excluded. Before adding the
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="refsets_associating_concepts" xml:lang="en">
+  <title>Associating Concepts with a Specification Reference Set</title>
+
+  <prolog>
+    <author/>
+
+    <metadata>
+      <keywords>
+        <indexterm>Specification
+        Refset<indexterm>constructing</indexterm><indexterm>modifying</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section>To create a reference set, you must specify which concepts will
+    be members (and which will not) in the specification refset. This entails
+    constructing a specification expression based on the inbuilt query
+    language components ( see <xref format="dita"
+    href="RefSets_query_language.dita">Query Language</xref> ) and can be
+    performed using the graphical user interface without any programming. A
+    query component can be selected from the pop-up dialog actived by right
+    mouse-click in the refset construction pane of the right-hand component
+    panel as shown in <xref format="dita"
+    href="#refsets_associating_concepts/add_specification_clause"/>.
+    <note>Most expression components reference an existing concept. Either the
+    concept is included or excluded, or the concept points to a taxonomy
+    branch or refset that in turn is included or excluded. Before adding the
     expression clause, ensure that the appropriate concept is selected in the
-   hierarchy.</note></section>
-  <section id="ak1007591"><title>Adding a specification clause to a Specification Reference
-    Set</title><ph>
-    <indexterm>Specification Reference Set </indexterm>
-    <indexterm>refset <indexterm>specification</indexterm>
-    </indexterm>
-   </ph>
-  </section>
-  <section>To add a concept to an existing refset, select the concept in the taxonomy, and apply the
-    <i>Add CONCEPT IS clause</i> from the pop-up menu that appears when right-clicking in the Refset
-   Specification area. For the meaning of the other clauses, see .</section>
-  <fig id="add_specification_clause">
-   <title>Adding a new clause to a specification refset</title>
-   <image href="../images/Refsets_Images/refset_expression_tokens.jpg" placement="break"/>
-  </fig>
-  <section><title>Retiring concepts from a Refset Specification</title>
-   <indexterm>specification refset<indexterm>retiring concepts</indexterm></indexterm>
-   <indexterm>refset<indexterm>retiring concepts</indexterm></indexterm> Concepts can be removed
-   from a refset by explicit exclusion. However, it is often more appropriate to remove a concept
-   from the specification by retiring the concept from the specification refset. This is achieved
-   from the refset specification pane, by right clicking on the selected concept, and choosing
-   'Retire' from the pop-up dialog, as illustrated in <xref
-    href="#topic4/fig_retiring_from_specification" format="dita"/>. <fig
-    id="fig_retiring_from_specification">
-    <title>Retiring a concept from a specification refset</title>
-    <image href="../images/Refsets_Images/retire_concept.jpg" placement="break"/>
-   </fig></section>
-  <section><title>Data Checks</title>
-   If the user adds an inactive concept to a refset the user is presented with a data alert notifying them that 
-   the concept added is inactive. The user is asked to confirm that they still want to add the concept. Commit 
-   is not prevented because there could be a clinical reason to add an inactive concept to a refset. </section>
-  <section id="ak1015597">
-   <title>Committing Changes<ph>
-     <indexterm>Committing Changes <indexterm>refsets</indexterm>
-     </indexterm>
-    </ph></title>
-  </section>
-  <section>The refset associations entered are provisional. No changes are made to the database
-   until you click the commit button (at the bottom right of the window). If you do not wish to
-   apply these entries, click the cancel button (next to the commit button) to clear the provisional
-   refset associations from the display. They will not be applied to the database.</section>
-  <section id="computing_members"><title>Computing the members</title>
-   <indexterm>refsets<indexterm>computing</indexterm></indexterm> The <i>compute refset from refset
-    spec</i>
-   <image href="../images/Refsets_Images/icon_compute_refset.png"/> button activates a process which
-   parses the specification expression and resolves all the members of the corresponding member
-   refset and marked parent refset. The progress of this process can be monitoried in the Activity
-   Viewer window. Users should remember to recompute the membership if ever a change is made to the
-   specification refset or if there is a change to the underlying taxonomy upon which the refset is
-   based. Release centres may wish to automate this as part of their release Quality Assurance
-   processing.</section>
-  <section>Buttons on the refset panel continue to be accessible whilst a refset is being computed.
-   This means a user may start a refset computation, and then edit an existing refset (or create a
-   new one) while waiting for the computation to finish. However, only one computation may occur at
-   any given time due to dependencies.. To prevent multiple computations, the compute button will be
-   disabled <image href="../images/Refsets_Images/icon_compute_refset_disabled.png"/> while a
-   compute is in progress, and re-enabled upon completion.</section>
- </body>
+    hierarchy.</note></section>
+
+    <section id="ak1007591"><title>Adding a specification clause to a
+    Specification Reference Set</title><ph> <indexterm>Specification Reference
+    Set </indexterm> <indexterm>refset <indexterm>specification</indexterm>
+    </indexterm> </ph></section>
+
+    <section>To add a concept to an existing refset, select the concept in the
+    taxonomy, and apply the <i>Add CONCEPT IS clause</i> from the pop-up menu
+    that appears when right-clicking in the Refset Specification area. For the
+    meaning of the other clauses, see .</section>
+
+    <fig id="add_specification_clause">
+      <title>Adding a new clause to a specification refset</title>
+
+      <image href="../images/Refsets_Images/refset_expression_tokens.jpg"
+             placement="break"/>
+    </fig>
+
+    <section><title>Retiring concepts from a Refset Specification</title>
+    <indexterm>specification refset<indexterm>retiring
+    concepts</indexterm></indexterm> <indexterm>refset<indexterm>retiring
+    concepts</indexterm></indexterm> Concepts can be removed from a refset by
+    explicit exclusion. However, it is often more appropriate to remove a
+    concept from the specification by retiring the concept from the
+    specification refset. This is achieved from the refset specification pane,
+    by right clicking on the selected concept, and choosing 'Retire' from the
+    pop-up dialog, as illustrated in <xref format="dita"
+    href="#refsets_associating_concepts/fig_retiring_from_specification"/>.
+    <fig id="fig_retiring_from_specification">
+        <title>Retiring a concept from a specification refset</title>
+
+        <image href="../images/Refsets_Images/retire_concept.jpg"
+               placement="break"/>
+      </fig></section>
+
+    <section><title>Data Checks</title>
+    If the user adds an inactive concept to a refset the user is presented with a data alert notifying them that 
+    the concept added is inactive. The user is asked to confirm that they still want to add the concept. Commit 
+    is not prevented because there could be a clinical reason to add an inactive concept to a refset. </section>
+
+    <section id="ak1015597"><title>Committing Changes<ph>
+    <indexterm>Committing Changes <indexterm>refsets</indexterm> </indexterm>
+    </ph></title></section>
+
+    <section>The refset associations entered are provisional. No changes are
+    made to the database until you click the commit button (at the bottom
+    right of the window). If you do not wish to apply these entries, click the
+    cancel button (next to the commit button) to clear the provisional refset
+    associations from the display. They will not be applied to the
+    database.</section>
+
+    <section id="computing_members"><title>Computing the members</title>
+    <indexterm>refsets<indexterm>computing</indexterm></indexterm> The
+    <i>compute refset from refset spec</i> <image
+    href="../images/Refsets_Images/icon_compute_refset.png"/> button activates
+    a process which parses the specification expression and resolves all the
+    members of the corresponding member refset and marked parent refset. The
+    progress of this process can be monitoried in the Activity Viewer window.
+    Users should remember to recompute the membership if ever a change is made
+    to the specification refset or if there is a change to the underlying
+    taxonomy upon which the refset is based. Release centres may wish to
+    automate this as part of their release Quality Assurance
+    processing.</section>
+
+    <section>Buttons on the refset panel continue to be accessible whilst a
+    refset is being computed. This means a user may start a refset
+    computation, and then edit an existing refset (or create a new one) while
+    waiting for the computation to finish. However, only one computation may
+    occur at any given time due to dependencies.. To prevent multiple
+    computations, the compute button will be disabled <image
+    href="../images/Refsets_Images/icon_compute_refset_disabled.png"/> while a
+    compute is in progress, and re-enabled upon completion.</section>
+  </body>
 </topic>

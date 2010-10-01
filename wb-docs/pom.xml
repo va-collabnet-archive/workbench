@@ -9,11 +9,11 @@
 	</parent>
 
 	<artifactId>wb-docs</artifactId>
-	<name>Augment DITA documentation with BP tasks</name>
+	<name>BP task dita files for Guidebook</name>
 
 	<description>Generate Workbench Guidebook DITA topic files for Business Process 
-                     Tasks by parsing collections java bean source files. Package all DITA topic files
-		     and ditamaps for later processing by DITA Open Toolkit.
+                Tasks by parsing collections of java bean source files. Package all DITA topic files
+		          and ditamaps for later processing by DITA Open Toolkit.
 	</description>
 
 	<packaging>pom</packaging>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic8" xml:lang="en">
+<topic id="e_searching" xml:lang="en">
   <title>Using the Search Function</title>
 
   <prolog>
@@ -18,7 +18,7 @@
     search function area provides a way to search for a complete or partial
     concept name. The search reviews all of the hierarchies, or just the
     hierarchy specified in the Root field (<xref format="dita"
-    href="#topic8/ag935505" type="section"/>) and then displays a list of
+    href="#e_searching/ag935505" type="section"/>) and then displays a list of
     every concept matching your search criteria. Using more advanced criteria,
     you can search within a specified portion of the hierarchy, within
     reference sets, or relationship type and destination. The results
@@ -73,8 +73,8 @@
     id="ag939574">Apache Lucene is a high-performance, full-featured text
     search engine library written entirely in Java. It is a technology
     suitable for nearly any application that requires full-text search,
-    especially cross-platform.</fn><xref format="dita" href="#topic8/ag939574"
-    scope="local" type="fn"/></section>
+    especially cross-platform.</fn><xref format="dita"
+    href="#e_searching/ag939574" scope="local" type="fn"/></section>
 
     <section><title>Lucene terms</title> A query is broken up into terms and
     operators. There are two types of terms: Single Terms and Phrases. A
@@ -199,7 +199,7 @@
 
     <section>To further define a search using additional criteria, click on
     the Plus symbol on the left of the Query field. An additional search line
-    will appear, as shown in <xref format="dita" href="#topic8/ag949777"
+    will appear, as shown in <xref format="dita" href="#e_searching/ag949777"
     type="fig"/>.</section>
 
     <fig id="ag949777">
@@ -304,7 +304,7 @@
     Panel is configured with its visible tabbed pane also linked to the
     taxonomy, then this too will also be populated with the corresponding
     concept.</p> <p>The results of such a linking are illustrated in <xref
-    format="dita" href="#topic8/fig_search_taxonomy_linking"/>. <fig
+    format="dita" href="#e_searching/fig_search_taxonomy_linking"/>. <fig
         id="fig_search_taxonomy_linking">
         <title>Locating a search result term in the taxonomy</title>
 

@@ -1,89 +1,91 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="bundle_structure" xml:lang="en">
+  <title>Bundle structure</title>
 
+  <body>
+    <section id="aw1047568">Each Maven project has its own POM and each Maven
+    project typically has one primary output. The rest of this section
+    describes the Maven projects typically used to generate an IHTSDO
+    Workbench application bundle build.<indexterm>Maven
+    </indexterm><indexterm>POM </indexterm><indexterm>Maven
+    </indexterm><indexterm>Maven </indexterm></section>
 
-<topic id="topic1a" xml:lang="en">
- <title>Bundle structure</title>
- <body>
-   <section id="aw1047568">Each Maven project has its own POM and each Maven project typically has
-   one primary output. The rest of this section describes the Maven projects typically used to
-   generate an IHTSDO Workbench application bundle build.<indexterm>Maven </indexterm><indexterm>POM
-    </indexterm><indexterm>Maven </indexterm><indexterm>Maven </indexterm></section>
-  <section id="aw1047587">Each Maven project for the editing application bundle build follows
-   Maven’s recommended directory structure, naming conventions for the directory structure and the
-   naming conventions for the primary output of the project. Some of the key projects used to define
-   an editing application bundle project are:<indexterm>Maven </indexterm><indexterm>Maven
-   </indexterm></section>
-  <section id="aw1047605">
-   <title>IHTSDO Workbench-api project</title>
-  </section>
-  <section id="aw1047618">The IHTSDO Workbench API project contains the large set of classes that
-   embody most of the IHTSDO Workbench Editor functionality that might need to be referenced by
-   those developers intending to extend or enhance the editor. Source code is not open source.
-   Contact Informatics Inc. for details. Target code is packaged under Maven as
-    <codeph>ace-api-</codeph><codeph>VERSION</codeph><codeph>.jar</codeph><indexterm>Maven </indexterm><indexterm>ace-api
-   </indexterm></section>
-  <section id="aw1047637">
-   <title>foundation project<ph>
-     <indexterm>foundation java components <indexterm>Maven project</indexterm>
-     </indexterm>
-     <indexterm>Maven project <indexterm>foundation</indexterm>
-     </indexterm>
-    </ph></title>
-  </section>
-  <section id="aw1047650">The foundation project contains utility classes that are general in nature
-   and shared by all the project modules. Source code is distributed under the Apache 2 open source
-   licence and is managed via the collabnet subversion repository at <xref
-    href="https://dwfa.aceworkspace.net/" scope="external" format="html">
-    <ph>https://dwfa.aceworkspace.net/</ph>
-   </xref>. Source code has been contributed by Informatics Inc. Target code is packaged under
-   Maven as <codeph>foundation-</codeph><codeph>VERSION</codeph><codeph>.jar</codeph><indexterm>subversion
+    <section id="aw1047587">Each Maven project for the editing application
+    bundle build follows Maven’s recommended directory structure, naming
+    conventions for the directory structure and the naming conventions for the
+    primary output of the project. Some of the key projects used to define an
+    editing application bundle project are:<indexterm>Maven
     </indexterm><indexterm>Maven </indexterm></section>
-  <section id="aw1047672">
-   <title>core project<ph>
-     <indexterm>core DWFA components <indexterm>project Maven project
-       <indexterm>core</indexterm></indexterm>
-     </indexterm>
-    </ph></title>
-  </section>
-  <section id="aw1047685">This project contains the majority of basic business logic classes that
-   control the distributed workflow capability, including business process control and scheduling
-   and queuing classes. Source code is distributed under the Apache 2 open source licence and is
-   managed via the collabnet subversion repository at <xref href="https://dwfa.aceworkspace.net/"
-    scope="external" format="html">
-    <ph>https://dwfa.aceworkspace.net/</ph>
-   </xref>. Source code has been contributed by Informatics Inc. Target code is packaged under
-   Maven as <codeph>core-</codeph><codeph>VERSION</codeph><codeph>.jar</codeph>.<indexterm>subversion
+
+    <section id="aw1047605"><title>IHTSDO Workbench-api
+    project</title></section>
+
+    <section id="aw1047618">The IHTSDO Workbench API project contains the
+    large set of classes that embody most of the IHTSDO Workbench Editor
+    functionality that might need to be referenced by those developers
+    intending to extend or enhance the editor. Source code is not open source.
+    Contact Informatics Inc. for details. Target code is packaged under Maven
+    as
+    <codeph>ace-api-</codeph><codeph>VERSION</codeph><codeph>.jar</codeph><indexterm>Maven
+    </indexterm><indexterm>ace-api </indexterm></section>
+
+    <section id="aw1047637"><title>foundation project<ph>
+    <indexterm>foundation java components <indexterm>Maven project</indexterm>
+    </indexterm> <indexterm>Maven project <indexterm>foundation</indexterm>
+    </indexterm> </ph></title></section>
+
+    <section id="aw1047650">The foundation project contains utility classes
+    that are general in nature and shared by all the project modules. Source
+    code is distributed under the Apache 2 open source licence and is managed
+    via the collabnet subversion repository at <xref format="html"
+    href="https://dwfa.aceworkspace.net/" scope="external">
+    <ph>https://dwfa.aceworkspace.net/</ph> </xref>. Source code has been
+    contributed by Informatics Inc. Target code is packaged under Maven as
+    <codeph>foundation-</codeph><codeph>VERSION</codeph><codeph>.jar</codeph><indexterm>subversion
     </indexterm><indexterm>Maven </indexterm></section>
-  <section id="aw1047708">
-   <title>vodb project<ph>
-     <indexterm>vodb java components <indexterm>project</indexterm>
-     </indexterm>
-     <indexterm>Maven proect <indexterm>vodb</indexterm>
-     </indexterm>
-    </ph></title>
-  </section>
-  <section id="aw1047721">The Versioned Object Database (VODB) project uses the java Berkeley DB<fn
-    id="aw1057383">Goals are what are executed to perform an action on the project. For example, the
-    jar:jar will compile the current project and produce a JAR. Each goal exists in a plugin, and
-    the goal name typically reflects the plugin (e.g. java:comple comes from the java
-    plugin).</fn><xref href="#topic1a/aw1057383" scope="local" type="fn" format="dita"/> framework
-   and engine developed by Sleepycat Software, and now managed by Oracle.<indexterm>VODB
-    </indexterm><indexterm>BerkeleyDB </indexterm><indexterm>Berkeley DB
-    </indexterm><indexterm>Maven goals </indexterm></section>
-  <section id="aw1047786">
-   <title>term-mojo project<ph>
-     <indexterm>term-mojo <indexterm>Maven project</indexterm>
-     </indexterm>
-     <indexterm>Maven project <indexterm>vodb</indexterm>
-     </indexterm>
-    </ph></title>
-  </section>
-  <section id="aw1047799">This project manages building Maven plugins that, in turn, are used to
-   transform terminology data in preparation for importing into standard file formats used by the
-   IHTSDO Workbench version-orented database, and by other applications.<indexterm>Maven
-   </indexterm></section>
- </body>
+
+    <section id="aw1047672"><title>core project<ph> <indexterm>core DWFA
+    components <indexterm>project Maven project
+    <indexterm>core</indexterm></indexterm> </indexterm>
+    </ph></title></section>
+
+    <section id="aw1047685">This project contains the majority of basic
+    business logic classes that control the distributed workflow capability,
+    including business process control and scheduling and queuing classes.
+    Source code is distributed under the Apache 2 open source licence and is
+    managed via the collabnet subversion repository at <xref format="html"
+    href="https://dwfa.aceworkspace.net/" scope="external">
+    <ph>https://dwfa.aceworkspace.net/</ph> </xref>. Source code has been
+    contributed by Informatics Inc. Target code is packaged under Maven as
+    <codeph>core-</codeph><codeph>VERSION</codeph><codeph>.jar</codeph>.<indexterm>subversion
+    </indexterm><indexterm>Maven </indexterm></section>
+
+    <section id="aw1047708"><title>vodb project<ph> <indexterm>vodb java
+    components <indexterm>project</indexterm> </indexterm> <indexterm>Maven
+    proect <indexterm>vodb</indexterm> </indexterm> </ph></title></section>
+
+    <section id="aw1047721">The Versioned Object Database (VODB) project uses
+    the java Berkeley DB<fn id="aw1057383">Goals are what are executed to
+    perform an action on the project. For example, the jar:jar will compile
+    the current project and produce a JAR. Each goal exists in a plugin, and
+    the goal name typically reflects the plugin (e.g. java:comple comes from
+    the java plugin).</fn><xref format="dita"
+    href="#bundle_structure/aw1057383" scope="local" type="fn"/> framework and
+    engine developed by Sleepycat Software, and now managed by
+    Oracle.<indexterm>VODB </indexterm><indexterm>BerkeleyDB
+    </indexterm><indexterm>Berkeley DB </indexterm><indexterm>Maven goals
+    </indexterm></section>
+
+    <section id="aw1047786"><title>term-mojo project<ph> <indexterm>term-mojo
+    <indexterm>Maven project</indexterm> </indexterm> <indexterm>Maven project
+    <indexterm>vodb</indexterm> </indexterm> </ph></title></section>
+
+    <section id="aw1047799">This project manages building Maven plugins that,
+    in turn, are used to transform terminology data in preparation for
+    importing into standard file formats used by the IHTSDO Workbench
+    version-orented database, and by other applications.<indexterm>Maven
+    </indexterm></section>
+  </body>
 </topic>
-

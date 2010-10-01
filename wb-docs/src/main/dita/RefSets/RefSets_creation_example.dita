@@ -60,7 +60,8 @@
         <stepxmp><fig>
             <title>Refset creation form - first page</title>
 
-            <image href="../images/Refsets_Images/creation_form_1.jpg"/>
+            <image href="../images/Refsets_Images/creation_form_1.jpg"
+                   placement="break"/>
           </fig></stepxmp>
 
         <substeps>
@@ -91,7 +92,7 @@
         refset creation process to the editor's inbox. The refset author will
         then proceed to specify how the members of the refset are to be
         defined, using the refset query expression language described in <xref
-        href="RefSets_query_language.dita#topic9"/>.</stepresult>
+        href="RefSets_query_language.dita"/>.</stepresult>
       </step>
 
       <step>
@@ -105,7 +106,8 @@
         <stepxmp><fig>
             <title>Refset creation process in Editor's inbox</title>
 
-            <image href="../images/Refsets_Images/editors_inbox.jpg"/>
+            <image href="../images/Refsets_Images/editors_inbox.jpg"
+                   placement="break"/>
           </fig></stepxmp>
       </step>
 
@@ -117,7 +119,8 @@
         <stepxmp><fig>
             <title>Editor's view of the refset creation process</title>
 
-            <image href="../images/Refsets_Images/creation_wizard_2a.jpg"/>
+            <image href="../images/Refsets_Images/creation_wizard_2a.jpg"
+                   placement="break"/>
           </fig></stepxmp>
       </step>
 
@@ -126,14 +129,13 @@
         specification tab of the refset pane. The specification expression is
         built from a set of primitives and terminology concepts, which can be
         combined into clauses. Refer to <xref
-        href="RefSets_query_language.dita#topic9"/>, and the example in <xref
-        href="associating_example.dita#associating_example"/>. The editor can
-        pause the process at any time by saving the current specification back
-        in his/her todo <indexterm>todo inbox</indexterm>inbox (implemented in
-        a <xref format="dita"
-        href="../Queues/queues_intro.dita/#topic1">queue</xref>), as a process
-        for editing at a later date. This is done via the <i>send to queue</i>
-        <image href="../images/Refsets_Images/save_to_todo.jpg"/>
+        href="RefSets_query_language.dita"/>, and the example in <xref
+        href="associating_example.dita"/>. The editor can pause the process at
+        any time by saving the current specification back in his/her todo
+        <indexterm>todo inbox</indexterm>inbox (implemented in a <xref
+        format="dita" href="../Queues/queues_intro.dita">queue</xref>), as a
+        process for editing at a later date. This is done via the <i>send to
+        queue</i> <image href="../images/Refsets_Images/save_to_todo.jpg"/>
         button.</cmd>
       </step>
 
@@ -149,7 +151,8 @@
             <title id="refset_spec_expression">sample refset specification
             expression</title>
 
-            <image href="../images/Refsets_Images/spec_logic_example.jpg"/>
+            <image href="../images/Refsets_Images/spec_logic_example.jpg"
+                   placement="break"/>
           </fig></stepxmp>
 
         <info><note>When editing the specification expression, pay particular
@@ -179,7 +182,8 @@
         <stepxmp><fig>
             <title>computing refset message</title>
 
-            <image href="../images/Refsets_Images/review-form-notice.jpg"/>
+            <image href="../images/Refsets_Images/review-form-notice.jpg"
+                   placement="break"/>
           </fig></stepxmp>
       </step>
 
@@ -193,7 +197,8 @@
         <stepxmp><fig>
             <title>reviewer approval/disapproval step</title>
 
-            <image href="../images/Refsets_Images/review-approve-notice.jpg"/>
+            <image href="../images/Refsets_Images/review-approve-notice.jpg"
+                   placement="break"/>
           </fig></stepxmp>
       </step>
 
@@ -206,7 +211,8 @@
             <title>reviewer checks one or more members for
             approval/disapproval</title>
 
-            <image href="../images/Refsets_Images/review-approve-member.jpg"/>
+            <image href="../images/Refsets_Images/review-approve-member.jpg"
+                   placement="break"/>
           </fig></stepxmp>
       </step>
 
@@ -221,7 +227,8 @@
         <stepxmp><fig>
             <title>prompt for simple refset member export file</title>
 
-            <image href="../images/Refsets_Images/review-tab_delimit_question.jpg"/>
+            <image href="../images/Refsets_Images/review-tab_delimit_question.jpg"
+                   placement="break"/>
           </fig></stepxmp>
       </step>
 

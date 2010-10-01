@@ -10,8 +10,8 @@
     <copyright>
       <copyryear year="2010"/>
 
-      <copyrholder>International Standards Development Organisation (IHTSDO)
-      </copyrholder>
+      <copyrholder>International Standards Development Organisation
+      (IHTSDO)</copyrholder>
     </copyright>
 
     <metadata>
@@ -72,7 +72,7 @@
     author.</p></section>
 
     <section><title>Other Paths</title><p>Classifier Path - see <xref
-    href="../Classifying/Classifying_intro.dita#topic1"/></p></section>
+    href="../Classifying/Classifying_intro.dita"/></p></section>
 
     <section><title>Editors' workflow and paths</title><p>When a new user
     needs to be configured into a collaborative authoring/editing environment,

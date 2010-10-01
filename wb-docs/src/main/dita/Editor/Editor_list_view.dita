@@ -1,46 +1,62 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="e_list_view" xml:lang="en">
+  <title>Using the List View</title>
 
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>List View</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
 
+  <body>
+    <section>The List View tab provides a way to conduct operations and
+    execute batch changes on a list of child concepts related to the focus
+    concept. When you click on the List tab, the List View window will display
+    <xref format="dita" href="#e_list_view/ag937955" type="fig"/>.</section>
 
-<topic id="topic7" xml:lang="en">
- <title>Using the List View </title>
- <prolog>
-  <metadata>
-   <keywords>
-    <indexterm>List View </indexterm>
-   </keywords>
-  </metadata>
- </prolog>
- <body>
-  <section>The List View tab provides a way to conduct operations and execute batch changes on a
-   list of child concepts related to the focus concept. When you click on the List tab, the List
-   View window will display <xref href="#topic7/ag937955" type="fig" format="dita"/>.</section>
-  <fig id="ag937955">
-   <title>List View Window</title>
-   <image href="../images/Using_The_ACE_Editor_Images/list_view.jpg" placement="break"/>
-  </fig>
-  <section>The List View window includes the business process plug-ins and toggle shown in <xref
-    href="#topic7/ag937977" type="fig" format="dita"/>.</section>
-  <fig id="ag937977">
-   <title>List View Window Plug-Ins and Toggle</title>
-   <image href="../images/Using_The_ACE_Editor_Images/list_view_toggles.jpg"
-    placement="break"/>
-  </fig>
-  <ul>
-   <li>Component View Toggle: Displays or hides component view of selected child concept.</li>
-   <li>Process Builder Plug-In: Displays or hides the process builder business process view.</li>
-   <li>Add Children to List Plug-In: Adds all of the children of the focus concept to a list, so
-    operations can be performed on the list of child concepts. Added child concepts will be
-    displayed in the “Destination Relationships” section of the Concepts Work Area.</li>
-   <li>Change Items to Selected Status Plug-In.</li>
-   <li>Iterate Over Concepts in the List View Plug-In.</li>
-   <li>Mark as Current Plug-In.</li>
-   <li>Flag Concepts in List Plug-In.</li>
-   <li>Move Items to New Parent Plug-In.</li>
-  </ul>
- </body>
+    <fig id="ag937955">
+      <title>List View Window</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/list_view.jpg"
+             placement="break"/>
+    </fig>
+
+    <section>The List View window includes the business process plug-ins and
+    toggle shown in <xref format="dita" href="#e_list_view/ag937977"
+    type="fig"/>.</section>
+
+    <fig id="ag937977">
+      <title>List View Window Plug-Ins and Toggle</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/list_view_toggles.jpg"
+             placement="break"/>
+    </fig>
+
+    <ul>
+      <li>Component View Toggle: Displays or hides component view of selected
+      child concept.</li>
+
+      <li>Process Builder Plug-In: Displays or hides the process builder
+      business process view.</li>
+
+      <li>Add Children to List Plug-In: Adds all of the children of the focus
+      concept to a list, so operations can be performed on the list of child
+      concepts. Added child concepts will be displayed in the “Destination
+      Relationships” section of the Concepts Work Area.</li>
+
+      <li>Change Items to Selected Status Plug-In.</li>
+
+      <li>Iterate Over Concepts in the List View Plug-In.</li>
+
+      <li>Mark as Current Plug-In.</li>
+
+      <li>Flag Concepts in List Plug-In.</li>
+
+      <li>Move Items to New Parent Plug-In.</li>
+    </ul>
+  </body>
 </topic>
-
- 

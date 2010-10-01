@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic3" xml:lang="en">
+<topic id="dev_key_concepts" xml:lang="en">
   <title>Key Concepts</title>
 
   <prolog>
@@ -28,8 +28,8 @@
     from Sun Microsystem's Java initiative. Similar to a <i>zip</i> or other
     archiving technology. Jar files contain a <i>MANIFEST</i> section of
     metadata about the archive. </fn><xref format="dita"
-    href="#topic3/at1057199" scope="local" type="fn"/><i> </i>file for version
-    management purposes.</section>
+    href="#dev_key_concepts/at1057199" scope="local" type="fn"/><i> </i>file
+    for version management purposes.</section>
 
     <section id="at1003629"><b>module</b>: [Maven concept]<indexterm>Maven
     concept<indexterm>module</indexterm></indexterm></section>
@@ -60,14 +60,14 @@
     access. A subversion repository on Collabnet<fn id="at1057225"> <xref
     format="html" href="http://www.collab.net" scope="external">
     <ph>http://www.collab.net</ph> </xref> </fn><xref format="dita"
-    href="#topic3/at1057225" scope="local" type="fn"/> may be used for storing
-    source code for developers of IHTSDO Workbench IDE components and Maven
-    plugins. A Subversion repository may also be also used by terminology
-    modellers for storing terminology changesets and change history from their
-    IHTSDO Workbench profiles. Maven repositories are used to hold built
-    components (jar files) that are used for constructing executable IHTSDO
-    Workbench IDE bundles, replete with SNOMED and/or other terminology sets
-    within a single database.<indexterm>repository
+    href="#dev_key_concepts/at1057225" scope="local" type="fn"/> may be used
+    for storing source code for developers of IHTSDO Workbench IDE components
+    and Maven plugins. A Subversion repository may also be also used by
+    terminology modellers for storing terminology changesets and change
+    history from their IHTSDO Workbench profiles. Maven repositories are used
+    to hold built components (jar files) that are used for constructing
+    executable IHTSDO Workbench IDE bundles, replete with SNOMED and/or other
+    terminology sets within a single database.<indexterm>repository
     </indexterm><indexterm>Maven
     concept<indexterm>repository</indexterm></indexterm><indexterm>Subversion
     </indexterm><indexterm>version </indexterm></section>
@@ -100,8 +100,9 @@
     IHTSDO Workbench's Apache Continuum server to facilitate this.<fn
     id="at1057262"> <xref format="html" href="http://continuum.apache.org/"
     scope="external"> <ph>http://continuum.apache.org</ph> </xref> </fn><xref
-    format="dita" href="#topic3/at1057262" scope="local" type="fn"/> server to
-    drive Maven builds after source code changes have been committed to the
-    IHTSDO workspace.<indexterm>Continuous Integration </indexterm></section>
+    format="dita" href="#dev_key_concepts/at1057262" scope="local" type="fn"/>
+    server to drive Maven builds after source code changes have been committed
+    to the IHTSDO workspace.<indexterm>Continuous Integration
+    </indexterm></section>
   </body>
 </topic>

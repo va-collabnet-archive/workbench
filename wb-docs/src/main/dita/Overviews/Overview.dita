@@ -1,108 +1,155 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic1" xml:lang="en">
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="over1" xml:lang="en">
   <title>Overview of the IHTSDO Toolkit</title>
-  <shortdesc>The IHTSDO Workbench Toolkit constitutes a powerful and flexible environment for
-    building, packaging and deploying tools for the production and management of clinical
-    terminologies and classifications.</shortdesc>
+
+  <shortdesc>The IHTSDO Workbench Toolkit constitutes a powerful and flexible
+  environment for building, packaging and deploying tools for the production
+  and management of clinical terminologies and classifications.</shortdesc>
+
   <body>
     <section>The toolkit comprises: <ul>
         <li>a set of pre-built components - jar files</li>
+
         <li>a set of source code components</li>
+
         <li>a set of terminology data files</li>
+
         <li>a repository for distribution and management of components</li>
-        <li>a set of scripts for automating various processes for building and deploying terminology
-          development tools and associated artefacts</li>
+
+        <li>a set of scripts for automating various processes for building and
+        deploying terminology development tools and associated artefacts</li>
+
         <li>a distributed workflow management system</li>
+
         <li>an extendable terminology editor</li>
+
         <li>an extendable terminology viewer</li>
       </ul></section>
-    <section>An IHTSDO IDE <i>application bundle</i> is a package of components ready for
-      installation on an end-user's computer. Such a bundle includes the various software
-      components, configuration files, policy files, predefined workflow tasks, a database
-      containing one or more versions of SNOMED, and other additional term sets relevant to the
-      terminology modeller's functional requirements. A terminology modeller may have several
-      different bundles on his/her machine, particularly during a period of rapid functional change.
-      In such cases, it is important to differentiate and clarify the functionality provided by each
-      bundle.</section>
+
+    <section>An IHTSDO IDE <i>application bundle</i> is a package of
+    components ready for installation on an end-user's computer. Such a bundle
+    includes the various software components, configuration files, policy
+    files, predefined workflow tasks, a database containing one or more
+    versions of SNOMED, and other additional term sets relevant to the
+    terminology modeller's functional requirements. A terminology modeller may
+    have several different bundles on his/her machine, particularly during a
+    period of rapid functional change. In such cases, it is important to
+    differentiate and clarify the functionality provided by each
+    bundle.</section>
   </body>
-  <topic id="topic2" xml:lang="en">
+
+  <topic id="over2" xml:lang="en">
     <title>IHTSDO Workbench Architecture</title>
+
     <body>
-      <section>IHTSDO Workbench is founded upon a loosely–coupled distributed architecture that
-        provides: </section>
+      <section>IHTSDO Workbench is founded upon a loosely–coupled distributed
+      architecture that provides:</section>
+
       <p>Reliable operations over unreliable networks</p>
-      <p>Business–process driven activities that can function reliably (and with high performance)
-        while disconnected from the network </p>
+
+      <p>Business–process driven activities that can function reliably (and
+      with high performance) while disconnected from the network</p>
+
       <p>No single point of system failure</p>
-      <section>Such loosely–coupled distributed architectures are common in applications where a
-        rich user experience is required, where user productivity is a primary concern, and where
-        disconnected operations are required. Some well-known applications that use these same
-        architectural principles include e-mail and calendar applications, and most software
-        development environments–such as Eclipse.</section>
-      <section>The IHTSDO Workbench architecture can scale computationally and organizationally as
-        the internal needs of the organization expand, and as terminology collaborations expand to
-        include an increasing number of external organizations.</section>
+
+      <section>Such loosely–coupled distributed architectures are common in
+      applications where a rich user experience is required, where user
+      productivity is a primary concern, and where disconnected operations are
+      required. Some well-known applications that use these same architectural
+      principles include e-mail and calendar applications, and most software
+      development environments–such as Eclipse.</section>
+
+      <section>The IHTSDO Workbench architecture can scale computationally and
+      organizationally as the internal needs of the organization expand, and
+      as terminology collaborations expand to include an increasing number of
+      external organizations.</section>
     </body>
   </topic>
-  <topic id="topic3" xml:lang="en">
+
+  <topic id="over3" xml:lang="en">
     <title>Non-Proprietary Foundation</title>
+
     <body>
-      <section>IHTSDO Workbench is based on a non-proprietary foundation. This non-proprietary
-        foundation enables multiple vendors to provide tools and services. The non-proprietary
-        foundation is based on a non-proprietary interchange format. This interchange format is
-        based on the SNOMED interchange format but with added extensions to support the needed
-        functionality. </section>
+      <section>IHTSDO Workbench is based on a non-proprietary foundation. This
+      non-proprietary foundation enables multiple vendors to provide tools and
+      services. The non-proprietary foundation is based on a non-proprietary
+      interchange format. This interchange format is based on the SNOMED
+      interchange format but with added extensions to support the needed
+      functionality.</section>
+
       <fig id="ab1069933">
         <title>Non-Proprietary Foundation</title>
-        <image href="../images/Overview_Images/overview_arch.jpg" placement="break"/>
+
+        <image href="../images/Overview_Images/overview_arch.jpg"
+               placement="break"/>
       </fig>
-      <section>This non-proprietary interchange is essential to remove and prevent vendor lock. This
-        non-proprietary foundation is the basis for an extensible infrastructure, and is extensible
-        through data access or extensions to the build environment.</section>
+
+      <section>This non-proprietary interchange is essential to remove and
+      prevent vendor lock. This non-proprietary foundation is the basis for an
+      extensible infrastructure, and is extensible through data access or
+      extensions to the build environment.</section>
+
       <fig id="ab1072876">
         <title>Extensible Infrastructure</title>
-        <image href="../images/Overview_Images/overview_extensible.jpg" placement="break"/>
+
+        <image href="../images/Overview_Images/overview_extensible.jpg"
+               placement="break"/>
       </fig>
     </body>
   </topic>
-  <topic id="topic4" xml:lang="en">
+
+  <topic id="over4" xml:lang="en">
     <title>Best-Practice Based</title>
+
     <body>
-      <section><title>Develop Iteratively</title> Given today's sophisticated systems, it is not
-        possible to sequentially first define the entire problem, design the entire solution, build
-        the software and then test the product at the end. An iterative approach is required that
-        allows an increasing understanding of the problem through successive refinements, and to
-        incrementally grow an effective solution over multiple iterations. <p>The IHTSDO Workbench
-          supports an iterative approach to development that allows developers to address the
-          highest risk items at every stage in the lifecycle, significantly reducing a project's
-          risk profile. This iterative approach helps attack risk through demonstrable
-          progress—frequent, executable releases that enable continuous end-user involvement and
-          feedback. Because each iteration ends with an executable release, the development team
-          stays focused on producing results, and frequent status checks help ensure that the
-          project stays on schedule. An iterative approach also makes it easier to accommodate
-          tactical changes in requirements, features or schedule.</p></section>
-      <section><title>Manage Requirements</title> The IHTSDO Workbench provides the necessary tools
-        to elicit, organize, and document required functionality and constraints, track and document
-        tradeoffs and decisions, and easily capture and communicate business requirements.</section>
-      <section><title>Use Component-Based Architectures</title> The IHTSDO Workbench provides a
-        framework that enables early development and baselining of a robust terminology
-        architecture, prior to committing resources for full-scale development. It describes how to
-        design a resilient architecture that is flexible, accommodates change, is intuitively
-        understandable, and promotes more effective reuse. </section>
-      <section><title>Verify Quality</title>The IHTSDO Workbench allows terminology developers to
-        build quality assessment into the process, in all activities, involving all participants,
-        using objective measurements and criteria, without being treated as an afterthought or a
-        separate activity performed by a separate group.</section>
-      <section><title>Control Changes</title>The IHTSDO Workbench allows users to manage
-        change--making certain that each change is acceptable, and being able to track those
-        changes. The IHTSDO Workbench provides the ability to control, track and monitor changes to
-        enable successful iterative development. The IHTSDO Workbench also makes it simple to
-        establish secure workspaces for each developer by providing isolation from changes made in
-        other workspaces and by controlling changes of all artifacts (e.g., models, code, documents,
-        etc.). And it brings a team together to work as a single unit by providing automated
-        integration and build management.</section>
+      <section><title>Develop Iteratively</title> Given today's sophisticated
+      systems, it is not possible to sequentially first define the entire
+      problem, design the entire solution, build the software and then test
+      the product at the end. An iterative approach is required that allows an
+      increasing understanding of the problem through successive refinements,
+      and to incrementally grow an effective solution over multiple
+      iterations. <p>The IHTSDO Workbench supports an iterative approach to
+      development that allows developers to address the highest risk items at
+      every stage in the lifecycle, significantly reducing a project's risk
+      profile. This iterative approach helps attack risk through demonstrable
+      progress—frequent, executable releases that enable continuous end-user
+      involvement and feedback. Because each iteration ends with an executable
+      release, the development team stays focused on producing results, and
+      frequent status checks help ensure that the project stays on schedule.
+      An iterative approach also makes it easier to accommodate tactical
+      changes in requirements, features or schedule.</p></section>
+
+      <section><title>Manage Requirements</title> The IHTSDO Workbench
+      provides the necessary tools to elicit, organize, and document required
+      functionality and constraints, track and document tradeoffs and
+      decisions, and easily capture and communicate business
+      requirements.</section>
+
+      <section><title>Use Component-Based Architectures</title> The IHTSDO
+      Workbench provides a framework that enables early development and
+      baselining of a robust terminology architecture, prior to committing
+      resources for full-scale development. It describes how to design a
+      resilient architecture that is flexible, accommodates change, is
+      intuitively understandable, and promotes more effective reuse.</section>
+
+      <section><title>Verify Quality</title>The IHTSDO Workbench allows
+      terminology developers to build quality assessment into the process, in
+      all activities, involving all participants, using objective measurements
+      and criteria, without being treated as an afterthought or a separate
+      activity performed by a separate group.</section>
+
+      <section><title>Control Changes</title>The IHTSDO Workbench allows users
+      to manage change--making certain that each change is acceptable, and
+      being able to track those changes. The IHTSDO Workbench provides the
+      ability to control, track and monitor changes to enable successful
+      iterative development. The IHTSDO Workbench also makes it simple to
+      establish secure workspaces for each developer by providing isolation
+      from changes made in other workspaces and by controlling changes of all
+      artifacts (e.g., models, code, documents, etc.). And it brings a team
+      together to work as a single unit by providing automated integration and
+      build management.</section>
     </body>
   </topic>
 </topic>

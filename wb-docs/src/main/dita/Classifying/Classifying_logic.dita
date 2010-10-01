@@ -6,33 +6,49 @@
 
   <body>
     <p><indexterm>logic<indexterm>editor</indexterm></indexterm><indexterm>role<indexterm>logic
-    editor</indexterm></indexterm>The Logic tab provides a Role Logic Editor.
+    editor</indexterm></indexterm>The Logic tab provides a Role Logic Editor
+    for constructing Description Logic Expressions using descriptions and
+    roles from the taxonomy. As the expression is constructed, the Description
+    logic is displayed to the user in both DL symbolic syntax as well as
+    Knowledge Representation Syntax Specification (KRSS<fn><xref
+    href="http://dl.kr.org/">http://dl.kr.org/</xref>, and the Stated Forms
+    chapter (7) of the <i>SNOMED Technical Reference Guide</i>.</fn>) format.
     The editor has two main parts: <i>Role Description Logic</i> and
     <i>Never-Group Roles</i>.</p>
 
     <section><title>Role Description Logic</title><indexterm>role description
     logic</indexterm><indexterm>logic<indexterm>role
-    description</indexterm></indexterm><p>The classifier has a general form
-    which is common to Reflexive, Transitive, Left-Identity, Right-Identity
-    and Role Composition.<fig>
+    description</indexterm></indexterm><indexterm>description
+    logic</indexterm><indexterm>DL</indexterm><indexterm>classifier<indexterm>description
+    logic</indexterm></indexterm><p>The classifier has a general form which is
+    common to Reflexive<indexterm>reflexive</indexterm>,
+    Transitive<indexterm>transitive</indexterm>,
+    Left-Identity<indexterm>left-identity</indexterm>,
+    Right-Identity<indexterm>right-identity</indexterm> and Role
+    Composition<indexterm>role composition</indexterm>.<fig>
         <title>Role Description Logic Grammar</title>
 
-        <image href="../images/classifier_images/Role_description_logic.jpg"/>
+        <image href="../images/classifier_images/Role_description_logic.jpg"
+               placement="break"/>
       </fig></p><p>The Role Description Logic editor works directly with the
     classifier general form to provide the user with the full classifier
     capabilities. </p><p>There are two basic steps to creating a role
     description logic. <fig>
         <title>steps in creating role description logic</title>
 
-        <image href="../images/classifier_images/logic_identity.jpg"/>
-      </fig></p><p>For example, to create the following right-identity,
-    <codeblock>direct-substance o has-active-ingredient -&gt; direct-substance</codeblock>
+        <image href="../images/classifier_images/logic_identity.jpg"
+               placement="break"/>
+      </fig></p></section>
+
+    <section><title>Example </title><p>For example, to create the following
+    Description Logic expression, <codeblock>direct-substance o has-active-ingredient -&gt; direct-substance</codeblock>
     Step 1. <b>Right Hand Side</b>. First add the Right Hand Side to the
     declarations list by selecting the Direct Substance in the taxonomy and
     then clicking the Declaration List (+) add icon:<fig id="reflexive">
         <title>right-hand side: reflexive</title>
 
-        <image href="../images/classifier_images/logic-reflexive.jpg"/>
+        <image href="../images/classifier_images/logic-reflexive.jpg"
+               placement="break"/>
       </fig></p><p>The step 1 will show the right hand side in both the upper
     RHS (Right Hand Side) list and the Declaration List. The result will also
     show a reflexive declaration because reflexive, by definition, has an
@@ -43,21 +59,24 @@
     href="../images/classifier_images/classifier_toggle_smallHS_add_icon.jpg"/>.</p><fig>
         <title>left-hand side</title>
 
-        <image href="../images/classifier_images/LHS_logic.jpg"/>
+        <image href="../images/classifier_images/LHS_logic.jpg"
+               placement="break"/>
       </fig><p>The right identity is now complete.</p></section>
 
     <section><title>Never-Group Role
-    List</title><indexterm>role<indexterm>never-group</indexterm></indexterm><p>Roles
-    are added to the Never-Group Role List by:</p><ol>
-        <li>selecting the role concept in the taxonomy list, and then </li>
+    List</title><indexterm>role<indexterm>never-group</indexterm></indexterm><indexterm>neve-group
+    roles</indexterm><p>Roles are added to the Never-Group Role List
+    by:</p><ol>
+        <li>selecting the role concept in the taxonomy list, and then</li>
 
-        <li> and then, clicking the "+" icon <image
+        <li>and then, clicking the "+" icon <image
         href="../images/classifier_images/classifier_toggle_smallHS_add_icon.jpg"/>
-        . </li>
+        .</li>
       </ol><p><fig>
         <title>Adding a Never-Group role</title>
 
-        <image href="../images/classifier_images/part_of.jpg"/>
+        <image href="../images/classifier_images/part_of.jpg"
+               placement="break"/>
       </fig></p></section>
 
     <section><title>Saving Logic

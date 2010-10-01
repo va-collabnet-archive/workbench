@@ -2,15 +2,15 @@
 <!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/ditabase.dtd">
 <dita>
-  <topic id="topic11" xml:lang="en">
+  <topic id="process_history" xml:lang="en">
     <title>Viewing Process Diagram History</title>
 
     <body>
       <section>You can test processes by pressing the Execute button in the
       lower right corner of the window. To view a history of the process’s
       execution, click on the View drop-down menu above the process diagram
-      panel and click His­tory. The screen will look similar to the example
-      shown in <xref format="dita" href="#topic11/ai932313"
+      panel and click History. The screen will look similar to the example
+      shown in <xref format="dita" href="#process_history/ai932313"
       type="fig"/>.</section>
 
       <fig id="ai932313">

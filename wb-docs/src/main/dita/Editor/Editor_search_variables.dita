@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic9" xml:lang="en">
+<topic id="e_search_variables" xml:lang="en">
   <title>Using the Search Variables</title>
 
   <prolog>
@@ -44,7 +44,7 @@
     Values</title></section>
 
     <section>Searching for a concept without using variables produces an “OR”
-    search, as shown <xref format="dita" href="#topic9/ag926584"
+    search, as shown <xref format="dita" href="#e_search_variables/ag926584"
     type="fig"/>.</section>
 
     <fig id="ag926584">
@@ -59,8 +59,9 @@
 
     <section>Searching for a concept that must include a specified word or
     phrase produces results such as as those shown <xref format="dita"
-    href="#topic9/ag926703" type="fig"/>. Note that the “Score” column
-    indicates how closely each concept matches the search criteria.</section>
+    href="#e_search_variables/ag926703" type="fig"/>. Note that the “Score”
+    column indicates how closely each concept matches the search
+    criteria.</section>
 
     <fig id="ag926703">
       <title>Lucene Search with the “Required” Variable</title>
@@ -75,8 +76,9 @@
 
     <section>Searching for a concept that must <i>exclude </i>a specified word
     or phrase produces results such as those shown in <xref format="dita"
-    href="#topic9/ag926772" type="fig"/>. Again, note that the “Score” column
-    indicates how closely each concept matches the search criteria.</section>
+    href="#e_search_variables/ag926772" type="fig"/>. Again, note that the
+    “Score” column indicates how closely each concept matches the search
+    criteria.</section>
 
     <fig id="ag926772">
       <title>Lucene Search with the “Exclude” Variable</title>
@@ -91,9 +93,9 @@
     <section>Searches can include multiple variables, to indicate a
     combination of criteria, such as “similar to”, not including certain words
     or phrases, but must include other words or phrases, as shown in <xref
-    format="dita" href="#topic9/ag940534" type="fig"/>. Again, note the
-    “Score” column indicates how closely each concept matches the search
-    criteria.</section>
+    format="dita" href="#e_search_variables/ag940534" type="fig"/>. Again,
+    note the “Score” column indicates how closely each concept matches the
+    search criteria.</section>
 
     <fig id="ag940534">
       <title>Lucene Search with Multiple Variables</title>
@@ -107,9 +109,10 @@
 
     <section>You can save search strings that you use frequently by pressing
     the Save Search button. Enter a name for the search and click the Save
-    button, as shown in <xref format="dita" href="#topic9/ag949994"
-    type="fig"/>. To retrieve a saved search, click the Retrieve Saved Search
-    button. Select the desired search and click the Open button.</section>
+    button, as shown in <xref format="dita"
+    href="#e_search_variables/ag949994" type="fig"/>. To retrieve a saved
+    search, click the Retrieve Saved Search button. Select the desired search
+    and click the Open button.</section>
 
     <fig id="ag949994">
       <title>Search - Save and Retrieve Buttons</title>

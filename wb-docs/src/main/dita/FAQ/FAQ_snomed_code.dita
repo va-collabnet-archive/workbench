@@ -21,7 +21,7 @@
     terminology development methodology being used, codes could be either
     SNOMED SCTIDs or UUIDs. The display of identifiers can be enabled using
     the Identifers Toggle described in <xref format="dita"
-    href="../Editor/Editor_concept_area.dita#topic4/ag936997"
+    href="../Editor/Editor_concept_area.dita#e_concept_area/ag936991"
     type="section"/>.</section>
   </body>
 </topic>

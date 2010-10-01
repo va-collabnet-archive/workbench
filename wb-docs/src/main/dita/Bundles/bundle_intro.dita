@@ -1,33 +1,40 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="bundle_intro" xml:lang="en-us">
+  <title>Building an application bundle</title>
 
+  <body>
+    <section>An IHTSDO Workbench IDE application bundle is a package of
+    components ready for installation on an end-user's computer. Such a bundle
+    includes the various software components, configuration files, policy
+    files, predefined workflow tasks, a database containing one or more
+    versions of SNOMED, and other additional term sets relevant to the
+    terminology modeller's functional requirements. A terminology modeller may
+    have several different bundles on his/her machine, particularly during a
+    period of rapid functional change. In such cases, it is important to
+    differentiate and clarify the functionality provided by each
+    bundle.</section>
 
-<topic id="topic1" xml:lang="en-us">
- <title>Building an application bundle</title>
- <body>
-  <section>An IHTSDO Workbench IDE application bundle is a package of components ready for
-   installation on an end-user's computer. Such a bundle includes the various software components,
-   configuration files, policy files, predefined workflow tasks, a database containing one or more
-   versions of SNOMED, and other additional term sets relevant to the terminology modeller's
-   functional requirements. A terminology modeller may have several different bundles on his/her
-   machine, particularly during a period of rapid functional change. In such cases, it is important
-   to differentiate and clarify the functionality provided by each bundle.</section>
-  <section id="aw1047511">For building all or part of an IHTSDO Workbench IDE bundle, the software
-   development team makes use of Maven, and Maven’s project object model (POM<fn id="aw1057322">see
-     <xref href="http://java.sun.com/docs/books/tutorial/javabeans/index.html" scope="external"
-     format="html">
-     <ph>http://java.sun.com/docs/books/tutorial/javabeans/index.html</ph>
-    </xref></fn><xref href="#topic1/aw1057322" scope="local" type="fn" format="dita"/>) and
-    plug-ins<fn id="aw1057343">The POM is the metadata that Maven needs to work with a project. The
-    filename is “pom.xml” and is located in the root directory for each project.</fn><xref
-    href="#topic1/aw1057343" scope="local" type="fn" format="dita"/>. Plug-ins define Goals<fn
-    id="aw1057365">Maven is organized in plug-ins. Every piece of functionality in Maven is
-    contained within a plugin.</fn><xref href="#topic1/aw1057365" scope="local" type="fn"
-    format="dita"/> and use the metadata found in the POM to perform their task. Maven is driven by
-   the POM’s and plug-ins used within the POMS for every Maven project. A typical IHTSDO Workbench
-   IDE bundle would comprise a set of Maven subprojects, governed by a master “bundle” project.
-    <indexterm>Maven </indexterm><indexterm>Maven </indexterm></section>
+    <section id="aw1047511">For building all or part of an IHTSDO Workbench
+    IDE bundle, the software development team makes use of Maven, and Maven’s
+    project object model (POM<fn id="aw1057322">see <xref format="html"
+    href="http://java.sun.com/docs/books/tutorial/javabeans/index.html"
+    scope="external">
+    <ph>http://java.sun.com/docs/books/tutorial/javabeans/index.html</ph>
+    </xref></fn><xref format="dita" href="#bundle_intro/aw1057322"
+    scope="local" type="fn"/>) and plug-ins<fn id="aw1057343">The POM is the
+    metadata that Maven needs to work with a project. The filename is
+    “pom.xml” and is located in the root directory for each project.</fn><xref
+    format="dita" href="#bundle_intro/aw1057343" scope="local" type="fn"/>.
+    Plug-ins define Goals<fn id="aw1057365">Maven is organized in plug-ins.
+    Every piece of functionality in Maven is contained within a
+    plugin.</fn><xref format="dita" href="#bundle_intro/aw1057365"
+    scope="local" type="fn"/> and use the metadata found in the POM to perform
+    their task. Maven is driven by the POM’s and plug-ins used within the POMS
+    for every Maven project. A typical IHTSDO Workbench IDE bundle would
+    comprise a set of Maven subprojects, governed by a master “bundle”
+    project. <indexterm>Maven </indexterm><indexterm>Maven
+    </indexterm></section>
   </body>
 </topic>
-

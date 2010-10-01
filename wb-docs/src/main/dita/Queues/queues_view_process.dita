@@ -1,36 +1,47 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="queues_process" xml:lang="en">
+  <title>Viewing a Process in a Queue</title>
 
+  <body>
+    <section>To view a process in a queue, click on a process row in the list.
+    For exam­ple, click on the “Break Password” process and the process will
+    display below the queue reading area. To “hide” the queue list so you can
+    view the entire process diagram, click on the up arrow above the diagram
+    area. The screen will look like the one shown in <xref format="dita"
+    href="#queues_process/ah922138" type="fig"/>.</section>
 
-<topic id="topic5" xml:lang="en">
- <title>Viewing a Process in a Queue</title>
- <body>
-  <section>To view a process in a queue, click on a process row in the list. For exam­ple, click on
-   the “Break Password” process and the process will display below the queue reading area. To “hide”
-   the queue list so you can view the entire process diagram, click on the up arrow above the
-   diagram area. The screen will look like the one shown in <xref href="#topic5/ah922138" type="fig"
-    format="dita"/>.</section>
-  <fig id="ah922138">
-   <title>Queue Viewer with Process Diagram</title>
-   <image href="../images/Using_The_Queue_Viewer_Images/using_the_queue_viewer_img_5.jpg"
-    placement="break" width="345" height="311"/>
-  </fig>
-  <section>You can also use the entire window to display and view a process by click­ing on the
-   left-facing arrow next to the Queue Name heading as shown in <xref href="#topic5/ah922152"
-    type="fig" format="dita"/>.</section>
-  <fig id="ah922152">
-   <title>Using Arrows to Resize the Process View</title>
-   <image href="../images/Using_The_Queue_Viewer_Images/using_the_queue_viewer_img_6.jpg"
-    placement="break" width="412" height="296"/>
-  </fig>
-  <section>The full screen view of the process is show in <xref href="#topic5/ah922167" type="fig"
-    format="dita"/>.</section>
-  <fig id="ah922167">
-   <title>Full Screen Process View</title>
-   <image href="../images/Using_The_Queue_Viewer_Images/using_the_queue_viewer_img_7.jpg"
-    placement="break" width="411" height="296"/>
-  </fig>
- </body>
+    <fig id="ah922138">
+      <title>Queue Viewer with Process Diagram</title>
+
+      <image height="311"
+             href="../images/Using_The_Queue_Viewer_Images/using_the_queue_viewer_img_5.jpg"
+             placement="break" width="345"/>
+    </fig>
+
+    <section>You can also use the entire window to display and view a process
+    by click­ing on the left-facing arrow next to the Queue Name heading as
+    shown in <xref format="dita" href="#queues_process/ah922152"
+    type="fig"/>.</section>
+
+    <fig id="ah922152">
+      <title>Using Arrows to Resize the Process View</title>
+
+      <image height="296"
+             href="../images/Using_The_Queue_Viewer_Images/using_the_queue_viewer_img_6.jpg"
+             placement="break" width="412"/>
+    </fig>
+
+    <section>The full screen view of the process is show in <xref
+    format="dita" href="#queues_process/ah922167" type="fig"/>.</section>
+
+    <fig id="ah922167">
+      <title>Full Screen Process View</title>
+
+      <image height="296"
+             href="../images/Using_The_Queue_Viewer_Images/using_the_queue_viewer_img_7.jpg"
+             placement="break" width="411"/>
+    </fig>
+  </body>
 </topic>
-

@@ -1,48 +1,69 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="ws_integration" xml:lang="en">
+  <title>Smart-Client Integration</title>
 
-<topic id="topic7" xml:lang="en">
- <title>Smart-Client Integration</title>
- <body>
-  <section>IHTSDO Workbench uses the CollabNet Integration Framework (CIF) to make configuration
-   management, application lifecycle management, and build and test services management available to
-   smart clients. CIF provides programmatic access to functionality and data within the CollabNet
-   Platform. The CIF allows CollabNet customers and partners to build integrations and extensions
-   that support application lifecycle management using the CollabNet Platform.</section>
-  <section>The CIF includes a collection of SDKs featuring Web Services APIs, integration
-   components, developer guides, code samples and support forums. CIF resources are available for
-   these CollabNet products:</section>
-  <section>CollabNet Subversion is extensible through APIs and language bindings that enable server
-   and client side extensions and integrations.</section>
-  <section>CollabNet SourceForge Enterprise is extensible through a comprehensive set of SOAP Web
-   Services APIs that provide access to the SCM, Change Management, Project Management, User and
-   Project Administration, Collaboration, and ALM capabilities of the platform. CollabNet
-   SourceForge Enterprise user interface can be changed through velocity templates.</section>
-  <section>CollabNet CUBiT is extensible via REST-based APIs that allow developers to integrate
-   their applications with CUBiT's capabilities to manage infrastructure for software
-   development.</section>
-  <fig id="au1001538">
-   <title>Smart-client integration with the IHTSDO Workspace</title>
-   <image href="../images/Workspace_Images/workspace_img_26.jpg" placement="break" width="550"
-    height="321"/>
-  </fig>
-  <section>Using CollabNet SourceForge and CUBiT, smart clients are integrated into a collaborative
-   workspace that supports the entire terminology lifecycle. Cubit is used to host:</section>
-  <p>Maven and Continuum – Maven and Continuum provide the basis for “continuous integration”, or
-   essentially a continuous build process applying quality checks, generating workflow items and
-   producing reports with the goal of iteratively improving the content's quality. Maven controls
-   the build process and provides a framework for executing quality tests and reports, while
-   Continuum schedules constant execution of these processes triggered by modification to software
-   or data contained in the distributed application.</p>
-  <p>Archiva –Archiva is an application for managing one or more remote repositories, including
-   administration, artifact handling, browsing and searching.</p>
-  <section id="au1001566">Each smart-client in <xref href="#topic7/au1001538" type="fig"
-    format="dita"/> has access to these components and the services that they provide. The
-   combination of these smart clients communicating over a Subversion based bus, together with the
-   CUBiT-hosted Maven, Continuum, and Archiva provides the full functionality of the distributed
-    application.<indexterm>Subversion </indexterm></section>
+  <body>
+    <section>IHTSDO Workbench uses the CollabNet Integration Framework (CIF)
+    to make configuration management, application lifecycle management, and
+    build and test services management available to smart clients. CIF
+    provides programmatic access to functionality and data within the
+    CollabNet Platform. The CIF allows CollabNet customers and partners to
+    build integrations and extensions that support application lifecycle
+    management using the CollabNet Platform.</section>
 
- </body>
+    <section>The CIF includes a collection of SDKs featuring Web Services
+    APIs, integration components, developer guides, code samples and support
+    forums. CIF resources are available for these CollabNet
+    products:</section>
+
+    <section>CollabNet Subversion is extensible through APIs and language
+    bindings that enable server and client side extensions and
+    integrations.</section>
+
+    <section>CollabNet SourceForge Enterprise is extensible through a
+    comprehensive set of SOAP Web Services APIs that provide access to the
+    SCM, Change Management, Project Management, User and Project
+    Administration, Collaboration, and ALM capabilities of the platform.
+    CollabNet SourceForge Enterprise user interface can be changed through
+    velocity templates.</section>
+
+    <section>CollabNet CUBiT is extensible via REST-based APIs that allow
+    developers to integrate their applications with CUBiT's capabilities to
+    manage infrastructure for software development.</section>
+
+    <fig id="au1001538">
+      <title>Smart-client integration with the IHTSDO Workspace</title>
+
+      <image height="321"
+             href="../images/Workspace_Images/workspace_img_26.jpg"
+             placement="break" width="550"/>
+    </fig>
+
+    <section>Using CollabNet SourceForge and CUBiT, smart clients are
+    integrated into a collaborative workspace that supports the entire
+    terminology lifecycle. Cubit is used to host:</section>
+
+    <p>Maven and Continuum – Maven and Continuum provide the basis for
+    “continuous integration”, or essentially a continuous build process
+    applying quality checks, generating workflow items and producing reports
+    with the goal of iteratively improving the content's quality. Maven
+    controls the build process and provides a framework for executing quality
+    tests and reports, while Continuum schedules constant execution of these
+    processes triggered by modification to software or data contained in the
+    distributed application.</p>
+
+    <p>Archiva –Archiva is an application for managing one or more remote
+    repositories, including administration, artifact handling, browsing and
+    searching.</p>
+
+    <section id="au1001566">Each smart-client in <xref format="dita"
+    href="#ws_integration/au1001538" type="fig"/> has access to these
+    components and the services that they provide. The combination of these
+    smart clients communicating over a Subversion based bus, together with the
+    CUBiT-hosted Maven, Continuum, and Archiva provides the full functionality
+    of the distributed application.<indexterm>Subversion
+    </indexterm></section>
+  </body>
 </topic>
-

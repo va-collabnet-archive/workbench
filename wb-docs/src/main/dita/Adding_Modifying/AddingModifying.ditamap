@@ -1,12 +1,24 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
-<map id="AddingModifying" xml:lang="en-us" title="Adding and modifying concepts">
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
+<map id="AddingModifying" title="Adding and modifying concepts"
+     xml:lang="en-us">
+  <title>Adding and Modifying concepts</title>
 
- <title>Adding and Modifying concepts</title>
- <topicref href="AddingModifying_intro.dita#topic1" type="topic" navtitle="Adding and Modifying Concepts - overview">
-  <topicref href="AddingModifying_concepts.dita#topic2" type="topic" navtitle="Concepts"> </topicref>
-  <topicref href="AddingModifying_relationships.dita#topic3" type="topic" navtitle="Relationships"> </topicref>
-  <topicref href="AddingModifying_changesets.dita#topic4" type="topic" navtitle="Submitting a Change Set to the IHTSDO Workspace"> </topicref>
- </topicref>
+  <topicref href="AddingModifying_intro.dita"
+            navtitle="Adding and Modifying Concepts - overview" type="topic">
+    <topicref href="About_Paths.dita" type="topic"/>
+
+    <topicref href="About_IsA.dita" type="topic"/>
+
+    <topicref href="AddingModifying_concepts.dita" navtitle="Concepts"
+              type="topic"/>
+
+    <topicref href="AddingModifying_relationships.dita"
+              navtitle="Relationships" type="topic"/>
+
+    <topicref href="AddingModifying_changesets.dita"
+              navtitle="Submitting a Change Set to the IHTSDO Workspace"
+              type="topic"/>
+  </topicref>
 </map>

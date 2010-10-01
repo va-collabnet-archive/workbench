@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic7" xml:lang="en">
+<topic id="dev_eclipse" xml:lang="en">
   <title>Setting up Eclipse for IHTSDO Workbench Development<ph>
   <indexterm>Eclipse <indexterm>setting up for developers</indexterm>
   </indexterm> </ph></title>
@@ -25,13 +25,13 @@
     and available from the Eclipse Foundation<fn id="at1074736"> <xref
     format="html" href="http://www.eclipse.org" scope="external">
     <ph>http://www.eclipse.org</ph> </xref> </fn><xref format="dita"
-    href="#topic7/at1074736" scope="local" type="fn"/>. Two particular Eclipse
-    plugins that improve productivity for IHTSDO Workbench development are the
-    Maven 2 plugin and the Subversion plugin available from Eclipse Plugin
-    Central<fn id="at1074703"> <xref format="html"
+    href="#dev_eclipse/at1074736" scope="local" type="fn"/>. Two particular
+    Eclipse plugins that improve productivity for IHTSDO Workbench development
+    are the Maven 2 plugin and the Subversion plugin available from Eclipse
+    Plugin Central<fn id="at1074703"> <xref format="html"
     href="http://www.eclipseplugincentral.com" scope="external">
     <ph>http://www.eclipseplugincentral.com</ph> </xref> </fn><xref
-    format="dita" href="#topic7/at1074703" scope="local"
+    format="dita" href="#dev_eclipse/at1074703" scope="local"
     type="fn"/>.</section>
 
     <section id="at1074727">Once these plugins are installed, they will need
@@ -46,7 +46,7 @@
 
     <section>An overview of components involved in the distributed development
     of the IHTSDO toolkit is illustrated in <xref format="dita"
-    href="#topic7/at1074348" type="fig"/></section>
+    href="#dev_eclipse/at1074348" type="fig"/></section>
 
     <fig id="at1074348">
       <title>The Developer's Environment for extending IHTSDO Workbench
@@ -57,8 +57,8 @@
     </fig>
 
     <section>The next chapter <xref format="dita"
-    href="../Workspace/workspace_intro.dita#topic1" type="topic"/>, explains
-    the pivotal role of the IHTSDO Workspace in the distributed development
+    href="../Workspace/workspace_intro.dita" type="topic"/>, explains the
+    pivotal role of the IHTSDO Workspace in the distributed development
     environment for extending IHTSDO Workbench functionality.</section>
   </body>
 </topic>

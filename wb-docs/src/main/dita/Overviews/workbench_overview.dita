@@ -34,7 +34,7 @@
           <row>
             <entry><b>Guidebook Version:</b></entry>
 
-            <entry>1.9a</entry>
+            <entry>2.0</entry>
           </row>
 
           <row>
@@ -59,7 +59,7 @@
       <title>Amendment History</title>
 
       <tgroup cols="3">
-        <colspec colwidth="10"/>
+        <colspec colwidth="10*"/>
 
         <colspec colwidth="12*"/>
 
@@ -168,11 +168,21 @@
           </row>
 
           <row>
-            <entry>1.9a</entry>
+            <entry>1.9b</entry>
 
-            <entry>2010-08-25</entry>
+            <entry>2010-09-25</entry>
 
             <entry>classifier example; new arena workarea;</entry>
+          </row>
+
+          <row>
+            <entry>2.0</entry>
+
+            <entry>2010-10-02</entry>
+
+            <entry>reformatted Guidebook - split into 3 PDFs (Wbench User
+            Guide; Wbench Business Process Guide; Wbench Developers Guide. new
+            HTML navigation pane</entry>
           </row>
         </tbody>
       </tgroup>
@@ -194,7 +204,8 @@
     (including without limitation the removal or modification of this notice)
     is prohibited without the express written permission of the IHTSDO.
     Details of the SNOMED CT Affiliate Licence may be found at <xref
-    format="html" href="http://www.ihtsdo.org/our-standards/licensing/"/>.</p>
+    format="html"
+    href="http://www.ihtsdo.org/join-us/use-snomed-ct-licenses/"/>.</p>
 
     <p id="copies">Any copy of this document that is not obtained directly
     from the IHTSDO (or a Member of the IHTSDO) is not controlled by the

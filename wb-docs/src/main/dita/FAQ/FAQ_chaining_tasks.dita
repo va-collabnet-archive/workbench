@@ -21,6 +21,6 @@
     template. The business process (template) can be stored, edited, loaded,
     executed with the Editor environment. A process can be invoked by a user
     through a number of different mechanisms. See <xref format="dita"
-    href="../Workflow/processes_intro.dita#topic1" type="topic"/></section>
+    href="../Workflow/processes_intro.dita" type="topic"/></section>
   </body>
 </topic>

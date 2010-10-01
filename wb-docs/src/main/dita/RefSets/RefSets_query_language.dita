@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic9" xml:lang="en">
+<topic id="refset_query_language" xml:lang="en">
   <title>Refset Specification Language</title>
 
   <prolog>
@@ -32,26 +32,30 @@
     used for constructing post-coordinated expressions for populating data
     fields. </note></section>
 
-    <section><title>Relationship types</title><p>Before introducing the
-    expression syntax, first let's look at the important relationship types
-    CONCEPT-IS, CONCEPT-IS-CHILD-OF, CONCEPT-IS-DESCENDENT-OF, and
-    CONCEPT-IS-KIND-OF. These relationships, and their corresponding
-    Description and Relationship cousins ( e.g. RELATIONSHIP-TYPE-IS-CHILD-OF
-    ) are encountered extensively in the specification of reference sets.
-    Let's consider a simplified fragment of the SNOMED <i>Clincal Finding</i>
-    hierarchy dealing with |Pneumonia|, depicted in <xref
-    href="#topic9/hierarchy_pneumonia"/>.<fig id="hierarchy_pneumonia">
+    <section><title>Relationship types</title><p>Before introducing the refset
+    specification expression syntax, first let's look at the important
+    relationship types CONCEPT-IS, CONCEPT-IS-CHILD-OF,
+    CONCEPT-IS-DESCENDENT-OF, and CONCEPT-IS-KIND-OF. These relationships, and
+    their corresponding Description and Relationship cousins ( e.g.
+    RELATIONSHIP-TYPE-IS-CHILD-OF ) are encountered extensively in the
+    specification of reference sets. Let's consider a simplified fragment of
+    the SNOMED <i>Clincal Finding</i> hierarchy dealing with |Pneumonia|,
+    depicted in <xref href="#refset_query_language/hierarchy_pneumonia"/>.<fig
+        id="hierarchy_pneumonia">
         <title>Pneumonia and some of its descendent concepts</title>
 
-        <image href="../images/Refsets_Images/hierarchy_pneumonia.jpg"/>
+        <image href="../images/Refsets_Images/hierarchy_pneumonia.jpg"
+               placement="break"/>
       </fig></p><p><ul>
         <li><b>CONCEPT-IS</b> <i>&lt;some concept&gt;</i>-
         <indexterm>CONCEPT-IS clause</indexterm>This declares a single exact
         concept to be a member of the refset, and is illustrated in <xref
-        format="dita" href="#topic9/concept-is"/>.<fig id="concept-is">
+        format="dita" href="#refset_query_language/concept-is"/>.<fig
+            id="concept-is">
             <title>CONCEPT-IS Pneumonia clause</title>
 
-            <image href="../images/Refsets_Images/concept-is_pneumonia.jpg"/>
+            <image href="../images/Refsets_Images/concept-is_pneumonia.jpg"
+                   placement="break"/>
           </fig></li>
 
         <li><b>CONCEPT-IS-CHILD-OF</b> <i>&lt;some concept&gt;</i>-
@@ -61,11 +65,12 @@
         specification. Note that the named concept, | pneumonia | , will NOT
         be included, unless it is included via a separate (OR) clause in the
         specification. The resulting selected concepts are illustrated in
-        <xref href="#topic9/concept-is-child-of"/>.<fig
+        <xref href="#refset_query_language/concept-is-child-of"/>.<fig
             id="concept-is-child-of">
             <title>CONCEPT-IS-CHILD-OF Pneumonia clause</title>
 
-            <image href="../images/Refsets_Images/concept-is-child-of_pneumonia.jpg"/>
+            <image href="../images/Refsets_Images/concept-is-child-of_pneumonia.jpg"
+                   placement="break"/>
           </fig></li>
 
         <li><b>CONCEPT-IS-DESCENDENT-OF</b> <i>&lt;some concept&gt;</i>-
@@ -75,11 +80,13 @@
         unless excluded by another (AND NOT .. ) clause in the specification.
         Note that the named concept, | pneumonia | , will NOT be included,
         unless it is included via a separate (OR) clause in the specification.
-        See <xref href="#topic9/concept-is-descendent-of"/>.<fig
+        See <xref
+        href="#refset_query_language/concept-is-descendent-of"/>.<fig
             id="concept-is-descendent-of">
             <title>CONCEPT-IS-DESCENDENT-OF Pneumonia clause</title>
 
-            <image href="../images/Refsets_Images/concept-is-descendent-of_pneumonia.jpg"/>
+            <image href="../images/Refsets_Images/concept-is-descendent-of_pneumonia.jpg"
+                   placement="break"/>
           </fig></li>
 
         <li><b>CONCEPT-IS-KIND-OF</b> <i>&lt;some concept&gt;</i>-
@@ -87,11 +94,13 @@
         named concept itself AND all descendents ( children, grandchildren,
         great-grandchildren, etc.) of the named concept will be members of the
         target refset, unless excluded by another (AND NOT .. ) clause in the
-        specification. See <xref href="#topic9/concept-is-kind-of"/>.<fig
+        specification. See <xref
+        href="#refset_query_language/concept-is-kind-of"/>.<fig
             id="concept-is-kind-of">
             <title>CONCEPT-IS-KIND-OF Pneumonia clause</title>
 
-            <image href="../images/Refsets_Images/concept-is-kind-of_pneumonia.jpg"/>
+            <image href="../images/Refsets_Images/concept-is-kind-of_pneumonia.jpg"
+                   placement="break"/>
           </fig></li>
       </ul></p></section>
 
@@ -136,28 +145,31 @@
     explicit concepts contained in the <i>Cognition removed</i> refset. The
     layout of the specification refset after it is constructed in the
     Workbench IDE is illustrated in <xref format="dita"
-    href="#topic9/cognition_specification"/>. </p> <fig
+    href="#refset_query_language/cognition_specification"/>. </p> <fig
         id="cognition_specification">
         <title>Constructed specification expression for "Cognition"
         refset</title>
 
-        <image href="../images/Refsets_Images/cognition_specification.jpg"/>
+        <image href="../images/Refsets_Images/cognition_specification.jpg"
+               placement="break"/>
       </fig> <p>A Venn diagram which shows an alternative view of the
     corresponding logical expression is also illustrated in <xref
-    format="dita" href="#topic9/cognition_venn"/>.</p> <fig
+    format="dita" href="#refset_query_language/cognition_venn"/>.</p> <fig
         id="cognition_venn">
         <title>Simplified Venn diagram for "Cognition" refset</title>
 
-        <image href="../images/Refsets_Images/cognition_venn.jpg"/>
+        <image href="../images/Refsets_Images/cognition_venn.jpg"
+               placement="break"/>
       </fig> <p>The content of the masked out Cognition removed refset as it
     appears when constructed using the specification query language is shown
     in <xref format="dita"
-    href="#topic9/cognition_removed_specification"/>.</p> <fig
+    href="#refset_query_language/cognition_removed_specification"/>.</p> <fig
         id="cognition_removed_specification">
         <title>Constructed specification expression for "Concept Removed"
         refset</title>
 
-        <image href="../images/Refsets_Images/cognition_removed_specification.jpg"/>
+        <image href="../images/Refsets_Images/cognition_removed_specification.jpg"
+               placement="break"/>
       </fig></section>
 
     <section><title>Example 3: Activites of Daily Living </title> <p>
@@ -260,8 +272,8 @@
     that may contain these three refset types. Alternatively, it could be
     implemented with a single refset type:
     <codeph>CONCEPT-CONCEPT-STRING</codeph>, where the String would be
-    variably intrepreted, but that presents problems of "context sensitive"
-    intrepretation and formatting (displaying a concept description in one
+    variably interpreted, but that presents problems of "context sensitive"
+    interpretation and formatting (displaying a concept description in one
     case, and a string in the other cases).</note>
 
     <section><title>Refset Fields:</title> <codeblock>
@@ -371,5 +383,34 @@
           precede and succeed the OR</dd>
         </dlentry>
       </dl> </p></section>
+
+    <section id="important_considerations"><title>Important
+    considerations</title><note>When a refset is computed from its
+    specification, any <codeph>CONCEPT-IS-KIND-OF</codeph>,
+    <codeph>CONCEPT-IS-CHILD-OF</codeph> and
+    <codeph>CONCEPT-IS-DESCENDANT-OF</codeph> clause is ONLY checked for
+    relationships of <codeph>status= active</codeph> (or subtype of
+    <codeph>active</codeph>), as shown in <xref
+    href="#refset_query_language/prostate_1"/>. In such clauses, the user is
+    able to specify the status of the concepts but not the relationships.
+    Expressions using the "REL ..." query tokens allow the user finer control
+    over the results. In these expressions, by default, if no relationship
+    status is specified it will use a wildcard and include all relationship
+    statuses. In the example shown in <xref
+    href="#refset_query_language/prostate_2"/>, the query needs a clause in
+    order to return the correct results: <codeph>rel destination is kind of :
+    Prostatic structure</codeph> ; <codeph>rel type is : Finding site</codeph>
+    ; <codeph><b>rel status is kind of : active</b></codeph>. If you required
+    even finer control over the status of the returned results you could add a
+    "<codeph>concept status is kind of: active</codeph>" in the outer OR.<fig
+        id="prostate_1">
+        <title>Expression returns status=ACTIVE members only</title>
+
+        <image href="../images/Refsets_Images/prostate1.jpg" placement="break"/>
+      </fig><fig id="prostate_2">
+        <title id="p">Expression not limited to status=ACTIVE members</title>
+
+        <image href="../images/Refsets_Images/prostate2.jpg" placement="break"/>
+      </fig></note></section>
   </body>
 </topic>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic2" xml:lang="en">
+<topic id="am_concepts" xml:lang="en">
   <title>Concepts</title>
 
   <prolog>
@@ -14,7 +14,8 @@
 
   <body>
     <section id="am1005028"><title>Searching for a Concept<ph>
-    <indexterm>Searching for a Concept </indexterm> </ph></title></section>
+    <indexterm>search<indexterm>concept</indexterm></indexterm>
+    </ph></title></section>
 
     <section>The Search feature is the most efficient way to find a particular
     concept in the hierarchy. When you launch a basic search, the IHTSDO IDE
@@ -24,8 +25,9 @@
     within reference sets, or within relationship type and
     destination.</section>
 
-    <p>Basic Search<indexterm>Basic Search </indexterm><indexterm>search
-    <indexterm>basic</indexterm> </indexterm></p>
+    <p><b>Basic Search</b><indexterm>basic search
+    </indexterm><indexterm>search <indexterm>basic</indexterm>
+    </indexterm></p>
 
     <section>To launch a search, type the search criteria in the query field
     in the Search function area of the window. Click on the binoculars icon
@@ -35,10 +37,10 @@
     Alternatively, you can drag a concept from the taxonomy pane or from a
     field in the concept work pane. For example, a search for all concepts
     containing “ocular refraction” would begin as shown in <xref format="dita"
-    href="#topic2/am1019652" type="fig"/>. A “searching for concept” message
-    will display while the search proceeds. (Note that when more than one word
-    is entered, matches for each word are returned. To search for a phrase,
-    enclose it in double quotes.)</section>
+    href="#am_concepts/am1019652" type="fig"/>. A “searching for concept”
+    message will display while the search proceeds. (Note that when more than
+    one word is entered, matches for each word are returned. To search for a
+    phrase, enclose it in double quotes.)</section>
 
     <fig id="am1019652">
       <title>Launching a search for “ocular refraction” concepts</title>
@@ -49,10 +51,10 @@
 
     <section>When the search is finished, the text fields in the Search area
     will display a list of concepts matching the search criteria, as shown in
-    <xref format="dita" href="#topic2/am1005131" type="fig"/>. The list can be
-    quite long, depending on the search term and how the criteria narrow the
-    search. To view more of the list, click on the resizing arrows on the top
-    left of the Search area to expand the list view.</section>
+    <xref format="dita" href="#am_concepts/am1005131" type="fig"/>. The list
+    can be quite long, depending on the search term and how the criteria
+    narrow the search. To view more of the list, click on the resizing arrows
+    on the top left of the Search area to expand the list view.</section>
 
     <fig id="am1005131">
       <title>Search Results for “ocular refraction”</title>
@@ -64,8 +66,8 @@
     <section>To select a concept from the search results, click on it. The
     text on the Search tab at the top of the window will change to the name of
     the selected concept, as shown in <xref format="dita"
-    href="#topic2/am1005173" type="fig"/>. To see the details of this concept,
-    click on this tab.</section>
+    href="#am_concepts/am1005173" type="fig"/>. To see the details of this
+    concept, click on this tab.</section>
 
     <fig id="am1005173">
       <title>Search tab populated with selected concept</title>
@@ -76,7 +78,7 @@
 
     <section>The selected concept, or “focus concept”, will display in the
     first line of the Descriptions section of the work area, as shown in <xref
-    format="dita" href="#topic2/am1005215" type="fig"/> Any additional
+    format="dita" href="#am_concepts/am1005215" type="fig"/> Any additional
     relationships that this concept has are displayed on succeeding
     lines.</section>
 
@@ -87,7 +89,8 @@
              placement="break"/>
     </fig>
 
-    <p>Advanced Search<indexterm>Advanced Search </indexterm></p>
+    <p><b>Advanced Search</b><indexterm>advanced search
+    </indexterm><indexterm>search<indexterm>advanced</indexterm></indexterm></p>
 
     <section>In addition to the basic search capability described in the
     preceding section, it is possible to search using additional criteria. To
@@ -96,7 +99,7 @@
     href="../images/adding_modifying_images/addingmodifying_img_6.jpg"
     placement="inline" width="36"/> to the left of the query field. An
     additional search line will appear below the first one, as shown in <xref
-    format="dita" href="#topic2/am1019803" type="fig"/>.</section>
+    format="dita" href="#am_concepts/am1019803" type="fig"/>.</section>
 
     <fig id="am1019803">
       <title>Advanced search field</title>
@@ -181,7 +184,7 @@
     placement="inline"/> in the <ph>Descriptions</ph> section of the work
     area. A new line will be added to the list, with the default description
     text “New Description”, as shown in <xref format="dita"
-    href="#topic2/am1005737" type="fig"/>.</section>
+    href="#am_concepts/am1005737" type="fig"/>.</section>
 
     <section>Note that new lines that have not yet been committed to the
     database are identified by a green vertical bar at the left-hand end of
@@ -257,8 +260,8 @@
     description to be modified in the Descriptions section of the work area.
     The options Change, Change Type, and Change Status are displayed. Select
     the property to modify and select a new value from the corresponding popup
-    selection box, as shown in <xref format="dita" href="#topic2/am1006040"
-    type="fig"/>.</section>
+    selection box, as shown in <xref format="dita"
+    href="#am_concepts/am1006040" type="fig"/>.</section>
 
     <section>To save the modified concept, click the commit button.</section>
 

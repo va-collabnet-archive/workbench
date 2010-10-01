@@ -4,7 +4,7 @@
 <map id="Classifying" title="In-built Classifier" xml:lang="en-us">
   <title>Using the Classifier</title>
 
-  <topicref href="Classifying_intro.dita#topic1"
+  <topicref href="Classifying_intro.dita"
             navtitle="Using the built-in Classifier " type="topic">
     <topicref format="dita" href="Classifying_using.dita" type="topic"/>
 
@@ -15,5 +15,9 @@
     <topicref href="Classifying_viewing.dita"/>
 
     <topicref href="Classifying_logic.dita"/>
+
+    <topicref href="Classifying_example1.dita"/>
+
+    <topicref href="Classifying_log.dita"/>
   </topicref>
 </map>

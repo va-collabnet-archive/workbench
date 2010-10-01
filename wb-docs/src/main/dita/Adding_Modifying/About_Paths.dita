@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="paths" xml:lang="en">
+  <title>About Paths</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>paths</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <p>This section looks at the notion of "paths" used by the Workbench to
+    associate terminology components - concepts, descriptions, relationships
+    and refsets to control the scope of their visibility, ownership and
+    changes.</p>
+
+    <section><title><ph><indexterm>changesets</indexterm></ph>Changesets</title><p>Whenever
+    changes are made to the content of any of the taxonomies currently in the
+    workbench, a changeset of those changes is stored on disk in the current
+    user's profile. Each change is associated with the edit path that was set
+    for that user at the time of the change. Paths are created via the
+    Preferences Panel. Each path, except for the root path (here
+    <i>Terminology Auxiliary path</i>) must have one or more
+    "origins".</p></section>
+
+    <section><title><ph><indexterm>path</indexterm></ph>Paths</title>The
+    IHTSDO workbench supports the viewing and editing of one or more
+    terminologies by a single user in a session. The terminology(ies) is
+    loaded from the Workbench's inbuilt database and may be supplemented by
+    timestamped changesets. By default, all changesets in the current user's
+    profile folder are loaded from changeset files when the application
+    starts. Additional changesets may be explicitly loaded by the user if a
+    business process has been configured to permit this.<fig
+        id="paths_and_positions">
+        <title>Paths, positions and components</title>
+
+        <image href="../images/adding_modifying_images/about_paths2.jpg"
+               placement="break"/>
+      </fig><p>Consider the position 'X' on the <i>SNOMED Core path</i> as
+    shown in <xref href="#paths/paths_and_positions"/>. Here, all terminology
+    components that lie upstream of position 'X' are visible at 'X'. Any
+    changes made to a downstream path, below where the '<i>SNOMED Core
+    path</i>' begins, are not visible at 'X'. Note that a new path can be
+    created without necessarily introducing new or altered concepts.
+    </p><p>Next, consider position 'Y' in <xref
+    href="#paths/paths_and_positions"/>. Here 'Y' lies on the <i>term author 1
+    path</i>, and reflects the changes that have been created by Terminology
+    Author 1. A second parallel path, <i>term author 2 path</i>, has been
+    created, and on which Terminology Author 2 creates changes to the
+    terminology. These changes can be carried out independently in separate
+    sessions on separate machines. Bringing the two paths together in a
+    separate session makes both changes visible. A new editing <i>resolution
+    path</i> has been constructed to resolve any conflicts. By bundling an
+    author's changes into changeset files, the capability to incorporate
+    changes across users, time and space is made possible. Changeset files can
+    be shared via a centralised (subversion) repository, by shared network
+    drives, even by emailing them between users.</p></section>
+  </body>
+</topic>

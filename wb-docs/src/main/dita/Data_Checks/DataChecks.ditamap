@@ -1,8 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
-<map id="DataChecks" xml:lang="en-us" title="Data checks">
- <title>Data Checking</title>
- <topicref href="DataChecks_intro.dita#topic1" type="topic" navtitle="Data Checks and Search Filters">
-   <topicref href="DataChecks.dita#topic3" type="topic" navtitle="DataChecks"> </topicref>
- </topicref>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
+<map id="DataChecks" title="Data checks" xml:lang="en-us">
+  <title>Data Checking</title>
+
+  <topicref href="DataChecks_intro.dita"
+            navtitle="Data Checks and Search Filters" type="topic">
+    <topicref href="DataChecks.dita" navtitle="DataChecks" type="topic"/>
+  </topicref>
 </map>

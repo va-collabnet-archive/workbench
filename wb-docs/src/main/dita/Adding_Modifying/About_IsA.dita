@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="isa" xml:lang="en">
+  <title>The IS-A relationship</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>IS-A</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <p><note>Although relationships in general are discussed in <xref
+    href="AddingModifying_relationships.dita"/>, the IS-A relationship(s) are
+    so fundamental to using the Workbench, not just for adding and modifying
+    concepts, but for "classification", "refset" construction and other
+    processing, that they have been singled out for special consideration
+    here.</note></p>
+
+    <section><title><ph><indexterm>is a<index-see-also>Is
+    a</index-see-also></indexterm></ph>The Workbench "is a"</title>The IHTSDO
+    workbench itself, incorporates some internal hierarchies of concepts,
+    often described as metadata concepts or auxiliary concepts, which exist
+    independently of any given terminology under consideration for authoring,
+    editing or processing by workbench users. Although they may not be
+    included in a final terminology distribution, they are needed for the
+    functioning of many aspects of the workbench. Some concepts covered by the
+    inbuilt workbench hierarchies include users, user roles, queues, paths and
+    more. In particular, these auxiliary metadata hierarchies are built upon,
+    and gain additional definition from the Workbench's inbuilt "is a"
+    relationship (all lower case). This is a concept in the <i>Terminology
+    Auxiliary concept</i> hierarchy and has a fully qualified name "is a
+    (relationship type)".</section>
+
+    <section><title><ph><indexterm>Is a<index-see-also>is
+    a</index-see-also></indexterm></ph>The SNOMED "Is a"</title>The IHTSDO
+    workbench supports terminology IS-A relationships other than the in-built
+    "is a". In particular, SNOMED CT incorporates its own IS-A relationship,
+    with a preferred term of "Is a" and fully specified name of "Is a
+    (attribute)". It is very important to be aware of these two IS-A
+    relationships, and where they are used, particularly with respect to their
+    use in various preference settings. The primary preference setting for
+    determining IS_A use is the Edit -&gt; Defaults -&gt; Default relationship
+    type, as shown in <xref format="dita"
+    href="About_IsA.dita#isa/default_rel_type" type="fig"/>.<fig
+        id="default_rel_type">
+        <title>Preference Panel - edit default settings</title>
+
+        <image href="../images/prefs_images/preferences_edit_default.jpg"
+               placement="break"/>
+      </fig><p>Other important preferences to watch out for with respect to
+    IS-A relationships are:<ul>
+        <li>edit -&gt; Rel type -&gt; Relationship types for pop up</li>
+      </ul></p><p><ul>
+        <li>classifier -&gt; Classification 'Is a'</li>
+      </ul></p></section>
+  </body>
+</topic>

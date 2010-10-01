@@ -79,10 +79,10 @@
             <entry colname="col1"><note>Before creating any reference sets,
             the IHTSDO Workbench IDE must be configured appropriately. see
             <xref format="dita"
-            href="../Editor/Editor_preferences_panel.dita#topic6">Understanding
-            the Preferences Panel</xref>. Additionally, the participants
-            involved need to have been given the appropriate permissions, by
-            having the appropriate role(s) granted to them by the Workbench
+            href="../Editor/Editor_preferences_panel.dita">Understanding the
+            Preferences Panel</xref>. Additionally, the participants involved
+            need to have been given the appropriate permissions, by having the
+            appropriate role(s) granted to them by the Workbench
             administrator. The relevant roles are author, owner, reviewer,
             subject matter expert. The fine grained permissions available to
             these roles can be viewed in the taxonomy under <i>Terminology

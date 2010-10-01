@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic18" xml:lang="en">
+<topic id="e_refset_inclusion_types" xml:lang="en">
   <title>Inclusion Types (refsets specification type 1 only)<ph>
   <indexterm>Inclusion Type </indexterm> </ph></title>
 
@@ -9,7 +9,7 @@
     <note>This section applies to the early, version 1 specification for
     refsets that is being deprecated in favour of the more powerful version 2
     specification based on query language expressions as described in <xref
-    format="dita" href="../RefSets/RefSets_query_language.dita#topic9">Query
+    format="dita" href="../RefSets/RefSets_query_language.dita">Query
     Language</xref>.</note>
 
     <section>To rule in or out concepts in the SNOMED hierarchy for membership
@@ -27,10 +27,11 @@
     types.</section>
 
     <section>There are four inclusion types and each has a symbol associated
-    with it, as shown in <xref format="dita" href="#topic18/ag942894"
-    type="fig"/> . These symbols appear in the taxonomy view pane, next to
-    concepts that have a refset membership definition associated with them, as
-    shown in <xref format="dita" href="#topic18/ag943277"
+    with it, as shown in <xref format="dita"
+    href="#e_refset_inclusion_types/ag942894" type="fig"/> . These symbols
+    appear in the taxonomy view pane, next to concepts that have a refset
+    membership definition associated with them, as shown in <xref
+    format="dita" href="#e_refset_inclusion_types/ag943277"
     type="fig"/>.</section>
 
     <fig id="ag942894">
@@ -100,15 +101,15 @@
     excluded.</i><indexterm>multiple inheritance </indexterm></section>
 
     <section>The hierachy fragment shown in <xref format="dita"
-    href="#topic18/ag943310" type="fig"/> displays an example of this type of
-    conflict. The concept Alcoholic Beverage has multiple inheritance. It
-    appears as a sub-child of the concept Dietary substance and also as a
-    sub-child of the concept Substance of abuse. Dietary substance has the
-    lineage include type applied to it, and thus its sub-child Alcoholic
-    beverage will be excluded from the refset. The concept Alcoholic beverage
-    cannot be both included and excluded; the two options are mutually
-    exclusive. Unless this situation is resolved, a member refset cannot be
-    generated.</section>
+    href="#e_refset_inclusion_types/ag943310" type="fig"/> displays an example
+    of this type of conflict. The concept Alcoholic Beverage has multiple
+    inheritance. It appears as a sub-child of the concept Dietary substance
+    and also as a sub-child of the concept Substance of abuse. Dietary
+    substance has the lineage include type applied to it, and thus its
+    sub-child Alcoholic beverage will be excluded from the refset. The concept
+    Alcoholic beverage cannot be both included and excluded; the two options
+    are mutually exclusive. Unless this situation is resolved, a member refset
+    cannot be generated.</section>
 
     <fig id="ag943310">
       <title>Example of Error in Inclusion Specification</title>

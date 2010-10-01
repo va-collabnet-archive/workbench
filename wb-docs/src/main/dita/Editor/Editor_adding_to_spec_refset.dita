@@ -1,70 +1,92 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic13" xml:lang="en">
- <title>Adding a Concept to a version 1 Specification Reference Set</title>
- <prolog>
-  <metadata>
-   <keywords><indexterm>refset <indexterm>adding a concept</indexterm>
-    </indexterm></keywords>
-  </metadata>
- </prolog>
- <body>
-  <note>This method is being deprecated in favour of the more powerful expression based method described in </note>
-  <section>To add the selected concept to an existing refset, click on the <i>Add Concept Extension
-    </i><i>button, as shown in </i><xref href="#topic13/ag941651" type="fig" format="dita"/>. </section>
-  <fig id="ag941651">
-   <title>Add Concept Extension Button</title>
-   <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_58.jpg"
-    placement="break" width="64" height="36"/>
-  </fig>
-  <section>The default reset will appear in the refset column. Double-click this value to change to
-   another refset. A drop-down list will display as shown in Select the desired refset.</section>
-  <fig id="ag941663">
-   <title>Changing Refset Associated with Concept</title>
-   <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_59.jpg"
-    placement="break" width="449" height="84"/>
-  </fig>
-  <section id="ag941884">
-   <title>Selecting the Concept Inclusion Type<ph>
-     <indexterm>Inclusion Type </indexterm>
-    </ph></title>
-  </section>
-  <section>When linking a concept to a refset, its inclusion type must be specified as either <i
-    >exclude individual, exclude lineage, individual include or lineage include. </i>
-  </section>
-  <section>When the concept is first added to a refset, an inclusion type will be assigned by
-   default (as set in the Preferences Panel). To modify this value, double-click on it in the
-   concept column. A list of values will display as shown in <xref href="#topic13/ag941931"
-    type="fig" format="dita"/>. Select the desired value. Or you can right-click on the entry and
-   select Change concept to display the pop-up list.</section>
-  <fig id="ag941931">
-   <title>Changing the Concept Inclusion Type</title>
-   <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_60.jpg"
-    placement="break" width="433" height="96"/>
-  </fig>
-  <section id="ag942009">
-   <title>Changing the Refset Association Status</title>
-  </section>
-  <section>The default refset status is normally set as current. (Other values are defined in the
-   Refset preferences.) To modify this value, double-click on it in the status column. A list of
-   values will display, as shown in <xref href="#topic13/ag942029" type="fig" format="dita"/>.
-   Select the desired value. Or you can right-click on the entry and select Change status to display
-   the list.</section>
-  <fig id="ag942029">
-   <title>Changing the Refset Association Status</title>
-   <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_61.jpg"
-    placement="break" width="398" height="48"/>
-  </fig>
-  <section id="ag942067">
-   <title>Committing Changes<ph>
-     <indexterm>commit <indexterm>refset changes</indexterm>
-     </indexterm>
-    </ph></title>
-  </section>
-  <section>The refset associations entered are not final in the database until you click the Commit
-   button at the bottom right of the IHTSDO IDE window. To clear the current entries (instead of
-   committing them), click the Cancel button at the bottom right of the IHTSDO IDE window.
-  </section>
- </body>
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="e_adding_to_spec" xml:lang="en">
+  <title>Adding a Concept to a version 1 Specification Reference Set</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>refset <indexterm>adding a concept</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <note>This method is being deprecated in favour of the more powerful
+    expression based method described in</note>
+
+    <section>To add the selected concept to an existing refset, click on the
+    <i>Add Concept Extension </i><i>button, as shown in </i><xref
+    format="dita" href="#e_adding_to_spec/ag941651" type="fig"/>.</section>
+
+    <fig id="ag941651">
+      <title>Add Concept Extension Button</title>
+
+      <image height="36"
+             href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_58.jpg"
+             placement="break" width="64"/>
+    </fig>
+
+    <section>The default reset will appear in the refset column. Double-click
+    this value to change to another refset. A drop-down list will display as
+    shown in Select the desired refset.</section>
+
+    <fig id="ag941663">
+      <title>Changing Refset Associated with Concept</title>
+
+      <image height="84"
+             href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_59.jpg"
+             placement="break" width="449"/>
+    </fig>
+
+    <section id="ag941884"><title>Selecting the Concept Inclusion Type<ph>
+    <indexterm>Inclusion Type </indexterm> </ph></title></section>
+
+    <section>When linking a concept to a refset, its inclusion type must be
+    specified as either <i>exclude individual, exclude lineage, individual
+    include or lineage include. </i></section>
+
+    <section>When the concept is first added to a refset, an inclusion type
+    will be assigned by default (as set in the Preferences Panel). To modify
+    this value, double-click on it in the concept column. A list of values
+    will display as shown in <xref format="dita"
+    href="#e_adding_to_spec/ag941931" type="fig"/>. Select the desired value.
+    Or you can right-click on the entry and select Change concept to display
+    the pop-up list.</section>
+
+    <fig id="ag941931">
+      <title>Changing the Concept Inclusion Type</title>
+
+      <image height="96"
+             href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_60.jpg"
+             placement="break" width="433"/>
+    </fig>
+
+    <section id="ag942009"><title>Changing the Refset Association
+    Status</title></section>
+
+    <section>The default refset status is normally set as current. (Other
+    values are defined in the Refset preferences.) To modify this value,
+    double-click on it in the status column. A list of values will display, as
+    shown in <xref format="dita" href="#e_adding_to_spec/ag942029"
+    type="fig"/>. Select the desired value. Or you can right-click on the
+    entry and select Change status to display the list.</section>
+
+    <fig id="ag942029">
+      <title>Changing the Refset Association Status</title>
+
+      <image height="48"
+             href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_61.jpg"
+             placement="break" width="398"/>
+    </fig>
+
+    <section id="ag942067"><title>Committing Changes<ph> <indexterm>commit
+    <indexterm>refset changes</indexterm> </indexterm> </ph></title></section>
+
+    <section>The refset associations entered are not final in the database
+    until you click the Commit button at the bottom right of the IHTSDO IDE
+    window. To clear the current entries (instead of committing them), click
+    the Cancel button at the bottom right of the IHTSDO IDE window.</section>
+  </body>
 </topic>

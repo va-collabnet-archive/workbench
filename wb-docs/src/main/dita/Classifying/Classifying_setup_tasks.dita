@@ -62,9 +62,9 @@
           </fig></stepresult>
       </step>
 
-      <step>
-        <cmd>Set up the 5 Classifier parameters using the Classifier Tab of
-        the Preferences Panel</cmd>
+      <step id="prefs">
+        <cmd id="preferences">Set up the 5 Classifier parameters using the
+        Classifier Tab of the Preferences Panel</cmd>
 
         <stepxmp>Navigating to the appropriate terms in the taxonomy view,
         drag and drop the following concepts to their respective targets in

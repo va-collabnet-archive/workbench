@@ -38,7 +38,8 @@
     <fig id="arena_overview">
       <title>The Editor's concept editing 'Arena'.</title>
 
-      <image href="../images/arena_images/arena_overview.jpg"/>
+      <image href="../images/arena_images/arena_overview.jpg"
+             placement="break"/>
     </fig>
 
     <p>The arena has three separate subpanels. The right hand side is the work
@@ -51,7 +52,71 @@
     <fig id="arena_layout">
       <title>layout of the Arena</title>
 
-      <image href="../images/arena_images/arena_parts.jpg"/>
+      <image href="../images/arena_images/arena_parts.jpg" placement="break"/>
+    </fig>
+
+    <p>Multiple concepts can be viewed simultaneously in the work area. Each
+    concept can have an auxilliary preferences pane and/or a personal taxonomy
+    navigator as show in <xref href="#arena/arena_concept"/>. </p>
+
+    <fig id="arena_concept">
+      <title>Concept with personal and floating taxonomy panes</title>
+
+      <image href="../images/arena_images/arena_concepts.jpg"
+             placement="break"/>
+    </fig>
+
+    <p>A key design aspect of editing terms within the Arena is to minimise
+    mouse movements when performing repetitive editing tasks. This has led to
+    the development of <i>templates</i>, supported by a rules processing
+    engine. A template is an aid during the concept creation task, whereby
+    predefined descriptions, relationships or other artefacts are presented to
+    the user with default values. A simple example is the requirement to
+    provide a Fully Specified Name and a Preferred Term for a SNOMED CT
+    concept. Another example is the common requirement to provide a Finding
+    Site for a SNOMED CT Clinical Finding.</p>
+
+    <fig id="task_launcher">
+      <title>Available tasks associated with a concept</title>
+
+      <image href="../images/arena_images/arena_concept_tasks.jpg"
+             placement="break"/>
+    </fig>
+
+    <p>Another useful aid provided by the Arena is the provision of context
+    sensitive drop pads which appear when terms are dragged and dropped near a
+    target in a concept pane. An example is shown in <xref
+    href="#arena/drop-pad"/>, where a new Is-a relationship is dynamically
+    created when a term is dragged onto the concept pane.</p>
+
+    <fig id="drop-pad">
+      <title>Context-sensitive drop-pad</title>
+
+      <image href="../images/arena_images/arena_drop-pad.jpg"
+             placement="break"/>
+    </fig>
+
+    <p>Once changes have been completed, they can be committed vi the commit
+    <image href="../images/arena_images/icon_check.png"/> button available in
+    the bottom right corner of each concept pane. Changes can be likewise
+    cancelled via the adjacent <image
+    href="../images/arena_images/icon_delete.png"/> button.</p>
+
+    <fig>
+      <title>Commit and cancel controls</title>
+
+      <image href="../images/arena_images/commit_cancel.jpg" placement="break"/>
+    </fig>
+
+    <p>Any single concept pane in the Arena can have auxiliary panes open on
+    either side, as shown in <xref href="#arena/fig_aux_panes"/>. The
+    navigator pane support one of taxonomy, history, or classifier
+    details.</p>
+
+    <fig id="fig_aux_panes">
+      <title>Auxiliary Preference and Navigator panes</title>
+
+      <image href="../images/arena_images/fully_exapnded_concept_pane.jpg"/>
     </fig>
   </body>
 </topic>

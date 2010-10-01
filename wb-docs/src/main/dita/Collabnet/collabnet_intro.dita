@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Topic//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic1" xml:lang="en-us">
+<topic id="collabnet_intro" xml:lang="en-us">
   <title>Using the IHTSDO Workspace on Collabnet</title>
 
   <body>
@@ -18,7 +18,7 @@
     advantages of using Collabnet, both for IHTSDO Workbench terminology
     development and for extending the IHTSDO Toolkit components themselves,
     are discussed in <xref format="dita"
-    href="../Workspace/workspace_intro.dita#topic1"
+    href="../Workspace/workspace_intro.dita"
     type="topic"/><indexterm>subversion </indexterm></section>
   </body>
 </topic>

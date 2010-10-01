@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic5" xml:lang="en">
+<topic id="e_menubar" xml:lang="en">
   <title>Reviewing the Menu Bar</title>
 
   <prolog>
@@ -14,7 +14,7 @@
 
   <body>
     <section>The Menu Bar, as shown in <xref format="dita"
-    href="#topic5/ag947660" type="fig"/>, provides tools to manage certain
+    href="#e_menubar/ag947660" type="fig"/>, provides tools to manage certain
     application and configuration functions, as described below, that are
     typically handled by a system administrator. The functions available via
     the menu bar may vary from installation to installation, and may include

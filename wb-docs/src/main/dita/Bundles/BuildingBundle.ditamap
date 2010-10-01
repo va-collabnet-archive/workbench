@@ -1,12 +1,21 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN"   "http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
-<map id="BuildingBundle" xml:lang="en-us" title="Application Bundles">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
+<map id="BuildingBundle" title="Application Bundles" xml:lang="en-us">
+  <title>Application bundles</title>
 
- <title>Application bundles</title>
- <topicref href="bundle_intro.dita#topic1" type="topic" navtitle="Building an application bundle">
-  <topicref href="bundle_structure.dita#topic1a" type="topic" navtitle="Bundle structure">  </topicref>
-  <topicref href="bundle_maven_setup.dita#topic2" type="topic" navtitle="Setting up for Maven builds">  </topicref>
-  <topicref href="bundle_install4j.dita#topic3" type="topic"   navtitle="Installation readiness with Install4j">  </topicref>
-  <topicref href="bundle_distribution.dita#topic4" type="topic"   navtitle="Distribution and update via Continuum">  </topicref>
- </topicref>
+  <topicref href="bundle_intro.dita" navtitle="Building an application bundle"
+            type="topic">
+    <topicref href="bundle_structure.dita" navtitle="Bundle structure"
+              type="topic"/>
+
+    <topicref href="bundle_maven_setup.dita"
+              navtitle="Setting up for Maven builds" type="topic"/>
+
+    <topicref href="bundle_install4j.dita"
+              navtitle="Installation readiness with Install4j" type="topic"/>
+
+    <topicref href="bundle_distribution.dita"
+              navtitle="Distribution and update via Continuum" type="topic"/>
+  </topicref>
 </map>

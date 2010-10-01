@@ -2,7 +2,7 @@
 <!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/ditabase.dtd">
 <dita>
-  <topic id="topic14" xml:lang="en">
+  <topic id="tk_refsets" xml:lang="en">
     <title>Reference Sets</title>
 
     <prolog>
@@ -177,9 +177,9 @@
 
       <section>Concept reference sets allow an icon to be associated with each
       concept associated with the reference set. <xref format="dita"
-      href="#topic14/ad1002655" type="fig"/> shows the inclusion types for a
-      particular type of reference set specification (type 1) developed by the
-      Australian National E-Health Transition Authority.</section>
+      href="#tk_refsets/ad1002655" type="fig"/> shows the inclusion types for
+      a particular type of reference set specification (type 1) developed by
+      the Australian National E-Health Transition Authority.</section>
 
       <fig id="ad1002655">
         <title>Inclusion Types</title>
@@ -196,7 +196,7 @@
 
       <section>When a reference set specification is created, the taxonomy can
       display the viewer images of the reference set values associated with
-      each concept. In <xref format="dita" href="#topic14/ad1002676"
+      each concept. In <xref format="dita" href="#tk_refsets/ad1002676"
       type="fig"/>, Fizzy drink is associated with a lineage include
       instruction, Milky drink is associated with an exclude lineage
       instruction, Cocoa drink is associated with an individual include
@@ -209,8 +209,8 @@
       methodology for specifying reference sets, a comprehensive expression
       language is used to hold the specification, and the Workbench has
       extensive support for constructing and assembling complex expressions,
-      such as that shown in <xref href="#topic14/specification_type2"/>.<fig
-          id="specification_type2">
+      such as that shown in <xref
+      href="#tk_refsets/specification_type2"/>.<fig id="specification_type2">
           <title>Refset speciciation editing capability</title>
 
           <image href="../images/Refsets_Images/specification_type2.jpg"/>

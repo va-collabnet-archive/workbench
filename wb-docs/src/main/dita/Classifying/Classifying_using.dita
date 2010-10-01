@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic2" xml:lang="en">
+<topic id="classifier_using" xml:lang="en">
   <title>Overview the Classifier</title>
 
   <prolog>
@@ -20,8 +20,8 @@
     provides support for using this classifier via in-built tasks available
     from within the Business Process Builder. The classifier related tasks
     available can be seen in <xref format="dita"
-    href="#topic2/image_0e5e4dcb-de09-4164-a171-b8959ea0dca0" type="fig"/>
-    <fig id="image_0e5e4dcb-de09-4164-a171-b8959ea0dca0">
+    href="#classifier_using/image_0e5e4dcb-de09-4164-a171-b8959ea0dca0"
+    type="fig"/> <fig id="image_0e5e4dcb-de09-4164-a171-b8959ea0dca0">
         <title>Process Builder pane showing classifier tasks</title>
 
         <image href="../images/classifier_images/classifier_task.jpg"/>
@@ -31,8 +31,12 @@
     particularly memory. The Workbench's Java Virtual Machine settings need to
     configured for sufficient heap space - at least 1200MBytes (
     <tt>-Xms1200m</tt> in the java startup script, see <xref format="dita"
-    href="../FAQ/FAQ.dita#topic8">How to overcome memory issues?</xref>
-    )</note>
+    href="../FAQ/FAQ.dita">How to overcome memory issues?</xref> )</note>
+
+    <note>Before running the classifier, ensure that the correct IS-A
+    relationship is set in the Classifier tab of the Preferences Panel. See
+    step <xref
+    href="Classifying_setup_tasks.dita#classifying_steps/prefs"/></note>
 
     <note>In order to view the results of running the classifier, ensure that
     the STATED_INFERRED<indexterm>inferred

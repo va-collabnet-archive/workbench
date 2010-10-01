@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic6" xml:lang="en">
+<topic id="e_prefs" xml:lang="en">
   <title>Understanding the Preferences Panel</title>
 
   <prolog>
@@ -29,8 +29,8 @@
 
     <section>To access Preferences, click on the Preferences Panel icon. A
     window similar to the one shown in <xref format="dita"
-    href="#topic6/ag937234" type="fig"/> will display. You will need to select
-    the path tab.</section>
+    href="#e_prefs/ag937234" type="fig"/> will display. You will need to
+    select the path tab.</section>
 
     <fig id="ag937234">
       <title>Preferences Panel</title>
@@ -64,15 +64,15 @@
     highlighting of paths in the taxonomy view. Concepts belonging to
     different editing paths can be visually differentiated using this feature
     as shown in <xref format="dita"
-    href="#topic6/image_taxonomy_colour_bars"/>.</p> <fig
+    href="#e_prefs/image_taxonomy_colour_bars"/>.</p> <fig
         id="image_taxonomy_colour_bars">
         <title>Colour highlighting of paths in the taxonomy view</title>
 
         <image href="../images/Using_The_ACE_Editor_Images/taxonomy_colour_bars.jpg"/>
       </fig> <p> Assignment of colours to paths is undertaken by checking the
     <i>color path</i> checkbox in the Path pane of the Preferences Panel, as
-    illustrated in <xref format="dita" href="#topic6/image_path_colour"/>.</p>
-    <fig id="image_path_colour">
+    illustrated in <xref format="dita"
+    href="#e_prefs/image_path_colour"/>.</p> <fig id="image_path_colour">
         <title>Choosing a colour to assign to a path</title>
 
         <image href="../images/Using_The_ACE_Editor_Images/path_colour.jpg"/>
@@ -100,7 +100,7 @@
 
     <section>The<i> Preferences View tab </i>displays the current settings and
     options for descriptions, relationships, status and roots, as shown in
-    <xref format="dita" href="#topic6/ag946086" type="fig"/>.</section>
+    <xref format="dita" href="#e_prefs/ag946086" type="fig"/>.</section>
 
     <fig id="ag946086">
       <title>Preferences Panel - View Tab</title>
@@ -176,7 +176,7 @@
     <section>The <i>Preferences Edit tab </i> displays the default settings
     for status, description, relationship type, relationship characteristic
     and relationship refinability. An example of default settings is shown in
-    <xref format="dita" href="#topic6/ag947067" type="fig"/>.</section>
+    <xref format="dita" href="#e_prefs/ag947067" type="fig"/>.</section>
 
     <section><title>Edit Defaults</title><indexterm>preferences
     <indexterm>Edit Defaults</indexterm> </indexterm></section>
@@ -255,7 +255,7 @@
     </fig>
 
     <section>You can add items to the defaults by copying and pasting from the
-    Hierarchy View, as shown in <xref format="dita" href="#topic6/ag938644"
+    Hierarchy View, as shown in <xref format="dita" href="#e_prefs/ag938644"
     type="fig"/>. The added item(s) will then display in the popup menu
     available in the Concept Work Area.</section>
 
@@ -267,7 +267,7 @@
     </fig>
 
     <section>The added item(s), as shown in <xref format="dita"
-    href="#topic6/ag938658" type="fig"/>, will then display in the popup menu
+    href="#e_prefs/ag938658" type="fig"/>, will then display in the popup menu
     in the Concept Work Area.</section>
 
     <fig id="ag938658">
@@ -280,7 +280,7 @@
     <section>The <i>Preferences Path tab </i>provides a way to create a new
     path (hierarchy view) from the existing paths for Terminology Auxiliary
     and SNOMED CORE taxonomies, as shown in <xref format="dita"
-    href="#topic6/ag938675" type="fig"/>.</section>
+    href="#e_prefs/ag938675" type="fig"/>.</section>
 
     <fig id="ag938675">
       <title>Preferences Panel - New Path Tab</title>
@@ -290,7 +290,7 @@
     </fig>
 
     <section>To add a new path to the available tabs, as shown in <xref
-    format="dita" href="#topic6/ag938689" type="fig"/>, follow the
+    format="dita" href="#e_prefs/ag938689" type="fig"/>, follow the
     instructions below.</section>
 
     <fig id="ag938689">
@@ -324,11 +324,10 @@
     </ph></section>
 
     <section>For information about reference set preference settings for the
-    tabs shown in <xref format="dita" href="#topic6/ag947183" type="fig"/>,
-    see <xref format="dita" href="Editor_displaying_spec_refsets.dita#topic14"
+    tabs shown in <xref format="dita" href="#e_prefs/ag947183" type="fig"/>,
+    see <xref format="dita" href="Editor_displaying_spec_refsets.dita"
     type="topic"/>, and <xref format="dita"
-    href="Editor_displaying_refset_members.dita#topic15"
-    type="topic"/>.</section>
+    href="Editor_displaying_refset_members.dita" type="topic"/>.</section>
 
     <section>The result of a specification refset is a member refset, i.e.,
     the set of concepts specified by the specification refset. IHTSDO IDE can
@@ -367,7 +366,7 @@
     <indexterm>preferences<indexterm>changeset</indexterm></indexterm>in the
     preferences panel allows you to determine the effect various actions have
     on changesets, as shown in <xref
-    href="#topic6/preferences_changeset"/>.<fig id="preferences_changeset">
+    href="#e_prefs/preferences_changeset"/>.<fig id="preferences_changeset">
         <title>the changeset preferences panel</title>
 
         <image href="../images/Using_The_ACE_Editor_Images/preferences_changeset.jpg"/>
@@ -397,7 +396,7 @@
         <image href="../images/Using_The_ACE_Editor_Images/preferences_chronicler_contradictions.jpg"/>
       </fig>A number of strategies are available to set the action that should
     be taken when identifying and resolving contadictions, as shown in <xref
-    href="#topic6/preferences_contradiction_strategies"/>.<fig
+    href="#e_prefs/preferences_contradiction_strategies"/>.<fig
         id="preferences_contradiction_strategies">
         <title>Preferences panel - chronicler - contradiction
         strategies</title>
@@ -421,15 +420,15 @@
     Tabs</title></section>
 
     <section>In addition to the icons described in <xref format="dita"
-    href="Editor_concept_area.dita#topic4/ag936964" type="section"/>, this
-    portion of the IHTSDO Workbench IDE window includes five tabs. The first
-    four tabs in the concept viewing and editing area are user-configurable.
-    By default, the first tab is linked to the current selection of the
-    hierarchy view. However, the first tab can be “unlinked” by clicking on
-    the Concept Linkage button.</section>
+    href="Editor_concept_area.dita#e_concept_area/ag936964" type="section"/>,
+    this portion of the IHTSDO Workbench IDE window includes five tabs. The
+    first four tabs in the concept viewing and editing area are
+    user-configurable. By default, the first tab is linked to the current
+    selection of the hierarchy view. However, the first tab can be “unlinked”
+    by clicking on the Concept Linkage button.</section>
 
     <section>In the example shown in <xref format="dita"
-    href="#topic6/ag938923" type="fig"/>, the Hierarchy tab contains the
+    href="#e_prefs/ag938923" type="fig"/>, the Hierarchy tab contains the
     hierarchy view name and the Search tab displays “Search” since a concept
     search has not been executed.</section>
 
@@ -448,7 +447,7 @@
 
     <section id="ag939128"><i>Empty and Empty2 Tabs</i>: These tabs are
     available for constructing new concepts by copying a concept, as shown in
-    <xref format="dita" href="#topic6/ag937461" type="fig"/>, and then
+    <xref format="dita" href="#e_prefs/ag937461" type="fig"/>, and then
     changing their descriptions and relationships. Concepts can be copied by
     using the drag and drop feature of the Transporter icon. The <i>Empty and
     Empty2 </i>tabs are not linked to the hierarchy.<indexterm>Empty tabs
@@ -464,8 +463,7 @@
     <section><i>List Tab</i>: The List tab provides a way to execute batch
     changes such as to associate a group of children with a different parent.
     For more information about functions available from the List Tab, see
-    <xref format="dita" href="Editor_list_view.dita#topic7"
-    type="topic"/>.</section>
+    <xref format="dita" href="Editor_list_view.dita" type="topic"/>.</section>
 
     <section id="ag937478"><title>Adding a Concept</title></section>
 
@@ -475,7 +473,7 @@
 
     <section>To add a concept, click on the plus sign + in the Descriptions
     icon of the work area, as shown in <xref format="dita"
-    href="#topic6/ag937496" type="fig"/>.</section>
+    href="#e_prefs/ag937496" type="fig"/>.</section>
 
     <fig id="ag937496">
       <title>Adding a New Concept</title>
@@ -487,14 +485,14 @@
     <section>To create the new concept, double-click on the blank text field.
     The current focus concept text will fill in. Change the existing text to
     reflect the new concept. For more information about adding descriptions,
-    <xref format="dita" href="#topic6/ag937578" type="section"/></section>
+    <xref format="dita" href="#e_prefs/ag937578" type="section"/></section>
 
     <section id="ag937510"><title>Modifying a Concept<ph> <indexterm>Modifying
     a Concept </indexterm> </ph></title></section>
 
     <section>To modify an existing concept, right-click on the concept
     description to be modified. A popup menu will display, as shown in <xref
-    format="dita" href="#topic6/ag937524" type="fig"/>.</section>
+    format="dita" href="#e_prefs/ag937524" type="fig"/>.</section>
 
     <fig id="ag937524">
       <title>Modifying a Concept</title>
@@ -511,7 +509,7 @@
     text field and modify the text.</section>
 
     <section>For more information about changing concepts, <xref format="dita"
-    href="#topic6/ag937578" type="section"/></section>
+    href="#e_prefs/ag937578" type="section"/></section>
 
     <section id="ag937546"><title>Changing Concept Attributes<ph>
     <indexterm>Concept Attributes <indexterm>changing</indexterm> </indexterm>
@@ -530,7 +528,7 @@
     <section><i>Green Bar: </i>Note that new lines that have not been
     committed to the database are identified by a green vertical bar at the
     left side of the line, as shown in <xref format="dita"
-    href="#topic6/ag937572" type="fig"/>. This visual identifier is used
+    href="#e_prefs/ag937572" type="fig"/>. This visual identifier is used
     throughout the IHTSDO Workbench Editor to denote uncommitted additions.
     The green bar will remain in place until you press the “Commit”
     button.</section>
@@ -552,7 +550,7 @@
     over the existing line. The Change or Retire menu displays. Click on one
     of the options. Note that the “status” column will show the option you
     selected. In either option, a new line will display, as shown in <xref
-    format="dita" href="#topic6/ag937596" type="fig"/>.</section>
+    format="dita" href="#e_prefs/ag937596" type="fig"/>.</section>
 
     <fig id="ag937596">
       <title>Changing a Description</title>
@@ -571,7 +569,7 @@
     Editor to denote uncommitted additions. </i> Double-click on the text
     field in the new line and replace the existing text with the description
     you want to add to the list, as shown in <xref format="dita"
-    href="#topic6/ag937610" type="fig"/>.</section>
+    href="#e_prefs/ag937610" type="fig"/>.</section>
 
     <fig id="ag937610">
       <title>Adding a Description</title>
@@ -635,7 +633,7 @@
 
     <section>To change or retire a source relationship, hover the cursor over
     the existing line. The Change or Retire menu displays, as shown in <xref
-    format="dita" href="#topic6/ag970542" type="fig"/>. Click on an option.
+    format="dita" href="#e_prefs/ag970542" type="fig"/>. Click on an option.
     Note that the “status” column will show the option you selected.</section>
 
     <fig id="ag970542">
@@ -651,7 +649,7 @@
     the “Source Relationships” description. A new line will be added to the
     list with the default relationship type “is-a rel (terminology constant)”.
     Copy and paste a description from the Hierarchy View, as shown in <xref
-    format="dita" href="#topic6/ag970577" type="fig"/>. <i>Note</i>: Added
+    format="dita" href="#e_prefs/ag970577" type="fig"/>. <i>Note</i>: Added
     line has been enlarged in screen shot for emphasis.</section>
 
     <fig id="ag970577">
@@ -693,7 +691,7 @@
 
     <section>To change or retire a destination relationship, right-click on
     the desired line and choose an option from the displayed popup menu, as
-    shown in <xref format="dita" href="#topic6/ag937774"
+    shown in <xref format="dita" href="#e_prefs/ag937774"
     type="fig"/>.</section>
 
     <fig id="ag937774">
@@ -709,7 +707,7 @@
 
     <section>To add a destination relationship, click on the green + symbol
     under the “Destination Relationships” description. A new line will be
-    added, as shown in <xref format="dita" href="#topic6/ag937792"
+    added, as shown in <xref format="dita" href="#e_prefs/ag937792"
     type="fig"/>. Copy and paste or type the new destination relationship
     values.</section>
 
@@ -756,7 +754,7 @@
     aid to help identify where the selected concept resides in the hierarchy.
     The selected concept is designated with blue arrows to highlight where its
     multiple lineages, if any, exist, as shown in <xref format="dita"
-    href="#topic6/ag949043" type="fig"/>.</section>
+    href="#e_prefs/ag949043" type="fig"/>.</section>
 
     <fig id="ag949043">
       <title>Concept Lineage</title>
@@ -766,7 +764,7 @@
     </fig>
 
     <section>As described in the Hierarchy View discussion (<xref
-    format="dita" href="Editor_hierarchy_view.dita#topic3/ag929147"
+    format="dita" href="Editor_hierarchy_view.dita#e_hierarchy/ag929147"
     type="section"/>), the slanted green arrows indicate additional parent
     lineages in higher positions in the hierarchy.</section>
 
@@ -776,12 +774,12 @@
     </ph></title></section>
 
     <section>As noted in <xref format="dita"
-    href="Editor_concept_area.dita#topic4/ag937081" type="section"/>, you can
-    view or hide access to a lineage graphing tool that provides dimensional
-    views of the current concept’s lineage. The default setting for the icon
-    is “off.” To turn the graphing option on, from the Preferences Panel,
-    select Component Panel and click in the box next to Lineage
-    Graph.</section>
+    href="Editor_concept_area.dita#e_concept_area/ag937081" type="section"/>,
+    you can view or hide access to a lineage graphing tool that provides
+    dimensional views of the current concept’s lineage. The default setting
+    for the icon is “off.” To turn the graphing option on, from the
+    Preferences Panel, select Component Panel and click in the box next to
+    Lineage Graph.</section>
 
     <section>This tool is especially helpful when working with complex
     concepts. Lineage graphs can be manipulated according to a number of
@@ -796,7 +794,7 @@
     search function to search for ‘duck viral hepatitis.’ This concept will
     yield a complex graph that can be reorganized by the lineage graph tools.
     The initially displayed graph will look like the one shown in <xref
-    format="dita" href="#topic6/ag949090" type="fig"/>. The focus concept
+    format="dita" href="#e_prefs/ag949090" type="fig"/>. The focus concept
     element is outlined in blue; the top SNOMED CT concept element is outlined
     in red.</section>
 
@@ -811,18 +809,18 @@
     <indexterm>graph controls </indexterm> </ph></title></section>
 
     <section>The icons on the left side of the lineage graph, as shown in
-    <xref format="dita" href="#topic6/ag948613" type="fig"/>, provide controls
-    for viewing the graph. The controls provide the following
+    <xref format="dita" href="#e_prefs/ag948613" type="fig"/>, provide
+    controls for viewing the graph. The controls provide the following
     functions:</section>
 
     <section><ph> <indexterm>hyperbolic view </indexterm><indexterm>lens
     view</indexterm> </ph>Lens Views - Use this control to change the graph
     image to hyperbolic (a curved representation) views that are useful for
     large, complex graphs, as shown in <xref format="dita"
-    href="#topic6/ag948645" type="fig"/>, or a hyperbolic layout, as shown in
-    <xref format="dita" href="#topic6/ag948693" type="fig"/> that distorts the
-    image of the elements. You can also magnify the view or layout from this
-    menu. Click “No lens” to return to the original view.</section>
+    href="#e_prefs/ag948645" type="fig"/>, or a hyperbolic layout, as shown in
+    <xref format="dita" href="#e_prefs/ag948693" type="fig"/> that distorts
+    the image of the elements. You can also magnify the view or layout from
+    this menu. Click “No lens” to return to the original view.</section>
 
     <fig id="ag948613">
       <title>Lineage Graph Controls</title>
@@ -857,12 +855,12 @@
 
     <section id="ag948822"><i>Nodes View</i> - Click this to enable use of the
     mouse to select nodes within the graph and move them around, as shown in
-    <xref format="dita" href="#topic6/ag948843" type="fig"/>. Use the mouse to
-    draw a line around the nodes you want to move. Click in the middle of one
-    of the selected nodes and drag to move the node. To extend the selected
-    node beyond the original borders, Shift/Click in the middle of the node.
-    To deselect the node, click outside the selection borders.<indexterm>nodes
-    view </indexterm></section>
+    <xref format="dita" href="#e_prefs/ag948843" type="fig"/>. Use the mouse
+    to draw a line around the nodes you want to move. Click in the middle of
+    one of the selected nodes and drag to move the node. To extend the
+    selected node beyond the original borders, Shift/Click in the middle of
+    the node. To deselect the node, click outside the selection
+    borders.<indexterm>nodes view </indexterm></section>
 
     <fig id="ag948843">
       <title>Lineage Graph - Node Moved</title>
@@ -873,7 +871,7 @@
 
     <section>Algorithm View - Click this icon to choose a specialized view
     based on the algorithims listed in the menu. For more information, see
-    <xref format="dita" href="#topic6/ag949194" type="section"/>.</section>
+    <xref format="dita" href="#e_prefs/ag949194" type="section"/>.</section>
 
     <section id="ag948576"><title>Using Lineage Graph Keyboard Controls<ph>
     <indexterm>keyboard controls <indexterm>lineage graph</indexterm>
@@ -902,7 +900,7 @@
     Algorithms <ph> <indexterm>graphs <indexterm>concept lineage
     layouts</indexterm> </indexterm> </ph></title></section>
 
-    <section>As noted in <xref format="dita" href="#topic6/ag949095"
+    <section>As noted in <xref format="dita" href="#e_prefs/ag949095"
     type="section"/>, the Algorithm View icon provides access to a number of
     graph views based on algorithms. The algorithms, by definition,
     incorporate some randomness that can change how the layout appears in
@@ -948,7 +946,7 @@
 
     <section>If you have selected more than one path, the Conflicts toggle
     displays (or hides) a view of conflicts between the two paths, as shown in
-    <xref format="dita" href="#topic6/ag937911" type="fig"/>.</section>
+    <xref format="dita" href="#e_prefs/ag937911" type="fig"/>.</section>
 
     <section><i>Resolution</i>: The resolved (agreeing) components of the
     conflicting versions are listed in the upper left section of the Conflicts
