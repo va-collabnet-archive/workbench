@@ -187,6 +187,7 @@ public class WorkbenchRunner {
 			File wbPropertiesFile = new File("config", WB_PROPERTIES);
 			boolean acePropertiesFileExists = wbPropertiesFile.exists();
 			wbProperties = new Properties();
+			SvnPrompter prompter = new SvnPrompter();
 			
 			boolean initialized = false;
 			if (acePropertiesFileExists) {
@@ -197,7 +198,7 @@ public class WorkbenchRunner {
 			SvnHelper svnHelper =  new SvnHelper(WorkbenchRunner.class, jiniConfig);
 			if (acePropertiesFileExists == false || initialized == false) {
 				try {
-					svnHelper.initialSubversionOperationsAndChangeSetImport(wbPropertiesFile);
+					svnHelper.initialSubversionOperationsAndChangeSetImport(wbPropertiesFile, prompter);
 				} catch (Exception ex) {
 					AceLog.getAppLog().alertAndLogException(ex);
 					System.exit(0);
@@ -222,13 +223,12 @@ public class WorkbenchRunner {
 				wbConfigFile = new File("config/wb.config");
 			}
 
-			SvnPrompter prompter = new SvnPrompter();
 			File profileDir = new File("profiles");
 			if ((profileDir.exists() == false && initializeFromSubversion)
 					|| (svnUpdateOnStart != null)) {
 	            Svn.setConnectedToSvn(true);
 	            svnHelper.initialSubversionOperationsAndChangeSetImport(new File(
-								"config", WB_PROPERTIES));
+								"config", WB_PROPERTIES), prompter);
 			}
 
 			if (wbConfigFile == null || !wbConfigFile.exists()) {

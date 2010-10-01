@@ -26,6 +26,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.cs.ChangeSetImporter;
+import org.dwfa.ace.task.svn.SvnPrompter;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.util.SelectObjectDialog;
 import org.dwfa.svn.Svn;
@@ -91,7 +92,7 @@ public class SvnHelper {
 		}
 	}
 
-	void initialSubversionOperationsAndChangeSetImport(File acePropertiesFile, boolean connectToSubversion)
+	void initialSubversionOperationsAndChangeSetImport(File acePropertiesFile, boolean connectToSubversion, SvnPrompter prompter)
 	throws ConfigurationException, FileNotFoundException, IOException, TaskFailedException, ClientException {
 		Properties aceProperties = new Properties();
 		aceProperties.setProperty("initial-svn-checkout", "true");
@@ -119,7 +120,7 @@ public class SvnHelper {
 					if (svnUpdateOnStart != null && svnUpdateOnStart.length > 0) {
 						for (String svnSpec : svnUpdateOnStart) {
 							activity.setProgressInfoLower("Update: " + svnSpec);
-							handleSvnUpdate(changeLocations, svnSpec);
+							handleSvnUpdate(changeLocations, svnSpec, prompter);
 						}
 					}
 
@@ -148,7 +149,7 @@ public class SvnHelper {
 		}
 	}
 
-	public void initialSubversionOperationsAndChangeSetImport(File acePropertiesFile) throws ConfigurationException,
+	public void initialSubversionOperationsAndChangeSetImport(File acePropertiesFile,  SvnPrompter prompter) throws ConfigurationException,
 	FileNotFoundException, IOException, TaskFailedException, ClientException {
 
 		Properties wbProperties = new Properties();
@@ -184,7 +185,7 @@ public class SvnHelper {
 					if (svnUpdateOnStart != null && svnUpdateOnStart.length > 0) {
 						for (String svnSpec : svnUpdateOnStart) {
 							activity.setProgressInfoLower("Update: " + svnSpec);
-							handleSvnUpdate(changeLocations, svnSpec);
+							handleSvnUpdate(changeLocations, svnSpec, prompter);
 						}
 					}
 				} finally {
@@ -316,7 +317,7 @@ public class SvnHelper {
 		}
 	}
 
-	private void handleSvnUpdate(List<File> changeLocations, String path) {
+	private void handleSvnUpdate(List<File> changeLocations, String path, SvnPrompter prompter) {
 		AceLog.getAppLog().info("Got svn update spec: " + path);
 		try {
 			Revision revision = Revision.HEAD;
@@ -326,8 +327,12 @@ public class SvnHelper {
 			boolean allowUnverObstructions = false;
 			if (path.equalsIgnoreCase(I_ConfigAceDb.MUTABLE_DB_LOC)) {
 				AceLog.getAppLog().info("Starting svn revert for: " + path);
-				Svn.getSvnClient().revert(path, Depth.infinity, null);
+				SubversionData svd = new SubversionData(null, path);
+				Svn.revertNoLock(svd, prompter);
 				changeLocations.add(new File("profiles"));
+				
+				
+				
 			} 
 			AceLog.getAppLog().info("Starting svn update for: " + path);
 			Svn.getSvnClient().update(path, revision, depth, depthIsSticky, ignoreExternals, allowUnverObstructions);
@@ -347,7 +352,7 @@ public class SvnHelper {
 		changeLocations.clear();
 	}
 
-	public void doChangeSetImport(List<File> changeLocations) {
+	public static void doChangeSetImport(List<File> changeLocations) {
 		if (Terms.get() == null) {
 			AceLog.getAppLog().info("Database not setup for eccs import: " + changeLocations);
 			return;

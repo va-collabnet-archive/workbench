@@ -551,58 +551,7 @@ public class Svn implements I_HandleSubversion {
 		I_ShowActivity activity = setupActivityPanel("Subversion revert");
 		try {
 
-			SvnLog.info("Starting revert");
-			Svn.getSvnClient().setPrompt(authenticator);
-			try {
-				int depth = Depth.unknown;
-				boolean onServer = false;
-				boolean getAll = false;
-				boolean noIgnore = false;
-				boolean ignoreExternals = false;
-				String[] changelists = null;
-				HandleStatus statusHandler = new HandleStatus();
-				Svn.getSvnClient().status(svd.getWorkingCopyStr(), depth, onServer, getAll, noIgnore, ignoreExternals,
-						changelists, statusHandler);
-				for (Status s : statusHandler.getStatusList()) {
-					if (s.isManaged() == true) {
-						if (s.getTextStatus() == StatusKind.missing) {
-							revert(s);
-						} else if (s.getTextStatus() == StatusKind.modified) {
-							revert(s);
-						} else if (s.getTextStatus() == StatusKind.deleted) {
-							revert(s);
-						} else if (s.getTextStatus() == StatusKind.conflicted) {
-							revert(s);
-						} else if (s.getTextStatus() == StatusKind.merged) {
-							revert(s);
-						} else if (s.getTextStatus() == StatusKind.unversioned) {
-							revert(s);
-						}
-					} else {
-						File fileToRevert = new File(s.getPath());
-						if (fileToRevert.isHidden() || fileToRevert.getName().startsWith(".")) {
-							// don't mess with the hidden files.
-						} else {
-							FileIO.recursiveDelete(fileToRevert);
-						}
-					}
-				}
-			} catch (ClientException e) {
-				if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
-					SvnLog.alertAndLog(e);
-					SvnLog.info("finished revert for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-							+ e.getLocalizedMessage());
-					throw new TaskFailedException(e);
-				}
-			} catch (IOException e) {
-				SvnLog.alertAndLog(e);
-				SvnLog.info("finished revert for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-						+ e.getLocalizedMessage());
-				throw new TaskFailedException(e);
-			}
-			SvnLog.info("finished revert");
-			ObjectServerCore.refreshServers();
-			SvnLog.info("refreshed Object Servers");
+			revertNoLock(svd, authenticator);
 		} finally {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
@@ -615,6 +564,69 @@ public class Svn implements I_HandleSubversion {
 				throw new TaskFailedException(e);
 			}
 
+		}
+	}
+
+	public static void revertNoLock(SubversionData svd,
+			PromptUserPassword3 authenticator) throws TaskFailedException {
+		SvnLog.info("Starting revert");
+		Svn.getSvnClient().setPrompt(authenticator);
+		try {
+			int depth = Depth.unknown;
+			boolean onServer = false;
+			boolean getAll = false;
+			boolean noIgnore = false;
+			boolean ignoreExternals = false;
+			String[] changelists = null;
+			HandleStatus statusHandler = new HandleStatus();
+			Svn.getSvnClient().status(svd.getWorkingCopyStr(), depth, onServer, getAll, noIgnore, ignoreExternals,
+					changelists, statusHandler);
+			for (Status s : statusHandler.getStatusList()) {
+				if (s.isManaged() == true) {
+					if (s.getTextStatus() == StatusKind.missing) {
+						revert(s);
+					} else if (s.getTextStatus() == StatusKind.modified) {
+						revert(s);
+					} else if (s.getTextStatus() == StatusKind.deleted) {
+						revert(s);
+					} else if (s.getTextStatus() == StatusKind.conflicted) {
+						revert(s);
+					} else if (s.getTextStatus() == StatusKind.merged) {
+						revert(s);
+					} else if (s.getTextStatus() == StatusKind.unversioned) {
+						revert(s);
+						deleteFiles(s);
+					}
+				} else {
+					deleteFiles(s);
+				}
+			}
+		} catch (ClientException e) {
+			if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+				SvnLog.alertAndLog(e);
+				SvnLog.info("finished revert for working copy: " + svd.getWorkingCopyStr() + "with exception: "
+						+ e.getLocalizedMessage());
+				throw new TaskFailedException(e);
+			}
+		} catch (IOException e) {
+			SvnLog.alertAndLog(e);
+			SvnLog.info("finished revert for working copy: " + svd.getWorkingCopyStr() + "with exception: "
+					+ e.getLocalizedMessage());
+			throw new TaskFailedException(e);
+		}
+		SvnLog.info("finished revert");
+		ObjectServerCore.refreshServers();
+		SvnLog.info("refreshed Object Servers");
+	}
+
+	private static void deleteFiles(Status s) throws IOException {
+		File fileToRevert = new File(s.getPath());
+		if (fileToRevert.exists()) {
+			if (fileToRevert.isHidden() || fileToRevert.getName().startsWith(".")) {
+				// don't mess with the hidden files.
+			} else {
+				FileIO.recursiveDelete(fileToRevert);
+			}
 		}
 	}
 
