@@ -13,12 +13,12 @@
   </prolog>
 
   <body>
-    <p><note>Although relationships in general are discussed in <xref
+    <section><note>Although relationships in general are discussed in <xref
     href="AddingModifying_relationships.dita"/>, the IS-A relationship(s) are
     so fundamental to using the Workbench, not just for adding and modifying
     concepts, but for "classification", "refset" construction and other
     processing, that they have been singled out for special consideration
-    here.</note></p>
+    here.</note></section>
 
     <section><title><ph><indexterm>is a<index-see-also>Is
     a</index-see-also></indexterm></ph>The Workbench "is a"</title>The IHTSDO

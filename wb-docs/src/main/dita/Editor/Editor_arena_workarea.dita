@@ -116,7 +116,8 @@
     <fig id="fig_aux_panes">
       <title>Auxiliary Preference and Navigator panes</title>
 
-      <image href="../images/arena_images/fully_exapnded_concept_pane.jpg"/>
+      <image href="../images/arena_images/fully_exapnded_concept_pane.jpg"
+             placement="break"/>
     </fig>
   </body>
 </topic>

@@ -25,23 +25,19 @@
         <title>Process Builder pane showing classifier tasks</title>
 
         <image href="../images/classifier_images/classifier_task.jpg"/>
-      </fig></section>
-
-    <note>The IHTSDO Classifier requires considerable system resources -
-    particularly memory. The Workbench's Java Virtual Machine settings need to
-    configured for sufficient heap space - at least 1200MBytes (
+      </fig><note>The IHTSDO Classifier requires considerable system resources
+    - particularly memory. The Workbench's Java Virtual Machine settings need
+    to configured for sufficient heap space - at least 1200MBytes (
     <tt>-Xms1200m</tt> in the java startup script, see <xref format="dita"
-    href="../FAQ/FAQ.dita">How to overcome memory issues?</xref> )</note>
-
-    <note>Before running the classifier, ensure that the correct IS-A
+    href="../FAQ/FAQ_intro.dita">How to overcome memory issues?</xref>
+    )</note><note>Before running the classifier, ensure that the correct IS-A
     relationship is set in the Classifier tab of the Preferences Panel. See
     step <xref
-    href="Classifying_setup_tasks.dita#classifying_steps/prefs"/></note>
-
-    <note>In order to view the results of running the classifier, ensure that
-    the STATED_INFERRED<indexterm>inferred
+    href="Classifying_setup_tasks.dita#classifying_steps/prefs"/></note><note>In
+    order to view the results of running the classifier, ensure that the
+    STATED_INFERRED<indexterm>inferred
     view</indexterm><indexterm>STATED_INFERRED</indexterm> viewing option is
-    checked in the Component Pane of the Preferences Panel.</note>
+    checked in the Component Pane of the Preferences Panel.</note></section>
 
     <section>The classifier is executed through a business process plugin and
     can take several minutes. Once the classifier has been run, the Normal
