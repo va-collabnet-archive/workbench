@@ -167,6 +167,21 @@
 						</goals>
 					</execution>
 					<execution>
+						<!-- copy treeview files from source director(ies) -->
+						<id>copy-treeview</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<tasks>
+								<copy todir="${project.build.directory}/xhtml/treeview">
+									<fileset dir="${dita.src.dir}/treeview"/>
+								</copy>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+					<execution>
 						<id>tweak-document-metadata</id>
 						<phase>process-sources</phase>
 						<configuration>
@@ -213,6 +228,7 @@
 								<concat destfile="${project.build.directory}/xhtml/Guidebook/commonltr.css" append="true">
 									<fileset file="src/main/resources/ihtsdo_body.css"/>
 								</concat>
+								<replaceregexp file="${project.build.directory}/xhtml/Guidebook/toc.html" flags="m" match="^&lt;ul" replace="&lt;!-- autoreplaced by Maven --"/>
 							</tasks>
 						</configuration>
 						<goals>
@@ -251,6 +267,96 @@
 				</configuration>
 				<executions>
 					<execution>
+						<id>userguide2pdf</id>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<!--
+									attach the generated PDF: this doesn't work in the current
+									version of the dita-maven-plugin when the ditamap is in a
+									subdirectory, so it is added using the build-helper below
+									<attach>true</attach>
+								-->
+							<antProperties>
+								<transtype>pdf2</transtype>
+								<dita.dir>${dita.ot.dir}</dita.dir>
+								<args.input>${dita.src.dir}/UserGuide/Workbench_UserGuide.ditamap</args.input>
+								<dita.extname>dita</dita.extname>
+								<output.dir>${project.build.directory}/pdf</output.dir>
+								<xep.dir>${xep.dir}</xep.dir>
+								<pdf.formatter>${dita.pdf.formatter}</pdf.formatter>
+								<generate.copy.outer>2</generate.copy.outer>
+								<outer.control>quiet</outer.control>
+								<!--
+										<customization.dir>${customization.dir}</customization.dir>
+										<clean.temp>yes</clean.temp>
+									-->
+							</antProperties>
+						</configuration>
+					</execution>
+					<execution>
+						<id>bpguide2pdf</id>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<!--
+										attach the generated PDF: this doesn't work in the current
+										version of the dita-maven-plugin when the ditamap is in a
+										subdirectory, so it is added using the build-helper below
+										<attach>true</attach>
+									-->
+							<antProperties>
+								<transtype>pdf2</transtype>
+								<dita.dir>${dita.ot.dir}</dita.dir>
+								<args.input>${dita.src.dir}/BusinessProcessGuide/Workbench_BusinessProcess_Guide.ditamap</args.input>
+								<dita.extname>dita</dita.extname>
+								<output.dir>${project.build.directory}/pdf</output.dir>
+								<xep.dir>${xep.dir}</xep.dir>
+								<pdf.formatter>${dita.pdf.formatter}</pdf.formatter>
+								<generate.copy.outer>2</generate.copy.outer>
+								<outer.control>quiet</outer.control>
+								<!--
+											<customization.dir>${customization.dir}</customization.dir>
+											<clean.temp>yes</clean.temp>
+										-->
+							</antProperties>
+						</configuration>
+					</execution>
+					<execution>
+						<id>devguide2pdf</id>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<!--
+											attach the generated PDF: this doesn't work in the current
+											version of the dita-maven-plugin when the ditamap is in a
+											subdirectory, so it is added using the build-helper below
+											<attach>true</attach>
+										-->
+							<antProperties>
+								<transtype>pdf2</transtype>
+								<dita.dir>${dita.ot.dir}</dita.dir>
+								<args.input>${dita.src.dir}/DevelopersGuide/Workbench_Developers_Guide.ditamap</args.input>
+								<dita.extname>dita</dita.extname>
+								<output.dir>${project.build.directory}/pdf</output.dir>
+								<xep.dir>${xep.dir}</xep.dir>
+								<pdf.formatter>${dita.pdf.formatter}</pdf.formatter>
+								<generate.copy.outer>2</generate.copy.outer>
+								<outer.control>quiet</outer.control>
+								<!--
+												<customization.dir>${customization.dir}</customization.dir>
+												<clean.temp>yes</clean.temp>
+											-->
+							</antProperties>
+						</configuration>
+					</execution>
+					<execution>
 						<id>dita2pdf</id>
 						<phase>process-sources</phase>
 						<goals>
@@ -258,11 +364,11 @@
 						</goals>
 						<configuration>
 							<!--
-					attach the generated PDF: this doesn't work in the current
-					version of the dita-maven-plugin when the ditamap is in a
-					subdirectory, so it is added using the build-helper below
-					<attach>true</attach>
-				-->
+												attach the generated PDF: this doesn't work in the current
+												version of the dita-maven-plugin when the ditamap is in a
+												subdirectory, so it is added using the build-helper below
+												<attach>true</attach>
+											-->
 							<antProperties>
 								<transtype>pdf2</transtype>
 								<dita.dir>${dita.ot.dir}</dita.dir>
@@ -274,9 +380,9 @@
 								<generate.copy.outer>2</generate.copy.outer>
 								<outer.control>quiet</outer.control>
 								<!--
-						<customization.dir>${customization.dir}</customization.dir>
-						<clean.temp>yes</clean.temp>
-					-->
+													<customization.dir>${customization.dir}</customization.dir>
+													<clean.temp>yes</clean.temp>
+												-->
 							</antProperties>
 						</configuration>
 					</execution>
@@ -298,9 +404,9 @@
 								<generate.copy.outer>2</generate.copy.outer>
 								<outer.control>quiet</outer.control>
 								<!--
-						<customization.dir>${customization.dir}</customization.dir>
-						<clean.temp>yes</clean.temp>
-					-->
+										<customization.dir>${customization.dir}</customization.dir>
+										<clean.temp>yes</clean.temp>
+									-->
 							</antProperties>
 						</configuration>
 					</execution>
