@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
+<map id="AdvancedRefSets" title="Advanced Reference Set processing"
+     xml:lang="en-US">
+  <!--ee initially created 2010-09-28 -->
+
+  <title>Advanced Reference Set processing</title>
+
+  <topicref collection-type="sequence" href="RefSets_advanced_intro.dita"
+            navtitle="Reference Sets - Introduction" type="topic">
+    <topicref href="RefSets_export_import.dita"/>
+
+    <topicref href="RefSets_export.dita" type="topic"/>
+
+    <topicref href="Refsets_export-maven.dita"/>
+
+    <topicref href="RefSets_import.dita" type="topic"/>
+
+    <topicref href="Subsets_export-maven.dita"/>
+
+    <topicref href="RefSets_report_intro.dita" type="topic"/>
+
+    <topicref href="RefSets_report_tasks.dita" type="task"/>
+  </topicref>
+</map>
