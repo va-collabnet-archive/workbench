@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -46,6 +47,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.gui.popup.ProcessPopupUtil;
@@ -54,6 +56,7 @@ import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -90,58 +93,242 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
     }
 
     private void makeAndShowPopup(MouseEvent e) throws TerminologyException {
-        JPopupMenu popup = null;
-        if (e.isPopupTrigger()) {
-            try {
-                JTree tree = (JTree) e.getSource();
-                int rowForLocation = tree.getRowForLocation(e.getX(), e.getY());
-                int[] selectedRow = tree.getSelectionRows();
-                if (rowForLocation < 0 || selectedRow == null || selectedRow[0] != rowForLocation) {
-                    tree.clearSelection();
-                    popup = makePopup(e, new File(AceFrame.pluginRoot, "refsetspec/spec-popup"), null);
-                } else {
-                    TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
-                    if (selPath != null) {
-                        if (rowForLocation != -1) {
-                            DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
-                            I_ExtendByRef specPart = (I_ExtendByRef) node.getUserObject();
-                            switch (EConcept.REFSET_TYPES.nidToType(specPart.getTypeId())) {
-                            case CID_CID:
-                                popup =
-                                        makePopup(e, new File(AceFrame.pluginRoot, "refsetspec/branch-popup"), specPart);
-                                break;
+        try {
+            I_GetConceptData spec = specEditor.getRefsetSpecInSpecEditor();
+            RefsetSpec refsetSpecHelper = new RefsetSpec(spec, aceConfig);
 
-                            case CID_CID_CID:
-                                popup =
-                                        makePopup(e,
-                                            new File(AceFrame.pluginRoot, "refsetspec/structural-query-popup"),
-                                            specPart);
-                                break;
-
-                            case CID_CID_STR:
-                                popup =
-                                        makePopup(e, new File(AceFrame.pluginRoot, "refsetspec/text-query-popup"),
-                                    specPart);
-                                break;
-                            default:
-                                popup = null;
-                            }
-                        }
+            JPopupMenu popup = null;
+            if (e.isPopupTrigger()) {
+                try {
+                    JTree tree = (JTree) e.getSource();
+                    int rowForLocation = tree.getRowForLocation(e.getX(), e.getY());
+                    int[] selectedRow = tree.getSelectionRows();
+                    if (rowForLocation < 0 || selectedRow == null || selectedRow[0] != rowForLocation) {
+                        tree.clearSelection();
+                        // no row selected so show grouping clauses and concept-contains clauses
+                        popup = makePopup(e, null, true, true, true, false);
                     } else {
-                        popup = makePopup(e, new File(AceFrame.pluginRoot, "refsetspec/spec-popup"), null);
+                        TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
+                        if (selPath != null) {
+                            if (rowForLocation != -1) {
+                                DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
+                                I_ExtendByRef specPart = (I_ExtendByRef) node.getUserObject();
+                                Collection<? extends I_ExtendByRef> extensions =
+                                        Terms.get().getAllExtensionsForComponent(
+                                            aceConfig.getRefsetSpecInSpecEditor().getConceptNid(), true);
+
+                                HashMap<Integer, I_ExtendByRef> memberIdBasedExtensionMap =
+                                        new HashMap<Integer, I_ExtendByRef>();
+                                memberIdBasedExtensionMap = populateMemberIdBasedExtensionMap(extensions);
+
+                                switch (EConcept.REFSET_TYPES.nidToType(specPart.getTypeId())) {
+                                case CID_CID:
+                                    boolean excludeDesc = true;
+                                    boolean excludeConcept = true;
+                                    boolean excludeRel = true;
+                                    boolean excludeContains = true;
+                                    if (refsetSpecHelper.isDescriptionComputeType()) {
+                                        // show AND, OR, !AND, !OR
+                                        // show desc clauses
+                                        excludeDesc = false;
+                                    } else if (refsetSpecHelper.isRelationshipComputeType()) {
+                                        // show AND, OR, !AND, !OR
+                                        // show rel clauses
+                                        excludeRel = false;
+                                    } else {
+                                        if (clauseIsChildOfConceptContainsDesc(specPart, memberIdBasedExtensionMap)) {
+                                            // show AND, OR, !AND, !OR
+                                            // show desc clauses
+                                            excludeDesc = false;
+                                        } else if (clauseIsChildOfConceptContainsRel(specPart,
+                                            memberIdBasedExtensionMap)) {
+                                            // show AND, OR, !AND, !OR
+                                            // show rel clauses
+                                            excludeRel = false;
+                                        } else {
+                                            // show AND, OR, !AND, !OR,
+                                            // show contains desc/rel, NOT contains desc/rel
+                                            // show concept clauses
+                                            excludeConcept = false;
+                                            excludeContains = false;
+                                        }
+                                    }
+
+                                    popup =
+                                            makePopup(e, specPart, excludeConcept, excludeDesc, excludeRel,
+                                                excludeContains);
+                                    break;
+                                case CID_CID_CID:
+                                    popup =
+                                            makePopup(e, new File(AceFrame.pluginRoot,
+                                                "refsetspec/structural-query-popup"), specPart);
+                                    break;
+                                case CID_CID_STR:
+                                    popup =
+                                            makePopup(e, new File(AceFrame.pluginRoot, "refsetspec/text-query-popup"),
+                                                specPart);
+                                    break;
+                                default:
+                                    popup = null;
+                                }
+                            }
+                        } else {
+                            // no row selected so show grouping clauses and concept-contains clauses
+                            popup = makePopup(e, null, true, true, true, false);
+                        }
                     }
+                    if (popup != null) {
+                        popup.show(e.getComponent(), e.getX(), e.getY());
+                    }
+                } catch (FileNotFoundException e1) {
+                    AceLog.getAppLog().alertAndLogException(e1);
+                } catch (IOException e1) {
+                    AceLog.getAppLog().alertAndLogException(e1);
+                } catch (ClassNotFoundException e1) {
+                    AceLog.getAppLog().alertAndLogException(e1);
                 }
-                if (popup != null) {
-                    popup.show(e.getComponent(), e.getX(), e.getY());
-                }
-            } catch (FileNotFoundException e1) {
-                AceLog.getAppLog().alertAndLogException(e1);
-            } catch (IOException e1) {
-                AceLog.getAppLog().alertAndLogException(e1);
-            } catch (ClassNotFoundException e1) {
-                AceLog.getAppLog().alertAndLogException(e1);
+            }
+        } catch (IOException e2) {
+            throw new TerminologyException(e2.getMessage());
+        }
+    }
+
+    private HashMap<Integer, I_ExtendByRef> populateMemberIdBasedExtensionMap(
+            Collection<? extends I_ExtendByRef> extensions) {
+        HashMap<Integer, I_ExtendByRef> extensionMap = new HashMap<Integer, I_ExtendByRef>();
+
+        for (I_ExtendByRef extension : extensions) {
+            extensionMap.put(extension.getMemberId(), extension);
+        }
+        return extensionMap;
+    }
+
+    private boolean clauseIsChildOfConceptContainsRel(I_ExtendByRef specPart,
+            HashMap<Integer, I_ExtendByRef> componentIdBasedExtensionMap) throws IOException, TerminologyException {
+        int conceptContainsRelNid = RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING.localize().getNid();
+        I_ExtendByRefPartCidCid cidCidPart = (I_ExtendByRefPartCidCid) specPart;
+        if (cidCidPart.getC2id() == conceptContainsRelNid) {
+            return true;
+        } else {
+            I_ExtendByRef parentSpecPart = componentIdBasedExtensionMap.get(specPart.getComponentId());
+            if (parentSpecPart == null) {
+                return false;
+            } else {
+                return clauseIsChildOfConceptContainsRel(parentSpecPart, componentIdBasedExtensionMap);
             }
         }
+    }
+
+    private boolean clauseIsChildOfConceptContainsDesc(I_ExtendByRef specPart,
+            HashMap<Integer, I_ExtendByRef> componentIdBasedExtensionMap) throws IOException, TerminologyException {
+
+        int conceptContainsRelNid = RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING.localize().getNid();
+        I_ExtendByRefPartCidCid cidCidPart = (I_ExtendByRefPartCidCid) specPart;
+        if (cidCidPart.getC2id() == conceptContainsRelNid) {
+            return true;
+        } else {
+            I_ExtendByRef parentSpecPart = componentIdBasedExtensionMap.get(specPart.getComponentId());
+            if (parentSpecPart == null) {
+                return false;
+            } else {
+                return clauseIsChildOfConceptContainsDesc(parentSpecPart, componentIdBasedExtensionMap);
+            }
+        }
+    }
+
+    private JPopupMenu makePopup(MouseEvent e, I_ExtendByRef specPart, boolean excludesConcept, boolean excludesDesc,
+            boolean excludesRel, boolean excludesContains) throws FileNotFoundException, IOException,
+            ClassNotFoundException, TerminologyException {
+        JPopupMenu popup = new JPopupMenu();
+        JMenuItem noActionItem = new JMenuItem("");
+        popup.add(noActionItem);
+
+        // adding grouping clauses (OR, AND, !OR, !AND) - these are always displayed
+        File groupingFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/grouping");
+        JMenu newSubMenuGrouping = new JMenu(groupingFile.getName());
+        popup.add(newSubMenuGrouping);
+        ProcessPopupUtil.addSubmenMenuItems(newSubMenuGrouping, groupingFile, this.aceConfig.getWorker());
+
+        // sub-menu for "concept-contains-desc" and "concept-contains-rel"
+        if (!excludesContains) {
+            File containsFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/contains");
+            JMenu newSubMenuContains = new JMenu(containsFile.getName());
+            popup.add(newSubMenuContains);
+            ProcessPopupUtil.addSubmenMenuItems(newSubMenuContains, containsFile, this.aceConfig.getWorker());
+        }
+
+        // sub-menu for concept based clauses e.g. concept is, concept is child of
+        if (!excludesConcept) {
+            File conceptFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/concept");
+            JMenu newSubMenuConcept = new JMenu(conceptFile.getName());
+            popup.add(newSubMenuConcept);
+            ProcessPopupUtil.addSubmenMenuItems(newSubMenuConcept, conceptFile, this.aceConfig.getWorker());
+        }
+
+        // sub-menu for desc based clauses e.g. desc is, desc is child of
+        if (!excludesDesc) {
+            File descFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/desc");
+            JMenu newSubMenuDesc = new JMenu(descFile.getName());
+            popup.add(newSubMenuDesc);
+            ProcessPopupUtil.addSubmenMenuItems(newSubMenuDesc, descFile, this.aceConfig.getWorker());
+        }
+
+        // sub-menu for rel based clauses e.g. rel is
+        if (!excludesRel) {
+            File relFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/rel");
+            JMenu newSubMenuRel = new JMenu(relFile.getName());
+            popup.add(newSubMenuRel);
+            ProcessPopupUtil.addSubmenMenuItems(newSubMenuRel, relFile, this.aceConfig.getWorker());
+        }
+
+        if (specPart != null) {
+            popup.addSeparator();
+
+            boolean uncommitted = false;
+            for (I_ExtendByRefPart part : specPart.getMutableParts()) {
+                if (part.getVersion() == Integer.MAX_VALUE) {
+                    uncommitted = true;
+                    break;
+                }
+            }
+            if (uncommitted) {
+                JMenuItem cancelActionItem = new JMenuItem("Cancel change");
+                cancelActionItem.addActionListener(new CancelChangeAction(specPart));
+                popup.add(cancelActionItem);
+            } else {
+                List<I_ExtendByRefVersion> tuples =
+                        (List<I_ExtendByRefVersion>) specPart.getTuples(aceConfig.getAllowedStatus(), aceConfig
+                            .getViewPositionSetReadOnly(), aceConfig.getPrecedence(), aceConfig
+                            .getConflictResolutionStrategy());
+
+                if (tuples.iterator().hasNext()) {
+                    I_ExtendByRefVersion firstTuple = tuples.iterator().next();
+                    I_GetConceptData refsetConcept = Terms.get().getConcept(firstTuple.getRefsetId());
+                    I_DescriptionTuple refsetDesc =
+                            refsetConcept.getDescTuple(aceConfig.getTableDescPreferenceList(), aceConfig);
+                    String prompt = "Add comment for '" + refsetDesc.getText() + "'";
+                    JMenuItem commentActionItem = new JMenuItem(prompt + "...");
+                    commentActionItem.addActionListener(new CommentSpecAction(firstTuple, prompt));
+                    popup.add(commentActionItem);
+                    popup.addSeparator();
+                    JMenuItem retireActionItem = new JMenuItem("Retire");
+                    retireActionItem.addActionListener(new RetireSpecAction(firstTuple));
+                    popup.add(retireActionItem);
+
+                    JMenuItem changeActionItem = new JMenuItem("Change...");
+                    changeActionItem.addActionListener(new ChangeSpecAction(firstTuple));
+                    popup.add(changeActionItem);
+                } else {
+                    tuples =
+                            (List<I_ExtendByRefVersion>) specPart.getTuples(null, aceConfig
+                                .getViewPositionSetReadOnly(), aceConfig.getPrecedence(), aceConfig
+                                .getConflictResolutionStrategy());
+                }
+            }
+
+        }
+
+        return popup;
     }
 
     private JPopupMenu makePopup(MouseEvent e, File directory, I_ExtendByRef specPart) throws FileNotFoundException,
