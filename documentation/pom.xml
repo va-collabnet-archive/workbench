@@ -212,7 +212,8 @@
 						<phase>package</phase>
 						<configuration>
 							<tasks>
-								<copy file="src/main/resources/index.html" tofile="${project.build.directory}/xhtml/Guidebook/index.html" overwrite="true" verbose="true"/>
+								<copy file="src/main/resources/index.html"   tofile="${project.build.directory}/xhtml/Guidebook/index.html" overwrite="true" verbose="true"/>
+								<copy file="src/main/resources/jq-ihtsdo.js" tofile="${project.build.directory}/xhtml/Guidebook/jq-ihtsdo.js" overwrite="true" verbose="true"/>
 							</tasks>
 						</configuration>
 						<goals>

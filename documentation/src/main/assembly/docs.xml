@@ -14,6 +14,27 @@
       </includes>
       <outputDirectory>/doc</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>target/pdf/UserGuide</directory>
+      <includes>
+        <include>**/*.pdf</include>
+      </includes>
+      <outputDirectory>/doc</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>target/pdf/BusinessProcessGuide</directory>
+      <includes>
+        <include>**/*.pdf</include>
+      </includes>
+      <outputDirectory>/doc</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>target/pdf/DevelopersGuide</directory>
+      <includes>
+        <include>**/*.pdf</include>
+      </includes>
+      <outputDirectory>/doc</outputDirectory>
+    </fileSet>
   </fileSets>
   <includeBaseDirectory>false</includeBaseDirectory>
 </assembly>
