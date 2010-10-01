@@ -487,10 +487,13 @@ public class ActivityViewer implements ActionListener {
 	            new ActivitySorter().execute();
 	         }
 		}
-		boolean update = updateActivity.getAndSet(false);
-		if (update) {
-	        new UpdateActivities().execute();
-		}
+		
+		synchronized (this) {
+            boolean update = updateActivity.getAndSet(false);
+            if (update) {
+                new UpdateActivities().execute();
+            }
+        }
 	}
 	
 	   private static class UpdateActivities extends SwingWorker<JPanel, Object> {
