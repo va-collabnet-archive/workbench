@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -338,22 +339,26 @@ public class SvnHelper {
 		}
 	}
 	public void doChangeSetImport() {
+		if (Terms.get() == null) {
+			AceLog.getAppLog().info("Database not setup for eccs import: " + changeLocations);
+			return;
+		}
 		doChangeSetImport(changeLocations);
 		changeLocations.clear();
 	}
 
 	public void doChangeSetImport(List<File> changeLocations) {
 		if (Terms.get() == null) {
-			AceLog.getAppLog().info("Database not setup for eccs import");
+			AceLog.getAppLog().info("Database not setup for eccs import: " + changeLocations);
 			return;
 		}
 		// import any change sets that may be downloaded
 		// from svn...
+		changeLocations = new ArrayList<File>(new HashSet<File>(changeLocations));
 		try {
 			Terms.get().suspendChangeSetWriters();
-			AceLog.getAppLog().info("Starting eccs import");
+			AceLog.getAppLog().info("Starting eccs import: " + changeLocations);
 
-			// TODO Support Import here...
 			ChangeSetImporter jcsImporter = new ChangeSetImporter() {
 
 				@Override

@@ -224,7 +224,7 @@ public class AceSvn {
 
     private void handleSvnCheckout(List<File> changeLocations, String svnSpec) throws TaskFailedException,
             ClientException {
-        AceLog.getAppLog().info("Got svn checkout spec: " + svnSpec);
+        AceLog.getAppLog().info("[AceSvn] Got svn checkout spec: " + svnSpec);
         String[] specParts = new String[] { svnSpec.substring(0, svnSpec.lastIndexOf("|")),
                                            svnSpec.substring(svnSpec.lastIndexOf("|") + 1) };
         int server = 0;
