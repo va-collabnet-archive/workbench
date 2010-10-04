@@ -452,6 +452,11 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             REFSET_IDENTITY, REFSET_PURPOSE_POSITION, CONCEPT_INT_EXTENSION }, new I_ConceptualizeUniversally[] {
             ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }), 
             
+	    MRCM_DOMAINS(new String[] { "MRCM Domains refsets", "MRCM Domains refsets" }, 
+	    		new I_ConceptualizeUniversally[] { REFSET_IDENTITY }), 
+		MRCM_RANGES(new String[] { "MRCM Domains refsets", "MRCM Domains refsets" }, 
+				new I_ConceptualizeUniversally[] { REFSET_IDENTITY }), 
+            
         // Issue Repository Auxiliary root;
         ISSUE_MANAGER_ROOT(new String[] { "Issue Manager Auxiliary Concept", "Issue Manager Auxiliary Concept" }, 
         		new I_ConceptualizeUniversally[] {}),
