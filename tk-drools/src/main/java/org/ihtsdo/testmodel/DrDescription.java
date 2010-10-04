@@ -18,9 +18,10 @@ public class DrDescription extends DrComponent{
 	private List<DrRefsetExtension> extensions;
 
 	//Inferred properties
-	private String referToConceptUuid; //null if has no refer to concept extension
-	private String caseSignificantCategory;
-	private boolean variantGenerationCandidate;
+	private String referToConceptUuid = ""; //null if has no refer to concept extension
+	private String caseSignificantCategory = "";
+	private boolean variantGenerationCandidate = false;
+	private boolean uniqueInConcept = false;
 	
 	
 	public DrDescription() {
@@ -131,6 +132,14 @@ public class DrDescription extends DrComponent{
 
 	public void setVariantGenerationCandidate(boolean variantGenerationCandidate) {
 		this.variantGenerationCandidate = variantGenerationCandidate;
+	}
+
+	public boolean isUniqueInConcept() {
+		return uniqueInConcept;
+	}
+
+	public void setUniqueInConcept(boolean uniqueInConcept) {
+		this.uniqueInConcept = uniqueInConcept;
 	}
 
 }

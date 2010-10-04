@@ -9,10 +9,10 @@ public class DrLanguageDesignationSet {
 	String languageRefsetUuid;
 	
 	//Inferred properties
-	int size;
-	int preferredTermOccurrence;
-	int preferredFsnOccurrence;
-	boolean hasDuplicates; 
+	int size = 0;
+	int preferredTermOccurrence = 0;
+	int preferredFsnOccurrence = 0;
+	boolean hasDuplicates = false; 
 	
 	public DrLanguageDesignationSet(){
 		descriptions=new HashSet<DrDescription>();

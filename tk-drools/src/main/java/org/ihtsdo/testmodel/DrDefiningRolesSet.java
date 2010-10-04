@@ -8,7 +8,7 @@ public class DrDefiningRolesSet {
 	private List<DrRelationship> relationships;
 	
 	//Inferred properties
-	private int numberOfIsas;
+	private int numberOfIsas = 0;
 
 	public String getRolesSetType() {
 		return rolesSetType;
