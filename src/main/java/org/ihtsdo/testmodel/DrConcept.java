@@ -16,16 +16,17 @@ public class DrConcept extends DrComponent{
 	private List<DrIdentifier> identifiers;
 	
 	//Inferred properties
-	private String specialConceptCategory;
-	private int numberOfStatedParents;
-	private boolean parentOfStatedChildren;
-	private boolean sourceOfDefiningRole;
-	private boolean targetOfDefiningRole;
-	private boolean targetOfHistoricalAssociation;
-	private String semanticTag;
-	private boolean variantEvaluationCandidate;
+	private String specialConceptCategory = "";
+	private int numberOfStatedParents = 0;
+	private int numberOfIncomingAssociations = 0;
+	private boolean parentOfStatedChildren = false;
+	private boolean sourceOfDefiningRole = false;
+	private boolean targetOfDefiningRole = false;
+	private boolean targetOfHistoricalAssociation = false;
+	private String semanticTag = "";
+	private boolean variantEvaluationCandidate = false;
 	private List<String> listOfDomainsUuids;
-	private String effectiveDomain;
+	private String effectiveDomain = "";
 	
 	
 	public DrConcept() {
@@ -197,6 +198,14 @@ public class DrConcept extends DrComponent{
 	public void setLanguageDesignationSets(
 			List<DrLanguageDesignationSet> languageDesignationSets) {
 		this.languageDesignationSets = languageDesignationSets;
+	}
+
+	public int getNumberOfIncomingAssociations() {
+		return numberOfIncomingAssociations;
+	}
+
+	public void setNumberOfIncomingAssociations(int numberOfIncomingAssociations) {
+		this.numberOfIncomingAssociations = numberOfIncomingAssociations;
 	}
 
 }

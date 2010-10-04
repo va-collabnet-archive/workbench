@@ -26,9 +26,11 @@ public class TerminologyHelperDrools {
 	private boolean wordsLoaded;
 	private InputStream fisW;
 	
+	// These properties are only used to support enumerations for the DSL, should not be used from Java
 	private String conceptDomain;
 	private String roleRange;
 	private String groupCondition;
+	// End of DSL enum properties
 	
 	public TerminologyHelperDrools() {
 		fis=(InputStream) TerminologyHelperDrools.class.getResourceAsStream("GB-US-spellingdiffs.txt");
@@ -375,34 +377,44 @@ public class TerminologyHelperDrools {
 			}
 		}
 	}
+	
+	//Mock implementation
 	public boolean isMemberOf(String conceptUUID, String refsetUUID) {
 		return true;
 	}
 	
+	//Mock implementation
 	public boolean isActive(String conceptUUID) {
 		return true;
 	}
 	
+	//Mock implementation
 	public boolean isParentOf(String parent, String subtype) throws Exception {
 		return (parent.equals(subtype));
 	}
 
+	//Mock implementation
 	public boolean isParentOfOrEqualTo(String parent, String subtype) throws Exception {
 		return (parent.equals(subtype));
 	}
 	
+	//Mock implementation
 	public boolean isFsnTextNotUnique(String fsn, String conceptUuid) throws Exception{
 		return false;
 	}
 	
+	
+	//Mock implementation
 	public boolean isValidSemtag(String semtag){
 		return false;
 	}
 	
+	//Mock implementation
 	public boolean isParentOfStatedChildren(String conceptUuid){
 		return true;
 	}
 	
+	//Mock implementation
 	public List<String> getListOfDomainsUuids(String conceptUuid) {
 		List<String> domains = new ArrayList<String>();
 		domains.add("clinicalFindingUuid");
@@ -410,6 +422,7 @@ public class TerminologyHelperDrools {
 		return domains;
 	}
 	
+	//Mock implementation
 	public String checkWordInList(String text) {
 		return "ICSCategory";
 	}
@@ -437,5 +450,24 @@ public class TerminologyHelperDrools {
 	public void setGroupCondition(String groupCondition) {
 		this.groupCondition = groupCondition;
 	}
-
+	
+	public boolean areParenthesesBalanced(String text) {
+		 MatchParen mp = new MatchParen();
+		 mp.add(text);
+		 return mp.isMatching();
+	}
+	
+	// mock implementation
+	public boolean isTargetOfReferToLink(String conceptUuid) {
+		return true;
+	}
+	
+	public boolean isExtensionConcept(String conceptUuid) {
+		return true;
+	}
+	
+	public boolean isSemanticTagEqualsInAllTerms(String conceptUuid) {
+		return false;
+	}
+	
 }

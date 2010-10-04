@@ -10,10 +10,10 @@ public abstract class DrComponent {
 	private String factContextName;
 	
 	//Inferred properties
-	private boolean published;
-	private boolean extensionComponent;
-	private String extensionId; //TODO: should be UUID?
-	private boolean active;
+	private boolean published = false;
+	private boolean extensionComponent = false;
+	private String extensionId = ""; //TODO: should be UUID?
+	private boolean active = false;
 	
 
 	public String getStatusUuid() {
