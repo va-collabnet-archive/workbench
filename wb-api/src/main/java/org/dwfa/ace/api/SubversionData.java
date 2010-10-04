@@ -114,4 +114,20 @@ public class SubversionData implements Serializable {
     public void setPassword(String password) {
         this.password = password;
     }
+
+	@Override
+	public String toString() {
+		StringBuffer buf = new StringBuffer();
+		
+		buf.append("svd workingCopy: ");
+		buf.append(workingCopyStr);
+		
+		buf.append(" user: ");
+		buf.append(username);
+		
+		buf.append(" url: ");
+		buf.append(repositoryUrlStr);
+		
+		return buf.toString();
+	}
 }

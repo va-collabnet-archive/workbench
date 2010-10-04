@@ -524,6 +524,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         @Override
+        @Deprecated
         public int getPathId() {
             if (index >= 0) {
                 return getMutableIdPart().getPathId();
@@ -532,9 +533,25 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         @Override
+        public int getPathNid() {
+            if (index >= 0) {
+                return getMutableIdPart().getPathNid();
+            }
+            return Bdb.getSapDb().getPathNid(primordialSapNid);
+        }
+
+        @Override
+        @Deprecated
         public int getStatusId() {
             if (index >= 0) {
                 return getMutableIdPart().getStatusId();
+            }
+            return Bdb.getSapDb().getStatusNid(primordialSapNid);
+        }
+        @Override
+        public int getStatusNid() {
+            if (index >= 0) {
+                return getMutableIdPart().getStatusNid();
             }
             return Bdb.getSapDb().getStatusNid(primordialSapNid);
         }
@@ -623,9 +640,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             // }
             // return new IdVersion(IdVersion.this, statusNid, pathNid, time, IdVersion.this);
 
-				return ConceptComponent.this.makeIdAnalog(getStatusId(), 
+				return ConceptComponent.this.makeIdAnalog(getStatusNid(), 
 						Terms.get().getAuthorNid(),
-						getPathId(), getTime());
+						getPathNid(), getTime());
         }
 
         @Override
@@ -652,8 +669,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         @Override
         public final ArrayIntList getPartComponentNids() {
             ArrayIntList resultList = getVariableVersionNids();
-            resultList.add(getPathId());
-            resultList.add(getStatusId());
+            resultList.add(getPathNid());
+            resultList.add(getStatusNid());
             return resultList;
         }
 
@@ -691,7 +708,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public int primordialUNid = Integer.MIN_VALUE;
 
     public CopyOnWriteArrayList<R> revisions;
-
+    
     private ArrayList<IdentifierVersion> additionalIdentifierVersions;
 
     private ArrayList<IdVersion> idVersions;
@@ -1178,8 +1195,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             returnValue = revisions.add(r);
         } else if (revisions.size() == 0) {
             returnValue = revisions.add(r);
-        } else if (revisions.get(revisions.size() - 1) != r) {
-        	assert revisions.get(revisions.size() - 1).equals(r) == false;
+        } else if (revisions.get(revisions.size() - 1) != r && getSapMap().containsKey(r.sapNid) == false) {
+        	assert revisions.get(revisions.size() - 1).equals(r) == false: 
+        		"last revision: " + revisions.get(revisions.size() - 1) + " new revision: " + r;
             returnValue = revisions.add(r);
         }
         r.primordialComponent = (C) this;

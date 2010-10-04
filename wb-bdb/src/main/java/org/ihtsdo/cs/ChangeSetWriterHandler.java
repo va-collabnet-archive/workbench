@@ -2,8 +2,9 @@ package org.ihtsdo.cs;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -12,9 +13,7 @@ import javax.swing.Timer;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
-import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.concept.Concept;
@@ -23,10 +22,12 @@ import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
 import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 
 public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConceptData, ActionListener {
 
-	private static CopyOnWriteArraySet<I_WriteChangeSet> writers = new CopyOnWriteArraySet<I_WriteChangeSet>();
+	private static ConcurrentHashMap<String, ChangeSetGeneratorBI> writerMap = new ConcurrentHashMap<String, ChangeSetGeneratorBI>();
 	public static AtomicInteger changeSetWriters = new AtomicInteger();
 
 	private I_RepresentIdSet cNidsToWrite;
@@ -40,12 +41,13 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
     private AtomicInteger processedChangedCount = new AtomicInteger();
     private int changedCount = Integer.MIN_VALUE;
     private ChangeSetWriterThreading changeSetWriterThreading;
-    private ChangeSetPolicy changeSetPolicy;
+    private ChangeSetGenerationPolicy changeSetPolicy;
     private Timer timer;
 	private Semaphore permit;
+	private List<ChangeSetGeneratorBI> writerListForHandler;
 
 	public ChangeSetWriterHandler(I_RepresentIdSet cNidsToWrite,
-			long commitTime, IntSet sapNidsFromCommit, ChangeSetPolicy changeSetPolicy, 
+			long commitTime, IntSet sapNidsFromCommit, ChangeSetGenerationPolicy changeSetPolicy, 
 			ChangeSetWriterThreading changeSetWriterThreading, 
 			Semaphore permit) {
 		super();
@@ -62,6 +64,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 		this.changeSetWriterThreading = changeSetWriterThreading;
 		changeSetWriters.incrementAndGet();
 		this.changeSetPolicy = changeSetPolicy;
+		writerListForHandler = new ArrayList<ChangeSetGeneratorBI>(writerMap.values());
 	}
 
 	@Override
@@ -77,7 +80,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 	        timer = new Timer(2000, this);
 	        timer.start();
 	        activity.setStopButtonVisible(false);
-			for (I_WriteChangeSet writer : writers) {
+			for (ChangeSetGeneratorBI writer : writerListForHandler) {
 				writer.open(sapNidsFromCommit);
 			}
             activity.setValue(0);
@@ -97,7 +100,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
             }
 
             activity.setProgressInfoLower("Committing change set writers...");
-            for (I_WriteChangeSet writer : writers) {
+            for (ChangeSetGeneratorBI writer : writerListForHandler) {
                 writer.commit();
             }
             long endTime = System.currentTimeMillis();
@@ -117,12 +120,12 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 		}
 	}
 
-	public static void addWriter(I_WriteChangeSet writer) {
-		writers.add(writer);
+	public static void addWriter(String key, ChangeSetGeneratorBI writer) {
+		writerMap.put(key, writer);
 	}
 
-	public static void removeWriter(I_WriteChangeSet writer) {
-		writers.remove(writer);
+	public static void removeWriter(String key) {
+		writerMap.remove(key);
 	}
 
     @Override
@@ -130,7 +133,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
         if (cNidsToWrite.isMember(cNid)) {
             processedChangedCount.incrementAndGet();
             Concept c = fcfc.fetch();
-            for (I_WriteChangeSet writer: writers) {
+            for (ChangeSetGeneratorBI writer: writerListForHandler) {
                 writer.setPolicy(changeSetPolicy);
                 writer.writeChanges(c, commitTime);
             }

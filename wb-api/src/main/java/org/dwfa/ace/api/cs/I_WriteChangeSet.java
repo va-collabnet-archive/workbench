@@ -16,20 +16,11 @@
  */
 package org.dwfa.ace.api.cs;
 
-import java.io.IOException;
 import java.io.Serializable;
 
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntSet;
+import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 
-public interface I_WriteChangeSet extends Serializable {
+public interface I_WriteChangeSet extends ChangeSetGeneratorBI, Serializable {
 
-    public void open(I_IntSet commitSapNids) throws IOException;
-
-    public void writeChanges(I_GetConceptData change, long time) throws IOException;
-    
-    public void setPolicy(ChangeSetPolicy policy);
-
-    public void commit() throws IOException;
 
 }

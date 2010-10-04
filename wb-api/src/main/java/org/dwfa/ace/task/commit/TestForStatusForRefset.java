@@ -34,13 +34,12 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
-import org.dwfa.util.bean.BeanList;
-import org.dwfa.util.bean.BeanType;
-import org.dwfa.util.bean.Spec;
 
+/*
 @BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
                    @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
                    @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
+*/
 public class TestForStatusForRefset extends AbstractConceptTest {
 
     private static final long serialVersionUID = 1;
@@ -73,10 +72,10 @@ public class TestForStatusForRefset extends AbstractConceptTest {
             I_IntSet actives = getActiveStatus(termFactory);
 
             AceLog.getAppLog().info("Testing for status for refset: " + concept);
-            for (I_ConceptAttributeTuple rel : concept.getConceptAttributeTuples(activeProfile.getAllowedStatus(),
+            for (I_ConceptAttributeTuple conAttr : concept.getConceptAttributeTuples(activeProfile.getAllowedStatus(),
                 allPositions, 
                 getFrameConfig().getPrecedence(), getFrameConfig().getConflictResolutionStrategy())) {
-                if (actives.contains(rel.getConceptStatus()))
+                if (actives.contains(conAttr.getStatusNid()))
                     return alertList;
             }
 
@@ -104,7 +103,7 @@ public class TestForStatusForRefset extends AbstractConceptTest {
                     // for (I_ExtendByRef ext : extensions) {
                     // System.out.println(ext.getComponentId() + " "
                     // + termFactory.getConcept(ext.getComponentId()));
-                    if (mem.getComponentId() == concept.getConceptNid()) {
+                    if (mem.getComponentNid() == concept.getConceptNid()) {
                         alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
                             "<html>Refset, but inactive", concept));
                         return alertList;

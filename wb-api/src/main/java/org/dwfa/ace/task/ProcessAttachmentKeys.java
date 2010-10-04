@@ -124,7 +124,9 @@ public enum ProcessAttachmentKeys {
     ISSUE_REPO_CONCEPT,
     ISSUE_REPO_PROP_NAME,
     ISSUE_REPO_PROP_PASSWORD,
-    REFSET_NAME;
+    REFSET_NAME, 
+    EXTRA_CHANGE_SET_GENERATOR_LIST,
+    ;
 
     public String getAttachmentKey() {
         return "A: " + this.name();

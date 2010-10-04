@@ -8,17 +8,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.Semaphore;
 
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.util.io.FileIO;
-import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.cs.I_ComputeEConceptForChangeSet;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public class EConceptChangeSetWriter implements I_WriteChangeSet {
     
@@ -34,7 +33,7 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
     private transient FileWriter cswcOut;
     private File csweFile;
     private transient FileWriter csweOut;
-    private I_IntSet commitSapNids;
+    private NidSetBI commitSapNids;
 
     private File tempFile;
 
@@ -42,7 +41,7 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
 
 	private I_ComputeEConceptForChangeSet computer;
 	
-	private ChangeSetPolicy policy;
+	private ChangeSetGenerationPolicy policy;
 	
 	private Semaphore writePermit = new Semaphore(1);
 	
@@ -57,7 +56,7 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
     }
 
     public EConceptChangeSetWriter(File changeSetFile, File tempFile, 
-    		ChangeSetPolicy policy, boolean timeStampEnabled) {
+    		ChangeSetGenerationPolicy policy, boolean timeStampEnabled) {
         super();
         this.changeSetFile = changeSetFile;
         this.tempFile = tempFile;
@@ -65,7 +64,7 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
         this.timeStampEnabled = timeStampEnabled;
     }
 
-    public EConceptChangeSetWriter(File changeSetFile, File tempFile, ChangeSetPolicy policy) {
+    public EConceptChangeSetWriter(File changeSetFile, File tempFile, ChangeSetGenerationPolicy policy) {
         super();
         this.changeSetFile = changeSetFile;
         this.tempFile = tempFile;
@@ -73,9 +72,9 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
     }
 
 	@Override
-	public void open(I_IntSet commitSapNids) throws IOException {
+	public void open(NidSetBI commitSapNids) throws IOException {
 	    this.commitSapNids = commitSapNids;
-		computer = new EConceptChangeSetComputer(policy, (IntSet) commitSapNids);
+		computer = new EConceptChangeSetComputer(policy, commitSapNids);
         if (changeSetFile.exists() == false) {
             changeSetFile.getParentFile().mkdirs();
             changeSetFile.createNewFile();
@@ -133,7 +132,7 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
         }
 	}
 	@Override
-	public void writeChanges(I_GetConceptData igcd, long time)
+	public void writeChanges(ConceptChronicleBI igcd, long time)
 			throws IOException {
 		assert time != Long.MAX_VALUE;
 		assert time != Long.MIN_VALUE;
@@ -214,7 +213,7 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
     }
 
     @Override
-    public void setPolicy(ChangeSetPolicy policy) {
+    public void setPolicy(ChangeSetGenerationPolicy policy) {
         this.policy = policy;
     }
 }

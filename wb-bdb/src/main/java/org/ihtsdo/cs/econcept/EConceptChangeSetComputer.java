@@ -5,9 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.dwfa.ace.api.cs.ChangeSetPolicy;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
@@ -32,6 +31,8 @@ import org.ihtsdo.etypes.EImage;
 import org.ihtsdo.etypes.EImageRevision;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipRevision;
+import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
@@ -45,14 +46,14 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet {
     private int minSapNid = Integer.MIN_VALUE;
     private int maxSapNid = Integer.MAX_VALUE;
-    private IntSet commitSapNids;
-    private ChangeSetPolicy policy;
+    private NidSetBI commitSapNids;
+    private ChangeSetGenerationPolicy policy;
 
     public String toString() {
         return "EConceptChangeSetComputer: minSapNid: " + minSapNid + " maxSapNid: " + maxSapNid + " policy: " + policy;
     }
 
-    public EConceptChangeSetComputer(ChangeSetPolicy policy, IntSet commitSapNids) {
+    public EConceptChangeSetComputer(ChangeSetGenerationPolicy policy, NidSetBI commitSapNids) {
         super();
         this.policy = policy;
         switch (policy) {
@@ -140,12 +141,12 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                             eImg.setFormat(v.getFormat());
                             eImg.setImage(v.getImage());
                             eImg.setTextDescription(v.getTextDescription());
-                            eImg.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeId()));
+                            eImg.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
                             setupFirstVersion(eImg, v);
                         } else {
                             EImageRevision eImgR = new EImageRevision();
                             eImgR.setTextDescription(v.getTextDescription());
-                            eImgR.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeId()));
+                            eImgR.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
                             setupRevision(eImg, v, eImgR);
                         }
                     }
@@ -162,25 +163,31 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
             for (Relationship.Version v : r.getTuples()) {
                 if (v.getSapNid() >= minSapNid && v.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE) {
                     if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
-                        changed.set(true);
-                        if (ecr == null) {
-                            ecr = new ERelationship();
-                            rels.add(ecr);
-                            ecr.setC1Uuid(Bdb.getPrimUuidForConcept(v.getC1Id()));
-                            ecr.setC2Uuid(Bdb.getPrimUuidForConcept(v.getC2Id()));
-                            ecr.setCharacteristicUuid(Bdb.getPrimUuidForConcept(v.getCharacteristicId()));
-                            ecr.setRefinabilityUuid(Bdb.getPrimUuidForConcept(v.getRefinabilityId()));
-                            ecr.setRelGroup(v.getGroup());
-                            ecr.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeId()));
-                            setupFirstVersion(ecr, v);
-                        } else {
-                            ERelationshipRevision ecv = new ERelationshipRevision();
-                            ecv.setCharacteristicUuid(Bdb.getPrimUuidForConcept(v.getCharacteristicId()));
-                            ecv.setRefinabilityUuid(Bdb.getPrimUuidForConcept(v.getRefinabilityId()));
-                            ecv.setRelGroup(v.getGroup());
-                            ecv.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeId()));
-                            setupRevision(ecr, v, ecv);
-                        }
+                        try {
+							changed.set(true);
+							if (ecr == null) {
+							    ecr = new ERelationship();
+							    rels.add(ecr);
+							    ecr.setC1Uuid(Bdb.getPrimUuidForConcept(v.getC1Id()));
+							    ecr.setC2Uuid(Bdb.getPrimUuidForConcept(v.getC2Id()));
+							    ecr.setCharacteristicUuid(Bdb.getPrimUuidForConcept(v.getCharacteristicId()));
+							    ecr.setRefinabilityUuid(Bdb.getPrimUuidForConcept(v.getRefinabilityNid()));
+							    ecr.setRelGroup(v.getGroup());
+							    ecr.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
+							    setupFirstVersion(ecr, v);
+							} else {
+							    ERelationshipRevision ecv = new ERelationshipRevision();
+							    ecv.setCharacteristicUuid(Bdb.getPrimUuidForConcept(v.getCharacteristicId()));
+							    ecv.setRefinabilityUuid(Bdb.getPrimUuidForConcept(v.getRefinabilityNid()));
+							    ecv.setRelGroup(v.getGroup());
+							    ecv.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
+							    setupRevision(ecr, v, ecv);
+							}
+						} catch (AssertionError e) {
+							AceLog.getAppLog().alertAndLogException(new Exception(e.getLocalizedMessage() + "\n\n" +
+									c.toLongString(), e));
+							throw e;
+						}
                     }
                 }
             }
@@ -203,14 +210,14 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                             ecd.setInitialCaseSignificant(v.isInitialCaseSignificant());
                             ecd.setLang(v.getLang());
                             ecd.setText(v.getText());
-                            ecd.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeId()));
+                            ecd.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
                             setupFirstVersion(ecd, v);
                         } else {
                             EDescriptionRevision ecv = new EDescriptionRevision();
                             ecv.setInitialCaseSignificant(v.isInitialCaseSignificant());
                             ecv.setLang(v.getLang());
                             ecv.setText(v.getText());
-                            ecv.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeId()));
+                            ecv.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
                             setupRevision(ecd, v, ecv);
                         }
                     }
@@ -246,8 +253,8 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         if (ec.revisions == null) {
             ec.revisions = new ArrayList();
         }
-        ev.setPathUuid(Bdb.getPrimUuidForConcept(v.getPathId()));
-        ev.setStatusUuid(Bdb.getPrimUuidForConcept(v.getStatusId()));
+        ev.setPathUuid(Bdb.getPrimUuidForConcept(v.getPathNid()));
+        ev.setStatusUuid(Bdb.getPrimUuidForConcept(v.getStatusNid()));
         ev.setAuthorUuid(Bdb.getPrimUuidForConcept(v.getAuthorNid()));
         ev.setTime(v.getTime());
         ec.revisions.add(ev);
@@ -256,8 +263,8 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
     @SuppressWarnings("unchecked")
     private void setupFirstVersion(TkComponent ec, ConceptComponent<?, ?>.Version v) throws IOException {
         ec.primordialUuid = v.getPrimUuid();
-        ec.setPathUuid(Bdb.getPrimUuidForConcept(v.getPathId()));
-        ec.setStatusUuid(Bdb.getPrimUuidForConcept(v.getStatusId()));
+        ec.setPathUuid(Bdb.getPrimUuidForConcept(v.getPathNid()));
+        ec.setStatusUuid(Bdb.getPrimUuidForConcept(v.getStatusNid()));
         ec.setAuthorUuid(Bdb.getPrimUuidForConcept(v.getAuthorNid()));
         ec.setTime(v.getTime());
         if (v.getAdditionalIdentifierParts() != null) {
@@ -273,9 +280,9 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                     }
                     eIdv.setDenotation(idv.getDenotation());
                     eIdv.setAuthorityUuid(Bdb.getPrimUuidForConcept(idv.getAuthorityNid()));
-                    eIdv.setPathUuid(Bdb.getPrimUuidForConcept(idv.getPathId()));
-                    eIdv.setStatusUuid(Bdb.getPrimUuidForConcept(idv.getStatusId()));
-                    eIdv.setAuthorUuid(Bdb.getPrimUuidForConcept(idv.getAuthorId()));
+                    eIdv.setPathUuid(Bdb.getPrimUuidForConcept(idv.getPathNid()));
+                    eIdv.setStatusUuid(Bdb.getPrimUuidForConcept(idv.getStatusNid()));
+                    eIdv.setAuthorUuid(Bdb.getPrimUuidForConcept(idv.getAuthorNid()));
                     eIdv.setTime(idv.getTime());
                 }
             }

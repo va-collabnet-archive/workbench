@@ -31,10 +31,14 @@ public interface I_IdPart {
     @Deprecated
     public I_IdPart duplicateIdPart();
     
+    @Deprecated
 	public int getPathId();
+	public int getPathNid();
 	public int getVersion();
 	public long getTime();
+	@Deprecated
 	public int getStatusId();
+	public int getStatusNid();
 	
 	public ArrayIntList getPartComponentNids();
 	

@@ -67,7 +67,7 @@ public class PromptUserForInput extends AbstractTask {
     private transient Condition returnCondition;
 
     private transient boolean done;
-
+    private transient I_EncodeBusinessProcess process;
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(instruction);
@@ -98,7 +98,7 @@ public class PromptUserForInput extends AbstractTask {
         					+ ((I_GetConceptData) c).toLongString());
         			
         		}
-        		HasUncommittedChanges.askToCommit();
+        		HasUncommittedChanges.askToCommit(process);
         	}
             if (Terms.get().getUncommitted().size() > 0) {
                 if (!DwfaEnv.isHeadless()) {
@@ -165,6 +165,7 @@ public class PromptUserForInput extends AbstractTask {
      */
     public Condition evaluate(I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         this.done = false;
+        this.process = process;
         I_ConfigAceFrame config =
                 (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
         boolean builderVisible = config.isBuilderToggleVisible();

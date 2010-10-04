@@ -1,10 +1,13 @@
 package org.ihtsdo.tk.api;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
@@ -31,5 +34,12 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
 	int uuidsToNid(UUID... uuids) throws IOException;
 	int uuidsToNid(Collection<UUID> uuids) throws IOException;
 	List<UUID> getUuidsForNid(int nid);
-		
+	
+    void addChangeSetGenerator(String key, ChangeSetGeneratorBI writer);
+    void removeChangeSetGenerator(String key);
+    
+    ChangeSetGeneratorBI createDtoChangeSetGenerator(File changeSetFileName, 
+    			File changeSetTempFileName, 
+    			ChangeSetGenerationPolicy policy);
+
 }

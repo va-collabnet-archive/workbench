@@ -105,6 +105,8 @@ public class InstructAndWaitDo extends AbstractTask {
     private transient Condition returnCondition;
 
     private transient boolean done;
+    
+    private transient I_EncodeBusinessProcess process;
 
     // EKM - seems a but easier than passing it around
     private I_ConfigAceFrame config;
@@ -395,7 +397,7 @@ public class InstructAndWaitDo extends AbstractTask {
         					+ ((I_GetConceptData) c).toLongString());
         			
         		}
-        		HasUncommittedChanges.askToCommit();
+        		HasUncommittedChanges.askToCommit(process);
         	}
             if (Terms.get().getUncommitted().size() > 0) {
                 if (!DwfaEnv.isHeadless()) {
@@ -497,6 +499,7 @@ public class InstructAndWaitDo extends AbstractTask {
             // The input term
             this.term = (String) process.getProperty(termPropName);
             this.done = false;
+            this.process = process;
             this.config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             // Get some space
             boolean builderVisible = config.isBuilderToggleVisible();

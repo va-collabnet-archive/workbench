@@ -49,4 +49,5 @@ public interface I_IdVersion extends I_IdPart {
      * @deprecated
      */
     public I_IdPart duplicateIdPart();
+
 }

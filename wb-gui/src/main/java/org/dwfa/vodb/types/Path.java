@@ -218,6 +218,7 @@ public class Path implements PathBI, I_Path {
                 pathId = Terms.get().uuidToNative(pathIdList);
             } else {
                 pathId = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize().getNid();
+                AceLog.getAppLog().warning("ReadPath error. " + pathIdList + " missing. Substuting WB Aux ");
             }
 
         } catch (TerminologyException e) {

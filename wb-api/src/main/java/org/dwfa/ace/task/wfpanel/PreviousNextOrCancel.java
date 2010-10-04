@@ -70,6 +70,7 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
     protected transient boolean subversionButtonVisible;
     protected transient boolean inboxButtonVisible;
     protected transient JPanel workflowPanel;
+    private transient I_EncodeBusinessProcess process;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -111,7 +112,7 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
         					+ ((I_GetConceptData) c).toLongString());
         			
         		}
-        		HasUncommittedChanges.askToCommit();
+        		HasUncommittedChanges.askToCommit(process);
         	}
             if (Terms.get().getUncommitted().size() > 0) {
                 if (!DwfaEnv.isHeadless()) {
@@ -219,6 +220,7 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
     protected void setup(I_EncodeBusinessProcess process) throws IntrospectionException, IllegalAccessException,
             InvocationTargetException {
         this.done = false;
+        this.process = process;
         config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
 
         builderVisible = config.isBuilderToggleVisible();

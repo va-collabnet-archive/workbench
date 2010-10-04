@@ -122,8 +122,8 @@ public abstract class ChangeSetImporter implements ActionListener {
             public int compare(I_ReadChangeSet r1, I_ReadChangeSet r2) {
                 try {
                     if (r1.nextCommitTime() == r2.nextCommitTime()) {
-                        return r1.getChangeSetFile().toURL().toString().compareTo(
-                            r2.getChangeSetFile().toURL().toString());
+                        return r1.getChangeSetFile().toURI().toURL().toString().compareTo(
+                            r2.getChangeSetFile().toURI().toURL().toString());
                     }
                     if (r1.nextCommitTime() > r2.nextCommitTime()) {
                         return 1;

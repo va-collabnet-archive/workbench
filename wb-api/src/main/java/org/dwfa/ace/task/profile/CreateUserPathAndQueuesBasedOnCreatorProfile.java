@@ -22,6 +22,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -36,6 +37,7 @@ import net.jini.config.Configuration;
 import net.jini.config.ConfigurationProvider;
 import net.jini.core.entry.Entry;
 
+import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
@@ -57,8 +59,11 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.dwfa.util.io.FileIO;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/profile", type = BeanType.TASK_BEAN) })
 public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
@@ -100,7 +105,8 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
+    @SuppressWarnings("unchecked")
+	public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         I_ConfigAceFrame newConfig;
         try {
             newConfig = (I_ConfigAceFrame) process.getProperty(newProfilePropName);
@@ -123,7 +129,7 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
 
             String userDirStr = "profiles" + File.separator + newConfig.getUsername();
             File userDir = new File(userDirStr);
-            File userQueueRoot = new File(userDir, "queues");
+            File userQueueRoot = new File("queues", newConfig.getUsername());
             userQueueRoot.mkdirs();
             EditOnPromotePath promotePathProfile = new EditOnPromotePath(creatorConfig);
             if (promotePathProfile.getEditingPathSet().size() != 1) {
@@ -173,10 +179,38 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
             	Terms.get().cancel();
                 return Condition.FALSE;
             }
-            try {
+            
+            File changeSetRoot = new File(userDir, "changesets");
+            changeSetRoot.mkdirs();
+            I_ConfigAceDb newDbProfile = newConfig.getDbConfig();
+            newDbProfile.setChangeSetRoot(changeSetRoot);
+            newDbProfile.setChangeSetWriterFileName(newConfig.getUsername() + "#1#" + 
+            		UUID.randomUUID().toString() + ".eccs");
+            newDbProfile.setUsername(newConfig.getUsername());
+
+            
+            String tempKey = UUID.randomUUID().toString();
+            
+            ChangeSetGeneratorBI generator = Ts.get().createDtoChangeSetGenerator(
+					new File(newConfig.getDbConfig().getChangeSetRoot(),
+							newConfig.getDbConfig().getChangeSetWriterFileName()), 
+							new File(newConfig.getDbConfig().getChangeSetRoot(), "#0#"
+									+ newConfig.getDbConfig().getChangeSetWriterFileName()),
+									ChangeSetGenerationPolicy.MUTABLE_ONLY);
+            List<ChangeSetGeneratorBI> extraGeneratorList = (List<ChangeSetGeneratorBI>) process.readAttachement(ProcessAttachmentKeys.EXTRA_CHANGE_SET_GENERATOR_LIST.getAttachmentKey());
+            if (extraGeneratorList == null) {
+            	extraGeneratorList = new ArrayList<ChangeSetGeneratorBI>();
+            }
+            extraGeneratorList.add(generator);
+            process.writeAttachment(ProcessAttachmentKeys.EXTRA_CHANGE_SET_GENERATOR_LIST.getAttachmentKey(), extraGeneratorList);
+
+            Ts.get().addChangeSetGenerator(tempKey, generator);
+           try {
             	Terms.get().commit();
             } catch (Exception e) {
                 throw new TaskFailedException();
+            } finally {
+                Ts.get().removeChangeSetGenerator(tempKey);
             }
 
             // Set roots
@@ -452,7 +486,6 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
 
         // Needs a concept record...
         I_GetConceptData pathConcept = Terms.get().newConcept(newPathUid, false, commitConfig);
-        Terms.get().addUncommitted(pathConcept);
 
         // Needs a description record...
         Terms.get().newDescription(UUID.randomUUID(), pathConcept, "en", config.getDbConfig().getFullName() + suffix,
@@ -469,6 +502,8 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
         		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()),
         		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, commitConfig);
 
+        Terms.get().addUncommitted(pathConcept);
+        
         return Terms.get().newPath(positionSet, pathConcept, commitConfig);
     }
 

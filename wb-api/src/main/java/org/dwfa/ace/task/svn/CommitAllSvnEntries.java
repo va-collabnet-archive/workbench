@@ -54,7 +54,12 @@ public class CommitAllSvnEntries extends AbstractAllSvnEntriesTask {
     }
 
     protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String taskKey) throws TaskFailedException {
-        try {
+        commit(config, svd, taskKey);
+    }
+
+	public static void commit(I_ConfigAceFrame config, SubversionData svd,
+			String taskKey) throws TaskFailedException {
+		try {
             SPECIAL_SVN_ENTRIES entry = SPECIAL_SVN_ENTRIES.valueOf(taskKey);
             BundleType bundleType = config.getBundleType();
             switch (entry) {
@@ -83,5 +88,5 @@ public class CommitAllSvnEntries extends AbstractAllSvnEntriesTask {
         } catch (IllegalArgumentException e) {
             config.svnCommit(svd);
         }
-    }
+	}
 }

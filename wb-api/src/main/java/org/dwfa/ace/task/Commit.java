@@ -18,7 +18,10 @@ package org.dwfa.ace.task;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 import org.dwfa.ace.api.Terms;
 import org.dwfa.bpa.process.Condition;
@@ -29,6 +32,8 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/db", type = BeanType.TASK_BEAN) })
 public class Commit extends AbstractTask {
@@ -52,11 +57,27 @@ public class Commit extends AbstractTask {
     }
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        List<String> extraGeneratorKeys = new ArrayList<String>();
         try {
+            List<ChangeSetGeneratorBI> extraGeneratorList = 
+            	(List<ChangeSetGeneratorBI>) process.readAttachement(ProcessAttachmentKeys.EXTRA_CHANGE_SET_GENERATOR_LIST.getAttachmentKey());
+
+            if (extraGeneratorList != null) {
+            	for (ChangeSetGeneratorBI generator: extraGeneratorList) {
+            		UUID key = UUID.randomUUID();
+            		extraGeneratorKeys.add(key.toString());
+                    Ts.get().addChangeSetGenerator(key.toString(), generator);
+            	}
+            }
+
             Terms.get().commit();
             return Condition.CONTINUE;
         } catch (Exception e) {
             throw new TaskFailedException(e);
+        } finally {
+        	for (String key: extraGeneratorKeys) {
+                Ts.get().removeChangeSetGenerator(key);
+        	}
         }
     }
 

@@ -23,12 +23,12 @@ import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.util.io.FileIO;
+import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public class CommitLog implements I_WriteChangeSet {
 
@@ -77,7 +77,7 @@ public class CommitLog implements I_WriteChangeSet {
         }
     }
 
-    public void open(I_IntSet commitSapNids) throws IOException {
+    public void open(NidSetBI commitSapNids) throws IOException {
         if (changeSetFile.exists() == false) {
             changeSetFile.getParentFile().mkdirs();
             changeSetFile.createNewFile();
@@ -86,17 +86,17 @@ public class CommitLog implements I_WriteChangeSet {
         tempOut = new OutputStreamWriter(new FileOutputStream(tempFile, true));
     }
 
-    public void writeChanges(I_GetConceptData change, long time) throws IOException {
+    public void writeChanges(ConceptChronicleBI change, long time) throws IOException {
         tempOut.append(dateFormat.format(new Date(time)));
 		tempOut.append("\tconcept\t");
-		tempOut.append(change.getInitialText());
+		tempOut.append(change.toString());
 		tempOut.append("\t");
-		tempOut.append(change.getUids().toString());
+		tempOut.append(change.getUUIDs().toString());
 		tempOut.append("\n");
     }
 
     @Override
-    public void setPolicy(ChangeSetPolicy policy) {
+    public void setPolicy(ChangeSetGenerationPolicy policy) {
         // nothing to do, does not honor policy
     }
 

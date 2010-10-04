@@ -79,6 +79,8 @@ public class InstructWithDoneAndTodo extends AbstractTask {
     protected transient Condition returnCondition;
 
     protected transient boolean done;
+    
+    private transient I_EncodeBusinessProcess process;
 
     protected transient I_ConfigAceFrame config;
     protected transient boolean builderVisible;
@@ -115,7 +117,7 @@ public class InstructWithDoneAndTodo extends AbstractTask {
         					+ ((I_GetConceptData) c).toLongString());
         			
         		}
-        		HasUncommittedChanges.askToCommit();
+        		HasUncommittedChanges.askToCommit(process);
         	}
             if (Terms.get().getUncommitted().size() > 0) {
                 if (!DwfaEnv.isHeadless()) {
@@ -291,6 +293,7 @@ public class InstructWithDoneAndTodo extends AbstractTask {
     }
 
     public Condition evaluate(I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
+    	this.process = process;
         try {
             DoSwing swinger = new DoSwing(process);
             swinger.start();

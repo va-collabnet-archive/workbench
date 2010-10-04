@@ -66,6 +66,8 @@ public class InstructAndWaitStepOrCancel extends AbstractTask {
     private transient Condition returnCondition;
 
     private transient boolean done;
+    
+    private transient I_EncodeBusinessProcess process;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -96,7 +98,7 @@ public class InstructAndWaitStepOrCancel extends AbstractTask {
             					+ ((I_GetConceptData) c).toLongString());
             			
             		}
-            		HasUncommittedChanges.askToCommit();
+            		HasUncommittedChanges.askToCommit(process);
             	}
                 if (!DwfaEnv.isHeadless()) {
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
@@ -151,6 +153,7 @@ public class InstructAndWaitStepOrCancel extends AbstractTask {
      */
     public Condition evaluate(I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         this.done = false;
+        this.process = process;
         I_ConfigAceFrame config =
                 (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
         boolean builderVisible = config.isBuilderToggleVisible();

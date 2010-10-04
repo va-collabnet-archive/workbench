@@ -1,17 +1,22 @@
 package org.ihtsdo.db.bdb;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 import org.ihtsdo.concept.ConceptVersion;
+import org.ihtsdo.cs.ChangeSetWriterHandler;
+import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
@@ -137,5 +142,24 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 	public List<UUID> getUuidsForNid(int nid) {
 		return Bdb.getUuidsToNidMap().getUuidsForNid(nid);
 	}
+
+	@Override
+	public void addChangeSetGenerator(String key, ChangeSetGeneratorBI writer) {
+		ChangeSetWriterHandler.addWriter(key, writer);
+    }
+	
+	@Override
+	public void removeChangeSetGenerator(String key) {
+		ChangeSetWriterHandler.removeWriter(key);
+    }
+
+    public ChangeSetGeneratorBI createDtoChangeSetGenerator(File changeSetFileName, 
+			File changeSetTempFileName, 
+			ChangeSetGenerationPolicy policy) {
+    	return new EConceptChangeSetWriter(
+    			changeSetFileName,
+    			changeSetTempFileName,
+    			policy, true);  	
+    }
 
 }

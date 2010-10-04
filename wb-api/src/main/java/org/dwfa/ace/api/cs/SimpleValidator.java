@@ -33,6 +33,7 @@ import org.dwfa.ace.utypes.UniversalAceExtByRefBean;
 import org.dwfa.ace.utypes.UniversalAcePath;
 import org.dwfa.ace.utypes.UniversalIdList;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.dto.concept.TkConcept;
 
 /**
  * Simple implementation of <code>I_ValidateChangeSetChanges</code> that always
@@ -69,25 +70,39 @@ public class SimpleValidator implements I_ValidateChangeSetChanges {
                 AceLog.getEditLog().fine("Read UniversalAceExtByRefBean... " + csObj);
             }
             return validateAceExtByRefBean((UniversalAceExtByRefBean) csObj, tf);
+        } else if (TkConcept.class.isAssignableFrom(csObj.getClass())) {
+            if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                AceLog.getEditLog().fine("Read TkConcept... " + csObj);
+            }
+            return validateTkConcept((TkConcept) csObj, tf);
         } else {
             throw new IOException("Can't handle class: " + csObj.getClass().getName());
         }
     }
 
-    protected boolean validateAceExtByRefBean(UniversalAceExtByRefBean bean, I_TermFactory tf) throws IOException,
+    private boolean validateTkConcept(TkConcept csObj,
+			I_TermFactory tf) {
+		return true;
+	}
+
+    @Deprecated
+	protected boolean validateAceExtByRefBean(UniversalAceExtByRefBean bean, I_TermFactory tf) throws IOException,
             TerminologyException {
         return true;
     }
 
+    @Deprecated
     protected boolean validateAcePath(UniversalAcePath path, I_TermFactory tf) throws IOException, TerminologyException {
         return true;
     }
 
+    @Deprecated
     protected boolean validateAceIdList(UniversalIdList bean, I_TermFactory tf) throws IOException,
             TerminologyException {
         return true;
     }
 
+    @Deprecated
     protected boolean validateAceBean(UniversalAceBean bean, I_TermFactory tf) throws IOException, TerminologyException {
         return true;
 

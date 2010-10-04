@@ -1,5 +1,7 @@
 package org.dwfa.ace.api.cs;
 
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+
 public enum ChangeSetPolicy {
     /**
      * Don't generate change sets. 
@@ -28,6 +30,36 @@ public enum ChangeSetPolicy {
     @Override
     public String toString() {
         return displayString;
+    }
+    
+    public static ChangeSetPolicy get(ChangeSetGenerationPolicy csgp) {
+    	switch (csgp) {
+		case COMPREHENSIVE:
+			return COMPREHENSIVE;
+		case INCREMENTAL:
+			return INCREMENTAL;
+		case MUTABLE_ONLY: 
+			return MUTABLE_ONLY;
+		case OFF:
+			return OFF;
+		default:
+			throw new UnsupportedOperationException("Can't handle csgp: " + csgp);
+		}
+    }
+
+    public ChangeSetGenerationPolicy convert() {
+    	switch (this) {
+		case COMPREHENSIVE:
+			return ChangeSetGenerationPolicy.COMPREHENSIVE;
+		case INCREMENTAL:
+			return ChangeSetGenerationPolicy.INCREMENTAL;
+		case MUTABLE_ONLY: 
+			return ChangeSetGenerationPolicy.MUTABLE_ONLY;
+		case OFF:
+			return ChangeSetGenerationPolicy.OFF;
+		default:
+			throw new UnsupportedOperationException("Can't handle csgp: " + this);
+		}
     }
 
 }

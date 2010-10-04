@@ -116,13 +116,25 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
     public int getPathId() {
         return sapBdb.getPathNid(statusAtPositionNid);
     }
+    @Override
+    public int getPathNid() {
+        return sapBdb.getPathNid(statusAtPositionNid);
+    }
 
     @Override
     public int getStatusId() {
         return sapBdb.getStatusNid(statusAtPositionNid);
     }
+    @Override
+    public int getStatusNid() {
+        return sapBdb.getStatusNid(statusAtPositionNid);
+    }
     
     public int getAuthorId() {
+    	return sapBdb.getAuthorNid(statusAtPositionNid);
+    }
+
+    public int getAuthorNid() {
     	return sapBdb.getAuthorNid(statusAtPositionNid);
     }
 
@@ -145,6 +157,7 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
     public void setStatusId(int statusId) {
         throw new UnsupportedOperationException();
     }
+    
 
     @Override
     public void setVersion(int version) {

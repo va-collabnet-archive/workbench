@@ -654,7 +654,7 @@ public class Svn implements I_HandleSubversion {
 		I_ShowActivity activity = setupActivityPanel("Subversion update");
 		try {
 
-			SvnLog.info("starting update");
+			SvnLog.info("starting update: " + svd);
 			Svn.getSvnClient().setPrompt(authenticator);
 			try {
 				if (interactive) {

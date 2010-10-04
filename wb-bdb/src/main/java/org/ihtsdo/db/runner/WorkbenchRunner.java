@@ -40,7 +40,6 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.commitlog.CommitLog;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrame;
@@ -69,6 +68,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.objectCache.ObjectCacheClassHandler;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 
 import com.sun.jini.start.LifeCycle;
 
@@ -165,25 +165,6 @@ public class WorkbenchRunner {
 			    ACE.editMode = false;
 			}
 			
-			if (System.getProperty("newprofile") != null) {
-                File dbFolder = new File("berkeley-db");
-                if (jiniConfig != null) {
-                    dbFolder = (File) jiniConfig.getEntry(this.getClass().getName(), "dbFolder", File.class,
-                        new File("target/berkeley-db"));
-                }
-                AceConfig.config = new AceConfig(dbFolder);
-                String username = "username";
-                File profileFile = new File("profiles/" + username, username + ".ace");
-                AceConfig.config.setProfileFile(profileFile);
-                AceConfig.setupAceConfig(AceConfig.config, null, null, false);
-
-	            File startupFolder = new File(profileFile.getParent(), "startup");
-	            startupFolder.mkdirs();
-
-	            File shutdownFolder = new File(profileFile.getParent(), "shutdown");
-	            shutdownFolder.mkdirs();
-			}
-
 			File wbPropertiesFile = new File("config", WB_PROPERTIES);
 			boolean acePropertiesFileExists = wbPropertiesFile.exists();
 			wbProperties = new Properties();
@@ -297,6 +278,28 @@ public class WorkbenchRunner {
 			setupLookAndFeel();
 			setupSwingExpansionTimerLogging();
 
+			if (System.getProperty("newprofile") != null) {
+                File dbFolder = new File("berkeley-db");
+                if (jiniConfig != null) {
+                    dbFolder = (File) jiniConfig.getEntry(this.getClass().getName(), "dbFolder", File.class,
+                        new File("target/berkeley-db"));
+                }
+                AceConfig.config = new AceConfig(dbFolder);
+                String username = "username";
+                File profileFile = new File("profiles/" + username, username + ".ace");
+                AceConfig.config.setProfileFile(profileFile);
+                AceConfig.setupAceConfig(AceConfig.config, null, null, false);
+
+	            File startupFolder = new File(profileFile.getParent(), "startup");
+	            startupFolder.mkdirs();
+
+	            File shutdownFolder = new File(profileFile.getParent(), "shutdown");
+	            shutdownFolder.mkdirs();
+			}
+
+			if (svnHelper != null) {
+				svnHelper.doChangeSetImport();
+			}
 			if (wbConfigFile != null && wbConfigFile.exists()
 					&& wbPropertiesFile.exists()) {
 
@@ -344,11 +347,8 @@ public class WorkbenchRunner {
 			}
 			wbProperties.storeToXML(new FileOutputStream(wbPropertiesFile),
 					null);
-			if (svnHelper != null) {
-				svnHelper.doChangeSetImport();
-			}
 			ACE.setAceConfig(AceConfig.config);
-			// TODO. Get config to work with new change sets AceConfig.config.addChangeSetWriters();
+
 			String writerName = AceConfig.config.getChangeSetWriterFileName();
 			if (!writerName.endsWith(".eccs")) {
 				String firstPart = writerName.substring(0, writerName.lastIndexOf('.'));
@@ -356,13 +356,13 @@ public class WorkbenchRunner {
 				AceConfig.config.setChangeSetWriterFileName(writerName);
 			}
 
-			ChangeSetWriterHandler.addWriter(new EConceptChangeSetWriter(
+			ChangeSetWriterHandler.addWriter(AceConfig.config.getUsername() + ".eccs", new EConceptChangeSetWriter(
 					new File(AceConfig.config.getChangeSetRoot(),
 							AceConfig.config.getChangeSetWriterFileName()),
 					new File(AceConfig.config.getChangeSetRoot(), "."
 							+ AceConfig.config.getChangeSetWriterFileName()),
-							ChangeSetPolicy.MUTABLE_ONLY, true));
-			ChangeSetWriterHandler.addWriter(new CommitLog(new File(
+							ChangeSetGenerationPolicy.INCREMENTAL, true));
+			ChangeSetWriterHandler.addWriter(AceConfig.config.getUsername() + ".commitLog.xls", new CommitLog(new File(
 					AceConfig.config.getChangeSetRoot(), "commitLog.xls"),
 					new File(AceConfig.config.getChangeSetRoot(), "."
 							+ "commitLog.xls")));
@@ -380,6 +380,13 @@ public class WorkbenchRunner {
 					while (login) {
 						if (frameCount == 1) {
 							if (ace.getPassword().equals(prompter.getPassword())) {
+								if (ace.getUsername().equals(prompter.getUsername()) == false) {
+									AceConfig.config.setUsername(ace.getUsername());
+									prompter.setUsername(ace.getUsername());
+								}
+							} else {
+								prompter.prompt("Please authenticate for: "
+										+ ace.getFrameName(), ace.getUsername());
 								if (ace.getUsername().equals(prompter.getUsername()) == false) {
 									AceConfig.config.setUsername(ace.getUsername());
 									prompter.setUsername(ace.getUsername());
@@ -437,7 +444,7 @@ public class WorkbenchRunner {
 					processFile(dir, lc);
 				}
 			}
-
+			AceConfig.config.save();
 			// Startup other queues here...
 			List<String> queuesToRemove = new ArrayList<String>();
 			for (String queue : AceConfig.config.getQueues()) {
@@ -464,8 +471,7 @@ public class WorkbenchRunner {
 			if (queuesToRemove.size() > 0) {
 				AceConfig.config.getQueues().removeAll(queuesToRemove);
 				StringBuffer buff = new StringBuffer();
-				buff
-						.append("<html><body>Removing queues that are not accessible: <br>");
+				buff.append("<html><body>Removing queues that are not accessible: <br>");
 				for (String queue : queuesToRemove) {
 					buff.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
 					buff.append(queue);

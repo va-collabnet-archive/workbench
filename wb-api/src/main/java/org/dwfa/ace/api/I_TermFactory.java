@@ -50,6 +50,7 @@ import org.dwfa.util.LogWithAlerts;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 
 public interface I_TermFactory {
 
@@ -268,9 +269,9 @@ public interface I_TermFactory {
     public void commit(ChangeSetPolicy changeSetPolicy, ChangeSetWriterThreading changeSetWriterThreading)
             throws Exception;
 
-    void addChangeSetWriter(I_WriteChangeSet writer);
+    void addChangeSetWriter(String key, ChangeSetGeneratorBI writer);
 
-    void removeChangeSetWriter(I_WriteChangeSet writer);
+    void removeChangeSetWriter(String key);
 
     Collection<I_WriteChangeSet> getChangeSetWriters();
 

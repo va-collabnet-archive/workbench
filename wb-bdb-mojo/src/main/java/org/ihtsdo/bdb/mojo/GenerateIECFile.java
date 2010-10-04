@@ -1,6 +1,7 @@
 package org.ihtsdo.bdb.mojo;
 
 import java.io.File;
+import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -95,15 +96,16 @@ public class GenerateIECFile extends AbstractMojo  {
             }
             ChangeSetPolicy changeSetPolicy = ChangeSetPolicy.valueOf(policy);
             EConceptChangeSetWriter writer = new EConceptChangeSetWriter(new File(output, changeSetFile), 
-                new File(output, changeSetFile + ".tmp"), changeSetPolicy, false);
-            ChangeSetWriterHandler.addWriter(writer);
+                new File(output, changeSetFile + ".tmp"), changeSetPolicy.convert(), false);
+            String key = UUID.randomUUID().toString();
+            ChangeSetWriterHandler.addWriter(key, writer);
             IntSet sapsToWrite = Bdb.getSapDb().getSpecifiedSapNids(pathIds, TimeUtil.getFileDateFormat().parse(startDate).getTime(), 
                 TimeUtil.getFileDateFormat().parse(endDate).getTime());
             getLog().info("Criterion matches " + sapsToWrite.size() + " sapNids: " + sapsToWrite);
             if (sapsToWrite.size() > 0) {
                 ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
                     Bdb.getConceptDb().getConceptNidSet(), System.currentTimeMillis(),
-                    sapsToWrite, changeSetPolicy, 
+                    sapsToWrite, changeSetPolicy.convert(), 
                     ChangeSetWriterThreading.MULTI_THREAD, null);
                 handler.run();
             }

@@ -130,6 +130,7 @@ import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetReader;
+import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.refset.MarkedParentRefsetHelper;
 import org.ihtsdo.db.bdb.computer.refset.MemberRefsetConflictCalculator;
@@ -147,6 +148,8 @@ import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 import com.sleepycat.je.DatabaseException;
@@ -192,8 +195,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public void addChangeSetWriter(I_WriteChangeSet writer) {
-        ChangeSetWriterHandler.addWriter(writer);
+    public void addChangeSetWriter(String key, ChangeSetGeneratorBI writer) {
+        ChangeSetWriterHandler.addWriter(key, writer);
     }
 
     @Override
@@ -1264,8 +1267,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public void removeChangeSetWriter(I_WriteChangeSet writer) {
-        ChangeSetWriterHandler.removeWriter(writer);
+    public void removeChangeSetWriter(String key) {
+        ChangeSetWriterHandler.removeWriter(key);
     }
 
     @Override
@@ -1923,5 +1926,14 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 		}
 		return authorNid;
 	}
+
+    public ChangeSetGeneratorBI createDtoChangeSetGenerator(File changeSetFileName, 
+			File changeSetTempFileName, 
+			ChangeSetGenerationPolicy policy) {
+    	return new EConceptChangeSetWriter(
+    			changeSetFileName,
+    			changeSetTempFileName,
+    			policy, true);  	
+    }
 
 }

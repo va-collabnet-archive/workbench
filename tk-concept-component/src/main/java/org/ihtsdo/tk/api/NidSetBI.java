@@ -23,4 +23,6 @@ public interface NidSetBI {
 
 	int getMin();
 
+	boolean contiguous();
+
 }

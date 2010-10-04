@@ -18,7 +18,10 @@ package org.dwfa.ace.task.db;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -26,6 +29,7 @@ import javax.swing.SwingUtilities;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -36,6 +40,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 
 /**
  * This task determines whether the database has uncommitted changes.
@@ -63,16 +69,16 @@ public class HasUncommittedChanges extends AbstractTask {
 
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+    public Condition evaluate(final I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
         	if (Terms.get().getUncommitted().size() > 0) {
         		if (SwingUtilities.isEventDispatchThread()) {
-        			askToCommit();
+        			askToCommit(process);
         		} else {
         			SwingUtilities.invokeAndWait(new Runnable() {
 						@Override
 						public void run() {
-		        			askToCommit();
+		        			askToCommit(process);
 						}
 					});
         		}
@@ -89,7 +95,7 @@ public class HasUncommittedChanges extends AbstractTask {
         }
     }
 
-	public static void askToCommit() {
+	public static void askToCommit(I_EncodeBusinessProcess process) {
 		Object[] options = {"Commit Changes",
                 "Cancel Changes",
                 "Do Nothing"};
@@ -103,10 +109,26 @@ public class HasUncommittedChanges extends AbstractTask {
 			    options,
 			    options[0]);     
 		if (n == JOptionPane.YES_OPTION) {
+	        List<String> extraGeneratorKeys = new ArrayList<String>();
 			try {
+	            List<ChangeSetGeneratorBI> extraGeneratorList = 
+	            	(List<ChangeSetGeneratorBI>) process.readAttachement(ProcessAttachmentKeys.EXTRA_CHANGE_SET_GENERATOR_LIST.getAttachmentKey());
+
+	            if (extraGeneratorList != null) {
+	            	for (ChangeSetGeneratorBI generator: extraGeneratorList) {
+	            		UUID key = UUID.randomUUID();
+	            		extraGeneratorKeys.add(key.toString());
+	                    Ts.get().addChangeSetGenerator(key.toString(), generator);
+	            	}
+	            }
+
 				Terms.get().commit();
 			} catch (Exception e) {
 				AceLog.getAppLog().alertAndLogException(e);
+			} finally {
+	        	for (String key: extraGeneratorKeys) {
+	                Ts.get().removeChangeSetGenerator(key);
+	        	}
 			}
 		} else if (n == JOptionPane.NO_OPTION) {
 			try {

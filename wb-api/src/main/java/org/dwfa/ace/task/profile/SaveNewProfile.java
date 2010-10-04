@@ -25,7 +25,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.UUID;
+import java.util.Map.Entry;
 
 import org.dwfa.ace.api.BundleType;
 import org.dwfa.ace.api.I_ConfigAceDb;
@@ -34,7 +34,7 @@ import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
-import org.dwfa.ace.task.svn.AddSubversionEntry;
+import org.dwfa.ace.task.svn.CommitAllSvnEntries;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -85,24 +85,42 @@ public class SaveNewProfile extends AbstractTask {
             profileToSave.setFrameName(profileToSave.getUsername() + " editor");
 
             I_ConfigAceFrame currentProfile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-            BundleType bundleType = currentProfile.getBundleType();
 
             I_ConfigAceDb currentDbProfile = currentProfile.getDbConfig();
-            File creatorsProfileFile = currentDbProfile.getProfileFile();
-            I_ConfigAceDb newDbProfile = profileToSave.getDbConfig();
 
-            String workingCopyStr = FileIO.getNormalizedRelativePath(creatorsProfileFile.getParentFile());
-
-            String userDirStr = "profiles" + File.separator + profileToSave.getUsername();
+             String userDirStr = "profiles" + File.separator + profileToSave.getUsername();
             File userDir = new File(userDirStr);
             File changeSetRoot = new File(userDir, "changesets");
             changeSetRoot.mkdirs();
             File profileFile = new File(userDir, profileToSave.getUsername() + ".ace");
+            I_ConfigAceDb newDbProfile = profileToSave.getDbConfig();
+            newDbProfile.getAceFrames().clear();
+            newDbProfile.getAceFrames().add(profileToSave);
+            newDbProfile.setDbFolder(currentDbProfile.getDbFolder());
+            newDbProfile.setProfileFile(profileFile);
+            newDbProfile.setUsername(profileToSave.getUsername());
 
-            switch (bundleType) {
+            // write new profile to disk
+            FileOutputStream fos = new FileOutputStream(profileFile);
+            BufferedOutputStream bos = new BufferedOutputStream(fos);
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(newDbProfile);
+            oos.close();
+
+            File startupFolder = new File(userDir, "startup");
+            startupFolder.mkdirs();
+
+            File shutdownFolder = new File(userDir, "shutdown");
+            shutdownFolder.mkdirs();
+
+            BundleType bundleType = currentProfile.getBundleType();
+            String workingCopyStr = FileIO.getNormalizedRelativePath(currentProfile.getDbConfig().getProfileFile().getParentFile());
+            boolean deleteProfile = false;
+           switch (bundleType) {
             case STAND_ALONE:
                 break;
             default:
+            	deleteProfile = true;
                 SubversionData creatorSvd = new SubversionData(null, workingCopyStr);
                 currentProfile.svnCompleteRepoInfo(creatorSvd);
                 String sequenceToFind = "src/main/profiles/";
@@ -127,40 +145,27 @@ public class SaveNewProfile extends AbstractTask {
                 }
                 int sequenceEnd = sequenceLocation + sequenceToFind.length();
                 String profileDirRepoUrl = creatorSvd.getRepositoryUrlStr().substring(0, sequenceEnd);
-
-                // Create a new profile-csu subversion entry
-                AddSubversionEntry addUserCsuSvn = new AddSubversionEntry();
-                addUserCsuSvn.setKeyName(I_ConfigAceFrame.SPECIAL_SVN_ENTRIES.PROFILE_CSU.toString());
-                addUserCsuSvn.setProfilePropName(profilePropName);
-                addUserCsuSvn.setPrompt("verify subversion settings for profile directory: ");
-                addUserCsuSvn.setRepoUrl(profileDirRepoUrl);
-                addUserCsuSvn.setWorkingCopy("profiles" + File.separator);
-                addUserCsuSvn.evaluate(process, worker);
-
+                String repositoryUrlStr = profileDirRepoUrl + profileToSave.getUsername();
+                String workingCopyStrForNewUser = "profiles" + File.separator + profileToSave.getUsername();
+                
+                SubversionData svd = new SubversionData(repositoryUrlStr, workingCopyStrForNewUser);
+                currentProfile.svnImport(svd);
             }
-
-            newDbProfile.getAceFrames().clear();
-            newDbProfile.getAceFrames().add(profileToSave);
-            newDbProfile.setChangeSetRoot(changeSetRoot);
-            newDbProfile.setChangeSetWriterFileName(profileToSave.getUsername() + "#0#" + UUID.randomUUID().toString()
-                + ".eccs");
-            newDbProfile.setDbFolder(currentDbProfile.getDbFolder());
-            newDbProfile.setProfileFile(profileFile);
-            newDbProfile.setUsername(profileToSave.getUsername());
-
-            // write new profile to disk
-            FileOutputStream fos = new FileOutputStream(profileFile);
-            BufferedOutputStream bos = new BufferedOutputStream(fos);
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
-            oos.writeObject(newDbProfile);
-            oos.close();
-
-            File startupFolder = new File(userDir, "startup");
-            startupFolder.mkdirs();
-
-            File shutdownFolder = new File(userDir, "shutdown");
-            shutdownFolder.mkdirs();
-
+       		worker.getLogger().info("Starting commits for: " + currentProfile.getSubversionMap().keySet());
+       	
+            for (Entry<String, SubversionData> entry: currentProfile.getSubversionMap().entrySet()) {
+            	if (!entry.getKey().equalsIgnoreCase(I_ConfigAceDb.MUTABLE_DB_LOC)) {
+                	worker.getLogger().info("commit: " + entry);
+                	CommitAllSvnEntries.commit(currentProfile, entry.getValue(), entry.getKey());
+            	} else {
+                	worker.getLogger().info("suppressed commit for: " + entry);
+            	}
+            }
+            
+            if (deleteProfile) {
+               	worker.getLogger().info("Recursive delete for: " + newDbProfile.getProfileFile().getParent());
+            	FileIO.recursiveDelete(newDbProfile.getProfileFile().getParentFile());
+            }
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
