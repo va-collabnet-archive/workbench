@@ -873,6 +873,17 @@ public class DiffBase extends AbstractMojo {
 		return text;
 	}
 
+	private HashMap<Integer, UUID> concept_uuid_cache = new HashMap<Integer, UUID>();
+
+	protected String getConceptUUID(int id) throws Exception {
+		UUID text = concept_uuid_cache.get(id);
+		if (text != null)
+			return text.toString();
+		text = Terms.get().getUids(id).iterator().next();
+		concept_uuid_cache.put(id, text);
+		return text.toString();
+	}
+
 	protected String getConceptPreferredDescription(int id) throws Exception {
 		return getConceptPreferredDescription(Terms.get().getConcept(id));
 	}

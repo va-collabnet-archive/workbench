@@ -79,7 +79,11 @@ public class ChangeReport extends DiffBase {
 
 	private PrintWriter out = null;
 
+	private PrintWriter out_xml;
+
 	private String changes;
+
+	private String changes_xml;
 
 	String cur_page;
 
@@ -107,6 +111,8 @@ public class ChangeReport extends DiffBase {
 		startChange(c);
 		changes += "<tr><td>" + "Added concept" + "</td><td>" + " "
 				+ "</td><td>" + " " + "</td></tr>";
+		changes_xml += startElement("added_concept") + conceptRef(c.getNid())
+				+ endElement("added_concept") + "\n";
 
 	}
 
@@ -130,6 +136,10 @@ public class ChangeReport extends DiffBase {
 		startChange(c);
 		changes += "<tr><td>" + "Status" + "</td><td>" + getConceptName(v1)
 				+ "</td><td>" + getConceptName(v2) + "</td></tr>";
+		changes_xml += startElement("status") + startElement("v1")
+				+ conceptRef(v1) + endElement("v1") + startElement("v2")
+				+ conceptRef(v2) + endElement("v2") + endElement("status")
+				+ "\n";
 	}
 
 	@Override
@@ -139,6 +149,34 @@ public class ChangeReport extends DiffBase {
 		startChange(c);
 		changes += "<tr><td>" + "Defined" + "</td><td>" + v1 + "</td><td>" + v2
 				+ "</td></tr>";
+		changes_xml += startElement("defined")
+				+ valueElement("v1", String.valueOf(v1))
+				+ valueElement("v2", String.valueOf(v2))
+				+ endElement("defined") + "\n";
+	}
+
+	protected String descriptionElement(I_DescriptionTuple d) throws Exception {
+		return startElement("description")
+				+ valueElement("id", d.getUUIDs().iterator().next().toString())
+				+ valueElement("text", d.getText())
+				+ conceptRefElement("status", d.getStatusNid())
+				+ conceptRefElement("type", d.getTypeNid())
+				+ valueElement("lang", d.getLang())
+				+ valueElement("case",
+						String.valueOf(d.isInitialCaseSignificant()))
+				+ endElement("description") + "\n";
+	}
+
+	protected String relationshipElement(I_RelTuple d) throws Exception {
+		return startElement("relationship")
+				+ valueElement("id", d.getUUIDs().iterator().next().toString())
+				+ conceptRefElement("destination", d.getDestinationNid())
+				+ conceptRefElement("status", d.getStatusNid())
+				+ conceptRefElement("type", d.getTypeNid())
+				+ conceptRefElement("characteristic", d.getCharacteristicNid())
+				+ conceptRefElement("refinability", d.getRefinabilityNid())
+				+ valueElement("group", String.valueOf(d.getGroup()))
+				+ endElement("changed_relationship");
 	}
 
 	@Override
@@ -150,6 +188,9 @@ public class ChangeReport extends DiffBase {
 				+ "</td><td>" + d.getText() + "<br>"
 				+ getConceptName(d.getTypeNid()) + " " + d.getLang()
 				+ "</td></tr>";
+		changes_xml += startElement("added_description")
+				+ descriptionElement(d) + endElement("added_description")
+				+ "\n";
 	}
 
 	protected void listChangedDescription(I_GetConceptData c,
@@ -187,6 +228,35 @@ public class ChangeReport extends DiffBase {
 				+ (d1.isInitialCaseSignificant() == d2
 						.isInitialCaseSignificant() ? " " : d2
 						.isInitialCaseSignificant()) + "</td></tr>";
+		changes_xml += startElement("changed_description")
+				+ valueElement("id", d1.getUUIDs().iterator().next().toString())
+				+ startElement("text")
+				+ valueElement("v1", d1.getText())
+				+ (d1.getText().equals(d2.getText()) ? "" : valueElement("v2",
+						d2.getText()))
+				+ endElement("text")
+				+ startElement("status")
+				+ conceptRefElement("v1", d1.getStatusNid())
+				+ (d1.getStatusNid() == d2.getStatusNid() ? ""
+						: conceptRefElement("v2", d2.getStatusNid()))
+				+ endElement("status")
+				+ startElement("type")
+				+ conceptRefElement("v1", d1.getTypeNid())
+				+ (d1.getTypeNid() == d2.getTypeNid() ? "" : conceptRefElement(
+						"v2", d2.getTypeNid()))
+				+ endElement("type")
+				+ startElement("lang")
+				+ valueElement("v1", d1.getLang())
+				+ (d1.getLang().equals(d2.getLang()) ? "" : valueElement("v2",
+						d2.getLang()))
+				+ endElement("lang")
+				+ startElement("case")
+				+ valueElement("v1",
+						String.valueOf(d1.isInitialCaseSignificant()))
+				+ (d1.isInitialCaseSignificant() == d2
+						.isInitialCaseSignificant() ? "" : valueElement("v2",
+						String.valueOf(d2.isInitialCaseSignificant())))
+				+ endElement("case") + endElement("changed_description") + "\n";
 		listed_changed_descriptions.add(d1.getDescId());
 	}
 
@@ -234,6 +304,9 @@ public class ChangeReport extends DiffBase {
 				+ "</td><td>" + getConceptName(d.getTypeNid()) + "<br>"
 				+ getConceptPreferredDescription(d.getDestinationNid())
 				+ "</td></tr>";
+		changes_xml += startElement("added_relationship")
+				+ relationshipElement(d) + endElement("added_relationship")
+				+ "\n";
 	}
 
 	protected void listChangedRelationship(I_GetConceptData c, I_RelTuple d1,
@@ -284,6 +357,38 @@ public class ChangeReport extends DiffBase {
 				+ (d1.getGroup() == d2.getGroup() ? " " : d2.getGroup())
 				+ "</td></tr>";
 		listed_changed_relationships.add(d1.getRelId());
+		changes_xml += startElement("changed_relationship")
+				+ valueElement("id", d1.getUUIDs().iterator().next().toString())
+				+ startElement("destination")
+				+ conceptRefElement("v1", d1.getDestinationNid())
+				+ (d1.getDestinationNid() == d2.getDestinationNid() ? ""
+						: conceptRefElement("v2", d2.getDestinationNid()))
+				+ endElement("destination")
+				+ startElement("status")
+				+ conceptRefElement("v1", d1.getStatusNid())
+				+ (d1.getStatusNid() == d2.getStatusNid() ? ""
+						: conceptRefElement("v2", d2.getStatusNid()))
+				+ endElement("status")
+				+ startElement("type")
+				+ conceptRefElement("v1", d1.getTypeNid())
+				+ (d1.getTypeNid() == d2.getTypeNid() ? "" : conceptRefElement(
+						"v2", d2.getTypeNid()))
+				+ endElement("type")
+				+ startElement("characteristic")
+				+ conceptRefElement("v1", d1.getCharacteristicNid())
+				+ (d1.getCharacteristicNid() == d2.getCharacteristicNid() ? ""
+						: conceptRefElement("v2", d2.getCharacteristicNid()))
+				+ endElement("characteristic")
+				+ startElement("refinability")
+				+ conceptRefElement("v1", d1.getRefinabilityNid())
+				+ (d1.getRefinabilityNid() == d2.getRefinabilityNid() ? ""
+						: conceptRefElement("v2", d2.getRefinabilityNid()))
+				+ endElement("refinability")
+				+ startElement("group")
+				+ valueElement("v1", String.valueOf(d1.getGroup()))
+				+ (d1.getGroup() == d2.getGroup() ? "" : valueElement("v2",
+						String.valueOf(d2.getGroup()))) + endElement("group")
+				+ endElement("changed_relationship");
 	}
 
 	@Override
@@ -493,6 +598,42 @@ public class ChangeReport extends DiffBase {
 		return all_concepts;
 	}
 
+	protected String startElement(String str) {
+		return "<" + str + ">";
+	}
+
+	protected String endElement(String str) {
+		return "</" + str + ">";
+	}
+
+	protected String emptyElement(String str) {
+		return "<" + str + "/>";
+	}
+
+	protected String valueElement(String str, String val) {
+		return startElement(str) + escapeValue(val) + endElement(str);
+	}
+
+	protected String escapeValue(String value) {
+		value = value.replace("&", "&#38;");
+		value = value.replace("<", "&#60;");
+		return value;
+	}
+
+	protected String conceptRefElement(String str, int id) throws Exception {
+		return startElement(str) + startElement("concept_ref")
+				+ valueElement("name", getConceptName(id))
+				+ valueElement("id", getConceptUUID(id))
+				+ endElement("concept_ref") + endElement(str);
+	}
+
+	protected String conceptRef(int id) throws Exception {
+		return startElement("concept_ref")
+				+ valueElement("name", getConceptName(id))
+				+ valueElement("id", getConceptUUID(id))
+				+ endElement("concept_ref");
+	}
+
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			test_p = false;
@@ -503,10 +644,17 @@ public class ChangeReport extends DiffBase {
 			I_TermFactory tf = Terms.get();
 			ArrayList<Integer> all_concepts = getAllConcepts();
 			getLog().info("Processing: " + all_concepts.size());
+			String file_name = report_dir + "/" + "change_report.xml";
+			out_xml = new PrintWriter(new BufferedWriter(
+					new OutputStreamWriter(new FileOutputStream(file_name),
+							"UTF-8")));
+			out_xml.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+			out_xml.println(startElement("change_report"));
 			int i = 0;
 			for (int id : all_concepts) {
 				I_GetConceptData c = tf.getConcept(id);
 				changes = "";
+				changes_xml = "";
 				if (debug_p)
 					System.out.println("Concept: " + c.getInitialText());
 				compareAttributes(c);
@@ -523,9 +671,13 @@ public class ChangeReport extends DiffBase {
 				out.println("<p><table border=\"1\" width=\"700\">"
 						+ "<col width=\"140\"/><col width=\"270\"/><col width=\"270\"/>"
 						+ changes + "</table>");
+				out_xml.println(startElement("changed_concept") + "\n"
+						+ changes_xml + endElement("changed_concept") + "\n");
 			}
 			if (out != null)
 				out.close();
+			out_xml.println(endElement("change_report"));
+			out_xml.close();
 			doSummaryReport();
 			doConceptList(report_dir + "/concepts.html");
 			sortConcepts(changed_concepts);
