@@ -142,7 +142,7 @@ public class RulesLibrary {
 		
 		StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 		
-		KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+		//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 		
 		ResultsCollectorWorkBench results = new ResultsCollectorWorkBench();
 		
