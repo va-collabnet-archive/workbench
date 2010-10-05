@@ -48,6 +48,21 @@ public class TerminologyHelperDrools {
 		wordsLoaded=false;
 	}
 
+	public boolean checkSameInitialWord(String term, String term2){
+		String fWord="";
+		String fWord2="";
+        if (term.indexOf(" ")>0)
+            fWord=term.substring(0,term.indexOf(" "));
+        else
+            fWord=term;
+        if (term2.indexOf(" ")>0)
+            fWord2=term2.substring(0,term2.indexOf(" "));
+        else
+            fWord2=term2;
+        
+        return fWord.equals(fWord2);
+	}
+	
 	public String getICSCategory(String term){
 		String retString="0";
 		String word;
