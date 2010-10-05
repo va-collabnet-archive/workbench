@@ -115,3 +115,15 @@ rule "isKindOf SNOMED concept"
 	then 
    		System.out.println("isKindOf SNOMED concept found: \n" + $c.toString());
 end
+
+rule "double spaces"
+	
+	when
+		$c : ConceptVersionBI(this isKindOf Taxonomies.SNOMED);
+		$d : DescriptionVersionBI(text matches ".*garbage to disable this rule match \\s\\s.*") from $c.descsActive
+	then 
+   		System.out.println("Double spaces found: \n" + $c.toString());
+   		DescriptionSpec dSpec = SpecFactory.get($d);
+   		dSpec.setDescText($d.getText().replace("  ", " "));
+   		templates.put(dSpec, $c.getNid());
+end

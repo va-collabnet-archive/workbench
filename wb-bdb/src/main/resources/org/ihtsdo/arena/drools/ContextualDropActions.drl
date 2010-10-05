@@ -16,6 +16,7 @@ import org.ihtsdo.arena.context.action.CloneAction;
 import org.ihtsdo.arena.context.action.CreateRelAction;
 import org.ihtsdo.arena.context.action.CloneAndRetireAction;
 import org.ihtsdo.arena.context.action.RetireAction;
+import org.ihtsdo.arena.context.action.UpdateDescFromSpecAction;
 
 import org.ihtsdo.tk.drools.facts.ComponentFact;
 import org.ihtsdo.tk.drools.facts.ConAttrFact;
@@ -103,6 +104,7 @@ rule "rule 5"
 
 	then 
 		actions.add(new AddFromSpecAction("add desc", $dropTarget, $dropObject));
+		actions.add(new UpdateDescFromSpecAction("update desc", $dropTarget, $dropObject));
 end
 
 rule "rule 6"
