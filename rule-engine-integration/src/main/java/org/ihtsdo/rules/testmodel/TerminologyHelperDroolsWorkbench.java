@@ -51,12 +51,14 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 		ConceptVersionBI parentConcept = Ts.get().getConceptVersion(config.getCoordinate(), UUID.fromString(parent));
 		ConceptVersionBI subtypeConcept = Ts.get().getConceptVersion(config.getCoordinate(), UUID.fromString(subtype));
-		return subtypeConcept.isKindOf(parentConcept);
+		boolean result = subtypeConcept.isKindOf(parentConcept);
+		return result;
 	}
 
 	public boolean isParentOfOrEqualTo(String parent, String subtype)
 	throws Exception {
-		return (subtype.equals(parent) || isParentOf(parent, subtype));
+		boolean result = (subtype.equals(parent) || isParentOf(parent, subtype));
+		return result;
 	}
 
 	@Override
