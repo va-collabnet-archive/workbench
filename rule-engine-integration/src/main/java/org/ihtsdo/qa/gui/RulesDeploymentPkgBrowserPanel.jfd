@@ -118,7 +118,7 @@
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
-          <string>0, 0, 0, 0, 0</string> 
+          <string>0, 0, 0, 0, 0, 0</string> 
          </void> 
          <void method="setProperty"> 
           <string>$hGap</string> 
@@ -402,7 +402,7 @@
           <string>javax.swing.JButton</string> 
           <void method="setProperty"> 
            <string>text</string> 
-           <string>Update Pkgs</string> 
+           <string>Update Pkg</string> 
           </void> 
           <void method="setProperty"> 
            <string>font</string> 
@@ -433,7 +433,7 @@
           <string>javax.swing.JButton</string> 
           <void method="setProperty"> 
            <string>text</string> 
-           <string>Validate Pkgs</string> 
+           <string>Validate Pkg</string> 
           </void> 
           <void method="setProperty"> 
            <string>font</string> 

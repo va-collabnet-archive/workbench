@@ -4,6 +4,7 @@
 
 package org.ihtsdo.qa.gui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -11,6 +12,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -154,7 +158,15 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 	}
 
 	private void button4ActionPerformed(ActionEvent e) {
-		updateList1(new PkgValidationListRenderer());
+		//validate
+		HashMap<UUID, Color> map = new HashMap<UUID, Color>();
+		RulesDeploymentPackageReference pkg = (RulesDeploymentPackageReference) list1.getSelectedValue();
+		if (pkg.validate()) {
+			map.put(pkg.getUuids().iterator().next(), Color.GREEN);
+		} else {
+			map.put(pkg.getUuids().iterator().next(), Color.RED);
+		}
+		updateList1(new MapPkgListRenderer(map));
 	}
 
 	private void button5ActionPerformed(ActionEvent e) {
@@ -176,7 +188,16 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 	}
 
 	private void button6ActionPerformed(ActionEvent e) {
-		updateList1(new PkgUpdateListRenderer());
+		//update
+		HashMap<UUID, Color> map = new HashMap<UUID, Color>();
+		RulesDeploymentPackageReference pkg = (RulesDeploymentPackageReference) list1.getSelectedValue();
+		try {
+			pkg.updateKnowledgeBase();
+			map.put(pkg.getUuids().iterator().next(), Color.GREEN);
+		} catch (Exception e1) {
+			map.put(pkg.getUuids().iterator().next(), Color.RED);
+		}
+		updateList1(new MapPkgListRenderer(map));
 	}
 
 
@@ -210,14 +231,14 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 		//---- label1 ----
 		label1.setText("Deployment Packages");
 		add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 5, 5), 0, 0));
 
 		//---- label2 ----
 		label2.setText("Selected deployment packages details");
 		add(label2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 0), 0, 0));
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 5, 0), 0, 0));
 
 		//======== scrollPane1 ========
 		{
@@ -231,34 +252,34 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 			scrollPane1.setViewportView(list1);
 		}
 		add(scrollPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 5, 5), 0, 0));
 
 		//======== panel1 ========
 		{
 			panel1.setLayout(new GridBagLayout());
 			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0};
-			((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0};
+			((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0};
 			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
 			//---- label3 ----
 			label3.setText("Name");
 			panel1.add(label3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 0), 0, 0));
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 			panel1.add(textField1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 0), 0, 0));
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 
 			//---- label4 ----
 			label4.setText("URL");
 			panel1.add(label4, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 0), 0, 0));
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 			panel1.add(textField2, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 0), 0, 0));
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 
 			//======== panel2 ========
 			{
@@ -277,8 +298,8 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 					}
 				});
 				panel2.add(button5, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 5), 0, 0));
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 				//---- button2 ----
 				button2.setText("Save");
@@ -289,8 +310,8 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 					}
 				});
 				panel2.add(button2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 5), 0, 0));
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 				//---- button1 ----
 				button1.setText("Cancel");
@@ -301,16 +322,16 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 					}
 				});
 				panel2.add(button1, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 0), 0, 0));
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 			}
 			panel1.add(panel2, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
-					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 0, 0), 0, 0));
+				GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+				new Insets(0, 0, 5, 0), 0, 0));
 		}
 		add(panel1, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 0), 0, 0));
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 5, 0), 0, 0));
 
 		//======== panel3 ========
 		{
@@ -321,7 +342,7 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 			((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 			//---- button6 ----
-			button6.setText("Update Pkgs");
+			button6.setText("Update Pkg");
 			button6.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			button6.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -329,11 +350,11 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 				}
 			});
 			panel3.add(button6, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
 
 			//---- button4 ----
-			button4.setText("Validate Pkgs");
+			button4.setText("Validate Pkg");
 			button4.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			button4.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -341,8 +362,8 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 				}
 			});
 			panel3.add(button4, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
 
 			//---- button3 ----
 			button3.setText("New");
@@ -353,12 +374,12 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 				}
 			});
 			panel3.add(button3, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 0), 0, 0));
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(panel3, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
-				GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-				new Insets(0, 0, 0, 5), 0, 0));
+			GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+			new Insets(0, 0, 0, 5), 0, 0));
 		// JFormDesigner - End of component initialization  //GEN-END:initComponents
 	}
 
