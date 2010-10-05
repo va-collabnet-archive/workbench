@@ -125,6 +125,13 @@
     		<type>jar</type>
     		<optional>false</optional>
     	</dependency>
+    	<dependency>
+    		<groupId>org.ihtsdo</groupId>
+    		<artifactId>rule-engine-integration</artifactId>
+    		<version>${project.version}</version>
+    		<type>jar</type>
+    		<optional>false</optional>
+    	</dependency>
     </dependencies>
     <reporting>
         <plugins>
