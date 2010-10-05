@@ -47,29 +47,16 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		return result;
 	}
 
-	public boolean isParentOf(String parents, String subtype) throws Exception {
+	public boolean isParentOf(String parent, String subtype) throws Exception {
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-		boolean result = false;
-		I_GetConceptData wbSubtype = Terms.get().getConcept(UUID.fromString(subtype));
-		String[] parentsStrings = parents.trim().split(",");
-		for (String parentString : parentsStrings) {
-			I_GetConceptData wbParent = Terms.get().getConcept(UUID.fromString(parentString.trim()));
-			if (wbParent.isParentOf(wbSubtype)) result = true;
-		}
-		return result;
+		ConceptVersionBI parentConcept = Ts.get().getConceptVersion(config.getCoordinate(), UUID.fromString(parent));
+		ConceptVersionBI subtypeConcept = Ts.get().getConceptVersion(config.getCoordinate(), UUID.fromString(subtype));
+		return subtypeConcept.isKindOf(parentConcept);
 	}
 
-	public boolean isParentOfOrEqualTo(String parents, String subtype)
+	public boolean isParentOfOrEqualTo(String parent, String subtype)
 	throws Exception {
-		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-		boolean result = false;
-		I_GetConceptData wbSubtype = Terms.get().getConcept(UUID.fromString(subtype));
-		String[] parentsStrings = parents.trim().split(",");
-		for (String parentString : parentsStrings) {
-			I_GetConceptData wbParent = Terms.get().getConcept(UUID.fromString(parentString.trim()));
-			if (wbParent.isParentOfOrEqualTo(wbSubtype)) result = true;
-		}
-		return result;
+		return (subtype.equals(parent) || isParentOf(parent, subtype));
 	}
 
 	@Override
