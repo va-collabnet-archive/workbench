@@ -48,6 +48,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.ihtsdo</groupId>
+            <artifactId>wb-bdb</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>commons-primitives</groupId>
             <artifactId>commons-primitives</artifactId>
             <version>1.0</version>
