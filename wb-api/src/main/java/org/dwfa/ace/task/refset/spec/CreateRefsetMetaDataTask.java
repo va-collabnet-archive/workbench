@@ -423,6 +423,9 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
         if (descriptionType.getNid() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize()
             .getNid()) {
             String filteredDescription = description;
+            filteredDescription = filteredDescription.trim();
+            filteredDescription = filteredDescription.replaceAll("[\\s]+", " ");
+            
             // remove all non-alphanumeric characters and replace with a space - this is to stop these characters
             // causing issues with the lucene search
             filteredDescription = filteredDescription.replaceAll("[\\s]", " AND ");
