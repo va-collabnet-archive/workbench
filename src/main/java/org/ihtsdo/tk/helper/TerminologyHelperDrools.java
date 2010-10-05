@@ -424,7 +424,7 @@ public class TerminologyHelperDrools {
 	
 	//Mock implementation
 	public String checkWordInList(String text) {
-		return "ICSCategory";
+		return text;
 	}
 
 	public String getConceptDomain() {
