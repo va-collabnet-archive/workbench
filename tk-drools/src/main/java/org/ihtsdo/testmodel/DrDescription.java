@@ -21,7 +21,7 @@ public class DrDescription extends DrComponent{
 	private String referToConceptUuid = ""; //null if has no refer to concept extension
 	private String caseSignificantCategory = "";
 	private boolean variantGenerationCandidate = false;
-	private boolean uniqueInConcept = false;
+	private boolean uniqueInConcept = true;
 	
 	
 	public DrDescription() {
