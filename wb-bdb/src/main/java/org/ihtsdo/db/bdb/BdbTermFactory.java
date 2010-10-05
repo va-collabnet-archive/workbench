@@ -74,6 +74,7 @@ import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
@@ -146,6 +147,7 @@ import org.ihtsdo.lucene.CheckAndProcessLuceneMatch;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.api.ComponentBI;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
@@ -1688,23 +1690,32 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         SpecRefsetHelper refsetHelper = new SpecRefsetHelper(frameConfig);
         Concept refsetConcept = Concept.get(refsetNid);
         RefsetSpec specHelper = new RefsetSpec(refsetConcept, true, frameConfig);
+        
         ComponentList<RefsetMember<?, ?>> members = refsetConcept.getData().getRefsetMembers();
 
         HashSet<Integer> currentMembersList = new HashSet<Integer>();
-        for (RefsetMember<?, ?> v : members) {
-            if (refsetHelper.hasCurrentRefsetExtension(refsetNid, v.getComponentId(), ReferenceConcepts.NORMAL_MEMBER
-                .getNid())) {
-                if (Terms.get().hasConcept(v.getComponentId())) {
-                    currentMembersList.add(v.getComponentId());
-                } else { // assume it is a description member
-                    I_DescriptionVersioned desc = Terms.get().getDescription(v.getComponentId());
-                    if (desc != null) {
-                        currentMembersList.add(desc.getConceptNid());
-                    }
-                }
-            }
+        NidSetBI allowedStatus = frameConfig.getAllowedStatus();
+        int cidTypeNid = REFSET_TYPES.CID.getTypeNid();
+        int normalMemberNid = ReferenceConcepts.NORMAL_MEMBER.getNid();
+        for (RefsetMember<?, ?> m : members) {
+        	for (RefsetMember.Version v: m.getVersions(frameConfig.getCoordinate())) {
+        		if (allowedStatus.contains(v.getStatusNid()) &&
+    					v.getTypeNid() == cidTypeNid) {
+    				if (((I_ExtendByRefPartCid) v).getC1id() == normalMemberNid) {
+    	                if (Terms.get().hasConcept(m.getComponentId())) {
+    	                    currentMembersList.add(m.getComponentId());
+    	                } else { // assume it is a description member
+    	                    I_DescriptionVersioned desc = Terms.get().getDescription(m.getComponentId());
+    	                    if (desc != null) {
+    	                        currentMembersList.add(desc.getConceptNid());
+    	                    }
+    	                }
+    				}
+    			}
+    		}        		
         }
-
+        	
+        	
         HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
         RefsetComputer computer;
         try {

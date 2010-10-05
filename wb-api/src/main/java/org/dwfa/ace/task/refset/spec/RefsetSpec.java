@@ -497,9 +497,12 @@ public class RefsetSpec {
 
     public Long getLastComputeTime() throws TerminologyException, IOException {
         I_GetConceptData specConcept = getRefsetSpecConcept();
+        if (specConcept == null) {
+        	return null;
+        }
         I_GetConceptData lastComputeTimeConcept = getComputeConcept();
         I_ExtendByRefPart latestPart = null;
-        for (I_ExtendByRef extension : Terms.get().getAllExtensionsForComponent(specConcept.getConceptNid(), true)) {
+        for (I_ExtendByRef extension : specConcept.getExtensions()) {
 
             if (extension.getRefsetId() == lastComputeTimeConcept.getConceptNid()) {
 

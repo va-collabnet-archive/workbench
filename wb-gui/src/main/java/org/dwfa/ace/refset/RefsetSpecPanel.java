@@ -720,7 +720,7 @@ public class RefsetSpecPanel extends JPanel {
                                     if (newStatus != null) {
                                         I_ExtendByRefPartCid analog =
                                                 (I_ExtendByRefPartCid) partToPromote.makeAnalog(promotionPart
-                                                    .getStatusId(), p.getConceptNid(), Long.MAX_VALUE);
+                                                    .getStatusNid(), p.getConceptNid(), Long.MAX_VALUE);
                                         analog.setC1id(newStatus.getNid());
 
                                         extForMember.addVersion(analog);

@@ -203,6 +203,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 	}
 	
 	@Override
+	@Deprecated
 	public int getTypeId() {
 		return REFSET_TYPES.CID.getTypeNid();
 	}

@@ -88,14 +88,17 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
      * org.dwfa.ace.refset.spec.I_HelpSpecRefset#hasCurrentRefsetExtension(int,
      * int, int)
      */
-    public boolean hasCurrentRefsetExtension(int refsetId, int componentNid, int memberTypeId) throws Exception {
+    @Override
+    public boolean hasCurrentRefsetExtension(int refsetId, int componentNid, int c1Nid) throws Exception {
     	Concept refsetConcept = Bdb.getConcept(refsetId);
     	RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
     	if (extension != null) {
     		for (RefsetMember.Version v: extension.getVersions(config.getCoordinate())) {
     			if (config.getAllowedStatus().contains(v.getStatusNid()) &&
-    					v.getTypeNid() == memberTypeId) {
-    				return true;
+    					v.getTypeNid() == REFSET_TYPES.CID.getTypeNid()) {
+    				if (((I_ExtendByRefPartCid) v).getC1id() == c1Nid) {
+        				return true;
+    				}
     			}
     		}
     	}
