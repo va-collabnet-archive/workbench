@@ -68,6 +68,14 @@
     		<optional>false</optional>
     	</dependency>
     	<dependency>
+    		<groupId>org.ihtsdo</groupId>
+    		<artifactId>rule-engine-integration</artifactId>
+    		<version>${project.version}</version>
+    		<type>jar</type>
+    		<optional>false</optional>
+    	</dependency>
+    	
+    	<dependency>
     		<groupId>jgraphx</groupId>
     		<artifactId>jgraphx</artifactId>
     		<version>1.4.0.0</version>

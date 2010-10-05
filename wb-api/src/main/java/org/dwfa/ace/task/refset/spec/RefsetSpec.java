@@ -429,7 +429,7 @@ public class RefsetSpec {
     public void setLastComputeTime(Long time) throws Exception {
         try {
 
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(config);
             boolean prevAutoCommit = helper.isAutocommitActive();
             helper.setAutocommitActive(false);
             I_GetConceptData specConcept = getRefsetSpecConcept();
@@ -437,7 +437,8 @@ public class RefsetSpec {
 
             if (specConcept != null && lastComputeTimeConcept != null) {
                 helper.newLongRefsetExtension(lastComputeTimeConcept.getConceptNid(), specConcept.getConceptNid(), time);
-}
+            }
+            Terms.get().addUncommittedNoChecks(lastComputeTimeConcept);
             helper.setAutocommitActive(prevAutoCommit);
         } catch (Exception e) {
             e.printStackTrace();
@@ -502,7 +503,7 @@ public class RefsetSpec {
         }
         I_GetConceptData lastComputeTimeConcept = getComputeConcept();
         I_ExtendByRefPart latestPart = null;
-        for (I_ExtendByRef extension : specConcept.getExtensions()) {
+        for (I_ExtendByRef extension : lastComputeTimeConcept.getExtensions()) {
 
             if (extension.getRefsetId() == lastComputeTimeConcept.getConceptNid()) {
 

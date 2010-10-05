@@ -120,7 +120,8 @@ public class HasUnreviewedItemsTask extends AbstractTask {
             if (versions.size() == 0) {
                 break;
             } else if (versions.size() > 1) {
-                throw new Exception("Unresolved conflict in promotion set. versions: " + versions + " member: " + r);
+                throw new Exception("Unresolved conflict in promotion set." + versions.size() +
+                		" conflicting versions: \n\n" + versions + "\n\nmember: " + r);
             }
             I_ExtendByRefVersion v = versions.get(0);
             I_ExtendByRefPartCid promotionPart = (I_ExtendByRefPartCid) v.getMutablePart();
