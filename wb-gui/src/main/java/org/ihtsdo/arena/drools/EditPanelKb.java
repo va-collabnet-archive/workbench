@@ -20,14 +20,23 @@ import org.drools.logger.KnowledgeRuntimeLogger;
 import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.RefsetAuxiliary;
+import org.ihtsdo.rules.RulesLibrary;
+import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.drools.IsKindOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.SatisfiesConstraintEvaluatorDefinition;
+import org.ihtsdo.tk.helper.ResultsItem;
 import org.ihtsdo.tk.spec.SpecBI;
+
+import org.ihtsdo.rules.RulesLibrary;
+import org.ihtsdo.rules.context.RulesContextHelper;
+import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 
 public class EditPanelKb implements Runnable {
 
@@ -111,6 +120,16 @@ public class EditPanelKb implements Runnable {
 					logger.close();
 				}
 			}
+			
+			try {
+				I_GetConceptData context = Terms.get().getConcept(RefsetAuxiliary.Concept.REALTIME_QA_CONTEXT.getUids());
+				ResultsCollectorWorkBench results = RulesLibrary.checkConcept(c, context, false, config);
+				Map<SpecBI, Integer> guvnorTemplates = results.getWbTemplates();
+				templates.putAll(guvnorTemplates);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
 		} catch (Throwable e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
