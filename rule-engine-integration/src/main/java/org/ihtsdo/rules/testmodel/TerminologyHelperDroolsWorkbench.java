@@ -31,6 +31,9 @@ import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 
 public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	
+	public TerminologyHelperDroolsWorkbench(){
+		super();
+	}
 	@Override
 	public boolean isMemberOf(String conceptUUID, String refsetUUID) {
 		boolean result = false;
