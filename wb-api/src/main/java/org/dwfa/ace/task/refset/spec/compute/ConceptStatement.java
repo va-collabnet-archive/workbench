@@ -19,19 +19,25 @@ package org.dwfa.ace.task.refset.spec.compute;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery.GROUPING_TYPE;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.time.TimeUtil;
 
@@ -160,6 +166,14 @@ public class ConceptStatement extends RefsetSpecStatement {
         case CONCEPT_STATUS_IS_KIND_OF:
             possibleConcepts.or(parentPossibleConcepts);
             break;
+		case V1_IS:
+		case V2_IS:
+		case ADDED_CONCEPT:
+		case CHANGED_CONCEPT_STATUS:
+		case CHANGED_CONCEPT_DEFINED:
+			// TODO - EKM
+			possibleConcepts.or(parentPossibleConcepts);
+			break;
         default:
             throw new RuntimeException("Can't handle queryToken: " + queryToken);
         }
@@ -186,28 +200,91 @@ public class ConceptStatement extends RefsetSpecStatement {
     }
 
     @Override
-    public boolean getStatementResult(I_AmTermComponent component) throws TerminologyException, IOException {
+    public boolean getStatementResult(I_AmTermComponent component, GROUPING_TYPE version, I_Position v1_is,
+			I_Position v2_is) throws TerminologyException, IOException {
         I_GetConceptData concept = (I_GetConceptData) component;
+
+		if (version != null || v1_is != null || v2_is != null) {
+			if (version == null)
+				throw new TerminologyException("Not in scope of V1 or V2: "
+						+ tokenEnum + " " + concept.getInitialText());
+			if (v1_is == null)
+				throw new TerminologyException("Need to set V1 IS: "
+						+ tokenEnum + " " + concept.getInitialText());
+			if (v2_is == null)
+				throw new TerminologyException("Need to set V2 IS: "
+						+ tokenEnum + " " + concept.getInitialText());
+		}
 
         switch (tokenEnum) {
         case CONCEPT_IS:
+			if (version == null) {
             return conceptIs(concept);
+			} else {
+				return conceptIs(concept, getVersion(version, v1_is, v2_is));
+			}
         case CONCEPT_IS_CHILD_OF:
-            return conceptIsChildOf(concept);
+			if (version == null) {
+				return conceptIsChildOf(concept);
+			} else {
+				return conceptIsChildOf(concept, getVersion(version, v1_is,
+						v2_is));
+			}
         case CONCEPT_IS_DESCENDENT_OF:
+			if (version == null) {
             return conceptIsDescendantOf(concept);
+			} else {
+				return conceptIsDescendantOf(concept, getVersion(version,
+						v1_is, v2_is));
+			}
         case CONCEPT_IS_KIND_OF:
+			if (version == null) {
             return conceptIsKindOf(concept);
+			} else {
+				return conceptIsKindOf(concept, getVersion(version, v1_is,
+						v2_is));
+			}
         case CONCEPT_IS_MEMBER_OF:
+			if (version == null) {
             return conceptIsMemberOf(concept);
+			} else {
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
+			}
         case CONCEPT_STATUS_IS:
+			if (version == null) {
             return conceptStatusIs(concept);
+			} else {
+				return conceptStatusIs(concept, getVersion(version, v1_is,
+						v2_is));
+			}
         case CONCEPT_STATUS_IS_CHILD_OF:
+			if (version == null) {
             return conceptStatusIsChildOf(concept);
+			} else {
+				return conceptStatusIsChildOf(concept, getVersion(version,
+						v1_is, v2_is));
+			}
         case CONCEPT_STATUS_IS_DESCENDENT_OF:
+			if (version == null) {
             return conceptStatusIsDescendantOf(concept);
+			} else {
+				return conceptStatusIsDescendantOf(concept, getVersion(version,
+						v1_is, v2_is));
+			}
         case CONCEPT_STATUS_IS_KIND_OF:
+			if (version == null) {
             return conceptStatusIsKindOf(concept);
+			} else {
+				return conceptStatusIsKindOf(concept, getVersion(version,
+						v1_is, v2_is));
+			}
+		case ADDED_CONCEPT:
+			return addedConcept(concept, version, v1_is, v2_is);
+		case CHANGED_CONCEPT_STATUS:
+			return changedConceptStatus(concept, version, v1_is, v2_is);
+		case CHANGED_CONCEPT_DEFINED:
+			return changedConceptDefined(concept, version, v1_is, v2_is);
         default:
             throw new RuntimeException("Can't handle queryToken: " + queryToken);
         }
@@ -295,6 +372,13 @@ public class ConceptStatement extends RefsetSpecStatement {
             termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
                 .getConflictResolutionStrategy());
     }
+    
+    private boolean conceptIs(I_GetConceptData concept, I_Position pos)
+			throws TerminologyException {
+		I_ConceptAttributePart a = getVersion(concept, pos);
+		return (a != null && concept.getConceptNid() == queryConstraintConcept
+				.getConceptNid());
+	}
 
     /**
      * Tests if the current concept has a status the same as the query
@@ -341,6 +425,52 @@ public class ConceptStatement extends RefsetSpecStatement {
 
         return false;
     }
+
+	private boolean conceptStatusIs(I_GetConceptData concept, I_Position pos)
+			throws TerminologyException {
+		I_ConceptAttributePart a = getVersion(concept, pos);
+		return (a != null && a.getStatusId() == queryConstraintConcept
+				.getConceptNid());
+	}
+
+	private boolean conceptStatusIsChildOf(I_GetConceptData concept,
+			I_Position pos) throws TerminologyException, IOException {
+		I_ConceptAttributePart a = getVersion(concept, pos);
+		if (a == null)
+			return false;
+		return conceptIsChildOf(Terms.get().getConcept(a.getStatusId()),
+				this.queryConstraintConcept, pos);
+	}
+
+	private boolean conceptStatusIsDescendantOf(I_GetConceptData concept,
+			I_Position pos) throws TerminologyException, IOException {
+		I_ConceptAttributePart a = getVersion(concept, pos);
+		if (a == null)
+			return false;
+		return conceptIsDescendantOf(Terms.get().getConcept(a.getStatusId()),
+				this.queryConstraintConcept, pos);
+	}
+
+	private boolean conceptStatusIsKindOf(I_GetConceptData concept,
+			I_Position pos) throws TerminologyException, IOException {
+		return conceptStatusIs(concept, pos)
+				|| conceptStatusIsDescendantOf(concept, pos);
+	}
+
+	private boolean conceptIsChildOf(I_GetConceptData c1, I_Position pos)
+			throws TerminologyException, IOException {
+		return conceptIsChildOf(c1, queryConstraintConcept, pos);
+	}
+
+	private boolean conceptIsDescendantOf(I_GetConceptData c1, I_Position pos)
+			throws TerminologyException, IOException {
+		return conceptIsDescendantOf(c1, queryConstraintConcept, pos);
+	}
+
+	private boolean conceptIsKindOf(I_GetConceptData concept, I_Position pos)
+			throws TerminologyException, IOException {
+		return conceptIs(concept, pos) || conceptIsDescendantOf(concept, pos);
+	}
 
     /**
      * Tests if the current concept has a status matching the query constraint,
@@ -442,5 +572,76 @@ public class ConceptStatement extends RefsetSpecStatement {
             throw new TerminologyException(e.getMessage());
         }
     }
+
+	private I_ConceptAttributePart getVersion(
+			I_GetConceptData conceptBeingTested, I_Position vn_is)
+			throws TerminologyException {
+		try {
+			ArrayList<I_AmPart> parts = new ArrayList<I_AmPart>(
+					conceptBeingTested.getConceptAttributes().getMutableParts());
+			I_AmPart part = getVersion(parts, vn_is, false);
+			return (I_ConceptAttributePart) part;
+		} catch (Exception e) {
+			throw new TerminologyException(e.getMessage());
+		}
+	}
+
+	private I_ConceptAttributePart getVersion(
+			I_GetConceptData conceptBeingTested, GROUPING_TYPE version,
+			I_Position v1_is, I_Position v2_is) throws TerminologyException {
+		return getVersion(conceptBeingTested, getVersion(version, v1_is, v2_is));
+	}
+
+	/**
+	 * Tests if the concept being tested has been added from v1 to v2
+	 * 
+	 * @param conceptBeingTested
+	 * @return
+	 * @throws TerminologyException
+	 * @throws IOException
+	 */
+	private boolean addedConcept(I_GetConceptData conceptBeingTested,
+			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
+			throws TerminologyException, IOException {
+		try {
+			// TODO version must be v2
+			I_ConceptAttributePart a1 = getVersion(conceptBeingTested, v1_is);
+			I_ConceptAttributePart a2 = getVersion(conceptBeingTested, v2_is);
+			return (a1 == null && a2 != null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new TerminologyException(e.getMessage());
+		}
+	}
+
+	private boolean changedConceptStatus(I_GetConceptData conceptBeingTested,
+			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
+			throws TerminologyException, IOException {
+		try {
+			I_ConceptAttributePart a1 = getVersion(conceptBeingTested, v1_is);
+			I_ConceptAttributePart a2 = getVersion(conceptBeingTested, v2_is);
+			return (a1 != null && a2 != null
+					&& a1.getVersion() != a2.getVersion() && a1.getStatusId() != a2
+					.getStatusId());
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new TerminologyException(e.getMessage());
+		}
+	}
+
+	private boolean changedConceptDefined(I_GetConceptData conceptBeingTested,
+			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
+			throws TerminologyException, IOException {
+		try {
+			I_ConceptAttributePart a1 = getVersion(conceptBeingTested, v1_is);
+			I_ConceptAttributePart a2 = getVersion(conceptBeingTested, v2_is);
+			return (a1 != null && a2 != null
+					&& a1.getVersion() != a2.getVersion() && a1.isDefined() != a2
+					.isDefined());
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new TerminologyException(e.getMessage());
+		}
+	}
 
 }

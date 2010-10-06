@@ -22,10 +22,12 @@ import java.util.Set;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
+import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery.GROUPING_TYPE;
 import org.dwfa.tapi.TerminologyException;
 
 public abstract class RefsetSpecComponent {
@@ -63,8 +65,10 @@ public abstract class RefsetSpecComponent {
         return null;
     }
 
-    public abstract boolean execute(I_AmTermComponent component, Collection<I_ShowActivity> activities)
-            throws IOException, TerminologyException;
+	public abstract boolean execute(I_AmTermComponent component,
+			GROUPING_TYPE version, I_Position v1Is, I_Position v2Is,
+			Collection<I_ShowActivity> activities) throws IOException,
+			TerminologyException;
 
     public abstract I_RepresentIdSet getPossibleConcepts(I_RepresentIdSet parentPossibleConcepts,
             Collection<I_ShowActivity> activities) throws TerminologyException, IOException;

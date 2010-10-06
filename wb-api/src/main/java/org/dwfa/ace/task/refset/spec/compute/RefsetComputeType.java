@@ -35,6 +35,9 @@ public enum RefsetComputeType {
         case NOT_CONCEPT_CONTAINS_DESC:
         case CONCEPT_CONTAINS_DESC:
             return DESCRIPTION;
+		case V1:
+		case V2:
+			return CONCEPT;
         default:
             throw new RuntimeException("Can't handle queryToken: " + groupingToken);
         }
@@ -103,6 +106,26 @@ public enum RefsetComputeType {
         case REL_DESTINATION_IS_CHILD_OF:
         case REL_DESTINATION_IS_DESCENDENT_OF:
             return RELATIONSHIP;
+		case V1_IS:
+		case V2_IS:
+		case ADDED_CONCEPT:
+		case CHANGED_CONCEPT_STATUS:
+		case CHANGED_CONCEPT_DEFINED:
+			return CONCEPT;
+		case ADDED_DESCRIPTION:
+		case CHANGED_DESCRIPTION_CASE:
+		case CHANGED_DESCRIPTION_LANGUAGE:
+		case CHANGED_DESCRIPTION_STATUS:
+		case CHANGED_DESCRIPTION_TERM:
+		case CHANGED_DESCRIPTION_TYPE:
+			return DESCRIPTION;
+		case ADDED_RELATIONSHIP:
+		case CHANGED_RELATIONSHIP_CHARACTERISTIC:
+		case CHANGED_RELATIONSHIP_GROUP:
+		case CHANGED_RELATIONSHIP_REFINABILITY:
+		case CHANGED_RELATIONSHIP_STATUS:
+		case CHANGED_RELATIONSHIP_TYPE:
+			return RELATIONSHIP;
         default:
             throw new RuntimeException("Can't handle queryToken: " + groupingToken);
         }

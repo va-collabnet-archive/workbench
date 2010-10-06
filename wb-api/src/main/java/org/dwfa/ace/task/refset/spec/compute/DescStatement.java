@@ -19,24 +19,33 @@ package org.dwfa.ace.task.refset.spec.compute;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.ScoreDoc;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
+import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery.GROUPING_TYPE;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.time.TimeUtil;
@@ -118,36 +127,129 @@ public class DescStatement extends RefsetSpecStatement {
         }
     }
 
-    public boolean getStatementResult(I_AmTermComponent component) throws IOException, TerminologyException {
+    public boolean getStatementResult(I_AmTermComponent component, GROUPING_TYPE version, I_Position v1_is,
+			I_Position v2_is) throws IOException, TerminologyException {
         if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
             I_DescriptionVersioned descriptionVersioned = (I_DescriptionVersioned) component;
-            I_DescriptionTuple descriptionTuple = descriptionVersioned.getLastTuple();
+			I_DescriptionTuple descriptionTuple = descriptionVersioned
+					.getLastTuple();
+
+			if (version != null || v1_is != null || v2_is != null) {
+				if (version == null)
+					throw new TerminologyException("Not in scope of V1 or V2: "
+							+ tokenEnum + " " + descriptionTuple.getText());
+				if (v1_is == null)
+					throw new TerminologyException("Need to set V1 IS: "
+							+ tokenEnum + " " + descriptionTuple.getText());
+				if (v2_is == null)
+					throw new TerminologyException("Need to set V2 IS: "
+							+ tokenEnum + " " + descriptionTuple.getText());
+			}
 
             switch (tokenEnum) {
             case DESC_IS:
+				if (version == null) {
                 return descriptionIs(descriptionTuple);
+				} else {
+					return descriptionIs(descriptionVersioned, getVersion(
+							version, v1_is, v2_is));
+				}
             case DESC_IS_MEMBER_OF:
+				if (version == null) {
                 return descriptionIsMemberOf(descriptionTuple);
+				} else {
+					throw new TerminologyException(tokenEnum
+							+ ": Unsupported operation for version scope.");
+				}
             case DESC_STATUS_IS:
+				if (version == null) {
                 return descriptionStatusIs(descriptionTuple);
+				} else {
+					return descriptionStatusIs(descriptionVersioned,
+							getVersion(version, v1_is, v2_is));
+				}
             case DESC_STATUS_IS_CHILD_OF:
+				if (version == null) {
                 return descriptionStatusIsChildOf(descriptionTuple);
+				} else {
+					return descriptionStatusIsChildOf(descriptionVersioned,
+							getVersion(version, v1_is, v2_is));
+				}
             case DESC_STATUS_IS_KIND_OF:
+				if (version == null) {
                 return descriptionStatusIsKindOf(descriptionTuple);
+				} else {
+					return descriptionStatusIsKindOf(descriptionVersioned,
+							getVersion(version, v1_is, v2_is));
+				}
             case DESC_STATUS_IS_DESCENDENT_OF:
-                return descriptionStatusIsDescendentOf(descriptionTuple);
+				if (version == null) {
+           		     return descriptionStatusIsDescendentOf(descriptionTuple);
+				} else {
+					return descriptionStatusIsDescendentOf(
+							descriptionVersioned, getVersion(version, v1_is,
+									v2_is));
+				}
             case DESC_TYPE_IS:
+				if (version == null) {
                 return descriptionTypeIs(descriptionTuple);
+				} else {
+					return descriptionTypeIs(descriptionVersioned, getVersion(
+							version, v1_is, v2_is));
+				}
             case DESC_TYPE_IS_CHILD_OF:
+				if (version == null) {
                 return descriptionTypeIsChildOf(descriptionTuple);
+				} else {
+					return descriptionTypeIsChildOf(descriptionVersioned,
+							getVersion(version, v1_is, v2_is));
+				}
             case DESC_TYPE_IS_KIND_OF:
+				if (version == null) {
                 return descriptionTypeIsKindOf(descriptionTuple);
+				} else {
+					return descriptionTypeIsKindOf(descriptionVersioned,
+							getVersion(version, v1_is, v2_is));
+				}
             case DESC_TYPE_IS_DESCENDENT_OF:
+				if (version == null) {
                 return descriptionTypeIsDescendentOf(descriptionTuple);
+				} else {
+					return descriptionTypeIsDescendentOf(descriptionVersioned,
+							getVersion(version, v1_is, v2_is));
+				}
             case DESC_REGEX_MATCH:
+				if (version == null) {
                 return descriptionRegexMatch(descriptionTuple);
+				} else {
+					return descriptionRegexMatch(descriptionVersioned,
+							getVersion(version, v1_is, v2_is));
+				}
             case DESC_LUCENE_MATCH:
+				if (version == null) {
                 return descriptionLuceneMatch(descriptionTuple);
+				} else {
+					throw new TerminologyException(tokenEnum
+							+ ": Unsupported operation for version scope.");
+				}
+			case ADDED_DESCRIPTION:
+				return addedDescription(descriptionVersioned, version, v1_is,
+						v2_is);
+			case CHANGED_DESCRIPTION_CASE:
+				return changedDescriptionCase(descriptionVersioned, version,
+						v1_is, v2_is);
+			case CHANGED_DESCRIPTION_LANGUAGE:
+				return changedDescriptionLanguage(descriptionVersioned,
+						version, v1_is, v2_is);
+			case CHANGED_DESCRIPTION_STATUS:
+				return changedDescriptionStatus(descriptionVersioned, version,
+						v1_is, v2_is);
+			case CHANGED_DESCRIPTION_TERM:
+				return changedDescriptionTerm(descriptionVersioned, version,
+						v1_is, v2_is);
+			case CHANGED_DESCRIPTION_TYPE:
+				return changedDescriptionType(descriptionVersioned, version,
+						v1_is, v2_is);
             default:
                 throw new RuntimeException("Can't handle queryToken: " + queryToken);
             }
@@ -213,6 +315,15 @@ public class DescStatement extends RefsetSpecStatement {
         case DESC_REGEX_MATCH:
             possibleConcepts.or(parentPossibleConcepts);
             break;
+		case ADDED_DESCRIPTION:
+		case CHANGED_DESCRIPTION_CASE:
+		case CHANGED_DESCRIPTION_LANGUAGE:
+		case CHANGED_DESCRIPTION_STATUS:
+		case CHANGED_DESCRIPTION_TERM:
+		case CHANGED_DESCRIPTION_TYPE:
+			// TODO - EKM
+			possibleConcepts.or(parentPossibleConcepts);
+			break;
         default:
             throw new RuntimeException("Can't handle queryToken: " + queryToken);
         }
@@ -502,4 +613,220 @@ public class DescStatement extends RefsetSpecStatement {
             throw new TerminologyException(e.getMessage());
         }
     }
+
+	private boolean addedDescription(
+			I_DescriptionVersioned descriptionBeingTested,
+			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
+			throws TerminologyException, IOException {
+		try {
+			I_DescriptionPart a1 = getVersion(descriptionBeingTested, v1_is);
+			I_DescriptionPart a2 = getVersion(descriptionBeingTested, v2_is);
+			return (a1 == null && a2 != null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new TerminologyException(e.getMessage());
+		}
+	}
+
+	private boolean changedDescriptionCase(
+			I_DescriptionVersioned descriptionBeingTested,
+			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
+			throws TerminologyException, IOException {
+		try {
+			I_DescriptionPart a1 = getVersion(descriptionBeingTested, v1_is);
+			I_DescriptionPart a2 = getVersion(descriptionBeingTested, v2_is);
+			return (a1 != null && a2 != null
+					&& a1.getVersion() != a2.getVersion() && a1
+					.isInitialCaseSignificant() != a2
+					.isInitialCaseSignificant());
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new TerminologyException(e.getMessage());
+		}
+	}
+
+	private boolean changedDescriptionLanguage(
+			I_DescriptionVersioned descriptionBeingTested,
+			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
+			throws TerminologyException, IOException {
+		try {
+			I_DescriptionPart a1 = getVersion(descriptionBeingTested, v1_is);
+			I_DescriptionPart a2 = getVersion(descriptionBeingTested, v2_is);
+			return (a1 != null && a2 != null
+					&& a1.getVersion() != a2.getVersion() && !a1.getLang()
+					.equals(a2.getLang()));
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new TerminologyException(e.getMessage());
+		}
+	}
+
+	private boolean changedDescriptionStatus(
+			I_DescriptionVersioned descriptionBeingTested,
+			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
+			throws TerminologyException, IOException {
+		try {
+			I_DescriptionPart a1 = getVersion(descriptionBeingTested, v1_is);
+			I_DescriptionPart a2 = getVersion(descriptionBeingTested, v2_is);
+			return (a1 != null && a2 != null
+					&& a1.getVersion() != a2.getVersion() && a1.getStatusId() != a2
+					.getStatusId());
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new TerminologyException(e.getMessage());
+		}
+	}
+
+	private boolean changedDescriptionTerm(
+			I_DescriptionVersioned descriptionBeingTested,
+			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
+			throws TerminologyException, IOException {
+		try {
+			I_DescriptionPart a1 = getVersion(descriptionBeingTested, v1_is);
+			I_DescriptionPart a2 = getVersion(descriptionBeingTested, v2_is);
+			return (a1 != null && a2 != null
+					&& a1.getVersion() != a2.getVersion() && !a1.getText()
+					.equals(a2.getText()));
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new TerminologyException(e.getMessage());
+		}
+	}
+
+	private boolean changedDescriptionType(
+			I_DescriptionVersioned descriptionBeingTested,
+			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
+			throws TerminologyException, IOException {
+		try {
+			I_DescriptionPart a1 = getVersion(descriptionBeingTested, v1_is);
+			I_DescriptionPart a2 = getVersion(descriptionBeingTested, v2_is);
+			return (a1 != null && a2 != null
+					&& a1.getVersion() != a2.getVersion() && a1.getTypeId() != a2
+					.getTypeId());
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new TerminologyException(e.getMessage());
+		}
+	}
+
+	private I_DescriptionPart getVersion(
+			I_DescriptionVersioned descriptionBeingTested, I_Position vn_is)
+			throws TerminologyException {
+		try {
+			ArrayList<I_AmPart> parts = new ArrayList<I_AmPart>(
+					descriptionBeingTested.getMutableParts());
+			I_AmPart part = getVersion(parts, vn_is, false);
+			return (I_DescriptionPart) part;
+			// I_DescriptionPart an = null;
+			// for (I_DescriptionPart a :
+			// descriptionBeingTested.getMutableParts()) {
+			// // Must be on the path
+			// // Find the greatest version <= the one of interest
+			// if (a.getPathId() == vn_is.getPath().getConceptId()
+			// && a.getVersion() <= vn_is.getVersion()
+			// && (an == null || an.getVersion() < a.getVersion()))
+			// an = a;
+			// }
+			// return an;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new TerminologyException(e.getMessage());
+		}
+	}
+
+	private boolean descriptionIs(
+			I_DescriptionVersioned descriptionBeingTested, I_Position pos)
+			throws TerminologyException {
+		I_DescriptionVersioned queryConstraintDesc = (I_DescriptionVersioned) queryConstraint;
+		I_DescriptionPart a = getVersion(descriptionBeingTested, pos);
+		return (a != null && descriptionBeingTested.getDescId() == queryConstraintDesc
+				.getDescId());
+	}
+
+	private boolean descriptionStatusIs(
+			I_DescriptionVersioned descriptionBeingTested, I_Position pos)
+			throws TerminologyException {
+		I_DescriptionPart a = getVersion(descriptionBeingTested, pos);
+		return (a != null && a.getStatusId() == ((I_GetConceptData) queryConstraint)
+				.getConceptNid());
+	}
+
+	private boolean descriptionStatusIsChildOf(
+			I_DescriptionVersioned descriptionBeingTested, I_Position pos)
+			throws TerminologyException, IOException {
+		I_DescriptionPart a = getVersion(descriptionBeingTested, pos);
+		if (a == null)
+			return false;
+		return conceptIsChildOf(Terms.get().getConcept(a.getStatusId()),
+				(I_GetConceptData) queryConstraint, pos);
+	}
+
+	private boolean descriptionStatusIsDescendentOf(
+			I_DescriptionVersioned descriptionBeingTested, I_Position pos)
+			throws TerminologyException, IOException {
+		I_DescriptionPart a = getVersion(descriptionBeingTested, pos);
+		if (a == null)
+			return false;
+		return conceptIsDescendantOf(Terms.get().getConcept(a.getStatusId()),
+				(I_GetConceptData) queryConstraint, pos);
+	}
+
+	private boolean descriptionStatusIsKindOf(
+			I_DescriptionVersioned descriptionBeingTested, I_Position pos)
+			throws TerminologyException, IOException {
+		return descriptionStatusIs(descriptionBeingTested, pos)
+				|| descriptionStatusIsDescendentOf(descriptionBeingTested, pos);
+	}
+
+	private boolean descriptionTypeIs(
+			I_DescriptionVersioned descriptionBeingTested, I_Position pos)
+			throws TerminologyException {
+		I_DescriptionPart a = getVersion(descriptionBeingTested, pos);
+		return (a != null && a.getTypeId() == ((I_GetConceptData) queryConstraint)
+				.getConceptNid());
+	}
+
+	private boolean descriptionTypeIsChildOf(
+			I_DescriptionVersioned descriptionBeingTested, I_Position pos)
+			throws TerminologyException, IOException {
+		I_DescriptionPart a = getVersion(descriptionBeingTested, pos);
+		if (a == null)
+			return false;
+		return conceptIsChildOf(Terms.get().getConcept(a.getTypeId()),
+				(I_GetConceptData) queryConstraint, pos);
+	}
+
+	private boolean descriptionTypeIsDescendentOf(
+			I_DescriptionVersioned descriptionBeingTested, I_Position pos)
+			throws TerminologyException, IOException {
+		I_DescriptionPart a = getVersion(descriptionBeingTested, pos);
+		if (a == null)
+			return false;
+		return conceptIsDescendantOf(Terms.get().getConcept(a.getTypeId()),
+				(I_GetConceptData) queryConstraint, pos);
+	}
+
+	private boolean descriptionTypeIsKindOf(
+			I_DescriptionVersioned descriptionBeingTested, I_Position pos)
+			throws TerminologyException, IOException {
+		return descriptionTypeIs(descriptionBeingTested, pos)
+				|| descriptionTypeIsDescendentOf(descriptionBeingTested, pos);
+	}
+
+	private boolean descriptionRegexMatch(
+			I_DescriptionVersioned descriptionBeingTested, I_Position pos)
+			throws TerminologyException {
+		if (regexPattern == null) {
+			String queryConstraintString = (String) queryConstraint;
+			regexPattern = Pattern.compile(queryConstraintString);
+			AceLog.getAppLog().info(
+					"Compiling regex: " + regexPattern + " into: "
+							+ regexPattern);
+		}
+		I_DescriptionPart a = getVersion(descriptionBeingTested, pos);
+		if (a == null)
+			return false;
+		return regexPattern.matcher(a.getText()).find();
+	}
+
 }
