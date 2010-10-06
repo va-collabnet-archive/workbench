@@ -10,9 +10,7 @@
 	<artifactId>ihtsdo-generate-econcepts</artifactId>
 	<version>2010-07-31</version>
 	<packaging>pom</packaging>
-	<name>ihtsdo-generate-econcepts -- Convert SNOMED Stated and Inferred to eConcepts</name>
-	<description>Convert SNOMED SCT RF1 Inferred release to eConcepts</description>
-
+	<name>ihtsdo-generate-econcepts</name>
 	<distributionManagement>
 	<site>
       <id>samples.site</id>

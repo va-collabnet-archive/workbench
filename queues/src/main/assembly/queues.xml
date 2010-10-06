@@ -1,0 +1,13 @@
+<assembly>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <directory>src/main/queues</directory>
+      <outputDirectory>/queues</outputDirectory>
+    </fileSet>
+  </fileSets>
+  <includeBaseDirectory>false</includeBaseDirectory>
+</assembly>
+

@@ -25,6 +25,16 @@
             <directoryMode>0755</directoryMode>
         </fileSet>
         <fileSet>
+            <directory>target/generated-resources/queues/</directory>
+            <lineEnding>keep</lineEnding>
+            <filtered>false</filtered>
+            <useStrictFiltering>false</useStrictFiltering>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <outputDirectory>queues</outputDirectory>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
+        <fileSet>
             <directory>target/generated-resources/plugins/</directory>
             <lineEnding>keep</lineEnding>
             <filtered>false</filtered>

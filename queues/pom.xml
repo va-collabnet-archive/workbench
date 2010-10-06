@@ -9,4 +9,26 @@
   <packaging>pom</packaging>
   <name>Workbench Queues</name>
   <description>Workbench Queues</description>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-profiles</id>
+            <configuration>
+              <descriptors>
+                <descriptor>src/main/assembly/queues.xml</descriptor>
+              </descriptors>
+            </configuration>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <phase>package</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
