@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,6 +36,7 @@ import org.dwfa.ace.api.LineageHelper;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.util.TupleVersionPart;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -118,24 +119,24 @@ public abstract class RefsetUtilities {
 
     private I_IntSet getStatuses() throws Exception {
         return getIntSet(
-            ArchitectonicAuxiliary.Concept.CURRENT, 
+            ArchitectonicAuxiliary.Concept.CURRENT,
             ArchitectonicAuxiliary.Concept.ACTIVE,
             ArchitectonicAuxiliary.Concept.PENDING_MOVE,
-            ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED, 
+            ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED,
             ArchitectonicAuxiliary.Concept.DO_NOT_EDIT_FOR_RELEASE);
     }
 
     private boolean isValidStatus(I_ConceptAttributeTuple att) throws TerminologyException, IOException {
-        int pendingMoveStatusId = 
+        int pendingMoveStatusId =
                 termFactory.getConcept(ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids()).getConceptId();
-        int currentUnreviewedStatusId = 
+        int currentUnreviewedStatusId =
                 termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()).getConceptId();
-        int noEditStatusId = 
+        int noEditStatusId =
                 termFactory.getConcept(ArchitectonicAuxiliary.Concept.DO_NOT_EDIT_FOR_RELEASE.getUids()).getConceptId();
-        
+
         return (att.getConceptStatus() == currentStatusId ||
                 att.getConceptStatus() == activeStatusId ||
-                att.getConceptStatus() == pendingMoveStatusId || 
+                att.getConceptStatus() == pendingMoveStatusId ||
                 att.getConceptStatus() == currentUnreviewedStatusId ||
                 att.getConceptStatus() == noEditStatusId);
     }
@@ -143,11 +144,11 @@ public abstract class RefsetUtilities {
     protected boolean isActiveStatus(int statusId) {
         return (statusId == currentStatusId || statusId == activeStatusId);
     }
-    
-    public Set<Integer> getAncestorsOfConcept(int conceptId, ClosestDistanceHashSet concepts) 
+
+    public Set<Integer> getAncestorsOfConcept(int conceptId, ClosestDistanceHashSet concepts)
             throws IOException, Exception {
 
-        Set<Integer> ancestors = new HashSet<Integer>(); 
+        Set<Integer> ancestors = new HashSet<Integer>();
         for (I_GetConceptData parent : new LineageHelper().getAllAncestors(termFactory.getConcept(conceptId))) {
             ancestors.add(parent.getConceptId());
         }
@@ -156,8 +157,8 @@ public abstract class RefsetUtilities {
 
     public List<Integer> getChildrenOfConcept(int conceptId) throws IOException, Exception {
 
-        List<Integer> descendants = new ArrayList<Integer>(); 
-        
+        List<Integer> descendants = new ArrayList<Integer>();
+
         LineageHelper lineageHelper = new LineageHelper();
         for (I_GetConceptData child : lineageHelper.getAllDescendants(
                 termFactory.getConcept(conceptId), lineageHelper.new FirstRelationOnly())) {
@@ -165,10 +166,10 @@ public abstract class RefsetUtilities {
         }
         return descendants;
      }
-    
+
     public List<Integer> getDescendantsOfConcept(int conceptId) throws IOException, Exception {
 
-       List<Integer> descendants = new ArrayList<Integer>(); 
+       List<Integer> descendants = new ArrayList<Integer>();
        descendants.add(conceptId);
        for (I_GetConceptData child : new LineageHelper().getAllDescendants(termFactory.getConcept(conceptId))) {
            descendants.add(child.getConceptId());
@@ -183,7 +184,7 @@ public abstract class RefsetUtilities {
         I_IntSet status = termFactory.newIntSet();
         status.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId());
         status.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getConceptId());
-        
+
         I_IntSet is_a = termFactory.newIntSet();
         if (this.altIsA == null) {
             is_a.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
@@ -195,17 +196,17 @@ public abstract class RefsetUtilities {
         I_GetConceptData refsetRoot = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
 
         Set<I_GetConceptData> refsetChildren = refsetRoot.getDestRelOrigins(status, is_a, null, false);
-        
-        int refsetPurposeRelId = 
+
+        int refsetPurposeRelId =
             termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids()).getConceptId();
-        
+
         for (I_GetConceptData refsetConcept : refsetChildren) {
             Set<I_GetConceptData> purposeConcepts = new HashSet<I_GetConceptData>();
 
             List<? extends I_RelVersioned> rels = refsetConcept.getSourceRels();
             for (I_RelVersioned rel : rels) {
                 List<I_RelTuple> tuples = rel.getTuples();
-                for (I_RelTuple tuple : tuples) {                    
+                for (I_RelTuple tuple : tuples) {
                     if (isActiveStatus(tuple.getStatusId()) && tuple.getRelTypeId() == refsetPurposeRelId) {
                         purposeConcepts.add(getConcept(tuple.getC2Id()));
                     }
@@ -275,7 +276,7 @@ public abstract class RefsetUtilities {
     }
 
     public I_GetConceptData getMemberSetConcept(int refsetId) throws Exception {
-        I_IntSet activeStatusIntSet = 
+        I_IntSet activeStatusIntSet =
             getIntSet(ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.ACTIVE);
         I_IntSet generatesRelIntSet = getIntSet(ConceptConstants.GENERATES_REL);
 
@@ -296,7 +297,7 @@ public abstract class RefsetUtilities {
 
     /**
      * Retires the latest version of a specified extension.
-     * 
+     *
      * @param extensionPart The extension to check.
      * @throws Exception
      */
@@ -347,7 +348,7 @@ public abstract class RefsetUtilities {
 
     /**
      * Adds a particular concept to the member set.
-     * 
+     *
      * @param conceptId the concept id of the concept we wish to add to the
      *            member set.
      * @param includeTypeConceptId
@@ -388,7 +389,7 @@ public abstract class RefsetUtilities {
 
     /**
      * Adds a particular concept to the member set.
-     * 
+     *
      * @param conceptId the concept id of the concept we wish to add to the
      *            member set.
      * @param includeTypeConceptId
@@ -396,9 +397,9 @@ public abstract class RefsetUtilities {
      */
     public void addToMemberSetAsParent(int conceptId, int memberSetId) throws Exception {
 
-        I_ThinExtByRefVersioned ext = 
+        I_ThinExtByRefVersioned ext =
             getExtensionForComponent(conceptId, memberSetId, ConceptConstants.PARENT_MARKER.localize().getNid());
-        
+
         if (ext != null) {
             I_ThinExtByRefPart clone = getLatestVersion(ext).duplicatePart();
             I_ThinExtByRefPartConcept conceptClone = (I_ThinExtByRefPartConcept) clone;
@@ -434,16 +435,16 @@ public abstract class RefsetUtilities {
     protected I_ThinExtByRefVersioned getExtensionForComponent(int conceptId, int refset, int extType) throws IOException {
 
         List<I_ThinExtByRefVersioned> exts = termFactory.getAllExtensionsForComponent(conceptId);
-        I_ThinExtByRefVersioned candidate = null; 
+        I_ThinExtByRefVersioned candidate = null;
         for (I_ThinExtByRefVersioned ext : exts) {
             if (ext.getRefsetId() == refset) {
                 // make sure the extension is not retired
                 I_ThinExtByRefPartConcept latestVersion = (I_ThinExtByRefPartConcept) getLatestVersion(ext);
-                if ((latestVersion.getC1id() == extType) && 
+                if ((latestVersion.getC1id() == extType) &&
                     (latestVersion.getStatusId() != retiredConceptId)) {
                     if (candidate != null) {
                         // cannot handle more than one (we already have a candidate)
-                        throw new TerminologyRuntimeException( 
+                        throw new TerminologyRuntimeException(
                             "Found more than one active extension for refset '" +
                             conceptToString(refset) + "' on concept '" + conceptToString(conceptId) + "'.");
                     }
@@ -462,30 +463,15 @@ public abstract class RefsetUtilities {
     public int getRelTypeTarget(int conceptId, ConceptSpec relType) throws Exception {
         I_GetConceptData concept = getConcept(conceptId);
 
-        List<I_RelTuple> srcRels = concept.getSourceRelTuples(null, getIntSet(relType), null, false, true);
-
         // ConceptId, Version
         HashMap<Integer, Integer> targets = new HashMap<Integer, Integer>();
-        
-        for (I_RelTuple srcRel : srcRels) {
-            int srcRelTargetId = srcRel.getC2Id();
-            int srcRelVersion = srcRel.getVersion();
-            if (targets.containsKey(srcRelTargetId)) {
-                int latestVersion = targets.get(srcRelTargetId);
-                if (srcRel.getVersion() > latestVersion) {
-                    if (isActiveStatus(srcRel.getStatusId())) {
-                        targets.put(srcRelTargetId, latestVersion);
-                    } else {
-                        targets.remove(srcRelTargetId);
-                    }
-                }
-            } else {
-                if (isActiveStatus(srcRel.getStatusId())) {
-                    targets.put(srcRelTargetId, srcRelVersion);
-                }
+
+        for(I_RelTuple srcRel : TupleVersionPart.getLatestMatchingTuples(concept.getSourceRelTuples(null, getIntSet(relType), null, false, true))){
+            if (isActiveStatus(srcRel.getStatusId())) {
+                targets.put(srcRel.getC2Id(), srcRel.getVersion());
             }
         }
-        
+
         if (targets.size() == 0) {
             throw new TerminologyException("A current source relationship of type '" + relType.getDescription()
                 + "' was not found for concept " + concept.getId().getUIDs().iterator().next());
@@ -505,7 +491,7 @@ public abstract class RefsetUtilities {
                 latestVersion = version;
             }
         }
-        
+
         return latestTargetId;
     }
 
@@ -536,7 +522,7 @@ public abstract class RefsetUtilities {
 //            conceptCache.put(id, concept);
 //        }
 //        return concept;
-        
+
         return termFactory.getConcept(id);
     }
 
@@ -551,7 +537,7 @@ public abstract class RefsetUtilities {
         name.append(",\"").append(conceptData).append("\"]");
         return name.toString();
     }
-    
+
     private String conceptToString(int id) {
         try {
             return termFactory.getConcept(id).getInitialText();
@@ -559,5 +545,5 @@ public abstract class RefsetUtilities {
             return Integer.toString(id);
         }
     }
-    
+
 }
