@@ -61,6 +61,8 @@ public enum TK_REFSET_TYPE {
                 return CID_FLOAT;
             case 12:
                 return CID_LONG;
+            case 13:
+            	return LONG;
             }
             throw new UnsupportedOperationException();
         }

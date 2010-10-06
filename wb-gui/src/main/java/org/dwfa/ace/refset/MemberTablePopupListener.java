@@ -136,12 +136,15 @@ public class MemberTablePopupListener extends MouseAdapter {
             if (config.getEditingPathSet().size() > 0) {
                 int column = table.columnAtPoint(e.getPoint());
                 int row = table.rowAtPoint(e.getPoint());
-                selectedObject = (StringWithExtTuple) table.getValueAt(row, column);
-                makePopup(e);
-                if (popup != null) {
-                    popup.show(e.getComponent(), e.getX(), e.getY());
+                Object obj = table.getValueAt(row, column);
+                if (obj.getClass().isAssignableFrom(StringWithExtTuple.class)) {
+                    selectedObject = (StringWithExtTuple) table.getValueAt(row, column);
+                    makePopup(e);
+                    if (popup != null) {
+                        popup.show(e.getComponent(), e.getX(), e.getY());
+                    }
                 }
-            } else {
+             } else {
                 JOptionPane.showMessageDialog(table.getTopLevelAncestor(),
                     "You must select at least one path to edit on...");
             }

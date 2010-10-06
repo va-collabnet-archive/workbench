@@ -232,6 +232,13 @@ public class PositionMapper {
             return RELATIVE_POSITION.EQUAL;
          case TIME:
             if (part1.getTime() == part2.getTime()) {
+            	if (positionDistance[part1.getSapNid()] > 
+                	positionDistance[part2.getSapNid()]) {
+            		return RELATIVE_POSITION.BEFORE;
+            	} else if (positionDistance[part1.getSapNid()] < 
+            			positionDistance[part2.getSapNid()]) {
+                    return RELATIVE_POSITION.AFTER;
+                } 
                 return RELATIVE_POSITION.CONTRADICTION;
             } else if (part1.getTime() < part2.getTime()) {
                 return RELATIVE_POSITION.BEFORE;

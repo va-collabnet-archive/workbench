@@ -84,7 +84,7 @@ public class RefsetSpec {
             I_GetConceptData computeType = getLatestSourceRelationshipTarget(spec, refsetComputeTypeRel);
 
             if (computeType == null) {
-                // backwards compatability - if no compute type has been specified, then a default compute type of
+                // backwards compatibility - if no compute type has been specified, then a default compute type of
                 // concept is used
                 return true;
             } else {
@@ -119,7 +119,7 @@ public class RefsetSpec {
             I_GetConceptData computeType = getLatestSourceRelationshipTarget(spec, refsetComputeTypeRel);
 
             if (computeType == null) {
-                // backwards compatability - if no compute type has been specified, then a default compute type of
+                // backwards compatibility - if no compute type has been specified, then a default compute type of
                 // concept is used
                 return false;
             } else {
@@ -142,7 +142,7 @@ public class RefsetSpec {
             I_GetConceptData computeType = getLatestSourceRelationshipTarget(spec, refsetComputeTypeRel);
 
             if (computeType == null) {
-                // backwards compatability - if no compute type has been specified, then a default compute type of
+                // backwards compatibility - if no compute type has been specified, then a default compute type of
                 // concept is used
                 return false;
             } else {
@@ -343,9 +343,9 @@ public class RefsetSpec {
                 Collection<? extends I_ExtendByRef> promotionExtensions =
                         Terms.get().getRefsetExtensionMembers(promotionRefsetConcept.getConceptNid());
                 for (I_ExtendByRef promotionExtension : promotionExtensions) {
-                    if (promotionExtension.getComponentId() == memberRefsetConcept.getConceptNid()) {
+                    if (promotionExtension.getComponentNid() == memberRefsetConcept.getConceptNid()) {
                         I_ExtendByRefPart latestPart = helper.getLatestPart(promotionExtension);
-                        if (currentStatuses.contains(latestPart.getStatusId())) {
+                        if (currentStatuses.contains(latestPart.getStatusNid())) {
                             if (latestPart instanceof I_ExtendByRefPartCid) {
                                 I_ExtendByRefPartCid latestConceptPart = (I_ExtendByRefPartCid) latestPart;
                                 return Terms.get().getConcept(latestConceptPart.getC1id()).getInitialText();
@@ -374,9 +374,9 @@ public class RefsetSpec {
                 Collection<? extends I_ExtendByRef> promotionExtensions =
                         Terms.get().getRefsetExtensionMembers(promotionRefsetConcept.getConceptNid());
                 for (I_ExtendByRef promotionExtension : promotionExtensions) {
-                    if (promotionExtension.getComponentId() == memberRefsetConcept.getConceptNid()) {
+                    if (promotionExtension.getComponentNid() == memberRefsetConcept.getConceptNid()) {
                         I_ExtendByRefPart latestPart = helper.getLatestPart(promotionExtension);
-                        if (currentIds.contains(latestPart.getStatusId())) {
+                        if (currentIds.contains(latestPart.getStatusNid())) {
                             if (latestPart instanceof I_ExtendByRefPartCid) {
                                 I_ExtendByRefPartCid latestConceptPart = (I_ExtendByRefPartCid) latestPart;
                                 I_GetConceptData status = Terms.get().getConcept(latestConceptPart.getC1id());
@@ -398,9 +398,7 @@ public class RefsetSpec {
     }
 
     public void modifyOverallSpecStatus(I_GetConceptData newStatus) throws Exception {
-        try {
-
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
             helper.setAutocommitActive(true);
             I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
             I_GetConceptData promotionRefsetConcept = getPromotionRefsetConcept();
@@ -420,15 +418,9 @@ public class RefsetSpec {
                     Terms.get().commit();
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new Exception("Error modifying the overall status of the refset : " + e.getLocalizedMessage());
-        }
     }
 
     public void setLastComputeTime(Long time) throws Exception {
-        try {
-
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(config);
             boolean prevAutoCommit = helper.isAutocommitActive();
             helper.setAutocommitActive(false);
@@ -440,10 +432,6 @@ public class RefsetSpec {
             }
             Terms.get().addUncommittedNoChecks(lastComputeTimeConcept);
             helper.setAutocommitActive(prevAutoCommit);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new Exception("Error setting the last compute time of refset : " + e.getLocalizedMessage());
-        }
     }
 
     public I_GetConceptData getEditConcept() throws TerminologyException, IOException {
@@ -456,8 +444,7 @@ public class RefsetSpec {
 
             return getLatestSourceRelationshipTarget(memberRefsetConcept, editTimeRel);
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new IOException(e);
         }
     }
 
@@ -472,8 +459,7 @@ public class RefsetSpec {
 
             return getLatestSourceRelationshipTarget(memberRefsetConcept, computeTimeRel);
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new IOException(e);
         }
     }
 
