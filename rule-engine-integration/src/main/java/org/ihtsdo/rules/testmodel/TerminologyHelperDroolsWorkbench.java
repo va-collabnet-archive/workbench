@@ -235,7 +235,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 					config.getConflictResolutionStrategy())) {
 					if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid()) {
 						if (tuple.getText().lastIndexOf("(") > -1 && tuple.getText().lastIndexOf(")") > -1) {
-							currentSemtags.add(tuple.getText().substring(tuple.getText().lastIndexOf("(")+1,tuple.getText().lastIndexOf(")")-1));
+							currentSemtags.add(tuple.getText().substring(tuple.getText().lastIndexOf("(")+1,tuple.getText().lastIndexOf(")")));
 						}
 					}
 			}
