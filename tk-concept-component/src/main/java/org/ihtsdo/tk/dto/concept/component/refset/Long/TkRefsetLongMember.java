@@ -53,7 +53,7 @@ public class TkRefsetLongMember extends TkRefsetAbstractMember<TkRefsetLongRevis
 
     @Override
     public TK_REFSET_TYPE getType() {
-        return TK_REFSET_TYPE.INT;
+        return TK_REFSET_TYPE.LONG;
     }
 
     public List<TkRefsetLongRevision> getRevisionList() {

@@ -29,12 +29,12 @@ public class ERefsetLongMember extends TkRefsetLongMember {
         }
         int partCount = m.getMutableParts().size();
         refsetUuid = Terms.get().nidToUuid(m.getRefsetId());
-        componentUuid = Terms.get().nidToUuid(m.getComponentId());
+        componentUuid = Terms.get().nidToUuid(m.getComponentNid());
 
         I_ExtendByRefPartLong part = (I_ExtendByRefPartLong) m.getMutableParts().get(0);
         longValue = part.getLongValue();
-        pathUuid = Terms.get().nidToUuid(part.getPathId());
-        statusUuid = Terms.get().nidToUuid(part.getStatusId());
+        pathUuid = Terms.get().nidToUuid(part.getPathNid());
+        statusUuid = Terms.get().nidToUuid(part.getStatusNid());
         time = part.getTime();
         if (partCount > 1) {
             revisions = new ArrayList<TkRefsetLongRevision>(partCount - 1);
@@ -54,8 +54,8 @@ public class ERefsetLongMember extends TkRefsetLongMember {
         componentUuid = Terms.get().nidToUuid(m.getComponentId());
         I_ExtendByRefPartLong part = (I_ExtendByRefPartLong) m.getMutablePart();
         longValue = part.getLongValue();
-        pathUuid = Terms.get().nidToUuid(part.getPathId());
-        statusUuid = Terms.get().nidToUuid(part.getStatusId());
+        pathUuid = Terms.get().nidToUuid(part.getPathNid());
+        statusUuid = Terms.get().nidToUuid(part.getStatusNid());
         time = part.getTime();
     }
 

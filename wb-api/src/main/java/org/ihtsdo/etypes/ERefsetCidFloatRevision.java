@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidFloat;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.dto.concept.component.refset.cidcidflt.TkRefsetCidFloatRevision;
+import org.ihtsdo.tk.dto.concept.component.refset.cidflt.TkRefsetCidFloatRevision;
 
 public class ERefsetCidFloatRevision extends TkRefsetCidFloatRevision {
 

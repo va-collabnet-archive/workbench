@@ -58,7 +58,7 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
 
 
     public static TkRefsetAbstractMember<?> convertRefsetMember(I_ExtendByRef m) throws TerminologyException, IOException {
-        REFSET_TYPES type = REFSET_TYPES.nidToType(m.getTypeId());
+        REFSET_TYPES type = REFSET_TYPES.nidToType(m.getTypeNid());
         if (type != null) {
             switch (type) {
             case CID:
@@ -77,6 +77,8 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
                 return new ERefsetStrMember(m);
             case CID_INT:
                 return new ERefsetCidIntMember(m);
+            case LONG:
+                return new ERefsetCidLongMember(m);
             default:
                 throw new UnsupportedOperationException("Cannot handle: " + type);
             }
@@ -137,9 +139,9 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
         CID_INT(8, RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION, I_ExtendByRefPartCidInt.class), 
         BOOLEAN(9, RefsetAuxiliary.Concept.BOOLEAN_EXTENSION, I_ExtendByRefPartBoolean.class), 
         CID_STR(10, RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION, I_ExtendByRefPartStr.class), 
-        CID_FLOAT(11, RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION, null), //TODO add interface for refset
+        CID_FLOAT(11, RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION, I_ExtendByRefPartCidFloat.class), 
         CID_LONG(12, RefsetAuxiliary.Concept.CID_LONG_EXTENSION, I_ExtendByRefPartCidLong.class), 
-        LONG(13, RefsetAuxiliary.Concept.LONG_EXTENSION, null); //TODO add interface for refset
+        LONG(13, RefsetAuxiliary.Concept.LONG_EXTENSION, I_ExtendByRefPartLong.class); 
 
         private int externalizedToken;
         private int typeNid;
@@ -213,7 +215,7 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
                         type.typeNid = Terms.get().uuidToNative(type.typeConcept.getUids());
                         temp.put(type.typeNid, type);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        throw new RuntimeException(e);
                     }
                 }
                 nidTypeMap = temp;
@@ -250,6 +252,8 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
                 return CID_FLOAT;
             case 12:
                 return CID_LONG;
+            case 13:
+                return LONG;
             }
             throw new UnsupportedOperationException();
         }

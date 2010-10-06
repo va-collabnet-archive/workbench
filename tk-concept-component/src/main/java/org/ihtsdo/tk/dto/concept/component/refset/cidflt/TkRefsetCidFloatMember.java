@@ -1,25 +1,28 @@
-package org.ihtsdo.tk.dto.concept.component.refset.cidcidflt;
+package org.ihtsdo.tk.dto.concept.component.refset.cidflt;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
-import org.ihtsdo.tk.dto.concept.component.TkRevision;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
-public class TkRefsetCidFloatRevision extends TkRevision {
+public class TkRefsetCidFloatMember extends TkRefsetAbstractMember<TkRefsetCidFloatRevision> {
 
     public static final long serialVersionUID = 1;
 
     public UUID c1Uuid;
     public float floatValue;
 
-    public TkRefsetCidFloatRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+    public TkRefsetCidFloatMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
         readExternal(in, dataVersion);
     }
 
-    public TkRefsetCidFloatRevision() {
+    public TkRefsetCidFloatMember() {
         super();
     }
 
@@ -28,6 +31,13 @@ public class TkRefsetCidFloatRevision extends TkRevision {
         super.readExternal(in, dataVersion);
         c1Uuid = new UUID(in.readLong(), in.readLong());
         floatValue = in.readFloat();
+        int versionSize = in.readInt();
+        if (versionSize > 0) {
+            revisions = new ArrayList<TkRefsetCidFloatRevision>(versionSize);
+            for (int i = 0; i < versionSize; i++) {
+                revisions.add(new TkRefsetCidFloatRevision(in, dataVersion));
+            }
+        }
     }
 
     @Override
@@ -36,6 +46,31 @@ public class TkRefsetCidFloatRevision extends TkRevision {
         out.writeLong(c1Uuid.getMostSignificantBits());
         out.writeLong(c1Uuid.getLeastSignificantBits());
         out.writeFloat(floatValue);
+        if (revisions == null) {
+            out.writeInt(0);
+        } else {
+            out.writeInt(revisions.size());
+            for (TkRefsetCidFloatRevision rmv : revisions) {
+                rmv.writeExternal(out);
+            }
+        }
+    }
+
+    @Override
+    public TK_REFSET_TYPE getType() {
+        return TK_REFSET_TYPE.CID_FLOAT;
+    }
+
+    public List<TkRefsetCidFloatRevision> getRevisionList() {
+        return revisions;
+    }
+
+    public UUID getC1Uuid() {
+        return c1Uuid;
+    }
+
+    public void setC1Uuid(UUID c1Uuid) {
+        this.c1Uuid = c1Uuid;
     }
 
     public float getFloatValue() {
@@ -46,12 +81,8 @@ public class TkRefsetCidFloatRevision extends TkRevision {
         this.floatValue = floatValue;
     }
 
-    public UUID getC1Uuid() {
-        return c1Uuid;
-    }
-
-    public void setC1Uuid(UUID c1Uuid) {
-        this.c1Uuid = c1Uuid;
+    public List<TkRefsetCidFloatRevision> getRevisions() {
+        return revisions;
     }
 
     /**
@@ -70,10 +101,19 @@ public class TkRefsetCidFloatRevision extends TkRevision {
     }
     
     /**
+     * Returns a hash code for this <code>ERefsetCidFloatMember</code>.
+     * 
+     * @return a hash code value for this <tt>ERefsetCidFloatMember</tt>.
+     */
+    public int hashCode() {
+        return this.primordialUuid.hashCode();
+    }
+
+    /**
      * Compares this object to the specified object. The result is <tt>true</tt>
      * if and only if the argument is not <tt>null</tt>, is a
-     * <tt>ERefsetCidFloatVersion</tt> object, and contains the same values, field by field, 
-     * as this <tt>ERefsetCidFloatVersion</tt>.
+     * <tt>ERefsetCidFloatMember</tt> object, and contains the same values, field by field, 
+     * as this <tt>ERefsetCidFloatMember</tt>.
      * 
      * @param obj the object to compare with.
      * @return <code>true</code> if the objects are the same; 
@@ -82,8 +122,8 @@ public class TkRefsetCidFloatRevision extends TkRevision {
     public boolean equals(Object obj) {
         if (obj == null)
             return false;
-        if (TkRefsetCidFloatRevision.class.isAssignableFrom(obj.getClass())) {
-            TkRefsetCidFloatRevision another = (TkRefsetCidFloatRevision) obj;
+        if (TkRefsetCidFloatMember.class.isAssignableFrom(obj.getClass())) {
+            TkRefsetCidFloatMember another = (TkRefsetCidFloatMember) obj;
 
             // =========================================================
             // Compare properties of 'this' class to the 'another' class
@@ -101,4 +141,5 @@ public class TkRefsetCidFloatRevision extends TkRevision {
         }
         return false;
     }
+
 }

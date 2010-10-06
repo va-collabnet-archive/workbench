@@ -166,7 +166,7 @@ public class IdentifierSet implements I_RepresentIdSet {
 			StringBuffer buff = new StringBuffer();
 			buff.append("NidIterator: nid: ");
 			buff.append(nid());
-			buff.append("component: ");
+			buff.append(" component: ");
 			try {
 				buff.append(Terms.get().getComponent(nid()).toString());
 			} catch (TerminologyException e) {
