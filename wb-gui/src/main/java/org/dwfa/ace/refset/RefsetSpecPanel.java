@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.refset;
 
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -43,7 +44,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.ACE;
@@ -52,6 +58,8 @@ import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -140,6 +148,9 @@ public class RefsetSpecPanel extends JPanel {
     private JCheckBox selectAllCheckBox;
     private CheckBoxHeaderRenderer checkBoxHeaderRenderer;
     private SelectAllCheckBoxListener selectAllCheckBoxListener;
+    private Box snomedIdPanel = new Box(BoxLayout.Y_AXIS);
+    private JSplitPane split;
+    private Box bottomPanelVerticalBox;
 
     private TermTreeHelper hierarchicalTreeHelper;
 
@@ -148,7 +159,7 @@ public class RefsetSpecPanel extends JPanel {
     public RefsetSpecPanel(ACE ace) throws Exception {
         super(new GridBagLayout());
         aceFrameConfig = ace.getAceFrameConfig();
-        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        split = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         split.setOneTouchExpandable(true);
 
         hierarchicalTreeHelper =
@@ -157,6 +168,7 @@ public class RefsetSpecPanel extends JPanel {
         refsetAndParentOnlyTreeHelper =
                 new TermTreeHelper(new RefsetSpecFrameConfig(ace.getAceFrameConfig(), new IntSet(), true), ace);
 
+        bottomPanelVerticalBox = new Box(BoxLayout.Y_AXIS);
         bottomTabs = new JTabbedPane();
         bottomTabs.addTab(HIERARCHICAL_VIEW, hierarchicalTreeHelper.getHierarchyPanel());
         bottomTabs.addTab(REFSET_AND_PARENT_ONLY_VIEW, refsetAndParentOnlyTreeHelper.getHierarchyPanel());
@@ -173,12 +185,17 @@ public class RefsetSpecPanel extends JPanel {
         verticalBox = new Box(BoxLayout.Y_AXIS);
         bottomTabs.addTab(TABLE_VIEW, verticalBox);
         bottomTabs.addTab(COMMENT_VIEW, new JScrollPane());
+        bottomTabs.addChangeListener(new TabChangeListener());
         commentTableModel = setupCommentTable();
         setupRefsetMemberTable(commentTableModel);
         editor.getLabel().setTermComponent(editor.getTermComponent());
         editor.addHistoryActionListener(new HistoryActionListener());
 
-        split.setBottomComponent(bottomTabs);
+        bottomPanelVerticalBox.add(bottomTabs);
+
+        refreshSnomedIdPanel();
+        bottomPanelVerticalBox.add(snomedIdPanel);
+        split.setBottomComponent(bottomPanelVerticalBox);
         split.setDividerLocation(200);
 
         GridBagConstraints c = new GridBagConstraints();
@@ -195,6 +212,47 @@ public class RefsetSpecPanel extends JPanel {
         c.weighty = 1.0;
         add(split, c);
         refsetTableModel.propertyChange(null);
+    }
+
+    private boolean memberTabSelected() {
+        int selectedTabIndex = bottomTabs.getSelectedIndex();
+        if (bottomTabs.getTitleAt(selectedTabIndex).equals(TABLE_VIEW)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void refreshSnomedIdPanel() {
+        if (snomedIdPanel == null) {
+            snomedIdPanel = new Box(BoxLayout.Y_AXIS);
+        }
+        snomedIdPanel.removeAll();
+        if (!memberTabSelected()) {
+            return;
+        }
+        if (!hasSingleComponentRowSelected()) {
+            return;
+        }
+        Box horizontalBox = new Box(BoxLayout.X_AXIS);
+        int memberId = getComponentIdOfCurrentSelection();
+
+        horizontalBox.add(Box.createHorizontalStrut(5));
+        JLabel snomedIdLabel = new JLabel("SNOMED ID of selected component: ");
+        horizontalBox.add(snomedIdLabel);
+        horizontalBox.add(Box.createHorizontalStrut(5));
+
+        if (hasSnomedId(memberId)) {
+            horizontalBox.add(new JLabel("" + getSnomedId(memberId)));
+        } else {
+            horizontalBox.add(new JLabel("Not available"));
+        }
+        horizontalBox.add(Box.createHorizontalGlue());
+
+        snomedIdPanel.add(Box.createVerticalStrut(5));
+        snomedIdPanel.add(horizontalBox);
+        snomedIdPanel.add(Box.createVerticalStrut(5));
+
     }
 
     public ReflexiveRefsetCommentTableModel setupCommentTable() throws NoSuchMethodException, Exception {
@@ -482,6 +540,10 @@ public class RefsetSpecPanel extends JPanel {
         // hide column as default (should only be visible during promotions BP)
         // refsetTable.getColumnModel().removeColumn(checkBoxColumn);
         refsetTable.addMouseListener(new MouseClickListener());
+
+        // add listener for member row selection so that we can update the SNOMED ID if necessary
+        ListSelectionModel selectionModel = refsetTable.getSelectionModel();
+        selectionModel.addListSelectionListener(new MemberSelectionListener(refsetTable));
 
         ExtTableRenderer renderer = new ExtTableRenderer();
         refsetTable.setDefaultRenderer(StringWithExtTuple.class, renderer);
@@ -982,5 +1044,112 @@ public class RefsetSpecPanel extends JPanel {
     public void refresh() {
         editor.refresh();
         setRefsetInSpecEditor(getRefsetInSpecEditor());
+    }
+
+    public class MemberSelectionListener implements ListSelectionListener {
+        JTableWithDragImage refsetTable;
+
+        public MemberSelectionListener(JTableWithDragImage refsetTable) {
+            this.refsetTable = refsetTable;
+        }
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            if (e.getValueIsAdjusting()) {
+                return;
+            }
+
+            refreshSnomedIdPanel();
+            snomedIdPanel.repaint();
+            Container parent = snomedIdPanel.getParent();
+            while (parent != null) {
+                parent.repaint();
+                parent = parent.getParent();
+            }
+
+        }
+    }
+
+    public class TabChangeListener implements ChangeListener {
+
+        @Override
+        public void stateChanged(ChangeEvent arg0) {
+            refreshSnomedIdPanel();
+            snomedIdPanel.repaint();
+        }
+    }
+
+    private boolean hasSnomedId(int componentId) {
+        try {
+            I_Identify idVersioned = Terms.get().getId(componentId);
+            int snomedIntegerId =
+                    Terms.get().getId(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next())
+                        .getNid();
+
+            List<? extends I_IdPart> parts = idVersioned.getMutableIdParts();
+            I_IdPart latestPart = null;
+            for (I_IdPart part : parts) {
+                if (latestPart == null || part.getTime() >= latestPart.getTime()) {
+                    if (part.getAuthorityNid() == snomedIntegerId) {
+                        latestPart = part;
+                    }
+                }
+            }
+
+            if (latestPart != null) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (TerminologyException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private Long getSnomedId(int componentId) {
+        try {
+            I_Identify idVersioned = Terms.get().getId(componentId);
+            int snomedIntegerId =
+                    Terms.get().getId(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next())
+                        .getNid();
+
+            List<? extends I_IdPart> parts = idVersioned.getMutableIdParts();
+            I_IdPart latestPart = null;
+            for (I_IdPart part : parts) {
+                if (latestPart == null || part.getTime() >= latestPart.getTime()) {
+                    if (part.getAuthorityNid() == snomedIntegerId) {
+                        latestPart = part;
+                    }
+                }
+            }
+
+            if (latestPart != null) {
+                return (Long) latestPart.getDenotation();
+            } else {
+                throw new TerminologyException("No SNOMED ID available");
+            }
+        } catch (TerminologyException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new Long(-1);
+    }
+
+    private boolean hasSingleComponentRowSelected() {
+        if (refsetTable.getSelectedRowCount() == 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private int getComponentIdOfCurrentSelection() {
+        int rowIndex = refsetTable.getSelectedRow();
+        StringWithExtTuple selectedComponent = (StringWithExtTuple) refsetTable.getValueAt(rowIndex, 1);
+        return selectedComponent.getId();
     }
 }
