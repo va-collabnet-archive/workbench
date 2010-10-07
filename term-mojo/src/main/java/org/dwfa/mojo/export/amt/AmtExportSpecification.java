@@ -101,7 +101,7 @@ public class AmtExportSpecification extends AbstractExportSpecification implemen
             Set<I_ConceptAttributeTuple> latestConceptTuples = new HashSet<I_ConceptAttributeTuple>();
             latestConceptTuples.addAll(TupleVersionPart.getLatestMatchingTuples(matchingConceptTuples));
             for (I_ConceptAttributeTuple tuple : matchingConceptTuples) {
-                setConceptDto(componentDto, tuple, latestConceptTuples.contains(tuple));
+                setConceptDto(componentDto, tuple, matchingDescriptionTuples, latestConceptTuples.contains(tuple));
             }
 
             setExtensionDto(componentDto.getConceptExtensionDtos(), concept.getConceptId(), TYPE.CONCEPT);

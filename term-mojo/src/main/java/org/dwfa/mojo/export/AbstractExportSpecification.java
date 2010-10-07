@@ -46,6 +46,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.util.TupleVersionComparator;
 import org.dwfa.ace.util.TupleVersionPart;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -98,6 +99,8 @@ public abstract class AbstractExportSpecification implements ExportSpecification
     protected final int aceLimitedStatusNId;
     protected final int aceMovedElsewhereStatusNId;
     protected final int snomedIntId;
+    /** Int set of fsn type. */
+    protected final I_IntSet fullySpecifiedDescriptionTypeIntSet = new IntSet();
     protected final boolean fullExport = false;
     /** The active concept. */
     protected final I_GetConceptData currentConcept;
@@ -137,6 +140,7 @@ public abstract class AbstractExportSpecification implements ExportSpecification
         descriptionInactivationIndicatorNid = ConceptConstants.DESCRIPTION_INACTIVATION_INDICATOR.localize().getNid();
         relationshipInactivationIndicatorNid = ConceptConstants.RELATIONSHIP_INACTIVATION_INDICATOR.localize().getNid();
         conceptInactivationIndicatorNid = ConceptConstants.CONCEPT_INACTIVATION_INDICATOR.localize().getNid();
+        fullySpecifiedDescriptionTypeIntSet.add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
 
         unspecifiedUuid = termFactory.getConcept(
                 ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getUids().iterator().next());
@@ -308,9 +312,9 @@ public abstract class AbstractExportSpecification implements ExportSpecification
      * @throws IOException
      * @throws TerminologyException
      */
-    protected void setConceptDto(ComponentDto componentDto, I_ConceptAttributeTuple tuple, boolean latest)
+    protected void setConceptDto(ComponentDto componentDto, I_ConceptAttributeTuple tuple, Collection<I_DescriptionTuple> descriptionTuples, boolean latest)
             throws Exception, IOException, TerminologyException {
-        updater.updateComponentDto(componentDto, tuple, latest);
+        updater.updateComponentDto(componentDto, tuple, descriptionTuples, latest);
     }
 
     /**

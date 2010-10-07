@@ -17,16 +17,14 @@
 
 package org.dwfa.mojo.export.amt;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
+
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.util.TupleVersionComparator;
-import org.dwfa.ace.util.TupleVersionPart;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.dto.ComponentDto;
 import org.dwfa.dto.ConceptDto;
@@ -64,7 +62,7 @@ public final class AmtComponentDtoUpdater extends AbstractComponentDtoUpdater {
     }
 
     @Override
-    public ComponentDto updateComponentDto(final ComponentDto componentDto, final I_ConceptAttributeTuple tuple,
+    public ComponentDto updateComponentDto(final ComponentDto componentDto, final I_ConceptAttributeTuple tuple, Collection<I_DescriptionTuple> descriptionTuples,
             final boolean latest) throws Exception {
            ConceptDto conceptDto = new ConceptDto();
         I_GetConceptData conceptData = termFactory.getConcept(tuple.getConId());
@@ -75,34 +73,7 @@ public final class AmtComponentDtoUpdater extends AbstractComponentDtoUpdater {
         this.addUuidSctIdIndentifierToConceptDto(
                 conceptDto, tuple, conceptData.getId().getVersions(), TYPE.CONCEPT, tuple.getConId(), latest);
 
-        List<I_DescriptionTuple> descriptionTuples = new ArrayList<I_DescriptionTuple>();
-        descriptionTuples.addAll(TupleVersionPart.getLatestMatchingTuples(
-                conceptData.getDescriptionTuples(null, fullySpecifiedDescriptionTypeIntSet, null, true)));
-        Collections.sort(descriptionTuples, new TupleVersionComparator());
-
-        String fsn = "NO FSN!!!";
-        I_DescriptionTuple fsnTuple = null;
-        if (!descriptionTuples.isEmpty()) {
-            for (I_DescriptionTuple iDescriptionTuple : descriptionTuples) {
-                if (check.isDescriptionActive(iDescriptionTuple.getStatusId())
-                        || iDescriptionTuple.getStatusId() == aceLimitedStatusNId) {
-                    if (fsnTuple == null || fsnTuple.getVersion() < iDescriptionTuple.getVersion()) {
-                        fsnTuple = iDescriptionTuple;
-                    }
-                }
-            }
-
-            //If no active FSN get the latest inactive FSN
-            if (fsnTuple != null) {
-                fsn = fsnTuple.getText();
-            } else {
-                fsn = descriptionTuples.iterator().next().getText();
-            }
-        } else {
-            logger.severe(String.format("No FSN for: %1$s concept %2$s",
-                    tuple.getVersion(), termFactory.getConcept(conceptData.getNid())));
-        }
-        conceptDto.setFullySpecifiedName(fsn);
+        conceptDto.setFullySpecifiedName(getFsn(descriptionTuples));
 
         conceptDto.setPrimative(!tuple.isDefined());
         conceptDto.setDefinitionStatusUuid(getDefinitionStatusUuid(tuple.isDefined()));

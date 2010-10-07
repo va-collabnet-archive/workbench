@@ -18,21 +18,25 @@
 package org.dwfa.mojo.export;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
+
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.util.TupleVersionComparator;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.dto.BaseConceptDto;
 import org.dwfa.dto.ComponentDto;
@@ -47,7 +51,6 @@ import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 import org.dwfa.mojo.ConceptConstants;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.ThinIdPart;
 
 /**
@@ -76,8 +79,6 @@ public abstract class AbstractComponentDtoUpdater {
     private final PROJECT defaultProject;
     /** International release path. */
     private final I_GetConceptData snomedReleasePath;
-    /** Int set of fsn type. */
-    protected final I_IntSet fullySpecifiedDescriptionTypeIntSet = new IntSet();
     /** The active concept. */
     protected final I_GetConceptData currentConcept;
     protected final int aceLimitedStatusNId;
@@ -147,8 +148,6 @@ public abstract class AbstractComponentDtoUpdater {
 
         synonymDescriptionType = termFactory.getConcept(
                 ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.localize().getUids().iterator().next());
-
-        fullySpecifiedDescriptionTypeIntSet.add(fullySpecifiedDescriptionType.getConceptId());
     }
 
     /**
@@ -177,9 +176,10 @@ public abstract class AbstractComponentDtoUpdater {
      *
      * @param componentDto ComponentDto - updated with the concept details
      * @param tuple I_ConceptAttributeTuple - to add to the ComponentDto
+     * @param descriptionTuples list of descriptions on the export path/s
      * @throws Exception
      */
-    public abstract ComponentDto updateComponentDto(ComponentDto componentDto, I_ConceptAttributeTuple tuple, boolean latest)
+    public abstract ComponentDto updateComponentDto(ComponentDto componentDto, I_ConceptAttributeTuple tuple, Collection<I_DescriptionTuple> descriptionTuples, boolean latest)
             throws Exception;
 
     /**
@@ -472,6 +472,39 @@ public abstract class AbstractComponentDtoUpdater {
         descriptionDto.setRf2TypeId(getRf2DescriptionType(tuple.getTypeId()));
 
         componentDto.getDescriptionDtos().add(descriptionDto);
+    }
+
+    /**
+     * Gets the latest active FSN description from the description collection
+     * @param descriptionTuples Collection of I_DescriptionTuple
+     * @return String or null if no active FSN
+     */
+    protected String getFsn(Collection<I_DescriptionTuple> descriptionTuples) {
+    	List<I_DescriptionTuple> descriptionTupleList = new ArrayList<I_DescriptionTuple>();
+    	descriptionTupleList.addAll(descriptionTuples);
+    	Collections.sort(descriptionTupleList, new TupleVersionComparator());
+
+        String fsn = null;
+        I_DescriptionTuple fsnTuple = null;
+        if (!descriptionTupleList.isEmpty()) {
+            for (I_DescriptionTuple iDescriptionTuple : descriptionTupleList) {
+                if (fullySpecifiedDescriptionType.getConceptId() == iDescriptionTuple.getTypeId()
+                		&& check.isDescriptionActive(iDescriptionTuple.getStatusId()) || iDescriptionTuple.getStatusId() == aceLimitedStatusNId) {
+                    if (fsnTuple == null || fsnTuple.getVersion() < iDescriptionTuple.getVersion()) {
+                        fsnTuple = iDescriptionTuple;
+                    }
+                }
+            }
+
+            //If no active FSN get the latest inactive FSN
+            if (fsnTuple != null) {
+                fsn = fsnTuple.getText();
+            } else {
+                fsn = descriptionTupleList.iterator().next().getText();
+            }
+        }
+
+        return fsn;
     }
 
     /**
