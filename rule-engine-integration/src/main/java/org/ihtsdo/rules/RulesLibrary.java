@@ -42,7 +42,6 @@ import org.drools.definition.KnowledgePackage;
 import org.drools.definition.rule.Rule;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
-import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -81,8 +80,11 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.helper.ResultsItem;
 import org.ihtsdo.tk.helper.templates.AbstractTemplate;
 import org.ihtsdo.tk.helper.templates.DescriptionTemplate;
+import org.ihtsdo.tk.helper.templates.RelationshipTemplate;
 import org.ihtsdo.tk.helper.templates.AbstractTemplate.TemplateType;
+import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.DescriptionSpec;
+import org.ihtsdo.tk.spec.RelSpec;
 import org.ihtsdo.tk.spec.SpecFactory;
 
 import com.googlecode.sardine.Sardine;
@@ -177,6 +179,19 @@ public class RulesLibrary {
 				}
 				//TODO: implement other properties
 				results.getWbTemplates().put(dSpec, description.getNid());
+			}
+			
+			if (template.getType().equals(TemplateType.RELATIONSHIP)) {
+				RelationshipTemplate rtemplate = (RelationshipTemplate) template;
+				ConceptSpec sourceConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getSourceUuid())).toString(),
+						UUID.fromString(rtemplate.getSourceUuid()));
+				ConceptSpec typeConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTypeUuid())).toString(),
+						UUID.fromString(rtemplate.getTypeUuid()));
+				ConceptSpec targetConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTargetUuid())).toString(),
+						UUID.fromString(rtemplate.getTargetUuid()));
+				RelSpec relSpec = new RelSpec(sourceConceptSpec, typeConceptSpec, targetConceptSpec);
+				//TODO: implement other properties
+				results.getWbTemplates().put(relSpec, concept.getConceptNid());
 			}
 			//TODO: implement other templates
 		}
