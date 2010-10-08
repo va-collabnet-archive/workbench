@@ -481,7 +481,7 @@ public abstract class AbstractComponentDtoUpdater {
      */
     protected String getFsn(Collection<I_DescriptionTuple> descriptionTuples) {
     	List<I_DescriptionTuple> descriptionTupleList = new ArrayList<I_DescriptionTuple>();
-        for (I_DescriptionTuple iDescriptionTuple : descriptionTupleList) {
+        for (I_DescriptionTuple iDescriptionTuple : descriptionTuples) {
         	if(fullySpecifiedDescriptionType.getConceptId() == iDescriptionTuple.getTypeId()){
         		descriptionTupleList.add(iDescriptionTuple);
         	}
