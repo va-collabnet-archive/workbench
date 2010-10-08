@@ -481,22 +481,25 @@ public abstract class AbstractComponentDtoUpdater {
      */
     protected String getFsn(Collection<I_DescriptionTuple> descriptionTuples) {
     	List<I_DescriptionTuple> descriptionTupleList = new ArrayList<I_DescriptionTuple>();
-    	descriptionTupleList.addAll(descriptionTuples);
-    	Collections.sort(descriptionTupleList, new TupleVersionComparator());
+        for (I_DescriptionTuple iDescriptionTuple : descriptionTupleList) {
+        	if(fullySpecifiedDescriptionType.getConceptId() == iDescriptionTuple.getTypeId()){
+        		descriptionTupleList.add(iDescriptionTuple);
+        	}
+        }
+        Collections.sort(descriptionTupleList, new TupleVersionComparator());
 
         String fsn = null;
         I_DescriptionTuple fsnTuple = null;
         if (!descriptionTupleList.isEmpty()) {
             for (I_DescriptionTuple iDescriptionTuple : descriptionTupleList) {
-                if (fullySpecifiedDescriptionType.getConceptId() == iDescriptionTuple.getTypeId()
-                		&& check.isDescriptionActive(iDescriptionTuple.getStatusId()) || iDescriptionTuple.getStatusId() == aceLimitedStatusNId) {
+                if (check.isDescriptionActive(iDescriptionTuple.getStatusId()) || iDescriptionTuple.getStatusId() == aceLimitedStatusNId) {
                     if (fsnTuple == null || fsnTuple.getVersion() < iDescriptionTuple.getVersion()) {
                         fsnTuple = iDescriptionTuple;
                     }
                 }
             }
 
-            //If no active FSN get the latest inactive FSN
+            //If no active/limited FSN get the latest inactive FSN
             if (fsnTuple != null) {
                 fsn = fsnTuple.getText();
             } else {
