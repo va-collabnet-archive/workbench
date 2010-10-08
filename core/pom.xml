@@ -19,7 +19,7 @@
     <parent>
         <groupId>au.gov.nehta</groupId>
         <artifactId>ace-modules</artifactId>
-        <version>1.20</version>
+        <version>1.21-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>au.gov.nehta</groupId>
@@ -27,9 +27,9 @@
     <packaging>jar</packaging>
     <name>Core Distributed Workflow Architecture Components</name>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta/ace-modules-1.20</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta/ace-modules-1.20</developerConnection>
-        <url>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta/ace-modules-1.20</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/core/branches/snapshot</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/core/branches/snapshot</developerConnection>
+        <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm</url>
     </scm>
     <dependencies>
         <dependency>
