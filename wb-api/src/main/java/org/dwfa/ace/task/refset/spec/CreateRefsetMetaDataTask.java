@@ -400,7 +400,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 
     }
 
-    private I_GetConceptData newConcept(I_ConfigAceFrame aceConfig) throws Exception {
+    public I_GetConceptData newConcept(I_ConfigAceFrame aceConfig) throws Exception {
         try {
             boolean isDefined = true;
 
@@ -414,7 +414,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
         }
     }
 
-    private void newDescription(I_GetConceptData concept, I_GetConceptData descriptionType, String description,
+    public void newDescription(I_GetConceptData concept, I_GetConceptData descriptionType, String description,
             I_ConfigAceFrame aceConfig) throws TerminologyException, Exception {
 
         I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
@@ -425,7 +425,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             String filteredDescription = description;
             filteredDescription = filteredDescription.trim();
             filteredDescription = filteredDescription.replaceAll("[\\s]+", " ");
-            
+
             // remove all non-alphanumeric characters and replace with a space - this is to stop these characters
             // causing issues with the lucene search
             filteredDescription = filteredDescription.replaceAll("[\\s]", " AND ");
@@ -546,6 +546,22 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 
     public void setComputeTypeUUIDPropName(String computeTypeUUIDPropName) {
         this.computeTypeUUIDPropName = computeTypeUUIDPropName;
+    }
+
+    public I_GetConceptData getStatus() {
+        return status;
+    }
+
+    public void setStatus(I_GetConceptData status) {
+        this.status = status;
+    }
+
+    public I_TermFactory getTermFactory() {
+        return termFactory;
+    }
+
+    public void setTermFactory(I_TermFactory termFactory) {
+        this.termFactory = termFactory;
     }
 
 }

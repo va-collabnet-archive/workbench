@@ -50,6 +50,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
@@ -61,11 +62,10 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.time.TimeUtil;
 
-
 public class TupleFileUtil {
 
-    public I_GetConceptData importFile(File importFile, File reportFile, I_ConfigAceFrame importConfig, I_ShowActivity activityPanel)
-            throws TerminologyException {
+    public I_GetConceptData importFile(File importFile, File reportFile, I_ConfigAceFrame importConfig,
+            I_ShowActivity activityPanel) throws TerminologyException {
 
         try {
             int lines = 0;
@@ -75,7 +75,7 @@ public class TupleFileUtil {
             int length = (int) importFile.length();
             activityPanel.setMaximum((int) importFile.length());
             activityPanel.setIndeterminate(false);
-            
+
             BufferedWriter outputFileWriter = new BufferedWriter(new FileWriter(reportFile));
             FileInputStream input = new FileInputStream(importFile);
             BufferedReader inputFileReader = new BufferedReader(new InputStreamReader(input));
@@ -86,7 +86,7 @@ public class TupleFileUtil {
 
             Set<I_GetConceptData> concepts = new HashSet<I_GetConceptData>();
             I_GetConceptData memberRefset = null;
-            
+
             Set<I_GetConceptData> refsetConcepts = new HashSet<I_GetConceptData>();
 
             while (currentLine != null) {
@@ -101,8 +101,8 @@ public class TupleFileUtil {
 
                     String remainingStr = TimeUtil.getRemainingTimeString(completed, length, elapsed);
 
-                    activityPanel.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Remaining: " + remainingStr
-                        + ".");
+                    activityPanel
+                        .setProgressInfoLower("Elapsed: " + elapsedStr + ";  Remaining: " + remainingStr + ".");
                 }
                 if (!currentLine.trim().equals("")) {
                     String[] lineParts = currentLine.split("\t");
@@ -110,8 +110,7 @@ public class TupleFileUtil {
                     UUID tupleUuid = UUID.fromString(lineParts[0]);
 
                     if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.CON_TUPLE.getUids().iterator().next())) {
-                        if (ConceptTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            importConfig)) {
+                        if (ConceptTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount, importConfig)) {
                             tupleCounter.conceptTupleCount++;
                             concepts.add(ConceptTupleFileUtil.getLastConcept());
                         } else {
@@ -131,8 +130,9 @@ public class TupleFileUtil {
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_CONCEPT_CONCEPT_TUPLE.getUids()
                         .iterator().next())) {
-                        I_GetConceptData refsetConcept = ConceptConceptExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            importConfig);
+                        I_GetConceptData refsetConcept =
+                                ConceptConceptExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
+                                    importConfig);
                         if (refsetConcept != null) {
                             refsetConcepts.add(refsetConcept);
                             tupleCounter.ccTupleCount++;
@@ -141,8 +141,9 @@ public class TupleFileUtil {
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_CONCEPT_CONCEPT_CONCEPT_TUPLE
                         .getUids().iterator().next())) {
-                        I_GetConceptData refsetConcept = ConceptConceptConceptExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            importConfig);
+                        I_GetConceptData refsetConcept =
+                                ConceptConceptConceptExtTupleFileUtil.importTuple(currentLine, outputFileWriter,
+                                    lineCount, importConfig);
                         if (refsetConcept != null) {
                             refsetConcepts.add(refsetConcept);
                             tupleCounter.cccTupleCount++;
@@ -151,8 +152,9 @@ public class TupleFileUtil {
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_CONCEPT_CONCEPT_STRING_TUPLE
                         .getUids().iterator().next())) {
-                        I_GetConceptData refsetConcept = ConceptConceptStringExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            importConfig);
+                        I_GetConceptData refsetConcept =
+                                ConceptConceptStringExtTupleFileUtil.importTuple(currentLine, outputFileWriter,
+                                    lineCount, importConfig);
                         if (refsetConcept != null) {
                             refsetConcepts.add(refsetConcept);
                             tupleCounter.ccsTupleCount++;
@@ -161,8 +163,9 @@ public class TupleFileUtil {
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_CONCEPT_TUPLE.getUids().iterator()
                         .next())) {
-                        I_GetConceptData refsetConcept = ConceptExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            importConfig);
+                        I_GetConceptData refsetConcept =
+                                ConceptExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
+                                    importConfig);
                         if (refsetConcept != null) {
                             refsetConcepts.add(refsetConcept);
                             tupleCounter.conceptExtTupleCount++;
@@ -171,8 +174,8 @@ public class TupleFileUtil {
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_INT_TUPLE.getUids().iterator()
                         .next())) {
-                        I_GetConceptData refsetConcept = IntExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            importConfig);
+                        I_GetConceptData refsetConcept =
+                                IntExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount, importConfig);
                         if (refsetConcept != null) {
                             refsetConcepts.add(refsetConcept);
                             tupleCounter.intTupleCount++;
@@ -183,8 +186,9 @@ public class TupleFileUtil {
                         // skip as we'll process them in the second pass
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_STRING_TUPLE.getUids().iterator()
                         .next())) {
-                        I_GetConceptData refsetConcept = StringExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            importConfig);
+                        I_GetConceptData refsetConcept =
+                                StringExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
+                                    importConfig);
                         if (refsetConcept != null) {
                             refsetConcepts.add(refsetConcept);
                             tupleCounter.stringTupleCount++;
@@ -193,11 +197,23 @@ public class TupleFileUtil {
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_CONCEPT_STRING_TUPLE.getUids()
                         .iterator().next())) {
-                        I_GetConceptData refsetConcept = ConceptStringExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            importConfig);
+                        I_GetConceptData refsetConcept =
+                                ConceptStringExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
+                                    importConfig);
                         if (refsetConcept != null) {
                             refsetConcepts.add(refsetConcept);
                             tupleCounter.csTupleCount++;
+                        } else {
+                            tupleCounter.errorCount++;
+                        }
+                    } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_LONG_TUPLE.getUids().iterator()
+                        .next())) {
+                        I_GetConceptData refsetConcept =
+                                LongExtTupleFileUtil
+                                    .importTuple(currentLine, outputFileWriter, lineCount, importConfig);
+                        if (refsetConcept != null) {
+                            refsetConcepts.add(refsetConcept);
+                            tupleCounter.longTupleCount++;
                         } else {
                             tupleCounter.errorCount++;
                         }
@@ -268,19 +284,22 @@ public class TupleFileUtil {
             outputFileWriter.newLine();
             outputFileWriter.write("Concept-string ext tuples imported: " + tupleCounter.csTupleCount);
             outputFileWriter.newLine();
+            outputFileWriter.write("Long ext tuples imported: " + tupleCounter.longTupleCount);
+            outputFileWriter.newLine();
             outputFileWriter.write("Errors encountered: " + tupleCounter.errorCount);
             outputFileWriter.newLine();
 
             outputFileWriter.flush();
             outputFileWriter.close();
             inputFileReader.close();
-            
-            for (I_GetConceptData refset: refsetConcepts) {
+
+            for (I_GetConceptData refset : refsetConcepts) {
                 Terms.get().addUncommittedNoChecks(refset);
             }
-            
+
             if (tupleCounter.errorCount > 0) {
-                AceLog.getAppLog().alertAndLogException(new IOException(tupleCounter.errorCount + " errors during import. Please examine error log."));
+                AceLog.getAppLog().alertAndLogException(
+                    new IOException(tupleCounter.errorCount + " errors during import. Please examine error log."));
             }
 
             return memberRefset;
@@ -338,6 +357,8 @@ public class TupleFileUtil {
         I_GetConceptData markedParentRefset = refsetSpecHelper.getMarkedParentRefsetConcept();
         I_GetConceptData commentsRefset = refsetSpecHelper.getCommentsRefsetConcept();
         I_GetConceptData promotionRefset = refsetSpecHelper.getPromotionRefsetConcept();
+        I_GetConceptData editTimeRefset = refsetSpecHelper.getEditConcept();
+        I_GetConceptData computeTimeRefset = refsetSpecHelper.getComputeConcept();
         if (memberRefset == null) {
             throw new TerminologyException(
                 "No member spec found. Please put the refset to be exported in the refset spec panel.");
@@ -347,7 +368,6 @@ public class TupleFileUtil {
                 "No marked parent refset found - the member refset should have a 'marked parent refset' relationship to the marked parent refset.");
         }
 
-
         I_IntSet allowedStatus = config.getAllowedStatus();
         I_IntSet allowedTypes = null;
         PositionSetReadOnly positions = config.getViewPositionSetReadOnly();
@@ -356,8 +376,8 @@ public class TupleFileUtil {
         exportFileWriter.append(ConceptTupleFileUtil.exportTuple(refsetSpec));
         tupleCounter.conceptTupleCount++;
         List<? extends I_DescriptionTuple> descTuples =
-                refsetSpec.getDescriptionTuples(allowedStatus, allowedTypes, positions, 
-                config.getPrecedence(), config.getConflictResolutionStrategy());
+                refsetSpec.getDescriptionTuples(allowedStatus, allowedTypes, positions, config.getPrecedence(), config
+                    .getConflictResolutionStrategy());
         for (I_DescriptionTuple tuple : descTuples) {
             exportFileWriter.append(DescTupleFileUtil.exportTuple(tuple));
             tupleCounter.descTupleCount++;
@@ -366,8 +386,9 @@ public class TupleFileUtil {
         // marked parent refset
         exportFileWriter.append(ConceptTupleFileUtil.exportTuple(markedParentRefset));
         tupleCounter.conceptTupleCount++;
-        descTuples = markedParentRefset.getDescriptionTuples(allowedStatus, allowedTypes, positions, 
-            config.getPrecedence(), config.getConflictResolutionStrategy());
+        descTuples =
+                markedParentRefset.getDescriptionTuples(allowedStatus, allowedTypes, positions, config.getPrecedence(),
+                    config.getConflictResolutionStrategy());
         for (I_DescriptionTuple tuple : descTuples) {
             exportFileWriter.append(DescTupleFileUtil.exportTuple(tuple));
             tupleCounter.descTupleCount++;
@@ -376,8 +397,9 @@ public class TupleFileUtil {
         // member refset
         exportFileWriter.append(ConceptTupleFileUtil.exportTuple(memberRefset));
         tupleCounter.conceptTupleCount++;
-        descTuples = memberRefset.getDescriptionTuples(allowedStatus, allowedTypes, positions, 
-            config.getPrecedence(), config.getConflictResolutionStrategy());
+        descTuples =
+                memberRefset.getDescriptionTuples(allowedStatus, allowedTypes, positions, config.getPrecedence(),
+                    config.getConflictResolutionStrategy());
         for (I_DescriptionTuple tuple : descTuples) {
             exportFileWriter.append(DescTupleFileUtil.exportTuple(tuple));
             tupleCounter.descTupleCount++;
@@ -387,8 +409,9 @@ public class TupleFileUtil {
         if (commentsRefset != null) {
             exportFileWriter.append(ConceptTupleFileUtil.exportTuple(commentsRefset));
             tupleCounter.conceptTupleCount++;
-            descTuples = commentsRefset.getDescriptionTuples(allowedStatus, allowedTypes, positions, 
-                config.getPrecedence(), config.getConflictResolutionStrategy());
+            descTuples =
+                    commentsRefset.getDescriptionTuples(allowedStatus, allowedTypes, positions, config.getPrecedence(),
+                        config.getConflictResolutionStrategy());
             for (I_DescriptionTuple tuple : descTuples) {
                 exportFileWriter.append(DescTupleFileUtil.exportTuple(tuple));
                 tupleCounter.descTupleCount++;
@@ -399,8 +422,35 @@ public class TupleFileUtil {
         if (promotionRefset != null) {
             exportFileWriter.append(ConceptTupleFileUtil.exportTuple(promotionRefset));
             tupleCounter.conceptTupleCount++;
-            descTuples = promotionRefset.getDescriptionTuples(allowedStatus, allowedTypes, positions, 
-                config.getPrecedence(), config.getConflictResolutionStrategy());
+            descTuples =
+                    promotionRefset.getDescriptionTuples(allowedStatus, allowedTypes, positions,
+                        config.getPrecedence(), config.getConflictResolutionStrategy());
+            for (I_DescriptionTuple tuple : descTuples) {
+                exportFileWriter.append(DescTupleFileUtil.exportTuple(tuple));
+                tupleCounter.descTupleCount++;
+            }
+        }
+
+        // edit time refset
+        if (editTimeRefset != null) {
+            exportFileWriter.append(ConceptTupleFileUtil.exportTuple(editTimeRefset));
+            tupleCounter.conceptTupleCount++;
+            descTuples =
+                    editTimeRefset.getDescriptionTuples(allowedStatus, allowedTypes, positions, config.getPrecedence(),
+                        config.getConflictResolutionStrategy());
+            for (I_DescriptionTuple tuple : descTuples) {
+                exportFileWriter.append(DescTupleFileUtil.exportTuple(tuple));
+                tupleCounter.descTupleCount++;
+            }
+        }
+
+        // compute time refset
+        if (computeTimeRefset != null) {
+            exportFileWriter.append(ConceptTupleFileUtil.exportTuple(computeTimeRefset));
+            tupleCounter.conceptTupleCount++;
+            descTuples =
+                    computeTimeRefset.getDescriptionTuples(allowedStatus, allowedTypes, positions, config
+                        .getPrecedence(), config.getConflictResolutionStrategy());
             for (I_DescriptionTuple tuple : descTuples) {
                 exportFileWriter.append(DescTupleFileUtil.exportTuple(tuple));
                 tupleCounter.descTupleCount++;
@@ -409,36 +459,60 @@ public class TupleFileUtil {
 
         // relationships (need to be created after the descriptions)
         List<? extends I_RelTuple> relTuples =
-                memberRefset.getSourceRelTuples(allowedStatus, allowedTypes, positions, 
-                    config.getPrecedence(), config.getConflictResolutionStrategy());
+                memberRefset.getSourceRelTuples(allowedStatus, allowedTypes, positions, config.getPrecedence(), config
+                    .getConflictResolutionStrategy());
         for (I_RelTuple tuple : relTuples) {
             exportFileWriter.append(RelTupleFileUtil.exportTuple(tuple));
             tupleCounter.relTupleCount++;
         }
-        relTuples = markedParentRefset.getSourceRelTuples(allowedStatus, allowedTypes, positions, 
-            config.getPrecedence(), config.getConflictResolutionStrategy());
+        relTuples =
+                markedParentRefset.getSourceRelTuples(allowedStatus, allowedTypes, positions, config.getPrecedence(),
+                    config.getConflictResolutionStrategy());
         for (I_RelTuple tuple : relTuples) {
             exportFileWriter.append(RelTupleFileUtil.exportTuple(tuple));
             tupleCounter.relTupleCount++;
         }
-        relTuples = refsetSpec.getSourceRelTuples(allowedStatus, allowedTypes, positions, 
-            config.getPrecedence(), config.getConflictResolutionStrategy());
+        relTuples =
+                refsetSpec.getSourceRelTuples(allowedStatus, allowedTypes, positions, config.getPrecedence(), config
+                    .getConflictResolutionStrategy());
         for (I_RelTuple tuple : relTuples) {
             exportFileWriter.append(RelTupleFileUtil.exportTuple(tuple));
             tupleCounter.relTupleCount++;
         }
         // optional comments and promotions relationships
         if (commentsRefset != null) {
-            relTuples = commentsRefset.getSourceRelTuples(allowedStatus, allowedTypes, positions, 
-                config.getPrecedence(), config.getConflictResolutionStrategy());
+            relTuples =
+                    commentsRefset.getSourceRelTuples(allowedStatus, allowedTypes, positions, config.getPrecedence(),
+                        config.getConflictResolutionStrategy());
             for (I_RelTuple tuple : relTuples) {
                 exportFileWriter.append(RelTupleFileUtil.exportTuple(tuple));
                 tupleCounter.relTupleCount++;
             }
         }
         if (promotionRefset != null) {
-            relTuples = promotionRefset.getSourceRelTuples(allowedStatus, allowedTypes, positions, 
-                config.getPrecedence(), config.getConflictResolutionStrategy());
+            relTuples =
+                    promotionRefset.getSourceRelTuples(allowedStatus, allowedTypes, positions, config.getPrecedence(),
+                        config.getConflictResolutionStrategy());
+            for (I_RelTuple tuple : relTuples) {
+                exportFileWriter.append(RelTupleFileUtil.exportTuple(tuple));
+                tupleCounter.relTupleCount++;
+            }
+        }
+        // edit time refset
+        if (editTimeRefset != null) {
+            relTuples =
+                    editTimeRefset.getSourceRelTuples(allowedStatus, allowedTypes, positions, config.getPrecedence(),
+                        config.getConflictResolutionStrategy());
+            for (I_RelTuple tuple : relTuples) {
+                exportFileWriter.append(RelTupleFileUtil.exportTuple(tuple));
+                tupleCounter.relTupleCount++;
+            }
+        }
+        // compute time refset
+        if (computeTimeRefset != null) {
+            relTuples =
+                    computeTimeRefset.getSourceRelTuples(allowedStatus, allowedTypes, positions,
+                        config.getPrecedence(), config.getConflictResolutionStrategy());
             for (I_RelTuple tuple : relTuples) {
                 exportFileWriter.append(RelTupleFileUtil.exportTuple(tuple));
                 tupleCounter.relTupleCount++;
@@ -482,6 +556,17 @@ public class TupleFileUtil {
         // optional promotion refset members
         if (promotionRefset != null) {
             exportRefsetMembers(promotionRefset, termFactory.getActiveAceFrameConfig(), exportFileWriter, tupleCounter);
+        }
+
+        // optional compute time refset members
+        if (computeTimeRefset != null) {
+            exportRefsetMembers(computeTimeRefset, termFactory.getActiveAceFrameConfig(), exportFileWriter,
+                tupleCounter);
+        }
+
+        // optional edit time refset members
+        if (editTimeRefset != null) {
+            exportRefsetMembers(editTimeRefset, termFactory.getActiveAceFrameConfig(), exportFileWriter, tupleCounter);
         }
     }
 
@@ -540,8 +625,8 @@ public class TupleFileUtil {
         I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
         for (I_ExtendByRef ext : extensions) {
             List<? extends I_ExtendByRefVersion> tuples =
-                    ext.getTuples(helper.getCurrentStatusIntSet(), null,
-                        configFrame.getPrecedence(), configFrame.getConflictResolutionStrategy());
+                    ext.getTuples(helper.getCurrentStatusIntSet(), null, configFrame.getPrecedence(), configFrame
+                        .getConflictResolutionStrategy());
 
             if (extensions.size() > 0) {
                 I_ExtendByRefVersion thinTuple = tuples.get(0);
@@ -565,6 +650,9 @@ public class TupleFileUtil {
                 } else if (thinPart instanceof I_ExtendByRefPartStr) {
                     exportFileWriter.append(StringExtTupleFileUtil.exportTuple(thinTuple));
                     tupleCounter.stringTupleCount++;
+                } else if (thinPart instanceof I_ExtendByRefPartLong) {
+                    exportFileWriter.append(LongExtTupleFileUtil.exportTuple(thinTuple));
+                    tupleCounter.longTupleCount++;
                 } else {
                     throw new TerminologyException("Unknown extension type:" + thinPart.toString());
                 }
@@ -605,9 +693,12 @@ public class TupleFileUtil {
                     I_ExtendByRefPartCidCidCid part = (I_ExtendByRefPartCidCidCid) thinTuple.getMutablePart();
                     I_GetConceptData clause = Terms.get().getConcept(part.getC2id());
                     I_GetConceptData potentialRefset = Terms.get().getConcept(part.getC3id());
-                    if (clause.getConceptNid() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_IS_MEMBER_OF.getUids())
-                        || clause.getConceptNid() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.DESC_IS_MEMBER_OF.getUids())
-                        || clause.getConceptNid() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.REL_IS_MEMBER_OF.getUids())) {
+                    if (clause.getConceptNid() == Terms.get().uuidToNative(
+                        RefsetAuxiliary.Concept.CONCEPT_IS_MEMBER_OF.getUids())
+                        || clause.getConceptNid() == Terms.get().uuidToNative(
+                            RefsetAuxiliary.Concept.DESC_IS_MEMBER_OF.getUids())
+                        || clause.getConceptNid() == Terms.get().uuidToNative(
+                            RefsetAuxiliary.Concept.REL_IS_MEMBER_OF.getUids())) {
                         if (isMemberRefset(potentialRefset)) {
                             RefsetSpec refsetSpecHelper = new RefsetSpec(potentialRefset, true, configFrame);
                             exportRefsetSpecToFile(outputFileWriter, refsetSpecHelper.getRefsetSpecConcept(),
@@ -656,8 +747,8 @@ public class TupleFileUtil {
 
         List<? extends I_RelTuple> relationships =
                 concept.getSourceRelTuples(Terms.get().getActiveAceFrameConfig().getAllowedStatus(), allowedTypes,
-                    Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
-                    config.getPrecedence(), config.getConflictResolutionStrategy());
+                    Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
+                        .getConflictResolutionStrategy());
         for (I_RelTuple rel : relationships) {
             if (rel.getTime() > latestVersion) {
                 latestVersion = rel.getTime();
@@ -689,8 +780,8 @@ public class TupleFileUtil {
 
         List<? extends I_RelTuple> relationships =
                 concept.getDestRelTuples(Terms.get().getActiveAceFrameConfig().getAllowedStatus(), allowedTypes, Terms
-                    .get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
-                    config.getPrecedence(), config.getConflictResolutionStrategy());
+                    .get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
+                    .getConflictResolutionStrategy());
         for (I_RelTuple rel : relationships) {
             if (rel.getTime() > latestVersion) {
                 latestVersion = rel.getTime();

@@ -113,6 +113,9 @@ public interface I_HelpSpecRefset extends I_HelpRefsets {
 
     public boolean newLongRefsetExtension(int refsetId, int componentId, long extLongValue) throws Exception;
 
+    public boolean newLongRefsetExtension(int refsetId, int componentId, long extLongValue, UUID memberUuid,
+            UUID pathUuid, UUID statusUuid, long effectiveTime) throws Exception;
+
     /**
      * Remove a concept from a refset
      * 

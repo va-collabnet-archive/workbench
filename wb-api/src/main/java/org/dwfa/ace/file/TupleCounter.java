@@ -12,6 +12,7 @@ public class TupleCounter {
     int intTupleCount = 0;
     int idTupleCount = 0;
     int stringTupleCount = 0;
+    int longTupleCount = 0;
     int csTupleCount = 0;
     int errorCount = 0;
 }

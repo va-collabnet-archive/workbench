@@ -88,7 +88,8 @@ public class RefsetSpec {
                 // concept is used
                 return true;
             } else {
-                if (computeType.getConceptNid() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_COMPUTE_TYPE.getUids())) {
+                if (computeType.getConceptNid() == Terms.get().uuidToNative(
+                    RefsetAuxiliary.Concept.CONCEPT_COMPUTE_TYPE.getUids())) {
                     return true;
                 } else {
                     return false;
@@ -123,7 +124,8 @@ public class RefsetSpec {
                 // concept is used
                 return false;
             } else {
-                if (computeType.getConceptNid() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.DESCRIPTION_COMPUTE_TYPE.getUids())) {
+                if (computeType.getConceptNid() == Terms.get().uuidToNative(
+                    RefsetAuxiliary.Concept.DESCRIPTION_COMPUTE_TYPE.getUids())) {
                     return true;
                 } else {
                     return false;
@@ -146,7 +148,8 @@ public class RefsetSpec {
                 // concept is used
                 return false;
             } else {
-                if (computeType.getConceptNid() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.RELATIONSHIP_COMPUTE_TYPE.getUids())) {
+                if (computeType.getConceptNid() == Terms.get().uuidToNative(
+                    RefsetAuxiliary.Concept.RELATIONSHIP_COMPUTE_TYPE.getUids())) {
                     return true;
                 } else {
                     return false;
@@ -252,7 +255,7 @@ public class RefsetSpec {
         allowedTypes.add(relationshipType.getConceptNid());
 
         if (concept != null) {
-            //TODO should use the version computer/handle contradiction better. 
+            // TODO should use the version computer/handle contradiction better.
             List<? extends I_RelTuple> relationships =
                     concept.getSourceRelTuples(null, allowedTypes, config.getViewPositionSetReadOnly(), config
                         .getPrecedence(), config.getConflictResolutionStrategy());
@@ -284,7 +287,7 @@ public class RefsetSpec {
         allowedTypes.add(relationshipType.getConceptNid());
 
         if (concept != null) {
-            //TODO should use the version computer/handle contradiction differently
+            // TODO should use the version computer/handle contradiction differently
             List<? extends I_RelTuple> relationships =
                     concept.getDestRelTuples(null, allowedTypes, config.getViewPositionSetReadOnly(), config
                         .getPrecedence(), config.getConflictResolutionStrategy());
@@ -319,8 +322,8 @@ public class RefsetSpec {
             List<? extends I_RelTuple> relationships =
                     concept.getSourceRelTuples(null, allowedTypes, config.getViewPositionSetReadOnly(), config
                         .getPrecedence(), config.getConflictResolutionStrategy());
-            //TODO should use the version computer/handle contradiction differently. 
-           for (I_RelTuple rel : relationships) {
+            // TODO should use the version computer/handle contradiction differently.
+            for (I_RelTuple rel : relationships) {
                 if (rel.getVersion() > latestVersion) {
                     latestVersion = rel.getVersion();
                     latestRel = rel;
@@ -380,8 +383,10 @@ public class RefsetSpec {
                             if (latestPart instanceof I_ExtendByRefPartCid) {
                                 I_ExtendByRefPartCid latestConceptPart = (I_ExtendByRefPartCid) latestPart;
                                 I_GetConceptData status = Terms.get().getConcept(latestConceptPart.getC1id());
-                                if (status.getConceptNid() == Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids())
-                                    || status.getConceptNid() == Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.IN_DEVELOPMENT.getUids())) {
+                                if (status.getConceptNid() == Terms.get().uuidToNative(
+                                    ArchitectonicAuxiliary.Concept.CURRENT.getUids())
+                                    || status.getConceptNid() == Terms.get().uuidToNative(
+                                        ArchitectonicAuxiliary.Concept.IN_DEVELOPMENT.getUids())) {
                                     return true;
                                 }
                             }
@@ -398,40 +403,40 @@ public class RefsetSpec {
     }
 
     public void modifyOverallSpecStatus(I_GetConceptData newStatus) throws Exception {
-             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-            helper.setAutocommitActive(true);
-            I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
-            I_GetConceptData promotionRefsetConcept = getPromotionRefsetConcept();
+        I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+        helper.setAutocommitActive(true);
+        I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
+        I_GetConceptData promotionRefsetConcept = getPromotionRefsetConcept();
 
-            if (memberRefsetConcept != null && promotionRefsetConcept != null) {
-                helper
-                    .retireConceptExtension(promotionRefsetConcept.getConceptNid(), memberRefsetConcept.getConceptNid());
+        if (memberRefsetConcept != null && promotionRefsetConcept != null) {
+            helper.retireConceptExtension(promotionRefsetConcept.getConceptNid(), memberRefsetConcept.getConceptNid());
+            Terms.get().commit();
+            if (helper.hasConceptRefsetExtensionWithAnyPromotionStatus(promotionRefsetConcept.getConceptNid(),
+                memberRefsetConcept.getConceptNid())) {
+                helper.newConceptExtensionPart(promotionRefsetConcept.getConceptNid(), memberRefsetConcept
+                    .getConceptNid(), newStatus.getConceptNid(), Terms.get().uuidToNative(
+                    ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
                 Terms.get().commit();
-                if (helper.hasConceptRefsetExtensionWithAnyPromotionStatus(promotionRefsetConcept.getConceptNid(),
-                    memberRefsetConcept.getConceptNid())) {
-                    helper.newConceptExtensionPart(promotionRefsetConcept.getConceptNid(), memberRefsetConcept
-                        .getConceptNid(), newStatus.getConceptNid(), Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
-                    Terms.get().commit();
-                } else {
-                    helper.newRefsetExtension(promotionRefsetConcept.getConceptNid(),
-                        memberRefsetConcept.getConceptNid(), newStatus.getConceptNid());
-                    Terms.get().commit();
-                }
+            } else {
+                helper.newRefsetExtension(promotionRefsetConcept.getConceptNid(), memberRefsetConcept.getConceptNid(),
+                    newStatus.getConceptNid());
+                Terms.get().commit();
             }
+        }
     }
 
     public void setLastComputeTime(Long time) throws Exception {
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(config);
-            boolean prevAutoCommit = helper.isAutocommitActive();
-            helper.setAutocommitActive(false);
-            I_GetConceptData specConcept = getRefsetSpecConcept();
-            I_GetConceptData lastComputeTimeConcept = getComputeConcept();
+        I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(config);
+        boolean prevAutoCommit = helper.isAutocommitActive();
+        helper.setAutocommitActive(false);
+        I_GetConceptData specConcept = getRefsetSpecConcept();
+        I_GetConceptData lastComputeTimeConcept = getComputeConcept();
 
-            if (specConcept != null && lastComputeTimeConcept != null) {
-                helper.newLongRefsetExtension(lastComputeTimeConcept.getConceptNid(), specConcept.getConceptNid(), time);
-            }
-            Terms.get().addUncommittedNoChecks(lastComputeTimeConcept);
-            helper.setAutocommitActive(prevAutoCommit);
+        if (specConcept != null && lastComputeTimeConcept != null) {
+            helper.newLongRefsetExtension(lastComputeTimeConcept.getConceptNid(), specConcept.getConceptNid(), time);
+        }
+        Terms.get().addUncommittedNoChecks(lastComputeTimeConcept);
+        helper.setAutocommitActive(prevAutoCommit);
     }
 
     public I_GetConceptData getEditConcept() throws TerminologyException, IOException {
@@ -485,10 +490,53 @@ public class RefsetSpec {
     public Long getLastComputeTime() throws TerminologyException, IOException {
         I_GetConceptData specConcept = getRefsetSpecConcept();
         if (specConcept == null) {
-        	return null;
+            return null;
         }
         I_GetConceptData lastComputeTimeConcept = getComputeConcept();
+        if (lastComputeTimeConcept == null) {
+            try {
+                CreateRefsetMetaDataTask task = new CreateRefsetMetaDataTask();
+                task.setStatus(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
+                task.setTermFactory(Terms.get());
+                String originalMemberFSN = getMemberRefsetConcept().getInitialText();
+                String editedFSN = "";
+                if (originalMemberFSN.indexOf(" refset") == -1) {
+                    editedFSN = originalMemberFSN;
+                } else {
+                    editedFSN = originalMemberFSN.substring(0, originalMemberFSN.indexOf(" refset"));
+                }
+                String computeTimeName = editedFSN + " compute time refset";
+
+                lastComputeTimeConcept = task.newConcept(config);
+                task
+                    .newDescription(lastComputeTimeConcept, Terms.get().getConcept(
+                        ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), computeTimeName,
+                        config);
+                task.newDescription(lastComputeTimeConcept, Terms.get().getConcept(
+                    ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), computeTimeName, config);
+
+                task.newRelationship(lastComputeTimeConcept, Terms.get().getConcept(
+                    ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), Terms.get().getConcept(
+                    RefsetAuxiliary.Concept.SUPPORTING_REFSETS.getUids()), config);
+
+                task.newRelationship(getMemberRefsetConcept(), Terms.get().getConcept(
+                    RefsetAuxiliary.Concept.COMPUTE_TIME_REL.getUids()), lastComputeTimeConcept, config);
+
+                task.newRelationship(lastComputeTimeConcept, Terms.get().getConcept(
+                    RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids()), Terms.get().getConcept(
+                    RefsetAuxiliary.Concept.ANCILLARY_DATA.getUids()), config);
+
+                Terms.get().addUncommittedNoChecks(lastComputeTimeConcept);
+
+                Terms.get().commit();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new TerminologyException(e.getMessage());
+            }
+        }
         I_ExtendByRefPart latestPart = null;
+
         for (I_ExtendByRef extension : lastComputeTimeConcept.getExtensions()) {
 
             if (extension.getRefsetId() == lastComputeTimeConcept.getConceptNid()) {
@@ -515,6 +563,50 @@ public class RefsetSpec {
     private Long getLastEditTime() throws TerminologyException, IOException {
         I_GetConceptData specConcept = getRefsetSpecConcept();
         I_GetConceptData lastEditTimeConcept = getEditConcept();
+        if (lastEditTimeConcept == null) {
+            try {
+                CreateRefsetMetaDataTask task = new CreateRefsetMetaDataTask();
+                task.setStatus(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
+
+                task.setTermFactory(Terms.get());
+                String originalMemberFSN = getMemberRefsetConcept().getInitialText();
+                String editedFSN = "";
+                if (originalMemberFSN.indexOf(" refset") == -1) {
+                    editedFSN = originalMemberFSN;
+                } else {
+                    editedFSN = originalMemberFSN.substring(0, originalMemberFSN.indexOf(" refset"));
+                }
+
+                String computeTimeName = editedFSN + " edit time refset";
+
+                lastEditTimeConcept = task.newConcept(config);
+                task
+                    .newDescription(lastEditTimeConcept, Terms.get().getConcept(
+                        ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), computeTimeName,
+                        config);
+                task.newDescription(lastEditTimeConcept, Terms.get().getConcept(
+                    ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), computeTimeName, config);
+
+                task.newRelationship(lastEditTimeConcept, Terms.get().getConcept(
+                    ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), Terms.get().getConcept(
+                    RefsetAuxiliary.Concept.SUPPORTING_REFSETS.getUids()), config);
+
+                task.newRelationship(getMemberRefsetConcept(), Terms.get().getConcept(
+                    RefsetAuxiliary.Concept.EDIT_TIME_REL.getUids()), lastEditTimeConcept, config);
+
+                task.newRelationship(lastEditTimeConcept, Terms.get().getConcept(
+                    RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids()), Terms.get().getConcept(
+                    RefsetAuxiliary.Concept.ANCILLARY_DATA.getUids()), config);
+
+                Terms.get().addUncommittedNoChecks(lastEditTimeConcept);
+
+                Terms.get().commit();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new TerminologyException(e.getMessage());
+            }
+        }
         I_ExtendByRefPart latestPart = null;
         for (I_ExtendByRef extension : Terms.get().getAllExtensionsForComponent(specConcept.getConceptNid(), true)) {
 
