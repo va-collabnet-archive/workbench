@@ -66,6 +66,10 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
         if (constraintDesc == null) {
             int constraintNid = ((I_ExtendByRefPartCidCidCid) getExtension().getMutablePart()).getC3id();
             Object component = Terms.get().getComponent(constraintNid);
+            if (component == null) {
+                constraintDesc = "NID: " + constraintNid + " (no visible component - check view paths)";
+                return constraintDesc;
+            }
             if (I_GetConceptData.class.isAssignableFrom(component.getClass())) {
                 I_GetConceptData thisConstraint = (I_GetConceptData) component;
                 try {
