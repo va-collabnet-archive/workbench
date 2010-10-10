@@ -44,6 +44,8 @@ import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
+import org.ihtsdo.db.bdb.computer.refset.RefsetHelper;
+import org.ihtsdo.db.bdb.computer.refset.SpecMemberRefsetHelper;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
@@ -69,17 +71,17 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
      * int)
      */
     public I_ExtendByRefPartCid getCurrentRefsetExtension(int refsetId, int componentNid) throws Exception {
-    	Concept refsetConcept = Bdb.getConcept(refsetId);
-    	RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
-    	if (extension != null) {
-    		for (RefsetMember.Version v: extension.getVersions(config.getCoordinate())) {
-    			if (config.getAllowedStatus().contains(v.getStatusNid()) &&
-    					v.getTypeNid() == REFSET_TYPES.CID.getTypeNid()) {
-    				return (I_ExtendByRefPartCid) v;
-    			}
-    		}
-    	}
-    	return null;
+        Concept refsetConcept = Bdb.getConcept(refsetId);
+        RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
+        if (extension != null) {
+            for (RefsetMember.Version v : extension.getVersions(config.getCoordinate())) {
+                if (config.getAllowedStatus().contains(v.getStatusNid())
+                    && v.getTypeNid() == REFSET_TYPES.CID.getTypeNid()) {
+                    return (I_ExtendByRefPartCid) v;
+                }
+            }
+        }
+        return null;
     }
 
     /*
@@ -90,19 +92,19 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
      */
     @Override
     public boolean hasCurrentRefsetExtension(int refsetId, int componentNid, int c1Nid) throws Exception {
-    	Concept refsetConcept = Bdb.getConcept(refsetId);
-    	RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
-    	if (extension != null) {
-    		for (RefsetMember.Version v: extension.getVersions(config.getCoordinate())) {
-    			if (config.getAllowedStatus().contains(v.getStatusNid()) &&
-    					v.getTypeNid() == REFSET_TYPES.CID.getTypeNid()) {
-    				if (((I_ExtendByRefPartCid) v).getC1id() == c1Nid) {
-        				return true;
-    				}
-    			}
-    		}
-    	}
-    	return false;
+        Concept refsetConcept = Bdb.getConcept(refsetId);
+        RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
+        if (extension != null) {
+            for (RefsetMember.Version v : extension.getVersions(config.getCoordinate())) {
+                if (config.getAllowedStatus().contains(v.getStatusNid())
+                    && v.getTypeNid() == REFSET_TYPES.CID.getTypeNid()) {
+                    if (((I_ExtendByRefPartCid) v).getC1id() == c1Nid) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /*
@@ -251,22 +253,22 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
      * (int, int, int, int)
      */
     @SuppressWarnings("unchecked")
-	public boolean hasCurrentConceptRefsetExtension(int refsetId, int componentNid, int conceptId, int statusNid)
+    public boolean hasCurrentConceptRefsetExtension(int refsetId, int componentNid, int conceptId, int statusNid)
             throws Exception {
-    	Concept refsetConcept = Bdb.getConcept(refsetId);
-    	RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
-    	if (extension != null) {
-    		for (RefsetMember.Version v: extension.getVersions(config.getCoordinate())) {
-    			if (v.getStatusNid() == statusNid) {
-    				if (v.getTypeNid() == REFSET_TYPES.CID.getTypeNid()) {
-    					if (((I_ExtendByRefPartCid) v).getC1id() == conceptId) {
-            				return true;
-    					}
-    				}
-    			}
-    		}
-    	}
-    	return false;
+        Concept refsetConcept = Bdb.getConcept(refsetId);
+        RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
+        if (extension != null) {
+            for (RefsetMember.Version v : extension.getVersions(config.getCoordinate())) {
+                if (v.getStatusNid() == statusNid) {
+                    if (v.getTypeNid() == REFSET_TYPES.CID.getTypeNid()) {
+                        if (((I_ExtendByRefPartCid) v).getC1id() == conceptId) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private boolean hasCurrentConceptStringRefsetExtension(int refsetId, int componentId, int conceptId,
@@ -319,6 +321,35 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                     if (latestPart instanceof I_ExtendByRefPartStr) {
                         String extensionString = ((I_ExtendByRefPartStr) latestPart).getStringValue();
                         if (extString.equals(extensionString)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean hasCurrentLongRefsetExtension(int refsetId, int componentId, Long extLong, int statusId)
+            throws Exception {
+        for (I_ExtendByRef extension : Terms.get().getAllExtensionsForComponent(componentId, true)) {
+
+            if (extension.getRefsetId() == refsetId) {
+
+                // get the latest version
+                I_ExtendByRefPart latestPart = null;
+                for (I_ExtendByRefPart part : extension.getMutableParts()) {
+                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
+                        latestPart = part;
+                    }
+                }
+
+                // confirm its the right extension value and its status is
+                // current
+                if (latestPart.getStatusNid() == statusId) {
+                    if (latestPart instanceof I_ExtendByRefPartLong) {
+                        Long extensionLong = ((I_ExtendByRefPartLong) latestPart).getLongValue();
+                        if (extLong.equals(extensionLong)) {
                             return true;
                         }
                     }
@@ -495,8 +526,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         // generate a UUID based on this refset's input data so that it is
         // stable in future executions
         UUID memberUuid =
-                generateUuid(Ts.get().getUuidsForNid(refsetId).get(0), Ts.get().getUuidsForNid(componentId).get(0), 
-                		Ts.get().getUuidsForNid(memberTypeId).get(0));
+                generateUuid(Ts.get().getUuidsForNid(refsetId).get(0), Ts.get().getUuidsForNid(componentId).get(0), Ts
+                    .get().getUuidsForNid(memberTypeId).get(0));
 
         RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.CID);
         refsetMap.put(REFSET_PROPERTY.CID_ONE, memberTypeId);
@@ -621,6 +652,60 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             }
             I_ExtendByRef newExtension =
                     getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.STR, refsetMap, memberUuid);
+            if (isAutocommitActive()) {
+                Terms.get().addUncommittedNoChecks(newExtension);
+                Terms.get().commit();
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see
+     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#newLongRefsetExtension(int,
+     * int, java.lang.Long, java.util.UUID, java.util.UUID, java.util.UUID,
+     * long)
+     */
+    public boolean newLongRefsetExtension(int refsetId, int componentId, long extLong, UUID memberUuid, UUID pathUuid,
+            UUID statusUuid, long effectiveTime) throws Exception {
+        try {
+            Collection<PathBI> paths = Terms.get().getPaths();
+            paths.clear();
+            paths.add(Terms.get().getPath(new UUID[] { pathUuid }));
+
+            if (memberUuid == null) {
+                memberUuid = UUID.randomUUID();
+            }
+            if (statusUuid == null) {
+                statusUuid =
+                        Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()).getUids()
+                            .iterator().next();
+            }
+
+            // check subject is not already a member
+            if (hasCurrentLongRefsetExtension(refsetId, componentId, extLong, Terms.get().getConcept(
+                new UUID[] { statusUuid }).getConceptNid())) {
+                if (logger.isLoggable(Level.FINE)) {
+                    logger.fine("Component is already a member of the refset. Skipping.");
+                }
+                return false;
+            }
+
+            // create a new extension (with a part for each path the user is
+            // editing)
+            RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.LONG);
+            refsetMap.put(REFSET_PROPERTY.LONG_VALUE, extLong);
+            refsetMap.put(REFSET_PROPERTY.STATUS, Bdb.uuidToNid(statusUuid));
+            if (effectiveTime != Long.MAX_VALUE) {
+                refsetMap.put(REFSET_PROPERTY.TIME, Long.MAX_VALUE);
+            }
+            I_ExtendByRef newExtension =
+                    getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.LONG, refsetMap, memberUuid);
             if (isAutocommitActive()) {
                 Terms.get().addUncommittedNoChecks(newExtension);
                 Terms.get().commit();
@@ -1202,9 +1287,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                             // found a member to retire
                             for (PathBI editPath : getEditPaths()) {
                                 I_ExtendByRefPartCid clone =
-                                        (I_ExtendByRefPartCid) latestPart
-                                            .makeAnalog(ReferenceConcepts.RETIRED.getNid(), editPath.getConceptNid(),
-                                                Long.MAX_VALUE);
+                                        (I_ExtendByRefPartCid) latestPart.makeAnalog(
+                                            ReferenceConcepts.RETIRED.getNid(), editPath.getConceptNid(),
+                                            Long.MAX_VALUE);
                                 extension.addVersion(clone);
                                 Terms.get().addUncommittedNoChecks(extension);
                             }
