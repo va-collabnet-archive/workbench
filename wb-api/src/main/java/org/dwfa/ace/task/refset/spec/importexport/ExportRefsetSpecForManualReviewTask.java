@@ -114,8 +114,9 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         returnCondition = Condition.ITEM_COMPLETE;
         delimiter = "\t";
         try {
-            activityPanel = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig(),
-                "Exporting refset spec...", true);
+            activityPanel =
+                    Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig(),
+                        "Exporting refset spec...", true);
             I_ConfigAceFrame configFrame =
                     (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
@@ -178,7 +179,8 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
                 "No member spec found. Please put the refset to be exported in the refset spec panel.");
         }
 
-        Collection<? extends I_ExtendByRef> extensions = termFactory.getRefsetExtensionMembers(memberRefset.getConceptNid());
+        Collection<? extends I_ExtendByRef> extensions =
+                termFactory.getRefsetExtensionMembers(memberRefset.getConceptNid());
 
         writeRefsetName(exportFileWriter, memberRefset);
         writeHeader(exportFileWriter);
@@ -190,13 +192,12 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         for (I_ExtendByRef ext : extensions) {
 
             List<? extends I_ExtendByRefVersion> tuples =
-                    ext.getTuples(helper.getCurrentStatusIntSet(), config
-                        .getViewPositionSetReadOnly(), 
-                        config.getPrecedence(), config.getConflictResolutionStrategy());
+                    ext.getTuples(null, config.getViewPositionSetReadOnly(), config.getPrecedence(), config
+                        .getConflictResolutionStrategy());
             I_ExtendByRefVersion latestTuple = null;
 
             for (I_ExtendByRefVersion currentTuple : tuples) {
-                if (latestTuple == null || latestTuple.getVersion() > currentTuple.getVersion()) {
+                if (latestTuple == null || latestTuple.getTime() > currentTuple.getTime()) {
                     latestTuple = currentTuple;
                 }
             }
@@ -204,7 +205,7 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
             if (latestTuple != null) {
                 if (latestTuple.getMutablePart() instanceof I_ExtendByRefPartCid) {
                     if (latestTuple.getRefsetId() == memberRefset.getConceptNid()) {
-                        if (helper.getCurrentStatusIntSet().contains(latestTuple.getStatusId())) {
+                        if (helper.getCurrentStatusIntSet().contains(latestTuple.getStatusNid())) {
                             I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) latestTuple.getMutablePart();
                             if (part.getC1id() == termFactory.getConcept(
                                 RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids()).getConceptNid()) {
@@ -316,11 +317,13 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         List<? extends I_DescriptionTuple> descriptionResults = null;
         if (termFactory.hasConcept(componentId)) {
             I_GetConceptData concept = termFactory.getConcept(componentId);
-            descriptionResults = concept.getDescriptionTuples(statuses, allowedTypes, positions, 
-                config.getPrecedence(), config.getConflictResolutionStrategy());
+            descriptionResults =
+                    concept.getDescriptionTuples(statuses, allowedTypes, positions, config.getPrecedence(), config
+                        .getConflictResolutionStrategy());
         } else {
             I_DescriptionVersioned descVersioned = termFactory.getDescription(componentId);
-            descriptionResults = descVersioned.getTuples(Terms.get().getActiveAceFrameConfig().getConflictResolutionStrategy());
+            descriptionResults =
+                    descVersioned.getTuples(Terms.get().getActiveAceFrameConfig().getConflictResolutionStrategy());
         }
 
         // find the latest tuple, so that the latest edited version of the
