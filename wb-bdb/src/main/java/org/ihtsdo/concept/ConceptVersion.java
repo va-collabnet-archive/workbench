@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
+import org.ihtsdo.cern.colt.map.OpenIntIntHashMap;
 import org.ihtsdo.concept.component.relationship.group.RelGroupVersion;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
@@ -300,7 +301,7 @@ public class ConceptVersion implements ConceptVersionBI {
 	public Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsIsa()
 			throws IOException {
 		HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
-		for (RelationshipChronicleBI rel: getRelsIncoming()) {
+		for (RelationshipChronicleBI rel: getRelsOutgoing()) {
 			for (RelationshipVersionBI relv: rel.getVersions()) {
 				if (coordinate.getIsaTypeNids().contains(relv.getTypeNid())) {
 					ConceptVersionBI cv = Ts.get().getConceptVersion(coordinate, relv.getDestinationNid());
@@ -311,6 +312,20 @@ public class ConceptVersion implements ConceptVersionBI {
 		return conceptSet;
 	}
 
+	@Override
+	public int[] getRelsOutgoingDestinationsNidsActiveIsa() throws IOException {
+		OpenIntIntHashMap nidList = new OpenIntIntHashMap(10);
+		for (RelationshipChronicleBI rel: getRelsOutgoing()) {
+			for (RelationshipVersionBI relv: rel.getVersions(coordinate)) {
+				if (coordinate.getIsaTypeNids().contains(relv.getTypeNid())) {
+					nidList.put(relv.getDestinationNid(), relv.getDestinationNid());
+				}
+			}
+		}
+		return nidList.keys().elements();
+	}
+	
+	
 	@Override
 	public int getNid() {
 		return concept.getNid();

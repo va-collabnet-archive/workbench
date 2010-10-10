@@ -10,14 +10,15 @@ import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.db.DbDependency;
 
 public interface TerminologyStoreDI extends TerminologyTransactionDI {
 	
 	TerminologySnapshotDI getSnapshot(Coordinate c);
 
-	ComponentChroncileBI<?> getComponent(int nid) throws IOException;
-	ComponentChroncileBI<?> getComponent(UUID... uuids) throws IOException;
-	ComponentChroncileBI<?> getComponent(Collection<UUID> uuids) throws IOException;
+	ComponentBI getComponent(int nid) throws IOException;
+	ComponentBI getComponent(UUID... uuids) throws IOException;
+	ComponentBI getComponent(Collection<UUID> uuids) throws IOException;
 	
 	ConceptChronicleBI getConcept(int cNid) throws IOException;
 	ConceptChronicleBI getConcept(UUID... uuids) throws IOException;
@@ -41,5 +42,9 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
     ChangeSetGeneratorBI createDtoChangeSetGenerator(File changeSetFileName, 
     			File changeSetTempFileName, 
     			ChangeSetGenerationPolicy policy);
+    
+    Collection<DbDependency> getLatestChangeSetDependencies() throws IOException;
+    
+    boolean satisfiesDependencies(Collection<DbDependency> dependencies) throws IOException;
 
 }

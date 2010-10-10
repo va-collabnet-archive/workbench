@@ -9,6 +9,7 @@ import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -20,6 +21,25 @@ public class KindOfSpec {
 	 * The view position for which this cache is valid.
 	 */
 	public PositionBI viewPosition;
+	public PositionBI getViewPosition() {
+		return viewPosition;
+	}
+	public NidSetBI getAllowedStatusNids() {
+		return allowedStatusNids;
+	}
+	public NidSetBI getRelTypeNids() {
+		return relTypeNids;
+	}
+	public int getKindNid() {
+		return kindNid;
+	}
+	public Precedence getPrecedence() {
+		return precedence;
+	}
+	public ContradictionManagerBI getContradictionMgr() {
+		return contradictionMgr;
+	}
+
 	/**
 	 * The allowed status cNids for which this cache is valid.
 	 */
@@ -43,6 +63,9 @@ public class KindOfSpec {
 	 */
 	private PositionSetReadOnly viewPositionSet;
 	
+	public Coordinate getCoordinate() {
+		return new Coordinate(precedence, viewPositionSet, allowedStatusNids, relTypeNids, contradictionMgr, Integer.MIN_VALUE);
+	}
 	public KindOfSpec(PositionBI viewPosition, NidSetBI allowedStatus,
 			NidSetBI relTypeNids, int kindNid, Precedence precedence, 
 			ContradictionManagerBI contradictionMgr) {

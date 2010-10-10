@@ -41,6 +41,7 @@ import org.dwfa.jini.TermEntry;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
 
 /**
  * Moves the parent process to the first queue that matches the selected queue
@@ -91,6 +92,13 @@ public class ToQueueParentProcess extends AbstractTask {
      *      org.dwfa.bpa.process.I_Work)
      */
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+    	try {
+            Stack<I_EncodeBusinessProcess> processStack = worker.getProcessStack();
+            I_EncodeBusinessProcess parentProcess = processStack.get(processStack.size() - 2);
+            parentProcess.setDbDependencies(Ts.get().getLatestChangeSetDependencies());
+		} catch (IOException e) {
+			throw new TaskFailedException(e);
+		}
         return Condition.STOP;
     }
 

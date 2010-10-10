@@ -35,6 +35,7 @@ import org.dwfa.bpa.process.I_QueueProcesses;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.ihtsdo.tk.Ts;
 
 /**
  * The <code>ToSpecifiedQueue</code> task will go to a specific queue based on
@@ -88,6 +89,11 @@ public class ToSpecifiedQueue extends AbstractTask {
     }
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+    	try {
+			process.setDbDependencies(Ts.get().getLatestChangeSetDependencies());
+		} catch (IOException e) {
+			throw new TaskFailedException(e);
+		}
         return Condition.STOP;
     }
 

@@ -47,7 +47,9 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
 	public Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsActive(int typeNid) throws IOException, ContraditionException;
 	public Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsActive(NidSetBI typeNids) throws IOException, ContraditionException;
 	public Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsActiveIsa() throws IOException, ContraditionException;
-	
+
+	public int[] getRelsOutgoingDestinationsNidsActiveIsa() throws IOException;
+
 	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive() throws IOException, ContraditionException;
 	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive(int typeNid) throws IOException, ContraditionException;
 	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive(NidSetBI typeNids) throws IOException, ContraditionException;
@@ -62,5 +64,6 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
 			ConstraintCheckType subjectCheck,
 			ConstraintCheckType propertyCheck,
 			ConstraintCheckType valueCheck) throws IOException, ContraditionException;
+
 
 }

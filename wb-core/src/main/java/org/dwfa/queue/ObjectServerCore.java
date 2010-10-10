@@ -461,9 +461,10 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
     }
 
     /**
+     * @throws IOException 
      * @see org.dwfa.bpa.process.I_QueueProcesses#getProcessMetaData(org.dwfa.bpa.process.I_SelectProcesses)
      */
-    public Collection<T> getMetaData(I_SelectObjects selector) throws RemoteException {
+    public Collection<T> getMetaData(I_SelectObjects selector) throws IOException {
         if (selector == null) {
             return new ArrayList<T>(this.objectInfoSortedSet);
         }
@@ -629,7 +630,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
         return new EntryID(UUID.fromString(idParts[1]));
     }
 
-    protected abstract T getObjectDescription(Object obj, EntryID entryID);
+    protected abstract T getObjectDescription(Object obj, EntryID entryID) throws IOException;
 
     /**
      * @throws IOException

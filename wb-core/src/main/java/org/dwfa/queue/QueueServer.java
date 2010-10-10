@@ -171,9 +171,10 @@ public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> imp
     }
 
     /**
+     * @throws IOException 
      * @see org.dwfa.bpa.process.I_QueueProcesses#getProcessMetaData(org.dwfa.bpa.process.I_SelectProcesses)
      */
-    public Collection<I_DescribeBusinessProcess> getProcessMetaData(I_SelectProcesses selector) throws RemoteException {
+    public Collection<I_DescribeBusinessProcess> getProcessMetaData(I_SelectProcesses selector) throws IOException {
         return getMetaData(selector);
     }
 
@@ -211,7 +212,7 @@ public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> imp
         return ".bp.write-pending";
     }
 
-    protected I_DescribeBusinessProcess getObjectDescription(Object obj, EntryID entryID) {
+    protected I_DescribeBusinessProcess getObjectDescription(Object obj, EntryID entryID) throws IOException {
         return new BusinessProcessInfo((I_DescribeBusinessProcess) obj, entryID);
     }
 

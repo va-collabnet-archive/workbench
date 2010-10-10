@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 import org.dwfa.bpa.Branch;
 import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.NoBranchForConditionException;
+import org.ihtsdo.tk.db.DbDependency;
 
 /**
  * Business Processes are a series of tasks encoded as JavaBeans.
@@ -482,5 +483,10 @@ public interface I_EncodeBusinessProcess extends I_DefineTask, I_ManagePropertie
      * @throws MalformedURLException
      */
     public String substituteProperties(String input) throws MalformedURLException, IOException;
+    
+    public Collection<DbDependency> getDbDependencies();
+
+    public void setDbDependencies(Collection<DbDependency> dbDependencies);
+
 
 }

@@ -19,9 +19,10 @@
  */
 package org.dwfa.bpa.process;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 public interface I_SelectObjects extends Serializable {
-    public boolean select(I_DescribeObject object);
+    public boolean select(I_DescribeObject object) throws IOException;
 
 }

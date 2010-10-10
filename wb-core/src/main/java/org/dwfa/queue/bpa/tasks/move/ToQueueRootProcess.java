@@ -22,6 +22,7 @@ package org.dwfa.queue.bpa.tasks.move;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.Stack;
 
 import net.jini.core.entry.Entry;
 import net.jini.core.lookup.ServiceID;
@@ -39,6 +40,7 @@ import org.dwfa.jini.TermEntry;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
 
 /**
  * Moves the root proces to the first queue that matches the queue type.
@@ -88,6 +90,12 @@ public class ToQueueRootProcess extends AbstractTask {
      *      org.dwfa.bpa.process.I_Work)
      */
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+    	try {
+            I_EncodeBusinessProcess rootProcess = worker.getProcessStack().get(0);
+            rootProcess.setDbDependencies(Ts.get().getLatestChangeSetDependencies());
+		} catch (IOException e) {
+			throw new TaskFailedException(e);
+		}
         return Condition.STOP;
     }
 

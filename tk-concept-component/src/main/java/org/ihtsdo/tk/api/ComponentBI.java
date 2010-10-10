@@ -15,5 +15,5 @@ public interface ComponentBI {
 	public int getConceptNid();
 	
 	public String toUserString();
-
+	
 }

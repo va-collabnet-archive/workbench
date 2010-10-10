@@ -151,7 +151,7 @@ public class ConceptStatement extends RefsetSpecStatement {
                     termFactory.getRefsetExtensionMembers(queryConstraintConcept.getConceptNid());
             Set<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
             for (I_ExtendByRef ext : refsetExtensions) {
-                refsetMembers.add(termFactory.getConcept(ext.getComponentId()));
+                refsetMembers.add(termFactory.getConcept(ext.getComponentNid()));
             }
             I_RepresentIdSet refsetMemberSet = termFactory.getIdSetfromTermCollection(refsetMembers);
             if (isNegated()) {
@@ -352,7 +352,10 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @throws TerminologyException
      */
     private boolean conceptIsDescendantOf(I_GetConceptData conceptBeingTested) throws IOException, TerminologyException {
-        return queryConstraintConcept.isParentOf(conceptBeingTested, currentStatuses, allowedTypes, termFactory
+    	if (conceptBeingTested.getNid() == queryConstraintConcept.getNid()) {
+    		return false;
+    	}
+    	return queryConstraintConcept.isParentOf(conceptBeingTested, currentStatuses, allowedTypes, termFactory
             .getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
             .getConflictResolutionStrategy());
     }
@@ -419,7 +422,7 @@ public class ConceptStatement extends RefsetSpecStatement {
             }
         }
 
-        if (latestTuple != null && latestTuple.getStatusId() == requiredStatusConcept.getConceptNid()) {
+        if (latestTuple != null && latestTuple.getStatusNid() == requiredStatusConcept.getConceptNid()) {
             return true;
         }
 

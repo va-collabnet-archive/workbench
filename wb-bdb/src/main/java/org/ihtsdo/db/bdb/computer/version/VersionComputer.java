@@ -46,6 +46,8 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 
     }
 
+    private int errorCount = 0;
+    
     public void addSpecifiedVersions(NidSetBI allowedStatus, PositionBI viewPosition, List<V> specifiedVersions,
             List<V> versions, Precedence precedencePolicy, ContradictionManagerBI contradictionMgr) {
         addSpecifiedVersions(allowedStatus, (NidSetBI) null, new PositionSetReadOnly(viewPosition),
@@ -136,13 +138,16 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                                     break;
                                 }
                                 // Duplicate values encountered.
-                                AceLog.getAppLog().warning(
-                                    RELATIVE_POSITION.EQUAL + " should never happen. Data is malformed. Part:\n" + part
-                                        + " \n  Part to test: \n" + prevPartToTest);
-                                partsForPosition.remove(part);
-                                partsForPosition.remove(prevPartToTest);
-                                Version dup = part.removeDuplicates(part, prevPartToTest);
-                                partsForPosition.remove(dup);
+                                errorCount++;
+                                if (errorCount < 5) {
+                                    AceLog.getAppLog().warning(
+                                            RELATIVE_POSITION.EQUAL + " should never happen. Data is malformed. Part:\n" + part
+                                                + " \n  Part to test: \n" + prevPartToTest);
+                                        partsForPosition.remove(part);
+                                        partsForPosition.remove(prevPartToTest);
+                                        Version dup = part.removeDuplicates(part, prevPartToTest);
+                                        partsForPosition.remove(dup);
+                                }
                                 break;
                             case UNREACHABLE:
                                 // Should have failed mapper.onRoute(part)

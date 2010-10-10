@@ -28,6 +28,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.BdbProperty;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.time.TimeUtil;
 
@@ -132,8 +133,10 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
                     "\n  +++++----------------\n End of change set: " + changeSetFile.getName()
                         + "\n  +++++---------------\n");
                 nextCommit = Long.MAX_VALUE;
-                Terms.get().setProperty(FileIO.getNormalizedRelativePath(changeSetFile),
+                Terms.get().setProperty(changeSetFile.getName(),
                     Long.toString(changeSetFile.length()));
+                Terms.get().setProperty(BdbProperty.LAST_CHANGE_SET_READ.toString(),
+                        changeSetFile.getName());
                 if (csreOut != null) {
                     csreOut.flush();
                     csreOut.close();
@@ -197,12 +200,12 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
     }
 
     private void lazyInit() throws FileNotFoundException, IOException, ClassNotFoundException {
-        String lastImportSize = Terms.get().getProperty(FileIO.getNormalizedRelativePath(changeSetFile));
+        String lastImportSize = Terms.get().getProperty(changeSetFile.getName());
         if (lastImportSize != null) {
             long lastSize = Long.parseLong(lastImportSize);
             if (lastSize == changeSetFile.length()) {
                 AceLog.getAppLog().finer(
-                    "Change set already fully read: " + FileIO.getNormalizedRelativePath(changeSetFile));
+                    "Change set already fully read: " + changeSetFile.getName());
                 // already imported, set to nothing to do...
                 nextCommit = Long.MAX_VALUE;
                 initialized = true;

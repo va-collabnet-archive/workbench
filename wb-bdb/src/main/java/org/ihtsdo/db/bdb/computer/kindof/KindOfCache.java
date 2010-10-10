@@ -14,11 +14,6 @@ public class KindOfCache {
 	private int queryCount = 0;
 	
 	/**
-	 * The number of concept that have been tested and included in this cache. 
-	 */
-	private int size = 0;
-	
-	/**
 	 * The set of cNids for which kindOf has been tested.
 	 */
 	private I_RepresentIdSet tested;
@@ -30,25 +25,34 @@ public class KindOfCache {
 	 * determined to be a kind-of. 
 	 */
 	private I_RepresentIdSet kindOf;
+	private I_RepresentIdSet possiblyKindOf;
 
-	public KindOfCache() throws IOException {
+	public KindOfCache(I_RepresentIdSet possiblyKindOf) throws IOException {
 		super();
 		tested = Terms.get().getEmptyIdSet();
 		kindOf = Terms.get().getEmptyIdSet();
+		this.possiblyKindOf = possiblyKindOf;
 	}
 
 	public boolean tested(int cNid) {
+		if (possiblyKindOf.isMember(cNid) == false) {
+			return true;
+		}
 		return tested.isMember(cNid);
 	}
 	
 	public boolean isKindOf(int cNid) {
+		if (possiblyKindOf.isMember(cNid) == false) {
+			return false;
+		}
 		if (tested.isMember(cNid)) {
-			queryCount++; 
+			queryCount++;
 			lastRequestTime = System.currentTimeMillis();
 			return kindOf.isMember(cNid);
 		}
-		throw new RuntimeException("You must setKindOf before calling isKindOf." + 
-				" Use tested(int cNid) to determine if setKindOf is set.");
+		throw new RuntimeException(
+				"You must setKindOf before calling isKindOf."
+						+ " Use tested(int cNid) to determine if setKindOf is set.");
 	}
 	
 	public void setKindOf(int cNid, boolean isKindOf) {
@@ -57,12 +61,11 @@ public class KindOfCache {
 				kindOf.setMember(cNid);
 			}
 			tested.setMember(cNid);
-			size = tested.cardinality();
 		}
 	}
 
 	public int getSize() {
-		return size;
+		return tested.cardinality();
 	}
 
 	public long getLastRequestTime() {
@@ -84,5 +87,9 @@ public class KindOfCache {
 		buff.append("\n   kindOf: ");
 		buff.append(kindOf);
 		return buff.toString();
+	}
+
+	public I_RepresentIdSet getPossibleKindOfConcepts() {
+		return possiblyKindOf;
 	}
 }

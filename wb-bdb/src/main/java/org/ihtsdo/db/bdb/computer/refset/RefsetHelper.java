@@ -97,14 +97,14 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
                 // get the latest version
                 for (I_ExtendByRefPart part : extension.getMutableParts()) {
                     if (part instanceof I_ExtendByRefPartCid && (latestPart == null)
-                        || (part.getVersion() >= latestPart.getVersion())) {
+                        || (part.getTime() >= latestPart.getTime())) {
                         latestPart = (I_ExtendByRefPartCid) part;
                     }
                 }
             }
 
             // confirm its the right extension value and its status is current
-            if (latestPart != null && latestPart.getStatusId() == ReferenceConcepts.CURRENT.getNid()) {
+            if (latestPart != null && latestPart.getStatusNid() == ReferenceConcepts.CURRENT.getNid()) {
                 return latestPart;
             }
         }
@@ -129,14 +129,14 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
                 // get the latest version
                 I_ExtendByRefPart latestPart = null;
                 for (I_ExtendByRefPart part : extension.getMutableParts()) {
-                    if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
                         latestPart = part;
                     }
                 }
 
                 // confirm its the right extension value and its status is
                 // current
-                if (latestPart.getStatusId() == ReferenceConcepts.CURRENT.getNid()) {
+                if (latestPart.getStatusNid() == ReferenceConcepts.CURRENT.getNid()) {
                     result.add((T) latestPart);
                 }
             }
@@ -167,7 +167,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
                 // get the latest version
                 I_ExtendByRefPart latestPart = null;
                 for (I_ExtendByRefPart part : extension.getMutableParts()) {
-                    if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
                         latestPart = part;
                     }
                 }
@@ -268,7 +268,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
                 // get the latest version
                 I_ExtendByRefPart latestPart = null;
                 for (I_ExtendByRefPart part : extension.getMutableParts()) {
-                    if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
                         latestPart = part;
                     }
                 }
@@ -283,7 +283,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
                     I_ExtendByRefPartCid clone =
                             (I_ExtendByRefPartCid) latestPart.makeAnalog(ReferenceConcepts.RETIRED.getNid(), latestPart
-                                .getPathId(), Long.MAX_VALUE);
+                                .getPathNid(), Long.MAX_VALUE);
                     extension.addVersion(clone);
                     if (isAutocommitActive()) {
                         Terms.get().addUncommittedNoChecks(extension);

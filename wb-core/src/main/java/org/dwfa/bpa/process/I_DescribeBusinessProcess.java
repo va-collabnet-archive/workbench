@@ -19,6 +19,7 @@
  */
 package org.dwfa.bpa.process;
 
+import java.io.IOException;
 import java.util.Date;
 
 /**
@@ -76,5 +77,12 @@ public interface I_DescribeBusinessProcess extends I_DescribeObject {
      *             missing, or malformed.
      */
     public void validateDestination() throws TaskFailedException;
+    
+    /**
+     * 
+     * @return <code>true</code> if the database dependencies required by this process are satisfied. 
+     * @throws IOException 
+     */
+    public boolean dbDependenciesAreSatisfied() throws IOException;
 
 }

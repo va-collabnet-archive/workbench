@@ -43,4 +43,10 @@ public interface I_RepresentIdSet {
 
     public void clear();
 
+	void andNot(I_RepresentIdSet other);
+
+	void union(I_RepresentIdSet other);
+
+	void xor(I_RepresentIdSet other);
+
 }

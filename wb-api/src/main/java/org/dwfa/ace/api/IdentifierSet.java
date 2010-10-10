@@ -49,6 +49,22 @@ public class IdentifierSet implements I_RepresentIdSet {
 	}
 
 	protected OpenBitSet bitSet;
+	
+	@Override
+	public void andNot(I_RepresentIdSet other) {
+		bitSet.andNot(((IdentifierSet)other).bitSet);
+	}
+
+	@Override
+	public void union(I_RepresentIdSet other) {
+		bitSet.union(((IdentifierSet)other).bitSet);
+	}
+
+	@Override
+	public void xor(I_RepresentIdSet other) {
+		bitSet.xor(((IdentifierSet)other).bitSet);
+	}
+
 	private int offset = Integer.MIN_VALUE;
 	private int toStringMax = 10;
 

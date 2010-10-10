@@ -39,6 +39,7 @@ import org.dwfa.jini.TermEntry;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
 
 /**
  * @author kec
@@ -107,6 +108,11 @@ public class ToUserSelectedQueueAllGroups extends AbstractTask {
                 throw new TaskFailedException("User did not select a queue...");
             }
             q = (I_QueueProcesses) service.service;
+        	try {
+    			process.setDbDependencies(Ts.get().getLatestChangeSetDependencies());
+    		} catch (IOException e) {
+    			throw new TaskFailedException(e);
+    		}
             return Condition.STOP;
         } catch (TaskFailedException e) {
             throw e;

@@ -59,9 +59,15 @@ public class AceListRenderer extends DefaultListCellRenderer {
                     boolean uncommitted = concept.isUncommitted();
                     
                     I_DescriptionTuple desc = concept.getDescTuple(config.getShortLabelDescPreferenceList(), config);
-                    if (desc != null) {
+                    String text;
+                    if (desc == null) {
+                    	text = concept.getInitialText();
+                    } else {
+                    	text = desc.getText();
+                    }
+                    if (text != null) {
                     	if (uncommitted) {
-                            renderComponent.setText(desc.getText());
+                            renderComponent.setText(text);
                             renderComponent.setOpaque(true);
                             if (!isSelected) {
                                 renderComponent.setBackground(Color.YELLOW);
@@ -74,7 +80,7 @@ public class AceListRenderer extends DefaultListCellRenderer {
                         				BorderFactory.createMatteBorder(0, 6, 0, 6, Color.YELLOW), b));
                             }
                     	} else {
-                            renderComponent.setText(desc.getText());
+                            renderComponent.setText(text);
                             renderComponent.setOpaque(true);
                             if (!isSelected) {
                                 renderComponent.setBackground(Color.WHITE);

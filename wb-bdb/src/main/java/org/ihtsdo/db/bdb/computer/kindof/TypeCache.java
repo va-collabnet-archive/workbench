@@ -1,0 +1,122 @@
+package org.ihtsdo.db.bdb.computer.kindof;
+
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
+
+import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.concept.I_FetchConceptFromCursor;
+import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
+import org.ihtsdo.concept.ParallelConceptIterator;
+import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.NidSetBI;
+
+public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnable {
+	protected ConcurrentHashMap<Integer, int[]> typeMap;
+    private List<ParallelConceptIterator> pcis;
+    protected Coordinate coordinate;
+    private boolean ready = false;
+    private boolean cancelled = false;
+    private CountDownLatch latch = new CountDownLatch(1);
+	protected NidSetBI types;
+
+	public CountDownLatch getLatch() {
+		return latch;
+	}
+
+	public boolean isCancelled() {
+		return cancelled;
+	}
+
+	public void setCancelled(boolean cancelled) {
+		this.cancelled = cancelled;
+	}
+
+	public boolean isReady() {
+		return ready;
+	}
+
+	public TypeCache() {
+		super();
+	}
+		
+	public void setup(Coordinate coordinate) throws Exception {
+		this.coordinate = coordinate;
+		this.types = coordinate.getIsaTypeNids();
+		typeMap = new ConcurrentHashMap<Integer, int[]>(Terms.get().getConceptCount());
+		KindOfComputer.kindOfComputerService.execute(this);
+	}
+
+	private static int cacheCount = 1;
+	
+	@Override
+	public void run()  {
+		int cacheNum = cacheCount++;
+		AceLog.getAppLog().info("Starting cache setup: " + cacheNum + " " + 
+				this.getClass().getSimpleName());
+		long startTime = System.currentTimeMillis();
+		try {
+			
+			Bdb.getConceptDb().iterateConceptDataInParallel(this);
+		} catch (Exception e) {
+			AceLog.getAppLog().log(Level.INFO, e.getLocalizedMessage(), e);
+			TypeCache.this.cancelled = true;
+		}
+		latch.countDown();
+		ready = !cancelled;
+		long elapsedTime = System.currentTimeMillis() - startTime;
+		AceLog.getAppLog().info("Finised cache setup: " + cacheNum 
+				+ " in: " + elapsedTime);
+	}
+
+	public boolean isKindOf(int childNid, int parentNid) throws Exception {
+		return isKindOfNoLatch(childNid, parentNid);
+	}
+	
+	public void addParents(int cNid, I_RepresentIdSet parentNidSet) {
+		int[] parents = typeMap.get(cNid);
+		if (parents != null) {
+			for (int parentNid: parents) {
+				if (!parentNidSet.isMember(parentNid)) {
+					parentNidSet.setMember(parentNid);
+					addParents(parentNid, parentNidSet);
+				}
+			}
+		}
+	}
+
+	protected boolean isKindOfNoLatch(int childNid, int parentNid) {
+		if (!cancelled) {
+			if (childNid == parentNid) {
+				return true;
+			}
+			int[] parents = (int[]) typeMap.get(childNid);
+			if (parents != null) {
+				for (int pNid: parents) {
+					if (isKindOfNoLatch(pNid, parentNid)) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public abstract void processUnfetchedConceptData(int cNid,
+			I_FetchConceptFromCursor fcfc) throws Exception;
+
+    @Override
+    public void setParallelConceptIterators(List<ParallelConceptIterator> pcis) {
+        this.pcis = pcis;
+    }
+
+	@Override
+	public boolean continueWork() {
+		return true;
+	}
+}

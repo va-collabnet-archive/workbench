@@ -5,5 +5,7 @@ import org.ihtsdo.tk.api.ComponentChroncileBI;
 
 public interface RelationshipChronicleBI extends ComponentChroncileBI<RelationshipVersionBI> {
 
+	int getOriginNid();
+	int getDestinationNid();
 
 }

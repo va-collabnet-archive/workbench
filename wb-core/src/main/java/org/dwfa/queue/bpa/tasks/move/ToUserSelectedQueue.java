@@ -43,6 +43,7 @@ import org.dwfa.jini.TermEntry;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
 
 /**
  * @author kec
@@ -145,6 +146,11 @@ public class ToUserSelectedQueue extends AbstractTask {
 
                 throw e;
             }
+        	try {
+    			process.setDbDependencies(Ts.get().getLatestChangeSetDependencies());
+    		} catch (IOException e) {
+    			throw new TaskFailedException(e);
+    		}
             return Condition.STOP;
         } catch (Exception e) {
             throw new TaskFailedException(e);

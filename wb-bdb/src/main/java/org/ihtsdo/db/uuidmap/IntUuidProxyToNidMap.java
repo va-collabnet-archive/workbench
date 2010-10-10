@@ -574,14 +574,7 @@ public class IntUuidProxyToNidMap extends AbstractUuidToIntHashMap {
 				newValues[index] = oldValues[i];
 				newState[index] = FULL;
 			}
-		}
-		if (newCapacity > 10240) {
-		AceLog.getAppLog().info("----- Finished rehash:  newCapacity: " + 
-					newCapacity + " " + 
-				TimeUtil.getElapsedTimeString(System.currentTimeMillis() - start)
-				+ " ----- ");
-		}
-		
+		}		
 	}
 
 	/**

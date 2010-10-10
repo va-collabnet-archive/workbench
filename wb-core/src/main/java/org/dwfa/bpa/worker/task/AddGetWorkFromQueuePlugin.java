@@ -34,7 +34,7 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.jini.ElectronicAddress;
-import org.dwfa.queue.SelectAll;
+import org.dwfa.queue.SelectAllWithSatisfiedDbConstraints;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -84,7 +84,7 @@ public class AddGetWorkFromQueuePlugin extends AbstractTask {
             I_Work workerToModify = (I_Work) process.readProperty(ProcessAttachmentKeysForWorkerTasks.WORKER.getAttachmentKey());
 
             GetWorkFromQueuePlugin getWorkPlugin = new GetWorkFromQueuePlugin(workerToModify,
-                (I_QueueProcesses) services[0].service, new SelectAll());
+                (I_QueueProcesses) services[0].service, new SelectAllWithSatisfiedDbConstraints());
             workerToModify.setPluginForInterface(I_GetWorkFromQueue.class, getWorkPlugin);
             getWorkPlugin.start((I_QueueProcesses) services[0].service);
 

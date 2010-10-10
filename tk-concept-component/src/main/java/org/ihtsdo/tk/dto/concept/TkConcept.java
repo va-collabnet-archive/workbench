@@ -13,6 +13,7 @@ import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanMember;
+import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidcid.TkRefsetCidCidMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidcidcid.TkRefsetCidCidCidMember;
@@ -120,6 +121,9 @@ public class TkConcept {
                     break;
                 case CID_STR:
                     refsetMembers.add(new TkRefsetCidStrMember(in, readDataVersion));
+                    break;
+                case LONG:
+                    refsetMembers.add(new TkRefsetLongMember(in, readDataVersion));
                     break;
                 default:
                     throw new UnsupportedOperationException("Can't handle refset type: " + type);

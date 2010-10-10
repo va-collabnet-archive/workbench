@@ -83,6 +83,8 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelFrozenEditor;
 import org.dwfa.bpa.tasks.util.ChangeProcessInstanceId;
 import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.db.DbDependency;
 
 /**
  * @author kec
@@ -382,8 +384,11 @@ public class BusinessProcess implements I_EncodeBusinessProcess, VetoableChangeL
 
     // version 11
     private String docSource;
+    
+    // version 12
+    private Collection<DbDependency> dbDependencies;
 
-    // transient and static
+	// transient and static
     private transient I_DefineTask lastTaskAdded;
 
     private transient I_DefineTask lastTaskRemoved;
@@ -392,7 +397,7 @@ public class BusinessProcess implements I_EncodeBusinessProcess, VetoableChangeL
 
     private static final long serialVersionUID = 1;
 
-    private static final int dataVersion = 11;
+    private static final int dataVersion = 12;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(BusinessProcess.dataVersion);
@@ -416,6 +421,7 @@ public class BusinessProcess implements I_EncodeBusinessProcess, VetoableChangeL
         out.writeObject(this.renderer);
         out.writeObject(this.propertySpecs);
         out.writeObject(this.docSource);
+        out.writeObject(this.dbDependencies);
     }
 
     @SuppressWarnings("unchecked")
@@ -503,6 +509,11 @@ public class BusinessProcess implements I_EncodeBusinessProcess, VetoableChangeL
                 this.docSource = (String) in.readObject();
             }
 
+            if ((objDataVersion > 11)) {
+                this.dbDependencies = (Collection<DbDependency>) in.readObject();
+            } else {
+            	this.dbDependencies = new ArrayList<DbDependency>(0);
+            }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -1742,4 +1753,18 @@ public class BusinessProcess implements I_EncodeBusinessProcess, VetoableChangeL
         }
         return locaters;
     }
+    
+    public Collection<DbDependency> getDbDependencies() {
+		return dbDependencies;
+	}
+
+	public void setDbDependencies(Collection<DbDependency> dbDependencies) {
+		this.dbDependencies = dbDependencies;
+	}
+
+	@Override
+	public boolean dbDependenciesAreSatisfied() throws IOException {
+		return Ts.get().satisfiesDependencies(getDbDependencies());
+	}
+
 }

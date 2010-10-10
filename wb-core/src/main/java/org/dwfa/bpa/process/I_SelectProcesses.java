@@ -19,11 +19,13 @@
  */
 package org.dwfa.bpa.process;
 
+import java.io.IOException;
+
 /**
  * @author kec
  * 
  */
 public interface I_SelectProcesses extends I_SelectObjects {
-    public boolean select(I_DescribeBusinessProcess process);
+    public boolean select(I_DescribeBusinessProcess process) throws IOException;
 
 }

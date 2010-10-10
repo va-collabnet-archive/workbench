@@ -35,6 +35,7 @@ import org.dwfa.bpa.process.I_QueueProcesses;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.ihtsdo.tk.Ts;
 
 /**
  * The <code>ToSpecifiedQueueRootProcess</code> task will go to a specific queue
@@ -87,6 +88,12 @@ public class ToSpecifiedQueueRootProcess extends AbstractTask {
     }
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+    	try {
+            I_EncodeBusinessProcess rootProcess = worker.getProcessStack().get(0);
+            rootProcess.setDbDependencies(Ts.get().getLatestChangeSetDependencies());
+		} catch (IOException e) {
+			throw new TaskFailedException(e);
+		}
         return Condition.STOP;
     }
 

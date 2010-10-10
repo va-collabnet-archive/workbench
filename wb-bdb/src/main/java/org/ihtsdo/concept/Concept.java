@@ -73,6 +73,7 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.media.MediaChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
@@ -85,7 +86,7 @@ import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
-public class Concept implements I_Transact, I_GetConceptData {
+public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI {
 
 	public static ReferenceType refType = ReferenceType.WEAK;
 	
@@ -1286,41 +1287,6 @@ public class Concept implements I_Transact, I_GetConceptData {
     }
 
 
-    private void addPossibleKindOfConcepts(I_RepresentIdSet possibleKindOfConcepts, 
-    		NidSetBI isATypes, I_ShowActivity activity)
-            throws IOException {
-        possibleKindOfConcepts.setMember(getNid());
-        for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
-        	if (activity.isCanceled()) {
-        		return;
-        	}
-            if (isATypes.contains(pair.getTypeNid())) {
-                int destNid = Bdb.getNidCNidMap().getCNid(pair.getRelNid());
-                if (!possibleKindOfConcepts.isMember(destNid)) {
-                    possibleKindOfConcepts.setMember(Bdb.getNidCNidMap().getCNid(pair.getRelNid()));
-                    Concept origin = Bdb.getConceptForComponent(pair.getRelNid());
-                    origin.addPossibleKindOfConcepts(possibleKindOfConcepts, isATypes, activity);
-                }
-            }
-        }
-    }
-
-    private void addPossibleKindOfConcepts(I_RepresentIdSet possibleKindOfConcepts, 
-    		NidSetBI isATypes)
-            throws IOException {
-        possibleKindOfConcepts.setMember(getNid());
-        for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
-            if (isATypes.contains(pair.getTypeNid())) {
-                int destNid = Bdb.getNidCNidMap().getCNid(pair.getRelNid());
-                if (!possibleKindOfConcepts.isMember(destNid)) {
-                    possibleKindOfConcepts.setMember(Bdb.getNidCNidMap().getCNid(pair.getRelNid()));
-                    Concept origin = Bdb.getConceptForComponent(pair.getRelNid());
-                    origin.addPossibleKindOfConcepts(possibleKindOfConcepts, isATypes);
-                }
-            }
-        }
-    }
-
     public Set<Integer> getPossibleDestRelsOfTypes(NidSetBI relTypes) throws IOException {
         Set<Integer> possibleRelNids = new HashSet<Integer>();
         for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
@@ -1386,39 +1352,42 @@ public class Concept implements I_Transact, I_GetConceptData {
         }
         return returnRels;
     }
-
+    
     @Override
     public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config, 
     		I_ShowActivity activity) throws IOException {
         NidSetBI isATypes = config.getDestRelTypes();
-        I_RepresentIdSet possibleKindOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
-        possibleKindOfConcepts.setMember(getNid());
-        for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
-        	if (activity.isCanceled()) {
-        		return possibleKindOfConcepts;
-        	}
-            if (isATypes.contains(pair.getTypeNid())) {
-                possibleKindOfConcepts.setMember(Bdb.getNidCNidMap().getCNid(pair.getRelNid()));
-                Concept origin = Bdb.getConceptForComponent(pair.getRelNid());
-                origin.addPossibleKindOfConcepts(possibleKindOfConcepts, 
-                		isATypes, activity);
-            }
-        }
-        return possibleKindOfConcepts;
+        return getPossibleKindOfConcepts(isATypes, activity);
     }
 
-    public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {
-        NidSetBI isATypes = config.getDestRelTypes();
-        I_RepresentIdSet possibleKindOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
+	public I_RepresentIdSet getPossibleKindOfConcepts(NidSetBI isATypes,
+			I_ShowActivity activity) throws IOException {
+		I_RepresentIdSet possibleKindOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
         possibleKindOfConcepts.setMember(getNid());
-        for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
+        
+        collectKindOf(activity, isATypes, possibleKindOfConcepts, nid);
+        
+        return possibleKindOfConcepts;
+	}
+
+	private void collectKindOf(I_ShowActivity activity, NidSetBI isATypes,
+			I_RepresentIdSet possibleKindOfConcepts, int cNid) throws IOException {
+		for (NidPairForRel pair : Bdb.getDestRelPairs(cNid)) {
+        	if (activity != null && activity.isCanceled()) {
+        		return;
+        	}
             if (isATypes.contains(pair.getTypeNid())) {
-                possibleKindOfConcepts.setMember(Bdb.getNidCNidMap().getCNid(pair.getRelNid()));
-                Concept origin = Bdb.getConceptForComponent(pair.getRelNid());
-                origin.addPossibleKindOfConcepts(possibleKindOfConcepts, isATypes);
+            	int cNidForOrigin = Bdb.getNidCNidMap().getCNid(pair.getRelNid());
+            	if (possibleKindOfConcepts.isMember(cNidForOrigin) == false) {
+                    possibleKindOfConcepts.setMember(cNidForOrigin);
+                    collectKindOf(activity, isATypes, possibleKindOfConcepts, cNidForOrigin);
+            	}
             }
         }
-        return possibleKindOfConcepts;
+	}
+
+    public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {
+        return getPossibleKindOfConcepts(config, null) ;
     }
 
     public boolean hasExtensionsForComponent(int nid) throws IOException {

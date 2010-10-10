@@ -147,6 +147,7 @@ import org.ihtsdo.lucene.CheckAndProcessLuceneMatch;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.api.ComponentBI;
+import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -1347,7 +1348,12 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
     
     public UUID nidToUuid(int nid) throws IOException {
-    	return Bdb.getConceptForComponent(nid).getComponent(nid).getPrimUuid();
+    	Concept c = Bdb.getConceptForComponent(nid);
+    	assert c != null: "No concept for nid: " + nid;
+    	ComponentChroncileBI<?> component = c.getComponent(nid);
+    	assert component != null: "No component in concept for nid: " + nid + 
+    		"\n\n\n" + c.toLongString();
+    	return component.getPrimUuid();
     }
 
     @Override

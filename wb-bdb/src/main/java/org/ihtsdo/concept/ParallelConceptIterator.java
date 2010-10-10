@@ -40,6 +40,7 @@ public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConcep
     private DatabaseEntry roFoundData;
     private DatabaseEntry mutableFoundData;
     private Thread currentThread;
+    private boolean stop = false;
 
     public ParallelConceptIterator(int first, int last, int count, I_ProcessUnfetchedConceptData processor,
             Database readOnly, Database mutable) {
@@ -175,6 +176,9 @@ public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConcep
     }
 
     private int advanceCursor(Cursor mutableCursor, DatabaseEntry mutableFoundKey, DatabaseEntry mutableFoundData) {
+    	if (stop) {
+    		return Integer.MAX_VALUE;
+    	}
         int mutableKey;
         if (mutableCursor.getNext(mutableFoundKey, mutableFoundData, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
             mutableKey = IntegerBinding.entryToInt(mutableFoundKey);
@@ -200,5 +204,9 @@ public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConcep
 
     public void setCurrentThread(Thread currentThread) {
         this.currentThread = currentThread;
+    }
+    
+    public void stop() {
+    	this.stop = true;
     }
 }

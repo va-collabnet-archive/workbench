@@ -33,6 +33,7 @@ import org.dwfa.bpa.process.I_DescribeBusinessProcess;
 import org.dwfa.bpa.process.I_DescribeQueueEntry;
 import org.dwfa.bpa.process.I_QueueProcesses;
 import org.dwfa.queue.SelectAll;
+import org.dwfa.queue.SelectAllWithSatisfiedDbConstraints;
 
 public class QueueTableModel extends AbstractTableModel {
     /**
@@ -65,7 +66,7 @@ public class QueueTableModel extends AbstractTableModel {
     
     public void updateQueueData() throws RemoteException, IOException {
 
-        Collection<I_DescribeBusinessProcess> newData = queue.getProcessMetaData(new SelectAll());
+        Collection<I_DescribeBusinessProcess> newData = queue.getProcessMetaData(new SelectAllWithSatisfiedDbConstraints());
         if (metaData == null) {
             metaData = new ArrayList<I_DescribeBusinessProcess>(newData);
         } else if (newData.equals(metaData)) {

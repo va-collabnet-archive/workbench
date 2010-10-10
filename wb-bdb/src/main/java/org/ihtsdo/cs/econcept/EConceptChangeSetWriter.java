@@ -8,11 +8,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.Semaphore;
 
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.cs.I_ComputeEConceptForChangeSet;
+import org.ihtsdo.db.bdb.BdbProperty;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.NidSetBI;
@@ -73,6 +75,14 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
 
 	@Override
 	public void open(NidSetBI commitSapNids) throws IOException {
+		if (changeSetFile.exists()) {
+		   Terms.get().setProperty(changeSetFile.getName(),
+		                Long.toString(changeSetFile.length()));
+		} else {
+		   Terms.get().setProperty(changeSetFile.getName(), "0");
+		}
+        Terms.get().setProperty(BdbProperty.LAST_CHANGE_SET_WRITTEN.toString(),
+                changeSetFile.getName());
 	    this.commitSapNids = commitSapNids;
 		computer = new EConceptChangeSetComputer(policy, commitSapNids);
         if (changeSetFile.exists() == false) {
@@ -128,6 +138,13 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
             }
             if (changeSetFile.length() == 0) {
                 changeSetFile.delete();
+            } else {
+                AceLog.getAppLog().info("Finished import of: " + changeSetFile.getName() + 
+                		" size: " + changeSetFile.length());
+                Terms.get().setProperty(changeSetFile.getName(),
+                        Long.toString(changeSetFile.length()));
+                Terms.get().setProperty(BdbProperty.LAST_CHANGE_SET_WRITTEN.toString(),
+                        changeSetFile.getName());
             }
         }
 	}

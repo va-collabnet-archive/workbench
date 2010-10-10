@@ -19,6 +19,7 @@
  */
 package org.dwfa.bpa;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
@@ -47,8 +48,9 @@ public class BusinessProcessInfo implements I_DescribeQueueEntry, Serializable {
     private String subject;
     private String name;
     private EntryID entryID;
+    private boolean dbDependenciesAreSatisfied;
 
-    /**
+	/**
      * @param processID
      * @param deadline
      * @param priority
@@ -57,7 +59,7 @@ public class BusinessProcessInfo implements I_DescribeQueueEntry, Serializable {
      * @param subject
      */
     public BusinessProcessInfo(ProcessID processID, Date deadline, Priority priority, String originator,
-            String destination, String subject, String name, EntryID entryID) {
+            String destination, String subject, String name, EntryID entryID, boolean dbDependenciesAreSatisfied) {
         super();
         this.processID = processID;
         this.deadline = deadline;
@@ -67,16 +69,17 @@ public class BusinessProcessInfo implements I_DescribeQueueEntry, Serializable {
         this.subject = subject;
         this.name = name;
         this.entryID = entryID;
+        this.dbDependenciesAreSatisfied = dbDependenciesAreSatisfied;
     }
 
-    public BusinessProcessInfo(I_DescribeQueueEntry info) {
+    public BusinessProcessInfo(I_DescribeQueueEntry info) throws IOException {
         this(info.getProcessID(), info.getDeadline(), info.getPriority(), info.getOriginator(), info.getDestination(),
-            info.getSubject(), info.getName(), info.getEntryID());
+            info.getSubject(), info.getName(), info.getEntryID(), info.dbDependenciesAreSatisfied());
     }
 
-    public BusinessProcessInfo(I_DescribeBusinessProcess info, EntryID entryID) {
+    public BusinessProcessInfo(I_DescribeBusinessProcess info, EntryID entryID) throws IOException {
         this(info.getProcessID(), info.getDeadline(), info.getPriority(), info.getOriginator(), info.getDestination(),
-            info.getSubject(), info.getName(), entryID);
+            info.getSubject(), info.getName(), entryID, info.dbDependenciesAreSatisfied());
     }
 
     /**
@@ -185,5 +188,9 @@ public class BusinessProcessInfo implements I_DescribeQueueEntry, Serializable {
     public int hashCode() {
         return entryID.hashCode();
     }
+
+    public boolean dbDependenciesAreSatisfied() {
+		return dbDependenciesAreSatisfied;
+	}
 
 }

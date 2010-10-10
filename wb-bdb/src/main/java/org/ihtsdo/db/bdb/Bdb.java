@@ -58,7 +58,7 @@ import com.sleepycat.je.EnvironmentLockedException;
 import com.sleepycat.je.EnvironmentMutableConfig;
 
 public class Bdb {
-
+	
 	private static final String G_VERSION = "gVersion";
 	public static AtomicLong gVersion = new AtomicLong();
 	private static Bdb readOnly;
@@ -71,7 +71,7 @@ public class Bdb {
 	private static PropertiesBdb propDb;
 	public static Xref xref;
 
-	private static ThreadGroup dbdThreadGroup  = 
+	public static ThreadGroup dbdThreadGroup  = 
 		new ThreadGroup("db threads");
 
 	private static ExecutorService syncService;
@@ -83,6 +83,10 @@ public class Bdb {
 	
 	private static boolean closed = true;
 	
+	public static boolean isClosed() {
+		return closed;
+	}
+
 	public static void commit() throws IOException {
 		long commitTime = System.currentTimeMillis();
 		statusAtPositionDb.commit(commitTime);
