@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -90,7 +91,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 
     private JComboBox updateOptions = new JComboBox(new String[] { REPLACE_OPTION, RETIRE_OPTION, SKIP_OPTION });
     private JTextArea editorComments = new JTextArea();
-    private TermComponentLabel replacementConceptLabel;
+    private ArrayList<TermComponentLabel> replacementConceptLabel;
 
     private I_GetConceptData refsetSpec;
     private Set<PositionBI> refsetSpecVersionSet;
@@ -115,11 +116,12 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
             I_ConfigAceFrame frameConfig) throws IOException, TerminologyException {
         super();
         replacementConceptLabel = null;
-        replacementConceptLabel = new TermComponentLabel(frameConfig);
+        replacementConceptLabel = new ArrayList<TermComponentLabel>();
+        replacementConceptLabel.add(new TermComponentLabel(frameConfig));
+
         this.refsetHelper = Terms.get().getRefsetHelper(frameConfig);
-        this.refsetSpec = this.refsetHelper.getSpecificationRefsetForRefset(refsetIdentityConcept, frameConfig)
-            .iterator()
-            .next();
+        this.refsetSpec =
+                this.refsetHelper.getSpecificationRefsetForRefset(refsetIdentityConcept, frameConfig).iterator().next();
         this.refsetSpecVersionSet = refsetSpecVersionSet;
         this.sourceTerminologyVersionSet = sourceTerminologyVersionSet;
         this.clausesToUpdate = clausesToUpdate;
@@ -143,9 +145,9 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         notCurrentStatus.add(ArchitectonicAuxiliary.Concept.EXTINCT.localize().getNid());
 
         I_ExtendByRef member = tf.getExtension(Terms.get().uuidToNative(clauseIds));
-        List<I_ExtendByRefVersion> tuples = (List<I_ExtendByRefVersion>) member.getTuples(
-            frameConfig.getAllowedStatus(), new PositionSetReadOnly(refsetSpecVersionSet), frameConfig.getPrecedence(),
-            frameConfig.getConflictResolutionStrategy());
+        List<I_ExtendByRefVersion> tuples =
+                (List<I_ExtendByRefVersion>) member.getTuples(frameConfig.getAllowedStatus(), new PositionSetReadOnly(
+                    refsetSpecVersionSet), frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
         for (I_ExtendByRefVersion tuple : tuples) {
             if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
                 I_ExtendByRefPartCidCid ccPart = (I_ExtendByRefPartCidCid) tuple.getMutablePart();
@@ -225,17 +227,17 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         gbc.gridy = 0;
         gbc.weighty = 0.0;
         gbc.insets = new Insets(5, 10, 5, 5); // padding (Top, Left, Bottom,
-                                              // Right)
+        // Right)
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(new JLabel("Refset Spec:"), gbc);
 
         gbc = new GridBagConstraints();
-        gbc.gridx = 2;
+        gbc.gridx = 3;
         gbc.gridy = 0;
         gbc.weighty = 0.0;
         gbc.insets = new Insets(5, 5, 5, 5); // padding (Top, Left, Bottom,
-                                             // Right)
+        // Right)
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         TermComponentLabel refsetSpecLabel = new TermComponentLabel(frameConfig);
@@ -251,17 +253,17 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         gbc.gridy = 1;
         gbc.weighty = 0.0;
         gbc.insets = new Insets(5, 10, 5, 5); // padding (Top, Left, Bottom,
-                                              // Right)
+        // Right)
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(new JLabel("Clause to Update:"), gbc);
 
         gbc = new GridBagConstraints();
-        gbc.gridx = 2;
+        gbc.gridx = 3;
         gbc.gridy = 1;
         gbc.weighty = 0.0;
         gbc.insets = new Insets(5, 5, 5, 5); // padding (Top, Left, Bottom,
-                                             // Right)
+        // Right)
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         StringBuffer buff = new StringBuffer();
@@ -270,9 +272,10 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         Collection<UUID> clauseIds = clausesToUpdate.get(0);
         I_ExtendByRef member = tf.getExtension(Terms.get().uuidToNative(clauseIds));
 
-        List<I_ExtendByRefVersion> tuples = (List<I_ExtendByRefVersion>) member.getTuples(
-            frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(), frameConfig.getPrecedence(),
-            frameConfig.getConflictResolutionStrategy());
+        List<I_ExtendByRefVersion> tuples =
+                (List<I_ExtendByRefVersion>) member.getTuples(frameConfig.getAllowedStatus(), frameConfig
+                    .getViewPositionSetReadOnly(), frameConfig.getPrecedence(), frameConfig
+                    .getConflictResolutionStrategy());
 
         I_ExtendByRefVersion tuple = tuples.iterator().next();
         if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
@@ -298,17 +301,17 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         gbc.gridy = 2;
         gbc.weighty = 0.0;
         gbc.insets = new Insets(5, 10, 5, 5); // padding (Top, Left, Bottom,
-                                              // Right)
+        // Right)
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(new JLabel("Specification Version:"), gbc);
 
         gbc = new GridBagConstraints();
-        gbc.gridx = 2;
+        gbc.gridx = 3;
         gbc.gridy = 2;
         gbc.weighty = 0.0;
         gbc.insets = new Insets(5, 5, 5, 5); // padding (Top, Left, Bottom,
-                                             // Right)
+        // Right)
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(new JLabel(refsetSpecVersionSet.toString()), gbc);
@@ -321,17 +324,17 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         gbc.gridy = 3;
         gbc.weighty = 0.0;
         gbc.insets = new Insets(5, 10, 5, 5); // padding (Top, Left, Bottom,
-                                              // Right)
+        // Right)
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(new JLabel("Terminology Version:"), gbc);
 
         gbc = new GridBagConstraints();
-        gbc.gridx = 2;
+        gbc.gridx = 3;
         gbc.gridy = 3;
         gbc.weighty = 0.0;
         gbc.insets = new Insets(5, 5, 5, 5); // padding (Top, Left, Bottom,
-                                             // Right)
+        // Right)
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(new JLabel(sourceTerminologyVersionSet.toString()), gbc);
@@ -345,7 +348,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         gbc.weighty = 0.0;
         gbc.gridwidth = 1;
         gbc.insets = new Insets(25, 10, 5, 5); // padding (Top, Left, Bottom,
-                                               // Right)
+        // Right)
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         Font sansSerifFontBold14 = new Font(Font.SANS_SERIF, Font.BOLD, 14);
@@ -358,9 +361,9 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.weighty = 0.0;
-        gbc.gridwidth = 3;
+        gbc.gridwidth = 4;
         gbc.insets = new Insets(0, indentSize, 5, 5); // padding (Top, Left,
-                                                      // Bottom, Right)
+        // Bottom, Right)
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         Font sansSerifFontBold12 = new Font(Font.SANS_SERIF, Font.BOLD, 12);
@@ -381,7 +384,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         gbc.gridy = 6;
         gbc.weighty = 0.0;
         gbc.insets = new Insets(5, indentSize, 5, 5); // padding (Top, Left,
-                                                      // Bottom, Right)
+        // Bottom, Right)
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(new JLabel("Concept Relations:"), gbc);
@@ -391,11 +394,11 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         gbc.gridy = 7;
         gbc.weightx = 1;
         gbc.weighty = 1;
-        gbc.gridwidth = 3;
+        gbc.gridwidth = 4;
         gbc.gridheight = 1;
         gbc.insets = new Insets(5, indentSize + 15, 5, 5); // padding (Top,
-                                                           // Left, Bottom,
-                                                           // Right)
+        // Left, Bottom,
+        // Right)
         gbc.anchor = GridBagConstraints.FIRST_LINE_START;
         gbc.fill = GridBagConstraints.BOTH;
         add(new JScrollPane(relTable), gbc);
@@ -408,17 +411,17 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         gbc.gridy = 8;
         gbc.weighty = 0.0;
         gbc.insets = new Insets(5, indentSize, 5, 5); // padding (Top, Left,
-                                                      // Bottom, Right)
+        // Bottom, Right)
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(new JLabel("Refresh Action:"), gbc);
 
         gbc = new GridBagConstraints();
-        gbc.gridx = 2;
+        gbc.gridx = 3;
         gbc.gridy = 8;
         gbc.weighty = 0.0;
         gbc.insets = new Insets(5, 5, 5, 5); // padding (Top, Left, Bottom,
-                                             // Right)
+        // Right)
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(updateOptions, gbc);
@@ -427,29 +430,56 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         // Concept Drop Zone...
         // -------------------------------------------------
         if (updateOptions.getSelectedItem().equals(REPLACE_OPTION)) {
-
             gbc = new GridBagConstraints();
             gbc.gridx = 0;
             gbc.gridy = 9;
             gbc.weighty = 0.0;
             gbc.insets = new Insets(5, indentSize, 5, 5); // padding (Top, Left,
-                                                          // Bottom, Right)
+            // Bottom, Right)
             gbc.anchor = GridBagConstraints.LINE_START;
             gbc.fill = GridBagConstraints.HORIZONTAL;
             add(new JLabel("Concept Replacement:"), gbc);
 
             gbc = new GridBagConstraints();
+            gbc.gridx = 1;
+            gbc.gridy = 9;
+            gbc.weighty = 0.0;
+            gbc.insets = new Insets(5, 1, 5, 1);
+            gbc.anchor = GridBagConstraints.EAST;
+            gbc.fill = GridBagConstraints.NONE;
+            JButton addNewReplacementSlotButton = new JButton("+");
+            addNewReplacementSlotButton.setToolTipText("Add empty replacement slot");
+            addNewReplacementSlotButton.addActionListener(new AddReplacementButtonListener());
+            add(addNewReplacementSlotButton, gbc);
+
+            gbc = new GridBagConstraints();
             gbc.gridx = 2;
             gbc.gridy = 9;
             gbc.weighty = 0.0;
+            gbc.insets = new Insets(5, 0, 5, 5);
+            gbc.anchor = GridBagConstraints.EAST;
+            gbc.fill = GridBagConstraints.NONE;
+            JButton removeReplacementSlotButton = new JButton("-");
+            removeReplacementSlotButton.setToolTipText("Remove empty replacement slot");
+            removeReplacementSlotButton.addActionListener(new RemoveReplacementButtonListener());
+            add(removeReplacementSlotButton, gbc);
+
+            gbc = new GridBagConstraints();
+            gbc.gridx = 3;
+            gbc.gridy = 9;
+            gbc.weighty = 0.0;
             gbc.insets = new Insets(5, 5, 5, 5); // padding (Top, Left, Bottom,
-                                                 // Right)
+            // Right)
             gbc.anchor = GridBagConstraints.LINE_START;
             gbc.fill = GridBagConstraints.HORIZONTAL;
-            replacementConceptLabel.setBorder(BorderFactory.createLoweredBevelBorder());
-            replacementConceptLabel.setBackground(Color.green);
-            add(replacementConceptLabel, gbc);
-
+            int labelCount = 0;
+            for (TermComponentLabel label : replacementConceptLabel) {
+                label.setBorder(BorderFactory.createLoweredBevelBorder());
+                label.setBackground(Color.green);
+                gbc.gridy = 9 + labelCount;
+                add(label, gbc);
+                labelCount++;
+            }
         }
 
         // -------------------------------------------------
@@ -459,22 +489,22 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 
             gbc = new GridBagConstraints();
             gbc.gridx = 0;
-            gbc.gridy = 10;
+            gbc.gridy = 9 + replacementConceptLabel.size();
             gbc.weighty = 0.0;
             gbc.insets = new Insets(5, indentSize, 5, 5); // padding (Top, Left,
-                                                          // Bottom, Right)
+            // Bottom, Right)
             gbc.anchor = GridBagConstraints.LINE_START;
             gbc.fill = GridBagConstraints.HORIZONTAL;
             add(new JLabel("Comments:"), gbc);
 
             gbc = new GridBagConstraints();
-            gbc.gridx = 2;
-            gbc.gridy = 10;
+            gbc.gridx = 3;
+            gbc.gridy = 9 + replacementConceptLabel.size();
             gbc.weightx = 1;
             gbc.weighty = 1;
             gbc.gridheight = 3;
             gbc.insets = new Insets(5, 5, 5, 5); // padding (Top, Left, Bottom,
-                                                 // Right)
+            // Right)
             gbc.anchor = GridBagConstraints.LINE_START;
             gbc.fill = GridBagConstraints.BOTH;
             editorComments.setLineWrap(true);
@@ -604,72 +634,103 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
             // Do replacement here...
 
             // Make sure a replacement Concept has been set
-            if (replacementConceptLabel == null || replacementConceptLabel.getTermComponent() == null) {
+            if (replacementConceptLabel == null) {
                 // Warn the user and skip
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                     "Please choose a 'Concept Replacement' to use this Refresh Action.", "", JOptionPane.ERROR_MESSAGE);
             } else {
-                Collection<UUID> clauseIds = clausesToUpdate.remove(0);
-                I_ExtendByRef member = tf.getExtension(tf.uuidToNative(clauseIds));
-                List<I_ExtendByRefVersion> tuples = new ArrayList<I_ExtendByRefVersion>();
-                member.addTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), tuples,
-                    config.getPrecedence(), config.getConflictResolutionStrategy());
-                PathSetReadOnly promotionPath = new PathSetReadOnly(config.getPromotionPathSet());
-                PositionBI viewPosition = config.getViewPositionSet().iterator().next();
-                PathBI editPath = config.getEditingPathSet().iterator().next();
-
-                for (I_ExtendByRefVersion tuple : tuples) {
-                    I_ExtendByRefPartCidCid newRetiredPart = (I_ExtendByRefPartCidCid) tuple.getMutablePart()
-                        .makeAnalog(retiredNid, editPath.getConceptNid(), Long.MAX_VALUE);
-                    member.addVersion(newRetiredPart);
-
-                    RefsetPropertyMap propMap = new RefsetPropertyMap();
-                    if (newRetiredPart.getC1id() == conceptUnderReview.getConceptNid()) {
-                        propMap.put(REFSET_PROPERTY.CID_ONE, replacementConceptLabel.getTermComponent().getNid());
-                    } else {
-                        propMap.put(REFSET_PROPERTY.CID_ONE, newRetiredPart.getC1id());
+                boolean replacementFound = false;
+                for (TermComponentLabel label : replacementConceptLabel) {
+                    if (label.getTermComponent() != null) {
+                        replacementFound = true;
                     }
-                    if (newRetiredPart.getC2id() == conceptUnderReview.getConceptNid()) {
-                        propMap.put(REFSET_PROPERTY.CID_TWO, replacementConceptLabel.getTermComponent().getNid());
-                    } else {
-                        propMap.put(REFSET_PROPERTY.CID_TWO, newRetiredPart.getC2id());
-                    }
-                    I_ExtendByRef newMember;
-                    switch (REFSET_TYPES.nidToType(tuple.getTypeId())) {
-                    case CID_CID:
-                        newMember = this.refsetHelper.getOrCreateRefsetExtension(member.getRefsetId(),
-                            member.getComponentId(), REFSET_TYPES.CID_CID, propMap, UUID.randomUUID());
-                        break;
-                    case CID_CID_CID:
-                        I_ExtendByRefPartCidCidCid c3Part = (I_ExtendByRefPartCidCidCid) newRetiredPart;
-                        if (c3Part.getC3id() == conceptUnderReview.getConceptNid()) {
-                            propMap.put(REFSET_PROPERTY.CID_THREE, replacementConceptLabel.getTermComponent().getNid());
-                        } else {
-                            propMap.put(REFSET_PROPERTY.CID_THREE, c3Part.getC3id());
+                }
+                if (!replacementFound) {
+                    // Warn the user and skip
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "Please choose a 'Concept Replacement' to use this Refresh Action.", "",
+                        JOptionPane.ERROR_MESSAGE);
+                } else {
+                    Collection<UUID> clauseIds = clausesToUpdate.remove(0);
+                    I_ExtendByRef member = tf.getExtension(tf.uuidToNative(clauseIds));
+                    List<I_ExtendByRefVersion> tuples = new ArrayList<I_ExtendByRefVersion>();
+                    member.addTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), tuples, config
+                        .getPrecedence(), config.getConflictResolutionStrategy());
+                    PathSetReadOnly promotionPath = new PathSetReadOnly(config.getPromotionPathSet());
+                    PositionBI viewPosition = config.getViewPositionSet().iterator().next();
+                    PathBI editPath = config.getEditingPathSet().iterator().next();
+                    boolean retire = true;
+                    I_ExtendByRefPartCidCid newRetiredPart = null;
+                    for (TermComponentLabel label : replacementConceptLabel) {
+
+                        for (I_ExtendByRefVersion tuple : tuples) {
+                            if (newRetiredPart == null) {
+                                newRetiredPart =
+                                        (I_ExtendByRefPartCidCid) tuple.getMutablePart().makeAnalog(retiredNid,
+                                            editPath.getConceptNid(), Long.MAX_VALUE);
+                            }
+                            if (retire) {
+                                member.addVersion(newRetiredPart);
+                            }
+
+                            RefsetPropertyMap propMap = new RefsetPropertyMap();
+                            if (newRetiredPart.getC1id() == conceptUnderReview.getConceptNid()) {
+                                propMap.put(REFSET_PROPERTY.CID_ONE, label.getTermComponent().getNid());
+                            } else {
+                                propMap.put(REFSET_PROPERTY.CID_ONE, newRetiredPart.getC1id());
+                            }
+                            if (newRetiredPart.getC2id() == conceptUnderReview.getConceptNid()) {
+                                propMap.put(REFSET_PROPERTY.CID_TWO, label.getTermComponent().getNid());
+                            } else {
+                                propMap.put(REFSET_PROPERTY.CID_TWO, newRetiredPart.getC2id());
+                            }
+                            I_ExtendByRef newMember;
+                            switch (REFSET_TYPES.nidToType(tuple.getTypeId())) {
+                            case CID_CID:
+                                newMember =
+                                        this.refsetHelper.getOrCreateRefsetExtension(member.getRefsetId(), member
+                                            .getComponentId(), REFSET_TYPES.CID_CID, propMap, UUID.randomUUID());
+                                break;
+                            case CID_CID_CID:
+                                I_ExtendByRefPartCidCidCid c3Part = (I_ExtendByRefPartCidCidCid) newRetiredPart;
+                                if (c3Part.getC3id() == conceptUnderReview.getConceptNid()) {
+                                    propMap.put(REFSET_PROPERTY.CID_THREE, label.getTermComponent().getNid());
+                                } else {
+                                    propMap.put(REFSET_PROPERTY.CID_THREE, c3Part.getC3id());
+                                }
+                                newMember =
+                                        this.refsetHelper.getOrCreateRefsetExtension(member.getRefsetId(), member
+                                            .getComponentId(), REFSET_TYPES.CID_CID_CID, propMap, UUID.randomUUID());
+                                break;
+                            default:
+                                throw new Exception("Can't handle: " + REFSET_TYPES.nidToType(member.getTypeId()));
+                            }
+                            if (writeComment) {
+                                RefsetPropertyMap commentPropMap = new RefsetPropertyMap();
+                                commentPropMap.put(REFSET_PROPERTY.STRING_VALUE, editorComments.getText());
+                                comment =
+                                        this.refsetHelper.getOrCreateRefsetExtension(commentRefset.getConceptNid(),
+                                            newMember.getComponentId(), REFSET_TYPES.STR, commentPropMap, UUID
+                                                .randomUUID());
+                                tf.addUncommittedNoChecks(commentRefset);
+                            }
+                            tf.addUncommittedNoChecks(refsetSpec);
+                            tf.commit();
+                            if (retire) {
+                                member.promote(viewPosition, promotionPath, retiredSet, frameConfig.getPrecedence());
+                            }
+                            newMember.promote(viewPosition, promotionPath, currentSet, frameConfig.getPrecedence());
+                            tf.addUncommittedNoChecks(refsetSpec);
+                            if (comment != null) {
+                                comment.promote(viewPosition, promotionPath, currentSet, frameConfig.getPrecedence());
+                                tf.addUncommittedNoChecks(commentRefset);
+                            }
+                            tf.commit();
+                            if (retire) {
+                                retire = false; // only retire the clause once, even if multiple replacements are added
+                            }
                         }
-                        newMember = this.refsetHelper.getOrCreateRefsetExtension(member.getRefsetId(),
-                            member.getComponentId(), REFSET_TYPES.CID_CID_CID, propMap, UUID.randomUUID());
-                        break;
-                    default:
-                        throw new Exception("Can't handle: " + REFSET_TYPES.nidToType(member.getTypeId()));
                     }
-                    if (writeComment) {
-                        RefsetPropertyMap commentPropMap = new RefsetPropertyMap();
-                        commentPropMap.put(REFSET_PROPERTY.STRING_VALUE, editorComments.getText());
-                        comment = this.refsetHelper.getOrCreateRefsetExtension(commentRefset.getConceptNid(),
-                            newMember.getComponentId(), REFSET_TYPES.STR, commentPropMap, UUID.randomUUID());
-                        tf.addUncommittedNoChecks(commentRefset);
-                    }
-                    tf.addUncommittedNoChecks(refsetSpec);
-                    tf.commit();
-                    member.promote(viewPosition, promotionPath, retiredSet, frameConfig.getPrecedence());
-                    newMember.promote(viewPosition, promotionPath, currentSet, frameConfig.getPrecedence());
-                    tf.addUncommittedNoChecks(refsetSpec);
-                    if (comment != null) {
-                        comment.promote(viewPosition, promotionPath, currentSet, frameConfig.getPrecedence());
-                        tf.addUncommittedNoChecks(commentRefset);
-                    }
-                    tf.commit();
                 }
             } // End check for replacementConceptLabel
         } else if (updateOptions.getSelectedItem().equals(RETIRE_OPTION)) {
@@ -677,20 +738,22 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
             Collection<UUID> clauseIds = clausesToUpdate.remove(0);
             I_ExtendByRef member = tf.getExtension(tf.uuidToNative(clauseIds));
             List<I_ExtendByRefVersion> tuples = new ArrayList<I_ExtendByRefVersion>();
-            member.addTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), tuples,
-                config.getPrecedence(), config.getConflictResolutionStrategy());
+            member.addTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), tuples, config
+                .getPrecedence(), config.getConflictResolutionStrategy());
             PathSetReadOnly promotionPath = new PathSetReadOnly(config.getPromotionPathSet());
             PositionBI viewPosition = config.getViewPositionSet().iterator().next();
 
             for (I_ExtendByRefVersion tuple : tuples) {
-                tuple.addVersion((I_ExtendByRefPart) tuple.getMutablePart().makeAnalog(retiredNid, viewPosition.getPath().getConceptNid(), Long.MAX_VALUE));
+                tuple.addVersion((I_ExtendByRefPart) tuple.getMutablePart().makeAnalog(retiredNid,
+                    viewPosition.getPath().getConceptNid(), Long.MAX_VALUE));
             }
             tf.addUncommittedNoChecks(refsetSpec);
             if (writeComment) {
                 RefsetPropertyMap commentPropMap = new RefsetPropertyMap();
                 commentPropMap.put(REFSET_PROPERTY.STRING_VALUE, editorComments.getText());
-                comment = this.refsetHelper.getOrCreateRefsetExtension(commentRefset.getConceptNid(),
-                    member.getComponentId(), REFSET_TYPES.STR, commentPropMap, UUID.randomUUID());
+                comment =
+                        this.refsetHelper.getOrCreateRefsetExtension(commentRefset.getConceptNid(), member
+                            .getComponentId(), REFSET_TYPES.STR, commentPropMap, UUID.randomUUID());
                 tf.addUncommittedNoChecks(commentRefset);
             }
             tf.commit();
@@ -706,6 +769,52 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
             // remove from front, add to end...
             clausesToUpdate.add(clausesToUpdate.remove(0));
         }
+    }
+
+    public class AddReplacementButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+
+            try {
+                replacementConceptLabel.add(new TermComponentLabel(frameConfig));
+                layoutRefreshSpecClausePanel();
+            } catch (IOException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            } catch (TerminologyException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
+        }
+
+    }
+
+    public class RemoveReplacementButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+
+            try {
+
+                TermComponentLabel labelToRemove = null;
+                for (TermComponentLabel label : replacementConceptLabel) {
+                    if (label.getText().equals("<html><font color=red>Empty")) {
+                        labelToRemove = label;
+                    }
+                }
+                if (labelToRemove != null) {
+                    if (replacementConceptLabel.size() > 1) {
+                        replacementConceptLabel.remove(labelToRemove);
+                    }
+                }
+
+                layoutRefreshSpecClausePanel();
+            } catch (IOException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            } catch (TerminologyException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
+        }
+
     }
 
 }
