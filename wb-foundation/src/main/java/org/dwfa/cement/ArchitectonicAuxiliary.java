@@ -146,6 +146,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                                      new I_ConceptualizeUniversally[] { TUPLE_TYPE }),
                     EXT_INT_TUPLE(new String[] {"int ext tuple", "int ext tuple"}, null,
                              new I_ConceptualizeUniversally[] { TUPLE_TYPE }),
+                    EXT_LONG_TUPLE(new String[] {"long ext tuple", "long ext tuple"}, null,
+                                 new I_ConceptualizeUniversally[] { TUPLE_TYPE }),
                     EXT_BOOLEAN_TUPLE(new String[] {"boolean ext tuple", "boolean ext tuple"}, null,
                              new I_ConceptualizeUniversally[] { TUPLE_TYPE }),
                     EXT_STRING_TUPLE(new String[] {"string ext tuple", "string ext tuple"}, null,
