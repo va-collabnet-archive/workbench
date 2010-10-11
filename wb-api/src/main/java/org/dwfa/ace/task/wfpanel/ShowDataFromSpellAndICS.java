@@ -21,26 +21,21 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
-import java.util.UUID;
 
 import javax.swing.DefaultListModel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionVersioned;
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.modeler.tool.AskForConceptName;
+import org.dwfa.ace.modeler.tool.AskForConceptParent;
 import org.dwfa.ace.modeler.tool.ShowConceptData;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -51,7 +46,7 @@ import org.dwfa.util.bean.Spec;
  * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/ide/wfpanel", type = BeanType.TASK_BEAN) })
-public class GetDataFromAFCPanel extends AbstractTask {
+public class ShowDataFromSpellAndICS extends AbstractTask {
 
 	/*
 	 * -----------------------
@@ -125,94 +120,52 @@ public class GetDataFromAFCPanel extends AbstractTask {
 
 			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
 			
-			ShowConceptData panel = null;
+			AskForConceptName panel = null;
 			
 			for (Component c : workflowDetailsSheet.getComponents()) {
-				if (ShowConceptData.class.isAssignableFrom(c.getClass())) {
-					panel = (ShowConceptData) c;
+				if (AskForConceptName.class.isAssignableFrom(c.getClass())) {
+					panel = (AskForConceptName) c;
 				}
 			}
 
 			if (panel != null) {
-				DefaultListModel listModel=panel.getParentModel();
+				DefaultListModel listModel=panel.getParentListModel();
 				String conceptName = panel.getConceptName().trim();
-				String semtag=panel.getSemtag();
-				DefaultListModel listSpe = panel.getLstSpeModel();
-				boolean ICS = panel.isICS();
+				String semtag=panel.getSemanticTag();
+				if (listModel.getSize()>0 && !conceptName.equals("") && !semtag.equals("")){
 					//				int width = 475;
 					//				int height = 260;
 					//				workflowDetailsSheet.setSize(width, height);
 					//				workflowDetailsSheet.setLayout(new GridLayout(1, 1));
-					String conceptFSN = conceptName + " (" + semtag + ")";
 
-					int n = JOptionPane.showConfirmDialog(
-							null,
-							"You are going to create the concept \"" + conceptFSN + "\"\n" +
-							"Are you sure?",
-							"Confirm",
-							JOptionPane.YES_NO_OPTION);
-					if (n == JOptionPane.YES_OPTION) {
-						//					// Create worklist member for unassigned work
-						//					WorkListMember workListMember = TerminologyProjectDAO.addConceptAsNacWorklistMember(
-						//							selectedWorkList, selectedConcept,
-						//							config.getUsername()+".outbox", config);
-						//					
-						//					process.setProperty(memberPropName, workListMember);
-						//					process.setProperty(memberPropName, workListMember);
+					ShowConceptData newPanel = new ShowConceptData(config,listModel, conceptName,semtag);
 
-						I_GetConceptData newConcept = null;
+					workflowDetailsSheet.remove(panel);
 
-						try {
-							//TODO validate duplicate concept
-							
+					workflowDetailsSheet.add(newPanel);
+					workflowDetailsSheet.revalidate();
+					//
+					//				int n = JOptionPane.showConfirmDialog(
+					//						null,
+					//						"You are going to send the concept \"" + selectedConcept.toString()+ "\"\n" +
+					//						"to a change workflow in the worklist \"" + selectedWorkList.getName()+ "\"\n" +
+					//						"Are you sure?",
+					//						"Confirm",
+					//						JOptionPane.YES_NO_OPTION);
+					//				if (n == JOptionPane.YES_OPTION) {
+					//					// Create worklist member for unassigned work
+					//					WorkListMember workListMember = TerminologyProjectDAO.addConceptAsNacWorklistMember(
+					//							selectedWorkList, selectedConcept,
+					//							config.getUsername()+".outbox", config);
+					//					
+					//					process.setProperty(memberPropName, workListMember);
+					//					process.setProperty(memberPropName, workListMember);
 
-							newConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
-
-							I_DescriptionVersioned descFSN = termFactory.newDescription(UUID.randomUUID(), newConcept, "en", conceptFSN,
-									termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()),
-									config);
-							I_DescriptionVersioned descPre = termFactory.newDescription(UUID.randomUUID(), newConcept, "en", conceptName,
-									termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), 
-									config);
-							descFSN.setInitialCaseSignificant(ICS);
-							descPre.setInitialCaseSignificant(ICS);
-							
-							for (int i = 0 ; i < listModel.getSize() ; i++){
-								termFactory.newRelationship(UUID.randomUUID(), newConcept, 
-									termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), 
-									(I_GetConceptData)listModel.get(i), 
-									termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), 
-									termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
-									termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 
-									0, config);
-							}
-							for (int i = 0 ; i < listSpe.getSize() ; i++){
-								String term=(String) listSpe.get(i);
-								if (term.endsWith("(" + semtag +")")){
-									I_DescriptionVersioned desc = termFactory.newDescription(UUID.randomUUID(), newConcept, "en-GB", term,
-											termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()),
-											config);
-									desc.setInitialCaseSignificant(ICS);
-								}else{
-									I_DescriptionVersioned desc = termFactory.newDescription(UUID.randomUUID(), newConcept, "en-GB", term,
-											termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()),
-											config);
-									desc.setInitialCaseSignificant(ICS);
-								}
-							}
-							
-							termFactory.addUncommittedNoChecks(newConcept);
-							termFactory.commit();
-
-						} catch (TerminologyException e) {
-							e.printStackTrace();
-						} catch (IOException e) {
-							e.printStackTrace();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
 					return Condition.ITEM_COMPLETE;
+				}else{
+					return Condition.ITEM_CANCELED;
+
+				}
 			}else {
 					return Condition.ITEM_CANCELED;
 

@@ -119,6 +119,10 @@ public class AskForConceptName extends JPanel {
 		conceptName=cptName.getText();
 	}
 
+	private void cptNameKeyTyped(KeyEvent e) {
+		conceptName=cptName.getText();
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		label1 = new JLabel();
@@ -167,6 +171,10 @@ public class AskForConceptName extends JPanel {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				cptNameKeyPressed(e);
+			}
+			@Override
+			public void keyTyped(KeyEvent e) {
+				cptNameKeyTyped(e);
 			}
 		});
 		add(cptName, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0,

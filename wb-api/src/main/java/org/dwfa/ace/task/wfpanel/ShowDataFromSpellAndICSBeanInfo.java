@@ -26,9 +26,9 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 /**
  * 
  */
-public class GetDataFromAFCPanelBeanInfo extends SimpleBeanInfo {
+public class ShowDataFromSpellAndICSBeanInfo extends SimpleBeanInfo {
 
-    public GetDataFromAFCPanelBeanInfo() {
+    public ShowDataFromSpellAndICSBeanInfo() {
         super();
     }
 
@@ -54,8 +54,8 @@ public class GetDataFromAFCPanelBeanInfo extends SimpleBeanInfo {
      * @return Returns the BeanDescriptor for this task
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(GetDataFromAFCPanel.class);
-        bd.setDisplayName("<html><font color='green'><center>Get concept data<br>and create concept");
+        BeanDescriptor bd = new BeanDescriptor(GetDataFromAFPCPanel.class);
+        bd.setDisplayName("<html><font color='green'><center>Show new concept data");
         return bd;
     }
 
