@@ -42,6 +42,7 @@ import org.drools.definition.KnowledgePackage;
 import org.drools.definition.rule.Rule;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
+import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -70,6 +71,7 @@ import org.dwfa.util.id.Type3UuidFactory;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
+import org.ihtsdo.rules.testmodel.DrComponentHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.rules.testmodel.TerminologyHelperDroolsWorkbench;
 import org.ihtsdo.testmodel.DrConcept;
@@ -144,7 +146,7 @@ public class RulesLibrary {
 		
 		StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 		
-		//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+		KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 		
 		ResultsCollectorWorkBench results = new ResultsCollectorWorkBench();
 		

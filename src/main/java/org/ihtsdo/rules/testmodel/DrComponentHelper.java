@@ -1,10 +1,11 @@
-package org.ihtsdo.rules;
+package org.ihtsdo.rules.testmodel;
 
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.ihtsdo.testmodel.DrConcept;
+import org.ihtsdo.testmodel.DrDefiningRolesSet;
 import org.ihtsdo.testmodel.DrDescription;
 import org.ihtsdo.testmodel.DrRelationship;
 import org.ihtsdo.tk.api.ContraditionException;
@@ -27,6 +28,12 @@ public class DrComponentHelper {
 			concept.setStatusUuid(tf.nidToUuid(attributeTuple.getStatusNid()).toString());
 			concept.setTime(attributeTuple.getTime());
 			concept.setFactContextName(factContextName);
+			
+			DrDefiningRolesSet statedRolesSet = new DrDefiningRolesSet();
+			statedRolesSet.setRolesSetType("Stated");
+			
+			DrDefiningRolesSet inferredRolesSet = new DrDefiningRolesSet();
+			inferredRolesSet.setRolesSetType("Inferred");
 			
 			//TODO int identifiers = Ts.get().get
 
@@ -60,7 +67,13 @@ public class DrComponentHelper {
 				loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
 				loopRel.setFactContextName(factContextName);
 				concept.getOutgoingRelationships().add(loopRel);
+				// TODO: discriminate between inferred and stated
+				statedRolesSet.getRelationships().add(loopRel);
+				inferredRolesSet.getRelationships().add(loopRel);
 			}
+			
+			concept.getDefiningRoleSets().add(statedRolesSet);
+			concept.getDefiningRoleSets().add(inferredRolesSet);
 			
 			for (RelationshipVersionBI relTuple : conceptBi.getRelsIncomingActive()) {
 				DrRelationship loopRel = new DrRelationship();
@@ -78,7 +91,7 @@ public class DrComponentHelper {
 				concept.getIncomingRelationships().add(loopRel);
 			}
 			
-			//TODO: implement refset filler
+			//TODO: implement extensions filler
 			
 		} catch (IOException e) {
 			e.printStackTrace();
