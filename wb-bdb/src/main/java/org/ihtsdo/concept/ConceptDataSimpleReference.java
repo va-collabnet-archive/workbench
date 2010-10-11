@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -219,7 +218,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             readWriteInput.skipFast(listStart);
             componentList = binder.entryToObject(readWriteInput);
         }
-        return new ArrayList<RefsetMember<?,?>>(new HashSet<RefsetMember<?,?>>(componentList));
+        return componentList;
     }
 
     public ConceptAttributes getConceptAttributes() throws IOException {
@@ -236,7 +235,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
     public AddMemberList getRefsetMembers() throws IOException {
         if (refsetMembers.get() == null) {
-            refsetMembers.compareAndSet(null, new AddMemberList(getList(new RefsetMemberBinder(),
+            refsetMembers.compareAndSet(null, new AddMemberList(getList(new RefsetMemberBinder(enclosingConcept),
                 OFFSETS.REFSET_MEMBERS, enclosingConcept)));
         }
         handleCanceledComponents();
@@ -522,11 +521,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             }
         }
         if (getMemberNids().contains(nid)) {
-            for (RefsetMember<?, ?> r : getRefsetMembers()) {
-                if (r.getNid() == nid) {
-                    return r;
-                }
-            }
+        	return getRefsetMember(nid);
         }
         
         for (RelGroupChronicleBI group: enclosingConcept.getRelGroups()) {

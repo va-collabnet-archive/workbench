@@ -31,6 +31,7 @@ import org.ihtsdo.concept.BdbLegacyFixedFactory;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.ConceptBdb;
 import org.ihtsdo.concept.OFFSETS;
+import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.db.bdb.id.UuidBdb;
@@ -186,6 +187,7 @@ public class Bdb {
 			LocalFixedTerminology.setStore(new BdbLegacyFixedFactory());
 			inform(activity, "loading cross references...");
 			xref = new Xref(readOnly, mutable);
+			//watchList.put(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(), ReferenceConcepts.REFSET_PATH_ORIGINS.getNid());
 			inform(activity, "Loading paths...");
 			pathManager = BdbPathManager.get();
 			tf.setPathManager(pathManager);
@@ -309,6 +311,18 @@ public class Bdb {
             activity.setStopButtonVisible(false);
 	        activity.setIndeterminate(true);
 	        activity.setProgressInfoUpper("Database sync to disk...");
+	        
+	        /*
+	        try {
+				Concept pathOrigins = getConceptDb().getConcept(RefsetAuxiliary.Concept.REFSET_PATH_ORIGINS.localize().getNid());
+				if (pathOrigins != null) {
+				    AceLog.getAppLog().info("Refset origins:\n\n" + pathOrigins.toLongString());
+				}
+			} catch (Exception e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
+			*/
+	        
 	        activity.setProgressInfoLower("Starting sync...");
 	    }
 

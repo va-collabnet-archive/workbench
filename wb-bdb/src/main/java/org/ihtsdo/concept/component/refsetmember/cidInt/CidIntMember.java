@@ -139,7 +139,9 @@ public class CidIntMember extends RefsetMember<CidIntRevision, CidIntMember> imp
             return false;
         if (CidIntMember.class.isAssignableFrom(obj.getClass())) {
             CidIntMember another = (CidIntMember) obj;
-            return this.c1Nid == another.c1Nid;
+            if (super.equals(another)) {
+                return this.c1Nid == another.c1Nid && this.intValue == another.intValue;
+            }
         }
         return false;
     }

@@ -270,15 +270,20 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 	
 	public static Concept get(int nid) throws IOException {
 		assert nid != Integer.MAX_VALUE : "nid == Integer.MAX_VALUE";
+		boolean newConcept = false;
 		Concept c = conceptsCRHM.get(nid);
 		if (c == null) {
 			Concept newC = new Concept(nid);
 			c = conceptsCRHM.putIfAbsent(nid, newC);
 			if (c == null) {
 				c = newC;
+				newConcept = true;
 			}
 		}
 		conceptsCRHM.put(nid, c);
+		if (Bdb.watchList.containsKey(nid) && newConcept) {
+			AceLog.getAppLog().info(c.toLongString());
+		}
 		return c;
 	}
 	
@@ -1463,5 +1468,4 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 		}
 		return results;
 	}
-
 }

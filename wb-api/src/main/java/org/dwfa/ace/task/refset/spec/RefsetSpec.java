@@ -569,42 +569,42 @@ public class RefsetSpec {
                 task.setStatus(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
 
                 task.setTermFactory(Terms.get());
-                String originalMemberFSN = getMemberRefsetConcept().getInitialText();
-                String editedFSN = "";
-                if (originalMemberFSN.indexOf(" refset") == -1) {
-                    editedFSN = originalMemberFSN;
-                } else {
-                    editedFSN = originalMemberFSN.substring(0, originalMemberFSN.indexOf(" refset"));
+                if (getMemberRefsetConcept() != null) {
+                    String originalMemberFSN = getMemberRefsetConcept().getInitialText();
+                    String editedFSN = "";
+                    if (originalMemberFSN.indexOf(" refset") == -1) {
+                        editedFSN = originalMemberFSN;
+                    } else {
+                        editedFSN = originalMemberFSN.substring(0, originalMemberFSN.indexOf(" refset"));
+                    }
+
+                    String computeTimeName = editedFSN + " edit time refset";
+
+                    lastEditTimeConcept = task.newConcept(config);
+                    task.newDescription(lastEditTimeConcept, Terms.get().getConcept(
+                            ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), computeTimeName,
+                            config);
+                    task.newDescription(lastEditTimeConcept, Terms.get().getConcept(
+                        ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), computeTimeName, config);
+
+                    task.newRelationship(lastEditTimeConcept, Terms.get().getConcept(
+                        ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), Terms.get().getConcept(
+                        RefsetAuxiliary.Concept.SUPPORTING_REFSETS.getUids()), config);
+
+                    task.newRelationship(getMemberRefsetConcept(), Terms.get().getConcept(
+                        RefsetAuxiliary.Concept.EDIT_TIME_REL.getUids()), lastEditTimeConcept, config);
+
+                    task.newRelationship(lastEditTimeConcept, Terms.get().getConcept(
+                        RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids()), Terms.get().getConcept(
+                        RefsetAuxiliary.Concept.ANCILLARY_DATA.getUids()), config);
+
+                    Terms.get().addUncommittedNoChecks(lastEditTimeConcept);
+
+                    Terms.get().commit();
                 }
 
-                String computeTimeName = editedFSN + " edit time refset";
-
-                lastEditTimeConcept = task.newConcept(config);
-                task
-                    .newDescription(lastEditTimeConcept, Terms.get().getConcept(
-                        ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), computeTimeName,
-                        config);
-                task.newDescription(lastEditTimeConcept, Terms.get().getConcept(
-                    ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), computeTimeName, config);
-
-                task.newRelationship(lastEditTimeConcept, Terms.get().getConcept(
-                    ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), Terms.get().getConcept(
-                    RefsetAuxiliary.Concept.SUPPORTING_REFSETS.getUids()), config);
-
-                task.newRelationship(getMemberRefsetConcept(), Terms.get().getConcept(
-                    RefsetAuxiliary.Concept.EDIT_TIME_REL.getUids()), lastEditTimeConcept, config);
-
-                task.newRelationship(lastEditTimeConcept, Terms.get().getConcept(
-                    RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids()), Terms.get().getConcept(
-                    RefsetAuxiliary.Concept.ANCILLARY_DATA.getUids()), config);
-
-                Terms.get().addUncommittedNoChecks(lastEditTimeConcept);
-
-                Terms.get().commit();
-
             } catch (Exception e) {
-                e.printStackTrace();
-                throw new TerminologyException(e.getMessage());
+                throw new IOException(e);
             }
         }
         I_ExtendByRefPart latestPart = null;

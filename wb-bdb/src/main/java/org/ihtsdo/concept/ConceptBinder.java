@@ -70,7 +70,7 @@ public class ConceptBinder extends TupleBinding<Concept> {
 					new ImageBinder());
 			byte[] refsetOutput = getRefsetBytes(conceptData, primordial,
 					OFFSETS.REFSET_MEMBERS, conceptData.getRefsetMembersIfChanged(),
-					new RefsetMemberBinder());
+					new RefsetMemberBinder(concept));
 			
 			
 			// KEC: start vestigial 

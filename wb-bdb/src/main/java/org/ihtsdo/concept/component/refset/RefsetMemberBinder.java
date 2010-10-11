@@ -11,6 +11,7 @@ import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_BindConceptComponents;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 import com.sleepycat.bind.tuple.TupleBinding;
@@ -32,9 +33,16 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
 	private Concept enclosingConcept; 
 
 
+	public RefsetMemberBinder(Concept concept) {
+		this.enclosingConcept = concept;
+	}
+
 	@Override
 	public Collection<RefsetMember<?, ?>> entryToObject(TupleInput input) {
 		assert enclosingConcept != null;
+		if (enclosingConcept.getNid() == ReferenceConcepts.REFSET_PATH_ORIGINS.getNid()) {
+			AceLog.getAppLog().info("reading refset path origins: ");
+		}
 		int listSize = input.readInt();
 		Collection<RefsetMember<?, ?>> newRefsetMemberList;
 		HashMap<Integer, RefsetMember<?, ?>> nidToRefsetMemberMap = null;
@@ -82,7 +90,6 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
 					if (refsetMember == null) {
 						refsetMember = factory.create(nid, typeNid, enclosingConcept, input);
 						if (refsetMember.getTime() != Long.MIN_VALUE) {
-						    Concept.componentsCRHM.putIfAbsent(nid, refsetMember);
 	                        RefsetMember<?, ?> oldMember = (RefsetMember<?, ?>) Concept.componentsCRHM.putIfAbsent(nid, refsetMember);
 	                        if (oldMember != null) {
 	                            refsetMember = oldMember;
@@ -111,14 +118,16 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
 	@Override
 	public void objectToEntry(Collection<RefsetMember<?, ?>> list,
 			TupleOutput output) {
+		if (enclosingConcept.getNid() == ReferenceConcepts.REFSET_PATH_ORIGINS.getNid()) {
+			AceLog.getAppLog().info("writing refset path origins: ");
+		}
 		List<RefsetMember<?, ?>> refsetMembersToWrite = new ArrayList<RefsetMember<?, ?>>(list.size());
 		for (RefsetMember<?, ?> refsetMember: list) {
 			encountered.incrementAndGet();
 			assert refsetMember.primordialSapNid != Integer.MAX_VALUE;
-			if (refsetMember.primordialSapNid > maxReadOnlyStatusAtPositionId) {
-			    if (refsetMember.getTime() != Long.MIN_VALUE) {
-	                refsetMembersToWrite.add(refsetMember);
-			    }
+			if (refsetMember.primordialSapNid > maxReadOnlyStatusAtPositionId  &&
+					refsetMember.getTime() != Long.MIN_VALUE) {
+	             refsetMembersToWrite.add(refsetMember);
 			} else {
 				if (refsetMember.revisions != null) {
 					for (RefsetRevision<?, ?> r: refsetMember.revisions) {
@@ -134,7 +143,7 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
 		output.writeInt(refsetMembersToWrite.size()); // List size
 		for (RefsetMember<?, ?> refsetMember: refsetMembersToWrite) {
 			written.incrementAndGet();
-			output.writeInt(refsetMember.getTypeId());
+			output.writeInt(refsetMember.getTypeNid());
 			refsetMember.writeComponentToBdb(output, maxReadOnlyStatusAtPositionId);
 		}
 	}

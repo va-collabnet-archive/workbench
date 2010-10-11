@@ -12,7 +12,6 @@ import org.dwfa.ace.api.I_AmTypedPart;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.component.ConceptComponent;
-import org.ihtsdo.concept.component.ConceptComponent.Version;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper.RELATIVE_POSITION;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
@@ -90,7 +89,6 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void addSpecifiedVersionsWithPositions(NidSetBI allowedStatus, NidSetBI allowedTypes,
     		PositionSetBI positions, List<V> specifiedVersions, List<? extends V> versions, 
             Precedence precedencePolicy, ContradictionManagerBI contradictionManager) {
@@ -143,10 +141,12 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                                     AceLog.getAppLog().warning(
                                             RELATIVE_POSITION.EQUAL + " should never happen. Data is malformed. Part:\n" + part
                                                 + " \n  Part to test: \n" + prevPartToTest);
+                                    /*
                                         partsForPosition.remove(part);
                                         partsForPosition.remove(prevPartToTest);
                                         Version dup = part.removeDuplicates(part, prevPartToTest);
                                         partsForPosition.remove(dup);
+                                   */
                                 }
                                 break;
                             case UNREACHABLE:

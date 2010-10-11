@@ -33,6 +33,7 @@ import org.dwfa.svn.Svn;
 import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.util.LogWithAlerts;
 import org.ihtsdo.cs.econcept.EConceptChangeSetReader;
+import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbPathManager;
 import org.ihtsdo.time.TimeUtil;
 import org.tigris.subversion.javahl.ClientException;
@@ -386,6 +387,7 @@ public class SvnHelper {
 
 			AceLog.getAppLog().info("Finished eccs import");
 			BdbPathManager.get().resetPathMap(); 
+			Bdb.sync();
 			Terms.get().resumeChangeSetWriters();
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);

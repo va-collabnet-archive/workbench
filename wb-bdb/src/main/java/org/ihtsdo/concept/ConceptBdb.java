@@ -57,7 +57,7 @@ public class ConceptBdb extends ComponentBdb {
     }
 
     public List<UUID> getUuidsForConcept(int cNid) throws IOException {
-        return getConcept(cNid).getUids();
+        return getConcept(cNid).getUUIDs();
     }
 
     public Concept getConcept(int cNid) throws IOException {

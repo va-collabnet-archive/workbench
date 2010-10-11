@@ -41,10 +41,10 @@ public class RelationshipRevision
 		ConceptComponent.addNidToBuffer(buf, typeNid);
 		buf.append(" dest:");
 		ConceptComponent.addNidToBuffer(buf, this.primordialComponent.getC2Id());
-        buf.append(" characteristic:");
+        buf.append(" c:");
 		ConceptComponent.addNidToBuffer(buf, this.characteristicNid);
-        buf.append(" group:" + this.group);
-        buf.append(" refinability:");
+        buf.append(" g:" + this.group);
+        buf.append(" r:");
 		ConceptComponent.addNidToBuffer(buf, this.refinabilityNid);
         buf.append(super.toString());
         return buf.toString();
