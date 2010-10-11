@@ -1086,12 +1086,15 @@ public class RefsetSpecPanel extends JPanel {
                     Terms.get().getId(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next())
                         .getNid();
 
-            List<? extends I_IdPart> parts = idVersioned.getMutableIdParts();
             I_IdPart latestPart = null;
-            for (I_IdPart part : parts) {
-                if (latestPart == null || part.getTime() >= latestPart.getTime()) {
-                    if (part.getAuthorityNid() == snomedIntegerId) {
-                        latestPart = part;
+
+            if (idVersioned != null) {
+                List<? extends I_IdPart> parts = idVersioned.getMutableIdParts();
+                for (I_IdPart part : parts) {
+                    if (latestPart == null || part.getTime() >= latestPart.getTime()) {
+                        if (part.getAuthorityNid() == snomedIntegerId) {
+                            latestPart = part;
+                        }
                     }
                 }
             }
