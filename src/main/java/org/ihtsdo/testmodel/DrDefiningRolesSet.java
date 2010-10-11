@@ -1,5 +1,6 @@
 package org.ihtsdo.testmodel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DrDefiningRolesSet {
@@ -9,6 +10,11 @@ public class DrDefiningRolesSet {
 	
 	//Inferred properties
 	private int numberOfIsas = 0;
+	
+	public DrDefiningRolesSet() {
+		super();
+		this.relationships = new ArrayList<DrRelationship>();
+	}
 
 	public String getRolesSetType() {
 		return rolesSetType;

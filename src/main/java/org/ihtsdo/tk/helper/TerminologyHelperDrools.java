@@ -439,7 +439,7 @@ public class TerminologyHelperDrools {
 	
 	//Mock implementation
 	public String checkWordInList(String text) {
-		return text;
+		return null;
 	}
 
 	public String getConceptDomain() {
