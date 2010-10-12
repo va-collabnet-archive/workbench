@@ -75,7 +75,7 @@ public class UpdateAllSvnEntries extends AbstractAllSvnEntriesTask {
                     break;
 
                 case DB_UPDATE:
-                	if (taskKey.equalsIgnoreCase(I_ConfigAceDb.MUTABLE_DB_LOC)) {
+                	if (taskKey.replace('\\', '/').equalsIgnoreCase(I_ConfigAceDb.MUTABLE_DB_LOC)) {
                         //config.svnUpdateDatabase(svd);
                 	} else {
                         config.svnUpdate(svd);

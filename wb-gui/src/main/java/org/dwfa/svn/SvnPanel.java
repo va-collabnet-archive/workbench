@@ -241,7 +241,7 @@ public class SvnPanel extends JPanel {
 
     public SvnPanel(I_ConfigAceFrame aceFrameConfig, String tabName) throws Exception {
         super(new GridBagLayout());
-        database = tabName.equalsIgnoreCase(I_ConfigAceDb.MUTABLE_DB_LOC);
+        database = tabName.replace('\\', '/').equalsIgnoreCase(I_ConfigAceDb.MUTABLE_DB_LOC);
         authenticator = new SvnPrompter();
         authenticator.setParentContainer(this);
         authenticator.setUsername(aceFrameConfig.getUsername());

@@ -326,7 +326,7 @@ public class SvnHelper {
 			boolean depthIsSticky = false;
 			boolean ignoreExternals = false;
 			boolean allowUnverObstructions = false;
-			if (path.equalsIgnoreCase(I_ConfigAceDb.MUTABLE_DB_LOC)) {
+			if (path.replace('\\', '/').equalsIgnoreCase(I_ConfigAceDb.MUTABLE_DB_LOC)) {
 				AceLog.getAppLog().info("Starting svn revert for: " + path);
 				SubversionData svd = new SubversionData(null, path);
 				Svn.revertNoLock(svd, prompter);

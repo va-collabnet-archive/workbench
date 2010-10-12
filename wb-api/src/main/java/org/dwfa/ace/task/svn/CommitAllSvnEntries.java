@@ -70,7 +70,7 @@ public class CommitAllSvnEntries extends AbstractAllSvnEntriesTask {
                     break;
 
                 case CHANGE_SET_UPDATE:
-                	if (taskKey.equalsIgnoreCase(I_ConfigAceDb.MUTABLE_DB_LOC)) {
+                	if (taskKey.replace('\\', '/').equalsIgnoreCase(I_ConfigAceDb.MUTABLE_DB_LOC)) {
                         // -- only handled at startup...
                 	} else {
                         config.svnCommit(svd);

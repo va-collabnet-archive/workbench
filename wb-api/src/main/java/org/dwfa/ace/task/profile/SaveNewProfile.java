@@ -154,7 +154,8 @@ public class SaveNewProfile extends AbstractTask {
        		worker.getLogger().info("Starting commits for: " + currentProfile.getSubversionMap().keySet());
        	
             for (Entry<String, SubversionData> entry: currentProfile.getSubversionMap().entrySet()) {
-            	if (!entry.getKey().equalsIgnoreCase(I_ConfigAceDb.MUTABLE_DB_LOC)) {
+            	
+            	if (!entry.getKey().replace('\\', '/').equalsIgnoreCase(I_ConfigAceDb.MUTABLE_DB_LOC)) {
                 	worker.getLogger().info("commit: " + entry);
                 	CommitAllSvnEntries.commit(currentProfile, entry.getValue(), entry.getKey());
             	} else {
