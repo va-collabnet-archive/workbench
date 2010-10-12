@@ -122,6 +122,7 @@
       <modules>
         <module>documentation</module>
         <module>viewer</module>
+        <module>database-synchronized</module>
         <module>editor-synchronized</module>
         <module>content-distribution</module>
       </modules>
