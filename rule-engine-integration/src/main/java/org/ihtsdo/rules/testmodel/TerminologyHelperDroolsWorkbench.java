@@ -30,7 +30,7 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 
 public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
-	
+
 	public TerminologyHelperDroolsWorkbench(){
 		super();
 	}
@@ -81,10 +81,10 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 					int dnid = Integer.parseInt(doc.get("dnid"));
 					I_DescriptionVersioned potential_fsn = Terms.get().getDescription(dnid, cnid);
 					if (potential_fsn != null) {
-						
+
 						DescriptionVersionBI description = (DescriptionVersionBI) 
 						Ts.get().getComponentVersion(Terms.get().getActiveAceFrameConfig().getCoordinate(), dnid);
-						
+
 						if (description.getTypeNid() == fsnType.getConceptNid()
 								&& description.getText().equals(fsn)
 								&& description.getLang().equals(potential_fsn.getLang())) {
@@ -104,11 +104,11 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public boolean isActive(String conceptUUID) {
 		boolean result = false;
-		
+
 		try {
 			ConceptVersionBI concept = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getCoordinate(), UUID.fromString(conceptUUID));
 			int status = concept.getConAttrs().getVersion(Terms.get().getActiveAceFrameConfig().getCoordinate()).getStatusNid();
@@ -116,7 +116,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 					status == ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()) {
 				result = true;
 			}
-				
+
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -124,10 +124,10 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		} catch (ContraditionException e) {
 			e.printStackTrace();
 		}
-		
+
 		return result;
 	}
-	
+
 	@Override
 	public boolean isValidSemtag(String semtag){
 		I_TermFactory tf = Terms.get();
@@ -141,7 +141,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 				for (I_DescriptionTuple tuple : semtagConcept.getDescriptionTuples(config.getAllowedStatus(),
 						config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
 						config.getConflictResolutionStrategy())) {
-						validSemtags.add(tuple.getText());
+					validSemtags.add(tuple.getText());
 				}
 			}
 		} catch (TerminologyException e) {
@@ -151,7 +151,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		}
 		return validSemtags.contains(semtag);
 	}
-	
+
 	public static Set<I_GetConceptData> getDescendants(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
 		try {
 			I_TermFactory termFactory = Terms.get();
@@ -172,7 +172,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		}
 		return descendants;
 	}
-	
+
 	@Override
 	public boolean isParentOfStatedChildren(String conceptUuid){
 		boolean result = false;
@@ -184,10 +184,10 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return result;
 	}
-	
+
 	@Override
 	public List<String> getListOfDomainsUuids(String conceptUuid) {
 		I_TermFactory tf = Terms.get();
@@ -208,53 +208,53 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		}
 		return domains;
 	}
-	
+
 	@Override
 	public boolean isTargetOfReferToLink(String conceptUuid) {
 		//TODO implement when refer to import is defined
 		return false;
 	}
-	
+
 	@Override
 	public boolean isExtensionConcept(String conceptUuid) {
 		//TODO implement when extensions representation is defined
 		return false;
 	}
-	
+
 	@Override
 	public boolean isSemanticTagEqualsInAllTerms(String conceptUuid) {
 		boolean result = false;
 		try {
 			I_TermFactory tf = Terms.get();
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-			
+
 			I_GetConceptData focusConcept = tf.getConcept(UUID.fromString(conceptUuid));
 			List<String> currentSemtags = new ArrayList<String>();
 			for (I_DescriptionTuple tuple : focusConcept.getDescriptionTuples(config.getAllowedStatus(),
 					config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
 					config.getConflictResolutionStrategy())) {
-					if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid()) {
-						if (tuple.getText().lastIndexOf("(") > -1 && tuple.getText().lastIndexOf(")") > -1) {
-							currentSemtags.add(tuple.getText().substring(tuple.getText().lastIndexOf("(")+1,tuple.getText().lastIndexOf(")")));
-						}
+				if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid()) {
+					if (tuple.getText().lastIndexOf("(") > -1 && tuple.getText().lastIndexOf(")") > -1) {
+						currentSemtags.add(tuple.getText().substring(tuple.getText().lastIndexOf("(")+1,tuple.getText().lastIndexOf(")")));
 					}
+				}
 			}
-			
+
 			I_GetConceptData semtagsRoot = tf.getConcept(ArchitectonicAuxiliary.Concept.SEMTAGS_ROOT.getUids());
 			Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
 			descendants = getDescendants(descendants, semtagsRoot);
+			List<String> loopSemtags = new ArrayList<String>();
 			for (I_GetConceptData semtagConcept : descendants) {
-				List<String> loopSemtags = new ArrayList<String>();
 				for (I_DescriptionTuple tuple : semtagConcept.getDescriptionTuples(config.getAllowedStatus(),
 						config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
 						config.getConflictResolutionStrategy())) {
-						if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()) {
-							loopSemtags.add(tuple.getText());
-						}
+					if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()) {
+						loopSemtags.add(tuple.getText());
+					}
 				}
-				if (loopSemtags.containsAll(currentSemtags)) {
-					result = true;
-				}
+			}
+			if (loopSemtags.containsAll(currentSemtags)) {
+				result = true;
 			}
 		} catch (TerminologyException e) {
 			e.printStackTrace();
@@ -263,5 +263,5 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		}
 		return result;
 	}
-	
+
 }
