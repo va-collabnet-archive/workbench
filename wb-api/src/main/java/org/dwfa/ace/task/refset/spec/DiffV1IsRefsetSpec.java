@@ -16,33 +16,15 @@
  */
 package org.dwfa.ace.task.refset.spec;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.RefsetPropertyMap;
-import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
-import org.dwfa.ace.task.refset.refresh.PanelRefsetVersion;
-import org.dwfa.bpa.process.I_EncodeBusinessProcess;
-import org.dwfa.bpa.process.I_Work;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec/diff", type = BeanType.TASK_BEAN) })
 public class DiffV1IsRefsetSpec extends DiffVnIsRefsetSpec {
