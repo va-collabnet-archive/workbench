@@ -731,6 +731,10 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
                             }
                         }
                     }
+
+                    refsetSpecHelper.setLastEditTime(System.currentTimeMillis());
+                    frameConfig.fireRefsetSpecChanged(member);
+                    frameConfig.refreshRefsetTab();
                 }
             } // End check for replacementConceptLabel
         } else if (updateOptions.getSelectedItem().equals(RETIRE_OPTION)) {
@@ -764,6 +768,9 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
                 tf.addUncommitted(comment);
             }
             tf.commit();
+            refsetSpecHelper.setLastEditTime(System.currentTimeMillis());
+            frameConfig.fireRefsetSpecChanged(member);
+            frameConfig.refreshRefsetTab();
 
         } else if (updateOptions.getSelectedItem().equals(SKIP_OPTION)) {
             // remove from front, add to end...
