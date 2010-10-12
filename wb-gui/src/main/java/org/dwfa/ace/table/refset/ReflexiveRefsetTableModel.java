@@ -328,6 +328,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
             tableChangeWorker.setStopWork(true);
         }
         allTuples = null;
+        values = null;
         allExtensions = null;
         if (getProgress() != null) {
             getProgress().setVisible(true);

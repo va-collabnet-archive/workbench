@@ -302,6 +302,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
 
     protected ArrayList<I_ExtendByRef> allExtensions;
 
+    protected ConcurrentHashMap<Long, Object> values;
+
     protected Map<Integer, I_GetConceptData> referencedConcepts = new ConcurrentHashMap<Integer, I_GetConceptData>();
 
     protected Set<Integer> conceptsToFetch = new HashSet<Integer>();
@@ -315,7 +317,24 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
     protected Integer promotionFilterId = null;
 
     protected JButton addButton = new JButton();
+    
+    public static long rowColumnToLong(int row, int column) {
+     	long key = row;
+     	key = key & 0x00000000FFFFFFFFL;
+    	long columnLong = column;
+    	columnLong = columnLong & 0x00000000FFFFFFFFL;
+    	key = key << 32;
+    	key = key | columnLong;
+    	return key;
+    }
 
+    public void addToValueCache(int row, int column, Object value) {
+    	if (values != null) {
+        	long key = rowColumnToLong(row, column);
+        	values.put(key, value);
+    	}
+    }
+    
     public ReflexiveTableModel(I_HostConceptPlugins host, ReflexiveRefsetFieldData[] columns) {
         super();
         this.columns = columns;
@@ -374,6 +393,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
     public int getRowCount() {
         if (allTuples == null) {
             allTuples = new ArrayList<I_ExtendByRefVersion>();
+            values = new ConcurrentHashMap<Long, Object>();
             if (tableChangeWorker != null) {
                 tableChangeWorker.stop();
             }
@@ -389,6 +409,12 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
     }
 
     public Object getValueAt(int rowIndex, int columnIndex) {
+    	if (values != null) {
+    		Object value = values.get(rowColumnToLong(rowIndex, columnIndex));
+    		if (value != null) {
+    			return value;
+    		}
+    	}
         I_TermFactory tf = Terms.get();
         if (allTuples == null || tableComponentId == Integer.MIN_VALUE) {
             return " ";
@@ -502,7 +528,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                     I_DescriptionTuple descTuple = (I_DescriptionTuple) value;
                     return new StringWithExtTuple(descTuple.getText(), tuple, descTuple.getConceptNid());
                 }
-                return new StringWithExtTuple(value.toString(), tuple, id);
+                addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(value.toString(), tuple, id));
+                return values.get(rowColumnToLong(rowIndex, columnIndex));
             case COMPONENT_IDENTIFIER:
                 if (Integer.class.isAssignableFrom(value.getClass())) {
                     id = (Integer) value;
@@ -512,9 +539,11 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                                 tf.getConcept(id).getDescTuple(host.getConfig().getTableDescPreferenceList(),
                                     host.getConfig());
                         if (desc != null) {
-                            return new StringWithExtTuple(desc.getText(), tuple, id);
+                            addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(desc.getText(), tuple, id));
+                            return values.get(rowColumnToLong(rowIndex, columnIndex));
                         }
-                        return new StringWithExtTuple(Integer.toString(id), tuple, id);
+                        addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(Integer.toString(id), tuple, id));
+                        return values.get(rowColumnToLong(rowIndex, columnIndex));
 
                     } else if (tf.hasExtension(id)) {
                         I_ExtendByRef ext = tf.getExtension(id);
@@ -542,7 +571,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                                 buff.append(obj.getMutablePart().toString());
                             }
 
-                            return new StringWithExtTuple(buff.toString(), tuple, id);
+                            addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(buff.toString(), tuple, id));
+                            return values.get(rowColumnToLong(rowIndex, columnIndex));
                         } else {
                             tuples =
                                     (List<I_ExtendByRefVersion>) ext.getTuples(null, config
@@ -568,7 +598,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                                     buff.append(obj.getMutablePart().toString());
                                 }
 
-                                return new StringWithExtTuple(buff.toString(), tuple, id);
+                                addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(buff.toString(), tuple, id));
+                                return values.get(rowColumnToLong(rowIndex, columnIndex));
                             }
                         }
                     } else {
@@ -576,14 +607,16 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                             I_DescriptionVersioned desc = tf.getDescription(id);
                             if (desc != null) {
                                 String text = desc.getLastTuple().getText();
-                                return new StringWithExtTuple(text, tuple, id);
-                            }
+                                 addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(text, tuple, id));
+                                return values.get(rowColumnToLong(rowIndex, columnIndex));
+                     }
                         } catch (TerminologyException e) {
                             return new StringWithExtTuple("No description available for id:" + id, tuple, id);
                         }
 
                     }
                 }
+                addToValueCache(rowIndex, columnIndex, value);
                 return value;
             case TIME:
                 if (tuple.getTime() == Long.MAX_VALUE) {
@@ -641,7 +674,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         if (allTuples.size() == 0) {
             return false;
         }
-        if (allTuples.get(row).getVersion() == Integer.MAX_VALUE) {
+        if (allTuples.get(row).getTime() == Long.MAX_VALUE) {
             if (columns[col].isUpdateEditable() == false) {
                 if (allTuples.get(row).getVersions().size() > 1) {
                     return false;
@@ -672,7 +705,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         if (columns[col].isCreationEditable() || columns[col].isUpdateEditable()) {
             I_ExtendByRefVersion extTuple = allTuples.get(row);
             boolean changed = false;
-            if (extTuple.getVersion() == Integer.MAX_VALUE) {
+            if (extTuple.getTime() == Long.MAX_VALUE) {
                 try {
                     switch (columns[col].getType()) {
                     case CONCEPT_IDENTIFIER:

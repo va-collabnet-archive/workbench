@@ -91,10 +91,10 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
                         case CONCEPT_COMPONENT:
                             if (col.readParamaters != null) {
                                 conceptsToFetch.add((Integer) col.getReadMethod().invoke(
-                                    Terms.get().getConcept(extension.getComponentId()), col.readParamaters));
+                                    Terms.get().getConcept(extension.getComponentNid()), col.readParamaters));
                             } else {
                                 conceptsToFetch.add((Integer) col.getReadMethod().invoke(
-                                		Terms.get().getConcept(extension.getComponentId())));
+                                		Terms.get().getConcept(extension.getComponentNid())));
                             }
                             break;
                         case COMPONENT:
@@ -186,6 +186,7 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
             tableChangeWorker.setStopWork(true);
         }
         allTuples = null;
+        values = null;
         allExtensions = null;
         if (getProgress() != null) {
             getProgress().setVisible(true);

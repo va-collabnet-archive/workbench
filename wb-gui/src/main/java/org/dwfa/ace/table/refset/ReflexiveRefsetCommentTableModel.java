@@ -43,6 +43,7 @@ public class ReflexiveRefsetCommentTableModel extends ReflexiveRefsetTableModel 
             tableChangeWorker.setStopWork(true);
         }
         allTuples = null;
+        values = null;
         allExtensions = null;
         if (getProgress() != null) {
             getProgress().setVisible(true);
