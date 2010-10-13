@@ -77,6 +77,7 @@ public class RulesContextEditorPanel extends JPanel {
 
 	private void updateTable1() {
 		try {
+			table1.setAutoCreateRowSorter(true);
 			label4.setText("Updating table...");
 			label4.repaint();
 			tableModel.clearData();

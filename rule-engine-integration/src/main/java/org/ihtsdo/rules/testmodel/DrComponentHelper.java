@@ -55,6 +55,7 @@ public class DrComponentHelper {
 
 			for (RelationshipVersionBI relTuple : conceptBi.getRelsOutgoingActive()) {
 				DrRelationship loopRel = new DrRelationship();
+				loopRel.setModifierUuid("someUuid");
 				loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
 				loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
 				loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
@@ -77,6 +78,7 @@ public class DrComponentHelper {
 			
 			for (RelationshipVersionBI relTuple : conceptBi.getRelsIncomingActive()) {
 				DrRelationship loopRel = new DrRelationship();
+				loopRel.setModifierUuid("someUuid");
 				loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
 				loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
 				loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
