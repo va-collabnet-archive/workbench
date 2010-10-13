@@ -108,8 +108,6 @@
     </pluginManagement>
   </build>
   <modules>
-    <module>sct-mini-release</module>
-    <module>ihtsdo-generate-econcepts-trek</module>
     <module>database</module>
     <module>java-binding</module>
     <module>profiles</module>
