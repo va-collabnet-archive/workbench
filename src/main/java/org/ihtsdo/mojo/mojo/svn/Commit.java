@@ -94,7 +94,7 @@ public class Commit extends AbstractMojo implements PromptUserPassword3 {
             getLog().info("Connecting to: " + repositoryUrlStr + " as: " + username);
             svd.setUsername(username);
             svd.setPassword(password);
-            svn.svnCommit(svd, this, false);
+            svn.svnCommit(svd, username != null ? this : null, false);
         } catch (NoSuchAlgorithmException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         } catch (IOException e) {
@@ -113,7 +113,7 @@ public class Commit extends AbstractMojo implements PromptUserPassword3 {
     }
 
     public boolean userAllowedSave() {
-        return false;
+        return true;
     }
 
     public int askTrustSSLServer(String arg0, boolean arg1) {
