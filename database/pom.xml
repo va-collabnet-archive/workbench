@@ -12,7 +12,7 @@
 	<description>Workbench Bundle Database</description>
 	<dependencies>
 		<dependency>
-			<groupId>org.ihtsdo</groupId>
+			<groupId>org.ihtsdo.sample</groupId>
 			<artifactId>ihtsdo-generate-econcepts</artifactId>
 			<type>zip</type>
 		</dependency>

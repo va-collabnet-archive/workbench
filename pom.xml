@@ -33,14 +33,12 @@
         <artifactId>ihtsdo-generate-econcepts</artifactId>
         <version>${baseline.database.version}</version>
         <type>zip</type>
-        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.ihtsdo.sample</groupId>
         <artifactId>sct-mini-release</artifactId>
         <version>${baseline.database.version}</version>
         <type>zip</type>
-        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.ihtsdo</groupId>
