@@ -8,16 +8,4 @@
   <artifactId>viewer</artifactId>
   <name>Workbench Bundle Viewer</name>
   <description>workbench bundle viewer</description>
-  
-  <profiles>
-    <profile>
-      <id>install4j</id>
-      <modules>
-        <module>installer-osx</module>        
-        <module>installer-linux</module>        
-        <module>installer-windows</module>        
-      </modules>	
-    </profile>
-  </profiles>
-  
 </project>

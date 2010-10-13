@@ -334,7 +334,7 @@
 	</build>
 	<profiles>
 		<profile>
-			<id>build-all</id>
+			<id>documentation</id>
 			<dependencies>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
@@ -344,7 +344,7 @@
 			</dependencies>
 		</profile>
 		<profile>
-			<id>install4j-x</id>
+			<id>installer</id>
 			<build>
 				<plugins>
 					<plugin>
@@ -405,14 +405,6 @@
 					</plugin>
 				</plugins>
 			</build>
-		</profile>
-		<profile>
-			<id>install4j</id>
-			<modules>
-				<module>installer-osx</module>        
-				<module>installer-linux</module>        
-				<module>installer-windows</module>        
-			</modules>	
 		</profile>
 	</profiles>
 </project>

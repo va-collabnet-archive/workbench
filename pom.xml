@@ -131,7 +131,7 @@
   </modules>
   <profiles>
     <profile>
-      <id>bundle-all</id>
+      <id>all</id>
       <modules>
         <module>documentation</module>
         <module>viewer</module>
@@ -141,9 +141,9 @@
       </modules>
     </profile>
     <profile>
-      <id>distribution</id>
+      <id>documentation</id>
       <modules>
-        <module>content-distribution</module>
+        <module>documentation</module>
       </modules>
     </profile>
     <profile>
@@ -153,17 +153,15 @@
       </modules>
     </profile>
     <profile>
-      <id>standalone</id>
-      <modules>
-        <module>editor-standalone</module>
-      </modules>
-    </profile>
-    <profile>
       <id>sync</id>
       <modules>
         <module>database-synchronized</module>
         <module>editor-synchronized</module>
       </modules>
+    </profile>
+    <profile>
+      <id>installer</id>
+      <!-- Nothing to do here, just in sub-modules. Listed here for documentation purposes -->
     </profile>
   </profiles>
 </project>
