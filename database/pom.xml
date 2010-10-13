@@ -14,7 +14,6 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>ihtsdo-generate-econcepts</artifactId>
-			<version>2010-07-31</version>
 			<type>zip</type>
 		</dependency>
 		<dependency>
@@ -70,7 +69,7 @@
 						<configuration>
 							<targetSubDir>generated-resources/jbin</targetSubDir>
 							<runtimeArtifacts>
-								<runtimeArtifact>org.ihtsdo:ihtsdo-generate-econcepts</runtimeArtifact>
+								<runtimeArtifact>org.ihtsdo.sample:ihtsdo-generate-econcepts</runtimeArtifact>
 							</runtimeArtifacts>
 						</configuration>
 					</execution>

@@ -13,9 +13,8 @@
 	<description>Workbench Synchronized Database</description>
 	<dependencies>
 		<dependency>
-			<groupId>org.ihtsdo</groupId>
+			<groupId>org.ihtsdo.sample</groupId>
 			<artifactId>ihtsdo-generate-econcepts</artifactId>
-			<version>2008-01-31</version>
 			<type>zip</type>
 		</dependency>
 		<dependency>
@@ -166,7 +165,7 @@
 								<configuration>
 									<targetSubDir>generated-resources/jbin</targetSubDir>
 									<runtimeArtifacts>
-										<runtimeArtifact>org.ihtsdo:ihtsdo-generate-econcepts</runtimeArtifact>
+										<runtimeArtifact>org.ihtsdo.sample:ihtsdo-generate-econcepts</runtimeArtifact>
 									</runtimeArtifacts>
 								</configuration>
 							</execution>

@@ -24,9 +24,24 @@
     <org.dwfa.jini.version>2.1</org.dwfa.jini.version>
     <org.apache.lucene.version>3.0.2</org.apache.lucene.version>
     <svnkit.version>1.3.0.5847</svnkit.version>
+    <baseline.database.version>2010-07-31-SNAPSHOT</baseline.database.version>
   </properties>
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.ihtsdo.sample</groupId>
+        <artifactId>ihtsdo-generate-econcepts</artifactId>
+        <version>${baseline.database.version}</version>
+        <type>zip</type>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.ihtsdo.sample</groupId>
+        <artifactId>sct-mini-release</artifactId>
+        <version>${baseline.database.version}</version>
+        <type>zip</type>
+        <scope>runtime</scope>
+      </dependency>
       <dependency>
         <groupId>org.ihtsdo</groupId>
         <artifactId>ihtsdo-resources</artifactId>
