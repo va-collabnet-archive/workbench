@@ -272,6 +272,8 @@ public class DroolsEnumUpdatePanel extends JPanel {
 		for (int i = 0; i < components.length; i++) {
 			signpostPanel.remove(components[i]);
 		}
+		signpostPanel.revalidate();
+		signpostPanel.repaint();
 	}
 
 	private void exportActionPerformed(ActionEvent e) {
@@ -342,40 +344,48 @@ public class DroolsEnumUpdatePanel extends JPanel {
 		panel3 = new JPanel();
 		removeButton = new JButton();
 
-		// ======== this ========
+		//======== this ========
 		setBorder(new EmptyBorder(10, 5, 5, 5));
 		setLayout(new BorderLayout(5, 5));
 
-		// ======== actionPanel ========
+		//======== actionPanel ========
 		{
 			actionPanel.setLayout(new GridBagLayout());
-			((GridBagLayout) actionPanel.getLayout()).columnWidths = new int[] { 246, 0, 0 };
-			((GridBagLayout) actionPanel.getLayout()).rowHeights = new int[] { 0, 29, 0 };
-			((GridBagLayout) actionPanel.getLayout()).columnWeights = new double[] { 1.0, 0.0, 1.0E-4 };
-			((GridBagLayout) actionPanel.getLayout()).rowWeights = new double[] { 0.0, 0.0, 1.0E-4 };
+			((GridBagLayout)actionPanel.getLayout()).columnWidths = new int[] {246, 0, 0};
+			((GridBagLayout)actionPanel.getLayout()).rowHeights = new int[] {0, 29, 0};
+			((GridBagLayout)actionPanel.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
+			((GridBagLayout)actionPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
 
-			// ---- label1 ----
+			//---- label1 ----
 			label1.setText("Guvnor property description");
-			actionPanel.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 3, 3), 0, 0));
+			actionPanel.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 3, 3), 0, 0));
 
-			// ---- label2 ----
+			//---- label2 ----
 			label2.setText("Deployment package");
-			actionPanel.add(label2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 3, 0), 0, 0));
+			actionPanel.add(label2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 3, 0), 0, 0));
 
-			// ---- refsetList ----
+			//---- refsetList ----
 			refsetList.setVisibleRowCount(1);
 			refsetList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			actionPanel.add(refsetList, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 3), 0, 0));
-			actionPanel.add(rulesPackageCombo, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+			actionPanel.add(refsetList, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+				new Insets(0, 0, 0, 3), 0, 0));
+			actionPanel.add(rulesPackageCombo, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(actionPanel, BorderLayout.NORTH);
 
-		// ======== panel1 ========
+		//======== panel1 ========
 		{
 			panel1.setBorder(new MatteBorder(1, 0, 0, 0, Color.gray));
 			panel1.setLayout(new FlowLayout(FlowLayout.RIGHT, 3, 3));
 
-			// ---- export ----
+			//---- export ----
 			export.setText("Export to Drools");
 			export.addActionListener(new ActionListener() {
 				@Override
@@ -385,7 +395,7 @@ public class DroolsEnumUpdatePanel extends JPanel {
 			});
 			panel1.add(export);
 
-			// ---- closeButton ----
+			//---- closeButton ----
 			closeButton.setText("close");
 			closeButton.addActionListener(new ActionListener() {
 				@Override
@@ -397,29 +407,33 @@ public class DroolsEnumUpdatePanel extends JPanel {
 		}
 		add(panel1, BorderLayout.SOUTH);
 
-		// ======== panel2 ========
+		//======== panel2 ========
 		{
 			panel2.setLayout(new GridBagLayout());
-			((GridBagLayout) panel2.getLayout()).columnWidths = new int[] { 0, 0 };
-			((GridBagLayout) panel2.getLayout()).rowHeights = new int[] { 0, 0, 0, 0 };
-			((GridBagLayout) panel2.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-			((GridBagLayout) panel2.getLayout()).rowWeights = new double[] { 0.0, 1.0, 0.0, 1.0E-4 };
+			((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0};
+			((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0, 0, 0};
+			((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+			((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 1.0, 0.0, 1.0E-4};
 
-			// ---- label3 ----
+			//---- label3 ----
 			label3.setText("Enumerations");
-			panel2.add(label3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 3, 0), 0, 0));
+			panel2.add(label3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 3, 0), 0, 0));
 
-			// ======== scrollPane2 ========
+			//======== scrollPane2 ========
 			{
 				scrollPane2.setViewportView(droolEnumList);
 			}
-			panel2.add(scrollPane2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 3, 0), 0, 0));
+			panel2.add(scrollPane2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 3, 0), 0, 0));
 
-			// ======== panel3 ========
+			//======== panel3 ========
 			{
 				panel3.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 
-				// ---- removeButton ----
+				//---- removeButton ----
 				removeButton.setText("Remove");
 				removeButton.addActionListener(new ActionListener() {
 					@Override
@@ -429,7 +443,9 @@ public class DroolsEnumUpdatePanel extends JPanel {
 				});
 				panel3.add(removeButton);
 			}
-			panel2.add(panel3, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+			panel2.add(panel3, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(panel2, BorderLayout.CENTER);
 		// //GEN-END:initComponents
