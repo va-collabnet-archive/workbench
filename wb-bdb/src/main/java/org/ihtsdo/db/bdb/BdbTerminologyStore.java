@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.ConceptVersion;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
@@ -189,14 +190,19 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 		return latestDependencies;
 	}
 
-    public boolean satisfiesDependencies(Collection<DbDependency> dependencies) throws IOException {
+    public boolean satisfiesDependencies(Collection<DbDependency> dependencies) {
     	if (dependencies != null) {
-        	for (DbDependency d: dependencies) {
-        		String value = Bdb.getProperty(d.getKey());
-        		if (d.satisfactoryValue(value) == false) {
-        			return false;
-        		}
-        	}
+        	try {
+				for (DbDependency d: dependencies) {
+					String value = Bdb.getProperty(d.getKey());
+					if (d.satisfactoryValue(value) == false) {
+						return false;
+					}
+				}
+			} catch (Throwable e) {
+				AceLog.getAppLog().alertAndLogException(e);
+				return false;
+			}
     	}
     	return true;
     }

@@ -37,6 +37,9 @@ public class EccsDependency extends DbDependency {
 
 	@Override
 	public boolean satisfactoryValue(String value) {
+		if (value == null) {
+			return false;
+		}
 		Long dependencySize = Long.valueOf(getSizeInBytes());
 		Long comparisonSize = Long.valueOf(value);
 		return comparisonSize >= dependencySize;

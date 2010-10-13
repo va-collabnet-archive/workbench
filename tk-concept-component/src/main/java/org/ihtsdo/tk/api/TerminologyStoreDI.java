@@ -45,6 +45,6 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
     
     Collection<DbDependency> getLatestChangeSetDependencies() throws IOException;
     
-    boolean satisfiesDependencies(Collection<DbDependency> dependencies) throws IOException;
+    boolean satisfiesDependencies(Collection<DbDependency> dependencies);
 
 }
