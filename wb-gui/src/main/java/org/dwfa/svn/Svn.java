@@ -67,12 +67,14 @@ import org.tmatesoft.svn.core.javahl.SVNClientImpl;
 
 public class Svn implements I_HandleSubversion {
 
-	enum SvnImpl {
-		NATIVE,
-		SVN_KIT
-	};
 
+    enum SvnImpl {
+		NATIVE,
+		SVN_KIT;
+    };
 	private static boolean connectedToSvn = false;
+
+    protected static boolean useCachedCredentials = false;
 
 	private static SvnImpl impl = SvnImpl.SVN_KIT;
 
@@ -81,12 +83,12 @@ public class Svn implements I_HandleSubversion {
 	private static SvnPrompter prompter = new SvnPrompter();
 
 	public static final int SEMAPHORE_PERMITS = 10;
-	public static Semaphore rwl = new Semaphore(SEMAPHORE_PERMITS, true);
 
+    public static Semaphore rwl = new Semaphore(SEMAPHORE_PERMITS, true);
 	public static SVNClientInterface getSvnClient() {
 		if (!isConnectedToSvn()) {
-			JOptionPane.showMessageDialog(null, 
-					"Skipping SVN task as not connected to SVN", 
+			JOptionPane.showMessageDialog(null,
+					"Skipping SVN task as not connected to SVN",
 					"Not connected to SVN",
 					JOptionPane.INFORMATION_MESSAGE);
 			return null;
@@ -96,19 +98,22 @@ public class Svn implements I_HandleSubversion {
 			switch (impl) {
 			case NATIVE:
 				client = new SVNClient();
-				AceLog.getAppLog().info("Created native svn client: " + 
+				AceLog.getAppLog().info("Created native svn client: " +
 						client.getVersion());
 				break;
 
 			case SVN_KIT:
 				SVNClientImpl c = SVNClientImpl.newInstance();
-				SVNClientImpl.setRuntimeCredentialsStorage(null);
-				c.setClientCredentialsStorage(null);
-				client = c;
-				client.password("");
-				client.username("");
+                if ( !useCachedCredentials )
+                {
+                    SVNClientImpl.setRuntimeCredentialsStorage(null);
+                    c.setClientCredentialsStorage(null);
+                    c.password("");
+                    c.username("");
+                }
+                client = c;
 
-				AceLog.getAppLog().info("Created Svnkit pure java svn client: " + 
+				AceLog.getAppLog().info("Created Svnkit pure java svn client: " +
 						client.getVersion());
 				break;
 
@@ -168,7 +173,12 @@ public class Svn implements I_HandleSubversion {
 		return client;
 	}
 
-	public static Status[] status(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) 
+    public static void setUseCachedCredentials( boolean useCachedCredentials )
+    {
+        Svn.useCachedCredentials = useCachedCredentials;
+    }
+
+	public static Status[] status(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
 	throws TaskFailedException {
 		return status(svd, authenticator, interactive, false);
 	}
