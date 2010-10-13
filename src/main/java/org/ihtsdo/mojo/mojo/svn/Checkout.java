@@ -12,6 +12,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.svn.Svn;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.mojo.maven.MojoUtil;
+import org.tigris.subversion.javahl.ClientException;
 
 /**
  * Update with svn changes.
@@ -41,17 +42,25 @@ public class Checkout
             {
                 Svn.setUseCachedCredentials(true);
             }
+            if ( subversionConfigDirectory != null )
+            {
+                Svn.getSvnClient().setConfigDirectory( subversionConfigDirectory );
+            }
             I_HandleSubversion svn = new Svn();
             SubversionData svd = new SubversionData(repositoryUrlStr, workingCopyStr);
             getLog().info("Connecting to: " + repositoryUrlStr + " as: " + username);
             svd.setUsername(username);
             svd.setPassword(password);
-            svn.svnCheckout(svd, username != null ? this : null, false);
+            svn.svnCheckout(svd, this, false);
         } catch (NoSuchAlgorithmException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         } catch (IOException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         } catch (TaskFailedException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        }
+        catch ( ClientException e )
+        {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
     }
