@@ -64,13 +64,11 @@ import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.id.Type3UuidFactory;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
-import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
 import org.ihtsdo.rules.testmodel.DrComponentHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.rules.testmodel.TerminologyHelperDroolsWorkbench;
@@ -100,49 +98,20 @@ public class RulesLibrary {
 	/** The CONCEPT MODEL knowledge package identifier */
 	public static int CONCEPT_MODEL_PKG = 0;
 	public static int LINGUISTIC_GUIDELINES_PKG = 1;
-
-	public static KnowledgeBase getKnowledgeBaseForContext(I_GetConceptData context, I_ConfigAceFrame config) throws Exception {
-		RulesDeploymentPackageReferenceHelper rulesPackageHelper = new RulesDeploymentPackageReferenceHelper(config);
-
-		KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-
-		for (RulesDeploymentPackageReference deploymentPackage : rulesPackageHelper.getAllRulesDeploymentPackages()) {
-			if (deploymentPackage.validate()) {
-				KnowledgeBase loopKBase = deploymentPackage.getKnowledgeBase(false);
-				loopKBase = filterForContext(loopKBase, context, config);
-				kbase.addKnowledgePackages(loopKBase.getKnowledgePackages());
-			}
-		}
-
-		return kbase;
-	}
-
-	public static KnowledgeBase filterForContext(KnowledgeBase kbase, I_GetConceptData context, I_ConfigAceFrame config) throws TerminologyException, IOException {
-		RulesContextHelper contextHelper = new RulesContextHelper(config);
-		I_GetConceptData excludeClause = Terms.get().getConcept(RefsetAuxiliary.Concept.EXCLUDE_INDIVIDUAL.getUids());
-		for (KnowledgePackage kpackg : kbase.getKnowledgePackages()) {
-			for (Rule rule : kpackg.getRules()) {
-				boolean excluded = false;
-				String ruleUid = (String) rule.getMetaData().get("UUID");
-				//String ruleUid = (String) rule.getMetaAttribute("UID");
-				if (ruleUid != null) {
-					I_GetConceptData role = contextHelper.getRoleInContext(ruleUid, context);
-					if (role != null && role.getConceptNid() == excludeClause.getConceptNid()) {
-						excluded = true;
-					}
-				}
-				if (excluded) {
-					kbase.removeRule(kpackg.getName(), rule.getName());
-				}
-			}
-		}
-		return kbase;
-	}
-
+	
+	
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
 			boolean onlyUncommittedContent, I_ConfigAceFrame config) 
 	throws Exception {
-		KnowledgeBase kbase = getKnowledgeBaseForContext(context, config);
+		RulesContextHelper contextHelper = new RulesContextHelper(config);
+		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper);
+	}
+	
+
+	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
+			boolean onlyUncommittedContent, I_ConfigAceFrame config, RulesContextHelper contextHelper) 
+	throws Exception {
+		KnowledgeBase kbase = contextHelper.getKnowledgeBaseForContext(context, config);
 
 		StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 
@@ -173,9 +142,9 @@ public class RulesLibrary {
 		List<String> relTypesList = new ArrayList<String>();
 		List<String> textList = new ArrayList<String>();
 		for (AbstractTemplate template : results.getTemplates()) {
-			if (!template.getType().equals(TemplateType.DESCRIPTION)) {
+			if (template.getType().equals(TemplateType.DESCRIPTION)) {
 				DescriptionTemplate dtemplate = (DescriptionTemplate) template;
-				if (textList.contains(dtemplate.getText())) {
+				if (!textList.contains(dtemplate.getText())) {
 					textList.add(dtemplate.getText());
 					DescriptionVersionBI description = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getCoordinate(),
 							UUID.fromString(dtemplate.getComponentUuid()));
@@ -190,8 +159,8 @@ public class RulesLibrary {
 
 			if (template.getType().equals(TemplateType.RELATIONSHIP)) {
 				RelationshipTemplate rtemplate = (RelationshipTemplate) template;
-				if (!relTypesList.contains(rtemplate.getTypeUuid())) {
-					relTypesList.add(rtemplate.getTypeUuid());
+				if (!relTypesList.contains(rtemplate.getTypeUuid().trim())) {
+					relTypesList.add(rtemplate.getTypeUuid().trim());
 					ConceptSpec sourceConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getSourceUuid())).toString(),
 							UUID.fromString(rtemplate.getSourceUuid()));
 					ConceptSpec typeConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTypeUuid())).toString(),

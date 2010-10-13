@@ -2,9 +2,15 @@ package org.ihtsdo.rules.context;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import org.drools.KnowledgeBase;
+import org.drools.KnowledgeBaseFactory;
+import org.drools.definition.KnowledgePackage;
+import org.drools.definition.rule.Rule;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -29,9 +35,59 @@ import org.ihtsdo.tk.api.PathBI;
 public class RulesContextHelper {
 
 	I_ConfigAceFrame config;
+	HashMap<Integer, KnowledgeBase> kbCache;
+	long lastCacheUpdateTime = 0;
 
 	public RulesContextHelper(I_ConfigAceFrame config) {
 		this.config = config;
+		this.kbCache = new HashMap<Integer, KnowledgeBase>();
+	}
+	
+	public KnowledgeBase getKnowledgeBaseForContext(I_GetConceptData context, I_ConfigAceFrame config) throws Exception {
+		//if (kbCache.containsKey(context) && ((Calendar.getInstance().getTimeInMillis() - lastCacheUpdateTime)<10000)) {
+		if (kbCache.containsKey(context.getConceptNid())) {
+			return kbCache.get(context.getConceptNid());
+		} else {
+			RulesDeploymentPackageReferenceHelper rulesPackageHelper = new RulesDeploymentPackageReferenceHelper(config);
+
+			KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+
+			for (RulesDeploymentPackageReference deploymentPackage : rulesPackageHelper.getAllRulesDeploymentPackages()) {
+				if (deploymentPackage.validate()) {
+					KnowledgeBase loopKBase = deploymentPackage.getKnowledgeBase(false);
+					loopKBase = filterForContext(loopKBase, context, config);
+					kbase.addKnowledgePackages(loopKBase.getKnowledgePackages());
+				}
+			}
+
+			kbCache =  new HashMap<Integer, KnowledgeBase>();
+			kbCache.put(context.getConceptNid(), kbase);
+			lastCacheUpdateTime = Calendar.getInstance().getTimeInMillis();
+
+			return kbase;
+		}
+	}
+
+	public KnowledgeBase filterForContext(KnowledgeBase kbase, I_GetConceptData context, I_ConfigAceFrame config) throws TerminologyException, IOException {
+		RulesContextHelper contextHelper = new RulesContextHelper(config);
+		I_GetConceptData excludeClause = Terms.get().getConcept(RefsetAuxiliary.Concept.EXCLUDE_INDIVIDUAL.getUids());
+		for (KnowledgePackage kpackg : kbase.getKnowledgePackages()) {
+			for (Rule rule : kpackg.getRules()) {
+				boolean excluded = false;
+				String ruleUid = (String) rule.getMetaData().get("UUID");
+				//String ruleUid = (String) rule.getMetaAttribute("UID");
+				if (ruleUid != null) {
+					I_GetConceptData role = contextHelper.getRoleInContext(ruleUid, context);
+					if (role != null && role.getConceptNid() == excludeClause.getConceptNid()) {
+						excluded = true;
+					}
+				}
+				if (excluded) {
+					kbase.removeRule(kpackg.getName(), rule.getName());
+				}
+			}
+		}
+		return kbase;
 	}
 
 	public I_GetConceptData createContext(String name) {
@@ -310,4 +366,25 @@ public class RulesContextHelper {
 
 		return lastPart;
 	}
+
+	public I_ConfigAceFrame getConfig() {
+		return config;
+	}
+
+	public void setConfig(I_ConfigAceFrame config) {
+		this.config = config;
+	}
+
+	public HashMap<Integer, KnowledgeBase> getKbCache() {
+		return kbCache;
+	}
+
+	public void setKbCache(HashMap<Integer, KnowledgeBase> kbCache) {
+		this.kbCache = kbCache;
+	}
+	
+	public void cleanCache() {
+		this.kbCache = new HashMap<Integer, KnowledgeBase>();
+	}
+
 }

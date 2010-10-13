@@ -53,6 +53,7 @@ public class RulesContextMatrixPanel extends JPanel {
 
 	private void updateTable1() {
 		try {
+			table1.setAutoCreateRowSorter(true);
 			I_GetConceptData agendaMetadataRefset = tf.getConcept(RefsetAuxiliary.Concept.RULES_CONTEXT_METADATA_REFSET.getUids());
 			I_GetConceptData includeClause = tf.getConcept(RefsetAuxiliary.Concept.INCLUDE_INDIVIDUAL.getUids());
 			I_GetConceptData excludeClause = tf.getConcept(RefsetAuxiliary.Concept.EXCLUDE_INDIVIDUAL.getUids());

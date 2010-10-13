@@ -90,11 +90,12 @@ public class TestListPanel extends JPanel {
 				return false;
 			}
 		};
+		RulesContextHelper contextHelper = new RulesContextHelper(config);
 		for (int i = 0; i < list1Model.getSize(); i++) {
 			I_GetConceptData loopConcept = (I_GetConceptData) list1Model.getElementAt(i);
 			I_GetConceptData context = (I_GetConceptData) comboBox1.getSelectedItem();
 			try {
-				ResultsCollectorWorkBench results = RulesLibrary.checkConcept(loopConcept, context, false, config);
+				ResultsCollectorWorkBench results = RulesLibrary.checkConcept(loopConcept, context, false, config, contextHelper);
 				for (ResultsItem resultsItem : results.getResultsItems()) {
 					table1Model.addRow(
 							new String[] {loopConcept.toString(), "[" + resultsItem.getErrorCode() + "] " + resultsItem.getMessage()});
