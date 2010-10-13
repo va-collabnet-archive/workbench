@@ -71,6 +71,11 @@ public abstract class AbstractSvnMojo
     }
 
     public boolean prompt(String realm, String username, boolean maySave) {
+        if ( this.username != null && this.password != null )
+        {
+            return true;
+        }
+
         if ( !interactive )
         {
             getLog().info( "Not prompting for username/password - non-interactive mode" );
@@ -79,11 +84,8 @@ public abstract class AbstractSvnMojo
 
         try
         {
-            if ( this.username == null || this.password == null )
-            {
-                this.username = prompter.prompt( realm + " Username", username );
-                this.password = prompter.promptForPassword( realm + " Password" );
-            }
+            this.username = prompter.prompt( realm + " Username", username );
+            this.password = prompter.promptForPassword( realm + " Password" );
         }
         catch ( PrompterException e )
         {
