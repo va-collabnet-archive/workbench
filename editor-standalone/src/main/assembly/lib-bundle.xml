@@ -69,6 +69,13 @@
         <include>pdfbox:pdfbox</include>
         <include>org.fontbox:fontbox</include>
         <!-- includes done for translation -->
+        <!-- includes for guvnor drools -->
+        <include>com.googlecode.sardine:sardine</include>
+        <include>commons-logging:commons-logging</include>
+        <include>commons-codec:commons-codec</include>
+        <include>org.apache.httpcomponents:httpclient</include>
+        <include>org.apache.httpcomponents:httpcore</include>
+        <!-- incluedes done for guvnor drools-->
       </includes>
     </dependencySet>
     <dependencySet>
