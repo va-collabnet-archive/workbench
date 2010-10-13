@@ -43,7 +43,7 @@ public class TerminologyHelperDrools {
 			}
 		}
 
-		fisW=(InputStream) TerminologyHelperDrools.class.getResourceAsStream("ICSWords.txt");
+		fisW=(InputStream) TerminologyHelperDrools.class.getResourceAsStream("IcsWords.txt");
 		words = new Hashtable<String,String>();
 		wordsLoaded=false;
 	}
