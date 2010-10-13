@@ -143,22 +143,22 @@ public class RulesLibrary {
 			boolean onlyUncommittedContent, I_ConfigAceFrame config) 
 	throws Exception {
 		KnowledgeBase kbase = getKnowledgeBaseForContext(context, config);
-		
+
 		StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
-		
+
 		KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
-		
+
 		ResultsCollectorWorkBench results = new ResultsCollectorWorkBench();
-		
+
 		ksession.setGlobal("resultsCollector", results);
 		ksession.setGlobal("terminologyHelper", new TerminologyHelperDroolsWorkbench());
-		
+
 		ConceptVersionBI conceptBi = Ts.get().getConceptVersion(config.getCoordinate(), concept.getNid());
-		
+
 		DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version");
 
 		ksession.insert(testConcept);
-		
+
 		ksession.fireAllRules();
 
 		//ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
@@ -169,31 +169,39 @@ public class RulesLibrary {
 					resultsItem.getErrorCode() + " - " + resultsItem.getMessage(), 
 					concept));
 		}
-		
+
+		List<String> relTypesList = new ArrayList<String>();
+		List<String> textList = new ArrayList<String>();
 		for (AbstractTemplate template : results.getTemplates()) {
-			if (template.getType().equals(TemplateType.DESCRIPTION)) {
+			if (!template.getType().equals(TemplateType.DESCRIPTION)) {
 				DescriptionTemplate dtemplate = (DescriptionTemplate) template;
-				DescriptionVersionBI description = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getCoordinate(),
-						UUID.fromString(dtemplate.getComponentUuid()));
-				DescriptionSpec dSpec = SpecFactory.get(description);
-				if (dtemplate.getText() != null) {
-					dSpec.setDescText(dtemplate.getText());
+				if (textList.contains(dtemplate.getText())) {
+					textList.add(dtemplate.getText());
+					DescriptionVersionBI description = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getCoordinate(),
+							UUID.fromString(dtemplate.getComponentUuid()));
+					DescriptionSpec dSpec = SpecFactory.get(description);
+					if (dtemplate.getText() != null) {
+						dSpec.setDescText(dtemplate.getText());
+					}
+					//TODO: implement other properties
+					results.getWbTemplates().put(dSpec, description.getNid());
 				}
-				//TODO: implement other properties
-				results.getWbTemplates().put(dSpec, description.getNid());
 			}
-			
+
 			if (template.getType().equals(TemplateType.RELATIONSHIP)) {
 				RelationshipTemplate rtemplate = (RelationshipTemplate) template;
-				ConceptSpec sourceConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getSourceUuid())).toString(),
-						UUID.fromString(rtemplate.getSourceUuid()));
-				ConceptSpec typeConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTypeUuid())).toString(),
-						UUID.fromString(rtemplate.getTypeUuid()));
-				ConceptSpec targetConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTargetUuid())).toString(),
-						UUID.fromString(rtemplate.getTargetUuid()));
-				RelSpec relSpec = new RelSpec(sourceConceptSpec, typeConceptSpec, targetConceptSpec);
-				//TODO: implement other properties
-				results.getWbTemplates().put(relSpec, concept.getConceptNid());
+				if (!relTypesList.contains(rtemplate.getTypeUuid())) {
+					relTypesList.add(rtemplate.getTypeUuid());
+					ConceptSpec sourceConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getSourceUuid())).toString(),
+							UUID.fromString(rtemplate.getSourceUuid()));
+					ConceptSpec typeConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTypeUuid())).toString(),
+							UUID.fromString(rtemplate.getTypeUuid()));
+					ConceptSpec targetConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTargetUuid())).toString(),
+							UUID.fromString(rtemplate.getTargetUuid()));
+					RelSpec relSpec = new RelSpec(sourceConceptSpec, typeConceptSpec, targetConceptSpec);
+					//TODO: implement other properties
+					results.getWbTemplates().put(relSpec, concept.getConceptNid());
+				}
 			}
 			//TODO: implement other templates
 		}
@@ -712,7 +720,7 @@ public class RulesLibrary {
 
 		return details;
 	}
-	
+
 	public static void updateGuvnorEnumerations(I_GetConceptData refset, RulesDeploymentPackageReference kPack, I_ConfigAceFrame config) {
 		try {
 			ConceptVersionBI refsetBI = Ts.get().getConceptVersion(config.getCoordinate(), refset.getUids());
@@ -722,16 +730,16 @@ public class RulesLibrary {
 				throw new Exception("Wrong number of guvnor property descriptions: " + guvnorDescriptionsSize);
 			}
 			propertyName = refsetBI.getDescsActive(ArchitectonicAuxiliary.Concept.GUVNOR_ENUM_PROPERTY_DESC_TYPE.localize().getNid()).iterator().next().getText();
-			
+
 			String guvnorEnumerationText = "'" + propertyName + "' : [";
 			for (I_ExtendByRef loopMember : Terms.get().getRefsetExtensionMembers(refset.getConceptNid())) {
-				
+
 				I_ExtendByRefPartCid lastPart = (I_ExtendByRefPartCid) loopMember.getTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), 
 						config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getMutablePart();
 				ConceptVersionBI loopConcept = Ts.get().getConceptVersion(config.getCoordinate(),lastPart.getC1id());
-				
+
 				String name = "";
-				
+
 				if (loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).size() > 0) {
 					name = loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).iterator().next().getText();
 				} else if (loopConcept.getDescsActive().size() > 0){
@@ -739,16 +747,16 @@ public class RulesLibrary {
 				} else {
 					name = "no description found";
 				}
-				
+
 				guvnorEnumerationText = guvnorEnumerationText + "'" + loopConcept.getPrimUuid();
 				guvnorEnumerationText = guvnorEnumerationText + "=" + name;
 				guvnorEnumerationText = guvnorEnumerationText + "',";
 			}
 			guvnorEnumerationText = guvnorEnumerationText.substring(0, guvnorEnumerationText.length()-1) + "]";
 			System.out.println(guvnorEnumerationText);
-			
+
 			Sardine sardine = SardineFactory.begin("username", "password");
-			
+
 			String pkgUrl = kPack.getUrl().substring(0, kPack.getUrl().indexOf(".Guvnor") + 7) + "/webdav/packages/";
 			pkgUrl = pkgUrl + kPack.getUrl().substring(kPack.getUrl().indexOf("/package/") + 9, kPack.getUrl().indexOf("/", kPack.getUrl().indexOf("/package/") + 10));
 			pkgUrl = pkgUrl + "/" + propertyName + ".enumeration";
@@ -764,74 +772,74 @@ public class RulesLibrary {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static boolean isIncludedInRefsetSpec(I_GetConceptData refset, I_GetConceptData candidateConcept, I_ConfigAceFrame config) {
 		boolean result = false;
-		
+
 		try {
-            RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, config);
-            I_GetConceptData refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
-            AceLog.getAppLog().info("Refset: " + refset.getInitialText() + " " + refset.getUids().get(0));
-            AceLog.getAppLog().info("Refset spec: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
-            RefsetComputeType computeType = RefsetComputeType.CONCEPT; // default
-            if (refsetSpecHelper.isDescriptionComputeType()) {
-                computeType = RefsetComputeType.DESCRIPTION;
-            } else if (refsetSpecHelper.isRelationshipComputeType()) {
-                AceLog.getAppLog().info("Invalid refset spec to compute - relationship compute types not supported.");
-                if (!DwfaEnv.isHeadless()) {
-                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                        "Invalid refset spec to compute - relationship compute types not supported.", "",
-                        JOptionPane.ERROR_MESSAGE);
-                }
-            }
+			RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, config);
+			I_GetConceptData refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
+			AceLog.getAppLog().info("Refset: " + refset.getInitialText() + " " + refset.getUids().get(0));
+			AceLog.getAppLog().info("Refset spec: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
+			RefsetComputeType computeType = RefsetComputeType.CONCEPT; // default
+			if (refsetSpecHelper.isDescriptionComputeType()) {
+				computeType = RefsetComputeType.DESCRIPTION;
+			} else if (refsetSpecHelper.isRelationshipComputeType()) {
+				AceLog.getAppLog().info("Invalid refset spec to compute - relationship compute types not supported.");
+				if (!DwfaEnv.isHeadless()) {
+					JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+							"Invalid refset spec to compute - relationship compute types not supported.", "",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
 
-            // verify a valid refset spec construction
-            if (refsetSpec == null) {
-                AceLog.getAppLog().info(
-                    "Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.");
-                if (!DwfaEnv.isHeadless()) {
-                    JOptionPane
-                        .showMessageDialog(
-                            LogWithAlerts.getActiveFrame(null),
-                            "Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.",
-                            "", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-            // Step 1: create the query object, based on the refset spec
-            RefsetSpecQuery query =
-                    RefsetQueryFactory.createQuery(config, Terms.get(), refsetSpec, refset, computeType);
+			// verify a valid refset spec construction
+			if (refsetSpec == null) {
+				AceLog.getAppLog().info(
+				"Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.");
+				if (!DwfaEnv.isHeadless()) {
+					JOptionPane
+					.showMessageDialog(
+							LogWithAlerts.getActiveFrame(null),
+							"Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.",
+							"", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+			// Step 1: create the query object, based on the refset spec
+			RefsetSpecQuery query =
+				RefsetQueryFactory.createQuery(config, Terms.get(), refsetSpec, refset, computeType);
 
-            // check validity of query
-            if (!query.isValidQuery() && query.getTotalStatementCount() != 0) {
-            	AceLog.getAppLog().info("Refset spec has dangling AND/OR. These must have sub-statements.");
-                if (!DwfaEnv.isHeadless()) {
-                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                        "Refset spec has dangling AND/OR. These must have sub-statements.", "",
-                        JOptionPane.ERROR_MESSAGE);
-                }
-            }
-            
-            I_GetConceptData selectedConcept = candidateConcept;
-            
-            System.out.println("************ Starting test computation *****************");
-            System.out.println("Refset spec = " + refsetSpec.toString());
-            System.out.println("Refset = " + refset.toString());
-            System.out.println("Concept to test = " + selectedConcept.toString());
-            
-            List<I_ShowActivity> activities = new ArrayList<I_ShowActivity>();
-             result = query.execute(selectedConcept, activities);
-            
-            System.out.println("++++++++++++++ Result = " + result);
-            System.out.println("************ Finished test computation *****************");
-		 } catch (Exception e) {
-	            AceLog.getAppLog().alertAndLogException(e);
-	            try {
-	                Terms.get().cancel();
-	            } catch (IOException ioException) {
-	                ioException.printStackTrace();
-	            }
-	        }
-		
+			// check validity of query
+			if (!query.isValidQuery() && query.getTotalStatementCount() != 0) {
+				AceLog.getAppLog().info("Refset spec has dangling AND/OR. These must have sub-statements.");
+				if (!DwfaEnv.isHeadless()) {
+					JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+							"Refset spec has dangling AND/OR. These must have sub-statements.", "",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
+
+			I_GetConceptData selectedConcept = candidateConcept;
+
+			System.out.println("************ Starting test computation *****************");
+			System.out.println("Refset spec = " + refsetSpec.toString());
+			System.out.println("Refset = " + refset.toString());
+			System.out.println("Concept to test = " + selectedConcept.toString());
+
+			List<I_ShowActivity> activities = new ArrayList<I_ShowActivity>();
+			result = query.execute(selectedConcept, activities);
+
+			System.out.println("++++++++++++++ Result = " + result);
+			System.out.println("************ Finished test computation *****************");
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+			try {
+				Terms.get().cancel();
+			} catch (IOException ioException) {
+				ioException.printStackTrace();
+			}
+		}
+
 		return result;
 	}
 }
