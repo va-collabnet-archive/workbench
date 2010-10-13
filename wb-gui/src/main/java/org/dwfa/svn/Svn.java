@@ -243,6 +243,10 @@ public class Svn implements I_HandleSubversion {
 						+ e.getLocalizedMessage());
 				throw new TaskFailedException(e);
 			}
+            else
+            {
+                SvnLog.info( "status cancelled: " + e.getMessage() );
+            }
 		}
 		SvnLog.info("finished status for working copy: " + workingCopy);
 		return status;
@@ -296,6 +300,10 @@ public class Svn implements I_HandleSubversion {
 							+ e.getLocalizedMessage());
 					throw new TaskFailedException(e);
 				}
+                else
+                {
+                    SvnLog.info( "cleanup cancelled: " + e.getMessage() );
+                }
 			}
 			SvnLog.info("finished cleanup");
 			ObjectServerCore.refreshServers();
@@ -464,6 +472,10 @@ public class Svn implements I_HandleSubversion {
 						+ e.getLocalizedMessage());
 				throw new TaskFailedException(e);
 			}
+            else
+            {
+                SvnLog.info( "commit cancelled: " + e.getMessage() );
+            }
 		}
 		SvnLog.info("finished commit");
 	}
@@ -528,6 +540,10 @@ public class Svn implements I_HandleSubversion {
 							+ e.getLocalizedMessage());
 					throw new TaskFailedException(e);
 				}
+                else
+                {
+                    SvnLog.info( "purge cancelled: " + e.getMessage() );
+                }
 			}
 			SvnLog.info("finished purge");
 			ObjectServerCore.refreshServers();
@@ -618,6 +634,10 @@ public class Svn implements I_HandleSubversion {
 						+ e.getLocalizedMessage());
 				throw new TaskFailedException(e);
 			}
+            else
+            {
+                SvnLog.info( "revert cancelled: " + e.getMessage() );
+            }
 		} catch (IOException e) {
 			SvnLog.alertAndLog(e);
 			SvnLog.info("finished revert for working copy: " + svd.getWorkingCopyStr() + "with exception: "
@@ -684,6 +704,10 @@ public class Svn implements I_HandleSubversion {
 							+ e.getLocalizedMessage());
 					throw new TaskFailedException(e);
 				}
+                else
+                {
+                    SvnLog.info( "update cancelled: " + e.getMessage() );
+                }
 			}
 			SvnLog.info("finished update");
 			ObjectServerCore.refreshServers();
@@ -762,6 +786,10 @@ public class Svn implements I_HandleSubversion {
 							+ "with exception: " + e.getLocalizedMessage());
 					throw new TaskFailedException(e);
 				}
+                else
+                {
+                    SvnLog.info( "database update cancelled: " + e.getMessage() );
+                }
 			}
 			SvnLog.info("finished database update");
 		} finally {
@@ -794,12 +822,9 @@ public class Svn implements I_HandleSubversion {
 		try {
 
 			SvnLog.info("starting checkout");
-            if ( authenticator != null )
-            {
-                Svn.getSvnClient().setPrompt(authenticator);
-            }
+      Svn.getSvnClient().setPrompt(authenticator);
 			try {
-				if (interactive) {
+                if (interactive) {
 					handleAuthentication(authenticator);
 				}
 				switchToReadOnlyMirror(svd);
@@ -817,6 +842,10 @@ public class Svn implements I_HandleSubversion {
 							+ e.getLocalizedMessage());
 					throw new TaskFailedException(e);
 				}
+                else
+                {
+                    SvnLog.info( "checkout cancelled: " + e.getMessage() );
+                }
 			}
 			SvnLog.info("finished checkout");
 			ObjectServerCore.refreshServers();
@@ -913,6 +942,10 @@ public class Svn implements I_HandleSubversion {
 				SvnLog.alertAndLog(e);
 				throw new TaskFailedException(e);
 			}
+            else
+            {
+                SvnLog.info( "list cancelled: " + e.getMessage() );
+            }
 		}
 		return callback.dirList;
 	}
@@ -1064,6 +1097,10 @@ public class Svn implements I_HandleSubversion {
 							+ e.getLocalizedMessage());
 					throw new TaskFailedException(e);
 				}
+                else
+                {
+                    SvnLog.info( "unlock cancelled: " + e.getMessage() );
+                }
 			}
 			SvnLog.info("finished unlock");
 		} finally {
@@ -1119,6 +1156,10 @@ public class Svn implements I_HandleSubversion {
 							+ e.getLocalizedMessage());
 					throw new TaskFailedException(e);
 				}
+                else
+                {
+                    SvnLog.info( "lock cancelled: " + e.getMessage() );
+                }
 			}
 			SvnLog.info("finished lock");
 		} finally {
@@ -1175,6 +1216,10 @@ public class Svn implements I_HandleSubversion {
 							+ e.getLocalizedMessage());
 					throw new TaskFailedException(e);
 				}
+                else
+                {
+                    SvnLog.info( "import cancelled: " + e.getMessage() );
+                }
 			}
 			SvnLog.info("finished import");
 		} finally {
@@ -1239,6 +1284,10 @@ public class Svn implements I_HandleSubversion {
 							+ "with exception: " + e.getLocalizedMessage());
 					throw new TaskFailedException(e);
 				}
+                else
+                {
+                    SvnLog.info( "switch cancelled: " + e.getMessage() );
+                }
 			}
 		}
 	}

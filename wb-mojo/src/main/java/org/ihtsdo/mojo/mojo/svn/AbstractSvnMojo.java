@@ -53,6 +53,12 @@ public abstract class AbstractSvnMojo
     private Prompter prompter;
 
     /**
+     * Subversion configuration directory. If not specified, the default (~/.subversion) will be used.
+     * @parameter
+     */
+    protected String subversionConfigDirectory;
+
+    /**
      * Check if Maven is operating in interactive mode.
      *
      * @parameter expression="${settings.interactiveMode}"
@@ -85,7 +91,7 @@ public abstract class AbstractSvnMojo
     }
 
     public boolean userAllowedSave() {
-        return false;
+        return true;
     }
 
     public int askTrustSSLServer(String arg0, boolean arg1) {
