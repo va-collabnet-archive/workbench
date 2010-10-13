@@ -8,9 +8,9 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<packaging>pom</packaging>
-	<artifactId>database-synchronized</artifactId>
-	<name>Workbench Synchronized Database</name>
-	<description>Workbench Synchronized Database</description>
+	<artifactId>editor-database</artifactId>
+	<name>Workbench Editor Database</name>
+	<description>Workbench Editor Database</description>
 	<dependencies>
 		<dependency>
 			<groupId>org.ihtsdo.sample</groupId>
@@ -608,6 +608,4 @@
       </build>
     </profile>
 	</profiles>
-  <!-- TODO: improve username issues -->
-  <!-- TODO: rename to editor-database -->
 </project>

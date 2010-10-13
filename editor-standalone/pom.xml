@@ -18,7 +18,7 @@
 			bundle will use.
 		-->
 			<groupId>org.ihtsdo.sample</groupId>
-			<artifactId>database</artifactId>
+			<artifactId>editor-database</artifactId>
       <type>zip</type>
 			<version>${project.version}</version>
 		</dependency>
@@ -321,7 +321,7 @@
               <runtimeArtifacts>
               	<runtimeArtifact>${project.groupId}:profiles</runtimeArtifact>
               	<runtimeArtifact>${project.groupId}:queues</runtimeArtifact>
-              	<runtimeArtifact>${project.groupId}:database</runtimeArtifact>
+              	<runtimeArtifact>${project.groupId}:editor-database</runtimeArtifact>
                 <runtimeArtifact>${project.groupId}:documentation</runtimeArtifact>
                 <runtimeArtifact>org.ihtsdo:wb-ide-admin-bp</runtimeArtifact>
                 <runtimeArtifact>org.ihtsdo:wb-ide-user-bp</runtimeArtifact>

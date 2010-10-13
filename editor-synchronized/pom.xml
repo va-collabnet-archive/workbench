@@ -17,7 +17,7 @@
 				bundle will use.
 			-->
 			<groupId>org.ihtsdo.sample</groupId>
-			<artifactId>database-synchronized</artifactId>
+			<artifactId>editor-database</artifactId>
       <type>zip</type>
 			<version>${project.version}</version>
 		</dependency>
@@ -233,7 +233,7 @@
 						<configuration>
 							<targetSubDir>generated-resources</targetSubDir>
               <runtimeArtifacts>
-                <runtimeArtifact>${project.groupId}:database-synchronized</runtimeArtifact>
+                <runtimeArtifact>${project.groupId}:editor-database</runtimeArtifact>
                 <runtimeArtifact>org.ihtsdo:wb-ide-admin-bp</runtimeArtifact>
                 <runtimeArtifact>org.ihtsdo:wb-ide-user-bp</runtimeArtifact>
               </runtimeArtifacts>
@@ -247,7 +247,7 @@
 						</goals>
 						<configuration>
 							<workingCopyStr>${project.build.directory}/wb-bundle/berkeley-db/mutable/</workingCopyStr>
-							<repositoryUrlStr>https://csfe.aceworkspace.net/svn/repos/workbench/wb-sample-pa/trunk/database-synchronized/src/main/berkeley-db/mutable/</repositoryUrlStr>
+							<repositoryUrlStr>https://csfe.aceworkspace.net/svn/repos/workbench/wb-sample-pa/berkeley-db/mutable/</repositoryUrlStr>
 							<username>${demo.sync.ci.user}</username>
 							<password>${demo.sync.ci.pwd}</password>
 						</configuration>

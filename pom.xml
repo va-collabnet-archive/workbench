@@ -141,7 +141,7 @@
     </pluginManagement>
   </build>
   <modules>
-    <module>database</module>
+    <module>editor-database</module>
     <module>java-binding</module>
     <module>profiles</module>
     <module>editor-standalone</module>
@@ -153,7 +153,6 @@
       <modules>
         <module>documentation</module>
         <module>viewer</module>
-        <module>database-synchronized</module>
         <module>editor-synchronized</module>
         <module>content-distribution</module>
       </modules>
@@ -173,7 +172,6 @@
     <profile>
       <id>sync</id>
       <modules>
-        <module>database-synchronized</module>
         <module>editor-synchronized</module>
       </modules>
     </profile>
