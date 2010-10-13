@@ -47,14 +47,30 @@ public abstract class AbstractSvnMojo
      */
     protected File targetDirectory;
 
-    /** @component */
+    /**
+     * @component
+     */
     private Prompter prompter;
+
+    /**
+     * Check if Maven is operating in interactive mode.
+     *
+     * @parameter expression="${settings.interactiveMode}"
+     * @readonly
+     */
+    private boolean interactive;
 
     public String askQuestion(String arg0, String arg1, boolean arg2, boolean arg3) {
         throw new UnsupportedOperationException();
     }
 
     public boolean prompt(String realm, String username, boolean maySave) {
+        if ( !interactive )
+        {
+            getLog().info( "Not prompting for username/password - non-interactive mode" );
+            return false;
+        }
+
         try
         {
             this.username = prompter.prompt( realm + " Username", username );
