@@ -79,8 +79,11 @@ public abstract class AbstractSvnMojo
 
         try
         {
-            this.username = prompter.prompt( realm + " Username", username );
-            this.password = prompter.promptForPassword( realm + " Password" );
+            if ( this.username == null || this.password == null )
+            {
+                this.username = prompter.prompt( realm + " Username", username );
+                this.password = prompter.promptForPassword( realm + " Password" );
+            }
         }
         catch ( PrompterException e )
         {
