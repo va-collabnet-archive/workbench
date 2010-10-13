@@ -14,6 +14,11 @@
         <org.ihtsdo.wb-icons.version>1.0.1</org.ihtsdo.wb-icons.version>
 	</properties>
 	<dependencies>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-interactivity-api</artifactId>
+      <version>1.0-alpha-6</version>
+    </dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-gui</artifactId>
