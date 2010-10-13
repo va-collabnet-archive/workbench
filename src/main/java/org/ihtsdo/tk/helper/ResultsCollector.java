@@ -25,12 +25,12 @@ import org.ihtsdo.tk.helper.templates.AbstractTemplate;
  * The Class ResultsCollector.
  */
 public class ResultsCollector {
-	
+
 	/** The alert list. */
 	//private List<AlertToDataConstraintFailure> alertList;
 	private List<ResultsItem> resultsItems;
 	private List<AbstractTemplate> templates;
-	
+
 	/**
 	 * Instantiates a new results collector.
 	 * 
@@ -45,7 +45,15 @@ public class ResultsCollector {
 	}
 
 	public void addResultsItem(ResultsItem resultsItem) {
-		this.resultsItems.add(resultsItem);
+		boolean insertRequired = true;
+		for (ResultsItem loopItem : resultsItems) {
+			if (loopItem.getErrorCode() == resultsItem.getErrorCode() && loopItem.getMessage().equals(resultsItem.getMessage())) {
+				insertRequired = false;
+			}
+		}
+		if (insertRequired) {
+			this.resultsItems.add(resultsItem);
+		}
 	}
 
 	public List<ResultsItem> getResultsItems() {
@@ -63,7 +71,7 @@ public class ResultsCollector {
 	public void setTemplates(List<AbstractTemplate> templates) {
 		this.templates = templates;
 	}
-	
+
 	public void addTemplate(AbstractTemplate template) {
 		this.templates.add(template);
 	}
