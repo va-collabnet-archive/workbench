@@ -601,6 +601,7 @@
               <repositoryUrlStr>${berkeleydb.svn.url}</repositoryUrlStr>
               <username>${demo.sync.ci.user}</username>
               <password>${demo.sync.ci.pwd}</password>
+              <subversionConfigDirectory>${svn.config.directory}</subversionConfigDirectory>
             </configuration>
           </plugin>
         </plugins>
