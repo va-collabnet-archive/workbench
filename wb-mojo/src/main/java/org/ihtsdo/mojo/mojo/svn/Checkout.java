@@ -7,6 +7,8 @@ import java.security.NoSuchAlgorithmException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.codehaus.plexus.components.interactivity.Prompter;
+import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.dwfa.ace.api.I_HandleSubversion;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.bpa.process.TaskFailedException;
@@ -78,7 +80,7 @@ public class Checkout extends AbstractMojo implements PromptUserPassword3 {
             getLog().info("Connecting to: " + repositoryUrlStr + " as: " + username);
             svd.setUsername(username);
             svd.setPassword(password);
-            svn.svnCheckout(svd, this, false);
+            svn.svnCheckout(svd, username != null ? this : null, false);
         } catch (NoSuchAlgorithmException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         } catch (IOException e) {
@@ -97,7 +99,7 @@ public class Checkout extends AbstractMojo implements PromptUserPassword3 {
     }
 
     public boolean userAllowedSave() {
-        return false;
+        return true;
     }
 
     public int askTrustSSLServer(String arg0, boolean arg1) {

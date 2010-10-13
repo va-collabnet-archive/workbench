@@ -784,7 +784,10 @@ public class Svn implements I_HandleSubversion {
 		try {
 
 			SvnLog.info("starting checkout");
-			Svn.getSvnClient().setPrompt(authenticator);
+            if ( authenticator != null )
+            {
+                Svn.getSvnClient().setPrompt(authenticator);
+            }
 			try {
 				if (interactive) {
 					handleAuthentication(authenticator);
