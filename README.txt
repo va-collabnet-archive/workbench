@@ -9,4 +9,5 @@ You can optionally build the following profiles
   - viewer: additionally builds a viewer (NOT YET FUNCTIONAL)
   - documentation: builds the documentation and includes it in any produced editor or viewer
   - installer: builds installers for whichever editor(s) or viewer are produced
-  - all: builds all 3 applications, with documentation and installers
+  - all: builds all 3 applications, with documentation. The installer profile must still be
+         added separately to build installers.

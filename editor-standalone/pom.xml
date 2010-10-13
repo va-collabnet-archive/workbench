@@ -344,6 +344,16 @@
 			</dependencies>
 		</profile>
 		<profile>
+			<id>all</id>
+			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>documentation</artifactId>
+					<type>zip</type>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
 			<id>installer</id>
 			<build>
 				<plugins>
