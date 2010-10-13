@@ -116,6 +116,26 @@
             <cubitProject>cement</cubitProject>
             <siteRoot>${project.artifactId}</siteRoot>
           </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>org.ihtsdo</groupId>
+              <artifactId>wb-bdb</artifactId>
+              <version>${wb-toolkit.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.apache.lucene</groupId>
+              <artifactId>lucene-core</artifactId>
+              <version>${org.apache.lucene.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <configuration>
+            <!-- always generate a clean copy of the database for releases -->
+            <arguments>-P-svn-db,generate-db</arguments>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -159,6 +179,10 @@
     </profile>
     <profile>
       <id>installer</id>
+      <!-- Nothing to do here, just in sub-modules. Listed here for documentation purposes -->
+    </profile>
+    <profile>
+      <id>svn-db</id>
       <!-- Nothing to do here, just in sub-modules. Listed here for documentation purposes -->
     </profile>
   </profiles>

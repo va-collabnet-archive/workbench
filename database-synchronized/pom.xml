@@ -24,8 +24,27 @@
 			<type>zip</type>
 		</dependency>
 	</dependencies>
+  <properties>
+    <berkeleydb.directory>${basedir}/berkeley-db</berkeleydb.directory>
+    <berkeleydb.svn.url>https://csfe.aceworkspace.net/svn/repos/workbench/wb-sample-pa/berkeley-db</berkeleydb.svn.url>
+  </properties>
 	<build>
 		<plugins>
+
+      <!-- 
+        Generation process:
+          - unpack profiles to obtain changesets [generate-sources]
+          - if using SVN, checkout the location (this must exist, but it can be empty. It will be effectively an
+            update if the working copy already exists) [generate-sources]
+          - open database [generate-resources]
+          - apply changesets [generate-resources]
+          - if the database does not yet exist, generate it [generate-sources, process-sources, generate-resources,
+            process-resources]
+          - commit and close database [process-resources]
+          - generate read-only version [process-resources]
+          - if using SVN, commit the updated database (add missing files) [prepare-package]
+          - produce assembly [package]
+      -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -47,18 +66,6 @@
 				<plugin>
 					<groupId>org.ihtsdo</groupId>
 					<artifactId>wb-mojo</artifactId>
-					<dependencies>
-						<dependency>
-							<groupId>org.ihtsdo</groupId>
-							<artifactId>wb-bdb</artifactId>
-							<version>${wb-toolkit.version}</version>
-						</dependency>
-						<dependency>
-							<groupId>org.apache.lucene</groupId>
-							<artifactId>lucene-core</artifactId>
-							<version>${org.apache.lucene.version}</version>
-						</dependency>
-					</dependencies>
 					<executions>
 						<execution>
 							<id>write-change-set-directories</id>
@@ -74,18 +81,18 @@
 							</configuration>
 						</execution>
 						<execution>
-							<id>vodb-open-csi</id>
-							<phase>generate-sources</phase>
+							<id>vodb-open</id>
+							<phase>generate-resources</phase>
 							<goals>
 								<goal>vodb-open</goal>
 							</goals>
 							<configuration>
-								<vodbDirectory>src/main/berkeley-db</vodbDirectory>
+								<vodbDirectory>${berkeleydb.directory}</vodbDirectory>
 							</configuration>
 						</execution>
 						<execution>
 							<id>bcs-read-all</id>
-							<phase>generate-sources</phase>
+							<phase>generate-resources</phase>
 							<goals>
 								<goal>bcs-read-all</goal>
 							</goals>
@@ -94,31 +101,18 @@
 							</configuration>
 						</execution>
 						<execution>
-							<id>vodb-commit-csi</id>
-							<phase>generate-sources</phase>
+							<id>vodb-commit</id>
+							<phase>process-resources</phase>
 							<goals>
 								<goal>vodb-commit</goal>
 							</goals>
 						</execution>
 						<execution>
-							<id>vodb-close-csi</id>
-							<phase>generate-sources</phase>
+							<id>vodb-close</id>
+							<phase>process-resources</phase>
 							<goals>
 								<goal>vodb-close</goal>
 							</goals>
-						</execution>
-						<execution>
-							<id>svn-commit</id>
-							<phase>prepare-package</phase>
-							<goals>
-								<goal>svn-commit</goal>
-							</goals>
-							<configuration>
-								<workingCopyStr>${project.build.directory}/../src/main/berkeley-db</workingCopyStr>
-								<repositoryUrlStr>${project.scm.developerConnection}/src/main/berkeley-db</repositoryUrlStr>
-								<username>${demo.sync.ci.user}</username>
-								<password>${demo.sync.ci.pwd}</password>
-							</configuration>
 						</execution>
 					</executions>
 				</plugin>		
@@ -126,34 +120,35 @@
 	</build>
 	<profiles>
 		<profile>
-			<id>generate-db-profile</id>
+			<id>generate-db</id>
 			<activation>
 				<activeByDefault>false</activeByDefault>
-				<!-- 
+				<!--
 					maven 2.X bug prevents activation this from working properly. Will have to manage by hand till upgrade. 
 					http://jira.codehaus.org/browse/MNG-2363
-				<file>
-					<missing>src/main/berkeley-db</missing>
-				</file>
+
+			  <!- - Note that we use a file within the directory, so that this will trigger on an empty checkout as well - ->
+        <file>
+          <missing>${berkeleydb.directory}/mutable/je.lck</missing>
+        </file>
 				-->
 			</activation>
 			<build>
 				<plugins>
 					<plugin>
+					  <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-clean-plugin</artifactId>
+            <configuration>
+              <filesets>
+                <fileset>
+                  <directory>${berkeleydb.directory}</directory>
+                </fileset>
+              </filesets>
+            </configuration>
+					</plugin>
+					<plugin>
 						<groupId>org.ihtsdo</groupId>
 						<artifactId>wb-mojo</artifactId>
-						<dependencies>
-							<dependency>
-								<groupId>org.ihtsdo</groupId>
-								<artifactId>wb-bdb</artifactId>
-								<version>${wb-toolkit.version}</version>
-							</dependency>
-							<dependency>
-								<groupId>org.apache.lucene</groupId>
-								<artifactId>lucene-core</artifactId>
-								<version>${org.apache.lucene.version}</version>
-							</dependency>
-						</dependencies>
 						<executions>
 							<execution>
 								<!-- unjar sct-econcepts from dependencies-->
@@ -188,16 +183,6 @@
 								</configuration>
 							</execution>
 							<execution>
-								<id>vodb-open</id>
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>vodb-open</goal>
-								</goals>
-								<configuration>
-									<vodbDirectory>src/main/berkeley-db</vodbDirectory>
-								</configuration>
-							</execution>
-							<execution>
 								<id>vodb-set-default-config</id>
 								<phase>generate-resources</phase>
 								<goals>
@@ -218,13 +203,6 @@
 										</ConceptDescriptor>
 									</editPaths>
 								</configuration>
-							</execution>
-							<execution>
-								<id>vodb-commit1</id>
-								<phase>process-resources</phase>
-								<goals>
-									<goal>vodb-commit</goal>
-								</goals>
 							</execution>
 							<execution>
 								<id>vodb-create-new-path from SNOMED Core concept</id>
@@ -556,27 +534,13 @@
 								</configuration>
 							</execution>
 							<execution>
-								<id>vodb-commit2</id>
-								<phase>process-resources</phase>
-								<goals>
-									<goal>vodb-commit</goal>
-								</goals>
-							</execution>
-							<execution>
-								<id>vodb-close</id>
-								<phase>process-resources</phase>
-								<goals>
-									<goal>vodb-close</goal>
-								</goals>
-							</execution>
-							<execution>
 								<id>vodb-mutable-to-readonly</id>
 								<phase>process-resources</phase>
 								<goals>
 									<goal>vodb-mutable-to-readonly</goal>
 								</goals>
 								<configuration>
-									<berkeleyDir>src/main/berkeley-db</berkeleyDir>
+									<berkeleyDir>${berkeleydb.directory}</berkeleyDir>
 								</configuration>
 							</execution>
 						</executions>
@@ -592,7 +556,7 @@
 									<goal>load-econcepts-multi</goal>
 								</goals>
 								<configuration>
-									<berkeleyDir>src/main/berkeley-db</berkeleyDir>
+									<berkeleyDir>${berkeleydb.directory}</berkeleyDir>
 									<generatedResources>${project.build.directory}/generated-resources/jbin</generatedResources>
 									<moveToReadOnly>false</moveToReadOnly>
 									<conceptsFileNames>
@@ -606,5 +570,43 @@
 				</plugins>
 			</build>
 		</profile>
+    <profile>
+      <id>svn-db</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.ihtsdo</groupId>
+            <artifactId>wb-mojo</artifactId>
+            <executions>
+              <execution>
+                <id>svn-checkout</id>
+                <phase>generate-sources</phase>
+                <goals>
+                  <goal>svn-checkout</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>svn-commit</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>svn-commit</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <workingCopyStr>${berkeleydb.directory}</workingCopyStr>
+              <repositoryUrlStr>${berkeleydb.svn.url}</repositoryUrlStr>
+              <username>${demo.sync.ci.user}</username>
+              <password>${demo.sync.ci.pwd}</password>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
 	</profiles>
+  <!-- TODO: improve username issues -->
+  <!-- TODO: rename to editor-database -->
 </project>

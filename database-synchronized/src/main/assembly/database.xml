@@ -4,8 +4,7 @@
   </formats>
   <fileSets>
     <fileSet>
-      <!-- Ideally, the plugins would generate into a clearer output, such as target/berkley-db -->
-      <directory>src/main/berkeley-db</directory>
+      <directory>./berkeley-db</directory>
       <outputDirectory>/berkeley-db</outputDirectory>
     </fileSet>
   </fileSets>

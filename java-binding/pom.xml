@@ -44,18 +44,6 @@
 				<groupId>org.ihtsdo</groupId>
 				<artifactId>wb-mojo</artifactId>
 				<extensions>true</extensions>
-				<dependencies>
-					<dependency>
-						<groupId>org.apache.lucene</groupId>
-						<artifactId>lucene-core</artifactId>
-						<version>${org.apache.lucene.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>org.ihtsdo</groupId>
-						<artifactId>wb-bdb</artifactId>
-						<version>${wb-toolkit.version}</version>
-					</dependency>
-				</dependencies>
 				<executions>
 					<execution>
 						<id>write-directories</id>

@@ -46,18 +46,6 @@
 			<plugin>
 				<groupId>org.ihtsdo</groupId>
 				<artifactId>wb-mojo</artifactId>
-				<dependencies>
-					<dependency>
-						<groupId>org.ihtsdo</groupId>
-						<artifactId>wb-bdb</artifactId>
-						<version>${wb-toolkit.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>org.apache.lucene</groupId>
-						<artifactId>lucene-core</artifactId>
-						<version>${org.apache.lucene.version}</version>
-					</dependency>
-				</dependencies>
 				<executions>
 					<execution>
 						<!-- unjar sct-econcepts from dependencies-->
