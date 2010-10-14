@@ -476,67 +476,179 @@
 				</dependency>
 			</dependencies>
 		</profile>
-		<profile>
+    <profile>
+      <id>zip</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>truezip-maven-plugin</artifactId>
+            <version>1.0-beta-5</version>
+            <executions>
+              <execution>
+                <id>copy-into</id>
+                <goals>
+                  <goal>copy</goal>
+                </goals>
+                <phase>package</phase>
+                <configuration>
+                  <fileset>
+                    <directory>${project.build.directory}/wb-bundle</directory>
+                    <outputDirectory>${project.build.directory}/wb-bundle.zip/</outputDirectory>
+                  </fileset>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <version>1.5</version>
+            <executions>
+              <execution>
+                <id>attach-zip</id>
+                <goals>
+                  <goal>attach-artifact</goal>
+                </goals>
+                <configuration>
+                  <artifacts>
+                    <artifact>
+                      <file>${project.build.directory}/wb-bundle.zip</file>
+                      <type>zip</type>
+                      <classifier>assembly</classifier>
+                    </artifact>
+                  </artifacts>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
 			<id>installer</id>
 			<build>
 				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>install4j</id>
-								<phase>install</phase>
-								<configuration>
-									<tasks>
-										<taskdef name="install4j"
-											classname="com.install4j.Install4JTask"
-											classpath="/Applications/install4j 4/bin/ant.jar;/opt/install4j/bin/ant.jar"/>
-										<install4j projectfile="src/main/install4j/ihtsdo_sa.install4j">
-											<variable name="project.version" value="${project.version}"/>
-											<variable name="bundle.directory.rt.i4j" value="${project.build.directory}/wb-bundle"/>
-											<variable name="bundle.directory" value="${project.build.directory}/wb-bundle"/>
-											<variable name="bundle.file_description" value="IHTSDO Editor Trek"/>
-											<variable name="bundle.copyright" value="2001 International Health Terminology Standards Development Organisation"/>
-											<variable name="bundle.version" value=".01-ihtsdo-trek"/>
-											<variable name="bundle.publisher" value="IHTSDO"/>
-											<variable name="bundle.publisher.url" value="http://www.ihtsdo.org/members/uk00/"/>
-											<variable name="bundle.vm_args" value="config/start-wb-local.config"/>
-											<variable name="bundle.vm_main_class" value="com.sun.jini.start.ServiceStarter"/>
-											<variable name="bundle.vm_parameters" value="&quot;-Dorg.dwfa.AboutBoxGraphic=&quot;"/>
-											<variable name="pom.short.name" value="ihtsdo editor trek sa"/>
-											<variable name="media.dir" value="${project.build.directory}/site"/>
-											<variable name="icons.dir" value="${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons"/>
-											<variable name="icon.icns" value="${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons/IHT_IconFiles1_128x128.icns"/>
-											<variable name="icon.ico" value="${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons/IHT_IconFiles2_48x48.ico"/>
-											<variable name="about.box" value="resources/org/ihtsdo/ihtsdo_sa_aboutbox.jpg"/>
-										</install4j>
-									</tasks>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-						<dependencies>
-							<dependency>
-								<groupId>commons-net</groupId>
-								<artifactId>commons-net</artifactId>
-								<version>1.4.1</version>
-							</dependency>
-							<dependency>
-								<groupId>ant</groupId>
-								<artifactId>ant-commons-net</artifactId>
-								<version>1.6.5</version>
-							</dependency>
-							<dependency>
-								<groupId>ant</groupId>
-								<artifactId>ant-nodeps</artifactId>
-								<version>1.6.5</version>
-							</dependency>
-						</dependencies>
-					</plugin>
-				</plugins>
+          <plugin>
+            <groupId>com.google.code.maven-install4j</groupId>
+            <artifactId>maven-install4j-plugin</artifactId>
+            <version>0.1.1</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>compile</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <!-- must be in path -->
+              <executable>install4jc</executable>
+              <configFile>${basedir}/src/main/install4j/ihtsdo_sa.install4j</configFile>
+              <releaseId>${project.version}</releaseId>
+              <verbose>true</verbose>
+              <compilerVariables>
+                <property>
+                  <name>project.version</name>
+                  <value>${project.version}</value>
+                </property>
+                <property>
+                  <name>bundle.directory.rt.i4j</name>
+                  <value>${project.build.directory}/wb-bundle</value>
+                </property>
+                <property>
+                  <name>bundle.directory</name>
+                  <value>${project.build.directory}/wb-bundle</value>
+                </property>
+                <property>
+                  <name>bundle.file_description</name>
+                  <value>"IHTSDO Editor Trek"</value>
+                </property>
+                <property>
+                  <name>bundle.copyright</name>
+                  <value>"2001 International Health Terminology Standards Development Organisation"</value>
+                </property>
+                <property>
+                  <name>bundle.version</name>
+                  <value>.01-ihtsdo-trek</value>
+                </property>
+                <property>
+                  <name>bundle.publisher</name>
+                  <value>IHTSDO</value>
+                </property>
+                <property>
+                  <name>bundle.publisher.url</name>
+                  <value>http://www.ihtsdo.org/members/uk00/</value>
+                </property>
+                <property>
+                  <name>bundle.vm_args</name>
+                  <value>config/start-wb-local.config</value>
+                </property>
+                <property>
+                  <name>bundle.vm_main_class</name>
+                  <value>com.sun.jini.start.ServiceStarter</value>
+                </property>
+                <property>
+                  <name>bundle.vm_parameters</name>
+                  <value>&quot;-Dorg.dwfa.AboutBoxGraphic=&quot;</value>
+                </property>
+                <property>
+                  <name>pom.short.name</name>
+                  <value>"ihtsdo editor trek sa"</value>
+                </property>
+                <property>
+                  <name>media.dir</name>
+                  <value>${project.build.directory}/site</value>
+                </property>
+                <property>
+                  <name>icons.dir</name>
+                  <value>${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons</value>
+                </property>
+                <property>
+                  <name>icon.icns</name>
+                  <value>${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons/IHT_IconFiles1_128x128.icns
+                  </value>
+                </property>
+                <property>
+                  <name>icon.ico</name>
+                  <value>${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons/IHT_IconFiles2_48x48.ico
+                  </value>
+                </property>
+                <property>
+                  <name>about.box</name>
+                  <value>resources/org/ihtsdo/ihtsdo_sa_aboutbox.jpg</value>
+                </property>
+              </compilerVariables>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <version>1.5</version>
+            <executions>
+              <execution>
+                <id>attach-installers</id>
+                <goals>
+                  <goal>attach-artifact</goal>
+                </goals>
+                <configuration>
+                  <artifacts>
+                    <artifact>
+                      <file>${project.build.directory}/install4j/_macos_folder.dmg</file>
+                      <type>dmg</type>
+                      <classifier>installer</classifier>
+                    </artifact>
+                    <artifact>
+                      <file>${project.build.directory}/install4j/_windows_jre.exe</file>
+                      <type>exe</type>
+                      <classifier>installer</classifier>
+                    </artifact>
+                  </artifacts>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
 			</build>
 		</profile>
 	</profiles>
