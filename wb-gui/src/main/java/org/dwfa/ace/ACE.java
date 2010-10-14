@@ -189,6 +189,8 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 
 public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActions {
+	
+	public static boolean refsetOnly = false;
 
     public class TestTupleCalculator implements ActionListener {
 
@@ -200,7 +202,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         public void actionPerformed(ActionEvent e) {
             I_TermFactory tf = Terms.get();
-            ;
             try {
                 I_GetConceptData refsetConcept = tf.getConcept(UUID.fromString("6fd32c1f-8096-40a1-9053-1cc204bc61e3"));
                 refsetConcept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(), aceFrameConfig);
@@ -1721,16 +1722,18 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         refsetSpecPanel.setRefsetInSpecEditor(refsetSpecPanel.getRefsetInSpecEditor());
         conceptTabs.addTab("refSet spec", new ImageIcon(ACE.class.getResource("/16x16/plain/paperclip.png")),
             refsetSpecPanel);
+        
+        if (!refsetOnly) {
 
         // CLASSIFIER TAB
-        snoRocketPanel = new SnoRocketTabPanel(this);
-        conceptTabs.addTab("classifier", new ImageIcon(ACE.class.getResource("/16x16/plain/chrystal_ball.png")),
+        	snoRocketPanel = new SnoRocketTabPanel(this);
+        	conceptTabs.addTab("classifier", new ImageIcon(ACE.class.getResource("/16x16/plain/chrystal_ball.png")),
             snoRocketPanel);
         
-        arena = new Arena(this);
-
-        conceptTabs.addTab("arena", new ImageIcon(ACE.class.getResource("/16x16/plain/eye.png")), 
-        		arena);
+            arena = new Arena(this);
+            conceptTabs.addTab("arena", new ImageIcon(ACE.class.getResource("/16x16/plain/eye.png")), 
+            		arena);
+        }
 
         /*
         */

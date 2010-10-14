@@ -200,6 +200,9 @@ public class WorkbenchRunner {
 				svnUpdateOnStart = (String[]) jiniConfig.getEntry(this
 						.getClass().getName(), "svnUpdateOnStart",
 						String[].class, null);
+				ACE.refsetOnly = (Boolean) jiniConfig.getEntry(this
+						.getClass().getName(), "refsetOnly",
+						Boolean.class, Boolean.FALSE);
 			} else {
 				wbConfigFile = new File("config/wb.config");
 			}
