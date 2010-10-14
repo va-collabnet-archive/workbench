@@ -622,6 +622,7 @@
                 <configuration>
                   <skipCheckoutIfExists>true</skipCheckoutIfExists>
                   <checkoutDirectory>${berkeleydb.directory}</checkoutDirectory>
+                  <workingDirectory>${berkeleydb.directory}</workingDirectory>
                   <connectionUrl>scm:svn:${berkeleydb.svn.url}</connectionUrl>
                   <username>${demo.sync.ci.user}</username>
                   <password>${demo.sync.ci.pwd}</password>
