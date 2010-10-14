@@ -16,6 +16,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_IterateIds;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
@@ -193,8 +194,8 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             I_ConfigAceFrame config, Collection<I_ShowActivity> activities) throws Exception {
         if (possibleCNids.isMember(conceptNid)) {
             boolean containsCurrentMember = currentRefsetMemberComponentNids.isMember(componentNid);
-
-            if (query.execute(component, activities)) {
+			if (query.execute(component, null, (I_Position) query.getV1Is(),
+					(I_Position) query.getV2Is(), activities)) {
             	newMemberNids.setMember(componentNid);
                 members.incrementAndGet();
                 if (!containsCurrentMember) {
