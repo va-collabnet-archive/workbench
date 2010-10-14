@@ -20,3 +20,5 @@ The following optimizations can also be configured:
   - generate-db: disabled by default (except during a release), this will generate a clean copy of the berkeley-db.
                  This is not currently connected to the svn-db profile, though it may be in future (being enabled
                  when SVN is not and vice-versa)
+  - clean-db: delete the database as part of the "clean" phase, before preceding with the usual generation phases.
+              Intended to be used with the svn-db profile, as it is already implied in the generate-db profile.

@@ -633,5 +633,23 @@
         </plugins>
       </build>
     </profile>
+    <profile>
+      <id>clean-db</id>
+			<build>
+				<plugins>
+					<plugin>
+					  <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-clean-plugin</artifactId>
+            <configuration>
+              <filesets>
+                <fileset>
+                  <directory>${berkeleydb.directory}</directory>
+                </fileset>
+              </filesets>
+            </configuration>
+					</plugin>
+        </plugins>
+      </build>
+    </profile>
 	</profiles>
 </project>
