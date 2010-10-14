@@ -16,6 +16,7 @@ The following optimizations can also be configured:
 
   - svn-db: enabled by default (except during a release), this will use an SVN copy of the berkeley-db to speed up
             builds. It can be disabled by running with -P-svn-db
+  - svn-db-commit: disabled by default, this is intended for CI to be able to update the above database copy
   - generate-db: disabled by default (except during a release), this will generate a clean copy of the berkeley-db.
                  This is not currently connected to the svn-db profile, though it may be in future (being enabled
                  when SVN is not and vice-versa)

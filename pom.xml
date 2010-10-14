@@ -175,13 +175,15 @@
         <module>editor-synchronized</module>
       </modules>
     </profile>
+    <!-- Nothing to do here, just in sub-modules. Listed here for documentation purposes -->
     <profile>
       <id>installer</id>
-      <!-- Nothing to do here, just in sub-modules. Listed here for documentation purposes -->
     </profile>
     <profile>
       <id>svn-db</id>
-      <!-- Nothing to do here, just in sub-modules. Listed here for documentation purposes -->
+    </profile>
+    <profile>
+      <id>svn-db-commit</id>
     </profile>
   </profiles>
 </project>
