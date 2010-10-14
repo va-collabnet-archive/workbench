@@ -4,81 +4,25 @@
       <outputDirectory>/lib</outputDirectory>
       <unpack>false</unpack>
       <scope>runtime</scope>
-      <includes>
-        <include>org.ihtsdo:rules-engine-integration</include>
-        <include>org.ihtsdo:tk-concept-component</include>
-        <include>org.ihtsdo:tk-drools</include>
-        <include>org.ihtsdo:wb-icons</include>
-        <include>org.ihtsdo:wb-foundation</include>
-        <include>org.ihtsdo:wb-core</include>
-        <include>org.ihtsdo:wb-api</include>
-        <include>org.ihtsdo:wb-gui</include>
-        <include>org.ihtsdo:wb-bdb</include>
-        <include>net.jini:jsk-lib</include>
-        <include>net.jini:jsk-platform</include>
-        <include>org.dwfa.jini:browser</include>
-        <include>org.dwfa.jini:start</include>
-        <include>org.dwfa.jini:tools</include>
-        <include>org.dwfa.jini:reggie</include>
-        <include>org.dwfa.jini:mahalo</include>
-        <include>org.ihtsdo:ihtsdo-resources</include>
-        <include>org.apache.geronimo.javamail:geronimo-javamail_1.4_mail</include>
-        <include>org.apache.geronimo.specs:geronimo-activation_1.1_spec</include>
-        <include>com.sleepycat:je</include>
-        <include>org.apache.lucene:lucene-core</include>
-        <include>jgraphx:jgraphx</include>
-        <include>jgraphx:jgraphx-examples</include>
-        <include>jung:jung</include>
-        <include>commons-collections:commons-collections</include>
-        <include>colt:colt</include>
-        <include>concurrent:concurrent</include>
-        <include>org.tmatesoft.svnkit:svnkit</include>
-        <include>org.tmatesoft.svnkit:svnkit-javahl</include>
-        <include>com.sun.jna:jna</include>
-        <include>com.sun:jaccess</include>
-        <include>com.trilead:trilead-ssh2</include>
-        <include>commons-primitives:commons-primitives</include>
-        <include>au.csiro:snorocket-bridge</include>
-        <include>au.csiro:snorocket-snapi</include>
-        <include>au.csiro:snorocket-core</include>
-        <include>javax.xml:jaxrpc-api</include>
-        <include>org.apache.axis:axis</include>
-        <include>org.mod4j.org.apache.commons:logging</include>
-        <include>commons-discovery:commons-discovery</include>
-        <!-- includes added for drools integration -->
-        <include>org.drools:drools-core</include>
-        <include>org.drools:drools-api</include>
-        <include>org.drools:drools-compiler</include>
-        <include>org.drools:drools-templates</include>
-        <include>org.eclipse.jdt:core</include>
-        <include>org.antlr:antlr-runtime</include>
-        <include>org.mvel:mvel2</include>
-        <include>org.codehaus.janino:janino</include>
-        <!-- includes done for drools integration -->
-        <!-- includes added for translation -->
-        <include>org.ihtsdo:rule-engine-integration</include>
-        <include>org.apache.lucene:lucene-highlighter</include>
-        <include>org.apache.lucene:lucene-spellchecker</include>
-        <include>org.apache.tika:tika-core</include>
-        <include>org.apache.tika:tika-parsers</include>
-        <include>commons-codec:commons-codec</include>
-        <include>org.apache.poi:poi</include>
-        <include>org.apache.poi:poi-scratchpad</include>
-        <include>org.apache.poi:poi-ooxml</include>
-        <include>org.apache.poi:poi-ooxml-schemas</include>
-        <include>pdfbox:pdfbox</include>
-        <include>org.fontbox:fontbox</include>
-        <!-- includes done for translation -->
-      </includes>
+      <!-- TODO: why is ihtsdo-resources in twice? -->
+      <excludes>
+        <!-- Exclude the dependencies just used to unpacking -->
+        <exclude>org.ihtsdo.sample:*</exclude>
+        <exclude>org.ihtsdo:wb-ide-admin-bp</exclude>
+        <exclude>org.ihtsdo:wb-ide-user-bp</exclude>
+        <!-- Included below -->
+        <exclude>org.dwfa.jini:jsk-dl</exclude>
+        <!-- not sure why this is not included but others in its tree are -->
+        <exclude>au.csiro:snorocket</exclude>
+        <!-- required at compile time by rule-engine, but not at runtime -->
+        <exclude>junit:junit</exclude>
+      </excludes>
     </dependencySet>
     <dependencySet>
       <outputDirectory>/lib-dl</outputDirectory>
       <unpack>false</unpack>
       <scope>runtime</scope>
       <includes>
-        <include>org.dwfa.jini:outrigger-dl</include>
-        <include>org.dwfa.jini:reggie-dl</include>
-        <include>org.dwfa.jini:mahalo-dl</include>
         <include>org.dwfa.jini:jsk-dl</include>
       </includes>
     </dependencySet>
@@ -94,13 +38,11 @@
       <outputDirectory>/resources</outputDirectory>
       <unpack>true</unpack>
       <unpackOptions>
-        <includes>
-          <include>**/*.jpg</include>
-          <include>**/*.png</include>
-          <include>**/*.ico</include>
-          <include>**/*.icns</include>
-          <include>**/*.pdf</include>
-        </includes>
+        <excludes>
+          <exclude>**/*.psd</exclude>
+          <exclude>**/*.doc</exclude>
+          <exclude>META-INF/**</exclude>
+        </excludes>
       </unpackOptions>
       <scope>runtime</scope>
       <includes>

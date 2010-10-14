@@ -8,6 +8,7 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>editor-synchronized</artifactId>
+  <packaging>pom</packaging>
 	<name>Workbench Bundle Synchronized Editor</name>
 	<description>Workbench Bundle Synchronized Editor </description>
 	<dependencies>
@@ -24,7 +25,6 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>ihtsdo-resources</artifactId>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
@@ -46,19 +46,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>documentation</artifactId>
-			<type>zip</type>
-		</dependency>
-		<dependency>
 			<groupId>org.dwfa.jini</groupId>
 			<artifactId>start</artifactId>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.dwfa.jini</groupId>
 			<artifactId>jsk-dl</artifactId>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
@@ -73,8 +66,168 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-bdb</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>com.collabnet</groupId>
+          <artifactId>sf_soap50_sdk</artifactId>
+        </exclusion>
+      </exclusions>
 		</dependency>
-	</dependencies>
+			<dependency>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>rule-engine-integration</artifactId>
+			<version>${wb-toolkit.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.xml</groupId>
+			<artifactId>jaxrpc-api</artifactId>
+			<version>1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.axis</groupId>
+			<artifactId>axis</artifactId>
+			<version>1.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mod4j.org.apache.commons</groupId>
+			<artifactId>logging</artifactId>
+			<version>1.0.4</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-discovery</groupId>
+			<artifactId>commons-discovery</artifactId>
+			<version>0.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-highlighter</artifactId>
+			<version>${org.apache.lucene.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.lucene</groupId>
+          <artifactId>lucene-memory</artifactId>
+        </exclusion>
+      </exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-spellchecker</artifactId>
+			<version>${org.apache.lucene.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-core</artifactId>
+			<version>0.4</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-parsers</artifactId>
+			<version>0.4</version>
+      <exclusions>
+        <exclusion>
+          <groupId>asm</groupId>
+          <artifactId>asm</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-compress</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>net.sourceforge.nekohtml</groupId>
+          <artifactId>nekohtml</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.geronimo.specs</groupId>
+          <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+        </exclusion>
+      </exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>${poi.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
+		</dependency>
+		<dependency>
+			<groupId>pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>0.7.3</version>
+      <exclusions>
+        <exclusion>
+          <groupId>bouncycastle</groupId>
+          <artifactId>bcmail-jdk14</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>bouncycastle</groupId>
+          <artifactId>bcprov-jdk14</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jempbox</groupId>
+          <artifactId>jempbox</artifactId>
+        </exclusion>
+      </exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.fontbox</groupId>
+			<artifactId>fontbox</artifactId>
+			<version>0.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-scratchpad</artifactId>
+			<version>${poi.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>${poi.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>dom4j</groupId>
+          <artifactId>dom4j</artifactId>
+        </exclusion>
+      </exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml-schemas</artifactId>
+			<version>${poi.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.xmlbeans</groupId>
+          <artifactId>xmlbeans</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>stax</groupId>
+          <artifactId>stax-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.geronimo.specs</groupId>
+          <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+        </exclusion>
+      </exclusions>
+		</dependency>
+  </dependencies>
 	<build>
 		<plugins>
 			<plugin>
@@ -233,6 +386,7 @@
 						<configuration>
 							<targetSubDir>generated-resources</targetSubDir>
               <runtimeArtifacts>
+                <runtimeArtifact>${project.groupId}:documentation</runtimeArtifact>
                 <runtimeArtifact>${project.groupId}:editor-database</runtimeArtifact>
                 <runtimeArtifact>org.ihtsdo:wb-ide-admin-bp</runtimeArtifact>
                 <runtimeArtifact>org.ihtsdo:wb-ide-user-bp</runtimeArtifact>
@@ -254,19 +408,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>exec-one</id>
-						<phase>run</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
 	<profiles>
@@ -276,9 +417,6 @@
 				<os>
 					<family>mac</family>
 				</os>
-				<file>
-					<exists>target/wb-bundle/dAceOsX.sh </exists>
-				</file>
 			</activation>
 			<build>
 				<pluginManagement>
@@ -286,18 +424,9 @@
 						<plugin>
 							<groupId>org.codehaus.mojo</groupId>
 							<artifactId>exec-maven-plugin</artifactId>
-							<executions>
-								<execution>
-									<id>exec-one</id>
-									<phase>run</phase>
-									<goals>
-										<goal>exec</goal>
-									</goals>
-								</execution>
-							</executions>
 							<configuration>
 								<workingDirectory>target/wb-bundle</workingDirectory>
-								<executable>./dAceOsX.sh</executable>
+                <executable>./dWbOsX.sh</executable>
 							</configuration>
 						</plugin>
 					</plugins>
@@ -305,14 +434,11 @@
 			</build>
 		</profile>
 		<profile>
-			<id>run-on-pc</id>
+      <id>run-on-windows</id>
 			<activation>
 				<os>
 					<family>windows</family>
 				</os>
-				<file>
-					<exists>target/wb-bundle/ace.bat </exists>
-				</file>
 			</activation>
 			<build>
 				<pluginManagement>
@@ -320,24 +446,35 @@
 						<plugin>
 							<groupId>org.codehaus.mojo</groupId>
 							<artifactId>exec-maven-plugin</artifactId>
-							<executions>
-								<execution>
-									<id>exec-one</id>
-									<phase>run</phase>
-									<goals>
-										<goal>exec</goal>
-									</goals>
-								</execution>
-							</executions>
 							<configuration>
 								<workingDirectory>target/wb-bundle</workingDirectory>
-								<executable>ace.bat</executable>
+                <executable>wb.bat</executable>
 							</configuration>
 						</plugin>
 					</plugins>
 				</pluginManagement>
 			</build>
 		</profile>
+    <profile>
+      <id>documentation</id>
+      <dependencies>
+        <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>documentation</artifactId>
+          <type>zip</type>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>all</id>
+      <dependencies>
+        <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>documentation</artifactId>
+          <type>zip</type>
+        </dependency>
+      </dependencies>
+    </profile>
 		<profile>
 			<id>installer</id>
 			<build>
@@ -354,17 +491,25 @@
 										<taskdef name="install4j"
 											classname="com.install4j.Install4JTask"
 											classpath="/Applications/install4j 4/bin/ant.jar;/opt/install4j/bin/ant.jar"/>
-										<install4j
-											projectfile="src/main/install4j/ihtsdo_sa.install4j">
-											<variable name="project.version"
-												value="${project.version}"/>
-											<variable name="bundle.directory.rt.i4j"
-												value="${csub.bundle.directory.rt.i4j}"/>
-											<variable name="bundle.directory"
-												value="wb-bundle"/>
-											<variable name="pom.short.name"
-												value="${sct.wb.ide.csub.bundle.shortname}"/>
-										</install4j>
+                    <install4j projectfile="src/main/install4j/ihtsdo_sa.install4j">
+                      <variable name="project.version" value="${project.version}"/>
+                      <variable name="bundle.directory.rt.i4j" value="${project.build.directory}/wb-bundle"/>
+                      <variable name="bundle.directory" value="${project.build.directory}/wb-bundle"/>
+                      <variable name="bundle.file_description" value="IHTSDO Editor Trek"/>
+                      <variable name="bundle.copyright" value="2001 International Health Terminology Standards Development Organisation"/>
+                      <variable name="bundle.version" value=".01-ihtsdo-trek"/>
+                      <variable name="bundle.publisher" value="IHTSDO"/>
+                      <variable name="bundle.publisher.url" value="http://www.ihtsdo.org/members/uk00/"/>
+                      <variable name="bundle.vm_args" value="config/start-wb-local.config"/>
+                      <variable name="bundle.vm_main_class" value="com.sun.jini.start.ServiceStarter"/>
+                      <variable name="bundle.vm_parameters" value="&quot;-Dorg.dwfa.AboutBoxGraphic=&quot;"/>
+                      <variable name="pom.short.name" value="ihtsdo editor trek sa"/>
+                      <variable name="media.dir" value="${project.build.directory}/site"/>
+                      <variable name="icons.dir" value="${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons"/>
+                      <variable name="icon.icns" value="${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons/IHT_IconFiles1_128x128.icns"/>
+                      <variable name="icon.ico" value="${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons/IHT_IconFiles2_48x48.ico"/>
+                      <variable name="about.box" value="resources/org/ihtsdo/ihtsdo_sa_aboutbox.jpg"/>
+                    </install4j>
 									</tasks>
 								</configuration>
 								<goals>
@@ -394,4 +539,7 @@
 			</build>
 		</profile>
 	</profiles>
+  <properties>
+    <poi.version>3.6</poi.version>
+  </properties>
 </project>

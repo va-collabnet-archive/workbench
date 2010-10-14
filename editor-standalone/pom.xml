@@ -275,22 +275,22 @@
 						<configuration>
 							<specs>
 								<extractAndProcessSpec>
-									<filePatternStr>^org/dwfa/resources/core/config.*config$ </filePatternStr>
-									<destDir>generated-resources/config </destDir>
+									<filePatternStr>^org/dwfa/resources/core/config.*config$</filePatternStr>
+									<destDir>generated-resources/config</destDir>
 									<substitutions>
 										<substutionSpec>
-											<patternStr>"org.dwfa.discovery" </patternStr>
-											<replacementStr>org.dwfa.jini.ConfigUtil.getUniqueJvmGroup() </replacementStr>
+											<patternStr>"org.dwfa.discovery"</patternStr>
+											<replacementStr>org.dwfa.jini.ConfigUtil.getUniqueJvmGroup()</replacementStr>
 											<nullActionStr>REPLACE_LITERAL</nullActionStr>
 										</substutionSpec>
 									</substitutions>
 								</extractAndProcessSpec>
 								<extractAndProcessSpec>
-									<filePatternStr>^org/jehri/config.*config$ </filePatternStr>
-									<destDir>generated-resources/config </destDir>
+									<filePatternStr>^org/jehri/config.*config$</filePatternStr>
+									<destDir>generated-resources/config</destDir>
 									<substitutions>
 										<substutionSpec>
-											<propertyName>org.dwfa.configname </propertyName>
+											<propertyName>org.dwfa.configname</propertyName>
 											<patternStr>UniqueConfig</patternStr>
 											<replacementStr/>
 											<nullActionStr>EMPTY_STRING</nullActionStr>
@@ -320,24 +320,24 @@
 									</substitutions>
 								</extractAndProcessSpec>
 								<extractAndProcessSpec>
-									<filePatternStr>^org/dwfa/ace/config.*policy </filePatternStr>
-									<destDir>generated-resources/config </destDir>
+									<filePatternStr>^org/dwfa/ace/config.*policy</filePatternStr>
+									<destDir>generated-resources/config</destDir>
 								</extractAndProcessSpec>
 								<extractAndProcessSpec>
-									<filePatternStr>^org/jehri/config.*policy </filePatternStr>
-									<destDir>generated-resources/config </destDir>
+									<filePatternStr>^org/jehri/config.*policy</filePatternStr>
+									<destDir>generated-resources/config</destDir>
 								</extractAndProcessSpec>
 								<extractAndProcessSpec>
-									<filePatternStr>^org/dwfa/resources/core/config.*policy </filePatternStr>
-									<destDir>generated-resources/config </destDir>
+									<filePatternStr>^org/dwfa/resources/core/config.*policy</filePatternStr>
+									<destDir>generated-resources/config</destDir>
 								</extractAndProcessSpec>
 								<extractAndProcessSpec>
-									<filePatternStr>^org/dwfa/resources/core/config.*properties </filePatternStr>
-									<destDir>generated-resources/config </destDir>
+									<filePatternStr>^org/dwfa/resources/core/config.*properties</filePatternStr>
+									<destDir>generated-resources/config</destDir>
 								</extractAndProcessSpec>
 								<extractAndProcessSpec>
-									<filePatternStr>^org/dwfa/resources/core/icon.* </filePatternStr>
-									<destDir>generated-resources/config/icon </destDir>
+									<filePatternStr>^org/dwfa/resources/core/icon.*</filePatternStr>
+									<destDir>generated-resources/config/icon</destDir>
 								</extractAndProcessSpec>
 							</specs>
 						</configuration>
@@ -349,7 +349,7 @@
 							<goal>export-beans</goal>
 						</goals>
 						<configuration>
-							<targetSubDir>generated-resources/ </targetSubDir>
+							<targetSubDir>generated-resources</targetSubDir>
 						</configuration>
 					</execution>
 					<execution>
@@ -361,14 +361,13 @@
 						<configuration>
 							<specs>
 								<configSpec>
-									<className>org.dwfa.ace.config.AceLocalConfiguration </className>
-									<configFileName>
-										generated-resources/config/start-ace-local.config </configFileName>
+									<className>org.dwfa.ace.config.AceLocalConfiguration</className>
+									<configFileName>generated-resources/config/start-ace-local.config</configFileName>
 									<methodName>writeToFile</methodName>
 								</configSpec>
 								<configSpec>
-									<className>org.dwfa.ace.config.AceConfiguration </className>
-									<configFileName> generated-resources/config/start-ace.config </configFileName>
+									<className>org.dwfa.ace.config.AceConfiguration</className>
+									<configFileName>generated-resources/config/start-ace.config</configFileName>
 									<methodName>writeToFile</methodName>
 								</configSpec>
 							</specs>
@@ -397,12 +396,12 @@
 							<goal>write-directories</goal>
 						</goals>
 						<configuration>
-							<targetSubDir>generated-resources/</targetSubDir>
+							<targetSubDir>generated-resources</targetSubDir>
               <runtimeArtifacts>
               	<runtimeArtifact>${project.groupId}:profiles</runtimeArtifact>
               	<runtimeArtifact>${project.groupId}:queues</runtimeArtifact>
-              	<runtimeArtifact>${project.groupId}:editor-database</runtimeArtifact>
                 <runtimeArtifact>${project.groupId}:documentation</runtimeArtifact>
+                <runtimeArtifact>${project.groupId}:editor-database</runtimeArtifact>
                 <runtimeArtifact>org.ihtsdo:wb-ide-admin-bp</runtimeArtifact>
                 <runtimeArtifact>org.ihtsdo:wb-ide-user-bp</runtimeArtifact>
               </runtimeArtifacts>
@@ -413,6 +412,50 @@
 		</plugins>
 	</build>
 	<profiles>
+    <profile>
+      <id>run-on-mac</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>exec-maven-plugin</artifactId>
+              <configuration>
+                <workingDirectory>target/wb-bundle</workingDirectory>
+                <executable>./dWbOsX.sh</executable>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>run-on-windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>exec-maven-plugin</artifactId>
+              <configuration>
+                <workingDirectory>target/wb-bundle</workingDirectory>
+                <executable>wb.bat</executable>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
 		<profile>
 			<id>documentation</id>
 			<dependencies>
