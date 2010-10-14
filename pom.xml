@@ -25,6 +25,8 @@
     <org.apache.lucene.version>3.0.2</org.apache.lucene.version>
     <svnkit.version>1.3.0.5847</svnkit.version>
     <baseline.database.version>2010-07-31-SNAPSHOT</baseline.database.version>
+    <berkeleydb.svn.url>https://csfe.aceworkspace.net/svn/repos/workbench/wb-sample-pa/berkeley-db</berkeleydb.svn.url>
+    <poi.version>3.6</poi.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -134,7 +136,7 @@
           <artifactId>maven-release-plugin</artifactId>
           <configuration>
             <!-- always generate a clean copy of the database for releases -->
-            <arguments>-P-svn-db,generate-db</arguments>
+            <arguments>-P-svn-db,generate-db,all</arguments>
           </configuration>
         </plugin>
       </plugins>

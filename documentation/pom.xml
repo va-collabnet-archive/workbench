@@ -509,9 +509,6 @@
 				<!-- User must specify this for this profile to work -->
 				<xep.dir>...</xep.dir>
 			</properties>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
 		</profile>
 	</profiles>
 </project>

@@ -26,7 +26,6 @@
 	</dependencies>
   <properties>
     <berkeleydb.directory>${basedir}/berkeley-db</berkeleydb.directory>
-    <berkeleydb.svn.url>https://csfe.aceworkspace.net/svn/repos/workbench/wb-sample-pa/berkeley-db</berkeleydb.svn.url>
   </properties>
 	<build>
 		<plugins>
@@ -603,7 +602,10 @@
     <profile>
       <id>svn-db</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <!-- activeByDefault is cancelled by other profiles. This is equivalent -->
+        <file>
+          <exists>pom.xml</exists>
+        </file>
       </activation>
       <build>
         <plugins>

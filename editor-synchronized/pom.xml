@@ -693,8 +693,6 @@
     </profile>
   </profiles>
   <properties>
-    <poi.version>3.6</poi.version>
     <berkeleydb.directory>${basedir}/berkeley-db</berkeleydb.directory>
-    <berkeleydb.svn.url>https://csfe.aceworkspace.net/svn/repos/workbench/wb-sample-pa/berkeley-db</berkeleydb.svn.url>
   </properties>
 </project>
