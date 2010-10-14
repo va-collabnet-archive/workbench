@@ -2,59 +2,19 @@
 <component>
     <fileSets>
         <fileSet>
-            <directory>target/generated-resources/config/</directory>
+            <directory>target/generated-resources/</directory>
             <lineEnding>keep</lineEnding>
             <filtered>false</filtered>
             <useStrictFiltering>false</useStrictFiltering>
             <useDefaultExcludes>true</useDefaultExcludes>
-            <outputDirectory>config</outputDirectory>
+            <outputDirectory>/</outputDirectory>
             <excludes>
-                <exclude>ace.config</exclude>
+                <exclude>config/ace.config</exclude>
+              <!-- TODO: check this, may just have been an oversight before -->
+                <exclude>processes/**</exclude>
+              <exclude>**/TestForEdgCType2Req.task</exclude>
+              <exclude>**/TestForEdgEType2Req.task</exclude>
             </excludes>
-            <fileMode>0644</fileMode>
-            <directoryMode>0755</directoryMode>
-        </fileSet>
-        <fileSet>
-            <directory>target/generated-resources/profiles/</directory>
-            <lineEnding>keep</lineEnding>
-            <filtered>false</filtered>
-            <useStrictFiltering>false</useStrictFiltering>
-            <useDefaultExcludes>true</useDefaultExcludes>
-            <outputDirectory>profiles</outputDirectory>
-            <fileMode>0644</fileMode>
-            <directoryMode>0755</directoryMode>
-        </fileSet>
-        <fileSet>
-            <directory>target/generated-resources/queues/</directory>
-            <lineEnding>keep</lineEnding>
-            <filtered>false</filtered>
-            <useStrictFiltering>false</useStrictFiltering>
-            <useDefaultExcludes>true</useDefaultExcludes>
-            <outputDirectory>queues</outputDirectory>
-            <fileMode>0644</fileMode>
-            <directoryMode>0755</directoryMode>
-        </fileSet>
-        <fileSet>
-            <directory>target/generated-resources/plugins/</directory>
-            <lineEnding>keep</lineEnding>
-            <filtered>false</filtered>
-            <useStrictFiltering>false</useStrictFiltering>
-            <useDefaultExcludes>true</useDefaultExcludes>
-            <outputDirectory>plugins</outputDirectory>
-            <excludes>
-                <exclude>**/TestForEdgCType2Req.task</exclude>
-                <exclude>**/TestForEdgEType2Req.task</exclude>
-            </excludes>
-            <fileMode>0644</fileMode>
-            <directoryMode>0755</directoryMode>
-        </fileSet>
-        <fileSet>
-            <directory>target/generated-resources/search/</directory>
-            <lineEnding>keep</lineEnding>
-            <filtered>false</filtered>
-            <useStrictFiltering>false</useStrictFiltering>
-            <useDefaultExcludes>true</useDefaultExcludes>
-            <outputDirectory>search</outputDirectory>
             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>
         </fileSet>
@@ -69,37 +29,12 @@
             <directoryMode>0755</directoryMode>
         </fileSet>
         <fileSet>
-            <directory>target/generated-resources/berkeley-db/</directory>
-            <lineEnding>keep</lineEnding>
-            <filtered>false</filtered>
-            <useStrictFiltering>false</useStrictFiltering>
-            <useDefaultExcludes>true</useDefaultExcludes>
-            <outputDirectory>berkeley-db</outputDirectory>
-             <fileMode>0644</fileMode>
-            <directoryMode>0755</directoryMode>
-        </fileSet>
-        <fileSet>
-            <directory>target/generated-resources/doc/</directory>
-            <lineEnding>keep</lineEnding>
-            <filtered>false</filtered>
-            <useStrictFiltering>false</useStrictFiltering>
-            <useDefaultExcludes>true</useDefaultExcludes>
-            <outputDirectory>doc</outputDirectory>
-            <fileMode>0644</fileMode>
-            <directoryMode>0755</directoryMode>
-        </fileSet>
-        <fileSet>
             <directory>src/main/config</directory>
             <lineEnding>keep</lineEnding>
             <filtered>false</filtered>
             <useStrictFiltering>false</useStrictFiltering>
             <useDefaultExcludes>true</useDefaultExcludes>
             <outputDirectory>config</outputDirectory>
-            <includes>
-                <include>*.config</include>
-                <include>*.properties</include>
-                <include>*.policy</include>
-            </includes>
             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>
         </fileSet>
@@ -110,8 +45,6 @@
             <useStrictFiltering>false</useStrictFiltering>
             <useDefaultExcludes>true</useDefaultExcludes>
             <outputDirectory>queues</outputDirectory>
-            <includes/>
-            <excludes/>
             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>
         </fileSet>
@@ -122,8 +55,6 @@
             <useStrictFiltering>false</useStrictFiltering>
             <useDefaultExcludes>true</useDefaultExcludes>
             <outputDirectory>docs</outputDirectory>
-            <includes/>
-            <excludes/>
             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>
         </fileSet>
@@ -134,8 +65,6 @@
             <useStrictFiltering>false</useStrictFiltering>
             <useDefaultExcludes>true</useDefaultExcludes>
             <outputDirectory>plugins/component/</outputDirectory>
-            <includes/>
-            <excludes/>
             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>
         </fileSet>
@@ -154,18 +83,6 @@
             <directoryMode>0755</directoryMode>
         </fileSet>
         <!-- End for collabnet tracker integration -->
-        <fileSet>
-            <directory>target/generated-resources/tasks/</directory>
-            <lineEnding>keep</lineEnding>
-            <filtered>false</filtered>
-            <useStrictFiltering>false</useStrictFiltering>
-            <useDefaultExcludes>true</useDefaultExcludes>
-            <outputDirectory>tasks/</outputDirectory>
-            <includes/>
-            <excludes/>
-            <fileMode>0644</fileMode>
-            <directoryMode>0755</directoryMode>
-        </fileSet>
-    </fileSets>    
+    </fileSets>
 </component>
         
