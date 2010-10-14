@@ -22,6 +22,11 @@
             <directoryMode>0755</directoryMode>
         </fileSet>
         <fileSet>
+            <directory>berkeley-db/mutable</directory>
+            <outputDirectory>berkeley-db/mutable</outputDirectory>
+            <useDefaultExcludes>false</useDefaultExcludes>
+        </fileSet>
+        <fileSet>
             <directory>src/main/config</directory>
             <lineEnding>keep</lineEnding>
             <filtered>false</filtered>

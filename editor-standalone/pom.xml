@@ -544,7 +544,7 @@
             <configuration>
               <!-- must be in path -->
               <executable>install4jc</executable>
-              <configFile>${basedir}/src/main/install4j/ihtsdo_sa.install4j</configFile>
+              <configFile>${basedir}/src/main/install4j/ihtsdo_sa_wb.install4j</configFile>
               <releaseId>${project.version}</releaseId>
               <verbose>true</verbose>
               <compilerVariables>
