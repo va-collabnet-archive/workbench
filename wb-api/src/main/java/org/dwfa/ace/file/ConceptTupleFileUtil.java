@@ -73,14 +73,25 @@ public class ConceptTupleFileUtil {
                 conceptUuid = UUID.fromString(lineParts[1]);
                 if ((Boolean) importConfig.getProperty("override") == false) {
                     UUID pathUuid = UUID.fromString(lineParts[3]);
+
                     if (Terms.get().hasPath(Terms.get().uuidToNative(pathUuid))) {
                         importConfig.getEditingPathSet().clear();
                         importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
                         importConfig.setProperty("pathUuid", pathUuid);
                     } else {
                         String errorMessage =
-                                "No path with identifier: " + pathUuid + " and no path override specified";
-                        throw new Exception(errorMessage);
+                                "No path with identifier: " + pathUuid
+                                    + " and no path override specified. Using WorkbenchAuxiliary as path instead.";
+                        outputFileWriter.write("Error on line " + lineCount + " : ");
+                        outputFileWriter.write(errorMessage);
+                        outputFileWriter.newLine();
+
+                        importConfig.getEditingPathSet().clear();
+                        importConfig.getEditingPathSet().add(
+                            Terms.get().getPath(
+                                ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids().iterator().next()));
+                        importConfig.setProperty("pathUuid", ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH
+                            .getUids().iterator().next());
                     }
                 }
                 statusUuid = UUID.fromString(lineParts[4]);

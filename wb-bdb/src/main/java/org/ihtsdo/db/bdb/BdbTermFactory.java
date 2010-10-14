@@ -270,7 +270,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public SearchResult doLuceneSearch(String query) throws IOException, org.apache.lucene.queryParser.ParseException {
-        Query q = new QueryParser(LuceneManager.version, "desc", new StandardAnalyzer(LuceneManager.version)).parse(query);
+        Query q =
+                new QueryParser(LuceneManager.version, "desc", new StandardAnalyzer(LuceneManager.version))
+                    .parse(query);
         return LuceneManager.search(q);
     }
 
@@ -311,36 +313,33 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public List<? extends I_ExtendByRef> getAllExtensionsForComponent(int nid) throws IOException {
-    	List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
+        List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
         if (pairs == null || pairs.size() == 0) {
             return new ArrayList<I_ExtendByRef>(0);
         }
-        List<I_ExtendByRef> returnValues = 
-        	new ArrayList<I_ExtendByRef>(pairs.size());
-        for (NidPairForRefset pair: pairs) {
-        	I_ExtendByRef ext = (I_ExtendByRef) Bdb.getComponent(pair.getMemberNid());
-        	if (ext != null) {
-        		returnValues.add(ext);
-        	}
+        List<I_ExtendByRef> returnValues = new ArrayList<I_ExtendByRef>(pairs.size());
+        for (NidPairForRefset pair : pairs) {
+            I_ExtendByRef ext = (I_ExtendByRef) Bdb.getComponent(pair.getMemberNid());
+            if (ext != null) {
+                returnValues.add(ext);
+            }
         }
         return returnValues;
     }
 
-     public List<? extends I_ExtendByRef> getRefsetExtensionsForComponent(int refsetNid, 
-    		 int nid) throws IOException {
-    	List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
+    public List<? extends I_ExtendByRef> getRefsetExtensionsForComponent(int refsetNid, int nid) throws IOException {
+        List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
         if (pairs == null || pairs.size() == 0) {
             return new ArrayList<I_ExtendByRef>(0);
         }
-        List<I_ExtendByRef> returnValues = 
-        	new ArrayList<I_ExtendByRef>(pairs.size());
-        for (NidPairForRefset pair: pairs) {
-        	if (pair.getRefsetNid() == refsetNid) {
-            	I_ExtendByRef ext = (I_ExtendByRef) Bdb.getComponent(pair.getMemberNid());
-            	if (ext != null) {
-            		returnValues.add(ext);
-            	}
-        	}
+        List<I_ExtendByRef> returnValues = new ArrayList<I_ExtendByRef>(pairs.size());
+        for (NidPairForRefset pair : pairs) {
+            if (pair.getRefsetNid() == refsetNid) {
+                I_ExtendByRef ext = (I_ExtendByRef) Bdb.getComponent(pair.getMemberNid());
+                if (ext != null) {
+                    returnValues.add(ext);
+                }
+            }
         }
         return returnValues;
     }
@@ -663,7 +662,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     @Override
     public boolean hasPath(int nid) throws IOException {
         try {
-            return pathManager.get(nid) != null;
+            return pathManager.hasPath(nid);
         } catch (PathNotExistsException e) {
             return false;
         } catch (TerminologyException e) {
@@ -832,11 +831,11 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         a.setDefined(isDefined);
         a.primordialUNid = Bdb.getUuidsToNidMap().getUNid(newConceptUuid);
         a.primordialSapNid = Integer.MIN_VALUE;
-                
+
         for (PathBI p : aceFrameConfig.getEditingPathSet()) {
             if (a.primordialSapNid == Integer.MIN_VALUE) {
-                a.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, 
-                		getUserNid(aceFrameConfig), p.getConceptNid(), time);
+                a.primordialSapNid =
+                        Bdb.getSapDb().getSapNid(statusNid, getUserNid(aceFrameConfig), p.getConceptNid(), time);
             } else {
                 if (a.revisions == null) {
                     a.revisions = new CopyOnWriteArrayList<ConceptAttributesRevision>();
@@ -847,13 +846,13 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         return newC;
     }
 
-	private static int getUserNid(I_ConfigAceFrame aceFrameConfig) {
-		int userNid = ReferenceConcepts.USER.getNid();
+    private static int getUserNid(I_ConfigAceFrame aceFrameConfig) {
+        int userNid = ReferenceConcepts.USER.getNid();
         if (aceFrameConfig.getDbConfig() != null && aceFrameConfig.getDbConfig().getUserConcept() != null) {
-        	userNid = aceFrameConfig.getDbConfig().getUserConcept().getConceptNid();
+            userNid = aceFrameConfig.getDbConfig().getUserConcept().getConceptNid();
         }
-		return userNid;
-	}
+        return userNid;
+    }
 
     @Override
     public I_ConceptAttributePart newConceptAttributePart() {
@@ -902,9 +901,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         d.primordialSapNid = Integer.MIN_VALUE;
         for (PathBI p : aceFrameConfig.getEditingPathSet()) {
             if (d.primordialSapNid == Integer.MIN_VALUE) {
-                d.primordialSapNid = Bdb.getSapDb().getSapNid(status.getNid(), 
-                		getUserNid(aceFrameConfig),
-                		p.getConceptNid(), effectiveDate);
+                d.primordialSapNid =
+                        Bdb.getSapDb().getSapNid(status.getNid(), getUserNid(aceFrameConfig), p.getConceptNid(),
+                            effectiveDate);
             } else {
                 if (d.revisions == null) {
                     d.revisions = new CopyOnWriteArrayList<DescriptionRevision>();
@@ -1076,9 +1075,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         assert config.getEditingPathSet().size() > 0 : "Empty editing path set. Must have at least one editing path.";
         for (PathBI p : config.getEditingPathSet()) {
             if (member.primordialSapNid == Integer.MIN_VALUE) {
-                member.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, 
-                		getUserNid(config),
-                		p.getConceptNid(), time);
+                member.primordialSapNid =
+                        Bdb.getSapDb().getSapNid(statusNid, getUserNid(config), p.getConceptNid(), time);
                 propMap.setPropertiesExceptSap((I_ExtendByRefPart) member);
             } else {
                 I_ExtendByRefPart revision = (I_ExtendByRefPart) member.makeAnalog(statusNid, p.getConceptNid(), time);
@@ -1124,8 +1122,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public PathBI newPath(Collection<? extends PositionBI> origins, I_GetConceptData pathConcept, I_ConfigAceFrame commitConfig)
-            throws TerminologyException, IOException {
+    public PathBI newPath(Collection<? extends PositionBI> origins, I_GetConceptData pathConcept,
+            I_ConfigAceFrame commitConfig) throws TerminologyException, IOException {
         assert pathConcept != null && pathConcept.getConceptNid() != 0;
         ArrayList<PositionBI> originList = new ArrayList<PositionBI>();
         if (origins != null) {
@@ -1192,9 +1190,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         int statusNid = relStatus.getNid();
         for (PathBI p : aceFrameConfig.getEditingPathSet()) {
             if (r.primordialSapNid == Integer.MIN_VALUE) {
-                r.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, 
-                		getUserNid(aceFrameConfig),
-                		p.getConceptNid(), effectiveDate);
+                r.primordialSapNid =
+                        Bdb.getSapDb().getSapNid(statusNid, getUserNid(aceFrameConfig), p.getConceptNid(),
+                            effectiveDate);
             } else {
                 if (r.revisions == null) {
                     r.revisions = new CopyOnWriteArrayList<RelationshipRevision>();
@@ -1229,21 +1227,17 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         r.setRefinabilityId(relRefinabilityNid);
         r.setCharacteristicId(relCharacteristicNid);
         r.setGroup(group);
-        r.primordialSapNid = Bdb.getSapDb().getSapNid(relStatusNid, 
-        		getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptNid(),
-        		pathNid, effectiveDate);
+        r.primordialSapNid =
+                Bdb.getSapDb().getSapNid(relStatusNid,
+                    getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptNid(), pathNid, effectiveDate);
         c.getSourceRels().add(r);
         return r;
     }
-    
-    
 
     @Override
-	public I_RelVersioned newRelationshipNoCheck(UUID newRelUid,
-			I_GetConceptData concept, int relTypeNid, int c2Nid,
-			int relCharacteristicNid, int relRefinabilityNid, int group,
-			int relStatusNid, int authorNid, int pathNid, long effectiveDate)
-			throws TerminologyException, IOException {
+    public I_RelVersioned newRelationshipNoCheck(UUID newRelUid, I_GetConceptData concept, int relTypeNid, int c2Nid,
+            int relCharacteristicNid, int relRefinabilityNid, int group, int relStatusNid, int authorNid, int pathNid,
+            long effectiveDate) throws TerminologyException, IOException {
         // NO CHECK PERFORMED
         Concept c = (Concept) concept;
         Relationship r = new Relationship();
@@ -1257,14 +1251,12 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         r.setRefinabilityId(relRefinabilityNid);
         r.setCharacteristicId(relCharacteristicNid);
         r.setGroup(group);
-        r.primordialSapNid = Bdb.getSapDb().getSapNid(relStatusNid, 
-        		authorNid,
-        		pathNid, effectiveDate);
+        r.primordialSapNid = Bdb.getSapDb().getSapNid(relStatusNid, authorNid, pathNid, effectiveDate);
         c.getSourceRels().add(r);
         return r;
-	}
+    }
 
-	@Override
+    @Override
     public void removeChangeSetReader(I_ReadChangeSet reader) {
         throw new UnsupportedOperationException();
     }
@@ -1346,16 +1338,15 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         }
         return null;
     }
-    
+
     public UUID nidToUuid(int nid) throws IOException {
-    	Concept c = Bdb.getConceptForComponent(nid);
-    	if (c == null) {
-    		return Bdb.getUuidsToNidMap().getUuidsForNid(nid).get(0);
-    	}
-    	ComponentChroncileBI<?> component = c.getComponent(nid);
-    	assert component != null: "No component in concept for nid: " + nid + 
-    		"\n\n\n" + c.toLongString();
-    	return component.getPrimUuid();
+        Concept c = Bdb.getConceptForComponent(nid);
+        if (c == null) {
+            return Bdb.getUuidsToNidMap().getUuidsForNid(nid).get(0);
+        }
+        ComponentChroncileBI<?> component = c.getComponent(nid);
+        assert component != null : "No component in concept for nid: " + nid + "\n\n\n" + c.toLongString();
+        return component.getPrimUuid();
     }
 
     @Override
@@ -1473,7 +1464,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         ;
         timer.start();
         try {
-            Query q = new QueryParser(LuceneManager.version, "desc", new StandardAnalyzer(LuceneManager.version)).parse(query);
+            Query q =
+                    new QueryParser(LuceneManager.version, "desc", new StandardAnalyzer(LuceneManager.version))
+                        .parse(query);
             if (LuceneManager.indexExists() == false) {
                 updater.setProgressInfo("Making lucene index -- this may take a while...");
                 LuceneManager.createLuceneDescriptionIndex();
@@ -1698,7 +1691,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         SpecRefsetHelper refsetHelper = new SpecRefsetHelper(frameConfig);
         Concept refsetConcept = Concept.get(refsetNid);
         RefsetSpec specHelper = new RefsetSpec(refsetConcept, true, frameConfig);
-        
+
         ComponentList<RefsetMember<?, ?>> members = refsetConcept.getData().getRefsetMembers();
 
         HashSet<Integer> currentMembersList = new HashSet<Integer>();
@@ -1706,24 +1699,22 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         int cidTypeNid = REFSET_TYPES.CID.getTypeNid();
         int normalMemberNid = ReferenceConcepts.NORMAL_MEMBER.getNid();
         for (RefsetMember<?, ?> m : members) {
-        	for (RefsetMember.Version v: m.getVersions(frameConfig.getCoordinate())) {
-        		if (allowedStatus.contains(v.getStatusNid()) &&
-    					v.getTypeNid() == cidTypeNid) {
-    				if (((I_ExtendByRefPartCid) v).getC1id() == normalMemberNid) {
-    	                if (Terms.get().hasConcept(m.getComponentId())) {
-    	                    currentMembersList.add(m.getComponentId());
-    	                } else { // assume it is a description member
-    	                    I_DescriptionVersioned desc = Terms.get().getDescription(m.getComponentId());
-    	                    if (desc != null) {
-    	                        currentMembersList.add(desc.getConceptNid());
-    	                    }
-    	                }
-    				}
-    			}
-    		}        		
+            for (RefsetMember.Version v : m.getVersions(frameConfig.getCoordinate())) {
+                if (allowedStatus.contains(v.getStatusNid()) && v.getTypeNid() == cidTypeNid) {
+                    if (((I_ExtendByRefPartCid) v).getC1id() == normalMemberNid) {
+                        if (Terms.get().hasConcept(m.getComponentId())) {
+                            currentMembersList.add(m.getComponentId());
+                        } else { // assume it is a description member
+                            I_DescriptionVersioned desc = Terms.get().getDescription(m.getComponentId());
+                            if (desc != null) {
+                                currentMembersList.add(desc.getConceptNid());
+                            }
+                        }
+                    }
+                }
+            }
         }
-        	
-        	
+
         HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
         RefsetComputer computer;
         try {
@@ -1863,9 +1854,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         int statusNid = aceConfig.getDefaultStatus().getNid();
         for (PathBI p : aceConfig.getEditingPathSet()) {
             if (img.primordialSapNid == Integer.MIN_VALUE) {
-                img.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, 
-                		aceConfig.getDbConfig().getUserConcept().getNid(),
-                		p.getConceptNid(), Long.MAX_VALUE);
+                img.primordialSapNid =
+                        Bdb.getSapDb().getSapNid(statusNid, aceConfig.getDbConfig().getUserConcept().getNid(),
+                            p.getConceptNid(), Long.MAX_VALUE);
             } else {
                 if (img.revisions == null) {
                     img.revisions = new CopyOnWriteArrayList<ImageRevision>();
@@ -1929,30 +1920,27 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     private int authorNid = Integer.MAX_VALUE;
-	@Override
-	public int getAuthorNid() {
-		if (authorNid == Integer.MAX_VALUE) {
-			try {
-				if (getActiveAceFrameConfig() != null && getActiveAceFrameConfig().getDbConfig() != null &&
-						getActiveAceFrameConfig().getDbConfig().getUserConcept() != null) {
-					authorNid = getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptNid();
-				} else {
-					authorNid = uuidToNative(TkRevision.unspecifiedUserUuid);
-				}
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-		return authorNid;
-	}
 
-    public ChangeSetGeneratorBI createDtoChangeSetGenerator(File changeSetFileName, 
-			File changeSetTempFileName, 
-			ChangeSetGenerationPolicy policy) {
-    	return new EConceptChangeSetWriter(
-    			changeSetFileName,
-    			changeSetTempFileName,
-    			policy, true);  	
+    @Override
+    public int getAuthorNid() {
+        if (authorNid == Integer.MAX_VALUE) {
+            try {
+                if (getActiveAceFrameConfig() != null && getActiveAceFrameConfig().getDbConfig() != null
+                    && getActiveAceFrameConfig().getDbConfig().getUserConcept() != null) {
+                    authorNid = getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptNid();
+                } else {
+                    authorNid = uuidToNative(TkRevision.unspecifiedUserUuid);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return authorNid;
+    }
+
+    public ChangeSetGeneratorBI createDtoChangeSetGenerator(File changeSetFileName, File changeSetTempFileName,
+            ChangeSetGenerationPolicy policy) {
+        return new EConceptChangeSetWriter(changeSetFileName, changeSetTempFileName, policy, true);
     }
 
 }
