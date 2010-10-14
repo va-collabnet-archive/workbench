@@ -263,6 +263,11 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
             JMenu newSubMenuConcept = new JMenu(conceptFile.getName());
             popup.add(newSubMenuConcept);
             ProcessPopupUtil.addSubmenMenuItems(newSubMenuConcept, conceptFile, this.aceConfig.getWorker());
+            // sub-menu for diff
+            conceptFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/diff");
+            newSubMenuConcept = new JMenu(conceptFile.getName());
+            popup.add(newSubMenuConcept);
+            ProcessPopupUtil.addSubmenMenuItems(newSubMenuConcept, conceptFile, this.aceConfig.getWorker());
         }
 
         // sub-menu for desc based clauses e.g. desc is, desc is child of
