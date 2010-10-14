@@ -426,6 +426,9 @@ public class RefsetSpec {
     }
 
     public void setLastComputeTime(Long time) throws Exception {
+        if (getRefsetSpecConcept() == null) {
+            return; // not a correct refset spec (i.e. doesn't have an associated spec)
+        }
         I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(config);
         boolean prevAutoCommit = helper.isAutocommitActive();
         helper.setAutocommitActive(false);
@@ -469,6 +472,9 @@ public class RefsetSpec {
     }
 
     public void setLastEditTime(Long time) throws Exception {
+        if (getRefsetSpecConcept() == null) {
+            return; // not a correct refset spec (i.e. doesn't have an associated spec)
+        }
         try {
 
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
@@ -488,9 +494,8 @@ public class RefsetSpec {
     }
 
     public Long getLastComputeTime() throws TerminologyException, IOException {
-        I_GetConceptData specConcept = getRefsetSpecConcept();
-        if (specConcept == null) {
-            return null;
+        if (getRefsetSpecConcept() == null) {
+            return null; // not a correct refset spec (i.e. doesn't have an associated spec)
         }
         I_GetConceptData lastComputeTimeConcept = getComputeConcept();
         if (lastComputeTimeConcept == null) {
@@ -561,6 +566,9 @@ public class RefsetSpec {
     }
 
     private Long getLastEditTime() throws TerminologyException, IOException {
+        if (getRefsetSpecConcept() == null) {
+            return null; // not a correct refset spec (i.e. doesn't have an associated spec)
+        }
         I_GetConceptData specConcept = getRefsetSpecConcept();
         I_GetConceptData lastEditTimeConcept = getEditConcept();
         if (lastEditTimeConcept == null) {
@@ -582,8 +590,8 @@ public class RefsetSpec {
 
                     lastEditTimeConcept = task.newConcept(config);
                     task.newDescription(lastEditTimeConcept, Terms.get().getConcept(
-                            ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), computeTimeName,
-                            config);
+                        ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), computeTimeName,
+                        config);
                     task.newDescription(lastEditTimeConcept, Terms.get().getConcept(
                         ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), computeTimeName, config);
 
@@ -631,6 +639,9 @@ public class RefsetSpec {
     }
 
     public boolean needsCompute() throws TerminologyException, IOException {
+        if (getRefsetSpecConcept() == null) {
+            return false; // not a correct refset spec (i.e. doesn't have an associated spec)
+        }
         Long lastComputeTime = getLastComputeTime();
         Long lastEditTime = getLastEditTime();
         if (lastEditTime == null) {
