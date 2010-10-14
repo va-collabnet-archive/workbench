@@ -20,11 +20,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import org.dwfa.ace.api.BundleType;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.SubversionData;
-import org.dwfa.ace.api.I_ConfigAceFrame.SPECIAL_SVN_ENTRIES;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -60,40 +58,12 @@ public class UpdateAllSvnEntries extends AbstractAllSvnEntriesTask {
 
 	public static void update(I_ConfigAceFrame config, SubversionData svd,
 			String taskKey) throws TaskFailedException {
-		try {
-            SPECIAL_SVN_ENTRIES entry = SPECIAL_SVN_ENTRIES.valueOf(taskKey);
-            BundleType bundleType = config.getBundleType();
-            switch (entry) {
-            case PROFILE_CSU:
-                switch (bundleType) {
-                case STAND_ALONE:
-                    // nothing to do...
-                    break;
-
-                case CHANGE_SET_UPDATE:
-                    config.svnUpdate(svd);
-                    break;
-
-                case DB_UPDATE:
-                	if (taskKey.replace('\\', '/').equalsIgnoreCase(I_ConfigAceDb.MUTABLE_DB_LOC)) {
-                        //config.svnUpdateDatabase(svd);
-                	} else {
-                        config.svnUpdate(svd);
-                	}
-                    break;
-
-                default:
-                    throw new TaskFailedException("Can't handle: " + bundleType);
-                }
-
-                break;
-
-            default:
-                throw new TaskFailedException("Don't know how to handle: " + entry);
-            }
-        } catch (IllegalArgumentException e) {
+    	if (taskKey.replace('\\', '/').equalsIgnoreCase(I_ConfigAceDb.MUTABLE_DB_LOC)) {
+    		// berkeley-db update only handled at startup. 
+            // config.svnUpdateDatabase(svd);
+    	} else {
             config.svnUpdate(svd);
-        }
+    	}
 	}
 
 }
