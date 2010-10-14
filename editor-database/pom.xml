@@ -582,13 +582,6 @@
             <artifactId>wb-mojo</artifactId>
             <executions>
               <execution>
-                <id>svn-checkout</id>
-                <phase>generate-sources</phase>
-                <goals>
-                  <goal>svn-checkout</goal>
-                </goals>
-              </execution>
-              <execution>
                 <id>svn-commit</id>
                 <phase>prepare-package</phase>
                 <goals>
