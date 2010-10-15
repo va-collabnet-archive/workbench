@@ -40,21 +40,27 @@ public class ConceptTupleFileUtil {
     public static String exportTuple(I_GetConceptData concept) throws TerminologyException, IOException {
 
         I_TermFactory termFactory = Terms.get();
+        String idTuple = null;
+        if (concept.getUids().size() > 0) {
+            idTuple = IDTupleFileUtil.exportTuple(termFactory.getId(concept.getUids().iterator().next()));
 
-        String idTuple = IDTupleFileUtil.exportTuple(termFactory.getId(concept.getUids().iterator().next()));
+            RefsetUtilImpl refsetUtil = new RefsetUtilImpl();
+            I_ConceptAttributePart part = refsetUtil.getLastestAttributePart(concept);
 
-        RefsetUtilImpl refsetUtil = new RefsetUtilImpl();
-        I_ConceptAttributePart part = refsetUtil.getLastestAttributePart(concept);
+            UUID conceptTupleUuid = ArchitectonicAuxiliary.Concept.CON_TUPLE.getUids().iterator().next();
+            UUID conceptUuid = termFactory.getUids(concept.getConceptNid()).iterator().next();
+            UUID statusUuid = termFactory.getUids(part.getStatusId()).iterator().next();
+            boolean isDefined = part.isDefined();
+            UUID pathUuid = termFactory.getUids(part.getPathId()).iterator().next();
+            long effectiveDate = part.getTime();
 
-        UUID conceptTupleUuid = ArchitectonicAuxiliary.Concept.CON_TUPLE.getUids().iterator().next();
-        UUID conceptUuid = termFactory.getUids(concept.getConceptNid()).iterator().next();
-        UUID statusUuid = termFactory.getUids(part.getStatusId()).iterator().next();
-        boolean isDefined = part.isDefined();
-        UUID pathUuid = termFactory.getUids(part.getPathId()).iterator().next();
-        long effectiveDate = part.getTime();
+            return idTuple + conceptTupleUuid + "\t" + conceptUuid + "\t" + isDefined + "\t" + pathUuid + "\t"
+                + statusUuid + "\t" + effectiveDate + "\n";
 
-        return idTuple + conceptTupleUuid + "\t" + conceptUuid + "\t" + isDefined + "\t" + pathUuid + "\t" + statusUuid
-            + "\t" + effectiveDate + "\n";
+        } else {
+            return "";
+        }
+
     }
 
     public static boolean importTuple(String inputLine, BufferedWriter outputFileWriter, int lineCount,

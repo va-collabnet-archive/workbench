@@ -39,8 +39,24 @@ public class RelTupleFileUtil {
 
             UUID tupleUuid = ArchitectonicAuxiliary.Concept.REL_TUPLE.getUids().iterator().next();
             UUID relUuid = termFactory.getUids(relTuple.getRelId()).iterator().next();
-            UUID c1Uuid = termFactory.getUids(relTuple.getC1Id()).iterator().next();
-            UUID c2Uuid = termFactory.getUids(relTuple.getC2Id()).iterator().next();
+            UUID c1Uuid = null;
+            try {
+                c1Uuid = termFactory.getUids(relTuple.getC1Id()).iterator().next();
+            } catch (NullPointerException e) {
+                c1Uuid =
+                        termFactory.getUids(
+                            ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.localize().getNid()).iterator()
+                            .next();
+            }
+            UUID c2Uuid = null;
+            try {
+                c2Uuid = termFactory.getUids(relTuple.getC2Id()).iterator().next();
+            } catch (NullPointerException e) {
+                c2Uuid =
+                        termFactory.getUids(
+                            ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.localize().getNid()).iterator()
+                            .next();
+            }
             UUID charUuid = termFactory.getUids(relTuple.getCharacteristicId()).iterator().next();
             int group = relTuple.getGroup();
             UUID refUuid = termFactory.getUids(relTuple.getRefinabilityId()).iterator().next();
