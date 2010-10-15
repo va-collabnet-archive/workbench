@@ -139,6 +139,91 @@
             <arguments>-P-svn-db,generate-db,all</arguments>
           </configuration>
         </plugin>
+
+        <!-- Installer configuration -->
+        <plugin>
+          <groupId>com.google.code.maven-install4j</groupId>
+          <artifactId>maven-install4j-plugin</artifactId>
+          <version>0.1.1</version>
+          <configuration>
+            <!-- must be in path -->
+            <executable>install4jc</executable>
+            <releaseId>${project.version}</releaseId>
+            <verbose>true</verbose>
+            <compilerVariables>
+              <property>
+                <name>project.version</name>
+                <value>${project.version}</value>
+              </property>
+              <property>
+                <name>bundle.directory.rt.i4j</name>
+                <value>${project.build.directory}/wb-bundle</value>
+              </property>
+              <property>
+                <name>bundle.directory</name>
+                <value>${project.build.directory}/wb-bundle</value>
+              </property>
+              <property>
+                <name>bundle.file_description</name>
+                <value>"IHTSDO Editor Trek"</value>
+              </property>
+              <property>
+                <name>bundle.copyright</name>
+                <value>"2001 International Health Terminology Standards Development Organisation"</value>
+              </property>
+              <property>
+                <name>bundle.version</name>
+                <value>.01-ihtsdo-trek</value>
+              </property>
+              <property>
+                <name>bundle.publisher</name>
+                <value>IHTSDO</value>
+              </property>
+              <property>
+                <name>bundle.publisher.url</name>
+                <value>http://www.ihtsdo.org/members/uk00/</value>
+              </property>
+              <property>
+                <name>bundle.vm_args</name>
+                <value>config/start-wb-local.config</value>
+              </property>
+              <property>
+                <name>bundle.vm_main_class</name>
+                <value>com.sun.jini.start.ServiceStarter</value>
+              </property>
+              <property>
+                <name>bundle.vm_parameters</name>
+                <value>&quot;-Dorg.dwfa.AboutBoxGraphic=&quot;</value>
+              </property>
+              <property>
+                <name>pom.short.name</name>
+                <value>"ihtsdo editor trek sa"</value>
+              </property>
+              <property>
+                <name>media.dir</name>
+                <value>${project.build.directory}/site</value>
+              </property>
+              <property>
+                <name>icons.dir</name>
+                <value>${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons</value>
+              </property>
+              <property>
+                <name>icon.icns</name>
+                <value>${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons/IHT_IconFiles1_128x128.icns
+                </value>
+              </property>
+              <property>
+                <name>icon.ico</name>
+                <value>${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons/IHT_IconFiles2_48x48.ico
+                </value>
+              </property>
+              <property>
+                <name>about.box</name>
+                <value>resources/org/ihtsdo/ihtsdo_sa_aboutbox.jpg</value>
+              </property>
+            </compilerVariables>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
