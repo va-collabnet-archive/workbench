@@ -17,10 +17,6 @@
 		<!-- *** SEE profile for XEP PDF formatter at end of this file -->
 	</properties>
 	<dependencies>
-		<!--
-			TODO: this is duplicated from the editor-standalone for now - need to
-			restructure bundle to make this more natural
-		-->
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-docs</artifactId>

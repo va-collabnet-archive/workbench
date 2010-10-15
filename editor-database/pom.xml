@@ -589,9 +589,6 @@
                 <configuration>
                   <workingCopyStr>${berkeleydb.directory}</workingCopyStr>
                   <repositoryUrlStr>${berkeleydb.svn.url}</repositoryUrlStr>
-                  <username>${demo.sync.ci.user}</username>
-                  <password>${demo.sync.ci.pwd}</password>
-                  <subversionConfigDirectory>${svn.config.directory}</subversionConfigDirectory>
                 </configuration>
               </execution>
             </executions>
@@ -612,7 +609,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-scm-plugin</artifactId>
-            <version>1.4</version>
             <executions>
               <execution>
                 <id>svn-checkout</id>
@@ -626,8 +622,6 @@
                   <checkoutDirectory>${berkeleydb.directory}</checkoutDirectory>
                   <workingDirectory>${berkeleydb.directory}</workingDirectory>
                   <connectionUrl>scm:svn:${berkeleydb.svn.url}</connectionUrl>
-                  <username>${demo.sync.ci.user}</username>
-                  <password>${demo.sync.ci.pwd}</password>
                 </configuration>
               </execution>
             </executions>
