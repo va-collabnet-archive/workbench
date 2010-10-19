@@ -426,14 +426,19 @@ public class RefsetSpec {
     }
 
     public void setLastComputeTime(Long time) throws Exception {
-        if (getRefsetSpecConcept() == null) {
+        I_GetConceptData specConcept = getRefsetSpecConcept();
+        if (specConcept == null) {
             return; // not a correct refset spec (i.e. doesn't have an associated spec)
         }
+
+        I_GetConceptData lastComputeTimeConcept = getComputeConcept();
+        if (lastComputeTimeConcept == null) {
+            return; // 
+        }
+
         I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(config);
         boolean prevAutoCommit = helper.isAutocommitActive();
         helper.setAutocommitActive(false);
-        I_GetConceptData specConcept = getRefsetSpecConcept();
-        I_GetConceptData lastComputeTimeConcept = getComputeConcept();
 
         if (specConcept != null && lastComputeTimeConcept != null) {
             helper.newLongRefsetExtension(lastComputeTimeConcept.getConceptNid(), specConcept.getConceptNid(), time);
