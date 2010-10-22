@@ -45,6 +45,7 @@ public class ReflexiveRefsetCommentTableModel extends ReflexiveRefsetTableModel 
         allTuples = null;
         values = null;
         allExtensions = null;
+        conceptCache = null;
         if (getProgress() != null) {
             getProgress().setVisible(true);
             getProgress().getProgressBar().setValue(0);

@@ -14,7 +14,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
-import org.dwfa.ace.api.I_IterateIds;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.Terms;
@@ -27,6 +26,8 @@ import org.ihtsdo.concept.I_ProcessConceptData;
 import org.ihtsdo.concept.component.identifier.IdentifierVersion;
 import org.ihtsdo.concept.component.identifier.IdentifierVersionString;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -146,6 +147,11 @@ public class CementLoadTest {
 	private static class AddStringIdProcessor implements I_ProcessConceptData {
 
 		I_RepresentIdSet cids;
+		@Override
+		public NidBitSetBI getNidSet() throws IOException {
+			return cids;
+		}
+
 		ConcurrentHashMap<Integer, Integer> conCids;
 		
 		public ConcurrentHashMap<Integer, Integer> getConCids() {
@@ -160,7 +166,7 @@ public class CementLoadTest {
 			super();
 			this.cids = new IdentifierSet((IdentifierSet) cids);
 			conCids = new ConcurrentHashMap<Integer, Integer>(cids.cardinality());
-			I_IterateIds cidItr = cids.iterator();
+			NidBitSetItrBI cidItr = cids.iterator();
 			while (cidItr.next()) {
 				conCids.put(cidItr.nid(), cidItr.nid());
 			}
@@ -206,7 +212,7 @@ public class CementLoadTest {
 			super();
 			this.cids = new IdentifierSet((IdentifierSet) cids);
 			conCids = new ConcurrentHashMap<Integer, Integer>(cids.cardinality());
-			I_IterateIds cidItr = cids.iterator();
+			NidBitSetItrBI cidItr = cids.iterator();
 			while (cidItr.next()) {
 				conCids.put(cidItr.nid(), cidItr.nid());
 			}
@@ -231,6 +237,10 @@ public class CementLoadTest {
 		@Override
 		public boolean continueWork() {
 			return true;
+		}
+		@Override
+		public NidBitSetBI getNidSet() throws IOException {
+			return cids;
 		}
 	}
 

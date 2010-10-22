@@ -33,10 +33,7 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IterateIds;
-import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -46,6 +43,7 @@ import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
@@ -1340,7 +1338,7 @@ public class DiffBase extends AbstractMojo {
 
 	protected ArrayList<Integer> getAllConcepts() throws Exception {
 		ArrayList<Integer> all_concepts = new ArrayList<Integer>();
-		for (I_IterateIds i = Terms.get().getConceptNidSet().iterator(); i
+		for (NidBitSetItrBI i = Terms.get().getConceptNidSet().iterator(); i
 				.next();) {
 			all_concepts.add(i.nid());
 		}

@@ -23,6 +23,7 @@ import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.OpenBitSet;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.NidBitSetBI;
 
 public class IdentifierSet implements I_RepresentIdSet {
 	
@@ -51,17 +52,17 @@ public class IdentifierSet implements I_RepresentIdSet {
 	protected OpenBitSet bitSet;
 	
 	@Override
-	public void andNot(I_RepresentIdSet other) {
+	public void andNot(NidBitSetBI other) {
 		bitSet.andNot(((IdentifierSet)other).bitSet);
 	}
 
 	@Override
-	public void union(I_RepresentIdSet other) {
+	public void union(NidBitSetBI other) {
 		bitSet.union(((IdentifierSet)other).bitSet);
 	}
 
 	@Override
-	public void xor(I_RepresentIdSet other) {
+	public void xor(NidBitSetBI other) {
 		bitSet.xor(((IdentifierSet)other).bitSet);
 	}
 
@@ -137,7 +138,7 @@ public class IdentifierSet implements I_RepresentIdSet {
 	 * @see
 	 * org.dwfa.ace.api.I_RepresentIdSet#and(org.dwfa.ace.api.IdentifierSet)
 	 */
-	public void and(I_RepresentIdSet other) {
+	public void and(NidBitSetBI other) {
 		bitSet.and(((IdentifierSet) other).bitSet);
 	}
 
@@ -146,7 +147,7 @@ public class IdentifierSet implements I_RepresentIdSet {
 	 * 
 	 * @see org.dwfa.ace.api.I_RepresentIdSet#or(org.dwfa.ace.api.IdentifierSet)
 	 */
-	public void or(I_RepresentIdSet other) {
+	public void or(NidBitSetBI other) {
 		bitSet.or(((IdentifierSet) other).bitSet);
 	}
 

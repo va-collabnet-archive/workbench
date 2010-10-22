@@ -55,6 +55,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.PositionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/gui/workflow/detail sheet", type = BeanType.TASK_BEAN) })
@@ -158,7 +159,7 @@ public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends
 							"Search found: " + matches.cardinality()
 									+ " matches.");
 					List<List<UUID>> idListList = new ArrayList<List<UUID>>();
-					I_IterateIds matchesIterator = matches.iterator();
+					NidBitSetItrBI matchesIterator = matches.iterator();
 					while (matchesIterator.next()) {
 						I_GetConceptData matchConcept = Terms.get().getConcept(
 								matchesIterator.nid());
@@ -177,7 +178,7 @@ public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends
 							SwingUtilities.invokeAndWait(new Runnable() {
 
 								public void run() {
-									I_IterateIds matchesIterator = matches
+									NidBitSetItrBI matchesIterator = matches
 											.iterator();
 									try {
 										while (matchesIterator.next()) {
@@ -209,7 +210,7 @@ public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends
 							SwingUtilities.invokeAndWait(new Runnable() {
 
 								public void run() {
-									I_IterateIds matchesIterator = matches
+									NidBitSetItrBI matchesIterator = matches
 											.iterator();
 									for (int i = 0; i < 5000; i++) {
 										try {

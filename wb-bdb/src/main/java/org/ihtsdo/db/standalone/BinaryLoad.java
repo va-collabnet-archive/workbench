@@ -27,6 +27,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.thread.NamedThreadFactory;
+import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
 
@@ -218,6 +219,10 @@ public class BinaryLoad {
 		@Override
 		public boolean continueWork() {
 			return true;
+		}
+		@Override
+		public NidBitSetBI getNidSet() throws IOException {
+			return Bdb.getConceptDb().getReadOnlyConceptIdSet();
 		}
     }
     

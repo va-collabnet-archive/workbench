@@ -18,6 +18,7 @@ import org.ihtsdo.db.bdb.ComponentBdb;
 import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRefset;
 import org.ihtsdo.db.util.NidPairForRel;
+import org.ihtsdo.tk.api.NidBitSetBI;
 
 import com.sleepycat.bind.tuple.LongBinding;
 import com.sleepycat.bind.tuple.TupleInput;
@@ -123,6 +124,7 @@ public class Xref extends ComponentBdb implements I_ProcessUnfetchedConceptData 
 			DatabaseEntry foundData = new DatabaseEntry();
 			while (cursor.getNext(foundKey, foundData,
 					LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
+				@SuppressWarnings("unused")
 				long index = LongBinding.entryToLong(foundKey);
 				TupleInput ti = new TupleInput(foundData.getData());
 				int records = ti.readInt();
@@ -299,6 +301,13 @@ public class Xref extends ComponentBdb implements I_ProcessUnfetchedConceptData 
 	public void processUnfetchedConceptData(int cNid,
 			I_FetchConceptFromCursor fcfc) throws Exception {
 		fcfc.fetch().updateXrefs();
+	}
+	
+	
+
+	@Override
+	public NidBitSetBI getNidSet() throws IOException {
+		return Bdb.getConceptDb().getConceptNidSet();
 	}
 
 	@Override

@@ -15,7 +15,6 @@ import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
-import org.dwfa.ace.api.I_IterateIds;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
@@ -37,6 +36,8 @@ import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.NidBitSetItrBI;
 
 public class RefsetComputer implements I_ProcessUnfetchedConceptData {
 	
@@ -260,11 +261,11 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
                     + retiredMembers.get());
             
             I_RepresentIdSet newParents = Bdb.getConceptDb().getEmptyIdSet();
-            I_IterateIds newMemberItr = newMemberNids.iterator();
+            NidBitSetItrBI newMemberItr = newMemberNids.iterator();
             while (newMemberItr.next()) {
             	isaCache.addParents(newMemberItr.nid(), newParents);
             }
-            I_IterateIds newParentItr = newParents.iterator();
+            NidBitSetItrBI newParentItr = newParents.iterator();
             while (newParentItr.next()) {
             	memberRefsetHelper.newRefsetExtension(markedParentRefsetConcept.getNid(), newParentItr.nid(), parentMemberTypeNid);
             }
@@ -281,17 +282,17 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             retiredMemberNids.andNot(newMemberNids);
 
             I_RepresentIdSet parentsToRetire = Bdb.getConceptDb().getEmptyIdSet();
-            I_IterateIds retiredMemberItr = retiredMemberNids.iterator();
+            NidBitSetItrBI retiredMemberItr = retiredMemberNids.iterator();
             while (retiredMemberItr.next()) {
             	isaCache.addParents(retiredMemberItr.nid(), parentsToRetire);
             }
             I_RepresentIdSet currentParents = Bdb.getConceptDb().getEmptyIdSet();
-            I_IterateIds currentMemberItr = currentRefsetMemberComponentNids.iterator();
+            NidBitSetItrBI currentMemberItr = currentRefsetMemberComponentNids.iterator();
             while (currentMemberItr.next()) {
             	isaCache.addParents(currentMemberItr.nid(), currentParents);
             }
             parentsToRetire.andNot(currentParents);
-            I_IterateIds parentToRetireItr = parentsToRetire.iterator();
+            NidBitSetItrBI parentToRetireItr = parentsToRetire.iterator();
             while (parentToRetireItr.next()) {
             	memberRefsetHelper.retireRefsetExtension(markedParentRefsetConcept.getNid(), parentToRetireItr.nid(), parentMemberTypeNid);
             }
@@ -336,4 +337,9 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
     public List<ParallelConceptIterator> getParallelConceptIterators() {
         return pcis;
     }
+
+	@Override
+	public NidBitSetBI getNidSet() {
+		return possibleCNids;
+	}
 }

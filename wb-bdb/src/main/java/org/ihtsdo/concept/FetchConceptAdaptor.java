@@ -1,6 +1,9 @@
 package org.ihtsdo.concept;
 
+import java.io.IOException;
 import java.util.List;
+
+import org.ihtsdo.tk.api.NidBitSetBI;
 
 
 public class FetchConceptAdaptor implements I_ProcessUnfetchedConceptData {
@@ -28,4 +31,10 @@ public class FetchConceptAdaptor implements I_ProcessUnfetchedConceptData {
         
     }
 
+	@Override
+	public NidBitSetBI getNidSet() throws IOException {
+		return processor.getNidSet();
+	}
+
+    
 }

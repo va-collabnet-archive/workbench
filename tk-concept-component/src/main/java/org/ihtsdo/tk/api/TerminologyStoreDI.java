@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
@@ -13,28 +14,33 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.db.DbDependency;
 
 public interface TerminologyStoreDI extends TerminologyTransactionDI {
-	
-	TerminologySnapshotDI getSnapshot(Coordinate c);
 
-	ComponentBI getComponent(int nid) throws IOException;
-	ComponentBI getComponent(UUID... uuids) throws IOException;
-	ComponentBI getComponent(Collection<UUID> uuids) throws IOException;
-	
-	ConceptChronicleBI getConcept(int cNid) throws IOException;
-	ConceptChronicleBI getConcept(UUID... uuids) throws IOException;
-	ConceptChronicleBI getConcept(Collection<UUID> uuids) throws IOException;
-	
-	ComponentVersionBI getComponentVersion(Coordinate coordinate, int nid) throws IOException, ContraditionException;
-	ComponentVersionBI getComponentVersion(Coordinate coordinate, UUID... uuids) throws IOException, ContraditionException;
-	ComponentVersionBI getComponentVersion(Coordinate coordinate, Collection<UUID> uuids) throws IOException, ContraditionException;
-	
-	ConceptVersionBI getConceptVersion(Coordinate coordinate, int cNid) throws IOException;
-	ConceptVersionBI getConceptVersion(Coordinate coordinate, UUID... uuids) throws IOException;
-	ConceptVersionBI getConceptVersion(Coordinate coordinate, Collection<UUID> uuids) throws IOException;
+	 TerminologySnapshotDI getSnapshot(Coordinate c);
 
-	int uuidsToNid(UUID... uuids) throws IOException;
-	int uuidsToNid(Collection<UUID> uuids) throws IOException;
-	List<UUID> getUuidsForNid(int nid);
+	 ComponentBI getComponent(int nid) throws IOException;
+	 ComponentBI getComponent(UUID... uuids) throws IOException;
+	 ComponentBI getComponent(Collection<UUID> uuids) throws IOException;
+	
+	 ConceptChronicleBI getConcept(int cNid) throws IOException;
+	 ConceptChronicleBI getConcept(UUID... uuids) throws IOException;
+	 ConceptChronicleBI getConcept(Collection<UUID> uuids) throws IOException;
+     Map<Integer, ConceptChronicleBI> getConcepts(NidBitSetBI cNids) throws IOException;
+	
+	 ComponentVersionBI getComponentVersion(Coordinate coordinate, int nid) throws IOException, ContraditionException;
+	 ComponentVersionBI getComponentVersion(Coordinate coordinate, UUID... uuids) throws IOException, ContraditionException;
+	 ComponentVersionBI getComponentVersion(Coordinate coordinate, Collection<UUID> uuids) throws IOException, ContraditionException;
+	
+	 ConceptVersionBI getConceptVersion(Coordinate coordinate, int cNid) throws IOException;
+	 ConceptVersionBI getConceptVersion(Coordinate coordinate, UUID... uuids) throws IOException;
+	 ConceptVersionBI getConceptVersion(Coordinate coordinate, Collection<UUID> uuids) throws IOException;
+     Map<Integer, ConceptVersionBI> getConceptVersions(Coordinate c, NidBitSetBI cNids) throws IOException;
+
+	 int uuidsToNid(UUID... uuids) throws IOException;
+	 int uuidsToNid(Collection<UUID> uuids) throws IOException;
+	 
+	 int getConceptNidForNid(int nid) throws IOException;
+	 
+	 List<UUID> getUuidsForNid(int nid);
 	
     void addChangeSetGenerator(String key, ChangeSetGeneratorBI writer);
     void removeChangeSetGenerator(String key);

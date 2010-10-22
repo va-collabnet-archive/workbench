@@ -16,37 +16,11 @@
  */
 package org.dwfa.ace.api;
 
-public interface I_RepresentIdSet {
+import org.ihtsdo.tk.api.NidBitSetBI;
 
-    public boolean isMember(int nid);
-
-    public void setMember(int nid);
-
-    public void setNotMember(int nid);
-
-    public void and(I_RepresentIdSet other);
-
-    public void or(I_RepresentIdSet other);
-
-    public I_IterateIds iterator();
+public interface I_RepresentIdSet extends NidBitSetBI {
 
     @Deprecated
     public int size();
-
-    /**
-     * 
-     * @return number of set bits. 
-     */
-    public int cardinality();
-
-    public int totalBits();
-
-    public void clear();
-
-	void andNot(I_RepresentIdSet other);
-
-	void union(I_RepresentIdSet other);
-
-	void xor(I_RepresentIdSet other);
 
 }

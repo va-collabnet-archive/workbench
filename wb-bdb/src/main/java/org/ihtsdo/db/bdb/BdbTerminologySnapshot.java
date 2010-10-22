@@ -2,12 +2,14 @@ package org.ihtsdo.db.bdb;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 import java.util.UUID;
 
 import org.ihtsdo.concept.ConceptVersion;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -93,6 +95,11 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
 	@Override
 	public void commit(ConceptChronicleBI cc) throws IOException {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Map<Integer, ConceptVersionBI> getConceptVersions(NidBitSetBI cNids) throws IOException {
+		return store.getConceptVersions(c, cNids);
 	}
 
 }

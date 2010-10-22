@@ -61,6 +61,9 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
@@ -72,6 +75,9 @@ import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.IntList;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public abstract class ReflexiveTableModel extends AbstractTableModel implements PropertyChangeListener,
         I_HoldRefsetData {
@@ -237,6 +243,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         protected Map<Integer, I_GetConceptData> construct() throws Exception {
             getProgress().setActive(true);
             Map<Integer, I_GetConceptData> concepts = new HashMap<Integer, I_GetConceptData>();
+            setupConceptCache();
             for (Integer id : new HashSet<Integer>(conceptsToFetch)) {
                 if (stopWork) {
                     break;
@@ -299,6 +306,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
     protected I_HostConceptPlugins host;
 
     protected List<I_ExtendByRefVersion> allTuples;
+    
+    protected Map<Integer, ConceptChronicleBI> conceptCache;
 
     protected ArrayList<I_ExtendByRef> allExtensions;
 
@@ -406,6 +415,56 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
             return 0;
         }
         return allTuples.size();
+    }
+    
+    public void setupConceptCache() throws IOException {
+    	NidBitSetBI conceptNids = Terms.get().getEmptyIdSet();
+    	for (int rowIndex = 0; rowIndex < allTuples.size(); rowIndex++) {
+    		for (int columnIndex = 0; columnIndex < columns.length; columnIndex++) {
+    	        try {
+    	            I_ExtendByRefVersion tuple = allTuples.get(rowIndex);
+    	            if (columns[columnIndex] != null && columns[columnIndex].invokeOnObjectType != null) {
+        	            switch (columns[columnIndex].invokeOnObjectType) {
+        	            case CONCEPT_COMPONENT:
+        	                if (columns[columnIndex].readParamaters != null) {
+        	                    if (Terms.get().hasConcept(tuple.getComponentId())) {
+        	                    	conceptNids.setMember(tuple.getComponentId());
+        	                    } else {
+        	                        conceptNids.setMember(Ts.get().getConceptNidForNid(tuple.getComponentId()));
+        	                    }
+        	                } else {
+    	                        conceptNids.setMember(Ts.get().getConceptNidForNid(tuple.getComponentId()));
+        	                }
+        	                break;
+        	            case COMPONENT:
+                            conceptNids.setMember(Ts.get().getConceptNidForNid(tuple.getComponentId()));
+        	                break;
+        	            case CONCEPT:
+        	                throw new UnsupportedOperationException();
+        	            case PART:
+                            I_ExtendByRefPart part = tuple.getMutablePart();
+                            if (I_ExtendByRefPartCid.class.isAssignableFrom(part.getClass())) {
+                            	conceptNids.setMember(Ts.get().getConceptNidForNid(((I_ExtendByRefPartCid) part).getC1id()));
+                            } else if (I_ExtendByRefPartCidCid.class.isAssignableFrom(part.getClass())) {
+                            	conceptNids.setMember(Ts.get().getConceptNidForNid(((I_ExtendByRefPartCidCid) part).getC2id()));
+                            } else if (I_ExtendByRefPartCidCidCid.class.isAssignableFrom(part.getClass())) {
+                            	conceptNids.setMember(Ts.get().getConceptNidForNid(((I_ExtendByRefPartCidCidCid) part).getC3id()));
+                            } 
+        	                break;
+
+        	            case PROMOTION_REFSET_PART:
+        	            	break;
+        	            default:
+        	                throw new UnsupportedOperationException("Don't know how to handle: "
+        	                    + columns[columnIndex].invokeOnObjectType);
+        	            }
+    	            }
+    	        } catch (Exception e) {
+    	            AceLog.getAppLog().alertAndLogException(e);
+    	        }
+    		}
+    	}
+    	conceptCache = Ts.get().getConcepts(conceptNids);
     }
 
     public Object getValueAt(int rowIndex, int columnIndex) {

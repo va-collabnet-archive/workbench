@@ -22,6 +22,7 @@ import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
 import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 
@@ -170,5 +171,10 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
         // TODO Auto-generated method stub
         
     }
+
+	@Override
+	public NidBitSetBI getNidSet() {
+		return cNidsToWrite;
+	}
 
 }

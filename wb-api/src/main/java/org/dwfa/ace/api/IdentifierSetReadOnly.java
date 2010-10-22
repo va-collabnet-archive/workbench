@@ -17,6 +17,7 @@
 package org.dwfa.ace.api;
 
 import org.apache.lucene.util.OpenBitSet;
+import org.ihtsdo.tk.api.NidBitSetBI;
 
 public class IdentifierSetReadOnly extends IdentifierSet {
 
@@ -25,12 +26,12 @@ public class IdentifierSetReadOnly extends IdentifierSet {
     }
 
     @Override
-    public void and(I_RepresentIdSet other) {
+    public void and(NidBitSetBI other) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void or(I_RepresentIdSet other) {
+    public void or(NidBitSetBI other) {
         throw new UnsupportedOperationException();
     }
 

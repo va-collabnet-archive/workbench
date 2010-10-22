@@ -65,6 +65,7 @@ import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.thread.NamedThreadFactory;
+import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public class BdbCommitManager {
@@ -347,7 +348,7 @@ public class BdbCommitManager {
                     int errorCount = 0;
                     int warningCount = 0;
                     if (performCreationTests) {
-                        I_IterateIds uncommittedCNidItr = uncommittedCNids.iterator();
+                        NidBitSetItrBI uncommittedCNidItr = uncommittedCNids.iterator();
                         dataCheckMap.clear();
                         while (uncommittedCNidItr.next()) {
                             List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
@@ -562,7 +563,7 @@ public class BdbCommitManager {
 
 	private static void handleCanceledConcepts(I_RepresentIdSet uncommittedCNids2)
 			throws IOException {
-	    I_IterateIds idItr = uncommittedCNids2.iterator();
+		NidBitSetItrBI idItr = uncommittedCNids2.iterator();
 		while (idItr.next()) {
 			Concept c = Concept.get(idItr.nid());
 			if (c.isCanceled()) {
@@ -829,7 +830,7 @@ public class BdbCommitManager {
 	public static Set<Concept> getUncommitted() {
 	    try {
 	        Set<Concept> returnSet = new HashSet<Concept>();
-	        I_IterateIds cNidItr = uncommittedCNids.iterator();
+	        NidBitSetItrBI cNidItr = uncommittedCNids.iterator();
 	        while (cNidItr.next()) {
 	            returnSet.add(Concept.get(cNidItr.nid()));
 	        }
@@ -846,7 +847,7 @@ public class BdbCommitManager {
 	public static List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings() {
 		List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
         try {
-            I_IterateIds cNidItr = uncommittedCNids.iterator();
+        	NidBitSetItrBI cNidItr = uncommittedCNids.iterator();
             while (cNidItr.next()) {
 			try {
 				Concept toTest = Concept.get(cNidItr.nid());

@@ -4,12 +4,19 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.ConceptVersion;
+import org.ihtsdo.concept.I_FetchConceptFromCursor;
+import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
+import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.tk.api.ComponentBI;
@@ -17,6 +24,7 @@ import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
@@ -207,4 +215,109 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     	return true;
     }
 
+    private class ConceptGetter implements I_ProcessUnfetchedConceptData {
+    	NidBitSetBI cNids;
+    	Map<Integer, ConceptChronicleBI> conceptMap = new ConcurrentHashMap<Integer, ConceptChronicleBI>();
+    	
+		public ConceptGetter(NidBitSetBI cNids) {
+			super();
+			this.cNids = cNids;
+		}
+
+		@Override
+		public NidBitSetBI getNidSet() throws IOException {
+			return cNids;
+		}
+
+		@Override
+		public void processUnfetchedConceptData(int cNid,
+				I_FetchConceptFromCursor fcfc) throws Exception {
+			if (cNids.isMember(cNid)) {
+				Concept c = fcfc.fetch();
+				conceptMap.put(cNid, c);
+			}
+			
+		}
+
+		@Override
+		public void setParallelConceptIterators(
+				List<ParallelConceptIterator> pcis) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public boolean continueWork() {
+			return true;
+		}
+    	
+    }
+	@Override
+    public Map<Integer, ConceptChronicleBI> getConcepts(NidBitSetBI cNids) throws IOException {
+    	ConceptGetter processor = new ConceptGetter(cNids);
+    	try {
+			Bdb.getConceptDb().iterateConceptDataInParallel(processor);
+		} catch (Exception e) {
+			throw new IOException(e);
+		}
+		return Collections.unmodifiableMap(new HashMap<Integer, ConceptChronicleBI>(processor.conceptMap));
+    }
+
+    private class ConceptVersionGetter implements I_ProcessUnfetchedConceptData {
+    	NidBitSetBI cNids;
+    	Map<Integer, ConceptVersionBI> conceptMap = new ConcurrentHashMap<Integer, ConceptVersionBI>();
+    	Coordinate coordinate;
+    	
+		public ConceptVersionGetter(NidBitSetBI cNids, Coordinate c) {
+			super();
+			this.cNids = cNids;
+			this.coordinate = c;
+		}
+
+		@Override
+		public NidBitSetBI getNidSet() throws IOException {
+			return cNids;
+		}
+
+		@Override
+		public void processUnfetchedConceptData(int cNid,
+				I_FetchConceptFromCursor fcfc) throws Exception {
+			if (cNids.isMember(cNid)) {
+				Concept c = fcfc.fetch();
+				conceptMap.put(cNid, new ConceptVersion(c, coordinate));
+			}
+			
+		}
+
+		@Override
+		public void setParallelConceptIterators(
+				List<ParallelConceptIterator> pcis) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public boolean continueWork() {
+			return true;
+		}
+    	
+    }
+	@Override
+	public Map<Integer, ConceptVersionBI> getConceptVersions(Coordinate c,
+			NidBitSetBI cNids) throws IOException {
+		ConceptVersionGetter processor = new ConceptVersionGetter(cNids, c);
+    	try {
+			Bdb.getConceptDb().iterateConceptDataInParallel(processor);
+		} catch (Exception e) {
+			throw new IOException(e);
+		}
+		return Collections.unmodifiableMap(new HashMap<Integer, ConceptVersionBI>(processor.conceptMap));
+	}
+
+	@Override
+	public int getConceptNidForNid(int nid) throws IOException {
+		return Bdb.getConceptNid(nid);
+	}
+
+    
 }

@@ -135,7 +135,7 @@
         <module>wb-wf</module>
         <module>wb-mojo</module>
         <module>wb-gui</module>        
-        <module>wb-bdb</module>        
+        <module>wb-bdb</module>
         <module>wb-bdb-mojo</module>
         <module>wb-dita-maven-plugin</module>
         <module>wb-docs</module>

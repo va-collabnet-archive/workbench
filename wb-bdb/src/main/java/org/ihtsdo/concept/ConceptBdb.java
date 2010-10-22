@@ -16,7 +16,6 @@ import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.IdentifierSetReadOnly;
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.ComponentBdb;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
@@ -127,10 +126,11 @@ public class ConceptBdb extends ComponentBdb {
         iterateConceptData(processor, processors * 2);
     }
 
+
     private void iterateConceptData(I_ProcessUnfetchedConceptData processor, int executors) throws IOException,
             InterruptedException, ExecutionException {
     	//AceLog.getAppLog().info("Iterate in parallel. Executors: " + executors);
-        IdentifierSet ids = (IdentifierSet) getReadOnlyConceptIdSet();
+        IdentifierSet ids = (IdentifierSet) processor.getNidSet();
         int cardinality = ids.cardinality();
         int idsPerParallelConceptIterator = cardinality / executors;
     	//AceLog.getAppLog().info("Iterate in parallel. idsPerParallelConceptIterator: " + idsPerParallelConceptIterator);
@@ -232,49 +232,6 @@ public class ConceptBdb extends ComponentBdb {
 
     public I_RepresentIdSet getEmptyIdSet() throws IOException {
         return new IdentifierSet(getReadOnlyConceptIdSet().totalBits());
-    }
-
-    public class ReferenceFinder implements I_ProcessConceptData {
-        int memberNid;
-        StringBuffer buff = new StringBuffer();
-
-        public ReferenceFinder(int memberNid) {
-            super();
-            this.memberNid = memberNid;
-        }
-
-        public void processConceptData(Concept concept) throws Exception {
-            if (concept.getAllNids().contains(memberNid)) {
-                buff.append(concept.toLongString());
-                return;
-            }
-            for (RefsetMember<?, ?> member : concept.getExtensions()) {
-                if (member.getNid() == memberNid) {
-                    buff.append(concept.toLongString());
-                    return;
-                }
-            }
-        }
-
-        @Override
-        public String toString() {
-            if (buff.length() == 0) {
-                buff.append("[no references found]");
-            }
-            return buff.toString();
-        }
-
-        @Override
-        public boolean continueWork() {
-            return true;
-        }
-
-    }
-
-    public String findReferences(int memberNid) throws Exception {
-        ReferenceFinder finder = new ReferenceFinder(memberNid);
-        iterateConceptDataInParallel(finder);
-        return finder.toString();
     }
 
     public void forget(Concept c) throws IOException {

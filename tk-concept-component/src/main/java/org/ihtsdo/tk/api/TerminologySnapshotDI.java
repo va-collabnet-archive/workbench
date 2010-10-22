@@ -2,6 +2,7 @@ package org.ihtsdo.tk.api;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 import java.util.UUID;
 
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -15,5 +16,6 @@ public interface TerminologySnapshotDI extends TerminologyTransactionDI {
 	ConceptVersionBI getConceptVersion(int cNid) throws IOException;
 	ConceptVersionBI getConceptVersion(UUID... uuids) throws IOException;
 	ConceptVersionBI getConceptVersion(Collection<UUID> uuids) throws IOException;
+    Map<Integer, ConceptVersionBI> getConceptVersions(NidBitSetBI cNids) throws IOException;
 
 }

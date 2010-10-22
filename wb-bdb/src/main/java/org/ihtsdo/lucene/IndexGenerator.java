@@ -1,17 +1,27 @@
 package org.ihtsdo.lucene;
 
+import java.io.IOException;
+
 import org.apache.lucene.index.IndexWriter;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_ProcessConceptData;
 import org.ihtsdo.concept.component.description.Description;
+import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.tk.api.NidBitSetBI;
 
 public class IndexGenerator implements I_ProcessConceptData {
 
 	private IndexWriter writer;
+	private NidBitSetBI nidSet;
 	
-	public IndexGenerator(IndexWriter writer) {
+	public NidBitSetBI getNidSet() {
+		return nidSet;
+	}
+	
+	public IndexGenerator(IndexWriter writer) throws IOException {
 		super();
 		this.writer = writer;
+		this.nidSet  = Bdb.getConceptDb().getConceptNidSet();
 	}
 
 
@@ -34,4 +44,6 @@ public class IndexGenerator implements I_ProcessConceptData {
 	public boolean continueWork() {
 		return true;
 	}
+
+
 }

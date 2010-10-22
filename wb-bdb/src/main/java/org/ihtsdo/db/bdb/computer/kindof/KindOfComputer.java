@@ -77,7 +77,7 @@ public class KindOfComputer {
 			lock.lock();
 			try {
 				if (isaCache == null) {
-					IsaCache tempIsaCache = new IsaCache();
+					IsaCache tempIsaCache = new IsaCache(Bdb.getConceptDb().getConceptNidSet());
 					tempIsaCache.setup(Terms.get().getActiveAceFrameConfig().getCoordinate());
 					isaCache = tempIsaCache;
 				}

@@ -50,7 +50,6 @@ import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_IterateIds;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_ProcessDescriptions;
@@ -148,6 +147,8 @@ import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -443,7 +444,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     @Override
     public I_RepresentIdSet getDescriptionIdSet() throws IOException {
         I_RepresentIdSet descriptionIdSet = new IdentifierSet();
-        I_IterateIds iterator = getConceptNidSet().iterator();
+        NidBitSetItrBI iterator = getConceptNidSet().iterator();
         while (iterator.next()) {
             Concept concept = Bdb.getConcept(iterator.nid());
             for (Description description : concept.getDescriptions()) {
@@ -700,6 +701,10 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         public boolean continueWork() {
             return true;
         }
+		@Override
+		public NidBitSetBI getNidSet() throws IOException {
+			return Bdb.getConceptDb().getReadOnlyConceptIdSet();
+		}       
     }
 
     @Override
@@ -1402,15 +1407,21 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         private List<I_TestSearchResults> checkList;
         private I_ConfigAceFrame config;
         private I_RepresentIdSet matches;
+    	private NidBitSetBI nidSet;
+    	
+    	public NidBitSetBI getNidSet() {
+    		return nidSet;
+    	}
 
         public ConceptSearcher(CountDownLatch conceptLatch, I_TrackContinuation tracker,
-                List<I_TestSearchResults> checkList, I_ConfigAceFrame config, I_RepresentIdSet matches) {
+                List<I_TestSearchResults> checkList, I_ConfigAceFrame config, I_RepresentIdSet matches) throws IOException {
             super();
             this.conceptLatch = conceptLatch;
             this.tracker = tracker;
             this.checkList = checkList;
             this.config = config;
             this.matches = matches;
+            this.nidSet = Bdb.getConceptDb().getConceptNidSet();
         }
 
         @Override
@@ -1540,10 +1551,15 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         private I_ConfigAceFrame config;
         private Pattern p;
         Collection<I_DescriptionVersioned> matches;
+    	private NidBitSetBI nidSet;
+    	
+    	public NidBitSetBI getNidSet() {
+    		return nidSet;
+    	}
 
         public RegexSearcher(CountDownLatch conceptLatch, I_TrackContinuation tracker, Semaphore checkSemaphore,
                 List<I_TestSearchResults> checkList, I_ConfigAceFrame config, Pattern p,
-                Collection<I_DescriptionVersioned> matches) {
+                Collection<I_DescriptionVersioned> matches) throws IOException {
             super();
             this.conceptLatch = conceptLatch;
             this.tracker = tracker;
@@ -1552,6 +1568,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             this.config = config;
             this.p = p;
             this.matches = matches;
+            this.nidSet = Bdb.getConceptDb().getConceptNidSet();
         }
 
         @Override
@@ -1680,7 +1697,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         return Bdb.getComponent(nid);
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public Condition computeRefset(int refsetNid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig) throws Exception {
         AceLog.getAppLog().info(">>>>>>>>>> Computing RefsetSpecQuery: " + query);
         List<String> dangleWarnings = RefsetQueryFactory.removeDangles(query);
@@ -1688,7 +1706,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             AceLog.getAppLog().info(warning + "\nClause removed from computation: ");
         }
 
-        SpecRefsetHelper refsetHelper = new SpecRefsetHelper(frameConfig);
         Concept refsetConcept = Concept.get(refsetNid);
         RefsetSpec specHelper = new RefsetSpec(refsetConcept, true, frameConfig);
 
@@ -1740,7 +1757,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                 Bdb.getConceptDb().iterateConceptDataInParallel(computer);
             } else {
                 AceLog.getAppLog().info(">>>>>>>>> Iterating concepts in sequence.");
-                I_IterateIds possibleItr = possibleIds.iterator();
+                NidBitSetItrBI possibleItr = possibleIds.iterator();
                 ConceptFetcher fetcher = new ConceptFetcher();
                 while (possibleItr.next()) {
                     fetcher.setConcept(Concept.get(possibleItr.nid()));

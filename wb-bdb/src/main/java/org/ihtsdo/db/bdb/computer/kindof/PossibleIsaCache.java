@@ -5,11 +5,23 @@ import java.util.Collection;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_FetchConceptFromCursor;
+import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 public class PossibleIsaCache extends TypeCache {
+
+	private NidBitSetBI nidSet;
+	
+	public NidBitSetBI getNidSet() {
+		return nidSet;
+	}
+
+	public PossibleIsaCache(NidBitSetBI nidSet) {
+		super();
+		this.nidSet = nidSet;
+	}
 
 	@Override
 	public void processUnfetchedConceptData(int cNid,
