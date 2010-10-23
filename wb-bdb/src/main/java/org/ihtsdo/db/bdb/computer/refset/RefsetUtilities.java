@@ -95,12 +95,12 @@ public abstract class RefsetUtilities extends LineageHelper implements
 		for (I_ExtendByRefPart version : versions) {
 
 			if (latest == null) {
-				if (version.getStatusId() == ReferenceConcepts.CURRENT.getNid()) {
+				if (version.getStatusNid() == ReferenceConcepts.CURRENT.getNid()) {
 					latest = version;
 				}
 			} else {
-				if (latest.getVersion() < version.getVersion()) {
-					if (version.getStatusId() == ReferenceConcepts.RETIRED
+				if (latest.getTime() < version.getTime()) {
+					if (version.getStatusNid() == ReferenceConcepts.RETIRED
 							.getNid()) {
 						// member has a later retirement so exclude
 						latest = null;
@@ -158,16 +158,16 @@ public abstract class RefsetUtilities extends LineageHelper implements
 
 	public boolean isValidStatus(I_ConceptAttributeTuple att)
 			throws TerminologyException, IOException {
-		return att.getStatusId() == termFactory.getConcept(
+		return att.getStatusNid() == termFactory.getConcept(
 				ArchitectonicAuxiliary.Concept.CURRENT.getUids())
 				.getConceptNid()
-				|| att.getStatusId() == termFactory.getConcept(
+				|| att.getStatusNid() == termFactory.getConcept(
 						ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids())
 						.getConceptNid()
-				|| att.getStatusId() == termFactory.getConcept(
+				|| att.getStatusNid() == termFactory.getConcept(
 						ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED
 								.getUids()).getConceptNid()
-				|| att.getStatusId() == termFactory.getConcept(
+				|| att.getStatusNid() == termFactory.getConcept(
 						ArchitectonicAuxiliary.Concept.DO_NOT_EDIT_FOR_RELEASE
 								.getUids()).getConceptNid();
 	}
@@ -260,10 +260,10 @@ public abstract class RefsetUtilities extends LineageHelper implements
 			for (I_RelVersioned rel : rels) {
 				List<? extends I_RelTuple> tuples = rel.getTuples();
 				for (I_RelTuple tuple : tuples) {
-					if (tuple.getStatusId() == termFactory.getConcept(
+					if (tuple.getStatusNid() == termFactory.getConcept(
 							ArchitectonicAuxiliary.Concept.CURRENT.getUids())
 							.getConceptNid()
-							&& tuple.getTypeId() == termFactory.getConcept(
+							&& tuple.getTypeNid() == termFactory.getConcept(
 									RefsetAuxiliary.Concept.REFSET_PURPOSE_REL
 											.getUids()).getConceptNid()) {
 
@@ -378,7 +378,7 @@ public abstract class RefsetUtilities extends LineageHelper implements
 
 			I_ExtendByRefPart clone = (I_ExtendByRefPart) latestVersion
 					.makeAnalog(ReferenceConcepts.RETIRED.getNid(),
-							latestVersion.getPathId(), Long.MAX_VALUE);
+							latestVersion.getPathNid(), Long.MAX_VALUE);
 			extensionPart.addVersion(clone);
 
 	    	if (isAutocommitActive()) {
@@ -395,7 +395,7 @@ public abstract class RefsetUtilities extends LineageHelper implements
 			if (latest == null) {
 				latest = att;
 			} else {
-				if (latest.getVersion() < att.getVersion()) {
+				if (latest.getTime() < att.getTime()) {
 					latest = att;
 				}
 			}
@@ -411,7 +411,7 @@ public abstract class RefsetUtilities extends LineageHelper implements
 			if (latest == null) {
 				latest = version;
 			} else {
-				if (latest.getVersion() < version.getVersion()) {
+				if (latest.getTime() < version.getTime()) {
 					latest = version;
 				}
 			}
