@@ -27,6 +27,7 @@ public class LocalFixedTerminology {
     }
 
     public static void setStore(I_StoreLocalFixedTerminology store) {
+        LocalFixedConcept.purge();
         LocalFixedTerminology.store = store;
     }
 }

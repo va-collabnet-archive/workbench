@@ -130,6 +130,10 @@ public class LocalFixedConcept implements I_ConceptualizeLocally, Externalizable
 
     private static WeakHashMap<LocalFixedConcept, WeakReference<LocalFixedConcept>> cbeans = new WeakHashMap<LocalFixedConcept, WeakReference<LocalFixedConcept>>();
 
+    public static void purge() {
+    	cbeans.clear();
+    }
+    
     public static LocalFixedConcept get(int conceptNid, Boolean primitive) {
         LocalFixedConcept cb = new LocalFixedConcept(conceptNid, primitive);
         WeakReference<LocalFixedConcept> ref = cbeans.get(cb);

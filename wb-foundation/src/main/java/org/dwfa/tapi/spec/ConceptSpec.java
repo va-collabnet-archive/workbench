@@ -114,7 +114,7 @@ public class ConceptSpec {
                     }
                 }
                 if (foundTransitively == false) {
-                    throw new RuntimeException("No matching rel: " + relSpec + " found for: " + local);
+                    throw new IOException("No matching rel: " + relSpec + " found for: " + local);
                 }
             }
         }
@@ -130,7 +130,8 @@ public class ConceptSpec {
             }
         }
         if (found == false) {
-            throw new RuntimeException("No description matching: " + description + " found for: " + local);
+            throw new IOException("No description matching: " + description + 
+            		" found for: " + local + " uuids: " + Arrays.asList(uuids));
         }
     }
 

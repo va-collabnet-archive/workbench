@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.attributes.ConceptAttributesBinder;
@@ -95,6 +96,7 @@ public class LoadBdb extends AbstractMojo {
 
 			long startTime = System.currentTimeMillis();
 			File conceptsFile = new File(generatedResources, conceptsFileName);
+			getLog().info("Starting load from: " + conceptsFile.getAbsolutePath());    
 
 			FileIO.recursiveDelete(berkeleyDir);
 			Bdb.setup(berkeleyDir.getAbsolutePath());

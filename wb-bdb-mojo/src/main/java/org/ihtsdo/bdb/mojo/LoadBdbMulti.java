@@ -103,6 +103,7 @@ public class LoadBdbMulti extends AbstractMojo {
 
             for (String fname : conceptsFileNames) {
                 File conceptsFile = new File(generatedResources, fname);
+    			getLog().info("Starting load from: " + conceptsFile.getAbsolutePath());    
 
                 FileInputStream fis = new FileInputStream(conceptsFile);
                 BufferedInputStream bis = new BufferedInputStream(fis);
