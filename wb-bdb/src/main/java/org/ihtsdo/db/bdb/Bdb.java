@@ -191,6 +191,7 @@ public class Bdb {
 			inform(activity, "Loading paths...");
 			pathManager = BdbPathManager.get();
 			tf.setPathManager(pathManager);
+			inform(activity, "Database open...");
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
