@@ -4929,6 +4929,9 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                 if (f.getAbsolutePath().contains("sct_relationships_stated"))
                     u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
                             "NHS UK Extension Path Stated");
+                else if (f.getAbsolutePath().contains("sct_relationships_inferred"))
+                    u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                            "NHS UK Extension Path Inferred");
                 else
                     u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
                             "NHS UK Extension Path");
@@ -4949,6 +4952,9 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                 if (f.getAbsolutePath().contains("sct_relationships_stated"))
                     u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
                             "NHS UK Drug Extension Path Stated");
+                else if (f.getAbsolutePath().contains("sct_relationships_inferred"))
+                    u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                            "NHS UK Drug Extension Path Inferred");
                 else
                     u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
                             "NHS UK Drug Extension Path");
