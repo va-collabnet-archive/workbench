@@ -1,0 +1,41 @@
+<assembly>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <directory>target/xhtml</directory>
+      <outputDirectory>/doc/html</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>target/pdf/Guidebook</directory>
+      <includes>
+        <include>**/*.pdf</include>
+      </includes>
+      <outputDirectory>/doc</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>target/pdf/UserGuide</directory>
+      <includes>
+        <include>**/*.pdf</include>
+      </includes>
+      <outputDirectory>/doc</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>target/pdf/BusinessProcessGuide</directory>
+      <includes>
+        <include>**/*.pdf</include>
+      </includes>
+      <outputDirectory>/doc</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>target/pdf/DevelopersGuide</directory>
+      <includes>
+        <include>**/*.pdf</include>
+      </includes>
+      <outputDirectory>/doc</outputDirectory>
+    </fileSet>
+  </fileSets>
+  <includeBaseDirectory>false</includeBaseDirectory>
+</assembly>
+

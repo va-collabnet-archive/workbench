@@ -1,0 +1,16 @@
+<body class="color"> 
+<table align="center" bgcolor="white" border="0"> 
+ <tr> 
+   <td><img src="../images/IHTSDO_logo.png" width=60px height=50px alt="IHTSDO"></td> 
+   <td><table> 
+         <tr><td><h3 class="logo" align="center">IHTSDO Workbench</h2></td></tr> 
+         <tr><td><h3 class="logo" align="center">CONTENTS</h3></td></tr> 
+       </table></td> 
+ </tr> 
+</table>
+        <div id="treecontrol">
+                <a title="Collapse the entire tree below" href="#"><img src="../treeview/images/minus.gif" /> Collapse All</a>
+                <a title="Expand the entire tree below" href="#"><img src="../treeview/images/plus.gif" /> Expand All</a>
+                <a title="Toggle the tree below, opening closed branches, closing open branches" href="#">Toggle All</a>
+        </div>
+   <ul id="black" class="treeview-black"> <!-- do not start any ul tags in col 1 !!! -->

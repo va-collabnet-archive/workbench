@@ -1,0 +1,19 @@
+<assembly>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <directory>src/main/profiles</directory>
+      <outputDirectory>/profiles</outputDirectory>
+      <includes>
+        <include>**/*.eccs</include>
+        <include>**/*.ace</include>
+        <include>**/*.config</include>
+        <include>**/*.oos</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+  <includeBaseDirectory>false</includeBaseDirectory>
+</assembly>
+

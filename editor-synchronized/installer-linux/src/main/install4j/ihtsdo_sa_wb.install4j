@@ -1,0 +1,1218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<install4j version="4.2.7" transformSequenceNumber="2">
+  <directoryPresets config="${compiler:bundle.dir}" />
+  <application name="${compiler:bundle.short_name}" distributionSourceDir="" applicationId="8437-0835-6258-1385" mediaDir="${compiler:media.dir}" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:sys.withJre}" compression="6" lzmaCompression="false" pack200Compression="true" excludeSignedFromPacking="true" keepModificationTimes="true" missingFilesStrategy="warn" shortName="${compiler:bundle.short_name}" publisher="${compiler:bundle.publisher}" publisherWeb="${compiler:bundle.publisher.url}" version="${compiler:bundle.version}" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="1.6" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
+    <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
+      <principalLanguage id="en" customLocalizationFile="" />
+      <additionalLanguages />
+    </languages>
+    <searchSequence>
+      <registry />
+      <envVar name="JAVA_HOME" />
+      <envVar name="JDK_HOME" />
+    </searchSequence>
+    <variables>
+      <variable name="jsk_policy_location" value="jre/lib/ext/jsk-policy-2.1.jar" />
+      <variable name="project.version" value="" />
+      <variable name="bundle.short_name" value="" />
+      <variable name="bundle.directory" value="" />
+      <variable name="bundle.name" value="" />
+      <variable name="bundle.directory.rt.i4j" value="" />
+      <variable name="bundle.file_description" value="" />
+      <variable name="bundle.copyright" value="" />
+      <variable name="bundle.version" value="" />
+      <variable name="bundle.publisher" value="" />
+      <variable name="bundle.publisher.url" value="" />
+      <variable name="bundle.vm_args" value="" />
+      <variable name="bundle.vm_main_class" value="" />
+      <variable name="bundle.vm_parameters" value="" />
+      <variable name="bundle.about_box_title" value="" />
+      <variable name="bundle.about_box_graphic" value="" />
+      <variable name="bundle.dock_icon" value="" />
+    </variables>
+  </application>
+  <files>
+    <filesets />
+    <roots />
+    <mountPoints>
+      <mountPoint id="17" root="" location="" mode="755" />
+    </mountPoints>
+    <entries>
+      <dirEntry mountPoint="17" file="${compiler:bundle.directory}" overwrite="1" shared="false" mode="644" uninstallMode="2" excludeSuffixes="" dirMode="755">
+        <exclude>
+          <entry location=".DS_Store" fileType="regular" />
+          <entry location="pWb.bat" fileType="regular" />
+          <entry location="pWbLinux.sh" fileType="regular" />
+          <entry location="wbLinux.sh" fileType="regular" />
+          <entry location="dWbLinux.sh" fileType="regular" />
+          <entry location="pWbOsX.sh" fileType="regular" />
+        </exclude>
+      </dirEntry>
+    </entries>
+    <components />
+  </files>
+  <launchers>
+    <launcher name="ihtsdo wb" id="13594" external="false" excludeFromMenu="false" menuName="${compiler:bundle.short_name}" icnsFile="${compiler:icon.icns}" pngIcon16File="${compiler:icons.dir}/IHT_IconFiles1_16x16.png" pngIcon32File="${compiler:icons.dir}/IHT_IconFiles1_32x32.png" macServiceDependencies="" swtApp="false" fileset="">
+      <executable name="${compiler:bundle.short_name}" type="1" iconSet="true" iconFile="${compiler:icon.ico}" executableDir="" redirectStderr="true" stderrFile="${compiler:bundle.short_name}.log" stderrMode="overwrite" redirectStdout="true" stdoutFile="${compiler:bundle.short_name}.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="true" workingDirectory="." singleInstance="true" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false">
+        <versionInfo include="true" fileVersion="${compiler:bundle.version}" fileDescription="${compiler:bundle.file_description}" legalCopyright="${compiler:bundle.copyright}" internalName="${compiler:bundle.short_name}" productName="{compiler:bundle.short_name}" />
+      </executable>
+      <splashScreen show="false" autoOff="false" alwaysOnTop="true" width="32" height="32" bitmapFile="" java6SplashScreen="false">
+        <text>
+          <statusLine x="20" y="20" text="${compiler:bundle.short_name}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+          <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+        </text>
+      </splashScreen>
+      <java mainClass="${compiler:bundle.vm_main_class}" vmParameters="${compiler:bundle.vm_parameters}" arguments="${compiler:bundle.vm_args}" allowVMPassthroughParameters="true" preferredVM="" bundleRuntime="true">
+        <classPath>
+          <scanDirectory location="lib" failOnError="false" />
+        </classPath>
+        <nativeLibraryDirectories />
+      </java>
+      <includedFiles />
+      <unextractableFiles />
+      <customScript mode="1" file="">
+        <scriptLines />
+      </customScript>
+    </launcher>
+  </launchers>
+  <installerGui installerType="1" suggestPreviousProgramGroup="false" addOnAppId="" suggestPreviousLocations="true">
+    <customCode useInstalledFiles="false" />
+    <applications>
+      <application name="" id="installer" beanClass="com.install4j.runtime.beans.applications.InstallerApplication" enabled="true" commentSet="false" comment="" customIcnsFile="${compiler:icon.icns}" customIcoFile="${compiler:icon.ico}">
+        <serializedBean>
+          <java class="java.beans.XMLDecoder">
+            <object class="com.install4j.runtime.beans.applications.InstallerApplication">
+              <void property="customPngIcon16File">
+                <object class="com.install4j.api.beans.ExternalFile">
+                  <string>${compiler:icons.dir}/IHT_IconFiles1_16x16.png</string>
+                </object>
+              </void>
+              <void property="customPngIcon32File">
+                <object class="com.install4j.api.beans.ExternalFile">
+                  <string>${compiler:icons.dir}/IHT_IconFiles1_32x32.png</string>
+                </object>
+              </void>
+              <void property="frameHeight">
+                <int>500</int>
+              </void>
+              <void property="frameWidth">
+                <int>800</int>
+              </void>
+              <void property="useCustomIcon">
+                <boolean>true</boolean>
+              </void>
+            </object>
+          </java>
+        </serializedBean>
+        <startup>
+          <screen name="" id="15" beanClass="com.install4j.runtime.beans.screens.StartupScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.StartupScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions>
+              <action name="" id="13851" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="failed to set install directory to desktop">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
+                      <void property="script">
+                        <object class="com.install4j.api.beans.ScriptProperty">
+                          <void property="value">
+                            <string>context.setInstallationDirectory(new
+File(WinFileSystem.getSpecialFolder(SpecialFolder.DESKTOP, false), "${compiler:bundle.short_name}"));
+return true;</string>
+                          </void>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+            </actions>
+            <formComponents />
+          </screen>
+        </startup>
+        <screens>
+          <screen name="" id="1" beanClass="com.install4j.runtime.beans.screens.WelcomeScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="true" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.WelcomeScreen">
+                  <void property="bannerBackground">
+                    <object class="java.awt.Color">
+                      <int>255</int>
+                      <int>255</int>
+                      <int>255</int>
+                      <int>255</int>
+                    </object>
+                  </void>
+                  <void property="bannerImageFile">
+                    <object class="com.install4j.api.beans.ExternalFile">
+                      <string>${compiler:icons.dir}/ihtsdologo32by32.png</string>
+                    </object>
+                  </void>
+                </object>
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="" id="13754" beanClass="com.install4j.runtime.beans.screens.LicenseScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.LicenseScreen">
+                  <void property="displayedText">
+                    <string>END USER LICENSE AGREEMENT
+
+ 
+
+Please read the terms of the following end user license agreement (the “Agreement”) carefully.  By installing the software distributed with this agreement (the "Software"), you are agreeing to be bound by the terms of this agreement and are accepting the software licensed pursuant to this agreement.  If you do not agree to the terms of this agreement, please do not install the software and return any media to the International Health Terminology Standards Development Organization (“IHTSDO”) at Rued Langgaards Vej 7, 5te a22, dk-2300, Copenhagen S, Denmark.
+
+ 
+
+1.         LICENSE GRANT
+
+ 
+(a) Subject to the terms of this Agreement, IHTSDO grants you a non-transferable license to use the Software. The Software is for use only by You and may not be sublicensed or transferred by You to others. 
+
+ 
+(b) All documentation, and all releases, corrections, updates and enhancements provided hereunder shall be considered part of the "Software."
+
+ 
+(c) The Software is intended only for use in the editing, authoring and maintenance of SNOMED CT.
+
+ 
+(d) Your rights under this license will terminate automatically without notice from IHTSDO if you fail to comply with any term(s) of this license.
+
+ 
+2.         LICENSE RESTRICTIONS
+
+ 
+(a) You shall not copy, reverse engineer, decompile, disassemble, translate, modify or make derivative works of the Software, in whole or in part. Further, you shall not rent, disclose, publish, sell, assign, lease, rent, sublicense, market, provide through a service bureau or transfer the Software, or any part thereof, or use it in any manner not expressly authorized by this Agreement.
+
+ 
+(b) Any attempt to transfer any of the rights, duties or obligations hereunder except as expressly provided for in this Agreement is void. The Software contains confidential and trade secret information of IHTSDO, and you shall at all times take reasonable steps to protect the confidentiality of such information.
+
+ 
+(c) You shall take all reasonable steps to ensure the integrity of the data held within the central repository accessed by the Software. In particular, You agree only to install and/or use the Software only on machines that are suitably protected by firewalls, anti-virus software and any other security measured that are necessary to prevent malicious corruption of data.
+ 
+
+3.         PROPRIETARY RIGHTS
+
+ 
+(a) You are only licensing rights to use the Software.  You understand and agree that You are not licensing the SNOMED CT International edition, which is licensed separately.  The Software, in whole and in part and all copies thereof, are and will remain the sole and exclusive property of IHTSDO. Further, you do not receive any ownership rights to the Software. IHTSDO and/or its licensors retain all, ownership rights to the Software.
+
+ 
+(b) You will not delete or in any manner alter the trademark, copyright, or other proprietary rights notices of IHTSDO and its licensors, appearing on or in the Software, screen outputs and prints generated with
+
+the Software as delivered to you. You will reproduce such notices on any permitted backup copy you make of the Software.
+
+ 
+(c) By accepting this agreement, you confirm that you have no actual or potential conflict of interest associated with use of the Software or of your other obligations under this Agreement.  If you become aware of any such conflict of interest, You shall immediately notify IHTSDO of that conflict of interest in writing.
+
+ 
+
+4.         LIMITATION OF LIABILITY
+
+ 
+(a) Third Party References and Material References made in the Software may include products, services, trademarks or hyperlinks of third parties. No such reference(s) shall constitute or imply an endorsement or recommendation by IHTSDO. In addition, you should exercise caution when using information displayed using the Software. IHTSDO makes no guarantees concerning the accuracy, currency, or quality of the content displayed using the Software.
+
+ 
+(b)  IHTSDO expressly disclaims all other warranties and conditions, including the implied warranties and conditions of non-infringement, merchantability, and fitness for a particular purpose. No oral or written information or communications from IHTSDO, its employees, distributors, dealers or agents shall increase the scope of the above warranties or create any new warranties.
+
+ 
+(c) In no event shall IHTSDO or its employees, distributors, dealers or agents be liable to you or any other party for indirect, special, incidental or consequential damages of any kind arising from this agreement, the use of the software. You expressly assume all responsibility for any damages, lost data, lost profits and other consequential damages that may result in any way out of this Agreement, including without limitation, use of the Software.
+
+ 
+5.         COMPLIANCE WITH LAW
+
+ 
+You acknowledge and agree that the Software may be subject to restrictions and controls imposed the government of countries that it is used within. You further agree to comply with all laws and regulations of all jurisdictions in your use of the Software.
+
+
+6.         GENERAL
+
+ 
+(a) This Agreement shall be governed by, and construed in accordance with, English law. The English courts shall have exclusive jurisdiction to settle any dispute arising out of or in connection with this Agreement (including a dispute regarding its existence, validity or termination).
+
+(b) This Agreement will bind and inure to the benefit of each party's successors and assigns, provided that you may not assign this Agreement, in whole or in part, without IHTSDO’s prior written consent.
+
+(c) If any provision of this Agreement is found illegal or unenforceable, it will be enforced to the maximum extent permissible, and if not possible, severed, and the legality and enforceability of the other provisions of this Agreement will not be affected.
+
+ 
+</string>
+                  </void>
+                  <void property="readAllRequired">
+                    <boolean>true</boolean>
+                  </void>
+                </object>
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="" id="2" beanClass="com.install4j.runtime.beans.screens.InstallationDirectoryScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.InstallationDirectoryScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="" id="3" beanClass="com.install4j.runtime.beans.screens.ComponentsScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.ComponentsScreen">
+                  <void property="showInstallationDirectoryChooser">
+                    <boolean>true</boolean>
+                  </void>
+                </object>
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="" id="4" beanClass="com.install4j.runtime.beans.screens.StandardProgramGroupScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.StandardProgramGroupScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="" id="5" beanClass="com.install4j.runtime.beans.screens.InstallationScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="true" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.InstallationScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions>
+              <action name="" id="13941" beanClass="com.install4j.runtime.beans.actions.InstallFilesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.InstallFilesAction" />
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="7" beanClass="com.install4j.runtime.beans.actions.desktop.CreateProgramGroupAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.desktop.CreateProgramGroupAction">
+                      <void property="programGroupName">
+                        <string>${compiler:sys.fullName}</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="8" beanClass="com.install4j.runtime.beans.actions.desktop.RegisterAddRemoveAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.desktop.RegisterAddRemoveAction">
+                      <void property="itemName">
+                        <string>${compiler:sys.fullName} ${compiler:sys.version}</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Add JVM options" id="13499" beanClass="com.install4j.runtime.beans.actions.misc.AddVmOptionsAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.misc.AddVmOptionsAction">
+                      <void property="launcherId">
+                        <string>13594</string>
+                      </void>
+                      <void property="vmOptions">
+                        <array class="java.lang.String" length="9">
+                          <void index="0">
+                            <string>-Xms700m</string>
+                          </void>
+                          <void index="1">
+                            <string>-Xmx1200m</string>
+                          </void>
+                          <void index="2">
+                            <string>-Djava.security.manager=</string>
+                          </void>
+                          <void index="3">
+                            <string>-Djava.security.policy=config/dwa.policy</string>
+                          </void>
+                          <void index="4">
+                            <string>-Djava.security.properties=conflig/dynamic-policy.security-properties</string>
+                          </void>
+                          <void index="5">
+                            <string>-Dorg.dwfa.AboutBoxTitle="${compiler:bundle.about_box_title}"</string>
+                          </void>
+                          <void index="6">
+                            <string>-Dorg.dwfa.AppMenuName="${compiler:bundle.short_name}"</string>
+                          </void>
+                          <void index="7">
+                            <string>-Dapple.laf.useScreenMenuBar=true</string>
+                          </void>
+                          <void index="8">
+                            <string>-Dorg.dwfa.AboutBoxGraphic=${compiler:bundle.about_box_graphic}</string>
+                          </void>
+                        </array>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="copy jsk-policy" id="10128" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
+                      <void property="destinationFile">
+                        <object class="java.io.File">
+                          <string>${compiler:jsk_policy_location}</string>
+                        </object>
+                      </void>
+                      <void property="overwriteMode">
+                        <object class="com.install4j.api.context.OverwriteMode" field="NEVER" />
+                      </void>
+                      <void property="sourceFile">
+                        <object class="java.io.File">
+                          <string>lib-ext/jsk-policy-2.1.jar</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="13749" beanClass="com.install4j.runtime.beans.actions.files.MoveFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.MoveFileAction">
+                      <void property="destinationFile">
+                        <object class="java.io.File">
+                          <string>tasks/ide/misc</string>
+                        </object>
+                      </void>
+                      <void property="overwriteMode">
+                        <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
+                      </void>
+                      <void property="sourceFile">
+                        <object class="java.io.File">
+                          <string>tasks/ace</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="13753" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>plugins/menu/CollabNet/ace.bp</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="14348" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>plugins/menu/CollabNet/australia.bp</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="14349" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>plugins/menu/Pallets</string>
+                        </object>
+                      </void>
+                      <void property="recurse">
+                        <boolean>true</boolean>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="modify bat file jre location" id="13807" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>wb.bat</string>
+                        </object>
+                      </void>
+                      <void property="replaceValue">
+                        <string>jre\bin\java -Xms</string>
+                      </void>
+                      <void property="searchValue">
+                        <string>java -Xms</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="set the OSX execute rights to aceOSX file" id="14055" beanClass="com.install4j.runtime.beans.actions.files.SetModeAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.SetModeAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>wbOsX.sh</string>
+                        </object>
+                      </void>
+                      <void property="mode">
+                        <string>a+x</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="14056" beanClass="com.install4j.runtime.beans.actions.files.AddWindowsFileRightsAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.AddWindowsFileRightsAction">
+                      <void property="execute">
+                        <boolean>true</boolean>
+                      </void>
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>*.bat</string>
+                        </object>
+                      </void>
+                      <void property="read">
+                        <boolean>true</boolean>
+                      </void>
+                      <void property="write">
+                        <boolean>true</boolean>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="wb xmx in batch file" id="14127" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>wb.bat</string>
+                        </object>
+                      </void>
+                      <void property="replaceValue">
+                        <string>-Xmx1200m</string>
+                      </void>
+                      <void property="searchValue">
+                        <string>-Xmx1400m</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="wb xms in batch file" id="14513" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>wb.bat</string>
+                        </object>
+                      </void>
+                      <void property="replaceValue">
+                        <string>-Xms700m</string>
+                      </void>
+                      <void property="searchValue">
+                        <string>-Xms1400m</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="dWb xmx in batch file" id="14565" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>dWb.bat</string>
+                        </object>
+                      </void>
+                      <void property="replaceValue">
+                        <string>-Xmx1200m</string>
+                      </void>
+                      <void property="searchValue">
+                        <string>-Xmx1400m</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="dWb xms in batch file" id="14566" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>dWb.bat</string>
+                        </object>
+                      </void>
+                      <void property="replaceValue">
+                        <string>-Xms700m</string>
+                      </void>
+                      <void property="searchValue">
+                        <string>-Xms1400m</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="osx memory xmx in batch file" id="14162" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>wbOsX.sh</string>
+                        </object>
+                      </void>
+                      <void property="logReplacement">
+                        <boolean>false</boolean>
+                      </void>
+                      <void property="replaceValue">
+                        <string>Xmx2000m</string>
+                      </void>
+                      <void property="searchValue">
+                        <string>Xmx1400m</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="rename osx name in batch file" id="14163" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>wbOsX.sh</string>
+                        </object>
+                      </void>
+                      <void property="replaceValue">
+                        <string>-Xdock:name="${compiler:bundle.short_name}"</string>
+                      </void>
+                      <void property="searchValue">
+                        <string>-Xdock:name="Workbench Bundle"</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="osx icon in batch file" id="14164" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>wbOsX.sh</string>
+                        </object>
+                      </void>
+                      <void property="replaceValue">
+                        <string>${compiler:bundle.dock_icon}</string>
+                      </void>
+                      <void property="searchValue">
+                        <string>bundle.gif</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="linux memory xmx in batch file" id="14166" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>wbLinux.sh</string>
+                        </object>
+                      </void>
+                      <void property="replaceValue">
+                        <string>Xmx1200m</string>
+                      </void>
+                      <void property="searchValue">
+                        <string>Xmx1400m</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="modify aceLinux jre location" id="14206" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>wbLinux.sh</string>
+                        </object>
+                      </void>
+                      <void property="replaceValue">
+                        <string>jre\bin\java \</string>
+                      </void>
+                      <void property="searchValue">
+                        <string>java \</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="14247" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="failIfNoReplacement">
+                        <boolean>true</boolean>
+                      </void>
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>wb.bat</string>
+                        </object>
+                      </void>
+                      <void property="replaceValue">
+                        <string>-Dorg.dwfa.AboutBoxTitle="${compiler:bundle.about_box_title}"  -Dorg.dwfa.AboutBoxGraphic="${compiler:bundle.about_box_graphic}"  -Dorg.dwfa.jiniport=8080</string>
+                      </void>
+                      <void property="searchValue">
+                        <string>-Dorg.dwfa.jiniport=8080</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="14248" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="failIfNoReplacement">
+                        <boolean>true</boolean>
+                      </void>
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>wbOsX.sh</string>
+                        </object>
+                      </void>
+                      <void property="replaceValue">
+                        <string>-Dorg.dwfa.AboutBoxTitle="${compiler:bundle.about_box_title}"  -Dorg.dwfa.AboutBoxGraphic="${compiler:bundle.about_box_graphic}"  -Dorg.dwfa.jiniport=8080</string>
+                      </void>
+                      <void property="searchValue">
+                        <string>-Dorg.dwfa.jiniport=8080</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="14249" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="failIfNoReplacement">
+                        <boolean>true</boolean>
+                      </void>
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>wbLinux.sh</string>
+                        </object>
+                      </void>
+                      <void property="replaceValue">
+                        <string>-Dorg.dwfa.AboutBoxTitle="${compiler:bundle.about_box_title}"  -Dorg.dwfa.AboutBoxGraphic="${compiler:bundle.about_box_graphic}"  -Dorg.dwfa.jiniport=8080</string>
+                      </void>
+                      <void property="searchValue">
+                        <string>-Dorg.dwfa.jiniport=8080</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="14401" beanClass="com.install4j.runtime.beans.actions.files.SetModeAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.SetModeAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>*.sh</string>
+                        </object>
+                      </void>
+                      <void property="mode">
+                        <string>a+e</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="del dOsX sh" id="14472" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>dWbOsX.sh</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="del wb OsX sh" id="14473" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>wbOsX.sh</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="del wb bat" id="14474" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>wb.bat</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="del dWb bat" id="14475" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>dWb.bat</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+            </actions>
+            <formComponents />
+          </screen>
+          <screen name="" id="14092" beanClass="com.install4j.runtime.beans.screens.FinishedScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="true">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.FinishedScreen">
+                  <void property="bannerBackground">
+                    <object class="java.awt.Color">
+                      <int>255</int>
+                      <int>255</int>
+                      <int>255</int>
+                      <int>255</int>
+                    </object>
+                  </void>
+                  <void property="bannerImageFile">
+                    <object class="com.install4j.api.beans.ExternalFile">
+                      <string>${compiler:icons.dir}/ihtsdologo32by32.png</string>
+                    </object>
+                  </void>
+                </object>
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+        </screens>
+      </application>
+      <application name="" id="uninstaller" beanClass="com.install4j.runtime.beans.applications.UninstallerApplication" enabled="true" commentSet="false" comment="" customIcnsFile="${compiler:icon.icns}" customIcoFile="${compiler:icon.ico}">
+        <serializedBean>
+          <java class="java.beans.XMLDecoder">
+            <object class="com.install4j.runtime.beans.applications.UninstallerApplication">
+              <void property="customPngIcon16File">
+                <object class="com.install4j.api.beans.ExternalFile">
+                  <string>${compiler:icons.dir}/IHT_IconFiles1_16x16.png</string>
+                </object>
+              </void>
+              <void property="customPngIcon32File">
+                <object class="com.install4j.api.beans.ExternalFile">
+                  <string>${compiler:icons.dir}/IHT_IconFiles1_32x32.png</string>
+                </object>
+              </void>
+              <void property="frameHeight">
+                <int>500</int>
+              </void>
+              <void property="frameWidth">
+                <int>800</int>
+              </void>
+              <void property="useCustomIcon">
+                <boolean>true</boolean>
+              </void>
+            </object>
+          </java>
+        </serializedBean>
+        <startup>
+          <screen name="" id="16" beanClass="com.install4j.runtime.beans.screens.StartupScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.StartupScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+        </startup>
+        <screens>
+          <screen name="" id="10" beanClass="com.install4j.runtime.beans.screens.UninstallWelcomeScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.UninstallWelcomeScreen">
+                  <void property="bannerBackground">
+                    <object class="java.awt.Color">
+                      <int>255</int>
+                      <int>255</int>
+                      <int>255</int>
+                      <int>255</int>
+                    </object>
+                  </void>
+                  <void property="bannerImageFile">
+                    <object class="com.install4j.api.beans.ExternalFile">
+                      <string>${compiler:icons.dir}/IHT_IconFiles2_48x48.jpg</string>
+                    </object>
+                  </void>
+                </object>
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="" id="11" beanClass="com.install4j.runtime.beans.screens.UninstallationScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.UninstallationScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions>
+              <action name="delete config directory" id="14440" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>config</string>
+                        </object>
+                      </void>
+                      <void property="recurse">
+                        <boolean>true</boolean>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="delete org directory" id="14402" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>org</string>
+                        </object>
+                      </void>
+                      <void property="recurse">
+                        <boolean>true</boolean>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="delete search directory" id="14316" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>search</string>
+                        </object>
+                      </void>
+                      <void property="recurse">
+                        <boolean>true</boolean>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="delete queues directory" id="14285" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>queues</string>
+                        </object>
+                      </void>
+                      <void property="recurse">
+                        <boolean>true</boolean>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="delete log file" id="14284" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>${compiler:bundle.short_name}.log</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="delete profiles directory" id="13663" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>profiles</string>
+                        </object>
+                      </void>
+                      <void property="recurse">
+                        <boolean>true</boolean>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="delete logs directory" id="13662" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>logs</string>
+                        </object>
+                      </void>
+                      <void property="recurse">
+                        <boolean>true</boolean>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="delete db directory" id="13661" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>berkeley-db</string>
+                        </object>
+                      </void>
+                      <void property="recurse">
+                        <boolean>true</boolean>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="delete config directory" id="13660" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>resources</string>
+                        </object>
+                      </void>
+                      <void property="recurse">
+                        <boolean>true</boolean>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="12" beanClass="com.install4j.runtime.beans.actions.UninstallFilesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.UninstallFilesAction" />
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+            </actions>
+            <formComponents />
+          </screen>
+          <screen name="" id="14" beanClass="com.install4j.runtime.beans.screens.UninstallFailureScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="true">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.UninstallFailureScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="" id="13" beanClass="com.install4j.runtime.beans.screens.UninstallSuccessScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="true">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.UninstallSuccessScreen">
+                  <void property="bannerBackground">
+                    <object class="java.awt.Color">
+                      <int>255</int>
+                      <int>255</int>
+                      <int>255</int>
+                      <int>255</int>
+                    </object>
+                  </void>
+                  <void property="bannerImageFile">
+                    <object class="com.install4j.api.beans.ExternalFile">
+                      <string>${compiler:icons.dir}/IHT_IconFiles2_48x48.jpg</string>
+                    </object>
+                  </void>
+                </object>
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+        </screens>
+      </application>
+    </applications>
+  </installerGui>
+  <mediaSets>
+    <win32 name="Windows" id="19" mediaFileName="${compiler:bundle.short_name}_windows_jre" installDir="${compiler:bundle.short_name}" overridePrincipalLanguage="false" requires64bit="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="windows-x86-1.6.0_20" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" directDownload="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="" runAsAdmin="false">
+      <excludedLaunchers />
+      <excludedComponents />
+      <excludedBeans>
+        <bean refId="14474" />
+        <bean refId="14475" />
+      </excludedBeans>
+      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
+      <exclude />
+      <variables />
+    </win32>
+    <macosFolder name="Mac OS X Folder" id="2027" mediaFileName="${compiler:sys.shortName}_${compiler:sys.platform}_folder" installDir="${compiler:sys.shortName}" overridePrincipalLanguage="false" requires64bit="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="">
+      <excludedLaunchers />
+      <excludedComponents />
+      <excludedBeans>
+        <bean refId="13851" />
+        <bean refId="14472" />
+        <bean refId="14473" />
+      </excludedBeans>
+      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
+      <exclude />
+      <variables>
+        <variable name="jsk_policy_location" value="/Library/Java/Extensions/jsk-policy-2.1.jar" />
+      </variables>
+    </macosFolder>
+  </mediaSets>
+  <buildIds buildAll="false">
+    <mediaSet refId="2027" />
+  </buildIds>
+</install4j>
+
