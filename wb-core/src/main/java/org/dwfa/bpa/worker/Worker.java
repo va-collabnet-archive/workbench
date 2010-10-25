@@ -960,5 +960,9 @@ public abstract class Worker implements I_Work {
     public void setPluginForInterface(Class<? extends I_PluginToWorker> pluginInterface, I_PluginToWorker plugin) {
         pluginMap.put(pluginInterface, plugin);
     }
+    
+    public List<Worker> getWorkerList(){
+    	return workerList;
+    }
 
 }
