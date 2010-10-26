@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
@@ -288,8 +289,12 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
             } catch (ExecutionException ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
-
-            fireTableDataChanged();
+            
+            try {
+				fireTableDataChanged();
+			} catch (Exception e) {
+				AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
+			}
 
         }
 
