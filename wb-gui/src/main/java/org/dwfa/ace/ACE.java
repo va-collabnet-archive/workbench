@@ -189,8 +189,8 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 
 public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActions {
-	
-	public static boolean refsetOnly = false;
+
+    public static boolean refsetOnly = false;
 
     public class TestTupleCalculator implements ActionListener {
 
@@ -1131,7 +1131,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             });
         }
     }
-    
+
     private class TogglePanelsActionListener implements ActionListener, ComponentListener {
         private Integer origWidth;
 
@@ -1390,6 +1390,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
      */
     public ACE(Configuration config, String pluginRoot) {
         super(new GridBagLayout());
+
         this.pluginRoot = pluginRoot;
         try {
             menuWorker = new MasterWorker(config);
@@ -1504,17 +1505,17 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     javax.swing.Timer startupTimer;
-	private Arena arena;
-    
+    private Arena arena;
+
     public JMenuBar createMenuBar(JFrame frame) throws LoginException, SecurityException, ConfigurationException,
             IOException, PrivilegedActionException, IntrospectionException, InvocationTargetException,
             IllegalAccessException, PropertyVetoException, ClassNotFoundException, NoSuchMethodException {
         this.frame = frame;
-         JMenuBar menuBar = new JMenuBar();
-         if (fileMenu == null) {
-             fileMenu = new JMenu("File");
-             menuBar.add(fileMenu);
-          }
+        JMenuBar menuBar = new JMenuBar();
+        if (fileMenu == null) {
+            fileMenu = new JMenu("File");
+            menuBar.add(fileMenu);
+        }
         JMenu editMenu = new JMenu("Edit");
         menuBar.add(editMenu);
         addToMenuBar(menuBar, editMenu, frame);
@@ -1529,7 +1530,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         if (fileMenu == null) {
             fileMenu = new JMenu("File");
             menuBar.add(fileMenu, 0);
-         }
+        }
         addFileMenu(menuBar);
         addEditMenu(menuBar, editMenu, aceFrame);
         ProcessPopupUtil.addProcessMenus(menuBar, pluginRoot, menuWorker);
@@ -1599,24 +1600,23 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         menuBar.add(editMenu);
     }
 
-    private void addFileMenu(JMenuBar menuBar) throws LoginException, ConfigurationException,
-            IOException, PrivilegedActionException, SecurityException, IntrospectionException,
-            InvocationTargetException, IllegalAccessException, PropertyVetoException, ClassNotFoundException,
-            NoSuchMethodException {
+    private void addFileMenu(JMenuBar menuBar) throws LoginException, ConfigurationException, IOException,
+            PrivilegedActionException, SecurityException, IntrospectionException, InvocationTargetException,
+            IllegalAccessException, PropertyVetoException, ClassNotFoundException, NoSuchMethodException {
         JMenuItem menuItem = null;
         if (editMode) {
             /*
              * menuItem = new JMenuItem("Export Baseline Jar...");
              * menuItem.addActionListener(new WriteJar(aceConfig));
              * fileMenu.add(menuItem); fileMenu.addSeparator();
-            menuItem = new JMenuItem("Import Java Changeset...");
-            menuItem.addActionListener(new ImportJavaChangeset(config, aceFrame, aceConfig));
-            fileMenu.add(menuItem);
-            fileMenu.addSeparator();
-            menuItem = new JMenuItem("Test Tuple Calculator...");
-            menuItem.addActionListener(new TestTupleCalculator(config, aceFrame, aceConfig));
-            fileMenu.add(menuItem);
-            fileMenu.addSeparator();
+             * menuItem = new JMenuItem("Import Java Changeset...");
+             * menuItem.addActionListener(new ImportJavaChangeset(config, aceFrame, aceConfig));
+             * fileMenu.add(menuItem);
+             * fileMenu.addSeparator();
+             * menuItem = new JMenuItem("Test Tuple Calculator...");
+             * menuItem.addActionListener(new TestTupleCalculator(config, aceFrame, aceConfig));
+             * fileMenu.add(menuItem);
+             * fileMenu.addSeparator();
              */
             /*
              * menuItem = new JMenuItem("Import Changeset Jar...");
@@ -1670,21 +1670,20 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         topPanel.add(newProcess, c);
         c.gridx++;
     }
-    
+
     private JComponent getContentPanel() throws Exception {
-    	
-    	String custUI = (String)ObjectCache.get(CustomStatics.CUSTOM_UI_CLASS);
-    	
-    	if(custUI != null && custUI.length() > 0) {
-    		I_ReturnMainPanel cp = (I_ReturnMainPanel)ObjectCache.get(custUI);
-    		return cp.getContentPanel(this);
-    	}
-    	
-    	else {
-    	return getDefaultContentPanel();
-    	}
+
+        String custUI = (String) ObjectCache.get(CustomStatics.CUSTOM_UI_CLASS);
+
+        if (custUI != null && custUI.length() > 0) {
+            I_ReturnMainPanel cp = (I_ReturnMainPanel) ObjectCache.get(custUI);
+            return cp.getContentPanel(this);
+        }
+
+        else {
+            return getDefaultContentPanel();
+        }
     }
-    
 
     private JComponent getDefaultContentPanel() throws Exception {
         treeHelper = new TermTreeHelper(this.aceFrameConfig, this);
@@ -1722,17 +1721,16 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         refsetSpecPanel.setRefsetInSpecEditor(refsetSpecPanel.getRefsetInSpecEditor());
         conceptTabs.addTab("refSet spec", new ImageIcon(ACE.class.getResource("/16x16/plain/paperclip.png")),
             refsetSpecPanel);
-        
+
         if (!refsetOnly) {
 
-        // CLASSIFIER TAB
-        	snoRocketPanel = new SnoRocketTabPanel(this);
-        	conceptTabs.addTab("classifier", new ImageIcon(ACE.class.getResource("/16x16/plain/chrystal_ball.png")),
-            snoRocketPanel);
-        
+            // CLASSIFIER TAB
+            snoRocketPanel = new SnoRocketTabPanel(this);
+            conceptTabs.addTab("classifier", new ImageIcon(ACE.class.getResource("/16x16/plain/chrystal_ball.png")),
+                snoRocketPanel);
+
             arena = new Arena(this);
-            conceptTabs.addTab("arena", new ImageIcon(ACE.class.getResource("/16x16/plain/eye.png")), 
-            		arena);
+            conceptTabs.addTab("arena", new ImageIcon(ACE.class.getResource("/16x16/plain/eye.png")), arena);
         }
 
         /*
@@ -1780,10 +1778,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     public Arena getArena() {
-		return arena;
-	}
+        return arena;
+    }
 
-	public JComponent getDataCheckListScroller() {
+    public JComponent getDataCheckListScroller() {
         if (dataCheckListScroller == null) {
             dataCheckListModel = new UncommittedListModel();
             dataCheckListPanel = new JPanel(new GridBagLayout());
@@ -2028,12 +2026,12 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         preferencesPalette.setVisible(true);
 
     }
-    
+
     private JTabbedPane makeChroniclerPreferences() {
         JTabbedPane p = new JTabbedPane();
         p.addTab("precedence", makePrecedencePreferencePanel());
         p.addTab("contradiction", makeContradictionPreferencePanel());
-        
+
         return p;
     }
 
@@ -2064,8 +2062,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         JPanel controlPanel = new JPanel(new GridLayout(3, 1));
         controlPanel.add(getCheckboxEditor("show contradictions in taxonomy view", "highlightConflictsInTaxonomyView",
             aceFrameConfig.getHighlightConflictsInTaxonomyView(), true));
-        controlPanel.add(getCheckboxEditor("show contradictions in component panel", "highlightConflictsInComponentPanel",
-            aceFrameConfig.getHighlightConflictsInComponentPanel(), true));
+        controlPanel.add(getCheckboxEditor("show contradictions in component panel",
+            "highlightConflictsInComponentPanel", aceFrameConfig.getHighlightConflictsInComponentPanel(), true));
 
         final JTextPane descriptionPanel = new JTextPane();
         descriptionPanel.setEditable(false);
@@ -2093,7 +2091,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         return contradictionConfigPanel;
     }
-    
+
     private Component makePrecedencePreferencePanel() {
         JPanel precedenceConfigPanel = new JPanel(new BorderLayout());
 
@@ -3059,14 +3057,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     static {
         swingTimer.start();
     }
-    
+
     public void setTopActivity(I_ShowActivity activity) {
         if (this.topActivity != null) {
             swingTimer.removeActionListener(this.topActivity);
         }
         this.topActivity = (ActivityPanel) activity;
         swingTimer.addActionListener(topActivity);
-        
+
         this.topActivity = (ActivityPanel) activity;
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -3074,7 +3072,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 if (activityPanel != null) {
                     Component[] children = activityPanel.getComponents();
                     if (children != null) {
-                        for (Component child: children) {
+                        for (Component child : children) {
                             activityPanel.remove(child);
                         }
                     }
@@ -3084,7 +3082,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                         activityPanel.add(new JPanel());
                     }
                 }
-             }
+            }
         });
     }
 
@@ -3122,9 +3120,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 viewerHistoryTableModel.removeElement(viewerHistoryTableModel.getSize() - 1);
             }
         } else if (evt.getPropertyName().equals("uncommitted")) {
-        	// Nothing to do...
+            // Nothing to do...
         } else if (evt.getPropertyName().equals("imported")) {
-           	// Nothing to do...
+            // Nothing to do...
         } else if (evt.getPropertyName().equals("roots")) {
             try {
                 treeHelper.setRoots();
@@ -3376,16 +3374,28 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
             public void run() {
                 if (queuePalette != null) {
-                    queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation() + 6,
-                        conceptTabs.getHeight() + 4);
+
+                    if (showQueuesButton.isSelected()) {
+                        getRootPane().getLayeredPane().moveToFront(queuePalette);
+                        deselectOthers(showQueuesButton);
+                    }
+                    queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), conceptTabs
+                        .getHeight() + 4);
+
                     revalidateAllParents(queuePalette);
-                    // revalidateAllDescendants(queuePalette);
+                    queuePalette.componentResized(null);
+
                 }
                 if (processPalette != null) {
-                    processPalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation() + 6,
-                        conceptTabs.getHeight() + 4);
+                    if (showProcessBuilder.isSelected()) {
+                        getRootPane().getLayeredPane().moveToFront(processPalette);
+                        deselectOthers(showProcessBuilder);
+                    }
+                    processPalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), conceptTabs
+                        .getHeight() + 4);
+
                     revalidateAllParents(processPalette);
-                    // revalidateAllDescendants(processPalette);
+                    processPalette.componentResized(null);
                 }
             }
 
