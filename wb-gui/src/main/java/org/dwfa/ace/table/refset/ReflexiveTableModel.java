@@ -326,6 +326,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
     protected Integer promotionFilterId = null;
 
     protected JButton addButton = new JButton();
+
+	private boolean useConceptCache = false;
     
     public static long rowColumnToLong(int row, int column) {
      	long key = row;
@@ -464,7 +466,9 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
     	        }
     		}
     	}
-    	conceptCache = Ts.get().getConcepts(conceptNids);
+    	if (useConceptCache ) {
+        	conceptCache = Ts.get().getConcepts(conceptNids);
+    	}
     }
 
     public Object getValueAt(int rowIndex, int columnIndex) {
