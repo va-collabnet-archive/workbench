@@ -164,8 +164,9 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
                 // Create a file dialog box to prompt for a new file to display
                 updateExtraCriterion();
                 QueryBean qb = new QueryBean(searchPhraseField.getText(), extraCriterion);
-                FileDialog f = new FileDialog((Frame) SearchPanel.this.getTopLevelAncestor(), "Save query (.query)",
-                    FileDialog.SAVE);
+                FileDialog f =
+                        new FileDialog((Frame) SearchPanel.this.getTopLevelAncestor(), "Save query (.query)",
+                            FileDialog.SAVE);
                 File searchFolder = new File("search");
                 f.setDirectory(searchFolder.getAbsolutePath());
                 f.setVisible(true); // Display dialog and wait for response
@@ -223,37 +224,37 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
         public void valueChanged(ListSelectionEvent e) {
             try {
-				// Ignore extra messages.
-				if (e.getValueIsAdjusting())
-				    return;
+                // Ignore extra messages.
+                if (e.getValueIsAdjusting())
+                    return;
 
-				ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-				if (lsm.isSelectionEmpty()) {
-				    // no rows are selected
-				} else {
-				    int viewRowIndex = lsm.getMinSelectionIndex();
-				    lastSelectedRow = viewRowIndex;
-				    int modelRow = descTable.convertRowIndexToModel(viewRowIndex);
-				    I_DescriptionTuple tuple = model.getDescription(modelRow);
-				    I_GetConceptData cb = Terms.get().getConcept(tuple.getConceptNid());
-				    for (I_ContainTermComponent l : linkedComponents) {
-				        l.setTermComponent(cb);
-				    }
-				    if (linkType == LINK_TYPE.TREE_LINK) {
-				        try {
-				            new ExpandPathToNodeStateListener((JTreeWithDragImage) config.getTreeInTaxonomyPanel(), config,
-				                cb);
-				            config.setHierarchySelection(cb);
-				        } catch (IOException e1) {
-				            AceLog.getAppLog().alertAndLogException(e1);
-				        }
-				    }
-				}
-			} catch (TerminologyException e1) {
-				AceLog.getAppLog().alertAndLogException(e1);
-			} catch (IOException e1) {
-				AceLog.getAppLog().alertAndLogException(e1);
-			}
+                ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+                if (lsm.isSelectionEmpty()) {
+                    // no rows are selected
+                } else {
+                    int viewRowIndex = lsm.getMinSelectionIndex();
+                    lastSelectedRow = viewRowIndex;
+                    int modelRow = descTable.convertRowIndexToModel(viewRowIndex);
+                    I_DescriptionTuple tuple = model.getDescription(modelRow);
+                    I_GetConceptData cb = Terms.get().getConcept(tuple.getConceptNid());
+                    for (I_ContainTermComponent l : linkedComponents) {
+                        l.setTermComponent(cb);
+                    }
+                    if (linkType == LINK_TYPE.TREE_LINK) {
+                        try {
+                            new ExpandPathToNodeStateListener((JTreeWithDragImage) config.getTreeInTaxonomyPanel(),
+                                config, cb);
+                            config.setHierarchySelection(cb);
+                        } catch (IOException e1) {
+                            AceLog.getAppLog().alertAndLogException(e1);
+                        }
+                    }
+                }
+            } catch (TerminologyException e1) {
+                AceLog.getAppLog().alertAndLogException(e1);
+            } catch (IOException e1) {
+                AceLog.getAppLog().alertAndLogException(e1);
+            }
         }
 
     }
@@ -407,7 +408,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
     private JButton addButton;
 
     private JButton removeButton;
-    
+
     private JButton eraseButton;
 
     private LINK_TYPE linkType = LINK_TYPE.UNLINKED;
@@ -506,7 +507,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         add(searchPhraseField, gbc);
 
         gbc.gridx++;
-        gbc.gridheight = 2;        
+        gbc.gridheight = 2;
         gbc.weightx = 0;
         gbc.fill = GridBagConstraints.NONE;
         eraseButton = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/delete2.png")));
@@ -517,7 +518,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridx++;
-        gbc.gridheight = 1;        
+        gbc.gridheight = 1;
 
         gbc.weightx = 0.75;
         progressBar = new JProgressBar();
@@ -529,11 +530,10 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         gbc.weightx = 0;
 
         gbc.fill = GridBagConstraints.NONE;
-        
 
         // row 0, double height
-        gbc.gridheight = 2;        
-        
+        gbc.gridheight = 2;
+
         searchSetting = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/preferences.png")));
         searchSetting.setVisible(false);
         gbc.gridx++;
@@ -563,8 +563,9 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         ImageIconList.add(ConceptPanel.UNLINKED_ICON);
         ImageIconList.add(ConceptPanel.TREE_LINK_ICON);
 
-        LinkListModel linkSpinnerModel = new LinkListModel(ImageIconList.toArray(new ImageIcon[ImageIconList.size()]),
-            LINK_TYPE.UNLINKED.ordinal());
+        LinkListModel linkSpinnerModel =
+                new LinkListModel(ImageIconList.toArray(new ImageIcon[ImageIconList.size()]), LINK_TYPE.UNLINKED
+                    .ordinal());
 
         linkSpinner = new JSpinner(linkSpinnerModel);
         linkSpinner.setBorder(BorderFactory.createEmptyBorder(3, 3, 2, 5));
@@ -575,14 +576,14 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
         gbc.gridx++;
         showHistory = new JToggleButton(new ImageIcon(ACE.class.getResource("/24x24/plain/history.png")));
-        showHistory.setToolTipText("<html>when selected, shows descriptions with any status value (including" +
-        		                     "<br>historical descriptions). When not selected, shows only the descriptions " +
-        		                     "<br>with the allowed status values set in the preferences.");
+        showHistory.setToolTipText("<html>when selected, shows descriptions with any status value (including"
+            + "<br>historical descriptions). When not selected, shows only the descriptions "
+            + "<br>with the allowed status values set in the preferences.");
         add(showHistory, gbc);
         gbc.gridx++;
 
-        searchWithDescTypeFilter = new JToggleButton(new ImageIcon(
-            ACE.class.getResource("/24x24/plain/component_preferences.png")));
+        searchWithDescTypeFilter =
+                new JToggleButton(new ImageIcon(ACE.class.getResource("/24x24/plain/component_preferences.png")));
         searchWithDescTypeFilter.setToolTipText("filter search using preferences");
         searchWithDescTypeFilter.setSelected(config.searchWithDescTypeFilter());
         searchWithDescTypeFilter.addActionListener(new FilterSearchActionListener());
@@ -622,7 +623,8 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         gbc.gridy++;
         gbc.gridheight = 1;
 
-        model = new DescriptionsFromCollectionTableModel(new DESC_FIELD[] { DESC_FIELD.SCORE, DESC_FIELD.STATUS,
+        model =
+                new DescriptionsFromCollectionTableModel(new DESC_FIELD[] { DESC_FIELD.SCORE, DESC_FIELD.STATUS,
                                                                            DESC_FIELD.TEXT, DESC_FIELD.TYPE }, config);
         descTable = new JTableWithDragImage(model);
         descTable.setAutoCreateColumnsFromModel(true);
@@ -654,8 +656,8 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         JScrollPane scrollPane = new JScrollPane(descTable);
-        JToggleButton maximizeTable = new JToggleButton(new ImageIcon(
-            ACE.class.getResource("/16x16/plain/fit_to_size.png")));
+        JToggleButton maximizeTable =
+                new JToggleButton(new ImageIcon(ACE.class.getResource("/16x16/plain/fit_to_size.png")));
         maximizeTable.setToolTipText("show/hide search criterion");
         maximizeTable.setSelected(false);
         maximizeTable.addActionListener(new MaximizeSearchListener());
@@ -838,16 +840,15 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         this.linkType = type;
     }
 
-    public I_DescriptionTuple getSearchResultsSelection() {
+    public I_DescriptionTuple getSearchResultsSelection() { // TODO
         int selectedRow = lastSelectedRow;
-        if (descTable.getSelectedRow() > 0) {
+        if (descTable.getSelectedRow() >= 0) {
             selectedRow = descTable.getSelectedRow();
         }
-        StringWithDescTuple swdt = (StringWithDescTuple) descTable.getValueAt(selectedRow, 0);
-        if (swdt != null) {
-            return swdt.getTuple();
-        }
-        return null;
+        int modelRow = descTable.convertRowIndexToModel(selectedRow);
+        I_DescriptionTuple tuple = model.getDescription(modelRow);
+
+        return tuple;
     }
 
     public List<CriterionPanel> getCriterionPanels() {
@@ -856,7 +857,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
     public void focusOnInput() {
         SwingUtilities.invokeLater(new Runnable() {
-            
+
             @Override
             public void run() {
                 searchPhraseField.selectAll();

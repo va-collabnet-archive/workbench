@@ -103,12 +103,13 @@ public class TerminologyTransferHandler extends TransferHandler {
                 conceptBeanFlavor = new DataFlavor(ConceptTransferable.conceptBeanType);
                 thinDescVersionedFlavor = new DataFlavor(DescriptionTransferable.thinDescVersionedType);
                 thinDescTupleFlavor = new DataFlavor(DescriptionTransferable.thinDescTupleType);
-                supportedFlavors = new DataFlavor[] { thinDescVersionedFlavor, thinDescTupleFlavor, conceptBeanFlavor,
-                                                     FixedTerminologyTransferable.universalFixedConceptFlavor,
-                                                     FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor,
-                                                     FixedTerminologyTransferable.universalFixedDescFlavor,
-                                                     FixedTerminologyTransferable.universalFixedDescInterfaceFlavor,
-                                                     DataFlavor.stringFlavor };
+                supportedFlavors =
+                        new DataFlavor[] { thinDescVersionedFlavor, thinDescTupleFlavor, conceptBeanFlavor,
+                                          FixedTerminologyTransferable.universalFixedConceptFlavor,
+                                          FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor,
+                                          FixedTerminologyTransferable.universalFixedDescFlavor,
+                                          FixedTerminologyTransferable.universalFixedDescInterfaceFlavor,
+                                          DataFlavor.stringFlavor };
             } catch (ClassNotFoundException e) {
                 // should never happen.
                 throw new RuntimeException(e);
@@ -119,127 +120,140 @@ public class TerminologyTransferHandler extends TransferHandler {
     @Override
     protected Transferable createTransferable(JComponent c) {
         try {
-			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-			    AceLog.getAppLog().fine("Creating a transferable for: " + c);
-			}
-			transferringComponent = c;
-			if (JTree.class.isAssignableFrom(c.getClass())) {
-			    JTree tree = (JTree) c;
-			    Object obj = tree.getLastSelectedPathComponent();
-			    DefaultMutableTreeNode node = (DefaultMutableTreeNode) obj;
-			    if (node != null) {
-				    return new ConceptTransferable((I_GetConceptData) node.getUserObject());
-			    }
-			    return new StringSelection("null");
+            if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                AceLog.getAppLog().fine("Creating a transferable for: " + c);
+            }
+            transferringComponent = c;
+            if (JTree.class.isAssignableFrom(c.getClass())) {
+                JTree tree = (JTree) c;
+                Object obj = tree.getLastSelectedPathComponent();
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) obj;
+                if (node != null) {
+                    return new ConceptTransferable((I_GetConceptData) node.getUserObject());
+                }
+                return new StringSelection("null");
 
-			} else if (TerminologyList.class.isAssignableFrom(c.getClass())) {
-			    TerminologyList list = (TerminologyList) c;
-			    return new ConceptTransferable((I_GetConceptData) list.getSelectedValue());
-			} else if (TerminologyIntList.class.isAssignableFrom(c.getClass())) {
-			    TerminologyIntList list = (TerminologyIntList) c;
-			    return new ConceptTransferable((I_GetConceptData) list.getSelectedValue());
-			} else if (JTable.class.isAssignableFrom(c.getClass())) {
-			    JTable termTable = (JTable) c;
-			    TableModel tableModel = termTable.getModel();
-			    if (RelTableModel.class.isAssignableFrom(tableModel.getClass())) {
-			        TableModel rtm = termTable.getModel();
-			        StringWithRelTuple swrt = (StringWithRelTuple) rtm.getValueAt(termTable.getSelectedRow(),
-			            termTable.getSelectedColumn());
-			        I_RelTuple rel = swrt.getTuple();
-			        TableColumn column = termTable.getColumnModel().getColumn(termTable.getSelectedColumn());
-			        REL_FIELD columnDesc = (REL_FIELD) column.getIdentifier();
-			        switch (columnDesc) {
-			        case SOURCE_ID:
-			            return new ConceptTransferable(Terms.get().getConcept(rel.getC1Id()));
-			        case REL_TYPE:
-			            return new ConceptTransferable(Terms.get().getConcept(rel.getTypeId()));
-			        case DEST_ID:
-			            return new ConceptTransferable(Terms.get().getConcept(rel.getC2Id()));
-			        case REFINABILITY:
-			            return new ConceptTransferable(Terms.get().getConcept(rel.getRefinabilityId()));
-			        case CHARACTERISTIC:
-			            return new ConceptTransferable(Terms.get().getConcept(rel.getCharacteristicId()));
-			        case STATUS:
-			            return new ConceptTransferable(Terms.get().getConcept(rel.getStatusId()));
+            } else if (TerminologyList.class.isAssignableFrom(c.getClass())) {
+                TerminologyList list = (TerminologyList) c;
+                return new ConceptTransferable((I_GetConceptData) list.getSelectedValue());
+            } else if (TerminologyIntList.class.isAssignableFrom(c.getClass())) {
+                TerminologyIntList list = (TerminologyIntList) c;
+                return new ConceptTransferable((I_GetConceptData) list.getSelectedValue());
+            } else if (JTable.class.isAssignableFrom(c.getClass())) {
+                JTable termTable = (JTable) c;
+                TableModel tableModel = termTable.getModel();
+                if (RelTableModel.class.isAssignableFrom(tableModel.getClass())) {
+                    TableModel rtm = termTable.getModel();
+                    int selectedRow = termTable.getSelectedRow();
+                    int selectedColumn = termTable.getSelectedColumn();
+                    int modelRow = termTable.convertRowIndexToModel(selectedRow);
+                    int modelColumn = termTable.convertColumnIndexToModel(selectedColumn);
+
+                    StringWithRelTuple swrt = (StringWithRelTuple) rtm.getValueAt(modelRow, modelColumn);
+                    I_RelTuple rel = swrt.getTuple();
+                    TableColumn column = termTable.getColumnModel().getColumn(termTable.getSelectedColumn());
+                    REL_FIELD columnDesc = (REL_FIELD) column.getIdentifier();
+                    switch (columnDesc) {
+                    case SOURCE_ID:
+                        return new ConceptTransferable(Terms.get().getConcept(rel.getC1Id()));
+                    case REL_TYPE:
+                        return new ConceptTransferable(Terms.get().getConcept(rel.getTypeId()));
+                    case DEST_ID:
+                        return new ConceptTransferable(Terms.get().getConcept(rel.getC2Id()));
+                    case REFINABILITY:
+                        return new ConceptTransferable(Terms.get().getConcept(rel.getRefinabilityId()));
+                    case CHARACTERISTIC:
+                        return new ConceptTransferable(Terms.get().getConcept(rel.getCharacteristicId()));
+                    case STATUS:
+                        return new ConceptTransferable(Terms.get().getConcept(rel.getStatusId()));
                     case PATH:
                         return new ConceptTransferable(Terms.get().getConcept(rel.getPathId()));
                     case REL_ID:
                         return new StringSelection(rel.toString());
-			        case VERSION:
+                    case VERSION:
                         return new StringSelection(new Date(rel.getTime()).toString());
-			        case GROUP:
+                    case GROUP:
                         return new StringSelection("" + rel.getGroup());
-			        default:
-			            throw new UnsupportedOperationException("Can't convert " + columnDesc + " to a concept bean");
-			        }
-			    } else if (DescriptionTableModel.class.isAssignableFrom(tableModel.getClass())) {
-			        TableModel dtm = termTable.getModel();
-			        if (termTable.getSelectedRow() >= 0) {
-			            StringWithDescTuple swdt = (StringWithDescTuple) dtm.getValueAt(termTable.getSelectedRow(),
-			                termTable.getSelectedColumn());
-			            I_DescriptionTuple desc = swdt.getTuple();
-			            TableColumn column = termTable.getColumnModel().getColumn(termTable.getSelectedColumn());
-			            DESC_FIELD columnDesc = (DESC_FIELD) column.getIdentifier();
-			            switch (columnDesc) {
+                    default:
+                        throw new UnsupportedOperationException("Can't convert " + columnDesc + " to a concept bean");
+                    }
+                } else if (DescriptionTableModel.class.isAssignableFrom(tableModel.getClass())) {
+                    TableModel dtm = termTable.getModel();
+                    if (termTable.getSelectedRow() >= 0) {
+                        int selectedRow = termTable.getSelectedRow();
+                        int selectedColumn = termTable.getSelectedColumn();
+                        int modelRow = termTable.convertRowIndexToModel(selectedRow);
+                        int modelColumn = termTable.convertColumnIndexToModel(selectedColumn);
 
-			            case CON_ID:
-			                return new ConceptTransferable(Terms.get().getConcept(desc.getConceptNid()));
-			            case STATUS:
-			                return new ConceptTransferable(Terms.get().getConcept(desc.getStatusId()));
-			            case TYPE:
-			                return new ConceptTransferable(Terms.get().getConcept(desc.getTypeId()));
-			            case CASE_FIXED:
-			                return new StringSelection(Boolean.toString(desc.isInitialCaseSignificant()));
-			            case LANG:
-			                return new StringSelection(desc.getLang());
-			            case TEXT:
-			                return new DescriptionTransferable(desc);
-	                    case PATH:
-	                        return new ConceptTransferable(Terms.get().getConcept(desc.getPathId()));
-			            case DESC_ID:
-	                        return new StringSelection(desc.toString());
-			            case VERSION:
-	                        return new StringSelection(new Date(desc.getTime()).toString());
-			            default:
-			                throw new UnsupportedOperationException("Can't convert " + columnDesc + " to a concept bean");
-			            }
-			        } else {
-			            JOptionPane.showMessageDialog(termTable, "No row is selected.", "Copy error",
-			                JOptionPane.ERROR_MESSAGE);
-			            return null;
-			        }
-			    } else if (DiffTableModel.class.isAssignableFrom(tableModel.getClass())) {
+                        StringWithDescTuple swdt = (StringWithDescTuple) dtm.getValueAt(modelRow, modelColumn);
+                        I_DescriptionTuple desc = swdt.getTuple();
+                        TableColumn column = termTable.getColumnModel().getColumn(termTable.getSelectedColumn());
+                        DESC_FIELD columnDesc = (DESC_FIELD) column.getIdentifier();
+                        switch (columnDesc) {
 
-			        AceLog.getAppLog().info("\r\n::: FOUND JTable type: " + tableModel.getClass().toString());
-			        DiffTableModel diffTableModel = (DiffTableModel) tableModel;
-			        int nid = diffTableModel.getNidAt(termTable.getSelectedRow(), 0);
-			        if (nid == Integer.MIN_VALUE)
-			            return null;
-			        return new ConceptTransferable(Terms.get().getConcept(nid));
+                        case CON_ID:
+                            return new ConceptTransferable(Terms.get().getConcept(desc.getConceptNid()));
+                        case STATUS:
+                            return new ConceptTransferable(Terms.get().getConcept(desc.getStatusId()));
+                        case TYPE:
+                            return new ConceptTransferable(Terms.get().getConcept(desc.getTypeId()));
+                        case CASE_FIXED:
+                            return new StringSelection(Boolean.toString(desc.isInitialCaseSignificant()));
+                        case LANG:
+                            return new StringSelection(desc.getLang());
+                        case TEXT:
+                            return new DescriptionTransferable(desc);
+                        case PATH:
+                            return new ConceptTransferable(Terms.get().getConcept(desc.getPathId()));
+                        case DESC_ID:
+                            return new StringSelection(desc.toString());
+                        case VERSION:
+                            return new StringSelection(new Date(desc.getTime()).toString());
+                        default:
+                            throw new UnsupportedOperationException("Can't convert " + columnDesc
+                                + " to a concept bean");
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(termTable, "No row is selected.", "Copy error",
+                            JOptionPane.ERROR_MESSAGE);
+                        return null;
+                    }
+                } else if (DiffTableModel.class.isAssignableFrom(tableModel.getClass())) {
 
-			    } else if (EquivTableModel.class.isAssignableFrom(tableModel.getClass())) {
+                    AceLog.getAppLog().info("\r\n::: FOUND JTable type: " + tableModel.getClass().toString());
+                    DiffTableModel diffTableModel = (DiffTableModel) tableModel;
+                    int selectedRow = termTable.getSelectedRow();
+                    int modelRow = termTable.convertRowIndexToModel(selectedRow);
+                    int nid = diffTableModel.getNidAt(modelRow, 0);
+                    if (nid == Integer.MIN_VALUE)
+                        return null;
+                    return new ConceptTransferable(Terms.get().getConcept(nid));
 
-			        AceLog.getAppLog().info("\r\n::: FOUND JTable type: " + tableModel.getClass().toString());
-			        EquivTableModel equivTableModel = (EquivTableModel) tableModel;
-			        int nid = equivTableModel.getNidAt(termTable.getSelectedRow(), 0);
-			        if (nid == Integer.MIN_VALUE)
-			            return null;
-			        return new ConceptTransferable(Terms.get().getConcept(nid));
+                } else if (EquivTableModel.class.isAssignableFrom(tableModel.getClass())) {
 
-			    } else {
-			        throw new UnsupportedOperationException("JTable type: " + tableModel.getClass().toString());
-			    }
-			} else {
-			    I_ContainTermComponent ictc = (I_ContainTermComponent) c;
-			    return new ConceptTransferable((I_GetConceptData) ictc.getTermComponent());
-			}
-		} catch (HeadlessException e) {
-			throw new RuntimeException(e);
-		} catch (TerminologyException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+                    AceLog.getAppLog().info("\r\n::: FOUND JTable type: " + tableModel.getClass().toString());
+                    EquivTableModel equivTableModel = (EquivTableModel) tableModel;
+                    int selectedRow = termTable.getSelectedRow();
+                    int modelRow = termTable.convertRowIndexToModel(selectedRow);
+                    int nid = equivTableModel.getNidAt(modelRow, 0);
+                    if (nid == Integer.MIN_VALUE)
+                        return null;
+                    return new ConceptTransferable(Terms.get().getConcept(nid));
+
+                } else {
+                    throw new UnsupportedOperationException("JTable type: " + tableModel.getClass().toString());
+                }
+            } else {
+                I_ContainTermComponent ictc = (I_ContainTermComponent) c;
+                return new ConceptTransferable((I_GetConceptData) ictc.getTermComponent());
+            }
+        } catch (HeadlessException e) {
+            throw new RuntimeException(e);
+        } catch (TerminologyException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -270,30 +284,30 @@ public class TerminologyTransferHandler extends TransferHandler {
             AceLog.getAppLog().fine("import: " + comp);
         }
         if (I_AcceptConcept.class.isAssignableFrom(comp.getClass())) {
-        	try {
-        		I_AcceptConcept title = (I_AcceptConcept) comp;
-				if (t.isDataFlavorSupported(conceptBeanFlavor)) {
-				    Object obj = t.getTransferData(conceptBeanFlavor);
-				    if (obj == null) {
-				        if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-				            AceLog.getAppLog().fine("t has null obj " + t);
-				            AceLog.getAppLog().fine("t has null obj " + Arrays.asList(t.getTransferDataFlavors()));
-				        }
-				        return false;
-				    }
-				    if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-				        AceLog.getAppLog().fine("Transfer data for conceptBeanFlavor is: " + obj);
-				    }
-				    if (ConceptBeanForTree.class.isAssignableFrom(obj.getClass())) {
-				        ConceptBeanForTree cbt = (ConceptBeanForTree) obj;
-				        title.sendConcept(cbt.getCoreBean());
-		                return true;
-				    } else {
-				        title.sendConcept((I_GetConceptData) obj);
-		                return true;
-				    }
-				}
-			} catch (UnsupportedFlavorException e) {
+            try {
+                I_AcceptConcept title = (I_AcceptConcept) comp;
+                if (t.isDataFlavorSupported(conceptBeanFlavor)) {
+                    Object obj = t.getTransferData(conceptBeanFlavor);
+                    if (obj == null) {
+                        if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                            AceLog.getAppLog().fine("t has null obj " + t);
+                            AceLog.getAppLog().fine("t has null obj " + Arrays.asList(t.getTransferDataFlavors()));
+                        }
+                        return false;
+                    }
+                    if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                        AceLog.getAppLog().fine("Transfer data for conceptBeanFlavor is: " + obj);
+                    }
+                    if (ConceptBeanForTree.class.isAssignableFrom(obj.getClass())) {
+                        ConceptBeanForTree cbt = (ConceptBeanForTree) obj;
+                        title.sendConcept(cbt.getCoreBean());
+                        return true;
+                    } else {
+                        title.sendConcept((I_GetConceptData) obj);
+                        return true;
+                    }
+                }
+            } catch (UnsupportedFlavorException e) {
                 AceLog.getAppLog().log(Level.FINE, e.getLocalizedMessage(), e);
             } catch (IOException e) {
                 AceLog.getAppLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
@@ -467,7 +481,7 @@ public class TerminologyTransferHandler extends TransferHandler {
                 AceLog.getAppLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
             } catch (TerminologyException e) {
                 AceLog.getAppLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
-			}
+            }
             return true;
         }
         try {
@@ -555,8 +569,9 @@ public class TerminologyTransferHandler extends TransferHandler {
                 int rowIndex = table.rowAtPoint(loc);
                 int columnIndex = table.columnAtPoint(loc);
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                    AceLog.getAppLog().fine("table.getMousePosition() rowIndex " + rowIndex + " columnIndex " + columnIndex + 
-                        " editable: " + model.isCellEditable(rowIndex, columnIndex));
+                    AceLog.getAppLog().fine(
+                        "table.getMousePosition() rowIndex " + rowIndex + " columnIndex " + columnIndex + " editable: "
+                            + model.isCellEditable(rowIndex, columnIndex));
                 }
                 if (model.isCellEditable(rowIndex, columnIndex)) {
                     return true;
