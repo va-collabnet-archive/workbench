@@ -87,8 +87,26 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
              ADMIN_ROLE("administrator role", "admin role",
                     new I_ConceptualizeUniversally[] { USER_ROLE }),
 
-
-
+                    
+        WORKFLOW_COMMENT_TYPE("Concept type",
+        		new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
+        	WORKFLOW_COMMENT("Workflow comment",
+        			new I_ConceptualizeUniversally[] { WORKFLOW_COMMENT_TYPE }),
+        	WORKFLOW_REJECTION("Workflow rejection",
+        			new I_ConceptualizeUniversally[] { WORKFLOW_COMMENT_TYPE }),
+        	WORKFLOW_COMMENT_WEB_REF("Workflow comment with web reference", 
+        			new I_ConceptualizeUniversally[] { WORKFLOW_COMMENT_TYPE }),
+                             
+    		SPELLING_REJECTION("Spelling",
+                    new I_ConceptualizeUniversally[] { WORKFLOW_REJECTION }),
+            LINGUISTIC_GUIDELINES_REJECTION("Linguistic guidelines",
+            		new I_ConceptualizeUniversally[] { WORKFLOW_REJECTION }),
+    		SEMANTIC_ERROR_REJECTION("Semantic error",
+    				new I_ConceptualizeUniversally[] { WORKFLOW_REJECTION }),
+			CLINICAL_ACCEPTABILITY_REJECTION("Clinical acceptability",
+    				new I_ConceptualizeUniversally[] { WORKFLOW_REJECTION }),
+    		OTHER_REASON_REJECTION("Other reason",
+    				new I_ConceptualizeUniversally[] { WORKFLOW_REJECTION }),
 
         USER_PERMISSION("user permission",
                     new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
