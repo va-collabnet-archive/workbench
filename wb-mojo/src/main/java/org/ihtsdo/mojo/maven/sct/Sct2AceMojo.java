@@ -107,6 +107,7 @@ import org.dwfa.util.id.Type5UuidFactory;
  * @goal sct2ace
  * @requiresDependencyResolution compile
  * @requiresProject false
+ * @deprecated Use Sct1ArtToEConcept instead.
  * 
  */
 

@@ -45,7 +45,7 @@ class SctYRelRecord implements Comparable<Object>, Serializable {
     int refinability; // REFINABILITY
     int group; // RELATIONSHIPGROUP
     boolean exceptionFlag; // to handle Concept ID change exception
-    int yPath;
+    int yPath; // index
     int yRevision;
 
     public SctYRelRecord(long relID, int st, long cOneID, long roleTypeSnoId, int roleTypeIdx, long cTwoID,
@@ -78,6 +78,39 @@ class SctYRelRecord implements Comparable<Object>, Serializable {
         this.exceptionFlag = false;
     }
 
+    public SctYRelRecord(long relID, int st, long cOneID, long roleTypeSnoId, int roleTypeIdx, long cTwoID,
+            int characterType, int r, int grp, int pathIdx) {
+    
+        this.relSnoId = relID; // RELATIONSHIPID
+        UUID tmpUUID = Type3UuidFactory.fromSNOMED(relSnoId);
+        this.relUuidMsb = tmpUUID.getMostSignificantBits();
+        this.relUuidLsb = tmpUUID.getLeastSignificantBits();
+
+        // additionalIds = null;
+        addedIds = null;
+        this.status = st; // status is computed for relationships
+        this.c1SnoId = cOneID; // CONCEPTID1
+        
+        tmpUUID = Type3UuidFactory.fromSNOMED(c1SnoId);
+        this.c1UuidMsb = tmpUUID.getMostSignificantBits();
+        this.c1UuidLsb = tmpUUID.getLeastSignificantBits();
+        
+        this.roleTypeSnoId = roleTypeSnoId; // RELATIONSHIPTYPE (SNOMED ID) 
+        this.roleTypeIdx = roleTypeIdx; // RELATIONSHIPTYPE  <-- INDEX (NOT SNOMED ID) 
+        
+        this.c2SnoId = cTwoID; // CONCEPTID2
+        tmpUUID = Type3UuidFactory.fromSNOMED(c2SnoId);
+        this.c2UuidMsb = tmpUUID.getMostSignificantBits();
+        this.c2UuidLsb = tmpUUID.getLeastSignificantBits();
+
+        this.characteristic = characterType; // CHARACTERISTICTYPE
+        this.refinability = r; // REFINABILITY
+        this.group = grp; // RELATIONSHIPGROUP
+        this.exceptionFlag = false;
+        
+        this.yPath = pathIdx;
+    }
+    
     public SctYRelRecord(UUID uuidRelId, int status, UUID uuidC1, int roleTypeIdx, UUID uuidC2,
             int characteristic, int refinability, int group, int revDate, int pathIdx) {
         
