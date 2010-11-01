@@ -12,8 +12,12 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 import javax.swing.DefaultListCellRenderer;
@@ -23,11 +27,17 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
 
@@ -37,8 +47,10 @@ import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
 public class RulesDeploymentPkgBrowserPanel extends JPanel {
 
 	private DefaultListModel list1Model;
+	private DefaultTableModel table1Model;
 	RulesDeploymentPackageReferenceHelper rulesPackageHelper = null;
 	RulesDeploymentPackageReference selectedRulesPackage = null;
+	RulesContextHelper contextHelper = null;
 
 	public RulesDeploymentPkgBrowserPanel(I_ConfigAceFrame config) {
 		initComponents();
@@ -53,11 +65,54 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 				components[i].setEnabled(false);
 			}
 			rulesPackageHelper = new RulesDeploymentPackageReferenceHelper(config);
+			contextHelper = new RulesContextHelper(config);
 			updateList1();
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void updateTable1() {
+		table1Model = new DefaultTableModel() {
+			public Class getColumnClass(int c) {
+				if (c == 1) {
+					return Boolean.class;
+				} else {
+					return getValueAt(0, c).getClass();
+				}
+			}
+			public boolean isCellEditable(int row, int col) { 
+				if (col == 1) {
+					return true; 
+				} else {
+					return false;
+				}
+			}
+		};
+
+		Object columnNames[] = { "Context", "Included"};
+		table1Model.setColumnIdentifiers(columnNames);
+		List<I_GetConceptData> currentContexts = new ArrayList<I_GetConceptData>();
+		if (selectedRulesPackage != null) {
+			currentContexts= contextHelper.getContextsForPackage(selectedRulesPackage);
+		}
+		try {
+			for (I_GetConceptData context : contextHelper.getAllContexts()) {
+				Boolean check = false;
+				if (currentContexts.contains(context)) {
+					check = true;
+				}
+				Object row[] = {context, new Boolean(check)};
+				table1Model.addRow(row);
+			}
+			table1.setModel(table1Model);
+			table1.validate();
+			table1.repaint();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	private void updateList1() {
@@ -73,15 +128,18 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 			}
 			list1.setModel(list1Model);
 			list1.validate();
+			scrollPane2.setVisible(false);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void list1ValueChanged(ListSelectionEvent e) {
+	private void prepareForEditing() {
 		// selected
 		selectedRulesPackage = (RulesDeploymentPackageReference) list1.getSelectedValue();
 		if (selectedRulesPackage != null) {
+			updateTable1();
+			scrollPane2.setVisible(true);
 			panel1.setEnabled(true);
 			Component[] components = panel1.getComponents();
 			for (int i = 0; i < components.length; i++) {
@@ -96,12 +154,21 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 		}
 	}
 
+	private void list1ValueChanged(ListSelectionEvent e) {
+		prepareForEditing();
+	}
+
+	private void list1MouseClicked(MouseEvent e) {
+		prepareForEditing();
+	}
+
 	private void button1ActionPerformed(ActionEvent e) {
 		// cancel
 		textField1.setText("");
 		textField2.setText("");
 		selectedRulesPackage = null;
 		panel1.setEnabled(false);
+		scrollPane2.setVisible(false);
 		Component[] components = panel1.getComponents();
 		for (int i = 0; i < components.length; i++) {
 			components[i].setEnabled(false);
@@ -117,16 +184,38 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 		// save
 		if (selectedRulesPackage == null) {
 			// new repo
-			rulesPackageHelper.createNewRulesDeploymentPackage(textField1.getText(), textField2.getText());
+			selectedRulesPackage = rulesPackageHelper.createNewRulesDeploymentPackage(textField1.getText(), textField2.getText());
 		} else {
 			selectedRulesPackage.setName(textField1.getText());
 			selectedRulesPackage.setUrl(textField2.getText());
 			rulesPackageHelper.updateDeploymentPackageReference(selectedRulesPackage);
 		}
+		
+		try {
+			RulesContextHelper contextHelper = new RulesContextHelper(Terms.get().getActiveAceFrameConfig());
+			
+			for (int i = 0 ; i < table1Model.getRowCount() ; i++) {
+				Boolean include = (Boolean) table1Model.getValueAt(i, 1);
+				I_GetConceptData context = (I_GetConceptData) table1Model.getValueAt(i, 0);
+				
+				if (include) {
+					contextHelper.addPkgReferenceToContext(selectedRulesPackage, context);
+				} else {
+					contextHelper.removePkgReferenceFromContext(selectedRulesPackage, context);
+				}
+				
+			}
+		} catch (TerminologyException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
 		textField1.setText("");
 		textField2.setText("");
 		selectedRulesPackage = null;
 		panel1.setEnabled(false);
+		scrollPane2.setVisible(false);
 		Component[] components = panel1.getComponents();
 		for (int i = 0; i < components.length; i++) {
 			components[i].setEnabled(false);
@@ -145,6 +234,8 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 		textField2.setText("");
 		selectedRulesPackage = null;
 		panel1.setEnabled(true);
+		updateTable1();
+		scrollPane2.setVisible(true);
 		Component[] components = panel1.getComponents();
 		for (int i = 0; i < components.length; i++) {
 			components[i].setEnabled(true);
@@ -172,11 +263,13 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 	}
 
 	private void button5ActionPerformed(ActionEvent e) {
+		//retire
 		rulesPackageHelper.retireRulesDeploymentPackageReference(selectedRulesPackage);
 		textField1.setText("");
 		textField2.setText("");
 		selectedRulesPackage = null;
 		panel1.setEnabled(false);
+		scrollPane2.setVisible(false);
 		Component[] components = panel1.getComponents();
 		for (int i = 0; i < components.length; i++) {
 			components[i].setEnabled(false);
@@ -216,6 +309,8 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 		textField1 = new JTextField();
 		label4 = new JLabel();
 		textField2 = new JTextField();
+		scrollPane2 = new JScrollPane();
+		table1 = new JTable();
 		panel2 = new JPanel();
 		button5 = new JButton();
 		button2 = new JButton();
@@ -249,8 +344,15 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 
 			//---- list1 ----
 			list1.addListSelectionListener(new ListSelectionListener() {
+				@Override
 				public void valueChanged(ListSelectionEvent e) {
 					list1ValueChanged(e);
+				}
+			});
+			list1.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					list1MouseClicked(e);
 				}
 			});
 			scrollPane1.setViewportView(list1);
@@ -265,7 +367,7 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0};
 			((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0};
 			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4};
 
 			//---- label3 ----
 			label3.setText("Name");
@@ -285,6 +387,14 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 0), 0, 0));
 
+			//======== scrollPane2 ========
+			{
+				scrollPane2.setViewportView(table1);
+			}
+			panel1.add(scrollPane2, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 0), 0, 0));
+
 			//======== panel2 ========
 			{
 				panel2.setLayout(new GridBagLayout());
@@ -297,6 +407,7 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 				button5.setText("Retire");
 				button5.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 				button5.addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						button5ActionPerformed(e);
 					}
@@ -309,6 +420,7 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 				button2.setText("Save");
 				button2.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 				button2.addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						button2ActionPerformed(e);
 					}
@@ -321,6 +433,7 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 				button1.setText("Cancel");
 				button1.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 				button1.addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						button1ActionPerformed(e);
 					}
@@ -329,9 +442,9 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 0, 0), 0, 0));
 			}
-			panel1.add(panel2, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
+			panel1.add(panel2, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0,
 					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 5, 0), 0, 0));
+					new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(panel1, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -349,6 +462,7 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 			button6.setText("Update Pkg");
 			button6.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			button6.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					button6ActionPerformed(e);
 				}
@@ -361,6 +475,7 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 			button4.setText("Validate Pkg");
 			button4.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			button4.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					button4ActionPerformed(e);
 				}
@@ -373,6 +488,7 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 			button3.setText("New");
 			button3.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			button3.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					button3ActionPerformed(e);
 				}
@@ -397,6 +513,8 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 	private JTextField textField1;
 	private JLabel label4;
 	private JTextField textField2;
+	private JScrollPane scrollPane2;
+	private JTable table1;
 	private JPanel panel2;
 	private JButton button5;
 	private JButton button2;

@@ -128,6 +128,7 @@ public class RulesLibrary {
 
 		ksession.insert(testConcept);
 
+		ksession.startProcess("org.ihtsdo.qa-execution2");
 		ksession.fireAllRules();
 
 		//ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
