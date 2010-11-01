@@ -61,17 +61,36 @@ public class RulesContextEditorPanel extends JPanel {
 
 		tableModel = new MyTableModel();
 		table1.setModel(tableModel);
-		
+
 		try {
 			for (I_GetConceptData context : contextHelper.getAllContexts()) {
 				comboBox2.addItem(context);
 			}
-			for (RulesDeploymentPackageReference repo : rulesRepoHelper.getAllRulesDeploymentPackages()) {
-				comboBox1.addItem(repo);
-			}
+			updateCheckBox1();
 			updateTable1();
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void updateCheckBox1() throws Exception {
+		I_GetConceptData selectedContext = (I_GetConceptData) comboBox2.getSelectedItem();
+		if (selectedContext != null) {
+			List<RulesDeploymentPackageReference> pkgs = contextHelper.getPackagesForContext(selectedContext);
+			comboBox1.removeAllItems();
+			for (RulesDeploymentPackageReference repo : pkgs) {
+				comboBox1.addItem(repo);
+			}
+			comboBox1.revalidate();
+			if (pkgs.size() == 0) {
+				tableModel.getDataVector().removeAllElements();
+				table1.revalidate();
+				table1.repaint();
+			}
+		} else {
+			tableModel.getDataVector().removeAllElements();
+			table1.revalidate();
+			table1.repaint();
 		}
 	}
 
@@ -85,19 +104,19 @@ public class RulesContextEditorPanel extends JPanel {
 				I_GetConceptData agendaMetadataRefset = tf.getConcept(RefsetAuxiliary.Concept.RULES_CONTEXT_METADATA_REFSET.getUids());
 				RulesDeploymentPackageReference selectedPackage = (RulesDeploymentPackageReference) comboBox1.getSelectedItem();
 				I_GetConceptData selectedContext = (I_GetConceptData) comboBox2.getSelectedItem();
-				
-				
-				//Fiddle with the Sport column's cell editors/renderers.
-		        setUpSportColumn(table1, table1.getColumnModel().getColumn(3));
 
-		        if (selectedPackage.validate()) {
+
+				//Fiddle with the Sport column's cell editors/renderers.
+				setUpSportColumn(table1, table1.getColumnModel().getColumn(3));
+
+				if (selectedPackage.validate()) {
 
 					for (Rule rule : selectedPackage.getRules()) {
 						//System.out.println("** rule: " + rule.getName());
 						String ruleUid = null;
 						String description =  null;
 						String ditaUid = null;
-						
+
 						try {
 							ruleUid = (String) rule.getMetaData().get("UUID");
 							//ruleUid = rule.getMetaAttribute("UID");
@@ -109,7 +128,7 @@ public class RulesContextEditorPanel extends JPanel {
 							// problem retrieving metadata, do nothing
 							System.out.println("Malformed metadata..");
 						}
-						
+
 						if (description == null) description = "";
 						if (ditaUid == null) ditaUid = "";
 
@@ -158,9 +177,9 @@ public class RulesContextEditorPanel extends JPanel {
 			e.printStackTrace();
 		}
 	}
-	
+
 	class MyTableModel extends DefaultTableModel {
-		
+
 		private Object[][] data = new Object[0][6];
 		private List<Object[]> dataList = new ArrayList<Object[]>();
 		private String[] columnNames = new String[6];
@@ -170,8 +189,8 @@ public class RulesContextEditorPanel extends JPanel {
 		private final static int STATUS_IN_CONTEXT = 3;
 		private final static int ORIGINAL_STATUS_IN_CONTEXT = 4;
 		private final static int RULE_UID = 5;
-		
-		
+
+
 		public MyTableModel() {
 			super();
 			dataList = new ArrayList<Object[]>();
@@ -182,7 +201,7 @@ public class RulesContextEditorPanel extends JPanel {
 			columnNames[ORIGINAL_STATUS_IN_CONTEXT] = "original status in context";
 			columnNames[RULE_UID] = "rule uide";
 		}
-		
+
 		public void clearData() {
 			dataList = new ArrayList<Object[]>();
 		}
@@ -196,65 +215,65 @@ public class RulesContextEditorPanel extends JPanel {
 		}
 
 		public int getColumnCount() {
-            return columnNames.length - 2;
-        }
+			return columnNames.length - 2;
+		}
 
-        public int getRowCount() {
-        	if(data == null){
-        		return 0;
-        	}
-    		return data.length;
-        }
+		public int getRowCount() {
+			if(data == null){
+				return 0;
+			}
+			return data.length;
+		}
 
-        public String getColumnName(int col) {
-            return columnNames[col];
-        }
+		public String getColumnName(int col) {
+			return columnNames[col];
+		}
 
-        public Object getValueAt(int row, int col) {
-    		return data[row][col];
-        }
+		public Object getValueAt(int row, int col) {
+			return data[row][col];
+		}
 
-        /*
-         * JTable uses this method to determine the default renderer/
-         * editor for each cell.  If we didn't implement this method,
-         * then the last column would contain text ("true"/"false"),
-         * rather than a check box.
-         */
-        public Class getColumnClass(int c) {
-        	if (getValueAt(0, c) != null) {
-        		return getValueAt(0, c).getClass();
-        	} else {
-        		return null;
-        	}
-        }
+		/*
+		 * JTable uses this method to determine the default renderer/
+		 * editor for each cell.  If we didn't implement this method,
+		 * then the last column would contain text ("true"/"false"),
+		 * rather than a check box.
+		 */
+		public Class getColumnClass(int c) {
+			if (getValueAt(0, c) != null) {
+				return getValueAt(0, c).getClass();
+			} else {
+				return null;
+			}
+		}
 
-        /*
-         * Don't need to implement this method unless your table's
-         * editable.
-         */
-        public boolean isCellEditable(int x, int y) {
+		/*
+		 * Don't need to implement this method unless your table's
+		 * editable.
+		 */
+		public boolean isCellEditable(int x, int y) {
 			if(y == 3){
 				return true;
 			}else{
 				return false;
 			}
 		}
-		
 
-        /*
-         * Don't need to implement this method unless your table's
-         * data can change.
-         */
-        public void setValueAt(Object value, int row, int col) {
-            data[row][col] = value;
-            fireTableCellUpdated(row, col);
-        }
+
+		/*
+		 * Don't need to implement this method unless your table's
+		 * data can change.
+		 */
+		public void setValueAt(Object value, int row, int col) {
+			data[row][col] = value;
+			fireTableCellUpdated(row, col);
+		}
 
 		public void saveStatusesInContext() {
 			for (Object[] row : dataList) {
 				Object statusInContext = row[STATUS_IN_CONTEXT];
 				Object originalStContext = row[ORIGINAL_STATUS_IN_CONTEXT];
-				
+
 				if(statusInContext instanceof I_GetConceptData && !statusInContext.toString().equals(originalStContext.toString())){
 					contextHelper.setRoleInContext(row[RULE_UID].toString(), (I_GetConceptData) comboBox2.getSelectedItem(), (I_GetConceptData)statusInContext);
 				}else if(originalStContext instanceof I_GetConceptData && !(statusInContext instanceof I_GetConceptData)){
@@ -262,13 +281,13 @@ public class RulesContextEditorPanel extends JPanel {
 				}
 			}
 		}
-    }
+	}
 
 
 
 	public void setUpSportColumn(JTable table, TableColumn conceptColumn) {
 		I_TermFactory tf = Terms.get();
-		
+
 		try {
 			I_GetConceptData includeClause = tf.getConcept(RefsetAuxiliary.Concept.INCLUDE_INDIVIDUAL.getUids());
 			I_GetConceptData excludeClause = tf.getConcept(RefsetAuxiliary.Concept.EXCLUDE_INDIVIDUAL.getUids());
@@ -278,7 +297,7 @@ public class RulesContextEditorPanel extends JPanel {
 			comboBox.addItem(includeClause);
 			comboBox.addItem(excludeClause);
 			conceptColumn.setCellEditor(new DefaultCellEditor(comboBox));
-	
+
 			// Set up tool tips for the sport cells.
 			DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
 			renderer.setToolTipText("Click for combo box");
@@ -288,11 +307,16 @@ public class RulesContextEditorPanel extends JPanel {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
-	
+
 	private void comboBox2ItemStateChanged(ItemEvent e) {
+		try {
+			updateCheckBox1();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
 		updateTable1();
 	}
 
@@ -302,10 +326,10 @@ public class RulesContextEditorPanel extends JPanel {
 
 	private void button2ActionPerformed(ActionEvent e) {
 		try {
-			
+
 			comboBox1.removeItemListener(comboBox1.getItemListeners()[0]);
 			comboBox2.removeItemListener(comboBox2.getItemListeners()[0]);
-			
+
 			comboBox2.removeAllItems();
 			for (I_GetConceptData context : contextHelper.getAllContexts()) {
 				comboBox2.addItem(context);
@@ -314,7 +338,7 @@ public class RulesContextEditorPanel extends JPanel {
 			for (RulesDeploymentPackageReference repo : rulesRepoHelper.getAllRulesDeploymentPackages()) {
 				comboBox1.addItem(repo);
 			}
-			
+
 			comboBox2.addItemListener(new ItemListener() {
 				public void itemStateChanged(ItemEvent e) {
 					comboBox2ItemStateChanged(e);
@@ -326,14 +350,14 @@ public class RulesContextEditorPanel extends JPanel {
 					comboBox1ItemStateChanged(e);
 				}
 			});
-			
+
 			updateTable1();
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
 		//updateTable1();
 	}
-	
+
 	private void saveButtonActionPerformed(ActionEvent e) {
 		tableModel.saveStatusesInContext();
 	}
@@ -372,12 +396,12 @@ public class RulesContextEditorPanel extends JPanel {
 			//---- label1 ----
 			label1.setText("Rule-Context editor");
 			panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 		}
 		add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 0, 0), 0, 0));
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 
 		//======== panel2 ========
 		{
@@ -390,8 +414,8 @@ public class RulesContextEditorPanel extends JPanel {
 			//---- label3 ----
 			label3.setText("Context:");
 			panel2.add(label3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			//---- comboBox2 ----
 			comboBox2.addItemListener(new ItemListener() {
@@ -400,14 +424,14 @@ public class RulesContextEditorPanel extends JPanel {
 				}
 			});
 			panel2.add(comboBox2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			//---- label2 ----
 			label2.setText("Repository:");
 			panel2.add(label2, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			//---- comboBox1 ----
 			comboBox1.addItemListener(new ItemListener() {
@@ -416,27 +440,27 @@ public class RulesContextEditorPanel extends JPanel {
 				}
 			});
 			panel2.add(comboBox1, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			//---- label4 ----
 			label4.setText("Notification");
 			label4.setForeground(Color.red);
 			panel2.add(label4, new GridBagConstraints(8, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(panel2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 0, 0), 0, 0));
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 
 		//======== scrollPane1 ========
 		{
 			scrollPane1.setViewportView(table1);
 		}
 		add(scrollPane1, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 0, 0), 0, 0));
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 
 		//======== panel3 ========
 		{
@@ -455,8 +479,8 @@ public class RulesContextEditorPanel extends JPanel {
 				}
 			});
 			panel3.add(button2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			//---- saveButton ----
 			saveButton.setText("Save");
@@ -467,12 +491,12 @@ public class RulesContextEditorPanel extends JPanel {
 				}
 			});
 			panel3.add(saveButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(panel3, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
-			GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-			new Insets(0, 0, 0, 0), 0, 0));
+				GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+				new Insets(0, 0, 0, 0), 0, 0));
 		// JFormDesigner - End of component initialization  //GEN-END:initComponents
 	}
 
