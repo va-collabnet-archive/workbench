@@ -233,7 +233,8 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			for (I_DescriptionTuple tuple : focusConcept.getDescriptionTuples(config.getAllowedStatus(),
 					config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
 					config.getConflictResolutionStrategy())) {
-				if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid()) {
+				if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid() 
+						&& tuple.getLang().equals("en")) {
 					if (tuple.getText().lastIndexOf("(") > -1 && tuple.getText().lastIndexOf(")") > -1) {
 						currentSemtags.add(tuple.getText().substring(tuple.getText().lastIndexOf("(")+1,tuple.getText().lastIndexOf(")")));
 					}

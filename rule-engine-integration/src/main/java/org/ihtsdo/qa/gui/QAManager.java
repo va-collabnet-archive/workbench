@@ -24,13 +24,17 @@ import org.dwfa.tapi.TerminologyException;
  */
 public class QAManager extends JPanel {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public static final String QA_MANAGER = "QA Manager";
 
 	public QAManager() {
 		initComponents();
 		try {
 			panel3.add(new RulesDeploymentPkgBrowserPanel(Terms.get().getActiveAceFrameConfig()), BorderLayout.CENTER);
-			panel4.add(new RulesContextMatrixPanel(Terms.get().getActiveAceFrameConfig()), BorderLayout.CENTER);
+			//panel4.add(new RulesContextMatrixPanel(Terms.get().getActiveAceFrameConfig()), BorderLayout.CENTER);
 			panel5.add(new RulesContextEditorPanel(Terms.get().getActiveAceFrameConfig()), BorderLayout.CENTER);
 			panel6.add(new TestListPanel(Terms.get().getActiveAceFrameConfig()), BorderLayout.CENTER);
 		} catch (TerminologyException e) {
@@ -60,10 +64,8 @@ public class QAManager extends JPanel {
 //				}
 //			}
 //		} catch (TerminologyException e) {
-//			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		} catch (IOException e) {
-//			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
 	}
@@ -74,7 +76,6 @@ public class QAManager extends JPanel {
 		tabbedPane1 = new JTabbedPane();
 		panel3 = new JPanel();
 		panel5 = new JPanel();
-		panel4 = new JPanel();
 		panel6 = new JPanel();
 		panel2 = new JPanel();
 		button1 = new JButton();
@@ -111,13 +112,6 @@ public class QAManager extends JPanel {
 				tabbedPane1.addTab("Rule-Context editor", panel5);
 
 
-				//======== panel4 ========
-				{
-					panel4.setLayout(new BorderLayout());
-				}
-				tabbedPane1.addTab("Rule-Context Matrix", panel4);
-
-
 				//======== panel6 ========
 				{
 					panel6.setLayout(new BorderLayout());
@@ -144,6 +138,7 @@ public class QAManager extends JPanel {
 			//---- button1 ----
 			button1.setText("Close");
 			button1.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					button1ActionPerformed();
 				}
@@ -163,7 +158,6 @@ public class QAManager extends JPanel {
 	private JTabbedPane tabbedPane1;
 	private JPanel panel3;
 	private JPanel panel5;
-	private JPanel panel4;
 	private JPanel panel6;
 	private JPanel panel2;
 	private JButton button1;
