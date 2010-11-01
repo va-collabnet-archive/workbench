@@ -477,9 +477,10 @@ public class RulesContextHelper {
 		I_TermFactory termFactory = Terms.get();
 
 		List<RulesDeploymentPackageReference> currentPkgs = getPackagesForContext(context);
-		boolean alreadyThere = false;
+		Boolean alreadyThere = false;
 		for (RulesDeploymentPackageReference loopPkg : currentPkgs) {
 			if (currentPkgs.containsAll(loopPkg.getUuids())) {
+				System.out.println("Setting to true...");
 				alreadyThere = true;
 			}
 		}

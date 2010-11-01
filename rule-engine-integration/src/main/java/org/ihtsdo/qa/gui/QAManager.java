@@ -33,6 +33,7 @@ public class QAManager extends JPanel {
 	public QAManager() {
 		initComponents();
 		try {
+			button1.setVisible(false); //hide close button
 			panel3.add(new RulesDeploymentPkgBrowserPanel(Terms.get().getActiveAceFrameConfig()), BorderLayout.CENTER);
 			//panel4.add(new RulesContextMatrixPanel(Terms.get().getActiveAceFrameConfig()), BorderLayout.CENTER);
 			panel5.add(new RulesContextEditorPanel(Terms.get().getActiveAceFrameConfig()), BorderLayout.CENTER);
