@@ -98,85 +98,87 @@ public class RulesLibrary {
 	/** The CONCEPT MODEL knowledge package identifier */
 	public static int CONCEPT_MODEL_PKG = 0;
 	public static int LINGUISTIC_GUIDELINES_PKG = 1;
-	
-	
+
+
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
 			boolean onlyUncommittedContent, I_ConfigAceFrame config) 
 	throws Exception {
 		RulesContextHelper contextHelper = new RulesContextHelper(config);
 		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper);
 	}
-	
+
 
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
 			boolean onlyUncommittedContent, I_ConfigAceFrame config, RulesContextHelper contextHelper) 
 	throws Exception {
 		KnowledgeBase kbase = contextHelper.getKnowledgeBaseForContext(context, config);
-
-		StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
-
-		KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
-
 		ResultsCollectorWorkBench results = new ResultsCollectorWorkBench();
+		
+		if (kbase.getKnowledgePackages().size() > 0) { 
 
-		ksession.setGlobal("resultsCollector", results);
-		ksession.setGlobal("terminologyHelper", new TerminologyHelperDroolsWorkbench());
+			StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 
-		ConceptVersionBI conceptBi = Ts.get().getConceptVersion(config.getCoordinate(), concept.getNid());
+			KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 
-		DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version");
+			ksession.setGlobal("resultsCollector", results);
+			ksession.setGlobal("terminologyHelper", new TerminologyHelperDroolsWorkbench());
 
-		ksession.insert(testConcept);
+			ConceptVersionBI conceptBi = Ts.get().getConceptVersion(config.getCoordinate(), concept.getNid());
 
-		ksession.startProcess("org.ihtsdo.qa-execution2");
-		ksession.fireAllRules();
+			DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version");
 
-		//ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
+			ksession.insert(testConcept);
 
-		for (ResultsItem resultsItem : results.getResultsItems() ) {
-			results.getAlertList().add(new AlertToDataConstraintFailure(
-					AlertToDataConstraintFailure.ALERT_TYPE.ERROR, 
-					resultsItem.getErrorCode() + " - " + resultsItem.getMessage(), 
-					concept));
-		}
+			ksession.startProcess("org.ihtsdo.qa-execution2");
+			ksession.fireAllRules();
 
-		List<String> relTypesList = new ArrayList<String>();
-		List<String> textList = new ArrayList<String>();
-		for (AbstractTemplate template : results.getTemplates()) {
-			if (template.getType().equals(TemplateType.DESCRIPTION)) {
-				DescriptionTemplate dtemplate = (DescriptionTemplate) template;
-				if (!textList.contains(dtemplate.getText())) {
-					textList.add(dtemplate.getText());
-					DescriptionVersionBI description = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getCoordinate(),
-							UUID.fromString(dtemplate.getComponentUuid()));
-					DescriptionSpec dSpec = SpecFactory.get(description);
-					if (dtemplate.getText() != null) {
-						dSpec.setDescText(dtemplate.getText());
+			//ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
+
+			for (ResultsItem resultsItem : results.getResultsItems() ) {
+				results.getAlertList().add(new AlertToDataConstraintFailure(
+						AlertToDataConstraintFailure.ALERT_TYPE.ERROR, 
+						resultsItem.getErrorCode() + " - " + resultsItem.getMessage(), 
+						concept));
+			}
+
+			List<String> relTypesList = new ArrayList<String>();
+			List<String> textList = new ArrayList<String>();
+			for (AbstractTemplate template : results.getTemplates()) {
+				if (template.getType().equals(TemplateType.DESCRIPTION)) {
+					DescriptionTemplate dtemplate = (DescriptionTemplate) template;
+					if (!textList.contains(dtemplate.getText())) {
+						textList.add(dtemplate.getText());
+						DescriptionVersionBI description = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getCoordinate(),
+								UUID.fromString(dtemplate.getComponentUuid()));
+						DescriptionSpec dSpec = SpecFactory.get(description);
+						if (dtemplate.getText() != null) {
+							dSpec.setDescText(dtemplate.getText());
+						}
+						//TODO: implement other properties
+						results.getWbTemplates().put(dSpec, description.getNid());
 					}
-					//TODO: implement other properties
-					results.getWbTemplates().put(dSpec, description.getNid());
 				}
+
+				if (template.getType().equals(TemplateType.RELATIONSHIP)) {
+					RelationshipTemplate rtemplate = (RelationshipTemplate) template;
+					if (!relTypesList.contains(rtemplate.getTypeUuid().trim())) {
+						relTypesList.add(rtemplate.getTypeUuid().trim());
+						ConceptSpec sourceConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getSourceUuid())).toString(),
+								UUID.fromString(rtemplate.getSourceUuid()));
+						ConceptSpec typeConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTypeUuid())).toString(),
+								UUID.fromString(rtemplate.getTypeUuid()));
+						ConceptSpec targetConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTargetUuid())).toString(),
+								UUID.fromString(rtemplate.getTargetUuid()));
+						RelSpec relSpec = new RelSpec(sourceConceptSpec, typeConceptSpec, targetConceptSpec);
+						//TODO: implement other properties
+						results.getWbTemplates().put(relSpec, concept.getConceptNid());
+					}
+				}
+				//TODO: implement other templates
 			}
 
-			if (template.getType().equals(TemplateType.RELATIONSHIP)) {
-				RelationshipTemplate rtemplate = (RelationshipTemplate) template;
-				if (!relTypesList.contains(rtemplate.getTypeUuid().trim())) {
-					relTypesList.add(rtemplate.getTypeUuid().trim());
-					ConceptSpec sourceConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getSourceUuid())).toString(),
-							UUID.fromString(rtemplate.getSourceUuid()));
-					ConceptSpec typeConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTypeUuid())).toString(),
-							UUID.fromString(rtemplate.getTypeUuid()));
-					ConceptSpec targetConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTargetUuid())).toString(),
-							UUID.fromString(rtemplate.getTargetUuid()));
-					RelSpec relSpec = new RelSpec(sourceConceptSpec, typeConceptSpec, targetConceptSpec);
-					//TODO: implement other properties
-					results.getWbTemplates().put(relSpec, concept.getConceptNid());
-				}
-			}
-			//TODO: implement other templates
+			ksession.dispose();
 		}
-
-		ksession.dispose();
 
 		return results;
 	}
