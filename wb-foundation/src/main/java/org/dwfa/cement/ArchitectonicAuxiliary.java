@@ -90,11 +90,11 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                     
         WORKFLOW_COMMENT_TYPE("Concept type",
         		new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
-        	WORKFLOW_COMMENT("Workflow comment",
+        	WORKFLOW_COMMENT("Comment",
         			new I_ConceptualizeUniversally[] { WORKFLOW_COMMENT_TYPE }),
-        	WORKFLOW_REJECTION("Workflow rejection",
+        	WORKFLOW_REJECTION("Rejection",
         			new I_ConceptualizeUniversally[] { WORKFLOW_COMMENT_TYPE }),
-        	WORKFLOW_COMMENT_WEB_REF("Workflow comment with web reference", 
+        	WORKFLOW_COMMENT_WEB_REF("Comment with web reference", 
         			new I_ConceptualizeUniversally[] { WORKFLOW_COMMENT_TYPE }),
                              
     		SPELLING_REJECTION("Spelling",
