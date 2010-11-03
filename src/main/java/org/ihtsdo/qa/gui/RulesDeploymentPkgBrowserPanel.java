@@ -108,7 +108,7 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 			}
 			table1.setModel(table1Model);
 			table1.validate();
-			table1.repaint();
+			panel1.revalidate();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -290,6 +290,8 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 			try {
 				pkg.updateKnowledgeBase();
 				map.put(pkg.getUuids().iterator().next(), Color.GREEN);
+				RulesContextHelper contextHelper = new RulesContextHelper(Terms.get().getActiveAceFrameConfig());
+				contextHelper.clearCache();
 			} catch (Exception e1) {
 				map.put(pkg.getUuids().iterator().next(), Color.RED);
 			}
