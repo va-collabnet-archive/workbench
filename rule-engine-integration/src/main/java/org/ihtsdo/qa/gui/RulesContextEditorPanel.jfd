@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_20" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_22" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -180,11 +180,38 @@
           <void property="name"> 
            <string>comboBox1</string> 
           </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+          <void method="setProperty"> 
+           <string>gridx</string> 
+           <int>3</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JButton</string> 
+          <void method="setProperty"> 
+           <string>text</string> 
+           <string>Search rules</string> 
+          </void> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object class="java.awt.Font"> 
+            <string>Lucida Grande</string> 
+            <int>0</int> 
+            <int>11</int> 
+           </object> 
+          </void> 
+          <void property="name"> 
+           <string>button1</string> 
+          </void> 
           <void method="addEvent"> 
            <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ItemListener</string> 
-            <string>itemStateChanged</string> 
-            <string>comboBox1ItemStateChanged</string> 
+            <string>java.awt.event.ActionListener</string> 
+            <string>actionPerformed</string> 
+            <string>button1ActionPerformed</string> 
             <boolean>true</boolean> 
            </object> 
           </void> 
@@ -193,7 +220,7 @@
           <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
           <void method="setProperty"> 
            <string>gridx</string> 
-           <int>3</int> 
+           <int>4</int> 
           </void> 
          </object> 
         </void> 

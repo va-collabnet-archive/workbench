@@ -67,7 +67,6 @@ public class RulesContextEditorPanel extends JPanel {
 				comboBox2.addItem(context);
 			}
 			updateCheckBox1();
-			updateTable1();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -99,7 +98,7 @@ public class RulesContextEditorPanel extends JPanel {
 			table1.setAutoCreateRowSorter(true);
 			label4.setText("Updating table...");
 			label4.repaint();
-			tableModel.clearData();
+			tableModel.data = new Object[0][0];
 			if (comboBox1.getSelectedItem() !=  null && comboBox2.getSelectedItem() != null) {
 				I_GetConceptData agendaMetadataRefset = tf.getConcept(RefsetAuxiliary.Concept.RULES_CONTEXT_METADATA_REFSET.getUids());
 				RulesDeploymentPackageReference selectedPackage = (RulesDeploymentPackageReference) comboBox1.getSelectedItem();
@@ -167,10 +166,11 @@ public class RulesContextEditorPanel extends JPanel {
 				TextAreaRenderer textAreaRenderer = new TextAreaRenderer();
 				cmodel.getColumn(0).setCellRenderer(textAreaRenderer); 
 				cmodel.getColumn(1).setCellRenderer(textAreaRenderer); 
-				// refresh table
-				table1.revalidate();
-				table1.repaint();
+				
 			}
+			// refresh table
+			table1.revalidate();
+			table1.repaint();
 			label4.setText("");
 			label4.repaint();
 		} catch (Exception e) {
@@ -317,7 +317,6 @@ public class RulesContextEditorPanel extends JPanel {
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
-		updateTable1();
 	}
 
 	private void comboBox1ItemStateChanged(ItemEvent e) {
@@ -362,6 +361,11 @@ public class RulesContextEditorPanel extends JPanel {
 		tableModel.saveStatusesInContext();
 	}
 
+	private void button1ActionPerformed(ActionEvent e) {
+		// search rules
+		updateTable1();
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		panel1 = new JPanel();
@@ -371,6 +375,7 @@ public class RulesContextEditorPanel extends JPanel {
 		comboBox2 = new JComboBox();
 		label2 = new JLabel();
 		comboBox1 = new JComboBox();
+		button1 = new JButton();
 		label4 = new JLabel();
 		scrollPane1 = new JScrollPane();
 		table1 = new JTable();
@@ -396,12 +401,12 @@ public class RulesContextEditorPanel extends JPanel {
 			//---- label1 ----
 			label1.setText("Rule-Context editor");
 			panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
 		}
 		add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 0, 0), 0, 0));
 
 		//======== panel2 ========
 		{
@@ -414,53 +419,60 @@ public class RulesContextEditorPanel extends JPanel {
 			//---- label3 ----
 			label3.setText("Context:");
 			panel2.add(label3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
 
 			//---- comboBox2 ----
 			comboBox2.addItemListener(new ItemListener() {
+				@Override
 				public void itemStateChanged(ItemEvent e) {
 					comboBox2ItemStateChanged(e);
 				}
 			});
 			panel2.add(comboBox2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
 
 			//---- label2 ----
 			label2.setText("Repository:");
 			panel2.add(label2, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+			panel2.add(comboBox1, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- comboBox1 ----
-			comboBox1.addItemListener(new ItemListener() {
-				public void itemStateChanged(ItemEvent e) {
-					comboBox1ItemStateChanged(e);
+			//---- button1 ----
+			button1.setText("Search rules");
+			button1.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			button1.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					button1ActionPerformed(e);
 				}
 			});
-			panel2.add(comboBox1, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+			panel2.add(button1, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
 
 			//---- label4 ----
 			label4.setText("Notification");
 			label4.setForeground(Color.red);
 			panel2.add(label4, new GridBagConstraints(8, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 0), 0, 0));
-		}
-		add(panel2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 0), 0, 0));
+		}
+		add(panel2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 0, 0), 0, 0));
 
 		//======== scrollPane1 ========
 		{
 			scrollPane1.setViewportView(table1);
 		}
 		add(scrollPane1, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 0, 0), 0, 0));
 
 		//======== panel3 ========
 		{
@@ -474,29 +486,31 @@ public class RulesContextEditorPanel extends JPanel {
 			button2.setText("Refresh");
 			button2.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			button2.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					button2ActionPerformed(e);
 				}
 			});
 			panel3.add(button2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
 
 			//---- saveButton ----
 			saveButton.setText("Save");
 			saveButton.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			saveButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					saveButtonActionPerformed(e);
 				}
 			});
 			panel3.add(saveButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 0), 0, 0));
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(panel3, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
-				GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-				new Insets(0, 0, 0, 0), 0, 0));
+			GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+			new Insets(0, 0, 0, 0), 0, 0));
 		// JFormDesigner - End of component initialization  //GEN-END:initComponents
 	}
 
@@ -508,6 +522,7 @@ public class RulesContextEditorPanel extends JPanel {
 	private JComboBox comboBox2;
 	private JLabel label2;
 	private JComboBox comboBox1;
+	private JButton button1;
 	private JLabel label4;
 	private JScrollPane scrollPane1;
 	private JTable table1;
