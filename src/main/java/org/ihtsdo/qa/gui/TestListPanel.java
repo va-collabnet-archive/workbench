@@ -115,6 +115,11 @@ public class TestListPanel extends JPanel {
 		testConcepts();
 	}
 
+	private void button3ActionPerformed(ActionEvent e) {
+		// Clear Cache
+		contextHelper.clearCache();
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		panel1 = new JPanel();
@@ -129,6 +134,7 @@ public class TestListPanel extends JPanel {
 		panel3 = new JPanel();
 		label3 = new JLabel();
 		comboBox1 = new JComboBox();
+		button3 = new JButton();
 		button2 = new JButton();
 
 		//======== this ========
@@ -220,6 +226,19 @@ public class TestListPanel extends JPanel {
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
 
+			//---- button3 ----
+			button3.setText("Clear KB Cache");
+			button3.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			button3.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					button3ActionPerformed(e);
+				}
+			});
+			panel3.add(button3, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
 			//---- button2 ----
 			button2.setText("Test concepts");
 			button2.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
@@ -252,6 +271,7 @@ public class TestListPanel extends JPanel {
 	private JPanel panel3;
 	private JLabel label3;
 	private JComboBox comboBox1;
+	private JButton button3;
 	private JButton button2;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

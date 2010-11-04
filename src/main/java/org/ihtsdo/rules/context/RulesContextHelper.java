@@ -20,6 +20,7 @@ import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.definition.KnowledgePackage;
 import org.drools.definition.rule.Rule;
+import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -57,36 +58,36 @@ public class RulesContextHelper {
 		this.kbCache = new HashMap<Integer, KnowledgeBase>();
 	}
 
-//	public void updateKbCacheFromFiles() {
-//		this.kbCache = new HashMap<Integer, KnowledgeBase>();
-//		File dir = new File("rules");
-//		for (File loopFile : dir.listFiles()) {
-//			if (loopFile.getName().endsWith(".bkb")) {
-//				try {
-//					ObjectInputStream in = new ObjectInputStream(new FileInputStream(loopFile));
-//					// The input stream might contain an individual
-//					// package or a collection.
-//					@SuppressWarnings( "unchecked" )
-//					//Collection<KnowledgePackage> kpkgs = (Collection<KnowledgePackage>)in.readObject();
-//					KnowledgeBase kbase = (KnowledgeBase) in.readObject();
-//					in.close();
-//					//KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-//					//kbase.addKnowledgePackages(kpkgs);
-//
-//					Integer contextId = Integer.valueOf(
-//							loopFile.getName().substring(0, loopFile.getName().indexOf(".")));
-//					kbCache.put(contextId, kbase);
-//
-//				} catch (FileNotFoundException e) {
-//					e.printStackTrace();
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				} catch (ClassNotFoundException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		}
-//	}
+	//	public void updateKbCacheFromFiles() {
+	//		this.kbCache = new HashMap<Integer, KnowledgeBase>();
+	//		File dir = new File("rules");
+	//		for (File loopFile : dir.listFiles()) {
+	//			if (loopFile.getName().endsWith(".bkb")) {
+	//				try {
+	//					ObjectInputStream in = new ObjectInputStream(new FileInputStream(loopFile));
+	//					// The input stream might contain an individual
+	//					// package or a collection.
+	//					@SuppressWarnings( "unchecked" )
+	//					//Collection<KnowledgePackage> kpkgs = (Collection<KnowledgePackage>)in.readObject();
+	//					KnowledgeBase kbase = (KnowledgeBase) in.readObject();
+	//					in.close();
+	//					//KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+	//					//kbase.addKnowledgePackages(kpkgs);
+	//
+	//					Integer contextId = Integer.valueOf(
+	//							loopFile.getName().substring(0, loopFile.getName().indexOf(".")));
+	//					kbCache.put(contextId, kbase);
+	//
+	//				} catch (FileNotFoundException e) {
+	//					e.printStackTrace();
+	//				} catch (IOException e) {
+	//					e.printStackTrace();
+	//				} catch (ClassNotFoundException e) {
+	//					e.printStackTrace();
+	//				}
+	//			}
+	//		}
+	//	}
 
 	public KnowledgeBase getKnowledgeBaseForContext(I_GetConceptData context, I_ConfigAceFrame config) throws Exception {
 		File serializedKbFile = new File("rules/" + context.getConceptNid() + ".bkb");
@@ -114,29 +115,32 @@ public class RulesContextHelper {
 
 			// **Flow test start**
 			KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-			kbuilder.add(ResourceFactory.newClassPathResource("rules/qa-execution2.rf"), ResourceType.DRF);
-			kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
-			// **Flow test end**
+			File flow = new File("rules/qa-execution2.rf");
+			if (flow.exists()) {
+				kbuilder.add(ResourceFactory.newClassPathResource("rules/qa-execution2.rf"), ResourceType.DRF);
+				kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+				// **Flow test end**
 
-			for (RulesDeploymentPackageReference deploymentPackage : getPackagesForContext(context)) {
-				if (deploymentPackage.validate()) {
-					KnowledgeBase loopKBase = deploymentPackage.getKnowledgeBase(false);
-					loopKBase = filterForContext(loopKBase, context, config);
-					kbase.addKnowledgePackages(loopKBase.getKnowledgePackages());
+				for (RulesDeploymentPackageReference deploymentPackage : getPackagesForContext(context)) {
+					if (deploymentPackage.validate()) {
+						KnowledgeBase loopKBase = deploymentPackage.getKnowledgeBase(false);
+						loopKBase = filterForContext(loopKBase, context, config);
+						kbase.addKnowledgePackages(loopKBase.getKnowledgePackages());
+					}
 				}
+				try {
+					ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
+					out.writeObject( kbase );
+					//out.writeObject( kbase.getKnowledgePackages() );
+					out.close();
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				kbCache.put(context.getConceptNid(), kbase);
+				lastCacheUpdateTime = Calendar.getInstance().getTimeInMillis();
 			}
-			try {
-				ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
-				out.writeObject( kbase );
-				//out.writeObject( kbase.getKnowledgePackages() );
-				out.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			kbCache.put(context.getConceptNid(), kbase);
-			lastCacheUpdateTime = Calendar.getInstance().getTimeInMillis();
 
 			return kbase;
 		}
@@ -464,6 +468,7 @@ public class RulesContextHelper {
 				loopFile.delete();
 			}
 		}
+		kbCache = new HashMap<Integer, KnowledgeBase>();
 		//updateKbCacheFromFiles();
 	}
 

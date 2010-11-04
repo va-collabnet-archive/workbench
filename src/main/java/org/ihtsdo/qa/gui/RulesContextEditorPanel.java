@@ -15,6 +15,9 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.DefaultCellEditor;
@@ -99,10 +102,11 @@ public class RulesContextEditorPanel extends JPanel {
 
 	private void updateTable1() {
 		try {
-			table1.setAutoCreateRowSorter(true);
+			//table1.setAutoCreateRowSorter(true);
 			label4.setText("Updating table...");
 			label4.repaint();
 			tableModel.data = new Object[0][0];
+			tableModel.dataList = new ArrayList<Object[]>();
 			if (comboBox1.getSelectedItem() !=  null && comboBox2.getSelectedItem() != null) {
 				I_GetConceptData agendaMetadataRefset = tf.getConcept(RefsetAuxiliary.Concept.RULES_CONTEXT_METADATA_REFSET.getUids());
 				RulesDeploymentPackageReference selectedPackage = (RulesDeploymentPackageReference) comboBox1.getSelectedItem();
@@ -113,8 +117,18 @@ public class RulesContextEditorPanel extends JPanel {
 				setUpSportColumn(table1, table1.getColumnModel().getColumn(3));
 
 				if (selectedPackage.validate()) {
-
-					for (Rule rule : selectedPackage.getRules()) {
+					Collection<Rule> rules = selectedPackage.getRules();
+					List<Rule> rulesList = new ArrayList<Rule>();
+					rulesList.addAll(rules);
+					Collections.sort(rulesList,
+							new Comparator<Rule>()
+							{
+								public int compare(Rule f1, Rule f2)
+								{
+									return f1.getName().compareTo(f2.getName());
+								}
+							});
+					for (Rule rule : rulesList) {
 						//System.out.println("** rule: " + rule.getName());
 						String ruleUid = null;
 						String description =  null;
@@ -256,7 +270,7 @@ public class RulesContextEditorPanel extends JPanel {
 		 * editable.
 		 */
 		public boolean isCellEditable(int x, int y) {
-			if(y == 3){
+			if(y == 3 && getValueAt(x,5) != null){
 				return true;
 			}else{
 				return false;
@@ -330,8 +344,8 @@ public class RulesContextEditorPanel extends JPanel {
 	private void button2ActionPerformed(ActionEvent e) {
 		try {
 
-			comboBox1.removeItemListener(comboBox1.getItemListeners()[0]);
-			comboBox2.removeItemListener(comboBox2.getItemListeners()[0]);
+//			comboBox1.removeItemListener(comboBox1.getItemListeners()[0]);
+//			comboBox2.removeItemListener(comboBox2.getItemListeners()[0]);
 
 			comboBox2.removeAllItems();
 			for (I_GetConceptData context : contextHelper.getAllContexts()) {
@@ -342,17 +356,17 @@ public class RulesContextEditorPanel extends JPanel {
 				comboBox1.addItem(repo);
 			}
 
-			comboBox2.addItemListener(new ItemListener() {
-				public void itemStateChanged(ItemEvent e) {
-					comboBox2ItemStateChanged(e);
-				}
-			});
-
-			comboBox1.addItemListener(new ItemListener() {
-				public void itemStateChanged(ItemEvent e) {
-					comboBox1ItemStateChanged(e);
-				}
-			});
+//			comboBox2.addItemListener(new ItemListener() {
+//				public void itemStateChanged(ItemEvent e) {
+//					comboBox2ItemStateChanged(e);
+//				}
+//			});
+//
+//			comboBox1.addItemListener(new ItemListener() {
+//				public void itemStateChanged(ItemEvent e) {
+//					comboBox1ItemStateChanged(e);
+//				}
+//			});
 
 			updateTable1();
 		} catch (Exception e1) {
@@ -385,7 +399,6 @@ public class RulesContextEditorPanel extends JPanel {
 		scrollPane1 = new JScrollPane();
 		table1 = new JTable();
 		panel3 = new JPanel();
-		button2 = new JButton();
 		saveButton = new JButton();
 
 		//======== this ========
@@ -487,19 +500,6 @@ public class RulesContextEditorPanel extends JPanel {
 			((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
 			((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-			//---- button2 ----
-			button2.setText("Refresh");
-			button2.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			button2.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					button2ActionPerformed(e);
-				}
-			});
-			panel3.add(button2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
-
 			//---- saveButton ----
 			saveButton.setText("Save");
 			saveButton.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
@@ -532,7 +532,6 @@ public class RulesContextEditorPanel extends JPanel {
 	private JScrollPane scrollPane1;
 	private JTable table1;
 	private JPanel panel3;
-	private JButton button2;
 	private JButton saveButton;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }
