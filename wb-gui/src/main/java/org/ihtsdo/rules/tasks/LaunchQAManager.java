@@ -53,6 +53,10 @@ public class LaunchQAManager extends AbstractTask {
 
 			AceFrameConfig config = (AceFrameConfig) worker
 			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+			
+			if (config == null) {
+				config = Terms.get().getActiveAceFrameConfig();
+			}
 
 			AceFrame ace=config.getAceFrame();
 			JTabbedPane tp=ace.getCdePanel().getConceptTabs();
