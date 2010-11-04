@@ -9,7 +9,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -44,7 +43,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
-import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
 
@@ -56,46 +54,61 @@ public class RulesContextHelper {
 
 	public RulesContextHelper(I_ConfigAceFrame config) {
 		this.config = config;
-		updateKbCacheFromFiles();
-	}
-
-	public void updateKbCacheFromFiles() {
 		this.kbCache = new HashMap<Integer, KnowledgeBase>();
-		File dir = new File("rules");
-		for (File loopFile : dir.listFiles()) {
-			if (loopFile.getName().endsWith(".bkb")) {
-				try {
-					ObjectInputStream in = new ObjectInputStream(new FileInputStream(loopFile));
-					// The input stream might contain an individual
-					// package or a collection.
-					@SuppressWarnings( "unchecked" )
-					//Collection<KnowledgePackage> kpkgs = (Collection<KnowledgePackage>)in.readObject();
-					KnowledgeBase kbase = (KnowledgeBase) in.readObject();
-					in.close();
-					//KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-					//kbase.addKnowledgePackages(kpkgs);
-
-					Integer contextId = Integer.valueOf(
-							loopFile.getName().substring(0, loopFile.getName().indexOf(".")));
-					kbCache.put(contextId, kbase);
-
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				}
-			}
-		}
 	}
+
+//	public void updateKbCacheFromFiles() {
+//		this.kbCache = new HashMap<Integer, KnowledgeBase>();
+//		File dir = new File("rules");
+//		for (File loopFile : dir.listFiles()) {
+//			if (loopFile.getName().endsWith(".bkb")) {
+//				try {
+//					ObjectInputStream in = new ObjectInputStream(new FileInputStream(loopFile));
+//					// The input stream might contain an individual
+//					// package or a collection.
+//					@SuppressWarnings( "unchecked" )
+//					//Collection<KnowledgePackage> kpkgs = (Collection<KnowledgePackage>)in.readObject();
+//					KnowledgeBase kbase = (KnowledgeBase) in.readObject();
+//					in.close();
+//					//KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+//					//kbase.addKnowledgePackages(kpkgs);
+//
+//					Integer contextId = Integer.valueOf(
+//							loopFile.getName().substring(0, loopFile.getName().indexOf(".")));
+//					kbCache.put(contextId, kbase);
+//
+//				} catch (FileNotFoundException e) {
+//					e.printStackTrace();
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				} catch (ClassNotFoundException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		}
+//	}
 
 	public KnowledgeBase getKnowledgeBaseForContext(I_GetConceptData context, I_ConfigAceFrame config) throws Exception {
-		//if (kbCache.containsKey(context) && ((Calendar.getInstance().getTimeInMillis() - lastCacheUpdateTime)<10000)) {
+		File serializedKbFile = new File("rules/" + context.getConceptNid() + ".bkb");
 		if (kbCache.containsKey(context.getConceptNid())) {
 			return kbCache.get(context.getConceptNid());
+		} else if (serializedKbFile.exists()){
+			KnowledgeBase kbase = null;
+			try {
+				ObjectInputStream in = new ObjectInputStream(new FileInputStream(serializedKbFile));
+				kbase = (KnowledgeBase) in.readObject();
+				in.close();
+				kbCache.put(context.getConceptNid(), kbase);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			return kbase;
 		} else {
-			RulesDeploymentPackageReferenceHelper rulesPackageHelper = new RulesDeploymentPackageReferenceHelper(config);
+			//RulesDeploymentPackageReferenceHelper rulesPackageHelper = new RulesDeploymentPackageReferenceHelper(config);
 
 			KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
 
@@ -112,7 +125,6 @@ public class RulesContextHelper {
 					kbase.addKnowledgePackages(loopKBase.getKnowledgePackages());
 				}
 			}
-			File serializedKbFile = new File("rules/" + context.getConceptNid() + ".bkb");
 			try {
 				ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
 				out.writeObject( kbase );
@@ -452,7 +464,7 @@ public class RulesContextHelper {
 				loopFile.delete();
 			}
 		}
-		updateKbCacheFromFiles();
+		//updateKbCacheFromFiles();
 	}
 
 	public List<RulesDeploymentPackageReference> getPackagesForContext(I_GetConceptData context) {

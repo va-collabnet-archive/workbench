@@ -417,22 +417,38 @@ public class RulesLibrary {
 	 */
 	public static KnowledgeBase getKnowledgeBase(UUID referenceUuid, byte[] bytes, boolean recreate) throws Exception {
 		KnowledgeBase kbase= null;
+		
+		if (recreate) {
+			try {
+				kbase = getKnowledgeBaseWithAgent(referenceUuid, bytes);
+			} catch (Exception e) {
+				// agent base not available
+			}
+		}
+		
+		if (!recreate || kbase == null) {
+			kbase = getKnowledgeBaseFromFileCache(referenceUuid);
+		}
+		
+		return kbase;
+	}
+	
+	private static KnowledgeBase getKnowledgeBaseFromFileCache(UUID referenceUuid) {
+		KnowledgeBase kbase= null;
 		File rulesDirectory = new File("rules");
 		if (!rulesDirectory.exists())
 		{
 			rulesDirectory.mkdir();
 		}
 		File serializedKbFile = new File(rulesDirectory, "knowledge_packages-" + referenceUuid.toString() + ".pkg");
-		if (serializedKbFile.exists() && !recreate) {
+		
+		if (serializedKbFile.exists()) {
 			try {
 				ObjectInputStream in = new ObjectInputStream(new FileInputStream(serializedKbFile));
 				// The input stream might contain an individual
 				// package or a collection.
-				@SuppressWarnings( "unchecked" )
-				Collection<KnowledgePackage> kpkgs = (Collection<KnowledgePackage>)in.readObject();
+				kbase = (KnowledgeBase)in.readObject();
 				in.close();
-				kbase = KnowledgeBaseFactory.newKnowledgeBase();
-				kbase.addKnowledgePackages(kpkgs);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -440,19 +456,29 @@ public class RulesLibrary {
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
-		} else {
-			KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( "Agent" );
-			kagent.applyChangeSet( ResourceFactory.newByteArrayResource(bytes) );
-			kbase = kagent.getKnowledgeBase();
-			try {
-				ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
-				out.writeObject( kbase.getKnowledgePackages() );
-				out.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		}
+		
+		return kbase;
+	}
+	private static KnowledgeBase getKnowledgeBaseWithAgent(UUID referenceUuid, byte[] bytes) {
+		KnowledgeBase kbase= null;
+		File rulesDirectory = new File("rules");
+		if (!rulesDirectory.exists())
+		{
+			rulesDirectory.mkdir();
+		}
+		File serializedKbFile = new File(rulesDirectory, "knowledge_packages-" + referenceUuid.toString() + ".pkg");
+		KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( "Agent" );
+		kagent.applyChangeSet( ResourceFactory.newByteArrayResource(bytes) );
+		kbase = kagent.getKnowledgeBase();
+		try {
+			ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
+			out.writeObject( kbase );
+			out.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		return kbase;
 	}
