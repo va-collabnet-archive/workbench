@@ -594,7 +594,10 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                             new I_ConceptualizeUniversally[] { ACTIVE }),
                     PROMOTED("promoted (active status type)",
                             new I_ConceptualizeUniversally[] { ACTIVE }),
-
+                    OUT_FOR_SME_REVIEW("Out for SME Review (active status type)",
+                                new I_ConceptualizeUniversally[] { ACTIVE }),
+                    READY_TO_RELEASE("Ready to release (active status type)",
+                                    new I_ConceptualizeUniversally[] { ACTIVE }),
                     OPTIONAL("optional (active status type)",
                              new I_ConceptualizeUniversally[] { ACTIVE }),
                     DEVELOPMENTAL("developmental (active status type)",
