@@ -90,7 +90,6 @@ public class TestListPanel extends JPanel {
 				return false;
 			}
 		};
-		RulesContextHelper contextHelper = new RulesContextHelper(config);
 		for (int i = 0; i < list1Model.getSize(); i++) {
 			I_GetConceptData loopConcept = (I_GetConceptData) list1Model.getElementAt(i);
 			I_GetConceptData context = (I_GetConceptData) comboBox1.getSelectedItem();
@@ -157,6 +156,7 @@ public class TestListPanel extends JPanel {
 			button1.setText("Refresh content from list");
 			button1.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			button1.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					button1ActionPerformed(e);
 				}
@@ -224,6 +224,7 @@ public class TestListPanel extends JPanel {
 			button2.setText("Test concepts");
 			button2.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			button2.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					button2ActionPerformed(e);
 				}

@@ -44,6 +44,10 @@ import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
  * @author Guillermo Reynoso
  */
 public class RulesContextEditorPanel extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private MyTableModel tableModel;
 	private I_TermFactory tf;
 	private I_ConfigAceFrame config;
@@ -359,6 +363,7 @@ public class RulesContextEditorPanel extends JPanel {
 
 	private void saveButtonActionPerformed(ActionEvent e) {
 		tableModel.saveStatusesInContext();
+		contextHelper.clearCache();
 	}
 
 	private void button1ActionPerformed(ActionEvent e) {
