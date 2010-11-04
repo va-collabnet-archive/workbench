@@ -118,6 +118,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                     new I_ConceptualizeUniversally[] { USER_PERMISSION }),
         USER("user",
               new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
+              SNOROCKET(new String[] {"Snorocket (classifier)", "Snorocket"}, null,
+                      new I_ConceptualizeUniversally[] { USER }),
               KEITH_CAMPBELL(new String[] {"Keith Campbell (Informatics, Inc.)", "KEC"}, null,
                       new I_ConceptualizeUniversally[] { USER }),
               SUSAN_CASTILLO(new String[] {"Susan Castillo (Informatics, Inc.)", "SC"}, null,
