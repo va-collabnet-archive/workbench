@@ -113,73 +113,75 @@ public class RulesLibrary {
 	throws Exception {
 		KnowledgeBase kbase = contextHelper.getKnowledgeBaseForContext(context, config);
 		ResultsCollectorWorkBench results = new ResultsCollectorWorkBench();
-		int a1 = kbase.getKnowledgePackages().size();
-		int a2 = kbase.getKnowledgePackages().iterator().next().getRules().size();
-		if (!(kbase.getKnowledgePackages().size() == 1 &&
-				kbase.getKnowledgePackages().iterator().next().getRules().size() == 0)) { 
+		if (kbase != null) {
+			int a1 = kbase.getKnowledgePackages().size();
+			int a2 = kbase.getKnowledgePackages().iterator().next().getRules().size();
+			if (!(kbase.getKnowledgePackages().size() == 1 &&
+					kbase.getKnowledgePackages().iterator().next().getRules().size() == 0)) { 
 
-			StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
+				StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 
-			KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+				//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 
-			ksession.setGlobal("resultsCollector", results);
-			ksession.setGlobal("terminologyHelper", new TerminologyHelperDroolsWorkbench());
+				ksession.setGlobal("resultsCollector", results);
+				ksession.setGlobal("terminologyHelper", new TerminologyHelperDroolsWorkbench());
 
-			ConceptVersionBI conceptBi = Ts.get().getConceptVersion(config.getCoordinate(), concept.getNid());
+				ConceptVersionBI conceptBi = Ts.get().getConceptVersion(config.getCoordinate(), concept.getNid());
 
-			DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version");
+				DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version");
 
-			ksession.insert(testConcept);
+				ksession.insert(testConcept);
 
-			ksession.startProcess("org.ihtsdo.qa-execution2");
-			ksession.fireAllRules();
+				ksession.startProcess("org.ihtsdo.qa-execution2");
+				ksession.fireAllRules();
 
-			//ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
+				//ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
 
-			for (ResultsItem resultsItem : results.getResultsItems() ) {
-				results.getAlertList().add(new AlertToDataConstraintFailure(
-						AlertToDataConstraintFailure.ALERT_TYPE.ERROR, 
-						resultsItem.getErrorCode() + " - " + resultsItem.getMessage(), 
-						concept));
-			}
+				for (ResultsItem resultsItem : results.getResultsItems() ) {
+					results.getAlertList().add(new AlertToDataConstraintFailure(
+							AlertToDataConstraintFailure.ALERT_TYPE.ERROR, 
+							resultsItem.getErrorCode() + " - " + resultsItem.getMessage(), 
+							concept));
+				}
 
-			List<String> relTypesList = new ArrayList<String>();
-			List<String> textList = new ArrayList<String>();
-			for (AbstractTemplate template : results.getTemplates()) {
-				if (template.getType().equals(TemplateType.DESCRIPTION)) {
-					DescriptionTemplate dtemplate = (DescriptionTemplate) template;
-					if (!textList.contains(dtemplate.getText())) {
-						textList.add(dtemplate.getText());
-						DescriptionVersionBI description = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getCoordinate(),
-								UUID.fromString(dtemplate.getComponentUuid()));
-						DescriptionSpec dSpec = SpecFactory.get(description);
-						if (dtemplate.getText() != null) {
-							dSpec.setDescText(dtemplate.getText());
+				List<String> relTypesList = new ArrayList<String>();
+				List<String> textList = new ArrayList<String>();
+				for (AbstractTemplate template : results.getTemplates()) {
+					if (template.getType().equals(TemplateType.DESCRIPTION)) {
+						DescriptionTemplate dtemplate = (DescriptionTemplate) template;
+						if (!textList.contains(dtemplate.getText())) {
+							textList.add(dtemplate.getText());
+							DescriptionVersionBI description = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getCoordinate(),
+									UUID.fromString(dtemplate.getComponentUuid()));
+							DescriptionSpec dSpec = SpecFactory.get(description);
+							if (dtemplate.getText() != null) {
+								dSpec.setDescText(dtemplate.getText());
+							}
+							//TODO: implement other properties
+							results.getWbTemplates().put(dSpec, description.getNid());
 						}
-						//TODO: implement other properties
-						results.getWbTemplates().put(dSpec, description.getNid());
 					}
+
+					if (template.getType().equals(TemplateType.RELATIONSHIP)) {
+						RelationshipTemplate rtemplate = (RelationshipTemplate) template;
+						if (!relTypesList.contains(rtemplate.getTypeUuid().trim())) {
+							relTypesList.add(rtemplate.getTypeUuid().trim());
+							ConceptSpec sourceConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getSourceUuid())).toString(),
+									UUID.fromString(rtemplate.getSourceUuid()));
+							ConceptSpec typeConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTypeUuid())).toString(),
+									UUID.fromString(rtemplate.getTypeUuid()));
+							ConceptSpec targetConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTargetUuid())).toString(),
+									UUID.fromString(rtemplate.getTargetUuid()));
+							RelSpec relSpec = new RelSpec(sourceConceptSpec, typeConceptSpec, targetConceptSpec);
+							//TODO: implement other properties
+							results.getWbTemplates().put(relSpec, concept.getConceptNid());
+						}
+					}
+					//TODO: implement other templates
 				}
 
-				if (template.getType().equals(TemplateType.RELATIONSHIP)) {
-					RelationshipTemplate rtemplate = (RelationshipTemplate) template;
-					if (!relTypesList.contains(rtemplate.getTypeUuid().trim())) {
-						relTypesList.add(rtemplate.getTypeUuid().trim());
-						ConceptSpec sourceConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getSourceUuid())).toString(),
-								UUID.fromString(rtemplate.getSourceUuid()));
-						ConceptSpec typeConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTypeUuid())).toString(),
-								UUID.fromString(rtemplate.getTypeUuid()));
-						ConceptSpec targetConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTargetUuid())).toString(),
-								UUID.fromString(rtemplate.getTargetUuid()));
-						RelSpec relSpec = new RelSpec(sourceConceptSpec, typeConceptSpec, targetConceptSpec);
-						//TODO: implement other properties
-						results.getWbTemplates().put(relSpec, concept.getConceptNid());
-					}
-				}
-				//TODO: implement other templates
+				ksession.dispose();
 			}
-
-			ksession.dispose();
 		}
 
 		return results;
@@ -417,22 +419,36 @@ public class RulesLibrary {
 	 */
 	public static KnowledgeBase getKnowledgeBase(UUID referenceUuid, byte[] bytes, boolean recreate) throws Exception {
 		KnowledgeBase kbase= null;
-		
+
 		if (recreate) {
 			try {
 				kbase = getKnowledgeBaseWithAgent(referenceUuid, bytes);
 			} catch (Exception e) {
 				// agent base not available
+				System.out.println("WARNING: Agent based connection with guvnor not available, using trying to load from cache...");
+				kbase = getKnowledgeBaseFromFileCache(referenceUuid);
+				if (kbase != null) {
+					System.out.println("WARNING: Cache load OK.");
+				} else {
+					System.out.println("WARNING: Cache loading failed, No knowledgebase.");
+				}
+			}
+		} else  {
+			kbase = getKnowledgeBaseFromFileCache(referenceUuid);
+			if (kbase != null) {
+				System.out.println("WARNING: Cache loading failed, terying Guvnor...");
+				kbase = getKnowledgeBaseWithAgent(referenceUuid, bytes);
+				if (kbase != null) {
+					System.out.println("WARNING: Guvnor load OK.");
+				} else {
+					System.out.println("WARNING: Guvnor loading failed, No knowledgebase.");
+				}
 			}
 		}
-		
-		if (!recreate || kbase == null) {
-			kbase = getKnowledgeBaseFromFileCache(referenceUuid);
-		}
-		
+
 		return kbase;
 	}
-	
+
 	private static KnowledgeBase getKnowledgeBaseFromFileCache(UUID referenceUuid) {
 		KnowledgeBase kbase= null;
 		File rulesDirectory = new File("rules");
@@ -441,7 +457,7 @@ public class RulesLibrary {
 			rulesDirectory.mkdir();
 		}
 		File serializedKbFile = new File(rulesDirectory, "knowledge_packages-" + referenceUuid.toString() + ".pkg");
-		
+
 		if (serializedKbFile.exists()) {
 			try {
 				ObjectInputStream in = new ObjectInputStream(new FileInputStream(serializedKbFile));
@@ -457,7 +473,7 @@ public class RulesLibrary {
 				e.printStackTrace();
 			}
 		}
-		
+
 		return kbase;
 	}
 	private static KnowledgeBase getKnowledgeBaseWithAgent(UUID referenceUuid, byte[] bytes) {
