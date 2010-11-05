@@ -695,10 +695,12 @@ public class RulesContextHelper {
 			
 			concept.promote(config.getViewPositionSet().iterator().next(), 
 					config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+			termFactory.addUncommittedNoChecks(concept);
 			
 			for (I_ExtendByRef loopExtension : termFactory.getAllExtensionsForComponent(concept.getConceptNid())) {
 				loopExtension.promote(config.getViewPositionSet().iterator().next(), 
 						config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+				termFactory.addUncommittedNoChecks(loopExtension);
 			}
 			
 			termFactory.commit();
