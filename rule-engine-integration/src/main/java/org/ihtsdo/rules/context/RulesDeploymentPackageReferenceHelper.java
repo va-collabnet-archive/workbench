@@ -27,6 +27,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.Precedence;
 
 public class RulesDeploymentPackageReferenceHelper {
 
@@ -87,6 +88,21 @@ public class RulesDeploymentPackageReferenceHelper {
 			termFactory.addUncommittedNoChecks(newConcept);
 			termFactory.addUncommittedNoChecks(rulesPackagesRefset);
 
+			termFactory.commit();
+			
+			I_IntSet allowedStatusWithRetired = Terms.get().newIntSet();
+			allowedStatusWithRetired.addAll(config.getAllowedStatus().getSetValues());
+			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
+			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
+			
+			newConcept.promote(config.getViewPositionSet().iterator().next(), 
+					config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+			
+			for (I_ExtendByRef loopExtension : termFactory.getAllExtensionsForComponent(newConcept.getConceptNid())) {
+				loopExtension.promote(config.getViewPositionSet().iterator().next(), 
+						config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+			}
+			
 			termFactory.commit();
 
 			return rulesPackage;
@@ -185,6 +201,21 @@ public class RulesDeploymentPackageReferenceHelper {
 			termFactory.addUncommittedNoChecks(rulesPackageRefset);
 
 			termFactory.commit();
+			
+			I_IntSet allowedStatusWithRetired = Terms.get().newIntSet();
+			allowedStatusWithRetired.addAll(config.getAllowedStatus().getSetValues());
+			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
+			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
+			
+			rulesPackageConcept.promote(config.getViewPositionSet().iterator().next(), 
+					config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+			
+			for (I_ExtendByRef loopExtension : termFactory.getAllExtensionsForComponent(rulesPackageConcept.getConceptNid())) {
+				loopExtension.promote(config.getViewPositionSet().iterator().next(), 
+						config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+			}
+			
+			termFactory.commit();
 
 			rulesPackageNewVersion = getRulesDeploymentPackageReference(rulesPackageConcept);
 			return rulesPackageNewVersion;
@@ -216,7 +247,7 @@ public class RulesDeploymentPackageReferenceHelper {
 			for (I_GetConceptData child : children) {
 				if (child.getConceptAttributeTuples(allowedStatuses, config.getViewPositionSetReadOnly(), 
 						config.getPrecedence(), 
-						config.getConflictResolutionStrategy()).iterator().next().getStatusId() !=
+						config.getConflictResolutionStrategy()).iterator().next().getStatusNid() !=
 							ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()) {
 					rulesPackages.add(getRulesDeploymentPackageReference(child));
 				}
@@ -247,7 +278,7 @@ public class RulesDeploymentPackageReferenceHelper {
 
 			for (I_DescriptionTuple tuple : descTuples) {
 
-				if (tuple.getTypeId() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()) {
+				if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()) {
 					I_DescriptionVersioned description = tuple.getDescVersioned();
 					for (PathBI editPath : config.getEditingPathSet()) {
 						I_DescriptionPart newPart = (I_DescriptionPart) tuple.getMutablePart().makeAnalog(
@@ -258,6 +289,16 @@ public class RulesDeploymentPackageReferenceHelper {
 						description.addVersion(newPart);
 					}
 					termFactory.addUncommittedNoChecks(concept);
+					
+					I_IntSet allowedStatusWithRetired = Terms.get().newIntSet();
+					allowedStatusWithRetired.addAll(config.getAllowedStatus().getSetValues());
+					allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
+					allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
+					
+					concept.promote(config.getViewPositionSet().iterator().next(), 
+							config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+					
+					termFactory.commit();
 				}
 			}
 		} catch (IOException e) {
@@ -268,7 +309,7 @@ public class RulesDeploymentPackageReferenceHelper {
 	}
 
 	public I_ExtendByRefPart getLastExtensionPart(I_ExtendByRef extension) throws TerminologyException, IOException {
-		int lastVersion = Integer.MIN_VALUE;
+		long lastVersion = Long.MIN_VALUE;
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 		I_IntSet allowedStatus = config.getAllowedStatus();
 		allowedStatus.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
@@ -277,8 +318,8 @@ public class RulesDeploymentPackageReferenceHelper {
 		for (I_ExtendByRefVersion loopTuple : extension.getTuples(
 				allowedStatus, config.getViewPositionSetReadOnly(), config.getPrecedence(),
 				config.getConflictResolutionStrategy())) {
-			if (loopTuple.getVersion() > lastVersion) {
-				lastVersion = loopTuple.getVersion();
+			if (loopTuple.getTime() > lastVersion) {
+				lastVersion = loopTuple.getTime();
 				lastPart = loopTuple.getMutablePart();
 			}
 		}
@@ -306,6 +347,21 @@ public class RulesDeploymentPackageReferenceHelper {
 			}
 			termFactory.addUncommittedNoChecks(conceptToRetireUpdatedFromDB);
 			termFactory.commit();
+			
+			I_IntSet allowedStatusWithRetired = Terms.get().newIntSet();
+			allowedStatusWithRetired.addAll(config.getAllowedStatus().getSetValues());
+			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
+			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
+			
+			conceptToRetireUpdatedFromDB.promote(config.getViewPositionSet().iterator().next(), 
+					config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+			
+			for (I_ExtendByRef loopExtension : termFactory.getAllExtensionsForComponent(conceptToRetireUpdatedFromDB.getConceptNid())) {
+				loopExtension.promote(config.getViewPositionSet().iterator().next(), 
+						config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+			}
+			
+			termFactory.commit();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (TerminologyException e) {
@@ -319,7 +375,7 @@ public class RulesDeploymentPackageReferenceHelper {
 		List<? extends I_ConceptAttributePart> refsetAttibuteParts = concept.getConceptAttributes().getMutableParts();
 		I_ConceptAttributePart latestAttributePart = null;
 		for (I_ConceptAttributePart attributePart : refsetAttibuteParts) {
-			if (latestAttributePart == null || attributePart.getVersion() >= latestAttributePart.getVersion()) {
+			if (latestAttributePart == null || attributePart.getTime() >= latestAttributePart.getTime()) {
 				latestAttributePart = attributePart;
 			}
 		}
