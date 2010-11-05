@@ -101,8 +101,10 @@ public class RulesDeploymentPackageReferenceHelper {
 			for (I_ExtendByRef loopExtension : termFactory.getAllExtensionsForComponent(newConcept.getConceptNid())) {
 				loopExtension.promote(config.getViewPositionSet().iterator().next(), 
 						config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+				termFactory.addUncommittedNoChecks(loopExtension);
 			}
-			
+			termFactory.addUncommittedNoChecks(newConcept);
+			termFactory.addUncommittedNoChecks(rulesPackagesRefset);
 			termFactory.commit();
 
 			return rulesPackage;
@@ -213,8 +215,10 @@ public class RulesDeploymentPackageReferenceHelper {
 			for (I_ExtendByRef loopExtension : termFactory.getAllExtensionsForComponent(rulesPackageConcept.getConceptNid())) {
 				loopExtension.promote(config.getViewPositionSet().iterator().next(), 
 						config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+				termFactory.addUncommittedNoChecks(loopExtension);
 			}
-			
+			termFactory.addUncommittedNoChecks(rulesPackageConcept);
+			termFactory.addUncommittedNoChecks(rulesPackageRefset);
 			termFactory.commit();
 
 			rulesPackageNewVersion = getRulesDeploymentPackageReference(rulesPackageConcept);
@@ -289,6 +293,7 @@ public class RulesDeploymentPackageReferenceHelper {
 						description.addVersion(newPart);
 					}
 					termFactory.addUncommittedNoChecks(concept);
+					termFactory.commit();
 					
 					I_IntSet allowedStatusWithRetired = Terms.get().newIntSet();
 					allowedStatusWithRetired.addAll(config.getAllowedStatus().getSetValues());
@@ -297,7 +302,7 @@ public class RulesDeploymentPackageReferenceHelper {
 					
 					concept.promote(config.getViewPositionSet().iterator().next(), 
 							config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
-					
+					termFactory.addUncommittedNoChecks(concept);
 					termFactory.commit();
 				}
 			}
@@ -359,8 +364,9 @@ public class RulesDeploymentPackageReferenceHelper {
 			for (I_ExtendByRef loopExtension : termFactory.getAllExtensionsForComponent(conceptToRetireUpdatedFromDB.getConceptNid())) {
 				loopExtension.promote(config.getViewPositionSet().iterator().next(), 
 						config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+				termFactory.addUncommittedNoChecks(loopExtension);
 			}
-			
+			termFactory.addUncommittedNoChecks(conceptToRetireUpdatedFromDB);
 			termFactory.commit();
 		} catch (IOException e) {
 			e.printStackTrace();
