@@ -19,6 +19,8 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.qa.gui.QAManager;
+import org.dwfa.ace.api.Terms;
+
 
 @BeanList(specs = 
 { @Spec(directory = "tasks/qa tasks", type = BeanType.TASK_BEAN)})
@@ -55,7 +57,7 @@ public class LaunchQAManager extends AbstractTask {
 			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 			
 			if (config == null) {
-				config = Terms.get().getActiveAceFrameConfig();
+				config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
 			}
 
 			AceFrame ace=config.getAceFrame();
