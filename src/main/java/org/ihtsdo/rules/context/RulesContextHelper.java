@@ -202,6 +202,8 @@ public class RulesContextHelper {
 			termFactory.addUncommittedNoChecks(newConcept);
 
 			termFactory.commit();
+			
+			promote(newConcept);
 
 			return newConcept;
 
@@ -254,6 +256,7 @@ public class RulesContextHelper {
 				tf.addUncommittedNoChecks(contextRefset);
 				tf.addUncommittedNoChecks(context);
 				tf.commit();
+				promote(context);
 			} else if (currentRolePart != null && newRole != null){
 				if (currentRolePart.getC1id() != newRole.getConceptNid() || currentRolePart.getStatusNid() != currentStatus.getConceptNid()) {
 					// update existing role
@@ -285,6 +288,7 @@ public class RulesContextHelper {
 								}
 								tf.addUncommittedNoChecks(contextRefset);
 								tf.commit();
+								promote(context);
 							}
 						}
 					}
@@ -320,6 +324,7 @@ public class RulesContextHelper {
 							}
 							tf.addUncommittedNoChecks(contextRefset);
 							tf.commit();
+							promote(context);
 						}
 					}
 				}
@@ -413,6 +418,8 @@ public class RulesContextHelper {
 						description.addVersion(newPart);
 					}
 					termFactory.addUncommittedNoChecks(concept);
+					termFactory.commit();
+					promote(concept);
 				}
 			}
 		} catch (IOException e) {
@@ -581,6 +588,7 @@ public class RulesContextHelper {
 							retiredAndReactivated = true;
 							termFactory.addUncommittedNoChecks(context);
 							termFactory.commit();
+							promote(context);
 						}
 					}
 				}
@@ -596,6 +604,7 @@ public class RulesContextHelper {
 							0, config);
 					termFactory.addUncommittedNoChecks(context);
 					termFactory.commit();
+					promote(context);
 				}
 			} catch (TerminologyException e) {
 				e.printStackTrace();
@@ -634,6 +643,7 @@ public class RulesContextHelper {
 					}
 					termFactory.addUncommittedNoChecks(context);
 					termFactory.commit();
+					promote(context);
 				}
 			}
 		} catch (TerminologyException e) {
@@ -672,6 +682,33 @@ public class RulesContextHelper {
 			e.printStackTrace();
 		}
 		return (activeStatuses.contains(statusId));
+	}
+	
+	public void promote(I_GetConceptData concept) {
+		try {
+			I_IntSet allowedStatusWithRetired = Terms.get().newIntSet();
+			allowedStatusWithRetired.addAll(config.getAllowedStatus().getSetValues());
+			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
+			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
+			
+			I_TermFactory termFactory = Terms.get();
+			
+			concept.promote(config.getViewPositionSet().iterator().next(), 
+					config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+			
+			for (I_ExtendByRef loopExtension : termFactory.getAllExtensionsForComponent(concept.getConceptNid())) {
+				loopExtension.promote(config.getViewPositionSet().iterator().next(), 
+						config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+			}
+			
+			termFactory.commit();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 
