@@ -24,7 +24,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -48,8 +48,8 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
     			new ConcurrentHashMap<ActionListener, ActionListener>();
     private ConcurrentHashMap<ActionListener, ActionListener> stopActionListeners = 
     			new ConcurrentHashMap<ActionListener, ActionListener>();
-    private CopyOnWriteArraySet<I_ShowActivity> showActivityListeners = 
-    			new CopyOnWriteArraySet<I_ShowActivity>();
+    private ConcurrentSkipListSet<I_ShowActivity> showActivityListeners = 
+    			new ConcurrentSkipListSet<I_ShowActivity>();
 
     
     

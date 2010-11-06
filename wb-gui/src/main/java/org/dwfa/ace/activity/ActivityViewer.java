@@ -26,8 +26,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
@@ -254,7 +254,7 @@ public class ActivityViewer implements ActionListener {
     private ComponentFrame viewerFrame;
 
     private List<I_ShowActivity> activitiesList = new CopyOnWriteArrayList<I_ShowActivity>();
-    private Set<I_ShowActivity> activitiesSet = new CopyOnWriteArraySet<I_ShowActivity>();
+    private Set<I_ShowActivity> activitiesSet = new ConcurrentSkipListSet<I_ShowActivity>();
     
     private static Timer resortTimer = new Timer(500, null);
     private static Timer updateTimer = new Timer(200, null);

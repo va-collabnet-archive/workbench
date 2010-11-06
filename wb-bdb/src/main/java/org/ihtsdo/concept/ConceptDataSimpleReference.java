@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -52,14 +52,14 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     private AtomicReference<AddMemberList> refsetMembers = new AtomicReference<AddMemberList>();
     
     
-    private AtomicReference<CopyOnWriteArraySet<Integer>> descNids =
-            new AtomicReference<CopyOnWriteArraySet<Integer>>();
-    private AtomicReference<CopyOnWriteArraySet<Integer>> srcRelNids =
-            new AtomicReference<CopyOnWriteArraySet<Integer>>();
-    private AtomicReference<CopyOnWriteArraySet<Integer>> imageNids =
-            new AtomicReference<CopyOnWriteArraySet<Integer>>();
-    private AtomicReference<CopyOnWriteArraySet<Integer>> memberNids =
-            new AtomicReference<CopyOnWriteArraySet<Integer>>();
+    private AtomicReference<ConcurrentSkipListSet<Integer>> descNids =
+            new AtomicReference<ConcurrentSkipListSet<Integer>>();
+    private AtomicReference<ConcurrentSkipListSet<Integer>> srcRelNids =
+            new AtomicReference<ConcurrentSkipListSet<Integer>>();
+    private AtomicReference<ConcurrentSkipListSet<Integer>> imageNids =
+            new AtomicReference<ConcurrentSkipListSet<Integer>>();
+    private AtomicReference<ConcurrentSkipListSet<Integer>> memberNids =
+            new AtomicReference<ConcurrentSkipListSet<Integer>>();
     private AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>> refsetMembersMap =
         new AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>>();
     private AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>> refsetComponentMap =
@@ -296,10 +296,10 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         return nidData;
     }
 
-    protected CopyOnWriteArraySet<Integer> getReadOnlyIntSet(OFFSETS offset) throws IOException {
+    protected Set<Integer> getReadOnlyIntSet(OFFSETS offset) throws IOException {
         TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
         if (readOnlyInput.available() < OFFSETS.getHeaderSize()) {
-            return new CopyOnWriteArraySet<Integer>();
+            return new ConcurrentSkipListSet<Integer>();
         }
         readOnlyInput.mark(OFFSETS.getHeaderSize());
         readOnlyInput.skipFast(offset.offset);
@@ -310,10 +310,10 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         return binder.entryToObject(readOnlyInput);
     }
 
-    protected CopyOnWriteArraySet<Integer> getMutableIntSet(OFFSETS offset) throws IOException {
+    protected Set<Integer> getMutableIntSet(OFFSETS offset) throws IOException {
         TupleInput mutableInput = nidData.getMutableTupleInput();
         if (mutableInput.available() < OFFSETS.getHeaderSize()) {
-            return new CopyOnWriteArraySet<Integer>();
+            return new ConcurrentSkipListSet<Integer>();
         }
         mutableInput.mark(OFFSETS.getHeaderSize());
         mutableInput.skipFast(offset.offset);
@@ -337,7 +337,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     @Override
     public Set<Integer> getDescNids() throws IOException {
         if (descNids.get() == null) {
-            CopyOnWriteArraySet<Integer> temp = new CopyOnWriteArraySet<Integer>(getDescNidsReadOnly());
+        	ConcurrentSkipListSet<Integer> temp = new ConcurrentSkipListSet<Integer>(getDescNidsReadOnly());
             temp.addAll(getMutableIntSet(OFFSETS.DESC_NIDS));
             descNids.compareAndSet(null, temp);
         }
@@ -350,9 +350,9 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
 
     @Override
-    public CopyOnWriteArraySet<Integer> getImageNids() throws IOException {
+    public Set<Integer> getImageNids() throws IOException {
         if (imageNids.get() == null) {
-            CopyOnWriteArraySet<Integer> temp = new CopyOnWriteArraySet<Integer>(getImageNidsReadOnly());
+        	ConcurrentSkipListSet<Integer> temp = new ConcurrentSkipListSet<Integer>(getImageNidsReadOnly());
             temp.addAll(getMutableIntSet(OFFSETS.IMAGE_NIDS));
             imageNids.compareAndSet(null, temp);
         }
@@ -365,9 +365,9 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
 
     @Override
-    public CopyOnWriteArraySet<Integer> getSrcRelNids() throws IOException {
+    public Set<Integer> getSrcRelNids() throws IOException {
         if (srcRelNids.get() == null) {
-            CopyOnWriteArraySet<Integer> temp = new CopyOnWriteArraySet<Integer>(getSrcRelNidsReadOnly());
+        	ConcurrentSkipListSet<Integer> temp = new ConcurrentSkipListSet<Integer>(getSrcRelNidsReadOnly());
             temp.addAll(getMutableIntSet(OFFSETS.SRC_REL_NIDS));
 
             srcRelNids.compareAndSet(null, temp);
@@ -376,14 +376,14 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
 
     @Override
-    public CopyOnWriteArraySet<Integer> getSrcRelNidsReadOnly() throws IOException {
+    public Set<Integer> getSrcRelNidsReadOnly() throws IOException {
         return getReadOnlyIntSet(OFFSETS.SRC_REL_NIDS);
     }
 
     @Override
-    public CopyOnWriteArraySet<Integer> getMemberNids() throws IOException {
+    public Set<Integer> getMemberNids() throws IOException {
         if (memberNids.get() == null) {
-            CopyOnWriteArraySet<Integer> temp = new CopyOnWriteArraySet<Integer>(getMemberNidsReadOnly());
+        	ConcurrentSkipListSet<Integer> temp = new ConcurrentSkipListSet<Integer>(getMemberNidsReadOnly());
             temp.addAll(getMutableIntSet(OFFSETS.MEMBER_NIDS));
             memberNids.compareAndSet(null, temp);
         }
@@ -391,7 +391,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
 
     @Override
-    public CopyOnWriteArraySet<Integer> getMemberNidsReadOnly() throws IOException {
+    public Set<Integer> getMemberNidsReadOnly() throws IOException {
         return getReadOnlyIntSet(OFFSETS.MEMBER_NIDS);
     }
 
