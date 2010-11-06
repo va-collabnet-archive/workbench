@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -262,9 +263,9 @@ public class CriterionPanel extends JPanel {
                             criterionOptions.add((I_TestSearchResults) pluginObj);
                         }
                     } catch (IOException ex) {
-                        AceLog.getAppLog().alertAndLogException(ex);
+                        AceLog.getAppLog().alertAndLog(Level.WARNING, "Processing: " + plugin.getAbsolutePath(), ex);
                     } catch (ClassNotFoundException ex) {
-                        AceLog.getAppLog().alertAndLogException(ex);
+                        AceLog.getAppLog().alertAndLog(Level.WARNING, "Processing: " + plugin.getAbsolutePath(), ex);
                     }
                 }
             } else {
