@@ -23,6 +23,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Comparator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
@@ -49,7 +50,13 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
     private ConcurrentHashMap<ActionListener, ActionListener> stopActionListeners = 
     			new ConcurrentHashMap<ActionListener, ActionListener>();
     private ConcurrentSkipListSet<I_ShowActivity> showActivityListeners = 
-    			new ConcurrentSkipListSet<I_ShowActivity>();
+    			new ConcurrentSkipListSet<I_ShowActivity>(new Comparator<I_ShowActivity>() {
+
+					@Override
+					public int compare(I_ShowActivity o1, I_ShowActivity o2) {
+						return o1.hashCode() - o2.hashCode();
+					}
+				});
 
     
     

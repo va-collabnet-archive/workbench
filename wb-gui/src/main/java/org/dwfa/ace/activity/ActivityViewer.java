@@ -254,7 +254,13 @@ public class ActivityViewer implements ActionListener {
     private ComponentFrame viewerFrame;
 
     private List<I_ShowActivity> activitiesList = new CopyOnWriteArrayList<I_ShowActivity>();
-    private Set<I_ShowActivity> activitiesSet = new ConcurrentSkipListSet<I_ShowActivity>();
+    private Set<I_ShowActivity> activitiesSet = new ConcurrentSkipListSet<I_ShowActivity>(new Comparator<I_ShowActivity>() {
+
+		@Override
+		public int compare(I_ShowActivity o1, I_ShowActivity o2) {
+			return o1.hashCode() - o2.hashCode();
+		}
+	});
     
     private static Timer resortTimer = new Timer(500, null);
     private static Timer updateTimer = new Timer(200, null);

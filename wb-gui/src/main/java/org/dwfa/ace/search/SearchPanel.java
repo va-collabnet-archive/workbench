@@ -68,6 +68,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -120,6 +121,13 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
             saveButton.setVisible(!toggle.isSelected());
             searchButton.setVisible(!toggle.isSelected());
             searchPhraseField.setVisible(!toggle.isSelected());
+			if (searchTypeCombo.getSelectedItem().equals(REFSET_QUERY)) {
+				searchPhraseField.setVisible(false);
+				refsetIdentityField.setVisible(!toggle.isSelected());
+			} else {
+				searchPhraseField.setVisible(!toggle.isSelected());
+				refsetIdentityField.setVisible(false);
+			}
             searchTypeCombo.setVisible(!toggle.isSelected());
             addButton.setVisible(!toggle.isSelected());
             removeButton.setVisible(!toggle.isSelected());
@@ -366,6 +374,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
     private static final long serialVersionUID = 1L;
 
     private JTextField searchPhraseField;
+    private TermComponentLabel refsetIdentityField;
 
     private DescriptionsFromCollectionTableModel model;
 
@@ -373,7 +382,8 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
     private static final String LUCENE_QUERY = "lucene query";
     private static final String REGEX_QUERY = "regex query";
-    private static final String[] QUERY_TYPES = { LUCENE_QUERY, REGEX_QUERY };
+    private static final String REFSET_QUERY = "refset query";
+    private static final String[] QUERY_TYPES = { LUCENE_QUERY, REGEX_QUERY, REFSET_QUERY };
 
     private JComboBox searchTypeCombo;
 
@@ -417,7 +427,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
     private int lastSelectedRow = -1;
 
-    public SearchPanel(I_ConfigAceFrame config, ACE ace) {
+    public SearchPanel(I_ConfigAceFrame config, ACE ace) throws TerminologyException, IOException {
         super(new GridBagLayout());
         this.config = config;
         this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "search");
@@ -497,6 +507,18 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         searchTypeCombo.setSelectedItem(LUCENE_QUERY);
         searchTypeCombo.setMinimumSize(new Dimension(175, 20));
         add(searchTypeCombo, gbc);
+        searchTypeCombo.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (searchTypeCombo.getSelectedItem().equals(REFSET_QUERY)) {
+					searchPhraseField.setVisible(false);
+				} else {
+					searchPhraseField.setVisible(true);
+				}
+				
+			}
+		});
 
         gbc.weightx = 1;
         gbc.gridx++;
@@ -505,6 +527,10 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         this.searchPhraseField.setMinimumSize(new Dimension(400, 20));
         this.searchPhraseField.setText("search");
         add(searchPhraseField, gbc);
+        
+        refsetIdentityField = new TermComponentLabel();
+        refsetIdentityField.setVisible(false);
+        add(refsetIdentityField, gbc);
 
         gbc.gridx++;
         gbc.gridheight = 2;
@@ -723,8 +749,10 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
     private void startSearch() {
         lastSelectedRow = -1;
         updateExtraCriterion();
-
-        if (searchPhraseField.getText().length() > 1) {
+        
+        if (searchTypeCombo.getSelectedItem().equals(REFSET_QUERY)) {
+        	
+        } else if (searchPhraseField.getText().length() > 1) {
             if (checkLuceneQuery(searchPhraseField.getText())) {
                 setShowProgress(true);
                 model.setDescriptions(new ArrayList<I_DescriptionVersioned>());
@@ -860,8 +888,10 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
             @Override
             public void run() {
-                searchPhraseField.selectAll();
-                searchPhraseField.requestFocusInWindow();
+            	if (searchPhraseField.isVisible()) {
+            		searchPhraseField.selectAll();
+                	searchPhraseField.requestFocusInWindow();
+            	}
             }
         });
     }
