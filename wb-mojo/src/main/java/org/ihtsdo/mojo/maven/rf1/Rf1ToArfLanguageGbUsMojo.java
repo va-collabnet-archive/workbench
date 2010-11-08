@@ -16,22 +16,24 @@
  */
 package org.ihtsdo.mojo.maven.rf1;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-
-import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * 
@@ -76,14 +78,16 @@ public class Rf1ToArfLanguageGbUsMojo extends AbstractMojo implements Serializab
      * 
      * @parameter
      */
-    private Date dateStart;
+    private String dateStart;
+    private Date dateStartObj;
 
     /**
      * Stop date inclusive
      * 
      * @parameter
      */
-    private Date dateStop;
+    private String dateStop;
+    private Date dateStopObj;
 
     /**
      * Location of the target directory.
@@ -121,11 +125,9 @@ public class Rf1ToArfLanguageGbUsMojo extends AbstractMojo implements Serializab
      * Directory used to output the eConcept format files
      * Default value "/classes" set programmatically due to file separator
      * 
-     * @parameter default-value="classes"
+     * @parameter default-value="generated-arf"
      */
     private String outputDirectory;
-
-    private String scratchDirectory = FILE_SEPARATOR + "tmp_steps";
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -166,8 +168,20 @@ public class Rf1ToArfLanguageGbUsMojo extends AbstractMojo implements Serializab
             String outDir) throws MojoFailureException, MojoExecutionException {
         getLog().info("::: Target Directory: " + tDir);
         getLog().info("::: Target Sub Directory:     " + tSubDir);
-        getLog().info("::: Start date (inclusive) = " + dateStart);
-        getLog().info("::: Stop date (inclusive) =  " + dateStop);
+
+        String rootGxDir = "language_en-GX";
+        // Create multiple directories
+        boolean success = (new File(tDir + tSubDir + FILE_SEPARATOR + rootGxDir)).mkdirs();
+        if (success) {
+            getLog().info("OUTPUT DIRECTORY: " + tDir + outDir);
+        }
+        getLog().info("::: Target GX Directory:     " + tSubDir + FILE_SEPARATOR + rootGxDir);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.ss HH:mm:ss");
+        if (dateStartObj != null)
+            getLog().info("::: Start date (inclusive) = " + sdf.format(dateStartObj));
+        if (dateStopObj != null)
+            getLog().info(":::  Stop date (inclusive) = " + sdf.format(dateStopObj));
 
         for (int i = 0; i < inDirs.length; i++)
             getLog().info("::: Input Directory (" + i + ") = " + inDirs[i].getDirName());
@@ -186,16 +200,23 @@ public class Rf1ToArfLanguageGbUsMojo extends AbstractMojo implements Serializab
         filter.add("Subsets_en-US");
         filter.add(".txt");
         List<List<RF1File>> subsetsUSListList = Rf1Dir.getRf1Files(tDir, tSubDir, inDirs, filter,
-                dateStart, dateStop);
+                dateStartObj, dateStopObj);
+        logFileListList(inDirs, subsetsUSListList);
+
         filter.set(1, "Subsets_en-GB");
         List<List<RF1File>> subsetsGBListList = Rf1Dir.getRf1Files(tDir, tSubDir, inDirs, filter,
-                dateStart, dateStop);
+                dateStartObj, dateStopObj);
+        logFileListList(inDirs, subsetsGBListList);
+
         filter.set(1, "SubsetMembers_en-US");
         List<List<RF1File>> membersUSListList = Rf1Dir.getRf1Files(tDir, tSubDir, inDirs, filter,
-                dateStart, dateStop);
+                dateStartObj, dateStopObj);
+        logFileListList(inDirs, membersUSListList);
+
         filter.set(1, "SubsetMembers_en-GB");
         List<List<RF1File>> membersGBListList = Rf1Dir.getRf1Files(tDir, tSubDir, inDirs, filter,
-                dateStart, dateStop);
+                dateStartObj, dateStopObj);
+        logFileListList(inDirs, membersGBListList);
 
         List<RF1File> subsetsUSList = new ArrayList<RF1File>();
         List<RF1File> subsetsGBList = new ArrayList<RF1File>();
@@ -240,13 +261,17 @@ public class Rf1ToArfLanguageGbUsMojo extends AbstractMojo implements Serializab
                     || dateSubsetGB.equals(dateMemberUS) != true)
                 throw new MojoExecutionException("date != date");
 
-            String dateStr = dateSubsetGB.toString();
+            Calendar calGB = Calendar.getInstance();
+            calGB.setTime(dateSubsetGB);
+
+            DateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+            String dateStr = formatter.format(dateSubsetGB);
 
             // CREATE SUBSETS FILE
-            String fNameSubsets = tDir + tSubDir + FILE_SEPARATOR + "der1_Subsets_en-GX" + dateStr
-                    + ".txt";
-            String fNameMembers = tDir + tSubDir + FILE_SEPARATOR + "der1_SubsetMembers_en-GX"
-                    + dateStr + ".txt";
+            String fNameSubsets = tDir + tSubDir + FILE_SEPARATOR + rootGxDir + FILE_SEPARATOR
+                    + "der1_Subsets_en-GX_" + dateStr + ".txt";
+            String fNameMembers = tDir + tSubDir + FILE_SEPARATOR + rootGxDir + FILE_SEPARATOR
+                    + "der1_SubsetMembers_en-GX_" + dateStr + ".txt";
 
             try {
                 // CREATE SUBSETS FILE
@@ -310,6 +335,8 @@ public class Rf1ToArfLanguageGbUsMojo extends AbstractMojo implements Serializab
 
         // RUN Rf1ToSubsetsArf
         Rf1ToArfSubsetsMojo mojo = new Rf1ToArfSubsetsMojo();
+        mojo.setDateStart(dateStart);
+        mojo.setDateStop(dateStop);
 
         // KEEP LOGIC
         if (keepUS) {
@@ -327,10 +354,29 @@ public class Rf1ToArfLanguageGbUsMojo extends AbstractMojo implements Serializab
         if (keepGBExceptions) {
             filter = new ArrayList<String>();
             filter.add("en-GX");
+            inDirs = new Rf1Dir[1];
+            inDirs[0] = new Rf1Dir(FILE_SEPARATOR + rootGxDir, "en-GX");
             mojo.executeMojo(tDir, tSubDir, inDirs, subsetIds, filter, outDir,
                     "language_subsets_en-GX");
         }
 
+    }
+
+    private void logFileListList(Rf1Dir[] dirs, List<List<RF1File>> fileListList) {
+        StringBuffer sb = new StringBuffer();
+        for (Rf1Dir dir : dirs)
+            sb.append("::: PROCESSING  " + dir.getDirName() + LINE_TERMINATOR);
+
+        Iterator<List<RF1File>> dit = fileListList.iterator(); // Directory Iterator
+        while (dit.hasNext()) {
+            List<RF1File> fl = dit.next(); // File List
+            Iterator<RF1File> fit = fl.iterator(); // File Iterator 
+            while (fit.hasNext()) {
+                RF1File f2 = fit.next();
+                sb.append("    " + f2.file.getName() + LINE_TERMINATOR);
+            }
+            sb.append("    ..." + LINE_TERMINATOR);
+        }
     }
 
     private int compareMember(Rf1SubsetMember m1, Rf1SubsetMember m2) {
@@ -347,6 +393,40 @@ public class Rf1ToArfLanguageGbUsMojo extends AbstractMojo implements Serializab
                 return 0; // m1 == m2
             }
         }
+    }
+
+    public String getDateStart() {
+        return this.dateStart;
+    }
+
+    public void setDateStart(String sStart) throws MojoFailureException {
+        this.dateStart = sStart;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+        try {
+            this.dateStartObj = formatter.parse(sStart + " 00:00:00");
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new MojoFailureException("SimpleDateFormat yyyy.MM.dd dateStart parse error: "
+                    + sStart);
+        }
+        getLog().info("::: START DATE (INCLUSIVE) " + this.dateStart);
+    }
+
+    public String getDateStop() {
+        return this.dateStop;
+    }
+
+    public void setDateStop(String sStop) throws MojoFailureException {
+        this.dateStop = sStop;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+        try {
+            this.dateStopObj = formatter.parse(sStop + " 23:59:59");
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new MojoFailureException("SimpleDateFormat yyyy.MM.dd dateStop parse error: "
+                    + sStop);
+        }
+        getLog().info(":::  STOP DATE (INCLUSIVE) " + this.dateStop);
     }
 
 }

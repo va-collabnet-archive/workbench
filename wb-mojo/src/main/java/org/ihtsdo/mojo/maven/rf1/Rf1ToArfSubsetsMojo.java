@@ -25,7 +25,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -37,7 +40,9 @@ import java.util.UUID;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.drools.runtime.Calendars;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
 import org.dwfa.util.id.Type5UuidFactory;
 
@@ -69,17 +74,19 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
 
     /**
      * Start date (inclusive)
-     * 
      * @parameter
      */
-    private Date dateStart;
+    private String dateStart;
+    private Date dateStartObj;
 
     /**
-     * Stop date inclusive
+     * Stop date (inclusive)
      * 
      * @parameter
+     * @required
      */
-    private Date dateStop;
+    private String dateStop;
+    private Date dateStopObj;
 
     /**
      * Location of the target directory.
@@ -117,7 +124,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
      * Directory used to output the eConcept format files
      * Default value "/classes" set programmatically due to file separator
      * 
-     * @parameter default-value="classes"
+     * @parameter default-value="generated-arf"
      */
     private String outputDirectory;
 
@@ -171,19 +178,25 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
             getLog().info("    POM: Output Directory: " + outputDirectory);
         }
 
-        executeMojo(targetDir, targetSubDir, rf1Dirs, rf1SubsetIds, fileFilterList, outputDirectory, outputFileName);
+        executeMojo(targetDir, targetSubDir, rf1Dirs, rf1SubsetIds, fileFilterList,
+                outputDirectory, outputFileName);
         getLog().info("::: END Rf1SubsetsToArf");
     }
 
     public void executeMojo(String tDir, String tSubDir, Rf1Dir[] inDirs, Rf1SubsetId[] subsetIds,
-            ArrayList<String> fFilters, String outDir, String outFileName) throws MojoFailureException {
+            ArrayList<String> fFilters, String outDir, String outFileName)
+            throws MojoFailureException {
         uuidCurrent = ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next();
         uuidRetired = ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next();
 
         getLog().info("::: Target Directory: " + tDir);
         getLog().info("::: Target Sub Directory:     " + tSubDir);
-        getLog().info("::: Start date (inclusive) = " + dateStart);
-        getLog().info("::: Stop date (inclusive) =  " + dateStop);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.ss HH:mm:ss");
+        if (dateStartObj != null)
+        getLog().info("::: Start date (inclusive) = " + sdf.format(dateStartObj));
+        if (dateStopObj != null)
+        getLog().info(":::  Stop date (inclusive) = " + sdf.format(dateStopObj));
 
         for (int i = 0; i < inDirs.length; i++)
             getLog().info("::: Input Directory (" + i + ") = " + inDirs[i].getDirName());
@@ -192,19 +205,16 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
             getLog().info("::: SubsetId " + idRec.toString());
 
         // Setup target (build) directory
-        getLog().info("    Target Build Directory: " + tDir);
-
-        // Setup target (build) directory
         BufferedWriter bwRefSet = null;
-        fNameSubsetRefsetArf = tDir + scratchDirectory + FILE_SEPARATOR + outFileName
-                + "_integer.refset";
+        fNameSubsetRefsetArf = tDir + tSubDir + outDir + FILE_SEPARATOR + "integer_" + outFileName
+                + ".refset";
 
         try {
             // FILE & DIRECTORY SETUP
             // Create multiple directories
-            boolean success = (new File(tDir + outDir)).mkdirs();
+            boolean success = (new File(tDir + tSubDir + outDir)).mkdirs();
             if (success) {
-                getLog().info("::: Output Directory: " + tDir + outDir);
+                getLog().info("::: Output Directory: " + tDir + tSubDir + outDir);
             }
 
             String tmpDir = scratchDirectory;
@@ -227,11 +237,11 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
             filter.add(".TXT");
             if (fFilters != null)
                 filter.addAll(fFilters);
-            fileListList = Rf1Dir.getRf1Files(tDir, tSubDir, inDirs, filter, dateStart, dateStop);
+            fileListList = Rf1Dir.getRf1Files(tDir, tSubDir, inDirs, filter, dateStartObj, dateStopObj);
             logFileListList(inDirs, fileListList);
             for (List<RF1File> fList : fileListList)
                 allFiles.addAll(fList);
-            parseSubsetIdToOriginalUuidMap(allFiles);
+            parseSubsetIdToOriginalUuidMap(allFiles, subsetIds);
 
             // PROCESS SUBSET MEMBERS FILES FOR EACH ROOT DIRECTORY
             filter = new ArrayList<String>();
@@ -242,11 +252,16 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
                 filter.addAll(fFilters);
             for (Rf1Dir d : inDirs) {
                 Rf1Dir[] tmpDirs = { d };
-                fileListList = Rf1Dir.getRf1Files(tDir, tSubDir, tmpDirs, filter, dateStart,
-                        dateStop);
+                fileListList = Rf1Dir.getRf1Files(tDir, tSubDir, tmpDirs, filter, dateStartObj,
+                        dateStopObj);
                 logFileListList(tmpDirs, fileListList);
                 processSubsetMembers(fileListList, bwRefSet);
             }
+
+            bwRefSet.close();
+
+            // WRITE REFSET CONCEPT(S)
+            saveRefsetConcept(tDir + tSubDir + outDir + FILE_SEPARATOR, subsetIds);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -375,7 +390,8 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
         }
     }
 
-    private void parseSubsetIdToOriginalUuidMap(List<RF1File> fl) throws IOException {
+    private void parseSubsetIdToOriginalUuidMap(List<RF1File> fl, Rf1SubsetId[] subsetIds)
+            throws IOException {
         int SUBSETID = 0;
         int SUBSETORIGINALID = 1;
         // int SUBSETVERSION = 2;
@@ -407,22 +423,21 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
 
                 // FIND ORIGINALID (SCTID)
                 int found = -1;
-                for (int i = 0; i < rf1SubsetIds.length; i++)
-                    if (sctIdOriginal == rf1SubsetIds[i].getSubsetSctIdOriginal())
+                for (int i = 0; i < subsetIds.length; i++)
+                    if (sctIdOriginal == subsetIds[i].getSubsetSctIdOriginal())
                         found = i;
 
                 if (found > -1) {
                     mapSubsetIdToOriginalSctId.put(sctIdSubset, sctIdOriginal);
-                    mapSubsetIdToPathUuid.put(sctIdSubset, rf1SubsetIds[found]
-                            .getSubsetPathUuidStr());
-                    mapSubsetIdToRefsetUuid.put(sctIdSubset, rf1SubsetIds[found]
+                    mapSubsetIdToPathUuid.put(sctIdSubset, subsetIds[found].getRefsetPathUuidStr());
+                    mapSubsetIdToRefsetUuid.put(sctIdSubset, subsetIds[found]
                             .getSubsetRefsetUuidStr());
                     getLog().info(
                             "::: MAP < " + sctIdSubset + " , " + sctIdOriginal + " (ORIGINAL) > "
-                                    + rf1SubsetIds[found].getSubsetRefsetUuidStr() + " (Refset), "
-                                    + rf1SubsetIds[found].getSubsetPathUuidStr() + " (Path)"
+                                    + subsetIds[found].getSubsetRefsetUuidStr() + " (Refset), "
+                                    + subsetIds[found].getRefsetPathUuidStr() + " (Path)"
                                     + subsetName + " // "
-                                    + rf1SubsetIds[found].getSubsetUuidFromName());
+                                    + subsetIds[found].getSubsetUuidFromName());
                 } else {
                     getLog().info(
                             "::: MAP ERROR UUID not specified for SUBSETORIGINALID == "
@@ -592,8 +607,193 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
         } // WHILE (EACH CONCEPTS DIRECTORY) *
     }
 
+    private void saveRefsetConcept(String arfDir, Rf1SubsetId[] subsetIds)
+            throws MojoFailureException {
+
+        try {
+            String infix = subsetIds[0].getRefsetFsName().replace(" ", "");
+            infix = infix.replace("-", "");
+
+            Writer concepts;
+            concepts = new BufferedWriter(new FileWriter(new File(arfDir, "concepts_" + infix
+                    + ".txt")));
+            Writer descriptions = new BufferedWriter(new FileWriter(new File(arfDir,
+                    "descriptions_" + infix + ".txt")));
+            Writer relationships = new BufferedWriter(new FileWriter(new File(arfDir,
+                    "relationships_" + infix + ".txt")));
+            Writer ids = new BufferedWriter(new FileWriter(
+                    new File(arfDir, "ids_" + infix + ".txt")));
+
+            for (Rf1SubsetId sid : subsetIds) {
+                SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.dd");
+                Date d = format.parse(sid.getRefsetDate());
+                format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String effectiveDate = format.format(d);
+
+                concepts.append(sid.getSubsetRefsetUuidStr()); // refset concept uuid
+                concepts.append("\t");
+                concepts.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next()
+                        .toString()); //status uuid
+                concepts.append("\t");
+                concepts.append("1"); // primitive
+                concepts.append("\t");
+                concepts.append(effectiveDate); // effective date
+                concepts.append("\t");
+                concepts.append(sid.getRefsetPathUuidStr()); //path uuid
+                concepts.append("\n");
+
+                ids.append(sid.getSubsetRefsetUuidStr()); // refset concept uuid
+                ids.append("\t");
+                ids.append(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getPrimoridalUid()
+                        .toString()); //source uuid
+                ids.append("\t");
+                ids.append(Long.toString(sid.getSubsetSctIdOriginal())); //source id
+                ids.append("\t");
+                ids.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next()
+                        .toString()); //status uuid
+                ids.append("\t");
+                ids.append(effectiveDate); // effective date
+                ids.append("\t");
+                ids.append(sid.getRefsetPathUuidStr()); //path uuid
+                ids.append("\n");
+
+                if (sid.getRefsetFsName() != null) {
+                    descriptions.append(Type5UuidFactory.get(
+                            Rf1Dir.SUBSETREFSET_ID_NAMESPACE_UUID_TYPE1
+                                    + "Subset Fully Specified Name" + sid.getRefsetFsName())
+                            .toString()); // description uuid
+                    descriptions.append("\t");
+                    descriptions.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator()
+                            .next().toString()); // status uuid
+                    descriptions.append("\t");
+                    descriptions.append(sid.getSubsetRefsetUuidStr()).toString(); // refset concept uuid
+                    descriptions.append("\t");
+                    descriptions.append(sid.getRefsetFsName()); // term
+                    descriptions.append("\t");
+                    descriptions.append("1"); // primitive
+                    descriptions.append("\t");
+                    descriptions
+                            .append(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
+                                    .getUids().iterator().next().toString()); // description type uuid
+                    descriptions.append("\t");
+                    descriptions.append("en"); // language code
+                    descriptions.append("\t");
+                    descriptions.append(effectiveDate); // effective date
+                    descriptions.append("\t");
+                    descriptions.append(sid.getRefsetPathUuidStr()); //path uuid
+                    descriptions.append("\n");
+                }
+
+                if (sid.getRefsetPrefName() != null) {
+                    descriptions.append(Type5UuidFactory.get(
+                            Rf1Dir.SUBSETREFSET_ID_NAMESPACE_UUID_TYPE1 + "Subset Preferred Name"
+                                    + sid.getRefsetPrefName()).toString()); // description uuid
+                    descriptions.append("\t");
+                    descriptions.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator()
+                            .next().toString()); // status uuid
+                    descriptions.append("\t");
+                    descriptions.append(sid.getSubsetRefsetUuidStr()).toString(); // refset concept uuid
+                    descriptions.append("\t");
+                    descriptions.append(sid.getRefsetPrefName()); // term
+                    descriptions.append("\t");
+                    descriptions.append("1"); // primitive
+                    descriptions.append("\t");
+                    descriptions
+                            .append(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
+                                    .getUids().iterator().next().toString()); // description type uuid
+                    descriptions.append("\t");
+                    descriptions.append("en"); // language code
+                    descriptions.append("\t");
+                    descriptions.append(effectiveDate); // effective date
+                    descriptions.append("\t");
+                    descriptions.append(sid.getRefsetPathUuidStr()); //path uuid
+                    descriptions.append("\n");
+                }
+
+                relationships.append(Type5UuidFactory.get(
+                        Rf1Dir.SUBSETREFSET_ID_NAMESPACE_UUID_TYPE1 + "Relationship"
+                                + sid.getSubsetSctIdOriginal()).toString()); // relationship uuid
+                relationships.append("\t");
+                relationships.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator()
+                        .next().toString()); // status uuid
+                relationships.append("\t");
+                relationships.append(sid.getSubsetRefsetUuidStr()); // refset source concept uuid
+                relationships.append("\t");
+                relationships.append(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids().iterator()
+                        .next().toString()); // relationship type uuid
+                relationships.append("\t");
+                relationships.append(sid.getRefsetParentUuid()); // destination concept uuid
+                relationships.append("\t");
+                relationships.append(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()
+                        .iterator().next().toString()); // characteristic type uuid
+                relationships.append("\t");
+                relationships.append(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()
+                        .iterator().next().toString()); // refinability uuid
+                relationships.append("\t");
+                relationships.append("0"); // relationship group
+                relationships.append("\t");
+                relationships.append(effectiveDate); // effective date
+                relationships.append("\t");
+                relationships.append(sid.getRefsetPathUuidStr()); // path uuid
+                relationships.append("\n");
+            }
+
+            concepts.close();
+            descriptions.close();
+            relationships.close();
+            ids.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new MojoFailureException("RefToArfSubsetsMojo IO Error", e);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            throw new MojoFailureException("RefToArfSubsetsMojo no such algorithm", e);
+        } catch (TerminologyException e) {
+            e.printStackTrace();
+            throw new MojoFailureException("RefToArfSubsetsMojo terminology exception", e);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new MojoFailureException("RefToArfSubsetsMojo parse exception", e);
+        }
+
+    }
+
     public void setSubsetIds(Rf1SubsetId[] subsetIds) {
         this.rf1SubsetIds = subsetIds;
     }
+    
+    public String getDateStart() {
+        return this.dateStart;   
+    }
+    
+    public void setDateStart(String sStart) throws MojoFailureException {
+        this.dateStart = sStart;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+        try {
+            this.dateStartObj = formatter.parse(sStart + " 00:00:00");
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new MojoFailureException("SimpleDateFormat yyyy.MM.dd dateStart parse error: "
+                    + sStart);
+        }
+        getLog().info("::: START DATE (INCLUSIVE) " + this.dateStart);
+    }
 
+    public String getDateStop() {
+        return this.dateStop;   
+    }
+    
+    public void setDateStop(String sStop) throws MojoFailureException {
+        this.dateStop = sStop;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+        try {
+            this.dateStopObj = formatter.parse(sStop + " 23:59:59");
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new MojoFailureException("SimpleDateFormat yyyy.MM.dd dateStop parse error: "
+                    + sStop);
+        }
+        getLog().info(":::  STOP DATE (INCLUSIVE) " + this.dateStop);
+    }
 }

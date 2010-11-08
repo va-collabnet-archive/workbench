@@ -8,28 +8,32 @@ import org.dwfa.util.id.Type5UuidFactory;
 
 public class Rf1SubsetId {
     private long subsetSctIdOriginal; // SCTID
-    private String subsetUuidFromName;
-    private UUID subsetPathUuid;
-    private String subsetPathUuidStr;
     private UUID subsetRefsetUuid;
     private String subsetRefsetUuidStr;
 
-    public Rf1SubsetId(long originalId, String uuidName) throws NoSuchAlgorithmException,
-            UnsupportedEncodingException {
-        this.subsetSctIdOriginal = originalId;
-        setSubsetUuidFromName(uuidName);
+    private String subsetPathUuidFromName; // Subset path name
+    private UUID subsetPathUuid;
+    private String subsetPathUuidStr;
+
+    private String refsetFsName;
+    private String refsetPrefName;
+
+    private String refsetParentUuid;
+    private String refsetDate; // 
+
+    public Rf1SubsetId() throws NoSuchAlgorithmException, UnsupportedEncodingException {
     }
 
     public long getSubsetSctIdOriginal() {
         return subsetSctIdOriginal;
     }
 
-    public void setSubsetSctIdOriginal(long subsetSctIdOriginal) {
+    public void setSctIdOriginal(long subsetSctIdOriginal) throws NoSuchAlgorithmException,
+            UnsupportedEncodingException {
         this.subsetSctIdOriginal = subsetSctIdOriginal;
-    }
-
-    public String getSubsetPathUuidStr() {
-        return subsetPathUuidStr;
+        this.subsetRefsetUuid = Type5UuidFactory.get(Rf1Dir.SUBSETREFSET_ID_NAMESPACE_UUID_TYPE1
+                + Long.toString(subsetSctIdOriginal));
+        this.subsetRefsetUuidStr = subsetRefsetUuid.toString();
     }
 
     public String getSubsetRefsetUuidStr() {
@@ -37,29 +41,68 @@ public class Rf1SubsetId {
     }
 
     public String getSubsetUuidFromName() {
-        return subsetUuidFromName;
+        return subsetPathUuidFromName;
     }
 
-    public void setSubsetUuidFromName(String name) throws NoSuchAlgorithmException,
-            UnsupportedEncodingException {
-        this.subsetUuidFromName = name;
-        this.subsetPathUuid = Type5UuidFactory
-                .get(Rf1Dir.SUBSETPATH_ID_NAMESPACE_UUID_TYPE1 + name);
-        this.subsetRefsetUuid = Type5UuidFactory.get(Rf1Dir.SUBSETREFSET_ID_NAMESPACE_UUID_TYPE1
-                + name);
-        
-        subsetPathUuidStr = subsetPathUuid.toString();
-        subsetRefsetUuidStr = subsetRefsetUuid.toString();
+    public String getRefsetPathUuidStr() {
+        return subsetPathUuidStr;
     }
     
+    public void setRefsetPathUuid(String uuid) {
+        this.subsetPathUuidFromName = uuid;
+        this.subsetPathUuid = UUID.fromString(uuid);
+        this.subsetPathUuidStr = uuid;        
+    }
+
+    public void setRefsetPathName(String name) throws NoSuchAlgorithmException,
+            UnsupportedEncodingException {
+        this.subsetPathUuidFromName = name;
+        this.subsetPathUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, name);
+        this.subsetPathUuidStr = subsetPathUuid.toString();
+        System.out.println("Rf1SubsetId.setRefsetPathName  subsetPathUuidStr  ="
+                + this.subsetPathUuidStr); // :DEBUG:!!!:
+    }
+
+    public String getRefsetParentUuid() {
+        return refsetParentUuid;
+    }
+
+    public void setRefsetParentUuid(String refestParentUuid) {
+        this.refsetParentUuid = refestParentUuid;
+    }
+
+    public String getRefsetDate() {
+        return refsetDate;
+    }
+
+    public void setRefsetDate(String refsetDate) {
+        this.refsetDate = refsetDate;
+    }
+
+    public String getRefsetFsName() {
+        return refsetFsName;
+    }
+
+    public void setRefsetFsName(String refsetFsName) {
+        this.refsetFsName = refsetFsName;
+    }
+
+    public String getRefsetPrefName() {
+        return refsetPrefName;
+    }
+
+    public void setRefsetPrefName(String refsetPrefName) {
+        this.refsetPrefName = refsetPrefName;
+    }
+
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        
+
         sb.append(subsetSctIdOriginal + " (SCTID), ");
-        sb.append(subsetUuidFromName + " (NAME), ");
+        sb.append(subsetPathUuidFromName + " (NAME), ");
         sb.append(subsetPathUuid + " (PATH), ");
         sb.append(subsetRefsetUuid + " (REFSET)");
-       
+
         return sb.toString();
     }
 

@@ -36,7 +36,7 @@ public class RF1File implements Comparable<Object> {
         this.file = f;
         this.revDateStr = dateStr;
 
-        String pattern = "yyyy-MM-dd hh:mm:ss";
+        String pattern = "yyyy-MM-dd HH:mm:ss";
         SimpleDateFormat formatter = new SimpleDateFormat(pattern);
         try {
             this.revDate = formatter.parse(revDateStr);
@@ -44,8 +44,6 @@ public class RF1File implements Comparable<Object> {
             e.printStackTrace();
             throw new MojoFailureException("SimpleDateFormat parse error");
         }
-        // :!!!:DEBUG
-        System.out.println("           " + f.getName() + " QUEUED");
     }
 
     @Override

@@ -17,7 +17,6 @@
 package org.ihtsdo.mojo.maven.rf1;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
@@ -26,11 +25,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.util.id.Type5UuidFactory;
 
 public class Rf1Dir {
     private String directoryName;
@@ -40,13 +36,14 @@ public class Rf1Dir {
     public static final String SUBSETREFSET_ID_NAMESPACE_UUID_TYPE1 = "d0b3c9c0-e395-11df-bccf-0800200c9a66";
     public static final String SUBSETPATH_ID_NAMESPACE_UUID_TYPE1 = "e1cff9e0-e395-11df-bccf-0800200c9a66";
 
+    private static final String FILE_SEPARATOR = File.separator;
+
     public Rf1Dir() {
         this.directoryName = "";
     }
 
-    public Rf1Dir(String name, String uuidName, String containsStr)
-            throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        this.directoryName = name;
+    public Rf1Dir(String name, String containsStr) {
+        this.directoryName = name.replace("/", FILE_SEPARATOR);
         this.fileNameContains = containsStr;
     }
 
@@ -63,12 +60,11 @@ public class Rf1Dir {
     }
 
     public void setFNameContains(String s) {
-        this.fileNameContains = s;
+        this.fileNameContains = s.replace("/", FILE_SEPARATOR);
     }
 
     public static List<List<RF1File>> getRf1Files(String wDir, String subDir, Rf1Dir[] inDirs,
-            ArrayList<String> filter, Date dateStart, Date dateStop)
-            throws MojoFailureException {
+            ArrayList<String> filter, Date dateStart, Date dateStop) throws MojoFailureException {
 
         List<List<RF1File>> listOfDirs = new ArrayList<List<RF1File>>();
         for (Rf1Dir sctDir : inDirs) {
@@ -76,8 +72,8 @@ public class Rf1Dir {
 
             File f1 = new File(new File(wDir, subDir), sctDir.getDirName());
             ArrayList<File> fv = new ArrayList<File>();
-            
-            for (int i=0; i<filter.size(); i++)
+
+            for (int i = 0; i < filter.size(); i++)
                 filter.set(i, filter.get(i).toUpperCase());
             listFilesRecursive(fv, f1, filter);
 
@@ -101,14 +97,15 @@ public class Rf1Dir {
 
     private static boolean inDateRange(String revDateStr, Date dateStart, Date dateStop)
             throws MojoFailureException {
-        String pattern = "yyyy-MM-dd hh:mm:ss";
+        String pattern = "yyyy-MM-dd HH:mm:ss";
         SimpleDateFormat formatter = new SimpleDateFormat(pattern);
         Date revDate;
         try {
             revDate = formatter.parse(revDateStr);
         } catch (ParseException e) {
             e.printStackTrace();
-            throw new MojoFailureException("SimpleDateFormat parse error");
+            throw new MojoFailureException(
+                    "SimpleDateFormat yyyy-MM-dd HH:mm:ss parse error: revDateStr");
         }
 
         if (dateStart != null && revDate.compareTo(dateStart) < 0)
@@ -152,12 +149,12 @@ public class Rf1Dir {
         Arrays.sort(files);
         for (int i = 0; i < files.length; i++) {
             String name = files[i].getName().toUpperCase();
-            
+
             boolean filterOK = true;
-            for (String s:filter)
+            for (String s : filter)
                 if (name.contains(s) == false)
                     filterOK = false;
-            
+
             if (files[i].isFile() && filterOK) {
                 list.add(files[i]);
             }
