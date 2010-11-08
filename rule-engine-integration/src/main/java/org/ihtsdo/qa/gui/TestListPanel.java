@@ -1,10 +1,8 @@
 package org.ihtsdo.qa.gui;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Calendar;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -52,6 +50,7 @@ public class TestListPanel extends JPanel {
 		table1.getColumnModel().getColumn(1).setCellRenderer(new TextAreaRenderer());
 		table1.repaint();
 		updateList1();
+		label4.setText("");
 	}
 
 	private void updateList1() {
@@ -81,6 +80,9 @@ public class TestListPanel extends JPanel {
 	}
 
 	private void testConcepts() {
+		label4.setText("");
+		label4.revalidate();
+		
 		String[] columnNames = {"Concept",
 		"Alerts"};
 		String[][] data = null;
@@ -90,6 +92,7 @@ public class TestListPanel extends JPanel {
 				return false;
 			}
 		};
+		long start = Calendar.getInstance().getTimeInMillis();
 		for (int i = 0; i < list1Model.getSize(); i++) {
 			I_GetConceptData loopConcept = (I_GetConceptData) list1Model.getElementAt(i);
 			I_GetConceptData context = (I_GetConceptData) comboBox1.getSelectedItem();
@@ -103,6 +106,9 @@ public class TestListPanel extends JPanel {
 				e.printStackTrace();
 			}
 		}
+		long end = Calendar.getInstance().getTimeInMillis();
+		label4.setText("Total test time: " + (end - start) + " milliseconds...");
+		label4.revalidate();
 		table1.setModel(table1Model);
 		table1.repaint();
 	}
@@ -132,6 +138,7 @@ public class TestListPanel extends JPanel {
 		scrollPane2 = new JScrollPane();
 		table1 = new JTable();
 		panel3 = new JPanel();
+		label4 = new JLabel();
 		label3 = new JLabel();
 		comboBox1 = new JComboBox();
 		button3 = new JButton();
@@ -212,17 +219,24 @@ public class TestListPanel extends JPanel {
 		//======== panel3 ========
 		{
 			panel3.setLayout(new GridBagLayout());
-			((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0, 0};
+			((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0, 0, 0};
 			((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {0, 0};
-			((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 			((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+
+			//---- label4 ----
+			label4.setText("text");
+			label4.setForeground(Color.red);
+			panel3.add(label4, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
 
 			//---- label3 ----
 			label3.setText("Use context:");
-			panel3.add(label3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+			panel3.add(label3, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
-			panel3.add(comboBox1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+			panel3.add(comboBox1, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
 
@@ -235,7 +249,7 @@ public class TestListPanel extends JPanel {
 					button3ActionPerformed(e);
 				}
 			});
-			panel3.add(button3, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+			panel3.add(button3, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
 
@@ -248,7 +262,7 @@ public class TestListPanel extends JPanel {
 					button2ActionPerformed(e);
 				}
 			});
-			panel3.add(button2, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
+			panel3.add(button2, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 0), 0, 0));
 		}
@@ -269,6 +283,7 @@ public class TestListPanel extends JPanel {
 	private JScrollPane scrollPane2;
 	private JTable table1;
 	private JPanel panel3;
+	private JLabel label4;
 	private JLabel label3;
 	private JComboBox comboBox1;
 	private JButton button3;

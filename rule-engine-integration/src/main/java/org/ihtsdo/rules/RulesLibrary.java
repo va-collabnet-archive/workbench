@@ -114,9 +114,10 @@ public class RulesLibrary {
 		KnowledgeBase kbase = contextHelper.getKnowledgeBaseForContext(context, config);
 		ResultsCollectorWorkBench results = new ResultsCollectorWorkBench();
 		if (kbase != null) {
-			int a1 = kbase.getKnowledgePackages().size();
-			int a2 = kbase.getKnowledgePackages().iterator().next().getRules().size();
-			if (!(kbase.getKnowledgePackages().size() == 1 &&
+//			int a1 = kbase.getKnowledgePackages().size();
+//			int a2 = kbase.getKnowledgePackages().iterator().next().getRules().size();
+			if (!(kbase.getKnowledgePackages().size() == 0) && 
+					!(kbase.getKnowledgePackages().size() == 1 &&
 					kbase.getKnowledgePackages().iterator().next().getRules().size() == 0)) { 
 
 				StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
