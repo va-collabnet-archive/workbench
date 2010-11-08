@@ -243,7 +243,7 @@
          <class>java.awt.GridBagLayout</class> 
          <void method="setProperty"> 
           <string>$columnSpecs</string> 
-          <string>0, 0, 0, 0, 0, 0</string> 
+          <string>0, 0, 0, 0, 0, 0, 0</string> 
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
@@ -274,6 +274,25 @@
           <string>javax.swing.JLabel</string> 
           <void method="setProperty"> 
            <string>text</string> 
+           <string>text</string> 
+          </void> 
+          <void method="setProperty"> 
+           <string>foreground</string> 
+           <object class="java.awt.Color" field="red"/> 
+          </void> 
+          <void property="name"> 
+           <string>label4</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JLabel</string> 
+          <void method="setProperty"> 
+           <string>text</string> 
            <string>Use context:</string> 
           </void> 
           <void property="name"> 
@@ -282,6 +301,10 @@
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
           <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+          <void method="setProperty"> 
+           <string>gridx</string> 
+           <int>1</int> 
+          </void> 
          </object> 
         </void> 
         <void method="add"> 
@@ -295,7 +318,7 @@
           <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
           <void method="setProperty"> 
            <string>gridx</string> 
-           <int>1</int> 
+           <int>2</int> 
           </void> 
          </object> 
         </void> 
@@ -330,7 +353,7 @@
           <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
           <void method="setProperty"> 
            <string>gridx</string> 
-           <int>4</int> 
+           <int>5</int> 
           </void> 
          </object> 
         </void> 
@@ -365,7 +388,7 @@
           <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
           <void method="setProperty"> 
            <string>gridx</string> 
-           <int>5</int> 
+           <int>6</int> 
           </void> 
          </object> 
         </void> 
