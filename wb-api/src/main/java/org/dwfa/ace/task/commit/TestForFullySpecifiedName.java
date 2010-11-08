@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.queryParser.QueryParser;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -136,7 +137,9 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                         String filteredDescription = part.getText();
                         // remove all non-alphanumeric characters and replace with a space - this is to stop these
                         // characters causing issues with the lucene search
-                        filteredDescription = filteredDescription.replaceAll("[^a-zA-Z0-9]", " ");
+                        // filteredDescription = filteredDescription.replaceAll("[^a-zA-Z0-9]", " ");
+                        // new removal using native lucene escaping 
+                        filteredDescription = QueryParser.escape(filteredDescription);
                         SearchResult result = Terms.get().doLuceneSearch(filteredDescription);
                         search: for (int i = 0; i < result.topDocs.totalHits; i++) {
                             Document doc = result.searcher.doc(i);
