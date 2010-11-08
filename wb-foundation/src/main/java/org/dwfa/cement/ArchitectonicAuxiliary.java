@@ -106,7 +106,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 					new I_ConceptualizeUniversally[] { WORKFLOW_COMMENT_TYPE }),
 					WORKFLOW_COMMENT_NO_EQUIV("no equivalent concept in target", 
 							new I_ConceptualizeUniversally[] { WORKFLOW_COMMENT_DIFF_TRANS }),
-					WORKFLOW_COMMENT_CONSENSUS("concensus building required", 
+					WORKFLOW_COMMENT_CONSENSUS("consensus building required", 
 							new I_ConceptualizeUniversally[] { WORKFLOW_COMMENT_DIFF_TRANS }),
 					WORKFLOW_COMMENT_AMBIGUOUS("ambiguous source fsn", 
 							new I_ConceptualizeUniversally[] { WORKFLOW_COMMENT_DIFF_TRANS }),
