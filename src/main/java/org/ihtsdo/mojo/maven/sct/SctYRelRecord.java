@@ -47,6 +47,9 @@ class SctYRelRecord implements Comparable<Object>, Serializable {
     boolean exceptionFlag; // to handle Concept ID change exception
     int yPath; // index
     int yRevision;
+    
+    /** user: 0=unassigned, 1=inferred/classifier */
+    int userIdx; 
 
     public SctYRelRecord(long relID, int st, long cOneID, long roleTypeSnoId, int roleTypeIdx, long cTwoID,
             int characterType, int r, int grp) {
@@ -76,10 +79,11 @@ class SctYRelRecord implements Comparable<Object>, Serializable {
         this.refinability = r; // REFINABILITY
         this.group = grp; // RELATIONSHIPGROUP
         this.exceptionFlag = false;
+        this.userIdx = 0;
     }
 
     public SctYRelRecord(long relID, int st, long cOneID, long roleTypeSnoId, int roleTypeIdx, long cTwoID,
-            int characterType, int r, int grp, int pathIdx) {
+            int characterType, int r, int grp, int pathIdx, int userIdx) {
     
         this.relSnoId = relID; // RELATIONSHIPID
         UUID tmpUUID = Type3UuidFactory.fromSNOMED(relSnoId);
@@ -109,6 +113,7 @@ class SctYRelRecord implements Comparable<Object>, Serializable {
         this.exceptionFlag = false;
         
         this.yPath = pathIdx;
+        this.userIdx = userIdx;
     }
     
     public SctYRelRecord(UUID uuidRelId, int status, UUID uuidC1, int roleTypeIdx, UUID uuidC2,
@@ -134,6 +139,7 @@ class SctYRelRecord implements Comparable<Object>, Serializable {
         this.exceptionFlag = false; // to handle Concept ID change exception
         this.yPath = pathIdx;
         this.yRevision = revDate;
+        this.userIdx = 0; // ARF Input Format does not have a field for user id.
     }
 
     // method required for object to be sortable (comparable) in arrays

@@ -37,7 +37,6 @@ import java.io.Serializable;
 import java.io.StreamTokenizer;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -80,7 +79,7 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 /**
  * <b>DESCRIPTION: </b><br>
  * 
- * SctSiToEConceptMojo is a maven mojo which converts SNOMED stated and inferred
+ * Sct1ArfToEConceptMojo is a maven mojo which converts SNOMED stated and inferred
  * (Distribution Normal Form) RF1 release files to IHTSDO Workbench 
  * versioned import eConcepts format.
  * <p>
@@ -163,7 +162,7 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
  * 
  * @author Marc E. Campbell
  * 
- * @goal sct-arf-to-econcepts
+ * @goal sct1-arf-to-econcepts
  * @requiresDependencyResolution compile
  * @requiresProject false
  */
@@ -202,14 +201,16 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
      * 
      * @parameter
      */
-    private Date dateStart;
+    private String dateStart;
+    private Date dateStartObj;
 
     /**
-     * Stop date inclusive
+     * Stop date (inclusive)
      * 
      * @parameter
      */
-    private Date dateStop;
+    private String dateStop;
+    private Date dateStopObj;
 
     /**
      * Location of the build directory.
@@ -232,7 +233,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
      * 
      * @parameter
      */
-    private String[] arfInputDirArray;
+    private String[] arfInputDirs;
 
     /**
      * SCT Input Directories Array. The directory array parameter supported
@@ -242,9 +243,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
      * relative each other. Each input directory in the array is treated as
      * mutually exclusive to others directories in the array.
      * 
-     * @parameter
+     * @parameter 
+     * @required
      */
-    private Sct1Directory[] sctInputDirArray;
+    private Sct1Dir[] sct1Dirs;
 
     /**
      * If this contains anything, only convert paths which match one of the
@@ -271,6 +273,28 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
      * @parameter default-value="classes"
      */
     private String outputDirectory;
+
+    /**
+     * 
+     * @parameter
+     * @required
+     */
+    private UUID uuidUser;
+
+    public void setUuidUser(String uuidStr) {
+        uuidUser = UUID.fromString(uuidStr);
+    }
+
+    /**
+     * Snorocket "User" UUID
+     * @parameter
+     * @required
+     */
+    private UUID uuidSnorocket;
+
+    public void setUuidSnorocket(String uuidStr) {
+        uuidSnorocket = UUID.fromString(uuidStr);
+    }
 
     private String scratchDirectory = FILE_SEPARATOR + "tmp_steps";
 
@@ -377,7 +401,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
         int ySourceUuidIdx;
 
-        public SCTFile(File f, String wDir, String subDir, String d, Sct1Directory sctDir) {
+        public SCTFile(File f, String wDir, String subDir, String d, Sct1Dir sctDir) {
             this.file = f;
             this.revDate = d;
             this.yRevDate = lookupYRevDateIdx(revDate);
@@ -713,7 +737,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new MojoFailureException("FAILED: SctSiToEConcept -- setupLookupPartA()");
+            throw new MojoFailureException("FAILED: Sct1ArfToEConcept -- setupLookupPartA()");
         }
 
     }
@@ -755,7 +779,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         } catch (ParseException e) {
             e.printStackTrace();
             throw new MojoFailureException(
-                    "FAILED: SctSiToEConcept -- setupLookupConverion(), date parse error");
+                    "FAILED: Sct1ArfToEConcept -- setupLookupConverion(), date parse error");
         }
 
         // SNOMED_INT ... :FYI: soft code in SctYConRecord
@@ -781,22 +805,22 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
 
         // SHOW input directories from POM file
-        for (int i = 0; i < sctInputDirArray.length; i++) {
-            sctInputDirArray[i].setDirectoryName(sctInputDirArray[i].getDirectoryName().replace('/',
+        for (int i = 0; i < sct1Dirs.length; i++) {
+            sct1Dirs[i].setDirectoryName(sct1Dirs[i].getDirectoryName().replace('/',
                     File.separatorChar));
-            getLog().info("POM SCT Input Directory (" + i + ") = " + sctInputDirArray[i]);
-            if (!sctInputDirArray[i].getDirectoryName().startsWith(FILE_SEPARATOR)) {
-                sctInputDirArray[i].setDirectoryName(FILE_SEPARATOR + sctInputDirArray[i].getDirectoryName());
+            getLog().info("POM SCT Input Directory (" + i + ") = " + sct1Dirs[i]);
+            if (!sct1Dirs[i].getDirectoryName().startsWith(FILE_SEPARATOR)) {
+                sct1Dirs[i].setDirectoryName(FILE_SEPARATOR + sct1Dirs[i].getDirectoryName());
             }
         }
 
-        if (arfInputDirArray == null)
-            arfInputDirArray = new String[0];
-        for (int i = 0; i < arfInputDirArray.length; i++) {
-            arfInputDirArray[i] = arfInputDirArray[i].replace('/', File.separatorChar);
-            getLog().info("POM ARF Input Directory (" + i + ") = " + arfInputDirArray[i]);
-            if (!arfInputDirArray[i].startsWith(FILE_SEPARATOR)) {
-                arfInputDirArray[i] = FILE_SEPARATOR + arfInputDirArray[i];
+        if (arfInputDirs == null)
+            arfInputDirs = new String[0];
+        for (int i = 0; i < arfInputDirs.length; i++) {
+            arfInputDirs[i] = arfInputDirs[i].replace('/', File.separatorChar);
+            getLog().info("POM ARF Input Directory (" + i + ") = " + arfInputDirs[i]);
+            if (!arfInputDirs[i].startsWith(FILE_SEPARATOR)) {
+                arfInputDirs[i] = FILE_SEPARATOR + arfInputDirs[i];
             }
         }
 
@@ -806,13 +830,13 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             getLog().info("POM Output Directory: " + outputDirectory);
         }
 
-        executeMojo(targetDir, targetSubDir, arfInputDirArray, sctInputDirArray, outputDirectory,
+        executeMojo(targetDir, targetSubDir, arfInputDirs, sct1Dirs, outputDirectory,
                 includeCTV3ID, includeSNOMEDRTID);
         getLog().info("::: END SctArfToEConcept");
     }
 
-    void executeMojo(String tDir, String tSubDir, String[] arfDirs, Sct1Directory[] sctDirs, String outDir,
-            boolean ctv3idTF, boolean snomedrtTF) throws MojoFailureException {
+    void executeMojo(String tDir, String tSubDir, String[] arfDirs, Sct1Dir[] sctDirs,
+            String outDir, boolean ctv3idTF, boolean snomedrtTF) throws MojoFailureException {
 
         // :DEBUG:TEST:
         countRefsetMember = 0;
@@ -824,8 +848,12 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
         getLog().info("::: Target Directory: " + tDir);
         getLog().info("::: Target Sub Directory:     " + tSubDir);
-        getLog().info("::: Start date (inclusive) = " + dateStart);
-        getLog().info("::: Stop date (inclusive) =  " + dateStop);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.ss hh:mm:ss");
+        if (dateStartObj != null)
+        getLog().info("::: Start date (inclusive) = " + sdf.format(dateStartObj));
+        if (dateStopObj != null)
+        getLog().info(":::  Stop date (inclusive) = " + sdf.format(dateStopObj));
 
         for (int i = 0; i < sctDirs.length; i++) {
             getLog().info("::: SCT Input Directory (" + i + ") = " + sctDirs[i].getDirectoryName());
@@ -987,15 +1015,15 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             executeMojoStep7();
 
         } catch (Exception e) { // Catch exception if any
-            getLog().info("SctArfToEConceptsMojo sct-arf-to-econcepts Error");
+            getLog().info("Sct1ArfToEConceptsMojo sct1-arf-to-econcepts Error");
             throw new MojoFailureException("Error", e);
         }
     }
 
-    private void executeMojoStep1(String wDir, String subDir, Sct1Directory[] inDirs, boolean ctv3idTF,
+    private void executeMojoStep1(String wDir, String subDir, Sct1Dir[] inDirs, boolean ctv3idTF,
             boolean snomedrtTF, ObjectOutputStream oosCon, ObjectOutputStream oosDes,
             ObjectOutputStream oosRel) throws MojoFailureException {
-        getLog().info("*** SctSiToEConcept STEP #1 BEGINNING ***");
+        getLog().info("*** Sct1ArfToEConcept STEP #1 BEGINNING ***");
         long start = System.currentTimeMillis();
 
         // PROCESS SNOMED FILES
@@ -1058,13 +1086,13 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         getLog().info(
                 "*** VERSIONING TIME: " + ((System.currentTimeMillis() - start) / 1000)
                         + " seconds");
-        getLog().info("*** SctSiToEConcept STEP #1 COMPLETED ***\r\n");
+        getLog().info("*** Sct1ArfToEConcept STEP #1 COMPLETED ***\r\n");
     }
 
     private void executeMojoStep2(String wDir, String subDir, String[] arfDirs,
             ObjectOutputStream oosCon, ObjectOutputStream oosDes, ObjectOutputStream oosRel,
             ObjectOutputStream oosIds, ObjectOutputStream oosRefSet) {
-        getLog().info("*** SctSiToEConcept STEP #2 BEGINNING - INGEST ARF ***");
+        getLog().info("*** Sct1ArfToEConcept STEP #2 BEGINNING - INGEST ARF ***");
         long start = System.currentTimeMillis();
 
         try {
@@ -1138,7 +1166,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         getLog().info(
                 "*** ARF TO BINARY OBJECT TIME: " + ((System.currentTimeMillis() - start) / 1000)
                         + " seconds");
-        getLog().info("*** SctSiToEConcept STEP #2 COMPLETED - INGEST ARF ***\r\n");
+        getLog().info("*** Sct1ArfToEConcept STEP #2 COMPLETED - INGEST ARF ***\r\n");
     }
 
     private void processArfConFiles(String wDir, List<List<ARFFile>> listOfDirs,
@@ -1532,7 +1560,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void executeMojoStep3() throws MojoFailureException {
-        getLog().info("*** SctSiToEConcept STEP #3 BEGINNING -- GATHER DESTINATION RELs ***");
+        getLog().info("*** Sct1ArfToEConcept STEP #3 BEGINNING -- GATHER DESTINATION RELs ***");
         long start = System.currentTimeMillis();
 
         try {
@@ -1623,11 +1651,11 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         getLog().info(
                 "*** DESTINATION RELs: " + ((System.currentTimeMillis() - start) / 1000)
                         + " seconds");
-        getLog().info("*** SctSiToEConcept STEP #3 COMPLETED -- GATHER DESTINATION RELs ***\r\n");
+        getLog().info("*** Sct1ArfToEConcept STEP #3 COMPLETED -- GATHER DESTINATION RELs ***\r\n");
     }
 
     private void executeMojoStep4() {
-        getLog().info("*** SctSiToEConcept STEP #4 BEGINNING -- MATCH IDs ***");
+        getLog().info("*** Sct1ArfToEConcept STEP #4 BEGINNING -- MATCH IDs ***");
         long start = System.currentTimeMillis();
 
         try {
@@ -1923,7 +1951,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         getLog().info(
                 "*** ATTACH IDs TIME: " + ((System.currentTimeMillis() - start) / 1000)
                         + " seconds");
-        getLog().info("*** SctSiToEConcept STEP #4 COMPLETED - MATCH IDs ***\r\n");
+        getLog().info("*** Sct1ArfToEConcept STEP #4 COMPLETED - MATCH IDs ***\r\n");
     }
 
     private TkIdentifier createEIdentifier(SctYIdRecord id) {
@@ -1946,7 +1974,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private int checkIdConMatched(SctYIdRecord id, SctYConRecord con) {
-        // TODO Auto-generated method stub
         final int BEFORE = -1;
         final int MATCH = 0;
         final int AFTER = 1;
@@ -1969,7 +1996,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private int checkIdDesMatched(SctYIdRecord id, SctYDesRecord des) {
-        // TODO Auto-generated method stub
         final int BEFORE = -1;
         final int MATCH = 0;
         final int AFTER = 1;
@@ -1992,7 +2018,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private int checkIdRelMatched(SctYIdRecord id, SctYRelRecord rel) {
-        // TODO Auto-generated method stub
         final int BEFORE = -1;
         final int MATCH = 0;
         final int AFTER = 1;
@@ -2015,7 +2040,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void executeMojoStep5() {
-        getLog().info("*** SctSiToEConcept Step #5 BEGINNING -- REFSET PREPARATION ***");
+        getLog().info("*** Sct1ArfToEConcept Step #5 BEGINNING -- REFSET PREPARATION ***");
         long start = System.currentTimeMillis();
 
         try {
@@ -2307,7 +2332,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         getLog().info(
                 "*** MASTER SORT TIME: " + ((System.currentTimeMillis() - start) / 1000)
                         + " seconds");
-        getLog().info("*** SctSiToEConcept Step #5 COMPLETED -- REFSET PREPARATION ***\r\n");
+        getLog().info("*** Sct1ArfToEConcept Step #5 COMPLETED -- REFSET PREPARATION ***\r\n");
     }
 
     private int compareMsbLsb(long aMsb, long aLsb, long bMsb, long bLsb) {
@@ -2330,7 +2355,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
     // :!!!:NYI: concepts may not need to be sorted again after previous step.
     private void executeMojoStep6() throws MojoFailureException {
-        getLog().info("*** SctSiToEConcept Step #6 BEGINNING -- SORT BY CONCEPT ***");
+        getLog().info("*** Sct1ArfToEConcept Step #6 BEGINNING -- SORT BY CONCEPT ***");
         long start = System.currentTimeMillis();
         try {
 
@@ -2654,7 +2679,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         getLog().info(
                 "*** MASTER SORT TIME: " + ((System.currentTimeMillis() - start) / 1000)
                         + " seconds");
-        getLog().info("*** SctSiToEConcept Step #6 COMPLETED -- SORT BY CONCEPT ***\r\n");
+        getLog().info("*** Sct1ArfToEConcept Step #6 COMPLETED -- SORT BY CONCEPT ***\r\n");
     }
 
     /**
@@ -2676,7 +2701,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         //        for (UUID u : yPathArray)
         //            getLog().info("PATH UUID :: " + u + " #=" + xyzdebug++);
 
-        getLog().info("*** SctSiToEConcept STEP #7 BEGINNING -- CREATE eCONCEPTS ***");
+        getLog().info("*** Sct1ArfToEConcept STEP #7 BEGINNING -- CREATE eCONCEPTS ***");
         long start = System.currentTimeMillis();
         countEConWritten = 0;
 
@@ -2959,7 +2984,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 "*** ECONCEPT CREATION TIME: " + ((System.currentTimeMillis() - start) / 1000)
                         + " seconds");
         getLog().info("*** ECONCEPTS WRITTEN TO FILE = " + countEConWritten);
-        getLog().info("*** SctSiToEConcept STEP #7 COMPLETED -- CREATE eCONCEPTS ***\r\n");
+        getLog().info("*** Sct1ArfToEConcept STEP #7 COMPLETED -- CREATE eCONCEPTS ***\r\n");
     }
 
     private void createEConcept(ArrayList<SctYConRecord> conList, ArrayList<SctYDesRecord> desList,
@@ -3163,6 +3188,11 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                         rid.setPathUuid(yPathArray[rRec.yPath]);
                         rid.setStatusUuid(uuidCurrent);
                         rid.setTime(yRevDateArray[rRec.yRevision]);
+                        if (rRec.userIdx == 1)
+                            rid.setAuthorUuid(uuidSnorocket);
+                        else
+                            rid.setAuthorUuid(uuidUser);
+
                         tmpRelAdditionalIds.add(rid);
                     }
                     if (rRec.addedIds != null) {
@@ -3186,6 +3216,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     rel.setStatusUuid(yStatusUuidArray[rRec.status]);
                     rel.setPathUuid(yPathArray[rRec.yPath]);
                     rel.setTime(yRevDateArray[rRec.yRevision]);
+                    if (rRec.userIdx == 1)
+                        rel.setAuthorUuid(uuidSnorocket);
+                    else
+                        rel.setAuthorUuid(uuidUser);
                     rel.revisions = null;
                 } else {
                     ERelationshipRevision erv = new ERelationshipRevision();
@@ -3196,6 +3230,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     erv.setStatusUuid(yStatusUuidArray[rRec.status]);
                     erv.setPathUuid(yPathArray[rRec.yPath]);
                     erv.setTime(yRevDateArray[rRec.yRevision]);
+                    if (rRec.userIdx == 1)
+                        erv.setAuthorUuid(uuidSnorocket);
+                    else
+                        erv.setAuthorUuid(uuidUser);
                     revisions.add(erv);
                 }
             }
@@ -3733,8 +3771,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         for (int ii = 0; ii < arfDirs.length; ii++) {
             ArrayList<ARFFile> listOfFiles = new ArrayList<ARFFile>();
 
-            getLog().info(prefix.toUpperCase() + " (" + ii + ") " + wDir + "/" +
-                            subDir + "/" +  arfDirs[ii]);
+            getLog().info(prefix.toUpperCase() + " (" + ii + ") " + wDir + subDir + arfDirs[ii]);
 
             File f1 = new File(new File(wDir, subDir), arfDirs[ii]);
             ArrayList<File> fv = new ArrayList<File>();
@@ -3775,11 +3812,11 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         return listOfDirs;
     }
 
-    private List<List<SCTFile>> getSctFiles(String wDir, String subDir, Sct1Directory[] inDirs,
+    private List<List<SCTFile>> getSctFiles(String wDir, String subDir, Sct1Dir[] inDirs,
             String prefix, String postfix) throws MojoFailureException {
 
         List<List<SCTFile>> listOfDirs = new ArrayList<List<SCTFile>>();
-        for (Sct1Directory sctDir : inDirs) {
+        for (Sct1Dir sctDir : inDirs) {
             ArrayList<SCTFile> listOfFiles = new ArrayList<SCTFile>();
 
             getLog().info(
@@ -3846,25 +3883,47 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         SimpleDateFormat formatter = new SimpleDateFormat(pattern);
         Date revDate = formatter.parse(revDateStr);
 
-        if (dateStart != null && revDate.compareTo(dateStart) < 0)
+        if (dateStartObj != null && revDate.compareTo(dateStartObj) < 0)
             return false; // precedes start date
 
-        if (dateStop != null && revDate.compareTo(dateStop) > 0)
+        if (dateStopObj != null && revDate.compareTo(dateStopObj) > 0)
             return false; // after end date
 
         return true;
     }
 
-    void setDateStart(String s) throws ParseException {
-        String pattern = "yyyy-MM-dd hh:mm:ss";
-        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-        dateStart = formatter.parse(s + " 00:00:00");
+    public String getDateStart() {
+        return this.dateStart;   
+    }
+    
+    public void setDateStart(String sStart) throws MojoFailureException {
+        this.dateStart = sStart;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+        try {
+            this.dateStartObj = formatter.parse(sStart + " 00:00:00");
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new MojoFailureException("SimpleDateFormat yyyy.MM.dd dateStart parse error: "
+                    + sStart);
+        }
+        getLog().info("::: START DATE (INCLUSIVE) " + this.dateStart);
     }
 
-    void setDateStop(String s) throws ParseException {
-        String pattern = "yyyy-MM-dd hh:mm:ss";
-        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-        dateStop = formatter.parse(s + " 23:59:59");
+    public String getDateStop() {
+        return this.dateStop;   
+    }
+
+    public void setDateStop(String sStop) throws MojoFailureException {
+        this.dateStop = sStop;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+        try {
+            this.dateStopObj = formatter.parse(sStop + " 23:59:59");
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new MojoFailureException("SimpleDateFormat yyyy.MM.dd dateStop parse error: "
+                    + sStop);
+        }
+        getLog().info(":::  STOP DATE (INCLUSIVE) " + this.dateStop);
     }
 
     /*
@@ -3888,6 +3947,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         while (dit.hasNext()) {
             List<SCTFile> fl = dit.next(); // File List
             Iterator<SCTFile> fit = fl.iterator(); // File Iterator
+            if (fit.hasNext() == false)
+                continue;
 
             // READ file1 as MASTER FILE
             SCTFile f1 = fit.next();
@@ -4037,6 +4098,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         while (dit.hasNext()) {
             List<SCTFile> fl = dit.next(); // File List
             Iterator<SCTFile> fit = fl.iterator(); // File Iterator
+            if (fit.hasNext() == false)
+                continue;
 
             // READ file1 as MASTER FILE
             SCTFile f1 = fit.next();
@@ -4528,8 +4591,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                         + (System.currentTimeMillis() - start) + " milliseconds");
     }
 
-    protected SctYRelRecord[] parseRelationships(String fName, SctYRelRecord[] a, int count, SCTFile f)
-            throws Exception {
+    protected SctYRelRecord[] parseRelationships(String fName, SctYRelRecord[] a, int count,
+            SCTFile f) throws Exception {
 
         long start = System.currentTimeMillis();
 
@@ -4574,17 +4637,21 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
             // Save to sortable array
             int pathIdx = f.yPathIdx;
+            int userIdx = 0;
             if (characteristic == 0 && f.isStated)
                 pathIdx = f.yPathStatedIdx;
-            else if (characteristic == 0)
+            else if (characteristic == 0) {
                 pathIdx = f.yPathInferredIdx;
+                userIdx = 1;
+            }
 
             // 1=Qualifier, 2=Historical, 3=Additional
             if (characteristic == 0 || (characteristic == 1 && f.keepQualifier)
                     || (characteristic == 2 && f.keepHistorical)
                     || (characteristic == 3 && f.keepAdditional)) {
                 a[relationships] = new SctYRelRecord(relID, status, conceptOneID, roleTypeSnoId,
-                        roleTypeIdx, conceptTwoID, characteristic, refinability, group, pathIdx);
+                        roleTypeIdx, conceptTwoID, characteristic, refinability, group, pathIdx,
+                        userIdx);
                 relationships++;
             } else {
                 // :!!!: count "not kept"
@@ -4615,7 +4682,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         int lenA = a.length;
         ArrayList<Integer> duplIdxList = new ArrayList<Integer>();
         for (int idx = 0; idx < lenA - 2; idx++) {
-            if (a[idx]== null || a[idx + 1] == null)
+            if (a[idx] == null || a[idx + 1] == null)
                 getLog().info("FOUND NULL :!!!:DEBUG");
             if ((a[idx].relUuidMsb == a[idx + 1].relUuidMsb)
                     && (a[idx].relUuidLsb == a[idx + 1].relUuidLsb)) {
@@ -4991,8 +5058,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         File[] files = root.listFiles();
         Arrays.sort(files);
         for (int i = 0; i < files.length; i++) {
-            if (files[i].isFile() && files[i].getName().endsWith(postfix)
-                    && files[i].getName().startsWith(prefix)) {
+            String name = files[i].getName().toUpperCase();
+
+            if (files[i].isFile() && name.endsWith(postfix.toUpperCase())
+                    && name.startsWith(prefix.toUpperCase())) {
                 list.add(files[i]);
             }
             if (files[i].isDirectory()) {

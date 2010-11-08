@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import org.dwfa.util.id.Type5UuidFactory;
 
-class Sct1Directory {
+public class Sct1Dir {
     private String directoryName;
 
     private Boolean keepQualifierFromInferred; // 1
@@ -14,7 +14,7 @@ class Sct1Directory {
     private Boolean keepAdditionalFromInferred; // 3
 
     private Boolean mapSctIdInferredToStated;
-    
+
     private String wbPathUuidCoreFromName; // Workbench Path Name
     private String wbPathUuidStatedFromName; // Workbench Path Name
     private String wbPathUuidInferredFromName; // Workbench Path Name
@@ -22,14 +22,14 @@ class Sct1Directory {
     private UUID wbPathUuidStated; // UUID derived from name
     private UUID wbPathUuidInferred; // UUID derived from name
 
-    public Sct1Directory() {
-        directoryName = "";
+    public Sct1Dir() {
+        this.directoryName = "";
 
-        mapSctIdInferredToStated = false;
+        this.mapSctIdInferredToStated = false;
 
-        keepQualifierFromInferred = false; // 1
-        keepHistoricalFromInferred = false; // 2
-        keepAdditionalFromInferred = false; // 3
+        this.keepQualifierFromInferred = false; // 1
+        this.keepHistoricalFromInferred = false; // 2
+        this.keepAdditionalFromInferred = false; // 3
     }
 
     public String getDirectoryName() {
@@ -94,6 +94,10 @@ class Sct1Directory {
         this.keepAdditionalFromInferred = keep;
     }
 
+    public Boolean getMapSctIdInferredToStated() {
+        return mapSctIdInferredToStated;
+    }
+
     public Boolean doMapSctIdInferredToStated() {
         return mapSctIdInferredToStated;
     }
@@ -114,6 +118,7 @@ class Sct1Directory {
         return wbPathUuidCore;
     }
 
+    /** UUID in String form */
     public void setWbPathUuidCore(String s) {
         this.wbPathUuidCore = UUID.fromString(s);
     }
@@ -122,8 +127,18 @@ class Sct1Directory {
         return wbPathUuidCoreFromName;
     }
 
-    public void setWbPathUuidCoreFromName(String name) throws NoSuchAlgorithmException,
-            UnsupportedEncodingException {
+    public void setCorePathUuid(String uuid) {
+        this.wbPathUuidCoreFromName = uuid;
+        this.wbPathUuidCore = UUID.fromString(uuid);
+    }
+
+    public void setCorePathName(String name) throws UnsupportedEncodingException,
+            NoSuchAlgorithmException {
+        setWbPathUuidCoreFromName(name);
+    }
+
+    public void setWbPathUuidCoreFromName(String name) throws UnsupportedEncodingException,
+            NoSuchAlgorithmException {
         this.wbPathUuidCoreFromName = name;
         this.wbPathUuidCore = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, name);
     }
@@ -132,12 +147,23 @@ class Sct1Directory {
         return wbPathUuidStated;
     }
 
+    /** UUID in String form */
     public void setWbPathUuidStated(String s) {
         this.wbPathUuidStated = UUID.fromString(s);
     }
 
     public String getWbPathUuidStatedFromName() {
         return wbPathUuidStatedFromName;
+    }
+
+    public void setStatedPathUuid(String uuid) {
+        this.wbPathUuidStatedFromName = uuid;
+        this.wbPathUuidStated = UUID.fromString(uuid);
+    }
+
+    public void setStatedPathName(String name) throws NoSuchAlgorithmException,
+            UnsupportedEncodingException {
+        setWbPathUuidStatedFromName(name);
     }
 
     public void setWbPathUuidStatedFromName(String name) throws NoSuchAlgorithmException,
@@ -150,6 +176,7 @@ class Sct1Directory {
         return wbPathUuidInferred;
     }
 
+    /** UUID in String form */
     public void setWbPathUuidInferred(String s) {
         this.wbPathUuidInferred = UUID.fromString(s);
     }
@@ -158,12 +185,20 @@ class Sct1Directory {
         return wbPathUuidInferredFromName;
     }
 
+    public void setInferredPathUuid(String uuid) {
+        this.wbPathUuidInferredFromName = uuid;
+        this.wbPathUuidInferred = UUID.fromString(uuid);
+    }
+
+    public void setInferredPathName(String name) throws NoSuchAlgorithmException,
+            UnsupportedEncodingException {
+        setWbPathUuidInferredFromName(name);
+    }
+
     public void setWbPathUuidInferredFromName(String name) throws NoSuchAlgorithmException,
             UnsupportedEncodingException {
         this.wbPathUuidInferredFromName = name;
         this.wbPathUuidInferred = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, name);
     }
 
-    
-    
 }
