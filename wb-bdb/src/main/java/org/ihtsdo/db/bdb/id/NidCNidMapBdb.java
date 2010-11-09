@@ -85,13 +85,13 @@ public class NidCNidMapBdb extends ComponentBdb {
 						maxValueEntries.add("[" + index + "][" + (j-1) + "]: " + ((index * NID_CNID_MAP_SIZE) + (j-1) + Integer.MIN_VALUE));
 					}
 				}
-				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+				if (AceLog.getAppLog().isLoggable(Level.INFO)) {
 	                if (readOnly) {
-	                    AceLog.getAppLog().fine("\n\nmax value entry count for read only index[" + index + "]: " + maxValueEntries.size());
+	                    AceLog.getAppLog().info("\n\nmax value entry count for read only index[" + index + "]: " + maxValueEntries.size());
 	                } else {
-	                    AceLog.getAppLog().fine("\n\nmax value entry count for mutable index[" + index + "]: " + maxValueEntries.size());
+	                    AceLog.getAppLog().info("\n\nmax value entry count for mutable index[" + index + "]: " + maxValueEntries.size());
 	                    if (maxValueEntries.size() > 0 && index < (nidCNidMaps.get().length - 1)) {
-	                       AceLog.getAppLog().fine("\n\n\nmax value entries: " + maxValueEntries);
+	                       AceLog.getAppLog().info("\n\n\nmax value entries: " + maxValueEntries);
 	                     }
 	                }
 				}
@@ -165,6 +165,8 @@ public class NidCNidMapBdb extends ComponentBdb {
 					}
 					if (maxValueEntries.size() > 0 && key < nidCNidMaps.get().length - 1) {
 						System.out.println("writing max value entries: " + maxValueEntries);
+					} else {
+						System.out.println("max value entry count in last array: " + maxValueEntries.size());
 					}
 					valueEntry = new DatabaseEntry(output.toByteArray());
 					OperationStatus status = mutable.put(null, keyEntry, valueEntry);
