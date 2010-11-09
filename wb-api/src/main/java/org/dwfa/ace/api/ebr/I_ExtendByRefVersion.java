@@ -18,9 +18,10 @@ package org.dwfa.ace.api.ebr;
 
 import java.util.List;
 
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_AmTuple;
 
-public interface I_ExtendByRefVersion extends I_ExtendByRefPart, I_AmTuple {
+public interface I_ExtendByRefVersion extends I_ExtendByRefPart, I_AmTuple, I_AmTermComponent {
 
     /**
      * @deprecated Use {@link #getStatusId()}

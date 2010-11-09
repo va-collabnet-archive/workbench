@@ -43,25 +43,27 @@ public class ActiveConceptAndDescTest implements I_TestSearchResults {
     public boolean test(I_AmTermComponent component, I_ConfigAceFrame frameConfig) throws TaskFailedException {
 		try {
 		    if (component != null) {
-	            I_DescriptionVersioned descV = (I_DescriptionVersioned) component;
-	            I_GetConceptData concept = Terms.get().getConcept(descV.getConceptNid());
-	            List<? extends I_ConceptAttributeTuple> attributes = concept.getConceptAttributeTuples(
-	                frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(), 
-	                frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
-	            if (attributes == null || attributes.size() == 0) {
-	                return false;
-	            }
-	            List<I_DescriptionTuple> matchingTuples = new ArrayList<I_DescriptionTuple>();
-	            I_IntSet allowedTypes = null;
-	            if (frameConfig.searchWithDescTypeFilter()) {
-	                allowedTypes = frameConfig.getDescTypes();
-	            }
-	            descV.addTuples(frameConfig.getAllowedStatus(), allowedTypes, 
-	                    frameConfig.getViewPositionSetReadOnly(), matchingTuples, 
-	                    frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
-	            if (matchingTuples.size() == 0) {
-	                return false;
-	            }
+		    	if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
+		            I_DescriptionVersioned descV = (I_DescriptionVersioned) component;
+		            I_GetConceptData concept = Terms.get().getConcept(descV.getConceptNid());
+		            List<? extends I_ConceptAttributeTuple> attributes = concept.getConceptAttributeTuples(
+		                frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(), 
+		                frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
+		            if (attributes == null || attributes.size() == 0) {
+		                return false;
+		            }
+		            List<I_DescriptionTuple> matchingTuples = new ArrayList<I_DescriptionTuple>();
+		            I_IntSet allowedTypes = null;
+		            if (frameConfig.searchWithDescTypeFilter()) {
+		                allowedTypes = frameConfig.getDescTypes();
+		            }
+		            descV.addTuples(frameConfig.getAllowedStatus(), allowedTypes, 
+		                    frameConfig.getViewPositionSetReadOnly(), matchingTuples, 
+		                    frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
+		            if (matchingTuples.size() == 0) {
+		                return false;
+		            }
+		    	}
 	            return true;
 		    } else {
 		        AceLog.getAppLog().alertAndLogException(new Exception("Attempting to test a null component"));

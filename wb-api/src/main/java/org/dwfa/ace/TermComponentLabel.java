@@ -273,6 +273,9 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
         }
 
         public void dragGestureRecognized(DragGestureEvent dge) {
+        	if (termComponent == null) {
+        		return;
+        	}
             Image dragImage = getDragImage();
             Point imageOffset = new Point(0, 0);
             try {

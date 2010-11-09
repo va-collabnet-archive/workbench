@@ -930,10 +930,10 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
     }
 
     public boolean isCellEditable(int row, int col) {
-        if (ACE.editMode == false) {
+        if (ACE.editMode == false || row < 0 || row >= allTuples.size()) {
             return false;
         }
-        if (allTuples.get(row).getVersion() == Integer.MAX_VALUE) {
+        if (allTuples.get(row).getTime() == Long.MAX_VALUE) {
             if (columns[col] == REFSET_FIELDS.REFSET_ID) {
                 if (allTuples.get(row).getVersions().size() > 1) {
                     return false;
@@ -950,7 +950,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
     public void setValueAt(Object value, int row, int col) {
         I_ExtendByRefVersion extTuple = allTuples.get(row);
         boolean changed = false;
-        if (extTuple.getVersion() == Integer.MAX_VALUE) {
+        if (extTuple.getTime() == Long.MAX_VALUE) {
             try {
                 switch (columns[col]) {
                 case REFSET_ID:

@@ -513,8 +513,12 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 			public void actionPerformed(ActionEvent e) {
 				if (searchTypeCombo.getSelectedItem().equals(REFSET_QUERY)) {
 					searchPhraseField.setVisible(false);
+					refsetIdentityField.setVisible(true);
+					refsetIdentityField.revalidate();
+					revalidate();
 				} else {
 					searchPhraseField.setVisible(true);
+					refsetIdentityField.setVisible(false);
 				}
 				
 			}
@@ -530,6 +534,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         
         refsetIdentityField = new TermComponentLabel();
         refsetIdentityField.setVisible(false);
+        refsetIdentityField.setMinimumSize(new Dimension(400, 20));
         add(refsetIdentityField, gbc);
 
         gbc.gridx++;
@@ -751,6 +756,13 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         updateExtraCriterion();
         
         if (searchTypeCombo.getSelectedItem().equals(REFSET_QUERY)) {
+        	if (refsetIdentityField.getTermComponent() == null) {
+        		return;
+        	}
+            setShowProgress(true);
+            model.setDescriptions(new ArrayList<I_DescriptionVersioned>());
+            ACE.threadPool.execute(new SearchRefsetWorker(this, model, 
+            		(I_GetConceptData) refsetIdentityField.getTermComponent(), config));
         	
         } else if (searchPhraseField.getText().length() > 1) {
             if (checkLuceneQuery(searchPhraseField.getText())) {
