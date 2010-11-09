@@ -160,7 +160,17 @@ public class NidCNidMapBdb extends ComponentBdb {
 					for (int i = 0; i < NID_CNID_MAP_SIZE; i++) {
 						output.writeInt(nidCNidMaps.get()[key][i]);
 						if (nidCNidMaps.get()[key][i] == Integer.MAX_VALUE) {
-							maxValueEntries.add("[" + key + "][" + i + "]");
+							if (i > 0) {
+								if (nidCNidMaps.get()[key][i-1] != Integer.MAX_VALUE) {
+									maxValueEntries.add("[" + key + "][" + (i-1) + "]: " + nidCNidMaps.get()[key][i-1]);
+								}
+								maxValueEntries.add("[" + key + "][" + i + "]");
+								if (i + 1 < NID_CNID_MAP_SIZE && nidCNidMaps.get()[key][i+1] != Integer.MAX_VALUE) {
+									maxValueEntries.add("[" + key + "][" + (i+1) + "]: " + nidCNidMaps.get()[key][i+1]);
+								}
+							} else {
+								maxValueEntries.add("[" + key + "][" + i + "]");
+							}
 						}
 					}
 					if (maxValueEntries.size() > 0 && key < nidCNidMaps.get().length - 1) {
