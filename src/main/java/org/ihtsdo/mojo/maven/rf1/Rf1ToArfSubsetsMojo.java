@@ -142,11 +142,15 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
 
     private String scratchDirectory = FILE_SEPARATOR + "tmp_steps";
 
-    private String fNameSubsetRefsetArf;
+    private String fNameSubsetIntRefsetArf;
+    private String fNameSubsetConRefsetArf;
 
-    private HashMap<Long, Long> mapSubsetIdToOriginalSctId; // Key = SctId, Value=SctId
-    private HashMap<Long, String> mapSubsetIdToPathUuid; // Key = SctId, Value=UUIDString
-    private HashMap<Long, String> mapSubsetIdToRefsetUuid; // Key = SctId, Value=UUIDString
+    private HashMap<Long, Rf1SubsetId> mapSubsetIdToOriginal; // Key=SctId, Value=Original Subset
+
+    // Setup UUIDs for Language and Realm Description subsets
+    private String FSN_UUID;
+    private String PFT_UUID;
+    private String SYNONYM_UUID;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -194,9 +198,9 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.ss HH:mm:ss");
         if (dateStartObj != null)
-        getLog().info("::: Start date (inclusive) = " + sdf.format(dateStartObj));
+            getLog().info("::: Start date (inclusive) = " + sdf.format(dateStartObj));
         if (dateStopObj != null)
-        getLog().info(":::  Stop date (inclusive) = " + sdf.format(dateStopObj));
+            getLog().info(":::  Stop date (inclusive) = " + sdf.format(dateStopObj));
 
         for (int i = 0; i < inDirs.length; i++)
             getLog().info("::: Input Directory (" + i + ") = " + inDirs[i].getDirName());
@@ -205,9 +209,20 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
             getLog().info("::: SubsetId " + idRec.toString());
 
         // Setup target (build) directory
-        BufferedWriter bwRefSet = null;
-        fNameSubsetRefsetArf = tDir + tSubDir + outDir + FILE_SEPARATOR + "integer_" + outFileName
+        BufferedWriter bwiRefSet = null;
+        BufferedWriter bwcRefSet = null;
+        fNameSubsetIntRefsetArf = tDir + tSubDir + outDir + FILE_SEPARATOR + "integer_" + outFileName
                 + ".refset";
+        fNameSubsetConRefsetArf = tDir + tSubDir + outDir + FILE_SEPARATOR + "concept_" + outFileName
+        + ".refset";
+
+        // Setup UUIDs for Language and Realm Description subsets
+        FSN_UUID = ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()
+                .iterator().next().toString();
+        PFT_UUID = ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids().iterator()
+                .next().toString();
+        SYNONYM_UUID = ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids().iterator()
+                .next().toString();
 
         try {
             // FILE & DIRECTORY SETUP
@@ -224,8 +239,11 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
             }
 
             // SETUP REFSET OUTPUT FILE
-            bwRefSet = new BufferedWriter(new FileWriter(fNameSubsetRefsetArf));
-            getLog().info("::: REFSET SUBSETS OUTPUT: " + fNameSubsetRefsetArf);
+            bwiRefSet = new BufferedWriter(new FileWriter(fNameSubsetIntRefsetArf));
+            getLog().info("::: REFSET INTEGER SUBSETS OUTPUT: " + fNameSubsetIntRefsetArf);
+            bwcRefSet = new BufferedWriter(new FileWriter(fNameSubsetConRefsetArf));
+            getLog().info("::: REFSET CONCEPT SUBSETS OUTPUT: " + fNameSubsetConRefsetArf);
+
 
             // SETUP SUBSET ID TO UUID MAP
             List<List<RF1File>> fileListList = null;
@@ -237,7 +255,8 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
             filter.add(".TXT");
             if (fFilters != null)
                 filter.addAll(fFilters);
-            fileListList = Rf1Dir.getRf1Files(tDir, tSubDir, inDirs, filter, dateStartObj, dateStopObj);
+            fileListList = Rf1Dir.getRf1Files(tDir, tSubDir, inDirs, filter, dateStartObj,
+                    dateStopObj);
             logFileListList(inDirs, fileListList);
             for (List<RF1File> fList : fileListList)
                 allFiles.addAll(fList);
@@ -255,10 +274,11 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
                 fileListList = Rf1Dir.getRf1Files(tDir, tSubDir, tmpDirs, filter, dateStartObj,
                         dateStopObj);
                 logFileListList(tmpDirs, fileListList);
-                processSubsetMembers(fileListList, bwRefSet);
+                processSubsetMembers(fileListList, bwiRefSet, bwcRefSet);
             }
 
-            bwRefSet.close();
+            bwiRefSet.close();
+            bwcRefSet.close();
 
             // WRITE REFSET CONCEPT(S)
             saveRefsetConcept(tDir + tSubDir + outDir + FILE_SEPARATOR, subsetIds);
@@ -293,15 +313,19 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
         }
     }
 
-    private String convertMemberToArf(Rf1SubsetMember m, String date)
+    private String convertMemberToArf(Rf1SubsetMember m, Rf1SubsetId sid, String date)
             throws NoSuchAlgorithmException, UnsupportedEncodingException {
         StringBuilder sb = new StringBuilder();
 
+        if (sid == null)
+            System.out.println(":DEBUG:!!!:");
+        if (sid.getSubsetRefsetUuidStr() == null)
+            System.out.println(":DEBUG:!!!:");
         // REFSET_UUID
-        sb.append(mapSubsetIdToRefsetUuid.get(m.subsetId) + TAB_CHARACTER);
+        sb.append(sid.getSubsetRefsetUuidStr() + TAB_CHARACTER);
         // MEMBER_UUID ... of refset member
         UUID uuid = Type5UuidFactory.get(Rf1Dir.SUBSETMEMBER_ID_NAMESPACE_UUID_TYPE1
-                + mapSubsetIdToOriginalSctId.get(m.subsetId) + m.memberId);
+                + sid.getSubsetSctIdOriginal() + m.memberId);
         sb.append(uuid.toString() + TAB_CHARACTER);
         // STATUS_UUID
         if (m.getStatus() == 0)
@@ -314,9 +338,24 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
         // EFFECTIVE_DATE
         sb.append(date + TAB_CHARACTER);
         // PATH_UUID
-        sb.append(mapSubsetIdToPathUuid.get(m.subsetId) + TAB_CHARACTER);
-        // INTEGER_EXTENSION_VALUE
-        sb.append(m.memberValue + LINE_TERMINATOR);
+        sb.append(sid.getRefsetPathUuidStr() + TAB_CHARACTER);
+
+        if (sid.getSubsetTypeInt() == 1 || sid.getSubsetTypeInt() == 1)
+            // Language (1) or Description (3) Subset Type
+            switch (m.memberValue) {
+            case 1: // Preferred Name
+                sb.append(PFT_UUID + LINE_TERMINATOR);
+                break;
+            case 2: // Synonym Name
+                sb.append(SYNONYM_UUID + LINE_TERMINATOR);
+                break;
+            case 3: // Fully Specified Name
+                sb.append(FSN_UUID + LINE_TERMINATOR);
+                break;
+            }
+        else
+            // INTEGER_EXTENSION_VALUE
+            sb.append(m.memberValue + LINE_TERMINATOR);
 
         return sb.toString();
     }
@@ -401,9 +440,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
         // int REALMID = 6;
         // int CONTEXTID = 7;
 
-        mapSubsetIdToOriginalSctId = new HashMap<Long, Long>();
-        mapSubsetIdToPathUuid = new HashMap<Long, String>();
-        mapSubsetIdToRefsetUuid = new HashMap<Long, String>();
+        mapSubsetIdToOriginal = new HashMap<Long, Rf1SubsetId>();
 
         for (RF1File rf : fl) {
 
@@ -421,6 +458,9 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
                 // SUBSETNAME
                 String subsetName = line[SUBSETNAME];
 
+                // SUBSETNAME
+                // int subsetType = Integer.parseInt(line[SUBSETTYPE]);
+
                 // FIND ORIGINALID (SCTID)
                 int found = -1;
                 for (int i = 0; i < subsetIds.length; i++)
@@ -428,10 +468,8 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
                         found = i;
 
                 if (found > -1) {
-                    mapSubsetIdToOriginalSctId.put(sctIdSubset, sctIdOriginal);
-                    mapSubsetIdToPathUuid.put(sctIdSubset, subsetIds[found].getRefsetPathUuidStr());
-                    mapSubsetIdToRefsetUuid.put(sctIdSubset, subsetIds[found]
-                            .getSubsetRefsetUuidStr());
+                    mapSubsetIdToOriginal.put(sctIdSubset, subsetIds[found]);
+
                     getLog().info(
                             "::: MAP < " + sctIdSubset + " , " + sctIdOriginal + " (ORIGINAL) > "
                                     + subsetIds[found].getSubsetRefsetUuidStr() + " (Refset), "
@@ -479,13 +517,15 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
                         + (System.currentTimeMillis() - start) + " milliseconds");
     }
 
-    private void processSubsetMembers(List<List<RF1File>> fileListList, BufferedWriter bw)
+    private void processSubsetMembers(List<List<RF1File>> fileListList, BufferedWriter bwi, BufferedWriter bwc)
             throws MojoFailureException, IOException, NoSuchAlgorithmException {
         // :!!!: does this need to be added Collections.sort(fileListList);
 
         int count1, count2; // records in arrays 1 & 2
         String fName1, fName2; // file path name
         String yRevDateStr; // :!!!: int in processConcepts
+        Rf1SubsetId tmpSid;
+        String tmpArf;
 
         Rf1SubsetMember[] a1, a2, a3 = null;
 
@@ -505,8 +545,15 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
             getLog().info("BASE FILE:  " + count1 + " records, " + fName1);
             a1 = new Rf1SubsetMember[count1];
             parseSubsetMembers(fName1, a1, count1);
-            for (int i = 0; i < count1; i++)
-                bw.write(convertMemberToArf(a1[i], yRevDateStr));
+            for (int i = 0; i < count1; i++) {
+                // Write history
+                tmpSid = mapSubsetIdToOriginal.get(a1[i].subsetId);
+                tmpArf = convertMemberToArf(a1[i], tmpSid, yRevDateStr);
+                if (tmpSid.getSubsetTypeInt() == 1 || tmpSid.getSubsetTypeInt() == 3)
+                    bwc.write(tmpArf);
+                else
+                    bwi.write(tmpArf);
+            }
 
             while (fit.hasNext()) {
                 // SETUP CURRENT CONCEPTS INPUT FILE
@@ -535,7 +582,12 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
 
                     case 2: // MODIFIED
                         // Write history
-                        bw.write(convertMemberToArf(a2[r2], yRevDateStr));
+                        tmpSid = mapSubsetIdToOriginal.get(a2[r2].subsetId);
+                        tmpArf = convertMemberToArf(a2[r2], tmpSid, yRevDateStr);
+                        if (tmpSid.getSubsetTypeInt() == 1 || tmpSid.getSubsetTypeInt() == 3)
+                            bwc.write(tmpArf);
+                        else
+                            bwi.write(tmpArf);
                         // Update master via pointer assignment
                         a1[r1] = a2[r2];
                         r1++;
@@ -545,7 +597,12 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
 
                     case 3: // ADDED
                         // Write history
-                        bw.write(convertMemberToArf(a2[r2], yRevDateStr));
+                        tmpSid = mapSubsetIdToOriginal.get(a2[r2].subsetId);
+                        tmpArf = convertMemberToArf(a2[r2], tmpSid, yRevDateStr);
+                        if (tmpSid.getSubsetTypeInt() == 1 || tmpSid.getSubsetTypeInt() == 3)
+                            bwc.write(tmpArf);
+                        else
+                            bwi.write(tmpArf);
                         // Hold pointer to append to master
                         a3[r3] = a2[r2];
                         r2++;
@@ -557,7 +614,12 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
                         // see ArchitectonicAuxiliary.getStatusFromId()
                         if (a1[r1].status != 1) { // if not RETIRED
                             a1[r1].status = 1; // set to RETIRED
-                            bw.write(convertMemberToArf(a1[r1], yRevDateStr));
+                            tmpSid = mapSubsetIdToOriginal.get(a1[r1].subsetId);
+                            tmpArf = convertMemberToArf(a1[r1], tmpSid, yRevDateStr);
+                            if (tmpSid.getSubsetTypeInt() == 1 || tmpSid.getSubsetTypeInt() == 3)
+                                bwc.write(tmpArf);
+                            else
+                                bwi.write(tmpArf);
                         }
                         r1++;
                         nDrop++;
@@ -574,7 +636,12 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
                 if (r2 < count2) {
                     while (r2 < count2) { // ADD CONCEPT REMAINING INPUT
                         // Write history
-                        bw.write(convertMemberToArf(a2[r2], yRevDateStr));
+                        tmpSid = mapSubsetIdToOriginal.get(a2[r2].subsetId);
+                        tmpArf = convertMemberToArf(a2[r2], tmpSid, yRevDateStr);
+                        if (tmpSid.getSubsetTypeInt() == 1 || tmpSid.getSubsetTypeInt() == 3)
+                            bwc.write(tmpArf);
+                        else
+                            bwi.write(tmpArf);
                         // Add to append array
                         a3[r3] = a2[r2];
                         nAdd++;
@@ -762,11 +829,11 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
     public void setSubsetIds(Rf1SubsetId[] subsetIds) {
         this.rf1SubsetIds = subsetIds;
     }
-    
+
     public String getDateStart() {
-        return this.dateStart;   
+        return this.dateStart;
     }
-    
+
     public void setDateStart(String sStart) throws MojoFailureException {
         this.dateStart = sStart;
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
@@ -781,9 +848,9 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
     }
 
     public String getDateStop() {
-        return this.dateStop;   
+        return this.dateStop;
     }
-    
+
     public void setDateStop(String sStop) throws MojoFailureException {
         this.dateStop = sStop;
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
