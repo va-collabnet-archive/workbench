@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 
 import javax.swing.DefaultCellEditor;
@@ -306,7 +307,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
     protected I_HostConceptPlugins host;
 
     protected List<I_ExtendByRefVersion> allTuples;
-    
+    private Semaphore allTuplesLock = new Semaphore(1);
+
     protected Map<Integer, ConceptChronicleBI> conceptCache;
 
     protected ArrayList<I_ExtendByRef> allExtensions;
@@ -327,25 +329,25 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
 
     protected JButton addButton = new JButton();
 
-	private boolean useConceptCache = false;
-    
+    private boolean useConceptCache = false;
+
     public static long rowColumnToLong(int row, int column) {
-     	long key = row;
-     	key = key & 0x00000000FFFFFFFFL;
-    	long columnLong = column;
-    	columnLong = columnLong & 0x00000000FFFFFFFFL;
-    	key = key << 32;
-    	key = key | columnLong;
-    	return key;
+        long key = row;
+        key = key & 0x00000000FFFFFFFFL;
+        long columnLong = column;
+        columnLong = columnLong & 0x00000000FFFFFFFFL;
+        key = key << 32;
+        key = key | columnLong;
+        return key;
     }
 
     public void addToValueCache(int row, int column, Object value) {
-    	if (values != null) {
-        	long key = rowColumnToLong(row, column);
-        	values.put(key, value);
-    	}
+        if (values != null) {
+            long key = rowColumnToLong(row, column);
+            values.put(key, value);
+        }
     }
-    
+
     public ReflexiveTableModel(I_HostConceptPlugins host, ReflexiveRefsetFieldData[] columns) {
         super();
         this.columns = columns;
@@ -381,7 +383,9 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
 
     public void setComponentId(int componentId) throws Exception {
         this.tableComponentId = componentId;
+        allTuplesLock.acquireUninterruptibly();
         this.allTuples = null;
+        allTuplesLock.release();
         this.allExtensions = null;
         this.checkedRows.clear();
         if (ACE.editMode) {
@@ -402,243 +406,238 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
     }
 
     public int getRowCount() {
-        if (allTuples == null) {
-            allTuples = new ArrayList<I_ExtendByRefVersion>();
-            values = new ConcurrentHashMap<Long, Object>();
-            if (tableChangeWorker != null) {
-                tableChangeWorker.stop();
-            }
-            conceptsToFetch.clear();
-            referencedConcepts.clear();
-            if (tableComponentId != Integer.MIN_VALUE) {
-                tableChangeWorker = getTableChangedSwingWorker(tableComponentId, promotionFilterId);
-                tableChangeWorker.start();
-            }
-            return 0;
-        }
-        return allTuples.size();
-    }
-    
-    public void setupConceptCache() throws IOException {
-    	NidBitSetBI conceptNids = Terms.get().getEmptyIdSet();
-    	for (int rowIndex = 0; rowIndex < allTuples.size(); rowIndex++) {
-    		for (int columnIndex = 0; columnIndex < columns.length; columnIndex++) {
-    	        try {
-    	            I_ExtendByRefVersion tuple = allTuples.get(rowIndex);
-    	            if (columns[columnIndex] != null && columns[columnIndex].invokeOnObjectType != null) {
-        	            switch (columns[columnIndex].invokeOnObjectType) {
-        	            case CONCEPT_COMPONENT:
-        	                if (columns[columnIndex].readParamaters != null) {
-        	                    if (Terms.get().hasConcept(tuple.getComponentId())) {
-        	                    	conceptNids.setMember(tuple.getComponentId());
-        	                    } else {
-        	                        conceptNids.setMember(Ts.get().getConceptNidForNid(tuple.getComponentId()));
-        	                    }
-        	                } else {
-    	                        conceptNids.setMember(Ts.get().getConceptNidForNid(tuple.getComponentId()));
-        	                }
-        	                break;
-        	            case COMPONENT:
-                            conceptNids.setMember(Ts.get().getConceptNidForNid(tuple.getComponentId()));
-        	                break;
-        	            case CONCEPT:
-        	                throw new UnsupportedOperationException();
-        	            case PART:
-                            I_ExtendByRefPart part = tuple.getMutablePart();
-                            if (I_ExtendByRefPartCid.class.isAssignableFrom(part.getClass())) {
-                            	conceptNids.setMember(Ts.get().getConceptNidForNid(((I_ExtendByRefPartCid) part).getC1id()));
-                            } else if (I_ExtendByRefPartCidCid.class.isAssignableFrom(part.getClass())) {
-                            	conceptNids.setMember(Ts.get().getConceptNidForNid(((I_ExtendByRefPartCidCid) part).getC2id()));
-                            } else if (I_ExtendByRefPartCidCidCid.class.isAssignableFrom(part.getClass())) {
-                            	conceptNids.setMember(Ts.get().getConceptNidForNid(((I_ExtendByRefPartCidCidCid) part).getC3id()));
-                            } 
-        	                break;
-
-        	            case PROMOTION_REFSET_PART:
-        	            	break;
-        	            default:
-        	                throw new UnsupportedOperationException("Don't know how to handle: "
-        	                    + columns[columnIndex].invokeOnObjectType);
-        	            }
-    	            }
-    	        } catch (Exception e) {
-    	            AceLog.getAppLog().alertAndLogException(e);
-    	        }
-    		}
-    	}
-    	if (useConceptCache ) {
-        	conceptCache = Ts.get().getConcepts(conceptNids);
-    	}
-    }
-
-    public Object getValueAt(int rowIndex, int columnIndex) {
-    	if (values != null) {
-    		Object value = values.get(rowColumnToLong(rowIndex, columnIndex));
-    		if (value != null) {
-    			return value;
-    		}
-    	}
-        I_TermFactory tf = Terms.get();
-        if (allTuples == null || tableComponentId == Integer.MIN_VALUE) {
-            return " ";
-        }
-        if (allTuples.size() == 0 && rowIndex == 0) {
-            return " ";
-        }
-        if (rowIndex < 0) {
-            return " ";
-        }
-        if (rowIndex >= allTuples.size()) {
-            return " "; // TODO check
-        }
-
-        // Test to see if this is the extra boolean column for approving/denying members.
-        if (columnIndex >= columns.length) {
-            return checkedRows.get(rowIndex);
-        }
-
-        if (columns[columnIndex].type == REFSET_FIELD_TYPE.ROW) {
-            return rowIndex + 1;
-        }
         try {
-            I_ExtendByRefVersion tuple = allTuples.get(rowIndex);
-            Object value = null;
-            int id = Integer.MIN_VALUE;
-            switch (columns[columnIndex].invokeOnObjectType) {
-            case CONCEPT_COMPONENT:
-                id = tuple.getComponentId();
-                if (columns[columnIndex].readParamaters != null) {
-                    if (tf.hasConcept(id)) {
-                        value =
-                                columns[columnIndex].getReadMethod()
-                                    .invoke(Terms.get().getConcept(tuple.getComponentId()),
-                                        columns[columnIndex].readParamaters);
-                    } else {
-                        try {
-                            I_DescriptionVersioned desc = tf.getDescription(id);
-                            if (desc != null) {
-                                value = desc.getLastTuple().getText();
-                            }
-                        } catch (Exception e) {
-                            value = "No description available.";
-                        }
-                    }
+            allTuplesLock.acquireUninterruptibly();
+            if (allTuples == null) {
+                allTuples = new ArrayList<I_ExtendByRefVersion>();
+                values = new ConcurrentHashMap<Long, Object>();
+                if (tableChangeWorker != null) {
+                    tableChangeWorker.stop();
+                }
+                conceptsToFetch.clear();
+                referencedConcepts.clear();
+                if (tableComponentId != Integer.MIN_VALUE) {
+                    tableChangeWorker = getTableChangedSwingWorker(tableComponentId, promotionFilterId);
+                    tableChangeWorker.start();
+                }
+                return 0;
+            }
+            return allTuples.size();
+        } finally {
+            allTuplesLock.release();
+        }
+    }
 
-                } else {
-                    value = columns[columnIndex].getReadMethod().invoke(Terms.get().getConcept(tuple.getComponentId()));
-                }
-                break;
-            case COMPONENT:
-                value = tuple.getComponentId();
-                break;
-            case CONCEPT:
-                throw new UnsupportedOperationException();
-            case IMMUTABLE:
-                if (columns[columnIndex].readParamaters != null) {
-                    value = columns[columnIndex].getReadMethod().invoke(tuple, columns[columnIndex].readParamaters);
-                } else {
-                    value = columns[columnIndex].getReadMethod().invoke(tuple);
-                }
-                break;
-            case PART:
-                if (columns[columnIndex].readParamaters != null) {
-                    value =
-                            columns[columnIndex].getReadMethod().invoke(tuple.getMutablePart(),
-                                columns[columnIndex].readParamaters);
-                } else {
+    public void setupConceptCache() throws IOException {
+        NidBitSetBI conceptNids = Terms.get().getEmptyIdSet();
+        try {
+            allTuplesLock.acquireUninterruptibly();
+
+            for (int rowIndex = 0; rowIndex < allTuples.size(); rowIndex++) {
+                for (int columnIndex = 0; columnIndex < columns.length; columnIndex++) {
                     try {
-                        I_ExtendByRefPart part = tuple.getMutablePart();
-                        if (columns[columnIndex].getReadMethod().getDeclaringClass().isAssignableFrom(part.getClass())) {
-                            value = columns[columnIndex].getReadMethod().invoke(part);
-                        } else {
-                            if (I_ExtendByRefPartBoolean.class.isAssignableFrom(part.getClass())) {
-                                value = ((I_ExtendByRefPartBoolean) part).getBooleanValue();
-                            } else if (I_ExtendByRefPartStr.class.isAssignableFrom(part.getClass())) {
-                                value = ((I_ExtendByRefPartStr) part).getStringValue();
-                            } else if (I_ExtendByRefPartInt.class.isAssignableFrom(part.getClass())) {
-                                value = ((I_ExtendByRefPartInt) part).getIntValue();
-                            } else {
-                                value = tuple.getMutablePart().toString();
+                        I_ExtendByRefVersion tuple = allTuples.get(rowIndex);
+                        if (columns[columnIndex] != null && columns[columnIndex].invokeOnObjectType != null) {
+                            switch (columns[columnIndex].invokeOnObjectType) {
+                            case CONCEPT_COMPONENT:
+                                if (columns[columnIndex].readParamaters != null) {
+                                    if (Terms.get().hasConcept(tuple.getComponentId())) {
+                                        conceptNids.setMember(tuple.getComponentId());
+                                    } else {
+                                        conceptNids.setMember(Ts.get().getConceptNidForNid(tuple.getComponentId()));
+                                    }
+                                } else {
+                                    conceptNids.setMember(Ts.get().getConceptNidForNid(tuple.getComponentId()));
+                                }
+                                break;
+                            case COMPONENT:
+                                conceptNids.setMember(Ts.get().getConceptNidForNid(tuple.getComponentId()));
+                                break;
+                            case CONCEPT:
+                                throw new UnsupportedOperationException();
+                            case PART:
+                                I_ExtendByRefPart part = tuple.getMutablePart();
+                                if (I_ExtendByRefPartCid.class.isAssignableFrom(part.getClass())) {
+                                    conceptNids.setMember(Ts.get().getConceptNidForNid(
+                                        ((I_ExtendByRefPartCid) part).getC1id()));
+                                } else if (I_ExtendByRefPartCidCid.class.isAssignableFrom(part.getClass())) {
+                                    conceptNids.setMember(Ts.get().getConceptNidForNid(
+                                        ((I_ExtendByRefPartCidCid) part).getC2id()));
+                                } else if (I_ExtendByRefPartCidCidCid.class.isAssignableFrom(part.getClass())) {
+                                    conceptNids.setMember(Ts.get().getConceptNidForNid(
+                                        ((I_ExtendByRefPartCidCidCid) part).getC3id()));
+                                }
+                                break;
+
+                            case PROMOTION_REFSET_PART:
+                                break;
+                            default:
+                                throw new UnsupportedOperationException("Don't know how to handle: "
+                                    + columns[columnIndex].invokeOnObjectType);
                             }
                         }
                     } catch (Exception e) {
-                        value = tuple.getMutablePart().toString();
-                        AceLog.getAppLog().warning("ReflexiveTableModel_1: " + e.getMessage() + ": " + value);
+                        AceLog.getAppLog().alertAndLogException(e);
                     }
                 }
-                break;
-            case PROMOTION_REFSET_PART:
-                value = getPromotionRefsetValue(tuple.getCore(), columns[columnIndex]);
-                break;
+            }
+            if (useConceptCache) {
+                conceptCache = Ts.get().getConcepts(conceptNids);
+            }
+        } finally {
+            allTuplesLock.release();
+        }
+    }
 
-            default:
-                throw new UnsupportedOperationException("Don't know how to handle: "
-                    + columns[columnIndex].invokeOnObjectType);
-            }
-            if (value == null) {
-                return new StringWithExtTuple(null, tuple, id);
-            }
-            switch (columns[columnIndex].getType()) {
-            case CONCEPT_IDENTIFIER:
-                if (Integer.class.isAssignableFrom(value.getClass())) {
-                    id = (Integer) value;
-                    int conceptId = (Integer) value;
-                    if (referencedConcepts.containsKey(conceptId)) {
-                        return new StringWithExtTuple(getPrefText(conceptId), tuple, id);
-                    }
-                    return new StringWithExtTuple(Integer.toString(conceptId), tuple, id);
-                } else if (I_DescriptionTuple.class.isAssignableFrom(value.getClass())) {
-                    I_DescriptionTuple descTuple = (I_DescriptionTuple) value;
-                    return new StringWithExtTuple(descTuple.getText(), tuple, descTuple.getConceptNid());
+    public Object getValueAt(int rowIndex, int columnIndex) {
+        try {
+            allTuplesLock.acquireUninterruptibly();
+            if (values != null) {
+                Object value = values.get(rowColumnToLong(rowIndex, columnIndex));
+                if (value != null) {
+                    return value;
                 }
-                addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(value.toString(), tuple, id));
-                return values.get(rowColumnToLong(rowIndex, columnIndex));
-            case COMPONENT_IDENTIFIER:
-                if (Integer.class.isAssignableFrom(value.getClass())) {
-                    id = (Integer) value;
-                    if (tf.hasConcept(id)) {
+            }
+            I_TermFactory tf = Terms.get();
+            if (allTuples == null || tableComponentId == Integer.MIN_VALUE) {
+                return " ";
+            }
+            if (allTuples.size() == 0 && rowIndex == 0) {
+                return " ";
+            }
+            if (rowIndex < 0) {
+                return " ";
+            }
+            if (rowIndex >= allTuples.size()) {
+                return " "; // TODO check
+            }
 
-                        I_DescriptionTuple desc =
-                                tf.getConcept(id).getDescTuple(host.getConfig().getTableDescPreferenceList(),
-                                    host.getConfig());
-                        if (desc != null) {
-                            addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(desc.getText(), tuple, id));
-                            return values.get(rowColumnToLong(rowIndex, columnIndex));
-                        }
-                        addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(Integer.toString(id), tuple, id));
-                        return values.get(rowColumnToLong(rowIndex, columnIndex));
+            // Test to see if this is the extra boolean column for approving/denying members.
+            if (columnIndex >= columns.length) {
+                return checkedRows.get(rowIndex);
+            }
 
-                    } else if (tf.hasExtension(id)) {
-                        I_ExtendByRef ext = tf.getExtension(id);
-                        I_ConfigAceFrame config = (I_ConfigAceFrame) columns[columnIndex].readParamaters[1];
-                        List<I_ExtendByRefVersion> tuples =
-                                (List<I_ExtendByRefVersion>) ext.getTuples(config.getAllowedStatus(), config
-                                    .getViewPositionSetReadOnly(), config.getPrecedence(), config
-                                    .getConflictResolutionStrategy());
-                        if (tuples.size() > 0) {
-                            I_ExtendByRefVersion obj = tuples.iterator().next();
-                            I_GetConceptData componentRefset = Terms.get().getConcept(obj.getRefsetId());
-                            I_DescriptionTuple refsetDesc =
-                                    componentRefset.getDescTuple(host.getConfig().getTableDescPreferenceList(), host
-                                        .getConfig());
-                            StringBuffer buff = new StringBuffer();
-                            buff.append("<html>");
-                            buff.append(refsetDesc.getText());
-                            buff.append(" member: ");
-                            // @TODO replace this test with a call to determine
-                            // "refset purpose" once the purpose is available.
-                            if (refsetDesc.getText().toLowerCase().endsWith("refset spec")) {
-                                RefsetSpecTreeCellRenderer renderer = new RefsetSpecTreeCellRenderer(host.getConfig());
-                                buff.append(renderer.getHtmlRendering(obj));
-                            } else {
-                                buff.append(obj.getMutablePart().toString());
-                            }
-
-                            addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(buff.toString(), tuple, id));
-                            return values.get(rowColumnToLong(rowIndex, columnIndex));
+            if (columns[columnIndex].type == REFSET_FIELD_TYPE.ROW) {
+                return rowIndex + 1;
+            }
+            try {
+                I_ExtendByRefVersion tuple = allTuples.get(rowIndex);
+                Object value = null;
+                int id = Integer.MIN_VALUE;
+                switch (columns[columnIndex].invokeOnObjectType) {
+                case CONCEPT_COMPONENT:
+                    id = tuple.getComponentId();
+                    if (columns[columnIndex].readParamaters != null) {
+                        if (tf.hasConcept(id)) {
+                            value =
+                                    columns[columnIndex].getReadMethod().invoke(
+                                        Terms.get().getConcept(tuple.getComponentId()),
+                                        columns[columnIndex].readParamaters);
                         } else {
-                            tuples =
-                                    (List<I_ExtendByRefVersion>) ext.getTuples(null, config
+                            try {
+                                I_DescriptionVersioned desc = tf.getDescription(id);
+                                if (desc != null) {
+                                    value = desc.getLastTuple().getText();
+                                }
+                            } catch (Exception e) {
+                                value = "No description available.";
+                            }
+                        }
+
+                    } else {
+                        value =
+                                columns[columnIndex].getReadMethod().invoke(
+                                    Terms.get().getConcept(tuple.getComponentId()));
+                    }
+                    break;
+                case COMPONENT:
+                    value = tuple.getComponentId();
+                    break;
+                case CONCEPT:
+                    throw new UnsupportedOperationException();
+                case IMMUTABLE:
+                    if (columns[columnIndex].readParamaters != null) {
+                        value = columns[columnIndex].getReadMethod().invoke(tuple, columns[columnIndex].readParamaters);
+                    } else {
+                        value = columns[columnIndex].getReadMethod().invoke(tuple);
+                    }
+                    break;
+                case PART:
+                    if (columns[columnIndex].readParamaters != null) {
+                        value =
+                                columns[columnIndex].getReadMethod().invoke(tuple.getMutablePart(),
+                                    columns[columnIndex].readParamaters);
+                    } else {
+                        try {
+                            I_ExtendByRefPart part = tuple.getMutablePart();
+                            if (columns[columnIndex].getReadMethod().getDeclaringClass().isAssignableFrom(
+                                part.getClass())) {
+                                value = columns[columnIndex].getReadMethod().invoke(part);
+                            } else {
+                                if (I_ExtendByRefPartBoolean.class.isAssignableFrom(part.getClass())) {
+                                    value = ((I_ExtendByRefPartBoolean) part).getBooleanValue();
+                                } else if (I_ExtendByRefPartStr.class.isAssignableFrom(part.getClass())) {
+                                    value = ((I_ExtendByRefPartStr) part).getStringValue();
+                                } else if (I_ExtendByRefPartInt.class.isAssignableFrom(part.getClass())) {
+                                    value = ((I_ExtendByRefPartInt) part).getIntValue();
+                                } else {
+                                    value = tuple.getMutablePart().toString();
+                                }
+                            }
+                        } catch (Exception e) {
+                            value = tuple.getMutablePart().toString();
+                            AceLog.getAppLog().warning("ReflexiveTableModel_1: " + e.getMessage() + ": " + value);
+                        }
+                    }
+                    break;
+                case PROMOTION_REFSET_PART:
+                    value = getPromotionRefsetValue(tuple.getCore(), columns[columnIndex]);
+                    break;
+
+                default:
+                    throw new UnsupportedOperationException("Don't know how to handle: "
+                        + columns[columnIndex].invokeOnObjectType);
+                }
+                if (value == null) {
+                    return new StringWithExtTuple(null, tuple, id);
+                }
+                switch (columns[columnIndex].getType()) {
+                case CONCEPT_IDENTIFIER:
+                    if (Integer.class.isAssignableFrom(value.getClass())) {
+                        id = (Integer) value;
+                        int conceptId = (Integer) value;
+                        if (referencedConcepts.containsKey(conceptId)) {
+                            return new StringWithExtTuple(getPrefText(conceptId), tuple, id);
+                        }
+                        return new StringWithExtTuple(Integer.toString(conceptId), tuple, id);
+                    } else if (I_DescriptionTuple.class.isAssignableFrom(value.getClass())) {
+                        I_DescriptionTuple descTuple = (I_DescriptionTuple) value;
+                        return new StringWithExtTuple(descTuple.getText(), tuple, descTuple.getConceptNid());
+                    }
+                    addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(value.toString(), tuple, id));
+                    return values.get(rowColumnToLong(rowIndex, columnIndex));
+                case COMPONENT_IDENTIFIER:
+                    if (Integer.class.isAssignableFrom(value.getClass())) {
+                        id = (Integer) value;
+                        if (tf.hasConcept(id)) {
+
+                            I_DescriptionTuple desc =
+                                    tf.getConcept(id).getDescTuple(host.getConfig().getTableDescPreferenceList(),
+                                        host.getConfig());
+                            if (desc != null) {
+                                addToValueCache(rowIndex, columnIndex,
+                                    new StringWithExtTuple(desc.getText(), tuple, id));
+                                return values.get(rowColumnToLong(rowIndex, columnIndex));
+                            }
+                            addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(Integer.toString(id), tuple,
+                                id));
+                            return values.get(rowColumnToLong(rowIndex, columnIndex));
+
+                        } else if (tf.hasExtension(id)) {
+                            I_ExtendByRef ext = tf.getExtension(id);
+                            I_ConfigAceFrame config = (I_ConfigAceFrame) columns[columnIndex].readParamaters[1];
+                            List<I_ExtendByRefVersion> tuples =
+                                    (List<I_ExtendByRefVersion>) ext.getTuples(config.getAllowedStatus(), config
                                         .getViewPositionSetReadOnly(), config.getPrecedence(), config
                                         .getConflictResolutionStrategy());
                             if (tuples.size() > 0) {
@@ -661,42 +660,75 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                                     buff.append(obj.getMutablePart().toString());
                                 }
 
-                                addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(buff.toString(), tuple, id));
+                                addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(buff.toString(), tuple,
+                                    id));
                                 return values.get(rowColumnToLong(rowIndex, columnIndex));
+                            } else {
+                                tuples =
+                                        (List<I_ExtendByRefVersion>) ext.getTuples(null, config
+                                            .getViewPositionSetReadOnly(), config.getPrecedence(), config
+                                            .getConflictResolutionStrategy());
+                                if (tuples.size() > 0) {
+                                    I_ExtendByRefVersion obj = tuples.iterator().next();
+                                    I_GetConceptData componentRefset = Terms.get().getConcept(obj.getRefsetId());
+                                    I_DescriptionTuple refsetDesc =
+                                            componentRefset.getDescTuple(host.getConfig().getTableDescPreferenceList(),
+                                                host.getConfig());
+                                    StringBuffer buff = new StringBuffer();
+                                    buff.append("<html>");
+                                    buff.append(refsetDesc.getText());
+                                    buff.append(" member: ");
+                                    // @TODO replace this test with a call to determine
+                                    // "refset purpose" once the purpose is available.
+                                    if (refsetDesc.getText().toLowerCase().endsWith("refset spec")) {
+                                        RefsetSpecTreeCellRenderer renderer =
+                                                new RefsetSpecTreeCellRenderer(host.getConfig());
+                                        buff.append(renderer.getHtmlRendering(obj));
+                                    } else {
+                                        buff.append(obj.getMutablePart().toString());
+                                    }
+
+                                    addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(buff.toString(),
+                                        tuple, id));
+                                    return values.get(rowColumnToLong(rowIndex, columnIndex));
+                                }
                             }
-                        }
-                    } else {
-                        try {
-                            I_DescriptionVersioned desc = tf.getDescription(id);
-                            if (desc != null) {
-                                String text = desc.getLastTuple().getText();
-                                 addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(text, tuple, id));
-                                return values.get(rowColumnToLong(rowIndex, columnIndex));
-                     }
-                        } catch (TerminologyException e) {
-                            return new StringWithExtTuple("No description available for id:" + id, tuple, id);
-                        }
+                        } else {
+                            try {
+                                I_DescriptionVersioned desc = tf.getDescription(id);
+                                if (desc != null) {
+                                    String text = desc.getLastTuple().getText();
+                                    addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(text, tuple, id));
+                                    return values.get(rowColumnToLong(rowIndex, columnIndex));
+                                }
+                            } catch (TerminologyException e) {
+                                return new StringWithExtTuple("No description available for id:" + id, tuple, id);
+                            }
 
+                        }
                     }
-                }
-                addToValueCache(rowIndex, columnIndex, value);
-                return value;
-            case TIME:
-                if (tuple.getTime() == Long.MAX_VALUE) {
-                    return new StringWithExtTuple(ThinVersionHelper.uncommittedHtml(), tuple, id);
-                }
-                return new StringWithExtTuple(ThinVersionHelper.format(tuple.getVersion()), tuple, id);
+                    addToValueCache(rowIndex, columnIndex, value);
+                    return value;
+                case TIME:
+                    if (tuple.getTime() == Long.MAX_VALUE) {
+                        return new StringWithExtTuple(ThinVersionHelper.uncommittedHtml(), tuple, id);
+                    }
+                    return new StringWithExtTuple(ThinVersionHelper.format(tuple.getVersion()), tuple, id);
 
-                // String extension
-            case STRING:
-                return new StringWithExtTuple((String) value, tuple, id, false, true);
+                    // String extension
+                case STRING:
+                    return new StringWithExtTuple((String) value, tuple, id, false, true);
+                }
+
+                AceLog.getAppLog().alertAndLogException(
+                    new Exception("Can't handle column type: " + columns[columnIndex]));
+            } catch (Exception e) {
+                AceLog.getAppLog().alertAndLogException(e);
             }
-
-            AceLog.getAppLog().alertAndLogException(new Exception("Can't handle column type: " + columns[columnIndex]));
-        } catch (Exception e) {
-            AceLog.getAppLog().alertAndLogException(e);
+            return null;
+        } finally {
+            allTuplesLock.release();
         }
-        return null;
     }
 
     protected abstract Object getPromotionRefsetValue(I_ExtendByRef extension,
@@ -725,84 +757,95 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
     }
 
     public boolean isCellEditable(int row, int col) {
-        if (ACE.editMode == false || allTuples == null) {
-            return false;
-        }
-        if (col >= columns.length) {
-            return true;
-        }
-        if (columns[col].isCreationEditable() == false) {
-            return false;
-        }
-        if (allTuples.size() == 0) {
-            return false;
-        }
-        if (allTuples.get(row).getTime() == Long.MAX_VALUE) {
-            if (columns[col].isUpdateEditable() == false) {
-                if (allTuples.get(row).getVersions().size() > 1) {
-                    return false;
+        try {
+            allTuplesLock.acquireUninterruptibly();
+            if (ACE.editMode == false || allTuples == null) {
+                return false;
+            }
+            if (col >= columns.length) {
+                return true;
+            }
+            if (columns[col].isCreationEditable() == false) {
+                return false;
+            }
+            if (allTuples.size() == 0) {
+                return false;
+            }
+            if (allTuples.get(row).getTime() == Long.MAX_VALUE) {
+                if (columns[col].isUpdateEditable() == false) {
+                    if (allTuples.get(row).getVersions().size() > 1) {
+                        return false;
+                    }
                 }
+                if (AceLog.getAppLog().isLoggable(Level.FINER)) {
+                    AceLog.getAppLog().finer("Cell is editable: " + row + " " + col);
+                }
+                return true;
             }
-            if (AceLog.getAppLog().isLoggable(Level.FINER)) {
-                AceLog.getAppLog().finer("Cell is editable: " + row + " " + col);
-            }
-            return true;
+            return false;
+        } finally {
+            allTuplesLock.release();
         }
-        return false;
     }
 
     public void setValueAt(Object value, int row, int col) {
-        if (col >= columns.length) {
-            if (Boolean.class.isAssignableFrom(value.getClass())) {
-                Boolean set = (Boolean) value;
-                if (set) {
-                    checkedRows.set(row);
-                } else {
-                    checkedRows.clear(row);
+        try {
+            allTuplesLock.acquireUninterruptibly();
+
+            if (col >= columns.length) {
+                if (Boolean.class.isAssignableFrom(value.getClass())) {
+                    Boolean set = (Boolean) value;
+                    if (set) {
+                        checkedRows.set(row);
+                    } else {
+                        checkedRows.clear(row);
+                    }
+                    return;
                 }
+                AceLog.getAppLog().warning("Can't handle value: " + value + " row: " + row + " col: " + col);
                 return;
             }
-            AceLog.getAppLog().warning("Can't handle value: " + value + " row: " + row + " col: " + col);
-            return;
-        }
-        if (columns[col].isCreationEditable() || columns[col].isUpdateEditable()) {
-            I_ExtendByRefVersion extTuple = allTuples.get(row);
-            boolean changed = false;
-            if (extTuple.getTime() == Long.MAX_VALUE) {
-                try {
-                    switch (columns[col].getType()) {
-                    case CONCEPT_IDENTIFIER:
-                        Integer identifier = (Integer) value;
-                        referencedConcepts.put(identifier, Terms.get().getConcept(identifier));
-                    default:
-                        switch (columns[col].invokeOnObjectType) {
-                        case COMPONENT:
-                        case CONCEPT:
-                        case CONCEPT_COMPONENT:
-                            break;
-                        case IMMUTABLE:
-                            columns[col].getWriteMethod().invoke(extTuple, value);
-                            changed = true;
-                            break;
-                        case PART:
-                            columns[col].getWriteMethod().invoke(extTuple.getMutablePart(), value);
-                            changed = true;
-                            break;
+            if (columns[col].isCreationEditable() || columns[col].isUpdateEditable()) {
+                I_ExtendByRefVersion extTuple = allTuples.get(row);
+                boolean changed = false;
+                if (extTuple.getTime() == Long.MAX_VALUE) {
+                    try {
+                        switch (columns[col].getType()) {
+                        case CONCEPT_IDENTIFIER:
+                            Integer identifier = (Integer) value;
+                            referencedConcepts.put(identifier, Terms.get().getConcept(identifier));
                         default:
-                            throw new UnsupportedOperationException("Can't handle type: "
-                                + columns[col].invokeOnObjectType);
+                            switch (columns[col].invokeOnObjectType) {
+                            case COMPONENT:
+                            case CONCEPT:
+                            case CONCEPT_COMPONENT:
+                                break;
+                            case IMMUTABLE:
+                                columns[col].getWriteMethod().invoke(extTuple, value);
+                                changed = true;
+                                break;
+                            case PART:
+                                columns[col].getWriteMethod().invoke(extTuple.getMutablePart(), value);
+                                changed = true;
+                                break;
+                            default:
+                                throw new UnsupportedOperationException("Can't handle type: "
+                                    + columns[col].invokeOnObjectType);
 
+                            }
                         }
+                    } catch (Exception e) {
+                        AceLog.getAppLog().alertAndLogException(e);
                     }
-                } catch (Exception e) {
-                    AceLog.getAppLog().alertAndLogException(e);
-                }
-                if (changed) {
-                    fireTableDataChanged();
-                    AceLog.getAppLog().info("refset table changed");
-                    updateDataAlerts(row);
+                    if (changed) {
+                        fireTableDataChanged();
+                        AceLog.getAppLog().info("refset table changed");
+                        updateDataAlerts(row);
+                    }
                 }
             }
+        } finally {
+            allTuplesLock.release();
         }
     }
 
@@ -817,16 +860,23 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
 
         @Override
         public void run() {
+
             if (isActive()) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         if (isActive()) {
-                            I_ExtendByRefVersion tuple = allTuples.get(row);
-                            Terms.get().addUncommitted(tuple.getCore());
+                            try {
+                                allTuplesLock.acquireUninterruptibly();
+                                I_ExtendByRefVersion tuple = allTuples.get(row);
+                                Terms.get().addUncommitted(tuple.getCore());
+                            } finally {
+                                allTuplesLock.release();
+                            }
                         }
                     }
                 });
             }
+
         }
 
         public boolean isActive() {
@@ -859,7 +909,12 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
     }
 
     public void removeRow(int rowIndex) {
-        allTuples.remove(rowIndex);
+        try {
+            allTuplesLock.acquireUninterruptibly();
+            allTuples.remove(rowIndex);
+        } finally {
+            allTuplesLock.release();
+        }
     }
 
     protected abstract I_ChangeTableInSwing getTableChangedSwingWorker(int tableComponentId2, Integer promotionFilterId);
