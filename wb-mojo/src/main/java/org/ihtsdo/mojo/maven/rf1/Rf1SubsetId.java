@@ -10,6 +10,9 @@ public class Rf1SubsetId {
     private long subsetSctIdOriginal; // SCTID
     private UUID subsetRefsetUuid;
     private String subsetRefsetUuidStr;
+    
+    private String subsetType;
+    private int subsetTypeInt;
 
     private String subsetPathUuidFromName; // Subset path name
     private UUID subsetPathUuid;
@@ -20,7 +23,7 @@ public class Rf1SubsetId {
 
     private String refsetParentUuid;
     private String refsetDate; // 
-
+    
     public Rf1SubsetId() throws NoSuchAlgorithmException, UnsupportedEncodingException {
     }
 
@@ -38,6 +41,24 @@ public class Rf1SubsetId {
 
     public String getSubsetRefsetUuidStr() {
         return subsetRefsetUuidStr;
+    }
+
+    public void setSubsetType(int subsetType) {
+        this.subsetTypeInt = subsetType;
+        this.subsetTypeInt = Integer.valueOf(subsetType);
+    }
+
+    public void setSubsetType(String subsetType) {
+        this.subsetType = subsetType;
+        this.subsetTypeInt = Integer.parseInt(subsetType);
+    }
+
+    public int getSubsetTypeInt() {
+        return subsetTypeInt;
+    }
+    
+    public String getSubsetType() {
+        return subsetType;
     }
 
     public String getSubsetUuidFromName() {
