@@ -36,7 +36,47 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 /**
+ * <b>DESCRIPTION: </b><br>
  * 
+ * Rf1ToArfLanguageGbUsMojo is a maven mojo which pre-processes RF1 en-GB and en-US for the Rf1ToArfSubsetsMojo.<br>
+ * <br>
+ * Rf1ToArfLanguageGbUsMojo will compare en-GB subset to en-US to create a en-GB exceptions subset.  
+ * The resulting en-GB subset is passed to the Rf1ToArfSubsetsMojo is <code>&lt;keepGBExceptions&gt;</code> is <code>true</code><p>
+ * 
+ * <b>INPUTS:</b><br>
+ * The pom needs to configure the following parameters for the <code>rf1-language-gb-us-to-arf</code> goal.
+ * <pre>
+ * &lt;targetSub&gt; subdirectoryname -- working sub directly under build directory
+ *
+ * &lt;keepGB&gt;           true | false -- keep GB Dialect Subset (false)
+ * &lt;keepGBExceptions&gt; true | false -- keep GB Dialect Exceptions (false)
+ * &lt;keepGBExceptions&gt; true | false -- keep GB Dialect Exceptions Subset (false)
+ * 
+ * &lt;dateStart&gt; yyyy.mm.dd -- filter excludes files before start date
+ * &lt;dateStop&gt;  yyyy.mm.dd -- filter excludes files after stop date
+ * 
+ * &lt;rf1Dirs&gt;            -- creates list of directories to be searched 
+ *    &lt;rf1Dir&gt; dir_name -- specific directory to be added to the search list 
+ *    
+ * &lt;rf1SubsetIds&gt;    -- list of subset id information items
+ *    &lt;rf1SubsetId&gt;  -- subset id information with addition information to create refset concept 
+ *       &lt;sctIdOriginal&gt;    long       -- subset original SCT ID  (must be match subsets file entry)
+ *       &lt;subsetType&gt;       integer    -- subset type (must be match subsets file entry)
+ *       &lt;refsetFsName&gt;     name       -- refset Fully Specified Name description
+ *       &lt;refsetPrefTerm&gt;   name       -- refset Preferred Term description
+ *       &lt;refsetPathUuid&gt;   uuid       -- refest path uuid
+ *       &lt;refsetDate&gt;       yyyy.mm.dd -- originating date of refset concept
+ *       &lt;refsetParentUuid&gt; uuid       -- taxonomy parent uuid
+ * </pre>
+ * 
+ * Note:<br>
+ * Commenting in or out &lt;rf1Dir&gt; items with enable and disable which file directories are imported.
+ * <b>EVERY &lt;rf1Dir&gt; MUST HAVE A CORRESPONDING &lt;rf1SubsetId&gt; TO ACCEPT THE IMPORTED DATA, OR THE BUILD WILL FAIL.</b><br>
+ * <br>
+ * Commenting in or out &lt;rf1SubsetId&gt; items will affect which subsets show in the taxonomy.
+ * A &lt;rf1SubsetId&gt; without a corresponding &lt;rf1Dir&gt; directory will create an empty refset concept.
+ * <br>
+ * <br>
  * @author Marc E. Campbell
  *
  * @goal rf1-language-gb-us-to-arf

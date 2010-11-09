@@ -79,12 +79,15 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 /**
  * <b>DESCRIPTION: </b><br>
  * 
- * Sct1ArfToEConceptMojo is a maven mojo which converts SNOMED stated and inferred
- * (Distribution Normal Form) RF1 release files to IHTSDO Workbench 
- * versioned import eConcepts format.
+ * Sct1ArfToEConceptMojo is a maven mojo which converts SNOMED concepts, descriptions,
+ * stated relationships and inferred relationships (Distribution Normal Form) RF1 release 
+ * files to IHTSDO Workbench versioned import eConcepts format.  ARF formatted files can also be 
+ * combined with the SCT 1 files.
  * <p>
- * 
- * <code><pre>
+ * <b>Relationship uuids are generated based on the algorithm below.  Note that changing the role group
+ * in terms of relationship members or an non-mutable part any role group member will cause that role group
+ * to be retired and a new role group to be created.</b> 
+ * <pre>
  * relGroupList = in concept1-type-concept2 sorted order
  *              {triplet_A(concept1-type-concept2),
  *               triplet_B(concept1-type-concept2), 
@@ -95,10 +98,32 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
  *                type_sctid_as_string + 
  *                concept2_sctid_as_string + 
  *                relGroupList_as_long_string);
- * </pre></code><p>
+ * </pre>
+ * <b>INPUTS:</b>
+ * <pre>
+ * &lt;targetSub&gt;       subdirname -- working sub directly under build directory
+ * &lt;outputDirectory&gt; dirname    -- directory for output eConcepts files
+ * &lt;dateStart&gt;       yyyy.mm.dd -- filter excludes files before start date
+ * &lt;dateStop&gt;        yyyy.mm.dd -- filter excludes files after stop date
+ * &lt;uuidSnorocket&gt;   uuid -- Snorocket User UUID for defining inferred relationships
+ * &lt;uuidUser&gt;        uuid -- User UUID if not a defining inferred relationship
+ * &lt;includeCTV3ID&gt;     true | false
+ * &lt;includeSNOMEDRTID&gt; true | false
  * 
- * <b>INPUTS:</b><br>
- * 
+ * &lt;sct1Dirs&gt;                  -- list of sct input directory items
+ *    &lt;sct1Dir&gt;                -- detailed input directory item
+ *       &lt;directoryName&gt; name  -- directory name
+ *       &lt;mapSctIdInferredToStated&gt;   true | false
+ *       &lt;keepHistoricalFromInferred&gt; true | false
+ *       &lt;keepQualifierFromInferred&gt;  true | false
+ *       &lt;keepAdditionalFromInferred&gt; true | false
+ *       &lt;corePathUuid&gt;     uuid -- core path UUID
+ *       &lt;inferredPathName&gt; name -- inferred path name
+ *       &lt;statedPathName&gt;   name -- stated path name
+ *
+ * &lt;arfInputDirs&gt;
+ *       &lt;param&gt;/cement/&lt;/param&gt;
+ * </pre>  
  * The POM needs to specify mutually exclusive extensions in separate
  * directories in the array <code>sctInputDirArray</code> parameter. Each
  * directory entry will be parsed to locate SNOMED formated text files in any
@@ -125,9 +150,7 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
  * <p>
  * <b>REQUIRMENTS:</b><br>
  * 
- * 1. RELEASE DATE must be in either the SNOMED file name or the parent folder
- * name. The date must have the format of <code>yyyy-MM-dd</code> or
- * <code>yyyyMMdd</code>. <br>
+ * 1. RELEASE DATE must be in either the SNOMED file name. The preferred date format in <code>yyyyMMdd</code>. <br>
  * <br>
  * 2. SNOMED EXTENSIONS must be mutually exclusive from SNOMED CORE and each
  * other; and, placed under separate <code>sctInputDirArray</code> directories.<br>
@@ -137,28 +160,30 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
  * Relationship file names without "_stated" or "_inferred" are not supported.
  * <p>
  * <b>PROCESSING:</b><br>
- * Step 1. Versioning & Relationship Generated IDs.  Merge time series of releases into 
+ * Step #1. Versioning & Relationship Generated IDs.  Merge time series of releases into 
  * a versioned intermediate concept, description, and relationship files.  This step 
  * also adds an algorithmically computed relationship ids.  Ids are kept directly with each primary 
  * (concept, description & relationship) component. <br>
  * <br>
- * Step 2. ARF files. Append arf files to sct binary records files.<br>
+ * Step #2. ARF files. Append arf files to sct binary records files.<br>
  * <br>
- * Step 3. Destination Rels.  Build file for destination rels. Non-required fields are dropped.<br>
+ * Step #3. Destination Rels.  Build file for destination rels. Non-required fields are dropped.<br>
  * <br>
- * Step 4. Sort. Sort concept, description, source relationship and destination relationship files
- *  to be in concept order.<br>
+ * Step #4. Match IDs. Associate ids with each specific component.<br>
  *  <br>
- *  Step 5. Inflate IDs.  Attached IDs to components.
+ * Step #5. Refset. Refset preparation.<br>
+ *  <br>
+ * Step #6. Sort.  Sort into concept order for merging the prepared files to create eConcepts in
+ * the next step.<br>
  *  <br>
  * Step #7. Create EConcepts.  Concurrently read pre-sorted concept, description, source relationship
  *  and destination relationship files and creates eConcepts.<br>
  * <p>
  * <b>NOTES:</b><br>
- * Records are NOT VERSIONED between files under DIFFERENT
+ * <b>Records are NOT VERSIONED between files under DIFFERENT
  * <code>sctInputDirArray</code> directories. The versioned output from
  * <code>sctInputDirArray[a+1]</code> is appended to the versioned output from
- * <code>sctInputDirArray[a]</code>. <br>
+ * <code>sctInputDirArray[a]</code>. </b><br>
  * 
  * @author Marc E. Campbell
  * 

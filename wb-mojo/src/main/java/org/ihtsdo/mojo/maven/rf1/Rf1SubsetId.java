@@ -19,7 +19,7 @@ public class Rf1SubsetId {
     private String subsetPathUuidStr;
 
     private String refsetFsName;
-    private String refsetPrefName;
+    private String refsetPrefTerm;
 
     private String refsetParentUuid;
     private String refsetDate; // 
@@ -108,12 +108,12 @@ public class Rf1SubsetId {
         this.refsetFsName = refsetFsName;
     }
 
-    public String getRefsetPrefName() {
-        return refsetPrefName;
+    public String getRefsetPrefTerm() {
+        return refsetPrefTerm;
     }
 
-    public void setRefsetPrefName(String refsetPrefName) {
-        this.refsetPrefName = refsetPrefName;
+    public void setRefsetPrefTerm(String term) {
+        this.refsetPrefTerm = term;
     }
 
     public String toString() {
