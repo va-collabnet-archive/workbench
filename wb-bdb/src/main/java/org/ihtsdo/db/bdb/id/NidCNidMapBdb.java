@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 
 import org.dwfa.ace.log.AceLog;
@@ -34,7 +34,7 @@ public class NidCNidMapBdb extends ComponentBdb {
 	private AtomicReference<int[][]> nidCNidMaps;
 	private boolean[] mapChanged;
 	private int readOnlyRecords;
-	private ReentrantLock writeLock = new ReentrantLock();
+	private ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
 
 	
 	public NidCNidMapBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv) throws IOException {
@@ -146,7 +146,7 @@ public class NidCNidMapBdb extends ComponentBdb {
 	}
 
 	private void writeChangedMaps() throws IOException {
-		writeLock.lock();
+		rwl.writeLock().lock();
 		try {
 			DatabaseEntry keyEntry = new DatabaseEntry();
 			TupleOutput output = new TupleOutput(new byte[NID_CNID_MAP_SIZE * 4]);
@@ -177,7 +177,7 @@ public class NidCNidMapBdb extends ComponentBdb {
 				}
 			}
 		} finally {
-			writeLock.unlock();
+			rwl.writeLock().unlock();
 		}
 	}
 
@@ -242,21 +242,29 @@ public class NidCNidMapBdb extends ComponentBdb {
 		}
 	}
    
-    private void ensureCapacity(int nextId) throws IOException {
-        int nidCidMapCount = ((nextId - Integer.MIN_VALUE) / NID_CNID_MAP_SIZE) + 1;
-        if (nidCidMapCount > nidCNidMaps.get().length) {
-            writeLock.lock();
-            if (nidCidMapCount > nidCNidMaps.get().length) {
-                try {
-                    expandCapacity(nidCidMapCount);
-                } finally {
-                    writeLock.unlock();
-                }
-            } else {
-                writeLock.unlock();
-            }
-        }
-    }
+	private void ensureCapacity(int nextId) throws IOException {
+		int nidCidMapCount = ((nextId - Integer.MIN_VALUE) / NID_CNID_MAP_SIZE) + 1;
+		rwl.readLock().lock();
+		try {
+			if (nidCidMapCount > nidCNidMaps.get().length) {
+				rwl.readLock().unlock();
+				rwl.writeLock().lock();
+				if (nidCidMapCount > nidCNidMaps.get().length) {
+					try {
+						expandCapacity(nidCidMapCount);
+					} finally {
+						rwl.readLock().lock();
+						rwl.writeLock().unlock();
+					}
+				} else {
+					rwl.readLock().lock();
+					rwl.writeLock().unlock();
+				}
+			}
+		} finally {
+			rwl.readLock().unlock();
+		}
+	}
 
     private void expandCapacity(int nidCidMapCount) throws IOException {
         int oldCount = nidCNidMaps.get().length;
