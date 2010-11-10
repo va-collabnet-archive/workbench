@@ -44,6 +44,7 @@
 				<groupId>org.ihtsdo</groupId>
 				<artifactId>wb-mojo</artifactId>
 				<extensions>true</extensions>
+				<version>${wb-toolkit.version}</version>
 				<dependencies>
 					<dependency>
 						<groupId>org.apache.lucene</groupId>

@@ -27,9 +27,9 @@
 				bundle will use.
 			-->
 			<groupId>org.ihtsdo</groupId>
-			<artifactId>sct-mini-release</artifactId>
+			<artifactId>sct-stress-test</artifactId>
 			<type>zip</type>
-			<version>2010-07-31</version>
+			<version>GUI</version>
 		</dependency>
 	</dependencies>
   	<build>
@@ -56,7 +56,7 @@
 				<groupId>org.ihtsdo</groupId>
 				<artifactId>wb-mojo</artifactId>
 				<!-- Temp fix to run build -->
-				<version>2.6.0-trek-4-SNAPSHOT</version>
+				<version>1.0-SNAPSHOT</version>
 				<executions>
 					<execution>
 						<id>write-directories</id>
@@ -67,7 +67,7 @@
 						<configuration>
 							<targetSubDir>generated-sources</targetSubDir>
 							<runtimeArtifacts>
-								<runtimeArtifact>org.ihtsdo:sct-mini-release</runtimeArtifact>
+								<runtimeArtifact>org.ihtsdo:sct-stress-test</runtimeArtifact>
 							</runtimeArtifacts>
 						</configuration>
 					</execution>
@@ -89,6 +89,28 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!-- 
+			<plugin>
+				<groupId>org.ihtsdo</groupId>
+				<artifactId>wb-bdb-mojo</artifactId>
+				<version>1.0-SNAPSHOT</version>
+				<executions>
+					<execution>
+						<id>export-workflow-history-as-econcepts</id>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>export-workflow-history-as-econcept</goal>
+						</goals>
+						<configuration>
+							<inputDatabasePath>src/main/resources/berkeley-db</inputDatabasePath>
+							<inputFilePath>src/main/resources/WfHx.txt</inputFilePath>
+							<targetDirectoryPath>generated-artifact</targetDirectoryPath>
+							<editPathUuid>8c230474-9f11-30ce-9cad-185a96fd03a2</editPathUuid>
+						</configuration>
+					</execution>
+				</executions>					
+			</plugin>
+			 -->
 		</plugins>
 	</build>
 </project>

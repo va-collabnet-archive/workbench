@@ -14,6 +14,7 @@
         <include>org.ihtsdo:wb-api</include>
         <include>org.ihtsdo:wb-gui</include>
         <include>org.ihtsdo:wb-bdb</include>
+        <include>org.ihtsdo:wb-wf</include>
         <include>net.jini:jsk-lib</include>
         <include>net.jini:jsk-platform</include>
         <include>org.dwfa.jini:browser</include>
