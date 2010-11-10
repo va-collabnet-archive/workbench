@@ -47,8 +47,6 @@
 			<plugin>
 				<groupId>org.ihtsdo</groupId>
 				<artifactId>wb-mojo</artifactId>
-										<version>${wb-toolkit.version}</version>
-				
 				<dependencies>
 					<dependency>
 						<groupId>org.ihtsdo</groupId>
@@ -102,7 +100,6 @@
 								<String>DOCUMENT_AUXILIARY</String>
 								<String>HL7</String>
 								<String>QUEUE_TYPE</String>
-								<String>WORKFLOW_AUXILIARY</String>
 							</taxonomies>
 							<output>${project.build.directory}/generated-resources/jbin
 							</output>
@@ -541,7 +538,6 @@
 							<conceptsFileNames>
 								<String>cement.jbin</String>
 								<String>sctSiEConcepts.jbin</String>
-								<!--  <String>wfHistory.jbin</String>  -->
 							</conceptsFileNames>
 						</configuration>
 					</execution>
