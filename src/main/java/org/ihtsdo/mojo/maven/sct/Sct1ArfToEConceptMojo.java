@@ -4707,8 +4707,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         int lenA = a.length;
         ArrayList<Integer> duplIdxList = new ArrayList<Integer>();
         for (int idx = 0; idx < lenA - 2; idx++) {
-            if (a[idx] == null || a[idx + 1] == null)
-                getLog().info("FOUND NULL :!!!:DEBUG");
             if ((a[idx].relUuidMsb == a[idx + 1].relUuidMsb)
                     && (a[idx].relUuidLsb == a[idx + 1].relUuidLsb)) {
                 duplIdxList.add(Integer.valueOf(idx));

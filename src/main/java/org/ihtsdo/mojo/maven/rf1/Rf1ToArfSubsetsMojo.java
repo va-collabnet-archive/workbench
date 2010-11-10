@@ -351,10 +351,6 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
             throws NoSuchAlgorithmException, UnsupportedEncodingException {
         StringBuilder sb = new StringBuilder();
 
-        if (sid == null)
-            System.out.println(":DEBUG:!!!:");
-        if (sid.getSubsetRefsetUuidStr() == null)
-            System.out.println(":DEBUG:!!!:");
         // REFSET_UUID
         sb.append(sid.getSubsetRefsetUuidStr() + TAB_CHARACTER);
         // MEMBER_UUID ... of refset member
@@ -374,7 +370,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
         // PATH_UUID
         sb.append(sid.getRefsetPathUuidStr() + TAB_CHARACTER);
 
-        if (sid.getSubsetTypeInt() == 1 || sid.getSubsetTypeInt() == 1)
+        if (sid.getSubsetTypeInt() == 1 || sid.getSubsetTypeInt() == 3)
             // Language (1) or Description (3) Subset Type
             switch (m.memberValue) {
             case 1: // Preferred Name
