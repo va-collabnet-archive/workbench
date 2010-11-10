@@ -1333,10 +1333,6 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             if (line[EXT_VALUE_UUID].charAt(0) == 't' || line[EXT_VALUE_UUID].charAt(0) == 'T')
                 vBool = true;
 
-            // :DEBUG:!!!:
-            //            if (uuidComponent.equals(UUID.fromString("7c57f6b4-4a63-52ad-b762-73acc15f23de"))) 
-            //                getLog().info("FOUND IT");
-
             SctYRefSetRecord tmpRsRec = new SctYRefSetRecord(uuidRefset, uuidMember, uuidComponent,
                     status, revDate, pathIdx, vBool);
 
@@ -2785,8 +2781,6 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
 
             while (theRsByRs.compareTo(theCon) == IS_LESS) {
                 rsByRsNext = readNextRsByRs(oisRsByRs, rsByRsList, rsByRsNext);
-                // :DEBUG:
-                //                UUID debugUuidRsByCon111 = UUID.fromString("ccbd4a65-9b1a-5df3-94d1-4a1085f3c758");
 
                 if (rsByRsNext == null && rsByRsList.size() == 0)
                     theRsByRs = new UUID(Long.MAX_VALUE, Long.MAX_VALUE);
@@ -3200,10 +3194,6 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     throw new UnsupportedOperationException("Cannot handle case");
             }
 
-            // :DEBUG:TEST:!!!: ec primordialUuid vs ca primordialUuid
-            //            if (countRefsetMember < 10)
-            //                getLog().info(
-            //                        "Refset Member: " + ec.getConceptAttributes().primordialUuid.toString());
             countRefsetMember++;
 
         }
@@ -3274,9 +3264,6 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     throw new UnsupportedOperationException("Cannot handle case");
 
             }
-            // :DEBUG:TEST:!!!: ec primordialUuid vs ca primordialUuid
-            //            if (countRefsetMaster < 10)
-            //                getLog().info("Refset Master: " + ec.getPrimordialUuid().toString());
             countRefsetMaster++;
 
             ec.setRefsetMembers(listErm);

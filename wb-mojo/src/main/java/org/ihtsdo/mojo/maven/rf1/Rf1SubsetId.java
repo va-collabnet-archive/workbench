@@ -80,8 +80,6 @@ public class Rf1SubsetId {
         this.subsetPathUuidFromName = name;
         this.subsetPathUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, name);
         this.subsetPathUuidStr = subsetPathUuid.toString();
-        System.out.println("Rf1SubsetId.setRefsetPathName  subsetPathUuidStr  ="
-                + this.subsetPathUuidStr); // :DEBUG:!!!:
     }
 
     public String getRefsetParentUuid() {
