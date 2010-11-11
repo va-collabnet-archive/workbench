@@ -49,7 +49,7 @@ import org.apache.maven.plugin.MojoFailureException;
  * &lt;targetSub&gt; subdirectoryname -- working sub directly under build directory
  *
  * &lt;keepGB&gt;           true | false -- keep GB Dialect Subset (false)
- * &lt;keepGBExceptions&gt; true | false -- keep GB Dialect Exceptions (false)
+ * &lt;keepUS&gt; true | false -- keep US Dialect Subset (false)
  * &lt;keepGBExceptions&gt; true | false -- keep GB Dialect Exceptions Subset (false)
  * 
  * &lt;dateStart&gt; yyyy.mm.dd -- filter excludes files before start date
