@@ -162,11 +162,13 @@ public class NidCNidMapBdb extends ComponentBdb {
 						if (nidCNidMaps.get()[key][i] == Integer.MAX_VALUE) {
 							if (i > 0) {
 								if (nidCNidMaps.get()[key][i-1] != Integer.MAX_VALUE) {
-									maxValueEntries.add("[" + key + "][" + (i-1) + "]: " + nidCNidMaps.get()[key][i-1]);
+									maxValueEntries.add("\n[" + key + "][" + (i-1) + "]: " + 
+											nidCNidMaps.get()[key][i-1] + "\n");
 								}
 								maxValueEntries.add("[" + key + "][" + i + "]");
 								if (i + 1 < NID_CNID_MAP_SIZE && nidCNidMaps.get()[key][i+1] != Integer.MAX_VALUE) {
-									maxValueEntries.add("[" + key + "][" + (i+1) + "]: " + nidCNidMaps.get()[key][i+1]);
+									maxValueEntries.add("\n[" + key + "][" + (i+1) + "]: " + 
+											nidCNidMaps.get()[key][i+1]  + "\n");
 								}
 							} else {
 								maxValueEntries.add("[" + key + "][" + i + "]");
@@ -176,7 +178,7 @@ public class NidCNidMapBdb extends ComponentBdb {
 					if (maxValueEntries.size() > 0 && key < nidCNidMaps.get().length - 1) {
 						System.out.println("writing max value entries: " + maxValueEntries);
 					} else {
-						System.out.println("max value entry count in last array: " + maxValueEntries.size());
+						//System.out.println("max value entry count in last array: " + maxValueEntries.size());
 					}
 					valueEntry = new DatabaseEntry(output.toByteArray());
 					OperationStatus status = mutable.put(null, keyEntry, valueEntry);
