@@ -167,42 +167,6 @@ public class VersionDiff extends DiffBase {
 
 	private int stats;
 
-	private int added_concept_change;
-
-	private int deleted_concept_change;
-
-	private int concept_status_change;
-
-	private int defined_change;
-
-	private int added_description_change;
-
-	private int deleted_description_change;
-
-	private int description_status_change;
-
-	private int description_term_change;
-
-	private int description_type_change;
-
-	private int description_language_change;
-
-	private int description_case_change;
-
-	private int added_relationship_change;
-
-	private int deleted_relationship_change;
-
-	private int relationship_status_change;
-
-	private int relationship_characteristic_change;
-
-	private int relationship_refinability_change;
-
-	private int relationship_type_change;
-
-	private int relationship_group_change;
-
 	private I_ConfigAceFrame config_ace_frame;
 
 	private RefsetPropertyMap refset_map;
@@ -324,7 +288,6 @@ public class VersionDiff extends DiffBase {
 	protected void addedConcept(I_GetConceptData c) throws Exception {
 		super.addedConcept(c);
 		addToRefset(c.getConceptNid(), this.added_concept_change, c.toString());
-		incr(this.added_concept_change);
 	}
 
 	@Override
@@ -332,7 +295,6 @@ public class VersionDiff extends DiffBase {
 		super.deletedConcept(c);
 		addToRefset(c.getConceptNid(), this.deleted_concept_change,
 				c.toString());
-		incr(this.deleted_concept_change);
 	}
 
 	@Override
@@ -341,7 +303,6 @@ public class VersionDiff extends DiffBase {
 		super.changedConceptStatus(c, v1, v2);
 		addToRefset(c.getConceptNid(), this.concept_status_change,
 				getConceptName(v1) + " -> " + getConceptName(v2));
-		incr(this.concept_status_change);
 	}
 
 	@Override
@@ -349,7 +310,6 @@ public class VersionDiff extends DiffBase {
 			throws Exception {
 		super.changedDefined(c, v1, v2);
 		addToRefset(c.getConceptNid(), this.defined_change, v1 + " -> " + v2);
-		incr(this.defined_change);
 	}
 
 	private void compareAttributesOrig(I_GetConceptData c, PathBI path)
@@ -407,8 +367,6 @@ public class VersionDiff extends DiffBase {
 		super.addedDescription(c, d);
 		addToRefset(c.getConceptNid(), this.added_description_change,
 				String.valueOf(d.getDescId()) + "\t" + d);
-		incr(this.added_description_change);
-
 	}
 
 	// @Override
@@ -428,7 +386,6 @@ public class VersionDiff extends DiffBase {
 				String.valueOf(d1.getDescId()) + "\t" + d2.getText() + ": "
 						+ getConceptName(d1.getStatusNid()) + " -> "
 						+ getConceptName(d2.getStatusNid()));
-		incr(this.description_status_change);
 	}
 
 	@Override
@@ -438,7 +395,6 @@ public class VersionDiff extends DiffBase {
 		addToRefset(c.getConceptNid(), this.description_term_change,
 				String.valueOf(d1.getDescId()) + "\t" + d1.getText() + " -> "
 						+ d2.getText());
-		incr(this.description_term_change);
 	}
 
 	@Override
@@ -448,7 +404,6 @@ public class VersionDiff extends DiffBase {
 		addToRefset(c.getConceptNid(), this.description_language_change,
 				String.valueOf(d1.getDescId()) + "\t" + d2.getText() + ": "
 						+ d1.getLang() + " -> " + d2.getLang());
-		incr(this.description_language_change);
 	}
 
 	@Override
@@ -461,7 +416,6 @@ public class VersionDiff extends DiffBase {
 				String.valueOf(d1.getDescId()) + "\t" + d2.getText() + ": "
 						+ d1.isInitialCaseSignificant() + " -> "
 						+ d2.isInitialCaseSignificant());
-		incr(this.description_case_change);
 	}
 
 	@Override
@@ -472,7 +426,6 @@ public class VersionDiff extends DiffBase {
 				String.valueOf(d1.getDescId()) + "\t" + d2.getText() + ": "
 						+ getConceptName(d1.getTypeNid()) + " -> "
 						+ getConceptName(d2.getTypeNid()));
-		incr(this.description_type_change);
 	}
 
 	private void compareDescriptionsOrig(I_GetConceptData c) throws Exception {
@@ -621,7 +574,6 @@ public class VersionDiff extends DiffBase {
 		super.addedRelationship(c, d);
 		addToRefset(c.getConceptNid(), this.added_relationship_change,
 				String.valueOf(d.getRelId()) + "\t" + d);
-		incr(this.added_relationship_change);
 	}
 
 	protected void deletedRelationship(I_GetConceptData c, I_RelTuple d)
@@ -640,7 +592,6 @@ public class VersionDiff extends DiffBase {
 				String.valueOf(d1.getRelId()) + "\t" + d2 + ": "
 						+ getConceptName(d1.getStatusNid()) + " -> "
 						+ getConceptName(d2.getStatusNid()));
-		incr(this.relationship_status_change);
 	}
 
 	@Override
@@ -651,7 +602,6 @@ public class VersionDiff extends DiffBase {
 				String.valueOf(d1.getRelId()) + "\t" + d2 + ": "
 						+ getConceptName(d1.getTypeNid()) + " -> "
 						+ getConceptName(d2.getTypeNid()));
-		incr(this.relationship_type_change);
 	}
 
 	@Override
@@ -662,7 +612,6 @@ public class VersionDiff extends DiffBase {
 				String.valueOf(d1.getRelId()) + "\t" + d2 + ": "
 						+ getConceptName(d1.getCharacteristicId()) + " -> "
 						+ getConceptName(d2.getCharacteristicId()));
-		incr(this.relationship_characteristic_change);
 	}
 
 	@Override
@@ -673,7 +622,6 @@ public class VersionDiff extends DiffBase {
 				String.valueOf(d1.getRelId()) + "\t" + d2 + ": "
 						+ getConceptName(d1.getCharacteristicId()) + " -> "
 						+ getConceptName(d2.getCharacteristicId()));
-		incr(this.relationship_refinability_change);
 	}
 
 	@Override
@@ -685,7 +633,6 @@ public class VersionDiff extends DiffBase {
 				this.relationship_group_change,
 				String.valueOf(d1.getRelId()) + "\t" + d2 + ": "
 						+ d1.getGroup() + " -> " + d2.getGroup());
-		incr(this.relationship_group_change);
 	}
 
 	private void compareRelationshipsOrig(I_GetConceptData c, PathBI path)
@@ -1057,9 +1004,9 @@ public class VersionDiff extends DiffBase {
 	 */
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
-			I_TermFactory tf = Terms.get();
-			processConfig();
+			super.execute();
 
+			I_TermFactory tf = Terms.get();
 			ArrayList<Integer> all_concepts = getAllConcepts();
 			long start = System.currentTimeMillis();
 			getLog().info(
