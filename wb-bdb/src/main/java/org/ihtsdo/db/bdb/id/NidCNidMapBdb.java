@@ -85,7 +85,7 @@ public class NidCNidMapBdb extends ComponentBdb {
 						maxValueEntries.add("[" + index + "][" + (j-1) + "]: " + ((index * NID_CNID_MAP_SIZE) + (j-1) + Integer.MIN_VALUE));
 					}
 				}
-				if (AceLog.getAppLog().isLoggable(Level.INFO)) {
+				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
 	                if (readOnly) {
 	                    AceLog.getAppLog().info("\n\nmax value entry count for read only index[" + index + "]: " + maxValueEntries.size());
 	                } else {
