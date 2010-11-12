@@ -83,6 +83,34 @@ public class BatchQACheck extends AbstractMojo {
 	 */
 	private String context_uuid;
 
+	/**
+	 * Execution details csv/txt file.
+	 * 
+	 * @parameter
+	 */
+	private File executionDetailsOutput;
+
+	/**
+	 * Execution details xml file.
+	 * 
+	 * @parameter
+	 */
+	private File executionXmlOutput;
+
+	/**
+	 * Findings csv/txt file.
+	 * 
+	 * @parameter
+	 */
+	private File findingsOutput;
+
+	/**
+	 * Rules csv/txt file.
+	 * 
+	 * @parameter
+	 */
+	private File rulesOutput;
+
 	/** The vodb directory. */
 	private File vodbDirectory;
 
@@ -100,18 +128,9 @@ public class BatchQACheck extends AbstractMojo {
 
 	/** The tf. */
 	private I_TermFactory tf;
-	
-	private File executionXmlOutput;
-	private File findingsOutput;
-	private File rulesOutput;
-	private File executionDetailsOutput;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
-			executionXmlOutput = new File(outputDirectory, "executionXmlOutput.xml");
-			findingsOutput = new File(outputDirectory, "findingsOutput.txt");
-			rulesOutput = new File(outputDirectory, "rulesOutput.txt");
-			executionDetailsOutput = new File(outputDirectory, "executionDetailsOutput.txt");
 			validateParamenters();
 			openDb();
 			exportExecutionDescriptor();
@@ -122,6 +141,7 @@ public class BatchQACheck extends AbstractMojo {
 	}
 
 	private void exportExecutionDescriptor() throws Exception {
+		//write executiondetailsoutput
 		I_GetConceptData context = tf.getConcept(UUID.fromString(context_uuid));
 		RulesContextHelper contextHelper = new RulesContextHelper(config);
 		List<RulesDeploymentPackageReference> kbPackages = contextHelper.getPackagesForContext(context);
@@ -140,7 +160,7 @@ public class BatchQACheck extends AbstractMojo {
 				// write rule in rulesOutput
 			}
 		}
-		// TODO: close xml
+		// TODO: close files
 
 	}
 
@@ -150,6 +170,18 @@ public class BatchQACheck extends AbstractMojo {
 	}
 
 	private void validateParamenters() throws Exception {
+		if (executionXmlOutput == null) {
+			executionXmlOutput = new File(outputDirectory, "executionXmlOutput.xml");
+		}
+		if (findingsOutput == null) {
+			findingsOutput = new File(outputDirectory, "findingsOutput.txt");
+		}
+		if (rulesOutput == null) {
+			rulesOutput = new File(outputDirectory, "rulesOutput.txt");
+		}
+		if (executionDetailsOutput == null) {
+			executionDetailsOutput = new File(outputDirectory, "executionDetailsOutput.txt");
+		}
 		UUID.fromString(test_path_uuid);
 		UUID.fromString(context_uuid);
 		DateFormat df = new SimpleDateFormat("yyyy.mm.dd hh:mm:ss zzz");
