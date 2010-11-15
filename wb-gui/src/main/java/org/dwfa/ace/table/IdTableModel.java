@@ -175,9 +175,10 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
                 if (workStopped) {
                     return false;
                 }
-                conceptsToFetch.add(part.getStatusId());
-                conceptsToFetch.add(part.getPathId());
+                conceptsToFetch.add(part.getStatusNid());
+                conceptsToFetch.add(part.getPathNid());
                 conceptsToFetch.add(part.getAuthorityNid());
+                conceptsToFetch.add(part.getAuthorNid());
             }
 
             if (workStopped) {
@@ -228,7 +229,13 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
     }
 
     public enum ID_FIELD {
-        LOCAL_ID("local id", 5, 100, 100), STATUS("status", 5, 50, 250), EXT_ID("id", 5, 85, 1550), VERSION("time", 5, 140, 140), PATH("path", 5, 90, 150), SOURCE("id source", 5, 50, 250);
+        LOCAL_ID("local id", 5, 100, 100),
+        STATUS("status", 5, 50, 250),
+        EXT_ID("id", 5, 85, 1550),
+        VERSION("time", 5, 140, 140),
+        AUTHOR("author", 5, 90, 150),
+        PATH("path", 5, 90, 150),
+        SOURCE("id source", 5, 50, 250);
 
         private String columnName;
 
@@ -394,6 +401,12 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
                     return new StringWithIdTuple(getPrefText(idTuple.getAuthorityNid()), idTuple, inConflict);
                 }
                 return new StringWithIdTuple(Integer.toString(idTuple.getAuthorityNid()), idTuple, inConflict);
+            case AUTHOR:
+                if (referencedConcepts.containsKey(idTuple.getAuthorNid())) {
+                    return new StringWithIdTuple(getPrefText(idTuple.getAuthorNid()), idTuple, inConflict);
+                }
+                return new StringWithIdTuple(Integer.toString(idTuple.getAuthorNid()), idTuple, inConflict);
+
             }
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);

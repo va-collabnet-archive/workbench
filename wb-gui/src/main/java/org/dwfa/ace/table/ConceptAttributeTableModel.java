@@ -73,7 +73,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
         @Override
         public I_GetConceptData getSelectedItem(Object value) throws TerminologyException, IOException {
             StringWithConceptTuple swdt = (StringWithConceptTuple) value;
-            return Terms.get().getConcept(swdt.getTuple().getStatusId());
+            return Terms.get().getConcept(swdt.getTuple().getStatusNid());
         }
 
         @Override
@@ -185,8 +185,8 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
             }
             List<? extends I_ConceptAttributeTuple> tuples = getConceptTuples(cb);
             for (I_ConceptAttributeTuple conVersion : tuples) {
-                conceptsToFetch.add(conVersion.getStatusId());
-                conceptsToFetch.add(conVersion.getPathId());
+                conceptsToFetch.add(conVersion.getStatusNid());
+                conceptsToFetch.add(conVersion.getPathNid());
                 if (stopWork) {
                     return false;
                 }
@@ -228,7 +228,12 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
     }
 
     public enum CONCEPT_FIELD {
-        CON_ID("cid", 5, 100, 100), STATUS("status", 5, 50, 250), DEFINED("defined", 5, 85, 1550), VERSION("time", 5, 140, 140), PATH("path", 5, 90, 150);
+        CON_ID("cid", 5, 100, 100), 
+        STATUS("status", 5, 50, 250),
+        DEFINED("defined", 5, 85, 1550),
+        AUTHOR("author", 5, 90, 150),
+        VERSION("time", 5, 140, 140),
+        PATH("path", 5, 90, 150);
 
         private String columnName;
 

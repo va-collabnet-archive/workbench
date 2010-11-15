@@ -75,6 +75,7 @@ public class SrcRelTableModel extends RelTableModel {
         return selectedTuples;
     }
 
+    @Override
     public void doDrop(I_GetConceptData obj) {
         throw new UnsupportedOperationException();
         /*

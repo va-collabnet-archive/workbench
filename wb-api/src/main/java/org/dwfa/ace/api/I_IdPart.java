@@ -34,6 +34,7 @@ public interface I_IdPart {
     @Deprecated
 	public int getPathId();
 	public int getPathNid();
+        public int getAuthorNid();
 	public int getVersion();
 	public long getTime();
 	@Deprecated

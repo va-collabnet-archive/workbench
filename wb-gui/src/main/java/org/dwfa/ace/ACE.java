@@ -187,6 +187,7 @@ import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.RelAssertionType;
 
 public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActions {
 
@@ -2261,26 +2262,57 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.EAST;
-        gbc.weightx = 1;
+        gbc.weightx = 0;
         gbc.weighty = 0;
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridheight = 1;
+
+        checkPanel.add(new JLabel("stated/inferred policy:"), gbc);
+
+        gbc.weightx = 1;
+        gbc.gridx = 1;
+        JComboBox relAssertionTypeComboBox = new JComboBox(RelAssertionType.values());
+        relAssertionTypeComboBox.setSelectedItem(aceFrameConfig.getRelAssertionType());
+         relAssertionTypeComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionevent) {
+                JComboBox cb = (JComboBox) actionevent.getSource();
+                RelAssertionType relAssertionType = (RelAssertionType) cb.getSelectedItem();
+                aceFrameConfig.setRelAssertionType(relAssertionType);
+             }
+        });
+
+        checkPanel.add(relAssertionTypeComboBox, gbc);
+        gbc.gridy++;
+        
+        gbc.gridx = 0;
+        gbc.gridwidth = 2;
         checkPanel.add(getCheckboxEditor("show viewer images in taxonomy view", "showViewerImagesInTaxonomy",
             aceFrameConfig.getShowViewerImagesInTaxonomy(), true), gbc);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridy++;
-        checkPanel.add(getCheckboxEditor("show path info in taxonomy view", "showPathInfoInTaxonomy", aceFrameConfig
-            .getShowPathInfoInTaxonomy(), true), gbc);
+        checkPanel.add(getCheckboxEditor("rel assertion type in taxonomy view", "setRelAssertionType",
+            aceFrameConfig.getShowViewerImagesInTaxonomy(), true), gbc);
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.gridy++;
-        checkPanel.add(getCheckboxEditor("show refset info in taxonomy view", "showRefsetInfoInTaxonomy",
+
+         checkPanel.add(getCheckboxEditor("show refset info in taxonomy view", "showRefsetInfoInTaxonomy",
             aceFrameConfig.getShowRefsetInfoInTaxonomy(), true), gbc);
+
+        /*
         gbc.weighty = 1;
         gbc.gridheight = 3;
         gbc.gridy++;
         checkPanel.add(new JScrollPane(makeTermList("Refsets to show in taxonomy view: ", aceFrameConfig
             .getRefsetsToShowInTaxonomy())), gbc);
+         * 
+         */
         relPrefPanel.add(checkPanel);
+        relPrefPanel.add(new JScrollPane(makeTermList("Refsets to show in taxonomy view: ", aceFrameConfig
+            .getRefsetsToShowInTaxonomy())));
+
+
 
         JPanel checkPanel2 = new JPanel(new GridBagLayout());
         gbc = new GridBagConstraints();
@@ -2560,21 +2592,13 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             I_GetConceptData.class, aceFrameConfig));
         wrapAndAdd(classifierPrefPanel, classificationIsaLabel, "Classification 'Is a': ");
 
-        TermComponentLabel classificationInputPathLabel = new TermComponentLabel(aceFrameConfig);
-        classificationInputPathLabel.setTermComponent(aceFrameConfig.getClassifierInputPath());
-        aceFrameConfig.addPropertyChangeListener("classifierInputPath", new PropertyListenerGlue("setTermComponent",
-            I_AmTermComponent.class, classificationInputPathLabel));
-        classificationInputPathLabel.addTermChangeListener(new PropertyListenerGlue("setClassifierInputPath",
+        TermComponentLabel classifierConceptLabel = new TermComponentLabel(aceFrameConfig);
+        classifierConceptLabel.setTermComponent(aceFrameConfig.getClassifierConcept());
+        aceFrameConfig.addPropertyChangeListener("classifierConcept", new PropertyListenerGlue("setTermComponent",
+            I_AmTermComponent.class, classifierConceptLabel));
+        classifierConceptLabel.addTermChangeListener(new PropertyListenerGlue("setClassifierConcept",
             I_GetConceptData.class, aceFrameConfig));
-        wrapAndAdd(classifierPrefPanel, classificationInputPathLabel, "Classification Stated (Input) Path: ");
-
-        TermComponentLabel classificationOutputPathLabel = new TermComponentLabel(aceFrameConfig);
-        classificationOutputPathLabel.setTermComponent(aceFrameConfig.getClassifierOutputPath());
-        aceFrameConfig.addPropertyChangeListener("classifierOutputPath", new PropertyListenerGlue("setTermComponent",
-            I_AmTermComponent.class, classificationOutputPathLabel));
-        classificationOutputPathLabel.addTermChangeListener(new PropertyListenerGlue("setClassifierOutputPath",
-            I_GetConceptData.class, aceFrameConfig));
-        wrapAndAdd(classifierPrefPanel, classificationOutputPathLabel, "Classification Inferred (Output) Path: ");
+        wrapAndAdd(classifierPrefPanel, classifierConceptLabel, "Classifier identity: ");
 
         return classifierPrefPanel;
 

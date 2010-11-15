@@ -13,6 +13,7 @@ import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.RelAssertionType;
 
 public class KindOfSpec {
 	
@@ -62,13 +63,21 @@ public class KindOfSpec {
 	 * each time a query is perfomed. 
 	 */
 	private PositionSetReadOnly viewPositionSet;
+
+        private int classifierNid;
+
+        private RelAssertionType relAssertionType;
 	
 	public Coordinate getCoordinate() {
-		return new Coordinate(precedence, viewPositionSet, allowedStatusNids, relTypeNids, contradictionMgr, Integer.MIN_VALUE);
+		return new Coordinate(precedence, viewPositionSet, 
+                        allowedStatusNids, relTypeNids,
+                        contradictionMgr, Integer.MIN_VALUE,
+                        classifierNid, relAssertionType);
 	}
 	public KindOfSpec(PositionBI viewPosition, NidSetBI allowedStatus,
 			NidSetBI relTypeNids, int kindNid, Precedence precedence, 
-			ContradictionManagerBI contradictionMgr) {
+			ContradictionManagerBI contradictionMgr, int classifierNid,
+                        RelAssertionType relAssertionType) {
 		super();
 		this.viewPosition = viewPosition;
 		this.allowedStatusNids = new IntSet(allowedStatus.getSetValues());
@@ -81,6 +90,8 @@ public class KindOfSpec {
 		this.viewPositionSet = new PositionSetReadOnly(viewPosition);
 		this.precedence = precedence;
 		this.contradictionMgr = contradictionMgr;
+                this.classifierNid = classifierNid;
+                this.relAssertionType = relAssertionType;
 	}
 	@Override
 	public boolean equals(Object obj) {

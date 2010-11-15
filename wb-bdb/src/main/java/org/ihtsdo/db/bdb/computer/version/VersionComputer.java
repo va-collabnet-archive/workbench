@@ -22,7 +22,7 @@ import org.ihtsdo.tk.api.Precedence;
 
 public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 
-    private class SortVersionsByTime implements Comparator<V> {
+    private class SortVersionsByTimeThenAuthor implements Comparator<V> {
 
         public int compare(V p1, V p2) {
 
@@ -31,7 +31,10 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
             }
             if (p1.getTime() == p2.getTime()) {
                 if (p1.getPathNid() == p2.getPathNid()) {
-                    return 0;
+                    if (p1.getAuthorNid() == p2.getAuthorNid()) {
+                        return p1.getStatusNid() - p2.getStatusNid();
+                    }
+                    return p1.getAuthorNid() - p2.getAuthorNid();
                 } else {
                     if (p1.getPathNid() > p2.getPathNid()) {
                         return -1;
@@ -42,29 +45,37 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
             }
             return 1;
         }
+    }
+    private int errorCount = 0;
 
+    public void addSpecifiedVersions(NidSetBI allowedStatus,
+            PositionBI viewPosition, List<V> specifiedVersions,
+            List<V> versions, Precedence precedencePolicy,
+            ContradictionManagerBI contradictionMgr) {
+        addSpecifiedVersions(allowedStatus, (NidSetBI) null,
+                new PositionSetReadOnly(viewPosition),
+                specifiedVersions, versions, precedencePolicy, contradictionMgr);
     }
 
-    private int errorCount = 0;
-    
-    public void addSpecifiedVersions(NidSetBI allowedStatus, PositionBI viewPosition, List<V> specifiedVersions,
-            List<V> versions, Precedence precedencePolicy, ContradictionManagerBI contradictionMgr) {
-        addSpecifiedVersions(allowedStatus, (NidSetBI) null, new PositionSetReadOnly(viewPosition),
-            specifiedVersions, versions, precedencePolicy, contradictionMgr);
-     }
-
-    public Collection<V> getSpecifiedVersions(NidSetBI allowedStatus, PositionBI viewPosition,
-            List<? extends V> versions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager) {
+    public Collection<V> getSpecifiedVersions(NidSetBI allowedStatus,
+            PositionBI viewPosition,
+            List<? extends V> versions, Precedence precedencePolicy,
+            ContradictionManagerBI contradictionManager) {
         List<V> specifiedVersions = new ArrayList<V>();
-        addSpecifiedVersions(allowedStatus, (NidSetBI) null, new PositionSetReadOnly(viewPosition),
-            specifiedVersions, versions, precedencePolicy, contradictionManager);
+        addSpecifiedVersions(allowedStatus, (NidSetBI) null,
+                new PositionSetReadOnly(viewPosition),
+                specifiedVersions, versions, precedencePolicy,
+                contradictionManager);
         return specifiedVersions;
 
     }
 
-    public void addSpecifiedVersions(NidSetBI allowedStatus, PositionSetBI positions, List<V> matchingTuples,
-            List<V> versions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager) {
-        addSpecifiedVersions(allowedStatus, null, positions, matchingTuples, versions, precedencePolicy, contradictionManager);
+    public void addSpecifiedVersions(NidSetBI allowedStatus,
+            PositionSetBI positions, List<V> matchingTuples,
+            List<V> versions, Precedence precedencePolicy,
+            ContradictionManagerBI contradictionManager) {
+        addSpecifiedVersions(allowedStatus, null, positions,
+                matchingTuples, versions, precedencePolicy, contradictionManager);
     }
 
     /**
@@ -80,28 +91,41 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
      * @param versions
      * @param core
      */
-    public void addSpecifiedVersions(NidSetBI allowedStatus, NidSetBI allowedTypes, PositionSetBI positions,
-            List<V> specifiedVersions, List<? extends V> versions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager) {
+    public void addSpecifiedVersions(NidSetBI allowedStatus,
+            NidSetBI allowedTypes, PositionSetBI positions,
+            List<V> specifiedVersions, List<? extends V> versions, 
+            Precedence precedencePolicy,
+            ContradictionManagerBI contradictionManager) {
         if (positions == null || positions.size() < 1) {
-            addSpecifiedVersionsNullPositions(allowedStatus, allowedTypes, specifiedVersions, versions, precedencePolicy, contradictionManager);
+            addSpecifiedVersionsNullPositions(allowedStatus, allowedTypes, 
+                    specifiedVersions, versions, precedencePolicy,
+                    contradictionManager);
         } else {
-            addSpecifiedVersionsWithPositions(allowedStatus, allowedTypes, positions, specifiedVersions, versions, precedencePolicy, contradictionManager);
+            addSpecifiedVersionsWithPositions(allowedStatus, allowedTypes, 
+                    positions, specifiedVersions, versions, precedencePolicy,
+                    contradictionManager);
         }
     }
 
-    private void addSpecifiedVersionsWithPositions(NidSetBI allowedStatus, NidSetBI allowedTypes,
-    		PositionSetBI positions, List<V> specifiedVersions, List<? extends V> versions, 
-            Precedence precedencePolicy, ContradictionManagerBI contradictionManager) {
+    private void addSpecifiedVersionsWithPositions(NidSetBI allowedStatus,
+            NidSetBI allowedTypes,
+            PositionSetBI positions, 
+            List<V> specifiedVersions,
+            List<? extends V> versions,
+            Precedence precedencePolicy,
+            ContradictionManagerBI contradictionManager) {
         HashSet<V> partsToAdd = new HashSet<V>();
         for (PositionBI p : positions) {
             HashSet<V> partsForPosition = new HashSet<V>();
             PositionMapper mapper = Bdb.getSapDb().getMapper(p);
-            nextpart: for (V part : versions) {
-               if (part.getTime() == Long.MIN_VALUE) {
+            nextpart:
+            for (V part : versions) {
+                if (part.getTime() == Long.MIN_VALUE) {
                     continue nextpart;
                 }
                 if (allowedTypes != null) {
-                    if (allowedTypes.contains(((I_AmTypedPart) part).getTypeNid()) == false) {
+                    if (allowedTypes.contains(
+                            ((I_AmTypedPart) part).getTypeNid()) == false) {
                         continue nextpart;
                     }
                 }
@@ -109,50 +133,55 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                     if (partsForPosition.size() == 0) {
                         partsForPosition.add(part);
                     } else {
-                        List<V> partsToCompare = new ArrayList<V>(partsForPosition);
+                        List<V> partsToCompare =
+                                new ArrayList<V>(partsForPosition);
                         for (V prevPartToTest : partsToCompare) {
-                            switch (mapper.fastRelativePosition(part, prevPartToTest, precedencePolicy)) {
-                            case AFTER:
-                                partsForPosition.remove(prevPartToTest);
-                                partsForPosition.add(part);
-                                break;
-                            case BEFORE:
-                                break;
-                            case CONTRADICTION:
-                                if (contradictionManager != null && allowedStatus != null) {
+                            switch (mapper.fastRelativePosition(part,
+                                    prevPartToTest, precedencePolicy)) {
+                                case AFTER:
                                     partsForPosition.remove(prevPartToTest);
-                                    partsForPosition.addAll(contradictionManager.resolveVersions(part, prevPartToTest));
-                                } else {
                                     partsForPosition.add(part);
-                                    partsForPosition.add(prevPartToTest);
-                                }
-                                break;
-                            case EQUAL:
-                                // Can only have one part per time/path
-                                // combination.
-                                if (prevPartToTest.equals(part)) {
-                                    // part already added from another position.
-                                    // No need to add again.
                                     break;
-                                }
-                                // Duplicate values encountered.
-                                errorCount++;
-                                if (errorCount < 5) {
-                                    AceLog.getAppLog().warning(
-                                            RELATIVE_POSITION.EQUAL + " should never happen. Data is malformed. Part:\n" + part
-                                                + " \n  Part to test: \n" + prevPartToTest);
-                                    /*
-                                        partsForPosition.remove(part);
+                                case BEFORE:
+                                    break;
+                                case CONTRADICTION:
+                                    if (contradictionManager != null &&
+                                            allowedStatus != null) {
                                         partsForPosition.remove(prevPartToTest);
-                                        Version dup = part.removeDuplicates(part, prevPartToTest);
-                                        partsForPosition.remove(dup);
-                                   */
-                                }
-                                break;
-                            case UNREACHABLE:
-                                // Should have failed mapper.onRoute(part)
-                                // above.
-                                throw new RuntimeException(RELATIVE_POSITION.UNREACHABLE + " should never happen.");
+                                        partsForPosition.addAll(
+                                           contradictionManager.resolveVersions(
+                                                         part, prevPartToTest));
+                                    } else {
+                                        partsForPosition.add(part);
+                                        partsForPosition.add(prevPartToTest);
+                                    }
+                                    break;
+                                case EQUAL:
+                                    // Can only have one part per time/path
+                                    // combination.
+                                    if (prevPartToTest.equals(part)) {
+                                        // part already added from another position.
+                                        // No need to add again.
+                                        break;
+                                    }
+                                    // Duplicate values encountered.
+                                    errorCount++;
+                                    if (errorCount < 5) {
+                                        AceLog.getAppLog().warning(
+                                                RELATIVE_POSITION.EQUAL +
+                                                " should never happen. "
+                                                + "Data is malformed. Part:\n" +
+                                                part
+                                                + " \n  Part to test: \n" +
+                                                prevPartToTest);
+                                    }
+                                    break;
+                                case UNREACHABLE:
+                                    // Should have failed mapper.onRoute(part)
+                                    // above.
+                                    throw new RuntimeException(
+                                            RELATIVE_POSITION.UNREACHABLE +
+                                            " should never happen.");
                             }
                         }
                     }
@@ -184,24 +213,31 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
      * @param versions
      * @param core
      */
-    private void addSpecifiedVersionsNullPositions(NidSetBI allowedStatus, NidSetBI allowedTypes,
-            List<V> specifiedVersions, List<? extends V> versions, 
-            Precedence precedencePolicy, ContradictionManagerBI contradictionManager) {
+    private void addSpecifiedVersionsNullPositions(NidSetBI allowedStatus,
+            NidSetBI allowedTypes,
+            List<V> specifiedVersions,
+            List<? extends V> versions,
+            Precedence precedencePolicy,
+            ContradictionManagerBI contradictionManager) {
         if (versions == null) {
             return;
         }
         HashSet<V> versionsToAdd = new HashSet<V>();
         HashSet<V> rejectedVersions = new HashSet<V>();
-        nextpart: for (V part : versions) {
+        nextpart:
+        for (V part : versions) {
             if (part.getTime() == Long.MIN_VALUE) {
                 rejectedVersions.add(part);
                 continue nextpart;
             }
-            if (allowedStatus != null && allowedStatus.contains(part.getStatusNid()) == false) {
+            if (allowedStatus != null &&
+                    allowedStatus.contains(part.getStatusNid()) == false) {
                 rejectedVersions.add(part);
                 continue nextpart;
             }
-            if (allowedTypes != null && allowedTypes.contains(((I_AmTypedPart) part).getTypeNid()) == false) {
+            if (allowedTypes != null &&
+                    allowedTypes.contains(
+                    ((I_AmTypedPart) part).getTypeNid()) == false) {
                 rejectedVersions.add(part);
                 continue nextpart;
             }
@@ -219,9 +255,9 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
         }
         versionsToAdd.removeAll(versionToRemove);
 
-        SortedSet<V> sortedVersionsToAdd = new TreeSet<V>(new SortVersionsByTime());
+        SortedSet<V> sortedVersionsToAdd =
+                new TreeSet<V>(new SortVersionsByTimeThenAuthor());
         sortedVersionsToAdd.addAll(versionsToAdd);
         specifiedVersions.addAll(sortedVersionsToAdd);
     }
-
 }

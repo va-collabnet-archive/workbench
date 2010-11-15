@@ -155,7 +155,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                             cb.getConceptAttributeTuples(aceConfig.getAllowedStatus(), aceConfig
                                 .getViewPositionSetReadOnly(), aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
                     for (I_ConceptAttributeTuple t : attributes) {
-                        Color pathColor = aceConfig.getColorForPath(t.getPathId());
+                        Color pathColor = aceConfig.getColorForPath(t.getPathNid());
                         if (pathColor != null) {
                             pathColors.add(pathColor);
                         }
@@ -184,7 +184,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                             for (I_ImageTuple imageTuple : cb.getImageTuples(aceConfig.getAllowedStatus(),
                                 viewerImageTypes, aceConfig.getViewPositionSetReadOnly(), 
                                 aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy())) {
-                                htmlPrefixes.add("<img src='ace:" + imageTuple.getImageId() + "$"
+                                htmlPrefixes.add("<img src='ace:" + imageTuple.getNid() + "$"
                                     + imageTuple.getConceptNid() + "' align=center>");
                             }
                         }
@@ -277,7 +277,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                     if (ebr != null
                                         && ebr.getRefsetId() == i) {
                                          List<I_ExtendByRefVersion> returnTuples = new ArrayList<I_ExtendByRefVersion>();
-                                        switch (EConcept.REFSET_TYPES.nidToType(ebr.getTypeId())) {
+                                        switch (EConcept.REFSET_TYPES.nidToType(ebr.getTypeNid())) {
                                         case BOOLEAN:
                                             ebr.addTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSetReadOnly(),
                                                 returnTuples, aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
@@ -297,7 +297,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                                         aceConfig.getAllowedStatus(), viewerImageTypes, aceConfig
                                                             .getViewPositionSetReadOnly(), 
                                                             aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy())) {
-                                                        htmlPrefixes.add("<img src='ace:" + imageTuple.getImageId()
+                                                        htmlPrefixes.add("<img src='ace:" + imageTuple.getNid()
                                                             + "$" + imageTuple.getConceptNid() + "' align=center>");
                                                     }
                                                 } catch (TerminologyException e) {
@@ -315,7 +315,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                                 for (I_ImageTuple imageTuple : ebrCb.getImageTuples(aceConfig
                                                     .getAllowedStatus(), viewerImageTypes, aceConfig
                                                     .getViewPositionSetReadOnly(), aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy())) {
-                                                    htmlPrefixes.add("<img src='ace:" + imageTuple.getImageId() + "$"
+                                                    htmlPrefixes.add("<img src='ace:" + imageTuple.getNid() + "$"
                                                         + imageTuple.getConceptNid() + "' align=center>");
                                                 }
                                             }
@@ -346,7 +346,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
 
                         }
 
-                        StringBuffer buff = new StringBuffer();
+                        StringBuilder buff = new StringBuilder();
                         if (htmlPrefixes.size() > 0 || htmlSuffixes.size() > 0) {
                             buff.append("<html>");
                             for (String prefix : htmlPrefixes) {
@@ -383,7 +383,9 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                     List<? extends I_RelTuple> versions =
                             cb.getSourceRelTuples(aceConfig.getAllowedStatus(), aceConfig.getDestRelTypes(),
                                 aceConfig.getViewPositionSetReadOnly(), 
-                                aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
+                                aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy(),
+                                aceConfig.getClassifierConcept().getConceptNid(),
+                                aceConfig.getRelAssertionType());
                     int sourceRelTupleSize = versions.size(); 
                     if (sourceRelTupleSize > 1) {
                         HashSet<I_RelTuple> unique = new HashSet<I_RelTuple>(versions);
@@ -446,7 +448,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
     }
 
     private void addChildrenToolTipText(I_GetConceptDataForTree cb) throws TerminologyException, IOException {
-        StringBuffer toolTipText = new StringBuffer();
+        StringBuilder toolTipText = new StringBuilder();
         toolTipText.append("<html>");
         int originCount = 0;
          for (PositionBI child: Terms.get().getPath(Terms.get().getUids(cb.getConceptNid())).getOrigins()) {
@@ -473,6 +475,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
         this.setToolTipText(toolTipText.toString());
     }
 
+    @Override
     public Rectangle getIconRect(int parentDepth) {
         int indent = (multiParentOpen.getIconWidth() * parentDepth);
         if (indent > 0) {
@@ -484,6 +487,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
     /**
      * Paints the value. The background is filled based on selected.
      */
+    @Override
     public void paint(Graphics g) {
         Color bColor;
 
@@ -560,14 +564,17 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
         return 0;
     }
 
+    @Override
     public I_GetConceptData getFocusBean() {
         return focusBean;
     }
 
+    @Override
     public void setFocusBean(I_GetConceptData focusBean) {
         this.focusBean = focusBean;
     }
 
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("showRefsetInfoInTaxonomy")) {
             showRefsetInfoInTaxonomy = aceConfig.getShowRefsetInfoInTaxonomy();

@@ -65,10 +65,9 @@ public class TreeMouseListener extends MouseAdapter {
                 AceLog.getAppLog().alertAndLogException(e);
             } catch (TerminologyException e) {
                 AceLog.getAppLog().alertAndLogException(e);
-			}
+            }
         }
     }
-
     private ACE ace;
 
     public TreeMouseListener(ACE ace) {
@@ -78,42 +77,46 @@ public class TreeMouseListener extends MouseAdapter {
 
     public void mousePressed(MouseEvent e) {
         try {
-			JTree tree = (JTree) e.getSource();
-			DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-			int selRow = tree.getRowForLocation(e.getX(), e.getY());
-			// AceLog.getLog().info("Selected row: " + selRow);
-			TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
-			if (selPath != null) {
-			    if (selRow != -1) {
-			        DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
-			        if (e.isPopupTrigger()) {
-			            makeAndShowPopup(e, (I_GetConceptData) node.getUserObject());
-			        } else {
-			            I_RenderAndFocusOnBean renderer = (I_RenderAndFocusOnBean) tree.getCellRenderer();
-			            I_GetConceptDataForTree treeBean = (I_GetConceptDataForTree) node.getUserObject();
-			            renderer = (TermTreeCellRenderer) renderer.getTreeCellRendererComponent(tree, node, true,
-			                tree.isExpanded(selRow), node.isLeaf(), selRow, true);
-			            Rectangle bounds = tree.getRowBounds(selRow);
-			            if (e.getClickCount() == 1) {
-			                Rectangle iconBounds = renderer.getIconRect(treeBean.getParentDepth());
+            JTree tree = (JTree) e.getSource();
+            DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+            int selRow = tree.getRowForLocation(e.getX(), e.getY());
+            // AceLog.getLog().info("Selected row: " + selRow);
+            TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
+            if (selPath != null) {
+                if (selRow != -1) {
+                    DefaultMutableTreeNode node =
+                            (DefaultMutableTreeNode) selPath.getLastPathComponent();
+                    if (e.isPopupTrigger()) {
+                        makeAndShowPopup(e, (I_GetConceptData) node.getUserObject());
+                    } else {
+                        I_RenderAndFocusOnBean renderer =
+                                (I_RenderAndFocusOnBean) tree.getCellRenderer();
+                        I_GetConceptDataForTree treeBean =
+                                (I_GetConceptDataForTree) node.getUserObject();
+                        renderer = (TermTreeCellRenderer)
+                                renderer.getTreeCellRendererComponent(tree, node, true,
+                                tree.isExpanded(selRow), node.isLeaf(), selRow, true);
+                        Rectangle bounds = tree.getRowBounds(selRow);
+                        if (e.getClickCount() == 1) {
+                            Rectangle iconBounds = renderer.getIconRect(treeBean.getParentDepth());
 
-			                if ((e.getPoint().x > bounds.x + iconBounds.x)
-			                    && (e.getPoint().x + 1 < bounds.x + iconBounds.x + iconBounds.width)) {
-			                    openOrCloseParent(tree, model, node, treeBean, bounds);
-			                }
-			            } else if (e.getClickCount() == 2) {
-			                openOrCloseParent(tree, model, node, treeBean, bounds);
-			            }
-			            // tree.setSelectionPath(new TreePath(selPath.getPath()));
-			            int newRow = tree.getRowForPath(selPath);
-			            // AceLog.getLog().info("New row: " + newRow);
-			            tree.setSelectionInterval(newRow, newRow);
-			        }
-			    }
-			}
-		} catch (TerminologyException e1) {
+                            if ((e.getPoint().x > bounds.x + iconBounds.x)
+                                    && (e.getPoint().x + 1 < bounds.x + iconBounds.x + iconBounds.width)) {
+                                openOrCloseParent(tree, model, node, treeBean, bounds);
+                            }
+                        } else if (e.getClickCount() == 2) {
+                            openOrCloseParent(tree, model, node, treeBean, bounds);
+                        }
+                        // tree.setSelectionPath(new TreePath(selPath.getPath()));
+                        int newRow = tree.getRowForPath(selPath);
+                        // AceLog.getLog().info("New row: " + newRow);
+                        tree.setSelectionInterval(newRow, newRow);
+                    }
+                }
+            }
+        } catch (TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
-		}
+        }
     }
 
     private void makeAndShowPopup(MouseEvent e, I_GetConceptData selectedConcept) {
@@ -147,18 +150,18 @@ public class TreeMouseListener extends MouseAdapter {
                         DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
                         I_ExtendByRef specPart = (I_ExtendByRef) node.getUserObject();
                         switch (EConcept.REFSET_TYPES.nidToType(specPart.getTypeId())) {
-                        case CID_CID:
-                            popup.addSeparator();
-                            addRefsetItems(popup, new File(AceFrame.pluginRoot, "refsetspec/branch-popup"), specPart);
-                            break;
-                        default:
+                            case CID_CID:
+                                popup.addSeparator();
+                                addRefsetItems(popup, new File(AceFrame.pluginRoot, "refsetspec/branch-popup"), specPart);
+                                break;
+                            default:
                         }
                     }
                 }
             }
             popup.addSeparator();
             RefsetCommentPopupListener refsetCommentActionListener = new RefsetCommentPopupListener(
-                ace.getAceFrameConfig(), ace.getRefsetSpecEditor());
+                    ace.getAceFrameConfig(), ace.getRefsetSpecEditor());
             refsetCommentActionListener.setConceptForComment(selectedConcept);
 
             JMenuItem refsetCommmentItem = new JMenuItem(refsetCommentActionListener.getPrompt());
@@ -171,8 +174,7 @@ public class TreeMouseListener extends MouseAdapter {
         popup.add(searchForSimilarConcepts);
         searchForSimilarConcepts.addActionListener(new SetSearchToSimilar());
         popup.addSeparator();
-        ProcessPopupUtil.addSubmenMenuItems(popup, new File(AceFrame.pluginRoot, "taxonomy"), ace.getAceFrameConfig()
-            .getWorker());
+        ProcessPopupUtil.addSubmenMenuItems(popup, new File(AceFrame.pluginRoot, "taxonomy"), ace.getAceFrameConfig().getWorker());
         return popup;
     }
 
@@ -196,9 +198,14 @@ public class TreeMouseListener extends MouseAdapter {
             ace.getAceFrameConfig().getParentExpandedNodes().add(treeBean.getConceptNid());
             List<? extends I_RelTuple> tuples;
             try {
-                tuples = treeBean.getSourceRelTuples(ace.getAceFrameConfig().getAllowedStatus(),
-                    ace.getAceFrameConfig().getDestRelTypes(), ace.getAceFrameConfig().getViewPositionSetReadOnly(), 
-                    ace.getAceFrameConfig().getPrecedence(), ace.getAceFrameConfig().getConflictResolutionStrategy());
+                tuples = treeBean.getSourceRelTuples(
+                        ace.getAceFrameConfig().getAllowedStatus(),
+                        ace.getAceFrameConfig().getDestRelTypes(),
+                        ace.getAceFrameConfig().getViewPositionSetReadOnly(),
+                        ace.getAceFrameConfig().getPrecedence(), 
+                        ace.getAceFrameConfig().getConflictResolutionStrategy(),
+                        ace.getAceFrameConfig().getClassifierConcept().getNid(),
+                        ace.getAceFrameConfig().getRelAssertionType());
                 int[] newNodeIndices = new int[tuples.size()];
                 int index = 0;
                 int insertIndex = parentNode.getIndex(node);
@@ -211,7 +218,7 @@ public class TreeMouseListener extends MouseAdapter {
                     }
 
                     ConceptBeanForTree extraParentBean = ConceptBeanForTree.get(t.getC2Id(), t.getRelId(),
-                        treeBean.getParentDepth() + 1, true, ace.getAceFrameConfig());
+                            treeBean.getParentDepth() + 1, true, ace.getAceFrameConfig());
                     DefaultMutableTreeNode extraParentNode = new DefaultMutableTreeNode(extraParentBean);
                     extraParentNode.setAllowsChildren(false);
                     parentNode.insert(extraParentNode, insertIndex++);
@@ -235,7 +242,7 @@ public class TreeMouseListener extends MouseAdapter {
             removeAllExtraParents(model, (I_GetConceptDataForTree) extraParentNode.getUserObject(), parentNode);
             int extraParentIndex = parentNode.getIndex(extraParentNode);
             parentNode.remove(extraParentIndex);
-            model.nodesWereRemoved(parentNode, new int[] { extraParentIndex }, new Object[] { extraParentNode });
+            model.nodesWereRemoved(parentNode, new int[]{extraParentIndex}, new Object[]{extraParentNode});
         }
         treeBean.getExtraParentNodes().clear();
     }

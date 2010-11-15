@@ -56,11 +56,8 @@ import org.ihtsdo.time.TimeUtil;
 public class ExpandNodeSwingWorker extends SwingWorker<Object> implements ActionListener {
 
     private static int workerCount = 0;
-
     private static boolean logTimingInfo = false;
-
     private int workerId = workerCount++;
-
     private static Logger logger = Logger.getLogger(ExpandNodeSwingWorker.class.getName());
 
     private class StopActionListener implements ActionListener {
@@ -69,25 +66,18 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
             lowerProgressMessage = "cancelled by user";
             stop();
         }
-
     }
-
     boolean hideWorkerId = true;
-    
     boolean removed = false;
-
     String workerIdStr = " [" + workerId + "]";
-
     String upperProgressMessage = "Expanding node " + workerIdStr;
-
     String lowerProgressMessage = "counting ";
 
     private class ProgressUpdator implements I_UpdateProgress {
+
         Timer updateTimer;
         long start = System.currentTimeMillis();
-
         ActivityPanel activity;
-
 
         public ProgressUpdator(boolean addToViewer) {
             super();
@@ -107,7 +97,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
         public void actionPerformed(ActionEvent e) {
             if (lowerProgressMessage.startsWith("counting")) {
                 activity.setProgressInfoLower(lowerProgressMessage + " continueWork:" + continueWork + " "
-                    + activity.nextSpinner());
+                        + activity.nextSpinner());
             }
             activity.setIndeterminate(maxChildren == -1);
             if ((completeLatch != null) && (!canceled)) {
@@ -115,7 +105,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
                 activity.setValue(processed);
                 activity.setMaximum(maxChildren);
                 activity.setProgressInfoLower(lowerProgressMessage + processed + "/" + maxChildren + " "
-                    + activity.nextSpinner());
+                        + activity.nextSpinner());
             } else {
                 activity.setProgressInfoLower(lowerProgressMessage);
             }
@@ -134,28 +124,23 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
                     if (System.currentTimeMillis() - start < 1000) {
                         activity.removeActivityFromViewer();
                     } else if (lowerProgressMessage.contains("Action programatically stopped")) {
-                         activity.removeActivityFromViewer();
+                        activity.removeActivityFromViewer();
                     }
                     if (lowerProgressMessage.startsWith("counting")) {
                         activity.setProgressInfoLower(lowerProgressMessage + " continueWork:" + continueWork + " "
-                            + activity.nextSpinner());
+                                + activity.nextSpinner());
                     }
                 }
             }
         }
-
     }
 
     private class ChildrenUpdator implements ActionListener {
 
         private int allowableSticks = 20;
-
         Timer updateTimer;
-
         boolean inProgress;
-
         private Long lastCheck = Long.MAX_VALUE;
-
         private int stuckCount = 0;
 
         public ChildrenUpdator() {
@@ -176,7 +161,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
                             logger.info("ChildrenUpdator stuck count exceeds allowable.");
                         }
                         lowerProgressMessage = "stopped because ChildrenUpdator stuck at: " + lastCheck + " ("
-                            + stuckCount + ") ";
+                                + stuckCount + ") ";
                         stop();
                     }
                 } else {
@@ -199,6 +184,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
     }
 
     private class AddChildWorker implements Runnable {
+
         int conceptId;
         int relId;
 
@@ -215,13 +201,14 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
                 }
                 DefaultMutableTreeNode child = null;
                 if (checkContinueWork("checking in add child worker")) {
-                	if (Terms.get().hasConcept(conceptId)) {
+                    if (Terms.get().hasConcept(conceptId)) {
                         I_GetConceptData cb = ConceptBeanForTree.get(conceptId, relId, 0, false,
                                 ExpandNodeSwingWorker.this.config);
-                            boolean leaf =  cb.isLeaf(config, false);;
-                            child = new DefaultMutableTreeNode(cb, !leaf);
-                            sortedNodes.add(child);
-                	}
+                        boolean leaf = cb.isLeaf(config, false);
+                        ;
+                        child = new DefaultMutableTreeNode(cb, !leaf);
+                        sortedNodes.add(child);
+                    }
                     completeLatch.countDown();
                 }
             } catch (Throwable ex) {
@@ -231,67 +218,53 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
                 logger.finest("ExpandNodeSwingWorker " + workerId + " AddChildWorker: " + conceptId + " finished");
             }
         }
-
     }
 
     private class MakeSrcChildWorkers implements Runnable {
+
         public void run() {
             for (I_RelTuple r : destRels) {
-            	try {
-					if (Terms.get().hasConcept(r.getC2Id())) {
-		                ACE.threadPool.execute(new AddChildWorker(r.getC1Id(), r.getRelId()));
-					}
-				} catch (Throwable e) {
-					AceLog.getAppLog().alertAndLogException(e);
-				}
+                try {
+                    if (Terms.get().hasConcept(r.getC2Id())) {
+                        ACE.threadPool.execute(new AddChildWorker(r.getC1Id(), r.getRelId()));
+                    }
+                } catch (Throwable e) {
+                    AceLog.getAppLog().alertAndLogException(e);
+                }
             }
         }
-
     }
 
     private class MakeDestChildWorkers implements Runnable {
+
         public void run() {
             for (I_RelTuple r : srcRels) {
-            	try {
-					if (Terms.get().hasConcept(r.getC2Id())) {
-					    ACE.threadPool.execute(new AddChildWorker(r.getC2Id(), r.getRelId()));
-					}
-				} catch (Throwable e) {
-					AceLog.getAppLog().alertAndLogException(e);
-				}
+                try {
+                    if (Terms.get().hasConcept(r.getC2Id())) {
+                        ACE.threadPool.execute(new AddChildWorker(r.getC2Id(), r.getRelId()));
+                    }
+                } catch (Throwable e) {
+                    AceLog.getAppLog().alertAndLogException(e);
+                }
             }
         }
-
     }
-
     DefaultTreeModel model;
-
     DefaultMutableTreeNode node;
-
     Comparator<I_GetConceptDataForTree> conceptBeanComparator;
-
     Boolean continueWork = true;
 
     public Boolean getContinueWork() {
         return continueWork;
     }
-
     boolean canceled = false;
-
     int maxChildren = -1;
-
     CountDownLatch completeLatch;
-
     List<? extends I_RelTuple> destRels;
-
     List<? extends I_RelTuple> srcRels;
-
     SortedSet<DefaultMutableTreeNode> sortedNodes;
-
     StopActionListener stopListener = new StopActionListener();
-
     private TermTreeHelper treeHelper;
-
     private JTreeWithDragImage tree;
 
     @Override
@@ -311,11 +284,14 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
         }
 
         lowerProgressMessage = "getting destination rels ";
-        destRels = cb.getDestRelTuples(allowedStatus, destRelTypes, positions, 
-            config.getPrecedence(), config.getConflictResolutionStrategy());
+        
+        destRels = cb.getDestRelTuples(allowedStatus, destRelTypes, positions,
+                config.getPrecedence(), config.getConflictResolutionStrategy(),
+                config.getClassifierConcept().getNid(), config.getRelAssertionType());
         lowerProgressMessage = "getting source rels ";
-        srcRels = cb.getSourceRelTuples(allowedStatus, sourceRelTypes, positions, 
-            config.getPrecedence(), config.getConflictResolutionStrategy());
+        srcRels = cb.getSourceRelTuples(allowedStatus, sourceRelTypes, positions,
+                config.getPrecedence(), config.getConflictResolutionStrategy(),
+                config.getClassifierConcept().getNid(), config.getRelAssertionType());
         for (I_FilterTaxonomyRels taxonomyFilter : config.getTaxonomyRelFilterList()) {
             taxonomyFilter.filter(cb, srcRels, destRels, config);
         }
@@ -345,11 +321,11 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
                     updateChildrenInNode();
                     upperProgressMessage = "Expansion complete for " + node + workerIdStr;
                     completeLatch = null;
-                    lowerProgressMessage = "Fetched " + node.getChildCount() + " children in " +
-                    TimeUtil.getElapsedTimeString(elapsedTime);
+                    lowerProgressMessage = "Fetched " + node.getChildCount() + " children in "
+                            + TimeUtil.getElapsedTimeString(elapsedTime);
                     if (node.getChildCount() != maxChildren) {
                         upperProgressMessage = "<html><font color=red>Warning for " + node + " expected children = "
-                            + maxChildren + " actual: " + node.getChildCount() + workerIdStr;
+                                + maxChildren + " actual: " + node.getChildCount() + workerIdStr;
                     }
                     stopWorkAndRemove("worker finished");
                     expandIfInList();
@@ -422,6 +398,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
     }
 
     private static class NodeComparator implements Comparator<DefaultMutableTreeNode> {
+
         Comparator<I_GetConceptDataForTree> comparator;
 
         public NodeComparator(Comparator<I_GetConceptDataForTree> comparator) {
@@ -431,15 +408,11 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
 
         public int compare(DefaultMutableTreeNode o1, DefaultMutableTreeNode o2) {
             return comparator.compare((I_GetConceptDataForTree) o1.getUserObject(),
-                (I_GetConceptDataForTree) o2.getUserObject());
+                    (I_GetConceptDataForTree) o2.getUserObject());
         }
-
     }
-
     private long expansionStart;
-
     private I_ConfigAceFrame config;
-
     private static Map<Object, ExpandNodeSwingWorker> workers = new TreeMap<Object, ExpandNodeSwingWorker>();
 
     public ExpandNodeSwingWorker(DefaultTreeModel model, JTreeWithDragImage tree, DefaultMutableTreeNode node,
@@ -464,7 +437,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
         this.config = config;
         this.conceptBeanComparator = conceptBeanComparator;
         sortedNodes = Collections.synchronizedSortedSet(new TreeSet<DefaultMutableTreeNode>(new NodeComparator(
-            conceptBeanComparator)));
+                conceptBeanComparator)));
         upperProgressMessage = "Expanding " + node + workerIdStr;
         ProgressUpdator progressUpdator = new ProgressUpdator(true);
         progressUpdator.activity.addRefreshActionListener(this);
@@ -528,7 +501,6 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
                 model.nodeStructureChanged(node);
                 model.setAsksAllowsChildren(true);
             }
-
         });
     }
 
@@ -539,5 +511,4 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
     public static void setLogTimingInfo(boolean logTimingInfo) {
         ExpandNodeSwingWorker.logTimingInfo = logTimingInfo;
     }
-
 }

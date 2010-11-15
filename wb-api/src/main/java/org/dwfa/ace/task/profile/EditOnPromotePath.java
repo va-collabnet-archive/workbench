@@ -68,10 +68,31 @@ import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.RelAssertionType;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class EditOnPromotePath implements I_ConfigAceFrame {
     I_ConfigAceFrame config;
+
+    @Override
+    public void setRelAssertionType(RelAssertionType relAssertionType) {
+        config.setRelAssertionType(relAssertionType);
+    }
+
+    @Override
+    public RelAssertionType getRelAssertionType() {
+        return config.getRelAssertionType();
+    }
+
+    @Override
+    public void setClassifierConcept(I_GetConceptData classifierConcept) {
+        config.setClassifierConcept(classifierConcept);
+    }
+
+    @Override
+    public I_GetConceptData getClassifierConcept() {
+        return config.getClassifierConcept();
+    }
 
 
 	public void quit() {

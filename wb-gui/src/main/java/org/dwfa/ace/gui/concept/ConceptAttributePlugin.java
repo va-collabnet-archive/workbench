@@ -134,6 +134,7 @@ public class ConceptAttributePlugin extends AbstractPlugin implements TableModel
         fields.add(CONCEPT_FIELD.DEFINED);
         fields.add(CONCEPT_FIELD.STATUS);
         if (host.getShowHistory()) {
+            fields.add(CONCEPT_FIELD.AUTHOR);
             fields.add(CONCEPT_FIELD.VERSION);
             fields.add(CONCEPT_FIELD.PATH);
         }

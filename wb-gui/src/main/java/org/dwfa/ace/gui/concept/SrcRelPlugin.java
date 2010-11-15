@@ -62,10 +62,12 @@ public class SrcRelPlugin extends RelPlugin {
         super(selectedByDefault, sequence);
     }
 
+    @Override
     public UUID getId() {
         return TOGGLES.SOURCE_RELS.getPluginId();
     }
 
+    @Override
     public JPanel getComponent(I_HostConceptPlugins host) throws TerminologyException, IOException {
         setHost(host);
         if (pluginPanel == null || RefsetUtil.refSetsChanged(host, toggleType, this, visibleExtensions)) {
@@ -96,6 +98,7 @@ public class SrcRelPlugin extends RelPlugin {
         fields.add(REL_FIELD.GROUP);
         fields.add(REL_FIELD.STATUS);
         if (showHistory) {
+            fields.add(REL_FIELD.AUTHOR);
             fields.add(REL_FIELD.VERSION);
             fields.add(REL_FIELD.PATH);
         }

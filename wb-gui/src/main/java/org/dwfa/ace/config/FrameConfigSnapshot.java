@@ -70,6 +70,7 @@ import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.RelAssertionType;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 /**
@@ -83,6 +84,24 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     I_ConfigAceFrame baseFrame;
+
+    public void setRelAssertionType(RelAssertionType relAssertionType) {
+        baseFrame.setRelAssertionType(relAssertionType);
+    }
+
+    public RelAssertionType getRelAssertionType() {
+        return baseFrame.getRelAssertionType();
+    }
+
+    @Override
+    public void setClassifierConcept(I_GetConceptData classifierConcept) {
+        baseFrame.setClassifierConcept(classifierConcept);
+    }
+
+    @Override
+    public I_GetConceptData getClassifierConcept() {
+        return baseFrame.getClassifierConcept();
+    }
 
 	public void quit() {
 		baseFrame.quit();

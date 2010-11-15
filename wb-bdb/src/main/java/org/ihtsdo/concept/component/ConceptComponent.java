@@ -541,6 +541,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         @Override
+        public int getAuthorNid() {
+            if (index >= 0) {
+                return getMutableIdPart().getAuthorNid();
+            }
+            return Bdb.getSapDb().getAuthorNid(primordialSapNid);
+        }
+
+        @Override
         @Deprecated
         public int getStatusId() {
             if (index >= 0) {

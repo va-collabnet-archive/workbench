@@ -48,6 +48,7 @@ import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.RelAssertionType;
 
 public interface I_ConfigAceFrame extends I_HandleSubversion {
 
@@ -631,6 +632,13 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public Coordinate getCoordinate();
     
     public void quit();
+
+    public I_GetConceptData getClassifierConcept();
+
+    public void setClassifierConcept(I_GetConceptData classifierConcept);
     
-    
+    public RelAssertionType getRelAssertionType();
+
+    public void setRelAssertionType(RelAssertionType relAssertionType);
+
 }

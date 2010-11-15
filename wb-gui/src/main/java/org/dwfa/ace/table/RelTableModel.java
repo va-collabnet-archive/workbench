@@ -66,26 +66,23 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public abstract class RelTableModel extends AbstractTableModel implements PropertyChangeListener, I_DoConceptDrop {
+
     enum FieldToChange {
+
         REFINABILITY, CHARACTERISTIC, TYPE, STATUS
     };
-
     List<I_RelTuple> allTuples;
-
     // protected ConceptPanel parentPanel;
-
     protected I_GetConceptData tableBean = null;
-
     private Set<Integer> conceptsToFetch = Collections.synchronizedSet(new HashSet<Integer>());
-
     Map<Integer, I_GetConceptData> referencedConcepts = Collections.synchronizedMap(new HashMap<Integer, I_GetConceptData>());
-
     private TableChangedSwingWorker tableChangeWorker;
-
     private SmallProgressPanel progress = new SmallProgressPanel();
 
     public class ReferencedConceptsSwingWorker extends SwingWorker<Boolean> {
+
         private class ProgressUpdator implements I_UpdateProgress {
+
             Timer updateTimer;
 
             public ProgressUpdator() {
@@ -104,8 +101,9 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
                     if (progress != null) {
                         JProgressBar progressBar = progress.getProgressBar();
                         progressBar.setValue(referencedConcepts.size());
-                        progress.setProgressInfo("   " + progressBar.getValue() + "/" + progressBar.getMaximum()
-                            + "   ");
+                        progress.setProgressInfo("   " + progressBar.getValue()
+                                + "/" + progressBar.getMaximum()
+                                + "   ");
                         fireTableDataChanged();
                         if (progressBar.getValue() == progressBar.getMaximum()) {
                             normalCompletionForUpdator();
@@ -119,11 +117,8 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
             public void normalCompletionForUpdator() {
                 normalCompletion();
             }
-
         }
-
         private boolean stopWork = false;
-
         ProgressUpdator updator = new ProgressUpdator();
 
         @Override
@@ -151,7 +146,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
                 if (get()) {
                     if (progress != null) {
                         progress.getProgressBar().setIndeterminate(false);
-                        if (conceptsToFetch.size() == 0) {
+                        if (conceptsToFetch.isEmpty()) {
                             progress.getProgressBar().setValue(1);
                         } else {
                             progress.getProgressBar().setValue(conceptsToFetch.size());
@@ -172,18 +167,16 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         public void stop() {
             stopWork = true;
         }
-
     }
 
     public class TableChangedSwingWorker extends SwingWorker<Integer> {
-        I_GetConceptData cb;
 
+        I_GetConceptData cb;
         private boolean workStopped = false;
 
         public boolean isWorkStopped() {
             return workStopped;
         }
-
         private ReferencedConceptsSwingWorker refConWorker;
 
         public TableChangedSwingWorker(I_GetConceptData cb) {
@@ -206,14 +199,15 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
                 if (workStopped) {
                     return -1;
                 }
-                assert r.getTypeId() != Integer.MAX_VALUE;
+                assert r.getTypeNid() != Integer.MAX_VALUE;
                 conceptsToFetch.add(r.getC1Id());
                 conceptsToFetch.add(r.getC2Id());
                 conceptsToFetch.add(r.getCharacteristicId());
                 conceptsToFetch.add(r.getRefinabilityId());
-                conceptsToFetch.add(r.getTypeId());
-                conceptsToFetch.add(r.getStatusId());
-                conceptsToFetch.add(r.getPathId());
+                conceptsToFetch.add(r.getTypeNid());
+                conceptsToFetch.add(r.getStatusNid());
+                conceptsToFetch.add(r.getPathNid());
+                conceptsToFetch.add(r.getAuthorNid());
             }
 
             refConWorker = new ReferencedConceptsSwingWorker();
@@ -226,7 +220,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
             super.finished();
             if (progress != null) {
                 progress.getProgressBar().setIndeterminate(false);
-                if (conceptsToFetch.size() == 0) {
+                if (conceptsToFetch.isEmpty()) {
                     progress.getProgressBar().setValue(1);
                     progress.getProgressBar().setMaximum(1);
                 } else {
@@ -253,23 +247,28 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         public void stop() {
             workStopped = true;
         }
-
     }
-
     /**
-	 * 
-	 */
+     *
+     */
     private static final long serialVersionUID = 1L;
 
     public enum REL_FIELD {
-        REL_ID("rid", 5, 100, 100), SOURCE_ID("origin", 5, 300, 1000), REL_TYPE("type", 5, 120, 500), DEST_ID("destination", 5, 300, 1000), GROUP("group", 5, 36, 46), REFINABILITY("refinability", 5, 80, 180), CHARACTERISTIC("char", 5, 70, 70), STATUS("status", 5, 50, 250), VERSION("time", 5, 140, 140), PATH("path", 5, 90, 180);
 
+        REL_ID("rid", 5, 100, 100),
+        SOURCE_ID("origin", 5, 300, 1000),
+        REL_TYPE("type", 5, 120, 500),
+        DEST_ID("destination", 5, 300, 1000),
+        GROUP("group", 5, 36, 46),
+        REFINABILITY("refinability", 5, 80, 180),
+        CHARACTERISTIC("char", 5, 70, 70),
+        STATUS("status", 5, 50, 250),
+        AUTHOR("author", 5, 90, 150),
+        VERSION("time", 5, 140, 140),
+        PATH("path", 5, 90, 180);
         private String columnName;
-
         private int min;
-
         private int pref;
-
         private int max;
 
         private REL_FIELD(String columnName, int min, int pref, int max) {
@@ -294,13 +293,9 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         public int getPref() {
             return pref;
         }
-
     }
-
     private REL_FIELD[] columns;
-
     protected I_HostConceptPlugins host;
-
     private I_ConfigAceFrame config;
 
     public RelTableModel(I_HostConceptPlugins host, REL_FIELD[] columns, I_ConfigAceFrame config) {
@@ -342,58 +337,63 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
             rel = allTuples.get(rowIndex);
 
             boolean inConflict = config.getHighlightConflictsInComponentPanel()
-                && config.getConflictResolutionStrategy().isInConflict((I_RelVersioned) rel.getFixedPart());
+                    && config.getConflictResolutionStrategy().isInConflict((I_RelVersioned) rel.getFixedPart());
 
             switch (field) {
-            case REL_ID:
-                return new StringWithRelTuple(Integer.toString(rel.getRelId()), rel, inConflict);
-            case SOURCE_ID:
-                if (referencedConcepts.containsKey(rel.getC1Id())) {
-                    return new StringWithRelTuple(getPrefText(rel.getC1Id()), rel, inConflict);
-                }
-                return new StringWithRelTuple(Integer.toString(rel.getC1Id()), rel, inConflict);
-            case REL_TYPE:
-                if (referencedConcepts.containsKey(rel.getTypeId())) {
-                    return new StringWithRelTuple(getPrefText(rel.getTypeId()), rel, inConflict);
-                }
-                return new StringWithRelTuple(Integer.toString(rel.getTypeId()), rel, inConflict);
-            case DEST_ID:
-                if (referencedConcepts.containsKey(rel.getC2Id())) {
-                    return new StringWithRelTuple(getPrefText(rel.getC2Id()), rel, inConflict);
-                }
-                return new StringWithRelTuple(Integer.toString(rel.getC2Id()), rel, inConflict);
-            case GROUP:
-                return new StringWithRelTuple(Integer.toString(rel.getGroup()), rel, inConflict);
-            case REFINABILITY:
-                if (referencedConcepts.containsKey(rel.getRefinabilityId())) {
-                    return new StringWithRelTuple(getPrefText(rel.getRefinabilityId()), rel, inConflict);
-                }
-                return new StringWithRelTuple(Integer.toString(rel.getRefinabilityId()), rel, inConflict);
-            case CHARACTERISTIC:
-                if (referencedConcepts.containsKey(rel.getCharacteristicId())) {
-                    return new StringWithRelTuple(getPrefText(rel.getCharacteristicId()), rel, inConflict);
-                }
-                return new StringWithRelTuple(Integer.toString(rel.getCharacteristicId()), rel, inConflict);
-            case STATUS:
-                if (referencedConcepts.containsKey(rel.getStatusId())) {
-                    return new StringWithRelTuple(getPrefText(rel.getStatusId()), rel, inConflict);
-                }
-                return new StringWithRelTuple(Integer.toString(rel.getStatusId()), rel, inConflict);
-            case VERSION:
-                if (rel.getVersion() == Integer.MAX_VALUE) {
-                    return new StringWithRelTuple(ThinVersionHelper.uncommittedHtml(), rel, inConflict);
-                }
-                return new StringWithRelTuple(ThinVersionHelper.format(rel.getVersion()), rel, inConflict);
-            case PATH:
-                if (referencedConcepts.containsKey(rel.getPathId())) {
-                    try {
-                        return new StringWithRelTuple(getPrefText(rel.getPathId()), rel, inConflict);
-                    } catch (Exception e) {
-                        new StringWithRelTuple(Integer.toString(rel.getPathId()) + " no pref text...", rel, inConflict);
-                        ;
+                case REL_ID:
+                    return new StringWithRelTuple(Integer.toString(rel.getRelId()), rel, inConflict);
+                case SOURCE_ID:
+                    if (referencedConcepts.containsKey(rel.getC1Id())) {
+                        return new StringWithRelTuple(getPrefText(rel.getC1Id()), rel, inConflict);
                     }
-                }
-                return new StringWithRelTuple(Integer.toString(rel.getPathId()), rel, inConflict);
+                    return new StringWithRelTuple(Integer.toString(rel.getC1Id()), rel, inConflict);
+                case REL_TYPE:
+                    if (referencedConcepts.containsKey(rel.getTypeNid())) {
+                        return new StringWithRelTuple(getPrefText(rel.getTypeNid()), rel, inConflict);
+                    }
+                    return new StringWithRelTuple(Integer.toString(rel.getTypeNid()), rel, inConflict);
+                case DEST_ID:
+                    if (referencedConcepts.containsKey(rel.getC2Id())) {
+                        return new StringWithRelTuple(getPrefText(rel.getC2Id()), rel, inConflict);
+                    }
+                    return new StringWithRelTuple(Integer.toString(rel.getC2Id()), rel, inConflict);
+                case GROUP:
+                    return new StringWithRelTuple(Integer.toString(rel.getGroup()), rel, inConflict);
+                case REFINABILITY:
+                    if (referencedConcepts.containsKey(rel.getRefinabilityId())) {
+                        return new StringWithRelTuple(getPrefText(rel.getRefinabilityId()), rel, inConflict);
+                    }
+                    return new StringWithRelTuple(Integer.toString(rel.getRefinabilityId()), rel, inConflict);
+                case CHARACTERISTIC:
+                    if (referencedConcepts.containsKey(rel.getCharacteristicId())) {
+                        return new StringWithRelTuple(getPrefText(rel.getCharacteristicId()), rel, inConflict);
+                    }
+                    return new StringWithRelTuple(Integer.toString(rel.getCharacteristicId()), rel, inConflict);
+                case STATUS:
+                    if (referencedConcepts.containsKey(rel.getStatusNid())) {
+                        return new StringWithRelTuple(getPrefText(rel.getStatusNid()), rel, inConflict);
+                    }
+                    return new StringWithRelTuple(Integer.toString(rel.getStatusNid()), rel, inConflict);
+                case VERSION:
+                    if (rel.getTime() == Long.MAX_VALUE) {
+                        return new StringWithRelTuple(ThinVersionHelper.uncommittedHtml(), rel, inConflict);
+                    }
+                    return new StringWithRelTuple(ThinVersionHelper.format(rel.getVersion()), rel, inConflict);
+                case PATH:
+                    if (referencedConcepts.containsKey(rel.getPathNid())) {
+                        try {
+                            return new StringWithRelTuple(getPrefText(rel.getPathNid()), rel, inConflict);
+                        } catch (Exception e) {
+                            return new StringWithRelTuple(Integer.toString(rel.getPathNid()) + " no pref text...", rel, inConflict);
+                        }
+                    }
+                    return new StringWithRelTuple(Integer.toString(rel.getPathNid()), rel, inConflict);
+                case AUTHOR:
+                    if (referencedConcepts.containsKey(rel.getAuthorNid())) {
+                        return new StringWithRelTuple(getPrefText(rel.getAuthorNid()), rel, inConflict);
+                    }
+                    return new StringWithRelTuple(Integer.toString(rel.getAuthorNid()), rel, inConflict);
+
             }
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
@@ -402,7 +402,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
     }
 
     private String getPrefText(int id) throws IOException {
-    	I_GetConceptData cb = referencedConcepts.get(id);
+        I_GetConceptData cb = referencedConcepts.get(id);
         I_DescriptionTuple desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
         if (desc != null) {
             return desc.getText();
@@ -412,10 +412,12 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         return cb.getInitialText();
     }
 
+    @Override
     public String getColumnName(int col) {
         return columns[col].getColumnName();
     }
 
+    @Override
     public boolean isCellEditable(int row, int col) {
         if (ACE.editMode == false) {
             return false;
@@ -424,42 +426,42 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
             return false;
         }
         I_RelTuple rel = allTuples.get(row);
-        if (rel.getVersion() != Integer.MAX_VALUE) {
+        if (rel.getTime() != Long.MAX_VALUE) {
             return false;
         }
         REL_FIELD field = columns[col];
         switch (field) {
-        case REL_ID:
-            return false;
-        case SOURCE_ID:
-            return false;
-        case REL_TYPE:
-            return true;
+            case REL_ID:
+                return false;
+            case SOURCE_ID:
+                return false;
+            case REL_TYPE:
+                return true;
             /*
              * if (rel.getFixedPart().getTuples().size() == 1) { return true; }
              * else { return allUncommitted(rel); }
              */
-        case DEST_ID:
-            return allUncommitted(rel);
-        case GROUP:
-            return true;
-        case REFINABILITY:
-            return true;
-        case CHARACTERISTIC:
-            return true;
-        case STATUS:
-            return true;
-        case VERSION:
-            return false;
-        case PATH:
-            return false;
+            case DEST_ID:
+                return allUncommitted(rel);
+            case GROUP:
+                return true;
+            case REFINABILITY:
+                return true;
+            case CHARACTERISTIC:
+                return true;
+            case STATUS:
+                return true;
+            case VERSION:
+                return false;
+            case PATH:
+                return false;
         }
         return false;
     }
 
     public boolean allUncommitted(I_RelTuple rel) {
         for (I_RelPart part : rel.getFixedPart().getMutableParts()) {
-            if (part.getVersion() != Integer.MAX_VALUE) {
+            if (part.getTime() != Long.MAX_VALUE) {
                 return false;
             }
         }
@@ -471,71 +473,72 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         REL_FIELD field = columns[col];
         boolean changed = false;
         try {
-			switch (field) {
-			case REL_ID:
-			    break;
-			case SOURCE_ID:
-			    break;
-			case REL_TYPE:
-			    Integer typeId = (Integer) value;
-			    rel.setTypeId(typeId);
-			    referencedConcepts.put(typeId, Terms.get().getConcept(typeId));
-			    changed = true;
-			    break;
-			case DEST_ID:
-			    Integer destId = (Integer) value;
-			    rel.getFixedPart().setC2Id(destId);
-			    referencedConcepts.put(destId, Terms.get().getConcept(destId));
-			    changed = true;
-			    break;
-			case GROUP:
-			    if (String.class.isAssignableFrom(value.getClass())) {
-			        String valueStr = (String) value;
-			        rel.setGroup(Integer.parseInt(valueStr));
-			    } else {
-			        rel.setGroup((Integer) value);
-			    }
-			    changed = true;
-			    break;
-			case REFINABILITY:
-			    Integer refinabilityId = (Integer) value;
-			    rel.setRefinabilityId(refinabilityId);
-			    referencedConcepts.put(refinabilityId, Terms.get().getConcept(refinabilityId));
-			    changed = true;
-			    break;
-			case CHARACTERISTIC:
-			    Integer characteristicId = (Integer) value;
-			    rel.setCharacteristicId(characteristicId);
-			    referencedConcepts.put(characteristicId, Terms.get().getConcept(characteristicId));
-			    changed = true;
-			    break;
-			case STATUS:
-			    Integer statusId = (Integer) value;
-			    rel.setStatusId(statusId);
-			    referencedConcepts.put(statusId, Terms.get().getConcept(statusId));
-			    changed = true;
-			    break;
-			case VERSION:
-			    break;
-			case PATH:
-			    break;
-			}
-	        if (changed) {
-	            AceLog.getAppLog().info("Rel table changed");
-	            updateDataAlerts(row);
-	            Terms.get().addUncommitted(Terms.get().getConcept(rel.getC1Id()));
-	        }
-		} catch (NumberFormatException e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		} catch (TerminologyException e) {
-		    AceLog.getAppLog().alertAndLogException(e);
-		} catch (IOException e) {
-		    AceLog.getAppLog().alertAndLogException(e);
-		}
+            switch (field) {
+                case REL_ID:
+                    break;
+                case SOURCE_ID:
+                    break;
+                case REL_TYPE:
+                    Integer typeId = (Integer) value;
+                    rel.setTypeNid(typeId);
+                    referencedConcepts.put(typeId, Terms.get().getConcept(typeId));
+                    changed = true;
+                    break;
+                case DEST_ID:
+                    Integer destId = (Integer) value;
+                    rel.getFixedPart().setC2Id(destId);
+                    referencedConcepts.put(destId, Terms.get().getConcept(destId));
+                    changed = true;
+                    break;
+                case GROUP:
+                    if (String.class.isAssignableFrom(value.getClass())) {
+                        String valueStr = (String) value;
+                        rel.setGroup(Integer.parseInt(valueStr));
+                    } else {
+                        rel.setGroup((Integer) value);
+                    }
+                    changed = true;
+                    break;
+                case REFINABILITY:
+                    Integer refinabilityId = (Integer) value;
+                    rel.setRefinabilityId(refinabilityId);
+                    referencedConcepts.put(refinabilityId, Terms.get().getConcept(refinabilityId));
+                    changed = true;
+                    break;
+                case CHARACTERISTIC:
+                    Integer characteristicId = (Integer) value;
+                    rel.setCharacteristicId(characteristicId);
+                    referencedConcepts.put(characteristicId, Terms.get().getConcept(characteristicId));
+                    changed = true;
+                    break;
+                case STATUS:
+                    Integer statusId = (Integer) value;
+                    rel.setStatusId(statusId);
+                    referencedConcepts.put(statusId, Terms.get().getConcept(statusId));
+                    changed = true;
+                    break;
+                case VERSION:
+                    break;
+                case PATH:
+                    break;
+            }
+            if (changed) {
+                AceLog.getAppLog().info("Rel table changed");
+                updateDataAlerts(row);
+                Terms.get().addUncommitted(Terms.get().getConcept(rel.getC1Id()));
+            }
+        } catch (NumberFormatException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        } catch (TerminologyException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        } catch (IOException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
         fireTableDataChanged();
     }
 
     private class UpdateDataAlertsTimerTask extends TimerTask {
+
         boolean active = true;
         final int row;
 
@@ -548,16 +551,17 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         public void run() {
             if (active) {
                 SwingUtilities.invokeLater(new Runnable() {
+
                     public void run() {
                         if (active) {
                             I_RelTuple rel = allTuples.get(row);
                             try {
-								Terms.get().addUncommitted(Terms.get().getConcept(rel.getC1Id()));
-							} catch (TerminologyException e) {
-								AceLog.getAppLog().alertAndLogException(e);
-							} catch (IOException e) {
-								AceLog.getAppLog().alertAndLogException(e);
-							}
+                                Terms.get().addUncommitted(Terms.get().getConcept(rel.getC1Id()));
+                            } catch (TerminologyException e) {
+                                AceLog.getAppLog().alertAndLogException(e);
+                            } catch (IOException e) {
+                                AceLog.getAppLog().alertAndLogException(e);
+                            }
                         }
                     }
                 });
@@ -567,9 +571,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         public void setActive(boolean active) {
             this.active = active;
         }
-
     }
-
     UpdateDataAlertsTimerTask alertUpdater;
 
     private void updateDataAlerts(int row) {
@@ -620,7 +622,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         this.progress = progress;
     }
 
-    public static class StringWithRelTuple extends StringWithTuple<StringWithRelTuple>  {
+    public static class StringWithRelTuple extends StringWithTuple<StringWithRelTuple> {
 
         I_RelTuple tuple;
 
@@ -654,7 +656,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         @Override
         public I_GetConceptData getSelectedItem(Object value) throws TerminologyException, IOException {
             StringWithRelTuple swdt = (StringWithRelTuple) value;
-            return Terms.get().getConcept(swdt.getTuple().getStatusId());
+            return Terms.get().getConcept(swdt.getTuple().getStatusNid());
         }
 
         @Override
@@ -713,9 +715,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
             public void focusLost(FocusEvent e) {
                 delegate.stopCellEditing();
             }
-
         }
-
         JTextField textField;
         int row;
         int column;
@@ -727,6 +727,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
             editorComponent = textField;
 
             delegate = new EditorDelegate() {
+
                 private static final long serialVersionUID = 1L;
 
                 public void setValue(Object value) {
@@ -811,7 +812,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         @Override
         public I_GetConceptData getSelectedItem(Object value) throws TerminologyException, IOException {
             StringWithRelTuple swdt = (StringWithRelTuple) value;
-            return Terms.get().getConcept(swdt.getTuple().getTypeId());
+            return Terms.get().getConcept(swdt.getTuple().getTypeNid());
         }
 
         @Override
@@ -863,5 +864,4 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
     protected I_ConfigAceFrame getConfig() {
         return config;
     }
-
 }

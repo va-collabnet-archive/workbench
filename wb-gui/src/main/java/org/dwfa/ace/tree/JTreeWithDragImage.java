@@ -101,11 +101,11 @@ public class JTreeWithDragImage extends JTree {
 
     private class SelectionListener implements TreeSelectionListener {
 
+        @Override
         public void valueChanged(TreeSelectionEvent e) {
             nextToLastSelection = lastSelection;
             lastSelection = e.getNewLeadSelectionPath();
         }
-
     }
 
     private class DragGestureListenerWithImage implements DragGestureListener {
@@ -117,6 +117,7 @@ public class JTreeWithDragImage extends JTree {
             this.dsl = dsl;
         }
 
+        @Override
         public void dragGestureRecognized(DragGestureEvent dge) {
             int selRow = getRowForLocation(dge.getDragOrigin().x, dge.getDragOrigin().y);
             TreePath path = getPathForLocation(dge.getDragOrigin().x, dge.getDragOrigin().y);
@@ -156,7 +157,7 @@ public class JTreeWithDragImage extends JTree {
             dragLabel.paint(og);
             og.dispose();
             FilteredImageSource fis = new FilteredImageSource(dragImage.getSource(),
-                TermLabelMaker.getTransparentFilter());
+                    TermLabelMaker.getTransparentFilter());
             dragImage = Toolkit.getDefaultToolkit().createImage(fis);
             return dragImage;
         }
@@ -169,40 +170,43 @@ public class JTreeWithDragImage extends JTree {
             lastPropagationId = Long.MIN_VALUE;
         }
 
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if (lastPropagationId == evt.getPropagationId()) {
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                    AceLog.getAppLog()
-                        .info("rf pc suppressed: " + evt.getPropertyName() + " " + evt.getPropagationId());
+                    AceLog.getAppLog().info("rf pc suppressed: " + 
+                            evt.getPropertyName() + " " +
+                            evt.getPropagationId());
                 }
                 return;
             }
             if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                 AceLog.getAppLog().info(
-                    "rf pc: " + evt.getPropertyName() + " " + evt.getPropagationId() + " (" + lastPropagationId
-                        + ") Thread: " + Thread.currentThread().getName() + " tree hash: "
-                        + JTreeWithDragImage.this.hashCode());
+                        "rf pc: " + evt.getPropertyName() + " " +
+                        evt.getPropagationId() + " (" + lastPropagationId
+                        + ") Thread: " + Thread.currentThread().getName() + 
+                        " tree hash: " + JTreeWithDragImage.this.hashCode());
             }
             lastPropagationId = evt.getPropagationId();
 
-             SwingUtilities.invokeLater(new Runnable() {
-				
-				@Override
-				public void run() {
-		            TreePath selection = lastSelection;
-		            if (selection == null) {
-		                selection = nextToLastSelection;
-		            }
-		            logSelectionPaths(selection, "Initial Selection Paths:");
-			           int horizValue = Integer.MAX_VALUE;
-			            int vertValue = Integer.MAX_VALUE;
-			            if (scroller != null) {
-			                horizValue = scroller.getHorizontalScrollBar().getValue();
-			                vertValue = scroller.getVerticalScrollBar().getValue();
-			            }
-		            restoreTreePositionAndSelection(selection, horizValue, vertValue);
-				}
-			});
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    TreePath selection = lastSelection;
+                    if (selection == null) {
+                        selection = nextToLastSelection;
+                    }
+                    logSelectionPaths(selection, "Initial Selection Paths:");
+                    int horizValue = Integer.MAX_VALUE;
+                    int vertValue = Integer.MAX_VALUE;
+                    if (scroller != null) {
+                        horizValue = scroller.getHorizontalScrollBar().getValue();
+                        vertValue = scroller.getVerticalScrollBar().getValue();
+                    }
+                    restoreTreePositionAndSelection(selection, horizValue, vertValue);
+                }
+            });
 
         }
 
@@ -216,23 +220,16 @@ public class JTreeWithDragImage extends JTree {
             }
         }
     }
-
     /**
-	 * 
-	 */
+     *
+     */
     private static final long serialVersionUID = 1L;
-
     private I_ConfigAceFrame config;
-
     private List<ChangeListener> workerFinishedListeners = new ArrayList<ChangeListener>();
-
     public Object lastPropagationId;
-
     public JScrollPane scroller;
-
     private TreePath lastSelection;
     private TreePath nextToLastSelection;
-
     private TermTreeHelper helper;
 
     public JScrollPane getScroller() {
@@ -251,25 +248,32 @@ public class JTreeWithDragImage extends JTree {
         this(config, null);
     }
 
-	protected JTreeWithDragImage(I_ConfigAceFrame config, TermTreeHelper helper) {
+    protected JTreeWithDragImage(I_ConfigAceFrame config, TermTreeHelper helper) {
         super();
         this.config = config;
         this.helper = helper;
-        DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY,
-            new DragGestureListenerWithImage(new TermLabelDragSourceListener()));
+        DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(this,
+                DnDConstants.ACTION_COPY,
+                new DragGestureListenerWithImage(new TermLabelDragSourceListener()));
         InputMap imap = this.getInputMap();
-        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-            TransferHandler.getCutAction().getValue(Action.NAME));
-        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-            TransferHandler.getCopyAction().getValue(Action.NAME));
-        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-            TransferHandler.getPasteAction().getValue(Action.NAME));
-        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, Event.CTRL_MASK), TransferHandler.getCutAction().getValue(
-            Action.NAME));
-        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK), TransferHandler.getCopyAction().getValue(
-            Action.NAME));
-        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.CTRL_MASK), TransferHandler.getPasteAction().getValue(
-            Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+                TransferHandler.getCutAction().getValue(Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+                TransferHandler.getCopyAction().getValue(Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+                TransferHandler.getPasteAction().getValue(Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, Event.CTRL_MASK),
+                TransferHandler.getCutAction().getValue(
+                Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK),
+                TransferHandler.getCopyAction().getValue(
+                Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.CTRL_MASK),
+                TransferHandler.getPasteAction().getValue(
+                Action.NAME));
 
         ActionMap map = this.getActionMap();
         map.put("cut", new AceTransferAction("cut"));
@@ -322,10 +326,10 @@ public class JTreeWithDragImage extends JTree {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) m.getRoot();
         Enumeration<DefaultMutableTreeNode> childEnum = root.children();
         while (childEnum.hasMoreElements()) {
-        	DefaultMutableTreeNode node = childEnum.nextElement();
-        	if (node != null) {
+            DefaultMutableTreeNode node = childEnum.nextElement();
+            if (node != null) {
                 m.nodeChanged(node);
-        	}
+            }
         }
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine("Tree data changed");
@@ -333,10 +337,9 @@ public class JTreeWithDragImage extends JTree {
 
         if (scroller != null) {
             Timer timer = new Timer(1000, new RestoreSelectionSwingWorker(JTreeWithDragImage.this, lastPropagationId,
-                horizValue, vertValue, selection, helper));
+                    horizValue, vertValue, selection, helper));
             timer.setRepeats(false);
             timer.start();
         }
     }
-
 }

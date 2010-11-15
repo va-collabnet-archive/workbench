@@ -78,11 +78,31 @@ import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.RelAssertionType;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
     I_ConfigAceFrame frameConfig;
+
+    @Override
+    public void setRelAssertionType(RelAssertionType relAssertionType) {
+        frameConfig.setRelAssertionType(relAssertionType);
+    }
+
+    @Override
+    public RelAssertionType getRelAssertionType() {
+        return frameConfig.getRelAssertionType();
+    }
+   @Override
+    public void setClassifierConcept(I_GetConceptData classifierConcept) {
+        frameConfig.setClassifierConcept(classifierConcept);
+    }
+
+    @Override
+    public I_GetConceptData getClassifierConcept() {
+        return frameConfig.getClassifierConcept();
+    }
 
     public void quit() {
 		frameConfig.quit();

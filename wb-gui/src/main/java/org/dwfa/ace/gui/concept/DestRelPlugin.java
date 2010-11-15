@@ -94,6 +94,7 @@ public class DestRelPlugin extends RelPlugin {
         fields.add(REL_FIELD.REFINABILITY);
         fields.add(REL_FIELD.STATUS);
         if (showHistory) {
+            fields.add(REL_FIELD.AUTHOR);
             fields.add(REL_FIELD.VERSION);
             fields.add(REL_FIELD.PATH);
         }

@@ -56,6 +56,7 @@ import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.media.MediaChronicleBI;
@@ -64,6 +65,36 @@ import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 
 public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<ConceptBeanForTree> {
     I_GetConceptData bean;
+
+    @Override
+    public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedStatus,
+            NidSetBI allowedTypes,
+            PositionSetBI positions,
+            Precedence precedencePolicy,
+            ContradictionManagerBI contradictionManager,
+            int classifierNid, RelAssertionType relAssertionType)
+            throws IOException, TerminologyException {
+        return bean.getSourceRelTuples(allowedStatus, allowedTypes,
+                positions, precedencePolicy, contradictionManager,
+                classifierNid, relAssertionType);
+    }
+
+    @Override
+    public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedStatus, 
+            NidSetBI allowedTypes,
+            PositionSetBI positions,
+            Precedence precedencePolicy,
+            ContradictionManagerBI contradictionManager,
+            int classifierNid,
+            RelAssertionType relAssertionType) throws IOException, TerminologyException {
+        return bean.getDestRelTuples(allowedStatus, 
+                allowedTypes,
+                positions,
+                precedencePolicy,
+                contradictionManager,
+                classifierNid,
+                relAssertionType);
+    }
     public boolean isUncommitted() {
 		return bean.isUncommitted();
 	}

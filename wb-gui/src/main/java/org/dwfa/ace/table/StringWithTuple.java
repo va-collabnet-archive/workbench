@@ -27,6 +27,7 @@ public abstract class StringWithTuple<T extends I_CellTextWithTuple<T>> implemen
         this.isInConflict = isInConflict;
     }
 
+    @Override
     public String toString() {
         String text = cellText;
         if (isInConflict()) {
@@ -38,6 +39,7 @@ public abstract class StringWithTuple<T extends I_CellTextWithTuple<T>> implemen
         return text;
     }
 
+    @Override
     public int compareTo(T another) {
         if (another == null || another.getCellText() == null) {
             return 1;
@@ -48,6 +50,7 @@ public abstract class StringWithTuple<T extends I_CellTextWithTuple<T>> implemen
         return cellText.compareTo(another.getCellText());
     }
 
+    @Override
     public String getCellText() {
         return cellText;
     }

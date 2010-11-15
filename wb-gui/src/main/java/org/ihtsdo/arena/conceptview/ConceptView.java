@@ -696,10 +696,7 @@ public class ConceptView extends JPanel {
 	}
 
 	public JComponent getRelTemplate(final RelSpec spec) throws TerminologyException, IOException {
-		Coordinate coordinate = new Coordinate(config.getPrecedence(),
-				config.getViewPositionSetReadOnly(), config
-						.getAllowedStatus(), config.getDestRelTypes(),
-				config.getConflictResolutionStrategy(), config.getLanguagePreferenceList().get(0));
+		Coordinate coordinate = config.getCoordinate();
 		DragPanelRelTemplate relPanel = new DragPanelRelTemplate(new GridBagLayout(), settings);
 		relPanel.setupDrag(spec);
 		relPanel.setBorder(BorderFactory.createRaisedBevelBorder());

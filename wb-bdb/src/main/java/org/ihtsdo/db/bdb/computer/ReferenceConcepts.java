@@ -23,8 +23,9 @@ public enum ReferenceConcepts {
 	AUX_IS_A(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()),
 	SNOMED_IS_A(SNOMED.Concept.IS_A.getUids()),
 	MARKED_PARENT_IS_A_TYPE(RefsetAuxiliary.Concept.MARKED_PARENT_IS_A_TYPE.getUids()),
-    NORMAL_MEMBER(RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids()), 
-    USER(ArchitectonicAuxiliary.Concept.USER.getUids()),
+        NORMAL_MEMBER(RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids()),
+        USER(ArchitectonicAuxiliary.Concept.USER.getUids()),
+        SNOROCKET(ArchitectonicAuxiliary.Concept.SNOROCKET.getUids()),
 	;
 	
 	private int nid;

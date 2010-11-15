@@ -222,6 +222,7 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
         return swrt.getTuple().getRelId();
     }
 
+    @Override
     public void tableChanged(TableModelEvent tme) {
         if (relTable.getSelectedRow() == -1) {
             if (relTable.getRowCount() > 0) {
@@ -232,58 +233,72 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
 
     }
 
+    @Override
     public I_GetConceptData getHierarchySelection() {
         return getHost().getHierarchySelection();
     }
 
+    @Override
     public boolean getShowHistory() {
         return getHost().getShowHistory();
     }
 
+    @Override
     public boolean getShowRefsets() {
         return getHost().getShowRefsets();
     }
 
+    @Override
     public boolean getToggleState(TOGGLES toggle) {
         return getHost().getToggleState(toggle);
     }
 
+    @Override
     public boolean getUsePrefs() {
         return getHost().getUsePrefs();
     }
 
+    @Override
     public void setAllTogglesToState(boolean state) {
         getHost().setAllTogglesToState(state);
     }
 
+    @Override
     public void setLinkType(LINK_TYPE link) {
         getHost().setLinkType(link);
     }
 
+    @Override
     public void setToggleState(TOGGLES toggle, boolean state) {
         getHost().setToggleState(toggle, state);
     }
 
+    @Override
     public void unlink() {
         getHost().unlink();
     }
 
+    @Override
     public I_ConfigAceFrame getConfig() {
         return getHost().getConfig();
     }
 
+    @Override
     public I_AmTermComponent getTermComponent() {
         return getSelectedPluginComponent();
     }
 
+    @Override
     public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         pcs.removePropertyChangeListener(propertyName, listener);
     }
 
+    @Override
     public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         pcs.addPropertyChangeListener(propertyName, listener);
     }
 
+    @Override
     public void setTermComponent(I_AmTermComponent arg0) {
         throw new UnsupportedOperationException();
     }

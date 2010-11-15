@@ -43,6 +43,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JList;
@@ -127,6 +128,7 @@ import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.RelAssertionType;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
@@ -135,7 +137,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 47; // keep current with
+    private static final int dataVersion = 48; // keep current with
     // objDataVersion logic
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
@@ -333,8 +335,13 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     // 45
     private I_GetConceptData classificationRoleRoot;
     
-    // 46
+    // 46, 47
     private Precedence precedence;
+
+    // 48
+     private I_GetConceptData classifierConcept;
+     private RelAssertionType relAssertionType = RelAssertionType.INFERRED_THEN_STATED;
+
 
     // transient
     private transient MasterWorker worker;
@@ -537,6 +544,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         
         // 46; 47 changed implementation class
         out.writeObject(precedence);
+
+        // 48
+        writeConceptAsId(classifierConcept, out);
+        out.writeObject(relAssertionType);
 
     }
 
@@ -1006,12 +1017,47 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             } else {
                 precedence = Precedence.PATH;
             }
+
+            if (objDataVersion >= 48) {
+                try {
+                    classifierConcept = readConceptFromSerializedUuids(in);
+                    if (classifierConcept == null) {
+                        classifierConcept = Terms.get().getConcept(
+                            ArchitectonicAuxiliary.Concept.SNOROCKET.getUids());
+                    }
+                    relAssertionType = (RelAssertionType) in.readObject();
+                } catch (TerminologyException ex) {
+                    throw new IOException(ex);
+               }
+            } else {
+                try {
+                    classifierConcept = Terms.get().getConcept(
+                            ArchitectonicAuxiliary.Concept.SNOROCKET.getUids());
+                    relAssertionType = RelAssertionType.INFERRED_THEN_STATED;
+                } catch (TerminologyException ex) {
+                    throw new IOException(ex);
+               }
+            }
               
 
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
         addListeners();
+    }
+
+    @Override
+    public I_GetConceptData getClassifierConcept() {
+        return classifierConcept;
+    }
+
+    @Override
+    public void setClassifierConcept(I_GetConceptData classifierConcept) {
+        if (classifierConcept != null) {
+            Object old = this.classifierConcept;
+            this.classifierConcept = classifierConcept;
+            changeSupport.firePropertyChange("classifierConcept", old, classifierConcept);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -1047,11 +1093,21 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public AceFrameConfig(AceConfig masterConfig) throws IOException {
         super();
         this.masterConfig = masterConfig;
+        try {
+            classifierConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SNOROCKET.getUids());
+        } catch (TerminologyException ex) {
+            throw new IOException(ex);
+        }
         addListeners();
     }
 
     public AceFrameConfig() throws IOException {
         super();
+        try {
+            classifierConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SNOROCKET.getUids());
+        } catch (TerminologyException ex) {
+            throw new IOException(ex);
+        }
         addListeners();
     }
 
@@ -1649,10 +1705,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * (non-Javadoc)
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getDefaultRelationshipType()
      */
+    @Override
     public I_GetConceptData getDefaultRelationshipType() {
         return defaultRelationshipType;
     }
 
+    @Override
     public void setDefaultRelationshipType(I_GetConceptData defaultRelationshipType) {
         Object old = this.defaultRelationshipType;
         this.defaultRelationshipType = defaultRelationshipType;
@@ -3067,10 +3125,18 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	public Coordinate getCoordinate() {
 		if (languagePreferenceList != null && languagePreferenceList.size()>1) {
 			return  new Coordinate(getPrecedence(), getViewPositionSetReadOnly(), 
-					getAllowedStatus(), getDestRelTypes(), getConflictResolutionStrategy(), languagePreferenceList.get(0));
+					getAllowedStatus(), getDestRelTypes(),
+                                        getConflictResolutionStrategy(),
+                                        languagePreferenceList.get(0),
+                                        classifierConcept.getConceptNid(),
+                                        relAssertionType);
 		} else {
 			return  new Coordinate(getPrecedence(), getViewPositionSetReadOnly(), 
-					getAllowedStatus(), getDestRelTypes(), getConflictResolutionStrategy(), Integer.MAX_VALUE);
+					getAllowedStatus(), getDestRelTypes(),
+                                        getConflictResolutionStrategy(),
+                                        Integer.MAX_VALUE,
+                                        classifierConcept.getConceptNid(),
+                                        relAssertionType);
 		}
 	}
 
@@ -3078,4 +3144,20 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	public void quit() {
 		aceFrame.getCdePanel().quit();
 	}
+
+        @Override
+    public RelAssertionType getRelAssertionType() {
+        return relAssertionType;
+    }
+
+        @Override
+    public void setRelAssertionType(RelAssertionType relAssertionType) {
+
+        Object old = this.relAssertionType;
+        this.relAssertionType = relAssertionType;
+        changeSupport.firePropertyChange("relAssertionType", old, relAssertionType);
+
+    }
+
+
 }

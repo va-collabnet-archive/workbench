@@ -200,6 +200,7 @@ public class DescriptionPlugin extends AbstractPlugin implements TableModelListe
         fields.add(DESC_FIELD.LANG);
         fields.add(DESC_FIELD.STATUS);
         if (host.getShowHistory()) {
+            fields.add(DESC_FIELD.AUTHOR);
             fields.add(DESC_FIELD.VERSION);
             fields.add(DESC_FIELD.PATH);
         }

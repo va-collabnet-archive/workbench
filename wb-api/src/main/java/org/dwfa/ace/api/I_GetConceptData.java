@@ -30,6 +30,7 @@ import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI {
@@ -169,8 +170,13 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      * @throws TerminologyException
      */
     public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
-            PositionSetBI positions, 
+            PositionSetBI positions,
             Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
+            throws IOException, TerminologyException;
+    public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
+            PositionSetBI positions,
+            Precedence precedencePolicy, ContradictionManagerBI contradictionManager,
+        int classifierNid, RelAssertionType relAssertionType)
             throws IOException, TerminologyException;
 
     /**
@@ -191,8 +197,12 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes, PositionSetBI positions, 
+    public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes, PositionSetBI positions,
         Precedence precedencePolicy, ContradictionManagerBI contradictionManager) throws IOException, TerminologyException;
+
+    public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes, PositionSetBI positions,
+        Precedence precedencePolicy, ContradictionManagerBI contradictionManager,
+        int classifierNid, RelAssertionType relAssertionType) throws IOException, TerminologyException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and

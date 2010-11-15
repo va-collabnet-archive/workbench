@@ -133,6 +133,7 @@ public class IdPlugin extends AbstractPlugin {
         fields.add(ID_FIELD.EXT_ID);
         fields.add(ID_FIELD.STATUS);
         if (host.getShowHistory()) {
+            fields.add(ID_FIELD.AUTHOR);
             fields.add(ID_FIELD.VERSION);
             fields.add(ID_FIELD.PATH);
         }
