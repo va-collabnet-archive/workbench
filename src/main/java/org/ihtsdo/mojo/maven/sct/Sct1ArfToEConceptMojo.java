@@ -103,8 +103,8 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
  * <pre>
  * &lt;targetSub&gt;       subdirname -- working sub directly under build directory
  * &lt;outputDirectory&gt; dirname    -- directory for output eConcepts files
- * &lt;dateStart&gt;       yyyy.mm.dd -- filter excludes files before start date
- * &lt;dateStop&gt;        yyyy.mm.dd -- filter excludes files after stop date
+ * &lt;dateStart&gt;       yyyy.mm.dd -- filter excludes files before startDate
+ * &lt;dateStop&gt;        yyyy.mm.dd -- filter excludes files after stopDate
  * &lt;uuidSnorocket&gt;   uuid -- Snorocket User UUID for defining inferred relationships
  * &lt;uuidUser&gt;        uuid -- User UUID if not a defining inferred relationship
  * &lt;includeCTV3ID&gt;     true | false
@@ -567,7 +567,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
     private int lookupRelCharTypeIdx(String uuid) {
         int idx = 0;
-        while (idx < 4) {
+        while (idx < 6) {
             if (uuid.equalsIgnoreCase(yRelCharStrArray[idx]))
                 break;
             idx++;
@@ -736,13 +736,16 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             //                yDesTypeStrArray[idx] = yDesTypeArray[idx].toString();
 
             // RELATIONSHIP CHARACTERISTIC
-            yRelCharArray = new UUID[5];
+            yRelCharArray = new UUID[6];
             for (int i = 0; i < 5; i++)
                 yRelCharArray[i] = ArchitectonicAuxiliary.getSnomedCharacteristicType(i).getUids()
                         .iterator().next();
+            yRelCharArray[5] = ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()
+                    .iterator().next();
+
             // string lookup array
-            yRelCharStrArray = new String[5];
-            for (int idx = 0; idx < 5; idx++)
+            yRelCharStrArray = new String[6];
+            for (int idx = 0; idx < 6; idx++)
                 yRelCharStrArray[idx] = yRelCharArray[idx].toString();
 
             // RELATIONSHIP REFINABILITY
@@ -876,9 +879,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.ss hh:mm:ss");
         if (dateStartObj != null)
-        getLog().info("::: Start date (inclusive) = " + sdf.format(dateStartObj));
+            getLog().info("::: Start date (inclusive) = " + sdf.format(dateStartObj));
         if (dateStopObj != null)
-        getLog().info(":::  Stop date (inclusive) = " + sdf.format(dateStopObj));
+            getLog().info(":::  Stop date (inclusive) = " + sdf.format(dateStopObj));
 
         for (int i = 0; i < sctDirs.length; i++) {
             getLog().info("::: SCT Input Directory (" + i + ") = " + sctDirs[i].getDirectoryName());
@@ -3918,9 +3921,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     public String getDateStart() {
-        return this.dateStart;   
+        return this.dateStart;
     }
-    
+
     public void setDateStart(String sStart) throws MojoFailureException {
         this.dateStart = sStart;
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
@@ -3935,7 +3938,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     public String getDateStop() {
-        return this.dateStop;   
+        return this.dateStop;
     }
 
     public void setDateStop(String sStop) throws MojoFailureException {
@@ -4663,9 +4666,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // Save to sortable array
             int pathIdx = f.yPathIdx;
             int userIdx = 0;
-            if (characteristic == 0 && f.isStated)
+            if (characteristic == 0 && f.isStated) {
                 pathIdx = f.yPathStatedIdx;
-            else if (characteristic == 0) {
+                characteristic = 5; // :NOTE: transient use for STATED_RELATIONSHIP 
+            } else if (characteristic == 0) {
                 pathIdx = f.yPathInferredIdx;
                 userIdx = 1;
             }
