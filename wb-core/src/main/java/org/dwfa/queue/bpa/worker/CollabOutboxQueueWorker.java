@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -68,7 +68,7 @@ import com.collabnet.ce.soap50.webservices.tracker.ArtifactSoapDO;
 
 /**
  * @author Marc Campbell
- * 
+ *
  */
 public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueue, Runnable {
 
@@ -155,7 +155,7 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
      * @see java.lang.Runnable#run()
      */
     public void run() {
-        // check of any *.bp in the outbox directory 
+        // check of any *.bp in the outbox directory
         // For each BP submit Tracker Artifact to Collabnet
 
         Transaction t;
@@ -244,19 +244,21 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
                 artDescription, group, category, sendStatus, customer, priority, estimatedHours,
                 sendToUser, releasedId, sfv, attachName, attachMimeType,
                 attachmentFileId);
-        
+
         tracker.setArtifactData(asdo, sendComment);
 
         String originId = (String) process.getProperty("A: ID_ARTF_PARENT");
-        String targetId = asdo.getId();
-        String description = category + " detail for " + customer;
-        tracker.createArtifactDependency(originId, targetId, description);
-        
+        if (originId != null) {
+            String targetId = asdo.getId();
+            String description = category + " detail for " + customer;
+            tracker.createArtifactDependency(originId, targetId, description);
+        }
+
         // logArtfSoapDO(asdo);
 
         return asdo.getId();
     }
-    
+
     private void doCollabNetArtfUpdate(I_EncodeBusinessProcess process, TrackerAppSoapUtil tracker,
             String sessionId, String artfId) throws IllegalArgumentException, IntrospectionException, IllegalAccessException, InvocationTargetException, IOException {
         String sendStatus = (String) process.getProperty("A: SEND_STATUS");
@@ -270,13 +272,13 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
         // String attachMimeType = "application/x-java-serialized-object";
         process.setProperty("A: SEND_COMMENT", "");
         String attachId = tracker.uploadAttachment(process);
-        
+
         // SET STATUS
         ArtifactSoapDO asdo = tracker.getArtifactData(sessionId, artfId);
         asdo.setAssignedTo(sendToUser);
         asdo.setStatus(sendStatus);
         tracker.setArtifactData(asdo, sendComment, attachName, attachMimeType, attachId);
-        
+
         if (sendStatus.equalsIgnoreCase("Detail closed")) {
 
             String sendParent = (String) process.getProperty("A: ID_ARTF_PARENT");
@@ -305,7 +307,7 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
         }
 
     }
-    
+
     public boolean doCollabNetDelivery(I_EncodeBusinessProcess process, Transaction t) throws IllegalArgumentException, IntrospectionException, IllegalAccessException, InvocationTargetException {
 
         logger.info(this.getWorkerDesc() + " trying CollabNet delivery. ");
@@ -328,7 +330,7 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
             String artfId = (String) process.getProperty("A: ID_ARTF");
             if (artfId.equalsIgnoreCase("NA"))
                 artfId = doCollabNetArtfCreate(process, tracker);
-            else 
+            else
                 doCollabNetArtfUpdate(process, tracker, sessionId, artfId);
 
             // LOGOFF
