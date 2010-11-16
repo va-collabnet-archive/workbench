@@ -143,7 +143,8 @@ public enum ProcessAttachmentKeys {
     TRACKER_TITLE,
     DESCRIPTION,
     SEND_TO_USER,
-    SEND_COMMENT;
+    SEND_COMMENT,
+    COLLABNET_ARTIFACT_SUBMITTER;
 
     public String getAttachmentKey() {
         return "A: " + this.name();

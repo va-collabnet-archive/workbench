@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,8 +46,8 @@ import org.dwfa.util.bean.Spec;
  * This task collects the Refset and SME data entered on the
  * SMEDetails panel currently displayed in the Workflow
  * Details Sheet and verifies that the required data has been filled in.
- *
- *
+ * 
+ * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec/wf/sme", type = BeanType.TASK_BEAN) })
 public class GetSMEDetailsPanelTask extends AbstractTask {
@@ -114,9 +114,10 @@ public class GetSMEDetailsPanelTask extends AbstractTask {
     }
 
     /**
-     * Handles actions required by the task after normal task completion (such as moving a
+     * Handles actions required by the task after normal task completion (such
+     * as moving a
      * process to another user's input queue).
-     *
+     * 
      * @return void
      * @param process The currently executing Workflow process
      * @param worker The worker currently executing this task
@@ -129,9 +130,11 @@ public class GetSMEDetailsPanelTask extends AbstractTask {
     }
 
     /**
-     * Performs the primary action of the task, which in this case is to gather and
-     * validate data that has been entered by the user on the Workflow Details Sheet.
-     *
+     * Performs the primary action of the task, which in this case is to gather
+     * and
+     * validate data that has been entered by the user on the Workflow Details
+     * Sheet.
+     * 
      * @return The exit condition of the task
      * @param process The currently executing Workflow process
      * @param worker The worker currently executing this task
@@ -197,8 +200,8 @@ public class GetSMEDetailsPanelTask extends AbstractTask {
                         return Condition.ITEM_CANCELED;
                     } else {
                         // Set the Refset property
-                        process.setSubject("SME Review " + smeNameRequest);
-                        process.setName("SME Review " + smeNameRequest);
+                        process.setSubject("SME Review for " + smeNameRequest + " (" + refset.getInitialText() + ")");
+                        process.setName("SME Review for " + smeNameRequest + " (" + refset.getInitialText() + ")");
                         process.setProperty(refsetUuidPropName, refset.getUids().iterator().next());
                     }
 
@@ -221,7 +224,8 @@ public class GetSMEDetailsPanelTask extends AbstractTask {
                         process.setProperty(descriptionPropName, "");
                     }
 
-                    // Under normal conditions this is where we should return from
+                    // Under normal conditions this is where we should return
+                    // from
                     return Condition.ITEM_COMPLETE;
 
                 }
@@ -240,7 +244,7 @@ public class GetSMEDetailsPanelTask extends AbstractTask {
 
     /**
      * This method overrides: getDataContainerIds() in AbstractTask
-     *
+     * 
      * @return The data container identifiers used by this task.
      */
     public int[] getDataContainerIds() {
@@ -248,8 +252,9 @@ public class GetSMEDetailsPanelTask extends AbstractTask {
     }
 
     /**
-     * This method implements the interface method specified by: getConditions() in I_DefineTask
-     *
+     * This method implements the interface method specified by: getConditions()
+     * in I_DefineTask
+     * 
      * @return The possible evaluation conditions for this task.
      * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
      */
