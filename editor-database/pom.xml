@@ -30,7 +30,7 @@
 	<build>
 		<plugins>
 
-      <!-- 
+      <!--
         Generation process:
           - unpack profiles to obtain changesets [generate-sources]
           - if using SVN, checkout the location (this must exist, but it can be empty. It will be effectively an
@@ -65,6 +65,7 @@
 				<plugin>
 					<groupId>org.ihtsdo</groupId>
 					<artifactId>wb-mojo</artifactId>
+                    <version>${wb-toolkit.version}</version>
 					<executions>
 						<execution>
 							<id>write-change-set-directories</id>
@@ -114,23 +115,16 @@
 							</goals>
 						</execution>
 					</executions>
-				</plugin>		
+				</plugin>
 		</plugins>
 	</build>
 	<profiles>
 		<profile>
 			<id>generate-db</id>
 			<activation>
-				<activeByDefault>false</activeByDefault>
-				<!--
-					maven 2.X bug prevents activation this from working properly. Will have to manage by hand till upgrade. 
-					http://jira.codehaus.org/browse/MNG-2363
-
-			  <!- - Note that we use a file within the directory, so that this will trigger on an empty checkout as well - ->
-        <file>
-          <missing>${berkeleydb.directory}/mutable/je.lck</missing>
-        </file>
-				-->
+				<property>
+                    <name>!env</name>
+                </property>
 			</activation>
 			<build>
 				<plugins>
@@ -148,6 +142,7 @@
 					<plugin>
 						<groupId>org.ihtsdo</groupId>
 						<artifactId>wb-mojo</artifactId>
+                        <version>${wb-toolkit.version}</version>
 						<executions>
 							<execution>
 								<!-- unjar sct-econcepts from dependencies-->
@@ -547,6 +542,7 @@
 					<plugin>
 						<groupId>org.ihtsdo</groupId>
 						<artifactId>wb-bdb-mojo</artifactId>
+                        <version>${wb-toolkit.version}</version>
 						<executions>
 							<execution>
 								<id>load-econcepts-multi</id>
@@ -579,6 +575,7 @@
           <plugin>
             <groupId>org.ihtsdo</groupId>
             <artifactId>wb-mojo</artifactId>
+            <version>${wb-toolkit.version}</version>
             <executions>
               <execution>
                 <id>svn-commit</id>
