@@ -52,8 +52,8 @@ import org.apache.maven.plugin.MojoFailureException;
  * &lt;keepUS&gt; true | false -- keep US Dialect Subset (false)
  * &lt;keepGBExceptions&gt; true | false -- keep GB Dialect Exceptions Subset (false)
  * 
- * &lt;dateStart&gt; yyyy.mm.dd -- filter excludes files before start date
- * &lt;dateStop&gt;  yyyy.mm.dd -- filter excludes files after stop date
+ * &lt;dateStart&gt; yyyy.mm.dd -- filter excludes files before startDate
+ * &lt;dateStop&gt;  yyyy.mm.dd -- filter excludes files after stopDate
  * 
  * &lt;rf1Dirs&gt;            -- creates list of directories to be searched 
  *    &lt;rf1Dir&gt; dir_name -- specific directory to be added to the search list 
@@ -171,7 +171,7 @@ public class Rf1ToArfLanguageGbUsMojo extends AbstractMojo implements Serializab
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        getLog().info("::: BEGIN Rf1LanguageGbUsToArf");
+        getLog().info("::: BEGIN Rf1ToArfLanguageGbUsMojo");
 
         // SHOW target directory from POM file
         String targetDir = targetDirectory.getAbsolutePath();
@@ -184,7 +184,7 @@ public class Rf1ToArfLanguageGbUsMojo extends AbstractMojo implements Serializab
         }
 
         if (rf1Dirs == null)
-            throw new MojoExecutionException("Rf1LanguageGbUsToArf <rf1Dirs> not provided");
+            throw new MojoExecutionException("Rf1ToArfLanguageGbUsMojo <rf1Dirs> not provided");
 
         for (int i = 0; i < rf1Dirs.length; i++) {
             rf1Dirs[i].setDirName(rf1Dirs[i].getDirName().replace('/', File.separatorChar));
@@ -201,7 +201,7 @@ public class Rf1ToArfLanguageGbUsMojo extends AbstractMojo implements Serializab
         }
 
         executeMojo(targetDir, targetSubDir, rf1Dirs, rf1SubsetIds, outputDirectory);
-        getLog().info("::: END Rf1LanguageGbUsToArf");
+        getLog().info("::: END Rf1ToArfLanguageGbUsMojo");
     }
 
     public void executeMojo(String tDir, String tSubDir, Rf1Dir[] inDirs, Rf1SubsetId[] subsetIds,

@@ -57,8 +57,8 @@ import org.dwfa.util.id.Type5UuidFactory;
  * <pre>
  * &lt;targetSub&gt; subdirectoryname -- working sub directly under build directory
  *
- * &lt;dateStart&gt; yyyy.mm.dd -- filter excludes files before start date
- * &lt;dateStop&gt;  yyyy.mm.dd -- filter excludes files after stop date
+ * &lt;dateStart&gt; yyyy.mm.dd -- filter excludes files before startDate
+ * &lt;dateStop&gt;  yyyy.mm.dd -- filter excludes files after stopDate
  * 
  * &lt;rf1Dirs&gt;            -- creates list of directories to be searched 
  *    &lt;rf1Dir&gt; dir_name -- specific directory to be added to the search list 
@@ -104,6 +104,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
     private static final String TAB_CHARACTER = "\t";
 
     private static UUID uuidCurrent;
+    private static String uuidCurrentStr;
     private static UUID uuidRetired;
 
     /**
@@ -225,6 +226,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
             ArrayList<String> fFilters, String outDir, String outFileName)
             throws MojoFailureException {
         uuidCurrent = ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next();
+        uuidCurrentStr = uuidCurrent.toString();
         uuidRetired = ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next();
 
         getLog().info("::: Target Directory: " + tDir);
@@ -729,8 +731,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
 
                 concepts.append(sid.getSubsetRefsetUuidStr()); // refset concept uuid
                 concepts.append("\t");
-                concepts.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next()
-                        .toString()); //status uuid
+                concepts.append(uuidCurrentStr); //status uuid
                 concepts.append("\t");
                 concepts.append("1"); // primitive
                 concepts.append("\t");
@@ -746,8 +747,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
                 ids.append("\t");
                 ids.append(Long.toString(sid.getSubsetSctIdOriginal())); //source id
                 ids.append("\t");
-                ids.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next()
-                        .toString()); //status uuid
+                ids.append(uuidCurrentStr); //status uuid
                 ids.append("\t");
                 ids.append(effectiveDate); // effective date
                 ids.append("\t");
@@ -760,8 +760,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
                                     + "Subset Fully Specified Name" + sid.getRefsetFsName())
                             .toString()); // description uuid
                     descriptions.append("\t");
-                    descriptions.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator()
-                            .next().toString()); // status uuid
+                    descriptions.append(uuidCurrentStr); // status uuid
                     descriptions.append("\t");
                     descriptions.append(sid.getSubsetRefsetUuidStr()).toString(); // refset concept uuid
                     descriptions.append("\t");
@@ -786,8 +785,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
                             Rf1Dir.SUBSETREFSET_ID_NAMESPACE_UUID_TYPE1 + "Subset Preferred Name"
                                     + sid.getRefsetPrefTerm()).toString()); // description uuid
                     descriptions.append("\t");
-                    descriptions.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator()
-                            .next().toString()); // status uuid
+                    descriptions.append(uuidCurrentStr); // status uuid
                     descriptions.append("\t");
                     descriptions.append(sid.getSubsetRefsetUuidStr()).toString(); // refset concept uuid
                     descriptions.append("\t");
@@ -811,8 +809,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
                         Rf1Dir.SUBSETREFSET_ID_NAMESPACE_UUID_TYPE1 + "Relationship"
                                 + sid.getSubsetSctIdOriginal()).toString()); // relationship uuid
                 relationships.append("\t");
-                relationships.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator()
-                        .next().toString()); // status uuid
+                relationships.append(uuidCurrentStr); // status uuid
                 relationships.append("\t");
                 relationships.append(sid.getSubsetRefsetUuidStr()); // refset source concept uuid
                 relationships.append("\t");
