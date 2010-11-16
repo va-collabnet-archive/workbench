@@ -219,155 +219,160 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
                 // LOOP THROUGH TRACKER ARTIFACTS
                 String artifactId = null; // :WAS: issueExternalArtfId
                 for (ArtifactSoapRow asr : arts) {
-                    logArtfSoapRow(asr);
-                    artifactId = asr.getId();
+                    // only look at the artifacts assigned to this user
+                    if (userNameStr.equals(asr.getAssignedToUsername())) {
+                        logArtfSoapRow(asr);
+                        artifactId = asr.getId();
 
-                    // SETUP DOWNLOAD ATTACHMENT DIRECTORY
-                    // File downloadDir = new File("src/test/java");
+                        // SETUP DOWNLOAD ATTACHMENT DIRECTORY
+                        // File downloadDir = new File("src/test/java");
 
-                    AttachmentSoapList attachList = tracker.listAttachments(artifactId);
-                    AttachmentSoapRow[] attachSoapRowArray = attachList.getDataRows();
-                    // :!!!:NYI: should only have one attachment
-                    // Get DataOjbect to be able to change values
-                    ArtifactSoapDO asdo = tracker.getArtifactData(sessionId, artifactId);
-                    logArtfSoapDO(asdo);
+                        AttachmentSoapList attachList = tracker.listAttachments(artifactId);
+                        AttachmentSoapRow[] attachSoapRowArray = attachList.getDataRows();
+                        // :!!!:NYI: should only have one attachment
+                        // Get DataOjbect to be able to change values
+                        ArtifactSoapDO asdo = tracker.getArtifactData(sessionId, artifactId);
+                        logArtfSoapDO(asdo);
 
-                    AttachmentSoapRow attachSoapRow = null;
-                    for (int i = 0; i < attachSoapRowArray.length; i++) {
-                        attachSoapRow = attachSoapRowArray[i];
-                        logAttachSoapRow(attachSoapRow);
+                        AttachmentSoapRow attachSoapRow = null;
+                        for (int i = 0; i < attachSoapRowArray.length; i++) {
+                            attachSoapRow = attachSoapRowArray[i];
+                            logAttachSoapRow(attachSoapRow);
 
-                        // DOWNLOAD ATTACHMENT
-                        String fName = attachSoapRow.getFileName();
-                        String fRawId = attachSoapRow.getRawFileId();
-                        // String fStoredId = attachSoapRow.getStoredFileId();
-                        String attachmentId = attachSoapRow.getAttachmentId();
-                        DataHandler dh = tracker.downloadAttachment(artifactId, fName, fRawId);
+                            // DOWNLOAD ATTACHMENT
+                            String fName = attachSoapRow.getFileName();
+                            String fRawId = attachSoapRow.getRawFileId();
+                            // String fStoredId =
+                            // attachSoapRow.getStoredFileId();
+                            String attachmentId = attachSoapRow.getAttachmentId();
+                            DataHandler dh = tracker.downloadAttachment(artifactId, fName, fRawId);
 
-                        String fileName = dh.getName().toLowerCase();
-                        logger.info("RUN:  attachment file name:  " + fileName);
+                            String fileName = dh.getName().toLowerCase();
+                            logger.info("RUN:  attachment file name:  " + fileName);
 
-                        if (fName.endsWith("bp")) {
+                            if (fName.endsWith("bp")) {
 
-                            t = this.getActiveTransaction();
+                                t = this.getActiveTransaction();
 
-                            // :DEBUG:BEGIN:
-                            ObjectInputStream ois = new ObjectInputStream(dh.getInputStream());
-                            I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
-                            process.setProperty("A: ID_ARTF", artifactId);
+                                // :DEBUG:BEGIN:
+                                ObjectInputStream ois = new ObjectInputStream(dh.getInputStream());
+                                I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
+                                process.setProperty("A: ID_ARTF", artifactId);
 
-                            process.setProperty("A: COLLABNET_ARTIFACT_SUBMITTER", asdo.getCreatedBy());
+                                process.setProperty("A: COLLABNET_ARTIFACT_SUBMITTER", asdo.getCreatedBy());
 
-                            this.queue.write(process, t);
+                                this.queue.write(process, t);
 
-                            // DELETE ATTACHMENT
-                            tracker.deleteAttachment(artifactId, attachmentId);
+                                // DELETE ATTACHMENT
+                                tracker.deleteAttachment(artifactId, attachmentId);
 
-                            // SET STATUS
-                            if (asdo.getStatus().equalsIgnoreCase("Unreviewed ready to download"))
-                                asdo.setStatus("Unreviewed in process");
-                            else
-                                asdo.setStatus("Detail in process");
+                                // SET STATUS
+                                if (asdo.getStatus().equalsIgnoreCase("Unreviewed ready to download"))
+                                    asdo.setStatus("Unreviewed in process");
+                                else
+                                    asdo.setStatus("Detail in process");
 
-                            tracker.setArtifactData(asdo, "Detail downloaded for next step.");
+                                tracker.setArtifactData(asdo, "Detail downloaded for next step.");
 
-                            this.commitTransactionIfActive();
+                                this.commitTransactionIfActive();
 
-                        } else if (fName.endsWith("csv")) {
-                            // String contentType = dh.getContentType();
-                            // String name = dh.getName();
+                            } else if (fName.endsWith("csv")) {
+                                // String contentType = dh.getContentType();
+                                // String name = dh.getName();
 
-                            File file = new File(fName);
-                            FileOutputStream fos = new FileOutputStream(file);
-                            dh.writeTo(fos);
-                            fos.close();
-                            logger.info("RUN:  attachment file saved:  " + file);
+                                File file = new File(fName);
+                                FileOutputStream fos = new FileOutputStream(file);
+                                dh.writeTo(fos);
+                                fos.close();
+                                logger.info("RUN:  attachment file saved:  " + file);
 
-                            // ** READ ** each CSV line
-                            FileReader fr = new FileReader(file);
-                            BufferedReader br = new BufferedReader(fr);
-                            String eachLine = br.readLine();
+                                // ** READ ** each CSV line
+                                FileReader fr = new FileReader(file);
+                                BufferedReader br = new BufferedReader(fr);
+                                String eachLine = br.readLine();
 
-                            if (eachLine != null) {
-                                String[] csvHeader = parseLine(eachLine);
+                                if (eachLine != null) {
+                                    String[] csvHeader = parseLine(eachLine);
 
-                                // if (csvHeader.length < 1)
+                                    // if (csvHeader.length < 1)
 
-                                // READ IN ALL "VALID" ROWS
-                                ArrayList<String[]> fileRows = new ArrayList<String[]>();
-                                eachLine = br.readLine();
-                                while (eachLine != null) {
-                                    String[] row = parseLine(eachLine);
-                                    // CHECK IF "VALID"
-                                    if (row.length > 1 && row[0].length() > 0 && row.length == csvHeader.length) {
-                                        fileRows.add(row);
-                                    }
-                                    // READ NEXT CSV LINE
+                                    // READ IN ALL "VALID" ROWS
+                                    ArrayList<String[]> fileRows = new ArrayList<String[]>();
                                     eachLine = br.readLine();
+                                    while (eachLine != null) {
+                                        String[] row = parseLine(eachLine);
+                                        // CHECK IF "VALID"
+                                        if (row.length > 1 && row[0].length() > 0 && row.length == csvHeader.length) {
+                                            fileRows.add(row);
+                                        }
+                                        // READ NEXT CSV LINE
+                                        eachLine = br.readLine();
+                                    }
+                                    br.close();
+                                    file.delete();
+
+                                    int rowCounter = 1;
+                                    Integer rowTotal = Integer.valueOf(fileRows.size());
+                                    for (String[] csvRow : fileRows) {
+
+                                        t = this.getActiveTransaction();
+                                        // CREATE BP AND SAVE BP
+                                        String processName =
+                                                asdo.getTitle() + " (detail#" + Integer.toString(rowCounter) + ")";
+
+                                        String bpStr = categoryBpMap.get(asdo.getCategory());
+
+                                        // I_EncodeBusinessProcess newProcess =
+                                        // (I_EncodeBusinessProcess)
+                                        // Class.forName("org.kp.bpa.KpetBusinessProcess").newInstance();
+                                        I_EncodeBusinessProcess newProcess =
+                                                (I_EncodeBusinessProcess) Class.forName(bpStr).newInstance();
+                                        newProcess.setName(processName);
+
+                                        newProcess.setProperty("A: CATEGORY", asdo.getCategory());
+                                        newProcess.setProperty("A: CUSTOMER", asdo.getCustomer());
+
+                                        newProcess.setProperty("A: ID_ARTF", "NA");
+                                        newProcess.setProperty("A: ID_ARTF_PARENT", asdo.getId());
+
+                                        newProcess.setProperty("A: SEND_STATUS", "Detail ready to download");
+                                        newProcess.setProperty("A: SEND_TO_USER", "username");
+                                        newProcess.setProperty("A: SEND_COMMENT", "Remotely updated.");
+                                        newProcess.setProperty("A: ROW", rowCounter);
+                                        newProcess.setProperty("A: ROW_TOTAL", rowTotal);
+
+                                        StringBuilder sb = new StringBuilder();
+                                        for (int ci = 0; ci < csvHeader.length; ci++)
+                                            sb.append("<html>" + csvHeader[ci] + ": " + csvRow[ci] + "<br>");
+                                        newProcess.setProperty("A: MESSAGE", sb.toString());
+
+                                        // Set artifact description.
+                                        sb = new StringBuilder();
+                                        for (int ci = 0; ci < csvHeader.length; ci++)
+                                            sb.append(csvHeader[ci] + ": " + csvRow[ci] + "\r\n");
+                                        if (asdo.getDescription().length() > 0)
+                                            newProcess.setProperty("A: DESCRIPTION", asdo.getDescription() + "\r\n"
+                                                + sb.toString());
+                                        else
+                                            newProcess.setProperty("A: DESCRIPTION", sb.toString());
+
+                                        this.queue.write(newProcess, t);
+
+                                        // SET STATUS
+                                        asdo.setStatus("Master in process");
+                                        tracker.setArtifactData(asdo, "Master downloaded.");
+
+                                        this.commitTransactionIfActive();
+
+                                        rowCounter = rowCounter + 1;
+                                    }
                                 }
-                                br.close();
-                                file.delete();
+                            } // if (fName.endsWith("csv"))
 
-                                int rowCounter = 1;
-                                Integer rowTotal = Integer.valueOf(fileRows.size());
-                                for (String[] csvRow : fileRows) {
+                        }
 
-                                    t = this.getActiveTransaction();
-                                    // CREATE BP AND SAVE BP
-                                    String processName =
-                                            asdo.getTitle() + " (detail#" + Integer.toString(rowCounter) + ")";
-
-                                    String bpStr = categoryBpMap.get(asdo.getCategory());
-
-                                    // I_EncodeBusinessProcess newProcess =
-                                    // (I_EncodeBusinessProcess)
-                                    // Class.forName("org.kp.bpa.KpetBusinessProcess").newInstance();
-                                    I_EncodeBusinessProcess newProcess =
-                                            (I_EncodeBusinessProcess) Class.forName(bpStr).newInstance();
-                                    newProcess.setName(processName);
-
-                                    newProcess.setProperty("A: CATEGORY", asdo.getCategory());
-                                    newProcess.setProperty("A: CUSTOMER", asdo.getCustomer());
-
-                                    newProcess.setProperty("A: ID_ARTF", "NA");
-                                    newProcess.setProperty("A: ID_ARTF_PARENT", asdo.getId());
-
-                                    newProcess.setProperty("A: SEND_STATUS", "Detail ready to download");
-                                    newProcess.setProperty("A: SEND_TO_USER", "username");
-                                    newProcess.setProperty("A: SEND_COMMENT", "Remotely updated.");
-                                    newProcess.setProperty("A: ROW", rowCounter);
-                                    newProcess.setProperty("A: ROW_TOTAL", rowTotal);
-
-                                    StringBuilder sb = new StringBuilder();
-                                    for (int ci = 0; ci < csvHeader.length; ci++)
-                                        sb.append("<html>" + csvHeader[ci] + ": " + csvRow[ci] + "<br>");
-                                    newProcess.setProperty("A: MESSAGE", sb.toString());
-
-                                    // Set artifact description.
-                                    sb = new StringBuilder();
-                                    for (int ci = 0; ci < csvHeader.length; ci++)
-                                        sb.append(csvHeader[ci] + ": " + csvRow[ci] + "\r\n");
-                                    if (asdo.getDescription().length() > 0)
-                                        newProcess.setProperty("A: DESCRIPTION", asdo.getDescription() + "\r\n"
-                                            + sb.toString());
-                                    else
-                                        newProcess.setProperty("A: DESCRIPTION", sb.toString());
-
-                                    this.queue.write(newProcess, t);
-
-                                    // SET STATUS
-                                    asdo.setStatus("Master in process");
-                                    tracker.setArtifactData(asdo, "Master downloaded.");
-
-                                    this.commitTransactionIfActive();
-
-                                    rowCounter = rowCounter + 1;
-                                }
-                            }
-                        } // if (fName.endsWith("csv"))
+                        logger.info("RUN:  priority SoapDO  " + asdo.getPriority());
                     }
-
-                    logger.info("RUN:  priority SoapDO  " + asdo.getPriority());
                 }
 
                 // CLOSE SESSION
