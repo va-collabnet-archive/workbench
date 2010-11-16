@@ -122,11 +122,13 @@ public class RulesContextHelper {
 				// **Flow test end**
 
 				for (RulesDeploymentPackageReference deploymentPackage : getPackagesForContext(context)) {
-					if (deploymentPackage.validate()) {
-						KnowledgeBase loopKBase = deploymentPackage.getKnowledgeBase(false);
+					//if (deploymentPackage.validate()) {
+					KnowledgeBase loopKBase = deploymentPackage.getKnowledgeBase(false);
+					if (loopKBase != null) {
 						loopKBase = filterForContext(loopKBase, context, config);
 						kbase.addKnowledgePackages(loopKBase.getKnowledgePackages());
 					}
+					//}
 				}
 				try {
 					ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
@@ -202,7 +204,7 @@ public class RulesContextHelper {
 			termFactory.addUncommittedNoChecks(newConcept);
 
 			termFactory.commit();
-			
+
 			promote(newConcept);
 
 			return newConcept;
@@ -683,26 +685,26 @@ public class RulesContextHelper {
 		}
 		return (activeStatuses.contains(statusId));
 	}
-	
+
 	public void promote(I_GetConceptData concept) {
 		try {
 			I_IntSet allowedStatusWithRetired = Terms.get().newIntSet();
 			allowedStatusWithRetired.addAll(config.getAllowedStatus().getSetValues());
 			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
 			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
-			
+
 			I_TermFactory termFactory = Terms.get();
-			
+
 			concept.promote(config.getViewPositionSet().iterator().next(), 
 					config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
 			termFactory.addUncommittedNoChecks(concept);
-			
+
 			for (I_ExtendByRef loopExtension : termFactory.getAllExtensionsForComponent(concept.getConceptNid())) {
 				loopExtension.promote(config.getViewPositionSet().iterator().next(), 
 						config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
 				termFactory.addUncommittedNoChecks(loopExtension);
 			}
-			
+
 			termFactory.commit();
 		} catch (IOException e) {
 			e.printStackTrace();

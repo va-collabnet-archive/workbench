@@ -436,7 +436,7 @@ public class RulesLibrary {
 			}
 		} else  {
 			kbase = getKnowledgeBaseFromFileCache(referenceUuid);
-			if (kbase != null) {
+			if (kbase == null) {
 				System.out.println("WARNING: Cache loading failed, terying Guvnor...");
 				kbase = getKnowledgeBaseWithAgent(referenceUuid, bytes);
 				if (kbase != null) {
