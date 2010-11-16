@@ -25,6 +25,7 @@ import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
 import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
 
 /**
  * @author kec
@@ -33,7 +34,7 @@ import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 public class ToUserSelectedQueueBeanInfo extends SimpleBeanInfo {
 
     /**
-     * 
+     *
      */
     public ToUserSelectedQueueBeanInfo() {
         super();
@@ -47,7 +48,13 @@ public class ToUserSelectedQueueBeanInfo extends SimpleBeanInfo {
             queueType.setDisplayName("Queue type");
             queueType.setShortDescription("The type of queue to place this process into.");
 
-            PropertyDescriptor rv[] = { queueType };
+            PropertyDescriptor message = new PropertyDescriptor("message", ToUserSelectedQueue.class);
+            message.setBound(true);
+            message.setPropertyEditorClass(JTextFieldEditor.class);
+            message.setDisplayName("message");
+            message.setShortDescription("A message to present to the user in a dialog after moving to queue.");
+
+            PropertyDescriptor rv[] = { queueType, message };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());

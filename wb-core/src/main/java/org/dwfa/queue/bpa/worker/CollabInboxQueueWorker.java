@@ -20,24 +20,16 @@
 package org.dwfa.queue.bpa.worker;
 
 import java.awt.Frame;
-import java.awt.GridLayout;
 import java.awt.HeadlessException;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.security.PrivilegedActionException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -45,19 +37,13 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.logging.Level;
 
-import javax.activation.CommandInfo;
-import javax.activation.CommandMap;
 import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.MailcapCommandMap;
-import javax.mail.Authenticator;
 import javax.security.auth.login.LoginException;
 
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
 import net.jini.core.transaction.Transaction;
 
-import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.gui.I_ManageUserTransactions;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -68,9 +54,6 @@ import org.dwfa.bpa.process.I_Workspace;
 import org.dwfa.bpa.process.NoSuchWorkspaceException;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.process.WorkspaceActiveException;
-import org.dwfa.bpa.util.Base64;
-import org.dwfa.bpa.util.FrameWithOpenFramesListener;
-import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.bpa.worker.Worker;
 import org.dwfa.bpa.worker.task.I_GetWorkFromQueue;
 
@@ -78,7 +61,6 @@ import com.collabnet.ce.soap50.types.SoapFieldValues;
 import com.collabnet.ce.soap50.types.SoapFilter;
 import com.collabnet.ce.soap50.webservices.cemain.AttachmentSoapList;
 import com.collabnet.ce.soap50.webservices.cemain.AttachmentSoapRow;
-import com.collabnet.ce.soap50.webservices.cemain.TrackerFieldSoapDO;
 import com.collabnet.ce.soap50.webservices.tracker.ArtifactSoapDO;
 import com.collabnet.ce.soap50.webservices.tracker.ArtifactSoapRow;
 
@@ -99,7 +81,7 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
     private String repoTrackerIdStr;
     private String userNameStr;
     private String userPwdStr;
-    private HashMap<String, String> categoryBpMap; 
+    private HashMap<String, String> categoryBpMap;
 
     // :NYI:!!!: CollabAuthenticator extends Authenticator see MailAuthenticator
     // :NYI:!!!: public class SvnPrompter implements PromptUserPassword3
@@ -110,68 +92,58 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
      * @param desc
      * @throws Exception
      */
-    public CollabInboxQueueWorker(Configuration config, UUID id, String desc,
-            I_SelectProcesses selector) throws Exception {
+    public CollabInboxQueueWorker(Configuration config, UUID id, String desc, I_SelectProcesses selector)
+            throws Exception {
         super(config, id, desc);
         props = new Properties();
 
         // TRACKER CONNECTION PARAMETERS
         // -- REPOSITORY URL "https://csfe.aceworkspace.net"
-        repoUrlStr = (String) this.config.getEntry(this.getClass().getName(), "repoUrlStr",
-                String.class);
+        repoUrlStr = (String) this.config.getEntry(this.getClass().getName(), "repoUrlStr", String.class);
         props.put("repo.url.str", repoUrlStr);
         // -- TRACKER ID "trackerNNNN"
-        repoTrackerIdStr = (String) this.config.getEntry(this.getClass().getName(),
-                "repoTrackerIdStr", String.class);
+        repoTrackerIdStr = (String) this.config.getEntry(this.getClass().getName(), "repoTrackerIdStr", String.class);
         props.put("repo.trackerid.str", repoTrackerIdStr);
 
         // LOGIN SESSION PARAMETERS
         // -- USER NAME
-        userNameStr = (String) this.config.getEntry(this.getClass().getName(), "userNameStr",
-                String.class);
+        userNameStr = (String) this.config.getEntry(this.getClass().getName(), "userNameStr", String.class);
         props.put("user.name.str", userNameStr);
         // -- USER PASSWORD
-        userPwdStr = (String) this.config.getEntry(this.getClass().getName(), "userPwdStr",
-                String.class);
+        userPwdStr = (String) this.config.getEntry(this.getClass().getName(), "userPwdStr", String.class);
         props.put("user.pwd.str", userPwdStr);
 
-        categoryBpMap = new HashMap<String, String>(); 
-        String tmpStr = (String) this.config.getEntry(this.getClass().getName(), "category01Str",
-                String.class);
+        categoryBpMap = new HashMap<String, String>();
+        String tmpStr = (String) this.config.getEntry(this.getClass().getName(), "category01Str", String.class);
         props.put("category.bp.01", tmpStr);
         int splitIdx = tmpStr.indexOf("/");
         categoryBpMap.put(tmpStr.substring(0, splitIdx), tmpStr.substring(splitIdx + 1));
 
-        tmpStr = (String) this.config.getEntry(this.getClass().getName(), "category02Str",
-                String.class);
+        tmpStr = (String) this.config.getEntry(this.getClass().getName(), "category02Str", String.class);
         props.put("category.bp.02", tmpStr);
         splitIdx = tmpStr.indexOf("/");
         categoryBpMap.put(tmpStr.substring(0, splitIdx), tmpStr.substring(splitIdx + 1));
-         
-        tmpStr = (String) this.config.getEntry(this.getClass().getName(), "category03Str",
-                String.class);
+
+        tmpStr = (String) this.config.getEntry(this.getClass().getName(), "category03Str", String.class);
         props.put("category.bp.03", tmpStr);
         splitIdx = tmpStr.indexOf("/");
         categoryBpMap.put(tmpStr.substring(0, splitIdx), tmpStr.substring(splitIdx + 1));
-        
-        tmpStr = (String) this.config.getEntry(this.getClass().getName(), "category04Str",
-                String.class);
+
+        tmpStr = (String) this.config.getEntry(this.getClass().getName(), "category04Str", String.class);
         props.put("category.bp.04", tmpStr);
         splitIdx = tmpStr.indexOf("/");
         categoryBpMap.put(tmpStr.substring(0, splitIdx), tmpStr.substring(splitIdx + 1));
-        
-        tmpStr = (String) this.config.getEntry(this.getClass().getName(), "category05Str",
-                String.class);
+
+        tmpStr = (String) this.config.getEntry(this.getClass().getName(), "category05Str", String.class);
         props.put("category.bp.05", tmpStr);
         splitIdx = tmpStr.indexOf("/");
         categoryBpMap.put(tmpStr.substring(0, splitIdx), tmpStr.substring(splitIdx + 1));
-        
-        tmpStr = (String) this.config.getEntry(this.getClass().getName(), "category06Str",
-                String.class);
+
+        tmpStr = (String) this.config.getEntry(this.getClass().getName(), "category06Str", String.class);
         props.put("category.bp.06", tmpStr);
         splitIdx = tmpStr.indexOf("/");
         categoryBpMap.put(tmpStr.substring(0, splitIdx), tmpStr.substring(splitIdx + 1));
-        
+
         // :NYI:!!!: ADD Authenticator. PROMPTS FOR PWD IF NOT PRESENT.
 
         this.setPluginForInterface(I_GetWorkFromQueue.class, this);
@@ -237,7 +209,7 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
                 SoapFilter sfStatusC = new SoapFilter();
                 sfStatusC.setName("status");
                 sfStatusC.setValue("Unreviewed ready to download");
-                SoapFilter[] sf = new SoapFilter[] {sfStatusA, sfStatusB, sfStatusC};
+                SoapFilter[] sf = new SoapFilter[] { sfStatusA, sfStatusB, sfStatusC };
 
                 // GET FILTERED LIST OF ARTIFACTS
                 List<ArtifactSoapRow> arts = tracker.getArtifactList(repoTrackerIdStr, sf);
@@ -259,6 +231,7 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
                     // Get DataOjbect to be able to change values
                     ArtifactSoapDO asdo = tracker.getArtifactData(sessionId, artifactId);
                     logArtfSoapDO(asdo);
+
                     AttachmentSoapRow attachSoapRow = null;
                     for (int i = 0; i < attachSoapRowArray.length; i++) {
                         attachSoapRow = attachSoapRowArray[i];
@@ -277,42 +250,44 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
                         if (fName.endsWith("bp")) {
 
                             t = this.getActiveTransaction();
-                            
+
                             // :DEBUG:BEGIN:
                             ObjectInputStream ois = new ObjectInputStream(dh.getInputStream());
                             I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
                             process.setProperty("A: ID_ARTF", artifactId);
+
+                            process.setProperty("A: COLLABNET_ARTIFACT_SUBMITTER", asdo.getCreatedBy());
+
                             this.queue.write(process, t);
-                            
+
                             // DELETE ATTACHMENT
                             tracker.deleteAttachment(artifactId, attachmentId);
-                            
+
                             // SET STATUS
-                            if (asdo.getStatus().equalsIgnoreCase("Unreviewed ready to download"))                                
+                            if (asdo.getStatus().equalsIgnoreCase("Unreviewed ready to download"))
                                 asdo.setStatus("Unreviewed in process");
                             else
                                 asdo.setStatus("Detail in process");
 
                             tracker.setArtifactData(asdo, "Detail downloaded for next step.");
-                            
-                            this.commitTransactionIfActive();
 
+                            this.commitTransactionIfActive();
 
                         } else if (fName.endsWith("csv")) {
                             // String contentType = dh.getContentType();
                             // String name = dh.getName();
-                            
+
                             File file = new File(fName);
                             FileOutputStream fos = new FileOutputStream(file);
                             dh.writeTo(fos);
                             fos.close();
                             logger.info("RUN:  attachment file saved:  " + file);
-                            
+
                             // ** READ ** each CSV line
-                            FileReader     fr = new FileReader(file);
+                            FileReader fr = new FileReader(file);
                             BufferedReader br = new BufferedReader(fr);
-                            String eachLine = br.readLine();    
-                            
+                            String eachLine = br.readLine();
+
                             if (eachLine != null) {
                                 String[] csvHeader = parseLine(eachLine);
 
@@ -324,8 +299,7 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
                                 while (eachLine != null) {
                                     String[] row = parseLine(eachLine);
                                     // CHECK IF "VALID"
-                                    if (row.length > 1 && row[0].length() > 0
-                                            && row.length == csvHeader.length) {
+                                    if (row.length > 1 && row[0].length() > 0 && row.length == csvHeader.length) {
                                         fileRows.add(row);
                                     }
                                     // READ NEXT CSV LINE
@@ -340,14 +314,16 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
 
                                     t = this.getActiveTransaction();
                                     // CREATE BP AND SAVE BP
-                                    String processName = asdo.getTitle() + " (detail#"
-                                            + Integer.toString(rowCounter) + ")";
+                                    String processName =
+                                            asdo.getTitle() + " (detail#" + Integer.toString(rowCounter) + ")";
 
                                     String bpStr = categoryBpMap.get(asdo.getCategory());
 
-                                    // I_EncodeBusinessProcess newProcess = (I_EncodeBusinessProcess) Class.forName("org.kp.bpa.KpetBusinessProcess").newInstance();
-                                    I_EncodeBusinessProcess newProcess = (I_EncodeBusinessProcess) Class
-                                            .forName(bpStr).newInstance();
+                                    // I_EncodeBusinessProcess newProcess =
+                                    // (I_EncodeBusinessProcess)
+                                    // Class.forName("org.kp.bpa.KpetBusinessProcess").newInstance();
+                                    I_EncodeBusinessProcess newProcess =
+                                            (I_EncodeBusinessProcess) Class.forName(bpStr).newInstance();
                                     newProcess.setName(processName);
 
                                     newProcess.setProperty("A: CATEGORY", asdo.getCategory());
@@ -356,8 +332,7 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
                                     newProcess.setProperty("A: ID_ARTF", "NA");
                                     newProcess.setProperty("A: ID_ARTF_PARENT", asdo.getId());
 
-                                    newProcess.setProperty("A: SEND_STATUS",
-                                            "Detail ready to download");
+                                    newProcess.setProperty("A: SEND_STATUS", "Detail ready to download");
                                     newProcess.setProperty("A: SEND_TO_USER", "username");
                                     newProcess.setProperty("A: SEND_COMMENT", "Remotely updated.");
                                     newProcess.setProperty("A: ROW", rowCounter);
@@ -365,8 +340,7 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
 
                                     StringBuilder sb = new StringBuilder();
                                     for (int ci = 0; ci < csvHeader.length; ci++)
-                                        sb.append("<html>" + csvHeader[ci] + ": " + csvRow[ci]
-                                                + "<br>");
+                                        sb.append("<html>" + csvHeader[ci] + ": " + csvRow[ci] + "<br>");
                                     newProcess.setProperty("A: MESSAGE", sb.toString());
 
                                     // Set artifact description.
@@ -374,9 +348,8 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
                                     for (int ci = 0; ci < csvHeader.length; ci++)
                                         sb.append(csvHeader[ci] + ": " + csvRow[ci] + "\r\n");
                                     if (asdo.getDescription().length() > 0)
-                                        newProcess.setProperty("A: DESCRIPTION", asdo
-                                                .getDescription()
-                                                + "\r\n" + sb.toString());
+                                        newProcess.setProperty("A: DESCRIPTION", asdo.getDescription() + "\r\n"
+                                            + sb.toString());
                                     else
                                         newProcess.setProperty("A: DESCRIPTION", sb.toString());
 
@@ -420,7 +393,8 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
      * constructor.
      */
     public static final char CSV_QUOTE_CHARACTER = '"';
-   /**
+
+    /**
      * Parses an incoming String and returns an array of elements.
      * 
      * @param nextLine
@@ -441,7 +415,8 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
             if (inQuotes) {
                 // continuing a quoted section, re-append newline
                 sb.append("\n");
-                // nextLine = getNextLine(); // :NYI: will need if any field includes new line
+                // nextLine = getNextLine(); // :NYI: will need if any field
+                // includes new line
                 // if (nextLine == null)
                 break;
             }
@@ -449,22 +424,48 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
 
                 char c = nextLine.charAt(i);
                 if (c == CSV_QUOTE_CHARACTER) {
-                    // this gets complex... the quote may end a quoted block, or escape another quote.
+                    // this gets complex... the quote may end a quoted block, or
+                    // escape another quote.
                     // do a 1-char lookahead:
-                    if (inQuotes // we are in quotes, therefore there can be escaped quotes in here.
-                            && nextLine.length() > (i + 1) // there is indeed another character to check.
-                            && nextLine.charAt(i + 1) == CSV_QUOTE_CHARACTER) { // ..and that char. is a quote also.
-                        // we have two quote chars in a row == one quote char, so consume them both and
-                        // put one on the token. we do *not* exit the quoted text.
+                    if (inQuotes // we are in quotes, therefore there can be
+                        // escaped quotes in here.
+                        && nextLine.length() > (i + 1) // there is indeed
+                        // another character to
+                        // check.
+                        && nextLine.charAt(i + 1) == CSV_QUOTE_CHARACTER) { // ..and
+                        // that
+                        // char.
+                        // is
+                        // a
+                        // quote
+                        // also.
+                        // we have two quote chars in a row == one quote char,
+                        // so consume them both and
+                        // put one on the token. we do *not* exit the quoted
+                        // text.
                         sb.append(nextLine.charAt(i + 1));
                         i++;
                     } else {
                         inQuotes = !inQuotes;
-                        // the tricky case of an embedded quote in the middle: a,bc"d"ef,g
-                        if (i > 2 //not on the begining of the line
-                                && nextLine.charAt(i - 1) != this.CSV_SEPARATOR //not at the begining of an escape sequence 
-                                && nextLine.length() > (i + 1)
-                                && nextLine.charAt(i + 1) != this.CSV_SEPARATOR //not at the end of an escape sequence
+                        // the tricky case of an embedded quote in the middle:
+                        // a,bc"d"ef,g
+                        if (i > 2 // not on the begining of the line
+                            && nextLine.charAt(i - 1) != this.CSV_SEPARATOR // not
+                            // at
+                            // the
+                            // begining
+                            // of
+                            // an
+                            // escape
+                            // sequence
+                            && nextLine.length() > (i + 1) && nextLine.charAt(i + 1) != this.CSV_SEPARATOR // not
+                        // at
+                        // the
+                        // end
+                        // of
+                        // an
+                        // escape
+                        // sequence
                         ) {
                             sb.append(c);
                         }
@@ -482,9 +483,7 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
 
     }
 
-    
-    public synchronized Condition execute(I_EncodeBusinessProcess process)
-            throws TaskFailedException {
+    public synchronized Condition execute(I_EncodeBusinessProcess process) throws TaskFailedException {
         throw new UnsupportedOperationException();
     }
 
@@ -492,8 +491,8 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
         throw new UnsupportedOperationException();
     }
 
-    public I_Workspace createWorkspace(UUID workspaceId, String name, File menuDir)
-            throws WorkspaceActiveException, Exception {
+    public I_Workspace createWorkspace(UUID workspaceId, String name, File menuDir) throws WorkspaceActiveException,
+            Exception {
         throw new UnsupportedOperationException();
     }
 
@@ -517,31 +516,29 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
         throw new UnsupportedOperationException();
     }
 
-    public I_Workspace createHeadlessWorkspace(UUID workspace_id) throws WorkspaceActiveException,
-            HeadlessException {
+    public I_Workspace createHeadlessWorkspace(UUID workspace_id) throws WorkspaceActiveException, HeadlessException {
         throw new UnsupportedOperationException();
     }
 
-    public I_Workspace createWorkspace(UUID arg0, String arg1, I_ManageUserTransactions arg2,
-            File menuDir) throws WorkspaceActiveException, Exception {
+    public I_Workspace createWorkspace(UUID arg0, String arg1, I_ManageUserTransactions arg2, File menuDir)
+            throws WorkspaceActiveException, Exception {
         throw new UnsupportedOperationException();
     }
 
-    public Object getObjFromFilesystem(Frame arg0, String arg1, String arg2, FilenameFilter arg3)
-            throws IOException, ClassNotFoundException {
+    public Object getObjFromFilesystem(Frame arg0, String arg1, String arg2, FilenameFilter arg3) throws IOException,
+            ClassNotFoundException {
         throw new UnsupportedOperationException();
     }
 
-    public void writeObjToFilesystem(Frame arg0, String arg1, String arg2, String arg3, Object arg4)
-            throws IOException {
+    public void writeObjToFilesystem(Frame arg0, String arg1, String arg2, String arg3, Object arg4) throws IOException {
         throw new UnsupportedOperationException();
     }
 
-    public I_Work getTransactionIndependentClone() throws LoginException, ConfigurationException,
-            IOException, PrivilegedActionException {
+    public I_Work getTransactionIndependentClone() throws LoginException, ConfigurationException, IOException,
+            PrivilegedActionException {
         throw new UnsupportedOperationException();
     }
-    
+
     void logArtfSoapRow(ArtifactSoapRow asr) {
         StringBuilder sb = new StringBuilder();
         // artifactId = "artfNNNN"
@@ -580,11 +577,11 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
         sb.append("\r\nSubmittedByFullname = " + asr.getSubmittedByFullname());
         // SubmittedByUsername = "usrname"
         sb.append("\r\nSubmittedByUsername = " + asr.getSubmittedByUsername());
-        // 
+        //
         sb.append("\r\n      SubmittedDate = " + asr.getSubmittedDate());
         logger.info(sb.toString());
     }
-    
+
     void logArtfSoapDO(ArtifactSoapDO asdo) {
         StringBuilder sb = new StringBuilder();
         sb.append("\r\n**     (Artifact) Id = " + asdo.getId());
@@ -592,7 +589,7 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
         sb.append("\r\n**          Priority = " + asdo.getPriority());
         sb.append("\r\n**            Status = " + asdo.getStatus());
         sb.append("\r\n**       StatusClass = " + asdo.getStatusClass());
-        
+
         sb.append("\r\n         ActualHours = " + asdo.getActualHours());
         sb.append("\r\n    (Artifact) Group = " + asdo.getGroup());
         sb.append("\r\n          AssignedTo = " + asdo.getAssignedTo());
@@ -615,15 +612,15 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
         String[] sfvTypes = sfv.getTypes();
         Object[] sfvValues = sfv.getValues();
         sb.append("\r\n          FlexFields = " + sfv);
-        
-        for (int i=0; i<sfvNames.length; i++) { 
+
+        for (int i = 0; i < sfvNames.length; i++) {
             sb.append("Name/Type/Value :: " + sfvNames[i]);
             sb.append(" / " + sfvTypes[i]);
             sb.append("\r\n / " + sfvValues[i]);
         }
         logger.info(sb.toString());
     }
-    
+
     void logAttachSoapRow(AttachmentSoapRow attachSoapRow) {
         StringBuilder sb = new StringBuilder();
         sb.append("\r\n// AttachmentId = " + attachSoapRow.getAttachmentId());
