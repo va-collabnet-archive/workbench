@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -117,7 +117,7 @@ public class SetWFDSheetToSMEDetailsPanelTask extends AbstractTask {
     /**
      * Handles actions required by the task after normal task completion (such as moving a
      * process to another user's input queue).
-     * 
+     *
      * @return void
      * @param process The currently executing Workflow process
      * @param worker The worker currently executing this task
@@ -132,7 +132,7 @@ public class SetWFDSheetToSMEDetailsPanelTask extends AbstractTask {
     /**
      * Performs the primary action of the task, which in this case is to gather and
      * validate data that has been entered by the user on the Workflow Details Sheet.
-     * 
+     *
      * @return The exit condition of the task
      * @param process The currently executing Workflow process
      * @param worker The worker currently executing this task
@@ -186,7 +186,7 @@ public class SetWFDSheetToSMEDetailsPanelTask extends AbstractTask {
             // Create a new panel to add to the Workflow Details Sheet
             JPanel workflowDetailsSheet = this.config.getWorkflowDetailsSheet();
             int width = 475;
-            int height = 400;
+            int height = 200;
             workflowDetailsSheet.setSize(width, height);
             workflowDetailsSheet.setLayout(new GridLayout(1, 1));
             SMEDetailsPanel newPanel = new SMEDetailsPanel(refsetSpecs);

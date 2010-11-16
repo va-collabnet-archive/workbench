@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,7 +27,7 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
  * The GetSMEDetailsPanelTaskBeanInfo class describes the visible elements of the
  * Workflow task GetSMEDetailsPanelTask so that it can be displayed in the
  * Process Builder.
- * 
+ *
  */
 public class GetSMEDetailsPanelTaskBeanInfo extends SimpleBeanInfo {
 
@@ -37,7 +37,7 @@ public class GetSMEDetailsPanelTaskBeanInfo extends SimpleBeanInfo {
 
     /**
      * Returns a list of property descriptors for this task.
-     * 
+     *
      * @return Returns a PropertyDescriptor array containing the properties of this task
      * @exception Error Thrown when an exception happens during Introspection
      */
@@ -82,8 +82,22 @@ public class GetSMEDetailsPanelTaskBeanInfo extends SimpleBeanInfo {
             commentsPropName.setDisplayName("<html><font color='blue'>comments prop name:");
             commentsPropName.setShortDescription("[OUT] The property to put the comments into.");
 
+            PropertyDescriptor sendToUserPropName;
+            sendToUserPropName = new PropertyDescriptor("sendToUserPropName", getBeanDescriptor().getBeanClass());
+            sendToUserPropName.setBound(true);
+            sendToUserPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            sendToUserPropName.setDisplayName("<html><font color='blue'>SME name prop name:");
+            sendToUserPropName.setShortDescription("[OUT] The property to put the SME name into.");
+
+            PropertyDescriptor descriptionPropName;
+            descriptionPropName = new PropertyDescriptor("descriptionPropName", getBeanDescriptor().getBeanClass());
+            descriptionPropName.setBound(true);
+            descriptionPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            descriptionPropName.setDisplayName("<html><font color='blue'>description prop name:");
+            descriptionPropName.setShortDescription("[OUT] The property to put the description into.");
+
             PropertyDescriptor rv[] =
-                    { profilePropName, ownerUuidPropName, ownerInboxPropName, refsetUuidPropName, commentsPropName };
+                    { profilePropName, ownerUuidPropName, ownerInboxPropName, refsetUuidPropName, commentsPropName, sendToUserPropName, descriptionPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -94,7 +108,7 @@ public class GetSMEDetailsPanelTaskBeanInfo extends SimpleBeanInfo {
      * Return the descriptor for this JavaBean which contains a reference to the JavaBean
      * that implements this task as well as the display name of the task along with
      * formating information.
-     * 
+     *
      * @see java.beans.BeanInfo#getBeanDescriptor()
      * @return Returns the BeanDescriptor for this task
      */
