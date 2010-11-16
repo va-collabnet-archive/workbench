@@ -1,0 +1,132 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.termmed</groupId>
+  <artifactId>qa-runner</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  <name>qa-runner</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+			<!--
+			this project contains the berkeley database directory that the
+			bundle will use.
+		-->
+			<groupId>com.termmed</groupId>
+			<artifactId>sample-database-qa</artifactId>
+      		<type>jar</type>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+  </dependencies>
+  <build>
+		<plugins>
+		<plugin>
+				<groupId>org.ihtsdo</groupId>
+				<artifactId>wb-mojo</artifactId>
+				<version>2.6.0-trek-7-SNAPSHOT</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.ihtsdo</groupId>
+						<artifactId>wb-bdb</artifactId>
+						<version>2.6.0-trek-7-SNAPSHOT</version>
+					</dependency>
+					<dependency>
+						<groupId>org.apache.lucene</groupId>
+						<artifactId>lucene-core</artifactId>
+						<version>3.0.2</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<!-- unjar databse from dependencies-->
+						<id>write-directories</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>write-directories</goal>
+						</goals>
+						<configuration>
+							<targetSubDir>generated-resources</targetSubDir>
+							<runtimeArtifacts>
+								<runtimeArtifact>com.termmed:sample-database-qa</runtimeArtifact>
+							</runtimeArtifacts>
+						</configuration>
+					</execution>
+					<execution>
+						<id>vodb-open</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>vodb-open</goal>
+						</goals>
+						<configuration>
+							<vodbDirectory>${project.build.directory}/generated-resources/berkeley-db
+							</vodbDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>vodb-set-default-config</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>vodb-set-default-config</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>vodb-set-edit-path</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>vodb-set-edit-paths</goal>
+						</goals>
+						<configuration>
+							<editPaths>
+								<ConceptDescriptor>
+									<uuid>2faa9260-8fb2-11db-b606-0800200c9a66</uuid>
+									<description>Workbench Auxiliary</description>
+								</ConceptDescriptor>
+							</editPaths>
+						</configuration>
+					</execution>
+					<execution>
+						<id>run-qa</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>perform-qa</goal>
+						</goals>
+						<configuration>
+							<test_path_uuid>2faa9260-8fb2-11db-b606-0800200c9a66</test_path_uuid>
+							<execution_name>Execution test 1</execution_name>
+							<test_time>2010.11.16 11:00:00 UTC</test_time>
+							<context_uuid>d974c480-f9b9-3ea1-91e8-b0a4b756a17d</context_uuid>
+						</configuration>
+					</execution>
+					<execution>
+						<id>vodb-close</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>vodb-close</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
