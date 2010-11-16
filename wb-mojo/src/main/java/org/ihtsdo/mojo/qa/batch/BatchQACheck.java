@@ -31,6 +31,7 @@ import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -175,6 +176,8 @@ public class BatchQACheck extends AbstractMojo {
 		OutputStreamWriter ruleOsw = new OutputStreamWriter(ruleFos, "UTF-8");
 		PrintWriter rulePw = new PrintWriter(ruleOsw);
 
+		FileOutputStream executionXmlOs = new FileOutputStream(executionXmlOutput); 
+		
 		// Execution header
 		executionPw.println("uuid" + "\t" + "name" + "\t" + "date" + "\t" + "context");
 		// Rules header
@@ -274,13 +277,19 @@ public class BatchQACheck extends AbstractMojo {
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
 			DOMSource source = new DOMSource(document);
-			StreamResult result = new StreamResult(new FileOutputStream(executionXmlOutput));
-			transformer.transform(source, result);
+			StreamResult result = new StreamResult(executionXmlOs);
+			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+	        transformer.setOutputProperty(OutputKeys.ENCODING,"ISO-8859-1");
+	        //transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+	        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
+			transformer.transform(source, result);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
 		} finally {
+			executionXmlOs.flush();
+			executionXmlOs.close();
 			executionPw.flush();
 			executionPw.close();
 			rulePw.flush();
