@@ -220,14 +220,18 @@ public class BatchQACheck extends AbstractMojo {
 					I_GetConceptData roleInContext = contextHelper.getRoleInContext(ruleUid, context); // STATUS
 
 					// Write to rules file
-					rulePw.print(loopRule.getName() + '\t');
-					rulePw.print(description + '\t');
-					rulePw.print(ruleUid + '\t');
-					rulePw.print(roleInContext.toUserString() + '\t');// Status
-					rulePw.print(severity + '\t');
-					rulePw.print(loopPackage.getName() + '\t');
-					rulePw.print(loopPackage.getUrl() + '\t');
-					rulePw.print(ditaUid + '\t');
+					rulePw.print(loopRule.getName() + "\t");
+					rulePw.print(description + "\t");
+					rulePw.print(ruleUid + "\t");
+					if (roleInContext != null) {
+						rulePw.print(roleInContext.toUserString() + "\t");// Status
+					} else {
+						rulePw.print("default" + "\t");// Status
+					}
+					rulePw.print(severity + "\t");
+					rulePw.print(loopPackage.getName() + "\t");
+					rulePw.print(loopPackage.getUrl() + "\t");
+					rulePw.print(ditaUid + "\t");
 					rulePw.print(df.format(executionDate.getTime()));
 					rulePw.println();
 
@@ -244,11 +248,15 @@ public class BatchQACheck extends AbstractMojo {
 					ruleElement.appendChild(UUIDElement);
 
 					Element statusElement = document.createElement("status");
-					statusElement.appendChild(document.createTextNode(roleInContext.toUserString()));
+					if (roleInContext != null) {
+						statusElement.appendChild(document.createTextNode(roleInContext.toUserString()));
+					} else {
+						statusElement.appendChild(document.createTextNode("default"));
+					}
 					ruleElement.appendChild(statusElement);
 
 					Element severityElement = document.createElement("severity");
-					severityElement.appendChild(document.createTextNode(severity.toString()));
+					severityElement.appendChild(document.createTextNode("Severity: " + severity));
 					ruleElement.appendChild(severityElement);
 
 					Element dtiaUidElement = document.createElement("ditaUid");
@@ -307,13 +315,13 @@ public class BatchQACheck extends AbstractMojo {
 	}
 
 	private void openDb() throws Exception {
-		vodbDirectory = new File("generated-resources/berkeley-db");
-		if (!vodbDirectory.exists()) {
-			throw new Exception("Database can't be found in expected location...");
-		}
-		dbSetupConfig = new DatabaseSetupConfig();
-		System.out.println("Opening database");
-		Terms.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig);
+//		vodbDirectory = new File("generated-resources/berkeley-db");
+//		if (!vodbDirectory.exists()) {
+//			throw new Exception("Database can't be found in expected location...");
+//		}
+//		dbSetupConfig = new DatabaseSetupConfig();
+//		System.out.println("Opening database");
+//		Terms.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig);
 		tf = (I_ImplementTermFactory) Terms.get();
 		config = getTestConfig();
 		tf.setActiveAceFrameConfig(config);
@@ -324,6 +332,10 @@ public class BatchQACheck extends AbstractMojo {
 		config = tf.newAceFrameConfig();
 		DateFormat df = new SimpleDateFormat("yyyy.mm.dd hh:mm:ss zzz");
 		config.addViewPosition(tf.newPosition(tf.getPath(new UUID[] { UUID.fromString(test_path_uuid) }), tf.convertToThinVersion(df.parse(test_time).getTime())));
+		
+		// Addes inferred promotion template to catch the context relationships [ testing
+		config.addViewPosition(tf.newPosition(tf.getPath(new UUID[] { UUID.fromString("cb0f6c0d-ebf3-5d84-9e12-d09a937cbffd") }), Integer.MAX_VALUE));
+		
 		config.addEditingPath(tf.getPath(new UUID[] { UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2") }));
 		config.getDescTypes().add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
 		config.getDescTypes().add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());
