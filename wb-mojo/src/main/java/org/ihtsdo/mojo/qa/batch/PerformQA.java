@@ -34,6 +34,7 @@ public class PerformQA implements I_ProcessConcepts {
 
 	@Override
 	public void processConcept(I_GetConceptData loopConcept) throws Exception {
+		System.out.println("Processing Concept: " + loopConcept);
 		ResultsCollectorWorkBench results = RulesLibrary.checkConcept(loopConcept, context, true, config, contextHelper);
 
 		if (!results.getResultsItems().isEmpty()) {
