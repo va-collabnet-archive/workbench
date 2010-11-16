@@ -214,6 +214,11 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     private static final int IS_EQUAL = 0;
     private static final int IS_GREATER = 1;
     private static final String FILE_SEPARATOR = File.separator;
+    
+    // workaround to set stated relationship characteristic as STATED_RELATIONSHIP 
+    // starts a integer 5 at beginning of import pipeline
+    // integer 5 is replaced with STATED_RELATIONSHIP UUID at eConcept creation
+    private static final int STATED_CHAR_WORKAROUND = 5;
 
     /**
      * Line terminator is deliberately set to CR-LF which is DOS style
@@ -722,25 +727,17 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
             // DESCRIPTION TYPES
             // Setup the standard description types used in SNOMED
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 5; i++)
                 lookupYDesTypeUuidIdx(ArchitectonicAuxiliary.getSnomedDescriptionType(i).getUids()
                         .iterator().next().toString());
-            //            // DESCRIPTION TYPES
-            //            yDesTypeArray = new UUID[4];
-            //            for (i = 0; i < 4; i++)
-            //                yDesTypeArray[i] = ArchitectonicAuxiliary.getSnomedDescriptionType(i).getUids()
-            //                        .iterator().next();
-            //            // string lookup array
-            //            yDesTypeStrArray = new String[4];
-            //            for (int idx = 0; idx < 4; idx++)
-            //                yDesTypeStrArray[idx] = yDesTypeArray[idx].toString();
-
+            lookupYDesTypeUuidIdx(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()
+                    .iterator().next().toString());
             // RELATIONSHIP CHARACTERISTIC
             yRelCharArray = new UUID[6];
             for (int i = 0; i < 5; i++)
                 yRelCharArray[i] = ArchitectonicAuxiliary.getSnomedCharacteristicType(i).getUids()
                         .iterator().next();
-            yRelCharArray[5] = ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()
+            yRelCharArray[STATED_CHAR_WORKAROUND] = ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()
                     .iterator().next();
 
             // string lookup array
@@ -4668,7 +4665,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             int userIdx = 0;
             if (characteristic == 0 && f.isStated) {
                 pathIdx = f.yPathStatedIdx;
-                characteristic = 5; // :NOTE: transient use for STATED_RELATIONSHIP 
+                characteristic = STATED_CHAR_WORKAROUND; // :NOTE: transient use for STATED_RELATIONSHIP 
             } else if (characteristic == 0) {
                 pathIdx = f.yPathInferredIdx;
                 userIdx = 1;
@@ -4677,7 +4674,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // 1=Qualifier, 2=Historical, 3=Additional
             if (characteristic == 0 || (characteristic == 1 && f.keepQualifier)
                     || (characteristic == 2 && f.keepHistorical)
-                    || (characteristic == 3 && f.keepAdditional)) {
+                    || (characteristic == 3 && f.keepAdditional)
+                    || characteristic == STATED_CHAR_WORKAROUND) {
                 a[relationships] = new SctYRelRecord(relID, status, conceptOneID, roleTypeSnoId,
                         roleTypeIdx, conceptTwoID, characteristic, refinability, group, pathIdx,
                         userIdx);
@@ -4778,6 +4776,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         Arrays.sort(a, comp);
 
         // 
+        if (a == null) 
+            System.out.println("!!!:DEBUG:");
+        if (a.length < 1) 
+            System.out.println("!!!:DEBUG:");
         long lastC1 = a[0].c1SnoId;
         int lastGroup = a[0].group;
         String GroupListStr = getGroupListString(a, 0);
