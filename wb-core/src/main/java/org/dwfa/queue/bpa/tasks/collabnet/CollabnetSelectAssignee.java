@@ -33,11 +33,15 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 
 /**
- * Presents a dialog box to the user to select a destination queue. Sets the
- * destination address of the process that directly contains this task to the
- * selected destination.
+ * Presents a dialog box to select a destination collabnet user.<br> 
+ * <br>
+ * User name need to be entered into the assignees field of the tasks.
+ * Each user name is separated by a ':'.
+ * The display name and login name for each user are separated by a '/'<br>
+ * <br>
+ * EXAMPLE:  "John Rogers/jr21:Sarah M. Callistor/scallistor"
  * 
- * @author kec
+ * @author Marc Campbell
  * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/queue tasks/collabnet", type = BeanType.TASK_BEAN) })
