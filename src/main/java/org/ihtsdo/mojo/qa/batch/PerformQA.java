@@ -1,8 +1,5 @@
 package org.ihtsdo.mojo.qa.batch;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.UUID;
@@ -21,14 +18,15 @@ public class PerformQA implements I_ProcessConcepts {
 	I_GetConceptData context;
 	UUID executionUUID;
 	RulesContextHelper contextHelper;
-	File outputFile;
+	PrintWriter findingPw;
 
-	public PerformQA(I_GetConceptData context, File outputFile, I_ConfigAceFrame config, UUID executionUUID) {
+	public PerformQA(I_GetConceptData context, PrintWriter findingPw, I_ConfigAceFrame config, UUID executionUUID,
+			RulesContextHelper contextHelper) {
 		super();
 		this.config = config;
 		this.context = context;
-		this.contextHelper = new RulesContextHelper(config);
-		this.outputFile = outputFile;
+		this.contextHelper = contextHelper;
+		this.findingPw = findingPw;
 		this.executionUUID = executionUUID;
 	}
 
@@ -43,12 +41,6 @@ public class PerformQA implements I_ProcessConcepts {
 	}
 
 	private void writeOutputFile(ResultsCollectorWorkBench results, I_GetConceptData concept) throws Exception {
-		// Add results to output file
-		FileOutputStream executionFos = new FileOutputStream(outputFile);
-		OutputStreamWriter executionOsw = new OutputStreamWriter(executionFos, "UTF-8");
-		PrintWriter findingPw = new PrintWriter(executionOsw);
-		//TODO: add header titles
-		findingPw.println("uuid" + "\t" + "execution" + "\t" + "rule" + "\t" + "component uuid" + "\t" + "component name" + "\t" + "error message");
 		
 		try {
 			List<AlertToDataConstraintFailure> alertList = results.getAlertList();
@@ -79,9 +71,6 @@ public class PerformQA implements I_ProcessConcepts {
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
-		} finally {
-			findingPw.flush();
-			findingPw.close();
 		}
 	}
 

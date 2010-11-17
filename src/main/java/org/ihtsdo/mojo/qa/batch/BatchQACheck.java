@@ -114,27 +114,33 @@ public class BatchQACheck extends AbstractMojo {
 	 * 
 	 * @parameter
 	 */
-	private File executionDetailsOutput;
+	private String executionDetailsOutputStr;
 
 	/**
 	 * Execution details xml file.
 	 * 
 	 * @parameter
 	 */
-	private File executionXmlOutput;
+	private String executionXmlOutputStr;
 
 	/**
 	 * Findings csv/txt file.
 	 * 
 	 * @parameter
 	 */
-	private File findingsOutput;
+	private String findingsOutputStr;
 
 	/**
 	 * Rules csv/txt file.
 	 * 
 	 * @parameter
 	 */
+	private String rulesOutputStr;
+	
+	
+	private File executionDetailsOutput;
+	private File executionXmlOutput;
+	private File findingsOutput;
 	private File rulesOutput;
 
 	/** The vodb directory. */
@@ -161,15 +167,15 @@ public class BatchQACheck extends AbstractMojo {
 		try {
 			validateParamenters();
 			openDb();
-			exportExecutionDescriptor();
-			performQA(executionUUID);
+			RulesContextHelper contextHelper = new RulesContextHelper(config);
+			exportExecutionDescriptor(contextHelper);
+			performQA(executionUUID, contextHelper);
 		} catch (Exception e) {
 			throw new MojoFailureException(e.getLocalizedMessage(), e);
 		}
 	}
 
-	private void exportExecutionDescriptor() throws Exception {
-
+	private void exportExecutionDescriptor(RulesContextHelper contextHelper) throws Exception {
 		FileOutputStream executionFos = new FileOutputStream(executionDetailsOutput);
 		OutputStreamWriter executionOsw = new OutputStreamWriter(executionFos, "UTF-8");
 		PrintWriter executionPw = new PrintWriter(executionOsw);
@@ -193,7 +199,7 @@ public class BatchQACheck extends AbstractMojo {
 			executionUUID = UUID.randomUUID();
 
 			I_GetConceptData context = tf.getConcept(UUID.fromString(context_uuid));
-			RulesContextHelper contextHelper = new RulesContextHelper(config);
+			contextHelper.getKnowledgeBaseForContext(context, config, true);
 
 			// Write Execution file
 			executionPw.print(executionUUID + "\t");
@@ -302,23 +308,40 @@ public class BatchQACheck extends AbstractMojo {
 		}
 	}
 
-	private void performQA(UUID executionUUID) throws Exception {
+	private void performQA(UUID executionUUID, RulesContextHelper contextHelper) throws Exception {
 		I_GetConceptData context = tf.getConcept(UUID.fromString(context_uuid));
-		tf.iterateConcepts(new PerformQA(context, findingsOutput, config, executionUUID));
+		// Add results to output file
+		FileOutputStream executionFos = new FileOutputStream(findingsOutput);
+		OutputStreamWriter executionOsw = new OutputStreamWriter(executionFos, "UTF-8");
+		PrintWriter findingPw = new PrintWriter(executionOsw);
+		//TODO: add header titles
+		findingPw.println("uuid" + "\t" + "execution" + "\t" + "rule" + "\t" + "component uuid" + "\t" + "component name" + "\t" + "error message");
+		tf.iterateConcepts(new PerformQA(context, findingPw, config, executionUUID, contextHelper));
+		findingPw.flush();
+		findingPw.close();
 	}
 
 	private void validateParamenters() throws Exception {
-		if (executionXmlOutput == null) {
+		
+		if (executionXmlOutputStr == null || executionXmlOutputStr.isEmpty()) {
 			executionXmlOutput = new File(outputDirectory, "executionXmlOutput.xml");
+		} else {
+			executionXmlOutput = new File(outputDirectory, executionXmlOutputStr);
 		}
-		if (findingsOutput == null) {
+		if (findingsOutputStr == null || findingsOutputStr.isEmpty()) {
 			findingsOutput = new File(outputDirectory, "findingsOutput.txt");
+		} else {
+			findingsOutput = new File(outputDirectory, findingsOutputStr);
 		}
-		if (rulesOutput == null) {
+		if (rulesOutputStr == null || rulesOutputStr.isEmpty()) {
 			rulesOutput = new File(outputDirectory, "rulesOutput.txt");
+		} else {
+			rulesOutput = new File(outputDirectory, rulesOutputStr);
 		}
-		if (executionDetailsOutput == null) {
+		if (executionDetailsOutputStr == null || executionDetailsOutputStr.isEmpty()) {
 			executionDetailsOutput = new File(outputDirectory, "executionDetailsOutput.txt");
+		} else {
+			executionDetailsOutput = new File(outputDirectory, executionDetailsOutputStr);
 		}
 		UUID.fromString(test_path_uuid);
 		UUID.fromString(context_uuid);
