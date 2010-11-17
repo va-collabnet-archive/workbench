@@ -84,6 +84,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
     /*
      * (non-Javadoc)
+     * 
      * @seeorg.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#
      * getFirstCurrentRefsetExtension(int, int)
      */
@@ -113,6 +114,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
     /*
      * (non-Javadoc)
+     * 
      * @seeorg.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#
      * getAllCurrentRefsetExtensions(int, int)
      */
@@ -147,6 +149,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#hasRefsetExtension
      * (int, int, org.dwfa.ace.api.RefsetPropertyMap)
@@ -181,6 +184,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#getRefsetExtension
      * (int, int, org.dwfa.ace.api.RefsetPropertyMap)
@@ -199,7 +203,10 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
+     * 
+     * 
      * org.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#hasCurrentRefsetExtension
      * (int, int, org.dwfa.ace.api.RefsetPropertyMap)
      */
@@ -214,6 +221,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
     /*
      * (non-Javadoc)
+     * 
      * @seeorg.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#
      * getOrCreateRefsetExtension(int, int, java.lang.Class,
      * org.dwfa.ace.api.RefsetPropertyMap)
@@ -225,7 +233,12 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
         I_ExtendByRef extension = getRefsetExtension(refsetId, componentId, propMap);
         // check subject is not already a member
         if (extension != null) {
-            return extension;
+            // grouping concepts are allowed to have multiple extensions with
+            // the same refset ID / component ID
+            // e.g. two AND's at the same level in the hierarchy
+            if (extension.getTypeNid() != RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
+                return extension;
+            }
         }
         // create a new extension (with a part for each path the user is
         // editing)
@@ -252,6 +265,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#retireRefsetExtension
      * (int, int, org.dwfa.ace.api.RefsetPropertyMap)
@@ -306,6 +320,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#setEditPaths(org.
      * dwfa.ace.api.PathBI)
@@ -323,6 +338,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#hasPurpose(int,
      * int)
      */
@@ -350,6 +366,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#hasPurpose(int,
      * org.dwfa.tapi.I_ConceptualizeUniversally)
      */
@@ -375,6 +392,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
     /*
      * (non-Javadoc)
+     * 
      * @seeorg.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#
      * getCommentsRefsetForRefset(org.dwfa.ace.api.I_GetConceptData,
      * org.dwfa.ace.api.I_ConfigAceFrame)
@@ -388,6 +406,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
     /*
      * (non-Javadoc)
+     * 
      * @seeorg.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#
      * getCommentsRefsetForRefset(org.dwfa.ace.api.I_GetConceptData,
      * org.dwfa.ace.api.I_ConfigAceFrame)
@@ -401,6 +420,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
     /*
      * (non-Javadoc)
+     * 
      * @seeorg.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#
      * getCommentsRefsetForRefset(org.dwfa.ace.api.I_GetConceptData,
      * org.dwfa.ace.api.I_ConfigAceFrame)
@@ -414,6 +434,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
     /*
      * (non-Javadoc)
+     * 
      * @seeorg.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#
      * getMarkedParentRefsetForRefset(org.dwfa.ace.api.I_GetConceptData,
      * org.dwfa.ace.api.I_ConfigAceFrame)
@@ -427,6 +448,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
     /*
      * (non-Javadoc)
+     * 
      * @seeorg.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#
      * getPromotionRefsetForRefset(org.dwfa.ace.api.I_GetConceptData,
      * org.dwfa.ace.api.I_ConfigAceFrame)
@@ -452,6 +474,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
     /*
      * (non-Javadoc)
+     * 
      * @seeorg.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#
      * getSpecificationRefsetForRefset(org.dwfa.ace.api.I_GetConceptData,
      * org.dwfa.ace.api.I_ConfigAceFrame)
@@ -477,6 +500,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.ihtsdo.db.bdb.computer.refset.I_HelpMemberRefsets#getMemberRefsets()
      */
