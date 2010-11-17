@@ -16,6 +16,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TrackContinuation;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.config.FrameConfigSnapshot;
@@ -31,25 +32,19 @@ import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements I_TrackContinuation {
+
     boolean continueWork = true;
-
     SearchPanel searchPanel;
-
     StopActionListener stopListener = new StopActionListener();
-
     CountDownLatch completeLatch;
-
     private int extensionCount;
-
     private Collection<I_DescriptionVersioned> refsetMatches;
-
     private DescriptionsFromCollectionTableModel model;
-
     I_ConfigAceFrame config;
-
-	private I_GetConceptData refsetConcept;
+    private I_GetConceptData refsetConcept;
 
     private class MatchUpdator implements ActionListener {
+
         Timer updateTimer;
 
         public MatchUpdator() {
@@ -64,7 +59,6 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
             }
             updateMatches();
         }
-
     }
 
     private class StopActionListener implements ActionListener {
@@ -81,12 +75,11 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
                 }
             }
         }
-
     }
 
     private class RegexProgressUpdator implements I_UpdateProgress {
-        Timer updateTimer;
 
+        Timer updateTimer;
         boolean firstUpdate = true;
 
         public RegexProgressUpdator() {
@@ -144,7 +137,6 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
             }
             searchPanel.setProgressValue(0);
         }
-
     }
 
     public SearchRefsetWorker(SearchPanel searchPanel, DescriptionsFromCollectionTableModel model,
@@ -166,59 +158,60 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
     @Override
     protected I_UpdateProgress construct() throws Exception {
         I_UpdateProgress updater;
-            refsetMatches = new ConcurrentSkipListSet<I_DescriptionVersioned>(
+        refsetMatches = new ConcurrentSkipListSet<I_DescriptionVersioned>(
                 new DescriptionComparator());
-            updater = new RegexProgressUpdator();
-            boolean alertForUnsupportedRc = true;
-            try {
-                Collection<? extends I_ExtendByRef> extensions = refsetConcept.getExtensions();
-                extensionCount = extensions.size();
-                completeLatch = new CountDownLatch(extensionCount);
-                new MatchUpdator();
-                List<I_TestSearchResults> criterion = searchPanel.getExtraCriterion();
-                int fsnNid = Ts.get().uuidsToNid(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
-                nextExt: for (I_ExtendByRef ext: extensions) {
-                	completeLatch.countDown();
-                	List<? extends I_ExtendByRefVersion> versions = ext.getTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), 
-                			config.getPrecedence(), config.getConflictResolutionStrategy());
-                	for (I_ExtendByRefVersion extVer: versions) {
-                		for (I_TestSearchResults test: criterion) {
-                			if (!test.test(extVer, config)) {
-                				continue nextExt;
-                			}
-                		}
-                    	// passed the tests. Add to results. 
-                		ComponentBI referencedComponent = Ts.get().getComponent(extVer.getComponentId());
-                		if (ConceptChronicleBI.class.isAssignableFrom(referencedComponent.getClass())) {
-                			ConceptChronicleBI conceptChr = (ConceptChronicleBI) referencedComponent;
-                			for (DescriptionChronicleBI descChr: conceptChr.getDescs()) {
-                    			for (DescriptionVersionBI descV: descChr.getVersions(config.getCoordinate())) {
-                    				if (descV.getTypeNid() == fsnNid) {
-                        				refsetMatches.add((I_DescriptionVersioned) descV);
-                        				continue nextExt;
-                    				}
-                    			}
-                			}
-                		} else if (DescriptionChronicleBI.class.isAssignableFrom(referencedComponent.getClass())) {
-                			DescriptionChronicleBI descChr = (DescriptionChronicleBI) referencedComponent;
-            				refsetMatches.add((I_DescriptionVersioned) descChr);
-                		} else {
-                			if (alertForUnsupportedRc) {
-                				alertForUnsupportedRc = false;
-                				AceLog.getAppLog().alertAndLogException(
-                						new Exception("Search does not support referenced component type: " +
-                								referencedComponent));
-                			}
-                		}
-                		
-                	}
-                }
-            } catch (Exception e) {
-                AceLog.getAppLog().alertAndLogException(e);
-                while (completeLatch.getCount() > 0) {
-                    completeLatch.countDown();
+        updater = new RegexProgressUpdator();
+        boolean alertForUnsupportedRc = true;
+        try {
+            Collection<? extends I_ExtendByRef> extensions = refsetConcept.getExtensions();
+            extensionCount = extensions.size();
+            completeLatch = new CountDownLatch(extensionCount);
+            new MatchUpdator();
+            List<I_TestSearchResults> criterion = searchPanel.getExtraCriterion();
+            int fsnNid = Ts.get().uuidsToNid(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+            nextExt:
+            for (I_ExtendByRef ext : extensions) {
+                completeLatch.countDown();
+                List<? extends I_ExtendByRefVersion> versions = ext.getTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(),
+                        config.getPrecedence(), config.getConflictResolutionStrategy());
+                for (I_ExtendByRefVersion extVer : versions) {
+                    for (I_TestSearchResults test : criterion) {
+                        if (!test.test(extVer, config)) {
+                            continue nextExt;
+                        }
+                    }
+                    // passed the tests. Add to results.
+                    ComponentBI referencedComponent = Ts.get().getComponent(extVer.getComponentId());
+                    if (ConceptChronicleBI.class.isAssignableFrom(referencedComponent.getClass())) {
+                        ConceptChronicleBI conceptChr = (ConceptChronicleBI) referencedComponent;
+                        for (DescriptionChronicleBI descChr : conceptChr.getDescs()) {
+                            for (DescriptionVersionBI descV : descChr.getVersions(config.getCoordinate())) {
+                                if (descV.getTypeNid() == fsnNid) {
+                                    refsetMatches.add((I_DescriptionVersioned) descChr);
+                                    continue nextExt;
+                                }
+                            }
+                        }
+                    } else if (DescriptionChronicleBI.class.isAssignableFrom(referencedComponent.getClass())) {
+                        DescriptionChronicleBI descChr = (DescriptionChronicleBI) referencedComponent;
+                        refsetMatches.add((I_DescriptionVersioned) descChr);
+                    } else {
+                        if (alertForUnsupportedRc) {
+                            alertForUnsupportedRc = false;
+                            AceLog.getAppLog().alertAndLogException(
+                                    new Exception("Search does not support referenced component type: "
+                                    + referencedComponent));
+                        }
+                    }
+
                 }
             }
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+            while (completeLatch.getCount() > 0) {
+                completeLatch.countDown();
+            }
+        }
         completeLatch.await();
         updater.actionPerformed(null);
         return updater;
