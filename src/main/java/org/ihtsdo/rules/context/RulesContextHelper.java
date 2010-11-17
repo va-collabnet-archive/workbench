@@ -20,7 +20,6 @@ import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.definition.KnowledgePackage;
 import org.drools.definition.rule.Rule;
-import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -90,10 +89,13 @@ public class RulesContextHelper {
 	//	}
 
 	public KnowledgeBase getKnowledgeBaseForContext(I_GetConceptData context, I_ConfigAceFrame config) throws Exception {
+		return getKnowledgeBaseForContext(context, config, false);
+	}
+	public KnowledgeBase getKnowledgeBaseForContext(I_GetConceptData context, I_ConfigAceFrame config, boolean recreate) throws Exception {
 		File serializedKbFile = new File("rules/" + context.getConceptNid() + ".bkb");
-		if (kbCache.containsKey(context.getConceptNid())) {
+		if (kbCache.containsKey(context.getConceptNid()) && !recreate) {
 			return kbCache.get(context.getConceptNid());
-		} else if (serializedKbFile.exists()){
+		} else if (serializedKbFile.exists() && !recreate){
 			KnowledgeBase kbase = null;
 			try {
 				ObjectInputStream in = new ObjectInputStream(new FileInputStream(serializedKbFile));
@@ -113,22 +115,18 @@ public class RulesContextHelper {
 
 			KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
 
-			// **Flow test start**
 			KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 			File flow = new File("rules/qa-execution2.rf");
 			if (flow.exists()) {
-				kbuilder.add(ResourceFactory.newClassPathResource("rules/qa-execution2.rf"), ResourceType.DRF);
+				kbuilder.add(ResourceFactory.newFileResource("rules/qa-execution2.rf"), ResourceType.DRF);
 				kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
-				// **Flow test end**
 
 				for (RulesDeploymentPackageReference deploymentPackage : getPackagesForContext(context)) {
-					//if (deploymentPackage.validate()) {
-					KnowledgeBase loopKBase = deploymentPackage.getKnowledgeBase(false);
+					KnowledgeBase loopKBase = deploymentPackage.getKnowledgeBase(recreate);
 					if (loopKBase != null) {
 						loopKBase = filterForContext(loopKBase, context, config);
 						kbase.addKnowledgePackages(loopKBase.getKnowledgePackages());
 					}
-					//}
 				}
 				try {
 					ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );

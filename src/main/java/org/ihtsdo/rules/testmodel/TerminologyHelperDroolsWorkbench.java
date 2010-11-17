@@ -177,14 +177,15 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	public boolean isParentOfStatedChildren(String conceptUuid){
 		boolean result = false;
 		//TODO implement for Stated when the definitive structure is defined
-		try {
-			result = getDescendants(new HashSet<I_GetConceptData>(), Terms.get().getConcept(UUID.fromString(conceptUuid))).size() > 0;
-		} catch (TerminologyException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (conceptUuid != null) {
+			try {
+				result = getDescendants(new HashSet<I_GetConceptData>(), Terms.get().getConcept(UUID.fromString(conceptUuid))).size() > 0;
+			} catch (TerminologyException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-
 		return result;
 	}
 
