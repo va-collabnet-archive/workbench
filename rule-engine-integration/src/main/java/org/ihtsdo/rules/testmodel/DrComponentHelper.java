@@ -15,26 +15,28 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 public class DrComponentHelper {
-	
+
 	public static DrConcept getDrConcept(ConceptVersionBI conceptBi, String factContextName) {
 		I_TermFactory tf = Terms.get();
 		DrConcept concept = new DrConcept();
-		
+
 		try {
 			ConAttrVersionBI attributeTuple = conceptBi.getConAttrsActive();
-			concept.setDefined(attributeTuple.isDefined());
-			concept.setPathUuid(tf.nidToUuid(attributeTuple.getPathNid()).toString());
-			concept.setPrimordialUuid(attributeTuple.getPrimUuid().toString());
-			concept.setStatusUuid(tf.nidToUuid(attributeTuple.getStatusNid()).toString());
-			concept.setTime(attributeTuple.getTime());
-			concept.setFactContextName(factContextName);
-			
+			if (attributeTuple != null) {
+				concept.setDefined(attributeTuple.isDefined());
+				concept.setPathUuid(tf.nidToUuid(attributeTuple.getPathNid()).toString());
+				concept.setPrimordialUuid(attributeTuple.getPrimUuid().toString());
+				concept.setStatusUuid(tf.nidToUuid(attributeTuple.getStatusNid()).toString());
+				concept.setTime(attributeTuple.getTime());
+				concept.setFactContextName(factContextName);
+			}
+
 			DrDefiningRolesSet statedRolesSet = new DrDefiningRolesSet();
 			statedRolesSet.setRolesSetType("Stated");
-			
+
 			DrDefiningRolesSet inferredRolesSet = new DrDefiningRolesSet();
 			inferredRolesSet.setRolesSetType("Inferred");
-			
+
 			//TODO int identifiers = Ts.get().get
 
 			for (DescriptionVersionBI descriptionVersion : conceptBi.getDescsActive()) {
@@ -72,10 +74,10 @@ public class DrComponentHelper {
 				statedRolesSet.getRelationships().add(loopRel);
 				inferredRolesSet.getRelationships().add(loopRel);
 			}
-			
+
 			concept.getDefiningRoleSets().add(statedRolesSet);
 			concept.getDefiningRoleSets().add(inferredRolesSet);
-			
+
 			for (RelationshipVersionBI relTuple : conceptBi.getRelsIncomingActive()) {
 				DrRelationship loopRel = new DrRelationship();
 				loopRel.setModifierUuid("someUuid");
@@ -92,15 +94,15 @@ public class DrComponentHelper {
 				loopRel.setFactContextName(factContextName);
 				concept.getIncomingRelationships().add(loopRel);
 			}
-			
+
 			//TODO: implement extensions filler
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ContraditionException e) {
 			e.printStackTrace();
 		}
-		
+
 		return concept;
 
 	}
