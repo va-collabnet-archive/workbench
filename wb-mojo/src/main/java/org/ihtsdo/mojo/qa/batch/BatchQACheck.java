@@ -31,7 +31,8 @@ import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -52,6 +53,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.tk.api.Precedence;
+import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -204,9 +206,10 @@ public class BatchQACheck extends AbstractMojo {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = dbf.newDocumentBuilder();
 
-			Document document = docBuilder.newDocument();
-			Element rootElement = document.createElement("description");
-			document.appendChild(rootElement);
+			DOMImplementation impl = docBuilder.getDOMImplementation();
+			
+			Document document = impl.createDocument(null, "description", null);
+			Element rootElement = document.getDocumentElement();
 
 			List<RulesDeploymentPackageReference> kbPackages = contextHelper.getPackagesForContext(context);
 			for (RulesDeploymentPackageReference loopPackage : kbPackages) {
@@ -242,13 +245,17 @@ public class BatchQACheck extends AbstractMojo {
 					Element ruleElement = document.createElement("rule");
 					ruleElement.setAttribute("name", loopRule.getName());
 
-					Element desciptionElement = document.createElement("description");
-					desciptionElement.appendChild(document.createTextNode(description));
-					ruleElement.appendChild(desciptionElement);
+					if(description != null){
+						Element desciptionElement = document.createElement("description");
+						desciptionElement.appendChild(document.createTextNode(description));
+						ruleElement.appendChild(desciptionElement);
+					}
 
-					Element UUIDElement = document.createElement("UUID");
-					UUIDElement.appendChild(document.createTextNode(ruleUid));
-					ruleElement.appendChild(UUIDElement);
+					if(ruleUid != null){
+						Element UUIDElement = document.createElement("UUID");
+						UUIDElement.appendChild(document.createTextNode(ruleUid));
+						ruleElement.appendChild(UUIDElement);
+					}
 
 					Element statusElement = document.createElement("status");
 					if (roleInContext != null) {
@@ -262,9 +269,12 @@ public class BatchQACheck extends AbstractMojo {
 					severityElement.appendChild(document.createTextNode("Severity: " + severity));
 					ruleElement.appendChild(severityElement);
 
-					Element dtiaUidElement = document.createElement("ditaUid");
-					dtiaUidElement.appendChild(document.createTextNode(ditaUid));
-					ruleElement.appendChild(dtiaUidElement);
+					if(ditaUid != null){
+						Element dtiaUidElement = document.createElement("ditaUid");
+						dtiaUidElement.appendChild(document.createTextNode(ditaUid));
+						ruleElement.appendChild(dtiaUidElement);
+					}
+						
 
 					Element lastExecutionElement = document.createElement("lastExecution");
 					lastExecutionElement.appendChild(document.createTextNode(df.format(executionDate.getTime())));
@@ -273,17 +283,12 @@ public class BatchQACheck extends AbstractMojo {
 				}
 			}
 
-			// Writes the document to xml file
-			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			Transformer transformer = transformerFactory.newTransformer();
-			DOMSource source = new DOMSource(document);
-			StreamResult result = new StreamResult(executionXmlOs);
-			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-	        transformer.setOutputProperty(OutputKeys.ENCODING,"ISO-8859-1");
-	        //transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-	        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-
-			transformer.transform(source, result);
+			// Serialize the document onto System.out
+		      TransformerFactory xformFactory = TransformerFactory.newInstance();  
+		      Transformer idTransform = xformFactory.newTransformer();
+		      Source input = new DOMSource(document);
+		      Result output = new StreamResult(executionXmlOs);
+		      idTransform.transform(input, output);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
