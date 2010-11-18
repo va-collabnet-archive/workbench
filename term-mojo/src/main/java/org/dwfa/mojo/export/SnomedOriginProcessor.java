@@ -72,26 +72,30 @@ public class SnomedOriginProcessor extends AbstractOriginProcessor implements Or
             config.setAllowedStatus(allowedStatus);
 
             for (PositionDescriptor positionDescriptor : originsForExport) {
-            	for (I_Position iPosition : PromoteToPath.getPositionsToCopy(positionDescriptor.getPath().getVerifiedConcept(), promotesToConcept, termFactory)) {
-                    UUID pathUuid = termFactory.getUids(iPosition.getPath().getConceptId()).iterator().next();
-                    if (!isExcludedPath(pathUuid, excludedPositions)) {
-                        Date timePoint = new Date();
-                        timePoint.setTime(iPosition.getTime());
-                        Position position = new Position(termFactory.getConcept(iPosition.getPath().getConceptId()),
-                                timePoint);
-                        position.setLastest(true);
-                        positions.add(position);
+            	try{
+	            	for (I_Position iPosition : PromoteToPath.getPositionsToCopy(positionDescriptor.getPath().getVerifiedConcept(), promotesToConcept, termFactory)) {
+	                    UUID pathUuid = termFactory.getUids(iPosition.getPath().getConceptId()).iterator().next();
+	                    if (!isExcludedPath(pathUuid, excludedPositions)) {
+	                        Date timePoint = new Date();
+	                        timePoint.setTime(iPosition.getTime());
+	                        Position position = new Position(termFactory.getConcept(iPosition.getPath().getConceptId()),
+	                                timePoint);
+	                        position.setLastest(true);
+	                        positions.add(position);
 
-                        if (!matainedModuleParent.isParentOf(termFactory.getConcept(pathUuid), allowedStatus, null, null, false)) {
-                            if (!releasePathDateMap.containsKey(pathUuid)) {
-                                Map<UUID, Date> mappedModuleDate = new HashMap<UUID, Date>(1);
-                                releasePathDateMap.put(pathUuid, mappedModuleDate);
+	                        if (!matainedModuleParent.isParentOf(termFactory.getConcept(pathUuid), allowedStatus, null, null, false)) {
+	                            if (!releasePathDateMap.containsKey(pathUuid)) {
+	                                Map<UUID, Date> mappedModuleDate = new HashMap<UUID, Date>(1);
+	                                releasePathDateMap.put(pathUuid, mappedModuleDate);
 
-                                mappedModuleDate.put(UUID.fromString(positionDescriptor.getPath().getUuid()),
-                                        AceDateFormat.getVersionHelperDateFormat().parse(positionDescriptor.getTimeString()));
-                            }
-                        }
-                    }
+	                                mappedModuleDate.put(UUID.fromString(positionDescriptor.getPath().getUuid()),
+	                                        AceDateFormat.getVersionHelperDateFormat().parse(positionDescriptor.getTimeString()));
+	                            }
+	                        }
+	                    }
+					}
+            	} catch (Exception ignore) {
+            		// if there is not promoted work then we just continue.
 				}
             }
 
