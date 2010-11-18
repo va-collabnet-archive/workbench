@@ -28,7 +28,7 @@ public enum RelAssertionType {
     /**
      * Inferred if it exists on the concept. If not, find a stated.
      */
-    INFERRED_THEN_STATED("stated then inferred");
+    INFERRED_THEN_STATED("inferred then stated");
 
     String displayName;
 
