@@ -8,12 +8,12 @@
 	<artifactId>rule-engine-integration</artifactId>
 	<name>Rules engine integration</name>
 	<url>http://maven.apache.org</url>
-	<repositories>
+	<!--   <repositories>
 		<repository>
 			<id>drools jboss repository</id>
 			<url>http://repository.jboss.com/maven2/</url>
 		</repository>
-	</repositories>
+	</repositories> -->
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
