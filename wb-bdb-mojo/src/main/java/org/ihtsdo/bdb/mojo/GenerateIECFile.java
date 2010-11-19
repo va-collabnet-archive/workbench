@@ -17,7 +17,7 @@ import org.ihtsdo.time.TimeUtil;
 
 
 /**
- * Goal which generates an incremental e-concept (iec) file.
+ * Goal which generates an incremental e-concept file, in a change set format (.eccs).
  * 
  * @goal generate-iec-file
  * 
@@ -27,7 +27,7 @@ import org.ihtsdo.time.TimeUtil;
 public class GenerateIECFile extends AbstractMojo  {
 
     /**
-     * Parent of the new path.
+     * ConceptSpec for the view paths to base the export on.
      * 
      * @parameter
      * @required
@@ -35,7 +35,8 @@ public class GenerateIECFile extends AbstractMojo  {
     private ConceptSpec[] pathsToExport;
 
     /**
-     * Start date for inclusion in the change set.
+     * Start date for inclusion in the change set, in
+     * yyyy-MM-dd-HH.mm.ss format.
      * 
      * @parameter
      * @required
@@ -43,7 +44,8 @@ public class GenerateIECFile extends AbstractMojo  {
     private String startDate;
     
     /**
-     * End date for inclusion in the change set.
+     * End date for inclusion in the change set, in
+     * yyyy-MM-dd-HH.mm.ss format.
      * 
      * @parameter
      * @required
@@ -51,7 +53,7 @@ public class GenerateIECFile extends AbstractMojo  {
     private String endDate;
 
     /**
-     * End date for inclusion in the change set.
+     * Policy for generation of the change set.
      * 
      * @parameter default-value="INCREMENTAL"
      * @required
@@ -60,7 +62,7 @@ public class GenerateIECFile extends AbstractMojo  {
     private String policy;
     
     /**
-     * End date for inclusion in the change set.
+     * File name for the resulting generated change set.
      * 
      * @parameter default-value="export.eccs"
      * @required
@@ -77,7 +79,7 @@ public class GenerateIECFile extends AbstractMojo  {
     private File output;
 
     /**
-     * Generated resources directory.
+     * Directory of the berkeley database to export from.
      * 
      * @parameter expression="${project.build.directory}/generated-resources/berkeley-db"
      * @required
