@@ -51,10 +51,16 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	}
 
 	public boolean isParentOf(String parent, String subtype) throws Exception {
+		boolean result = false;
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 		ConceptVersionBI parentConcept = Ts.get().getConceptVersion(config.getCoordinate(), UUID.fromString(parent));
 		ConceptVersionBI subtypeConcept = Ts.get().getConceptVersion(config.getCoordinate(), UUID.fromString(subtype));
-		boolean result = subtypeConcept.isKindOf(parentConcept);
+		if (RulesLibrary.myStaticIsACache == null) { 
+			result = subtypeConcept.isKindOf(parentConcept);
+		} else {
+			//System.out.println("Using rules library isa cache!");
+			result = RulesLibrary.myStaticIsACache.isKindOf(subtypeConcept.getConceptNid(), parentConcept.getConceptNid());
+		}
 		return result;
 	}
 
