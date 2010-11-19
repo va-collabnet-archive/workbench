@@ -50,6 +50,8 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
+import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.tk.api.Precedence;
@@ -168,11 +170,22 @@ public class BatchQACheck extends AbstractMojo {
 			validateParamenters();
 			openDb();
 			RulesContextHelper contextHelper = new RulesContextHelper(config);
+			cleanKbFileCache();
 			exportExecutionDescriptor(contextHelper);
 			performQA(executionUUID, contextHelper);
 		} catch (Exception e) {
 			throw new MojoFailureException(e.getLocalizedMessage(), e);
 		}
+	}
+
+	private void cleanKbFileCache() {
+		File rules = new File("rules");
+		for (File loopFile : rules.listFiles()) {
+			if (loopFile.getName().endsWith(".bkb") || loopFile.getName().endsWith(".pkg")) {
+				loopFile.delete();
+			}
+		}
+		
 	}
 
 	private void exportExecutionDescriptor(RulesContextHelper contextHelper) throws Exception {
@@ -316,32 +329,37 @@ public class BatchQACheck extends AbstractMojo {
 		PrintWriter findingPw = new PrintWriter(executionOsw);
 		//TODO: add header titles
 		findingPw.println("uuid" + "\t" + "execution" + "\t" + "rule" + "\t" + "component uuid" + "\t" + "component name" + "\t" + "error message");
+		Long start = Calendar.getInstance().getTimeInMillis();
 		tf.iterateConcepts(new PerformQA(context, findingPw, config, executionUUID, contextHelper));
 		findingPw.flush();
 		findingPw.close();
 	}
 
 	private void validateParamenters() throws Exception {
+		File qaOutput = new File(outputDirectory, "generated-resources/qa-output/");
+		if (!qaOutput.exists()) {
+			qaOutput.mkdirs();
+		}
 		
 		if (executionXmlOutputStr == null || executionXmlOutputStr.isEmpty()) {
-			executionXmlOutput = new File(outputDirectory, "executionXmlOutput.xml");
+			executionXmlOutput = new File(qaOutput, "executionXmlOutput.xml");
 		} else {
-			executionXmlOutput = new File(outputDirectory, executionXmlOutputStr);
+			executionXmlOutput = new File(qaOutput, executionXmlOutputStr);
 		}
 		if (findingsOutputStr == null || findingsOutputStr.isEmpty()) {
-			findingsOutput = new File(outputDirectory, "findingsOutput.txt");
+			findingsOutput = new File(qaOutput, "findingsOutput.txt");
 		} else {
-			findingsOutput = new File(outputDirectory, findingsOutputStr);
+			findingsOutput = new File(qaOutput, findingsOutputStr);
 		}
 		if (rulesOutputStr == null || rulesOutputStr.isEmpty()) {
-			rulesOutput = new File(outputDirectory, "rulesOutput.txt");
+			rulesOutput = new File(qaOutput, "rulesOutput.txt");
 		} else {
-			rulesOutput = new File(outputDirectory, rulesOutputStr);
+			rulesOutput = new File(qaOutput, rulesOutputStr);
 		}
 		if (executionDetailsOutputStr == null || executionDetailsOutputStr.isEmpty()) {
-			executionDetailsOutput = new File(outputDirectory, "executionDetailsOutput.txt");
+			executionDetailsOutput = new File(qaOutput, "executionDetailsOutput.txt");
 		} else {
-			executionDetailsOutput = new File(outputDirectory, executionDetailsOutputStr);
+			executionDetailsOutput = new File(qaOutput, executionDetailsOutputStr);
 		}
 		UUID.fromString(test_path_uuid);
 		UUID.fromString(context_uuid);
@@ -377,6 +395,9 @@ public class BatchQACheck extends AbstractMojo {
 		config.getDescTypes().add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
 		config.getDescTypes().add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());
 		config.getDescTypes().add(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.localize().getNid());
+		config.getDestRelTypes().add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+		config.getDestRelTypes().add(ArchitectonicAuxiliary.Concept.IS_A_DUP_REL.localize().getNid());
+		config.getDestRelTypes().add(Terms.get().uuidToNative(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25")));;
 		config.setDefaultStatus(tf.getConcept((ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid())));
 		config.getAllowedStatus().add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
 		config.getAllowedStatus().add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
