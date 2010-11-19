@@ -23,17 +23,20 @@ import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 import org.ihtsdo.tk.drools.facts.ComponentFact;
-import org.ihtsdo.tk.drools.facts.DescFact;
+import org.ihtsdo.tk.drools.facts.RelFact;
+import org.ihtsdo.tk.drools.facts.RelGroupFact;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 
-public class MoveDescAction extends AbstractAction {
+public class MoveToRelGroupAction extends AbstractAction {
 
 	private static final long serialVersionUID = 1L;
 
 	ComponentVersionBI sourceComponent;
 	ComponentVersionBI targetComponent;
-	public MoveDescAction(String actionName, DescFact sourceFact, ConceptFact destFact) {
+	
+	public MoveToRelGroupAction(String actionName, RelFact sourceFact, RelGroupFact destFact) {
 		super(actionName);
 		this.sourceComponent = sourceFact.getComponent();
 		this.targetComponent = destFact.getComponent();
@@ -59,12 +62,13 @@ public class MoveDescAction extends AbstractAction {
 			}
 			if (RelationshipVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
 				RelationshipVersionBI rel = (RelationshipVersionBI) sourceComponent;
+				RelGroupVersionBI relGroup = (RelGroupVersionBI) targetComponent;
 				I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), concept, 
 						rel.getTypeNid(), 
 						rel.getDestinationNid(), 
 						rel.getCharacteristicNid(), 
 						rel.getRefinabilityNid(), 
-						rel.getGroup(), 
+						relGroup.getRelGroup(), 
 						rel.getStatusNid(), 
 						config.getDbConfig().getUserConcept().getNid(), 
 						pathItr.next().getConceptNid(), 

@@ -76,11 +76,11 @@ public class CloneAndRetireAction extends AbstractAction {
 			
 			if (I_AmPart.class.isAssignableFrom(component.getClass())) {
 				I_AmPart componentVersion = (I_AmPart) component;
-				for (PositionBI vp: config.getViewPositionSet()) {
+				for (PathBI ep: config.getEditingPathSet()) {
 					componentVersion.makeAnalog(
 							ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), 
 							config.getDbConfig().getUserConcept().getNid(),
-							vp.getPath().getConceptNid(), 
+							ep.getConceptNid(), 
 							Long.MAX_VALUE);
 				}
 			}

@@ -54,13 +54,31 @@ public class UpdateDescFromSpecAction extends AbstractAction {
 
 	private void updateDesc() throws TerminologyException, IOException {
 		DescriptionSpec descSpec = ((DescSpecFact) spec).getDescSpec();
-		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-		I_DescriptionVersioned description = Terms.get().getDescription(Terms.get().uuidToNative(descSpec.getUuids()));
-		I_DescriptionPart descPart = description.getTuples(config.getConflictResolutionStrategy()).iterator().next().getMutablePart();
-		I_DescriptionPart newPart = (I_DescriptionPart) descPart.makeAnalog(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), 
-				config.getEditingPathSet().iterator().next().getConceptNid(), Long.MAX_VALUE);
-		newPart.setText(descSpec.getDescText());
-		description.addVersion(newPart);
+		DescriptionVersionBI conceptDesc = (DescriptionVersionBI) concept;
+		
+		if(conceptDesc.getText() == descSpec.getDescText){
+			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+			I_DescriptionVersioned description = Terms.get().getDescription(Terms.get().uuidToNative(descSpec.getUuids())); //null
+			I_DescriptionPart descPart = description.getTuples(config.getConflictResolutionStrategy()).iterator().next().getMutablePart();
+			I_DescriptionPart newPart = (I_DescriptionPart) descPart.makeAnalog(
+					ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), 
+					config.getEditingPathSet().iterator().next().getConceptNid(), 
+					Long.MAX_VALUE);
+			newPart.setText(descSpec.getDescText());
+			description.addVersion(newPart);
+		}
+		else{ //new
+			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+			I_DescriptionVersioned description = Terms.get().getDescription(Terms.get().uuidToNative(descSpec.getUuids())); //null
+			I_DescriptionPart descPart = description.getTuples(config.getConflictResolutionStrategy()).iterator().next().getMutablePart();
+			I_DescriptionPart newPart = (I_DescriptionPart) descPart.makeAnalog(
+					ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), 
+					config.getEditingPathSet().iterator().next().getConceptNid(), 
+					Long.MAX_VALUE);
+			newPart.setText(conceptDesc.getText());
+			description.addVersion(newPart);
+			//HERE
+		}
 		Terms.get().addUncommitted(Terms.get().getConcept(concept.getNid()));
 	}
 

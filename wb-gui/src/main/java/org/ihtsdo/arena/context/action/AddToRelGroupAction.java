@@ -15,27 +15,30 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.drools.facts.DescSpecFact;
 import org.ihtsdo.tk.drools.facts.RelSpecFact;
 import org.ihtsdo.tk.drools.facts.SpecFact;
+import org.ihtsdo.tk.drools.facts.RelGroupFact;
 import org.ihtsdo.tk.spec.DescriptionSpec;
 import org.ihtsdo.tk.spec.RelSpec;
 
-public class AddFromSpecAction extends AbstractAction {
+public class AddToRelGroupAction extends AbstractAction {
 
 	private static final long serialVersionUID = 1L;
 
-	ConceptVersionBI concept;
+	ComponentVersionBI component;
 	SpecFact<?> spec;
 
-	public AddFromSpecAction(String actionName, 
-			ConceptFact concept, SpecFact<?> spec) throws IOException {
+	public AddToRelGroupAction(String actionName, 
+			RelGroupFact relGroup, SpecFact<?> spec) throws IOException { //was concept fact
 		super(actionName);
-		this.concept = concept.getConcept();
+		this.component = relGroup.getRelGroup();//??
 		this.spec = spec;
-		
 	}
 
 	@Override
@@ -56,28 +59,28 @@ public class AddFromSpecAction extends AbstractAction {
 	private void addDesc() throws TerminologyException, IOException {
 		DescriptionSpec descSpec = ((DescSpecFact) spec).getDescSpec();
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-		Terms.get().newDescription(UUID.randomUUID(),  Terms.get().getConcept(concept.getNid()), 
+		Terms.get().newDescription(UUID.randomUUID(),  Terms.get().getConcept(component.getConceptNid()), 
 				descSpec.getLangText(), 
 				descSpec.getDescText(), 
 				Terms.get().getConcept(descSpec.getDescTypeSpec().getNid()), 
 				config, ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-		Terms.get().addUncommitted(Terms.get().getConcept(concept.getNid()));
+		Terms.get().addUncommitted(Terms.get().getConcept(component.getConceptNid()));
 	}
 	
 	private void addRel() {
 		RelSpec relSpec = ((RelSpecFact) spec).getRelSpec();
 		try {
 			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-			
+			RelGroupChronicleBI group = (RelGroupChronicleBI) component;
 			Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
-			I_GetConceptData originConcept = Terms.get().getConcept(concept.getNid());
+			I_GetConceptData originConcept = Terms.get().getConcept(component.getConceptNid());
 			I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), 
 					originConcept, 
 					relSpec.getRelTypeSpec().getNid(), 
 					relSpec.getDestinationSpec().getNid(),
 					ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid(), 
 					ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.localize().getNid(), 
-					0, 
+					group.getRelGroup(), //set to relGroup
 					ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), 
 					config.getDbConfig().getUserConcept().getNid(),
 					pathItr.next().getConceptNid(), 

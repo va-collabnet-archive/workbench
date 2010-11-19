@@ -14,6 +14,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.drools.facts.ComponentFact;
 
 public class RetireAction extends AbstractAction {
@@ -36,11 +37,11 @@ public class RetireAction extends AbstractAction {
 			if (I_AmPart.class.isAssignableFrom(component.getClass())) {
 				I_AmPart componentVersion = (I_AmPart) component;
 				I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-				for (PositionBI vp: config.getViewPositionSet()) {
+				for (PathBI ep: config.getEditingPathSet()) {
 					componentVersion.makeAnalog(
 							ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), 
 							config.getDbConfig().getUserConcept().getNid(),
-							vp.getPath().getConceptNid(), 
+							ep.getConceptNid(), 
 							Long.MAX_VALUE);
 				}
 				I_GetConceptData concept = Terms.get().getConceptForNid(componentVersion.getNid());

@@ -23,17 +23,20 @@ import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 import org.ihtsdo.tk.drools.facts.ComponentFact;
-import org.ihtsdo.tk.drools.facts.DescFact;
+import org.ihtsdo.tk.drools.facts.RelFact;
+import org.ihtsdo.tk.drools.facts.RelGroupFact;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 
-public class MoveDescAction extends AbstractAction {
+public class CopyToRelGroupAction extends AbstractAction {
 
 	private static final long serialVersionUID = 1L;
 
 	ComponentVersionBI sourceComponent;
 	ComponentVersionBI targetComponent;
-	public MoveDescAction(String actionName, DescFact sourceFact, ConceptFact destFact) {
+	
+	public CopyToRelGroupAction(String actionName, RelFact sourceFact, RelGroupFact destFact) {
 		super(actionName);
 		this.sourceComponent = sourceFact.getComponent();
 		this.targetComponent = destFact.getComponent();
@@ -59,12 +62,13 @@ public class MoveDescAction extends AbstractAction {
 			}
 			if (RelationshipVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
 				RelationshipVersionBI rel = (RelationshipVersionBI) sourceComponent;
+				RelGroupVersionBI relGroup = (RelGroupVersionBI) targetComponent;
 				I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), concept, 
 						rel.getTypeNid(), 
 						rel.getDestinationNid(), 
 						rel.getCharacteristicNid(), 
 						rel.getRefinabilityNid(), 
-						rel.getGroup(), 
+						relGroup.getRelGroup(), 
 						rel.getStatusNid(), 
 						config.getDbConfig().getUserConcept().getNid(), 
 						pathItr.next().getConceptNid(), 
@@ -77,27 +81,7 @@ public class MoveDescAction extends AbstractAction {
 			}
 			
 			Terms.get().addUncommitted(concept);
-			
-			
-			
-			if (I_AmPart.class.isAssignableFrom(sourceComponent.getClass())) {
-				I_AmPart componentVersion = (I_AmPart) sourceComponent;
-				for (PathBI ep: config.getEditingPathSet()) {
-					componentVersion.makeAnalog(
-							ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), 
-							config.getDbConfig().getUserConcept().getNid(),
-							ep.getConceptNid(), 
-							Long.MAX_VALUE);
-				}
-				I_GetConceptData retireConcept = Terms.get().getConceptForNid(componentVersion.getNid());
-				Terms.get().addUncommitted(retireConcept);
-			}
-			
-			
-			
-			
-			
-			
+					
 		} catch (TerminologyException e1) {
 			AceLog.getAppLog().alertAndLogException(e1);
 		} catch (IOException e1) {

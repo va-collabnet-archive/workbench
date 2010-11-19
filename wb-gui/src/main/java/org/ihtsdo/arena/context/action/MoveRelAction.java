@@ -25,15 +25,16 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.drools.facts.ComponentFact;
 import org.ihtsdo.tk.drools.facts.DescFact;
+import org.ihtsdo.tk.drools.facts.RelFact;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 
-public class MoveDescAction extends AbstractAction {
+public class MoveRelAction extends AbstractAction {
 
 	private static final long serialVersionUID = 1L;
 
 	ComponentVersionBI sourceComponent;
 	ComponentVersionBI targetComponent;
-	public MoveDescAction(String actionName, DescFact sourceFact, ConceptFact destFact) {
+	public MoveRelAction(String actionName, RelFact sourceFact, ConceptFact destFact) {
 		super(actionName);
 		this.sourceComponent = sourceFact.getComponent();
 		this.targetComponent = destFact.getComponent();
@@ -64,7 +65,7 @@ public class MoveDescAction extends AbstractAction {
 						rel.getDestinationNid(), 
 						rel.getCharacteristicNid(), 
 						rel.getRefinabilityNid(), 
-						rel.getGroup(), 
+						0, 
 						rel.getStatusNid(), 
 						config.getDbConfig().getUserConcept().getNid(), 
 						pathItr.next().getConceptNid(), 

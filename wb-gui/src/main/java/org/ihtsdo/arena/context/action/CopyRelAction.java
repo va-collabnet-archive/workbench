@@ -7,33 +7,29 @@ import java.util.UUID;
 
 import javax.swing.AbstractAction;
 
-import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.drools.facts.ComponentFact;
-import org.ihtsdo.tk.drools.facts.DescFact;
+import org.ihtsdo.tk.drools.facts.RelFact;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 
-public class MoveDescAction extends AbstractAction {
+public class CopyRelAction extends AbstractAction {
 
 	private static final long serialVersionUID = 1L;
 
 	ComponentVersionBI sourceComponent;
 	ComponentVersionBI targetComponent;
-	public MoveDescAction(String actionName, DescFact sourceFact, ConceptFact destFact) {
+	public CopyRelAction(String actionName, RelFact sourceFact, ConceptFact destFact) {
 		super(actionName);
 		this.sourceComponent = sourceFact.getComponent();
 		this.targetComponent = destFact.getComponent();
@@ -64,7 +60,7 @@ public class MoveDescAction extends AbstractAction {
 						rel.getDestinationNid(), 
 						rel.getCharacteristicNid(), 
 						rel.getRefinabilityNid(), 
-						rel.getGroup(), 
+						0, 
 						rel.getStatusNid(), 
 						config.getDbConfig().getUserConcept().getNid(), 
 						pathItr.next().getConceptNid(), 
@@ -75,27 +71,7 @@ public class MoveDescAction extends AbstractAction {
 							pathItr.next().getConceptNid(), Long.MAX_VALUE);
 				}
 			}
-			
 			Terms.get().addUncommitted(concept);
-			
-			
-			
-			if (I_AmPart.class.isAssignableFrom(sourceComponent.getClass())) {
-				I_AmPart componentVersion = (I_AmPart) sourceComponent;
-				for (PathBI ep: config.getEditingPathSet()) {
-					componentVersion.makeAnalog(
-							ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), 
-							config.getDbConfig().getUserConcept().getNid(),
-							ep.getConceptNid(), 
-							Long.MAX_VALUE);
-				}
-				I_GetConceptData retireConcept = Terms.get().getConceptForNid(componentVersion.getNid());
-				Terms.get().addUncommitted(retireConcept);
-			}
-			
-			
-			
-			
 			
 			
 		} catch (TerminologyException e1) {
