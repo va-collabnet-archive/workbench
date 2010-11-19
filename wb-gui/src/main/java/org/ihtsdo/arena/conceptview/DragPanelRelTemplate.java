@@ -7,8 +7,9 @@ import javax.swing.TransferHandler;
 
 import org.ihtsdo.tk.spec.RelSpec;
 
+//FROM THIS public class DragPanelRelTemplate extends DragPanel<RelSpec> {
 public class DragPanelRelTemplate extends DragPanel<RelSpec> {
-
+	
 	/**
 	 * 
 	 */
@@ -26,12 +27,12 @@ public class DragPanelRelTemplate extends DragPanel<RelSpec> {
 
 	@Override
 	public DataFlavor[] getTransferDataFlavors() {
-		return new DataFlavor[] { DragPanelDataFlavors.descVersionFlavor };
+		return new DataFlavor[] { DragPanelDataFlavors.relVersionFlavor }; //from desc
 	}
 	
 	@Override
 	public DataFlavor getNativeDataFlavor() {
-		return DragPanelDataFlavors.descVersionFlavor ;
+		return DragPanelDataFlavors.relVersionFlavor ; //from desc
 	}
 
 	@Override
@@ -51,7 +52,7 @@ public class DragPanelRelTemplate extends DragPanel<RelSpec> {
 	public RelSpec getDraggedThing() {
 		return thingToDrag;
 	}
-
+	
 	@Override
 	public String getUserString(RelSpec obj) {
 		return obj.toString();
