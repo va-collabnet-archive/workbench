@@ -120,9 +120,10 @@ public class PositionMapper {
         if (version.getTime() < Long.MAX_VALUE) {
             return positionDistance[version.getSapNid()] >= 0
                     && version.getTime() <= destination.getTime();
-        } else {
+        } else if (destination.getTime() > System.currentTimeMillis()) {
             return positionDistance[version.getSapNid()] >= 0;
         }
+        return false;
     }
 
     public boolean isSetup() {
