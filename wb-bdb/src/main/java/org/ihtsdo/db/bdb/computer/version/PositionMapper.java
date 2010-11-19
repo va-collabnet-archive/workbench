@@ -117,7 +117,12 @@ public class PositionMapper {
         }
         assert version.getSapNid() < positionDistance.length : "sapNid: " + version.getSapNid()
                 + " length: " + positionDistance.length + " version: " + version;
-        return positionDistance[version.getSapNid()] >= 0;
+        if (version.getTime() < Long.MAX_VALUE) {
+            return positionDistance[version.getSapNid()] >= 0
+                    && version.getTime() <= destination.getTime();
+        } else {
+            return positionDistance[version.getSapNid()] >= 0;
+        }
     }
 
     public boolean isSetup() {
