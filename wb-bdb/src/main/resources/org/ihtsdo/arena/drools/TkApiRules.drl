@@ -53,7 +53,7 @@ rule "FSN not satisfies desc constraint"
 	then 
 
 		   for (DescriptionVersionBI $d : $c.getDescsActive(WbDescType.FULLY_SPECIFIED.getNid())) {
-   		    	templates.put(new DescriptionSpec(null, 
+   		    	templates.put(new DescriptionSpec($c.getUUIDs(), #from null
    		    									  SpecFactory.get($c), 
    		    									  WbDescType.FULLY_SPECIFIED, 
    		    									  $d.getText() + " (ADD TAG)"), 
@@ -71,10 +71,10 @@ rule "no FSN"
 	then 
 
 		for (DescriptionVersionBI $d : $c.getDescsActive(WbDescType.PREFERRED.getNid())) {
-   		    	templates.put(new DescriptionSpec(null, 
+   		    	templates.put(new DescriptionSpec($c.getUUIDs(), #fromNull
    		    									  SpecFactory.get($c), 
    		    									  WbDescType.FULLY_SPECIFIED, 
-   		    									  $d.getText() + " (ADD TAG)"), 
+   		    									  $d.getText() + " (ADD TAG (NO FSN))"), 
    		    									  $d.getNid());
 		} 	
    		System.out.println("concept failing FS_SEMANTIC_TAG constraint found: \n" + $c.toString());
