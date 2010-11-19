@@ -62,7 +62,7 @@ public class GenerateIECFile extends AbstractMojo  {
     /**
      * End date for inclusion in the change set.
      * 
-     * @parameter default-value="export.iec"
+     * @parameter default-value="export.eccs"
      * @required
      * 
      */
