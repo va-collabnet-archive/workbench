@@ -52,5 +52,7 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
     Collection<DbDependency> getLatestChangeSetDependencies() throws IOException;
     
     boolean satisfiesDependencies(Collection<DbDependency> dependencies);
+    
+    KindOfCacheBI getCache(Coordinate coordinate) throws Exception;
 
 }
