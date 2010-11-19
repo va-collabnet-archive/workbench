@@ -20,16 +20,28 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+   
     <dependency>
-			<!--
-			this project contains the berkeley database directory that the
-			bundle will use.
-		-->
 			<groupId>com.termmed</groupId>
 			<artifactId>sample-database-qa</artifactId>
       		<type>jar</type>
 			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
+	</dependency>
+	<!--
+	<dependency>
+			 <groupId>org.ihtsdo.sample</groupId>
+            <artifactId>database</artifactId>
+            <type>zip</type>
+            <version>1.0-trek-ihtsdo-1-SNAPSHOT</version>
+	</dependency>
+		
+	<dependency>
+			 <groupId>org.ihtsdo.sample</groupId>
+            <artifactId>full-database</artifactId>
+            <type>jar</type>
+            <version>0.0.1-SNAPSHOT</version>
+	</dependency>
+	-->
   </dependencies>
   <build>
 		<plugins>
@@ -61,6 +73,8 @@
 							<targetSubDir>generated-resources</targetSubDir>
 							<runtimeArtifacts>
 								<runtimeArtifact>com.termmed:sample-database-qa</runtimeArtifact>
+								<!-- <runtimeArtifact>org.ihtsdo.sample:database</runtimeArtifact> -->
+								<!-- <runtimeArtifact>org.ihtsdo.sample:full-database</runtimeArtifact> -->
 							</runtimeArtifacts>
 						</configuration>
 					</execution>
@@ -105,7 +119,7 @@
 						</goals>
 						<configuration>
 							<test_path_uuid>2faa9260-8fb2-11db-b606-0800200c9a66</test_path_uuid>
-							<execution_name>Execution test 1</execution_name>
+							<execution_name>Daily morning qa execution of release candidate</execution_name>
 							<test_time>2010.11.16 11:00:00 UTC</test_time>
 							<context_uuid>d974c480-f9b9-3ea1-91e8-b0a4b756a17d</context_uuid>
 						</configuration>
@@ -129,4 +143,15 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+        <profile>
+            <id>ramdisk</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <directory>/Volumes/ramdisk/maven-targets/${groupId}-${artifactId}/</directory>
+            </build>
+        </profile>
+  </profiles>
 </project>
