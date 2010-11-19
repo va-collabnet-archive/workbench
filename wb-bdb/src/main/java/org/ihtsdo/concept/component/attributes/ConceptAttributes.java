@@ -594,7 +594,7 @@ public class ConceptAttributes
         if (defined) {
             buf.append("is fully defined");
         }
-        if (defined) {
+        if (defined == false) {
             buf.append("is primitive");
         }
         return buf.toString();
