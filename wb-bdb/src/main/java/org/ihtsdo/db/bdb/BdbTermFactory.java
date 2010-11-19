@@ -273,7 +273,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     public SearchResult doLuceneSearch(String query) throws IOException, org.apache.lucene.queryParser.ParseException {
         Query q =
                 new QueryParser(LuceneManager.version, "desc", new StandardAnalyzer(LuceneManager.version))
-                    .parse(query);
+                    .parse(QueryParser.escape(query));
         return LuceneManager.search(q);
     }
 

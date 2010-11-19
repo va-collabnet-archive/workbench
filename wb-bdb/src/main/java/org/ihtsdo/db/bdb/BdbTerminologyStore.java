@@ -19,11 +19,14 @@ import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
 import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
+import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
+import org.ihtsdo.db.bdb.computer.kindof.TypeCache;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
@@ -317,6 +320,14 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 	@Override
 	public int getConceptNidForNid(int nid) throws IOException {
 		return Bdb.getConceptNid(nid);
+	}
+
+	@Override
+	public KindOfCacheBI getCache(Coordinate coordinate) throws Exception {
+		TypeCache c = new IsaCache(Bdb.getConceptDb().getConceptNidSet());
+		c.setup(coordinate);
+		c.getLatch().await();
+		return c;
 	}
 
     

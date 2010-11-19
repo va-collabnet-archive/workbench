@@ -13,9 +13,10 @@ import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
 import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.NidSetBI;
 
-public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnable {
+public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnable, KindOfCacheBI {
 	protected ConcurrentHashMap<Integer, int[]> typeMap;
     private List<ParallelConceptIterator> pcis;
     protected Coordinate coordinate;
@@ -24,6 +25,7 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
     private CountDownLatch latch = new CountDownLatch(1);
 	protected NidSetBI types;
 
+	@Override
 	public CountDownLatch getLatch() {
 		return latch;
 	}
@@ -44,6 +46,10 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 		super();
 	}
 		
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.db.bdb.computer.kindof.I_CacheKindOfRels#setup(org.ihtsdo.tk.api.Coordinate)
+	 */
+	@Override
 	public void setup(Coordinate coordinate) throws Exception {
 		this.coordinate = coordinate;
 		this.types = coordinate.getIsaTypeNids();
@@ -73,6 +79,10 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 				+ " in: " + elapsedTime);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.db.bdb.computer.kindof.I_CacheKindOfRels#isKindOf(int, int)
+	 */
+	@Override
 	public boolean isKindOf(int childNid, int parentNid) throws Exception {
 		return isKindOfNoLatch(childNid, parentNid);
 	}
