@@ -2,28 +2,22 @@ package org.ihtsdo.arena.context.action;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.UUID;
 
 import javax.swing.AbstractAction;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.drools.facts.DescSpecFact;
-import org.ihtsdo.tk.drools.facts.RelSpecFact;
 import org.ihtsdo.tk.drools.facts.SpecFact;
 import org.ihtsdo.tk.spec.DescriptionSpec;
-import org.ihtsdo.tk.spec.RelSpec;
 
 public class UpdateDescFromSpecAction extends AbstractAction {
 
@@ -56,7 +50,7 @@ public class UpdateDescFromSpecAction extends AbstractAction {
 		DescriptionSpec descSpec = ((DescSpecFact) spec).getDescSpec();
 		DescriptionVersionBI conceptDesc = (DescriptionVersionBI) concept;
 		
-		if(conceptDesc.getText() == descSpec.getDescText){
+		if(conceptDesc.getText() == descSpec.getDescText()){
 			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 			I_DescriptionVersioned description = Terms.get().getDescription(Terms.get().uuidToNative(descSpec.getUuids())); //null
 			I_DescriptionPart descPart = description.getTuples(config.getConflictResolutionStrategy()).iterator().next().getMutablePart();
