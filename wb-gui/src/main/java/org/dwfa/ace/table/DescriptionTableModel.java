@@ -141,7 +141,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 
     public Object getValueAt(int rowIndex, int columnIndex) {
         try {
-            if (rowIndex >= getRowCount() || rowIndex < 0) {
+            if (rowIndex >= getRowCount() || rowIndex < 0 || columnIndex < 0) {
                 return null;
             }
             I_DescriptionTuple desc = getDescription(rowIndex);

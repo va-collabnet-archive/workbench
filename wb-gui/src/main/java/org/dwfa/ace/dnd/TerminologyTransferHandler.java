@@ -184,7 +184,9 @@ public class TerminologyTransferHandler extends TransferHandler {
                         int selectedColumn = termTable.getSelectedColumn();
                         int modelRow = termTable.convertRowIndexToModel(selectedRow);
                         int modelColumn = termTable.convertColumnIndexToModel(selectedColumn);
-
+                        if (modelColumn < 0) {
+                        	modelColumn = 0;
+                        }
                         StringWithDescTuple swdt = (StringWithDescTuple) dtm.getValueAt(modelRow, modelColumn);
                         I_DescriptionTuple desc = swdt.getTuple();
                         TableColumn column = termTable.getColumnModel().getColumn(termTable.getSelectedColumn());
