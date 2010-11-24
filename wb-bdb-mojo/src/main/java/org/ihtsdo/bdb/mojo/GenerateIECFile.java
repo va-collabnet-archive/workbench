@@ -64,11 +64,24 @@ public class GenerateIECFile extends AbstractMojo  {
     /**
      * File name for the resulting generated change set.
      * 
-     * @parameter default-value="export.eccs"
+     * @parameter default-value="exportFile"
      * @required
      * 
      */
     private String changeSetFile;
+    
+    /**
+     * Format of the generated file.
+     * Allowed values are: <code>eccs</code> (e-concept change set) and <code>iec</code> (incremental e-concept).
+     * <p>
+     * The format will be appended to the end of the provided file name. In the default case, the resulting
+     * file name will be: <code>exportFile.eccs</code>
+     * 
+     * @parameter default-value="eccs"
+     * @required
+     * 
+     */
+    private String format;
     
     /**
      * output directory.
@@ -97,8 +110,12 @@ public class GenerateIECFile extends AbstractMojo  {
                 }
             }
             ChangeSetPolicy changeSetPolicy = ChangeSetPolicy.valueOf(policy);
+            if (!changeSetFile.endsWith(format)) {
+                changeSetFile = changeSetFile + "." + format;
+            }
+            boolean timeStampEnabled = format.toLowerCase().equals("eccs");
             EConceptChangeSetWriter writer = new EConceptChangeSetWriter(new File(output, changeSetFile), 
-                new File(output, changeSetFile + ".tmp"), changeSetPolicy.convert(), false);
+                new File(output, changeSetFile + ".tmp"), changeSetPolicy.convert(), timeStampEnabled);
             String key = UUID.randomUUID().toString();
             ChangeSetWriterHandler.addWriter(key, writer);
             IntSet sapsToWrite = Bdb.getSapDb().getSpecifiedSapNids(pathIds, TimeUtil.getFileDateFormat().parse(startDate).getTime(), 
