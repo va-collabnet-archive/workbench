@@ -18,6 +18,7 @@ package org.ihtsdo.tk.spec;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.List;
 
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.Coordinate;
@@ -51,6 +52,18 @@ public class DescriptionSpec implements SpecBI {
 		this.conceptSpec = concept;
 		this.descTypeSpec = descType;
 	}
+	
+
+	public DescriptionSpec(List<UUID> descUuids, ConceptSpec concept, 
+			ConceptSpec descType, String description) {
+		UUID[] uuid = descUuids.toArray(new UUID[0]);
+		this.descUuids = uuid;
+		this.descText = description;
+		this.conceptSpec = concept;
+		this.descTypeSpec = descType;
+	}
+
+
 
 	public DescriptionVersionBI get(Coordinate c) throws IOException {
 		ConceptVersionBI concept = conceptSpec.get(c);
