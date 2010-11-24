@@ -50,6 +50,11 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.classifier.DiffTableModel;
 import org.dwfa.ace.classifier.EquivTableModel;
 import org.dwfa.ace.list.TerminologyIntList;
@@ -64,6 +69,9 @@ import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.ace.table.RelTableModel.REL_FIELD;
 import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
+import org.dwfa.ace.table.refset.RefsetMemberTableModel;
+import org.dwfa.ace.table.refset.StringWithExtTuple;
+import org.dwfa.ace.table.refset.RefsetMemberTableModel.REFSET_FIELDS;
 import org.dwfa.ace.tree.ConceptBeanForTree;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.ace.tree.JTreeWithDragImage;
@@ -142,12 +150,60 @@ public class TerminologyTransferHandler extends TransferHandler {
             } else if (JTable.class.isAssignableFrom(c.getClass())) {
                 JTable termTable = (JTable) c;
                 TableModel tableModel = termTable.getModel();
-                if (RelTableModel.class.isAssignableFrom(tableModel.getClass())) {
+                if (RefsetMemberTableModel.class.isAssignableFrom(tableModel.getClass())) {
+                    TableModel dtm = termTable.getModel();
+                    if (termTable.getSelectedRow() >= 0) {
+                        int selectedRow = termTable.getSelectedRow();
+                        int selectedColumn = termTable.getSelectedColumn();
+                        int modelRow = termTable.convertRowIndexToModel(selectedRow);
+                        int modelColumn = termTable.convertColumnIndexToModel(selectedColumn);
+                        if (modelColumn < 0) {
+                        	modelColumn = 0;
+                        }
+                        StringWithExtTuple swet = (StringWithExtTuple) dtm.getValueAt(modelRow, modelColumn);
+                        I_ExtendByRefVersion extVersion = swet.getTuple();
+                        TableColumn column = termTable.getColumnModel().getColumn(termTable.getSelectedColumn());
+                        REFSET_FIELDS columnField = (REFSET_FIELDS) column.getIdentifier();
+                        switch (columnField) {
+						case BOOLEAN_VALUE:
+	                        return new StringSelection(Boolean.toString(
+	                        		((I_ExtendByRefPartBoolean) extVersion.getMutablePart()).getBooleanValue()));
+						case COMPONENT_ID:
+	                        return new ConceptTransferable(Terms.get().getConcept(extVersion.getComponentId()));
+						case CONCEPT_ID:
+	                        return new ConceptTransferable(Terms.get().getConcept(
+	                        		((I_ExtendByRefPartCid) extVersion.getMutablePart()).getC1id()));
+						case INTEGER_VALUE:
+	                        return new StringSelection(Integer.toString(
+	                        		((I_ExtendByRefPartInt) extVersion.getMutablePart()).getIntValue()));
+						case MEMBER_ID:
+	                        return new ConceptTransferable(Terms.get().getConcept(extVersion.getComponentId()));
+						case PATH:
+	                        return new ConceptTransferable(Terms.get().getConcept(extVersion.getPathNid()));
+						case REFSET_ID:
+	                        return new ConceptTransferable(Terms.get().getConcept(extVersion.getRefsetId()));
+						case STATUS:
+	                        return new ConceptTransferable(Terms.get().getConcept(extVersion.getStatusNid()));
+						case STRING_VALUE:
+	                        return new StringSelection(
+	                        		((I_ExtendByRefPartStr) extVersion.getMutablePart()).getStringValue());
+						case VERSION:
+	                        return new StringSelection(swet.getCellText());
+						default:
+	                        throw new UnsupportedOperationException("Can't convert " + columnField + " to a transferable");
+						}
+                    }
+                    return null;
+                	
+                } else if (RelTableModel.class.isAssignableFrom(tableModel.getClass())) {
                     TableModel rtm = termTable.getModel();
                     int selectedRow = termTable.getSelectedRow();
                     int selectedColumn = termTable.getSelectedColumn();
                     int modelRow = termTable.convertRowIndexToModel(selectedRow);
                     int modelColumn = termTable.convertColumnIndexToModel(selectedColumn);
+                    if (modelColumn < 0) {
+                    	modelColumn = 0;
+                    }
 
                     StringWithRelTuple swrt = (StringWithRelTuple) rtm.getValueAt(modelRow, modelColumn);
                     I_RelTuple rel = swrt.getTuple();
