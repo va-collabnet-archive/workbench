@@ -2,10 +2,16 @@ package org.ihtsdo.arena.context.action;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.UUID;
+import java.util.Collection;
 
 import javax.swing.AbstractAction;
 
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.Terms;
@@ -13,23 +19,32 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.ContraditionException;//THIS
+import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.ComponentBI;
+import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
+import org.ihtsdo.tk.drools.facts.ComponentFact;
 import org.ihtsdo.tk.drools.facts.DescSpecFact;
+import org.ihtsdo.tk.drools.facts.DescFact;
 import org.ihtsdo.tk.drools.facts.SpecFact;
+import org.ihtsdo.tk.drools.facts.RelSpecFact;
 import org.ihtsdo.tk.spec.DescriptionSpec;
+import org.ihtsdo.tk.spec.RelSpec;
 
 public class UpdateDescFromSpecAction extends AbstractAction {
 
 	private static final long serialVersionUID = 1L;
 
-	ConceptVersionBI concept;
+	ConceptVersionBI component;
 	SpecFact<?> spec;
 
 	public UpdateDescFromSpecAction(String actionName, 
-			ConceptFact concept, SpecFact<?> spec) throws IOException {
+			ConceptFact fact, SpecFact<?> spec) throws IOException {
 		super(actionName);
-		this.concept = concept.getConcept();
+		this.component = fact.getComponent();
 		this.spec = spec;
 	}
 
@@ -46,34 +61,81 @@ public class UpdateDescFromSpecAction extends AbstractAction {
 		}
 	}
 
-	private void updateDesc() throws TerminologyException, IOException {
-		DescriptionSpec descSpec = ((DescSpecFact) spec).getDescSpec();
-		DescriptionVersionBI conceptDesc = (DescriptionVersionBI) concept;
+	private void updateDesc() throws TerminologyException, IOException, ContraditionException {
+		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+		I_GetConceptData concept = Terms.get().getConceptForNid(component.getNid());
 		
-		if(conceptDesc.getText() == descSpec.getDescText()){
-			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-			I_DescriptionVersioned description = Terms.get().getDescription(Terms.get().uuidToNative(descSpec.getUuids())); //null
-			I_DescriptionPart descPart = description.getTuples(config.getConflictResolutionStrategy()).iterator().next().getMutablePart();
-			I_DescriptionPart newPart = (I_DescriptionPart) descPart.makeAnalog(
-					ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), 
-					config.getEditingPathSet().iterator().next().getConceptNid(), 
-					Long.MAX_VALUE);
-			newPart.setText(descSpec.getDescText());
-			description.addVersion(newPart);
-		}
-		else{ //new
-			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-			I_DescriptionVersioned description = Terms.get().getDescription(Terms.get().uuidToNative(descSpec.getUuids())); //null
-			I_DescriptionPart descPart = description.getTuples(config.getConflictResolutionStrategy()).iterator().next().getMutablePart();
-			I_DescriptionPart newPart = (I_DescriptionPart) descPart.makeAnalog(
-					ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), 
-					config.getEditingPathSet().iterator().next().getConceptNid(), 
-					Long.MAX_VALUE);
-			newPart.setText(conceptDesc.getText());
-			description.addVersion(newPart);
-			//HERE
-		}
-		Terms.get().addUncommitted(Terms.get().getConcept(concept.getNid()));
+		Collection descriptions = component.getDescsActive();
+		
+		for (Object descObject : descriptions) {
+			DescriptionVersionBI desc = (DescriptionVersionBI) descObject;
+			DescriptionSpec descSpec = ((DescSpecFact) spec).getDescSpec(); 
+			
+			if (desc.getTypeNid() == descSpec.getDescTypeSpec().getNid() && !(desc.getText().equals(descSpec.getDescText()))) { //if desc type is equal and text has changed, retire and make new
+				
+				//description
+				if (DescSpecFact.class.isAssignableFrom(spec.getClass())) {
+					
+					Terms.get().newDescription(UUID.randomUUID(),  Terms.get().getConcept(concept.getNid()), 
+							descSpec.getLangText(), 
+							descSpec.getDescText(), 
+							Terms.get().getConcept(descSpec.getDescTypeSpec().getNid()), 
+							config, ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+					Terms.get().addUncommitted(Terms.get().getConcept(concept.getNid()));
+				}
+				
+				//concept
+				if (RelSpecFact.class.isAssignableFrom(spec.getClass())) {
+					RelSpec relSpec = ((RelSpecFact) spec).getRelSpec();
+					Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
+					I_GetConceptData originConcept = Terms.get().getConcept(concept.getNid());
+					I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), 
+							originConcept, 
+							relSpec.getRelTypeSpec().getNid(), 
+							relSpec.getDestinationSpec().getNid(),
+							ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid(), 
+							ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.localize().getNid(), 
+							0, 
+							ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), 
+							config.getDbConfig().getUserConcept().getNid(),
+							pathItr.next().getConceptNid(), 
+				            Long.MAX_VALUE);
+					
+					while (pathItr.hasNext()) {
+						newRel.makeAnalog(newRel.getStatusNid(), newRel.getAuthorNid(), pathItr.next().getConceptNid(), Long.MAX_VALUE);
+					}
+					Terms.get().addUncommitted(originConcept);
+				}
+			
+			
+			
+				if (I_AmPart.class.isAssignableFrom(desc.getClass())) {
+					I_AmPart componentVersion = (I_AmPart) desc;
+					for (PathBI ep: config.getEditingPathSet()) {
+						componentVersion.makeAnalog(
+								ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), 
+								config.getDbConfig().getUserConcept().getNid(),
+								ep.getConceptNid(), 
+								Long.MAX_VALUE);
+					}
+					I_GetConceptData retireConcept = Terms.get().getConceptForNid(componentVersion.getNid());
+					Terms.get().addUncommitted(retireConcept);
+				}
+			}
+			
+			else{ //other: make analog and update
+				I_DescriptionVersioned description = Terms.get().getDescription(Terms.get().uuidToNative(descSpec.getUuids()));
+				I_DescriptionPart descPart = description.getTuples(config.getConflictResolutionStrategy()).iterator().next().getMutablePart();
+				I_DescriptionPart newPart = (I_DescriptionPart) descPart.makeAnalog(
+						ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), 
+						config.getEditingPathSet().iterator().next().getConceptNid(), 
+						Long.MAX_VALUE);
+				newPart.setText(descSpec.getDescText());
+				description.addVersion(newPart);
+			
+			}
+			Terms.get().addUncommitted(Terms.get().getConcept(concept.getNid()));
+		}	
 	}
 
 }
