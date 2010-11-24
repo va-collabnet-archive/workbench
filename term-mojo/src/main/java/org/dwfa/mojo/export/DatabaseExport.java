@@ -174,6 +174,13 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
     private int numberOfThreads = 1;
 
     /**
+     * Forward generate the language refset.
+     *
+     * @parameter
+     */
+    private boolean generateLangaugeRefset = true;
+
+    /**
      * Export file output handler for RF2
      */
     private ExportOutputHandler rf2OutputHandler;
@@ -294,6 +301,7 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
                 exportSpecification = new SnomedExportSpecification(positions, inclusionRoots, exclusionRoots,
                         NAMESPACE.fromString(defaultNamespace), PROJECT.valueOf(defaultProject));
                 ((SnomedExportSpecification)exportSpecification).setReleasePart(releasePart);
+                ((SnomedExportSpecification)exportSpecification).setGenerateLangaugeRefset(generateLangaugeRefset);
             }
 
 

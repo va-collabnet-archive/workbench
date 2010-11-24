@@ -281,7 +281,6 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
         Map<Integer,I_ThinExtByRefVersioned> extensionSet = new HashMap<Integer,I_ThinExtByRefVersioned>();
 
         for (I_DescriptionTuple currentDescription : TupleVersionPart.getLatestMatchingTuples(conceptDescriptionTuples)) {
-
             if (check.isDescriptionActive(currentDescription.getStatusId())) {
                 if (currentDescription.getTypeId() == preferredDescriptionType.getNid()) {
                     latestPreferredTerm = getAdrsVersion(currentDescription, latestPreferredTerm, true, true);
@@ -291,9 +290,13 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
                     latestUnSpecifiedDescriptionTypes = getAdrsVersion(currentDescription, latestUnSpecifiedDescriptionTypes, false);
                 }
             }
+        }
 
+        //retire US acceptable term, old preferred terms and update status and language types
+        for (I_DescriptionTuple currentDescription : TupleVersionPart.getLatestMatchingTuples(conceptDescriptionTuples)) {
             I_ThinExtByRefVersioned currentLanguageExtensions = getRefsetExtensionVersioned(adrsNid,currentDescription.getDescId());
-			if (currentLanguageExtensions != null) {
+
+        	if (currentLanguageExtensions != null) {
 				extensionSet.put(currentDescription.getDescId(), currentLanguageExtensions);
 				I_ThinExtByRefPartConcept latestPart = (I_ThinExtByRefPartConcept) TupleVersionPart.getLatestPart(currentLanguageExtensions.getVersions());
 				// retire inactive descriptions and active US terms that are Acceptable type
@@ -320,12 +323,21 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
 					}
 					updatedPart.setPathId(releasePart.getPathId());
 					updatedPart.setVersion(releasePart.getVersion());
+				// retire old preferred terms.
+				} else if (getLangaugeType(currentDescription.getTypeId()) == rf2PreferredDescriptionTypeNid
+						&& currentLanguageExtensions.getComponentId() != currentDescription.getConceptId()) {
+					I_ThinExtByRefPartConcept updatedPart = (I_ThinExtByRefPartConcept) latestPart.duplicate();
+					currentLanguageExtensions.addVersion(updatedPart);
+					updatedPart.setStatusId(retiredConcept.getNid());
+					updatedPart.setPathId(releasePart.getPathId());
+					updatedPart.setVersion(releasePart.getVersion());
 				}
 
 				componentDto.getDescriptionExtensionDtos().addAll(
 						extensionProcessor.processList(currentLanguageExtensions,
 								currentLanguageExtensions.getVersions(), TYPE.DESCRIPTION, true));
-			}
+        	}
+
         }
 
         //If update preferred term if new available
@@ -757,4 +769,11 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
     public final void setReleasePart(ThinConPart releasePart) {
         this.releasePart = releasePart;
     }
+
+	/**
+	 * @param generateLangaugeRefset the generateLangaugeRefset to set
+	 */
+	public final void setGenerateLangaugeRefset(boolean generateLangaugeRefset) {
+		this.generateLangaugeRefset = generateLangaugeRefset;
+	}
 }
