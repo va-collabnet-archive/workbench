@@ -17,7 +17,8 @@ import org.ihtsdo.time.TimeUtil;
 
 
 /**
- * Goal which generates an incremental e-concept file, in a change set format (.eccs).
+ * Goal which generates an incremental e-concept file, in a change set 
+ * format (.eccs), or in incremental e-concept format (.iec).
  * 
  * @goal generate-iec-file
  * 
