@@ -157,7 +157,7 @@ public class TerminologyTransferHandler extends TransferHandler {
                     case SOURCE_ID:
                         return new ConceptTransferable(Terms.get().getConcept(rel.getC1Id()));
                     case REL_TYPE:
-                        return new ConceptTransferable(Terms.get().getConcept(rel.getTypeId()));
+                        return new ConceptTransferable(Terms.get().getConcept(rel.getTypeNid()));
                     case DEST_ID:
                         return new ConceptTransferable(Terms.get().getConcept(rel.getC2Id()));
                     case REFINABILITY:
@@ -165,9 +165,9 @@ public class TerminologyTransferHandler extends TransferHandler {
                     case CHARACTERISTIC:
                         return new ConceptTransferable(Terms.get().getConcept(rel.getCharacteristicId()));
                     case STATUS:
-                        return new ConceptTransferable(Terms.get().getConcept(rel.getStatusId()));
+                        return new ConceptTransferable(Terms.get().getConcept(rel.getStatusNid()));
                     case PATH:
-                        return new ConceptTransferable(Terms.get().getConcept(rel.getPathId()));
+                        return new ConceptTransferable(Terms.get().getConcept(rel.getPathNid()));
                     case REL_ID:
                         return new StringSelection(rel.toString());
                     case VERSION:
@@ -188,32 +188,39 @@ public class TerminologyTransferHandler extends TransferHandler {
                         	modelColumn = 0;
                         }
                         StringWithDescTuple swdt = (StringWithDescTuple) dtm.getValueAt(modelRow, modelColumn);
-                        I_DescriptionTuple desc = swdt.getTuple();
-                        TableColumn column = termTable.getColumnModel().getColumn(termTable.getSelectedColumn());
-                        DESC_FIELD columnDesc = (DESC_FIELD) column.getIdentifier();
-                        switch (columnDesc) {
+                        if (swdt != null) {
+                            I_DescriptionTuple desc = swdt.getTuple();
+                            TableColumn column = termTable.getColumnModel().getColumn(termTable.getSelectedColumn());
+                            DESC_FIELD columnDesc = (DESC_FIELD) column.getIdentifier();
+                            switch (columnDesc) {
 
-                        case CON_ID:
-                            return new ConceptTransferable(Terms.get().getConcept(desc.getConceptNid()));
-                        case STATUS:
-                            return new ConceptTransferable(Terms.get().getConcept(desc.getStatusId()));
-                        case TYPE:
-                            return new ConceptTransferable(Terms.get().getConcept(desc.getTypeId()));
-                        case CASE_FIXED:
-                            return new StringSelection(Boolean.toString(desc.isInitialCaseSignificant()));
-                        case LANG:
-                            return new StringSelection(desc.getLang());
-                        case TEXT:
-                            return new DescriptionTransferable(desc);
-                        case PATH:
-                            return new ConceptTransferable(Terms.get().getConcept(desc.getPathId()));
-                        case DESC_ID:
-                            return new StringSelection(desc.toString());
-                        case VERSION:
-                            return new StringSelection(new Date(desc.getTime()).toString());
-                        default:
-                            throw new UnsupportedOperationException("Can't convert " + columnDesc
-                                + " to a concept bean");
+                            case CON_ID:
+                                return new ConceptTransferable(Terms.get().getConcept(desc.getConceptNid()));
+                            case STATUS:
+                                return new ConceptTransferable(Terms.get().getConcept(desc.getStatusNid()));
+                            case TYPE:
+                                return new ConceptTransferable(Terms.get().getConcept(desc.getTypeNid()));
+                            case CASE_FIXED:
+                                return new StringSelection(Boolean.toString(desc.isInitialCaseSignificant()));
+                            case LANG:
+                                return new StringSelection(desc.getLang());
+                            case TEXT:
+                                return new DescriptionTransferable(desc);
+                            case PATH:
+                                return new ConceptTransferable(Terms.get().getConcept(desc.getPathNid()));
+                            case DESC_ID:
+                                return new StringSelection(desc.toString());
+                            case VERSION:
+                                return new StringSelection(new Date(desc.getTime()).toString());
+                            default:
+                                throw new UnsupportedOperationException("Can't convert " + columnDesc
+                                    + " to a concept bean");
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(termTable, "No valid row is selected.", "Copy error",
+                                    JOptionPane.ERROR_MESSAGE);
+                                return null;
+
                         }
                     } else {
                         JOptionPane.showMessageDialog(termTable, "No row is selected.", "Copy error",
