@@ -17,6 +17,7 @@
 package org.dwfa.ace.file;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -53,14 +54,20 @@ public class ConceptListReader extends IterableFileReader<I_GetConceptData> {
             if (conceptId.length() == 0 || description.length() == 0) {
                 throw new TerminologyException("Invalid file format");
             }
-
-            for (I_GetConceptData concept : termFactory.getConcept(conceptId)) {
+            if (conceptId.length() == 36) {
+                I_GetConceptData concept = termFactory.getConcept(UUID.fromString(conceptId));
+                // validate against the description to ensure the id matches
+                if (verifyDescription(concept, description)) {
+                    return concept;
+                }
+             }
+            for (I_GetConceptData concept: termFactory.getConcept(conceptId)) {
                 // validate against the description to ensure the id matches
                 if (verifyDescription(concept, description)) {
                     return concept;
                 }
             }
-
+            
             throw new TerminologyException("Cannot find a concept with ID " + conceptId + " and the description '"
                 + description + "'");
 
