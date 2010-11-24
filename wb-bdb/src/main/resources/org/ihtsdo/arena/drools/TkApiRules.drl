@@ -53,7 +53,7 @@ rule "FSN not satisfies desc constraint"
 	then 
 
 		   for (DescriptionVersionBI $d : $c.getDescsActive(WbDescType.FULLY_SPECIFIED.getNid())) {
-   		    	templates.put(new DescriptionSpec($c.getUUIDs(), #from null
+   		    	templates.put(new DescriptionSpec($d.getUUIDs(), #from c
    		    									  SpecFactory.get($c), 
    		    									  WbDescType.FULLY_SPECIFIED, 
    		    									  $d.getText() + " (ADD TAG)"), 
@@ -71,7 +71,7 @@ rule "no FSN"
 	then 
 
 		for (DescriptionVersionBI $d : $c.getDescsActive(WbDescType.PREFERRED.getNid())) {
-   		    	templates.put(new DescriptionSpec($c.getUUIDs(), #fromNull
+   		    	templates.put(new DescriptionSpec($d.getUUIDs(), #from c
    		    									  SpecFactory.get($c), 
    		    									  WbDescType.FULLY_SPECIFIED, 
    		    									  $d.getText() + " (ADD TAG (NO FSN))"), 
