@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
 
 import jsr166y.ConcurrentReferenceHashMap;
@@ -45,7 +47,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.types.IntSet;
-import org.ihtsdo.concept.component.ComponentList;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.description.Description.Version;
@@ -129,8 +130,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             }
         }
         if (eConcept.getDescriptions() != null
-                && eConcept.getDescriptions().size() != 0) {
-            if (c.getDescriptions() == null || c.getDescriptions().size() == 0) {
+                && !eConcept.getDescriptions().isEmpty()) {
+            if (c.getDescriptions() == null || c.getDescriptions().isEmpty()) {
                 setDescriptionsFromEConcept(eConcept, c);
             } else {
                 Set<Integer> currentDNids = c.data.getDescNids();
@@ -149,8 +150,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             }
         }
         if (eConcept.getRelationships() != null
-                && eConcept.getRelationships().size() != 0) {
-            if (c.getSourceRels() == null || c.getSourceRels().size() == 0) {
+                && !eConcept.getRelationships().isEmpty()) {
+            if (c.getSourceRels() == null || c.getSourceRels().isEmpty()) {
                 setRelationshipsFromEConcept(eConcept, c);
             } else {
                 Set<Integer> currentSrcRelNids = c.data.getSrcRelNids();
@@ -166,8 +167,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             }
         }
         if (eConcept.getImages() != null
-                && eConcept.getImages().size() != 0) {
-            if (c.getImages() == null || c.getImages().size() == 0) {
+                && !eConcept.getImages().isEmpty()) {
+            if (c.getImages() == null || c.getImages().isEmpty()) {
                 setImagesFromEConcept(eConcept, c);
             } else {
                 Set<Integer> currentImageNids = c.data.getImageNids();
@@ -183,8 +184,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             }
         }
         if (eConcept.getRefsetMembers() != null
-                && eConcept.getRefsetMembers().size() != 0) {
-            if (c.getRefsetMembers() == null || c.getRefsetMembers().size() == 0) {
+                && !eConcept.getRefsetMembers().isEmpty()) {
+            if (c.getRefsetMembers() == null || c.getRefsetMembers().isEmpty()) {
                 setRefsetMembersFromEConcept(eConcept, c);
             } else {
                 Set<Integer> currentMemberNids = c.data.getMemberNids();
@@ -353,13 +354,15 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         data.resetNidData();
     }
 
+    @Override
     public int getNid() {
         return nid;
     }
 
+    @Override
     public Collection<Description> getDescriptions() throws IOException {
         if (isCanceled()) {
-            return new ComponentList<Description>(new ArrayList<Description>());
+            return new ConcurrentSkipListSet<Description>(new ComponentComparator());
         }
         return data.getDescriptions();
     }
@@ -368,7 +371,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             NidSetBI allowedTypes, PositionSetBI viewPositions,
             Precedence precedence, ContradictionManagerBI contradictionMgr) throws IOException {
         if (isCanceled()) {
-            return new ComponentList<Description.Version>(new ArrayList<Description.Version>());
+            return new ConcurrentSkipListSet<Description.Version>(new ComponentComparator());
         }
         Collection<Description> descriptions = getDescriptions();
         List<Description.Version> versions = new ArrayList<Version>(descriptions.size());
@@ -384,7 +387,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             NidSetBI allowedTypes, PositionSetBI viewPositions,
             Precedence precedence, ContradictionManagerBI contradictionMgr) throws IOException {
         if (isCanceled()) {
-            return new ComponentList<Relationship.Version>(new ArrayList<Relationship.Version>());
+            return new ArrayList<Relationship.Version>();
         }
         Collection<Relationship> rels = getNativeSourceRels();
         List<Relationship.Version> versions = new ArrayList<Relationship.Version>(rels.size());
@@ -400,7 +403,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             NidSetBI allowedTypes, PositionSetBI viewPositions,
             Precedence precedence, ContradictionManagerBI contradictionMgr) throws IOException {
         if (isCanceled()) {
-            return new ComponentList<Image.Version>(new ArrayList<Image.Version>());
+            return new ConcurrentSkipListSet<Image.Version>(new ComponentComparator());
         }
         Collection<Image> media = getImages();
         List<Image.Version> versions = new ArrayList<Image.Version>(media.size());
@@ -412,13 +415,14 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return versions;
     }
 
-    public ComponentList<Relationship> getSourceRels() throws IOException {
+    @Override
+    public Collection<Relationship> getSourceRels() throws IOException {
         return getNativeSourceRels();
     }
 
-    public ComponentList<Relationship> getNativeSourceRels() throws IOException {
+    public Collection<Relationship> getNativeSourceRels() throws IOException {
         if (isCanceled()) {
-            return new ComponentList<Relationship>(new ArrayList<Relationship>());
+            return new ConcurrentSkipListSet<Relationship>();
         }
         return data.getSourceRels();
     }
@@ -459,6 +463,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     }
 
     @Deprecated
+    @Override
     public List<UUID> getUids() throws IOException {
         if (getConceptAttributes() != null) {
             return getConceptAttributes().getUUIDs();
@@ -466,6 +471,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return new ArrayList<UUID>();
     }
 
+    @Override
     public List<UUID> getUUIDs() {
         try {
             if (getConceptAttributes() != null) {
@@ -477,6 +483,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return new ArrayList<UUID>();
     }
 
+    @Override
     public UUID getPrimUuid() {
         try {
             if (getConceptAttributes() != null) {
@@ -498,6 +505,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return new ArrayList<UUID>();
     }
 
+    @Override
     public List<I_ConceptAttributeTuple> getConceptAttributeTuples(
             NidSetBI allowedStatus, PositionSetBI positionSet,
             Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
@@ -511,6 +519,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return returnTuples;
     }
 
+    @Override
     public List<I_ConceptAttributeTuple> getConceptAttributeTuples(
             Precedence precedencePolicy, ContradictionManagerBI contradictionManager) throws IOException,
             TerminologyException {
@@ -520,6 +529,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return getConceptAttributeTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), precedencePolicy, contradictionManager);
     }
 
+    @Override
     public ConceptAttributes getConceptAttributes() throws IOException {
         if (data != null) {
             return data.getConceptAttributes();
@@ -531,7 +541,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             PositionSetBI viewPositions,
             Precedence precedence, ContradictionManagerBI contradictionMgr) throws IOException {
         if (isCanceled()) {
-            return new ComponentList<ConceptAttributes.Version>(new ArrayList<ConceptAttributes.Version>());
+            return new ArrayList<ConceptAttributes.Version>();
         }
         List<ConceptAttributes.Version> versions = new ArrayList<ConceptAttributes.Version>(2);
         versions.addAll(getConceptAttributes().getVersions(allowedStatus,
@@ -548,18 +558,20 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return returnList;
     }
 
+    @Override
     public int getConceptNid() {
         return nid;
     }
 
+    @Override
     public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder,
             I_IntList langPrefOrder, NidSetBI allowedStatus,
             PositionSetBI positionSet, LANGUAGE_SORT_PREF sortPref,
             Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
             throws IOException {
         NidSetBI typeSet = new IntSet();
-        for (int nid : typePrefOrder.getListArray()) {
-            typeSet.add(nid);
+        for (int typeNid : typePrefOrder.getListArray()) {
+            typeSet.add(typeNid);
         }
         switch (sortPref) {
             case LANG_B4_TYPE:
@@ -658,6 +670,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 config.getPrecedence(), config.getConflictResolutionStrategy());
     }
 
+    @Override
     public List<I_DescriptionTuple> getDescriptionTuples(
             NidSetBI allowedStatus, NidSetBI allowedTypes,
             PositionSetBI positions,
@@ -670,6 +683,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return returnDescriptions;
     }
 
+    @Override
     public List<I_DescriptionTuple> getDescriptionTuples() throws IOException,
             TerminologyException {
 
@@ -679,6 +693,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 config.getPrecedence(), config.getConflictResolutionStrategy());
     }
 
+    @Override
     public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedTypes,
             Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
             throws IOException, TerminologyException {
@@ -689,6 +704,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 precedencePolicy, contradictionManager);
     }
 
+    @Override
     public Collection<Relationship> getDestRels() throws IOException {
         if (isCanceled()) {
             return new ArrayList<Relationship>();
@@ -696,6 +712,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return data.getDestRels();
     }
 
+    @Override
     public Collection<RefsetMember<?, ?>> getExtensions() throws IOException {
         if (isCanceled()) {
             return new ArrayList<RefsetMember<?, ?>>();
@@ -712,6 +729,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return data.getRefsetMemberForComponent(componentNid);
     }
 
+    @Override
     public List<I_ImageTuple> getImageTuples() throws IOException,
             TerminologyException {
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -720,6 +738,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 config.getPrecedence(), config.getConflictResolutionStrategy());
     }
 
+    @Override
     public Collection<Image> getImages() throws IOException {
         return data.getImages();
     }
@@ -736,6 +755,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return null;
     }
 
+    @Override
     public String getInitialText() throws IOException {
         if (isCanceled()) {
             return "canceled";
@@ -781,7 +801,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         }
 
         List<I_DescriptionVersioned> localDesc = getUncommittedDescriptions();
-        if (localDesc.size() == 0) {
+        if (localDesc.isEmpty()) {
             try {
                 if (fsDescNid == Integer.MIN_VALUE) {
                     fsDescNid = Terms.get().uuidToNative(
@@ -818,6 +838,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return first.getText();
     }
 
+    @Override
     public Set<I_GetConceptData> getSourceRelTargets(NidSetBI allowedTypes,
             Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
             throws IOException, TerminologyException {
@@ -842,10 +863,12 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return Collections.unmodifiableList(new ArrayList<I_DescriptionVersioned>());
     }
 
+    @Override
     public List<I_Identify> getUncommittedIdVersioned() {
         return Collections.unmodifiableList(new ArrayList<I_Identify>());
     }
 
+    @Override
     public NidSetBI getUncommittedIds() {
         return new IntSet();
     }
@@ -858,6 +881,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return Collections.unmodifiableList(new ArrayList<I_RelVersioned>());
     }
 
+    @Override
     public UniversalAceBean getUniversalAceBean() throws IOException,
             TerminologyException {
         UniversalAceBean uab = new UniversalAceBean();
@@ -880,6 +904,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return uab;
     }
 
+    @Override
     public boolean isLeaf(I_ConfigAceFrame aceConfig, boolean addUncommitted)
             throws IOException {
 
@@ -907,6 +932,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return false;
     }
 
+    @Override
     public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,
             Precedence precedence) throws IOException, TerminologyException {
         boolean promotedAnything = false;
@@ -1045,11 +1071,13 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return false;
     }
 
+    @Override
     public boolean isParentOf(I_GetConceptData child) throws IOException, TerminologyException {
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
         return isParentOf(child, config.getAllowedStatus(), config.getDestRelTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
     }
 
+    @Override
     public boolean isParentOfOrEqualTo(I_GetConceptData child) throws IOException, TerminologyException {
         if (child == this) {
             return true;
@@ -1094,6 +1122,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
      * (non-Javadoc)
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
         try {
             if (!isCanceled()) {
@@ -1106,6 +1135,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         }
     }
 
+    @Override
     public String toUserString() {
         try {
             if (!isCanceled()) {
@@ -1123,6 +1153,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
      * 
      * @return
      */
+    @Override
     public String toLongString() {
         StringBuffer buff = new StringBuffer();
         try {
@@ -1189,14 +1220,17 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return data.getRefsetMember(memberNid);
     }
 
+    @Override
     public Relationship getDestRel(int relNid) throws IOException {
         return Bdb.getConceptForComponent(relNid).getRelationship(relNid);
     }
 
+    @Override
     public Relationship getSourceRel(int relNid) throws IOException {
         return getRelationship(relNid);
     }
 
+    @Override
     public boolean isUncommitted() {
         return data.isUncommitted();
     }
@@ -1249,11 +1283,12 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         data.setLastWrite(version);
     }
 
-    public ComponentList<RefsetMember<?, ?>> getRefsetMembers()
+    public ConcurrentSkipListSet<RefsetMember<?, ?>> getRefsetMembers()
             throws IOException {
         return data.getRefsetMembers();
     }
 
+    @Override
     public boolean isCanceled() throws IOException {
         if (getConceptAttributes() == null || getConceptAttributes().getTime() == Long.MIN_VALUE) {
             return true;
@@ -1261,14 +1296,17 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return false;
     }
 
+    @Override
     public final Set<I_DescriptionTuple> getCommonDescTuples(I_ConfigAceFrame config) throws IOException {
         return ConflictHelper.getCommonDescTuples(this, config);
     }
 
+    @Override
     public final Set<I_RelTuple> getCommonRelTuples(I_ConfigAceFrame config) throws IOException, TerminologyException {
         return ConflictHelper.getCommonRelTuples(this, config);
     }
 
+    @Override
     public final Set<I_ConceptAttributeTuple> getCommonConceptAttributeTuples(I_ConfigAceFrame config)
             throws IOException, TerminologyException {
         return ConflictHelper.getCommonConceptAttributeTuples(this, config);
@@ -1276,7 +1314,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     @Override
     public boolean everHadSrcRelOfType(int typeNid) throws IOException {
-        ComponentList<Relationship> rels = getSourceRels();
+        Collection<Relationship> rels = getSourceRels();
         for (Relationship r : rels) {
             if (r.everWasType(typeNid)) {
                 return true;
@@ -1307,6 +1345,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         }
     }
 
+    @Override
     public I_RepresentIdSet getPossibleChildOfConcepts(I_ConfigAceFrame config) throws IOException {
         NidSetBI isATypes = config.getDestRelTypes();
         I_RepresentIdSet possibleChildOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
@@ -1330,6 +1369,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     }
 
     @Deprecated
+    @Override
     public Set<Concept> getDestRelOrigins(NidSetBI allowedTypes) throws IOException, TerminologyException {
 
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -1468,6 +1508,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         }
     }
 
+    @Override
     public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {
         return getPossibleKindOfConcepts(config, null);
     }
@@ -1481,7 +1522,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     }
 
     public boolean hasMediaExtensions() throws IOException {
-        if (data.getImageNids() == null || data.getImageNids().size() == 0) {
+        if (data.getImageNids() == null || data.getImageNids().isEmpty()) {
             return false;
         }
         for (int imageNid : data.getImageNids()) {

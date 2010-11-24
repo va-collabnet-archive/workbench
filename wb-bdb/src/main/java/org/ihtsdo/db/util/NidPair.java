@@ -5,7 +5,7 @@ import java.util.List;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
 
-public abstract class NidPair {
+public abstract class NidPair implements Comparable<NidPair> {
 	protected int nid1;
 	protected int nid2;
 	private int hash;
@@ -55,8 +55,11 @@ public abstract class NidPair {
 
 	@Override
 	public boolean equals(Object obj) {
-		NidPair another = (NidPair) obj;
+            if (obj.getClass().isAssignableFrom(NidPair.class)) {
+ 		NidPair another = (NidPair) obj;
 		return this.nid1 == another.nid1 && this.nid2 == another.nid2;
+            }
+            return false;
 	}
 
 	@Override
@@ -77,5 +80,17 @@ public abstract class NidPair {
 	public boolean isRefsetPair() {
 		return !isRelPair();
 	}
+
+    @Override
+    public int compareTo(NidPair o) {
+        long diff = asLong() - o.asLong();
+        if (diff > 0) {
+            return 1;
+        }
+        if (diff < 0) {
+            return -1;
+        }
+        return 0;
+    }
 
 }

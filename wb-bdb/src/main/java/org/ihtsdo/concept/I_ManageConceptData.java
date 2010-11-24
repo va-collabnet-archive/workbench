@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.ihtsdo.concept.component.ComponentList;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.image.Image;
@@ -16,6 +15,10 @@ import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import org.ihtsdo.concept.ConceptDataManager.AddDescriptionList;
+import org.ihtsdo.concept.ConceptDataManager.AddImageList;
+import org.ihtsdo.concept.ConceptDataManager.AddMemberList;
+import org.ihtsdo.concept.ConceptDataManager.AddSrcRelList;
 
 public interface I_ManageConceptData {
 
@@ -26,21 +29,21 @@ public interface I_ManageConceptData {
 	public int getReadWriteDataVersion() throws InterruptedException,
 			ExecutionException, IOException;
 
-	public ComponentList<Relationship> getSourceRels() throws IOException;
-	public ComponentList<Relationship> getSourceRelsIfChanged() throws IOException;
+	public AddSrcRelList getSourceRels() throws IOException;
+	public Collection<Relationship> getSourceRelsIfChanged() throws IOException;
 
-	public ComponentList<Description> getDescriptions() throws IOException;
-	public ComponentList<Description> getDescriptionsIfChanged() throws IOException;
+	public AddDescriptionList getDescriptions() throws IOException;
+	public Collection<Description> getDescriptionsIfChanged() throws IOException;
 
 	public ConceptAttributes getConceptAttributes() throws IOException;
 	public ConceptAttributes getConceptAttributesIfChanged() throws IOException;
 
 	public RefsetMember<?, ?> getRefsetMemberForComponent(int componentNid) throws IOException;
-	public ComponentList<RefsetMember<?, ?>> getRefsetMembers() throws IOException;
-	public ComponentList<RefsetMember<?, ?>> getRefsetMembersIfChanged() throws IOException;
+	public AddMemberList getRefsetMembers() throws IOException;
+	public Collection<RefsetMember<?, ?>> getRefsetMembersIfChanged() throws IOException;
 
-	public ComponentList<Image> getImages() throws IOException;
-	public ComponentList<Image> getImagesIfChanged() throws IOException;
+	public AddImageList getImages() throws IOException;
+	public Collection<Image> getImagesIfChanged() throws IOException;
 
 	/**
 	 * Destination rels are stored as a relid and a type id in 

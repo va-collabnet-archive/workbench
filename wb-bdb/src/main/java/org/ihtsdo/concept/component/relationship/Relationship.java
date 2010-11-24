@@ -522,6 +522,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         return specifiedVersions;
     }
 
+    @Override
     public List<? extends I_RelTuple> getSpecifiedVersions(NidSetBI allowedStatus,
             PositionSetBI positions, Precedence precedencePolicy,
             ContradictionManagerBI contradictionManager)

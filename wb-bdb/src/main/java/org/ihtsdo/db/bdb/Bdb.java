@@ -167,7 +167,7 @@ public class Bdb {
 			statusAtPositionDb = new StatusAtPositionBdb(readOnly, mutable);
 			inform(activity, "loading concept database...");
 			conceptDb = new ConceptBdb(readOnly, mutable);
-			inform(activity, "settig up term factory...");
+			inform(activity, "setting up term factory...");
 			
 			String versionString = getProperty(G_VERSION);
 			if (versionString != null) {
