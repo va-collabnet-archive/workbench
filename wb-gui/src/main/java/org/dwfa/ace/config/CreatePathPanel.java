@@ -38,6 +38,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.path.SelectPathAndPositionPanelWithCombo;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.tk.api.PositionBI;
 
 public class CreatePathPanel extends JPanel implements ActionListener {
@@ -133,15 +134,16 @@ public class CreatePathPanel extends JPanel implements ActionListener {
             }
             I_GetConceptData selectedParent =  (I_GetConceptData) parent.getTermComponent();
             if (selectedParent == null) {
-                JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "You must designate one parent for path.");
+                JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "You must designate one parent for the path.");
                 return;
             }
 
             // Create a concept for the path
             I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             
-            I_GetConceptData cb = Terms.get().newConcept(UUID.randomUUID(), 
-            		false, config);
+            UUID pathUUID = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, desc.getText());
+
+            I_GetConceptData cb = Terms.get().newConcept(pathUUID,  false, config);
 
             // Needs a description record...
             Terms.get().newDescription(UUID.randomUUID(), cb, "en", desc.getText(),
@@ -168,7 +170,7 @@ public class CreatePathPanel extends JPanel implements ActionListener {
 
             Terms.get().newPath(origins, cb);
 
-            AceLog.getAppLog().info("Created new path: " + desc.getText() + " " + origins);
+            AceLog.getAppLog().info("Created new path: " + desc.getText() + " uuid: " + pathUUID + " Origins: " + origins);
             this.desc.setText("");
             this.parent.setTermComponent(null);
             Terms.get().commit();
