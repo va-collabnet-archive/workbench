@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.UUID;
 import java.util.Collection;
+import javax.swing.JOptionPane;// THIS
+import javax.swing.JFrame; //THIS
 
 import javax.swing.AbstractAction;
 
@@ -51,6 +53,7 @@ public class MoveRelGroupAction extends AbstractAction {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		
 		try {
 			I_GetConceptData concept = Terms.get().getConceptForNid(targetComponent.getNid());
 			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -80,6 +83,13 @@ public class MoveRelGroupAction extends AbstractAction {
 			 for (Object relObject: sourceRels) {
 				 Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
 				 ComponentVersionBI component = (ComponentVersionBI) relObject; 
+				 
+				 	/*This is what I was trying to get to work, needs to be in CopyRelAction and CloneRelGroupAction as well
+				 	 * if (component.getTime() == Long.MAX_VALUE) {
+				 		JOptionPane.showMessageDialog(new JFrame(), "Please commit before next operation");
+				 		return;
+				 	}*/
+				 	
 				
 							RelationshipVersionBI rel = (RelationshipVersionBI) component;
  							I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), concept, 
@@ -112,7 +122,8 @@ public class MoveRelGroupAction extends AbstractAction {
 							I_GetConceptData retireConcept = Terms.get().getConceptForNid(componentVersion.getNid());
 							Terms.get().addUncommitted(retireConcept);
 						}
-				 }
+				 	}
+				
 		} catch (TerminologyException e1) {
 			AceLog.getAppLog().alertAndLogException(e1);
 		} catch (IOException e1) {
