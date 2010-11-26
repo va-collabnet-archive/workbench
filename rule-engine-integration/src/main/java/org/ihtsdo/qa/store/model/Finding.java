@@ -7,7 +7,7 @@ public class Finding extends ViewPointSpecificObject {
 	private UUID executionUuid;
 	private UUID ruleUuid;
 	private UUID componentUuid;
-    private String errorMessage;
+    private String details;
 
 	public Finding() {
 	}
@@ -44,12 +44,12 @@ public class Finding extends ViewPointSpecificObject {
 		this.componentUuid = componentUuid;
 	}
 
-	public String getErrorMessage() {
-		return errorMessage;
+	public String getDetails() {
+		return details;
 	}
 
-	public void setErrorMessage(String errorMessage) {
-		this.errorMessage = errorMessage;
+	public void setDetails(String details) {
+		this.details = details;
 	}
 
 }

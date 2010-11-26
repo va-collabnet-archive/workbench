@@ -14,6 +14,7 @@ import org.ihtsdo.qa.store.model.Finding;
 import org.ihtsdo.qa.store.model.QACase;
 import org.ihtsdo.qa.store.model.QACaseVersion;
 import org.ihtsdo.qa.store.model.QACoordinate;
+import org.ihtsdo.qa.store.model.QADatabase;
 import org.ihtsdo.qa.store.model.Rule;
 import org.ihtsdo.qa.store.model.TerminologyComponent;
 import org.ihtsdo.qa.store.model.view.RulesReportLine;
@@ -126,17 +127,17 @@ public class QAStoreStubImpl implements QAStoreBI {
 	@Override
 	public List<Rule> getAllRules() {
 		Rule rule1 = new Rule();
-		rule1.setErrorCode(11);
+		rule1.setRuleCode(11);
 		rule1.setName("FSN must be unique");
 		rule1.setSeverity(3);
 
 		Rule rule2 = new Rule();
-		rule2.setErrorCode(25);
+		rule2.setRuleCode(25);
 		rule2.setName("Retired concept should not have defining roles");
 		rule2.setSeverity(3);
 
 		Rule rule3 = new Rule();
-		rule3.setErrorCode(46);
+		rule3.setRuleCode(46);
 		rule3.setName("Tex should not have double spaces");
 		rule3.setSeverity(1);
 
@@ -191,15 +192,15 @@ public class QAStoreStubImpl implements QAStoreBI {
 	}
 
 	@Override
-	public List<String> getAllDatabases() {
-		List<String> databases = new ArrayList<String>();
-		databases.add("production database");
-		databases.add("test database");
+	public List<QADatabase> getAllDatabases() {
+		List<QADatabase> databases = new ArrayList<QADatabase>();
+		databases.add(new QADatabase(UUID.fromString("2694ed96-f8ce-11df-98cf-0800200c9a66"), "production database"));
+		databases.add(new QADatabase(UUID.fromString("2694ed97-f8ce-11df-98cf-0800200c9a66"), "test database"));
 		return databases;
 	}
 
 	@Override
-	public List<TerminologyComponent> getAllPathsForDatabase(String database) {
+	public List<TerminologyComponent> getAllPathsForDatabase(UUID databaseUid) {
 		List<TerminologyComponent> paths = new ArrayList<TerminologyComponent>();
 		paths.add(new TerminologyComponent(UUID.fromString("2694ed93-f8ce-11df-98cf-0800200c9a66"), "SNOMED CT Core path", null));
 		paths.add(new TerminologyComponent(UUID.fromString("2694ed94-f8ce-11df-98cf-0800200c9a66"), "US Drugs Extension path", null));
@@ -217,16 +218,15 @@ public class QAStoreStubImpl implements QAStoreBI {
 	}
 
 	@Override
-	public List<String> getAllTimesForPath(String database, UUID pathUuid) {
+	public List<String> getAllTimesForPath(UUID databaseUuid, UUID pathUuid) {
 		List<String> dates = new ArrayList<String>();
 		dates.add("latest");
 		return dates;
 	}
 
 	@Override
-	public List<String> getAllDatabasesForPath(UUID pathUuid) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<QADatabase> getAllDatabasesForPath(UUID pathUuid) {
+		return getAllDatabases();
 	}
 
 	@Override
@@ -278,6 +278,28 @@ public class QAStoreStubImpl implements QAStoreBI {
 
 
 		return lines;
+	}
+
+	@Override
+	public String getExecutionRulesDetails(UUID executionUuid) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getExecutionOutcomeDetails(UUID executionUuid) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public QADatabase getQADatabase(UUID databaseUuid) {
+		for (QADatabase loopDatabase : getAllDatabases()) {
+			if (loopDatabase.getDatabaseUuid().equals(databaseUuid)) {
+				return loopDatabase;
+			}
+		}
+		return null;
 	}
 
 }

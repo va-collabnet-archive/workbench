@@ -1,11 +1,10 @@
 package org.ihtsdo.qa.store.model;
 
-import java.util.Date;
 import java.util.UUID;
 
 public abstract class ViewPointSpecificObject {
 	
-	private String database;
+	private UUID databaseUuid;
 	private UUID pathUuid;
 	private String viewPointTime;
 	
@@ -29,14 +28,12 @@ public abstract class ViewPointSpecificObject {
 		this.viewPointTime = viewPointTime;
 	}
 
-	public String getDatabase() {
-		return database;
+	public UUID getDatabaseUuid() {
+		return databaseUuid;
 	}
 
-	public void setDatabase(String database) {
-		this.database = database;
+	public void setDatabaseUuid(UUID databaseUuid) {
+		this.databaseUuid = databaseUuid;
 	}
-	
-	
 
 }

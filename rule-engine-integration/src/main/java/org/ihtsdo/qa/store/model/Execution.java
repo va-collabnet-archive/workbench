@@ -10,6 +10,8 @@ public class Execution extends ViewPointSpecificObject {
 	private Date date;
 	private String description;
 	private String contextName;
+	private Date startTime;
+	private Date endTime;
 	
 	public Execution() {
 		super();
@@ -53,6 +55,22 @@ public class Execution extends ViewPointSpecificObject {
 
 	public void setContextName(String contextName) {
 		this.contextName = contextName;
+	}
+
+	public Date getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(Date startTime) {
+		this.startTime = startTime;
+	}
+
+	public Date getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(Date endTime) {
+		this.endTime = endTime;
 	}
 
 }
