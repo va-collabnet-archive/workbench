@@ -100,11 +100,22 @@ public class RulesLibrary {
 	public static int LINGUISTIC_GUIDELINES_PKG = 1;
 	
 	public static KindOfCacheBI myStaticIsACache;
+	public static TerminologyHelperDroolsWorkbench terminologyHelperCache;
+	
+	public static TerminologyHelperDroolsWorkbench getTerminologyHelper() {
+		if (terminologyHelperCache == null) {
+			terminologyHelperCache =  new TerminologyHelperDroolsWorkbench();
+			terminologyHelperCache.loadProperties();
+			return terminologyHelperCache;
+		} else {
+			return terminologyHelperCache;
+		}
+	}
 	
 	public static KindOfCacheBI setupIsACache() throws TerminologyException, Exception {
 			return myStaticIsACache = Ts.get().getCache(Terms.get().getActiveAceFrameConfig().getCoordinate());
 	}
-
+	
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
 			boolean onlyUncommittedContent, I_ConfigAceFrame config) 
 	throws Exception {
@@ -130,7 +141,7 @@ public class RulesLibrary {
 				//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 
 				ksession.setGlobal("resultsCollector", results);
-				ksession.setGlobal("terminologyHelper", new TerminologyHelperDroolsWorkbench());
+				ksession.setGlobal("terminologyHelper", getTerminologyHelper());
 
 				ConceptVersionBI conceptBi = Ts.get().getConceptVersion(config.getCoordinate(), concept.getNid());
 
@@ -243,7 +254,7 @@ public class RulesLibrary {
 
 		StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 		ksession.setGlobal("resultsCollector", new ResultsCollectorWorkBench());
-		ksession.setGlobal("terminologyHelper", new TerminologyHelperDroolsWorkbench());
+		ksession.setGlobal("terminologyHelper", getTerminologyHelper());
 
 		//TODO: convert to tk model
 		//		List<TerminologyComponent> termComponents =  new ArrayList<TerminologyComponent>();
@@ -316,7 +327,7 @@ public class RulesLibrary {
 
 		StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 		ksession.setGlobal("resultsCollector", new ResultsCollectorWorkBench());
-		ksession.setGlobal("terminologyHelper", new TerminologyHelperDroolsWorkbench());
+		ksession.setGlobal("terminologyHelper", getTerminologyHelper());
 
 		//ksession.insert(new TransitiveClosureHelperMock());
 
