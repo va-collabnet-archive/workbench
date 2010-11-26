@@ -215,7 +215,7 @@ public class TerminologyHelperDrools {
 
 		try{
 			if (!propsLoaded){
-				if (!LoadProperties())
+				if (!loadProperties())
 					return false;
 			}
 			String GB = "en-gb";
@@ -253,7 +253,7 @@ public class TerminologyHelperDrools {
 
 		try{
 			if (!propsLoaded){
-				if (!LoadProperties())
+				if (!loadProperties())
 					return "";
 			}
 			String GB = "en-gb";
@@ -290,7 +290,7 @@ public class TerminologyHelperDrools {
 		return "";
 	}
 
-	private boolean LoadProperties(){
+	public boolean loadProperties(){
 
 		try{
 			String aLine=null;
