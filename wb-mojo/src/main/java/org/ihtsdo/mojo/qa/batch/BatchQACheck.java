@@ -50,8 +50,6 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
-import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.tk.api.Precedence;
