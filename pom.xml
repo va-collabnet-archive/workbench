@@ -27,7 +27,6 @@
       		<type>jar</type>
 			<version>0.0.1-SNAPSHOT</version>
 	</dependency>
-	<!--
 	<dependency>
 			 <groupId>org.ihtsdo.sample</groupId>
             <artifactId>database</artifactId>
@@ -41,7 +40,6 @@
             <type>jar</type>
             <version>0.0.1-SNAPSHOT</version>
 	</dependency>
-	-->
   </dependencies>
   <build>
 		<plugins>
@@ -72,9 +70,9 @@
 						<configuration>
 							<targetSubDir>generated-resources</targetSubDir>
 							<runtimeArtifacts>
-								<runtimeArtifact>com.termmed:sample-database-qa</runtimeArtifact>
+								<!-- <runtimeArtifact>com.termmed:sample-database-qa</runtimeArtifact> -->
 								<!-- <runtimeArtifact>org.ihtsdo.sample:database</runtimeArtifact> -->
-								<!-- <runtimeArtifact>org.ihtsdo.sample:full-database</runtimeArtifact> -->
+								<runtimeArtifact>org.ihtsdo.sample:full-database</runtimeArtifact>
 							</runtimeArtifacts>
 						</configuration>
 					</execution>
