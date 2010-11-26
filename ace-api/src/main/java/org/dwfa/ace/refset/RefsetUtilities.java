@@ -195,7 +195,7 @@ public abstract class RefsetUtilities {
 
         I_GetConceptData refsetRoot = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
 
-        Set<I_GetConceptData> refsetChildren = refsetRoot.getDestRelOrigins(status, is_a, null, false);
+        Set<I_GetConceptData> refsetChildren = refsetRoot.getDestRelOrigins(status, is_a, null, false, true);
 
         int refsetPurposeRelId =
             termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids()).getConceptId();
@@ -203,11 +203,11 @@ public abstract class RefsetUtilities {
         for (I_GetConceptData refsetConcept : refsetChildren) {
             Set<I_GetConceptData> purposeConcepts = new HashSet<I_GetConceptData>();
 
-            List<? extends I_RelVersioned> rels = refsetConcept.getSourceRels();
+            List<? extends I_RelVersioned> rels = refsetConcept.getSourceRels(); //refsetConcept.getSourceRelTuples(null, null, null, false, true)
             for (I_RelVersioned rel : rels) {
                 List<I_RelTuple> tuples = rel.getTuples();
                 for (I_RelTuple tuple : tuples) {
-                    if (isActiveStatus(tuple.getStatusId()) && tuple.getRelTypeId() == refsetPurposeRelId) {
+                    if (isActiveStatus(tuple.getStatusId()) && tuple.getTypeId() == refsetPurposeRelId) {
                         purposeConcepts.add(getConcept(tuple.getC2Id()));
                     }
                 }

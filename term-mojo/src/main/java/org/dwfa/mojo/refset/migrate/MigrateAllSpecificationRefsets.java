@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,6 +16,7 @@
  */
 package org.dwfa.mojo.refset.migrate;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,9 +42,10 @@ import org.dwfa.ace.refset.RefsetUtilities;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.mojo.ConceptDescriptor;
+import org.dwfa.tapi.TerminologyException;
 
 /**
- * 
+ *
  * @goal migrate-all-spec-refsets
  */
 @SuppressWarnings("deprecation")
@@ -379,8 +381,12 @@ public class MigrateAllSpecificationRefsets extends AbstractMojo {
      * Utilises the {@link RefsetUtilities} class by injecting the db
      */
     private class RefsetHelper extends RefsetUtilities {
-        public RefsetHelper(I_TermFactory termFactory) {
+        public RefsetHelper(I_TermFactory termFactory) throws Exception {
             super.termFactory = termFactory;
+
+            retiredConceptId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next());
+            currentStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
+            activeStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.ACTIVE.getUids().iterator().next());
         }
     }
 

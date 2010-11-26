@@ -27,6 +27,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -37,6 +38,7 @@ import org.dwfa.ace.api.process.I_ProcessQueue;
 import org.dwfa.ace.refset.MarkedParentRefsetHelper;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.ace.util.TupleVersionPart;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 
 /**
@@ -79,6 +81,8 @@ public class RegenerateAllMarkedParents extends AbstractMojo implements I_Proces
 
     private int conceptCount = 0;
 
+    private I_IntSet activeIntSet;
+
 
     public RegenerateAllMarkedParents() throws Exception {
         termFactory = LocalVersionedTerminology.get();
@@ -99,6 +103,9 @@ public class RegenerateAllMarkedParents extends AbstractMojo implements I_Proces
         }
 
         config.setViewPositions(null);
+
+        activeIntSet.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+        activeIntSet.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -128,7 +135,7 @@ public class RegenerateAllMarkedParents extends AbstractMojo implements I_Proces
         }
 
         for (I_ThinExtByRefVersioned thinExtByRefVersioned : getTermFactory().getAllExtensionsForComponent(concept.getNid())) {
-            List<I_ThinExtByRefTuple> extensions = thinExtByRefVersioned.getTuples(null, null, true, false);
+            List<I_ThinExtByRefTuple> extensions = thinExtByRefVersioned.getTuples(activeIntSet, null, true, true);
 
             for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
                 if (thinExtByRefTuple.getPart() instanceof I_ThinExtByRefPartConcept) {
