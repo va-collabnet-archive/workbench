@@ -12,7 +12,18 @@ public class Rule {
 	private String packageName;
 	private String packageUrl;
 	private UUID ditaUuid;
-	private int errorCode;
+	private int ruleCode;
+	private String category;
+	private String expectedResult;
+	private String suggestedResolution;
+	private String example;
+	private String standingIssues;
+	private boolean isWhitelistAllowed;
+	private boolean isWhitelistResetAllowed;
+	private boolean isWhitelistResetWhenClosed;
+	private String ditaDocumentationLinkUuid;
+	private String ditaGeneratedTopicUuid;
+	private String modifiedBy;
 
 	public Rule() {
 	}
@@ -81,12 +92,101 @@ public class Rule {
 		this.ditaUuid = ditaUuid;
 	}
 
-	public int getErrorCode() {
-		return errorCode;
+	public int getRuleCode() {
+		return ruleCode;
 	}
 
-	public void setErrorCode(int errorCode) {
-		this.errorCode = errorCode;
+	public void setRuleCode(int ruleCode) {
+		this.ruleCode = ruleCode;
 	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
+	public String getExpectedResult() {
+		return expectedResult;
+	}
+
+	public void setExpectedResult(String expectedResult) {
+		this.expectedResult = expectedResult;
+	}
+
+	public String getSuggestedResolution() {
+		return suggestedResolution;
+	}
+
+	public void setSuggestedResolution(String suggestedResolution) {
+		this.suggestedResolution = suggestedResolution;
+	}
+
+	public String getExample() {
+		return example;
+	}
+
+	public void setExample(String example) {
+		this.example = example;
+	}
+
+	public String getStandingIssues() {
+		return standingIssues;
+	}
+
+	public void setStandingIssues(String standingIssues) {
+		this.standingIssues = standingIssues;
+	}
+
+	public boolean isWhitelistAllowed() {
+		return isWhitelistAllowed;
+	}
+
+	public void setWhitelistAllowed(boolean isWhitelistAllowed) {
+		this.isWhitelistAllowed = isWhitelistAllowed;
+	}
+
+	public boolean isWhitelistResetAllowed() {
+		return isWhitelistResetAllowed;
+	}
+
+	public void setWhitelistResetAllowed(boolean isWhitelistResetAllowed) {
+		this.isWhitelistResetAllowed = isWhitelistResetAllowed;
+	}
+
+	public boolean isWhitelistResetWhenClosed() {
+		return isWhitelistResetWhenClosed;
+	}
+
+	public void setWhitelistResetWhenClosed(boolean isWhitelistResetWhenClosed) {
+		this.isWhitelistResetWhenClosed = isWhitelistResetWhenClosed;
+	}
+
+	public String getDitaDocumentationLinkUuid() {
+		return ditaDocumentationLinkUuid;
+	}
+
+	public void setDitaDocumentationLinkUuid(String ditaDocumentationLinkUuid) {
+		this.ditaDocumentationLinkUuid = ditaDocumentationLinkUuid;
+	}
+
+	public String getDitaGeneratedTopicUuid() {
+		return ditaGeneratedTopicUuid;
+	}
+
+	public void setDitaGeneratedTopicUuid(String ditaGeneratedTopicUuid) {
+		this.ditaGeneratedTopicUuid = ditaGeneratedTopicUuid;
+	}
+
+	public String getModifiedBy() {
+		return modifiedBy;
+	}
+
+	public void setModifiedBy(String modifiedBy) {
+		this.modifiedBy = modifiedBy;
+	}
+
 
 }

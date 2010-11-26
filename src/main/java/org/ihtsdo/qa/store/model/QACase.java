@@ -10,8 +10,13 @@ public class QACase extends ViewPointSpecificObject {
 	private UUID ruleUuid;
 	private UUID componentUuid;
 	private boolean isActive;
-	private int dispositionStatusUuid;
-	private String editor;
+	private UUID dispositionStatusUuid;
+	private UUID dispositionReasonUuid;
+	private Date dispositionStatusDate;
+	private String dispositionStatusEditor;
+	private String dispositionAnnotation;
+	private String detail;
+	private String assignedTo;
 	private Date effectiveTime;
 	private List<String> comments;
 
@@ -42,14 +47,6 @@ public class QACase extends ViewPointSpecificObject {
 		this.componentUuid = componentUuid;
 	}
 
-	public int getWhitelistType() {
-		return dispositionStatusUuid;
-	}
-
-	public void setWhitelistType(int whitelistType) {
-		this.dispositionStatusUuid = whitelistType;
-	}
-
 	public boolean isActive() {
 		return isActive;
 	}
@@ -58,20 +55,60 @@ public class QACase extends ViewPointSpecificObject {
 		this.isActive = isActive;
 	}
 
-	public int getDispositionStatusUuid() {
+	public UUID getDispositionStatusUuid() {
 		return dispositionStatusUuid;
 	}
 
-	public void setDispositionStatusUuid(int dispositionStatusUuid) {
+	public void setDispositionStatusUuid(UUID dispositionStatusUuid) {
 		this.dispositionStatusUuid = dispositionStatusUuid;
 	}
 
-	public String getEditor() {
-		return editor;
+	public UUID getDispositionReasonUuid() {
+		return dispositionReasonUuid;
 	}
 
-	public void setEditor(String editor) {
-		this.editor = editor;
+	public void setDispositionReasonUuid(UUID dispositionReasonUuid) {
+		this.dispositionReasonUuid = dispositionReasonUuid;
+	}
+
+	public Date getDispositionStatusDate() {
+		return dispositionStatusDate;
+	}
+
+	public void setDispositionStatusDate(Date dispositionStatusDate) {
+		this.dispositionStatusDate = dispositionStatusDate;
+	}
+
+	public String getDispositionStatusEditor() {
+		return dispositionStatusEditor;
+	}
+
+	public void setDispositionStatusEditor(String dispositionStatusEditor) {
+		this.dispositionStatusEditor = dispositionStatusEditor;
+	}
+
+	public String getDispositionAnnotation() {
+		return dispositionAnnotation;
+	}
+
+	public void setDispositionAnnotation(String dispositionAnnotation) {
+		this.dispositionAnnotation = dispositionAnnotation;
+	}
+
+	public String getDetail() {
+		return detail;
+	}
+
+	public void setDetail(String detail) {
+		this.detail = detail;
+	}
+
+	public String getAssignedTo() {
+		return assignedTo;
+	}
+
+	public void setAssignedTo(String assignedTo) {
+		this.assignedTo = assignedTo;
 	}
 
 	public Date getEffectiveTime() {
@@ -89,5 +126,6 @@ public class QACase extends ViewPointSpecificObject {
 	public void setComments(List<String> comments) {
 		this.comments = comments;
 	}
+
 
 }

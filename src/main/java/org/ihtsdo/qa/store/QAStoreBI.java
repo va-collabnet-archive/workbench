@@ -11,6 +11,7 @@ import org.ihtsdo.qa.store.model.Finding;
 import org.ihtsdo.qa.store.model.QACase;
 import org.ihtsdo.qa.store.model.QACaseVersion;
 import org.ihtsdo.qa.store.model.QACoordinate;
+import org.ihtsdo.qa.store.model.QADatabase;
 import org.ihtsdo.qa.store.model.Rule;
 import org.ihtsdo.qa.store.model.TerminologyComponent;
 import org.ihtsdo.qa.store.model.view.RulesReportLine;
@@ -23,12 +24,13 @@ public interface QAStoreBI {
 	public Execution getExecution(UUID ExecutionUuid);
 	public QACase getQACase(UUID qaCaseUuid);
 	public DispositionStatus getDispositionStatus(UUID dispositionStatusUuid);
+	public QADatabase getQADatabase(UUID databaseUuid);
 	
-	public List<String> getAllDatabases();
-	public List<String> getAllDatabasesForPath(UUID pathUuid);
+	public List<QADatabase> getAllDatabases();
+	public List<QADatabase> getAllDatabasesForPath(UUID pathUuid);
 	public List<TerminologyComponent> getAllPaths();
-	public List<TerminologyComponent> getAllPathsForDatabase(String database);
-	public List<String> getAllTimesForPath(String database, UUID pathUuid);
+	public List<TerminologyComponent> getAllPathsForDatabase(UUID databaseUuid);
+	public List<String> getAllTimesForPath(UUID databaseUuid, UUID pathUuid);
 	
 	public List<Finding> getFindingsForExecution(UUID executionUuid);
 	public List<Finding> getFindingsForComponent(QACoordinate coordinate, UUID componentUuid);
@@ -55,6 +57,9 @@ public interface QAStoreBI {
 	public List<RulesReportLine> getRulesReportLines(QACoordinate qaCoordinate);
 	
 	public List<TerminologyComponent> getAllComponents();
+	
+	public String getExecutionRulesDetails(UUID executionUuid);
+	public String getExecutionOutcomeDetails(UUID executionUuid);
 	
 	public void persistComponent(TerminologyComponent component);
 	public void persistRule(Rule rule);

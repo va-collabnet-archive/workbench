@@ -26,6 +26,7 @@ import javax.swing.table.DefaultTableModel;
 import org.ihtsdo.qa.store.QAStoreBI;
 import org.ihtsdo.qa.store.model.DispositionStatus;
 import org.ihtsdo.qa.store.model.QACoordinate;
+import org.ihtsdo.qa.store.model.QADatabase;
 import org.ihtsdo.qa.store.model.TerminologyComponent;
 import org.ihtsdo.qa.store.model.view.RulesReportLine;
 
@@ -83,7 +84,7 @@ public class QAResultsBrowser extends JPanel {
 
 	private void setupDatabasesCombo() {
 		comboBox1.removeAllItems();
-		for (String loopDatabase : store.getAllDatabases()) {
+		for (QADatabase loopDatabase : store.getAllDatabases()) {
 			comboBox1.addItem(loopDatabase);
 		}
 	}
@@ -91,7 +92,7 @@ public class QAResultsBrowser extends JPanel {
 	private void setupPathsCombo() {
 		comboBox2.removeAllItems();
 		if (comboBox1.getSelectedItem() != null) {
-			for (TerminologyComponent loopPath : store.getAllPathsForDatabase((String) comboBox1.getSelectedItem())) {
+			for (TerminologyComponent loopPath : store.getAllPathsForDatabase(((QADatabase) comboBox1.getSelectedItem()).getDatabaseUuid())) {
 				comboBox2.addItem(loopPath);
 			}
 		}
@@ -100,7 +101,7 @@ public class QAResultsBrowser extends JPanel {
 	private void setupTimeCombo() {
 		comboBox3.removeAllItems();
 		if (comboBox1.getSelectedItem() != null && comboBox2.getSelectedItem() != null) {
-			for (String loopDate : store.getAllTimesForPath((String) comboBox1.getSelectedItem(), 
+			for (String loopDate : store.getAllTimesForPath(((QADatabase) comboBox1.getSelectedItem()).getDatabaseUuid(), 
 					((TerminologyComponent) comboBox2.getSelectedItem()).getComponentUuid())) {
 				comboBox3.addItem(loopDate);
 			}
@@ -111,10 +112,10 @@ public class QAResultsBrowser extends JPanel {
 		if (comboBox1.getSelectedItem() != null && 
 				comboBox2.getSelectedItem() != null &&
 				comboBox3.getSelectedItem() != null) {
-			String database = (String) comboBox1.getSelectedItem();
+			QADatabase database = (QADatabase) comboBox1.getSelectedItem();
 			TerminologyComponent path = (TerminologyComponent) comboBox2.getSelectedItem();
 			String time = (String) comboBox3.getSelectedItem();
-			QACoordinate coordinate = new QACoordinate(database, path.getComponentUuid(), time);
+			QACoordinate coordinate = new QACoordinate(database.getDatabaseUuid(), path.getComponentUuid(), time);
 			updateTable1(coordinate);
 		}
 	}
@@ -131,7 +132,7 @@ public class QAResultsBrowser extends JPanel {
 		List<RulesReportLine> lines = store.getRulesReportLines(coordinate);
 		for (RulesReportLine line : lines) {
 			LinkedHashSet<String> row = new LinkedHashSet<String>();
-			row.add(String.valueOf(line.getRule().getErrorCode()));
+			row.add(String.valueOf(line.getRule().getRuleCode()));
 			row.add(line.getRule().getName());
 			row.add(String.valueOf(line.getRule().getSeverity()));
 			row.add(String.valueOf(line.getStatusCount().get(true)));
