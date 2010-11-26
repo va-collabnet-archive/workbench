@@ -66,5 +66,6 @@ public interface QAStoreBI {
 	public void persistFinding(Finding finding);
 	public void persistExecution(Execution execution);
 	public void persistQACase(QACase qaCase);
+	public void persistQADatabase(QADatabase database);
 	
 }

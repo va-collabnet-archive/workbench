@@ -302,4 +302,10 @@ public class QAStoreStubImpl implements QAStoreBI {
 		return null;
 	}
 
+	@Override
+	public void persistQADatabase(QADatabase database) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
