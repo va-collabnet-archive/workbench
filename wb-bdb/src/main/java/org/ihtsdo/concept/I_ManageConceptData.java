@@ -15,10 +15,10 @@ import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 
 import com.sleepycat.bind.tuple.TupleInput;
-import org.ihtsdo.concept.ConceptDataManager.AddDescriptionList;
-import org.ihtsdo.concept.ConceptDataManager.AddImageList;
-import org.ihtsdo.concept.ConceptDataManager.AddMemberList;
-import org.ihtsdo.concept.ConceptDataManager.AddSrcRelList;
+import org.ihtsdo.concept.ConceptDataManager.AddDescriptionSet;
+import org.ihtsdo.concept.ConceptDataManager.AddImageSet;
+import org.ihtsdo.concept.ConceptDataManager.AddMemberSet;
+import org.ihtsdo.concept.ConceptDataManager.AddSrcRelSet;
 
 public interface I_ManageConceptData {
 
@@ -29,20 +29,20 @@ public interface I_ManageConceptData {
 	public int getReadWriteDataVersion() throws InterruptedException,
 			ExecutionException, IOException;
 
-	public AddSrcRelList getSourceRels() throws IOException;
+	public AddSrcRelSet getSourceRels() throws IOException;
 	public Collection<Relationship> getSourceRelsIfChanged() throws IOException;
 
-	public AddDescriptionList getDescriptions() throws IOException;
+	public AddDescriptionSet getDescriptions() throws IOException;
 	public Collection<Description> getDescriptionsIfChanged() throws IOException;
 
 	public ConceptAttributes getConceptAttributes() throws IOException;
 	public ConceptAttributes getConceptAttributesIfChanged() throws IOException;
 
 	public RefsetMember<?, ?> getRefsetMemberForComponent(int componentNid) throws IOException;
-	public AddMemberList getRefsetMembers() throws IOException;
+	public AddMemberSet getRefsetMembers() throws IOException;
 	public Collection<RefsetMember<?, ?>> getRefsetMembersIfChanged() throws IOException;
 
-	public AddImageList getImages() throws IOException;
+	public AddImageSet getImages() throws IOException;
 	public Collection<Image> getImagesIfChanged() throws IOException;
 
 	/**

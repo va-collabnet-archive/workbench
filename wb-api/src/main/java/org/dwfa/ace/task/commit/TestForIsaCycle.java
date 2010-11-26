@@ -19,6 +19,7 @@ package org.dwfa.ace.task.commit;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.dwfa.ace.api.I_GetConceptData;
@@ -59,7 +60,7 @@ public class TestForIsaCycle extends AbstractConceptTest {
         try {
             ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
 
-            List<? extends I_RelVersioned> usrl = (List<? extends I_RelVersioned>) concept.getSourceRels();
+            Collection<? extends I_RelVersioned> usrl = (List<? extends I_RelVersioned>) concept.getSourceRels();
 
             boolean foundCycle = false;
             String error = SnoTable.updatePrefs(false);
@@ -72,7 +73,7 @@ public class TestForIsaCycle extends AbstractConceptTest {
                     List<? extends I_RelTuple> rvtl = rv.getTuples();
                     for (I_RelTuple rt : rvtl) {
                         try {
-                            boolean test = SnoTable.findIsaCycle(rt.getC1Id(), rt.getTypeId(), rt.getC2Id());
+                            boolean test = SnoTable.findIsaCycle(rt.getC1Id(), rt.getTypeNid(), rt.getC2Id());
                             if (test)
                                 foundCycle = true;
                         } catch (TerminologyException e) {

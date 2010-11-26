@@ -6,9 +6,10 @@ package org.ihtsdo.concept;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
 
 import org.dwfa.ace.log.AceLog;
@@ -24,7 +25,6 @@ import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRel;
 
 import com.sleepycat.bind.tuple.TupleInput;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  * File format:<br>
@@ -34,11 +34,11 @@ import java.util.concurrent.ConcurrentSkipListSet;
  */
 public abstract class ConceptDataManager implements I_ManageConceptData {
 
-    public class AddDescriptionList extends ConcurrentSkipListSet<Description> {
+    public class AddDescriptionSet extends ConcurrentSkipListSet<Description> {
 
         private static final long serialVersionUID = 1L;
 
-        public AddDescriptionList(Collection<? extends Description> c) {
+        public AddDescriptionSet(Collection<? extends Description> c) {
             super(new ComponentComparator());
             addAll(c);
         }
@@ -59,11 +59,11 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
         }
     }
 
-    public class AddSrcRelList extends ConcurrentSkipListSet<Relationship> {
+    public class AddSrcRelSet extends ConcurrentSkipListSet<Relationship> {
 
         private static final long serialVersionUID = 1L;
 
-        public AddSrcRelList(Collection<? extends Relationship> c) {
+        public AddSrcRelSet(Collection<? extends Relationship> c) {
             super(new ComponentComparator());
             addAll(c);
         }
@@ -87,11 +87,11 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
         }
     }
 
-    public class AddImageList extends ConcurrentSkipListSet<Image> {
+    public class AddImageSet extends ConcurrentSkipListSet<Image> {
 
         private static final long serialVersionUID = 1L;
 
-        public AddImageList(Collection<? extends Image> c) {
+        public AddImageSet(Collection<? extends Image> c) {
             super(new ComponentComparator());
             addAll(c);
         }
@@ -111,11 +111,11 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
         }
     }
 
-    public class AddMemberList extends ConcurrentSkipListSet<RefsetMember<?, ?>> {
+    public class AddMemberSet extends ConcurrentSkipListSet<RefsetMember<?, ?>> {
 
         private static final long serialVersionUID = 1L;
 
-        public AddMemberList(Collection<? extends RefsetMember<?, ?>> c) {
+        public AddMemberSet(Collection<? extends RefsetMember<?, ?>> c) {
             super(new ComponentComparator());
             addAll(c);
         }
@@ -136,29 +136,23 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
         }
     }
 
-    public class SetModifiedWhenChangedList extends CopyOnWriteArrayList<NidPair> {
+    public class SetModifiedWhenChangeSet extends ConcurrentSkipListSet<NidPair> {
 
         /**
          * 
          */
         private static final long serialVersionUID = 1L;
 
-        public SetModifiedWhenChangedList() {
+        public SetModifiedWhenChangeSet() {
             super();
         }
 
-        public SetModifiedWhenChangedList(Collection<NidPair> c) {
+        public SetModifiedWhenChangeSet(Collection<NidPair> c) {
             super(c);
         }
 
-        public SetModifiedWhenChangedList(NidPair[] toCopyIn) {
-            super(toCopyIn);
-        }
-
-        @Override
-        public void add(int index, NidPair element) {
-            super.add(index, element);
-            modified();
+        public SetModifiedWhenChangeSet(NidPair[] toCopyIn) {
+            super(Arrays.asList(toCopyIn));
         }
 
         @Override
@@ -175,22 +169,6 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
             return returnValue;
         }
 
-        @Override
-        public boolean addAll(int index, Collection<? extends NidPair> c) {
-            boolean returnValue = super.addAll(index, c);
-            modified();
-            return returnValue;
-        }
-
-        @Override
-        public int addAllAbsent(Collection<? extends NidPair> c) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public boolean addIfAbsent(NidPair e) {
-            throw new UnsupportedOperationException();
-        }
 
         @Override
         public void clear() {
@@ -217,11 +195,6 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
         @Override
         public boolean retainAll(Collection<?> c) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public NidPair remove(int index) {
             throw new UnsupportedOperationException();
         }
     }

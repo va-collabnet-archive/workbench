@@ -45,10 +45,10 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     private static HashMap<I_ConfigAceFrame, IsLeafBinder> isLeafBinders = new HashMap<I_ConfigAceFrame, IsLeafBinder>();
 
     private AtomicReference<ConceptAttributes> attributes = new AtomicReference<ConceptAttributes>();
-    private AtomicReference<AddSrcRelList> srcRels = new AtomicReference<AddSrcRelList>();
-    private AtomicReference<AddDescriptionList> descriptions = new AtomicReference<AddDescriptionList>();
-    private AtomicReference<AddImageList> images = new AtomicReference<AddImageList>();
-    private AtomicReference<AddMemberList> refsetMembers = new AtomicReference<AddMemberList>();
+    private AtomicReference<AddSrcRelSet> srcRels = new AtomicReference<AddSrcRelSet>();
+    private AtomicReference<AddDescriptionSet> descriptions = new AtomicReference<AddDescriptionSet>();
+    private AtomicReference<AddImageSet> images = new AtomicReference<AddImageSet>();
+    private AtomicReference<AddMemberSet> refsetMembers = new AtomicReference<AddMemberSet>();
     
     
     private AtomicReference<ConcurrentSkipListSet<Integer>> descNids =
@@ -140,9 +140,9 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
 
     @Override
-    public AddSrcRelList getSourceRels() throws IOException {
+    public AddSrcRelSet getSourceRels() throws IOException {
         if (srcRels.get() == null) {
-            srcRels.compareAndSet(null, new AddSrcRelList(getList(new RelationshipBinder(), OFFSETS.SOURCE_RELS,
+            srcRels.compareAndSet(null, new AddSrcRelSet(getList(new RelationshipBinder(), OFFSETS.SOURCE_RELS,
                 enclosingConcept)));
         }
         handleCanceledComponents();
@@ -150,9 +150,9 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
 
     @Override
-    public AddDescriptionList getDescriptions() throws IOException {
+    public AddDescriptionSet getDescriptions() throws IOException {
         if (descriptions.get() == null) {
-            descriptions.compareAndSet(null, new AddDescriptionList(getList(new DescriptionBinder(),
+            descriptions.compareAndSet(null, new AddDescriptionSet(getList(new DescriptionBinder(),
                 OFFSETS.DESCRIPTIONS, enclosingConcept)));
         }
         handleCanceledComponents();
@@ -236,9 +236,9 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
 
     @Override
-    public AddMemberList getRefsetMembers() throws IOException {
+    public AddMemberSet getRefsetMembers() throws IOException {
         if (refsetMembers.get() == null) {
-            refsetMembers.compareAndSet(null, new AddMemberList(getList(new RefsetMemberBinder(enclosingConcept),
+            refsetMembers.compareAndSet(null, new AddMemberSet(getList(new RefsetMemberBinder(enclosingConcept),
                 OFFSETS.REFSET_MEMBERS, enclosingConcept)));
         }
         handleCanceledComponents();
@@ -287,9 +287,9 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
 
     @Override
-    public AddImageList getImages() throws IOException {
+    public AddImageSet getImages() throws IOException {
         if (images.get() == null) {
-            images.compareAndSet(null, new AddImageList(getList(new ImageBinder(), OFFSETS.IMAGES, enclosingConcept)));
+            images.compareAndSet(null, new AddImageSet(getList(new ImageBinder(), OFFSETS.IMAGES, enclosingConcept)));
         }
         handleCanceledComponents();
         return images.get();
