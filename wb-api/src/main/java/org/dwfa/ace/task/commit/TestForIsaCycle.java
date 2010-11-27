@@ -60,7 +60,7 @@ public class TestForIsaCycle extends AbstractConceptTest {
         try {
             ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
 
-            Collection<? extends I_RelVersioned> usrl = (List<? extends I_RelVersioned>) concept.getSourceRels();
+            Collection<? extends I_RelVersioned> usrl = (Collection<? extends I_RelVersioned>) concept.getSourceRels();
 
             boolean foundCycle = false;
             String error = SnoTable.updatePrefs(false);
