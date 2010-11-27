@@ -353,6 +353,9 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
             throws NoSuchAlgorithmException, UnsupportedEncodingException {
         StringBuilder sb = new StringBuilder();
 
+        if (sid == null)
+            getLog().info("POSSIBLE MISSING FILE " + m.toString());
+        
         // REFSET_UUID
         sb.append(sid.getSubsetRefsetUuidStr() + TAB_CHARACTER);
         // MEMBER_UUID ... of refset member
@@ -482,7 +485,14 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
 
             while (br.ready()) {
                 String[] line = br.readLine().split(TAB_CHARACTER);
+                
+                if (line.length != 8) {
+                    getLog().info("::: :!!!: line.length 8 != " + Integer.toString(line.length));
+                    continue;
+                }
 
+                getLog().info(" SUBSETORIGINALID:" + line[SUBSETORIGINALID] + " SUBSETID:" + line[SUBSETID]);
+                
                 // SUBSETID
                 Long sctIdSubset = Long.parseLong(line[SUBSETID]);
                 // SUBSETORIGINALID
@@ -490,6 +500,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
                 // SUBSETNAME
                 String subsetName = line[SUBSETNAME];
 
+                
                 // SUBSETNAME
                 // int subsetType = Integer.parseInt(line[SUBSETTYPE]);
 
@@ -551,7 +562,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
 
     private void processSubsetMembers(List<List<RF1File>> fileListList, BufferedWriter bwi, BufferedWriter bwc)
             throws MojoFailureException, IOException, NoSuchAlgorithmException {
-        // :!!!: does this need to be added Collections.sort(fileListList);
+        // :!!!: does "Collections.sort(fileListList);" need to be added?
 
         int count1, count2; // records in arrays 1 & 2
         String fName1, fName2; // file path name
@@ -568,6 +579,9 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
             List<RF1File> fl = dit.next(); // File List
             Iterator<RF1File> fit = fl.iterator(); // File Iterator
 
+            if (fit == null || fit.hasNext() == false)
+                continue;
+            
             // READ file1 as MASTER FILE
             RF1File f1 = fit.next();
             fName1 = f1.file.getPath();

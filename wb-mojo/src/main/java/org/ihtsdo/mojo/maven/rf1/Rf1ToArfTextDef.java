@@ -268,8 +268,6 @@ public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
         int count1, count2; // records in arrays 1 & 2
         String fName1, fName2; // file path name
         String yRevDateStr; // :!!!: int in processConcepts
-        Rf1SubsetId tmpSid;
-        String tmpArf;
 
         Rf1TextDef[] a1;
         Rf1TextDef[] a2, a3 = null;
@@ -278,6 +276,11 @@ public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
 
         Iterator<RF1File> fit = fileList.iterator(); // File Iterator
 
+        if (fit == null || fit.hasNext() == false) {
+            getLog().info("processTextDefinitions: exiting, no files");
+            return;
+        }
+        
         // READ file1 as MASTER FILE
         RF1File f1 = fit.next();
         fName1 = f1.file.getPath();
@@ -285,6 +288,7 @@ public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
 
         a1 = Rf1TextDef.parseFile(f1);
         count1 = a1.length;
+        getLog().info("Counted: " + count1 + " records, " + fName1);
 
         for (int i = 0; i < count1; i++)
             // Write history baseline
