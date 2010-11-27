@@ -1993,7 +1993,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         lsb = yStatusUuidArray[id.status].getLeastSignificantBits();
         eId.setStatusUuid(new UUID(msb, lsb));
         // eId.setStatusUuid(lookupYStatus(id.status));
-        eId.setTime(id.yRevision);
+        eId.setTime(yRevDateArray[id.yRevision]);
 
         return eId;
     }
@@ -2083,14 +2083,14 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                         aRs.add((SctYRefSetRecord) obj);
                         count++;
                         if (count % 100000 == 0)
-                            getLog().info(" concept count = " + count);
+                            getLog().info(" refset member in = " + count);
                     }
                 }
             } catch (EOFException ex) {
-                getLog().info(" id count = " + count + " @EOF\r\n");
+                getLog().info(" refset member in = " + count + " @EOF\r\n");
             }
             ois.close();
-            getLog().info(" id count = " + count + "\r\n");
+            getLog().info(" refset member in = " + count + "\r\n");
 
             // Sort by [COMPONENTID]
             Collections.sort(aRs);
@@ -4573,41 +4573,40 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         st.eolIsSignificant(true);
         int descriptions = 0;
 
-        skipLineOne(st);
-        int tokenType = st.nextToken();
-        while ((tokenType != StreamTokenizer.TT_EOF) && (descriptions < count)) {
+        int DESCRIPTIONID = 0;
+        int DESCRIPTIONSTATUS = 1;
+        int CONCEPTID = 2;
+        int TERM = 3;
+        int INITIALCAPITALSTATUS = 4;
+        int DESCRIPTIONTYPE = 5;
+        int LANGUAGECODE = 6;
+        
+        // Header row
+        r.readLine();
+
+        while (r.ready()) {
+            String[] line = r.readLine().split(TAB_CHARACTER);
+        
             // DESCRIPTIONID
-            long descriptionId = Long.parseLong(st.sval);
+            long descriptionId = Long.parseLong(line[DESCRIPTIONID]);
             // DESCRIPTIONSTATUS
-            tokenType = st.nextToken();
-            int status = Integer.parseInt(st.sval);
+            int status = Integer.parseInt(line[DESCRIPTIONSTATUS]);
             // CONCEPTID
-            tokenType = st.nextToken();
-            long conSnoId = Long.parseLong(st.sval);
+            long conSnoId = Long.parseLong(line[CONCEPTID]);
             // TERM
-            tokenType = st.nextToken();
-            String text = st.sval;
+            String text = line[TERM];
             // INITIALCAPITALSTATUS
-            tokenType = st.nextToken();
-            int capStatus = Integer.parseInt(st.sval);
+            int capStatus = Integer.parseInt(line[INITIALCAPITALSTATUS]);
             // DESCRIPTIONTYPE
-            tokenType = st.nextToken();
-            int typeInt = Integer.parseInt(st.sval);
+            int typeInt = Integer.parseInt(line[DESCRIPTIONTYPE]);
             // LANGUAGECODE
-            tokenType = st.nextToken();
-            String lang = st.sval;
+            String lang = line[LANGUAGECODE];
 
             // Save to sortable array
             a[descriptions] = new SctYDesRecord(descriptionId, status, conSnoId, text, capStatus,
                     typeInt, lang);
             descriptions++;
 
-            // CR
-            tokenType = st.nextToken();
-            // LF
-            tokenType = st.nextToken();
-            // Beginning of loop
-            tokenType = st.nextToken();
         }
         Arrays.sort(a);
 
