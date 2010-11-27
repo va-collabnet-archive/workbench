@@ -432,7 +432,10 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         	                    if (Terms.get().hasConcept(tuple.getComponentId())) {
         	                    	conceptNids.setMember(tuple.getComponentId());
         	                    } else {
-        	                        conceptNids.setMember(Ts.get().getConceptNidForNid(tuple.getComponentId()));
+        	                    	int cNid = Ts.get().getConceptNidForNid(tuple.getComponentId());
+        	                    	if (cNid != Integer.MAX_VALUE) {
+            	                        conceptNids.setMember(cNid);
+        	                    	}
         	                    }
         	                } else {
     	                        conceptNids.setMember(Ts.get().getConceptNidForNid(tuple.getComponentId()));
@@ -446,11 +449,20 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         	            case PART:
                             I_ExtendByRefPart part = tuple.getMutablePart();
                             if (I_ExtendByRefPartCid.class.isAssignableFrom(part.getClass())) {
-                            	conceptNids.setMember(Ts.get().getConceptNidForNid(((I_ExtendByRefPartCid) part).getC1id()));
+    	                    	int cNid = Ts.get().getConceptNidForNid(((I_ExtendByRefPartCid) part).getC1id());
+    	                    	if (cNid != Integer.MAX_VALUE) {
+        	                        conceptNids.setMember(cNid);
+    	                    	}
                             } else if (I_ExtendByRefPartCidCid.class.isAssignableFrom(part.getClass())) {
-                            	conceptNids.setMember(Ts.get().getConceptNidForNid(((I_ExtendByRefPartCidCid) part).getC2id()));
+    	                    	int cNid = Ts.get().getConceptNidForNid(((I_ExtendByRefPartCidCid) part).getC2id());
+    	                    	if (cNid != Integer.MAX_VALUE) {
+        	                        conceptNids.setMember(cNid);
+    	                    	}
                             } else if (I_ExtendByRefPartCidCidCid.class.isAssignableFrom(part.getClass())) {
-                            	conceptNids.setMember(Ts.get().getConceptNidForNid(((I_ExtendByRefPartCidCidCid) part).getC3id()));
+    	                    	int cNid = Ts.get().getConceptNidForNid(((I_ExtendByRefPartCidCidCid) part).getC3id());
+    	                    	if (cNid != Integer.MAX_VALUE) {
+        	                        conceptNids.setMember(cNid);
+    	                    	}
                             } 
         	                break;
 

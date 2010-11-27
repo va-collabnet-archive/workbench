@@ -207,15 +207,15 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
                         }
                     } else {
                     	errorCount++;
-                    	if (errorCount < 3) {
-                        	AceLog.getAppLog().alertAndLogException(new Exception("Extension version does not reference a known component: " +
-                        			extVer));
-                    	}
                     	AceLog.getAppLog().warning("Extension version does not reference a known component: " +
                     			extVer);
                     }
 
                 }
+            	if (errorCount > 0) {
+                	AceLog.getAppLog().alertAndLogException(new Exception(errorCount + 
+                			" extensions do not reference known components. See log for details."));
+            	}
             }
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
