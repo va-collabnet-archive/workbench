@@ -527,7 +527,7 @@ public class ConceptView extends JPanel {
 		CollapsePanel cprg = new CollapsePanel("Group: ", settings);
 		relGroupPanel.add(cprg, gbc);
 		gbc.gridy++;
-		for (RelationshipVersionBI r: group.getRels()) {
+		for (RelationshipVersionBI r: group.getCurrentRels()) {
 			DragPanelRel dpr = getRelComponent(r);
 			cprg.addToggleComponent(dpr);
 			dpr.setInGroup(true);

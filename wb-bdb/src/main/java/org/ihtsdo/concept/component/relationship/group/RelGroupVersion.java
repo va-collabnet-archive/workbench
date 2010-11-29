@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
@@ -36,9 +35,14 @@ public class RelGroupVersion
 		this.coordinate = coordinate;
 		setupLatest();
 	}
+	
+	public Collection<? extends RelationshipChronicleBI> getRels() {
+		return rg.getRels();
+	}
+
 
 	@Override
-	public Collection<? extends RelationshipVersionBI> getRels() throws ContraditionException {
+	public Collection<? extends RelationshipVersionBI> getCurrentRels() throws ContraditionException {
 		ArrayList<RelationshipVersionBI> results = new ArrayList<RelationshipVersionBI>();
 		for (RelationshipChronicleBI relc: rg.getRels()) {
 			if (coordinate != null) {
@@ -133,13 +137,9 @@ public class RelGroupVersion
 	public String toUserString() {
 	    StringBuffer buff = new StringBuffer();
     	buff.append("Group: ");
-	    try {
-			for (RelationshipVersionBI rel: getRels()) {
-				buff.append(rel.toUserString());
-				buff.append("; ");
-			}
-		} catch (ContraditionException e) {
-			AceLog.getAppLog().alertAndLogException(e);
+	    for (RelationshipChronicleBI rel: getRels()) {
+			buff.append(rel.toUserString());
+			buff.append("; ");
 		}
 		return buff.toString();
 	}

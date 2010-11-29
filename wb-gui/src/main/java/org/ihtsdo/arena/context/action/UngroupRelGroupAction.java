@@ -2,37 +2,24 @@ package org.ihtsdo.arena.context.action;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.UUID;
 import java.util.Collection;
 
 import javax.swing.AbstractAction;
 
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_RelVersioned;
-import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_RelPart;
-
 import org.dwfa.ace.api.Terms;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.api.description.DescriptionVersionBI;
-import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
-import org.ihtsdo.tk.drools.facts.ComponentFact;
-import org.ihtsdo.tk.drools.facts.RelFact;
-import org.ihtsdo.tk.drools.facts.RelGroupFact;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
+import org.ihtsdo.tk.drools.facts.RelGroupFact;
 
 
 
@@ -60,7 +47,7 @@ public class UngroupRelGroupAction extends AbstractAction {
 		try {	
 			//get rels from sourceComponent 
 			RelGroupVersionBI source = (RelGroupVersionBI) sourceComponent; 
-			Collection sourceRels = source.getRels(); 
+			Collection sourceRels = source.getCurrentRels(); 
 			//loop through rels
 			 for (Object relObject: sourceRels) {
 				 if (I_AmPart.class.isAssignableFrom(relObject.getClass())) {

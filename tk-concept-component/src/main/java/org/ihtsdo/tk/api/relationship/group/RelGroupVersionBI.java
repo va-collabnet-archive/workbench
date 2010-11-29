@@ -8,6 +8,6 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 public interface RelGroupVersionBI extends RelGroupChronicleBI, ComponentVersionBI {
 
-	public Collection<? extends RelationshipVersionBI> getRels();
+	public Collection<? extends RelationshipVersionBI> getCurrentRels() throws ContraditionException;
 
 }
