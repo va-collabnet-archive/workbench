@@ -127,19 +127,22 @@ public class QAStoreStubImpl implements QAStoreBI {
 	@Override
 	public List<Rule> getAllRules() {
 		Rule rule1 = new Rule();
-		rule1.setRuleCode(11);
+		rule1.setRuleCode("11");
 		rule1.setName("FSN must be unique");
 		rule1.setSeverity(3);
+		rule1.setCategory("Descriptions model");
 
 		Rule rule2 = new Rule();
-		rule2.setRuleCode(25);
+		rule2.setRuleCode("25");
 		rule2.setName("Retired concept should not have defining roles");
 		rule2.setSeverity(3);
+		rule2.setCategory("Concept model");
 
 		Rule rule3 = new Rule();
-		rule3.setRuleCode(46);
+		rule3.setRuleCode("46");
 		rule3.setName("Tex should not have double spaces");
 		rule3.setSeverity(1);
+		rule3.setCategory("Descriptions model");
 
 		List<Rule> rules = new ArrayList<Rule>();
 		rules.add(rule1);

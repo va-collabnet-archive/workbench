@@ -29,6 +29,10 @@ public class DispositionStatus implements Comparable {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	public String toString() {
+		return getName();
+	}
 
 	@Override
 	public int compareTo(Object otherObject) {
