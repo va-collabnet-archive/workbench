@@ -332,17 +332,17 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
     }
 
     private int compareMember(Rf1SubsetMember m1, Rf1SubsetMember m2) {
-        if ((m1.subsetId == m2.subsetId) && (m1.memberId == m2.memberId)) {
+        if ((m1.origSubsetId == m2.origSubsetId) && (m1.memberId == m2.memberId)) {
             if (m1.memberValue == m2.memberValue)
                 return 1; // SAME
             else
                 return 2; // SAME COMPONENT, DIFFERENT VALUE
-        } else if (m1.subsetId == m2.subsetId) {
+        } else if (m1.origSubsetId == m2.origSubsetId) {
             if (m1.memberId > m2.memberId)
                 return 3; // ADDED
             else
                 return 4; // DROPPED
-        } else if (m1.subsetId > m2.subsetId) {
+        } else if (m1.origSubsetId > m2.origSubsetId) {
             return 3; // ADDED            
         } else { // m1.subsetId < m2.subsetId
             return 4; // DROPPED            
@@ -584,16 +584,15 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
             
             // READ file1 as MASTER FILE
             RF1File f1 = fit.next();
-            fName1 = f1.file.getPath();
             yRevDateStr = f1.revDateStr;
 
-            count1 = countFileLines(fName1);
-            getLog().info("BASE FILE:  " + count1 + " records, " + fName1);
-            a1 = new Rf1SubsetMember[count1];
-            parseSubsetMembers(fName1, a1, count1);
+            a1 = Rf1SubsetMember.parseSubsetMembers(f1, mapSubsetIdToOriginal);
+            count1 = a1.length;
+            getLog().info("BASE FILE:  " + count1 + " records, " + f1.file.getPath());
+
             for (int i = 0; i < count1; i++) {
                 // Write history
-                tmpSid = mapSubsetIdToOriginal.get(a1[i].subsetId);
+                tmpSid = mapSubsetIdToOriginal.get(a1[i].origSubsetId);
                 tmpArf = convertMemberToArf(a1[i], tmpSid, yRevDateStr);
                 if (tmpSid.getSubsetTypeInt() == 1 || tmpSid.getSubsetTypeInt() == 3)
                     bwc.write(tmpArf);
@@ -604,15 +603,12 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
             while (fit.hasNext()) {
                 // SETUP CURRENT CONCEPTS INPUT FILE
                 RF1File f2 = fit.next();
-                fName2 = f2.file.getPath();
                 yRevDateStr = f2.revDateStr;
 
-                count2 = countFileLines(fName2);
-                getLog().info("Counted: " + count2 + " records, " + fName2);
-
                 // Parse in file2
-                a2 = new Rf1SubsetMember[count2];
-                parseSubsetMembers(fName2, a2, count2);
+                a2 = Rf1SubsetMember.parseSubsetMembers(f2, mapSubsetIdToOriginal);
+                count2 = a2.length;
+                getLog().info("BASE FILE:  " + count2 + " records, " + f2.file.getPath());
 
                 int r1 = 0, r2 = 0, r3 = 0; // reset record indices
                 int nSame = 0, nMod = 0, nAdd = 0, nDrop = 0; // counters
@@ -628,7 +624,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
 
                     case 2: // MODIFIED
                         // Write history
-                        tmpSid = mapSubsetIdToOriginal.get(a2[r2].subsetId);
+                        tmpSid = mapSubsetIdToOriginal.get(a2[r2].origSubsetId);
                         tmpArf = convertMemberToArf(a2[r2], tmpSid, yRevDateStr);
                         if (tmpSid.getSubsetTypeInt() == 1 || tmpSid.getSubsetTypeInt() == 3)
                             bwc.write(tmpArf);
@@ -643,7 +639,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
 
                     case 3: // ADDED
                         // Write history
-                        tmpSid = mapSubsetIdToOriginal.get(a2[r2].subsetId);
+                        tmpSid = mapSubsetIdToOriginal.get(a2[r2].origSubsetId);
                         tmpArf = convertMemberToArf(a2[r2], tmpSid, yRevDateStr);
                         if (tmpSid.getSubsetTypeInt() == 1 || tmpSid.getSubsetTypeInt() == 3)
                             bwc.write(tmpArf);
@@ -660,7 +656,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
                         // see ArchitectonicAuxiliary.getStatusFromId()
                         if (a1[r1].status != 1) { // if not RETIRED
                             a1[r1].status = 1; // set to RETIRED
-                            tmpSid = mapSubsetIdToOriginal.get(a1[r1].subsetId);
+                            tmpSid = mapSubsetIdToOriginal.get(a1[r1].origSubsetId);
                             tmpArf = convertMemberToArf(a1[r1], tmpSid, yRevDateStr);
                             if (tmpSid.getSubsetTypeInt() == 1 || tmpSid.getSubsetTypeInt() == 3)
                                 bwc.write(tmpArf);
@@ -682,7 +678,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
                 if (r2 < count2) {
                     while (r2 < count2) { // ADD CONCEPT REMAINING INPUT
                         // Write history
-                        tmpSid = mapSubsetIdToOriginal.get(a2[r2].subsetId);
+                        tmpSid = mapSubsetIdToOriginal.get(a2[r2].origSubsetId);
                         tmpArf = convertMemberToArf(a2[r2], tmpSid, yRevDateStr);
                         if (tmpSid.getSubsetTypeInt() == 1 || tmpSid.getSubsetTypeInt() == 3)
                             bwc.write(tmpArf);

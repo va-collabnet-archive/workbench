@@ -330,9 +330,9 @@ public class Rf1ToArfLanguageGbUsMojo extends AbstractMojo implements Serializab
 
                 // CREATE MEMBERS FILE
                 Rf1SubsetMember[] membersGB = Rf1SubsetMember.parseSubsetMembers(membersGBList
-                        .get(i));
+                        .get(i), subsetSctIdOriginal);
                 Rf1SubsetMember[] membersUS = Rf1SubsetMember.parseSubsetMembers(membersUSList
-                        .get(i));
+                        .get(i), subsetSctIdOriginal);
 
                 BufferedWriter bwMembersGX = new BufferedWriter(new FileWriter(fNameMembers));
                 getLog().info("::: GB EXCEPTION MEMBERS OUTPUT: " + bwMembersGX);

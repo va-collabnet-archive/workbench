@@ -214,7 +214,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     private static final int IS_EQUAL = 0;
     private static final int IS_GREATER = 1;
     private static final String FILE_SEPARATOR = File.separator;
-    
+
     // workaround to set stated relationship characteristic as STATED_RELATIONSHIP 
     // starts a integer 5 at beginning of import pipeline
     // integer 5 is replaced with STATED_RELATIONSHIP UUID at eConcept creation
@@ -737,8 +737,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             for (int i = 0; i < 5; i++)
                 yRelCharArray[i] = ArchitectonicAuxiliary.getSnomedCharacteristicType(i).getUids()
                         .iterator().next();
-            yRelCharArray[STATED_CHAR_WORKAROUND] = ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()
-                    .iterator().next();
+            yRelCharArray[STATED_CHAR_WORKAROUND] = ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP
+                    .getUids().iterator().next();
 
             // string lookup array
             yRelCharStrArray = new String[6];
@@ -2065,15 +2065,17 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void executeMojoStep5() {
-        getLog().info("*** Sct1ArfToEConcept Step #5 BEGINNING -- REFSET PREPARATION ***");
+        getLog().info("*** Sct1ArfToEConcept Step #5 BEGINNING -- REFSET ATTACHMENT ***");
         long start = System.currentTimeMillis();
 
         try {
             // *** READ IN REFSET ***
+            int numObj = countFileObjects(fNameStep2Refset);
+
             ObjectInputStream ois;
             ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(
                     fNameStep2Refset)));
-            ArrayList<SctYRefSetRecord> aRs = new ArrayList<SctYRefSetRecord>();
+            ArrayList<SctYRefSetRecord> aRs = new ArrayList<SctYRefSetRecord>(numObj);
 
             int count = 0;
             Object obj = null;
@@ -2357,7 +2359,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         getLog().info(
                 "*** MASTER SORT TIME: " + ((System.currentTimeMillis() - start) / 1000)
                         + " seconds");
-        getLog().info("*** Sct1ArfToEConcept Step #5 COMPLETED -- REFSET PREPARATION ***\r\n");
+        getLog().info("*** Sct1ArfToEConcept Step #5 COMPLETED -- REFSET ATTACHMENT ***\r\n");
     }
 
     private int compareMsbLsb(long aMsb, long aLsb, long bMsb, long bLsb) {
@@ -3312,6 +3314,13 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         // ADD REFSET MEMBER VALUES
         if (rsByRsList != null && rsByRsList.size() > 0) {
             List<TkRefsetAbstractMember<?>> listErm = new ArrayList<TkRefsetAbstractMember<?>>();
+
+            if (rsByRsList.size() > 100000) {
+                UUID tmpUUID = new UUID(cRec0.conUuidMsb, cRec0.conUuidLsb);
+                getLog().info(
+                        "::: NOTE: concept with refset members = " + rsByRsList.size()
+                                + ", concept UUID = " + tmpUUID.toString());
+            }
 
             for (SctYRefSetRecord r : rsByRsList) {
 
@@ -4580,13 +4589,13 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         int INITIALCAPITALSTATUS = 4;
         int DESCRIPTIONTYPE = 5;
         int LANGUAGECODE = 6;
-        
+
         // Header row
         r.readLine();
 
         while (r.ready()) {
             String[] line = r.readLine().split(TAB_CHARACTER);
-        
+
             // DESCRIPTIONID
             long descriptionId = Long.parseLong(line[DESCRIPTIONID]);
             // DESCRIPTIONSTATUS
@@ -4775,9 +4784,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         Arrays.sort(a, comp);
 
         // 
-        if (a == null) 
+        if (a == null)
             System.out.println("!!!:DEBUG:");
-        if (a.length < 1) 
+        if (a.length < 1)
             System.out.println("!!!:DEBUG:");
         long lastC1 = a[0].c1SnoId;
         int lastGroup = a[0].group;
@@ -5027,6 +5036,23 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         // lineCount NOTE: COUNT -1 BECAUSE FIRST LINE SKIPPED
         // lineCount NOTE: REQUIRES THAT LAST LINE IS VALID RECORD
         return lineCount - 1;
+    }
+
+    private int countFileObjects(String fName) throws FileNotFoundException, IOException,
+            ClassNotFoundException {
+        int objCount = 0;
+
+        ObjectInputStream ois;
+        ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(fName)));
+        try {
+            while ((ois.readObject()) != null) {
+                objCount++;
+            }
+        } catch (EOFException ex) {
+            getLog().info(" object count = " + objCount + " @EOF " + fName + "\r\n");
+        }
+
+        return objCount;
     }
 
     private String getFileRevDate(File f) throws MojoFailureException {
