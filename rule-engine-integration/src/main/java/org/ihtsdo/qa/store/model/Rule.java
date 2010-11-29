@@ -12,7 +12,7 @@ public class Rule {
 	private String packageName;
 	private String packageUrl;
 	private UUID ditaUuid;
-	private int ruleCode;
+	private String ruleCode;
 	private String category;
 	private String expectedResult;
 	private String suggestedResolution;
@@ -90,14 +90,6 @@ public class Rule {
 
 	public void setDitaUuid(UUID ditaUuid) {
 		this.ditaUuid = ditaUuid;
-	}
-
-	public int getRuleCode() {
-		return ruleCode;
-	}
-
-	public void setRuleCode(int ruleCode) {
-		this.ruleCode = ruleCode;
 	}
 
 	public String getCategory() {
@@ -186,6 +178,14 @@ public class Rule {
 
 	public void setModifiedBy(String modifiedBy) {
 		this.modifiedBy = modifiedBy;
+	}
+
+	public String getRuleCode() {
+		return ruleCode;
+	}
+
+	public void setRuleCode(String ruleCode) {
+		this.ruleCode = ruleCode;
 	}
 
 

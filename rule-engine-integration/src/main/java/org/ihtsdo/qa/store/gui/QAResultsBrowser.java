@@ -14,6 +14,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.LinkedHashSet;
 import java.util.List;
+import javax.swing.*;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -41,18 +42,20 @@ public class QAResultsBrowser extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private QAStoreBI store;
 	private DefaultTableModel tableModel;
-	private LinkedHashSet<DispositionStatus> dispositionStatuses; 
+	private LinkedHashSet<DispositionStatus> dispositionStatuses;
+	private boolean showFilters = false;
 
 	public QAResultsBrowser(QAStoreBI store) {
 		this.store = store;
 		initComponents();
-		
+		panel4.setVisible(false);
 		dispositionStatuses = new LinkedHashSet<DispositionStatus>();
 		dispositionStatuses.addAll(store.getAllDispositionStatus());
-		
+
 		LinkedHashSet<String> columnNames = new LinkedHashSet<String>();
-		columnNames.add("Error code");
+		columnNames.add("Rule code");
 		columnNames.add("Rule name");
+		columnNames.add("Category");
 		columnNames.add("Severity");
 		columnNames.add("Open");
 		for (DispositionStatus loopStatus : dispositionStatuses) {
@@ -60,13 +63,13 @@ public class QAResultsBrowser extends JPanel {
 		}
 		columnNames.add("Closed");
 		columnNames.add("Last run");
-		
-//		String[] columnNamesArray = new String[columnNames.size()];
-//		int i = 0;
-//		for (String loopString : columnNames) {
-//			columnNamesArray[i] = loopString;
-//			i++;
-//		}
+
+		//		String[] columnNamesArray = new String[columnNames.size()];
+		//		int i = 0;
+		//		for (String loopString : columnNames) {
+		//			columnNamesArray[i] = loopString;
+		//			i++;
+		//		}
 
 		String[][] data = null;
 		tableModel = new DefaultTableModel(data, columnNames.toArray()) {
@@ -80,6 +83,42 @@ public class QAResultsBrowser extends JPanel {
 		setupDatabasesCombo();
 		setupPathsCombo();
 		setupTimeCombo();
+		setupStatusCombo();
+		setupDispositionCombo();
+		setupSeverityCombo();
+		setupCategoryCombo();
+	}
+
+	private void setupCategoryCombo() {
+		comboBox8.removeAllItems();
+		comboBox8.addItem("Any");
+		comboBox8.addItem("Concept model");
+		comboBox8.addItem("Descriptions model");
+	}
+
+	private void setupSeverityCombo() {
+		comboBox7.removeAllItems();
+		comboBox7.addItem("Any");
+		comboBox7.addItem("1");
+		comboBox7.addItem("2");
+		comboBox7.addItem("3");
+	}
+
+	private void setupDispositionCombo() {
+		comboBox6.removeAllItems();
+		comboBox6.addItem("Any");
+		for (DispositionStatus loopStatus : dispositionStatuses) {
+			comboBox6.addItem(loopStatus);
+		}
+	}
+
+	private void setupStatusCombo() {
+		comboBox5.removeAllItems();
+		comboBox5.addItem("Any");
+		comboBox5.addItem("Open cases");
+		comboBox5.addItem("No open cases");
+		comboBox5.addItem("Closed cases");
+		comboBox5.addItem("No closed cases");
 	}
 
 	private void setupDatabasesCombo() {
@@ -119,7 +158,7 @@ public class QAResultsBrowser extends JPanel {
 			updateTable1(coordinate);
 		}
 	}
-	
+
 	private void clearTable1() {
 		while (tableModel.getRowCount()>0){
 			tableModel.removeRow(0);
@@ -131,17 +170,74 @@ public class QAResultsBrowser extends JPanel {
 		clearTable1();
 		List<RulesReportLine> lines = store.getRulesReportLines(coordinate);
 		for (RulesReportLine line : lines) {
-			LinkedHashSet<String> row = new LinkedHashSet<String>();
-			row.add(String.valueOf(line.getRule().getRuleCode()));
-			row.add(line.getRule().getName());
-			row.add(String.valueOf(line.getRule().getSeverity()));
-			row.add(String.valueOf(line.getStatusCount().get(true)));
-			for (DispositionStatus loopStatus : dispositionStatuses) {
-				row.add(String.valueOf(line.getDispositionStatusCount().get(loopStatus.getDispositionStatusUuid())));
+			boolean lineApproved = true;
+			if (showFilters) {
+				if (comboBox5.getSelectedIndex() != 0){
+					String selectedStatus = (String) comboBox5.getSelectedItem();
+					if (selectedStatus.equals("Open cases")) {
+						if (line.getStatusCount().get(true) ==  0) {
+							lineApproved = false;
+						}
+					} else if (selectedStatus.equals("No open cases")) {
+						if (line.getStatusCount().get(true) >  0) {
+							lineApproved = false;
+						}
+					} else if (selectedStatus.equals("Closed cases")) {
+						if (line.getStatusCount().get(false) ==  0) {
+							lineApproved = false;
+						}
+					} else if (selectedStatus.equals("No closed cases")) {
+						if (line.getStatusCount().get(false) >  0) {
+							lineApproved = false;
+						}
+					}
+				}
+				if (comboBox6.getSelectedIndex() != 0){
+					DispositionStatus selectedDisposition = (DispositionStatus) comboBox6.getSelectedItem();
+					if (line.getDispositionStatusCount().get(selectedDisposition.getDispositionStatusUuid()) == 0) {
+						lineApproved = false;
+					}
+				}
+				if (comboBox7.getSelectedIndex() != 0){
+					Integer selectedSeverity = Integer.valueOf((String) comboBox7.getSelectedItem());
+					if (line.getRule().getSeverity() != selectedSeverity) {
+						lineApproved = false;
+					}
+				}
+				if (comboBox8.getSelectedIndex() != 0){
+					String selectedCategory = (String) comboBox8.getSelectedItem();
+					if (!line.getRule().getCategory().equals(selectedCategory)) {
+						lineApproved = false;
+					}
+				}
+				String filterText = textField1.getText().trim().toLowerCase();
+				if (!filterText.isEmpty()) {
+					if (!line.getRule().getName().toLowerCase().contains(filterText)) {
+						lineApproved = false;
+					}
+				}
+				String filterCode = textField2.getText().trim().toLowerCase();
+				if (!filterCode.isEmpty()) {
+					if (!line.getRule().getRuleCode().toLowerCase().contains(filterText)) {
+						lineApproved = false;
+					}
+				}
 			}
-			row.add(String.valueOf(line.getStatusCount().get(false)));
-			row.add(line.getLastExecutionTime().toString());
-			tableModel.addRow(row.toArray());
+
+			if (lineApproved) {
+				LinkedHashSet<String> row = new LinkedHashSet<String>();
+				row.add(String.valueOf(line.getRule().getRuleCode()));
+				row.add(line.getRule().getName());
+				row.add(line.getRule().getCategory());
+				row.add(String.valueOf(line.getRule().getSeverity()));
+				row.add(String.valueOf(line.getStatusCount().get(true)));
+				for (DispositionStatus loopStatus : dispositionStatuses) {
+					row.add(String.valueOf(line.getDispositionStatusCount().get(loopStatus.getDispositionStatusUuid())));
+				}
+				row.add(String.valueOf(line.getStatusCount().get(false)));
+				row.add(line.getLastExecutionTime().toString());
+				tableModel.addRow(row.toArray());
+			}
 		}
 		table1.revalidate();
 	}
@@ -161,6 +257,18 @@ public class QAResultsBrowser extends JPanel {
 		clearTable1();
 	}
 
+	private void button2ActionPerformed(ActionEvent e) {
+		if (showFilters) {
+			button2.setText("Show filters");
+			panel4.setVisible(false);
+			showFilters = false;
+		} else {
+			button2.setText("Hide filters");
+			panel4.setVisible(true);
+			showFilters = true;
+		}
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		panel1 = new JPanel();
@@ -171,6 +279,20 @@ public class QAResultsBrowser extends JPanel {
 		comboBox2 = new JComboBox();
 		comboBox3 = new JComboBox();
 		button1 = new JButton();
+		button2 = new JButton();
+		panel4 = new JPanel();
+		label11 = new JLabel();
+		label4 = new JLabel();
+		label8 = new JLabel();
+		label10 = new JLabel();
+		label9 = new JLabel();
+		label5 = new JLabel();
+		textField2 = new JTextField();
+		comboBox5 = new JComboBox();
+		textField1 = new JTextField();
+		comboBox8 = new JComboBox();
+		comboBox7 = new JComboBox();
+		comboBox6 = new JComboBox();
 		panel2 = new JPanel();
 		scrollPane1 = new JScrollPane();
 		table1 = new JTable();
@@ -179,16 +301,16 @@ public class QAResultsBrowser extends JPanel {
 		//======== this ========
 		setLayout(new GridBagLayout());
 		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
-		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0, 0, 0};
+		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0};
 		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-		((GridBagLayout)getLayout()).rowWeights = new double[] {0.0, 1.0, 0.0, 1.0E-4};
+		((GridBagLayout)getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0, 0.0, 1.0E-4};
 
 		//======== panel1 ========
 		{
 			panel1.setLayout(new GridBagLayout());
-			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 107, 0, 0, 0, 0, 0, 0, 0};
+			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 107, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 			((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0};
-			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
 
 			//---- label1 ----
@@ -253,9 +375,91 @@ public class QAResultsBrowser extends JPanel {
 			});
 			panel1.add(button1, new GridBagConstraints(7, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- button2 ----
+			button2.setText("Show filters");
+			button2.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			button2.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					button2ActionPerformed(e);
+				}
+			});
+			panel1.add(button2, new GridBagConstraints(13, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
 		}
 		add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 5, 0), 0, 0));
+
+		//======== panel4 ========
+		{
+			panel4.setLayout(new GridBagLayout());
+			((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {0, 0, 0, 209, 0, 0, 0, 0};
+			((GridBagLayout)panel4.getLayout()).rowHeights = new int[] {0, 0, 0};
+			((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel4.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
+
+			//---- label11 ----
+			label11.setText("Rule code");
+			panel4.add(label11, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
+			//---- label4 ----
+			label4.setText("Status");
+			panel4.add(label4, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
+			//---- label8 ----
+			label8.setText("Rule name filter");
+			panel4.add(label8, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
+			//---- label10 ----
+			label10.setText("Category");
+			panel4.add(label10, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
+			//---- label9 ----
+			label9.setText("Severity");
+			panel4.add(label9, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
+			//---- label5 ----
+			label5.setText("Disposition");
+			panel4.add(label5, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+			panel4.add(textField2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+			panel4.add(comboBox5, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- textField1 ----
+			textField1.setColumns(50);
+			panel4.add(textField1, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+			panel4.add(comboBox8, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+			panel4.add(comboBox7, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+			panel4.add(comboBox6, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+		}
+		add(panel4, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 5, 0), 0, 0));
 
@@ -275,7 +479,7 @@ public class QAResultsBrowser extends JPanel {
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+		add(panel2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 5, 0), 0, 0));
 
@@ -287,7 +491,7 @@ public class QAResultsBrowser extends JPanel {
 			((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0E-4};
 			((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 		}
-		add(panel3, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+		add(panel3, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 0, 0), 0, 0));
 		// JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -302,6 +506,20 @@ public class QAResultsBrowser extends JPanel {
 	private JComboBox comboBox2;
 	private JComboBox comboBox3;
 	private JButton button1;
+	private JButton button2;
+	private JPanel panel4;
+	private JLabel label11;
+	private JLabel label4;
+	private JLabel label8;
+	private JLabel label10;
+	private JLabel label9;
+	private JLabel label5;
+	private JTextField textField2;
+	private JComboBox comboBox5;
+	private JTextField textField1;
+	private JComboBox comboBox8;
+	private JComboBox comboBox7;
+	private JComboBox comboBox6;
 	private JPanel panel2;
 	private JScrollPane scrollPane1;
 	private JTable table1;
