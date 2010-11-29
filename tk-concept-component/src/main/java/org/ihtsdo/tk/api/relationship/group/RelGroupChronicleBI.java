@@ -8,7 +8,7 @@ import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 
 public interface RelGroupChronicleBI extends ComponentChroncileBI<RelGroupVersionBI> {
 	
-	public Collection<? extends RelationshipChronicleBI> getRels() throws ContraditionException;
+	public Collection<? extends RelationshipChronicleBI> getRels();
 	
 	public int getRelGroup();
 }
