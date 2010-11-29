@@ -47,7 +47,7 @@ public class UngroupRelGroupAction extends AbstractAction {
 		try {	
 			//get rels from sourceComponent 
 			RelGroupVersionBI source = (RelGroupVersionBI) sourceComponent; 
-			Collection sourceRels = source.getCurrentRels(); 
+			Collection<?> sourceRels = source.getCurrentRels(); 
 			//loop through rels
 			 for (Object relObject: sourceRels) {
 				 if (I_AmPart.class.isAssignableFrom(relObject.getClass())) {

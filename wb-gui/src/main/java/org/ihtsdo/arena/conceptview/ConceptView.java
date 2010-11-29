@@ -479,6 +479,11 @@ public class ConceptView extends JPanel {
 
 	private Collection<JComponent> dropComponents = Collections.synchronizedList(new ArrayList<JComponent>());
 
+	public ConceptView() throws TerminologyException, IOException {
+		this.config = Terms.get().getActiveAceFrameConfig();
+		kb = new EditPanelKb(config);
+		addCommitListener(settings);
+	}
 
 	
 	public ConceptView(I_ConfigAceFrame config, ConceptViewSettings settings) {
@@ -486,6 +491,11 @@ public class ConceptView extends JPanel {
 		this.config = config;
 		this.settings = settings;
 		kb = new EditPanelKb(config);
+		addCommitListener(settings);
+	}
+
+
+	private void addCommitListener(ConceptViewSettings settings) {
 		settings.getConfig().addPropertyChangeListener("commit", new PropertyChangeListener() {
 			
 			@Override
