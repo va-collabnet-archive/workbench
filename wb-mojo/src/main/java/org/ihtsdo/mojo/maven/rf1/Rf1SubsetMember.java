@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import org.apache.maven.plugin.MojoFailureException;
 
@@ -27,19 +28,19 @@ public class Rf1SubsetMember implements Comparable<Object> {
 
     private static final String TAB_CHARACTER = "\t";
 
-    long subsetId; // SCTID subset release id, see SubsetTable for original subset  id
+    long origSubsetId; // SCTID original subset release id, see SubsetTable for original subset id
+    // long subsetId; // SCTID subset release id, see SubsetTable for original subset id
     long memberId; // SCTID for SNOMED Concept or Description 
     int memberValue; // MEMBERSTATUS For Descriptions: 1=Preferred, 2=Synonym, 3=FSN
     //String linkedId; // SCTID, used for navigation subsets
 
     int status;
-    
-    public Rf1SubsetMember(long subsetId, long memberId, int value) {
-        this.subsetId = subsetId;
+
+    public Rf1SubsetMember(long origSubsetId, long memberId, int value) {
+        this.origSubsetId = origSubsetId;
         this.memberId = memberId;
         this.memberValue = value;
-        this.status = 0; // CURRENT is 0 
-
+        this.status = 0; // CURRENT is 0
     }
 
     public long getMemberId() {
@@ -70,9 +71,9 @@ public class Rf1SubsetMember implements Comparable<Object> {
     public int compareTo(Object o) {
         Rf1SubsetMember tmp = (Rf1SubsetMember) o;
 
-        if (this.subsetId < tmp.subsetId) {
+        if (this.origSubsetId < tmp.origSubsetId) {
             return -1; // instance less than received
-        } else if (this.subsetId > tmp.subsetId) {
+        } else if (this.origSubsetId > tmp.origSubsetId) {
             return 1; // instance greater than received
         } else {
             if (this.memberId < tmp.memberId) {
@@ -91,12 +92,43 @@ public class Rf1SubsetMember implements Comparable<Object> {
         }
     }
 
-    public static Rf1SubsetMember[] parseSubsetMembers(RF1File rf1)
+    public static Rf1SubsetMember[] parseSubsetMembers(RF1File rf1, long originalSubsetId)
             throws IOException, MojoFailureException {
 
         int lineCount = RF1File.countFileLines(rf1);
         Rf1SubsetMember[] a = new Rf1SubsetMember[lineCount];
-        
+
+        BufferedReader br = new BufferedReader(new FileReader(rf1.file));
+        int members = 0;
+
+        // int SUBSETID = 0;
+        int MEMBERID = 1;
+        int MEMBERSTATUS = 2; // NOTE: status is used as a "value"
+        // int LINKEDID = 3;
+
+        // Header row
+        br.readLine();
+
+        while (br.ready()) {
+            String[] line = br.readLine().split(TAB_CHARACTER);
+            // long subsetId = Long.parseLong(line[SUBSETID]);
+            long memberId = Long.parseLong(line[MEMBERID]);
+            int memberValue = Integer.parseInt(line[MEMBERSTATUS]);
+
+            a[members] = new Rf1SubsetMember(originalSubsetId, memberId, memberValue);
+
+            members++;
+        }
+        Arrays.sort(a);
+        return a;
+    }
+
+    public static Rf1SubsetMember[] parseSubsetMembers(RF1File rf1,
+            HashMap<Long, Rf1SubsetId> mapSubsetIdToOriginal) throws IOException,
+            MojoFailureException {
+        int lineCount = RF1File.countFileLines(rf1);
+        Rf1SubsetMember[] a = new Rf1SubsetMember[lineCount];
+
         BufferedReader br = new BufferedReader(new FileReader(rf1.file));
         int members = 0;
 
@@ -114,7 +146,8 @@ public class Rf1SubsetMember implements Comparable<Object> {
             long memberId = Long.parseLong(line[MEMBERID]);
             int memberValue = Integer.parseInt(line[MEMBERSTATUS]);
 
-            a[members] = new Rf1SubsetMember(subsetId, memberId, memberValue);
+            long originalSubsetId = mapSubsetIdToOriginal.get(subsetId).getSubsetSctIdOriginal();
+            a[members] = new Rf1SubsetMember(originalSubsetId, memberId, memberValue);
 
             members++;
         }
