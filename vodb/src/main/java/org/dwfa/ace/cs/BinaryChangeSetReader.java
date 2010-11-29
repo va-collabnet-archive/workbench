@@ -357,19 +357,26 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
             if (getVodb().hasExtension(memberId)) {
                 extension = getVodb().getExtension(memberId);
             } else {
-                int refsetId = getVodb().getId(bean.getRefsetUid()).getNativeId();
-                I_IdVersioned componentUuid = getVodb().getId(bean.getComponentUid());
-
-                if (componentUuid == null) {
+            	I_IdVersioned refsetIdVersioned = getVodb().getId(bean.getRefsetUid());
+            	if(refsetIdVersioned == null){
                     AceLog.getAppLog().severe(
-                        changeSetFile.getName() + " Error importing extension... Component with id does not exist: "
-                            + bean.getComponentUid());
-                } else {
-                    int componentId = componentUuid.getNativeId();
-                    int typeId = getVodb().getId(bean.getTypeUid()).getNativeId();
-                    int partCount = bean.getVersions().size();
-                    extension = new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId, partCount);
-                }
+                            changeSetFile.getName() + " Error importing extension... Refset with id does not exist: "
+                                + bean.getRefsetUid());
+            	} else {
+	                int refsetId = refsetIdVersioned.getNativeId();
+	                I_IdVersioned componentUuid = getVodb().getId(bean.getComponentUid());
+
+	                if (componentUuid == null) {
+	                    AceLog.getAppLog().severe(
+	                        changeSetFile.getName() + " Error importing extension... Component with id does not exist: "
+	                            + bean.getComponentUid());
+	                } else {
+	                    int componentId = componentUuid.getNativeId();
+	                    int typeId = getVodb().getId(bean.getTypeUid()).getNativeId();
+	                    int partCount = bean.getVersions().size();
+	                    extension = new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId, partCount);
+	                }
+            	}
             }
             if (extension != null) {
                 boolean changed = false;

@@ -203,7 +203,7 @@ public abstract class RefsetUtilities {
         for (I_GetConceptData refsetConcept : refsetChildren) {
             Set<I_GetConceptData> purposeConcepts = new HashSet<I_GetConceptData>();
 
-            List<? extends I_RelVersioned> rels = refsetConcept.getSourceRels(); //refsetConcept.getSourceRelTuples(null, null, null, false, true)
+            List<? extends I_RelVersioned> rels = refsetConcept.getSourceRels();
             for (I_RelVersioned rel : rels) {
                 List<I_RelTuple> tuples = rel.getTuples();
                 for (I_RelTuple tuple : tuples) {
