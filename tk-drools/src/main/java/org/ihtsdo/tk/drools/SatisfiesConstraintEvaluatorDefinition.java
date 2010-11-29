@@ -24,9 +24,45 @@ public class SatisfiesConstraintEvaluatorDefinition implements EvaluatorDefiniti
 	private static final String DEFAULT_PARAMETERS = "x,e,e";
 
 	public static class SatisfiesConstraintEvaluator extends BaseEvaluator {
-		ConstraintCheckType subjectCheck;
-		ConstraintCheckType propertyCheck;
-		ConstraintCheckType valueCheck;
+	    /**
+		 * 
+		 */
+	    private static final long serialVersionUID = 1L;
+
+	    private static final int dataVersion = 1;
+
+		@Override
+		public void readExternal(ObjectInput in) throws IOException,
+				ClassNotFoundException {
+			super.readExternal(in);
+	        int objDataVersion = in.readInt();
+	        if (objDataVersion == dataVersion) {
+	        	subjectCheck = (ConstraintCheckType) in.readObject();
+	        	propertyCheck = (ConstraintCheckType) in.readObject();
+	        	valueCheck = (ConstraintCheckType) in.readObject();
+	        } else {
+	            throw new IOException("Can't handle dataversion: " + objDataVersion);
+	        }
+		}
+
+		@Override
+		public void writeExternal(ObjectOutput out) throws IOException {
+			super.writeExternal(out);
+	        out.writeInt(dataVersion);
+	        out.writeObject(subjectCheck);
+	        out.writeObject(propertyCheck);
+	        out.writeObject(valueCheck);
+		}
+
+	    private ConstraintCheckType subjectCheck;
+		private ConstraintCheckType propertyCheck;
+		private ConstraintCheckType valueCheck;
+		
+	    public SatisfiesConstraintEvaluator() {
+	    	super();
+			// No arg constructor for serialization. 
+		}
+		
 		
 		public SatisfiesConstraintEvaluator(final ValueType type, final boolean isNegated, String parameterText) {
 			super(type, isNegated ? IsKindOfEvaluatorDefinition.NOT_IS_KIND_OF : IsKindOfEvaluatorDefinition.IS_KIND_OF);
@@ -87,6 +123,30 @@ public class SatisfiesConstraintEvaluatorDefinition implements EvaluatorDefiniti
 		@Override
 		public String toString() {
 			return "SatisfiesConstraint satisfiesConstraint";
+		}
+
+		public ConstraintCheckType getSubjectCheck() {
+			return subjectCheck;
+		}
+
+		public void setSubjectCheck(ConstraintCheckType subjectCheck) {
+			this.subjectCheck = subjectCheck;
+		}
+
+		public ConstraintCheckType getPropertyCheck() {
+			return propertyCheck;
+		}
+
+		public void setPropertyCheck(ConstraintCheckType propertyCheck) {
+			this.propertyCheck = propertyCheck;
+		}
+
+		public ConstraintCheckType getValueCheck() {
+			return valueCheck;
+		}
+
+		public void setValueCheck(ConstraintCheckType valueCheck) {
+			this.valueCheck = valueCheck;
 		}
 
 	}

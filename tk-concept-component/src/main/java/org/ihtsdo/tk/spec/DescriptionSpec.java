@@ -17,8 +17,10 @@
 package org.ihtsdo.tk.spec;
 
 import java.io.IOException;
-import java.util.UUID;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
+import java.util.UUID;
 
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.Coordinate;
@@ -27,7 +29,33 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 public class DescriptionSpec implements SpecBI {
 
-	private UUID[] descUuids;
+    /**
+	 * 
+	 */
+    private static final long serialVersionUID = 1L;
+
+    private static final int dataVersion = 1;
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeUTF(descText);
+        out.writeUTF(langText);
+        out.writeObject(descUuids);
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+        	descText = in.readUTF();
+        	langText = in.readUTF();
+        	descUuids = (UUID[]) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+
+    }
+
+    private UUID[] descUuids;
 
 	private String descText;
 	private String langText = "en";

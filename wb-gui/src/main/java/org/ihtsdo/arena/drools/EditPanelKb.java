@@ -1,6 +1,12 @@
 package org.ihtsdo.arena.drools;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,15 +20,16 @@ import org.drools.builder.KnowledgeBuilderConfiguration;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.builder.conf.EvaluatorOption;
+import org.drools.definition.KnowledgePackage;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
 import org.drools.logger.KnowledgeRuntimeLogger;
 import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.ihtsdo.rules.RulesLibrary;
@@ -31,18 +38,12 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.drools.IsKindOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.SatisfiesConstraintEvaluatorDefinition;
-import org.ihtsdo.tk.helper.ResultsItem;
 import org.ihtsdo.tk.spec.SpecBI;
-
-import org.ihtsdo.rules.RulesLibrary;
-import org.ihtsdo.rules.context.RulesContextHelper;
-import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 
 public class EditPanelKb implements Runnable {
 
 	private KnowledgeBase kbase;
 	private I_ConfigAceFrame config;
-	private String drlFileStr = "org/ihtsdo/arena/drools/TkApiRules.drl";
 	private CountDownLatch kbLatch = new CountDownLatch(1);
 
 	public EditPanelKb(I_ConfigAceFrame config) {
@@ -53,37 +54,59 @@ public class EditPanelKb implements Runnable {
 	
 	@Override
 	public void run() {
-		kbase = setupKb(drlFileStr);
+		try {
+			kbase = setupKb(new File("drools-rules/TkApiRules.drl"));
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 		kbLatch.countDown();
 	}
 
 
-	public static KnowledgeBase setupKb(String testResource) {
+	public static KnowledgeBase setupKb(File kbFile) throws IOException {
+		Collection<KnowledgePackage> kpkgs;
+		File drlPkgFile = new File(kbFile.getParentFile(), kbFile.getName() + ".kpkgs");
+		if (!drlPkgFile.exists() || drlPkgFile.lastModified() < kbFile.lastModified()) {
+			HashMap<Resource, ResourceType> resources = new HashMap<Resource, ResourceType>();
+			resources.put(ResourceFactory.newFileResource(kbFile), ResourceType.DRL);
+			KnowledgeBuilderConfiguration builderConfig = KnowledgeBuilderFactory
+					.newKnowledgeBuilderConfiguration();
+			builderConfig.setOption(EvaluatorOption.get(
+					IsKindOfEvaluatorDefinition.IS_KIND_OF.getOperatorString(),
+					new IsKindOfEvaluatorDefinition()));
+			builderConfig.setOption(EvaluatorOption.get(
+					SatisfiesConstraintEvaluatorDefinition.SATISFIES_CONSTRAINT.getOperatorString(),
+					new SatisfiesConstraintEvaluatorDefinition()));
+			
+			KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
 
-		HashMap<Resource, ResourceType> resources = new HashMap<Resource, ResourceType>();
-
-		resources.put(ResourceFactory.newClassPathResource(testResource),
-				ResourceType.DRL);
-
-		KnowledgeBuilderConfiguration builderConfig = KnowledgeBuilderFactory
-				.newKnowledgeBuilderConfiguration();
-		builderConfig.setOption(EvaluatorOption.get(
-				IsKindOfEvaluatorDefinition.IS_KIND_OF.getOperatorString(),
-				new IsKindOfEvaluatorDefinition()));
-		builderConfig.setOption(EvaluatorOption.get(
-				SatisfiesConstraintEvaluatorDefinition.SATISFIES_CONSTRAINT.getOperatorString(),
-				new SatisfiesConstraintEvaluatorDefinition()));
+			KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder(kbase, builderConfig);
+			for (Resource resource : resources.keySet()) {
+				kbuilder.add(resource, resources.get(resource));
+			}
+			if (kbuilder.hasErrors()) {
+				throw new RuntimeException(kbuilder.getErrors().toString());
+			}
+			
+			kpkgs = kbuilder.getKnowledgePackages();
+			ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( drlPkgFile ) );
+			out.writeObject(kpkgs);
+			out.close();
+		} else {
+			ObjectInputStream in = new ObjectInputStream( new FileInputStream( drlPkgFile ) );
+			try {
+				// The input stream might contain an individual
+				// package or a collection.
+				kpkgs = (Collection<KnowledgePackage>) in.readObject();
+			} catch (ClassNotFoundException e) {
+				throw new IOException(e);
+			} finally {
+				in.close();
+			}
+		} 
 		KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-
-		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory
-				.newKnowledgeBuilder(kbase, builderConfig);
-		for (Resource resource : resources.keySet()) {
-			kbuilder.add(resource, resources.get(resource));
-		}
-		if (kbuilder.hasErrors()) {
-			throw new RuntimeException(kbuilder.getErrors().toString());
-		}
-		kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+		kbase.addKnowledgePackages(kpkgs);
 		return kbase;
 	}
 
@@ -135,26 +158,4 @@ public class EditPanelKb implements Runnable {
 		}
 		return templates;
 	}
-
-	public void setConceptOld(I_GetConceptData c) {
-		setupKb("org/ihtsdo/arena/drools/ConceptRules.drl");
-		StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
-		KnowledgeRuntimeLogger logger = KnowledgeRuntimeLoggerFactory
-				.newConsoleLogger(ksession);
-
-		ksession.setGlobal("editPaths", config.getEditingPathSetReadOnly());
-		ksession.setGlobal("viewPositions", config.getViewPositionSetReadOnly());
-		ksession.setGlobal("precedence", config.getPrecedence());
-		ksession.setGlobal("contradictionMgr", config.getConflictResolutionStrategy());
-		ksession.setGlobal("allowedStatus", config.getAllowedStatus());
-		ksession.setGlobal("allowedDescTypes", null);
-		ksession.setGlobal("allowedSrcRelTypes", null);
-		ksession.setGlobal("allowedMediaTypes", null);
-		ksession.insert(c);
-		ksession.fireAllRules();
-		logger.close();
-
-	}
-
-
 }

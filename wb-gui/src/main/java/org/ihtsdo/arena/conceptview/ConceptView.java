@@ -14,6 +14,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -830,7 +831,11 @@ public class ConceptView extends JPanel {
 	
 	private void getKbActions(Object thingToDrop) {
 		if (kbase == null) {
-			kbase = EditPanelKb.setupKb("org/ihtsdo/arena/drools/ContextualDropActions.drl");
+			try {
+				kbase = EditPanelKb.setupKb(new File("drools-rules/ContextualDropActions.drl"));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		try {
 			actionList.clear();

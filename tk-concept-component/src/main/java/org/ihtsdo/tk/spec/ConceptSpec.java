@@ -17,6 +17,8 @@
 package org.ihtsdo.tk.spec;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -30,6 +32,32 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 public class ConceptSpec implements SpecBI {
+
+    /**
+	 * 
+	 */
+    private static final long serialVersionUID = 1L;
+
+    private static final int dataVersion = 1;
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeUTF(description);
+        out.writeObject(uuids);
+        out.writeObject(relSpecs);
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            description = in.readUTF();
+            uuids = (UUID[]) in.readObject();
+            relSpecs = (RelSpec[]) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+
+    }
 
     private UUID[] uuids;
 

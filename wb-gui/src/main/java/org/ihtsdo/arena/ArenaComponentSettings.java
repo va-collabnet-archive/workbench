@@ -418,7 +418,7 @@ public abstract class ArenaComponentSettings implements Serializable,
             }
 
             // Initiates a resize event in the handler
-            mxCellHandler handler = graphContainer.getSubHandler().getHandler(cell);
+            mxCellHandler handler = graphContainer.getSelectionCellsHandler().getHandler(cell);
 
             if (handler != null)
             {

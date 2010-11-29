@@ -32,6 +32,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -427,7 +428,11 @@ public abstract class  DragPanel<T extends Object> extends JPanel implements Tra
 	private void setup(ConceptViewSettings settings) {
 		this.settings = settings;
 		if (kbase == null) {
-			kbase = EditPanelKb.setupKb("org/ihtsdo/arena/drools/ContextualDropActions.drl");
+			try {
+				kbase = EditPanelKb.setupKb(new File("drools-rules/ContextualDropActions.drl"));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
