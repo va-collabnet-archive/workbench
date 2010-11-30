@@ -93,6 +93,7 @@ public class QACasesBrowser extends JPanel {
 		}
 		
 		setupPageLinesCombo();
+		updatePageCounters();
 		
 	}
 	
