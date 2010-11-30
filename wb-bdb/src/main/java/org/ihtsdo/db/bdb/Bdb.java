@@ -3,11 +3,9 @@ package org.ihtsdo.db.bdb;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -31,7 +29,6 @@ import org.ihtsdo.concept.BdbLegacyFixedFactory;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.ConceptBdb;
 import org.ihtsdo.concept.OFFSETS;
-import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.db.bdb.id.UuidBdb;
@@ -252,13 +249,8 @@ public class Bdb {
 				uuidToNid(version.getPathUuid()), 
 				version.getTime());
 		
-		if (sapNidCache.size() > 10) {
-			Iterator<Entry<String, Integer>> cacheIterator =  sapNidCache.entrySet().iterator();
-			while (sapNidCache.size() > 5) {
-				cacheIterator.next();
-				cacheIterator.remove();
-			}
-			
+		if (sapNidCache.size() > 500) {
+			sapNidCache = new ConcurrentHashMap<String, Integer>();
 		}
 		sapNidCache.put(sapNidKey, sapNid);
 		return sapNid;
