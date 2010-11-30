@@ -97,11 +97,12 @@ public class ArenaEditor extends BasicGraphEditor
         }
         mxCodecRegistry.addPackage("org.ihtsdo.arena.conceptview");
         mxCodecRegistry.register(new mxObjectCodec(new ConceptViewSettings()));
-
-        Document document = mxUtils.parse(mxUtils.readFile(new File("arena/2-up.mxe").getAbsolutePath()));
-
-        mxCodec codec = new mxCodec(document);
-        codec.decode(document.getDocumentElement(), getGraphComponent().getGraph().getModel());
+        File defaultArenaConfig = new File("arena/default.mxe");
+        if (defaultArenaConfig.exists()) {
+            Document document = mxUtils.parse(mxUtils.readFile(defaultArenaConfig.getAbsolutePath()));
+            mxCodec codec = new mxCodec(document);
+            codec.decode(document.getDocumentElement(), getGraphComponent().getGraph().getModel());
+        }
 
         setModified(false);
         setCurrentFile(null);
