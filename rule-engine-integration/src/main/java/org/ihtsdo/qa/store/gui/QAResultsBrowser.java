@@ -8,6 +8,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -44,6 +45,7 @@ public class QAResultsBrowser extends JPanel {
 	private DefaultTableModel tableModel;
 	private LinkedHashSet<DispositionStatus> dispositionStatuses;
 	private boolean showFilters = false;
+	private QACoordinate coordinate;
 
 	public QAResultsBrowser(QAStoreBI store) {
 		this.store = store;
@@ -51,7 +53,7 @@ public class QAResultsBrowser extends JPanel {
 		panel4.setVisible(false);
 		dispositionStatuses = new LinkedHashSet<DispositionStatus>();
 		dispositionStatuses.addAll(store.getAllDispositionStatus());
-
+		
 		LinkedHashSet<String> columnNames = new LinkedHashSet<String>();
 		columnNames.add("Rule code");
 		columnNames.add("Rule name");
@@ -63,13 +65,6 @@ public class QAResultsBrowser extends JPanel {
 		}
 		columnNames.add("Closed");
 		columnNames.add("Last run");
-
-		//		String[] columnNamesArray = new String[columnNames.size()];
-		//		int i = 0;
-		//		for (String loopString : columnNames) {
-		//			columnNamesArray[i] = loopString;
-		//			i++;
-		//		}
 
 		String[][] data = null;
 		tableModel = new DefaultTableModel(data, columnNames.toArray()) {
@@ -87,6 +82,14 @@ public class QAResultsBrowser extends JPanel {
 		setupDispositionCombo();
 		setupSeverityCombo();
 		setupCategoryCombo();
+	}
+	
+	public JTable getTable() {
+		return table1;
+	}
+	
+	public QACoordinate getQACoordinate() {
+		return coordinate;
 	}
 
 	private void setupCategoryCombo() {
@@ -154,7 +157,7 @@ public class QAResultsBrowser extends JPanel {
 			QADatabase database = (QADatabase) comboBox1.getSelectedItem();
 			TerminologyComponent path = (TerminologyComponent) comboBox2.getSelectedItem();
 			String time = (String) comboBox3.getSelectedItem();
-			QACoordinate coordinate = new QACoordinate(database.getDatabaseUuid(), path.getComponentUuid(), time);
+			coordinate = new QACoordinate(database.getDatabaseUuid(), path.getComponentUuid(), time);
 			updateTable1(coordinate);
 		}
 	}
@@ -218,16 +221,16 @@ public class QAResultsBrowser extends JPanel {
 				}
 				String filterCode = textField2.getText().trim().toLowerCase();
 				if (!filterCode.isEmpty()) {
-					if (!line.getRule().getRuleCode().toLowerCase().contains(filterText)) {
+					if (!line.getRule().getRuleCode().toLowerCase().equals(filterCode)) {
 						lineApproved = false;
 					}
 				}
 			}
 
 			if (lineApproved) {
-				LinkedHashSet<String> row = new LinkedHashSet<String>();
+				LinkedHashSet<Object> row = new LinkedHashSet<Object>();
 				row.add(String.valueOf(line.getRule().getRuleCode()));
-				row.add(line.getRule().getName());
+				row.add(line.getRule());
 				row.add(line.getRule().getCategory());
 				row.add(String.valueOf(line.getRule().getSeverity()));
 				row.add(String.valueOf(line.getStatusCount().get(true)));
@@ -269,6 +272,10 @@ public class QAResultsBrowser extends JPanel {
 		}
 	}
 
+	private void table1MouseClicked(MouseEvent e) {
+		// TODO add your code here
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		panel1 = new JPanel();
@@ -282,16 +289,16 @@ public class QAResultsBrowser extends JPanel {
 		button2 = new JButton();
 		panel4 = new JPanel();
 		label11 = new JLabel();
-		label4 = new JLabel();
 		label8 = new JLabel();
 		label10 = new JLabel();
 		label9 = new JLabel();
+		label4 = new JLabel();
 		label5 = new JLabel();
 		textField2 = new JTextField();
-		comboBox5 = new JComboBox();
 		textField1 = new JTextField();
 		comboBox8 = new JComboBox();
 		comboBox7 = new JComboBox();
+		comboBox5 = new JComboBox();
 		comboBox6 = new JComboBox();
 		panel2 = new JPanel();
 		scrollPane1 = new JScrollPane();
@@ -397,9 +404,9 @@ public class QAResultsBrowser extends JPanel {
 		//======== panel4 ========
 		{
 			panel4.setLayout(new GridBagLayout());
-			((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {0, 0, 0, 209, 0, 0, 0, 0};
+			((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {0, 0, 209, 0, 0, 0, 0};
 			((GridBagLayout)panel4.getLayout()).rowHeights = new int[] {0, 0, 0};
-			((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 			((GridBagLayout)panel4.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
 
 			//---- label11 ----
@@ -408,27 +415,27 @@ public class QAResultsBrowser extends JPanel {
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
 
-			//---- label4 ----
-			label4.setText("Status");
-			panel4.add(label4, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
-
 			//---- label8 ----
 			label8.setText("Rule name filter");
-			panel4.add(label8, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+			panel4.add(label8, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
 
 			//---- label10 ----
 			label10.setText("Category");
-			panel4.add(label10, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+			panel4.add(label10, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
 
 			//---- label9 ----
 			label9.setText("Severity");
-			panel4.add(label9, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+			panel4.add(label9, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
+			//---- label4 ----
+			label4.setText("Status");
+			panel4.add(label4, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
 
@@ -436,28 +443,28 @@ public class QAResultsBrowser extends JPanel {
 			label5.setText("Disposition");
 			panel4.add(label5, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+				new Insets(0, 0, 5, 0), 0, 0));
 			panel4.add(textField2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
-			panel4.add(comboBox5, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
 
 			//---- textField1 ----
 			textField1.setColumns(50);
-			panel4.add(textField1, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
+			panel4.add(textField1, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
-			panel4.add(comboBox8, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
+			panel4.add(comboBox8, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
-			panel4.add(comboBox7, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0,
+			panel4.add(comboBox7, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+			panel4.add(comboBox5, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
 			panel4.add(comboBox6, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(panel4, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -473,6 +480,14 @@ public class QAResultsBrowser extends JPanel {
 
 			//======== scrollPane1 ========
 			{
+
+				//---- table1 ----
+				table1.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						table1MouseClicked(e);
+					}
+				});
 				scrollPane1.setViewportView(table1);
 			}
 			panel2.add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
@@ -509,16 +524,16 @@ public class QAResultsBrowser extends JPanel {
 	private JButton button2;
 	private JPanel panel4;
 	private JLabel label11;
-	private JLabel label4;
 	private JLabel label8;
 	private JLabel label10;
 	private JLabel label9;
+	private JLabel label4;
 	private JLabel label5;
 	private JTextField textField2;
-	private JComboBox comboBox5;
 	private JTextField textField1;
 	private JComboBox comboBox8;
 	private JComboBox comboBox7;
+	private JComboBox comboBox5;
 	private JComboBox comboBox6;
 	private JPanel panel2;
 	private JScrollPane scrollPane1;
