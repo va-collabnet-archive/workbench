@@ -13,6 +13,13 @@
         <include>**/*.oos</include>
       </includes>
     </fileSet>
+    <fileSet>
+      <directory>src/main/arena</directory>
+      <outputDirectory>/arena</outputDirectory>
+      <includes>
+        <include>**/*.mxe</include>
+      </includes>
+    </fileSet>
   </fileSets>
   <includeBaseDirectory>false</includeBaseDirectory>
 </assembly>

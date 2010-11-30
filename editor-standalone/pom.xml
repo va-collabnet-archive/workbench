@@ -43,6 +43,12 @@
 			<artifactId>wb-icons</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>tk-arena-rules</artifactId>
+			<type>zip</type>
+		</dependency>
+		
+		<dependency>
 			<groupId>jgraphx</groupId>
 			<artifactId>jgraphx-examples</artifactId>
 			<scope>runtime</scope>
@@ -424,6 +430,7 @@
                 <runtimeArtifact>${project.groupId}:editor-database</runtimeArtifact>
                 <runtimeArtifact>org.ihtsdo:wb-ide-admin-bp</runtimeArtifact>
                 <runtimeArtifact>org.ihtsdo:wb-ide-user-bp</runtimeArtifact>
+              	<runtimeArtifact>org.ihtsdo:tk-arena-rules</runtimeArtifact>
               </runtimeArtifacts>
 						</configuration>
 					</execution>
