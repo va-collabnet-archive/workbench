@@ -10,7 +10,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -25,7 +28,11 @@ import org.ihtsdo.qa.store.QAStoreBI;
 import org.ihtsdo.qa.store.model.DispositionStatus;
 import org.ihtsdo.qa.store.model.QACoordinate;
 import org.ihtsdo.qa.store.model.Rule;
+import org.ihtsdo.qa.store.model.view.QACasesReportColumn;
 import org.ihtsdo.qa.store.model.view.QACasesReportLine;
+import org.ihtsdo.qa.store.model.view.QACasesReportPage;
+import org.ihtsdo.qa.store.model.view.RulesReportColumn;
+import org.ihtsdo.qa.store.model.view.RulesReportPage;
 
 /**
  * @author Guillermo Reynoso
@@ -42,6 +49,9 @@ public class QACasesBrowser extends JPanel {
 	private DefaultTableModel tableModel;
 	private QACoordinate coordinate;
 	private Rule rule;
+	private int startLine = 0;
+	private int finalLine = 0;
+	private int totalLines = 0;
 
 	public QACasesBrowser(QAStoreBI store, QACoordinate coordinate, Rule rule) {
 		this.store = store;
@@ -82,6 +92,16 @@ public class QACasesBrowser extends JPanel {
 			setupPanel(store, coordinate, rule);
 		}
 		
+		setupPageLinesCombo();
+		
+	}
+	
+	private void setupPageLinesCombo() {
+		comboBox6.removeAllItems();
+		comboBox6.addItem("25");
+		comboBox6.addItem("50");
+		comboBox6.addItem("75");
+		comboBox6.addItem("100");
 	}
 	
 	public void setupPanel(QAStoreBI store, QACoordinate coordinate, Rule rule) {
@@ -90,6 +110,8 @@ public class QACasesBrowser extends JPanel {
 		this.rule = rule;
 		
 		panel4.setVisible(false);
+		
+		clearTable1();
 		
 		label7.setText(store.getQADatabase(coordinate.getDatabaseUuid()).getName());
 		label8.setText(store.getComponent(coordinate.getPathUuid()).getComponentName());
@@ -103,38 +125,51 @@ public class QACasesBrowser extends JPanel {
 		showFilters = false;
 		button2.setText("Show filters");
 		//updateTable1();
+		updatePageCounters();
 	}
 
 	private void updateTable1() {
 		clearTable1();
-		for (QACasesReportLine line : store.getQACasesReportLines(coordinate, rule.getRuleUuid())) {
+		List <QACasesReportColumn> sortBy = new ArrayList<QACasesReportColumn>();
+		sortBy.add(QACasesReportColumn.CONCEPT_NAME);
+
+		HashMap<QACasesReportColumn, Object> filter = new HashMap<QACasesReportColumn, Object>();
+		Integer selectedPageLengh = Integer.parseInt((String) comboBox6.getSelectedItem());
+		QACasesReportPage page = store.getQACasesReportLinesByPage(coordinate, rule.getRuleUuid(), 
+				sortBy, filter, startLine, selectedPageLengh);
+		List<QACasesReportLine> lines = page.getLines();
+		totalLines = page.getTotalLines();
+		startLine = page.getInitialLine();
+		finalLine =  page.getFinalLine();
+		updatePageCounters();
+		for (QACasesReportLine line : lines) {
 			boolean lineApproved = true;
-			if (showFilters) {
-				if (comboBox4.getSelectedIndex() != 0){
-					String selectedStatus = (String) comboBox4.getSelectedItem();
-					if (selectedStatus.equals("Open")) {
-						if (!line.getQaCase().isActive()) {
-							lineApproved = false;
-						}
-					} else if (selectedStatus.equals("Closed")) {
-						if (line.getQaCase().isActive()) {
-							lineApproved = false;
-						}
-					}
-				}
-				if (comboBox5.getSelectedIndex() != 0){
-					DispositionStatus selectedDisposition = (DispositionStatus) comboBox5.getSelectedItem();
-					if (!line.getDisposition().getDispositionStatusUuid().equals(selectedDisposition.getDispositionStatusUuid())) {
-						lineApproved = false;
-					}
-				}
-				String filterText = textField1.getText().trim().toLowerCase();
-				if (!filterText.isEmpty()) {
-					if (!line.getComponent().getComponentName().toLowerCase().contains(filterText)) {
-						lineApproved = false;
-					}
-				}
-			}
+//			if (showFilters) {
+//				if (comboBox4.getSelectedIndex() != 0){
+//					String selectedStatus = (String) comboBox4.getSelectedItem();
+//					if (selectedStatus.equals("Open")) {
+//						if (!line.getQaCase().isActive()) {
+//							lineApproved = false;
+//						}
+//					} else if (selectedStatus.equals("Closed")) {
+//						if (line.getQaCase().isActive()) {
+//							lineApproved = false;
+//						}
+//					}
+//				}
+//				if (comboBox5.getSelectedIndex() != 0){
+//					DispositionStatus selectedDisposition = (DispositionStatus) comboBox5.getSelectedItem();
+//					if (!line.getDisposition().getDispositionStatusUuid().equals(selectedDisposition.getDispositionStatusUuid())) {
+//						lineApproved = false;
+//					}
+//				}
+//				String filterText = textField1.getText().trim().toLowerCase();
+//				if (!filterText.isEmpty()) {
+//					if (!line.getComponent().getComponentName().toLowerCase().contains(filterText)) {
+//						lineApproved = false;
+//					}
+//				}
+//			}
 
 			if (lineApproved) {
 				LinkedHashSet<Object> row = new LinkedHashSet<Object>();
@@ -195,8 +230,29 @@ public class QACasesBrowser extends JPanel {
 			showFilters = true;
 		}
 	}
+	
+	private void updatePageCounters() {
+		label17.setText(String.valueOf(startLine));
+		label19.setText(String.valueOf(finalLine));
+		label21.setText(String.valueOf(totalLines));
+		button4.setEnabled(startLine > 1);
+		button5.setEnabled(finalLine < totalLines);
+		panel3.revalidate();
+	}
 
 	private void button3ActionPerformed(ActionEvent e) {
+		// previous page
+		Integer selectedPageLengh = Integer.parseInt((String) comboBox6.getSelectedItem());
+		startLine = startLine - selectedPageLengh;
+		if (startLine < 1) {
+			startLine = 1;
+		}
+		updateTable1();
+	}
+
+	private void button4ActionPerformed(ActionEvent e) {
+		Integer selectedPageLengh = Integer.parseInt((String) comboBox6.getSelectedItem());
+		startLine = startLine + selectedPageLengh;
 		updateTable1();
 	}
 
@@ -228,6 +284,17 @@ public class QACasesBrowser extends JPanel {
 		scrollPane1 = new JScrollPane();
 		table1 = new JTable();
 		panel3 = new JPanel();
+		label15 = new JLabel();
+		comboBox6 = new JComboBox();
+		label16 = new JLabel();
+		hSpacer1 = new JPanel(null);
+		button4 = new JButton();
+		label17 = new JLabel();
+		label18 = new JLabel();
+		label19 = new JLabel();
+		label20 = new JLabel();
+		label21 = new JLabel();
+		button5 = new JButton();
 
 		//======== this ========
 		setLayout(new GridBagLayout());
@@ -405,10 +472,94 @@ public class QACasesBrowser extends JPanel {
 		//======== panel3 ========
 		{
 			panel3.setLayout(new GridBagLayout());
-			((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0};
+			((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {0, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 58, 0, 0, 0, 0, 0, 0, 0};
 			((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {0, 0};
-			((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 			((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+
+			//---- label15 ----
+			label15.setText("Show ");
+			label15.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			panel3.add(label15, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- comboBox6 ----
+			comboBox6.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			panel3.add(comboBox6, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- label16 ----
+			label16.setText("rows per page");
+			label16.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			panel3.add(label16, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(hSpacer1, new GridBagConstraints(3, 0, 9, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- button4 ----
+			button4.setText("<");
+			button4.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			button4.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					button3ActionPerformed(e);
+				}
+			});
+			panel3.add(button4, new GridBagConstraints(12, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- label17 ----
+			label17.setText("0");
+			label17.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			panel3.add(label17, new GridBagConstraints(13, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- label18 ----
+			label18.setText("to");
+			label18.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			panel3.add(label18, new GridBagConstraints(14, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- label19 ----
+			label19.setText("0");
+			label19.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			panel3.add(label19, new GridBagConstraints(15, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- label20 ----
+			label20.setText("of");
+			label20.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			panel3.add(label20, new GridBagConstraints(16, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- label21 ----
+			label21.setText("0");
+			label21.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			panel3.add(label21, new GridBagConstraints(17, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- button5 ----
+			button5.setText(">");
+			button5.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			button5.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					button4ActionPerformed(e);
+				}
+			});
+			panel3.add(button5, new GridBagConstraints(18, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(panel3, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -443,5 +594,16 @@ public class QACasesBrowser extends JPanel {
 	private JScrollPane scrollPane1;
 	private JTable table1;
 	private JPanel panel3;
+	private JLabel label15;
+	private JComboBox comboBox6;
+	private JLabel label16;
+	private JPanel hSpacer1;
+	private JButton button4;
+	private JLabel label17;
+	private JLabel label18;
+	private JLabel label19;
+	private JLabel label20;
+	private JLabel label21;
+	private JButton button5;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

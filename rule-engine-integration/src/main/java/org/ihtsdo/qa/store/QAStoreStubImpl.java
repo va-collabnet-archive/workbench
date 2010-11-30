@@ -16,6 +16,7 @@ import org.ihtsdo.qa.store.model.QACaseVersion;
 import org.ihtsdo.qa.store.model.QACoordinate;
 import org.ihtsdo.qa.store.model.QADatabase;
 import org.ihtsdo.qa.store.model.Rule;
+import org.ihtsdo.qa.store.model.Severity;
 import org.ihtsdo.qa.store.model.TerminologyComponent;
 import org.ihtsdo.qa.store.model.view.QACasesReportColumn;
 import org.ihtsdo.qa.store.model.view.QACasesReportLine;
@@ -148,21 +149,21 @@ public class QAStoreStubImpl implements QAStoreBI {
 		Rule rule1 = new Rule();
 		rule1.setRuleCode("11");
 		rule1.setName("FSN must be unique");
-		rule1.setSeverity(3);
+		rule1.setSeverity(getAllSeverities().get(1));
 		rule1.setCategory("Descriptions model");
 		rule1.setRuleUuid(UUID.fromString("2694ed98-f8ce-11df-98cf-0800200c9a66"));
 
 		Rule rule2 = new Rule();
 		rule2.setRuleCode("25");
 		rule2.setName("Retired concept should not have defining roles");
-		rule2.setSeverity(3);
+		rule2.setSeverity(getAllSeverities().get(2));
 		rule2.setCategory("Concept model");
 		rule2.setRuleUuid(UUID.fromString("2694ed99-f8ce-11df-98cf-0800200c9a66"));
 
 		Rule rule3 = new Rule();
 		rule3.setRuleCode("46");
 		rule3.setName("Tex should not have double spaces");
-		rule3.setSeverity(1);
+		rule3.setSeverity(getAllSeverities().get(0));
 		rule3.setCategory("Descriptions model");
 		rule3.setRuleUuid(UUID.fromString("2694ed00-f8ce-11df-98cf-0800200c9a66"));
 
@@ -371,7 +372,7 @@ public class QAStoreStubImpl implements QAStoreBI {
 		for (int i = 1; i < pageLenght; i++) {
 			lines.addAll(getRulesReportLines(qaCoordinate));
 		}
-		return new RulesReportPage(lines, sortBy, 1, pageLenght, 150);
+		return new RulesReportPage(lines, sortBy, filter, startLine, startLine + pageLenght -1, 150);
 	}
 
 	@Override
@@ -383,7 +384,26 @@ public class QAStoreStubImpl implements QAStoreBI {
 		for (int i = 1; i < pageLenght; i++) {
 			lines.addAll(getQACasesReportLines(qaCoordinate, ruleUuid));
 		}
-		return new QACasesReportPage(lines, sortBy, 1, pageLenght, 550);
+		return new QACasesReportPage(lines, sortBy, filter, startLine, startLine + pageLenght -1, 550);
+	}
+
+	@Override
+	public List<Severity> getAllSeverities() {
+		List<Severity> severities = new ArrayList<Severity>();
+		severities.add(new Severity(UUID.randomUUID(), "Low", ""));
+		severities.add(new Severity(UUID.randomUUID(), "Medium", ""));
+		severities.add(new Severity(UUID.randomUUID(), "High", ""));
+		return severities;
+	}
+
+	@Override
+	public Severity getSeverity(UUID severityUuid) {
+		for (Severity loopSeverity : getAllSeverities()) {
+			if (loopSeverity.getSeverityUuid().equals(severityUuid)) {
+				return loopSeverity;
+			}
+		}
+		return null;
 	}
 
 }
