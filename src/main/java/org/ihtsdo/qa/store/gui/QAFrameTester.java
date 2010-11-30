@@ -1,6 +1,7 @@
 package org.ihtsdo.qa.store.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 
 import javax.swing.JFrame;
 
@@ -15,9 +16,10 @@ public class QAFrameTester {
 	private static void createAndShowGUI() {
 		//Create and set up the window.
 		JFrame frame = new JFrame("QA Frame");
+		frame.setPreferredSize(new Dimension(1024,768));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		frame.getContentPane().add(new QAResultsBrowser(new QAStoreStubImpl()), BorderLayout.CENTER);
+		frame.getContentPane().add(new QAStorePanel(new QAStoreStubImpl()), BorderLayout.CENTER);
 
 		//Display the window.
 		frame.pack();

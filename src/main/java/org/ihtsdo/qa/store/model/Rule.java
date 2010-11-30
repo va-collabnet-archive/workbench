@@ -188,5 +188,8 @@ public class Rule {
 		this.ruleCode = ruleCode;
 	}
 
+	public String toString() {
+		return name;
+	}
 
 }
