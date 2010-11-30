@@ -14,7 +14,9 @@ import org.ihtsdo.qa.store.model.QACoordinate;
 import org.ihtsdo.qa.store.model.QADatabase;
 import org.ihtsdo.qa.store.model.Rule;
 import org.ihtsdo.qa.store.model.TerminologyComponent;
+import org.ihtsdo.qa.store.model.view.QACasesReportColumn;
 import org.ihtsdo.qa.store.model.view.QACasesReportLine;
+import org.ihtsdo.qa.store.model.view.RulesReportColumn;
 import org.ihtsdo.qa.store.model.view.RulesReportLine;
 
 public interface QAStoreBI {
@@ -56,7 +58,9 @@ public interface QAStoreBI {
 	public Date getRuleLastExecutionTime(QACoordinate coordinate);
 	
 	public List<RulesReportLine> getRulesReportLines(QACoordinate qaCoordinate);
+	public List<RulesReportLine> getRulesReportLinesByPage(QACoordinate qaCoordinate, List<RulesReportColumn> sortBy, int startLine, int pageLenght);
 	public List<QACasesReportLine> getQACasesReportLines(QACoordinate qaCoordinate, UUID ruleUuid);
+	public List<QACasesReportLine> getQACasesReportLinesByPage(QACoordinate qaCoordinate, UUID ruleUuid, List<QACasesReportColumn> sortBy, int startLine, int pageLenght);
 	
 	public List<TerminologyComponent> getAllComponents();
 	

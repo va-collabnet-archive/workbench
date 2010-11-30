@@ -32,6 +32,10 @@ import org.ihtsdo.qa.store.model.view.QACasesReportLine;
  */
 public class QACasesBrowser extends JPanel {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private boolean showFilters = false;
 	private LinkedHashSet<DispositionStatus> dispositionStatuses;
 	private QAStoreBI store;
