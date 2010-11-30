@@ -8,7 +8,7 @@ public class Rule {
 	private String name;
 	private String description;
 	private int status; // create enum for this value
-	private int severity; // create enum for this value
+	private Severity severity; // create enum for this value
 	private String packageName;
 	private String packageUrl;
 	private UUID ditaUuid;
@@ -60,11 +60,11 @@ public class Rule {
 		this.status = status;
 	}
 
-	public int getSeverity() {
+	public Severity getSeverity() {
 		return severity;
 	}
 
-	public void setSeverity(int severity) {
+	public void setSeverity(Severity severity) {
 		this.severity = severity;
 	}
 

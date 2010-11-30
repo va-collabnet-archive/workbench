@@ -13,6 +13,7 @@ import org.ihtsdo.qa.store.model.QACaseVersion;
 import org.ihtsdo.qa.store.model.QACoordinate;
 import org.ihtsdo.qa.store.model.QADatabase;
 import org.ihtsdo.qa.store.model.Rule;
+import org.ihtsdo.qa.store.model.Severity;
 import org.ihtsdo.qa.store.model.TerminologyComponent;
 import org.ihtsdo.qa.store.model.view.QACasesReportColumn;
 import org.ihtsdo.qa.store.model.view.QACasesReportLine;
@@ -40,6 +41,9 @@ public interface QAStoreBI {
 	public List<Finding> getFindingsForExecution(UUID executionUuid);
 	public List<Finding> getFindingsForComponent(QACoordinate coordinate, UUID componentUuid);
 	public List<Finding> getFindingsForPeriod(QACoordinate coordinate, Date dateStart, Date dateEnd);
+	
+	public List<Severity> getAllSeverities();
+	public Severity getSeverity(UUID severityUuid);
 	
 	public List<QACase> getAllQACases(QACoordinate coordinate);
 	public List<QACase> getQACasesForComponent(QACoordinate coordinate, UUID componentUuid);
