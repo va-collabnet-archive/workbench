@@ -476,6 +476,10 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
         // int CONTEXTID = 7;
 
         mapSubsetIdToOriginal = new HashMap<Long, Rf1SubsetId>();
+        
+        // MAP ORIGINALS TO SELF
+        for (Rf1SubsetId sid : subsetIds)
+            mapSubsetIdToOriginal.put(sid.getSubsetSctIdOriginal(), sid);
 
         for (RF1File rf : fl) {
 
