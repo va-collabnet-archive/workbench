@@ -19,8 +19,10 @@ import org.ihtsdo.qa.store.model.Rule;
 import org.ihtsdo.qa.store.model.TerminologyComponent;
 import org.ihtsdo.qa.store.model.view.QACasesReportColumn;
 import org.ihtsdo.qa.store.model.view.QACasesReportLine;
+import org.ihtsdo.qa.store.model.view.QACasesReportPage;
 import org.ihtsdo.qa.store.model.view.RulesReportColumn;
 import org.ihtsdo.qa.store.model.view.RulesReportLine;
+import org.ihtsdo.qa.store.model.view.RulesReportPage;
 
 public class QAStoreStubImpl implements QAStoreBI {
 	
@@ -362,19 +364,26 @@ public class QAStoreStubImpl implements QAStoreBI {
 	}
 
 	@Override
-	public List<RulesReportLine> getRulesReportLinesByPage(
+	public RulesReportPage getRulesReportLinesByPage(
 			QACoordinate qaCoordinate, List<RulesReportColumn> sortBy,
-			int startLine, int pageLenght) {
-		// TODO Auto-generated method stub
-		return null;
+			HashMap<RulesReportColumn, Object> filter, int startLine, int pageLenght) {
+		List<RulesReportLine> lines = new ArrayList<RulesReportLine>();
+		for (int i = 1; i < pageLenght; i++) {
+			lines.addAll(getRulesReportLines(qaCoordinate));
+		}
+		return new RulesReportPage(lines, sortBy, 1, pageLenght, 150);
 	}
 
 	@Override
-	public List<QACasesReportLine> getQACasesReportLinesByPage(
+	public QACasesReportPage getQACasesReportLinesByPage(
 			QACoordinate qaCoordinate, UUID ruleUuid,
-			List<QACasesReportColumn> sortBy, int startLine, int pageLenght) {
-		// TODO Auto-generated method stub
-		return null;
+			List<QACasesReportColumn> sortBy, HashMap<QACasesReportColumn, Object> filter, 
+			int startLine, int pageLenght) {
+		List<QACasesReportLine> lines = new ArrayList<QACasesReportLine>();
+		for (int i = 1; i < pageLenght; i++) {
+			lines.addAll(getQACasesReportLines(qaCoordinate, ruleUuid));
+		}
+		return new QACasesReportPage(lines, sortBy, 1, pageLenght, 550);
 	}
 
 }
