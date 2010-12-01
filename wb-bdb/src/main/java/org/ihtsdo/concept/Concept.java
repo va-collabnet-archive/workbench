@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -577,11 +576,11 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             case LANG_B4_TYPE:
                 return getLangPreferredDesc(getDescriptionTuples(allowedStatus,
                         typeSet, positionSet, precedencePolicy, contradictionManager), typePrefOrder, langPrefOrder,
-                        allowedStatus, positionSet, typeSet);
+                        allowedStatus, positionSet, typeSet, true);
             case TYPE_B4_LANG:
                 return getTypePreferredDesc(getDescriptionTuples(allowedStatus,
                         typeSet, positionSet, precedencePolicy, contradictionManager), typePrefOrder, langPrefOrder,
-                        allowedStatus, positionSet, typeSet);
+                        allowedStatus, positionSet, typeSet, true);
             default:
                 throw new IOException("Can't handle sort type: " + sortPref);
         }
@@ -591,7 +590,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             Collection<I_DescriptionTuple> descriptions,
             I_IntList typePrefOrder, I_IntList langPrefOrder,
             NidSetBI allowedStatus, PositionSetBI positionSet,
-            NidSetBI typeSet) throws IOException, ToIoException {
+            NidSetBI typeSet, boolean tryType) throws IOException, ToIoException {
         if (descriptions.size() > 0) {
             if (descriptions.size() > 1) {
                 List<I_DescriptionTuple> matchedList = new ArrayList<I_DescriptionTuple>();
@@ -615,9 +614,13 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                             if (matchedList.size() == 1) {
                                 return matchedList.get(0);
                             }
-                            return getTypePreferredDesc(matchedList,
-                                    typePrefOrder, langPrefOrder,
-                                    allowedStatus, positionSet, typeSet);
+                            if (tryType) {
+                                return getTypePreferredDesc(matchedList,
+                                        typePrefOrder, langPrefOrder,
+                                        allowedStatus, positionSet, typeSet, false);
+                            } else {
+                                return matchedList.get(0);
+                            }
                         }
                     }
                 }
@@ -633,7 +636,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             Collection<I_DescriptionTuple> descriptions,
             I_IntList typePrefOrder, I_IntList langPrefOrder,
             NidSetBI allowedStatus, PositionSetBI positionSet,
-            NidSetBI typeSet) throws IOException, ToIoException {
+            NidSetBI typeSet, boolean tryLang) throws IOException, ToIoException {
         if (descriptions.size() > 0) {
             if (descriptions.size() > 1) {
                 List<I_DescriptionTuple> matchedList = new ArrayList<I_DescriptionTuple>();
@@ -650,9 +653,13 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                         if (matchedList.size() == 1) {
                             return matchedList.get(0);
                         }
-                        return getLangPreferredDesc(matchedList, typePrefOrder,
+                        if (tryLang) {
+                        	return getLangPreferredDesc(matchedList, typePrefOrder,
                                 langPrefOrder, allowedStatus, positionSet,
-                                typeSet);
+                                typeSet, false);
+                        } else {
+                            return matchedList.get(0);
+                        }
                     }
                 }
                 return descriptions.iterator().next();
