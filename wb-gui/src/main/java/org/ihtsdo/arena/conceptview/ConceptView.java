@@ -74,6 +74,7 @@ import org.ihtsdo.tk.spec.SpecBI;
 import org.ihtsdo.tk.spec.SpecFactory;
 import org.ihtsdo.util.swing.GuiUtil;
 
+
 public class ConceptView extends JPanel {
 	
 	public class LayoutConceptWorker extends SwingWorker<Map<SpecBI, Integer>, Boolean> {
@@ -141,20 +142,22 @@ public class ConceptView extends JPanel {
 
 						try {
 							Collection<? extends RelGroupVersionBI> group = Ts.get().getConceptVersion(coordinate, concept.getNid()).getRelGroups();
-							if (group != null) {
-								CollapsePanel  cprg = new CollapsePanel("rel groups", settings);
-								boolean cprgAdded = false;
-								for (RelGroupVersionBI r: group) {
-									if (!cprgAdded) {
-										add(cprg, gbc);
+							for (RelGroupVersionBI r: group) { 
+								Collection<? extends RelationshipVersionBI> currentRels = r.getCurrentRels();
+								if(!currentRels.isEmpty()) { 
+									CollapsePanel  cprg = new CollapsePanel("rel groups", settings);
+									boolean cprgAdded = false;
+										if (!cprgAdded) {
+											add(cprg, gbc);
+											gbc.gridy++;
+											cprgAdded = true;
+										}
+										
+										JComponent rgc = getRelGroupComponent(r);
+										cprg.addToggleComponent(rgc);
+										add(rgc, gbc);
 										gbc.gridy++;
-										cprgAdded = true;
-									}
-									JComponent rgc = getRelGroupComponent(r);
-									cprg.addToggleComponent(rgc);
-									add(rgc, gbc);
-									gbc.gridy++;
-								}				
+								}
 							}
 						} catch (ContraditionException e) {
 							AceLog.getAppLog().alertAndLogException(e);
@@ -544,7 +547,9 @@ public class ConceptView extends JPanel {
 			relGroupPanel.add(dpr, gbc);
 			gbc.gridy++;
 		}
+	
 		return relGroupPanel;
+
 	}
 	
 	private abstract class PropertyChangeManager<T extends TypedComponentAnalogBI> implements PropertyChangeListener {
