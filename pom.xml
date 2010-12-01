@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <!-- Replace this parent with your organization's parent -->
-  <!-- <parent>
+  <parent>
     <groupId>org.ihtsdo</groupId>
     <artifactId>ihtsdo-parent</artifactId>
     <version>1</version>
-  </parent> -->
+  </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.ihtsdo.sample</groupId>
   <artifactId>wb-sample-pa</artifactId>
