@@ -116,6 +116,7 @@
 							<goal>perform-qa</goal>
 						</goals>
 						<configuration>
+							<database_uuid>37d75b70-fd91-11df-8cff-0800200c9a66</database_uuid>
 							<test_path_uuid>2faa9260-8fb2-11db-b606-0800200c9a66</test_path_uuid>
 							<execution_name>Daily morning qa execution of release candidate</execution_name>
 							<test_time>2010.11.16 11:00:00 UTC</test_time>
