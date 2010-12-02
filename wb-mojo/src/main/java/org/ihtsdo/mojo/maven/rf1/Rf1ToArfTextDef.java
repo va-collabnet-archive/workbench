@@ -272,7 +272,7 @@ public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
         Rf1TextDef[] a1;
         Rf1TextDef[] a2, a3 = null;
 
-        getLog().info("START RF1 SUBSETS PROCESSING...");
+        getLog().info("START TEXT DEFINITION PROCESSING...");
 
         Iterator<RF1File> fit = fileList.iterator(); // File Iterator
 
@@ -300,19 +300,17 @@ public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
             fName2 = f2.file.getPath();
             yRevDateStr = f2.revDateStr;
 
-            count2 = RF1File.countFileLines(f2);
-            getLog().info("Counted: " + count2 + " records, " + fName2);
-
             // Parse in file2
             a2 = Rf1TextDef.parseFile(f2);
             count2 = a2.length;
+            getLog().info("Counted: " + count2 + " records, " + fName2);
 
             int r1 = 0, r2 = 0, r3 = 0; // reset record indices
             int nSame = 0, nMod = 0, nAdd = 0, nDrop = 0; // counters
             a3 = new Rf1TextDef[count2]; // max3
             while ((r1 < count1) && (r2 < count2)) {
 
-                switch (a1[r1].compareTo(a2[r2])) {
+                switch (compareVersion(a1[r1], a2[r2])) {
                 case 1: // SAME, skip to next
                     r1++;
                     r2++;
@@ -392,6 +390,25 @@ public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
         } // WHILE (EACH CONCEPTS INPUT FILE)
     } // WHILE (EACH CONCEPTS DIRECTORY) *
 
+    private int compareVersion(Rf1TextDef a1, Rf1TextDef a2) {
+        if (a1.conceptSid < a2.conceptSid) {
+            return 4; // DROPPED instance less than received
+        } else if (a1.conceptSid > a2.conceptSid) {
+            return 3; // ADDED instance greater than received
+
+        } else {    
+            int test = a1.snomedId.compareToIgnoreCase(a2.snomedId);
+            
+            if (test > 1) {
+                return 4; // DROPPED instance less than received
+            } else if (test < 1) {
+                return 3; // ADDED instance greater than received
+            } else {
+                return 1; // SAME
+            }
+        }
+    }
+    
     private void countCheck(int count1, int count2, int same, int modified, int added, int dropped) {
 
         // CHECK COUNTS TO MASTER FILE1 RECORD COUNT
