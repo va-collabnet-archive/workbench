@@ -20,6 +20,9 @@ public class Snomed {
 	public static ConceptSpec CLINICAL_FINDING = 
 		new ConceptSpec("Clinical finding (finding)", 
 						UUID.fromString("bd83b1dd-5a82-34fa-bb52-06f666420a1c"));
-
+	
+	public static ConceptSpec FULLY_SPECIFIED_DESCRIPTION_TYPE = 
+		new ConceptSpec("fully specified name (description type)", 
+						UUID.fromString("5e1fe940-8faf-11db-b606-0800200c9a66"));
 
 }
