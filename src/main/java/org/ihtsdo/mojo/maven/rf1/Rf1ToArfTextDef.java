@@ -399,9 +399,9 @@ public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
         } else {    
             int test = a1.snomedId.compareToIgnoreCase(a2.snomedId);
             
-            if (test > 1) {
+            if (test < 0) {
                 return 4; // DROPPED instance less than received
-            } else if (test < 1) {
+            } else if (test > 0) {
                 return 3; // ADDED instance greater than received
             } else {
                 return 1; // SAME

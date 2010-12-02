@@ -54,10 +54,10 @@ public class Rf1TextDef implements Comparable<Object> {
             return 1; // instance greater than received
         } else {
             int test = this.snomedId.compareToIgnoreCase(tmp.snomedId);
-            if (test > 1) {
-                return -1; // instance less than received
-            } else if (test < 1) {
-                return 1; // instance greater than received
+            if (test < 0) {
+                return -1; // instance less than received o
+            } else if (test > 0) {
+                return 1; // instance greater than received o
             } else {
                 return 0; // instance == received
             }
