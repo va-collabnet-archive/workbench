@@ -69,6 +69,7 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
@@ -1017,50 +1018,14 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             ContradictionManagerBI contradictionManager,
             int classifierNid, RelAssertionType relAssertionType)
             throws IOException, TerminologyException {
-        List<? extends I_RelTuple> possibleValues = getSourceRelTuples(allowedStatus,
-                allowedTypes, positions, precedencePolicy,
-                contradictionManager);
-        List<I_RelTuple> actualValues =
-                new ArrayList<I_RelTuple>(possibleValues.size());
-        switch (relAssertionType) {
-            case INFERRED:
-                if (possibleValues.isEmpty()) {
-                    return possibleValues;
-                }
-                for (I_RelTuple rt: possibleValues) {
-                    if (rt.getAuthorNid() == classifierNid) {
-                       actualValues.add(rt);
-                    }
-                }
-                return actualValues;
-            case INFERRED_THEN_STATED:
-                if (possibleValues.isEmpty() || possibleValues.size() == 1) {
-                    return possibleValues;
-                }
-                for (I_RelTuple rt: possibleValues) {
-                    if (rt.getAuthorNid() == classifierNid) {
-                       actualValues.add(rt);
-                    }
-                }
-                if (actualValues.size() > 0) {
-                    return actualValues;
-                }
-                return possibleValues;
-             case STATED:
-                                if (possibleValues.isEmpty()) {
-                    return possibleValues;
-                }
-                for (I_RelTuple rt: possibleValues) {
-                    if (rt.getAuthorNid() != classifierNid) {
-                       actualValues.add(rt);
-                    }
-                }
-                return actualValues;
-                default:
-                    throw new IOException("Can't handle relAssertionType: "
-                            + relAssertionType);
-
-        }
+    	
+        Coordinate coordinate = new Coordinate(precedencePolicy, 
+        		positions, allowedStatus, allowedTypes, contradictionManager, Integer.MIN_VALUE, classifierNid, relAssertionType);
+        List<Relationship.Version> actualValues = new ArrayList<Relationship.Version>();
+        for (Relationship rel : getSourceRels()) {
+        	actualValues.addAll(rel.getVersions(coordinate));
+        }        
+        return actualValues;
     }
 
     @Override
@@ -1398,55 +1363,19 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     private boolean removeInvalidXrefs = false;
 
     @Override
-    public List<I_RelTuple> getDestRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
+    public List<Relationship.Version> getDestRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
             PositionSetBI positions, Precedence precedencePolicy,
             ContradictionManagerBI contradictionManager,
             int classifierNid, RelAssertionType relAssertionType)
             throws IOException {
-        List<I_RelTuple> possibleValues = getDestRelTuples(allowedStatus, 
-                allowedTypes, positions, precedencePolicy,
-                contradictionManager);
-        List<I_RelTuple> actualValues =
-                new ArrayList<I_RelTuple>(possibleValues.size());
-        switch (relAssertionType) {
-            case INFERRED:
-                if (possibleValues.isEmpty()) {
-                    return possibleValues;
-                }
-                for (I_RelTuple rt: possibleValues) {
-                    if (rt.getAuthorNid() == classifierNid) {
-                       actualValues.add(rt);
-                    }
-                }
-                return actualValues;
-            case INFERRED_THEN_STATED:
-                if (possibleValues.isEmpty() || possibleValues.size() == 1) {
-                    return possibleValues;
-                }
-                for (I_RelTuple rt: possibleValues) {
-                    if (rt.getAuthorNid() == classifierNid) {
-                       actualValues.add(rt);
-                    }
-                }
-                if (actualValues.size() > 0) {
-                    return actualValues;
-                }
-                return possibleValues;
-             case STATED:
-                                if (possibleValues.isEmpty()) {
-                    return possibleValues;
-                }
-                for (I_RelTuple rt: possibleValues) {
-                    if (rt.getAuthorNid() != classifierNid) {
-                       actualValues.add(rt);
-                    }
-                }
-                return actualValues;
-                default:
-                    throw new IOException("Can't handle relAssertionType: "
-                            + relAssertionType);
-
-        }
+    	
+        Coordinate coordinate = new Coordinate(precedencePolicy, 
+        		positions, allowedStatus, allowedTypes, contradictionManager, Integer.MIN_VALUE, classifierNid, relAssertionType);
+        List<Relationship.Version> actualValues = new ArrayList<Relationship.Version>();
+        for (Relationship rel : getDestRels()) {
+        	actualValues.addAll(rel.getVersions(coordinate));
+        }        
+        return actualValues;
     }
 
     @Override
