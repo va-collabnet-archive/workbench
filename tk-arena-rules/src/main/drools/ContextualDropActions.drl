@@ -43,7 +43,9 @@ import org.ihtsdo.tk.drools.facts.DescSpecFact;
 import org.ihtsdo.tk.drools.facts.RelFact;
 import org.ihtsdo.tk.drools.facts.RelSpecFact;
 import org.ihtsdo.tk.drools.facts.RelGroupFact;
-import org.ihtsdo.tk.drools.facts.SpecFact; //this
+import org.ihtsdo.tk.Ts; //this
+import org.dwfa.cement.ArchitectonicAuxiliary; //this
+
 
 import org.ihtsdo.tk.spec.DescriptionSpec;
 
@@ -151,12 +153,12 @@ rule "rule 7" #rel onto rel (in group)
 end
 
 rule "rule 8" #desc onto concept
-	
+
 	when
 		(and
 			($dropTarget: ConceptFact(context == Context.DROP_TARGET))
 			($dropObject: DescFact(context == Context.DROP_OBJECT, component.conceptNid != $dropTarget.component.conceptNid,
-				component.time != Long.MAX_VALUE))
+				component.time != Long.MAX_VALUE, component.typeNid != Snomed.FULLY_SPECIFIED_DESCRIPTION_TYPE.nid))
 		)
 		
 	then
