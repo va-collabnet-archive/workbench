@@ -4484,6 +4484,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private int compareDescription(SctYDesRecord c1, SctYDesRecord c2) {
+                
         if (c1.desSnoId == c2.desSnoId) {
             if ((c1.status == c2.status) && (c1.conSnoId == c2.conSnoId)
                     && c1.termText.equals(c2.termText) && (c1.capStatus == c2.capStatus)
