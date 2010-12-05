@@ -18,8 +18,10 @@ package org.ihtsdo.mojo.maven.rf1;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -315,7 +317,8 @@ public class Rf1ToArfLanguageGbUsMojo extends AbstractMojo implements Serializab
 
             try {
                 // CREATE SUBSETS FILE
-                BufferedWriter bwSubsets = new BufferedWriter(new FileWriter(fNameSubsets));
+                BufferedWriter bwSubsets = new BufferedWriter(new OutputStreamWriter(
+                        new FileOutputStream(fNameSubsets), "UTF-8"));
                 getLog().info("::: GB EXCEPTION SUBSETS OUTPUT: " + bwSubsets);
                 Rf1SubsetTable[] tmp = Rf1SubsetTable.parseSubsetIdToOriginalUuidMap(subsetsGBList
                         .get(i));
@@ -334,7 +337,8 @@ public class Rf1ToArfLanguageGbUsMojo extends AbstractMojo implements Serializab
                 Rf1SubsetMember[] membersUS = Rf1SubsetMember.parseSubsetMembers(membersUSList
                         .get(i), subsetSctIdOriginal);
 
-                BufferedWriter bwMembersGX = new BufferedWriter(new FileWriter(fNameMembers));
+                BufferedWriter bwMembersGX = new BufferedWriter(new OutputStreamWriter(
+                        new FileOutputStream(fNameMembers), "UTF-8"));
                 getLog().info("::: GB EXCEPTION MEMBERS OUTPUT: " + bwMembersGX);
                 bwMembersGX.write("SUBSETID\tMEMBERID\tMEMBERSTATUS\tLINKEDID\r\n");
 

@@ -18,8 +18,10 @@ package org.ihtsdo.mojo.maven.sct;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.List;
@@ -105,8 +107,8 @@ public class Sct1UniqueMojo extends AbstractMojo implements Serializable {
     }
 
     public void executeMojo(File tDir, String tSubDir, String in1stDir, String in2ndDir,
-            String out1stDir, String out2ndDir, String dupDir) throws ParseException, MojoFailureException,
-            IOException {
+            String out1stDir, String out2ndDir, String dupDir) throws ParseException,
+            MojoFailureException, IOException {
 
         String fPathIn1stDir = tDir + FILE_SEPARATOR + tSubDir + in1stDir;
         String fPathIn2ndDir = tDir + FILE_SEPARATOR + tSubDir + in2ndDir;
@@ -118,7 +120,7 @@ public class Sct1UniqueMojo extends AbstractMojo implements Serializable {
         getLog().info(":::  Input 2nd: " + fPathIn2ndDir);
         getLog().info("::: Output 1st: " + fPathOut1stDir);
         getLog().info("::: Output 2nd: " + fPathOut2ndDir);
-        
+
         List<Sct1File> in1stFiles = Sct1File.getSctFiles(tDir.getAbsolutePath(), tSubDir, in1stDir,
                 "descriptions", ".txt");
         List<Sct1File> in2ndFiles = Sct1File.getSctFiles(tDir.getAbsolutePath(), tSubDir, in2ndDir,
@@ -159,18 +161,18 @@ public class Sct1UniqueMojo extends AbstractMojo implements Serializable {
             SctYDesRecord[] a1 = Sct1File.parseDescriptions(f1);
             SctYDesRecord[] a2 = Sct1File.parseDescriptions(f2);
 
-            BufferedWriter bw1 = new BufferedWriter(new FileWriter(fPathOut1stDir
-                    + FILE_SEPARATOR + f1.file.getName()));
-            BufferedWriter bw2 = new BufferedWriter(new FileWriter(fPathOut2ndDir
-                    + FILE_SEPARATOR + f2.file.getName()));
-            
+            BufferedWriter bw1 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+                    fPathOut1stDir + FILE_SEPARATOR + f1.file.getName()), "UTF-8"));
+            BufferedWriter bw2 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+                    fPathOut2ndDir + FILE_SEPARATOR + f2.file.getName()), "UTF-8"));
+
             bw1.write(SctYDesRecord.toStringHeader() + LINE_TERMINATOR);
             bw2.write(SctYDesRecord.toStringHeader() + LINE_TERMINATOR);
 
             BufferedWriter bwDupl = null;
             if (fPathDupl2ndDir != null) {
-                bwDupl = new BufferedWriter(new FileWriter(fPathDupl2ndDir
-                        + FILE_SEPARATOR + "dupl_" + f2.file.getName()));
+                bwDupl = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+                        fPathDupl2ndDir + FILE_SEPARATOR + "dupl_" + f2.file.getName()), "UTF-8"));
                 bwDupl.write(SctYDesRecord.toStringHeader() + LINE_TERMINATOR);
             }
 
@@ -196,6 +198,13 @@ public class Sct1UniqueMojo extends AbstractMojo implements Serializable {
                     countKeep1st++;
                     if (bwDupl != null)
                         bwDupl.write(a2[idx2].toString() + LINE_TERMINATOR);
+
+                    // DATA_CHECK
+                    if (a1[idx1].termText.compareToIgnoreCase(a2[idx2].termText) != 0) {
+                        getLog().info("::: WARNING NOT DUPLICATE \t" + a1[idx1].toString());
+                        getLog().info(":::         NOT DUPLICATE \t" + a2[idx2].toString());
+                    }
+
                     idx1++;
                     idx2++;
                 } else {
