@@ -17,8 +17,10 @@
 package org.ihtsdo.mojo.maven.rf1;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.UUID;
 
 import org.apache.maven.plugin.MojoFailureException;
@@ -69,7 +71,8 @@ public class Rf1SubsetTable {
 
         Rf1SubsetTable[] a = new Rf1SubsetTable[RF1File.countFileLines(rf1)];
 
-        BufferedReader br = new BufferedReader(new FileReader(rf1.file));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(rf1.file),
+                "UTF-8"));
         // Header row
         br.readLine();
 
@@ -100,7 +103,7 @@ public class Rf1SubsetTable {
         }
 
         br.close();
-        
+
         return a;
     } // setupSubsetIdToOriginalUuidMap
 

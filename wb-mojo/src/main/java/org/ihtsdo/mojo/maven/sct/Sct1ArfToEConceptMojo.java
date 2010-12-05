@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.StreamTokenizer;
 import java.io.UnsupportedEncodingException;
@@ -1093,7 +1094,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             String erFileName = wDir + scratchDirectory + FILE_SEPARATOR
                     + "relationships_report.txt";
             BufferedWriter erw;
-            erw = new BufferedWriter(new FileWriter(erFileName));
+            erw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(erFileName),
+                    "UTF-8"));
             getLog().info("RELATIONSHIPS Exceptions Report OUTPUT: " + erFileName);
 
             processRelationshipsFiles(wDir, listOfRiDirs, oosRel, erw);
@@ -1202,7 +1204,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void parseArfConFile(File f, ObjectOutputStream oos) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(f));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
+                "UTF-8"));
 
         int CONCEPT_UUID = 0;
         int CONCEPT_STATUS = 1;
@@ -1244,7 +1247,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void parseArfDesFile(File f, ObjectOutputStream oos) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(f));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
+                "UTF-8"));
 
         int DESCRIPTION_UUID = 0;
         int STATUS_UUID = 1;
@@ -1306,7 +1310,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void parseArfRelFile(File f, ObjectOutputStream oos) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(f));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
+                "UTF-8"));
 
         int RELATIONSHIP_UUID = 0;
         int STATUS_UUID = 1;
@@ -1360,7 +1365,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void parseArfIdsFile(File f, ObjectOutputStream oos) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(f));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
+                "UTF-8"));
 
         int PRIMARY_UUID = 0;
         int SOURCE_SYSTEM_UUID = 1;
@@ -1402,7 +1408,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void parseArfRsBoolFile(File f, ObjectOutputStream oos) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(f));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
+                "UTF-8"));
 
         int REFSEST_UUID = 0;
         int MEMBER_UUID = 1;
@@ -1454,7 +1461,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void parseArfRsConFile(File f, ObjectOutputStream oos) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(f));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
+                "UTF-8"));
 
         int REFSEST_UUID = 0;
         int MEMBER_UUID = 1;
@@ -1500,7 +1508,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void parseArfRsIntFile(File f, ObjectOutputStream oos) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(f));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
+                "UTF-8"));
 
         int REFSEST_UUID = 0;
         int MEMBER_UUID = 1;
@@ -1546,7 +1555,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void parseArfRsStrFile(File f, ObjectOutputStream oos) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(f));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
+                "UTF-8"));
 
         int REFSEST_UUID = 0;
         int MEMBER_UUID = 1;
@@ -4125,7 +4135,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         // SETUP DESCRIPTIONS EXCEPTION REPORT
         String erFileName = wDir + scratchDirectory + FILE_SEPARATOR + "descriptions_report.txt";
         BufferedWriter er;
-        er = new BufferedWriter(new FileWriter(erFileName));
+        er = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(erFileName), "UTF-8"));
         getLog().info("exceptions report OUTPUT: " + erFileName);
 
         Iterator<List<SCTFile>> dit = sctv.iterator(); // Directory Iterator
@@ -4484,7 +4494,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private int compareDescription(SctYDesRecord c1, SctYDesRecord c2) {
-                
+
         if (c1.desSnoId == c2.desSnoId) {
             if ((c1.status == c2.status) && (c1.conSnoId == c2.conSnoId)
                     && c1.termText.equals(c2.termText) && (c1.capStatus == c2.capStatus)
@@ -4535,7 +4545,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         int SNOMEDID = 4; // SNOMED RT ID (Read Code)
         int ISPRIMITIVE = 5;
 
-        BufferedReader br = new BufferedReader(new FileReader(fName));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fName),
+                "UTF-8"));
         int concepts = 0;
 
         // Header row
@@ -4630,7 +4641,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
         long start = System.currentTimeMillis();
 
-        BufferedReader r = new BufferedReader(new FileReader(fName));
+        BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(fName),
+                "UTF-8"));
         StreamTokenizer st = new StreamTokenizer(r);
         st.resetSyntax();
         st.wordChars('\u001F', '\u00FF');
@@ -5018,7 +5030,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         BufferedReader br = null;
 
         try {
-            br = new BufferedReader(new FileReader(fileName));
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF-8"));
             try {
                 while (br.readLine() != null) {
                     lineCount++;

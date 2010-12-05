@@ -18,8 +18,10 @@ package org.ihtsdo.mojo.maven.rf1;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
@@ -228,7 +230,7 @@ public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
 
         try {
             // CREATE DESCRIPTIONS ARF FILE
-            BufferedWriter bwOutDescr = new BufferedWriter(new FileWriter(fNameOutDescr));
+            BufferedWriter bwOutDescr = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fNameOutDescr), "UTF-8"));
            getLog().info("::: TextDefinitions DESCRIPTION ARF OUTPUT: " + bwOutDescr.toString());
 
             processTextDefinitions(textDefList, bwOutDescr);

@@ -40,7 +40,7 @@ public class Sct1File implements Comparable<Object> {
         BufferedReader br = null;
 
         try {
-            br = new BufferedReader(new FileReader(rf1.file));
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(rf1.file), "UTF-8"));
             try {
                 while (br.readLine() != null) {
                     lineCount++;
