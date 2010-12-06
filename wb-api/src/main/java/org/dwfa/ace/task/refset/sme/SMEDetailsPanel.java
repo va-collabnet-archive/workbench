@@ -19,9 +19,8 @@ package org.dwfa.ace.task.refset.sme;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -53,22 +52,22 @@ public class SMEDetailsPanel extends JPanel {
     private JLabel commentsLabel;
 
     private JComboBox refsetNameComboBox;
-    private JTextArea smeNameTextField;
+    private JComboBox smeNameComboBox;
     private JTextArea commentsTextField;
 
-    private Set<I_GetConceptData> refsets;
-    private JScrollPane smeNameScrollPane;
+    private TreeSet<I_GetConceptData> refsets;
+    private TreeMap<String, String> users = new TreeMap<String, String>();
     private JScrollPane commentsScrollPane;
 
-    public SMEDetailsPanel(Set<I_GetConceptData> refsets) {
+    public SMEDetailsPanel(TreeSet<I_GetConceptData> refsets, TreeMap<String, String> users) {
         super();
         this.refsets = refsets;
+        this.users = users;
         init();
     }
 
     private void init() {
         setDefaultValues();
-        addListeners();
         layoutComponents();
     }
 
@@ -76,27 +75,19 @@ public class SMEDetailsPanel extends JPanel {
 
         // labels
         refsetNameLabel = new JLabel("Refset name (required):");
-        smeNameLabel = new JLabel("Subject matter expert name (required):");
+        smeNameLabel = new JLabel("Subject matter expert (required):");
         commentsLabel = new JLabel("Comments (optional):");
 
         // buttons and boxes
         refsetNameComboBox = new JComboBox(refsets.toArray());
+        smeNameComboBox = new JComboBox(users.keySet().toArray());
 
         // text fields
-        smeNameTextField = new JTextArea();
-        smeNameTextField.setLineWrap(true);
-        smeNameTextField.setWrapStyleWord(true);
-        smeNameScrollPane = new JScrollPane(smeNameTextField);
-        smeNameScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         commentsTextField = new JTextArea();
         commentsTextField.setLineWrap(true);
         commentsTextField.setWrapStyleWord(true);
         commentsScrollPane = new JScrollPane(commentsTextField);
         commentsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    }
-
-    private void addListeners() {
-        refsetNameComboBox.addActionListener(new RefsetListener());
     }
 
     private void layoutComponents() {
@@ -109,9 +100,9 @@ public class SMEDetailsPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weighty = 0.0;
-        gbc.weightx = 0;
+        // gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
-        gbc.fill = GridBagConstraints.NONE;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 0, 5);
         this.add(refsetNameLabel, gbc);
 
@@ -121,39 +112,41 @@ public class SMEDetailsPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 0, 5);
-        gbc.weightx = 1;
+        // gbc.weightx = 1;
         if (refsets.size() == 0) {
             this.add(new JLabel("No available refsets."), gbc);
         } else {
             this.add(refsetNameComboBox, gbc);
         }
 
-        // original request
+        gbc = new GridBagConstraints();
+        // sme
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.weighty = 0.0;
-        gbc.weightx = 0;
+        // gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.insets = new Insets(5, 5, 40, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 0, 5);
         this.add(smeNameLabel, gbc);
 
         gbc.gridx = 2;
         gbc.gridy = 3;
         gbc.weighty = 0.0;
-        gbc.weightx = 1;
-        gbc.fill = GridBagConstraints.BOTH;
+        // gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 0, 5);
-        this.add(smeNameScrollPane, gbc);
+        this.add(smeNameComboBox, gbc);
 
+        gbc = new GridBagConstraints();
         // comments
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.weighty = 0.0;
         gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
-        gbc.fill = GridBagConstraints.NONE;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 40, 5);
         this.add(commentsLabel, gbc);
 
@@ -169,14 +162,6 @@ public class SMEDetailsPanel extends JPanel {
         this.validate();
     }
 
-    class RefsetListener implements ActionListener {
-
-        public void actionPerformed(ActionEvent e) {
-            layoutComponents();
-        }
-
-    }
-
     public String getComments() {
         String result = commentsTextField.getText();
         if (result == null) {
@@ -188,15 +173,9 @@ public class SMEDetailsPanel extends JPanel {
         }
     }
 
-    public String getSmeNameRequest() {
-        String result = smeNameTextField.getText();
-        if (result == null) {
-            return null;
-        } else if (result.trim().equals("")) {
-            return null;
-        } else {
-            return result;
-        }
+    public String getUserName() {
+        String selectedFullName = (String) smeNameComboBox.getSelectedItem();
+        return users.get(selectedFullName);
     }
 
     public I_GetConceptData getRefset() {

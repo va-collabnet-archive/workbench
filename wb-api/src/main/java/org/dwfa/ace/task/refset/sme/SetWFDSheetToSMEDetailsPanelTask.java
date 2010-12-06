@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,6 +17,9 @@
 package org.dwfa.ace.task.refset.sme;
 
 import java.awt.GridLayout;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -26,6 +29,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.swing.JPanel;
@@ -54,7 +58,8 @@ import org.dwfa.util.bean.Spec;
 
 /**
  * This task prepares the Workflow Details Sheet to display the SMEDetailsPanel
- * where the user will be asked to enter a number of fields required to start the
+ * where the user will be asked to enter a number of fields required to start
+ * the
  * SME review process.
  */
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec/wf/sme", type = BeanType.TASK_BEAN) })
@@ -115,9 +120,10 @@ public class SetWFDSheetToSMEDetailsPanelTask extends AbstractTask {
     }
 
     /**
-     * Handles actions required by the task after normal task completion (such as moving a
+     * Handles actions required by the task after normal task completion (such
+     * as moving a
      * process to another user's input queue).
-     *
+     * 
      * @return void
      * @param process The currently executing Workflow process
      * @param worker The worker currently executing this task
@@ -130,9 +136,11 @@ public class SetWFDSheetToSMEDetailsPanelTask extends AbstractTask {
     }
 
     /**
-     * Performs the primary action of the task, which in this case is to gather and
-     * validate data that has been entered by the user on the Workflow Details Sheet.
-     *
+     * Performs the primary action of the task, which in this case is to gather
+     * and
+     * validate data that has been entered by the user on the Workflow Details
+     * Sheet.
+     * 
      * @return The exit condition of the task
      * @param process The currently executing Workflow process
      * @param worker The worker currently executing this task
@@ -176,7 +184,9 @@ public class SetWFDSheetToSMEDetailsPanelTask extends AbstractTask {
             this.termFactory = Terms.get();
 
             // Get a list of valid Refset Specs
-            Set<I_GetConceptData> refsetSpecs = getValidRefsetSpecs();
+            TreeSet<I_GetConceptData> refsetSpecs = getValidRefsetSpecs();
+
+            TreeMap<String, String> users = getCollabnetUsers();
 
             // Clear the Workflow Details Sheet
             ClearWorkflowDetailsSheet clear = new ClearWorkflowDetailsSheet();
@@ -186,10 +196,10 @@ public class SetWFDSheetToSMEDetailsPanelTask extends AbstractTask {
             // Create a new panel to add to the Workflow Details Sheet
             JPanel workflowDetailsSheet = this.config.getWorkflowDetailsSheet();
             int width = 475;
-            int height = 200;
+            int height = 150;
             workflowDetailsSheet.setSize(width, height);
             workflowDetailsSheet.setLayout(new GridLayout(1, 1));
-            SMEDetailsPanel newPanel = new SMEDetailsPanel(refsetSpecs);
+            SMEDetailsPanel newPanel = new SMEDetailsPanel(refsetSpecs, users);
 
             workflowDetailsSheet.add(newPanel);
         } catch (Exception e) {
@@ -197,8 +207,33 @@ public class SetWFDSheetToSMEDetailsPanelTask extends AbstractTask {
         }
     }
 
-    private Set<I_GetConceptData> getValidRefsetSpecs() throws Exception {
-        Set<I_GetConceptData> refsetSpecs = new TreeSet<I_GetConceptData>(new Comparator<Object>() {
+    private TreeMap<String, String> getCollabnetUsers() {
+        try {
+            TreeMap<String, String> users = new TreeMap<String, String>();
+            String fileName = "config" + File.separator + "collabnet-users.txt";
+            File file = new File(fileName);
+            FileReader fileReader = new FileReader(file);
+            BufferedReader bufferedFileReader = new BufferedReader(fileReader);
+
+            String line = bufferedFileReader.readLine();
+            while (line != null) {
+                String[] lineParts = line.split(",");
+                if (lineParts.length == 2) {
+                    users.put(lineParts[0], lineParts[1]);
+                }
+                line = bufferedFileReader.readLine();
+            }
+
+            bufferedFileReader.close();
+            return users;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new TreeMap<String, String>();
+        }
+    }
+
+    private TreeSet<I_GetConceptData> getValidRefsetSpecs() throws Exception {
+        TreeSet<I_GetConceptData> refsetSpecs = new TreeSet<I_GetConceptData>(new Comparator<Object>() {
 
             @Override
             public int compare(Object o1, Object o2) {

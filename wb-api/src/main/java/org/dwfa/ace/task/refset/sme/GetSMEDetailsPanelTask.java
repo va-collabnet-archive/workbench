@@ -156,7 +156,7 @@ public class GetSMEDetailsPanelTask extends AbstractTask {
 
                     I_GetConceptData refset = panel.getRefset();
                     String comments = panel.getComments();
-                    String smeNameRequest = panel.getSmeNameRequest();
+                    String smeUserName = panel.getUserName();
                     I_GetConceptData owner = config.getDbConfig().getUserConcept();
                     RefsetSpecWizardTask wizard = new RefsetSpecWizardTask();
 
@@ -180,14 +180,14 @@ public class GetSMEDetailsPanelTask extends AbstractTask {
                     // -----------------------------------------
                     // smeNameRequest is required
                     // -----------------------------------------
-                    if (smeNameRequest == null) {
+                    if (smeUserName == null) {
                         // Warn the user that Refset is required.
                         JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                             "You must enter a SME Name. ", "", JOptionPane.ERROR_MESSAGE);
                         return Condition.ITEM_CANCELED;
                     } else {
                         // Set the SME Name request property
-                        process.setProperty(sendToUserPropName, smeNameRequest);
+                        process.setProperty(sendToUserPropName, smeUserName);
                     }
 
                     // -----------------------------------------
@@ -200,8 +200,8 @@ public class GetSMEDetailsPanelTask extends AbstractTask {
                         return Condition.ITEM_CANCELED;
                     } else {
                         // Set the Refset property
-                        process.setSubject("SME Review for " + smeNameRequest + " (" + refset.getInitialText() + ")");
-                        process.setName("SME Review for " + smeNameRequest + " (" + refset.getInitialText() + ")");
+                        process.setSubject("SME Review for " + smeUserName + " (" + refset.getInitialText() + ")");
+                        process.setName("SME Review for " + smeUserName + " (" + refset.getInitialText() + ")");
                         process.setProperty(refsetUuidPropName, refset.getUids().iterator().next());
                     }
 
