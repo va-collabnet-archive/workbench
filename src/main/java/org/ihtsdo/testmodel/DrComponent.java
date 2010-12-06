@@ -12,7 +12,7 @@ public abstract class DrComponent {
 	//Inferred properties
 	private boolean published = false;
 	private boolean extensionComponent = false;
-	private String extensionId = ""; //TODO: should be UUID?
+	private String extensionId = "";
 	private boolean active = false;
 	
 
