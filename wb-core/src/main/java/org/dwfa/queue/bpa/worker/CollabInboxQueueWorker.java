@@ -64,7 +64,7 @@ import com.collabnet.ce.soap50.webservices.cemain.AttachmentSoapRow;
 import com.collabnet.ce.soap50.webservices.tracker.ArtifactSoapDO;
 import com.collabnet.ce.soap50.webservices.tracker.ArtifactSoapRow;
 
-/**
+/*
  * @author Marc Campbell
  */
 public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue, Runnable {
@@ -267,10 +267,11 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
                                 tracker.deleteAttachment(artifactId, attachmentId);
 
                                 // SET STATUS
-                                if (asdo.getStatus().equalsIgnoreCase("Unreviewed ready to download"))
-                                    asdo.setStatus("Unreviewed in process");
-                                else
+                                if (asdo.getStatus().equalsIgnoreCase("Unreviewed ready to download")) {
+                                    asdo.setStatus("Unreviewed in progress");
+                                } else {
                                     asdo.setStatus("Detail in process");
+                                }
 
                                 tracker.setArtifactData(asdo, "Detail downloaded for next step.");
 
