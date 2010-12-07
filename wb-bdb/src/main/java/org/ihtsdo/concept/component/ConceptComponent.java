@@ -840,8 +840,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         assert nid != Integer.MIN_VALUE : "Processing nid: " + enclosingConcept.getNid();
     }
 
-    // TODO move the EComponent constructors to a helper class or factory
-    // class...
+    // TODO move the EComponent constructors to a helper class or factory class...
     // So that the size of this class is kept limited ?
     protected ConceptComponent(TkComponent<?> eComponent, Concept enclosingConcept) throws IOException {
         super();

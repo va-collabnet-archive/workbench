@@ -782,7 +782,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                     inConflict);
 
             case VERSION:
-                if (tuple.getVersion() == Integer.MAX_VALUE) {
+                if (tuple.getTime() == Long.MAX_VALUE) {
                     return new StringWithExtTuple(ThinVersionHelper.uncommittedHtml(), tuple, tuple.getMemberId(),
                         inConflict);
                 }

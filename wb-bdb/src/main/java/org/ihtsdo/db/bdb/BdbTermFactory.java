@@ -320,9 +320,11 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             return new ArrayList<I_ExtendByRef>(0);
         }
         List<I_ExtendByRef> returnValues = new ArrayList<I_ExtendByRef>(pairs.size());
+        HashSet<Integer> addedMembers = new HashSet<Integer>();
         for (NidPairForRefset pair : pairs) {
             I_ExtendByRef ext = (I_ExtendByRef) Bdb.getComponent(pair.getMemberNid());
-            if (ext != null) {
+            if (ext != null && !addedMembers.contains(ext.getNid())) {
+            	addedMembers.add(ext.getNid());
                 returnValues.add(ext);
             }
         }
@@ -336,10 +338,12 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             return new ArrayList<I_ExtendByRef>(0);
         }
         List<I_ExtendByRef> returnValues = new ArrayList<I_ExtendByRef>(pairs.size());
+        HashSet<Integer> addedMembers = new HashSet<Integer>();
         for (NidPairForRefset pair : pairs) {
             if (pair.getRefsetNid() == refsetNid) {
                 I_ExtendByRef ext = (I_ExtendByRef) Bdb.getComponent(pair.getMemberNid());
-                if (ext != null) {
+                if (ext != null && !addedMembers.contains(ext.getNid())) {
+                	addedMembers.add(ext.getNid());
                     returnValues.add(ext);
                 }
             }
