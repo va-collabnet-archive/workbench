@@ -4339,9 +4339,54 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 count2 = a2.length;
 
                 int r1 = 0, r2 = 0, r3 = 0; // reset record indices
-                int nSame = 0, nMod = 0, nAdd = 0, nDrop = 0; // counters
+                int nSame = 0, nMod = 0, nAdd = 0, nDrop = 0, nSidChange = 0; // counters
                 a3 = new SctYRelRecord[count2];
                 while ((r1 < count1) && (r2 < count2)) {
+//                    // :!!!:DEBUG
+//                    UUID debugUuid1 = new UUID(a1[r1].relUuidMsb, a1[r1].relUuidLsb);
+//                    UUID debugUuid2 = new UUID(a2[r2].relUuidMsb, a2[r2].relUuidLsb);
+//
+//                    if (debugUuid1.toString().compareToIgnoreCase(
+//                            "11eb336d-a06d-5558-8676-b7c2777a051f") == 0
+//                            || debugUuid1.toString().compareToIgnoreCase(
+//                                    "9c60b432-f891-5124-b730-8389c78ba6cc") == 0
+//                            || debugUuid2.toString().compareToIgnoreCase(
+//                                    "11eb336d-a06d-5558-8676-b7c2777a051f") == 0
+//                            || debugUuid2.toString().compareToIgnoreCase(
+//                                    "9c60b432-f891-5124-b730-8389c78ba6cc") == 0) {
+//                        System.out.println("!!! VERSION A: " + debugUuid1 + ", Rel="
+//                                + a1[r1].relSnoId + ": " + a1[r1].c1SnoId + ", "
+//                                + lookupRoleType(a1[r1].roleTypeIdx) + ", " + a1[r1].c2SnoId + " g"
+//                                + a1[r1].group + " s" + a1[r1].status);
+//
+//                        System.out.println("!!! VERSION B: " + debugUuid2 + ", Rel="
+//                                + a2[r2].relSnoId + ": " + a2[r2].c1SnoId + ", "
+//                                + lookupRoleType(a2[r2].roleTypeIdx) + ", " + a2[r2].c2SnoId + " g"
+//                                + a2[r2].group + " s" + a2[r2].status);
+//
+//                        switch (compareRelationship(a1[r1], a2[r2])) {
+//                        case 1:
+//                            System.out.println("!!! ...1... SAME SKIP ");
+//                            break;
+//                        case 2:
+//                            System.out
+//                                    .println("!!! ...2... MODIFIED, WRITE A RETIRED, WRITE B CURRENT, B=>A ");
+//                            break;
+//                        case 3:
+//                            System.out.println("!!! ...3... ADDED, WRITE B CURRENT, B=>C=>A ");
+//                            break;
+//                        case 4:
+//                            System.out.println("!!! ...4... DROPPED, WRITE A RETIRED");
+//                            break;
+//                        case 4:
+//                            System.out.println("!!! ...5... SNOMED ID CHANGED");
+//                            break;
+//                        default:
+//                            System.out.println("!!! ...DEFAULT... NOT ALLOWED ");
+//                            break;
+//                        }
+//                    }
+
                     switch (compareRelationship(a1[r1], a2[r2])) {
                     case 1: // SAME RELATIONSHIP, skip to next
                         r1++;
@@ -4407,11 +4452,30 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                             a1[r1].status = 1; // set to RETIRED
                             a1[r1].yRevision = xRevDate;
                             oos.writeUnshared(a1[r1]);
-
-                            // :xxx: bw.write(a1[r1].toStringArf(revDate, pathID));
                         }
                         r1++;
                         nDrop++;
+                        break;
+
+                    case 5:
+                        // RETIRE FROM OLD GROUP
+                        if (a1[r1].status != 1) { // if not RETIRED
+                            a1[r1].status = 1; // set to RETIRED
+                            a1[r1].yRevision = xRevDate;
+                            oos.writeUnshared(a1[r1]);
+                        }
+
+                        // ADD TO NEW GROUP
+                        a2[r2].yRevision = xRevDate;
+                        oos.writeUnshared(a2[r2]);
+
+                        // REPLACE EXISTING RECORD
+                        a1[r1] = a2[r2];
+
+                        r1++;
+                        r2++;
+
+                        nSidChange++;
                         break;
 
                     } // SWITCH (COMPARE RELATIONSHIP)
@@ -4451,7 +4515,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 }
 
                 // Check counter numbers to master and input file record counts
-                countCheck(count1, count2, nSame, nMod, nAdd, nDrop);
+                countCheck(count1, count2, nSame, nMod, nAdd, nDrop, nSidChange);
 
                 // SETUP NEW MASTER ARRAY
                 a2 = new SctYRelRecord[count1 + nAdd];
@@ -4514,6 +4578,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
     private int compareRelationship(SctYRelRecord c1, SctYRelRecord c2) {
         if (c1.relUuidMsb == c2.relUuidMsb && c1.relUuidLsb == c2.relUuidLsb) {
+            if (c1.relSnoId != c2.relSnoId)
+                return 5; // relSnoId Changed
+
             if ((c1.status == c2.status) && (c1.characteristic == c2.characteristic)
                     && (c1.refinability == c2.refinability) && (c1.group == c2.group))
                 return 1; // SAME
@@ -4796,11 +4863,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         };
         Arrays.sort(a, comp);
 
-        // 
-        if (a == null)
-            System.out.println("!!!:DEBUG:");
-        if (a.length < 1)
-            System.out.println("!!!:DEBUG:");
         long lastC1 = a[0].c1SnoId;
         int lastGroup = a[0].group;
         String GroupListStr = getGroupListString(a, 0);
@@ -4813,6 +4875,15 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // SET RELATIONSHIP UUID
             UUID uuid = Type5UuidFactory.get(REL_ID_NAMESPACE_UUID_TYPE1 + a[i].c1SnoId
                     + a[i].roleTypeSnoId + a[i].c2SnoId + GroupListStr);
+            // 
+            if (uuid.toString().compareToIgnoreCase("9c60b432-f891-5124-b730-8389c78ba6cc") == 0)
+                System.out.println("!!!:PARSE: 9c60b432-f891-5124-b730-8389c78ba6cc... Rel="
+                        + a[i].relSnoId + ":" + a[i].c1SnoId + "-" + a[i].roleTypeSnoId + "-"
+                        + a[i].c2SnoId + " G" + a[i].group + " RG(" + GroupListStr + ")");
+            if (uuid.toString().compareToIgnoreCase("11eb336d-a06d-5558-8676-b7c2777a051f") == 0)
+                System.out.println("!!!:PARSE: 11eb336d-a06d-5558-8676-b7c2777a051f... Rel:"
+                        + a[i].relSnoId + ":" + a[i].c1SnoId + "-" + a[i].roleTypeSnoId + "-"
+                        + a[i].c2SnoId + " G" + a[i].group + " RG(" + GroupListStr + ")");
             // :yyy:
             a[i].relUuidMsb = uuid.getMostSignificantBits();
             a[i].relUuidLsb = uuid.getLeastSignificantBits();
@@ -5021,6 +5092,37 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             getLog().info(
                     "FAILED2:: SAME+MODIFIED+ADDED   = " + same + "+" + modified + "+" + added
                             + " = " + (same + modified + added) + " != " + count2);
+        }
+
+    }
+
+    private void countCheck(int count1, int count2, int same, int modified, int added, int dropped,
+            int idchanged) {
+
+        // CHECK COUNTS TO MASTER FILE1 RECORD COUNT
+        if ((same + modified + dropped + idchanged) == count1) {
+            getLog().info(
+                    "PASSED1:: SAME+MODIFIED+DROPPED+IDCHANGED = " + same + "+" + modified + "+"
+                            + dropped + "+" + idchanged + " = "
+                            + (same + modified + dropped + idchanged) + " == " + count1);
+        } else {
+            getLog().info(
+                    "FAILED1:: SAME+MODIFIED+DROPPED+IDCHANGED = " + same + "+" + modified + "+"
+                            + dropped + "+" + idchanged + " = "
+                            + (same + modified + dropped + idchanged) + " != " + count1);
+        }
+
+        // CHECK COUNTS TO UPDATE FILE2 RECORD COUNT
+        if ((same + modified + added + idchanged) == count2) {
+            getLog().info(
+                    "PASSED2:: SAME+MODIFIED+ADDED+IDCHANGE   = " + same + "+" + modified + "+"
+                            + added + "+" + idchanged + " = "
+                            + (same + modified + added + idchanged) + " == " + count2);
+        } else {
+            getLog().info(
+                    "FAILED2:: SAME+MODIFIED+ADDED+IDCHANGE   = " + same + "+" + modified + "+"
+                            + added + "+" + idchanged + " = "
+                            + (same + modified + added + idchanged) + " != " + count2);
         }
 
     }

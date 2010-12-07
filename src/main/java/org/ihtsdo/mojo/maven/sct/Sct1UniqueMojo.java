@@ -199,12 +199,6 @@ public class Sct1UniqueMojo extends AbstractMojo implements Serializable {
                     if (bwDupl != null)
                         bwDupl.write(a2[idx2].toString() + LINE_TERMINATOR);
 
-                    // DATA_CHECK
-                    if (a1[idx1].termText.compareToIgnoreCase(a2[idx2].termText) != 0) {
-                        getLog().info("::: WARNING NOT DUPLICATE \t" + a1[idx1].toString());
-                        getLog().info(":::         NOT DUPLICATE \t" + a2[idx2].toString());
-                    }
-
                     idx1++;
                     idx2++;
                 } else {

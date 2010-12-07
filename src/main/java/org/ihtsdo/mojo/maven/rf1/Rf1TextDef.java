@@ -55,14 +55,7 @@ public class Rf1TextDef implements Comparable<Object> {
         } else if (this.conceptSid > tmp.conceptSid) {
             return 1; // instance greater than received
         } else {
-            int test = this.snomedId.compareToIgnoreCase(tmp.snomedId);
-            if (test < 0) {
-                return -1; // instance less than received o
-            } else if (test > 0) {
-                return 1; // instance greater than received o
-            } else {
-                return 0; // instance == received
-            }
+            return 0; // instance == received
         }
     }
 
