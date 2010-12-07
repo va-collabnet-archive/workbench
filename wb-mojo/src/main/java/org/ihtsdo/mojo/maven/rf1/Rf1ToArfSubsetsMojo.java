@@ -627,7 +627,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
                 int nSame = 0, nMod = 0, nAdd = 0, nDrop = 0; // counters
                 a3 = new Rf1SubsetMember[count2]; // max3
                 while ((r1 < count1) && (r2 < count2)) {
-
+                    
                     switch (compareMember(a1[r1], a2[r2])) {
                     case 1: // SAME, skip to next
                         r1++;

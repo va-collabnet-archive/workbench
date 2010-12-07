@@ -48,8 +48,6 @@ import org.dwfa.util.id.Type5UuidFactory;
  * 
  * Rf1ToArfTextDef is a maven mojo which pre-processes TextDefinitions to arf format.<br>
  * <br>
- * Rf1ToArfTextDef will compare en-GB subset to en-US to create a en-GB exceptions subset.  
- * The resulting en-GB subset is passed to the Rf1ToArfSubsetsMojo is <code>&lt;keepGBExceptions&gt;</code> is <code>true</code><p>
  * 
  * <b>INPUTS:</b><br>
  * The pom needs to configure the following parameters for the <code>rf1-language-gb-us-to-arf</code> goal.
@@ -63,8 +61,6 @@ import org.dwfa.util.id.Type5UuidFactory;
  *    &lt;rf1Dir&gt; dir_name -- specific directory to be added to the search list     
  * </pre>
  * 
- * <br>
- * <br>
  * @author Marc E. Campbell
  *
  * @goal rf1-textdefinitions-to-arf
@@ -230,8 +226,9 @@ public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
 
         try {
             // CREATE DESCRIPTIONS ARF FILE
-            BufferedWriter bwOutDescr = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fNameOutDescr), "UTF-8"));
-           getLog().info("::: TextDefinitions DESCRIPTION ARF OUTPUT: " + bwOutDescr.toString());
+            BufferedWriter bwOutDescr = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(fNameOutDescr), "UTF-8"));
+            getLog().info("::: TextDefinitions DESCRIPTION ARF OUTPUT: " + bwOutDescr.toString());
 
             processTextDefinitions(textDefList, bwOutDescr);
 
@@ -282,7 +279,7 @@ public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
             getLog().info("processTextDefinitions: exiting, no files");
             return;
         }
-        
+
         // READ file1 as MASTER FILE
         RF1File f1 = fit.next();
         fName1 = f1.file.getPath();
@@ -398,19 +395,11 @@ public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
         } else if (a1.conceptSid > a2.conceptSid) {
             return 3; // ADDED instance greater than received
 
-        } else {    
-            int test = a1.snomedId.compareToIgnoreCase(a2.snomedId);
-            
-            if (test < 0) {
-                return 4; // DROPPED instance less than received
-            } else if (test > 0) {
-                return 3; // ADDED instance greater than received
-            } else {
-                return 1; // SAME
-            }
+        } else {
+            return 1; // SAME
         }
     }
-    
+
     private void countCheck(int count1, int count2, int same, int modified, int added, int dropped) {
 
         // CHECK COUNTS TO MASTER FILE1 RECORD COUNT
