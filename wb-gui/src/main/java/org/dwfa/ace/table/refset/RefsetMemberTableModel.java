@@ -907,8 +907,13 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 refsetDefaults = preferences.getIntegerPreferences();
                 refsetDefaults = preferences.getConIntPreferences();
                 extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptNid());
-                extProps.put(REFSET_PROPERTY.INTEGER_VALUE, ((I_RefsetDefaultsInteger) refsetDefaults)
-                    .getDefaultForIntegerRefset());
+                if (I_RefsetDefaultsInteger.class.isAssignableFrom(refsetDefaults.getClass())) {
+                    extProps.put(REFSET_PROPERTY.INTEGER_VALUE, ((I_RefsetDefaultsInteger) refsetDefaults)
+                            .getDefaultForIntegerRefset());
+                } else if (I_RefsetDefaultsConInt.class.isAssignableFrom(refsetDefaults.getClass())) {
+                    extProps.put(REFSET_PROPERTY.INTEGER_VALUE, ((I_RefsetDefaultsConInt) refsetDefaults)
+                            .getDefaultForIntegerValue());
+                }
                 break;
             default:
                 throw new UnsupportedOperationException("Can't handle ref set type: " + refsetType);
