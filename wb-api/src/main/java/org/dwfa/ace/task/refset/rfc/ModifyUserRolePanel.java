@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -50,7 +51,8 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 
 /**
- * The modify user role panel allows the user to select a user from the drop down list and remove their roles
+ * The modify user role panel allows the user to select a user from the drop
+ * down list and remove their roles
  * as required.
  * 
  * @author Chrissy Hill
@@ -248,18 +250,18 @@ public class ModifyUserRolePanel extends JPanel {
     }
 
     /**
-     * Calculates a set of valid users - a user is valid is they are a child of the User concept in the top hierarchy,
+     * Calculates a set of valid users - a user is valid is they are a child of
+     * the User concept in the top hierarchy,
      * and have a description of type "user inbox".
      * 
      * @return The set of valid users.
      */
-    private Set<I_GetConceptData> getValidUsers() {
-        HashSet<I_GetConceptData> validUsers = new HashSet<I_GetConceptData>();
+    private TreeSet<I_GetConceptData> getValidUsers() {
+        TreeSet<I_GetConceptData> validUsers = new TreeSet<I_GetConceptData>();
         try {
             // TODO replace with passed in config...
             I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-            I_GetConceptData userParent =
-                    Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
+            I_GetConceptData userParent = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
 
             I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
@@ -277,9 +279,9 @@ public class ModifyUserRolePanel extends JPanel {
                 int latestVersion = Integer.MIN_VALUE;
 
                 List<? extends I_DescriptionTuple> descriptionResults =
-                        user.getDescriptionTuples(null, descAllowedTypes, Terms.get()
-                            .getActiveAceFrameConfig().getViewPositionSetReadOnly(),
-                            config.getPrecedence(), config.getConflictResolutionStrategy());
+                        user.getDescriptionTuples(null, descAllowedTypes, Terms.get().getActiveAceFrameConfig()
+                            .getViewPositionSetReadOnly(), config.getPrecedence(), config
+                            .getConflictResolutionStrategy());
                 for (I_DescriptionTuple descriptionTuple : descriptionResults) {
 
                     if (descriptionTuple.getVersion() > latestVersion) {
@@ -302,10 +304,10 @@ public class ModifyUserRolePanel extends JPanel {
         return validUsers;
     }
 
-    private Set<I_GetConceptData> getValidHierarchies() {
+    private TreeSet<I_GetConceptData> getValidHierarchies() {
         I_TermFactory termFactory = Terms.get();
         I_GetConceptData currentUser = (I_GetConceptData) userComboBox.getSelectedItem();
-        HashSet<I_GetConceptData> hierarchies = new HashSet<I_GetConceptData>();
+        TreeSet<I_GetConceptData> hierarchies = new TreeSet<I_GetConceptData>();
         I_IntSet roleAllowedTypes = termFactory.newIntSet();
 
         try {
@@ -345,11 +347,11 @@ public class ModifyUserRolePanel extends JPanel {
         return hierarchies;
     }
 
-    private Set<I_GetConceptData> getValidRoles() {
+    private TreeSet<I_GetConceptData> getValidRoles() {
         I_TermFactory termFactory = Terms.get();
         I_GetConceptData currentUser = (I_GetConceptData) userComboBox.getSelectedItem();
         I_GetConceptData currentHierarchy = (I_GetConceptData) hierarchyComboBox.getSelectedItem();
-        HashSet<I_GetConceptData> roles = new HashSet<I_GetConceptData>();
+        TreeSet<I_GetConceptData> roles = new TreeSet<I_GetConceptData>();
         I_IntSet roleAllowedTypes = termFactory.newIntSet();
 
         try {
@@ -367,9 +369,7 @@ public class ModifyUserRolePanel extends JPanel {
             roleAllowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWER_ROLE.getUids())
                 .getConceptNid());
 
-            Collection<? extends I_RelVersioned> roleRels = currentUser.getSourceRels();// (null, roleAllowedTypes, positions,
-            // true,
-            // true);
+            Collection<? extends I_RelVersioned> roleRels = currentUser.getSourceRels();
 
             for (I_RelVersioned roleRel : roleRels) {
                 if (roleRel.getLastTuple().getStatusId() != ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()) {
@@ -438,8 +438,8 @@ public class ModifyUserRolePanel extends JPanel {
 
                     List<? extends I_RelTuple> roleRels =
                             currentUser.getSourceRelTuples(currentStatus, roleAllowedTypes, termFactory
-                                .getActiveAceFrameConfig().getViewPositionSetReadOnly(),
-                                config.getPrecedence(), config.getConflictResolutionStrategy());
+                                .getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
+                                .getConflictResolutionStrategy());
 
                     for (I_RelTuple roleRel : roleRels) {
                         if (currentHierarchy.getConceptNid() == roleRel.getC2Id()) {
@@ -468,12 +468,11 @@ public class ModifyUserRolePanel extends JPanel {
                             + " promotionPaths: " + promotionPaths);
                 }
                 I_IntSet retiredSet = Terms.get().newIntSet();
-                retiredSet.add(ArchitectonicAuxiliary.Concept.RETIRED
-                    .localize().getNid());
-                
+                retiredSet.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
+
                 PositionBI viewPosition = viewPositionSet.iterator().next();
-                currentUser.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
-                    retiredSet, config.getPrecedence());
+                currentUser.promote(viewPosition, config.getPromotionPathSetReadOnly(), retiredSet, config
+                    .getPrecedence());
                 termFactory.addUncommittedNoChecks(currentUser);
                 termFactory.commit();
 

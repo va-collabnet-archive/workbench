@@ -42,7 +42,7 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
     public I_ConceptAttributeVersioned getConceptAttributes() throws IOException;
 
     public int getConceptNid();
-    
+
     public boolean everHadSrcRelOfType(int typeNid) throws IOException;
 
     /**
@@ -61,8 +61,9 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(NidSetBI allowedStatus, PositionSetBI positions, 
-        Precedence precedencePolicy, ContradictionManagerBI contradictionManager) throws IOException, TerminologyException;
+    public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(NidSetBI allowedStatus,
+            PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
+            throws IOException, TerminologyException;
 
     /**
      * Retrieves tuples using the conflict strategy if specified
@@ -73,9 +74,8 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples( 
-        Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
-            throws IOException, TerminologyException;
+    public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(Precedence precedencePolicy,
+            ContradictionManagerBI contradictionManager) throws IOException, TerminologyException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
@@ -92,10 +92,9 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      *            current profile's conflict resolution strategy is required
      * @return List of matching tuples
      */
-    public List<? extends I_DescriptionTuple> getDescriptionTuples(NidSetBI allowedStatus, 
-        NidSetBI allowedTypes,
-        PositionSetBI positionSet, 
-        Precedence precedencePolicy, ContradictionManagerBI contradictionManager) throws IOException;
+    public List<? extends I_DescriptionTuple> getDescriptionTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
+            PositionSetBI positionSet, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
+            throws IOException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
@@ -108,11 +107,9 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      * @throws TerminologyException
      */
     @Deprecated
-    public List<? extends I_DescriptionTuple> getDescriptionTuples() throws IOException,
-            TerminologyException;
+    public List<? extends I_DescriptionTuple> getDescriptionTuples() throws IOException, TerminologyException;
 
     public Collection<? extends I_ExtendByRef> getExtensions() throws IOException, TerminologyException;
-
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
@@ -130,8 +127,9 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<? extends I_ImageTuple> getImageTuples(NidSetBI allowedStatus, NidSetBI allowedTypes, PositionSetBI positions, 
-        Precedence precedencePolicy, ContradictionManagerBI contradictionManager) throws IOException, TerminologyException;
+    public List<? extends I_ImageTuple> getImageTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
+            PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
+            throws IOException, TerminologyException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
@@ -143,8 +141,7 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<? extends I_ImageTuple> getImageTuples() throws IOException,
-            TerminologyException;
+    public List<? extends I_ImageTuple> getImageTuples() throws IOException, TerminologyException;
 
     /**
      * If you want to get all the is-a relationships for this concept, pass in
@@ -169,8 +166,7 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      * @throws TerminologyException
      */
     public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
-            PositionSetBI positions, 
-            Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
+            PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
             throws IOException, TerminologyException;
 
     /**
@@ -191,8 +187,9 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes, PositionSetBI positions, 
-        Precedence precedencePolicy, ContradictionManagerBI contradictionManager) throws IOException, TerminologyException;
+    public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
+            PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
+            throws IOException, TerminologyException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
@@ -208,8 +205,8 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedTypes, 
-        Precedence precedencePolicy, ContradictionManagerBI contradictionManager) throws IOException, TerminologyException;
+    public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedTypes, Precedence precedencePolicy,
+            ContradictionManagerBI contradictionManager) throws IOException, TerminologyException;
 
     /**
      * If you want to get all the is-a immediate parents for this concept, pass
@@ -234,8 +231,7 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      * @throws TerminologyException
      */
     public Set<? extends I_GetConceptData> getSourceRelTargets(NidSetBI allowedStatus, NidSetBI allowedTypes,
-    		PositionSetBI positions, 
-            Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
+            PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
             throws IOException, TerminologyException;
 
     /**
@@ -253,8 +249,8 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      * @throws IOException
      * @throws TerminologyException
      */
-    public Set<? extends I_GetConceptData> getSourceRelTargets(NidSetBI allowedTypes, 
-        Precedence precedencePolicy, ContradictionManagerBI contradictionManager) throws IOException, TerminologyException;
+    public Set<? extends I_GetConceptData> getSourceRelTargets(NidSetBI allowedTypes, Precedence precedencePolicy,
+            ContradictionManagerBI contradictionManager) throws IOException, TerminologyException;
 
     /**
      * Gets the relationship origins based on the passed statuses, relationship
@@ -279,8 +275,7 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      * @throws TerminologyException
      */
     public Set<? extends I_GetConceptData> getDestRelOrigins(NidSetBI allowedStatus, NidSetBI allowedTypes,
-            PositionSetBI positions, 
-            Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
+            PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
             throws IOException, TerminologyException;
 
     /**
@@ -302,7 +297,8 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      * @throws TerminologyException
      */
     @Deprecated
-    public Set<? extends I_GetConceptData> getDestRelOrigins(NidSetBI allowedTypes) throws IOException, TerminologyException;
+    public Set<? extends I_GetConceptData> getDestRelOrigins(NidSetBI allowedTypes) throws IOException,
+            TerminologyException;
 
     public Collection<? extends I_DescriptionVersioned> getDescriptions() throws IOException;
 
@@ -331,8 +327,8 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
     public I_Identify getIdentifier() throws IOException;
 
     public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder, I_IntList langPrefOrder, NidSetBI allowedStatus,
-            PositionSetBI positionSet, LANGUAGE_SORT_PREF sortPref, 
-            Precedence precedencePolicy, ContradictionManagerBI contradictionManager) throws IOException;
+            PositionSetBI positionSet, LANGUAGE_SORT_PREF sortPref, Precedence precedencePolicy,
+            ContradictionManagerBI contradictionManager) throws IOException;
 
     public I_DescriptionTuple getDescTuple(I_IntList descTypePreferenceList, I_ConfigAceFrame config)
             throws IOException;
@@ -342,24 +338,24 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
     public UniversalAceBean getUniversalAceBean() throws IOException, TerminologyException;
 
     public boolean isParentOf(I_GetConceptData child, NidSetBI allowedStatus, NidSetBI allowedTypes,
-            PositionSetBI positions, 
-            Precedence precedencePolicy, ContradictionManagerBI contradictionManager) throws IOException, TerminologyException;
+            PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
+            throws IOException, TerminologyException;
 
     @Deprecated
     public boolean isParentOf(I_GetConceptData child) throws IOException, TerminologyException;
 
     public boolean isParentOfOrEqualTo(I_GetConceptData child, NidSetBI allowedStatus, NidSetBI allowedTypes,
-            PositionSetBI positions, 
-            Precedence precedencePolicy, ContradictionManagerBI contradictionManager) throws IOException, TerminologyException;
+            PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
+            throws IOException, TerminologyException;
 
     @Deprecated
-    public boolean isParentOfOrEqualTo(I_GetConceptData child) throws IOException,
-            TerminologyException;
+    public boolean isParentOfOrEqualTo(I_GetConceptData child) throws IOException, TerminologyException;
 
     /**
-     * Denotation: the act of pointing out by name. Used as an 
+     * Denotation: the act of pointing out by name. Used as an
      * alternative to the repeated use of identifier with different
-     * contextual meanings. 
+     * contextual meanings.
+     * 
      * @return
      */
     public Object getDenotation(int authorityNid) throws IOException, TerminologyException;
@@ -379,29 +375,30 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      * @throws IOException
      */
     public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException;
+
     /**
-     * Child of = only immediate children, not grand-children, etc. 
+     * Child of = only immediate children, not grand-children, etc.
+     * 
      * @param configFrame
      * @return
      * @throws IOException
      */
-    public I_RepresentIdSet getPossibleChildOfConcepts(I_ConfigAceFrame configFrame)  throws IOException;
+    public I_RepresentIdSet getPossibleChildOfConcepts(I_ConfigAceFrame configFrame) throws IOException;
 
     public List<I_Identify> getUncommittedIdVersioned();
-    
+
     public String toLongString();
 
-	public boolean isCanceled() throws IOException;
+    public boolean isCanceled() throws IOException;
 
-	public Set<? extends I_ConceptAttributeTuple> getCommonConceptAttributeTuples(
-			I_ConfigAceFrame config) throws IOException, TerminologyException;
+    public Set<? extends I_ConceptAttributeTuple> getCommonConceptAttributeTuples(I_ConfigAceFrame config)
+            throws IOException, TerminologyException;
 
-	public Set<? extends I_DescriptionTuple> getCommonDescTuples(I_ConfigAceFrame config) throws IOException;
+    public Set<? extends I_DescriptionTuple> getCommonDescTuples(I_ConfigAceFrame config) throws IOException;
 
-	public Set<? extends I_RelTuple> getCommonRelTuples(I_ConfigAceFrame config) throws IOException, TerminologyException;
+    public Set<? extends I_RelTuple> getCommonRelTuples(I_ConfigAceFrame config) throws IOException,
+            TerminologyException;
 
-	I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config,
-			I_ShowActivity activity) throws IOException;
-
+    I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config, I_ShowActivity activity) throws IOException;
 
 }

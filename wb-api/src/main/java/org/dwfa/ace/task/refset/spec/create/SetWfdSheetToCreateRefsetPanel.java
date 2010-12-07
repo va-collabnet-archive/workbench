@@ -22,8 +22,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -47,8 +47,10 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * This task prepares the Workflow Details Sheet to display the CreateRefsetPanel
- * panel where the user will be asked to enter a number of fields required to start the
+ * This task prepares the Workflow Details Sheet to display the
+ * CreateRefsetPanel
+ * panel where the user will be asked to enter a number of fields required to
+ * start the
  * Create Refset process.
  * 
  * @author Perry Reid
@@ -103,7 +105,8 @@ public class SetWfdSheetToCreateRefsetPanel extends AbstractTask {
     }
 
     /**
-     * Handles actions required by the task after normal task completion (such as moving a
+     * Handles actions required by the task after normal task completion (such
+     * as moving a
      * process to another user's input queue).
      * 
      * @return void
@@ -118,8 +121,10 @@ public class SetWfdSheetToCreateRefsetPanel extends AbstractTask {
     }
 
     /**
-     * Performs the primary action of the task, which in this case is to gather and
-     * validate data that has been entered by the user on the Workflow Details Sheet.
+     * Performs the primary action of the task, which in this case is to gather
+     * and
+     * validate data that has been entered by the user on the Workflow Details
+     * Sheet.
      * 
      * @return The exit condition of the task
      * @param process The currently executing Workflow process
@@ -166,12 +171,16 @@ public class SetWfdSheetToCreateRefsetPanel extends AbstractTask {
             // create list of all users
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(this.config);
             Set<? extends I_GetConceptData> allValidUsers = helper.getAllValidUsers();
+            TreeSet<I_GetConceptData> allValidUsersSorted = new TreeSet<I_GetConceptData>();
+            for (I_GetConceptData concept : allValidUsers) {
+                allValidUsersSorted.add(concept);
+            }
 
             // check permissions for the current user - they require
             // "create new refset" permission either as a user role or
             // individual permission
             TestForCreateNewRefsetPermission permissionTest = new TestForCreateNewRefsetPermission();
-            Set<I_GetConceptData> permissibleRefsetParents = new HashSet<I_GetConceptData>();
+            TreeSet<I_GetConceptData> permissibleRefsetParents = new TreeSet<I_GetConceptData>();
             permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromIndividualUserPermissions(owner));
             permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromRolePermissions(owner));
 
@@ -186,14 +195,15 @@ public class SetWfdSheetToCreateRefsetPanel extends AbstractTask {
             int height = 590;
             workflowDetailsSheet.setSize(width, height);
             workflowDetailsSheet.setLayout(new GridLayout(1, 1));
-            CreateRefsetPanel newPanel = new CreateRefsetPanel(allValidUsers, permissibleRefsetParents);
+            CreateRefsetPanel newPanel = new CreateRefsetPanel(allValidUsersSorted, permissibleRefsetParents);
 
             /*----------------------------------------------------------------------------------
              *  Add the initialized panel to the Workflow Details Sheet
              * ----------------------------------------------------------------------------------
              */
             workflowDetailsSheet.add(newPanel);
-            workflowDetailsSheet.putClientProperty(DetailSheetClientProperties.COMPONENT_FOR_FOCUS, newPanel.getRequestedFocus());
+            workflowDetailsSheet.putClientProperty(DetailSheetClientProperties.COMPONENT_FOR_FOCUS, newPanel
+                .getRequestedFocus());
 
         } catch (Exception e) {
             ex = e;

@@ -22,9 +22,9 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.Box;
 import javax.swing.JLabel;
@@ -43,7 +43,8 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 /**
- * This panel allows the user to select a refset spec that they have owner access to.
+ * This panel allows the user to select a refset spec that they have owner
+ * access to.
  * 
  * @author Chrissy Hill
  * 
@@ -62,12 +63,12 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
 
     private DynamicWidthComboBox refsetComboBox;
     private DynamicWidthComboBox statusComboBox;
-    
+
     I_ConfigAceFrame config;
 
     public ModifyOverallSpecStatusPanel() throws TerminologyException, IOException {
         super();
-        //TODO use other than termFactory.getActiveAceFrameConfig();
+        // TODO use other than termFactory.getActiveAceFrameConfig();
         config = Terms.get().getActiveAceFrameConfig();
         init(config);
     }
@@ -90,8 +91,8 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
         newStatusLabel = new JLabel("New status: ");
     }
 
-    private Set<I_GetConceptData> getValidStatuses() {
-        Set<I_GetConceptData> statuses = new HashSet<I_GetConceptData>();
+    private TreeSet<I_GetConceptData> getValidStatuses() {
+        TreeSet<I_GetConceptData> statuses = new TreeSet<I_GetConceptData>();
         try {
             statuses.add(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
             statuses.add(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IN_DEVELOPMENT.getUids()));
@@ -199,12 +200,13 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
     }
 
     /**
-     * Calculates a set of valid refsets. Valid refsets include any that the current user has owner access to.
+     * Calculates a set of valid refsets. Valid refsets include any that the
+     * current user has owner access to.
      * 
      * @return The set of valid parents.
      */
     private Set<I_GetConceptData> getValidRefsets() {
-        HashSet<I_GetConceptData> validRefsets = new HashSet<I_GetConceptData>();
+        TreeSet<I_GetConceptData> validRefsets = new TreeSet<I_GetConceptData>();
         try {
 
             I_TermFactory termFactory = Terms.get();
@@ -221,8 +223,8 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
 
             List<? extends I_RelTuple> roleRels =
                     activeUser.getSourceRelTuples(currentStatuses, roleAllowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
-                        config.getPrecedence(), config.getConflictResolutionStrategy());
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
+                        .getConflictResolutionStrategy());
 
             for (I_RelTuple roleRel : roleRels) {
 
@@ -230,7 +232,7 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
 
                 Set<? extends I_GetConceptData> children =
                         hierarchy.getDestRelOrigins(currentStatuses, termFactory.getActiveAceFrameConfig()
-                            .getDestRelTypes(), termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
+                            .getDestRelTypes(), termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly(),
                             config.getPrecedence(), config.getConflictResolutionStrategy());
                 for (I_GetConceptData child : children) {
 

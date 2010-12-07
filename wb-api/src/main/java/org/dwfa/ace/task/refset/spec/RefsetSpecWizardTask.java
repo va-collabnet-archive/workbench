@@ -22,10 +22,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import javax.swing.JFrame;
@@ -94,16 +94,15 @@ public class RefsetSpecWizardTask extends AbstractTask {
         try {
 
             termFactory = Terms.get();
-            final         // TODO replace with passed in config...
+            final// TODO replace with passed in config...
             I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             condition = Condition.ITEM_CANCELED;
             I_GetConceptData userParent = termFactory.getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
             I_IntSet allowedTypes = termFactory.getActiveAceFrameConfig().getDestRelTypes();
 
             // create list of editors -> FSN, for use in the drop down list
-            final Set<? extends I_GetConceptData> allValidUsers =
-                    userParent.getDestRelOrigins(allowedTypes);
-            final HashMap<String, I_GetConceptData> validUserMap = new HashMap<String, I_GetConceptData>();
+            final Set<? extends I_GetConceptData> allValidUsers = userParent.getDestRelOrigins(allowedTypes);
+            final TreeMap<String, I_GetConceptData> validUserMap = new TreeMap<String, I_GetConceptData>();
             I_GetConceptData fsnConcept =
                     termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
             I_IntSet fsnAllowedTypes = termFactory.newIntSet();
@@ -112,8 +111,8 @@ public class RefsetSpecWizardTask extends AbstractTask {
                 String latestDescription = null;
                 int latestVersion = Integer.MIN_VALUE;
                 List<? extends I_DescriptionTuple> descriptionResults =
-                        validUser.getDescriptionTuples(null, fsnAllowedTypes, null, 
-                            config.getPrecedence(), config.getConflictResolutionStrategy());
+                        validUser.getDescriptionTuples(null, fsnAllowedTypes, null, config.getPrecedence(), config
+                            .getConflictResolutionStrategy());
 
                 for (I_DescriptionTuple descriptionTuple : descriptionResults) {
                     if (descriptionTuple.getVersion() > latestVersion) {
@@ -136,7 +135,7 @@ public class RefsetSpecWizardTask extends AbstractTask {
             permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromIndividualUserPermissions(owner));
             permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromRolePermissions(owner));
 
-            final HashMap<String, I_GetConceptData> validNewRefsetParentMap =
+            final TreeMap<String, I_GetConceptData> validNewRefsetParentMap =
                     createFsnConceptMap(permissibleRefsetParents);
             SwingUtilities.invokeAndWait(new Runnable() {
                 public void run() {
@@ -256,9 +255,9 @@ public class RefsetSpecWizardTask extends AbstractTask {
         }
     }
 
-    private HashMap<String, I_GetConceptData> createFsnConceptMap(Set<I_GetConceptData> concepts)
+    private TreeMap<String, I_GetConceptData> createFsnConceptMap(Set<I_GetConceptData> concepts)
             throws TerminologyException, IOException {
-        HashMap<String, I_GetConceptData> map = new HashMap<String, I_GetConceptData>();
+        TreeMap<String, I_GetConceptData> map = new TreeMap<String, I_GetConceptData>();
 
         for (I_GetConceptData concept : concepts) {
 
@@ -272,30 +271,26 @@ public class RefsetSpecWizardTask extends AbstractTask {
         // TODO replace with passed in config...
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-        I_GetConceptData descriptionType =
-                Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
+        I_GetConceptData descriptionType = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
         I_IntSet allowedTypes = Terms.get().newIntSet();
         allowedTypes.add(descriptionType.getConceptNid());
         String latestDescription = null;
         int latestVersion = Integer.MIN_VALUE;
 
         I_IntSet activeStatuses = Terms.get().newIntSet();
-        activeStatuses.add(Terms.get()
-            .getConcept((ArchitectonicAuxiliary.Concept.ACTIVE.getUids())).getConceptNid());
-        activeStatuses.add(Terms.get().getConcept(
-            (ArchitectonicAuxiliary.Concept.CURRENT.getUids())).getConceptNid());
-        activeStatuses.add(Terms.get().getConcept(
-            (ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED.getUids())).getConceptNid());
-        activeStatuses.add(Terms.get().getConcept(
-            (ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids())).getConceptNid());
-        activeStatuses.add(Terms.get().getConcept(
-            (ArchitectonicAuxiliary.Concept.LIMITED.getUids())).getConceptNid());
-        activeStatuses.add(Terms.get().getConcept(
-            (ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids())).getConceptNid());
+        activeStatuses.add(Terms.get().getConcept((ArchitectonicAuxiliary.Concept.ACTIVE.getUids())).getConceptNid());
+        activeStatuses.add(Terms.get().getConcept((ArchitectonicAuxiliary.Concept.CURRENT.getUids())).getConceptNid());
+        activeStatuses.add(Terms.get().getConcept((ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED.getUids()))
+            .getConceptNid());
+        activeStatuses.add(Terms.get().getConcept((ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()))
+            .getConceptNid());
+        activeStatuses.add(Terms.get().getConcept((ArchitectonicAuxiliary.Concept.LIMITED.getUids())).getConceptNid());
+        activeStatuses.add(Terms.get().getConcept((ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids()))
+            .getConceptNid());
 
         List<? extends I_DescriptionTuple> descriptionResults =
-                concept.getDescriptionTuples(activeStatuses, allowedTypes, null, 
-                    config.getPrecedence(), config.getConflictResolutionStrategy());
+                concept.getDescriptionTuples(activeStatuses, allowedTypes, null, config.getPrecedence(), config
+                    .getConflictResolutionStrategy());
         for (I_DescriptionTuple descriptionTuple : descriptionResults) {
             if (descriptionTuple.getVersion() > latestVersion) {
                 latestVersion = descriptionTuple.getVersion();

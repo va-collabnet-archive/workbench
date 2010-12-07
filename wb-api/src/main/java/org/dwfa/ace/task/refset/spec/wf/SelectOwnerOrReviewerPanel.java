@@ -24,9 +24,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import javax.swing.AbstractButton;
@@ -57,7 +56,7 @@ public class SelectOwnerOrReviewerPanel extends JPanel implements ActionListener
     private static final long serialVersionUID = 1L;
 
     private I_TermFactory termFactory;
-    private Map<String, I_GetConceptData> userMap = new HashMap<String, I_GetConceptData>();
+    private TreeMap<String, I_GetConceptData> userMap = new TreeMap<String, I_GetConceptData>();
     private UUID[] reviewerUuids;
     private I_GetConceptData owner;
     private TermEntry selectedUser;

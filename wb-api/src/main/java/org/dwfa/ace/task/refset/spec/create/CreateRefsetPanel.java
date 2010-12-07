@@ -29,9 +29,11 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -70,7 +72,7 @@ import org.dwfa.util.io.FileIO;
  */
 class ReviewerTableModel extends AbstractTableModel {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 
@@ -124,7 +126,8 @@ class ReviewerTableModel extends AbstractTableModel {
 }
 
 /**
- * The Create Refset panel is used to start the Create Refset process. It allows the user to input:
+ * The Create Refset panel is used to start the Create Refset process. It allows
+ * the user to input:
  * 1) refset name
  * 2) Refset Parent (from pulldown menu)
  * 3) comments (text field)
@@ -141,7 +144,7 @@ class ReviewerTableModel extends AbstractTableModel {
  * 
  */
 public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
-    
+
     /*
      * -----------------------
      * Properties
@@ -180,15 +183,14 @@ public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
     private HashSet<File> attachmentSet = new HashSet<File>();
     private ArrayListModel<File> attachmentListModel;
 
-    private Set<? extends I_GetConceptData> refsetParents;
-    private Set<? extends I_GetConceptData> editors;
-    private Set<Object> reviewers;
-    private Set<? extends I_GetConceptData> validUsers;
+    private TreeSet<? extends I_GetConceptData> refsetParents;
+    private TreeSet<? extends I_GetConceptData> editors;
+    private TreeSet<I_GetConceptData> reviewers;
+    private TreeSet<? extends I_GetConceptData> validUsers;
 
     private String noReviewText = "no reviewer assigned";
 
-    public CreateRefsetPanel(Set<? extends I_GetConceptData> allValidUsers,
-            Set<I_GetConceptData> permissibleRefsetParents) {
+    public CreateRefsetPanel(TreeSet<I_GetConceptData> allValidUsers, TreeSet<I_GetConceptData> permissibleRefsetParents) {
         super(new GridBagLayout());
 
         this.refsetParents = permissibleRefsetParents;
@@ -226,7 +228,7 @@ public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
             public void componentShown(ComponentEvent e) {
                 e.getComponent().requestFocusInWindow();
             }
-            
+
         });
         refsetParentComboBox = new JComboBox(refsetParents.toArray());
         commentsTextField = new JTextArea();
@@ -264,7 +266,7 @@ public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
 
         if (refsetParent == null) {
             editors = validUsers;
-            reviewers = new HashSet<Object>(validUsers);
+            reviewers = new TreeSet<I_GetConceptData>(validUsers);
         } else {
             editors = getPermissibleEditors(refsetParent);
             reviewers = getPermissibleReviewers(refsetParent);
@@ -280,7 +282,12 @@ public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
 
         if (reviewerComboBox != null) {
             Object previousReviewer = reviewerComboBox.getSelectedItem();
-            reviewerComboBox = new JComboBox(reviewers.toArray());
+
+            // reviewerComboBox = new JComboBox(reviewers.toArray());
+            ArrayList<Object> sortedReviewers = new ArrayList<Object>();
+            sortedReviewers.addAll(reviewers);
+            sortedReviewers.add(noReviewText);
+            reviewerComboBox = new JComboBox(sortedReviewers.toArray());
             if (previousReviewer != null || reviewers.size() == 0) {
                 reviewerComboBox.setSelectedItem(previousReviewer);
             } else {
@@ -303,14 +310,16 @@ public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
         // Refset Name (Label & TextField)
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.insets = new Insets(5, 10, 0, 5); // padding (top, left, bottom, right)
+        gbc.insets = new Insets(5, 10, 0, 5); // padding (top, left, bottom,
+        // right)
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.weighty = 0;
         this.add(refsetNameLabel, gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom, right)
+        gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom,
+        // right)
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         this.add(refsetNameTextField, gbc);
@@ -318,7 +327,8 @@ public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
         // Refset Parent (Label & ComboBox)
         gbc.gridx = 0;
         gbc.gridy++;
-        gbc.insets = new Insets(5, 10, 0, 5); // padding (top, left, bottom, right)
+        gbc.insets = new Insets(5, 10, 0, 5); // padding (top, left, bottom,
+        // right)
         gbc.anchor = GridBagConstraints.LINE_START;
         this.add(refsetParentLabel, gbc);
 
@@ -352,27 +362,31 @@ public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.weighty = 0.0;
-        gbc.insets = new Insets(5, 10, 0, 5); // padding (top, left, bottom, right)
+        gbc.insets = new Insets(5, 10, 0, 5); // padding (top, left, bottom,
+        // right)
         gbc.anchor = GridBagConstraints.LINE_START;
         this.add(requestorLabel, gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom, right)
+        gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom,
+        // right)
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         this.add(requestorTextField, gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
-        gbc.insets = new Insets(5, 10, 0, 5); // padding (top, left, bottom, right)
+        gbc.insets = new Insets(5, 10, 0, 5); // padding (top, left, bottom,
+        // right)
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.NONE;
         this.add(editorLabel, gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom, right)
+        gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom,
+        // right)
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         if (editors == null || editors.size() == 0) {
@@ -384,13 +398,15 @@ public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
         // Reviewer (Label and ComboBox)
         gbc.gridx = 0;
         gbc.gridy++;
-        gbc.insets = new Insets(5, 10, 0, 5); // padding (top, left, bottom, right)
+        gbc.insets = new Insets(5, 10, 0, 5); // padding (top, left, bottom,
+        // right)
         gbc.anchor = GridBagConstraints.LINE_START;
         this.add(reviewerLabel, gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom, right)
+        gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom,
+        // right)
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         if (reviewers == null || reviewers.size() == 0) {
@@ -400,7 +416,8 @@ public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
         }
 
         /*
-         * Table for selecting multiple reviewers. Not needed now, may use in the future.
+         * Table for selecting multiple reviewers. Not needed now, may use in
+         * the future.
          * gbc.gridy++;
          * gbc.weighty = 1.0;
          * gbc.fill = GridBagConstraints.BOTH;
@@ -414,26 +431,30 @@ public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
         // deadline
         gbc.gridx = 0;
         gbc.gridy++;
-        gbc.insets = new Insets(5, 10, 0, 5); // padding (top, left, bottom, right)
+        gbc.insets = new Insets(5, 10, 0, 5); // padding (top, left, bottom,
+        // right)
         gbc.anchor = GridBagConstraints.LINE_START;
         this.add(deadlineLabel, gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom, right)
+        gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom,
+        // right)
         gbc.anchor = GridBagConstraints.LINE_START;
         this.add(deadlinePicker, gbc);
 
         // priority
         gbc.gridx = 0;
         gbc.gridy++;
-        gbc.insets = new Insets(5, 10, 5, 5); // padding (top, left, bottom, right)
+        gbc.insets = new Insets(5, 10, 5, 5); // padding (top, left, bottom,
+        // right)
         gbc.anchor = GridBagConstraints.LINE_START;
         this.add(priorityLabel, gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(5, 5, 5, 5); // padding (top, left, bottom, right)
+        gbc.insets = new Insets(5, 5, 5, 5); // padding (top, left, bottom,
+        // right)
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         this.add(priorityComboBox, gbc);
@@ -441,7 +462,8 @@ public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
         // refset compute type (description or concept)
         gbc.gridx = 0;
         gbc.gridy++;
-        gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom, right)
+        gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom,
+        // right)
         gbc.anchor = GridBagConstraints.LINE_START;
         this.add(computeTypeLabel, gbc);
 
@@ -449,7 +471,8 @@ public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 5, 10, 10); // padding (top, left, bottom, right)
+        gbc.insets = new Insets(5, 5, 10, 10); // padding (top, left, bottom,
+        // right)
         this.add(conceptTypeChoice, gbc);
 
         gbc.gridx = 1;
@@ -457,13 +480,15 @@ public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(0, 5, 10, 10); // padding (top, left, bottom, right)
+        gbc.insets = new Insets(0, 5, 10, 10); // padding (top, left, bottom,
+        // right)
         this.add(descriptionTypeChoice, gbc);
 
         // file attachments
         gbc.gridx = 0;
         gbc.gridy++;
-        gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom, right)
+        gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom,
+        // right)
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         this.add(openFileChooserButton, gbc);
@@ -474,7 +499,8 @@ public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
         gbc.weighty = 1;
-        gbc.insets = new Insets(0, 10, 10, 10); // padding (top, left, bottom, right)
+        gbc.insets = new Insets(0, 10, 10, 10); // padding (top, left, bottom,
+        // right)
 
         attachmentListModel = new ArrayListModel<File>();
         attachmentList = new JList(attachmentListModel);
@@ -489,13 +515,15 @@ public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
         attachmentScroller.setBorder(BorderFactory.createTitledBorder("Attachments (optional):"));
         this.add(attachmentScroller, gbc);
 
-        // Using validate(), Tell the panel to lay out its subcomponents again. It should be invoked
-        // when this container's subcomponents are modified after the container has been displayed.
+        // Using validate(), Tell the panel to lay out its subcomponents again.
+        // It should be invoked
+        // when this container's subcomponents are modified after the container
+        // has been displayed.
         this.validate();
 
     }
 
-    private Set<? extends I_GetConceptData> getPermissibleEditors(I_GetConceptData refsetParent) {
+    private TreeSet<? extends I_GetConceptData> getPermissibleEditors(I_GetConceptData refsetParent) {
         /*
          * -------------------------------------------------
          * Get a list of valid editors
@@ -505,7 +533,7 @@ public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
             if (refsetParent == null) {
                 return this.validUsers;
             }
-            Set<I_GetConceptData> permissibleEditors = new HashSet<I_GetConceptData>();
+            TreeSet<I_GetConceptData> permissibleEditors = new TreeSet<I_GetConceptData>();
 
             for (I_GetConceptData user : this.validUsers) {
                 if (hasEditorPermission(user, refsetParent)) {
@@ -519,14 +547,13 @@ public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
         }
     }
 
-    private Set<Object> getPermissibleReviewers(I_GetConceptData refsetParent) {
+    private TreeSet<I_GetConceptData> getPermissibleReviewers(I_GetConceptData refsetParent) {
         /*
          * -------------------------------------------------
          * Get a list of valid reviewers
          * -------------------------------------------------
          */
-        Set<Object> permissibleReviewers = new HashSet<Object>();
-        permissibleReviewers.add(noReviewText);
+        TreeSet<I_GetConceptData> permissibleReviewers = new TreeSet<I_GetConceptData>();
         try {
             if (refsetParent == null) {
                 permissibleReviewers.addAll(validUsers);
@@ -583,7 +610,7 @@ public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
             try {
                 if (e.getActionCommand().equals(openFileChooserButton.getText())) {
                     Frame f = null;
-                    for (Frame f2: Frame.getFrames()) {
+                    for (Frame f2 : Frame.getFrames()) {
                         if (f2.isActive()) {
                             f = f2;
                             break;
@@ -749,18 +776,17 @@ public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
     public I_GetConceptData getComputeType() throws TerminologyException, IOException {
 
         if (conceptTypeChoice.isSelected()) {
-            return Terms.get().getConcept(
-                RefsetAuxiliary.Concept.CONCEPT_COMPUTE_TYPE.localize().getNid());
+            return Terms.get().getConcept(RefsetAuxiliary.Concept.CONCEPT_COMPUTE_TYPE.localize().getNid());
         } else if (descriptionTypeChoice.isSelected()) {
-            return Terms.get().getConcept(
-                RefsetAuxiliary.Concept.DESCRIPTION_COMPUTE_TYPE.localize().getNid());
+            return Terms.get().getConcept(RefsetAuxiliary.Concept.DESCRIPTION_COMPUTE_TYPE.localize().getNid());
         } else {
             return null;
         }
     }
 
     // -----------------------
-    // Refreshes the author and reviewer combo boxes and redraws the panel, when a different refset parent is chosen.
+    // Refreshes the author and reviewer combo boxes and redraws the panel, when
+    // a different refset parent is chosen.
     // -----------------------
     public class RefsetParentActionLister implements ActionListener {
         public void actionPerformed(ActionEvent arg0) {
@@ -770,8 +796,11 @@ public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.ace.task.refset.spec.create.I_RequestFocus#getRequestedFocus()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.ace.task.refset.spec.create.I_RequestFocus#getRequestedFocus()
      */
     public JComponent getRequestedFocus() {
         return refsetNameTextField;

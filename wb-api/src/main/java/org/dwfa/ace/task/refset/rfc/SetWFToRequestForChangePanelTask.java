@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -141,8 +142,8 @@ public class SetWFToRequestForChangePanelTask extends AbstractTask {
         }
     }
 
-    private Set<I_GetConceptData> getValidRefsets() throws Exception {
-        Set<I_GetConceptData> refsets = new HashSet<I_GetConceptData>();
+    private TreeSet<I_GetConceptData> getValidRefsets() throws Exception {
+        TreeSet<I_GetConceptData> refsets = new TreeSet<I_GetConceptData>();
 
         I_GetConceptData owner = config.getDbConfig().getUserConcept();
         TestForCreateNewRefsetPermission permissionTest = new TestForCreateNewRefsetPermission();
@@ -153,8 +154,9 @@ public class SetWFToRequestForChangePanelTask extends AbstractTask {
         I_IntSet allowedTypes = config.getDestRelTypes();
 
         for (I_GetConceptData parent : permissibleRefsetParents) {
-            Set<? extends I_GetConceptData> children = parent.getDestRelOrigins(null, allowedTypes, null, 
-                config.getPrecedence(), config.getConflictResolutionStrategy());
+            Set<? extends I_GetConceptData> children =
+                    parent.getDestRelOrigins(null, allowedTypes, null, config.getPrecedence(), config
+                        .getConflictResolutionStrategy());
             for (I_GetConceptData child : children) {
                 if (isRefset(child)) {
                     RefsetSpec spec = new RefsetSpec(child, true, config);
@@ -172,8 +174,9 @@ public class SetWFToRequestForChangePanelTask extends AbstractTask {
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize().getNid());
 
-        List<? extends I_RelTuple> relationships = child.getDestRelTuples(null, allowedTypes, null, 
-            config.getPrecedence(), config.getConflictResolutionStrategy());
+        List<? extends I_RelTuple> relationships =
+                child.getDestRelTuples(null, allowedTypes, null, config.getPrecedence(), config
+                    .getConflictResolutionStrategy());
         if (relationships.size() > 0) {
             return true;
         } else {
