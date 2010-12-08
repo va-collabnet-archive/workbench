@@ -24,8 +24,11 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
@@ -36,13 +39,17 @@ import javax.swing.tree.TreePath;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.gui.popup.ProcessPopupUtil;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.RefsetCommentPopupListener;
 import org.dwfa.ace.search.QueryBean;
 import org.dwfa.ace.search.SimilarConceptQuery;
+import org.dwfa.ace.task.refset.spec.RefsetSpec;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
 
@@ -65,7 +72,7 @@ public class TreeMouseListener extends MouseAdapter {
                 AceLog.getAppLog().alertAndLogException(e);
             } catch (TerminologyException e) {
                 AceLog.getAppLog().alertAndLogException(e);
-			}
+            }
         }
     }
 
@@ -78,42 +85,43 @@ public class TreeMouseListener extends MouseAdapter {
 
     public void mousePressed(MouseEvent e) {
         try {
-			JTree tree = (JTree) e.getSource();
-			DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-			int selRow = tree.getRowForLocation(e.getX(), e.getY());
-			// AceLog.getLog().info("Selected row: " + selRow);
-			TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
-			if (selPath != null) {
-			    if (selRow != -1) {
-			        DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
-			        if (e.isPopupTrigger()) {
-			            makeAndShowPopup(e, (I_GetConceptData) node.getUserObject());
-			        } else {
-			            I_RenderAndFocusOnBean renderer = (I_RenderAndFocusOnBean) tree.getCellRenderer();
-			            I_GetConceptDataForTree treeBean = (I_GetConceptDataForTree) node.getUserObject();
-			            renderer = (TermTreeCellRenderer) renderer.getTreeCellRendererComponent(tree, node, true,
-			                tree.isExpanded(selRow), node.isLeaf(), selRow, true);
-			            Rectangle bounds = tree.getRowBounds(selRow);
-			            if (e.getClickCount() == 1) {
-			                Rectangle iconBounds = renderer.getIconRect(treeBean.getParentDepth());
+            JTree tree = (JTree) e.getSource();
+            DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+            int selRow = tree.getRowForLocation(e.getX(), e.getY());
+            // AceLog.getLog().info("Selected row: " + selRow);
+            TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
+            if (selPath != null) {
+                if (selRow != -1) {
+                    DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
+                    if (e.isPopupTrigger()) {
+                        makeAndShowPopup(e, (I_GetConceptData) node.getUserObject());
+                    } else {
+                        I_RenderAndFocusOnBean renderer = (I_RenderAndFocusOnBean) tree.getCellRenderer();
+                        I_GetConceptDataForTree treeBean = (I_GetConceptDataForTree) node.getUserObject();
+                        renderer =
+                                (TermTreeCellRenderer) renderer.getTreeCellRendererComponent(tree, node, true, tree
+                                    .isExpanded(selRow), node.isLeaf(), selRow, true);
+                        Rectangle bounds = tree.getRowBounds(selRow);
+                        if (e.getClickCount() == 1) {
+                            Rectangle iconBounds = renderer.getIconRect(treeBean.getParentDepth());
 
-			                if ((e.getPoint().x > bounds.x + iconBounds.x)
-			                    && (e.getPoint().x + 1 < bounds.x + iconBounds.x + iconBounds.width)) {
-			                    openOrCloseParent(tree, model, node, treeBean, bounds);
-			                }
-			            } else if (e.getClickCount() == 2) {
-			                openOrCloseParent(tree, model, node, treeBean, bounds);
-			            }
-			            // tree.setSelectionPath(new TreePath(selPath.getPath()));
-			            int newRow = tree.getRowForPath(selPath);
-			            // AceLog.getLog().info("New row: " + newRow);
-			            tree.setSelectionInterval(newRow, newRow);
-			        }
-			    }
-			}
-		} catch (TerminologyException e1) {
+                            if ((e.getPoint().x > bounds.x + iconBounds.x)
+                                && (e.getPoint().x + 1 < bounds.x + iconBounds.x + iconBounds.width)) {
+                                openOrCloseParent(tree, model, node, treeBean, bounds);
+                            }
+                        } else if (e.getClickCount() == 2) {
+                            openOrCloseParent(tree, model, node, treeBean, bounds);
+                        }
+                        // tree.setSelectionPath(new TreePath(selPath.getPath()));
+                        int newRow = tree.getRowForPath(selPath);
+                        // AceLog.getLog().info("New row: " + newRow);
+                        tree.setSelectionInterval(newRow, newRow);
+                    }
+                }
+            }
+        } catch (TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
-		}
+        }
     }
 
     private void makeAndShowPopup(MouseEvent e, I_GetConceptData selectedConcept) {
@@ -132,8 +140,8 @@ public class TreeMouseListener extends MouseAdapter {
         }
     }
 
-    private JPopupMenu makePopup(MouseEvent e, I_GetConceptData selectedConcept) throws FileNotFoundException,
-            IOException, ClassNotFoundException, TerminologyException {
+    private JPopupMenu makePopup(MouseEvent e, I_GetConceptData selectedConcept) throws FileNotFoundException, IOException,
+            ClassNotFoundException, TerminologyException {
         JPopupMenu popup = new JPopupMenu();
         JMenuItem noActionItem = new JMenuItem("");
         popup.add(noActionItem);
@@ -146,10 +154,49 @@ public class TreeMouseListener extends MouseAdapter {
                     if (selPath != null) {
                         DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
                         I_ExtendByRef specPart = (I_ExtendByRef) node.getUserObject();
-                        switch (EConcept.REFSET_TYPES.nidToType(specPart.getTypeId())) {
+                        switch (EConcept.REFSET_TYPES.nidToType(specPart.getTypeNid())) {
                         case CID_CID:
                             popup.addSeparator();
-                            addRefsetItems(popup, new File(AceFrame.pluginRoot, "refsetspec/branch-popup"), specPart);
+                            Collection<? extends I_ExtendByRef> extensions =
+                                    Terms.get().getAllExtensionsForComponent(
+                                        ace.getAceFrameConfig().getRefsetSpecInSpecEditor().getConceptNid(), true);
+                            HashMap<Integer, I_ExtendByRef> memberIdBasedExtensionMap =
+                                    new HashMap<Integer, I_ExtendByRef>();
+                            memberIdBasedExtensionMap = populateMemberIdBasedExtensionMap(extensions);
+                            RefsetSpec refsetSpecHelper =
+                                    new RefsetSpec(ace.getAceFrameConfig().getRefsetSpecInSpecEditor(), ace
+                                        .getAceFrameConfig());
+                            boolean excludeDesc = true;
+                            boolean excludeConcept = true;
+                            boolean excludeRel = true;
+                            boolean excludeContains = true;
+                            if (refsetSpecHelper.isDescriptionComputeType()) {
+                                // show AND, OR, !AND, !OR
+                                // show desc clauses
+                                excludeDesc = false;
+                            } else if (refsetSpecHelper.isRelationshipComputeType()) {
+                                // show AND, OR, !AND, !OR
+                                // show rel clauses
+                                excludeRel = false;
+                            } else {
+                                if (clauseIsChildOfConceptContainsDesc(specPart, memberIdBasedExtensionMap)) {
+                                    // show AND, OR, !AND, !OR
+                                    // show desc clauses
+                                    excludeDesc = false;
+                                } else if (clauseIsChildOfConceptContainsRel(specPart, memberIdBasedExtensionMap)) {
+                                    // show AND, OR, !AND, !OR
+                                    // show rel clauses
+                                    excludeRel = false;
+                                } else {
+                                    // show AND, OR, !AND, !OR,
+                                    // show contains desc/rel, NOT contains desc/rel
+                                    // show concept clauses
+                                    excludeConcept = false;
+                                    excludeContains = false;
+                                }
+                            }
+
+                            addRefsetItems(popup, excludeConcept, excludeDesc, excludeRel, excludeContains);
                             break;
                         default:
                         }
@@ -157,8 +204,8 @@ public class TreeMouseListener extends MouseAdapter {
                 }
             }
             popup.addSeparator();
-            RefsetCommentPopupListener refsetCommentActionListener = new RefsetCommentPopupListener(
-                ace.getAceFrameConfig(), ace.getRefsetSpecEditor());
+            RefsetCommentPopupListener refsetCommentActionListener =
+                    new RefsetCommentPopupListener(ace.getAceFrameConfig(), ace.getRefsetSpecEditor());
             refsetCommentActionListener.setConceptForComment(selectedConcept);
 
             JMenuItem refsetCommmentItem = new JMenuItem(refsetCommentActionListener.getPrompt());
@@ -176,9 +223,93 @@ public class TreeMouseListener extends MouseAdapter {
         return popup;
     }
 
-    private void addRefsetItems(JPopupMenu popup, File directory, I_ExtendByRef specPart)
-            throws FileNotFoundException, IOException, ClassNotFoundException {
-        ProcessPopupUtil.addSubmenMenuItems(popup, directory, ace.getAceFrameConfig().getWorker());
+    private HashMap<Integer, I_ExtendByRef> populateMemberIdBasedExtensionMap(Collection<? extends I_ExtendByRef> extensions) {
+        HashMap<Integer, I_ExtendByRef> extensionMap = new HashMap<Integer, I_ExtendByRef>();
+
+        for (I_ExtendByRef extension : extensions) {
+            extensionMap.put(extension.getMemberId(), extension);
+        }
+        return extensionMap;
+    }
+
+    private boolean clauseIsChildOfConceptContainsRel(I_ExtendByRef specPart,
+            HashMap<Integer, I_ExtendByRef> componentIdBasedExtensionMap) throws IOException, TerminologyException {
+        int conceptContainsRelNid = RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING.localize().getNid();
+        I_ExtendByRefPartCidCid cidCidPart = (I_ExtendByRefPartCidCid) specPart;
+        if (cidCidPart.getC2id() == conceptContainsRelNid) {
+            return true;
+        } else {
+            I_ExtendByRef parentSpecPart = componentIdBasedExtensionMap.get(specPart.getComponentNid());
+            if (parentSpecPart == null) {
+                return false;
+            } else {
+                return clauseIsChildOfConceptContainsRel(parentSpecPart, componentIdBasedExtensionMap);
+            }
+        }
+    }
+
+    private boolean clauseIsChildOfConceptContainsDesc(I_ExtendByRef specPart,
+            HashMap<Integer, I_ExtendByRef> componentIdBasedExtensionMap) throws IOException, TerminologyException {
+
+        int conceptContainsRelNid = RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING.localize().getNid();
+        I_ExtendByRefPartCidCid cidCidPart = (I_ExtendByRefPartCidCid) specPart;
+        if (cidCidPart.getC2id() == conceptContainsRelNid) {
+            return true;
+        } else {
+            I_ExtendByRef parentSpecPart = componentIdBasedExtensionMap.get(specPart.getComponentId());
+            if (parentSpecPart == null) {
+                return false;
+            } else {
+                return clauseIsChildOfConceptContainsDesc(parentSpecPart, componentIdBasedExtensionMap);
+            }
+        }
+    }
+
+    private void addRefsetItems(JPopupMenu popup, boolean excludesConcept, boolean excludesDesc, boolean excludesRel,
+            boolean excludesContains) throws FileNotFoundException, IOException, ClassNotFoundException {
+        // adding grouping clauses (OR, AND, !OR, !AND) - these are always displayed
+        File groupingFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/grouping");
+        JMenu newSubMenuGrouping = new JMenu(groupingFile.getName());
+        popup.add(newSubMenuGrouping);
+        ProcessPopupUtil.addSubmenMenuItems(newSubMenuGrouping, groupingFile, ace.getAceFrameConfig().getWorker());
+
+        // sub-menu for "concept-contains-desc" and "concept-contains-rel"
+        if (!excludesContains) {
+            File containsFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/contains");
+            JMenu newSubMenuContains = new JMenu(containsFile.getName());
+            popup.add(newSubMenuContains);
+            ProcessPopupUtil.addSubmenMenuItems(newSubMenuContains, containsFile, ace.getAceFrameConfig().getWorker());
+        }
+
+        // sub-menu for concept based clauses e.g. concept is, concept is child of
+        if (!excludesConcept) {
+            File conceptFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/concept");
+            JMenu newSubMenuConcept = new JMenu(conceptFile.getName());
+            popup.add(newSubMenuConcept);
+            ProcessPopupUtil.addSubmenMenuItems(newSubMenuConcept, conceptFile, ace.getAceFrameConfig().getWorker());
+            // sub-menu for diff
+            conceptFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/diff");
+            newSubMenuConcept = new JMenu(conceptFile.getName());
+            popup.add(newSubMenuConcept);
+            ProcessPopupUtil.addSubmenMenuItems(newSubMenuConcept, conceptFile, ace.getAceFrameConfig().getWorker());
+        }
+
+        // sub-menu for desc based clauses e.g. desc is, desc is child of
+        if (!excludesDesc) {
+            File descFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/desc");
+            JMenu newSubMenuDesc = new JMenu(descFile.getName());
+            popup.add(newSubMenuDesc);
+            ProcessPopupUtil.addSubmenMenuItems(newSubMenuDesc, descFile, ace.getAceFrameConfig().getWorker());
+        }
+
+        // sub-menu for rel based clauses e.g. rel is
+        if (!excludesRel) {
+            File relFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/rel");
+            JMenu newSubMenuRel = new JMenu(relFile.getName());
+            popup.add(newSubMenuRel);
+            ProcessPopupUtil.addSubmenMenuItems(newSubMenuRel, relFile, ace.getAceFrameConfig().getWorker());
+        }
+
     }
 
     private void openOrCloseParent(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode node,
@@ -196,9 +327,10 @@ public class TreeMouseListener extends MouseAdapter {
             ace.getAceFrameConfig().getParentExpandedNodes().add(treeBean.getConceptNid());
             List<? extends I_RelTuple> tuples;
             try {
-                tuples = treeBean.getSourceRelTuples(ace.getAceFrameConfig().getAllowedStatus(),
-                    ace.getAceFrameConfig().getDestRelTypes(), ace.getAceFrameConfig().getViewPositionSetReadOnly(), 
-                    ace.getAceFrameConfig().getPrecedence(), ace.getAceFrameConfig().getConflictResolutionStrategy());
+                tuples =
+                        treeBean.getSourceRelTuples(ace.getAceFrameConfig().getAllowedStatus(), ace.getAceFrameConfig()
+                            .getDestRelTypes(), ace.getAceFrameConfig().getViewPositionSetReadOnly(), ace
+                            .getAceFrameConfig().getPrecedence(), ace.getAceFrameConfig().getConflictResolutionStrategy());
                 int[] newNodeIndices = new int[tuples.size()];
                 int index = 0;
                 int insertIndex = parentNode.getIndex(node);
@@ -210,8 +342,9 @@ public class TreeMouseListener extends MouseAdapter {
                         continue;
                     }
 
-                    ConceptBeanForTree extraParentBean = ConceptBeanForTree.get(t.getC2Id(), t.getRelId(),
-                        treeBean.getParentDepth() + 1, true, ace.getAceFrameConfig());
+                    ConceptBeanForTree extraParentBean =
+                            ConceptBeanForTree.get(t.getC2Id(), t.getRelId(), treeBean.getParentDepth() + 1, true, ace
+                                .getAceFrameConfig());
                     DefaultMutableTreeNode extraParentNode = new DefaultMutableTreeNode(extraParentBean);
                     extraParentNode.setAllowsChildren(false);
                     parentNode.insert(extraParentNode, insertIndex++);

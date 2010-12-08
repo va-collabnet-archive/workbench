@@ -121,7 +121,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                                         new HashMap<Integer, I_ExtendByRef>();
                                 memberIdBasedExtensionMap = populateMemberIdBasedExtensionMap(extensions);
 
-                                switch (EConcept.REFSET_TYPES.nidToType(specPart.getTypeId())) {
+                                switch (EConcept.REFSET_TYPES.nidToType(specPart.getTypeNid())) {
                                 case CID_CID:
                                     boolean excludeDesc = true;
                                     boolean excludeConcept = true;
@@ -223,7 +223,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
         if (cidCidPart.getC2id() == conceptContainsRelNid) {
             return true;
         } else {
-            I_ExtendByRef parentSpecPart = componentIdBasedExtensionMap.get(specPart.getComponentId());
+            I_ExtendByRef parentSpecPart = componentIdBasedExtensionMap.get(specPart.getComponentNid());
             if (parentSpecPart == null) {
                 return false;
             } else {
