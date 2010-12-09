@@ -163,25 +163,25 @@
             </releases>
         </pluginRepository>
     </pluginRepositories>
-    <repositories>
+ <!--   <repositories>
         <repository>
             <id>central</id>
             <url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/all/</url>
             <snapshots>
                 <enabled>true</enabled>
                 <checksumPolicy>fail</checksumPolicy>
-            <!-- To be reviewed, currently daily is the default
+            To be reviewed, currently daily is the default
             <updatePolicy>never</updatePolicy>
-            -->
+            
             </snapshots>
             <releases>
                 <enabled>true</enabled>
                 <checksumPolicy>fail</checksumPolicy>
             </releases>
-        </repository>
-    </repositories>
+        </repository> 
+    </repositories> -->
   <!-- TODO: to be moved into a organisational parent POM -->
-  <distributionManagement>
+ <!-- <distributionManagement>
     <snapshotRepository>
       <id>maestro_ihtsdo.wb-snapshots</id>
       <name>IHTSDO Workbench Snapshots Repository</name>
@@ -192,5 +192,18 @@
       <name>IHTSDO Workbench Releases Repository</name>
       <url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/wb-releases/</url>
     </repository>
-  </distributionManagement>
+  </distributionManagement> -->
+  
+    <distributionManagement>
+        <snapshotRepository>
+            <id>maestro_kp.kp-snapshots</id>
+            <name>Maestro KP Snapshots Repository</name>
+            <url>http://mgr.servers.aceworkspace.net/apps/maestro_kp/archiva/repository/kp-snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>maestro_kp.kp-releases</id>
+            <name>Maestro KP Releases Repository</name>
+            <url>http://mgr.servers.aceworkspace.net/apps/maestro_kp/archiva/repository/kp-releases</url>
+        </repository>
+    </distributionManagement>
 </project>
