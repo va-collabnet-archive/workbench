@@ -32,6 +32,8 @@ public class RelationshipDto extends ConceptDto {
     private Character refinableCode;
     private Integer relationshipGroup;
     private Character characteristicTypeCode;
+    private Map<UUID, Long> sourceIdMap;
+    private Map<UUID, Long> relTypeMap;
 
     /**
      * Bean constructor.
@@ -164,5 +166,21 @@ public class RelationshipDto extends ConceptDto {
      */
     public void setCharacteristicTypeCode(Character characteristicTypeCode) {
         this.characteristicTypeCode = characteristicTypeCode;
+    }
+
+    public Map<UUID, Long> getSourceIdMap() {
+        return sourceIdMap;
+    }
+
+    public void setSourceIdMap(final Map<UUID, Long> sourceIdMap) {
+        this.sourceIdMap = sourceIdMap;
+    }
+
+    public Map<UUID, Long> getRelTypeMap() {
+        return relTypeMap;
+    }
+
+    public void setRelTypeMap(final Map<UUID, Long> relTypeMap) {
+        this.relTypeMap = relTypeMap;
     }
 }

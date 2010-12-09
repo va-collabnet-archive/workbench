@@ -17,16 +17,27 @@
 
 package org.dwfa.mojo.export;
 
+import java.io.IOException;
+
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.TerminologyException;
 
 /**
  *
  * @author Matthew Edwards
  */
 public final class SnomedExportUtility extends AbstractExportUtility implements DatabaseExportUtility {
+    /** International release path. */
+    private final I_GetConceptData snomedReleasePath;
+    final I_TermFactory termFactory;
 
-
+    public SnomedExportUtility(final I_TermFactory termFactory) throws Exception {
+        this.termFactory = termFactory;
+        snomedReleasePath = termFactory.getConcept(
+            ArchitectonicAuxiliary.Concept.SNOMED_CORE.localize().getUids().iterator().next());
+    }
     /**
      * Utility Method to return the latest {@link Position} for an instance of {@link I_GetConceptData}.
      * @param conceptData the {@link I_GetConceptData} to get the latest position from.
@@ -42,4 +53,28 @@ public final class SnomedExportUtility extends AbstractExportUtility implements 
         position.setLastest(true);
         return position;
     }
+
+    /**
+     * Is the path the SNOMED international path
+     * @param pathNid int
+     *
+     * @return true if path is snomedReleasePath or child of
+     *
+     * @throws IOException DB errors
+     * @throws TerminologyException DB errors
+     */
+    public boolean isInternationalPath(int pathNid) throws IOException, TerminologyException {
+        boolean internationPath = false;
+        I_GetConceptData pathConcept = termFactory.getConcept(pathNid);
+
+        if (snomedReleasePath.isParentOf(pathConcept, null, null, null, false)) {
+            internationPath = true;
+        } else if (snomedReleasePath.equals(pathConcept)) {
+            internationPath = true;
+        }
+
+        return internationPath;
+    }
+
+
 }

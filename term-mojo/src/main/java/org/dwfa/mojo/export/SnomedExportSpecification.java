@@ -35,6 +35,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.util.TupleVersionPart;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -171,7 +172,7 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
 
         this.updater = new SnomedComponentDtoUpdater(defaultNamespace, defaultProject, extensionProcessor);
 
-        utility = new SnomedExportUtility();
+        utility = new SnomedExportUtility(termFactory);
 
         I_GetConceptData conceptRetired = termFactory.getConcept(
                 ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED.localize().getUids().iterator().next());
@@ -296,66 +297,80 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
         for (I_DescriptionTuple currentDescription : TupleVersionPart.getLatestMatchingTuples(conceptDescriptionTuples)) {
             I_ThinExtByRefVersioned currentLanguageExtensions = getRefsetExtensionVersioned(adrsNid,currentDescription.getDescId());
 
-        	if (currentLanguageExtensions != null) {
-				extensionSet.put(currentDescription.getDescId(), currentLanguageExtensions);
-				I_ThinExtByRefPartConcept latestPart = (I_ThinExtByRefPartConcept) TupleVersionPart.getLatestPart(currentLanguageExtensions.getVersions());
-				// retire inactive descriptions and active US terms that are Acceptable type
-				if ((getLangaugeType(currentDescription.getTypeId()) == rf2AcceptableDescriptionTypeNid
-						&& currentDescription.getLang().equals(EN_US) && check.isActive(latestPart.getStatusId()))
-						|| (!check.isDescriptionActive(currentDescription.getStatusId()) && check.isActive(latestPart.getStatusId()))) {
-					I_ThinExtByRefPartConcept updatedPart = (I_ThinExtByRefPartConcept) latestPart.duplicate();
-					currentLanguageExtensions.addVersion(updatedPart);
-					updatedPart.setStatusId(retiredConcept.getNid());
-					updatedPart.setPathId(releasePart.getPathId());
-					updatedPart.setVersion(releasePart.getVersion());
-				// Check for status or type update
-				} else if (((check.isDescriptionActive(currentDescription.getStatusId()) && !check.isActive(latestPart.getStatusId()))
-								|| (check.isDescriptionActive(currentDescription.getStatusId()) && latestPart.getC1id() != getLangaugeType(currentDescription.getTypeId())))
-								&& ! (getLangaugeType(currentDescription.getTypeId()) == rf2AcceptableDescriptionTypeNid
-										&& currentDescription.getLang().equals(EN_US))) {
-					int status = (check.isDescriptionActive(currentDescription.getStatusId())) ? activeConcept.getNid() : retiredConcept.getNid();
-					I_ThinExtByRefPartConcept updatedPart = (I_ThinExtByRefPartConcept) latestPart.duplicate();
-					currentLanguageExtensions.addVersion(updatedPart);
-					updatedPart.setStatusId(status);
-					// only update the type if active
-					if (status == activeConcept.getNid()) {
-						updatedPart.setC1id(getLangaugeType(currentDescription.getTypeId()));
-					}
-					updatedPart.setPathId(releasePart.getPathId());
-					updatedPart.setVersion(releasePart.getVersion());
-				// retire old preferred terms.
-				} else if (getLangaugeType(currentDescription.getTypeId()) == rf2PreferredDescriptionTypeNid
-						&& currentLanguageExtensions.getComponentId() != currentDescription.getConceptId()) {
-					I_ThinExtByRefPartConcept updatedPart = (I_ThinExtByRefPartConcept) latestPart.duplicate();
-					currentLanguageExtensions.addVersion(updatedPart);
-					updatedPart.setStatusId(retiredConcept.getNid());
-					updatedPart.setPathId(releasePart.getPathId());
-					updatedPart.setVersion(releasePart.getVersion());
-				}
+            if (currentLanguageExtensions != null) {
+                boolean editedNationally = hasBeenUpdatedNationally(currentLanguageExtensions);
 
-				componentDto.getDescriptionExtensionDtos().addAll(
-						extensionProcessor.processList(currentLanguageExtensions,
-								currentLanguageExtensions.getVersions(), TYPE.DESCRIPTION, true));
-        	}
+                extensionSet.put(currentDescription.getDescId(), currentLanguageExtensions);
+                I_ThinExtByRefPartConcept latestPart = (I_ThinExtByRefPartConcept) TupleVersionPart.getLatestPart(currentLanguageExtensions.getVersions());
+                // retire inactive descriptions and active US terms that are Acceptable type
+                if (!editedNationally && (getLangaugeType(currentDescription.getTypeId()) == rf2AcceptableDescriptionTypeNid
+                        && currentDescription.getLang().equals(EN_US) && check.isActive(latestPart.getStatusId()))
+                        || (!check.isDescriptionActive(currentDescription.getStatusId()) && check.isActive(latestPart.getStatusId()))) {
+                    I_ThinExtByRefPartConcept updatedPart = (I_ThinExtByRefPartConcept) latestPart.duplicate();
+                    currentLanguageExtensions.addVersion(updatedPart);
+                    updatedPart.setStatusId(retiredConcept.getNid());
+                    updatedPart.setPathId(releasePart.getPathId());
+                    updatedPart.setVersion(releasePart.getVersion());
+                // Check for status or type update
+                } else if (!editedNationally && ((check.isDescriptionActive(currentDescription.getStatusId()) && !check.isActive(latestPart.getStatusId()))
+                                || (check.isDescriptionActive(currentDescription.getStatusId()) && latestPart.getC1id() != getLangaugeType(currentDescription.getTypeId())))
+                                && ! (getLangaugeType(currentDescription.getTypeId()) == rf2AcceptableDescriptionTypeNid
+                                        && currentDescription.getLang().equals(EN_US))) {
+                    int status = (check.isDescriptionActive(currentDescription.getStatusId())) ? activeConcept.getNid() : retiredConcept.getNid();
+                    I_ThinExtByRefPartConcept updatedPart = (I_ThinExtByRefPartConcept) latestPart.duplicate();
+                    currentLanguageExtensions.addVersion(updatedPart);
+                    updatedPart.setStatusId(status);
+                    // only update the type if active
+                    if (status == activeConcept.getNid()) {
+                        updatedPart.setC1id(getLangaugeType(currentDescription.getTypeId()));
+                    }
+                    updatedPart.setPathId(releasePart.getPathId());
+                    updatedPart.setVersion(releasePart.getVersion());
+                // retire old preferred terms.
+                } else if (check.isActive(latestPart.getStatusId())
+                        && getLangaugeType(latestPart.getC1id()) == rf2PreferredDescriptionTypeNid
+                        && currentLanguageExtensions.getComponentId() != latestPreferredTerm.getDescId()) {
+                    I_ThinExtByRefPartConcept updatedPart = (I_ThinExtByRefPartConcept) latestPart.duplicate();
+                    currentLanguageExtensions.addVersion(updatedPart);
+                    updatedPart.setStatusId(retiredConcept.getNid());
+                    updatedPart.setPathId(releasePart.getPathId());
+                    updatedPart.setVersion(releasePart.getVersion());
+                }
+
+                componentDto.getDescriptionExtensionDtos().addAll(
+                        extensionProcessor.processList(currentLanguageExtensions,
+                                currentLanguageExtensions.getVersions(), TYPE.DESCRIPTION, true));
+            }
 
         }
 
         //If update preferred term if new available
         if (latestPreferredTerm != null) {
-        	I_ThinExtByRefVersioned currentLanguageExtensions = extensionSet.get(latestPreferredTerm.getDescId());
-        	if(currentLanguageExtensions == null){
-        		setAdrsExtension(componentDto, latestPreferredTerm, rf2PreferredDescriptionTypeNid);
-        	}
+            I_ThinExtByRefVersioned currentLanguageExtensions = extensionSet.get(latestPreferredTerm.getDescId());
+            if(currentLanguageExtensions == null){
+                setAdrsExtension(componentDto, latestPreferredTerm, rf2PreferredDescriptionTypeNid);
+            }
         }
         //If no extension added a new extension for active Synonyms or UnSpecified descriptions
-		List<I_DescriptionTuple> acceptableDescriptions = (!latestSynonyms.isEmpty()) ? latestSynonyms : latestUnSpecifiedDescriptionTypes;
+        List<I_DescriptionTuple> acceptableDescriptions = (!latestSynonyms.isEmpty()) ? latestSynonyms : latestUnSpecifiedDescriptionTypes;
         for (I_DescriptionTuple acceptableDescriptionTuple : acceptableDescriptions) {
-        	I_ThinExtByRefVersioned currentLanguageExtensions = extensionSet.get(acceptableDescriptionTuple.getDescId());
-        	if(currentLanguageExtensions == null){
-        		setAdrsExtension(componentDto, acceptableDescriptionTuple, rf2AcceptableDescriptionTypeNid);
-        	}
+            I_ThinExtByRefVersioned currentLanguageExtensions = extensionSet.get(acceptableDescriptionTuple.getDescId());
+            if(currentLanguageExtensions == null){
+                setAdrsExtension(componentDto, acceptableDescriptionTuple, rf2AcceptableDescriptionTypeNid);
+            }
         }
     }
+
+    private boolean hasBeenUpdatedNationally(I_ThinExtByRefVersioned languageExtensions) throws Exception {
+        boolean updated = false;
+
+        for(I_ThinExtByRefPart part : languageExtensions.getVersions()){
+            updated = ((SnomedExportUtility)utility).isInternationalPath(part.getPathId());
+        }
+
+        return updated;
+    }
+
 
     /**
      * Get the RF2 language reference set value for the description type
@@ -592,15 +607,20 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
      * @throws ClassCastException if a matching refset extension is not of type
      *             T
      */
-    private I_ThinExtByRefVersioned getRefsetExtensionVersioned(int refsetId, int conceptId)
-            throws Exception {
+    private I_ThinExtByRefVersioned getRefsetExtensionVersioned(int refsetId, int conceptId) throws Exception {
         I_ThinExtByRefVersioned result = null;
+        Set<I_ThinExtByRefTuple> exportableTuples = new HashSet<I_ThinExtByRefTuple>();
 
         for (I_ThinExtByRefVersioned extension : termFactory.getAllExtensionsForComponent(conceptId)) {
             if (extension.getRefsetId() == refsetId) {
-                result = extension;
-                break;
+                for (Position position : positions) {
+                    exportableTuples.addAll(position.getMatchingTuples(extension.getTuples(null, null, false, true)));
+                }
             }
+        }
+
+        if (TupleVersionPart.getLatestPart(exportableTuples) != null) {
+            result = TupleVersionPart.getLatestPart(exportableTuples).getCore();
         }
 
         return result;

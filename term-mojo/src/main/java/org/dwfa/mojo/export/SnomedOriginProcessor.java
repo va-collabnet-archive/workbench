@@ -18,16 +18,14 @@ package org.dwfa.mojo.export;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
+
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.ace.task.path.PromoteToPath;
 import org.dwfa.mojo.ConceptDescriptor;
@@ -44,15 +42,12 @@ public class SnomedOriginProcessor extends AbstractOriginProcessor implements Or
     private final I_GetConceptData promotesToConcept;
     /**The concept that groups all the maintained modules.*/
     private final ConceptDescriptor maintainedModuleParent;
-    /**Utility for performing DatabaseExport Functions.*/
-    private final DatabaseExportUtility helper;
 
     public SnomedOriginProcessor(final I_GetConceptData currentConcept,
             final List<PositionDescriptor> releasePositions, final PositionDescriptor[] originsForExport,
             final ConceptDescriptor maintainedModuleParent) throws Exception {
         super(currentConcept, releasePositions, originsForExport);
         this.maintainedModuleParent = maintainedModuleParent;
-        this.helper = new SnomedExportUtility();
         this.promotesToConcept = termFactory.getConcept(ConceptConstants.PROMOTES_TO.localize().getNid());
     }
 
