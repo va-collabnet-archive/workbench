@@ -99,18 +99,18 @@ public class WorkbenchRunner {
 
 			/*
 			 * from http://lists.apple.com/archives/java-dev/2004/oct/msg00591.html
-			 * 
-                The problem is that a ProgressMonitor would cause some kind of background thread 
-                which would throw up junk events which had to be processed, a memory and CPU drain. 
-                Specifically, a ProgressMonitor contains a JProgressBar and a JPBar on Mac OS X uses 
-                AquaProgressBarUI as its look-and-feel. APBarUI is buggy in that even though the 
-                progress bar may no longer be visible, the thread used to animate the progress 
-                bar never stops doing its thing. Each displayed JPBar has its own thread, all 
-                of which get stuck in memory, which can slow things down to a crawl and cause, 
+			 *
+                The problem is that a ProgressMonitor would cause some kind of background thread
+                which would throw up junk events which had to be processed, a memory and CPU drain.
+                Specifically, a ProgressMonitor contains a JProgressBar and a JPBar on Mac OS X uses
+                AquaProgressBarUI as its look-and-feel. APBarUI is buggy in that even though the
+                progress bar may no longer be visible, the thread used to animate the progress
+                bar never stops doing its thing. Each displayed JPBar has its own thread, all
+                of which get stuck in memory, which can slow things down to a crawl and cause,
                 as with my application, OutOfMemoryExceptions.
 
-                The solution is to not use AquaProgressBarUI. I have put the following lines in 
-                my code so that my application will use the BasicProgressBarUI instead. 
+                The solution is to not use AquaProgressBarUI. I have put the following lines in
+                my code so that my application will use the BasicProgressBarUI instead.
                 It's ugly but that's a secondary concern.
 
                 javax.swing.UIManager.put( "ProgressBarUI", "javax.swing.plaf.basic.BasicProgressBarUI" );
@@ -121,7 +121,7 @@ public class WorkbenchRunner {
 			    //javax.swing.UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 	            //javax.swing.UIManager.put( "ProgressBarUI", "javax.swing.plaf.synth.SynthProgressBarUI");
 	            //javax.swing.UIManager.put( "javax.swing.plaf.basic.BasicProgressBarUI", Class.forName("javax.swing.plaf.synth.SynthProgressBarUI") );
-	            
+
 	            //System.getProperties().setProperty("swing.defaultlaf", "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 
                 javax.swing.UIManager.put( "ProgressBarUI", "javax.swing.plaf.basic.BasicProgressBarUI" );
@@ -160,16 +160,16 @@ public class WorkbenchRunner {
 			});
 			ActivityViewer.addActivity(activity);
 
-			
+
 			if (System.getProperty("viewer") != null && System.getProperty("viewer").toLowerCase().startsWith("t")) {
 			    ACE.editMode = false;
 			}
-			
+
 			File wbPropertiesFile = new File("config", WB_PROPERTIES);
 			boolean acePropertiesFileExists = wbPropertiesFile.exists();
 			wbProperties = new Properties();
 			SvnPrompter prompter = new SvnPrompter();
-			
+
 			boolean initialized = false;
 			if (acePropertiesFileExists) {
 				wbProperties.loadFromXML(new FileInputStream(wbPropertiesFile));
@@ -177,9 +177,11 @@ public class WorkbenchRunner {
 						.get("initialized"));
 			}
 			SvnHelper svnHelper =  new SvnHelper(WorkbenchRunner.class, jiniConfig);
+			boolean attemptedProfileSelection = false;
 			if (acePropertiesFileExists == false || initialized == false) {
 				try {
 					svnHelper.initialSubversionOperationsAndChangeSetImport(wbPropertiesFile, prompter);
+					attemptedProfileSelection = true;
 				} catch (Exception ex) {
 					AceLog.getAppLog().alertAndLogException(ex);
 					System.exit(0);
@@ -208,8 +210,8 @@ public class WorkbenchRunner {
 			}
 
 			File profileDir = new File("profiles");
-			if ((profileDir.exists() == false && initializeFromSubversion)
-					|| (svnUpdateOnStart != null)) {
+			if (((profileDir.exists() == false && initializeFromSubversion)
+					|| (svnUpdateOnStart != null)) && !attemptedProfileSelection) {
 	            Svn.setConnectedToSvn(true);
 	            svnHelper.initialSubversionOperationsAndChangeSetImport(new File(
 								"config", WB_PROPERTIES), prompter);
@@ -319,8 +321,8 @@ public class WorkbenchRunner {
 							.getDbFolder(), "je.properties");
 					FileIO.copyFile(jeUserPropertiesFile, jeDbPropertiesFile);
 				}
-				
-				
+
+
 				ObjectInputStream ois = new ObjectInputStream(
 						new BufferedInputStream(
 								new FileInputStream(userProfile)));
@@ -370,7 +372,7 @@ public class WorkbenchRunner {
 					new File(AceConfig.config.getChangeSetRoot(), "."
 							+ "commitLog.xls")));
 
-			
+
 			int successCount = 0;
 			int frameCount = 0;
 
@@ -782,7 +784,7 @@ public class WorkbenchRunner {
 			}
 		}
 	}
-	
+
 	private void checkCustom() {
 		String custPropFN = null;
 		try {
@@ -800,10 +802,10 @@ public class WorkbenchRunner {
 					Object obj = ObjectCacheClassHandler.getInstClass(custCN);
 					if(obj != null) {
 						ObjectCache.put(CustomStatics.CUSTOMPROPSFN, cpfn);
-						ObjectCache.put(CustomStatics.CUSTOM_UI_CLASS, custCN);	
+						ObjectCache.put(CustomStatics.CUSTOM_UI_CLASS, custCN);
 						ObjectCache.put(CustomStatics.CUSTOMPROPS, custProps);
-					}	
-				}	
+					}
+				}
 			}
 		}
 	}
