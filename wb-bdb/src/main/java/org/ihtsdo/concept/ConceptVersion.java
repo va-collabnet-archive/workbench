@@ -9,6 +9,14 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.JComponent;
+
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.cern.colt.map.OpenIntIntHashMap;
@@ -33,7 +41,10 @@ import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.example.binding.Snomed;
 import org.ihtsdo.tk.spec.ConceptSpec;
+
+import org.dwfa.tapi.TerminologyException; //TODO this 
 
 public class ConceptVersion implements ConceptVersionBI {
 
@@ -543,4 +554,42 @@ public class ConceptVersion implements ConceptVersionBI {
             throws IOException {
         throw new UnsupportedOperationException();
     }
-}
+    
+    //TODO
+    @Override
+    public boolean isMember(int conceptNid, int evalRefsetNid) throws IOException{ 
+    	boolean isMember = false;
+    	try{
+    	I_TermFactory tf = Terms.get();
+    	I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
+    	List<? extends I_ExtendByRef> memberRefsets = tf.getAllExtensionsForComponent(conceptNid/*concept.getConceptNid()*/); 
+    	//ConceptSpec refset = Snomed.TEST_REFEST;
+    	//int evaluationRefset = refset.getNid();
+ 
+    	if (memberRefsets != null){
+    	for (I_ExtendByRef extn : memberRefsets) {
+    		int refsetNidCurrent = extn.getRefsetId();
+    		List<? extends I_ExtendByRefPart> currentRefsets = tf.getRefsetHelper(config).getAllCurrentRefsetExtensions(refsetNidCurrent, conceptNid/*concept.getConceptNid()*/);
+    		
+    		for(I_ExtendByRefPart cr: currentRefsets){
+    			if (refsetNidCurrent == evalRefsetNid) {
+    				isMember = true;
+    			}
+    		}
+    	}
+    	}
+    	return isMember;
+    	}catch (TerminologyException e) {
+    		throw new IOException(e); //TODO maybe this one? throw new IOException(e);
+    	}catch (Exception e) {
+    		throw new IOException(e); //AceLog.getAppLog().alertAndLogException(e);
+        }
+    	
+    }
+    
+    //TODO to here
+    }
+    
+		
+    
+
