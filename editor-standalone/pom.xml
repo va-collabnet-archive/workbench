@@ -47,7 +47,10 @@
 			<artifactId>tk-arena-rules</artifactId>
 			<type>zip</type>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>tk-arena-spec</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>jgraphx</groupId>
 			<artifactId>jgraphx-examples</artifactId>
