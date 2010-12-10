@@ -14,7 +14,7 @@ public class SctYRefSetRecord implements Comparable<SctYRefSetRecord>, Serializa
 
     private static final long serialVersionUID = 1L;
 
-    long conUuidMsb; // ENVELOP CONCEPTID
+    long conUuidMsb; // ENVELOP CONCEPTID (eConcept to which this concept belongs)
     long conUuidLsb; // ENVELOP CONCEPTID
     long componentUuidMsb;
     long componentUuidLsb;
