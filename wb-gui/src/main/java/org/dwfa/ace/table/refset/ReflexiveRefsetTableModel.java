@@ -51,7 +51,7 @@ import org.dwfa.vodb.types.IntSet;
 public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 
@@ -70,8 +70,8 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                 promotionRefsetIds.add(RefsetAuxiliary.Concept.PROMOTION_REL.localize().getNid());
                 promotionTuples =
                         refsetConcept.getSourceRelTuples(host.getConfig().getAllowedStatus(), promotionRefsetIds, host
-                            .getConfig().getViewPositionSetReadOnly(), host.getConfig().getPrecedence(),
-                            host.getConfig().getConflictResolutionStrategy());
+                            .getConfig().getViewPositionSetReadOnly(), host.getConfig().getPrecedence(), host.getConfig()
+                            .getConflictResolutionStrategy());
                 Iterator<? extends I_RelTuple> promotionIterator = promotionTuples.iterator();
                 promotionRefsetComponentMap = new HashMap<Integer, I_ExtendByRef>();
                 if (promotionIterator.hasNext()) {
@@ -79,13 +79,14 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                     promotionRefsetIdentify = Terms.get().getConcept(promotionRefsetId);
                     Collection<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionMembers(promotionRefsetId);
                     promotionRefsetComponentMap = new HashMap<Integer, I_ExtendByRef>(members.size());
-                    for (I_ExtendByRef ext: members) {
+                    for (I_ExtendByRef ext : members) {
                         promotionRefsetComponentMap.put(ext.getComponentId(), ext);
                     }
                 }
+
             } catch (Exception e) {
                 AceLog.getAppLog().alertAndLogException(e);
-            } 
+            }
         }
 
         public TableChangedSwingWorker(Integer componentId) {
@@ -122,8 +123,8 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                 }
 
                 List<? extends I_ExtendByRefVersion> original =
-                        extension.getTuples(statusSet, positionSet, 
-                            host.getConfig().getPrecedence(), host.getConfig().getConflictResolutionStrategy());
+                        extension.getTuples(statusSet, positionSet, host.getConfig().getPrecedence(), host.getConfig()
+                            .getConflictResolutionStrategy());
                 List<I_ExtendByRefVersion> allParts = new ArrayList<I_ExtendByRefVersion>();
                 allParts.addAll(original);
 
@@ -156,15 +157,14 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                             case CONCEPT_COMPONENT:
                                 if (col.readParamaters != null) {
                                     Object readValue =
-                                            col.getReadMethod().invoke(
-                                                Terms.get().getConcept(extension.getComponentId()), col.readParamaters);
+                                            col.getReadMethod().invoke(Terms.get().getConcept(extension.getComponentId()),
+                                                col.readParamaters);
                                     if (readValue != null && Integer.class.isAssignableFrom(readValue.getClass())) {
                                         conceptsToFetch.add((Integer) readValue);
                                     }
                                 } else {
                                     Object readValue =
-                                            col.getReadMethod().invoke(
-                                                Terms.get().getConcept(extension.getComponentId()));
+                                            col.getReadMethod().invoke(Terms.get().getConcept(extension.getComponentId()));
                                     if (readValue != null && Integer.class.isAssignableFrom(readValue.getClass())) {
                                         conceptsToFetch.add((Integer) readValue);
                                     }
@@ -176,8 +176,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                                 throw new UnsupportedOperationException();
                             case IMMUTABLE:
                                 if (col.readParamaters != null) {
-                                    conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple,
-                                        col.readParamaters));
+                                    conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple, col.readParamaters));
                                 } else {
                                     conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple));
                                 }
@@ -208,10 +207,10 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                                                             new Exception(obj + " is not an instance of Integer"));
                                                     }
                                                 } catch (Exception e) {
-                                                    AceLog.getAppLog().alertAndLogException(new Exception(
-                                                        "ReflexiveRefsetTableModel.CONCEPT_IDENTIFIER:", e));
+                                                    AceLog.getAppLog().alertAndLogException(
+                                                        new Exception("ReflexiveRefsetTableModel.CONCEPT_IDENTIFIER:", e));
                                                 }
-                                            } 
+                                            }
                                         }
                                         break;
                                     case STRING:
@@ -289,12 +288,12 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
             } catch (ExecutionException ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
-            
+
             try {
-				fireTableDataChanged();
-			} catch (Exception e) {
-				AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
-			}
+                fireTableDataChanged();
+            } catch (Exception e) {
+                AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
+            }
 
         }
 
@@ -310,16 +309,13 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
     @SuppressWarnings("unchecked")
     public Object getPromotionRefsetValue(I_ExtendByRef extension, ReflexiveRefsetFieldData col) throws IOException,
             IllegalAccessException, InvocationTargetException, TerminologyException {
-        if (promotionRefsetComponentMap != null && 
-                promotionRefsetComponentMap.containsKey(extension.getNid())) {
+        if (promotionRefsetComponentMap != null && promotionRefsetComponentMap.containsKey(extension.getNid())) {
             I_ExtendByRef promotionMember = promotionRefsetComponentMap.get(extension.getNid());
             if (promotionMember != null) {
-                List<I_ExtendByRefVersion> promotionTuples = (List<I_ExtendByRefVersion>) 
-                promotionMember.getTuples(
-                    host.getConfig().getAllowedStatus(), 
-                    host.getConfig().getViewPositionSetReadOnly(),
-                    host.getConfig().getPrecedence(), 
-                    host.getConfig().getConflictResolutionStrategy());
+                List<I_ExtendByRefVersion> promotionTuples =
+                        (List<I_ExtendByRefVersion>) promotionMember.getTuples(host.getConfig().getAllowedStatus(), host
+                            .getConfig().getViewPositionSetReadOnly(), host.getConfig().getPrecedence(), host.getConfig()
+                            .getConflictResolutionStrategy());
                 if (promotionTuples.size() > 0) {
                     return col.getReadMethod().invoke(promotionTuples.get(0).getMutablePart());
                 }
@@ -372,17 +368,18 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                 I_ExtendByRefVersion tuple = allTuples.get(i);
                 memberNids.add(tuple.getNid());
             } else {
-            	//TODO verify this is correct behaviour -- Chrissy...
-            	/* Why did we previously get: 
-            	
-            	Exception in thread "AWT-EventQueue-0" java.lang.IndexOutOfBoundsException: Index: 18, Size: 18
-            	at java.util.ArrayList.RangeCheck(ArrayList.java:547)
-            	at java.util.ArrayList.get(ArrayList.java:322)
-            	at org.dwfa.ace.table.refset.ReflexiveRefsetTableModel.getSelectedTuples(ReflexiveRefsetTableModel.java:364)
-
-            	*/
-                AceLog.getAppLog().warning("Selected row > row collection: " + i + 
-                    " all tuples: " + allTuples);
+                //TODO verify this is correct behaviour -- Chrissy...
+                /*
+                 * Why did we previously get:
+                 * 
+                 * Exception in thread "AWT-EventQueue-0"
+                 * java.lang.IndexOutOfBoundsException: Index: 18, Size: 18
+                 * at java.util.ArrayList.RangeCheck(ArrayList.java:547)
+                 * at java.util.ArrayList.get(ArrayList.java:322)
+                 * atorg.dwfa.ace.table.refset.ReflexiveRefsetTableModel.
+                 * getSelectedTuples(ReflexiveRefsetTableModel.java:364)
+                 */
+                AceLog.getAppLog().warning("Selected row > row collection: " + i + " all tuples: " + allTuples);
             }
         }
         return memberNids;

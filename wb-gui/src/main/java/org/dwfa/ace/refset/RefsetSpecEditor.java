@@ -108,8 +108,7 @@ import org.ihtsdo.etypes.EConcept;
 public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeListener {
 
     private static EnumSet<EConcept.REFSET_TYPES> allowedTypes =
-            EnumSet.of(EConcept.REFSET_TYPES.CID_CID, EConcept.REFSET_TYPES.CID_CID_CID,
-                EConcept.REFSET_TYPES.CID_CID_STR);
+            EnumSet.of(EConcept.REFSET_TYPES.CID_CID, EConcept.REFSET_TYPES.CID_CID_CID, EConcept.REFSET_TYPES.CID_CID_STR);
 
     PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
@@ -339,8 +338,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         }
 
         private void perform() {
-            firePropertyChange(I_HostConceptPlugins.SHOW_HISTORY, !historyButton.isSelected(), historyButton
-                .isSelected());
+            firePropertyChange(I_HostConceptPlugins.SHOW_HISTORY, !historyButton.isSelected(), historyButton.isSelected());
             try {
                 updateSpecTree(false);
                 if (refsetSpecPanel != null && refsetSpecPanel.getRefsetTable() != null) {
@@ -381,8 +379,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                     } else {
                         Long lastComputeTime = spec.getLastComputeTime();
                         if (lastComputeTime == null) {
-                            computeStatusValueLabel
-                                .setText("spec is new (yet to be modified) and has never been computed");
+                            computeStatusValueLabel.setText("spec is new (yet to be modified) and has never been computed");
                             computeStatusValueLabel.setForeground(Color.black);
                         } else {
                             computeStatusValueLabel.setText("spec unmodified since last compute");
@@ -604,8 +601,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
     private JPanel leftTogglePane;
 
-    public RefsetSpecEditor(ACE ace, TermTreeHelper treeHelper, TermTreeHelper refsetTree,
-            RefsetSpecPanel refsetSpecPanel) throws Exception {
+    public RefsetSpecEditor(ACE ace, TermTreeHelper treeHelper, TermTreeHelper refsetTree, RefsetSpecPanel refsetSpecPanel)
+            throws Exception {
         super();
         this.ace = ace;
         this.treeHelper = treeHelper;
@@ -613,8 +610,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         this.refsetSpecPanel = refsetSpecPanel;
         topPanel = new JPanel(new GridBagLayout());
 
-        this.tabHistoryList =
-                (LinkedList<I_GetConceptData>) ace.getAceFrameConfig().getTabHistoryMap().get(TAB_HISTORY_KEY);
+        this.tabHistoryList = (LinkedList<I_GetConceptData>) ace.getAceFrameConfig().getTabHistoryMap().get(TAB_HISTORY_KEY);
 
         if (this.tabHistoryList == null) {
             this.tabHistoryList = new LinkedList<I_GetConceptData>();
@@ -650,8 +646,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         c.gridx++;
         componentHistoryButton = new JButton(ConceptPanel.HISTORY_ICON);
         componentHistoryButton.addActionListener(new ShowHistoryListener());
-        componentHistoryButton
-            .setToolTipText("click to show history of the RefSet Specification displayed in this viewer");
+        componentHistoryButton.setToolTipText("click to show history of the RefSet Specification displayed in this viewer");
         topPanel.add(componentHistoryButton, c);
 
         c.gridx = 0;
@@ -898,8 +893,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                                         "<html>Execution of <font color='blue'>" + bp.getName() + "</font> complete.");
                                 } else {
                                     getConfig().setStatusMessage(
-                                        "<html><font color='blue'>Process complete: <font color='red'>"
-                                            + exceptionMessage);
+                                        "<html><font color='blue'>Process complete: <font color='red'>" + exceptionMessage);
                                 }
                                 ace.getAceFrameConfig().refreshRefsetTab();
                             }
@@ -919,7 +913,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     private JComponent getContentPane() throws Exception {
         JTabbedPane refsetTabs = new JTabbedPane();
         refsetTabs.addTab("specification", getSpecPane());
-        commentTable = RefsetSpecPanel.createCommentTable(ace.getAceFrameConfig(), this);
+        commentTable = getRefsetSpecPanel().createCommentTable(ace.getAceFrameConfig(), this);
         commentTableModel = (ReflexiveRefsetCommentTableModel) commentTable.getModel();
         commentScroller = new JScrollPane(commentTable);
         refsetTabs.addTab("comments", commentScroller);

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.dwfa.ace.refset;
 
@@ -31,7 +31,7 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
     private int id;
     private IntSet cantFindWarning = new IntSet();
     /**
-     * 
+     *
      */
     private final RefsetSpecEditor refsetSpecEditor;
 
@@ -41,7 +41,7 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
     UpdateTreeSpec(RefsetSpecEditor refsetSpecEditor) {
         this.id = count++;
         this.refsetSpecEditor = refsetSpecEditor;
-        frameConfig =  this.refsetSpecEditor.ace.getAceFrameConfig();
+        frameConfig = this.refsetSpecEditor.ace.getAceFrameConfig();
         oldRoot = (RefsetSpecTreeNode) this.refsetSpecEditor.specTree.getModel().getRoot();
         refsetConcept = (I_GetConceptData) this.refsetSpecEditor.label.getTermComponent();
     }
@@ -89,7 +89,9 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
         if (cancel) {
             return null;
         }
-        commentTable = RefsetSpecPanel.createCommentTable(this.refsetSpecEditor.ace.getAceFrameConfig(), this.refsetSpecEditor);
+        commentTable =
+                refsetSpecEditor.getRefsetSpecPanel().createCommentTable(this.refsetSpecEditor.ace.getAceFrameConfig(),
+                    this.refsetSpecEditor);
         specScrollHorizValue = this.refsetSpecEditor.specTreeScroller.getHorizontalScrollBar().getValue();
         specScrollVertValue = this.refsetSpecEditor.specTreeScroller.getVerticalScrollBar().getValue();
         commentScrollHorizValue = this.refsetSpecEditor.commentScroller.getHorizontalScrollBar().getValue();
@@ -111,9 +113,10 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
         if (refsetConcept != null) {
             relTypes.add(RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize().getNid());
             List<? extends I_RelTuple> refsetSpecTuples =
-                    refsetConcept.getDestRelTuples(this.refsetSpecEditor.ace.getAceFrameConfig().getAllowedStatus(), relTypes, this.refsetSpecEditor.ace
-                        .getAceFrameConfig().getViewPositionSetReadOnly(), this.refsetSpecEditor.ace.aceFrameConfig.getPrecedence(),
-                        this.refsetSpecEditor.ace.aceFrameConfig.getConflictResolutionStrategy());
+                    refsetConcept.getDestRelTuples(this.refsetSpecEditor.ace.getAceFrameConfig().getAllowedStatus(),
+                        relTypes, this.refsetSpecEditor.ace.getAceFrameConfig().getViewPositionSetReadOnly(),
+                        this.refsetSpecEditor.ace.aceFrameConfig.getPrecedence(), this.refsetSpecEditor.ace.aceFrameConfig
+                            .getConflictResolutionStrategy());
             if (refsetSpecTuples != null && refsetSpecTuples.size() > 0) {
                 this.refsetSpecEditor.refsetSpecConcept = Terms.get().getConcept(refsetSpecTuples.get(0).getC1Id());
                 localRefsetSpecConcept = Terms.get().getConcept(refsetSpecTuples.get(0).getC1Id());
@@ -187,9 +190,9 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
                                 msg.append("] ");
                                 msg.append(extNode.toString());
                                 msg.append("<br>Probably the parent was retired, but the children clauses where not.");
-                                msg.append("<br>Please retire all the child clauses. " +
-                                        "<br><br>If the child clauses are not shown, toggle the history button. " +
-                                        "<br><br>UpdateTreeSpec: ");
+                                msg.append("<br>Please retire all the child clauses. "
+                                    + "<br><br>If the child clauses are not shown, toggle the history button. "
+                                    + "<br><br>UpdateTreeSpec: ");
                                 msg.append(id);
                                 AceLog.getAppLog().alertAndLogException(new Exception(msg.toString()));
                                 nodesToRemove.add(extNode);
@@ -200,7 +203,7 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
                     break;
                 }
             }
-            for (RefsetSpecTreeNode toRemove: nodesToRemove) {
+            for (RefsetSpecTreeNode toRemove : nodesToRemove) {
                 extensionMap.remove(((I_ExtendByRef) toRemove.getUserObject()).getMemberId());
             }
         }
@@ -223,17 +226,16 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
 
     private void addExtensionsToMap(I_GetConceptData localRefsetSpecConcept,
             HashMap<Integer, RefsetSpecTreeNode> extensionMap) throws IOException, TerminologyException {
-        Collection<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionMembers(
-            localRefsetSpecConcept.getNid());
+        Collection<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionMembers(localRefsetSpecConcept.getNid());
         for (I_ExtendByRef ext : members) {
-        	
-            int currentTupleCount = ext.getTuples(frameConfig.getAllowedStatus(),
-                frameConfig.getViewPositionSetReadOnly(), frameConfig.getPrecedence(),
-                frameConfig.getConflictResolutionStrategy()).size();
+
+            int currentTupleCount =
+                    ext.getTuples(frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(),
+                        frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy()).size();
 
             if (currentTupleCount > 0 || this.refsetSpecEditor.historyButton.isSelected()) {
-                extensionMap.put(ext.getMemberId(), new RefsetSpecTreeNode(ext,
-                    this.refsetSpecEditor.ace.getAceFrameConfig()));
+                extensionMap.put(ext.getMemberId(), new RefsetSpecTreeNode(ext, this.refsetSpecEditor.ace
+                    .getAceFrameConfig()));
             }
         }
     }
