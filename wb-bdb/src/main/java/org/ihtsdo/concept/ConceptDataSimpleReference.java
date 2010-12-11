@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -245,12 +246,27 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         return refsetMembers.get();
     }
 
+	@SuppressWarnings("unchecked")
 	private void handleCanceledComponents() {
 		if (lastExtinctRemoval < BdbCommitManager.getLastCancel()) {
 			if (refsetMembers != null && 
 					refsetMembers.get() != null && 
 					refsetMembers.get().size() > 0) {
-	        	removeCanceledFromList(refsetMembers.get());
+					List<RefsetMember<?, ?>> removed = 
+						(List<RefsetMember<?, ?>>) removeCanceledFromList(refsetMembers.get());
+					if (refsetMembersMap.get() != null
+							|| refsetComponentMap.get() != null) { 
+						Map<Integer, ?> memberMap = refsetMembersMap.get();
+						Map<Integer, ?> componentMap = refsetComponentMap.get();
+						for (RefsetMember<?, ?> cc: removed) {
+							if (memberMap != null) {
+								memberMap.remove(cc.getNid());
+							}
+							if (componentMap != null) {
+								componentMap.remove(cc.getComponentNid());
+							}
+						}
+					}
 			}
 			if (descriptions != null && 
 					descriptions.get() != null && 
@@ -271,19 +287,20 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         }
 	}
 
-    private void removeCanceledFromList(Collection<? extends ConceptComponent<?, ?>> ccList) {
+    private List<? extends ConceptComponent<?, ?>> removeCanceledFromList(Collection<? extends ConceptComponent<?, ?>> ccList) {
+        List<ConceptComponent<?, ?>> toRemove = new ArrayList<ConceptComponent<?, ?>>();
         if (ccList != null) {
             synchronized (ccList) {
-                List<ConceptComponent<?, ?>> toRemove = new ArrayList<ConceptComponent<?, ?>>();
                 for (ConceptComponent<?, ?> cc : ccList) {
                     if (cc.getTime() == Long.MIN_VALUE) {
                         toRemove.add(cc);
+            			Concept.componentsCRHM.remove(cc.getNid());
                     }
                 }
                 ccList.removeAll(toRemove);
-
             }
         }
+        return toRemove;
     }
 
     @Override

@@ -72,6 +72,10 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 			// we have to put it back so the component can read it again...
 			input.reset();
 			C conceptComponent = (C) Concept.componentsCRHM.get(nid);
+			if (conceptComponent != null && conceptComponent.getTime() == Long.MIN_VALUE) {
+				conceptComponent = null;
+				Concept.componentsCRHM.remove(nid);
+			}
 			if (nidToConceptComponentMap != null && 
 			        nidToConceptComponentMap.containsKey(nid)) {
 				if (conceptComponent == null) {
