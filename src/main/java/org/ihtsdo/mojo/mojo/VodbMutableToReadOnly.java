@@ -39,13 +39,14 @@ public class VodbMutableToReadOnly extends AbstractMojo {
 
     void executeMojo(File berkeleyDir) throws MojoExecutionException {
         try {
+            LuceneManager.setDbRootDir(berkeleyDir);
             FileIO.recursiveDelete(new File(berkeleyDir, "read-only"));
             File dirToMove = new File(berkeleyDir, "mutable");
             dirToMove.renameTo(new File(berkeleyDir, "read-only"));
             new File(berkeleyDir, "mutable").mkdir();
-            LuceneManager.setDbRootDir(berkeleyDir);
             Terms.createFactory(berkeleyDir, false, 0L, new DatabaseSetupConfig());
-            LuceneManager.writeToLucene((Collection<Description>) Ts.get().getConcept(ReferenceConcepts.CURRENT.getNid()).getDescs());
+            LuceneManager.writeToLucene((Collection<Description>) 
+                    Ts.get().getConcept(ReferenceConcepts.CURRENT.getNid()).getDescs());
             I_ImplementTermFactory termFactoryImpl = (I_ImplementTermFactory) Terms.get();
             termFactoryImpl.close();
 
