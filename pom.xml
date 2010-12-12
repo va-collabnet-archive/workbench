@@ -44,8 +44,8 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-api</artifactId>
-			<version>${project.version}</version>
-			<scope>compile</scope>
+			<version>2.6.0-trek-7-SNAPSHOT</version>
+		 <type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
