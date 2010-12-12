@@ -21,8 +21,7 @@ import org.ihtsdo.tk.example.binding.SnomedRelType;
 import org.ihtsdo.tk.example.binding.SnomedRelSpec;
 import org.ihtsdo.tk.example.binding.Taxonomies;
 import org.ihtsdo.tk.example.binding.WbDescType;
-
-
+import org.ihtsdo.arena.spec.Refsets; 
 
 #declare any global variables here
 
@@ -50,4 +49,35 @@ rule "add if null concept in host"
 	then 
 		actions.add(actionFactory.make(new File("plugins/component/new_concept.bp")));
 end
+
+rule "add if not in refset"
+	when 
+		$c: ConceptVersionBI (this not isMemberOf Refsets.TEST);
+	then 
+		actions.add(actionFactory.make(new File("plugins/add-concept/add_to_refset_test.bp")));
+end
+
+
+rule "remove if in refset"
+	when
+		$c: ConceptVersionBI (this isMemberOf Refsets.TEST); 
+	then 
+		actions.add(actionFactory.make(new File("plugins/remove-concept/remove_from_refset_test.bp")));
+end
+
+rule "add if not in refset test2"
+	when 
+		$c: ConceptVersionBI (this not isMemberOf Refsets.TEST2);
+	then 
+		actions.add(actionFactory.make(new File("plugins/add-concept/add_to_refset_test2.bp")));
+end
+
+
+rule "remove if in refset test2"
+	when
+		$c: ConceptVersionBI (this isMemberOf Refsets.TEST2); 
+	then 
+		actions.add(actionFactory.make(new File("plugins/remove-concept/remove_from_refset_test2.bp")));
+end
+
 

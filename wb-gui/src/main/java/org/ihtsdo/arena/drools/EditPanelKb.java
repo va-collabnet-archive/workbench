@@ -37,6 +37,7 @@ import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.drools.IsKindOfEvaluatorDefinition;
+import org.ihtsdo.tk.drools.IsMemberOfEvaluatorDefinition; //TODO this
 import org.ihtsdo.tk.drools.SatisfiesConstraintEvaluatorDefinition;
 import org.ihtsdo.tk.spec.SpecBI;
 
@@ -78,6 +79,9 @@ public class EditPanelKb implements Runnable {
 			builderConfig.setOption(EvaluatorOption.get(
 					SatisfiesConstraintEvaluatorDefinition.SATISFIES_CONSTRAINT.getOperatorString(),
 					new SatisfiesConstraintEvaluatorDefinition()));
+			builderConfig.setOption(EvaluatorOption.get( //TODO this
+					IsMemberOfEvaluatorDefinition.IS_MEMBER_OF.getOperatorString(),
+					new IsMemberOfEvaluatorDefinition()));
 			
 			KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
 

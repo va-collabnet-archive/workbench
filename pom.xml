@@ -141,6 +141,7 @@
         <module>wb-docs</module>
         <module>tk-concept-component</module>
         <module>tk-drools</module>
+        <module>tk-arena-spec</module>
         <module>tk-arena-rules</module>
         <module>rule-engine-integration</module>
     </modules>

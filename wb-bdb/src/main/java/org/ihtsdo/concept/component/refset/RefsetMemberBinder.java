@@ -73,6 +73,11 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
 			int nid = input.readInt();
 			input.reset();
 			RefsetMember<?, ?> refsetMember = (RefsetMember<?, ?>) Concept.componentsCRHM.get(nid);
+			if (refsetMember != null && refsetMember.getTime() == Long.MIN_VALUE) {
+				refsetMember = null;
+				Concept.componentsCRHM.remove(nid);
+			}
+
 			if (nidToRefsetMemberMap != null && nidToRefsetMemberMap.containsKey(nid)) {
 				if (refsetMember == null) {
 					refsetMember = nidToRefsetMemberMap.get(nid);

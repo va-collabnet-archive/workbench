@@ -14,6 +14,8 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.media.MediaVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.example.binding.Snomed;
+import org.ihtsdo.tk.spec.ConceptSpec;
 
 public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI {
 	
@@ -64,6 +66,11 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
 			ConstraintCheckType subjectCheck,
 			ConstraintCheckType propertyCheck,
 			ConstraintCheckType valueCheck) throws IOException, ContraditionException;
+	//TODO
+	
+	public boolean isMember(int conceptNid, int evalRefsetNid) throws IOException; 
+	
+	//TODO to here
 
 
 }

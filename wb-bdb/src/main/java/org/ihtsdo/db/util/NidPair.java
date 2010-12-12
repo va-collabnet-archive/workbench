@@ -40,7 +40,7 @@ public abstract class NidPair implements Comparable<NidPair> {
 		super();
 		this.nid1 = nid1;
 		this.nid2 = nid2;
-		HashFunction.hashCode(new int[] { nid1, nid2 });
+		this.hash = HashFunction.hashCode(new int[] { nid1, nid2 });
 	}
 	
 	public long asLong() {

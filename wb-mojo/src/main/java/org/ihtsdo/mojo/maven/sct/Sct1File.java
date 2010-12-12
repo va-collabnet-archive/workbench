@@ -3,7 +3,6 @@ package org.ihtsdo.mojo.maven.sct;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
@@ -19,10 +18,12 @@ public class Sct1File implements Comparable<Object> {
 
     File file;
     Date revDate;
-
+    long time;
+    
     public Sct1File(File f, Date d) {
         this.file = f;
         this.revDate = d;
+        this.time = d.getTime();
     }
 
     public String toString() {
@@ -60,8 +61,8 @@ public class Sct1File implements Comparable<Object> {
         // lineCount NOTE: REQUIRES THAT LAST LINE IS VALID RECORD
         return lineCount - 1;
     }
-
-    public static Date getFileRevDate(File f) throws ParseException {
+    
+    private static Date getFileRevDate(File f) throws ParseException {
         int pos;
         Date d1 = null;
         Date d2 = null;
