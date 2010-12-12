@@ -373,12 +373,11 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
             }
 
             I_ConfigAceFrame config = host.getConfig();
-            boolean inConflict = config.getHighlightConflictsInComponentPanel()
-                && config.getConflictResolutionStrategy().isInConflict((I_Identify) idTuple.getFixedIdPart());
+            boolean inConflict = false;
 
             switch (columns[columnIndex]) {
             case LOCAL_ID:
-                return new StringWithIdTuple(Integer.toString(idTuple.getNid()), idTuple, inConflict);
+                return new StringWithIdTuple(Integer.toString(host.getTermComponent().getNid()), idTuple, inConflict);
             case STATUS:
                 if (referencedConcepts.containsKey(idTuple.getStatusId())) {
                     return new StringWithIdTuple(getPrefText(idTuple.getStatusId()), idTuple, inConflict);
@@ -451,119 +450,6 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
 
     public void setProgress(SmallProgressPanel progress) {
         this.progress = progress;
-    }
-
-    public class PopupListener extends MouseAdapter {
-        private class ChangeActionListener implements ActionListener {
-
-            public ChangeActionListener() {
-                super();
-            }
-
-            public void actionPerformed(ActionEvent e) {
-                try {
-					for (PathBI p : config.getEditingPathSet()) {
-					    I_IdPart newPart = selectedObject.getTuple().duplicateIdPart();
-					    newPart.setPathId(p.getConceptNid());
-					    newPart.setVersion(Integer.MAX_VALUE);
-					    selectedObject.getTuple().getIdentifier().addMutableIdPart(newPart);
-					}
-					Terms.get().addUncommitted(Terms.get().getConcept(selectedObject.getTuple().getNid()));
-					allTuples = null;
-					IdTableModel.this.fireTableDataChanged();
-				} catch (TerminologyException e1) {
-					throw new RuntimeException(e1);
-				} catch (IOException e1) {
-					throw new RuntimeException(e1);
-				}
-            }
-        }
-
-        private class RetireActionListener implements ActionListener {
-
-            public RetireActionListener() {
-                super();
-            }
-
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    for (PathBI p : config.getEditingPathSet()) {
-                        I_IdPart newPart = selectedObject.getTuple().duplicateIdPart();
-                        newPart.setPathId(p.getConceptNid());
-                        newPart.setVersion(Integer.MAX_VALUE);
-                        newPart.setStatusId(Terms.get().uuidToNative(
-                            ArchitectonicAuxiliary.Concept.RETIRED.getUids()));
-                        referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
-                        selectedObject.getTuple().getIdentifier().addMutableIdPart(newPart);
-                    }
-                    Terms.get().addUncommitted(Terms.get().getConcept(selectedObject.getTuple().getNid()));
-                    allTuples = null;
-                    IdTableModel.this.fireTableDataChanged();
-                } catch (Exception ex) {
-                    AceLog.getAppLog().alertAndLogException(ex);
-                }
-            }
-        }
-
-        JPopupMenu popup;
-
-        JTable table;
-
-        ActionListener retire;
-
-        ActionListener change;
-
-        StringWithIdTuple selectedObject;
-
-        I_ConfigAceFrame config;
-
-        public PopupListener(JTable table, I_ConfigAceFrame config) {
-            super();
-            this.table = table;
-            this.config = config;
-            retire = new RetireActionListener();
-            change = new ChangeActionListener();
-        }
-
-        private void makePopup(MouseEvent e) {
-            popup = new JPopupMenu();
-            JMenuItem noActionItem = new JMenuItem("");
-            popup.add(noActionItem);
-            int column = table.columnAtPoint(e.getPoint());
-            int row = table.rowAtPoint(e.getPoint());
-            selectedObject = (StringWithIdTuple) table.getValueAt(row, column);
-            JMenuItem changeItem = new JMenuItem("Change");
-            popup.add(changeItem);
-            changeItem.addActionListener(change);
-            JMenuItem retireItem = new JMenuItem("Retire");
-            popup.add(retireItem);
-            retireItem.addActionListener(retire);
-        }
-
-        public void mousePressed(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        public void mouseReleased(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        private void maybeShowPopup(MouseEvent e) {
-            if (e.isPopupTrigger()) {
-                if (config.getEditingPathSet().size() > 0) {
-                    makePopup(e);
-                    popup.show(e.getComponent(), e.getX(), e.getY());
-                } else {
-                    JOptionPane.showMessageDialog(table.getTopLevelAncestor(),
-                        "You must select at least one path to edit on...");
-                }
-            }
-            e.consume();
-        }
-    }
-
-    public PopupListener makePopupListener(JTable table, I_ConfigAceFrame config) {
-        return new PopupListener(table, config);
     }
 
     public static class IdStatusFieldEditor extends AbstractPopupFieldEditor {

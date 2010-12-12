@@ -7,5 +7,5 @@ public interface ComponentVersionBI extends ComponentBI {
     public int getAuthorNid();
     public int getPathNid();
     public long getTime();
-
+    public int getSapNid();
 }

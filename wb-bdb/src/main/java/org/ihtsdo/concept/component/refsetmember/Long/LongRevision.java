@@ -13,136 +13,155 @@ import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import java.util.Collection;
+import org.ihtsdo.concept.component.refsetmember.Long.LongMember.Version;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.refset.RefsetMemberVersionBI;
 
 public class LongRevision extends RefsetRevision<LongRevision, LongMember>
-	implements I_ExtendByRefPartLong {
+        implements I_ExtendByRefPartLong {
 
-	private long longValue;
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+    private long longValue;
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();  
+        StringBuffer buf = new StringBuffer();
         buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" longValue:" + this.longValue);
         buf.append(super.toString());
         return buf.toString();
     }
 
-
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return false;
+        }
         if (LongRevision.class.isAssignableFrom(obj.getClass())) {
             LongRevision another = (LongRevision) obj;
-            return this.longValue == another.longValue && 
-            super.equals(obj);
+            return this.longValue == another.longValue
+                    && super.equals(obj);
         }
         return false;
     }
 
-    
-    public LongRevision(int statusNid, int pathNid, long time, 
-			LongMember primoridalMember) {
-		super(statusNid, pathNid, time, 
-				primoridalMember);
-		longValue = primoridalMember.getLongValue();
-	}
+    public LongRevision(int statusNid, int pathNid, long time,
+            LongMember primoridalMember) {
+        super(statusNid, pathNid, time,
+                primoridalMember);
+        longValue = primoridalMember.getLongValue();
+    }
 
-    public LongRevision(int statusNid, int authorNid, int pathNid, long time, 
-			LongMember primoridalMember) {
-		super(statusNid, authorNid, pathNid, time, 
-				primoridalMember);
-		longValue = primoridalMember.getLongValue();
-	}
+    public LongRevision(int statusNid, int authorNid, int pathNid, long time,
+            LongMember primoridalMember) {
+        super(statusNid, authorNid, pathNid, time,
+                primoridalMember);
+        longValue = primoridalMember.getLongValue();
+    }
 
-	public LongRevision(int statusAtPositionNid, 
-			LongMember primoridalMember) {
-		super(statusAtPositionNid, primoridalMember);
-		longValue = primoridalMember.getLongValue();
-	}
+    public LongRevision(int statusAtPositionNid,
+            LongMember primoridalMember) {
+        super(statusAtPositionNid, primoridalMember);
+        longValue = primoridalMember.getLongValue();
+    }
 
-	protected LongRevision(int statusNid, int authorNid, int pathNid, long time, 
-			LongRevision another) {
-		super(statusNid, authorNid, pathNid, time, another.primordialComponent);
-		longValue = another.longValue;
-	}
+    protected LongRevision(int statusNid, int authorNid, int pathNid, long time,
+            LongRevision another) {
+        super(statusNid, authorNid, pathNid, time, another.primordialComponent);
+        longValue = another.longValue;
+    }
 
-	protected LongRevision(int statusNid, int pathNid, long time, 
-			LongRevision another) {
-		super(statusNid, pathNid, time, another.primordialComponent);
-		longValue = another.longValue;
-	}
+    protected LongRevision(int statusNid, int pathNid, long time,
+            LongRevision another) {
+        super(statusNid, pathNid, time, another.primordialComponent);
+        longValue = another.longValue;
+    }
 
-	@Override
-	public LongRevision makeAnalog(int statusNid, int pathNid, long time) {
+    @Override
+    public LongRevision makeAnalog(int statusNid, int pathNid, long time) {
         LongRevision newR = new LongRevision(statusNid, pathNid, time, this);
         primordialComponent.addRevision(newR);
         return newR;
-	}
+    }
 
-
-	@Override
-	public LongRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+    @Override
+    public LongRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
         LongRevision newR = new LongRevision(statusNid, authorNid, pathNid, time, this);
         primordialComponent.addRevision(newR);
         return newR;
-	}
-
+    }
 
     @Override
     public LongRevision makeAnalog() {
-         return new LongRevision(getStatusNid(), getPathNid(), getTime(), this);
+        return new LongRevision(getStatusNid(), getPathNid(), getTime(), this);
     }
 
-	public LongRevision(TupleInput input, 
-			LongMember primoridalMember) {
-		super(input, primoridalMember);
-		longValue = input.readLong();
-	}
+    public LongRevision(TupleInput input,
+            LongMember primoridalMember) {
+        super(input, primoridalMember);
+        longValue = input.readLong();
+    }
 
-	public LongRevision(TkRefsetLongRevision eVersion,
-			LongMember member) {
-		super(eVersion, member);
-		this.longValue = eVersion.getLongValue();
-	}
+    public LongRevision(TkRefsetLongRevision eVersion,
+            LongMember member) {
+        super(eVersion, member);
+        this.longValue = eVersion.getLongValue();
+    }
 
     public LongRevision() {
         super();
     }
-    
+
     @Override
-	public UniversalAceExtByRefPart getUniversalPart()
-			throws TerminologyException, IOException {
-		// TODO
-		throw new UnsupportedOperationException();
-	}
+    public UniversalAceExtByRefPart getUniversalPart()
+            throws TerminologyException, IOException {
+        // TODO
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
-		// TODO
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
+        // TODO
+        throw new UnsupportedOperationException();
+    }
 
-	public long getLongValue() {
-		return longValue;
-	}
+    public long getLongValue() {
+        return longValue;
+    }
 
-	public void setLongValue(long longValue) {
-		this.longValue = longValue;
+    public void setLongValue(long longValue) {
+        this.longValue = longValue;
         modified();
-	}
+    }
+
     @Override
     protected void writeFieldsToBdb(TupleOutput output) {
         output.writeLong(longValue);
     }
-    
+
     @Override
     public ArrayIntList getVariableVersionNids() {
         return new ArrayIntList(2);
     }
 
+    @Override
+    public LongMember.Version getVersion(Coordinate c)
+            throws ContraditionException {
+        return (Version) ((LongMember) primordialComponent).getVersion(c);
+    }
+
+    @Override
+    public Collection<LongMember.Version> getVersions() {
+        return ((LongMember) primordialComponent).getVersions();
+    }
+
+    @Override
+    public Collection<? extends RefsetMemberVersionBI> getVersions(
+            Coordinate c) {
+        return ((LongMember) primordialComponent).getVersions(c);
+    }
 }

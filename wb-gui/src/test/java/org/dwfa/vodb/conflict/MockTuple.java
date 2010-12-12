@@ -30,6 +30,7 @@ import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -240,5 +241,10 @@ public class MockTuple implements I_AmTuple {
 	public String toUserString() {
 	       throw new UnsupportedOperationException();
 	}
+
+    @Override
+    public int getSapNid() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 
 }

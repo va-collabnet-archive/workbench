@@ -24,52 +24,63 @@ public interface I_IdPart {
 
     public void setAuthorityNid(int sourceNid);
 
+    /**
+     * Denotation: the act of pointing out by name. Used as an 
+     * alternative to the repeated use of identifier with different
+     * contextual meanings. 
+     * @return
+     */
     public Object getDenotation();
 
     public void setDenotation(Object sourceId);
 
     @Deprecated
     public I_IdPart duplicateIdPart();
-    
+
     @Deprecated
-	public int getPathId();
-	public int getPathNid();
-        public int getAuthorNid();
-	public int getVersion();
-	public long getTime();
-	@Deprecated
-	public int getStatusId();
-	public int getStatusNid();
-	
-	public ArrayIntList getPartComponentNids();
-	
-	/**
-	 * 1. Analog, an object, concept or situation which in some way resembles a different situation
-	 * 2. Analogy, in language, a comparison between concepts
-	 * @param statusNid
-	 * @param pathNid
-	 * @param time
-	 * @return
-	 */
-	public I_IdPart makeIdAnalog(int statusNid, int authorNid, int pathNid, long time);
+    public int getPathId();
 
-	/**
-	 * 
-	 * @param pathId
-	 * @deprecated use makeAnalog
-	 */
-	@Deprecated 
-	public void setPathId(int pathId);
-	/**
-	 * 
-	 * @param version
-	 * @deprecated use makeAnalog
-	 */
-	@Deprecated 
-	public void setVersion(int version);
-	
-	
-	@Deprecated 
-	public void setStatusId(int statusId);
+    public int getPathNid();
 
+    public int getAuthorNid();
+
+    public int getVersion();
+
+    public long getTime();
+
+    @Deprecated
+    public int getStatusId();
+
+    public int getStatusNid();
+
+    public ArrayIntList getPartComponentNids();
+
+    /**
+     * 1. Analog, an object, concept or situation which in some way resembles a different situation
+     * 2. Analogy, in language, a comparison between concepts
+     * @param statusNid
+     * @param pathNid
+     * @param time
+     * @return
+     */
+    public I_IdPart makeIdAnalog(int statusNid, int authorNid, int pathNid, long time);
+
+    /**
+     * 
+     * @param pathId
+     * @deprecated use makeAnalog
+     */
+    @Deprecated
+    public void setPathId(int pathId);
+
+    /**
+     * 
+     * @param version
+     * @deprecated use makeAnalog
+     */
+    @Deprecated
+    public void setVersion(int version);
+
+    @Deprecated
+    public void setStatusId(int statusId);
 }

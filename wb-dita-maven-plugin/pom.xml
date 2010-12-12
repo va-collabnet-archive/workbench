@@ -8,7 +8,7 @@
   </parent>
   <artifactId>wb-dita-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <name>workbench Maven DITA documentation mojo</name>
+  <name>Workbench Maven DITA documentation mojo</name>
   <description>This Maven plugin (or mojo - Maven plain Old Java Object) builds a set of DITA topic
     files that can, in turn, be used to build documentation for the IHTSDO workbench. In this case,
     the DITA topic files describe each of the Workbench Business Process Automation tasks.

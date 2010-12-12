@@ -106,14 +106,15 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
 	private int c1Nid;
 	private int c2Nid;
 
-	public CidCidMember(Concept enclosingConcept, 
+	public CidCidMember(int enclosingConceptNid, 
 			TupleInput input) throws IOException {
-		super(enclosingConcept, 
+		super(enclosingConceptNid, 
 				input);
 	}
 
-	public CidCidMember(TkRefsetCidCidMember refsetMember, Concept enclosingConcept) throws IOException {
-		super(refsetMember, enclosingConcept);
+	public CidCidMember(TkRefsetCidCidMember refsetMember, 
+                int enclosingConceptNid) throws IOException {
+		super(refsetMember, enclosingConceptNid);
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		c2Nid = Bdb.uuidToNid(refsetMember.getC2Uuid());
 		if (refsetMember.getRevisionList() != null) {

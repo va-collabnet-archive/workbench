@@ -67,11 +67,13 @@ import org.dwfa.ace.task.classify.SnoRel;
 import org.dwfa.ace.task.classify.SnoTable;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.refset.RefsetMemberChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
@@ -336,6 +338,21 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 		public UUID getPrimUuid() {
 			return core.getPrimUuid();
 		}
+
+        @Override
+        public boolean addAnnotation(RefsetMemberChronicleBI annotation) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public Collection<? extends RefsetMemberChronicleBI> getAnnotations() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public int getSapNid() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
     }
 
     
@@ -695,6 +712,21 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         @Override
         public boolean hasExtensions() {
             return false;
+        }
+
+        @Override
+        public boolean addAnnotation(RefsetMemberChronicleBI annotation) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public Collection<? extends RefsetMemberChronicleBI> getAnnotations() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public int getSapNid() {
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
     }

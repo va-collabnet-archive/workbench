@@ -14,6 +14,10 @@ import org.ihtsdo.tk.dto.concept.component.refset.cidcidstr.TkRefsetCidCidStrRev
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import java.util.Collection;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.refset.RefsetMemberVersionBI;
 
 public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidStrMember>
 	implements I_ExtendByRefPartCidCidString {
@@ -236,5 +240,23 @@ public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidS
         variableNids.add(getC2id());
         return variableNids;
     }
+       
+    @Override
+    public CidCidStrMember.Version getVersion(Coordinate c)
+            throws ContraditionException {
+        return (CidCidStrMember.Version) ((CidCidStrMember) primordialComponent).getVersion(c);
+    }
+
+    @Override
+    public Collection<CidCidStrMember.Version> getVersions() {
+        return ((CidCidStrMember) primordialComponent).getVersions();
+    }
+
+    @Override
+    public Collection<? extends RefsetMemberVersionBI> getVersions(
+            Coordinate c) {
+        return ((CidCidStrMember) primordialComponent).getVersions(c);
+    }
+
 
 }

@@ -156,6 +156,7 @@ import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 import com.sleepycat.je.DatabaseException;
+import org.ihtsdo.tk.api.refset.RefsetMemberChronicleBI;
 
 public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_Search {
 
@@ -327,6 +328,16 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             	addedMembers.add(ext.getNid());
                 returnValues.add(ext);
             }
+        }
+        
+        ComponentBI component = 
+                Bdb.getComponent(nid);
+        if (component instanceof Concept) {
+            component = ((Concept) component).getConceptAttributes();
+        }
+        ComponentChroncileBI<?> cc = (ComponentChroncileBI<?>) component;
+        for (RefsetMemberChronicleBI annotation: cc.getAnnotations()) {
+            returnValues.add((I_ExtendByRef) annotation);
         }
         return returnValues;
     }

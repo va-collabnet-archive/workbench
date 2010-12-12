@@ -1,4 +1,4 @@
-package org.ihtsdo.mojo.maven;
+package org.ihtsdo.mojo.econcept;
 
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;

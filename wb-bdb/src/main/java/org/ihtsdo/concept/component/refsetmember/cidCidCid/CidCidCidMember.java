@@ -128,13 +128,13 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 	private int c2Nid;
 	private int c3Nid;
 
-	public CidCidCidMember(Concept enclosingConcept, TupleInput input) throws IOException {
-		super(enclosingConcept, input);
+	public CidCidCidMember(int enclosingConceptNid, TupleInput input) throws IOException {
+		super(enclosingConceptNid, input);
 	}
 
 	public CidCidCidMember(TkRefsetCidCidCidMember refsetMember, 
-			Concept enclosingConcept) throws IOException {
-		super(refsetMember, enclosingConcept);
+			int enclosingConceptNid) throws IOException {
+		super(refsetMember, enclosingConceptNid);
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		c2Nid = Bdb.uuidToNid(refsetMember.getC2Uuid());
 		c3Nid = Bdb.uuidToNid(refsetMember.getC3Uuid());

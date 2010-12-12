@@ -27,6 +27,7 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
         super.readExternal(in, dataVersion);
         defined = in.readBoolean();
         int versionCount = in.readInt();
+        assert versionCount < 1024: "Version count is: " + versionCount;
         if (versionCount > 0) {
             revisions = new ArrayList<TkConceptAttributesRevision>(versionCount);
             for (int i = 0; i < versionCount; i++) {
@@ -42,8 +43,10 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
         if (revisions == null) {
             out.writeInt(0);
         } else {
+            assert revisions.size() < 1024: "Version count is: " + 
+                    revisions.size() + "\n\n" + this.toString();
             out.writeInt(revisions.size());
-            for (TkConceptAttributesRevision cav : revisions) {
+            for (TkConceptAttributesRevision cav: revisions) {
                 cav.writeExternal(out);
             }
         }

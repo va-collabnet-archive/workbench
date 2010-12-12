@@ -35,6 +35,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimerTask;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
@@ -96,10 +98,12 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
 
         private class TextFieldFocusListener implements FocusListener {
 
+            @Override
             public void focusGained(FocusEvent e) {
                 // nothing to do
             }
 
+            @Override
             public void focusLost(FocusEvent e) {
                 delegate.stopCellEditing();
             }
@@ -120,6 +124,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             delegate = new EditorDelegate() {
                 private static final long serialVersionUID = 1L;
 
+                @Override
                 public void setValue(Object value) {
                     if (StringWithExtTuple.class.isAssignableFrom(value.getClass())) {
                         StringWithExtTuple swet = (StringWithExtTuple) value;
@@ -129,6 +134,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                     }
                 }
 
+                @Override
                 public Object getCellEditorValue() {
                     return textField.getText();
                 }
@@ -136,6 +142,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             textField.addActionListener(delegate);
         }
 
+        @Override
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
             this.row = row;
             this.column = column;
@@ -191,10 +198,12 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             delegate = new EditorDelegate() {
                 private static final long serialVersionUID = 1L;
 
+                @Override
                 public void setValue(Object value) {
                     combo.setSelectedItem(getSelectedItem(value));
                 }
 
+                @Override
                 public Object getCellEditorValue() {
                     return ((I_GetConceptData) combo.getSelectedItem()).getConceptNid();
                 }
@@ -209,6 +218,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             }
         }
 
+        @Override
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
             try {
                 populatePopup();
@@ -451,9 +461,9 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
 
     ArrayList<I_ExtendByRef> allExtensions;
 
-    Map<Integer, I_GetConceptData> referencedConcepts = new HashMap<Integer, I_GetConceptData>();
+    Map<Integer, I_GetConceptData> referencedConcepts = new ConcurrentHashMap<Integer, I_GetConceptData>();
 
-    private Set<Integer> conceptsToFetch = new HashSet<Integer>();
+    private Set<Integer> conceptsToFetch = new ConcurrentSkipListSet<Integer>();
 
     private TableChangedSwingWorker tableChangeWorker;
 
@@ -490,7 +500,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
         @Override
         protected Map<Integer, I_GetConceptData> construct() throws Exception {
             getProgress().setActive(true);
-            Map<Integer, I_GetConceptData> concepts = new HashMap<Integer, I_GetConceptData>();
+            Map<Integer, I_GetConceptData> concepts = new ConcurrentHashMap<Integer, I_GetConceptData>();
             for (Integer id : new HashSet<Integer>(conceptsToFetch)) {
                 if (stopWork) {
                     break;
@@ -507,7 +517,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             super.finished();
             if (getProgress() != null) {
                 getProgress().getProgressBar().setIndeterminate(false);
-                if (conceptsToFetch.size() == 0) {
+                if (conceptsToFetch.isEmpty()) {
                     getProgress().getProgressBar().setValue(1);
                 } else {
                     getProgress().getProgressBar().setValue(conceptsToFetch.size());
@@ -561,7 +571,6 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 if (stopWork) {
                     return false;
                 }
-                conceptsToFetch.add(ext.getRefsetId());
                 List<? extends I_ExtendByRefVersion> parts = new ArrayList<I_ExtendByRefVersion>();
                 if (!host.getShowHistory()) {
                     parts = ext.getTuples(allowedStatus, null,
@@ -607,6 +616,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                         AceLog.getAppLog().info("all tuples for RefsetMemberTableModel is  null");
                         return false;
                     }
+                    conceptsToFetch.add(ext.getRefsetId());
                     allTuples.add(tuple);
                 }
             }
@@ -622,7 +632,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             try {
                 if (getProgress() != null) {
                     getProgress().getProgressBar().setIndeterminate(false);
-                    if (conceptsToFetch.size() == 0) {
+                    if (conceptsToFetch.isEmpty()) {
                         getProgress().getProgressBar().setValue(1);
                         getProgress().getProgressBar().setMaximum(1);
                     } else {

@@ -50,18 +50,32 @@ public class ConceptVersion implements ConceptVersionBI {
 
     private Concept concept;
 
+    @Override
+    public void setAnnotationStyleRefset(boolean annotationStyleRefset) {
+        concept.setAnnotationStyleRefset(annotationStyleRefset);
+    }
+
+    @Override
+    public boolean isAnnotationStyleRefset() throws IOException {
+        return concept.isAnnotationStyleRefset();
+    }
+
+    @Override
     public boolean isUncommitted() {
         return concept.isUncommitted();
     }
 
+    @Override
     public UUID getPrimUuid() {
         return concept.getPrimUuid();
     }
 
+    @Override
     public int getConceptNid() {
         return concept.getConceptNid();
     }
 
+    @Override
     public List<UUID> getUUIDs() {
         return concept.getUUIDs();
     }
@@ -554,7 +568,12 @@ public class ConceptVersion implements ConceptVersionBI {
             throws IOException {
         throw new UnsupportedOperationException();
     }
-    
+
+    @Override
+    public int getSapNid() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     //TODO
     @Override
     public boolean isMember(int conceptNid, int evalRefsetNid) throws IOException{ 
@@ -588,8 +607,6 @@ public class ConceptVersion implements ConceptVersionBI {
     }
     
     //TODO to here
-    }
+}
     
 		
-    
-

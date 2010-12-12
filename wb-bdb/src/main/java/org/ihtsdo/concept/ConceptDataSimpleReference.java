@@ -44,6 +44,8 @@ import com.sleepycat.bind.tuple.TupleInput;
 public class ConceptDataSimpleReference extends ConceptDataManager {
 
     private static HashMap<I_ConfigAceFrame, IsLeafBinder> isLeafBinders = new HashMap<I_ConfigAceFrame, IsLeafBinder>();
+    
+    private Boolean annotationStyleRefset;
 
     private AtomicReference<ConceptAttributes> attributes = new AtomicReference<ConceptAttributes>();
     private AtomicReference<AddSrcRelSet> srcRels = new AtomicReference<AddSrcRelSet>();
@@ -64,6 +66,8 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         new AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>>();
     private AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>> refsetComponentMap =
         new AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>>();
+        
+
 
     public ConceptDataSimpleReference(Concept enclosingConcept) throws IOException {
         super(new NidDataFromBdb(enclosingConcept.getNid()));
@@ -77,6 +81,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         this.enclosingConcept = enclosingConcept;
     }
     
+    @Override
     public boolean hasUncommittedComponents() {
         if (hasUncommittedVersion(attributes.get()) ||
         		hasUncommittedId(attributes.get())) {
@@ -603,39 +608,22 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                     }
                 }
             }
-        } else {
-            IsLeafBinder leafBinder = isLeafBinders.get(aceConfig);
-            if (leafBinder == null) {
-                leafBinder = new IsLeafBinder(aceConfig);
-                if (isLeafBinders.size() > 5) {
-                    isLeafBinders.clear();
-                }
-                isLeafBinders.put(aceConfig, leafBinder);
-            }
-            
-            TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
-            if (readOnlyInput.available() > OFFSETS.getHeaderSize()) {
-                readOnlyInput.mark(OFFSETS.getHeaderSize());
-                readOnlyInput.skipFast(OFFSETS.DEST_REL_NID_TYPE_NIDS.offset);
-                int dataOffset = readOnlyInput.readInt();
-                readOnlyInput.reset();
-                readOnlyInput.skipFast(dataOffset);
-                isLeaf = leafBinder.entryToObject(readOnlyInput);
-            }
-            
-            if (isLeaf) {
-                TupleInput mutableInput = nidData.getMutableTupleInput();
-                if (mutableInput.available() > OFFSETS.getHeaderSize()) {
-                    mutableInput.mark(OFFSETS.getHeaderSize());
-                    mutableInput.skipFast(OFFSETS.DEST_REL_NID_TYPE_NIDS.offset);
-                    int dataOffset = mutableInput.readInt();
-                    mutableInput.reset();
-                    mutableInput.skipFast(dataOffset);
-                    isLeaf = leafBinder.entryToObject(mutableInput);
-                }
-            }
         }
         return isLeaf;
+    }
+
+    
+    @Override
+    public boolean isAnnotationStyleRefset() throws IOException {
+        if (annotationStyleRefset == null) {
+            annotationStyleRefset = getIsAnnotationStyleRefset();
+        }
+        return annotationStyleRefset;
+    }
+
+    public void setAnnotationStyleRefset(boolean annotationStyleRefset) {
+        modified();
+        this.annotationStyleRefset = annotationStyleRefset;
     }
 
 }

@@ -30,104 +30,105 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class CidIntMember extends RefsetMember<CidIntRevision, CidIntMember> implements I_ExtendByRefPartCidInt {
 
-	private static VersionComputer<RefsetMember<CidIntRevision, CidIntMember>.Version> computer = 
-		new VersionComputer<RefsetMember<CidIntRevision, CidIntMember>.Version>();
+    private static VersionComputer<RefsetMember<CidIntRevision, CidIntMember>.Version> computer =
+            new VersionComputer<RefsetMember<CidIntRevision, CidIntMember>.Version>();
 
-	protected VersionComputer<RefsetMember<CidIntRevision, CidIntMember>.Version> getVersionComputer() {
-		return computer;
-	}
+    protected VersionComputer<RefsetMember<CidIntRevision, CidIntMember>.Version> getVersionComputer() {
+        return computer;
+    }
 
-	public class Version 
-	extends RefsetMember<CidIntRevision, CidIntMember>.Version 
-	implements I_ExtendByRefVersion, I_ExtendByRefPartCidInt {
+    public class Version
+            extends RefsetMember<CidIntRevision, CidIntMember>.Version
+            implements I_ExtendByRefVersion, I_ExtendByRefPartCidInt {
 
-		private Version() {
-			super();
-		}
+        private Version() {
+            super();
+        }
 
-		private Version(int index) {
-			super(index);
-		}
+        private Version(int index) {
+            super(index);
+        }
 
-		public int compareTo(I_ExtendByRefPart o) {
-			if (I_ExtendByRefPartCidInt.class.isAssignableFrom(o.getClass())) {
-				I_ExtendByRefPartCidInt another = (I_ExtendByRefPartCidInt) o;
-				if (this.getC1id() != another.getC1id()) {
-					return this.getC1id() - another.getC1id();
-				}
-				if (this.getIntValue() != another.getIntValue()) {
-					return this.getIntValue() - another.getIntValue();
-				}
-			}
-			return super.compareTo(o);
-		}
+        public int compareTo(I_ExtendByRefPart o) {
+            if (I_ExtendByRefPartCidInt.class.isAssignableFrom(o.getClass())) {
+                I_ExtendByRefPartCidInt another = (I_ExtendByRefPartCidInt) o;
+                if (this.getC1id() != another.getC1id()) {
+                    return this.getC1id() - another.getC1id();
+                }
+                if (this.getIntValue() != another.getIntValue()) {
+                    return this.getIntValue() - another.getIntValue();
+                }
+            }
+            return super.compareTo(o);
+        }
 
-		@Override
-		public int getC1id() {
-			if (index >= 0) {
-				return revisions.get(index).getC1id();
-			}
-			return CidIntMember.this.getC1Nid();
-		}
+        @Override
+        public int getC1id() {
+            if (index >= 0) {
+                return revisions.get(index).getC1id();
+            }
+            return CidIntMember.this.getC1Nid();
+        }
 
-		@Override
-		public void setC1id(int c1id) {
-			if (index >= 0) {
-				revisions.get(index).setC1id(c1id);
-			}
-			CidIntMember.this.setC1Nid(c1id);
-		}
+        @Override
+        public void setC1id(int c1id) {
+            if (index >= 0) {
+                revisions.get(index).setC1id(c1id);
+            }
+            CidIntMember.this.setC1Nid(c1id);
+        }
 
+        @Override
+        public I_ExtendByRefPartCidInt duplicate() {
+            return (I_ExtendByRefPartCidInt) super.duplicate();
+        }
 
-		@Override
-		public I_ExtendByRefPartCidInt duplicate() {
-			return (I_ExtendByRefPartCidInt) super.duplicate();
-		}
+        @Override
+        public int getIntValue() {
+            if (index >= 0) {
+                return revisions.get(index).getIntValue();
+            }
+            return CidIntMember.this.getIntValue();
+        }
 
-		@Override
-		public int getIntValue() {
-			if (index >= 0) {
-				return revisions.get(index).getIntValue();
-			}
-			return CidIntMember.this.getIntValue();
-		}
+        @Override
+        public void setIntValue(int intValue) {
+            if (index >= 0) {
+                revisions.get(index).setIntValue(intValue);
+            }
+            CidIntMember.this.setIntValue(intValue);
+        }
 
-		@Override
-		public void setIntValue(int intValue) {
-			if (index >= 0) {
-				revisions.get(index).setIntValue(intValue);
-			}
-			CidIntMember.this.setIntValue(intValue);
-		}
-		@Override
-		public ERefsetCidIntMember getERefsetMember() throws TerminologyException, IOException {
-			return new ERefsetCidIntMember(this);
-		}
+        @Override
+        public ERefsetCidIntMember getERefsetMember() throws TerminologyException, IOException {
+            return new ERefsetCidIntMember(this);
+        }
 
-		@Override
-		public ERefsetCidIntRevision getERefsetRevision() throws TerminologyException, IOException {
-			return new ERefsetCidIntRevision(this);
-		}
-	}
+        @Override
+        public ERefsetCidIntRevision getERefsetRevision() throws TerminologyException, IOException {
+            return new ERefsetCidIntRevision(this);
+        }
+    }
+    private int c1Nid;
+    private int intValue;
 
-	private int c1Nid;
-	private int intValue;
+    public CidIntMember(int enclosingConceptNid,
+            TupleInput input) throws IOException {
+        super(enclosingConceptNid, input);
+    }
 
-	public CidIntMember(Concept enclosingConcept, TupleInput input) throws IOException {
-		super(enclosingConcept, input);
-	}
-
-	public CidIntMember(TkRefsetCidIntMember refsetMember, Concept enclosingConcept) throws IOException {
-		super(refsetMember, enclosingConcept);
-		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
-		intValue = refsetMember.getIntValue();
-		if (refsetMember.getRevisionList() != null) {
-			revisions = new CopyOnWriteArrayList<CidIntRevision>();
-			for (TkRefsetCidIntRevision eVersion: refsetMember.getRevisionList()) {
-				revisions.add(new CidIntRevision(eVersion, this));
-			}
-		}
-	}
+    public CidIntMember(TkRefsetCidIntMember refsetMember,
+            int enclosingConceptNid) throws IOException {
+        super(refsetMember, enclosingConceptNid);
+        c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
+        intValue = refsetMember.getIntValue();
+        if (refsetMember.getRevisionList() != null) {
+            revisions = new CopyOnWriteArrayList<CidIntRevision>();
+            for (TkRefsetCidIntRevision eVersion : refsetMember.getRevisionList()) {
+                revisions.add(new CidIntRevision(eVersion, this));
+            }
+        }
+    }
 
     public CidIntMember() {
         super();
@@ -135,8 +136,9 @@ public class CidIntMember extends RefsetMember<CidIntRevision, CidIntMember> imp
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return false;
+        }
         if (CidIntMember.class.isAssignableFrom(obj.getClass())) {
             CidIntMember another = (CidIntMember) obj;
             if (super.equals(another)) {
@@ -148,34 +150,35 @@ public class CidIntMember extends RefsetMember<CidIntRevision, CidIntMember> imp
 
     @Override
     public int hashCode() {
-        return HashFunction.hashCode(new int[] { c1Nid });
-    } 
-    
+        return HashFunction.hashCode(new int[]{c1Nid});
+    }
+
     @Override
-	protected boolean membersEqual(
-			ConceptComponent<CidIntRevision, CidIntMember> obj) {
-		if (CidFloatMember.class.isAssignableFrom(obj.getClass())) {
-			CidIntMember another = (CidIntMember) obj;
-			return this.c1Nid == another.c1Nid && this.intValue == another.intValue;
-		}
-		return false;
-	}
+    protected boolean membersEqual(
+            ConceptComponent<CidIntRevision, CidIntMember> obj) {
+        if (CidFloatMember.class.isAssignableFrom(obj.getClass())) {
+            CidIntMember another = (CidIntMember) obj;
+            return this.c1Nid == another.c1Nid && this.intValue == another.intValue;
+        }
+        return false;
+    }
 
-	@Override
-	protected final CidIntRevision readMemberRevision(TupleInput input) {
-		return new CidIntRevision(input, this);
-	}
-	@Override
-	protected void readMemberFields(TupleInput input) {
-		c1Nid = input.readInt();
-		intValue = input.readInt();
-	}
-	@Override
-	protected void writeMember(TupleOutput output) {
-		output.writeInt(c1Nid);
-		output.writeInt(intValue);
-	}
+    @Override
+    protected final CidIntRevision readMemberRevision(TupleInput input) {
+        return new CidIntRevision(input, this);
+    }
 
+    @Override
+    protected void readMemberFields(TupleInput input) {
+        c1Nid = input.readInt();
+        intValue = input.readInt();
+    }
+
+    @Override
+    protected void writeMember(TupleOutput output) {
+        output.writeInt(c1Nid);
+        output.writeInt(intValue);
+    }
 
     @Override
     public ArrayIntList getVariableVersionNids() {
@@ -184,28 +187,27 @@ public class CidIntMember extends RefsetMember<CidIntRevision, CidIntMember> imp
         return variableNids;
     }
 
-	@Override
-	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+    @Override
+    public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
         if (this.getTime() == time && this.getPathNid() == pathNid) {
             this.setStatusNid(statusNid);
             return this;
         }
-		CidIntRevision newR = new CidIntRevision(statusNid, pathNid, time, this);
-		addRevision(newR);
-		return newR;
-	}
+        CidIntRevision newR = new CidIntRevision(statusNid, pathNid, time, this);
+        addRevision(newR);
+        return newR;
+    }
 
-	@Override
-	public I_AmPart makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+    @Override
+    public I_AmPart makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
         if (this.getTime() == time && this.getPathNid() == pathNid) {
             this.setStatusNid(statusNid);
             return this;
         }
-		CidIntRevision newR = new CidIntRevision(statusNid, authorNid, pathNid, time, this);
-		addRevision(newR);
-		return newR;
-	}
-
+        CidIntRevision newR = new CidIntRevision(statusNid, authorNid, pathNid, time, this);
+        addRevision(newR);
+        return newR;
+    }
 
     @Override
     public CidIntRevision makeAnalog() {
@@ -213,78 +215,79 @@ public class CidIntMember extends RefsetMember<CidIntRevision, CidIntMember> imp
         return newR;
     }
 
-	public int getC1Nid() {
-		return c1Nid;
-	}
+    public int getC1Nid() {
+        return c1Nid;
+    }
 
-	public void setC1Nid(int c1Nid) {
-		this.c1Nid = c1Nid;
+    public void setC1Nid(int c1Nid) {
+        this.c1Nid = c1Nid;
         modified();
-	}
+    }
 
-	public int getIntValue() {
-		return intValue;
-	}
+    public int getIntValue() {
+        return intValue;
+    }
 
-	public void setIntValue(int intValue) {
-		this.intValue = intValue;
+    public void setIntValue(int intValue) {
+        this.intValue = intValue;
         modified();
-	}
+    }
 
-	@Override
-	public int getTypeId() {
-		return REFSET_TYPES.CID_INT.getTypeNid();
-	}
+    @Override
+    public int getTypeId() {
+        return REFSET_TYPES.CID_INT.getTypeNid();
+    }
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();  
+        StringBuffer buf = new StringBuffer();
         buf.append(this.getClass().getSimpleName() + ":{");
         buf.append("c1Nid: ");
         ConceptComponent.addNidToBuffer(buf, c1Nid);
         buf.append(" intValue: " + this.intValue);
-         buf.append(super.toString());
+        buf.append(super.toString());
         return buf.toString();
     }
 
-	@Override
-	public StrRevision duplicate() {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public StrRevision duplicate() {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public int getC1id() {
-		return getC1Nid();
-	}
+    @Override
+    public int getC1id() {
+        return getC1Nid();
+    }
 
-	@Override
-	public void setC1id(int c1id) {
-		setC1Nid(c1id);
-	}
-	@SuppressWarnings("unchecked")
-	public List<Version> getVersions() {
-		if (versions == null) {
-			int count = 1;
-			if (revisions != null) {
-				count = count + revisions.size();
-			}
-			ArrayList<Version> list = new ArrayList<Version>(count);
-			if (getTime() != Long.MIN_VALUE) {
-				list.add(new Version());
-			}
-			if (revisions != null) {
-				for (int i = 0; i < revisions.size(); i++) {
-					if (revisions.get(i).getTime() != Long.MIN_VALUE) {
-						list.add(new Version(i));
-					}
-				}
-			}
-			versions = list;
-		}
-		return (List<Version>) versions;
-	}
+    @Override
+    public void setC1id(int c1id) {
+        setC1Nid(c1id);
+    }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Version> getVersions() {
+        if (versions == null) {
+            int count = 1;
+            if (revisions != null) {
+                count = count + revisions.size();
+            }
+            ArrayList<Version> list = new ArrayList<Version>(count);
+            if (getTime() != Long.MIN_VALUE) {
+                list.add(new Version());
+            }
+            if (revisions != null) {
+                for (int i = 0; i < revisions.size(); i++) {
+                    if (revisions.get(i).getTime() != Long.MIN_VALUE) {
+                        list.add(new Version(i));
+                    }
+                }
+            }
+            versions = list;
+        }
+        return (List<Version>) versions;
+    }
 }

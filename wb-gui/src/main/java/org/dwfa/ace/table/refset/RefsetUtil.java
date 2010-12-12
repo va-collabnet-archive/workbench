@@ -190,8 +190,8 @@ public class RefsetUtil {
                     super.setSelectedItem(value);
                 }
             };
-            comboBox.addItem(new Boolean(true));
-            comboBox.addItem(new Boolean(false));
+            comboBox.addItem(Boolean.TRUE);
+            comboBox.addItem(Boolean.FALSE);
             extTable.getColumn(REFSET_FIELDS.BOOLEAN_VALUE).setCellEditor(new DefaultCellEditor(comboBox));
             break;
         case STRING:

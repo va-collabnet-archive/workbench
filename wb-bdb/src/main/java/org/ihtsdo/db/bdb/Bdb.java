@@ -54,6 +54,7 @@ import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.je.EnvironmentLockedException;
 import com.sleepycat.je.EnvironmentMutableConfig;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 public class Bdb {
 	
@@ -273,6 +274,10 @@ public class Bdb {
 		assert conceptDb != null;
 		return conceptDb;
 	}
+        
+        public static void addAsAnnotations(List<TkRefsetAbstractMember<?>> members) throws Exception {
+            conceptDb.iterateConceptDataInParallel(new AnnotationAdder(members));
+        }
 	
 	public static int getConceptNid(int componentNid) {
 		return nidCidMapDb.getCNid(componentNid);

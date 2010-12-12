@@ -288,7 +288,6 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
             }
         }
 
-        @Override
         public RelationshipRevision makeAnalog() {
             if (index >= 0) {
                 RelationshipRevision rev = revisions.get(index);
@@ -326,12 +325,12 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
     public Relationship(Concept enclosingConcept,
             TupleInput input) throws IOException {
-        super(enclosingConcept,
+        super(enclosingConcept.getNid(),
                 input);
     }
 
     public Relationship(TkRelationship eRel, Concept enclosingConcept) throws IOException {
-        super(eRel, enclosingConcept);
+        super(eRel, enclosingConcept.getNid());
         c2Nid = Bdb.uuidToNid(eRel.getC2Uuid());
         setCharacteristicNid(Bdb.uuidToNid(eRel.getCharacteristicUuid()));
         group = eRel.getRelGroup();

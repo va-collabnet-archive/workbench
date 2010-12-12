@@ -67,6 +67,16 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
     I_GetConceptData bean;
 
     @Override
+    public void setAnnotationStyleRefset(boolean annotationSyleRefset) {
+        bean.setAnnotationStyleRefset(annotationSyleRefset);
+    }
+
+    @Override
+    public boolean isAnnotationStyleRefset() throws IOException {
+        return bean.isAnnotationStyleRefset();
+    }
+
+    @Override
     public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedStatus,
             NidSetBI allowedTypes,
             PositionSetBI positions,

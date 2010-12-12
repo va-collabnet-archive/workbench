@@ -14,18 +14,22 @@ import org.ihtsdo.tk.dto.concept.component.refset.cidflt.TkRefsetCidFloatRevisio
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import java.util.Collection;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.refset.RefsetMemberVersionBI;
 
 public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatMember> {
 
-	private int c1Nid;
-	private float floatValue;
+    private int c1Nid;
+    private float floatValue;
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();  
+        StringBuffer buf = new StringBuffer();
         buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" c1Nid: ");
         ConceptComponent.addNidToBuffer(buf, c1Nid);
@@ -34,60 +38,60 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
         return buf.toString();
     }
 
-
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return false;
+        }
         if (CidFloatRevision.class.isAssignableFrom(obj.getClass())) {
             CidFloatRevision another = (CidFloatRevision) obj;
-            return this.c1Nid == another.c1Nid && 
-            	this.floatValue == another.floatValue &&
-            	super.equals(obj);
+            return this.c1Nid == another.c1Nid
+                    && this.floatValue == another.floatValue
+                    && super.equals(obj);
         }
         return false;
     }
-    
-    public CidFloatRevision(int statusNid, int pathNid, long time, 
-			CidFloatMember primoridalMember) {
-		super(statusNid, pathNid, time, 
-				primoridalMember);
-		c1Nid = primoridalMember.getC1Nid();
-		floatValue = primoridalMember.getFloatValue();
-	}
 
-    public CidFloatRevision(int statusNid, int authorNid, int pathNid, long time, 
-			CidFloatMember primoridalMember) {
-		super(statusNid, authorNid, pathNid, time, 
-				primoridalMember);
-		c1Nid = primoridalMember.getC1Nid();
-		floatValue = primoridalMember.getFloatValue();
-	}
+    public CidFloatRevision(int statusNid, int pathNid, long time,
+            CidFloatMember primoridalMember) {
+        super(statusNid, pathNid, time,
+                primoridalMember);
+        c1Nid = primoridalMember.getC1Nid();
+        floatValue = primoridalMember.getFloatValue();
+    }
 
-	public CidFloatRevision(int statusAtPositionNid, 
-			CidFloatMember primoridalMember) {
-		super(statusAtPositionNid, 
-				primoridalMember);
-		c1Nid = primoridalMember.getC1Nid();
-		floatValue = primoridalMember.getFloatValue();
-	}
+    public CidFloatRevision(int statusNid, int authorNid, int pathNid, long time,
+            CidFloatMember primoridalMember) {
+        super(statusNid, authorNid, pathNid, time,
+                primoridalMember);
+        c1Nid = primoridalMember.getC1Nid();
+        floatValue = primoridalMember.getFloatValue();
+    }
 
-	protected CidFloatRevision(int statusNid, int pathNid, long time, 
-			CidFloatRevision another) {
-		super(statusNid, pathNid, time, another.primordialComponent);
-		c1Nid = another.c1Nid;
-		floatValue = another.floatValue;
-	}
+    public CidFloatRevision(int statusAtPositionNid,
+            CidFloatMember primoridalMember) {
+        super(statusAtPositionNid,
+                primoridalMember);
+        c1Nid = primoridalMember.getC1Nid();
+        floatValue = primoridalMember.getFloatValue();
+    }
 
-	protected CidFloatRevision(int statusNid, int authorNid, int pathNid, long time, 
-			CidFloatRevision another) {
-		super(statusNid, authorNid, pathNid, time, another.primordialComponent);
-		c1Nid = another.c1Nid;
-		floatValue = another.floatValue;
-	}
+    protected CidFloatRevision(int statusNid, int pathNid, long time,
+            CidFloatRevision another) {
+        super(statusNid, pathNid, time, another.primordialComponent);
+        c1Nid = another.c1Nid;
+        floatValue = another.floatValue;
+    }
 
-	@Override
-	public CidFloatRevision makeAnalog(int statusNid, int pathNid, long time) {
+    protected CidFloatRevision(int statusNid, int authorNid, int pathNid, long time,
+            CidFloatRevision another) {
+        super(statusNid, authorNid, pathNid, time, another.primordialComponent);
+        c1Nid = another.c1Nid;
+        floatValue = another.floatValue;
+    }
+
+    @Override
+    public CidFloatRevision makeAnalog(int statusNid, int pathNid, long time) {
         if (this.getTime() == time && this.getPathNid() == pathNid) {
             this.setStatusNid(statusNid);
             return this;
@@ -95,10 +99,10 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
         CidFloatRevision newR = new CidFloatRevision(statusNid, pathNid, time, this);
         primordialComponent.addRevision(newR);
         return newR;
-	}
+    }
 
-	@Override
-	public CidFloatRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+    @Override
+    public CidFloatRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
         if (this.getTime() == time && this.getPathNid() == pathNid) {
             this.setStatusNid(statusNid);
             return this;
@@ -106,68 +110,68 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
         CidFloatRevision newR = new CidFloatRevision(statusNid, authorNid, pathNid, time, this);
         primordialComponent.addRevision(newR);
         return newR;
-	}
-
+    }
 
     @Override
     public CidFloatRevision makeAnalog() {
-         return new CidFloatRevision(getStatusNid(), getPathNid(), getTime(), this);
+        return new CidFloatRevision(getStatusNid(), getPathNid(), getTime(), this);
     }
 
-	public CidFloatRevision(TupleInput input, 
-			CidFloatMember primoridalMember) {
-		super(input, primoridalMember);
-		c1Nid = input.readInt();
-		floatValue = input.readFloat();
-	}
+    public CidFloatRevision(TupleInput input,
+            CidFloatMember primoridalMember) {
+        super(input, primoridalMember);
+        c1Nid = input.readInt();
+        floatValue = input.readFloat();
+    }
 
-	public CidFloatRevision(TkRefsetCidFloatRevision eVersion,
-			CidFloatMember member) {
-		super(eVersion, member);
-		c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());
-		floatValue = eVersion.getFloatValue();
-	}
+    public CidFloatRevision(TkRefsetCidFloatRevision eVersion,
+            CidFloatMember member) {
+        super(eVersion, member);
+        c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());
+        floatValue = eVersion.getFloatValue();
+    }
 
     public CidFloatRevision() {
         super();
     }
-    
+
     @Override
-	public UniversalAceExtByRefPart getUniversalPart()
-			throws TerminologyException, IOException {
-		// TODO
-		throw new UnsupportedOperationException();
-	}
+    public UniversalAceExtByRefPart getUniversalPart()
+            throws TerminologyException, IOException {
+        // TODO
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
-		// TODO
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
+        // TODO
+        throw new UnsupportedOperationException();
+    }
 
-	public int getC1Nid() {
-		return c1Nid;
-	}
+    public int getC1Nid() {
+        return c1Nid;
+    }
 
-	public void setC1Nid(int c1Nid) {
-		this.c1Nid = c1Nid;
+    public void setC1Nid(int c1Nid) {
+        this.c1Nid = c1Nid;
         modified();
-	}
+    }
 
-	public float getFloatValue() {
-		return floatValue;
-	}
+    public float getFloatValue() {
+        return floatValue;
+    }
 
-	public void setFloatValue(float floatValue) {
-		this.floatValue = floatValue;
+    public void setFloatValue(float floatValue) {
+        this.floatValue = floatValue;
         modified();
-	}
+    }
+
     @Override
     protected void writeFieldsToBdb(TupleOutput output) {
         output.writeInt(c1Nid);
         output.writeFloat(floatValue);
     }
-    
+
     @Override
     public ArrayIntList getVariableVersionNids() {
         ArrayIntList variableNids = new ArrayIntList(3);
@@ -175,4 +179,20 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
         return variableNids;
     }
 
+    @Override
+    public CidFloatMember.Version getVersion(Coordinate c)
+            throws ContraditionException {
+        return (CidFloatMember.Version) ((CidFloatMember) primordialComponent).getVersion(c);
+    }
+
+    @Override
+    public Collection<CidFloatMember.Version> getVersions() {
+        return ((CidFloatMember) primordialComponent).getVersions();
+    }
+
+    @Override
+    public Collection<? extends RefsetMemberVersionBI> getVersions(
+            Coordinate c) {
+        return ((CidFloatMember) primordialComponent).getVersions(c);
+    }
 }

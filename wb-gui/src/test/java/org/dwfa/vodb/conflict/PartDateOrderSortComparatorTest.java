@@ -27,6 +27,7 @@ import junit.framework.Assert;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -165,6 +166,12 @@ public class PartDateOrderSortComparatorTest {
 		public String toUserString() {
 		       throw new UnsupportedOperationException();
 		}
+
+        @Override
+        public int getSapNid() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
     }
 
     private TestPart newestTestPart;

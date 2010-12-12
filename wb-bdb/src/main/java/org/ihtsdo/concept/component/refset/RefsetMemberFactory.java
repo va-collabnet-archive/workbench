@@ -35,88 +35,85 @@ import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class RefsetMemberFactory  {
+public class RefsetMemberFactory {
 
-	@SuppressWarnings("unchecked")
-	public RefsetMember create(int nid, int typeNid, Concept enclosingConcept,
-			TupleInput input) throws IOException {
-		assert enclosingConcept != null;
-		REFSET_TYPES memberType;
-		try {
-			assert Arrays.asList(REFSET_TYPES.values()).contains(REFSET_TYPES.nidToType(typeNid));
-			memberType = REFSET_TYPES.nidToType(typeNid);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		assert memberType != null: " Member type null for nid: " + nid;
-		switch (memberType) {
-		case BOOLEAN:
-			return new BooleanMember(enclosingConcept, input);
-		case CID:
-			return new CidMember(enclosingConcept, input);
-		case CID_CID:
-			return new CidCidMember(enclosingConcept, input);
-		case CID_CID_CID:
-			return new CidCidCidMember(enclosingConcept, input);
-		case CID_CID_STR:
-			return new CidCidStrMember(enclosingConcept, input);
-		case CID_INT:
-			return new CidIntMember(enclosingConcept, input);
-		case CID_STR:
-			return new CidStrMember(enclosingConcept, input);
-		case INT:
-			return new IntMember(enclosingConcept, input);
-		case CID_FLOAT:
-			return new CidFloatMember(enclosingConcept, input);
-		case MEMBER:
-			return new MembershipMember(enclosingConcept, input);
-		case STR:
-			return new StrMember(enclosingConcept, input);
-		case CID_LONG:
-			return new CidLongMember(enclosingConcept, input);
-		case LONG:
-			return new LongMember(enclosingConcept, input);
+    @SuppressWarnings("unchecked")
+    public RefsetMember create(int nid, int typeNid, int enclosingConceptNid,
+            TupleInput input) throws IOException {
+        REFSET_TYPES memberType;
+        try {
+            assert Arrays.asList(REFSET_TYPES.values()).contains(REFSET_TYPES.nidToType(typeNid));
+            memberType = REFSET_TYPES.nidToType(typeNid);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        assert memberType != null : " Member type null for nid: " + nid;
+        switch (memberType) {
+            case BOOLEAN:
+                return new BooleanMember(enclosingConceptNid, input);
+            case CID:
+                return new CidMember(enclosingConceptNid, input);
+            case CID_CID:
+                return new CidCidMember(enclosingConceptNid, input);
+            case CID_CID_CID:
+                return new CidCidCidMember(enclosingConceptNid, input);
+            case CID_CID_STR:
+                return new CidCidStrMember(enclosingConceptNid, input);
+            case CID_INT:
+                return new CidIntMember(enclosingConceptNid, input);
+            case CID_STR:
+                return new CidStrMember(enclosingConceptNid, input);
+            case INT:
+                return new IntMember(enclosingConceptNid, input);
+            case CID_FLOAT:
+                return new CidFloatMember(enclosingConceptNid, input);
+            case MEMBER:
+                return new MembershipMember(enclosingConceptNid, input);
+            case STR:
+                return new StrMember(enclosingConceptNid, input);
+            case CID_LONG:
+                return new CidLongMember(enclosingConceptNid, input);
+            case LONG:
+                return new LongMember(enclosingConceptNid, input);
 
-		default:
-			throw new UnsupportedOperationException(
-					"Can't handle member type: " + memberType);
-		}
-	}
-	
-	public static RefsetMember<?,?> create(TkRefsetAbstractMember<?> refsetMember, Concept enclosingConcept) throws IOException {
-		assert enclosingConcept != null;
-		switch (refsetMember.getType()) {
-		case BOOLEAN:
-			return new BooleanMember((TkRefsetBooleanMember) refsetMember, enclosingConcept);
-		case CID:
-			return new CidMember((TkRefsetCidMember) refsetMember, enclosingConcept);
-		case CID_CID:
-			return new CidCidMember((TkRefsetCidCidMember) refsetMember, enclosingConcept);
-		case CID_CID_CID:
-			return new CidCidCidMember((TkRefsetCidCidCidMember) refsetMember, enclosingConcept);
-		case CID_CID_STR:
-			return new CidCidStrMember((TkRefsetCidCidStrMember) refsetMember, enclosingConcept);
-		case CID_INT:
-			return new CidIntMember((TkRefsetCidIntMember) refsetMember, enclosingConcept);
-		case CID_STR:
-			return new CidStrMember((TkRefsetCidStrMember) refsetMember, enclosingConcept);
-		case INT:
-			return new IntMember((TkRefsetIntMember) refsetMember, enclosingConcept);
-		case CID_FLOAT:
-			return new CidFloatMember((TkRefsetCidFloatMember) refsetMember, enclosingConcept);
-		case MEMBER:
-			return new MembershipMember((TkRefsetMember) refsetMember, enclosingConcept);
-		case STR:
-			return new StrMember((TkRefsetStrMember) refsetMember, enclosingConcept);
-		case CID_LONG:
-			return new CidLongMember((TkRefsetCidLongMember) refsetMember, enclosingConcept);
-		case LONG:
-			return new LongMember((TkRefsetLongMember) refsetMember, enclosingConcept);
+            default:
+                throw new UnsupportedOperationException(
+                        "Can't handle member type: " + memberType);
+        }
+    }
 
-		default:
-			throw new UnsupportedOperationException(
-					"Can't handle member type: " + refsetMember.getType());
-		}
-	}
+    public static RefsetMember<?, ?> create(TkRefsetAbstractMember<?> refsetMember, int enclosingConceptNid) throws IOException {
+        switch (refsetMember.getType()) {
+            case BOOLEAN:
+                return new BooleanMember((TkRefsetBooleanMember) refsetMember, enclosingConceptNid);
+            case CID:
+                return new CidMember((TkRefsetCidMember) refsetMember, enclosingConceptNid);
+            case CID_CID:
+                return new CidCidMember((TkRefsetCidCidMember) refsetMember, enclosingConceptNid);
+            case CID_CID_CID:
+                return new CidCidCidMember((TkRefsetCidCidCidMember) refsetMember, enclosingConceptNid);
+            case CID_CID_STR:
+                return new CidCidStrMember((TkRefsetCidCidStrMember) refsetMember, enclosingConceptNid);
+            case CID_INT:
+                return new CidIntMember((TkRefsetCidIntMember) refsetMember, enclosingConceptNid);
+            case CID_STR:
+                return new CidStrMember((TkRefsetCidStrMember) refsetMember, enclosingConceptNid);
+            case INT:
+                return new IntMember((TkRefsetIntMember) refsetMember, enclosingConceptNid);
+            case CID_FLOAT:
+                return new CidFloatMember((TkRefsetCidFloatMember) refsetMember, enclosingConceptNid);
+            case MEMBER:
+                return new MembershipMember((TkRefsetMember) refsetMember, enclosingConceptNid);
+            case STR:
+                return new StrMember((TkRefsetStrMember) refsetMember, enclosingConceptNid);
+            case CID_LONG:
+                return new CidLongMember((TkRefsetCidLongMember) refsetMember, enclosingConceptNid);
+            case LONG:
+                return new LongMember((TkRefsetLongMember) refsetMember, enclosingConceptNid);
 
+            default:
+                throw new UnsupportedOperationException(
+                        "Can't handle member type: " + refsetMember.getType());
+        }
+    }
 }

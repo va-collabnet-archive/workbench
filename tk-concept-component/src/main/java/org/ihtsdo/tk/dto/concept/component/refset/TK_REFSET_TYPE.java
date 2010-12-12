@@ -36,7 +36,8 @@ public enum TK_REFSET_TYPE {
         }
 
         public static TK_REFSET_TYPE readType(DataInput input) throws IOException {
-            switch (input.readByte()) {
+            int type = input.readByte();
+            switch (type) {
             case 1:
                 return MEMBER;
             case 2:
@@ -64,6 +65,6 @@ public enum TK_REFSET_TYPE {
             case 13:
             	return LONG;
             }
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException("Can't handle type: " + type);
         }
 }

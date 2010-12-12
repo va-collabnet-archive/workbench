@@ -14,9 +14,10 @@ import org.ihtsdo.tk.api.ext.I_ConceptualizeExternally;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 
-public class ConceptAttributesRevision extends Revision<ConceptAttributesRevision, ConceptAttributes> 
-	implements I_ConceptAttributePart, ConAttrAnalogBI {
+public class ConceptAttributesRevision extends Revision<ConceptAttributesRevision, ConceptAttributes>
+        implements I_ConceptAttributePart, ConAttrAnalogBI {
 
     private boolean defined = false;
 
@@ -25,10 +26,10 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
     }
 
     public ConceptAttributesRevision(I_ConceptualizeExternally another, ConceptAttributes primoridalMember) {
-        super(Bdb.uuidToNid(another.getStatusUuid()), 
-        		Bdb.uuidToNid(another.getAuthorUuid()),
-        		Bdb.uuidToNid(another.getPathUuid()), another.getTime(),
-            primoridalMember);
+        super(Bdb.uuidToNid(another.getStatusUuid()),
+                Bdb.uuidToNid(another.getAuthorUuid()),
+                Bdb.uuidToNid(another.getPathUuid()), another.getTime(),
+                primoridalMember);
         this.defined = another.isDefined();
     }
 
@@ -59,12 +60,12 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
             return this;
         }
         try {
-			return new ConceptAttributesRevision(this, statusNid, 
-					Terms.get().getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptNid(),
-					pathNid, time, this.primordialComponent);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		} 
+            return new ConceptAttributesRevision(this, statusNid,
+                    Terms.get().getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptNid(),
+                    pathNid, time, this.primordialComponent);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -75,12 +76,12 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
             return this;
         }
         try {
-			return new ConceptAttributesRevision(this, statusNid, 
-					authorNid,
-					pathNid, time, this.primordialComponent);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		} 
+            return new ConceptAttributesRevision(this, statusNid,
+                    authorNid,
+                    pathNid, time, this.primordialComponent);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -122,12 +123,13 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
         buf.append(super.toString());
         return buf.toString();
     }
-    
+
     // TODO Verify this is a correct implementation
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return false;
+        }
         if (ConceptAttributesRevision.class.isAssignableFrom(obj.getClass())) {
             ConceptAttributesRevision another = (ConceptAttributesRevision) obj;
             if (this.sapNid == another.sapNid) {
@@ -137,21 +139,25 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
         return false;
     }
 
-	
-	@Override
-	public ConceptAttributes.Version getVersion(Coordinate c)
-			throws ContraditionException {
-		return primordialComponent.getVersion(c);
-	}
-
-	@Override
-	public Collection<ConceptAttributes.Version> getVersions(
-			Coordinate c) {
-		return primordialComponent.getVersions(c);
-	}		
+    @Override
+    public ConceptAttributes.Version getVersion(Coordinate c)
+            throws ContraditionException {
+        return primordialComponent.getVersion(c);
+    }
 
     @Override
-	public String toUserString() {
+    public Collection<ConceptAttributes.Version> getVersions(
+            Coordinate c) {
+        return primordialComponent.getVersions(c);
+    }
+
+    @Override
+    public Collection<ConceptAttributes.Version> getVersions() {
+        return ((ConceptAttributes) primordialComponent).getVersions();
+    }
+
+    @Override
+    public String toUserString() {
         StringBuffer buf = new StringBuffer();
         buf.append("concept ");
         if (defined) {
@@ -161,6 +167,5 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
             buf.append("is primitive");
         }
         return buf.toString();
-	}    
-
+    }
 }

@@ -25,6 +25,7 @@ import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRel;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import org.ihtsdo.concept.component.AnnotationStyleBinder;
 
 /**
  * File format:<br>
@@ -53,7 +54,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
                 throw new RuntimeException(e1);
             }
         }
-        
+
         public boolean addDirect(Description e) {
             return super.add(e);
         }
@@ -82,6 +83,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
                 throw new RuntimeException(e1);
             }
         }
+
         public boolean addDirect(Relationship e) {
             return super.add(e);
         }
@@ -106,6 +108,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
                 throw new RuntimeException(e1);
             }
         }
+
         public boolean addDirect(Image e) {
             return super.add(e);
         }
@@ -131,6 +134,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
                 throw new RuntimeException(e1);
             }
         }
+
         public boolean addDirect(RefsetMember<?, ?> e) {
             return super.add(e);
         }
@@ -168,7 +172,6 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
             modified();
             return returnValue;
         }
-
 
         @Override
         public void clear() {
@@ -213,6 +216,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
         this.lastWrite = this.lastChange;
     }
 
+    @Override
     public void resetNidData() {
         this.nidData.reset();
     }
@@ -233,6 +237,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
     protected long lastWrite = Long.MIN_VALUE;
     protected long lastExtinctRemoval = Long.MIN_VALUE;
 
+    @Override
     public void modified() {
         lastChange = Bdb.gVersion.incrementAndGet();
     }
@@ -242,6 +247,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
      * 
      * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#getNid()
      */
+    @Override
     public int getNid() {
         return enclosingConcept.getNid();
     }
@@ -252,10 +258,25 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
      * @see
      * org.ihtsdo.db.bdb.concept.I_ManageConceptData#getReadWriteDataVersion()
      */
+    @Override
     public int getReadWriteDataVersion() throws InterruptedException,
             ExecutionException, IOException {
         DataVersionBinder binder = DataVersionBinder.getBinder();
         return binder.entryToObject(nidData.getMutableTupleInput());
+    }
+
+    public boolean getIsAnnotationStyleRefset() throws IOException {
+        AnnotationStyleBinder binder = AnnotationStyleBinder.getBinder();
+        TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
+        boolean isAnnotationStyle = false;
+        if (readOnlyInput.available() > 0) {
+            isAnnotationStyle = binder.entryToObject(readOnlyInput);
+        }
+        TupleInput readWriteInput = nidData.getMutableTupleInput();
+        if (readWriteInput.available() > 0) {
+            isAnnotationStyle = binder.entryToObject(readWriteInput);
+        }
+        return isAnnotationStyle;
     }
 
     /*
@@ -263,6 +284,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
      * 
      * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#getDestRels()
      */
+    @Override
     public List<Relationship> getDestRels() throws IOException {
 
         List<Relationship> destRels = new ArrayList<Relationship>();

@@ -21,6 +21,7 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -39,6 +40,7 @@ import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.thread.NamedThreadFactory;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 /**
  * Goal which loads an EConcept.jbin file into a bdb.
@@ -48,6 +50,7 @@ import org.ihtsdo.thread.NamedThreadFactory;
  * @phase process-sources
  */
 public class LoadBdbMulti extends AbstractMojo {
+
     /**
      * concepts file names.
      * 
@@ -55,6 +58,13 @@ public class LoadBdbMulti extends AbstractMojo {
      * @required
      */
     private String[] conceptsFileNames;
+    
+     /**
+     * rsta file names.
+     * 
+     * @parameter
+     */
+    private String[] rstaFileNames;
 
     /**
      * Generated resources directory.
@@ -63,7 +73,6 @@ public class LoadBdbMulti extends AbstractMojo {
      * @required
      */
     private String generatedResources;
-
     /**
      * Berkeley directory.
      * 
@@ -71,27 +80,19 @@ public class LoadBdbMulti extends AbstractMojo {
      * @required
      */
     private File berkeleyDir;
-
-	/**
-	 * 
-	 * @parameter default-value=true
-	 */
+    /**
+     * 
+     * @parameter default-value=true
+     */
     private boolean moveToReadOnly;
-
     AtomicInteger conceptsRead = new AtomicInteger();
     AtomicInteger conceptsProcessed = new AtomicInteger();
-    
     private ThreadGroup loadBdbMultiDbThreadGroup = new ThreadGroup("LoadBdbMulti threads");
-
-     
-            
     ExecutorService executors = Executors.newCachedThreadPool(
             new NamedThreadFactory(loadBdbMultiDbThreadGroup, "converter "));
-    
     LinkedBlockingQueue<I_ProcessEConcept> converters = new LinkedBlockingQueue<I_ProcessEConcept>();
-    
     private int runtimeConverterSize = Runtime.getRuntime().availableProcessors() * 2;
- 
+
     @Override
     public void execute() throws MojoExecutionException {
         executeMojo(conceptsFileNames, generatedResources, berkeleyDir);
@@ -111,16 +112,26 @@ public class LoadBdbMulti extends AbstractMojo {
 
             for (String fname : conceptsFileNames) {
                 File conceptsFile = new File(generatedResources, fname);
-    			getLog().info("Starting load from: " + conceptsFile.getAbsolutePath());    
+                getLog().info("Starting load from: " + conceptsFile.getAbsolutePath());
 
                 FileInputStream fis = new FileInputStream(conceptsFile);
                 BufferedInputStream bis = new BufferedInputStream(fis);
                 DataInputStream in = new DataInputStream(bis);
 
                 try {
-                    while (true) {
+                   System.out.print(conceptsRead + "-");
+                   while (true) {
                         EConcept eConcept = new EConcept(in);
-                        conceptsRead.incrementAndGet();
+                        int read = conceptsRead.incrementAndGet();
+                        if (read % 100 == 0) {
+                            if (read % 8000 == 0) {
+                                System.out.println('.');
+                                System.out.print(read + "-");
+                            } else {
+                                System.out.print('.');
+                            }
+                        }
+
                         I_ProcessEConcept conceptConverter = converters.take();
                         conceptConverter.setEConcept(eConcept);
                         executors.execute(conceptConverter);
@@ -128,6 +139,8 @@ public class LoadBdbMulti extends AbstractMojo {
                 } catch (EOFException e) {
                     in.close();
                 }
+                System.out.println('.');
+                getLog().info("Processed concept count: " + conceptsRead);
             }
 
             // See if any exceptions in the last converters;
@@ -139,21 +152,44 @@ public class LoadBdbMulti extends AbstractMojo {
             while (conceptsProcessed.get() < conceptsRead.get()) {
                 Thread.sleep(1000);
             }
+            
+            if (rstaFileNames != null) {
+                for (String rstaName: rstaFileNames) {
+                  getLog().info("Processing: " + rstaName);
+                  File rstaFile = new File(generatedResources, rstaName);
+                FileInputStream fis = new FileInputStream(rstaFile);
+                BufferedInputStream bis = new BufferedInputStream(fis);
+                DataInputStream in = new DataInputStream(bis);
+                try {
+                   while (true) {
+                        EConcept eConcept = new EConcept(in);
+                        getLog().info("Adding: " + 
+                                eConcept.getRefsetMembers().size() +
+                                " annotations");
+                        Bdb.addAsAnnotations(eConcept.getRefsetMembers());
+
+                        
+                    }
+                } catch (EOFException e) {
+                    in.close();
+                }
+                }
+            }
 
             getLog().info("finished load, start sync");
             getLog().info("Concept count: " + Bdb.getConceptDb().getCount());
             getLog().info(
                     "Concept attributes encountered: " + ConceptAttributesBinder.encountered
-                            + " written: " + ConceptAttributesBinder.written);
+                    + " written: " + ConceptAttributesBinder.written);
             getLog().info(
                     "Descriptions encountered: " + DescriptionBinder.encountered + " written: "
-                            + DescriptionBinder.written);
+                    + DescriptionBinder.written);
             getLog().info(
                     "Relationships encountered: " + RelationshipBinder.encountered + " written: "
-                            + RelationshipBinder.written);
+                    + RelationshipBinder.written);
             getLog().info(
                     "Reset members encountered: " + RefsetMemberBinder.encountered + " written: "
-                            + RefsetMemberBinder.written);
+                    + RefsetMemberBinder.written);
 
             getLog().info("Starting db sync.");
             Bdb.sync();
@@ -164,11 +200,11 @@ public class LoadBdbMulti extends AbstractMojo {
             getLog().info("db closed");
             getLog().info("elapsed time: " + (System.currentTimeMillis() - startTime));
 
-			if (moveToReadOnly) {
-				FileIO.recursiveDelete(new File(berkeleyDir, "read-only"));
-				File dirToMove = new File(berkeleyDir, "mutable");
-				dirToMove.renameTo(new File(berkeleyDir, "read-only"));
-			}
+            if (moveToReadOnly) {
+                FileIO.recursiveDelete(new File(berkeleyDir, "read-only"));
+                File dirToMove = new File(berkeleyDir, "mutable");
+                dirToMove.renameTo(new File(berkeleyDir, "read-only"));
+            }
         } catch (Exception ex) {
             throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
         } catch (Throwable ex) {
@@ -180,10 +216,10 @@ public class LoadBdbMulti extends AbstractMojo {
     private interface I_ProcessEConcept extends Runnable {
 
         public void setEConcept(EConcept eConcept) throws Throwable;
-
     }
 
     private class ConvertConcept implements I_ProcessEConcept {
+
         Throwable exception = null;
         EConcept eConcept = null;
         Concept newConcept = null;

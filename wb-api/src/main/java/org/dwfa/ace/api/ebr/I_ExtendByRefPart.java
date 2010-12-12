@@ -22,8 +22,10 @@ import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.refset.RefsetMemberVersionBI;
 
-public interface I_ExtendByRefPart extends Comparable<I_ExtendByRefPart>, I_AmPart {
+public interface I_ExtendByRefPart extends Comparable<I_ExtendByRefPart>, 
+        I_AmPart, RefsetMemberVersionBI {
 
     /**
      * @deprecated Use {@link #getStatusId()}

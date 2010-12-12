@@ -23,5 +23,8 @@ public interface ConceptChronicleBI extends ComponentBI {
 	public Collection<? extends RelGroupChronicleBI>     getRelGroups() throws IOException, ContraditionException;
 	
 	public boolean isUncommitted();
+        
+        public boolean isAnnotationStyleRefset() throws IOException;
+        public void setAnnotationStyleRefset(boolean annotationSyleRefset);
 
 }

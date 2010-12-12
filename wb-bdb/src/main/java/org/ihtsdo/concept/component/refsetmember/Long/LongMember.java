@@ -95,12 +95,12 @@ public class LongMember extends RefsetMember<LongRevision, LongMember> implement
 
 	private long longValue;
 
-	public LongMember(Concept enclosingConcept, TupleInput input) throws IOException {
-		super(enclosingConcept, input);
+	public LongMember(int enclosingConceptNid, TupleInput input) throws IOException {
+		super(enclosingConceptNid, input);
 	}
 
-	public LongMember(TkRefsetLongMember refsetMember, Concept enclosingConcept) throws IOException {
-		super(refsetMember, enclosingConcept);
+	public LongMember(TkRefsetLongMember refsetMember, int enclosingConceptNid) throws IOException {
+		super(refsetMember, enclosingConceptNid);
 		longValue =refsetMember.getLongValue();
 		if (refsetMember.getRevisionList() != null) {
 			revisions = new CopyOnWriteArrayList<LongRevision>();

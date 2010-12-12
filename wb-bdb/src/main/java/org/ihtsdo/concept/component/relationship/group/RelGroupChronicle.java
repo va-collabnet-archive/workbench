@@ -12,6 +12,7 @@ import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.refset.RefsetMemberChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
@@ -102,6 +103,16 @@ public class RelGroupChronicle implements RelGroupChronicleBI {
 	public boolean isUncommitted() {
 		return false;
 	}
+
+    @Override
+    public boolean addAnnotation(RefsetMemberChronicleBI annotation) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Collection<? extends RefsetMemberChronicleBI> getAnnotations() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 
 
 }

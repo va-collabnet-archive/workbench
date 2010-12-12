@@ -12,7 +12,6 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
-import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.Bdb;
@@ -95,14 +94,14 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 
 	private int c1Nid;
 
-	public CidMember(Concept enclosingConcept, 
+	public CidMember(int enclosingConceptNid, 
 			TupleInput input) throws IOException {
-		super(enclosingConcept, input);
+		super(enclosingConceptNid, input);
 	}
 
 
-	public CidMember(TkRefsetCidMember refsetMember, Concept enclosingConcept) throws IOException {
-		super(refsetMember, enclosingConcept);
+	public CidMember(TkRefsetCidMember refsetMember, int enclosingConceptNid) throws IOException {
+		super(refsetMember, enclosingConceptNid);
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		if (refsetMember.getRevisionList() != null) {
 			ArrayList<CidRevision> tmpRevisions = new ArrayList<CidRevision>();

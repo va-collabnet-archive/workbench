@@ -6,7 +6,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.util.HashFunction;
-import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.Bdb;
@@ -17,35 +16,38 @@ import org.ihtsdo.tk.dto.concept.component.refset.cidlong.TkRefsetCidLongRevisio
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import java.util.ArrayList;
+import java.util.List;
 
-public class CidLongMember 
-				extends RefsetMember<CidLongRevision, CidLongMember> {
+public class CidLongMember
+        extends RefsetMember<CidLongRevision, CidLongMember> {
 
-	private static VersionComputer<RefsetMember<CidLongRevision, CidLongMember>.Version> computer = 
-		new VersionComputer<RefsetMember<CidLongRevision, CidLongMember>.Version>();
+    private static VersionComputer<RefsetMember<CidLongRevision, CidLongMember>.Version> computer =
+            new VersionComputer<RefsetMember<CidLongRevision, CidLongMember>.Version>();
 
-	protected VersionComputer<RefsetMember<CidLongRevision, CidLongMember>.Version> getVersionComputer() {
-		return computer;
-	}
+    protected VersionComputer<RefsetMember<CidLongRevision, CidLongMember>.Version> getVersionComputer() {
+        return computer;
+    }
+    private int c1Nid;
+    private long longValue;
 
-	private int c1Nid;
-	private long longValue;
+    public CidLongMember(int enclosingConceptNid,
+            TupleInput input) throws IOException {
+        super(enclosingConceptNid, input);
+    }
 
-	public CidLongMember(Concept enclosingConcept, TupleInput input) throws IOException {
-		super(enclosingConcept, input);
-	}
-
-	public CidLongMember(TkRefsetCidLongMember refsetMember, Concept enclosingConcept) throws IOException {
-		super(refsetMember, enclosingConcept);
-		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
-		longValue = refsetMember.getLongValue();
-		if (refsetMember.getRevisionList() != null) {
-			revisions = new CopyOnWriteArrayList<CidLongRevision>();
-			for (TkRefsetCidLongRevision eVersion: refsetMember.getRevisionList()) {
-				revisions.add(new CidLongRevision(eVersion, this));
-			}
-		}
-	}
+    public CidLongMember(TkRefsetCidLongMember refsetMember,
+            int enclosingConceptNid) throws IOException {
+        super(refsetMember, enclosingConceptNid);
+        c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
+        longValue = refsetMember.getLongValue();
+        if (refsetMember.getRevisionList() != null) {
+            revisions = new CopyOnWriteArrayList<CidLongRevision>();
+            for (TkRefsetCidLongRevision eVersion : refsetMember.getRevisionList()) {
+                revisions.add(new CidLongRevision(eVersion, this));
+            }
+        }
+    }
 
     public CidLongMember() {
         super();
@@ -53,8 +55,9 @@ public class CidLongMember
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return false;
+        }
         if (CidLongMember.class.isAssignableFrom(obj.getClass())) {
             CidLongMember another = (CidLongMember) obj;
             return this.c1Nid == another.c1Nid;
@@ -64,33 +67,35 @@ public class CidLongMember
 
     @Override
     public int hashCode() {
-        return HashFunction.hashCode(new int[] { c1Nid });
-    } 
-    
-    @Override
-	protected boolean membersEqual(
-			ConceptComponent<CidLongRevision, CidLongMember> obj) {
-		if (CidLongMember.class.isAssignableFrom(obj.getClass())) {
-			CidLongMember another = (CidLongMember) obj;
-			return this.c1Nid == another.c1Nid && this.longValue == another.longValue;
-		}
-		return false;
-	}
+        return HashFunction.hashCode(new int[]{c1Nid});
+    }
 
-	@Override
-	protected final CidLongRevision readMemberRevision(TupleInput input) {
-		return new CidLongRevision(input, this);
-	}
-	@Override
-	protected void readMemberFields(TupleInput input) {
-		c1Nid = input.readInt();
-		longValue = input.readLong();
-	}
-	@Override
-	protected void writeMember(TupleOutput output) {
-		output.writeInt(c1Nid);
-		output.writeLong(longValue);
-	}
+    @Override
+    protected boolean membersEqual(
+            ConceptComponent<CidLongRevision, CidLongMember> obj) {
+        if (CidLongMember.class.isAssignableFrom(obj.getClass())) {
+            CidLongMember another = (CidLongMember) obj;
+            return this.c1Nid == another.c1Nid && this.longValue == another.longValue;
+        }
+        return false;
+    }
+
+    @Override
+    protected final CidLongRevision readMemberRevision(TupleInput input) {
+        return new CidLongRevision(input, this);
+    }
+
+    @Override
+    protected void readMemberFields(TupleInput input) {
+        c1Nid = input.readInt();
+        longValue = input.readLong();
+    }
+
+    @Override
+    protected void writeMember(TupleOutput output) {
+        output.writeInt(c1Nid);
+        output.writeLong(longValue);
+    }
 
     @Override
     public ArrayIntList getVariableVersionNids() {
@@ -99,25 +104,25 @@ public class CidLongMember
         return variableNids;
     }
 
-	@Override
-	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+    @Override
+    public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
         if (getTime() == time && getPathNid() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
-		CidLongRevision newR = new CidLongRevision(statusNid, pathNid, time, this);
-		addRevision(newR);
-		return newR;
-	}
+        CidLongRevision newR = new CidLongRevision(statusNid, pathNid, time, this);
+        addRevision(newR);
+        return newR;
+    }
 
-	@Override
-	public I_AmPart makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+    @Override
+    public I_AmPart makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
         if (getTime() == time && getPathNid() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
-		CidLongRevision newR = new CidLongRevision(statusNid, authorNid, pathNid, time, this);
-		addRevision(newR);
-		return newR;
-	}
+        CidLongRevision newR = new CidLongRevision(statusNid, authorNid, pathNid, time, this);
+        addRevision(newR);
+        return newR;
+    }
 
     @Override
     public CidLongRevision makeAnalog() {
@@ -125,42 +130,64 @@ public class CidLongMember
         return newR;
     }
 
-	
-	public int getC1Nid() {
-		return c1Nid;
-	}
+    public int getC1Nid() {
+        return c1Nid;
+    }
 
-	public void setC1Nid(int c1Nid) {
-		this.c1Nid = c1Nid;
+    public void setC1Nid(int c1Nid) {
+        this.c1Nid = c1Nid;
         modified();
-	}
+    }
 
-	public long getLongValue() {
-		return longValue;
-	}
+    public long getLongValue() {
+        return longValue;
+    }
 
-	public void setLongValue(long longValue) {
-		this.longValue = longValue;
+    public void setLongValue(long longValue) {
+        this.longValue = longValue;
         modified();
-	}
+    }
 
-	@Override
-	public int getTypeId() {
-		return REFSET_TYPES.CID_LONG.getTypeNid();
-	}
+    @Override
+    public int getTypeId() {
+        return REFSET_TYPES.CID_LONG.getTypeNid();
+    }
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();  
+        StringBuffer buf = new StringBuffer();
         buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" c1Nid: ");
-		addNidToBuffer(buf, c1Nid);
+        addNidToBuffer(buf, c1Nid);
         buf.append(" longValue:" + this.longValue);
         buf.append(super.toString());
         return buf.toString();
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Version> getVersions() {
+        if (versions == null) {
+            int count = 1;
+            if (revisions != null) {
+                count = count + revisions.size();
+            }
+            ArrayList<Version> list = new ArrayList<Version>(count);
+            if (getTime() != Long.MIN_VALUE) {
+                list.add(new Version());
+            }
+            if (revisions != null) {
+                for (int i = 0; i < revisions.size(); i++) {
+                    if (revisions.get(i).getTime() != Long.MIN_VALUE) {
+                        list.add(new Version(i));
+                    }
+                }
+            }
+            versions = list;
+        }
+        return (List<Version>) versions;
+    }
 }

@@ -120,6 +120,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     private static Concept mergeWithEConcept(EConcept eConcept, Concept c, boolean updateLucene)
             throws IOException {
+        c.setAnnotationStyleRefset(eConcept.isAnnotationStyleRefset());
         TkConceptAttributes eAttr = eConcept.getConceptAttributes();
         if (eAttr != null) {
             if (c.getConceptAttributes() == null) {
@@ -193,9 +194,9 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                     int rNid = Bdb.uuidToNid(er.primordialUuid);
                     RefsetMember<?, ?> r = c.getRefsetMember(rNid);
                     if (currentMemberNids.contains(rNid) && r != null) {
-                        r.merge(RefsetMemberFactory.create(er, c));
+                        r.merge(RefsetMemberFactory.create(er, c.getNid()));
                     } else {
-                        c.getRefsetMembers().add(RefsetMemberFactory.create(er, c));
+                        c.getRefsetMembers().add(RefsetMemberFactory.create(er, c.getNid()));
                     }
                 }
             }
@@ -207,7 +208,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             Concept c) throws IOException {
         for (TkRefsetAbstractMember<?> eRefsetMember : eConcept.getRefsetMembers()) {
             RefsetMember<?, ?> refsetMember = RefsetMemberFactory.create(
-                    eRefsetMember, c);
+                    eRefsetMember, c.getConceptNid());
             c.data.add(refsetMember);
         }
     }
@@ -1522,4 +1523,15 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         }
         return results;
     }
+
+    @Override
+    public boolean isAnnotationStyleRefset() throws IOException {
+        return data.isAnnotationStyleRefset();
+    }
+
+    @Override
+    public void setAnnotationStyleRefset(boolean annotationStyleRefset) {
+        data.setAnnotationStyleRefset(annotationStyleRefset);
+    }
+    
 }

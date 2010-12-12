@@ -26,7 +26,6 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
 
     private static StatusAtPositionBdb sapBdb = Bdb.getSapDb();
 
-    private transient ConceptComponent<?, ?> conceptComponent;
     private int statusAtPositionNid;
     private int authorityNid;
 
@@ -164,12 +163,7 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public I_Identify getIdentifier() {
-        return conceptComponent;
-    }
-
-    @Override
+     @Override
     public I_IdPart getMutableIdPart() {
         // TODO Auto-generated method stub
         return null;
@@ -187,16 +181,6 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
         return null;
     }
 
-    @Override
-    public final I_Identify getFixedIdPart() {
-        return conceptComponent;
-    }
-
-    @Override
-    public int getNid() {
-        return conceptComponent.nid;
-    }
-
     public int getSapNid() {
         return statusAtPositionNid;
     }
@@ -209,7 +193,6 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
         StringBuffer buf = new StringBuffer();
 
         buf.append("sap:" + statusAtPositionNid);
-        buf.append(" conceptComponent:" + conceptComponent);
         buf.append(" authority:");
         ConceptComponent.addNidToBuffer(buf, authorityNid);
         buf.append(" path:");
