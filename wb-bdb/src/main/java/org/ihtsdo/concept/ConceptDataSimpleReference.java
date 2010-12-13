@@ -246,46 +246,47 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         return refsetMembers.get();
     }
 
-	@SuppressWarnings("unchecked")
-	private void handleCanceledComponents() {
-		if (lastExtinctRemoval < BdbCommitManager.getLastCancel()) {
-			if (refsetMembers != null && 
-					refsetMembers.get() != null && 
-					refsetMembers.get().size() > 0) {
-					List<RefsetMember<?, ?>> removed = 
-						(List<RefsetMember<?, ?>>) removeCanceledFromList(refsetMembers.get());
-					if (refsetMembersMap.get() != null
-							|| refsetComponentMap.get() != null) { 
-						Map<Integer, ?> memberMap = refsetMembersMap.get();
-						Map<Integer, ?> componentMap = refsetComponentMap.get();
-						for (RefsetMember<?, ?> cc: removed) {
-							if (memberMap != null) {
-								memberMap.remove(cc.getNid());
-							}
-							if (componentMap != null) {
-								componentMap.remove(cc.getComponentNid());
-							}
-						}
-					}
-			}
-			if (descriptions != null && 
-					descriptions.get() != null && 
-					descriptions.get().size() > 0) {
-	        	removeCanceledFromList(descriptions.get());
-			}
-			if (images != null && 
-					images.get() != null && 
-					images.get().size() > 0) {
-	        	removeCanceledFromList(images.get());
-			}
-			if (srcRels != null && 
-					srcRels.get() != null && 
-					srcRels.get().size() > 0) {
-	        	removeCanceledFromList(srcRels.get());
-			}
-			lastExtinctRemoval = Bdb.gVersion.incrementAndGet();
+    @SuppressWarnings("unchecked")
+    private void handleCanceledComponents() {
+        if (lastExtinctRemoval < BdbCommitManager.getLastCancel()) {
+            if (refsetMembers != null
+                    && refsetMembers.get() != null
+                    && refsetMembers.get().size() > 0) {
+                List<RefsetMember<?, ?>> removed =
+                        (List<RefsetMember<?, ?>>) removeCanceledFromList(refsetMembers.get());
+                if (refsetMembersMap.get() != null
+                        || refsetComponentMap.get() != null) {
+                    Map<Integer, ?> memberMap = refsetMembersMap.get();
+                    Map<Integer, ?> componentMap = refsetComponentMap.get();
+                    for (RefsetMember<?, ?> cc : removed) {
+                        if (memberMap != null) {
+                            memberMap.remove(cc.getNid());
+                        }
+                        if (componentMap != null) {
+                            componentMap.remove(cc.getComponentNid());
+                        }
+                    }
+                }
+            }
+            if (descriptions != null
+                    && descriptions.get() != null
+                    && descriptions.get().size() > 0) {
+                AddDescriptionSet descList = descriptions.get();
+                removeCanceledFromList(descList);
+            }
+            if (images != null
+                    && images.get() != null
+                    && images.get().size() > 0) {
+                removeCanceledFromList(images.get());
+            }
+            if (srcRels != null
+                    && srcRels.get() != null
+                    && srcRels.get().size() > 0) {
+                removeCanceledFromList(srcRels.get());
+            }
+            lastExtinctRemoval = Bdb.gVersion.incrementAndGet();
         }
-	}
+    }
 
     private List<? extends ConceptComponent<?, ?>> removeCanceledFromList(Collection<? extends ConceptComponent<?, ?>> ccList) {
         List<ConceptComponent<?, ?>> toRemove = new ArrayList<ConceptComponent<?, ?>>();
@@ -294,7 +295,17 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                 for (ConceptComponent<?, ?> cc : ccList) {
                     if (cc.getTime() == Long.MIN_VALUE) {
                         toRemove.add(cc);
-            			Concept.componentsCRHM.remove(cc.getNid());
+                        Concept.componentsCRHM.remove(cc.getNid());
+                    } else {
+                        List<Revision> revisionToRemove = new ArrayList<Revision>();
+                        for (Revision r: cc.revisions) {
+                            if (r.getTime() == Long.MIN_VALUE) {
+                                revisionToRemove.add(r);
+                            }
+                        }
+                        for (Revision r: revisionToRemove) {
+                            cc.revisions.remove(r);
+                        }
                     }
                 }
                 ccList.removeAll(toRemove);
