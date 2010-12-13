@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <!-- Replace this parent with your organization's parent -->
   <parent>
     <groupId>org.ihtsdo</groupId>
@@ -9,14 +8,14 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.ihtsdo.sample</groupId>
   <artifactId>wb-sample-pa</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0-mini-1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Workbench IDE Project Assembly</name>
   <description>Workbench IDE Project Assembly</description>
   <scm>
-    <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/wb-sample-pa/trunk</connection>
-    <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/wb-sample-pa/trunk</developerConnection>
-    <url>https://csfe.aceworkspace.net/svn/repos/workbench/wb-sample-pa/trunk</url>
+    <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/wb-sample-pa/branches/wb_mini-release-pa_trek</connection>
+    <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/wb-sample-pa/branches/wb_mini-release-pa_trek</developerConnection>
+    <url>https://csfe.aceworkspace.net/svn/repos/workbench/wb-sample-pa/branches/wb_mini-release-pa_trek</url>
   </scm>
   <properties>
     <!-- must be trek as it has the required wb-mojo changes -->
@@ -230,7 +229,7 @@
               </property>
               <property>
                 <name>bundle.vm_parameters</name>
-                <value>&quot;-Dorg.dwfa.AboutBoxGraphic=&quot;</value>
+                <value>"-Dorg.dwfa.AboutBoxGraphic="</value>
               </property>
               <property>
                 <name>pom.short.name</name>
