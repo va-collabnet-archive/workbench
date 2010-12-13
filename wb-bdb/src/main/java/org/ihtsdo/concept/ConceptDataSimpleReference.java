@@ -297,15 +297,17 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                         toRemove.add(cc);
                         Concept.componentsCRHM.remove(cc.getNid());
                     } else {
-                        List<Revision> revisionToRemove = new ArrayList<Revision>();
-                        for (Revision r: cc.revisions) {
-                            if (r.getTime() == Long.MIN_VALUE) {
-                                revisionToRemove.add(r);
+                    	if (cc.revisions != null) {
+                            List<Revision> revisionToRemove = new ArrayList<Revision>();
+                            for (Revision r: cc.revisions) {
+                                if (r.getTime() == Long.MIN_VALUE) {
+                                    revisionToRemove.add(r);
+                                }
                             }
-                        }
-                        for (Revision r: revisionToRemove) {
-                            cc.revisions.remove(r);
-                        }
+                            for (Revision r: revisionToRemove) {
+                                cc.revisions.remove(r);
+                            }
+                    	}
                     }
                 }
                 ccList.removeAll(toRemove);
