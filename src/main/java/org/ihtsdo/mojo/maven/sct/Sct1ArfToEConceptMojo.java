@@ -1440,10 +1440,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // STATUS_UUID = 2;
             int status = lookupYStatusUuidIdx(line[STATUS_UUID]);
             // REFERENCED_COMPONENT_UUID = 3;
-            // :!!!:DEBUG
-            if (line[REFERENCED_COMPONENT_UUID]
-                    .compareToIgnoreCase("b6a89879-4e43-354c-88dc-0d0a1c63611b") == 0)
-                System.out.println(":!!!:DEBUG");
             UUID uuidComponent = UUID.fromString(line[REFERENCED_COMPONENT_UUID]);
             // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
             long revTime = arfSimpleDateFormat.parse(line[EFFECTIVE_DATE]).getTime();
@@ -3346,11 +3342,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     // :!!!:NYI: tmp.setAdditionalIdComponents(additionalIdComponents);
                     listErm.add(tmp);
                 } else if (r.valueType == Sct1_RefSetRecord.ValueType.CONCEPT) {
-                    // :!!!:DEBUG
-                    if (r.referencedComponentUuidMsb == -5284806515947784884L
-                            && r.referencedComponentUuidLsb == -8584972452597898981L)
-                        System.out.println(":!!!:DEBUG");
-                    
                     ERefsetCidMember tmp = new ERefsetCidMember();
                     tmp.setRefsetUuid(new UUID(r.refsetUuidMsb, r.refsetUuidLsb));
                     tmp.setPrimordialComponentUuid(new UUID(r.refsetMemberUuidMsb,
