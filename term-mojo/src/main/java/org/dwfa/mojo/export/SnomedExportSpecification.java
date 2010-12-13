@@ -245,7 +245,7 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
 //            }
 
             if (generateLangaugeRefset) {
-            	updateAdrsComponentDto(componentDto, matchingDescriptionTuples);
+                updateAdrsComponentDto(componentDto, matchingDescriptionTuples);
             }
 
             Set<I_RelTuple> latestRelationshipTuples = new HashSet<I_RelTuple>();
@@ -265,7 +265,7 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
 
     /**
      * Update the ADRS members.
-	 *
+     *
      * for each of the latest concept descriptions
      * get latest active descriptions for a preferred, synonyms and unspecifieds terms
      * If the extension is inactive, check the description is inactive
@@ -276,22 +276,11 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
      * @throws Exception
      */
     private void updateAdrsComponentDto(ComponentDto componentDto, Collection<I_DescriptionTuple> conceptDescriptionTuples) throws Exception {
-        I_DescriptionTuple latestPreferredTerm = null;
-        List<I_DescriptionTuple> latestSynonyms = new ArrayList<I_DescriptionTuple>();
-        List<I_DescriptionTuple> latestUnSpecifiedDescriptionTypes = new ArrayList<I_DescriptionTuple>();
         Map<Integer,I_ThinExtByRefVersioned> extensionSet = new HashMap<Integer,I_ThinExtByRefVersioned>();
 
-        for (I_DescriptionTuple currentDescription : TupleVersionPart.getLatestMatchingTuples(conceptDescriptionTuples)) {
-            if (check.isDescriptionActive(currentDescription.getStatusId())) {
-                if (currentDescription.getTypeId() == preferredDescriptionType.getNid()) {
-                    latestPreferredTerm = getAdrsVersion(currentDescription, latestPreferredTerm, true, true);
-                } else if (currentDescription.getTypeId() == synonymDescriptionType.getNid()) {
-                    latestSynonyms = getAdrsVersion(currentDescription, latestSynonyms, false);
-                } else if (currentDescription.getTypeId() == unspecifiedDescriptionType.getNid()) {
-                    latestUnSpecifiedDescriptionTypes = getAdrsVersion(currentDescription, latestUnSpecifiedDescriptionTypes, false);
-                }
-            }
-        }
+        I_DescriptionTuple latestPreferredTerm = getPreferredTerm(conceptDescriptionTuples);
+        List<I_DescriptionTuple> latestSynonyms = getAcceptableList(conceptDescriptionTuples, synonymDescriptionType.getNid());
+        List<I_DescriptionTuple> latestUnSpecifiedDescriptionTypes = getAcceptableList(conceptDescriptionTuples, unspecifiedDescriptionType.getNid());
 
         //retire US acceptable term, old preferred terms and update status and language types
         for (I_DescriptionTuple currentDescription : TupleVersionPart.getLatestMatchingTuples(conceptDescriptionTuples)) {
@@ -328,7 +317,7 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
                     updatedPart.setVersion(releasePart.getVersion());
                 // retire old preferred terms.
                 } else if (check.isActive(latestPart.getStatusId())
-                        && getLangaugeType(latestPart.getC1id()) == rf2PreferredDescriptionTypeNid
+                        && latestPart.getC1id() == rf2PreferredDescriptionTypeNid
                         && currentLanguageExtensions.getComponentId() != latestPreferredTerm.getDescId()) {
                     I_ThinExtByRefPartConcept updatedPart = (I_ThinExtByRefPartConcept) latestPart.duplicate();
                     currentLanguageExtensions.addVersion(updatedPart);
@@ -361,16 +350,68 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
         }
     }
 
+    /**
+     * If the path is not on the release path then assume a local update.
+     *
+     * @param languageExtensions I_ThinExtByRefVersioned
+     * @return true if the path is not releasePart.getPathId()
+     * @throws Exception
+     */
     private boolean hasBeenUpdatedNationally(I_ThinExtByRefVersioned languageExtensions) throws Exception {
-        boolean updated = false;
-
-        for(I_ThinExtByRefPart part : languageExtensions.getVersions()){
-            updated = ((SnomedExportUtility)utility).isInternationalPath(part.getPathId());
-        }
-
-        return updated;
+        return ! (TupleVersionPart.getLatestPart(languageExtensions.getVersions()).getPathId() == releasePart.getPathId());
     }
 
+    /**
+     * Get the preferred term from the list of description.
+     *
+     * If a local edit has added a preferred term then this description is returned.
+     *
+     * @param conceptDescriptionTuples List of I_DescriptionTuple
+     * @return I_DescriptionTuple preferred or null if no preferred descriptions
+     * @throws Exception
+     */
+    private I_DescriptionTuple getPreferredTerm(Collection<I_DescriptionTuple> conceptDescriptionTuples) throws Exception {
+        I_DescriptionTuple latestPreferredTerm = null;
+
+        for (I_DescriptionTuple currentDescription : TupleVersionPart.getLatestMatchingTuples(conceptDescriptionTuples)) {
+            I_ThinExtByRefVersioned currentLanguageExtensions = getRefsetExtensionVersioned(adrsNid,currentDescription.getDescId());
+
+            if (currentLanguageExtensions != null && hasBeenUpdatedNationally(currentLanguageExtensions)) {
+                if (check.isActive(currentLanguageExtensions.getLatestVersion().getStatusId())
+                        && ((I_ThinExtByRefPartConcept)currentLanguageExtensions.getLatestVersion()).getC1id() == rf2PreferredDescriptionTypeNid) {
+                    latestPreferredTerm = currentDescription;
+                    break;
+                }
+            } else if (check.isDescriptionActive(currentDescription.getStatusId())) {
+                if (currentDescription.getTypeId() == preferredDescriptionType.getNid()) {
+                    latestPreferredTerm = getAdrsVersion(currentDescription, latestPreferredTerm, true, true);
+                }
+            }
+        }
+
+        return latestPreferredTerm;
+    }
+
+    /**
+     * The list of <code>acceptableType</code> descriptions
+     *
+     * @param conceptDescriptionTuples List of I_DescriptionTuple
+     * @param acceptableType int description type (RF1)
+     * @return List of active description I_DescriptionTuple
+     * @throws Exception
+     */
+    private List<I_DescriptionTuple> getAcceptableList(Collection<I_DescriptionTuple> conceptDescriptionTuples, int acceptableType) throws Exception {
+        List<I_DescriptionTuple> acceptableDescriptions = new ArrayList<I_DescriptionTuple>();
+
+        for (I_DescriptionTuple currentDescription : TupleVersionPart.getLatestMatchingTuples(conceptDescriptionTuples)) {
+            if (check.isDescriptionActive(currentDescription.getStatusId())
+                    && currentDescription.getTypeId() == acceptableType) {
+                acceptableDescriptions = getAdrsVersion(currentDescription, acceptableDescriptions, false);
+            }
+        }
+
+        return acceptableDescriptions;
+    }
 
     /**
      * Get the RF2 language reference set value for the description type
@@ -378,13 +419,13 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
      * @return int
      */
     private int getLangaugeType(int descriptionStatus) {
-    	int languageType = rf2AcceptableDescriptionTypeNid;
+        int languageType = rf2AcceptableDescriptionTypeNid;
 
-    	if (descriptionStatus == preferredDescriptionType.getNid()) {
-    		languageType = rf2PreferredDescriptionTypeNid;
+        if (descriptionStatus == preferredDescriptionType.getNid()) {
+            languageType = rf2PreferredDescriptionTypeNid;
         }
 
-    	return languageType;
+        return languageType;
     }
 
     /**
@@ -790,10 +831,10 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
         this.releasePart = releasePart;
     }
 
-	/**
-	 * @param generateLangaugeRefset the generateLangaugeRefset to set
-	 */
-	public final void setGenerateLangaugeRefset(boolean generateLangaugeRefset) {
-		this.generateLangaugeRefset = generateLangaugeRefset;
-	}
+    /**
+     * @param generateLangaugeRefset the generateLangaugeRefset to set
+     */
+    public final void setGenerateLangaugeRefset(boolean generateLangaugeRefset) {
+        this.generateLangaugeRefset = generateLangaugeRefset;
+    }
 }

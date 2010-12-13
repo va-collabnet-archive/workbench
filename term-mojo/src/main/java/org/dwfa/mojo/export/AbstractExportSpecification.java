@@ -460,28 +460,28 @@ public abstract class AbstractExportSpecification implements ExportSpecification
          * @throws TerminologyException
          * @throws IOException
          */
-		private void fixIdTimeAndModule(I_ThinExtByRefPart tuple,
-				List<I_IdPart> idParts) throws TerminologyException,
-				IOException {
-			I_IdPart latestIdPart = null;
+        private void fixIdTimeAndModule(I_ThinExtByRefPart tuple,
+                List<I_IdPart> idParts) throws TerminologyException,
+                IOException {
+            I_IdPart latestIdPart = null;
 
-			for (I_IdPart iIdPart : idParts) {
-				if (iIdPart.getSource() == snomedIntId
-						&& (latestIdPart == null || (latestIdPart != null && iIdPart
-								.getVersion() > latestIdPart.getVersion()))) {
-					latestIdPart = iIdPart;
-				}
-			}
-			if (latestIdPart != null
-					&& tuple.getVersion() < latestIdPart.getVersion()) {
-				I_IdPart fixedPart = latestIdPart.duplicate();
-				fixedPart.setVersion(tuple.getVersion());
-				fixedPart.setPathId(tuple.getPathId());
+            for (I_IdPart iIdPart : idParts) {
+                if (iIdPart.getSource() == snomedIntId
+                        && (latestIdPart == null || (latestIdPart != null && iIdPart
+                                .getVersion() > latestIdPart.getVersion()))) {
+                    latestIdPart = iIdPart;
+                }
+            }
+            if (latestIdPart != null
+                    && tuple.getVersion() < latestIdPart.getVersion()) {
+                I_IdPart fixedPart = latestIdPart.duplicate();
+                fixedPart.setVersion(tuple.getVersion());
+                fixedPart.setPathId(tuple.getPathId());
 
-				idParts.add(fixedPart);
-				idParts.remove(latestIdPart);
-			}
-		}
+                idParts.add(fixedPart);
+                idParts.remove(latestIdPart);
+            }
+        }
 
         /**
          * Create a UUID id part for export. The member UUID will based on the refset id and concept 1 id.
@@ -544,7 +544,7 @@ public abstract class AbstractExportSpecification implements ExportSpecification
         @Override
         public ExtensionDto getExtensionDto(I_ThinExtByRefVersioned thinExtByRefVersioned,
                 I_ThinExtByRefPartConcept tuple, TYPE type, boolean latest) throws Exception {
-            ExtensionDto extensionDto = extensionProcessor.getExtensionDto(thinExtByRefVersioned, tuple, type, latest);
+            ExtensionDto extensionDto = extensionProcessor.getExtensionDto(thinExtByRefVersioned, tuple, type, latest);//termFactory.getConcept(tuple.getStatusId()) termFactory.getUids(thinExtByRefVersioned.getComponentId())
 
             extensionDto.setConcept1Id(updater.getIdMap(tuple, tuple.getC1id()));
 
