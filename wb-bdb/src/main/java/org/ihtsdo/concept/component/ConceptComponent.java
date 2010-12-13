@@ -723,7 +723,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public CopyOnWriteArrayList<R> revisions;
     protected ArrayList<IdentifierVersion> additionalIdVersions;
     private ArrayList<IdVersion> idVersions;
-    protected ConcurrentSkipListSet<RefsetMemberChronicleBI> annotations;
+    public ConcurrentSkipListSet<RefsetMemberChronicleBI> annotations;
 
     public boolean addAnnotation(RefsetMemberChronicleBI annotation) {
         if (annotations == null) {
@@ -814,7 +814,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         return buf.toString();
     }
 
-    protected abstract List<? extends Version> getVersions();
+    public abstract List<? extends Version> getVersions();
 
     public Set<Integer> getAnnotationSapNids() {
         int size = 0;
