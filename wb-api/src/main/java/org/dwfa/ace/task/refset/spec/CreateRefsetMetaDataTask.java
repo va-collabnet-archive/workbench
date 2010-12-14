@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -59,13 +59,13 @@ import org.ihtsdo.lucene.SearchResult;
  * relationships (member refset -> refset identity, remaining concepts ->
  * supporting refset)
  * This task also sets the destination inbox.
- * 
+ *
  * Required input to this task is the name of the refset being created.
- * 
+ *
  * @author Chrissy Hill
  * @author Perry Reid
  * @version 3, October 2009
- * 
+ *
  */
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec", type = BeanType.TASK_BEAN) })
 public class CreateRefsetMetaDataTask extends AbstractTask {
@@ -163,7 +163,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
      * Handles actions required by the task after normal task completion (such
      * as moving a
      * process to another user's input queue).
-     * 
+     *
      * @return void
      * @param process The currently executing Workflow process
      * @param worker The worker currently executing this task
@@ -180,7 +180,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
      * a small user interface to the user which allows them to specify the
      * characteristics
      * of this refset to be created.
-     * 
+     *
      * @return The exit condition of the task
      * @param process The currently executing Workflow process
      * @param worker The worker currently executing this task
@@ -212,7 +212,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 
     /**
      * Creates the new refset.
-     * 
+     *
      * @return void
      * @param process The currently executing Workflow process
      * @param worker The worker currently executing this task
@@ -244,23 +244,19 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             I_GetConceptData ptConcept =
                     termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
             I_GetConceptData isA = termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
-            I_GetConceptData supportingRefset =
-                    termFactory.getConcept(RefsetAuxiliary.Concept.SUPPORTING_REFSETS.getUids());
+            I_GetConceptData supportingRefset = termFactory.getConcept(RefsetAuxiliary.Concept.SUPPORTING_REFSETS.getUids());
             I_GetConceptData markedParentRel =
                     termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids());
             I_GetConceptData markedParentIsATypeRel =
                     termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_IS_A_TYPE.getUids());
-            I_GetConceptData specifiesRefsetRel =
-                    termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
-            I_GetConceptData refsetReviewerRel =
-                    termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_REVIEWER.getUids());
+            I_GetConceptData specifiesRefsetRel = termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
+            I_GetConceptData refsetReviewerRel = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_REVIEWER.getUids());
             I_GetConceptData refsetOwnerRel = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_OWNER.getUids());
             I_GetConceptData refsetEditorRel = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_EDITOR.getUids());
             I_GetConceptData promotionRel = termFactory.getConcept(RefsetAuxiliary.Concept.PROMOTION_REL.getUids());
             I_GetConceptData commentsRel = termFactory.getConcept(RefsetAuxiliary.Concept.COMMENTS_REL.getUids());
             I_GetConceptData editTimeRel = termFactory.getConcept(RefsetAuxiliary.Concept.EDIT_TIME_REL.getUids());
-            I_GetConceptData computeTimeRel =
-                    termFactory.getConcept(RefsetAuxiliary.Concept.COMPUTE_TIME_REL.getUids());
+            I_GetConceptData computeTimeRel = termFactory.getConcept(RefsetAuxiliary.Concept.COMPUTE_TIME_REL.getUids());
             I_GetConceptData purposeRel = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
             I_GetConceptData refsetComputeTypeRel =
                     termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_COMPUTE_TYPE_REL.getUids());
@@ -270,8 +266,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
                     termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PARENT_MEMBER_PURPOSE.getUids());
             I_GetConceptData enumeratedAnnotation =
                     termFactory.getConcept(RefsetAuxiliary.Concept.ENUMERATED_ANNOTATION_PURPOSE.getUids());
-            I_GetConceptData specAnnotation =
-                    termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_SPECIFICATION.getUids());
+            I_GetConceptData specAnnotation = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_SPECIFICATION.getUids());
             I_GetConceptData ancillaryDataAnnotation =
                     termFactory.getConcept(RefsetAuxiliary.Concept.ANCILLARY_DATA.getUids());
 
@@ -373,11 +368,8 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 
             process.setProperty(ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey(), memberRefset.getUids().iterator()
                 .next());
-            process.setProperty(ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey(), refsetSpec.getUids()
-                .iterator().next());
-
-            termFactory.getActiveAceFrameConfig().setBuilderToggleVisible(true);
-            termFactory.getActiveAceFrameConfig().setInboxToggleVisible(true);
+            process.setProperty(ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey(), refsetSpec.getUids().iterator()
+                .next());
 
             termFactory.addUncommittedNoChecks(memberRefset);
             termFactory.addUncommittedNoChecks(refsetSpec);
@@ -420,8 +412,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
         I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
         I_IntSet actives = helper.getCurrentStatusIntSet();
 
-        if (descriptionType.getNid() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize()
-            .getNid()) {
+        if (descriptionType.getNid() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid()) {
             String filteredDescription = description;
             filteredDescription = filteredDescription.trim();
             filteredDescription = filteredDescription.replaceAll("[\\s]+", " ");
@@ -455,8 +446,8 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 
     }
 
-    public void newRelationship(I_GetConceptData concept, I_GetConceptData relationshipType,
-            I_GetConceptData destination, I_ConfigAceFrame aceConfig) throws Exception {
+    public void newRelationship(I_GetConceptData concept, I_GetConceptData relationshipType, I_GetConceptData destination,
+            I_ConfigAceFrame aceConfig) throws Exception {
         try {
             int statusId = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptNid();
             UUID relUuid = UUID.randomUUID();
