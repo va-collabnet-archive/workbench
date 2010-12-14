@@ -62,10 +62,13 @@ public class ArenaGraphComponent extends mxGraphComponent
     public Component[] createComponents(mxCellState state) {
         if (getGraph().getModel().isVertex(state.getCell())) {
         	mxCell cell = (mxCell) state.getCell();
-        	if (ConceptViewSettings.class.isAssignableFrom(cell.getValue().getClass())) {
-                return new Component[] { new ConceptViewRenderer(state.getCell(), this, ace) };
-        	} else  if (TaxonomyViewSettings.class.isAssignableFrom(cell.getValue().getClass())) {
-                return new Component[] { new TaxonomyViewRenderer(state.getCell(), this, ace) };
+        	Object cellValue = cell.getValue();
+        	if (cellValue != null) {
+            	if (ConceptViewSettings.class.isAssignableFrom(cellValue.getClass())) {
+                    return new Component[] { new ConceptViewRenderer(state.getCell(), this, ace) };
+            	} else  if (TaxonomyViewSettings.class.isAssignableFrom(cellValue.getClass())) {
+                    return new Component[] { new TaxonomyViewRenderer(state.getCell(), this, ace) };
+            	}
         	}
         }
         return null;

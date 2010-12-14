@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -31,9 +32,48 @@ import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 
 public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
+	private I_GetConceptData semtagsRoot;
+	private List<String> validSemtags;
+	private List<String> domains;
+
 	public TerminologyHelperDroolsWorkbench(){
 		super();
+		try {
+			semtagsRoot = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SEMTAGS_ROOT.getUids());
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
+
+	public List<String> getValidSemtags() {
+		if (validSemtags == null) {
+			I_TermFactory tf = Terms.get();
+			validSemtags = new ArrayList<String>();
+			try {
+				I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
+				Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
+				descendants = getDescendants(descendants, semtagsRoot);
+				for (I_GetConceptData semtagConcept : descendants) {
+					for (I_DescriptionTuple tuple : semtagConcept.getDescriptionTuples(config.getAllowedStatus(),
+							config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
+							config.getConflictResolutionStrategy())) {
+						validSemtags.add(tuple.getText());
+					}
+				}
+			} catch (TerminologyException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return validSemtags;
+		} else {
+			return validSemtags;
+		}
+
+	}
+
 	@Override
 	public boolean isMemberOf(String conceptUUID, String refsetUUID) {
 		boolean result = false;
@@ -53,13 +93,15 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	public boolean isParentOf(String parent, String subtype) throws Exception {
 		boolean result = false;
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-		ConceptVersionBI parentConcept = Ts.get().getConceptVersion(config.getCoordinate(), UUID.fromString(parent));
-		ConceptVersionBI subtypeConcept = Ts.get().getConceptVersion(config.getCoordinate(), UUID.fromString(subtype));
+		int parentConceptNid = Terms.get().uuidToNative(UUID.fromString(parent));
+		int subtypeConceptNid = Terms.get().uuidToNative(UUID.fromString(subtype));
 		if (RulesLibrary.myStaticIsACache == null) { 
+			ConceptVersionBI parentConcept = Ts.get().getConceptVersion(config.getCoordinate(), parentConceptNid);
+			ConceptVersionBI subtypeConcept = Ts.get().getConceptVersion(config.getCoordinate(), subtypeConceptNid);
 			result = subtypeConcept.isKindOf(parentConcept);
 		} else {
 			//System.out.println("Using rules library isa cache!");
-			result = RulesLibrary.myStaticIsACache.isKindOf(subtypeConcept.getConceptNid(), parentConcept.getConceptNid());
+			result = RulesLibrary.myStaticIsACache.isKindOf(subtypeConceptNid, parentConceptNid);
 		}
 		return result;
 	}
@@ -75,8 +117,8 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		boolean result = false;
 		I_TermFactory tf = Terms.get();
 		try {
-			I_GetConceptData fsnType = tf.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
-
+			int fsnTypeNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+			fsn = "+\"" + QueryParser.escape(fsn) + "\"";
 			SearchResult results = tf.doLuceneSearch(fsn);
 			TopDocs topDocs = results.topDocs;
 			ScoreDoc[] docs = topDocs.scoreDocs;
@@ -91,7 +133,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 						DescriptionVersionBI description = (DescriptionVersionBI) 
 						Ts.get().getComponentVersion(Terms.get().getActiveAceFrameConfig().getCoordinate(), dnid);
 
-						if (description.getTypeNid() == fsnType.getConceptNid()
+						if (description.getTypeNid() == fsnTypeNid
 								&& description.getText().equals(fsn)
 								&& description.getLang().equals(potential_fsn.getLang())) {
 							result = true;
@@ -136,26 +178,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 	@Override
 	public boolean isValidSemtag(String semtag){
-		I_TermFactory tf = Terms.get();
-		List<String> validSemtags = new ArrayList<String>();
-		try {
-			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-			I_GetConceptData semtagsRoot = tf.getConcept(ArchitectonicAuxiliary.Concept.SEMTAGS_ROOT.getUids());
-			Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
-			descendants = getDescendants(descendants, semtagsRoot);
-			for (I_GetConceptData semtagConcept : descendants) {
-				for (I_DescriptionTuple tuple : semtagConcept.getDescriptionTuples(config.getAllowedStatus(),
-						config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
-						config.getConflictResolutionStrategy())) {
-					validSemtags.add(tuple.getText());
-				}
-			}
-		} catch (TerminologyException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return validSemtags.contains(semtag);
+		return getValidSemtags().contains(semtag);
 	}
 
 	public static Set<I_GetConceptData> getDescendants(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
@@ -197,23 +220,27 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 	@Override
 	public List<String> getListOfDomainsUuids(String conceptUuid) {
-		I_TermFactory tf = Terms.get();
-		List<String> domains = new ArrayList<String>();
-		try {
-			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-			Set<I_GetConceptData> allDomains = getDescendants(new HashSet<I_GetConceptData>(), 
-					Terms.get().getConcept(RefsetAuxiliary.Concept.MRCM_DOMAINS.getUids()));
-			for (I_GetConceptData domain : allDomains) {
-				if (isMemberOf(conceptUuid, domain.getPrimUuid().toString())) {
-					domains.add(domain.getPrimUuid().toString());
+		if (domains == null) {
+			domains = new ArrayList<String>();
+			I_TermFactory tf = Terms.get();
+			try {
+				I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
+				Set<I_GetConceptData> allDomains = getDescendants(new HashSet<I_GetConceptData>(), 
+						Terms.get().getConcept(RefsetAuxiliary.Concept.MRCM_DOMAINS.getUids()));
+				for (I_GetConceptData domain : allDomains) {
+					if (isMemberOf(conceptUuid, domain.getPrimUuid().toString())) {
+						domains.add(domain.getPrimUuid().toString());
+					}
 				}
+			} catch (TerminologyException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		} catch (TerminologyException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+			return domains;
+		} else {
+			return domains;
 		}
-		return domains;
 	}
 
 	@Override
@@ -248,20 +275,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 				}
 			}
 
-			I_GetConceptData semtagsRoot = tf.getConcept(ArchitectonicAuxiliary.Concept.SEMTAGS_ROOT.getUids());
-			Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
-			descendants = getDescendants(descendants, semtagsRoot);
-			List<String> loopSemtags = new ArrayList<String>();
-			for (I_GetConceptData semtagConcept : descendants) {
-				for (I_DescriptionTuple tuple : semtagConcept.getDescriptionTuples(config.getAllowedStatus(),
-						config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
-						config.getConflictResolutionStrategy())) {
-					if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()) {
-						loopSemtags.add(tuple.getText());
-					}
-				}
-			}
-			if (loopSemtags.containsAll(currentSemtags)) {
+			if (getValidSemtags().containsAll(currentSemtags)) {
 				result = true;
 			}
 		} catch (TerminologyException e) {

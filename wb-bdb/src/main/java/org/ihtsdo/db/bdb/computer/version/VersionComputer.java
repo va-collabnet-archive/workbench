@@ -15,6 +15,8 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper.RELATIVE_POSITION;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
@@ -78,6 +80,18 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                 matchingTuples, versions, precedencePolicy, contradictionManager);
     }
 
+    public void addSpecifiedRelVersions(List<V> matchingVersions, List<V> versions, Coordinate c) {
+        if (c.getPositionSet() == null || c.getPositionSet().size() < 1) {
+            addSpecifiedVersionsNullPositions(c.getAllowedStatusNids(), c.getIsaTypeNids(), 
+            		matchingVersions, versions, c.getPrecedence(),
+                    c.getContradictionManager(), null);
+        } else {
+            addSpecifiedVersionsWithPositions(c.getAllowedStatusNids(), c.getIsaTypeNids(), 
+            		c.getPositionSet(), matchingVersions, versions, c.getPrecedence(),
+                    c.getContradictionManager(),  null);
+        }
+    }
+    
     /**
      * 
      * @param allowedStatus
@@ -99,12 +113,35 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
         if (positions == null || positions.size() < 1) {
             addSpecifiedVersionsNullPositions(allowedStatus, allowedTypes, 
                     specifiedVersions, versions, precedencePolicy,
-                    contradictionManager);
+                    contradictionManager, null);
         } else {
             addSpecifiedVersionsWithPositions(allowedStatus, allowedTypes, 
                     positions, specifiedVersions, versions, precedencePolicy,
-                    contradictionManager);
+                    contradictionManager, null);
         }
+    }
+    
+    private class AuthorAntiFilter extends AuthorFilter {
+    	private AuthorAntiFilter(int... nids) {
+    		super(nids);
+    	}
+    	
+    	public boolean pass(V part) {
+    		return !super.pass(part);
+    	}
+    }
+
+    private class AuthorFilter {
+    	NidSetBI authorNids = new NidSet();
+    	private AuthorFilter(int... nids) {
+    		for (int nid: nids) {
+    			authorNids.add(nid);
+    		}
+    	}
+    	
+    	public boolean pass(V part) {
+    		return authorNids.contains(part.getAuthorNid());
+    	}
     }
 
     private void addSpecifiedVersionsWithPositions(NidSetBI allowedStatus,
@@ -113,14 +150,14 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
             List<V> specifiedVersions,
             List<? extends V> versions,
             Precedence precedencePolicy,
-            ContradictionManagerBI contradictionManager) {
+            ContradictionManagerBI contradictionManager, AuthorFilter filter) {
         HashSet<V> partsToAdd = new HashSet<V>();
         for (PositionBI p : positions) {
             HashSet<V> partsForPosition = new HashSet<V>();
             PositionMapper mapper = Bdb.getSapDb().getMapper(p);
             nextpart:
             for (V part : versions) {
-                if (part.getTime() == Long.MIN_VALUE) {
+                if (part.getTime() == Long.MIN_VALUE || (filter != null && filter.pass(part))) {
                     continue nextpart;
                 }
                 if (allowedTypes != null) {
@@ -218,7 +255,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
             List<V> specifiedVersions,
             List<? extends V> versions,
             Precedence precedencePolicy,
-            ContradictionManagerBI contradictionManager) {
+            ContradictionManagerBI contradictionManager, AuthorFilter filter) {
         if (versions == null) {
             return;
         }
@@ -226,7 +263,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
         HashSet<V> rejectedVersions = new HashSet<V>();
         nextpart:
         for (V part : versions) {
-            if (part.getTime() == Long.MIN_VALUE) {
+            if (part.getTime() == Long.MIN_VALUE || (filter != null && filter.pass(part))) {
                 rejectedVersions.add(part);
                 continue nextpart;
             }

@@ -105,7 +105,6 @@ import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_FetchConceptFromCursor;
 import org.ihtsdo.concept.I_ProcessConceptData;
-import org.ihtsdo.concept.component.ComponentList;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.concept.component.description.Description;
@@ -165,7 +164,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     private File envHome;
 
     public static void canEdit(I_ConfigAceFrame aceFrameConfig) throws TerminologyException {
-        if (aceFrameConfig.getEditingPathSet().size() == 0) {
+        if (aceFrameConfig.getEditingPathSet().isEmpty()) {
             throw new TerminologyException(
                 "<br><br>You must select an editing path before editing...<br><br>No editing path selected.");
         }
@@ -292,10 +291,12 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         BdbCommitManager.forget(rel);
     }
 
+    @Override
     public void forget(I_ExtendByRef extension) throws IOException {
         BdbCommitManager.forget(extension);
     }
 
+    @Override
     public void forget(I_ConceptAttributeVersioned attr) throws IOException {
         BdbCommitManager.forget(attr);
     }
@@ -315,29 +316,34 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     @Override
     public List<? extends I_ExtendByRef> getAllExtensionsForComponent(int nid) throws IOException {
         List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
-        if (pairs == null || pairs.size() == 0) {
+        if (pairs == null || pairs.isEmpty()) {
             return new ArrayList<I_ExtendByRef>(0);
         }
         List<I_ExtendByRef> returnValues = new ArrayList<I_ExtendByRef>(pairs.size());
+        HashSet<Integer> addedMembers = new HashSet<Integer>();
         for (NidPairForRefset pair : pairs) {
             I_ExtendByRef ext = (I_ExtendByRef) Bdb.getComponent(pair.getMemberNid());
-            if (ext != null) {
+            if (ext != null && !addedMembers.contains(ext.getNid())) {
+            	addedMembers.add(ext.getNid());
                 returnValues.add(ext);
             }
         }
         return returnValues;
     }
 
+    @Override
     public List<? extends I_ExtendByRef> getRefsetExtensionsForComponent(int refsetNid, int nid) throws IOException {
         List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
-        if (pairs == null || pairs.size() == 0) {
+        if (pairs == null || pairs.isEmpty()) {
             return new ArrayList<I_ExtendByRef>(0);
         }
         List<I_ExtendByRef> returnValues = new ArrayList<I_ExtendByRef>(pairs.size());
+        HashSet<Integer> addedMembers = new HashSet<Integer>();
         for (NidPairForRefset pair : pairs) {
             if (pair.getRefsetNid() == refsetNid) {
                 I_ExtendByRef ext = (I_ExtendByRef) Bdb.getComponent(pair.getMemberNid());
-                if (ext != null) {
+                if (ext != null && !addedMembers.contains(ext.getNid())) {
+                	addedMembers.add(ext.getNid());
                     returnValues.add(ext);
                 }
             }
@@ -395,9 +401,19 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public Set<I_GetConceptData> getConcept(String conceptId) throws TerminologyException,
+    public Set<I_GetConceptData> getConcept(String conceptIdStr) throws TerminologyException,
             org.apache.lucene.queryParser.ParseException, IOException {
-        throw new UnsupportedOperationException();
+        Set<I_GetConceptData> matchingConcepts = new HashSet<I_GetConceptData>();
+        Query q = new QueryParser(LuceneManager.version,
+                "desc", new StandardAnalyzer(LuceneManager.version)).parse(conceptIdStr);
+        SearchResult result = LuceneManager.search(q);
+
+        for (int i = 0; i < result.topDocs.totalHits; i++) {
+            Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
+            int cnid = Integer.parseInt(doc.get("cnid"));
+            matchingConcepts.add(Concept.get(cnid));
+        }
+        return matchingConcepts;
     }
 
     @Override
@@ -1709,7 +1725,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         Concept refsetConcept = Concept.get(refsetNid);
         RefsetSpec specHelper = new RefsetSpec(refsetConcept, true, frameConfig);
 
-        ComponentList<RefsetMember<?, ?>> members = refsetConcept.getData().getRefsetMembers();
+        Collection<RefsetMember<?, ?>> members = refsetConcept.getData().getRefsetMembers();
 
         HashSet<Integer> currentMembersList = new HashSet<Integer>();
         NidSetBI allowedStatus = frameConfig.getAllowedStatus();

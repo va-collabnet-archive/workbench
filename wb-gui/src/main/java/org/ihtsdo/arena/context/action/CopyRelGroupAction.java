@@ -77,7 +77,7 @@ public class CopyRelGroupAction extends AbstractAction {
 			
 			//get rels with matching sourceGroup from sourceComponent 
 			RelGroupVersionBI source = (RelGroupVersionBI) sourceComponent; 
-			Collection sourceRels = source.getRels(); 
+			Collection sourceRels = source.getCurrentRels(); 
 			//loop through rels
 			 for (Object relObject: sourceRels) {
 				 Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();

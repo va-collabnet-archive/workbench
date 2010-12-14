@@ -8,15 +8,15 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ihtsdo</groupId>
     <artifactId>wb-mmb</artifactId>
-    <version>2.6.0-trek-7-SNAPSHOT</version>
+    <version>2.6.0-trek-7</version>
     <name>Workbench modules multi-module build</name>
     <packaging>pom</packaging>
     <description>multi-module build for the Workbench modules (dwfa-pom, foundation, 
                  dwfa-mojo, core, ace-api, vodb and term-mojo)</description>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit_trek</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit_trek</developerConnection>
-        <url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit_trek</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-2.6.0-trek-7</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-2.6.0-trek-7</developerConnection>
+        <url>https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-2.6.0-trek-7</url>
     </scm>
     <properties>
         <ace.devstyle.version>1.1-SNAPSHOT</ace.devstyle.version>
@@ -141,6 +141,7 @@
         <module>wb-docs</module>
         <module>tk-concept-component</module>
         <module>tk-drools</module>
+        <module>tk-arena-rules</module>
         <module>rule-engine-integration</module>
     </modules>
     <!-- Reconfigure the central repository definitions, which will be directed by settings.xml to IHTSDO.

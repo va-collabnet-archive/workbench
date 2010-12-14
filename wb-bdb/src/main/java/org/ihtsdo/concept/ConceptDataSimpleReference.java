@@ -15,7 +15,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.concept.component.ComponentList;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.ConceptComponentBinder;
 import org.ihtsdo.concept.component.Revision;
@@ -46,10 +45,10 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     private static HashMap<I_ConfigAceFrame, IsLeafBinder> isLeafBinders = new HashMap<I_ConfigAceFrame, IsLeafBinder>();
 
     private AtomicReference<ConceptAttributes> attributes = new AtomicReference<ConceptAttributes>();
-    private AtomicReference<AddSrcRelList> srcRels = new AtomicReference<AddSrcRelList>();
-    private AtomicReference<AddDescriptionList> descriptions = new AtomicReference<AddDescriptionList>();
-    private AtomicReference<AddImageList> images = new AtomicReference<AddImageList>();
-    private AtomicReference<AddMemberList> refsetMembers = new AtomicReference<AddMemberList>();
+    private AtomicReference<AddSrcRelSet> srcRels = new AtomicReference<AddSrcRelSet>();
+    private AtomicReference<AddDescriptionSet> descriptions = new AtomicReference<AddDescriptionSet>();
+    private AtomicReference<AddImageSet> images = new AtomicReference<AddImageSet>();
+    private AtomicReference<AddMemberSet> refsetMembers = new AtomicReference<AddMemberSet>();
     
     
     private AtomicReference<ConcurrentSkipListSet<Integer>> descNids =
@@ -98,7 +97,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
 
 
-    private boolean hasUncommittedVersion(ComponentList<? extends ConceptComponent<?, ?>> componentList) {
+    private boolean hasUncommittedVersion(Collection<? extends ConceptComponent<?, ?>> componentList) {
         if (componentList != null) {
             for (ConceptComponent<?, ?> cc: componentList) {
                 if (hasUncommittedVersion(cc)) {
@@ -140,18 +139,20 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         return false;
     }
 
-    public AddSrcRelList getSourceRels() throws IOException {
+    @Override
+    public AddSrcRelSet getSourceRels() throws IOException {
         if (srcRels.get() == null) {
-            srcRels.compareAndSet(null, new AddSrcRelList(getList(new RelationshipBinder(), OFFSETS.SOURCE_RELS,
+            srcRels.compareAndSet(null, new AddSrcRelSet(getList(new RelationshipBinder(), OFFSETS.SOURCE_RELS,
                 enclosingConcept)));
         }
         handleCanceledComponents();
         return srcRels.get();
     }
 
-    public AddDescriptionList getDescriptions() throws IOException {
+    @Override
+    public AddDescriptionSet getDescriptions() throws IOException {
         if (descriptions.get() == null) {
-            descriptions.compareAndSet(null, new AddDescriptionList(getList(new DescriptionBinder(),
+            descriptions.compareAndSet(null, new AddDescriptionSet(getList(new DescriptionBinder(),
                 OFFSETS.DESCRIPTIONS, enclosingConcept)));
         }
         handleCanceledComponents();
@@ -221,6 +222,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         return componentList;
     }
 
+    @Override
     public ConceptAttributes getConceptAttributes() throws IOException {
         if (attributes.get() == null) {
             ArrayList<ConceptAttributes> components =
@@ -233,9 +235,10 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         return attributes.get();
     }
 
-    public AddMemberList getRefsetMembers() throws IOException {
+    @Override
+    public AddMemberSet getRefsetMembers() throws IOException {
         if (refsetMembers.get() == null) {
-            refsetMembers.compareAndSet(null, new AddMemberList(getList(new RefsetMemberBinder(enclosingConcept),
+            refsetMembers.compareAndSet(null, new AddMemberSet(getList(new RefsetMemberBinder(enclosingConcept),
                 OFFSETS.REFSET_MEMBERS, enclosingConcept)));
         }
         handleCanceledComponents();
@@ -268,25 +271,25 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         }
 	}
 
-	private void removeCanceledFromList(List<? extends ConceptComponent<?,?>> ccList) {
-		if (ccList != null) {
-			synchronized (ccList) {
-				List<Integer> toRemove = new ArrayList<Integer>();
-				for (int i = ccList.size() -1; i > -1; i--) {
-					if (ccList.get(i).getTime() == Long.MIN_VALUE) {
-							toRemove.add(i);
-					}
-				}
-				for (int i: toRemove) {
-					ccList.remove(i);
-				}
-			}
-		}
-	}
+    private void removeCanceledFromList(Collection<? extends ConceptComponent<?, ?>> ccList) {
+        if (ccList != null) {
+            synchronized (ccList) {
+                List<ConceptComponent<?, ?>> toRemove = new ArrayList<ConceptComponent<?, ?>>();
+                for (ConceptComponent<?, ?> cc : ccList) {
+                    if (cc.getTime() == Long.MIN_VALUE) {
+                        toRemove.add(cc);
+                    }
+                }
+                ccList.removeAll(toRemove);
 
-    public AddImageList getImages() throws IOException {
+            }
+        }
+    }
+
+    @Override
+    public AddImageSet getImages() throws IOException {
         if (images.get() == null) {
-            images.compareAndSet(null, new AddImageList(getList(new ImageBinder(), OFFSETS.IMAGES, enclosingConcept)));
+            images.compareAndSet(null, new AddImageSet(getList(new ImageBinder(), OFFSETS.IMAGES, enclosingConcept)));
         }
         handleCanceledComponents();
         return images.get();
@@ -324,6 +327,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         return binder.entryToObject(mutableInput);
     }
 
+    @Override
     public void set(ConceptAttributes attr) throws IOException {
         if (attributes.get() != null) {
             throw new IOException("Attributes is already set. Please modify the exisiting attributes object.");
@@ -474,22 +478,22 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
 
     @Override
-    public ComponentList<Description> getDescriptionsIfChanged() throws IOException {
+    public Collection<Description> getDescriptionsIfChanged() throws IOException {
         return descriptions.get();
     }
 
     @Override
-    public ComponentList<Image> getImagesIfChanged() throws IOException {
+    public Collection<Image> getImagesIfChanged() throws IOException {
         return images.get();
     }
 
     @Override
-    public ComponentList<RefsetMember<?, ?>> getRefsetMembersIfChanged() throws IOException {
+    public Collection<RefsetMember<?, ?>> getRefsetMembersIfChanged() throws IOException {
         return refsetMembers.get();
     }
 
     @Override
-    public ComponentList<Relationship> getSourceRelsIfChanged() throws IOException {
+    public Collection<Relationship> getSourceRelsIfChanged() throws IOException {
         return srcRels.get();
     }
 
@@ -532,6 +536,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         return null;
     }
 
+    @Override
     public boolean hasComponent(int nid) throws IOException {
         if (getNid() == nid) {
             return true;

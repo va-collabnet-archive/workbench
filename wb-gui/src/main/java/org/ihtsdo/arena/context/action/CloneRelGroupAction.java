@@ -28,13 +28,11 @@ import org.ihtsdo.tk.drools.facts.ComponentFact;
 import org.ihtsdo.tk.drools.facts.RelFact;
 import org.ihtsdo.tk.drools.facts.RelGroupFact;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
-
-//test
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_RelPart;
 import org.ihtsdo.tk.api.PositionBI;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-//
+
 
 
 public class CloneRelGroupAction extends AbstractAction {
@@ -77,11 +75,12 @@ public class CloneRelGroupAction extends AbstractAction {
 				
 				//get rels with matching sourceGroup from sourceComponent 
 				RelGroupVersionBI source = (RelGroupVersionBI) sourceComponent; 
-				Collection sourceRels = source.getRels(); 
+				Collection sourceRels = source.getCurrentRels(); //form getRels
 				//loop through rels
 				 for (Object relObject: sourceRels) {
 					 Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
 					 ComponentVersionBI component = (ComponentVersionBI) relObject; 
+					 
 					 
 								RelationshipVersionBI rel = (RelationshipVersionBI) component;
 	 							I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), concept, 

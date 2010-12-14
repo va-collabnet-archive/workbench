@@ -14,6 +14,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -72,6 +73,7 @@ import org.ihtsdo.tk.spec.RelSpec;
 import org.ihtsdo.tk.spec.SpecBI;
 import org.ihtsdo.tk.spec.SpecFactory;
 import org.ihtsdo.util.swing.GuiUtil;
+
 
 public class ConceptView extends JPanel {
 	
@@ -140,20 +142,22 @@ public class ConceptView extends JPanel {
 
 						try {
 							Collection<? extends RelGroupVersionBI> group = Ts.get().getConceptVersion(coordinate, concept.getNid()).getRelGroups();
-							if (group != null) {
-								CollapsePanel  cprg = new CollapsePanel("rel groups", settings);
-								boolean cprgAdded = false;
-								for (RelGroupVersionBI r: group) {
-									if (!cprgAdded) {
-										add(cprg, gbc);
+							for (RelGroupVersionBI r: group) { 
+								Collection<? extends RelationshipVersionBI> currentRels = r.getCurrentRels();
+								if(!currentRels.isEmpty()) { 
+									CollapsePanel  cprg = new CollapsePanel("rel groups", settings);
+									boolean cprgAdded = false;
+										if (!cprgAdded) {
+											add(cprg, gbc);
+											gbc.gridy++;
+											cprgAdded = true;
+										}
+										
+										JComponent rgc = getRelGroupComponent(r);
+										cprg.addToggleComponent(rgc);
+										add(rgc, gbc);
 										gbc.gridy++;
-										cprgAdded = true;
-									}
-									JComponent rgc = getRelGroupComponent(r);
-									cprg.addToggleComponent(rgc);
-									add(rgc, gbc);
-									gbc.gridy++;
-								}				
+								}
 							}
 						} catch (ContraditionException e) {
 							AceLog.getAppLog().alertAndLogException(e);
@@ -478,6 +482,11 @@ public class ConceptView extends JPanel {
 
 	private Collection<JComponent> dropComponents = Collections.synchronizedList(new ArrayList<JComponent>());
 
+	public ConceptView() throws TerminologyException, IOException {
+		this.config = Terms.get().getActiveAceFrameConfig();
+		kb = new EditPanelKb(config);
+		addCommitListener(settings);
+	}
 
 	
 	public ConceptView(I_ConfigAceFrame config, ConceptViewSettings settings) {
@@ -485,6 +494,11 @@ public class ConceptView extends JPanel {
 		this.config = config;
 		this.settings = settings;
 		kb = new EditPanelKb(config);
+		addCommitListener(settings);
+	}
+
+
+	private void addCommitListener(ConceptViewSettings settings) {
 		settings.getConfig().addPropertyChangeListener("commit", new PropertyChangeListener() {
 			
 			@Override
@@ -526,14 +540,16 @@ public class ConceptView extends JPanel {
 		CollapsePanel cprg = new CollapsePanel("Group: ", settings);
 		relGroupPanel.add(cprg, gbc);
 		gbc.gridy++;
-		for (RelationshipVersionBI r: group.getRels()) {
+		for (RelationshipVersionBI r: group.getCurrentRels()) {
 			DragPanelRel dpr = getRelComponent(r);
 			cprg.addToggleComponent(dpr);
 			dpr.setInGroup(true);
 			relGroupPanel.add(dpr, gbc);
 			gbc.gridy++;
 		}
+	
 		return relGroupPanel;
+
 	}
 	
 	private abstract class PropertyChangeManager<T extends TypedComponentAnalogBI> implements PropertyChangeListener {
@@ -830,7 +846,11 @@ public class ConceptView extends JPanel {
 	
 	private void getKbActions(Object thingToDrop) {
 		if (kbase == null) {
-			kbase = EditPanelKb.setupKb("org/ihtsdo/arena/drools/ContextualDropActions.drl");
+			try {
+				kbase = EditPanelKb.setupKb(new File("drools-rules/ContextualDropActions.drl"));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		try {
 			actionList.clear();

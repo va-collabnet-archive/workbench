@@ -1112,7 +1112,7 @@ public class RefsetSpecPanel extends JPanel {
         return false;
     }
 
-    private Long getSnomedId(int componentId) {
+    private String getSnomedId(int componentId) {
         try {
             I_Identify idVersioned = Terms.get().getId(componentId);
             int snomedIntegerId =
@@ -1130,7 +1130,7 @@ public class RefsetSpecPanel extends JPanel {
             }
 
             if (latestPart != null) {
-                return (Long) latestPart.getDenotation();
+                return latestPart.getDenotation().toString();
             } else {
                 throw new TerminologyException("No SNOMED ID available");
             }
@@ -1139,7 +1139,7 @@ public class RefsetSpecPanel extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new Long(-1);
+        return "unknown";
     }
 
     private boolean hasSingleComponentRowSelected() {

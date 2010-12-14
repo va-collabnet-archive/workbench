@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.StreamTokenizer;
 import java.io.UnsupportedEncodingException;
@@ -214,7 +215,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     private static final int IS_EQUAL = 0;
     private static final int IS_GREATER = 1;
     private static final String FILE_SEPARATOR = File.separator;
-    
+
     // workaround to set stated relationship characteristic as STATED_RELATIONSHIP 
     // starts a integer 5 at beginning of import pipeline
     // integer 5 is replaced with STATED_RELATIONSHIP UUID at eConcept creation
@@ -737,8 +738,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             for (int i = 0; i < 5; i++)
                 yRelCharArray[i] = ArchitectonicAuxiliary.getSnomedCharacteristicType(i).getUids()
                         .iterator().next();
-            yRelCharArray[STATED_CHAR_WORKAROUND] = ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()
-                    .iterator().next();
+            yRelCharArray[STATED_CHAR_WORKAROUND] = ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP
+                    .getUids().iterator().next();
 
             // string lookup array
             yRelCharStrArray = new String[6];
@@ -1093,7 +1094,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             String erFileName = wDir + scratchDirectory + FILE_SEPARATOR
                     + "relationships_report.txt";
             BufferedWriter erw;
-            erw = new BufferedWriter(new FileWriter(erFileName));
+            erw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(erFileName),
+                    "UTF-8"));
             getLog().info("RELATIONSHIPS Exceptions Report OUTPUT: " + erFileName);
 
             processRelationshipsFiles(wDir, listOfRiDirs, oosRel, erw);
@@ -1202,7 +1204,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void parseArfConFile(File f, ObjectOutputStream oos) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(f));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
+                "UTF-8"));
 
         int CONCEPT_UUID = 0;
         int CONCEPT_STATUS = 1;
@@ -1244,7 +1247,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void parseArfDesFile(File f, ObjectOutputStream oos) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(f));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
+                "UTF-8"));
 
         int DESCRIPTION_UUID = 0;
         int STATUS_UUID = 1;
@@ -1306,7 +1310,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void parseArfRelFile(File f, ObjectOutputStream oos) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(f));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
+                "UTF-8"));
 
         int RELATIONSHIP_UUID = 0;
         int STATUS_UUID = 1;
@@ -1360,7 +1365,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void parseArfIdsFile(File f, ObjectOutputStream oos) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(f));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
+                "UTF-8"));
 
         int PRIMARY_UUID = 0;
         int SOURCE_SYSTEM_UUID = 1;
@@ -1402,7 +1408,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void parseArfRsBoolFile(File f, ObjectOutputStream oos) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(f));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
+                "UTF-8"));
 
         int REFSEST_UUID = 0;
         int MEMBER_UUID = 1;
@@ -1454,7 +1461,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void parseArfRsConFile(File f, ObjectOutputStream oos) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(f));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
+                "UTF-8"));
 
         int REFSEST_UUID = 0;
         int MEMBER_UUID = 1;
@@ -1500,7 +1508,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void parseArfRsIntFile(File f, ObjectOutputStream oos) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(f));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
+                "UTF-8"));
 
         int REFSEST_UUID = 0;
         int MEMBER_UUID = 1;
@@ -1546,7 +1555,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void parseArfRsStrFile(File f, ObjectOutputStream oos) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(f));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
+                "UTF-8"));
 
         int REFSEST_UUID = 0;
         int MEMBER_UUID = 1;
@@ -1993,7 +2003,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         lsb = yStatusUuidArray[id.status].getLeastSignificantBits();
         eId.setStatusUuid(new UUID(msb, lsb));
         // eId.setStatusUuid(lookupYStatus(id.status));
-        eId.setTime(id.yRevision);
+        eId.setTime(yRevDateArray[id.yRevision]);
 
         return eId;
     }
@@ -2065,15 +2075,17 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void executeMojoStep5() {
-        getLog().info("*** Sct1ArfToEConcept Step #5 BEGINNING -- REFSET PREPARATION ***");
+        getLog().info("*** Sct1ArfToEConcept Step #5 BEGINNING -- REFSET ATTACHMENT ***");
         long start = System.currentTimeMillis();
 
         try {
             // *** READ IN REFSET ***
+            int numObj = countFileObjects(fNameStep2Refset);
+
             ObjectInputStream ois;
             ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(
                     fNameStep2Refset)));
-            ArrayList<SctYRefSetRecord> aRs = new ArrayList<SctYRefSetRecord>();
+            ArrayList<SctYRefSetRecord> aRs = new ArrayList<SctYRefSetRecord>(numObj);
 
             int count = 0;
             Object obj = null;
@@ -2083,14 +2095,14 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                         aRs.add((SctYRefSetRecord) obj);
                         count++;
                         if (count % 100000 == 0)
-                            getLog().info(" concept count = " + count);
+                            getLog().info(" refset member in = " + count);
                     }
                 }
             } catch (EOFException ex) {
-                getLog().info(" id count = " + count + " @EOF\r\n");
+                getLog().info(" refset member in = " + count + " @EOF\r\n");
             }
             ois.close();
-            getLog().info(" id count = " + count + "\r\n");
+            getLog().info(" refset member in = " + count + "\r\n");
 
             // Sort by [COMPONENTID]
             Collections.sort(aRs);
@@ -2357,7 +2369,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         getLog().info(
                 "*** MASTER SORT TIME: " + ((System.currentTimeMillis() - start) / 1000)
                         + " seconds");
-        getLog().info("*** Sct1ArfToEConcept Step #5 COMPLETED -- REFSET PREPARATION ***\r\n");
+        getLog().info("*** Sct1ArfToEConcept Step #5 COMPLETED -- REFSET ATTACHMENT ***\r\n");
     }
 
     private int compareMsbLsb(long aMsb, long aLsb, long bMsb, long bLsb) {
@@ -3313,6 +3325,13 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         if (rsByRsList != null && rsByRsList.size() > 0) {
             List<TkRefsetAbstractMember<?>> listErm = new ArrayList<TkRefsetAbstractMember<?>>();
 
+            if (rsByRsList.size() > 100000) {
+                UUID tmpUUID = new UUID(cRec0.conUuidMsb, cRec0.conUuidLsb);
+                getLog().info(
+                        "::: NOTE: concept with refset members = " + rsByRsList.size()
+                                + ", concept UUID = " + tmpUUID.toString());
+            }
+
             for (SctYRefSetRecord r : rsByRsList) {
 
                 if (r.valueType == SctYRefSetRecord.ValueType.BOOLEAN) {
@@ -4116,7 +4135,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         // SETUP DESCRIPTIONS EXCEPTION REPORT
         String erFileName = wDir + scratchDirectory + FILE_SEPARATOR + "descriptions_report.txt";
         BufferedWriter er;
-        er = new BufferedWriter(new FileWriter(erFileName));
+        er = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(erFileName), "UTF-8"));
         getLog().info("exceptions report OUTPUT: " + erFileName);
 
         Iterator<List<SCTFile>> dit = sctv.iterator(); // Directory Iterator
@@ -4320,9 +4339,54 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 count2 = a2.length;
 
                 int r1 = 0, r2 = 0, r3 = 0; // reset record indices
-                int nSame = 0, nMod = 0, nAdd = 0, nDrop = 0; // counters
+                int nSame = 0, nMod = 0, nAdd = 0, nDrop = 0, nSidChange = 0; // counters
                 a3 = new SctYRelRecord[count2];
                 while ((r1 < count1) && (r2 < count2)) {
+//                    // :!!!:DEBUG
+//                    UUID debugUuid1 = new UUID(a1[r1].relUuidMsb, a1[r1].relUuidLsb);
+//                    UUID debugUuid2 = new UUID(a2[r2].relUuidMsb, a2[r2].relUuidLsb);
+//
+//                    if (debugUuid1.toString().compareToIgnoreCase(
+//                            "11eb336d-a06d-5558-8676-b7c2777a051f") == 0
+//                            || debugUuid1.toString().compareToIgnoreCase(
+//                                    "9c60b432-f891-5124-b730-8389c78ba6cc") == 0
+//                            || debugUuid2.toString().compareToIgnoreCase(
+//                                    "11eb336d-a06d-5558-8676-b7c2777a051f") == 0
+//                            || debugUuid2.toString().compareToIgnoreCase(
+//                                    "9c60b432-f891-5124-b730-8389c78ba6cc") == 0) {
+//                        System.out.println("!!! VERSION A: " + debugUuid1 + ", Rel="
+//                                + a1[r1].relSnoId + ": " + a1[r1].c1SnoId + ", "
+//                                + lookupRoleType(a1[r1].roleTypeIdx) + ", " + a1[r1].c2SnoId + " g"
+//                                + a1[r1].group + " s" + a1[r1].status);
+//
+//                        System.out.println("!!! VERSION B: " + debugUuid2 + ", Rel="
+//                                + a2[r2].relSnoId + ": " + a2[r2].c1SnoId + ", "
+//                                + lookupRoleType(a2[r2].roleTypeIdx) + ", " + a2[r2].c2SnoId + " g"
+//                                + a2[r2].group + " s" + a2[r2].status);
+//
+//                        switch (compareRelationship(a1[r1], a2[r2])) {
+//                        case 1:
+//                            System.out.println("!!! ...1... SAME SKIP ");
+//                            break;
+//                        case 2:
+//                            System.out
+//                                    .println("!!! ...2... MODIFIED, WRITE A RETIRED, WRITE B CURRENT, B=>A ");
+//                            break;
+//                        case 3:
+//                            System.out.println("!!! ...3... ADDED, WRITE B CURRENT, B=>C=>A ");
+//                            break;
+//                        case 4:
+//                            System.out.println("!!! ...4... DROPPED, WRITE A RETIRED");
+//                            break;
+//                        case 4:
+//                            System.out.println("!!! ...5... SNOMED ID CHANGED");
+//                            break;
+//                        default:
+//                            System.out.println("!!! ...DEFAULT... NOT ALLOWED ");
+//                            break;
+//                        }
+//                    }
+
                     switch (compareRelationship(a1[r1], a2[r2])) {
                     case 1: // SAME RELATIONSHIP, skip to next
                         r1++;
@@ -4388,11 +4452,30 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                             a1[r1].status = 1; // set to RETIRED
                             a1[r1].yRevision = xRevDate;
                             oos.writeUnshared(a1[r1]);
-
-                            // :xxx: bw.write(a1[r1].toStringArf(revDate, pathID));
                         }
                         r1++;
                         nDrop++;
+                        break;
+
+                    case 5:
+                        // RETIRE FROM OLD GROUP
+                        if (a1[r1].status != 1) { // if not RETIRED
+                            a1[r1].status = 1; // set to RETIRED
+                            a1[r1].yRevision = xRevDate;
+                            oos.writeUnshared(a1[r1]);
+                        }
+
+                        // ADD TO NEW GROUP
+                        a2[r2].yRevision = xRevDate;
+                        oos.writeUnshared(a2[r2]);
+
+                        // REPLACE EXISTING RECORD
+                        a1[r1] = a2[r2];
+
+                        r1++;
+                        r2++;
+
+                        nSidChange++;
                         break;
 
                     } // SWITCH (COMPARE RELATIONSHIP)
@@ -4432,7 +4515,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 }
 
                 // Check counter numbers to master and input file record counts
-                countCheck(count1, count2, nSame, nMod, nAdd, nDrop);
+                countCheck(count1, count2, nSame, nMod, nAdd, nDrop, nSidChange);
 
                 // SETUP NEW MASTER ARRAY
                 a2 = new SctYRelRecord[count1 + nAdd];
@@ -4475,6 +4558,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private int compareDescription(SctYDesRecord c1, SctYDesRecord c2) {
+
         if (c1.desSnoId == c2.desSnoId) {
             if ((c1.status == c2.status) && (c1.conSnoId == c2.conSnoId)
                     && c1.termText.equals(c2.termText) && (c1.capStatus == c2.capStatus)
@@ -4494,6 +4578,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
     private int compareRelationship(SctYRelRecord c1, SctYRelRecord c2) {
         if (c1.relUuidMsb == c2.relUuidMsb && c1.relUuidLsb == c2.relUuidLsb) {
+            if (c1.relSnoId != c2.relSnoId)
+                return 5; // relSnoId Changed
+
             if ((c1.status == c2.status) && (c1.characteristic == c2.characteristic)
                     && (c1.refinability == c2.refinability) && (c1.group == c2.group))
                 return 1; // SAME
@@ -4525,7 +4612,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         int SNOMEDID = 4; // SNOMED RT ID (Read Code)
         int ISPRIMITIVE = 5;
 
-        BufferedReader br = new BufferedReader(new FileReader(fName));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fName),
+                "UTF-8"));
         int concepts = 0;
 
         // Header row
@@ -4573,41 +4661,40 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         st.eolIsSignificant(true);
         int descriptions = 0;
 
-        skipLineOne(st);
-        int tokenType = st.nextToken();
-        while ((tokenType != StreamTokenizer.TT_EOF) && (descriptions < count)) {
+        int DESCRIPTIONID = 0;
+        int DESCRIPTIONSTATUS = 1;
+        int CONCEPTID = 2;
+        int TERM = 3;
+        int INITIALCAPITALSTATUS = 4;
+        int DESCRIPTIONTYPE = 5;
+        int LANGUAGECODE = 6;
+
+        // Header row
+        r.readLine();
+
+        while (r.ready()) {
+            String[] line = r.readLine().split(TAB_CHARACTER);
+
             // DESCRIPTIONID
-            long descriptionId = Long.parseLong(st.sval);
+            long descriptionId = Long.parseLong(line[DESCRIPTIONID]);
             // DESCRIPTIONSTATUS
-            tokenType = st.nextToken();
-            int status = Integer.parseInt(st.sval);
+            int status = Integer.parseInt(line[DESCRIPTIONSTATUS]);
             // CONCEPTID
-            tokenType = st.nextToken();
-            long conSnoId = Long.parseLong(st.sval);
+            long conSnoId = Long.parseLong(line[CONCEPTID]);
             // TERM
-            tokenType = st.nextToken();
-            String text = st.sval;
+            String text = line[TERM];
             // INITIALCAPITALSTATUS
-            tokenType = st.nextToken();
-            int capStatus = Integer.parseInt(st.sval);
+            int capStatus = Integer.parseInt(line[INITIALCAPITALSTATUS]);
             // DESCRIPTIONTYPE
-            tokenType = st.nextToken();
-            int typeInt = Integer.parseInt(st.sval);
+            int typeInt = Integer.parseInt(line[DESCRIPTIONTYPE]);
             // LANGUAGECODE
-            tokenType = st.nextToken();
-            String lang = st.sval;
+            String lang = line[LANGUAGECODE];
 
             // Save to sortable array
             a[descriptions] = new SctYDesRecord(descriptionId, status, conSnoId, text, capStatus,
                     typeInt, lang);
             descriptions++;
 
-            // CR
-            tokenType = st.nextToken();
-            // LF
-            tokenType = st.nextToken();
-            // Beginning of loop
-            tokenType = st.nextToken();
         }
         Arrays.sort(a);
 
@@ -4621,7 +4708,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
         long start = System.currentTimeMillis();
 
-        BufferedReader r = new BufferedReader(new FileReader(fName));
+        BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(fName),
+                "UTF-8"));
         StreamTokenizer st = new StreamTokenizer(r);
         st.resetSyntax();
         st.wordChars('\u001F', '\u00FF');
@@ -4775,11 +4863,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         };
         Arrays.sort(a, comp);
 
-        // 
-        if (a == null) 
-            System.out.println("!!!:DEBUG:");
-        if (a.length < 1) 
-            System.out.println("!!!:DEBUG:");
         long lastC1 = a[0].c1SnoId;
         int lastGroup = a[0].group;
         String GroupListStr = getGroupListString(a, 0);
@@ -4792,6 +4875,15 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // SET RELATIONSHIP UUID
             UUID uuid = Type5UuidFactory.get(REL_ID_NAMESPACE_UUID_TYPE1 + a[i].c1SnoId
                     + a[i].roleTypeSnoId + a[i].c2SnoId + GroupListStr);
+            // 
+            if (uuid.toString().compareToIgnoreCase("9c60b432-f891-5124-b730-8389c78ba6cc") == 0)
+                System.out.println("!!!:PARSE: 9c60b432-f891-5124-b730-8389c78ba6cc... Rel="
+                        + a[i].relSnoId + ":" + a[i].c1SnoId + "-" + a[i].roleTypeSnoId + "-"
+                        + a[i].c2SnoId + " G" + a[i].group + " RG(" + GroupListStr + ")");
+            if (uuid.toString().compareToIgnoreCase("11eb336d-a06d-5558-8676-b7c2777a051f") == 0)
+                System.out.println("!!!:PARSE: 11eb336d-a06d-5558-8676-b7c2777a051f... Rel:"
+                        + a[i].relSnoId + ":" + a[i].c1SnoId + "-" + a[i].roleTypeSnoId + "-"
+                        + a[i].c2SnoId + " G" + a[i].group + " RG(" + GroupListStr + ")");
             // :yyy:
             a[i].relUuidMsb = uuid.getMostSignificantBits();
             a[i].relUuidLsb = uuid.getLeastSignificantBits();
@@ -5004,12 +5096,43 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
     }
 
+    private void countCheck(int count1, int count2, int same, int modified, int added, int dropped,
+            int idchanged) {
+
+        // CHECK COUNTS TO MASTER FILE1 RECORD COUNT
+        if ((same + modified + dropped + idchanged) == count1) {
+            getLog().info(
+                    "PASSED1:: SAME+MODIFIED+DROPPED+IDCHANGED = " + same + "+" + modified + "+"
+                            + dropped + "+" + idchanged + " = "
+                            + (same + modified + dropped + idchanged) + " == " + count1);
+        } else {
+            getLog().info(
+                    "FAILED1:: SAME+MODIFIED+DROPPED+IDCHANGED = " + same + "+" + modified + "+"
+                            + dropped + "+" + idchanged + " = "
+                            + (same + modified + dropped + idchanged) + " != " + count1);
+        }
+
+        // CHECK COUNTS TO UPDATE FILE2 RECORD COUNT
+        if ((same + modified + added + idchanged) == count2) {
+            getLog().info(
+                    "PASSED2:: SAME+MODIFIED+ADDED+IDCHANGE   = " + same + "+" + modified + "+"
+                            + added + "+" + idchanged + " = "
+                            + (same + modified + added + idchanged) + " == " + count2);
+        } else {
+            getLog().info(
+                    "FAILED2:: SAME+MODIFIED+ADDED+IDCHANGE   = " + same + "+" + modified + "+"
+                            + added + "+" + idchanged + " = "
+                            + (same + modified + added + idchanged) + " != " + count2);
+        }
+
+    }
+
     private static int countFileLines(String fileName) throws MojoFailureException {
         int lineCount = 0;
         BufferedReader br = null;
 
         try {
-            br = new BufferedReader(new FileReader(fileName));
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF-8"));
             try {
                 while (br.readLine() != null) {
                     lineCount++;
@@ -5028,6 +5151,23 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         // lineCount NOTE: COUNT -1 BECAUSE FIRST LINE SKIPPED
         // lineCount NOTE: REQUIRES THAT LAST LINE IS VALID RECORD
         return lineCount - 1;
+    }
+
+    private int countFileObjects(String fName) throws FileNotFoundException, IOException,
+            ClassNotFoundException {
+        int objCount = 0;
+
+        ObjectInputStream ois;
+        ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(fName)));
+        try {
+            while ((ois.readObject()) != null) {
+                objCount++;
+            }
+        } catch (EOFException ex) {
+            getLog().info(" object count = " + objCount + " @EOF " + fName + "\r\n");
+        }
+
+        return objCount;
     }
 
     private String getFileRevDate(File f) throws MojoFailureException {

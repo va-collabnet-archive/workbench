@@ -4,7 +4,8 @@ import org.ihtsdo.tk.api.constraint.DescriptionConstraint;
 import org.ihtsdo.tk.api.constraint.RelConstraintIncoming;
 import org.ihtsdo.tk.api.constraint.RelConstraintOutgoing;
 
-public class SnomedConstraints {
+public class SnomedConstraints  {
+
 	public static RelConstraintOutgoing FINDING_SITE_OUT = 
 		SnomedRelSpec.FINDING_SITE.getOriginatingRelConstraint();
 	

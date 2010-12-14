@@ -18,8 +18,10 @@ package org.ihtsdo.mojo.maven.rf1;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 
 import org.apache.maven.plugin.MojoFailureException;
@@ -32,7 +34,7 @@ public class Rf1TextDef implements Comparable<Object> {
     String snomedId;
     String fsn;
     String definition;
-    
+
     int status; // current or retired
 
     public Rf1TextDef(long tmpConceptSid, String tmpSnomedId, String tmpFsn, String tmpDefinition) {
@@ -40,7 +42,7 @@ public class Rf1TextDef implements Comparable<Object> {
         this.snomedId = tmpSnomedId;
         this.fsn = tmpFsn;
         this.definition = tmpDefinition;
-        
+
         this.status = 0; // CURRENT is 0 
     }
 
@@ -53,24 +55,17 @@ public class Rf1TextDef implements Comparable<Object> {
         } else if (this.conceptSid > tmp.conceptSid) {
             return 1; // instance greater than received
         } else {
-            int test = this.snomedId.compareToIgnoreCase(tmp.snomedId);
-            if (test > 1) {
-                return -1; // instance less than received
-            } else if (test < 1) {
-                return 1; // instance greater than received
-            } else {
-                return 0; // instance == received
-            }
+            return 0; // instance == received
         }
     }
-    
-    public static Rf1TextDef[] parseFile(RF1File rf1) throws IOException,
-            MojoFailureException {
+
+    public static Rf1TextDef[] parseFile(RF1File rf1) throws IOException, MojoFailureException {
 
         int lineCount = RF1File.countFileLines(rf1);
         Rf1TextDef[] a = new Rf1TextDef[lineCount];
 
-        BufferedReader br = new BufferedReader(new FileReader(rf1.file));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(rf1.file),
+                "UTF-8"));
         int members = 0;
 
         int CONCEPT_SID = 0;

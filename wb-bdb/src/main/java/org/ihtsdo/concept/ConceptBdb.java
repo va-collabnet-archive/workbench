@@ -33,12 +33,13 @@ public class ConceptBdb extends ComponentBdb {
 
     private IdentifierSet conceptIdSet;
 
-    private static ThreadGroup conDbThreadGroup = new ThreadGroup("concept db threads");
+    private static final ThreadGroup conDbThreadGroup = new ThreadGroup("concept db threads");
 
-    private static ExecutorService iteratorService =
-            Executors.newCachedThreadPool(new NamedThreadFactory(conDbThreadGroup, "parallel iterator service"));
-
-    private int processors = Runtime.getRuntime().availableProcessors();
+    private static final int processors = Runtime.getRuntime().availableProcessors();
+    
+    private static final ExecutorService iteratorService =
+            Executors.newCachedThreadPool( 
+            new NamedThreadFactory(conDbThreadGroup, "parallel iterator service"));
 
     public ConceptBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv) throws IOException {
         super(readOnlyBdbEnv, mutableBdbEnv);

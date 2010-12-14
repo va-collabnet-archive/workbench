@@ -236,7 +236,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 case COMPONENT_ID:
                     throw new UnsupportedOperationException("Can't do concept combobox on " + field);
                 case STATUS:
-                    return Terms.get().getConcept(swet.getTuple().getStatusId());
+                    return Terms.get().getConcept(swet.getTuple().getStatusNid());
                 case VERSION:
                     throw new UnsupportedOperationException("Can't do concept combobox on " + field);
                 case PATH:
@@ -576,29 +576,29 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                     }
 
                     if (I_ExtendByRefPartBoolean.class.isAssignableFrom(tuple.getClass())) {
-                        conceptsToFetch.add(tuple.getStatusId());
-                        conceptsToFetch.add(tuple.getPathId());
+                        conceptsToFetch.add(tuple.getStatusNid());
+                        conceptsToFetch.add(tuple.getPathNid());
                     } else if (I_ExtendByRefPartStr.class.isAssignableFrom(tuple.getClass())) {
-                        conceptsToFetch.add(tuple.getStatusId());
-                        conceptsToFetch.add(tuple.getPathId());
+                        conceptsToFetch.add(tuple.getStatusNid());
+                        conceptsToFetch.add(tuple.getPathNid());
                     } else if (I_ExtendByRefPartCid.class.isAssignableFrom(tuple.getClass())) {
                         I_ExtendByRefPartCid conceptPart = (I_ExtendByRefPartCid) tuple;
                         conceptsToFetch.add(conceptPart.getC1id());
-                        conceptsToFetch.add(tuple.getStatusId());
-                        conceptsToFetch.add(tuple.getPathId());
+                        conceptsToFetch.add(tuple.getStatusNid());
+                        conceptsToFetch.add(tuple.getPathNid());
                     } else if (I_ExtendByRefPartCidInt.class.isAssignableFrom(tuple.getClass())) {
                         I_ExtendByRefPartCidInt conceptPart = (I_ExtendByRefPartCidInt) tuple;
                         conceptsToFetch.add(conceptPart.getC1id());
-                        conceptsToFetch.add(tuple.getStatusId());
-                        conceptsToFetch.add(tuple.getPathId());
+                        conceptsToFetch.add(tuple.getStatusNid());
+                        conceptsToFetch.add(tuple.getPathNid());
                     } else if (I_ExtendByRefPartCidFloat.class.isAssignableFrom(tuple.getClass())) {
                         I_ExtendByRefPartCidFloat conceptPart = (I_ExtendByRefPartCidFloat) tuple;
                         conceptsToFetch.add(conceptPart.getUnitsOfMeasureId());
-                        conceptsToFetch.add(tuple.getStatusId());
-                        conceptsToFetch.add(tuple.getPathId());
+                        conceptsToFetch.add(tuple.getStatusNid());
+                        conceptsToFetch.add(tuple.getPathNid());
                     } else if (I_ExtendByRefPartInt.class.isAssignableFrom(tuple.getClass())) {
-                        conceptsToFetch.add(tuple.getStatusId());
-                        conceptsToFetch.add(tuple.getPathId());
+                        conceptsToFetch.add(tuple.getStatusNid());
+                        conceptsToFetch.add(tuple.getPathNid());
                     }
                     if (stopWork) {
                         return false;
@@ -774,15 +774,15 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                     inConflict);
 
             case STATUS:
-                if (referencedConcepts.containsKey(tuple.getStatusId())) {
-                    return new StringWithExtTuple(getPrefText(tuple.getStatusId()), tuple, tuple.getStatusId(),
+                if (referencedConcepts.containsKey(tuple.getStatusNid())) {
+                    return new StringWithExtTuple(getPrefText(tuple.getStatusNid()), tuple, tuple.getStatusNid(),
                         inConflict);
                 }
-                return new StringWithExtTuple(Integer.toString(tuple.getStatusId()), tuple, tuple.getStatusId(),
+                return new StringWithExtTuple(Integer.toString(tuple.getStatusNid()), tuple, tuple.getStatusNid(),
                     inConflict);
 
             case VERSION:
-                if (tuple.getVersion() == Integer.MAX_VALUE) {
+                if (tuple.getTime() == Long.MAX_VALUE) {
                     return new StringWithExtTuple(ThinVersionHelper.uncommittedHtml(), tuple, tuple.getMemberId(),
                         inConflict);
                 }
@@ -790,10 +790,10 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                     inConflict);
 
             case PATH:
-                if (referencedConcepts.containsKey(tuple.getPathId())) {
-                    return new StringWithExtTuple(getPrefText(tuple.getPathId()), tuple, tuple.getPathId(), inConflict);
+                if (referencedConcepts.containsKey(tuple.getPathNid())) {
+                    return new StringWithExtTuple(getPrefText(tuple.getPathNid()), tuple, tuple.getPathNid(), inConflict);
                 }
-                return new StringWithExtTuple(Integer.toString(tuple.getPathId()), tuple, tuple.getPathId(), inConflict);
+                return new StringWithExtTuple(Integer.toString(tuple.getPathNid()), tuple, tuple.getPathNid(), inConflict);
 
             case BOOLEAN_VALUE:
                 return new StringWithExtTuple(Boolean.toString(((I_ExtendByRefPartBoolean) tuple.getMutablePart())
@@ -907,8 +907,13 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 refsetDefaults = preferences.getIntegerPreferences();
                 refsetDefaults = preferences.getConIntPreferences();
                 extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptNid());
-                extProps.put(REFSET_PROPERTY.INTEGER_VALUE, ((I_RefsetDefaultsInteger) refsetDefaults)
-                    .getDefaultForIntegerRefset());
+                if (I_RefsetDefaultsInteger.class.isAssignableFrom(refsetDefaults.getClass())) {
+                    extProps.put(REFSET_PROPERTY.INTEGER_VALUE, ((I_RefsetDefaultsInteger) refsetDefaults)
+                            .getDefaultForIntegerRefset());
+                } else if (I_RefsetDefaultsConInt.class.isAssignableFrom(refsetDefaults.getClass())) {
+                    extProps.put(REFSET_PROPERTY.INTEGER_VALUE, ((I_RefsetDefaultsConInt) refsetDefaults)
+                            .getDefaultForIntegerValue());
+                }
                 break;
             default:
                 throw new UnsupportedOperationException("Can't handle ref set type: " + refsetType);
@@ -967,8 +972,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                     break;
                 case STATUS:
                     Integer statusId = (Integer) value;
-                    if (statusId != extTuple.getStatusId()) {
-                        extTuple.setStatusId(statusId);
+                    if (statusId != extTuple.getStatusNid()) {
+                        extTuple.setStatusNid(statusId);
                         referencedConcepts.put(statusId, Terms.get().getConcept(statusId));
                         changed = true;
                     }

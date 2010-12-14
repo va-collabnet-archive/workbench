@@ -72,9 +72,12 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
-
 	}
 
+	public ConceptViewSettings() {
+		super();
+		this.linkedTab = 0;
+	}	
 	public ConceptViewSettings(Integer linkedTab) {
 		super();
 		this.linkedTab = linkedTab;
@@ -286,5 +289,13 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 	@Override
 	public I_GetConceptData getConcept() {
 		return (I_GetConceptData) getHost().getTermComponent();
+	}
+
+	public Integer getLinkedTab() {
+		return linkedTab;
+	}
+
+	public void setLinkedTab(Integer linkedTab) {
+		this.linkedTab = linkedTab;
 	}
 }

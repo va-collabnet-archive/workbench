@@ -1,6 +1,7 @@
 package org.ihtsdo.arena.editor;
 
 import java.awt.BorderLayout;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -11,10 +12,15 @@ import org.dwfa.ace.ACE;
 import org.ihtsdo.arena.ArenaComponentSettings;
 import org.ihtsdo.arena.conceptview.ConceptViewSettings;
 import org.ihtsdo.arena.taxonomyview.TaxonomyViewSettings;
+import org.w3c.dom.Document;
 
+import com.mxgraph.io.mxCodec;
+import com.mxgraph.io.mxCodecRegistry;
+import com.mxgraph.io.mxObjectCodec;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.util.mxRectangle;
+import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
@@ -89,7 +95,19 @@ public class ArenaEditor extends BasicGraphEditor
                 v1.setValue(settings);
         	}
         }
+        mxCodecRegistry.addPackage("org.ihtsdo.arena.conceptview");
+        mxCodecRegistry.register(new mxObjectCodec(new ConceptViewSettings()));
+        File defaultArenaConfig = new File("arena/default.mxe");
+        if (defaultArenaConfig.exists()) {
+            Document document = mxUtils.parse(mxUtils.readFile(defaultArenaConfig.getAbsolutePath()));
+            mxCodec codec = new mxCodec(document);
+            codec.decode(document.getDocumentElement(), getGraphComponent().getGraph().getModel());
+        }
 
+        setModified(false);
+        setCurrentFile(null);
+   
+    
     }
 
     private void addPaletteTemplate(EditorPalette palette,  String label, String imageName, int link) {

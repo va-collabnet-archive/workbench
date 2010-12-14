@@ -16,7 +16,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TrackContinuation;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.config.FrameConfigSnapshot;
@@ -174,6 +173,8 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
                 completeLatch.countDown();
                 List<? extends I_ExtendByRefVersion> versions = ext.getTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(),
                         config.getPrecedence(), config.getConflictResolutionStrategy());
+                
+                int errorCount = 0;
                 for (I_ExtendByRefVersion extVer : versions) {
                     for (I_TestSearchResults test : criterion) {
                         if (!test.test(extVer, config)) {
@@ -182,29 +183,39 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
                     }
                     // passed the tests. Add to results.
                     ComponentBI referencedComponent = Ts.get().getComponent(extVer.getComponentId());
-                    if (ConceptChronicleBI.class.isAssignableFrom(referencedComponent.getClass())) {
-                        ConceptChronicleBI conceptChr = (ConceptChronicleBI) referencedComponent;
-                        for (DescriptionChronicleBI descChr : conceptChr.getDescs()) {
-                            for (DescriptionVersionBI descV : descChr.getVersions(config.getCoordinate())) {
-                                if (descV.getTypeNid() == fsnNid) {
-                                    refsetMatches.add((I_DescriptionVersioned) descChr);
-                                    continue nextExt;
+                    if (referencedComponent != null) {
+                        if (ConceptChronicleBI.class.isAssignableFrom(referencedComponent.getClass())) {
+                            ConceptChronicleBI conceptChr = (ConceptChronicleBI) referencedComponent;
+                            for (DescriptionChronicleBI descChr : conceptChr.getDescs()) {
+                                for (DescriptionVersionBI descV : descChr.getVersions(config.getCoordinate())) {
+                                    if (descV.getTypeNid() == fsnNid) {
+                                        refsetMatches.add((I_DescriptionVersioned) descChr);
+                                        continue nextExt;
+                                    }
                                 }
                             }
+                        } else if (DescriptionChronicleBI.class.isAssignableFrom(referencedComponent.getClass())) {
+                            DescriptionChronicleBI descChr = (DescriptionChronicleBI) referencedComponent;
+                            refsetMatches.add((I_DescriptionVersioned) descChr);
+                        } else {
+                            if (alertForUnsupportedRc) {
+                                alertForUnsupportedRc = false;
+                                AceLog.getAppLog().alertAndLogException(
+                                        new Exception("Search does not support referenced component type: "
+                                        + referencedComponent));
+                            }
                         }
-                    } else if (DescriptionChronicleBI.class.isAssignableFrom(referencedComponent.getClass())) {
-                        DescriptionChronicleBI descChr = (DescriptionChronicleBI) referencedComponent;
-                        refsetMatches.add((I_DescriptionVersioned) descChr);
                     } else {
-                        if (alertForUnsupportedRc) {
-                            alertForUnsupportedRc = false;
-                            AceLog.getAppLog().alertAndLogException(
-                                    new Exception("Search does not support referenced component type: "
-                                    + referencedComponent));
-                        }
+                    	errorCount++;
+                    	AceLog.getAppLog().warning("Extension version does not reference a known component: " +
+                    			extVer);
                     }
 
                 }
+            	if (errorCount > 0) {
+                	AceLog.getAppLog().alertAndLogException(new Exception(errorCount + 
+                			" extensions do not reference known components. See log for details."));
+            	}
             }
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);

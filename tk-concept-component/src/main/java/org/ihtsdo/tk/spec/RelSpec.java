@@ -16,10 +16,40 @@
  */
 package org.ihtsdo.tk.spec;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import org.ihtsdo.tk.api.constraint.RelConstraintIncoming;
 import org.ihtsdo.tk.api.constraint.RelConstraintOutgoing;
 
 public class RelSpec implements SpecBI {
+
+    /**
+	 * 
+	 */
+    private static final long serialVersionUID = 1L;
+
+    private static final int dataVersion = 1;
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(originSpec);
+        out.writeObject(relTypeSpec);
+        out.writeObject(destinationSpec);
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+        	originSpec = (ConceptSpec) in.readObject();
+        	relTypeSpec = (ConceptSpec) in.readObject();
+        	destinationSpec = (ConceptSpec) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+
+    }
 
     private ConceptSpec originSpec;
 	private ConceptSpec relTypeSpec;

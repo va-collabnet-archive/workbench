@@ -203,6 +203,9 @@ public class WorkbenchRunner {
 				ACE.refsetOnly = (Boolean) jiniConfig.getEntry(this
 						.getClass().getName(), "refsetOnly",
 						Boolean.class, Boolean.FALSE);
+				ACE.editMode = (Boolean) jiniConfig.getEntry(this
+						.getClass().getName(), "allowEdit",
+						Boolean.class, Boolean.TRUE);
 			} else {
 				wbConfigFile = new File("config/wb.config");
 			}

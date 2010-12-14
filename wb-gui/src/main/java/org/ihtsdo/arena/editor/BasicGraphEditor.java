@@ -205,7 +205,7 @@ public class BasicGraphEditor extends JPanel
         JSplitPane outer = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, inner,
                 graphComponent);
         outer.setOneTouchExpandable(true);
-        outer.setDividerLocation(180);
+        outer.setDividerLocation(0);
         outer.setOneTouchExpandable(true);
         outer.setBorder(null);
 

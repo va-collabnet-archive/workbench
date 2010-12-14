@@ -28,7 +28,7 @@ class SctYDesRecord implements Comparable<Object>, Serializable {
 
     long desSnoId; // DESCRIPTIONID
     long desUuidMsb;
-    long desUuidLsb;    
+    long desUuidLsb;
     int status; // DESCRIPTIONSTATUS
     // ArrayList<EIdentifier> additionalIds;
     ArrayList<SctYIdRecord> addedIds;
@@ -47,16 +47,16 @@ class SctYDesRecord implements Comparable<Object>, Serializable {
         UUID tmpUUID = Type3UuidFactory.fromSNOMED(desSnoId);
         desUuidMsb = tmpUUID.getMostSignificantBits();
         desUuidLsb = tmpUUID.getLeastSignificantBits();
-        
+
         status = s;
         // additionalIds = null;
         addedIds = null;
-        
+
         conSnoId = cId;
         tmpUUID = Type3UuidFactory.fromSNOMED(conSnoId);
         conUuidMsb = tmpUUID.getMostSignificantBits();
         conUuidLsb = tmpUUID.getLeastSignificantBits();
-        
+
         termText = new String(text);
         capStatus = cStat;
         descriptionType = typeInt;
@@ -65,21 +65,21 @@ class SctYDesRecord implements Comparable<Object>, Serializable {
 
     public SctYDesRecord(UUID desUuid, int status, UUID uuidCon, String termStr,
             int capitalization, int desTypeIdx, String langCodeStr, int revDate, int pathIdx) {
-         this.desSnoId = Long.MAX_VALUE; // DESCRIPTIONID
-         this.desUuidMsb = desUuid.getMostSignificantBits();
-         this.desUuidLsb = desUuid.getLeastSignificantBits();    
-         this.status = status; // DESCRIPTIONSTATUS
-         // additionalIds = null;
-         addedIds = null;
-         this.conSnoId = Long.MAX_VALUE; // CONCEPTID
-         this.conUuidMsb = uuidCon.getMostSignificantBits(); // CONCEPTID
-         this.conUuidLsb = uuidCon.getLeastSignificantBits(); // CONCEPTID    
-         this.termText = termStr; // TERM
-         this.capStatus = capitalization; // INITIALCAPITALSTATUS -- capitalization
-         this.descriptionType = desTypeIdx; // DESCRIPTIONTYPE
-         this.languageCode = langCodeStr; // LANGUAGECODE
-         this.yPath = pathIdx;
-         this.yRevision = revDate;
+        this.desSnoId = Long.MAX_VALUE; // DESCRIPTIONID
+        this.desUuidMsb = desUuid.getMostSignificantBits();
+        this.desUuidLsb = desUuid.getLeastSignificantBits();
+        this.status = status; // DESCRIPTIONSTATUS
+        // additionalIds = null;
+        addedIds = null;
+        this.conSnoId = Long.MAX_VALUE; // CONCEPTID
+        this.conUuidMsb = uuidCon.getMostSignificantBits(); // CONCEPTID
+        this.conUuidLsb = uuidCon.getLeastSignificantBits(); // CONCEPTID    
+        this.termText = termStr; // TERM
+        this.capStatus = capitalization; // INITIALCAPITALSTATUS -- capitalization
+        this.descriptionType = desTypeIdx; // DESCRIPTIONTYPE
+        this.languageCode = langCodeStr; // LANGUAGECODE
+        this.yPath = pathIdx;
+        this.yRevision = revDate;
     }
 
     // method required for object to be sortable (comparable) in arrays
@@ -107,10 +107,18 @@ class SctYDesRecord implements Comparable<Object>, Serializable {
     }
 
     // Create string to show some input fields for exception reporting
+    // DESCRIPTIONID    DESCRIPTIONSTATUS   CONCEPTID   TERM    INITIALCAPITALSTATUS    DESCRIPTIONTYPE LANGUAGECODE
+    public static String toStringHeader() {
+        return "DESCRIPTIONID" + TAB_CHARACTER + "DESCRIPTIONSTATUS" + TAB_CHARACTER + "CONCEPTID"
+                + TAB_CHARACTER + "TERM" + TAB_CHARACTER + "INITIALCAPITALSTATUS" + TAB_CHARACTER
+                + "DESCRIPTIONTYPE" + TAB_CHARACTER + "LANGUAGECODE";
+    }
+
+    // Create string to show some input fields for exception reporting
     public String toString() {
-        return desSnoId + TAB_CHARACTER + status + TAB_CHARACTER + conSnoId + TAB_CHARACTER + termText
-                + TAB_CHARACTER + capStatus + TAB_CHARACTER + descriptionType + TAB_CHARACTER
-                + languageCode;
+        return desSnoId + TAB_CHARACTER + status + TAB_CHARACTER + conSnoId + TAB_CHARACTER
+                + termText + TAB_CHARACTER + capStatus + TAB_CHARACTER + descriptionType
+                + TAB_CHARACTER + languageCode;
     }
 
 }

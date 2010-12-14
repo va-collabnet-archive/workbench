@@ -37,8 +37,38 @@ import org.ihtsdo.tk.spec.ConceptSpec;
 
 
 public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
-	public static class IsKindOfEvaluator extends BaseEvaluator {
+	public static class IsKindOfEvaluator extends BaseEvaluator  {
 
+	    /**
+		 * 
+		 */
+	    private static final long serialVersionUID = 1L;
+
+	    private static final int dataVersion = 1;
+
+		@Override
+		public void readExternal(ObjectInput in) throws IOException,
+				ClassNotFoundException {
+			init();
+			super.readExternal(in);
+	        int objDataVersion = in.readInt();
+	        if (objDataVersion == dataVersion) {
+	        	// Nothing to do
+	        } else {
+	            throw new IOException("Can't handle dataversion: " + objDataVersion);
+	        }
+		}
+
+		@Override
+		public void writeExternal(ObjectOutput out) throws IOException {
+			super.writeExternal(out);
+	        out.writeInt(dataVersion);
+		}
+
+	    public IsKindOfEvaluator() {
+	    	super();
+			// No arg constructor for serialization. 
+		}
 		public IsKindOfEvaluator(final ValueType type, final boolean isNegated) {
 			super(type, isNegated ? IsKindOfEvaluatorDefinition.NOT_IS_KIND_OF : IsKindOfEvaluatorDefinition.IS_KIND_OF);
 		}
@@ -105,10 +135,22 @@ public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
 
 	}
 
-	public static final Operator IS_KIND_OF = Operator.addOperatorToRegistry("isKindOf", false);
-	public static final Operator NOT_IS_KIND_OF = Operator.addOperatorToRegistry(IS_KIND_OF.getOperatorString(), true);
-	private static final String[] SUPPORTED_IDS = { IS_KIND_OF.getOperatorString() };
+	public static Operator IS_KIND_OF = null;
+	public static Operator NOT_IS_KIND_OF = null;
+	private static String[] SUPPORTED_IDS = null;
+	
+	private static void init() {
+		if (IS_KIND_OF == null) {
+			IS_KIND_OF = Operator.addOperatorToRegistry("isKindOf", false);
+			NOT_IS_KIND_OF = Operator.addOperatorToRegistry(IS_KIND_OF.getOperatorString(), true);
+			SUPPORTED_IDS = new String[] { IS_KIND_OF.getOperatorString() };
+		}
+	}
 
+	static {
+		init();
+	}
+	
 	private Evaluator[] evaluator;
 	@Override
 	public Evaluator getEvaluator(ValueType type, Operator operator) {

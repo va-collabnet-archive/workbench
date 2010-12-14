@@ -522,6 +522,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         return specifiedVersions;
     }
 
+    @Override
     public List<? extends I_RelTuple> getSpecifiedVersions(NidSetBI allowedStatus,
             PositionSetBI positions, Precedence precedencePolicy,
             ContradictionManagerBI contradictionManager)
@@ -597,7 +598,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         return Collections.unmodifiableList(new ArrayList<Version>(getVersions()));
     }
 
-    public List<? extends Version> getVersions() {
+    public List<Version> getVersions() {
         if (versions == null) {
             int count = 1;
             if (revisions != null) {
@@ -868,13 +869,9 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     @Override
     public List<Relationship.Version> getVersions(Coordinate c) {
         List<Version> possibleValues = new ArrayList<Version>(2);
-        computer.addSpecifiedVersions(c.getAllowedStatusNids(),
-                (NidSetBI) null,
-                c.getPositionSet(),
-                possibleValues,
+        computer.addSpecifiedRelVersions(possibleValues,
                 getVersions(),
-                c.getPrecedence(),
-                c.getContradictionManager());
+                c);
 
         List<Relationship.Version> actualValues =
                 new ArrayList<Relationship.Version>(possibleValues.size());

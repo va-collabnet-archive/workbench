@@ -1,5 +1,7 @@
 package org.ihtsdo.tk.spec;
 
-public interface SpecBI {
+import java.io.Serializable;
+
+public interface SpecBI extends Serializable {
 
 }

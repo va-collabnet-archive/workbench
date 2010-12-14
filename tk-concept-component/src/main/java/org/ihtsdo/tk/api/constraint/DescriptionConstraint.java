@@ -1,6 +1,8 @@
 package org.ihtsdo.tk.api.constraint;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.Coordinate;
@@ -8,6 +10,28 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 public class DescriptionConstraint implements ConstraintBI {
+
+    private static final long serialVersionUID = 1L;
+
+    private static final int dataVersion = 1;
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(conceptSpec);
+        out.writeObject(descTypeSpec);
+        out.writeUTF(text);
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+        	conceptSpec = (ConceptSpec) in.readObject();
+        	descTypeSpec = (ConceptSpec) in.readObject();
+        	text = in.readUTF();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
     private ConceptSpec conceptSpec;
 	private ConceptSpec descTypeSpec;

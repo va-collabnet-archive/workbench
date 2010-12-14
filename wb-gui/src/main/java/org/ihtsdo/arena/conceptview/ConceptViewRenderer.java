@@ -18,6 +18,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -149,7 +150,11 @@ public class ConceptViewRenderer extends JLayeredPane
             final mxGraphComponent graphContainer, ACE ace)
     {
     	
-		contextualConceptActionsKBase = EditPanelKb.setupKb("org/ihtsdo/arena/drools/ContextualConceptActionsPanel.drl");
+		try {
+			contextualConceptActionsKBase = EditPanelKb.setupKb(new File("drools-rules/ContextualConceptActionsPanel.drl"));
+		} catch (IOException e1) {
+			throw new RuntimeException(e1);
+		}
 		workflowPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
         this.cell = (mxCell) cellObj;
         this.graphContainer = graphContainer;

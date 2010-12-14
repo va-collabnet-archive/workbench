@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
@@ -18,6 +17,10 @@ public class RelGroupVersion
 		implements RelGroupVersionBI{
 
 	private RelGroupChronicleBI rg;
+	private int authorNid;
+	private int statusNid;
+	private int pathNid;
+	private long time = Long.MIN_VALUE;
 	
 	public UUID getPrimUuid() {
 		return rg.getPrimUuid();
@@ -30,10 +33,16 @@ public class RelGroupVersion
 		assert coordinate != null;
 		this.rg = rg;
 		this.coordinate = coordinate;
+		setupLatest();
+	}
+	
+	public Collection<? extends RelationshipChronicleBI> getRels() {
+		return rg.getRels();
 	}
 
+
 	@Override
-	public Collection<? extends RelationshipVersionBI> getRels() throws ContraditionException {
+	public Collection<? extends RelationshipVersionBI> getCurrentRels() throws ContraditionException {
 		ArrayList<RelationshipVersionBI> results = new ArrayList<RelationshipVersionBI>();
 		for (RelationshipChronicleBI relc: rg.getRels()) {
 			if (coordinate != null) {
@@ -91,37 +100,46 @@ public class RelGroupVersion
 		return Arrays.asList(new RelGroupVersion[] { new RelGroupVersion(this, null) });
 	}
 
+	private void setupLatest() {
+		time = Long.MIN_VALUE;
+		for (RelationshipChronicleBI rel: rg.getRels()) {
+			for (RelationshipVersionBI relV: rel.getVersions(coordinate)) {
+				if (relV.getTime() > time) {
+					time = relV.getTime();
+					authorNid = relV.getAuthorNid();
+					pathNid = relV.getPathNid();
+					statusNid = relV.getStatusNid();
+				}
+			}
+		}
+	}
 	@Override
 	public int getAuthorNid() {
-		throw new UnsupportedOperationException();
+		return authorNid;
 	}
 
 	@Override
 	public int getPathNid() {
-		throw new UnsupportedOperationException();
+		return pathNid;
 	}
 
 	@Override
 	public int getStatusNid() {
-		throw new UnsupportedOperationException();
+		return statusNid;
 	}
 
 	@Override
 	public long getTime() {
-		throw new UnsupportedOperationException();
+		return time;
 	}
 
 	@Override
 	public String toUserString() {
 	    StringBuffer buff = new StringBuffer();
     	buff.append("Group: ");
-	    try {
-			for (RelationshipVersionBI rel: getRels()) {
-				buff.append(rel.toUserString());
-				buff.append("; ");
-			}
-		} catch (ContraditionException e) {
-			AceLog.getAppLog().alertAndLogException(e);
+	    for (RelationshipChronicleBI rel: getRels()) {
+			buff.append(rel.toUserString());
+			buff.append("; ");
 		}
 		return buff.toString();
 	}

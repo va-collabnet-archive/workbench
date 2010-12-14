@@ -38,6 +38,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.LuceneManager;
+import org.ihtsdo.thread.NamedThreadFactory;
 
 /**
  * Goal which loads an EConcept.jbin file into a bdb.
@@ -79,12 +80,19 @@ public class LoadBdbMulti extends AbstractMojo {
 
     AtomicInteger conceptsRead = new AtomicInteger();
     AtomicInteger conceptsProcessed = new AtomicInteger();
+    
+    private ThreadGroup loadBdbMultiDbThreadGroup = new ThreadGroup("LoadBdbMulti threads");
 
-    ExecutorService executors = Executors.newCachedThreadPool();
+     
+            
+    ExecutorService executors = Executors.newCachedThreadPool(
+            new NamedThreadFactory(loadBdbMultiDbThreadGroup, "converter "));
+    
     LinkedBlockingQueue<I_ProcessEConcept> converters = new LinkedBlockingQueue<I_ProcessEConcept>();
+    
     private int runtimeConverterSize = Runtime.getRuntime().availableProcessors() * 2;
-    private int converterSize = 1;
-
+ 
+    @Override
     public void execute() throws MojoExecutionException {
         executeMojo(conceptsFileNames, generatedResources, berkeleyDir);
 
@@ -93,7 +101,7 @@ public class LoadBdbMulti extends AbstractMojo {
     void executeMojo(String[] conceptsFileNames, String generatedResources,
             File berkeleyDir) throws MojoExecutionException {
         try {
-            for (int i = 0; i < converterSize; i++) {
+            for (int i = 0; i < runtimeConverterSize; i++) {
                 converters.put(new ConvertConcept());
             }
 
@@ -212,6 +220,7 @@ public class LoadBdbMulti extends AbstractMojo {
          * org.ihtsdo.db.bdb.I_ProcessEConcept#setEConcept(org.ihtsdo.etypes
          * .EConcept)
          */
+        @Override
         public void setEConcept(EConcept eConcept) throws Throwable {
             if (exception != null) {
                 throw exception;

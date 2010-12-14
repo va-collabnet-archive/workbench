@@ -18,8 +18,10 @@ package org.ihtsdo.mojo.maven.rf1;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
@@ -46,8 +48,6 @@ import org.dwfa.util.id.Type5UuidFactory;
  * 
  * Rf1ToArfTextDef is a maven mojo which pre-processes TextDefinitions to arf format.<br>
  * <br>
- * Rf1ToArfTextDef will compare en-GB subset to en-US to create a en-GB exceptions subset.  
- * The resulting en-GB subset is passed to the Rf1ToArfSubsetsMojo is <code>&lt;keepGBExceptions&gt;</code> is <code>true</code><p>
  * 
  * <b>INPUTS:</b><br>
  * The pom needs to configure the following parameters for the <code>rf1-language-gb-us-to-arf</code> goal.
@@ -61,8 +61,6 @@ import org.dwfa.util.id.Type5UuidFactory;
  *    &lt;rf1Dir&gt; dir_name -- specific directory to be added to the search list     
  * </pre>
  * 
- * <br>
- * <br>
  * @author Marc E. Campbell
  *
  * @goal rf1-textdefinitions-to-arf
@@ -228,8 +226,9 @@ public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
 
         try {
             // CREATE DESCRIPTIONS ARF FILE
-            BufferedWriter bwOutDescr = new BufferedWriter(new FileWriter(fNameOutDescr));
-           getLog().info("::: TextDefinitions DESCRIPTION ARF OUTPUT: " + bwOutDescr.toString());
+            BufferedWriter bwOutDescr = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(fNameOutDescr), "UTF-8"));
+            getLog().info("::: TextDefinitions DESCRIPTION ARF OUTPUT: " + bwOutDescr.toString());
 
             processTextDefinitions(textDefList, bwOutDescr);
 
@@ -268,15 +267,18 @@ public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
         int count1, count2; // records in arrays 1 & 2
         String fName1, fName2; // file path name
         String yRevDateStr; // :!!!: int in processConcepts
-        Rf1SubsetId tmpSid;
-        String tmpArf;
 
         Rf1TextDef[] a1;
         Rf1TextDef[] a2, a3 = null;
 
-        getLog().info("START RF1 SUBSETS PROCESSING...");
+        getLog().info("START TEXT DEFINITION PROCESSING...");
 
         Iterator<RF1File> fit = fileList.iterator(); // File Iterator
+
+        if (fit == null || fit.hasNext() == false) {
+            getLog().info("processTextDefinitions: exiting, no files");
+            return;
+        }
 
         // READ file1 as MASTER FILE
         RF1File f1 = fit.next();
@@ -285,6 +287,7 @@ public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
 
         a1 = Rf1TextDef.parseFile(f1);
         count1 = a1.length;
+        getLog().info("Counted: " + count1 + " records, " + fName1);
 
         for (int i = 0; i < count1; i++)
             // Write history baseline
@@ -296,19 +299,17 @@ public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
             fName2 = f2.file.getPath();
             yRevDateStr = f2.revDateStr;
 
-            count2 = RF1File.countFileLines(f2);
-            getLog().info("Counted: " + count2 + " records, " + fName2);
-
             // Parse in file2
             a2 = Rf1TextDef.parseFile(f2);
             count2 = a2.length;
+            getLog().info("Counted: " + count2 + " records, " + fName2);
 
             int r1 = 0, r2 = 0, r3 = 0; // reset record indices
             int nSame = 0, nMod = 0, nAdd = 0, nDrop = 0; // counters
             a3 = new Rf1TextDef[count2]; // max3
             while ((r1 < count1) && (r2 < count2)) {
 
-                switch (a1[r1].compareTo(a2[r2])) {
+                switch (compareVersion(a1[r1], a2[r2])) {
                 case 1: // SAME, skip to next
                     r1++;
                     r2++;
@@ -387,6 +388,17 @@ public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
 
         } // WHILE (EACH CONCEPTS INPUT FILE)
     } // WHILE (EACH CONCEPTS DIRECTORY) *
+
+    private int compareVersion(Rf1TextDef a1, Rf1TextDef a2) {
+        if (a1.conceptSid < a2.conceptSid) {
+            return 4; // DROPPED instance less than received
+        } else if (a1.conceptSid > a2.conceptSid) {
+            return 3; // ADDED instance greater than received
+
+        } else {
+            return 1; // SAME
+        }
+    }
 
     private void countCheck(int count1, int count2, int same, int modified, int added, int dropped) {
 

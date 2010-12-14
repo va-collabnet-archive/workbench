@@ -73,6 +73,9 @@ public class Svn implements I_HandleSubversion {
 		SVN_KIT;
     };
 	private static boolean connectedToSvn = false;
+	
+	private static int svnNotConnectedWarningCount = 0;
+	public static int maxSvnNotConnectedWarningCount = 1;
 
     protected static boolean useCachedCredentials = false;
 
@@ -87,10 +90,13 @@ public class Svn implements I_HandleSubversion {
     public static Semaphore rwl = new Semaphore(SEMAPHORE_PERMITS, true);
 	public static SVNClientInterface getSvnClient() {
 		if (!isConnectedToSvn()) {
-			JOptionPane.showMessageDialog(null,
-					"Skipping SVN task as not connected to SVN",
-					"Not connected to SVN",
-					JOptionPane.INFORMATION_MESSAGE);
+			if (svnNotConnectedWarningCount < maxSvnNotConnectedWarningCount) {
+				svnNotConnectedWarningCount++;
+				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+						JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: getSvnClient()" );				
+			}
 			return null;
 		}
 		if (client == null) {
@@ -187,8 +193,13 @@ public class Svn implements I_HandleSubversion {
 	throws TaskFailedException {
 
 		if (!isConnectedToSvn()) {
-			JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
-					JOptionPane.INFORMATION_MESSAGE);
+			if (svnNotConnectedWarningCount < maxSvnNotConnectedWarningCount) {
+				svnNotConnectedWarningCount++;
+				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+						JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: status()" );				
+			}
 			return null;
 		}
 		Status[] status = null;
@@ -278,8 +289,13 @@ public class Svn implements I_HandleSubversion {
 	public static void cleanup(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
 	throws TaskFailedException {
 		if (!isConnectedToSvn()) {
-			JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
-					JOptionPane.INFORMATION_MESSAGE);
+			if (svnNotConnectedWarningCount < maxSvnNotConnectedWarningCount) {
+				svnNotConnectedWarningCount++;
+				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+						JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: cleanup()" );				
+			}
 			return;
 		}
 		SvnLog.info("Acquiring svn write lock [cleanup]");
@@ -326,8 +342,13 @@ public class Svn implements I_HandleSubversion {
 	public static void commit(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
 	throws TaskFailedException {
 		if (!isConnectedToSvn()) {
-			JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
-					JOptionPane.INFORMATION_MESSAGE);
+			if (svnNotConnectedWarningCount < maxSvnNotConnectedWarningCount) {
+				svnNotConnectedWarningCount++;
+				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+						JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: commit()" );				
+			}
 			return;
 		}
 		SvnLog.info("Acquiring svn write lock [commit]");
@@ -495,8 +516,13 @@ public class Svn implements I_HandleSubversion {
 	public static void purge(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
 	throws TaskFailedException {
 		if (!isConnectedToSvn()) {
-			JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
-					JOptionPane.INFORMATION_MESSAGE);
+			if (svnNotConnectedWarningCount < maxSvnNotConnectedWarningCount) {
+				svnNotConnectedWarningCount++;
+				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+						JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: purge()" );				
+			}
 			return;
 		}
 		SvnLog.info("Acquiring svn write lock [purge]");
@@ -566,8 +592,13 @@ public class Svn implements I_HandleSubversion {
 	public static void revert(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
 	throws TaskFailedException {
 		if (!isConnectedToSvn()) {
-			JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
-					JOptionPane.INFORMATION_MESSAGE);
+			if (svnNotConnectedWarningCount < maxSvnNotConnectedWarningCount) {
+				svnNotConnectedWarningCount++;
+				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+						JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: revert()" );				
+			}
 			return;
 		}
 		SvnLog.info("Acquiring svn write lock [revert]");
@@ -662,8 +693,13 @@ public class Svn implements I_HandleSubversion {
 
 	private static void revert(Status s) throws ClientException {
 		if (!isConnectedToSvn()) {
-			JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
-					JOptionPane.INFORMATION_MESSAGE);
+			if (svnNotConnectedWarningCount < maxSvnNotConnectedWarningCount) {
+				svnNotConnectedWarningCount++;
+				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+						JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: revert()" );				
+			}
 			return;
 		}
 		Svn.getSvnClient().revert(s.getPath(), Depth.infinity, null);
@@ -673,8 +709,13 @@ public class Svn implements I_HandleSubversion {
 	public static void update(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
 	throws TaskFailedException {
 		if (!isConnectedToSvn()) {
-			JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
-					JOptionPane.INFORMATION_MESSAGE);
+			if (svnNotConnectedWarningCount < maxSvnNotConnectedWarningCount) {
+				svnNotConnectedWarningCount++;
+				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+						JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: update()" );				
+			}
 			return;
 		}
 		SvnLog.info("Acquiring svn write lock [update]");
@@ -730,8 +771,13 @@ public class Svn implements I_HandleSubversion {
 	public static void updateDatabase(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
 	throws TaskFailedException {
 		if (!isConnectedToSvn()) {
-			JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
-					JOptionPane.INFORMATION_MESSAGE);
+			if (svnNotConnectedWarningCount < maxSvnNotConnectedWarningCount) {
+				svnNotConnectedWarningCount++;
+				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+						JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: updateDatabase()" );				
+			}
 			return;
 		}
 		SvnLog.info("Acquiring svn write lock [update-database]");
@@ -810,8 +856,13 @@ public class Svn implements I_HandleSubversion {
 	public static void checkout(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
 	throws TaskFailedException {
 		if (!isConnectedToSvn()) {
-			JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
-					JOptionPane.INFORMATION_MESSAGE);
+			if (svnNotConnectedWarningCount < maxSvnNotConnectedWarningCount) {
+				svnNotConnectedWarningCount++;
+				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+						JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: checkout()" );				
+			}
 			return;
 		}
 		SvnLog.info("Acquiring svn write lock [checkout]");
@@ -867,8 +918,13 @@ public class Svn implements I_HandleSubversion {
 
 	private static void handleAuthentication(PromptUserPassword3 authenticator) {
 		if (!isConnectedToSvn()) {
-			JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
-					JOptionPane.INFORMATION_MESSAGE);
+			if (svnNotConnectedWarningCount < maxSvnNotConnectedWarningCount) {
+				svnNotConnectedWarningCount++;
+				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+						JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: handleAuthentication()" );				
+			}
 			return;
 		}
 		Svn.getSvnClient().password("");
@@ -1071,8 +1127,13 @@ public class Svn implements I_HandleSubversion {
 	public static void unlock(SubversionData svd, File toUnlock, PromptUserPassword3 authenticator, boolean interactive)
 	throws TaskFailedException {
 		if (!isConnectedToSvn()) {
-			JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
-					JOptionPane.INFORMATION_MESSAGE);
+			if (svnNotConnectedWarningCount < maxSvnNotConnectedWarningCount) {
+				svnNotConnectedWarningCount++;
+				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+						JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: unlock()" );				
+			}
 			return;
 		}
 		SvnLog.info("Acquiring svn write lock [unlock]");
@@ -1121,8 +1182,13 @@ public class Svn implements I_HandleSubversion {
 	public void svnLock(SubversionData svd, File toLock, PromptUserPassword3 authenticator, boolean interactive)
 	throws TaskFailedException {
 		if (!isConnectedToSvn()) {
-			JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
-					JOptionPane.INFORMATION_MESSAGE);
+			if (svnNotConnectedWarningCount < maxSvnNotConnectedWarningCount) {
+				svnNotConnectedWarningCount++;
+				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+						JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: svnLock()" );				
+			}
 			return;
 		}
 		Svn.lock(svd, toLock, authenticator, interactive);
@@ -1131,8 +1197,13 @@ public class Svn implements I_HandleSubversion {
 	public static void lock(SubversionData svd, File toLock, PromptUserPassword3 authenticator, boolean interactive)
 	throws TaskFailedException {
 		if (!isConnectedToSvn()) {
-			JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
-					JOptionPane.INFORMATION_MESSAGE);
+			if (svnNotConnectedWarningCount < maxSvnNotConnectedWarningCount) {
+				svnNotConnectedWarningCount++;
+				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+						JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: lock()" );				
+			}
 			return;
 		}
 		SvnLog.info("Acquiring svn write lock [lock]");
@@ -1180,8 +1251,13 @@ public class Svn implements I_HandleSubversion {
 	public static void doImport(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
 	throws TaskFailedException {
 		if (!isConnectedToSvn()) {
-			JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
-					JOptionPane.INFORMATION_MESSAGE);
+			if (svnNotConnectedWarningCount < maxSvnNotConnectedWarningCount) {
+				svnNotConnectedWarningCount++;
+				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+						JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: doImport()" );				
+			}
 			return;
 		}
 		SvnLog.info("Acquiring svn write lock [import]");
@@ -1241,8 +1317,13 @@ public class Svn implements I_HandleSubversion {
 
 	private static void switchToReadOnlyMirror(SubversionData svd) throws TaskFailedException {
 		if (!isConnectedToSvn()) {
-			JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
-					JOptionPane.INFORMATION_MESSAGE);
+			if (svnNotConnectedWarningCount < maxSvnNotConnectedWarningCount) {
+				svnNotConnectedWarningCount++;
+				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+						JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: switchToReadOnlyMirror()" );				
+			}
 			return;
 		}
 		if (svd.getWorkingCopyStr() == null) {
