@@ -156,6 +156,7 @@ import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 import com.sleepycat.je.DatabaseException;
+import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.tk.api.refset.RefsetMemberChronicleBI;
 
 public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_Search {
@@ -1092,6 +1093,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         assert config.getEditingPathSet() != null : "Config edit path set cannot be null.";
         member.enclosingConceptNid = refsetConcept.getNid();
         member.nid = Bdb.uuidToNid(primordialUuid);
+        member.refsetNid = refsetConcept.getNid();
         Bdb.getNidCNidMap().setCNidForNid(refsetConcept.getNid(), member.nid);
         member.referencedComponentNid = referencedComponentNid;
         member.primordialUNid = Bdb.getUuidsToNidMap().getUNid(primordialUuid);
@@ -1116,7 +1118,12 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                 member.addVersion(revision);
             }
         }
-        refsetConcept.getExtensions().add(member);
+        if (refsetConcept.isAnnotationStyleRefset()) {
+            ConceptComponent<?,?> referencedComponent = (ConceptComponent<?, ?>) Bdb.getComponent(referencedComponentNid);
+            referencedComponent.addAnnotation(member);
+        } else {
+            refsetConcept.getExtensions().add(member);
+        }
         return member;
     }
 
