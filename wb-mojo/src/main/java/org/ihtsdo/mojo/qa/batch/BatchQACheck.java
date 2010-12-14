@@ -52,6 +52,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
+import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
 import org.ihtsdo.tk.api.Precedence;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
@@ -144,8 +145,22 @@ public class BatchQACheck extends AbstractMojo {
 	 * @parameter
 	 */
 	private String rulesOutputStr;
-	
-	
+
+	/**
+	 * delpoyment package reference name.
+	 * 
+	 * @parameter
+	 */
+	private String pkgName;
+
+	/**
+	 * delpoyment package reference url.
+	 * 
+	 * @parameter
+	 */
+	private String pkgUrl;
+
+
 	private File executionDetailsOutput;
 	private File executionXmlOutput;
 	private File findingsOutput;
@@ -180,6 +195,11 @@ public class BatchQACheck extends AbstractMojo {
 			validateParamenters();
 			openDb();
 			RulesContextHelper contextHelper = new RulesContextHelper(config);
+			if ((pkgName != null && !pkgName.isEmpty()) && ((pkgUrl != null && !pkgUrl.isEmpty()))) {
+				RulesDeploymentPackageReferenceHelper pkgHelper = new RulesDeploymentPackageReferenceHelper(config);
+				RulesDeploymentPackageReference pkgReference = pkgHelper.createNewRulesDeploymentPackage(pkgName, pkgUrl);
+				contextHelper.addPkgReferenceToContext(pkgReference, tf.getConcept(UUID.fromString(context_uuid)));
+			}
 			cleanKbFileCache();
 			exportExecutionDescriptor(contextHelper);
 			performQA(executionUUID, contextHelper);
@@ -195,7 +215,7 @@ public class BatchQACheck extends AbstractMojo {
 				loopFile.delete();
 			}
 		}
-		
+
 	}
 
 	private void exportExecutionDescriptor(RulesContextHelper contextHelper) throws Exception {
@@ -205,7 +225,7 @@ public class BatchQACheck extends AbstractMojo {
 		PrintWriter rulePw = new PrintWriter(ruleOsw);
 
 		FileOutputStream executionXmlOs = new FileOutputStream(executionXmlOutput); 
-		
+
 		// Rules header
 		rulePw.println(  "rule uuid" + "\t" + "name" + "\t" + "description" + "\t" + "severity" + "\t" 
 				+ "package name" + "\t" + "package url" + "\t" + "dita uid" + "\t" + "rule code");
@@ -222,7 +242,7 @@ public class BatchQACheck extends AbstractMojo {
 			DocumentBuilder docBuilder = dbf.newDocumentBuilder();
 
 			DOMImplementation impl = docBuilder.getDOMImplementation();
-			
+
 			Document document = impl.createDocument(null, "description", null);
 			Element rootElement = document.getDocumentElement();
 
@@ -291,7 +311,7 @@ public class BatchQACheck extends AbstractMojo {
 						dtiaUidElement.appendChild(document.createTextNode(ditaUid));
 						ruleElement.appendChild(dtiaUidElement);
 					}
-						
+
 
 					Element lastExecutionElement = document.createElement("lastExecution");
 					lastExecutionElement.appendChild(document.createTextNode(df.format(executionDate.getTime())));
@@ -301,11 +321,11 @@ public class BatchQACheck extends AbstractMojo {
 			}
 
 			// Serialize the document onto System.out
-		      TransformerFactory xformFactory = TransformerFactory.newInstance();  
-		      Transformer idTransform = xformFactory.newTransformer();
-		      Source input = new DOMSource(document);
-		      Result output = new StreamResult(executionXmlOs);
-		      idTransform.transform(input, output);
+			TransformerFactory xformFactory = TransformerFactory.newInstance();  
+			Transformer idTransform = xformFactory.newTransformer();
+			Source input = new DOMSource(document);
+			Result output = new StreamResult(executionXmlOs);
+			idTransform.transform(input, output);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
@@ -357,7 +377,7 @@ public class BatchQACheck extends AbstractMojo {
 		if (!qaOutput.exists()) {
 			qaOutput.mkdirs();
 		}
-		
+
 		if (executionXmlOutputStr == null || executionXmlOutputStr.isEmpty()) {
 			executionXmlOutput = new File(qaOutput, "executionXmlOutput.xml");
 		} else {
@@ -387,13 +407,13 @@ public class BatchQACheck extends AbstractMojo {
 	}
 
 	private void openDb() throws Exception {
-//		vodbDirectory = new File("generated-resources/berkeley-db");
-//		if (!vodbDirectory.exists()) {
-//			throw new Exception("Database can't be found in expected location...");
-//		}
-//		dbSetupConfig = new DatabaseSetupConfig();
-//		System.out.println("Opening database");
-//		Terms.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig);
+		//		vodbDirectory = new File("generated-resources/berkeley-db");
+		//		if (!vodbDirectory.exists()) {
+		//			throw new Exception("Database can't be found in expected location...");
+		//		}
+		//		dbSetupConfig = new DatabaseSetupConfig();
+		//		System.out.println("Opening database");
+		//		Terms.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig);
 		tf = (I_ImplementTermFactory) Terms.get();
 		config = getTestConfig();
 		tf.setActiveAceFrameConfig(config);
@@ -404,11 +424,12 @@ public class BatchQACheck extends AbstractMojo {
 		config = tf.newAceFrameConfig();
 		DateFormat df = new SimpleDateFormat("yyyy.mm.dd hh:mm:ss");
 		config.addViewPosition(tf.newPosition(tf.getPath(new UUID[] { UUID.fromString(test_path_uuid) }), tf.convertToThinVersion(df.parse(test_time).getTime())));
-		
+
 		// Addes inferred promotion template to catch the context relationships [ testing
-		config.addViewPosition(tf.newPosition(tf.getPath(new UUID[] { UUID.fromString("cb0f6c0d-ebf3-5d84-9e12-d09a937cbffd") }), Integer.MAX_VALUE));
-		
-		config.addEditingPath(tf.getPath(new UUID[] { UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2") }));
+		//config.addViewPosition(tf.newPosition(tf.getPath(new UUID[] { UUID.fromString("cb0f6c0d-ebf3-5d84-9e12-d09a937cbffd") }), Integer.MAX_VALUE));
+
+		//config.addEditingPath(tf.getPath(new UUID[] { UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2") }));
+		config.addEditingPath(tf.getPath(new UUID[] { UUID.fromString(test_path_uuid) }));
 		config.getDescTypes().add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
 		config.getDescTypes().add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());
 		config.getDescTypes().add(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.localize().getNid());

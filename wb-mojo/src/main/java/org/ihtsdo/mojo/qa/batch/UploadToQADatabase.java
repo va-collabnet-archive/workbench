@@ -42,7 +42,7 @@ import com.mysql.jdbc.Statement;
  * @see <code>org.apache.maven.plugin.AbstractMojo</code>
  * @author ALO
  * @goal upload-to-qa-db
- * @phase process-resources
+ * @phase compile
  */
 public class UploadToQADatabase extends AbstractMojo {
 
@@ -58,7 +58,34 @@ public class UploadToQADatabase extends AbstractMojo {
 	 * Execution details csv/txt file.
 	 * 
 	 * @parameter
-	 * @required
+	 */
+	private String executionDetailsOutputStr;
+
+	/**
+	 * Execution details xml file.
+	 * 
+	 * @parameter
+	 */
+	private String executionXmlOutputStr;
+
+	/**
+	 * Findings csv/txt file.
+	 * 
+	 * @parameter
+	 */
+	private String findingsOutputStr;
+
+	/**
+	 * Rules csv/txt file.
+	 * 
+	 * @parameter
+	 */
+	private String rulesOutputStr;
+	
+	/**
+	 * Execution details csv/txt file.
+	 * 
+	 * @parameter
 	 */
 	private File executionDetails;
 	
@@ -66,7 +93,6 @@ public class UploadToQADatabase extends AbstractMojo {
 	 * Execution details xml file.
 	 * 
 	 * @parameter
-	 * @required
 	 */
 	private File executionXml;
 	
@@ -74,7 +100,6 @@ public class UploadToQADatabase extends AbstractMojo {
 	 * Findings csv/txt file.
 	 * 
 	 * @parameter
-	 * @required
 	 */
 	private File findings;
 	
@@ -82,7 +107,6 @@ public class UploadToQADatabase extends AbstractMojo {
 	 * Rules csv/txt file.
 	 * 
 	 * @parameter
-	 * @required
 	 */
 	private File rules;
 	
@@ -113,7 +137,7 @@ public class UploadToQADatabase extends AbstractMojo {
 	/**
 	 * backup folder
 	 * 
-	 * @parameter
+	 * @parameter expression="folder"
 	 * @required
 	 */
 	private File backupFolder;
@@ -122,8 +146,6 @@ public class UploadToQADatabase extends AbstractMojo {
 
 	private String runId;
 
-	
-	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			validateParamenters();
@@ -132,7 +154,6 @@ public class UploadToQADatabase extends AbstractMojo {
 			throw new MojoFailureException(e.getLocalizedMessage(), e);
 		}
 	}
-
 
 	private void loadToDatabase() throws SQLException, IOException {
 		loadExecutionInfo();
@@ -264,6 +285,31 @@ public class UploadToQADatabase extends AbstractMojo {
 
 
 	private void validateParamenters() throws Exception {
+		File qaOutput = new File(outputDirectory, "generated-resources/qa-output/");
+		if (!qaOutput.exists()) {
+			qaOutput.mkdirs();
+		}
+		
+		if (executionXmlOutputStr == null || executionXmlOutputStr.isEmpty()) {
+			executionXml = new File(qaOutput, "executionXmlOutput.xml");
+		} else {
+			executionXml = new File(qaOutput, executionXmlOutputStr);
+		}
+		if (findingsOutputStr == null || findingsOutputStr.isEmpty()) {
+			findings = new File(qaOutput, "findingsOutput.txt");
+		} else {
+			findings = new File(qaOutput, findingsOutputStr);
+		}
+		if (rulesOutputStr == null || rulesOutputStr.isEmpty()) {
+			rules = new File(qaOutput, "rulesOutput.txt");
+		} else {
+			rules = new File(qaOutput, rulesOutputStr);
+		}
+		if (executionDetailsOutputStr == null || executionDetailsOutputStr.isEmpty()) {
+			executionDetails = new File(qaOutput, "executionDetailsOutput.txt");
+		} else {
+			executionDetails = new File(qaOutput, executionDetailsOutputStr);
+		}
 		if (!executionDetails.exists() || !executionXml.exists() || !findings.exists() || !rules.exists()) {
 			throw new Exception("File not found...");
 		}
