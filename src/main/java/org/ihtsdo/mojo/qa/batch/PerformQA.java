@@ -37,7 +37,7 @@ public class PerformQA implements I_ProcessConcepts {
 	TerminologyHelperDroolsWorkbench terminologyHelperCache;
 	int count;
 	long start;
-	
+
 	HashMap<String,Long> traceElapsedTimes;
 	HashMap<String,Integer> traceCounts;
 	int fsnNid;
@@ -78,7 +78,8 @@ public class PerformQA implements I_ProcessConcepts {
 
 	@Override
 	public void processConcept(I_GetConceptData loopConcept) throws Exception {
-		if (myStaticIsACache.isKindOf(loopConcept.getConceptNid(), snomedRoot.getConceptNid())) {
+		//testing cut-off, skip all after 2000
+		if (count < 2001 && myStaticIsACache.isKindOf(loopConcept.getConceptNid(), snomedRoot.getConceptNid())) {
 			//snomedRoot.isParentOfOrEqualTo(loopConcept)
 			//, config.getAllowedStatus(), 
 			//destRels, config.getViewPositionSetReadOnly(), 
@@ -86,69 +87,69 @@ public class PerformQA implements I_ProcessConcepts {
 			long individualStart = Calendar.getInstance().getTimeInMillis();
 			ResultsCollectorWorkBench results = RulesLibrary.checkConcept(loopConcept, context, true, config, contextHelper);
 			long individualElapsed = Calendar.getInstance().getTimeInMillis()-individualStart;
-			
+
 			// TRACERS
-//			String fsn = "";
-//			for (I_DescriptionTuple loopTuple : loopConcept.getDescriptionTuples(config.getAllowedStatus(),
-//					config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
-//					config.getConflictResolutionStrategy())) {
-//				if (loopTuple.getTypeNid() == fsnNid && loopTuple.getLang().equals("en")) {
-//					fsn = loopTuple.getText();
-//				}
-//			}
-			
-//			String fsnTracer = "no semtag";
-//			try {
-//				fsnTracer = "Semtag: " + fsn.substring(fsn.indexOf("(") + 1, fsn.indexOf(")") - 1);
-//			} catch (Exception e) {
-//				// no semtag
-//			}
-			
-//			String descriptionsTracer = "Descriptions: " + loopConcept.getDescriptionTuples(config.getAllowedStatus(),
-//					config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
-//					config.getConflictResolutionStrategy()).size();
-//			String relationshipsTracer = "Relationships: " + loopConcept.getSourceRelTuples(config.getAllowedStatus(),
-//					null, config.getViewPositionSetReadOnly(), config.getPrecedence(),
-//					config.getConflictResolutionStrategy()).size();
-			
+			//			String fsn = "";
+			//			for (I_DescriptionTuple loopTuple : loopConcept.getDescriptionTuples(config.getAllowedStatus(),
+			//					config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
+			//					config.getConflictResolutionStrategy())) {
+			//				if (loopTuple.getTypeNid() == fsnNid && loopTuple.getLang().equals("en")) {
+			//					fsn = loopTuple.getText();
+			//				}
+			//			}
+
+			//			String fsnTracer = "no semtag";
+			//			try {
+			//				fsnTracer = "Semtag: " + fsn.substring(fsn.indexOf("(") + 1, fsn.indexOf(")") - 1);
+			//			} catch (Exception e) {
+			//				// no semtag
+			//			}
+
+			//			String descriptionsTracer = "Descriptions: " + loopConcept.getDescriptionTuples(config.getAllowedStatus(),
+			//					config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
+			//					config.getConflictResolutionStrategy()).size();
+			//			String relationshipsTracer = "Relationships: " + loopConcept.getSourceRelTuples(config.getAllowedStatus(),
+			//					null, config.getViewPositionSetReadOnly(), config.getPrecedence(),
+			//					config.getConflictResolutionStrategy()).size();
+
 			//if (traceElapsedTimes.keySet().contains(fsnTracer)) {
-				//traceElapsedTimes.put(fsnTracer, traceElapsedTimes.get(fsnTracer) + individualElapsed);
-				//traceCounts.put(fsnTracer, traceCounts.get(fsnTracer)+1);
+			//traceElapsedTimes.put(fsnTracer, traceElapsedTimes.get(fsnTracer) + individualElapsed);
+			//traceCounts.put(fsnTracer, traceCounts.get(fsnTracer)+1);
 			//} else {
-				//traceElapsedTimes.put(fsnTracer, individualElapsed);
-				//traceCounts.put(fsnTracer, 1);
+			//traceElapsedTimes.put(fsnTracer, individualElapsed);
+			//traceCounts.put(fsnTracer, 1);
 			//}
-//			if (traceElapsedTimes.keySet().contains(descriptionsTracer)) {
-//				traceElapsedTimes.put(descriptionsTracer, traceElapsedTimes.get(descriptionsTracer) + individualElapsed);
-//				traceCounts.put(descriptionsTracer, traceCounts.get(descriptionsTracer)+1);
-//			} else {
-//				traceElapsedTimes.put(descriptionsTracer, individualElapsed);
-//				traceCounts.put(descriptionsTracer, 1);
-//			}
-//			if (traceElapsedTimes.keySet().contains(relationshipsTracer)) {
-//				traceElapsedTimes.put(relationshipsTracer, traceElapsedTimes.get(relationshipsTracer) + individualElapsed);
-//				traceCounts.put(relationshipsTracer, traceCounts.get(relationshipsTracer)+1);
-//			} else {
-//				traceElapsedTimes.put(relationshipsTracer, individualElapsed);
-//				traceCounts.put(relationshipsTracer, 1);
-//			}
-			
+			//			if (traceElapsedTimes.keySet().contains(descriptionsTracer)) {
+			//				traceElapsedTimes.put(descriptionsTracer, traceElapsedTimes.get(descriptionsTracer) + individualElapsed);
+			//				traceCounts.put(descriptionsTracer, traceCounts.get(descriptionsTracer)+1);
+			//			} else {
+			//				traceElapsedTimes.put(descriptionsTracer, individualElapsed);
+			//				traceCounts.put(descriptionsTracer, 1);
+			//			}
+			//			if (traceElapsedTimes.keySet().contains(relationshipsTracer)) {
+			//				traceElapsedTimes.put(relationshipsTracer, traceElapsedTimes.get(relationshipsTracer) + individualElapsed);
+			//				traceCounts.put(relationshipsTracer, traceCounts.get(relationshipsTracer)+1);
+			//			} else {
+			//				traceElapsedTimes.put(relationshipsTracer, individualElapsed);
+			//				traceCounts.put(relationshipsTracer, 1);
+			//			}
+
 			// END TRACERS
-			
+
 			//System.out.println("Individual loop for " + loopConcept.toString() + " in " + individualElapsed + " ms.");
 			count++;
 			if (count % 1000 == 0) {
 				System.out.println("Checked " + count + " effective concepts in " + (Calendar.getInstance().getTimeInMillis()-start) + " ms.");
 				start = Calendar.getInstance().getTimeInMillis();
-				
+
 				//Tracers output
-//				List<String> keyList = new ArrayList<String>();
-//				keyList.addAll(traceCounts.keySet());
-//				Collections.sort(keyList);
-//				for (String loopKey : keyList) {
-//					System.out.println(loopKey + " Check count: " + traceCounts.get(loopKey) + " Check time: " + traceElapsedTimes.get(loopKey));
-//				}
-//				System.out.println("");
+				//				List<String> keyList = new ArrayList<String>();
+				//				keyList.addAll(traceCounts.keySet());
+				//				Collections.sort(keyList);
+				//				for (String loopKey : keyList) {
+				//					System.out.println(loopKey + " Check count: " + traceCounts.get(loopKey) + " Check time: " + traceElapsedTimes.get(loopKey));
+				//				}
+				//				System.out.println("");
 				//end
 			}
 			if (!results.getResultsItems().isEmpty()) {
