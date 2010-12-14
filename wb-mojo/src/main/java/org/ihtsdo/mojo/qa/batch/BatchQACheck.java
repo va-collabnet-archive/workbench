@@ -79,6 +79,14 @@ public class BatchQACheck extends AbstractMojo {
 	private File outputDirectory;
 
 	/**
+	 * The uuid for database.
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String database_uuid;
+
+	/**
 	 * The uuid for the tested path.
 	 * 
 	 * @parameter
@@ -162,9 +170,13 @@ public class BatchQACheck extends AbstractMojo {
 	private I_TermFactory tf;
 
 	UUID executionUUID;
-
+	DateFormat df;
+	Calendar executionDate ;
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
+			df = new SimpleDateFormat("yyyy.mm.dd hh:mm:ss zzz");
+			executionDate = new GregorianCalendar();
+			executionUUID = UUID.randomUUID();
 			validateParamenters();
 			openDb();
 			RulesContextHelper contextHelper = new RulesContextHelper(config);
@@ -187,38 +199,24 @@ public class BatchQACheck extends AbstractMojo {
 	}
 
 	private void exportExecutionDescriptor(RulesContextHelper contextHelper) throws Exception {
-		FileOutputStream executionFos = new FileOutputStream(executionDetailsOutput);
-		OutputStreamWriter executionOsw = new OutputStreamWriter(executionFos, "UTF-8");
-		PrintWriter executionPw = new PrintWriter(executionOsw);
-
+		
 		FileOutputStream ruleFos = new FileOutputStream(rulesOutput);
 		OutputStreamWriter ruleOsw = new OutputStreamWriter(ruleFos, "UTF-8");
 		PrintWriter rulePw = new PrintWriter(ruleOsw);
 
 		FileOutputStream executionXmlOs = new FileOutputStream(executionXmlOutput); 
 		
-		// Execution header
-		executionPw.println("uuid" + "\t" + "name" + "\t" + "date" + "\t" + "context");
 		// Rules header
-		rulePw.println("name" + "\t" + "description" + "\t" + "rule uuid" + "\t" + "status" + "\t" + "severity" + "\t" 
-				+ "package name" + "\t" + "package url" + "\t" + "dita uid" + "\t" + "last execution");
+		rulePw.println(  "rule uuid" + "\t" + "name" + "\t" + "description" + "\t" + "severity" + "\t" 
+				+ "package name" + "\t" + "package url" + "\t" + "dita uid" + "\t" + "rule code");
 
 		try {
-			DateFormat df = new SimpleDateFormat("yyyy.mm.dd hh:mm:ss zzz");
-			Calendar executionDate = new GregorianCalendar();
 
-			executionUUID = UUID.randomUUID();
 
 			I_GetConceptData context = tf.getConcept(UUID.fromString(context_uuid));
 			contextHelper.getKnowledgeBaseForContext(context, config, true);
 
-			// Write Execution file
-			executionPw.print(executionUUID + "\t");
-			executionPw.print(execution_name);
-			executionPw.print(df.format(executionDate.getTime()) + "\t");
-			executionPw.print(context.toUserString());
-			executionPw.println();
-
+		
 			// Create the execution XMLexecutionPw
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = dbf.newDocumentBuilder();
@@ -240,22 +238,24 @@ public class BatchQACheck extends AbstractMojo {
 					String description = (String) loopRule.getMetaData().get("DESCRIPTION");
 					String ditaUid = (String) loopRule.getMetaData().get("DITA_UID");
 					Integer severity = (Integer) loopRule.getMetaData().get("SEVERITY");
+					String ruleCode = (String) loopRule.getMetaData().get("RULE_CODE");
 					I_GetConceptData roleInContext = contextHelper.getRoleInContext(ruleUid, context); // STATUS
 
 					// Write to rules file
+					rulePw.print(ruleUid + "\t");
 					rulePw.print(loopRule.getName() + "\t");
 					rulePw.print(description + "\t");
-					rulePw.print(ruleUid + "\t");
-					if (roleInContext != null) {
-						rulePw.print(roleInContext.toUserString() + "\t");// Status
-					} else {
-						rulePw.print("default" + "\t");// Status
-					}
+//					if (roleInContext != null) {
+//						rulePw.print(roleInContext.toUserString() + "\t");// Status
+//					} else {
+//						rulePw.print("default" + "\t");// Status
+//					}
 					rulePw.print(severity + "\t");
 					rulePw.print(loopPackage.getName() + "\t");
 					rulePw.print(loopPackage.getUrl() + "\t");
 					rulePw.print(ditaUid + "\t");
-					rulePw.print(df.format(executionDate.getTime()));
+					rulePw.print(ruleCode);
+//					rulePw.print(df.format(executionDate.getTime()));
 					rulePw.println();
 
 					// Generate XML components
@@ -312,8 +312,6 @@ public class BatchQACheck extends AbstractMojo {
 		} finally {
 			executionXmlOs.flush();
 			executionXmlOs.close();
-			executionPw.flush();
-			executionPw.close();
 			rulePw.flush();
 			rulePw.close();
 		}
@@ -321,16 +319,37 @@ public class BatchQACheck extends AbstractMojo {
 
 	private void performQA(UUID executionUUID, RulesContextHelper contextHelper) throws Exception {
 		I_GetConceptData context = tf.getConcept(UUID.fromString(context_uuid));
+
 		// Add results to output file
-		FileOutputStream executionFos = new FileOutputStream(findingsOutput);
-		OutputStreamWriter executionOsw = new OutputStreamWriter(executionFos, "UTF-8");
-		PrintWriter findingPw = new PrintWriter(executionOsw);
+		FileOutputStream findingFos = new FileOutputStream(findingsOutput);
+		OutputStreamWriter findingOsw = new OutputStreamWriter(findingFos, "UTF-8");
+		PrintWriter findingPw = new PrintWriter(findingOsw);
 		//TODO: add header titles
-		findingPw.println("uuid" + "\t" + "execution" + "\t" + "rule" + "\t" + "component uuid" + "\t" + "component name" + "\t" + "error message");
+		findingPw.println("uuid" + "\t" + "database Uid" + "\t" + "path Uid" + "\t" + "run Id" + "\t" + "rule uid" + "\t" + "component uuid"  + "\t" + "details" + "\t" + "component name");
 		Long start = Calendar.getInstance().getTimeInMillis();
-		tf.iterateConcepts(new PerformQA(context, findingPw, config, executionUUID, contextHelper));
+		tf.iterateConcepts(new PerformQA(context, findingPw, config, executionUUID, contextHelper, database_uuid, test_path_uuid));
 		findingPw.flush();
 		findingPw.close();
+		Long end = Calendar.getInstance().getTimeInMillis();
+		
+		FileOutputStream executionFos = new FileOutputStream(executionDetailsOutput);
+		OutputStreamWriter executionOsw = new OutputStreamWriter(executionFos, "UTF-8");
+		PrintWriter executionPw = new PrintWriter(executionOsw);
+		// Execution header
+		executionPw.println("uuid" + "\t" + "database Uid" + "\t" + "path Uid" + "\t" + "name" + "\t" + "view point" + "\t" + "start time" + "\t" + "end time" + "\t" + "context");
+		// Write Execution file
+		executionPw.print(executionUUID + "\t");
+		executionPw.print(database_uuid + "\t");
+		executionPw.print(test_path_uuid + "\t");
+		executionPw.print(execution_name + "\t");
+		executionPw.print(test_time + "\t");
+		executionPw.print(df.format(start) + "\t");
+		executionPw.print(df.format(end) + "\t");
+		executionPw.print(context.toUserString());
+		executionPw.println();
+
+		executionPw.flush();
+		executionPw.close();
 	}
 
 	private void validateParamenters() throws Exception {
@@ -361,7 +380,7 @@ public class BatchQACheck extends AbstractMojo {
 		}
 		UUID.fromString(test_path_uuid);
 		UUID.fromString(context_uuid);
-		DateFormat df = new SimpleDateFormat("yyyy.mm.dd hh:mm:ss zzz");
+		DateFormat df = new SimpleDateFormat("yyyy.mm.dd hh:mm:ss");
 		if (test_time != null && !test_time.isEmpty()) {
 			df.parse(test_time);
 		}
@@ -383,7 +402,7 @@ public class BatchQACheck extends AbstractMojo {
 	private I_ConfigAceFrame getTestConfig() throws TerminologyException, IOException, ParseException {
 		I_ConfigAceFrame config = null;
 		config = tf.newAceFrameConfig();
-		DateFormat df = new SimpleDateFormat("yyyy.mm.dd hh:mm:ss zzz");
+		DateFormat df = new SimpleDateFormat("yyyy.mm.dd hh:mm:ss");
 		config.addViewPosition(tf.newPosition(tf.getPath(new UUID[] { UUID.fromString(test_path_uuid) }), tf.convertToThinVersion(df.parse(test_time).getTime())));
 		
 		// Addes inferred promotion template to catch the context relationships [ testing

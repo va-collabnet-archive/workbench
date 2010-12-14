@@ -41,15 +41,19 @@ public class PerformQA implements I_ProcessConcepts {
 	HashMap<String,Long> traceElapsedTimes;
 	HashMap<String,Integer> traceCounts;
 	int fsnNid;
+	private String databaseUuid;
+	private String testPathUuid;
 
 	public PerformQA(I_GetConceptData context, PrintWriter findingPw, I_ConfigAceFrame config, UUID executionUUID,
-			RulesContextHelper contextHelper) {
+			RulesContextHelper contextHelper, String databaseUuid, String testPathUuid) {
 		super();
 		this.config = config;
 		this.context = context;
 		this.contextHelper = contextHelper;
 		this.findingPw = findingPw;
 		this.executionUUID = executionUUID;
+		this.databaseUuid=databaseUuid;
+		this.testPathUuid=testPathUuid;
 		this.count = 0;
 		this.start = Calendar.getInstance().getTimeInMillis();
 		traceElapsedTimes = new HashMap<String,Long>();
@@ -171,16 +175,19 @@ public class PerformQA implements I_ProcessConcepts {
 				UUID findingUUID = UUID.randomUUID();
 				int errorCode = resultItem.getErrorCode();//Rule
 				String message = resultItem.getMessage();
+				String ruleUuid = resultItem.getRuleUuid();
 				String conceptName = concept.toUserString();
 				UUID conceptUUID = concept.getUids().get(0);
 
 				//Write data to file
 				findingPw.print(findingUUID + "\t");
+				findingPw.print(databaseUuid + "\t");
+				findingPw.print(testPathUuid + "\t");
 				findingPw.print(executionUUID + "\t");
-				findingPw.print(errorCode + "\t");// Rule
-				findingPw.print(conceptName + "\t");
+				findingPw.print(ruleUuid + "\t");// Rule
 				findingPw.print(conceptUUID + "\t");
-				findingPw.print(message);
+				findingPw.print(errorCode + "-" + message);
+				findingPw.print(conceptName + "\t");
 				findingPw.println();
 			}
 		} catch (Exception e) {
