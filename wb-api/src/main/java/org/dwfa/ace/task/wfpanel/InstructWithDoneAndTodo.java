@@ -79,7 +79,7 @@ public class InstructWithDoneAndTodo extends AbstractTask {
     protected transient Condition returnCondition;
 
     protected transient boolean done;
-    
+
     private transient I_EncodeBusinessProcess process;
 
     protected transient I_ConfigAceFrame config;
@@ -111,14 +111,13 @@ public class InstructWithDoneAndTodo extends AbstractTask {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent e) {
-        	if (Terms.get().getUncommitted().size() > 0) {
-        		for (I_Transact c: Terms.get().getUncommitted()) {
-        			AceLog.getAppLog().warning("Uncommitted changes to: " 
-        					+ ((I_GetConceptData) c).toLongString());
-        			
-        		}
-        		HasUncommittedChanges.askToCommit(process);
-        	}
+            if (Terms.get().getUncommitted().size() > 0) {
+                for (I_Transact c : Terms.get().getUncommitted()) {
+                    AceLog.getAppLog().warning("Uncommitted changes to: " + ((I_GetConceptData) c).toLongString());
+
+                }
+                HasUncommittedChanges.askToCommit(process);
+            }
             if (Terms.get().getUncommitted().size() > 0) {
                 if (!DwfaEnv.isHeadless()) {
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
@@ -222,9 +221,9 @@ public class InstructWithDoneAndTodo extends AbstractTask {
 
         builderVisible = config.isBuilderToggleVisible();
         config.setBuilderToggleVisible(false);
-        subversionButtonVisible = config.isBuilderToggleVisible();
+        subversionButtonVisible = config.isSubversionToggleVisible();
         config.setSubversionToggleVisible(false);
-        inboxButtonVisible = config.isSubversionToggleVisible();
+        inboxButtonVisible = config.isInboxToggleVisible();
         config.setInboxToggleVisible(false);
         workflowPanel = config.getWorkflowPanel();
     }
@@ -293,7 +292,7 @@ public class InstructWithDoneAndTodo extends AbstractTask {
     }
 
     public Condition evaluate(I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
-    	this.process = process;
+        this.process = process;
         try {
             DoSwing swinger = new DoSwing(process);
             swinger.start();
