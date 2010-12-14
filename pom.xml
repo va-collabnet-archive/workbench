@@ -20,25 +20,11 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
-   
-    <dependency>
-			<groupId>com.termmed</groupId>
-			<artifactId>sample-database-qa</artifactId>
-      		<type>jar</type>
-			<version>0.0.1-SNAPSHOT</version>
-	</dependency>
 	<dependency>
-			 <groupId>org.ihtsdo.sample</groupId>
+			 <groupId>org.ihtsdo.sample.mv</groupId>
             <artifactId>database</artifactId>
             <type>zip</type>
-            <version>1.0-trek-ihtsdo-1-SNAPSHOT</version>
-	</dependency>
-		
-	<dependency>
-			 <groupId>org.ihtsdo.sample</groupId>
-            <artifactId>full-database</artifactId>
-            <type>jar</type>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>trek-SCT-EN-ES-USDE-VTMVMP-1.0-SNAPSHOT</version>
 	</dependency>
   </dependencies>
   <build>
@@ -46,12 +32,12 @@
 		<plugin>
 				<groupId>org.ihtsdo</groupId>
 				<artifactId>wb-mojo</artifactId>
-				<version>2.6.0-trek-7-SNAPSHOT</version>
+				<version>2.6.0-trek-8-SNAPSHOT</version>
 				<dependencies>
 					<dependency>
 						<groupId>org.ihtsdo</groupId>
 						<artifactId>wb-bdb</artifactId>
-						<version>2.6.0-trek-7-SNAPSHOT</version>
+						<version>2.6.0-trek-8-SNAPSHOT</version>
 					</dependency>
 					<dependency>
 						<groupId>org.apache.lucene</groupId>
@@ -71,8 +57,8 @@
 							<targetSubDir>generated-resources</targetSubDir>
 							<runtimeArtifacts>
 								<!-- <runtimeArtifact>com.termmed:sample-database-qa</runtimeArtifact> -->
-								<!-- <runtimeArtifact>org.ihtsdo.sample:database</runtimeArtifact> -->
-								<runtimeArtifact>org.ihtsdo.sample:full-database</runtimeArtifact>
+								<runtimeArtifact>org.ihtsdo.sample.mv:database</runtimeArtifact> 
+								<!-- <runtimeArtifact>org.ihtsdo.sample:full-database</runtimeArtifact> -->
 							</runtimeArtifacts>
 						</configuration>
 					</execution>
@@ -117,10 +103,24 @@
 						</goals>
 						<configuration>
 							<database_uuid>37d75b70-fd91-11df-8cff-0800200c9a66</database_uuid>
-							<test_path_uuid>2faa9260-8fb2-11db-b606-0800200c9a66</test_path_uuid>
+							<test_path_uuid>8c230474-9f11-30ce-9cad-185a96fd03a2</test_path_uuid>
 							<execution_name>Daily morning qa execution of release candidate</execution_name>
-							<test_time>2010.11.16 11:00:00 UTC</test_time>
+							<test_time>2011.11.16 11:00:00</test_time>
 							<context_uuid>d974c480-f9b9-3ea1-91e8-b0a4b756a17d</context_uuid>
+							<pkgName>QA-Package</pkgName>
+							<pkgUrl>http://127.0.0.1:8080/drools-guvnor/org.drools.guvnor.Guvnor/package/ihtsdo-qa/qa-package</pkgUrl>
+						</configuration>
+					</execution>
+					<execution>
+						<id>import-results</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>upload-to-qa-db</goal>
+						</goals>
+						<configuration>
+							<url>jdbc:mysql://10.0.0.11:3306/qa_db</url>
+							<username>manu</username>
+							<password>manu</password>
 						</configuration>
 					</execution>
 					<execution>
