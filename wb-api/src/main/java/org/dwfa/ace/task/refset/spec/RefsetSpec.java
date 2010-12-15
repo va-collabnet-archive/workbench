@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,7 +44,7 @@ public class RefsetSpec {
 
     /**
      * Use this constructor if you wish to input the refset spec concept.
-     * 
+     *
      * @param spec
      */
     public RefsetSpec(I_GetConceptData spec, I_ConfigAceFrame config) {
@@ -56,7 +56,7 @@ public class RefsetSpec {
     /**
      * Use this constructor if you wish to input the member refset concept,
      * rather than the refset spec concept.
-     * 
+     *
      * @param concept
      * @param memberRefsetInputted
      */
@@ -167,8 +167,7 @@ public class RefsetSpec {
 
     public I_GetConceptData getMemberRefsetConcept() {
         try {
-            I_GetConceptData specifiesRefsetRel =
-                    termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
+            I_GetConceptData specifiesRefsetRel = termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
             return getLatestSourceRelationshipTarget(getRefsetSpecConcept(), specifiesRefsetRel);
         } catch (Exception e) {
             e.printStackTrace();
@@ -194,8 +193,7 @@ public class RefsetSpec {
 
     public I_GetConceptData getRefsetPurposeConcept() {
         try {
-            I_GetConceptData refsetPurposeRel =
-                    termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
+            I_GetConceptData refsetPurposeRel = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
             I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
             if (memberRefsetConcept == null) {
                 return null;
@@ -240,13 +238,13 @@ public class RefsetSpec {
 
     /**
      * Gets the latest specified relationship's target.
-     * 
+     *
      * @param relationshipType
      * @return
      * @throws Exception
      */
-    public I_GetConceptData getLatestSourceRelationshipTarget(I_GetConceptData concept,
-            I_GetConceptData relationshipType) throws Exception {
+    public I_GetConceptData getLatestSourceRelationshipTarget(I_GetConceptData concept, I_GetConceptData relationshipType)
+            throws Exception {
 
         I_GetConceptData latestTarget = null;
         int latestVersion = Integer.MIN_VALUE;
@@ -272,7 +270,7 @@ public class RefsetSpec {
 
     /**
      * Gets the latest specified relationship's target.
-     * 
+     *
      * @param relationshipType
      * @return
      * @throws Exception
@@ -289,8 +287,8 @@ public class RefsetSpec {
         if (concept != null) {
             // TODO should use the version computer/handle contradiction differently
             List<? extends I_RelTuple> relationships =
-                    concept.getDestRelTuples(null, allowedTypes, config.getViewPositionSetReadOnly(), config
-                        .getPrecedence(), config.getConflictResolutionStrategy());
+                    concept.getDestRelTuples(null, allowedTypes, config.getViewPositionSetReadOnly(),
+                        config.getPrecedence(), config.getConflictResolutionStrategy());
             for (I_RelTuple rel : relationships) {
                 if (rel.getVersion() > latestVersion) {
                     latestVersion = rel.getVersion();
@@ -304,13 +302,12 @@ public class RefsetSpec {
 
     /**
      * Gets the latest specified relationship's target.
-     * 
+     *
      * @param relationshipType
      * @return
      * @throws Exception
      */
-    public I_RelTuple getLatestRelationship(I_GetConceptData concept, I_GetConceptData relationshipType)
-            throws Exception {
+    public I_RelTuple getLatestRelationship(I_GetConceptData concept, I_GetConceptData relationshipType) throws Exception {
 
         I_RelTuple latestRel = null;
         int latestVersion = Integer.MIN_VALUE;
@@ -409,13 +406,10 @@ public class RefsetSpec {
         I_GetConceptData promotionRefsetConcept = getPromotionRefsetConcept();
 
         if (memberRefsetConcept != null && promotionRefsetConcept != null) {
-            helper.retireConceptExtension(promotionRefsetConcept.getConceptNid(), memberRefsetConcept.getConceptNid());
-            Terms.get().commit();
             if (helper.hasConceptRefsetExtensionWithAnyPromotionStatus(promotionRefsetConcept.getConceptNid(),
                 memberRefsetConcept.getConceptNid())) {
-                helper.newConceptExtensionPart(promotionRefsetConcept.getConceptNid(), memberRefsetConcept
-                    .getConceptNid(), newStatus.getConceptNid(), Terms.get().uuidToNative(
-                    ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
+                helper.newConceptExtensionPart(promotionRefsetConcept.getConceptNid(), memberRefsetConcept.getConceptNid(),
+                    newStatus.getConceptNid(), Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
                 Terms.get().commit();
             } else {
                 helper.newRefsetExtension(promotionRefsetConcept.getConceptNid(), memberRefsetConcept.getConceptNid(),
@@ -433,7 +427,7 @@ public class RefsetSpec {
 
         I_GetConceptData lastComputeTimeConcept = getComputeConcept();
         if (lastComputeTimeConcept == null) {
-            return; // 
+            return; //
         }
 
         I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(config);
@@ -463,8 +457,7 @@ public class RefsetSpec {
 
     public I_GetConceptData getComputeConcept() throws TerminologyException, IOException {
         try {
-            I_GetConceptData computeTimeRel =
-                    termFactory.getConcept(RefsetAuxiliary.Concept.COMPUTE_TIME_REL.getUids());
+            I_GetConceptData computeTimeRel = termFactory.getConcept(RefsetAuxiliary.Concept.COMPUTE_TIME_REL.getUids());
             I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
             if (memberRefsetConcept == null) {
                 return null;
@@ -518,10 +511,8 @@ public class RefsetSpec {
                 String computeTimeName = editedFSN + " compute time refset";
 
                 lastComputeTimeConcept = task.newConcept(config);
-                task
-                    .newDescription(lastComputeTimeConcept, Terms.get().getConcept(
-                        ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), computeTimeName,
-                        config);
+                task.newDescription(lastComputeTimeConcept, Terms.get().getConcept(
+                    ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), computeTimeName, config);
                 task.newDescription(lastComputeTimeConcept, Terms.get().getConcept(
                     ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), computeTimeName, config);
 
@@ -595,8 +586,7 @@ public class RefsetSpec {
 
                     lastEditTimeConcept = task.newConcept(config);
                     task.newDescription(lastEditTimeConcept, Terms.get().getConcept(
-                        ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), computeTimeName,
-                        config);
+                        ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), computeTimeName, config);
                     task.newDescription(lastEditTimeConcept, Terms.get().getConcept(
                         ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), computeTimeName, config);
 
