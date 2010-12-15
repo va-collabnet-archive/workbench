@@ -157,6 +157,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
             PositionMapper mapper = Bdb.getSapDb().getMapper(p);
             nextpart:
             for (V part : versions) {
+                try {
                 if (part.getTime() == Long.MIN_VALUE || (filter != null && filter.pass(part))) {
                     continue nextpart;
                 }
@@ -223,6 +224,10 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                         }
                     }
                 }
+            } catch (java.lang.ArrayIndexOutOfBoundsException ex) {
+                 AceLog.getAppLog().warning("[4] Revision removed concurrently.");
+
+            }
             }
             if (allowedStatus != null) {
                 List<V> partsToCompare = new ArrayList<V>(partsForPosition);
@@ -263,6 +268,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
         HashSet<V> rejectedVersions = new HashSet<V>();
         nextpart:
         for (V part : versions) {
+            try {
             if (part.getTime() == Long.MIN_VALUE || (filter != null && filter.pass(part))) {
                 rejectedVersions.add(part);
                 continue nextpart;
@@ -279,6 +285,10 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                 continue nextpart;
             }
             versionsToAdd.add(part);
+            } catch (java.lang.ArrayIndexOutOfBoundsException ex) {
+                 AceLog.getAppLog().warning("[3] Revision removed concurrently.");
+
+            }
         }
         ArrayList<V> versionToRemove = new ArrayList<V>();
         for (V reject : rejectedVersions) {

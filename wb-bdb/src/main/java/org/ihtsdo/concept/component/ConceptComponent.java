@@ -315,6 +315,12 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         public Version(int index) {
             super();
+            assert index >= 0: "index: " + index;
+            if (revisions != null) {
+                assert index <= revisions.size(): "index: " + index;
+            } else {
+                assert index == 0;
+            }
             this.index = index;
         }
 
@@ -916,7 +922,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
     }
 
-    protected abstract void clearVersions();
+    public abstract void clearVersions();
 
     public Concept getEnclosingConcept() {
         try {

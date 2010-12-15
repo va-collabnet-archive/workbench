@@ -564,13 +564,18 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 conceptsToFetch.add(ext.getRefsetId());
                 List<? extends I_ExtendByRefVersion> parts = new ArrayList<I_ExtendByRefVersion>();
                 if (!host.getShowHistory()) {
+                    try {
                     parts = ext.getTuples(allowedStatus, null,
                         host.getConfig().getPrecedence(), host.getConfig().getConflictResolutionStrategy());
+                   } catch (ArrayIndexOutOfBoundsException ex) {
+                        // revision deleted concurrently...
+                        AceLog.getAppLog().warning("[2] Revision removed concurrently.");
+                    }
                 } else {
                     parts = ext.getTuples();
                 }
                 for (I_ExtendByRefVersion tuple : parts) {
-
+                    try {
                     if (!getExtPartClass().isAssignableFrom(tuple.getClass())) {
                         break;
                     }
@@ -608,6 +613,10 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                         return false;
                     }
                     allTuples.add(tuple);
+                    } catch (ArrayIndexOutOfBoundsException ex) {
+                        // revision deleted concurrently...
+                        AceLog.getAppLog().warning("Revision removed concurrently.");
+                    }
                 }
             }
 
@@ -919,7 +928,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 throw new UnsupportedOperationException("Can't handle ref set type: " + refsetType);
             }
             I_ExtendByRef extension =
-                    refsetHelper.getOrCreateRefsetExtension(refsetDefaults.getDefaultRefset().getConceptNid(),
+                    refsetHelper.createRefsetExtension(refsetDefaults.getDefaultRefset().getConceptNid(),
                         tableComponentId, extProps.getMemberType(), extProps, UUID.randomUUID());
             Terms.get().addUncommitted(extension);
             propertyChange(null);

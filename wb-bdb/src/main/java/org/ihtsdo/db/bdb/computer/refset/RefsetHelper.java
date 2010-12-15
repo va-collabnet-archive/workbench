@@ -232,6 +232,16 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
         return makeMemberAndSetup(refsetId, componentId, type, propMap, memberUuid);
     }
 
+    public <T extends I_ExtendByRefPart> I_ExtendByRef createRefsetExtension(int refsetId, int componentId,
+            REFSET_TYPES type, final RefsetPropertyMap propMap, UUID memberUuid) throws Exception {
+
+        access();
+        // create a new extension (with a part for each path the user is
+        // editing)
+        return makeMemberAndSetup(refsetId, componentId, type, propMap, memberUuid);
+    }
+
+
     protected I_ExtendByRef makeMemberAndSetup(int refsetId, int referencedComponentNid, REFSET_TYPES type,
             final RefsetPropertyMap propMap, UUID memberUuid) throws IOException {
 

@@ -306,6 +306,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                             }
                             for (Revision r: revisionToRemove) {
                                 cc.revisions.remove(r);
+                                cc.clearVersions();
                             }
                     	}
                     }

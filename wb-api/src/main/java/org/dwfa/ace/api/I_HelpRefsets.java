@@ -81,6 +81,10 @@ public interface I_HelpRefsets extends I_HelpLineage {
 			int refsetId, int componentId, REFSET_TYPES type,
 			RefsetPropertyMap extProps, UUID memberUuid) throws Exception;
 
+	public <T extends I_ExtendByRefPart> I_ExtendByRef createRefsetExtension(
+			int refsetId, int componentId, REFSET_TYPES type,
+			RefsetPropertyMap extProps, UUID memberUuid) throws Exception;
+
 
 
 	/**
