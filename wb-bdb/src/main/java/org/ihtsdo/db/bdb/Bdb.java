@@ -232,6 +232,7 @@ public class Bdb {
 		}
 	}
 
+
 	private static ConcurrentHashMap<String, Integer> sapNidCache = new ConcurrentHashMap<String, Integer>();
 	
 	public static int getSapNid(TkRevision version) {
@@ -252,13 +253,8 @@ public class Bdb {
 				uuidToNid(version.getPathUuid()), 
 				version.getTime());
 		
-		if (sapNidCache.size() > 10) {
-			Iterator<Entry<String, Integer>> cacheIterator =  sapNidCache.entrySet().iterator();
-			while (sapNidCache.size() > 5) {
-				cacheIterator.next();
-				cacheIterator.remove();
-			}
-			
+		if (sapNidCache.size() > 500) {
+			sapNidCache = new ConcurrentHashMap<String, Integer>();
 		}
 		sapNidCache.put(sapNidKey, sapNid);
 		return sapNid;
