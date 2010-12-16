@@ -7,14 +7,17 @@ import java.util.UUID;
 import org.ihtsdo.qa.store.model.Rule;
 
 public class RulesReportLine {
-	
+
 	private Rule rule;
 	private HashMap<Boolean, Integer> statusCount;
 	private HashMap<UUID, Integer> dispositionStatusCount;
 	private Date lastExecutionTime;
-	
-	public RulesReportLine(Rule rule, HashMap<Boolean, Integer> statusCount,
-			HashMap<UUID, Integer> dispositionStatusCount, Date lastExecutionTime) {
+
+	public RulesReportLine() {
+		super();
+	}
+
+	public RulesReportLine(Rule rule, HashMap<Boolean, Integer> statusCount, HashMap<UUID, Integer> dispositionStatusCount, Date lastExecutionTime) {
 		super();
 		this.rule = rule;
 		this.statusCount = statusCount;
@@ -42,8 +45,7 @@ public class RulesReportLine {
 		return dispositionStatusCount;
 	}
 
-	public void setDispositionStatusCount(
-			HashMap<UUID, Integer> dispositionStatusCount) {
+	public void setDispositionStatusCount(HashMap<UUID, Integer> dispositionStatusCount) {
 		this.dispositionStatusCount = dispositionStatusCount;
 	}
 

@@ -2,6 +2,7 @@ package org.ihtsdo.qa.store;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -64,7 +65,7 @@ public interface QAStoreBI {
 	public Date getRuleLastExecutionTime(QACoordinate coordinate);
 	
 	public List<RulesReportLine> getRulesReportLines(QACoordinate qaCoordinate);
-	public RulesReportPage getRulesReportLinesByPage(QACoordinate qaCoordinate, List<RulesReportColumn> sortBy, HashMap<RulesReportColumn, Object> filter, int startLine, int pageLenght);
+	public RulesReportPage getRulesReportLinesByPage(QACoordinate qaCoordinate, LinkedHashMap<RulesReportColumn,Boolean> sortBy, HashMap<RulesReportColumn, Object> filter, int startLine, int pageLenght);
 	public List<QACasesReportLine> getQACasesReportLines(QACoordinate qaCoordinate, UUID ruleUuid);
 	public QACasesReportPage getQACasesReportLinesByPage(QACoordinate qaCoordinate, UUID ruleUuid, List<QACasesReportColumn> sortBy, HashMap<QACasesReportColumn, Object> filter, int startLine, int pageLenght);
 	

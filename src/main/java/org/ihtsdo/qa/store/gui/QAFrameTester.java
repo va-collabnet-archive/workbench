@@ -5,6 +5,7 @@ import java.awt.Dimension;
 
 import javax.swing.JFrame;
 
+import org.ihtsdo.qa.store.QAStoreBIImpl;
 import org.ihtsdo.qa.store.QAStoreStubImpl;
 
 public class QAFrameTester {
