@@ -255,13 +255,11 @@ public class UploadToQADatabase extends AbstractMojo {
 		
 		fi.close();
 		
-		String statementText="INSERT INTO qa_database (database_uid, name) values (?,?)";
+		String statementText="INSERT INTO qa_database (database_uid, name) select distinct '" + 
+							db + "','" + db + "' from dual where not exists (select 0 from " +
+						"qa_database where database_uid='" + db + "')";
 
 		PreparedStatement statement = (com.mysql.jdbc.PreparedStatement)con.clientPrepareStatement(statementText);
-
-		statement.setString(1, db);
-		
-		statement.setString(2, db);
 
 		statement.execute();
 
