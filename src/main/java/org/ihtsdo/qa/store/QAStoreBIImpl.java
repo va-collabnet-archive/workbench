@@ -48,13 +48,19 @@ import org.ihtsdo.qadb.ws.data.RulesReportLinesByPageResponse;
 import org.ihtsdo.qadb.ws.data.StatusCount_type0;
 
 public class QAStoreBIImpl implements QAStoreBI {
+	
+	private String url = "http://localhost:8080/axis2/services/qadb-service";
+	
+	public QAStoreBIImpl(String url) {
+		this.url = url;
+	}
 
 	@Override
 	public TerminologyComponent getComponent(UUID componentUuid) {
 		TerminologyComponent result = null;
 		QadbServiceStub service = null;
 		try {
-			service = new QadbServiceStub();
+			service = new QadbServiceStub(url);
 
 			ComponentRequest componentRequest = new ComponentRequest();
 			componentRequest.setComponentUuid(componentUuid.toString());
