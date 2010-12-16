@@ -195,6 +195,7 @@
         <module>tk-drools</module>
         <module>tk-arena-spec</module>
         <module>tk-arena-rules</module>
+        <module>tk-qa-ws-client</module>
         <module>rule-engine-integration</module>
     </modules>
 </project>

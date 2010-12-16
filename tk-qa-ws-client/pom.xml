@@ -9,7 +9,7 @@
 
 	<artifactId>tk-qa-ws-client</artifactId>
 	<packaging>jar</packaging>
-	<name>tk-qa-ws-client</name>
+	<name>QA Database Web Service Client</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
