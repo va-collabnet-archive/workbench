@@ -104,7 +104,7 @@ public class BatchQACheck extends AbstractMojo {
 	private String execution_name;
 
 	/**
-	 * The time for the test in yyyy.mm.dd hh:mm:ss zzz format
+	 * The time for the test in yyyy.mm.dd hh:mm:ss format
 	 * 
 	 * @parameter
 	 */
@@ -189,7 +189,7 @@ public class BatchQACheck extends AbstractMojo {
 	Calendar executionDate ;
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
-			df = new SimpleDateFormat("yyyy.mm.dd hh:mm:ss zzz");
+			df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
 			executionDate = new GregorianCalendar();
 			executionUUID = UUID.randomUUID();
 			validateParamenters();
@@ -356,7 +356,7 @@ public class BatchQACheck extends AbstractMojo {
 		OutputStreamWriter executionOsw = new OutputStreamWriter(executionFos, "UTF-8");
 		PrintWriter executionPw = new PrintWriter(executionOsw);
 		// Execution header
-		executionPw.println("uuid" + "\t" + "database Uid" + "\t" + "path Uid" + "\t" + "name" + "\t" + "view point" + "\t" + "start time" + "\t" + "end time" + "\t" + "context");
+		executionPw.println("uuid" + "\t" + "database Uid" + "\t" + "path Uid" + "\t" + "name" + "\t" + "view point" + "\t" + "start time" + "\t" + "end time" + "\t" + "context"+ "\t" + "path name");
 		// Write Execution file
 		executionPw.print(executionUUID + "\t");
 		executionPw.print(database_uuid + "\t");
@@ -365,7 +365,8 @@ public class BatchQACheck extends AbstractMojo {
 		executionPw.print(test_time + "\t");
 		executionPw.print(df.format(start) + "\t");
 		executionPw.print(df.format(end) + "\t");
-		executionPw.print(context.toUserString());
+		executionPw.print(context.toUserString() + "\t");
+		executionPw.print(tf.getConcept(UUID.fromString(test_path_uuid)).toUserString());
 		executionPw.println();
 
 		executionPw.flush();
@@ -400,7 +401,7 @@ public class BatchQACheck extends AbstractMojo {
 		}
 		UUID.fromString(test_path_uuid);
 		UUID.fromString(context_uuid);
-		DateFormat df = new SimpleDateFormat("yyyy.mm.dd hh:mm:ss");
+		DateFormat df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
 		if (test_time != null && !test_time.isEmpty()) {
 			df.parse(test_time);
 		}
@@ -422,7 +423,7 @@ public class BatchQACheck extends AbstractMojo {
 	private I_ConfigAceFrame getTestConfig() throws TerminologyException, IOException, ParseException {
 		I_ConfigAceFrame config = null;
 		config = tf.newAceFrameConfig();
-		DateFormat df = new SimpleDateFormat("yyyy.mm.dd hh:mm:ss");
+		DateFormat df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
 		config.addViewPosition(tf.newPosition(tf.getPath(new UUID[] { UUID.fromString(test_path_uuid) }), tf.convertToThinVersion(df.parse(test_time).getTime())));
 
 		// Addes inferred promotion template to catch the context relationships [ testing

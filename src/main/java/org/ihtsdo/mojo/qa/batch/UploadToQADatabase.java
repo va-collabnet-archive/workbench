@@ -221,6 +221,7 @@ public class UploadToQADatabase extends AbstractMojo {
 		String et="";
 		String context="";
 		String xmlExec="";
+		String pathName="";
 		if (currentLine != null) {
 			String[] lineParts = currentLine.split("\t");
 
@@ -232,6 +233,7 @@ public class UploadToQADatabase extends AbstractMojo {
 			st= lineParts[5];
 			et = lineParts[6];
 			context = lineParts[7];
+			pathName = lineParts[8];
 
 		}
 
@@ -252,13 +254,25 @@ public class UploadToQADatabase extends AbstractMojo {
 		}
 		
 		fi.close();
+		
+		String statementText="INSERT INTO qa_database (database_uid, name) values (?,?)";
 
-		String statementText = "INSERT INTO QA_RUN (run_id, database_uid, path_uid,name, viewpoint_time, start_time, end_time,context_name,context_configuration,run_configuration)" +
-		" values (?,?,?,?,?,?,?,?,?,?) " ;
+		PreparedStatement statement = (com.mysql.jdbc.PreparedStatement)con.clientPrepareStatement(statementText);
+
+		statement.setString(1, db);
+		
+		statement.setString(2, db);
+
+		statement.execute();
+
+		statement.close();
+
+		statementText = "INSERT INTO QA_RUN (run_id, database_uid, path_uid,name, viewpoint_time, start_time, end_time,context_name,context_configuration,run_configuration,path_name)" +
+		" values (?,?,?,?,?,?,?,?,?,?,?) " ;
 //		String statementText = "INSERT INTO QA_RUN (run_id, database_uid, path_uid,name,context_name,context_configuration,run_configuration)" +
 //		" values (?,?,?,?,?,?,?) " ;
 		
-		PreparedStatement statement = (com.mysql.jdbc.PreparedStatement)con.clientPrepareStatement(statementText);
+		statement = (com.mysql.jdbc.PreparedStatement)con.clientPrepareStatement(statementText);
 	
 		statement.setString(1, runId);
 		
@@ -271,6 +285,7 @@ public class UploadToQADatabase extends AbstractMojo {
 		statement.setString(8, context);
 		statement.setString(9, xmlExec);
 		statement.setString(10, xmlExec);
+		statement.setString(11, pathName);
 
 //		statement.setString(5, context);
 //		statement.setString(6, xmlExec);
