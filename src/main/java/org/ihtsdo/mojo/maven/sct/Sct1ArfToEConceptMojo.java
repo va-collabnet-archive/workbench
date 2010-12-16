@@ -773,7 +773,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-        getLog().info("::: BEGIN SctArfToEConcept");
+        getLog().info("::: BEGIN Sct1ArfToEConcept");
 
         // SHOW build directory from POM file
         String targetDir = targetDirectory.getAbsolutePath();
@@ -813,7 +813,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
         executeMojo(targetDir, targetSubDir, arfInputDirs, sct1Dirs, outputDirectory,
                 includeCTV3ID, includeSNOMEDRTID);
-        getLog().info("::: END SctArfToEConcept");
+        getLog().info("::: END Sct1ArfToEConcept");
     }
 
     void executeMojo(String tDir, String tSubDir, String[] arfDirs, Sct1Dir[] sctDirs,

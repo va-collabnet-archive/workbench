@@ -17,9 +17,7 @@
 package org.ihtsdo.mojo.maven.rf1;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
@@ -87,7 +85,10 @@ public class Rf1TextDef implements Comparable<Object> {
 
             members++;
         }
+        br.close();
+
         Arrays.sort(a);
+        
         return a;
     }
 

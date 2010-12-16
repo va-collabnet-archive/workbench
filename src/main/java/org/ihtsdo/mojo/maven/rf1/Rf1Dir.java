@@ -36,6 +36,8 @@ public class Rf1Dir {
     public static final String SUBSETREFSET_ID_NAMESPACE_UUID_TYPE1 = "d0b3c9c0-e395-11df-bccf-0800200c9a66";
     public static final String SUBSETPATH_ID_NAMESPACE_UUID_TYPE1 = "e1cff9e0-e395-11df-bccf-0800200c9a66";
 
+    public static final String HISTORY_TABLE_REFERENCES_NAMESPACE_UUID_TYPE1 = "22928260-08d8-11e0-81e0-0800200c9a66";
+
     private static final String FILE_SEPARATOR = File.separator;
 
     public Rf1Dir() {
