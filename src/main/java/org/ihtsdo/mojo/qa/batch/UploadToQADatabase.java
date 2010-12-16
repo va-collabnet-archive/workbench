@@ -269,6 +269,7 @@ public class UploadToQADatabase extends AbstractMojo {
 
 		statementText = "INSERT INTO QA_RUN (run_id, database_uid, path_uid,name, viewpoint_time, start_time, end_time,context_name,context_configuration,run_configuration,path_name)" +
 		" values (?,?,?,?,?,?,?,?,?,?,?) " ;
+
 //		String statementText = "INSERT INTO QA_RUN (run_id, database_uid, path_uid,name,context_name,context_configuration,run_configuration)" +
 //		" values (?,?,?,?,?,?,?) " ;
 		
