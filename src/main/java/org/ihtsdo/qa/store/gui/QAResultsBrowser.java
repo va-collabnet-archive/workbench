@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -281,7 +282,7 @@ public class QAResultsBrowser extends JPanel {
 			//			}
 
 			if (lineApproved) {
-				List<Object> row = new ArrayList<Object>();
+				LinkedList<Object> row = new LinkedList<Object>();
 				row.add(String.valueOf(line.getRule().getRuleCode()));
 				row.add(line.getRule());
 				row.add(line.getRule().getCategory());

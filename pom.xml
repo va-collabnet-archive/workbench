@@ -89,8 +89,8 @@
 		</dependency>
 		<dependency>
 		    <groupId>org.ihtsdo</groupId>
-		    <artifactId>qa-webservice-client</artifactId>
-		    <version>0.0.1-SNAPSHOT</version>
+		    <artifactId>tk-qa-ws-client</artifactId>
+		    <version>${project.version}</version>
 		</dependency>
 	</dependencies>
 	<build>

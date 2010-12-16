@@ -67,7 +67,7 @@ public interface QAStoreBI {
 	public List<RulesReportLine> getRulesReportLines(QACoordinate qaCoordinate);
 	public RulesReportPage getRulesReportLinesByPage(QACoordinate qaCoordinate, LinkedHashMap<RulesReportColumn,Boolean> sortBy, HashMap<RulesReportColumn, Object> filter, int startLine, int pageLenght);
 	public List<QACasesReportLine> getQACasesReportLines(QACoordinate qaCoordinate, UUID ruleUuid);
-	public QACasesReportPage getQACasesReportLinesByPage(QACoordinate qaCoordinate, UUID ruleUuid, List<QACasesReportColumn> sortBy, HashMap<QACasesReportColumn, Object> filter, int startLine, int pageLenght);
+	public QACasesReportPage getQACasesReportLinesByPage(QACoordinate qaCoordinate, UUID ruleUuid, LinkedHashMap<QACasesReportColumn,Boolean> sortBy, HashMap<QACasesReportColumn, Object> filter, int startLine, int pageLenght);
 	
 	public List<TerminologyComponent> getAllComponents();
 	

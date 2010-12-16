@@ -41,11 +41,14 @@ import org.ihtsdo.qadb.ws.data.Database;
 import org.ihtsdo.qadb.ws.data.DispositionStatusCount_type0;
 import org.ihtsdo.qadb.ws.data.IntBoolKeyValue;
 import org.ihtsdo.qadb.ws.data.IntStrKeyValue;
+import org.ihtsdo.qadb.ws.data.QACasesReportLinesByPageRequest;
+import org.ihtsdo.qadb.ws.data.QACasesReportLinesByPageResponse;
 import org.ihtsdo.qadb.ws.data.QADatabaseRequest;
 import org.ihtsdo.qadb.ws.data.QADatabaseResponse;
 import org.ihtsdo.qadb.ws.data.RulesReportLinesByPageRequest;
 import org.ihtsdo.qadb.ws.data.RulesReportLinesByPageResponse;
 import org.ihtsdo.qadb.ws.data.StatusCount_type0;
+import org.ihtsdo.qadb.ws.data.WsQACasesReportLine;
 
 public class QAStoreBIImpl implements QAStoreBI {
 	
@@ -53,6 +56,10 @@ public class QAStoreBIImpl implements QAStoreBI {
 	
 	public QAStoreBIImpl(String url) {
 		this.url = url;
+	}
+
+	public QAStoreBIImpl() {
+		super();
 	}
 
 	@Override
@@ -110,7 +117,7 @@ public class QAStoreBIImpl implements QAStoreBI {
 	public QADatabase getQADatabase(UUID databaseUuid) {
 		QADatabase result = null;
 		try {
-			QadbServiceStub service = new QadbServiceStub();
+			QadbServiceStub service = new QadbServiceStub(url);
 			
 			QADatabaseRequest request = new QADatabaseRequest();
 			request.setDatabaseUuid(databaseUuid.toString());
@@ -130,7 +137,7 @@ public class QAStoreBIImpl implements QAStoreBI {
 	public List<QADatabase> getAllDatabases() {
 		List<QADatabase> result = null;
 		try {
-			QadbServiceStub service = new QadbServiceStub();
+			QadbServiceStub service = new QadbServiceStub(url);
 			AllDatabasesResponse response = service.getAllDatabases();
 			Database[] wsDatabases = response.getDatabase();
 			result = new ArrayList<QADatabase>();
@@ -156,7 +163,7 @@ public class QAStoreBIImpl implements QAStoreBI {
 	public List<TerminologyComponent> getAllPaths() {
 		List<TerminologyComponent> result = null;
 		try {
-			QadbServiceStub service = new QadbServiceStub();
+			QadbServiceStub service = new QadbServiceStub(url);
 			
 			AllPathsResponse response = service.getAllPaths();
 			Component[] paths = response.getPaths();
@@ -177,7 +184,7 @@ public class QAStoreBIImpl implements QAStoreBI {
 	public List<TerminologyComponent> getAllPathsForDatabase(UUID databaseUuid) {
 		List<TerminologyComponent> result = null;
 		try {
-			QadbServiceStub service = new QadbServiceStub();
+			QadbServiceStub service = new QadbServiceStub(url);
 			
 			AllPathsForDatabaseRequest request = new AllPathsForDatabaseRequest();
 			request.setDatabaseUuid(databaseUuid.toString());
@@ -225,7 +232,7 @@ public class QAStoreBIImpl implements QAStoreBI {
 	public List<Severity> getAllSeverities() {
 		List<Severity> result = null;
 		try {
-			QadbServiceStub service = new QadbServiceStub();
+			QadbServiceStub service = new QadbServiceStub(url);
 			
 			AllSeveritiesResponse response = service.getAllSeverities();
 			org.ihtsdo.qadb.ws.data.Severity[] severities = response.getSeverity();
@@ -282,7 +289,7 @@ public class QAStoreBIImpl implements QAStoreBI {
 	public List<DispositionStatus> getAllDispositionStatus() {
 		List<DispositionStatus> result = null;
 		try {
-			QadbServiceStub service = new QadbServiceStub();
+			QadbServiceStub service = new QadbServiceStub(url);
 			AllDispositionStatusResponse response = service.getAllDispositionStatus();
 			org.ihtsdo.qadb.ws.data.DispositionStatus[] wsDispStatuses = response.getDispositionStatus();
 			result = new ArrayList<DispositionStatus>();
@@ -324,7 +331,7 @@ public class QAStoreBIImpl implements QAStoreBI {
 		List<Rule> result = null;
 		QadbServiceStub service;
 		try {
-			service = new QadbServiceStub();
+			service = new QadbServiceStub(url);
 			AllRulesResponse reponse = service.getAllRules();
 			org.ihtsdo.qadb.ws.data.Rule[] rules = reponse.getRule();
 			result = new ArrayList<Rule>();
@@ -370,7 +377,7 @@ public class QAStoreBIImpl implements QAStoreBI {
 			int pageLenght) {
 		RulesReportPage result = null;
 		try {
-			QadbServiceStub service = new QadbServiceStub();
+			QadbServiceStub service = new QadbServiceStub(url);
 
 			RulesReportLinesByPageRequest request = new RulesReportLinesByPageRequest();
 
@@ -445,17 +452,59 @@ public class QAStoreBIImpl implements QAStoreBI {
 	}
 
 	@Override
-	public QACasesReportPage getQACasesReportLinesByPage(QACoordinate qaCoordinate, UUID ruleUuid, List<QACasesReportColumn> sortBy, HashMap<QACasesReportColumn, Object> filter,
+	public QACasesReportPage getQACasesReportLinesByPage(QACoordinate qaCoordinate, UUID ruleUuid, LinkedHashMap<QACasesReportColumn, Boolean> sortBy, HashMap<QACasesReportColumn, Object> filter,
 			int startLine, int pageLenght) {
-		// TODO Auto-generated method stub
-		return null;
+		QACasesReportPage reportPage = null;
+		try{
+			QadbServiceStub service = new QadbServiceStub(url);
+			
+			QACasesReportLinesByPageRequest request = new QACasesReportLinesByPageRequest();
+			IntStrKeyValue[] wsFilter = null;
+			WsClientDataConverter.qaCaseFilterToWsQaCaseFilter(filter, wsFilter);
+			IntBoolKeyValue[] wsSorteBy = null;
+			WsClientDataConverter.qaCaseSortToWsQaCaseSort(sortBy, wsSorteBy);
+			
+			org.ihtsdo.qadb.ws.data.QACoordinate wsQaCoord = new org.ihtsdo.qadb.ws.data.QACoordinate(); 
+			WsClientDataConverter.qaCoordinateToWsQaCoordinate(qaCoordinate, wsQaCoord);
+
+			request.setFilter(wsFilter);
+			request.setQaCoordinate(wsQaCoord);
+			request.setSorteBy(wsSorteBy);
+			request.setStartLine(12);
+			request.setPageLenght(123);
+			request.setRuleUuid(ruleUuid.toString());
+			QACasesReportLinesByPageResponse wsResponse = service.getQACasesReportLinesByPage(request);
+			
+			reportPage = new QACasesReportPage();
+			reportPage.setFilter(filter);
+			reportPage.setSortBy(sortBy);
+			reportPage.setFinalLine(wsResponse.getFinalLine());
+			reportPage.setTotalLines(wsResponse.getTotalLines());
+			reportPage.setInitialLine(wsResponse.getInitialLine());
+			WsQACasesReportLine[] wslines = wsResponse.getLines();
+			List<QACasesReportLine> lines = new ArrayList<QACasesReportLine>();
+			for (WsQACasesReportLine wsQACasesReportLine : wslines) {
+				
+				QACase qaCase = WsClientDataConverter.wsCaseToCase(wsQACasesReportLine.getQaCase());
+				TerminologyComponent component = WsClientDataConverter.wsComponentToTerminologyComponent(wsQACasesReportLine.getComponent());
+				DispositionStatus disposition = WsClientDataConverter.wsDipsStatusToDispStatus(wsQACasesReportLine.getDispositionStatus());
+				QACasesReportLine line = new QACasesReportLine(qaCase, component, disposition);
+				lines.add(line);
+				
+			}
+			reportPage.setLines(lines);
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return reportPage;
 	}
 
 	@Override
 	public List<TerminologyComponent> getAllComponents() {
 		List<TerminologyComponent> result = null;
 		try {
-			QadbServiceStub service = new QadbServiceStub();
+			QadbServiceStub service = new QadbServiceStub(url);
 			AllComponentsResponse wsResponse = service.getAllComponents();
 			Component[] wsComponents = wsResponse.getComponent();
 			result = new ArrayList<TerminologyComponent>();

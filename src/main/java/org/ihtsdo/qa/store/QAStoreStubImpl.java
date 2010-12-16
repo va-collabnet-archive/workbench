@@ -379,7 +379,7 @@ public class QAStoreStubImpl implements QAStoreBI {
 	@Override
 	public QACasesReportPage getQACasesReportLinesByPage(
 			QACoordinate qaCoordinate, UUID ruleUuid,
-			List<QACasesReportColumn> sortBy, HashMap<QACasesReportColumn, Object> filter, 
+			LinkedHashMap<QACasesReportColumn,Boolean> sortBy, HashMap<QACasesReportColumn, Object> filter, 
 			int startLine, int pageLenght) {
 		List<QACasesReportLine> lines = new ArrayList<QACasesReportLine>();
 		for (int i = 1; i < pageLenght; i++) {

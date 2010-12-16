@@ -1,19 +1,20 @@
 package org.ihtsdo.qa.store.model.view;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class QACasesReportPage {
 	
 	private List<QACasesReportLine> lines;
-	private List<QACasesReportColumn> sortBy;
+	private LinkedHashMap<QACasesReportColumn, Boolean> sortBy;
 	private HashMap<QACasesReportColumn, Object> filter;
 	private int initialLine;
 	private int finalLine;
 	private int totalLines;
 	
 	public QACasesReportPage(List<QACasesReportLine> lines,
-			List<QACasesReportColumn> sortBy,
+			LinkedHashMap<QACasesReportColumn, Boolean> sortBy,
 			HashMap<QACasesReportColumn, Object> filter, int initialLine,
 			int finalLine, int totalLines) {
 		super();
@@ -25,6 +26,10 @@ public class QACasesReportPage {
 		this.totalLines = totalLines;
 	}
 
+	public QACasesReportPage() {
+		super();
+	}
+
 	public List<QACasesReportLine> getLines() {
 		return lines;
 	}
@@ -33,11 +38,11 @@ public class QACasesReportPage {
 		this.lines = lines;
 	}
 
-	public List<QACasesReportColumn> getSortBy() {
+	public LinkedHashMap<QACasesReportColumn, Boolean> getSortBy() {
 		return sortBy;
 	}
 
-	public void setSortBy(List<QACasesReportColumn> sortBy) {
+	public void setSortBy(LinkedHashMap<QACasesReportColumn, Boolean> sortBy) {
 		this.sortBy = sortBy;
 	}
 
