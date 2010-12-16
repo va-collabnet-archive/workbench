@@ -61,7 +61,6 @@ public class WsClientDataConverter {
 		Rule result = new Rule();
 		result.setRuleCode(wsRule.getRuleCode());
 		if(wsRule.getRuleUuid() != null){
-			System.out.println(wsRule.getRuleUuid());
 			result.setRuleUuid(UUID.fromString(wsRule.getRuleUuid()));
 		}
 		result.setName(wsRule.getName());
@@ -93,7 +92,6 @@ public class WsClientDataConverter {
 		result.setComponentName(component.getComponentName());
 		result.setComponentUuid(UUID.fromString(component.getComponentUuid()));
 		if(component.getSctid() != null && !component.getSctid().equals("null")){
-			System.err.println(component.getSctid());
 			result.setSctid(Long.valueOf(component.getSctid()));
 		}
 		return result;
