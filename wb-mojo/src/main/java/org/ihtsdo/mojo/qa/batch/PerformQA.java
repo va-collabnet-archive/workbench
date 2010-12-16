@@ -187,8 +187,8 @@ public class PerformQA implements I_ProcessConcepts {
 				findingPw.print(executionUUID + "\t");
 				findingPw.print(ruleUuid + "\t");// Rule
 				findingPw.print(conceptUUID + "\t");
-				findingPw.print(errorCode + "-" + message);
-				findingPw.print(conceptName + "\t");
+				findingPw.print(errorCode + "-" + message + "\t");
+				findingPw.print(conceptName);
 				findingPw.println();
 			}
 		} catch (Exception e) {
