@@ -430,7 +430,10 @@ public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
                 "org.ihstdo.textdefinition" + Long.toString(a1.conceptSid) + a1.definition)
                 .toString()); // description uuid
         descriptions.append("\t");
-        descriptions.append(uuidCurrentStr); // status uuid
+        if (a1.status == 0)
+            descriptions.append(uuidCurrentStr); // status uuid
+        else
+            descriptions.append(uuidRetiredStr); // status uuid
         descriptions.append("\t");
         descriptions.append(Type3UuidFactory.fromSNOMED(a1.conceptSid).toString()); // concept uuid
         descriptions.append("\t");
