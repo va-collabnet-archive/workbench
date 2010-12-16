@@ -44,7 +44,7 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-api</artifactId>
-			<version>2.6.0-trek-8-SNAPSHOT</version>
+			<version>${project.version}</version>
 		 <type>jar</type>
 		</dependency>
 		<dependency>
@@ -86,6 +86,11 @@
 		    <groupId>org.apache.httpcomponents</groupId>
 		    <artifactId>httpcore</artifactId>
 		    <version>4.0.1</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.ihtsdo</groupId>
+		    <artifactId>tk-qa-ws-client</artifactId>
+		    <version>${project.version}</version>
 		</dependency>
 	</dependencies>
 	<build>

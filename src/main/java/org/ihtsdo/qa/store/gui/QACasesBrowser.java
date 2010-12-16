@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -115,7 +116,9 @@ public class QACasesBrowser extends JPanel {
 		clearTable1();
 		
 		label7.setText(store.getQADatabase(coordinate.getDatabaseUuid()).getName());
-		label8.setText(store.getComponent(coordinate.getPathUuid()).getComponentName());
+		if(store.getComponent(coordinate.getPathUuid())!= null){
+			label8.setText(store.getComponent(coordinate.getPathUuid()).getComponentName());
+		}
 		label9.setText(coordinate.getViewPointTime());
 		label10.setText(rule.getRuleCode());
 		label13.setText(rule.getName());
@@ -131,8 +134,8 @@ public class QACasesBrowser extends JPanel {
 
 	private void updateTable1() {
 		clearTable1();
-		List <QACasesReportColumn> sortBy = new ArrayList<QACasesReportColumn>();
-		sortBy.add(QACasesReportColumn.CONCEPT_NAME);
+		LinkedHashMap<QACasesReportColumn,Boolean> sortBy = new LinkedHashMap<QACasesReportColumn,Boolean>();
+		sortBy.put(QACasesReportColumn.CONCEPT_NAME,true);
 
 		HashMap<QACasesReportColumn, Object> filter = new HashMap<QACasesReportColumn, Object>();
 		Integer selectedPageLengh = Integer.parseInt((String) comboBox6.getSelectedItem());

@@ -16,7 +16,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -213,8 +215,8 @@ public class QAResultsBrowser extends JPanel {
 	private void updateTable1(QACoordinate coordinate) {
 		clearTable1();
 		//List<RulesReportLine> lines = store.getRulesReportLines(coordinate);
-		List <RulesReportColumn> sortBy = new ArrayList<RulesReportColumn>();
-		sortBy.add(RulesReportColumn.RULE_NAME);
+		LinkedHashMap<RulesReportColumn, Boolean> sortBy = new LinkedHashMap<RulesReportColumn,Boolean>();
+		sortBy.put(RulesReportColumn.RULE_NAME,true);
 
 		HashMap<RulesReportColumn, Object> filter = new HashMap<RulesReportColumn, Object>();
 		Integer selectedPageLengh = Integer.parseInt((String) comboBox4.getSelectedItem());
@@ -280,17 +282,19 @@ public class QAResultsBrowser extends JPanel {
 			//			}
 
 			if (lineApproved) {
-				LinkedHashSet<Object> row = new LinkedHashSet<Object>();
+				LinkedList<Object> row = new LinkedList<Object>();
 				row.add(String.valueOf(line.getRule().getRuleCode()));
 				row.add(line.getRule());
 				row.add(line.getRule().getCategory());
 				row.add(line.getRule().getSeverity());
-				row.add(String.valueOf(line.getStatusCount().get(true)));
+				row.add(line.getStatusCount().get(true));
 				for (DispositionStatus loopStatus : dispositionStatuses) {
-					row.add(String.valueOf(line.getDispositionStatusCount().get(loopStatus.getDispositionStatusUuid())));
+					row.add(line.getDispositionStatusCount().get(loopStatus.getDispositionStatusUuid()));
 				}
-				row.add(String.valueOf(line.getStatusCount().get(false)));
-				row.add(line.getLastExecutionTime().toString());
+				row.add(line.getStatusCount().get(false));
+				if(line.getLastExecutionTime() != null){
+					row.add(line.getLastExecutionTime().toString());
+				}
 				tableModel.addRow(row.toArray());
 			}
 		}

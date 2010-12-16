@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -366,7 +367,7 @@ public class QAStoreStubImpl implements QAStoreBI {
 
 	@Override
 	public RulesReportPage getRulesReportLinesByPage(
-			QACoordinate qaCoordinate, List<RulesReportColumn> sortBy,
+			QACoordinate qaCoordinate, LinkedHashMap<RulesReportColumn,Boolean> sortBy,
 			HashMap<RulesReportColumn, Object> filter, int startLine, int pageLenght) {
 		List<RulesReportLine> lines = new ArrayList<RulesReportLine>();
 		for (int i = 1; i < pageLenght; i++) {
@@ -378,7 +379,7 @@ public class QAStoreStubImpl implements QAStoreBI {
 	@Override
 	public QACasesReportPage getQACasesReportLinesByPage(
 			QACoordinate qaCoordinate, UUID ruleUuid,
-			List<QACasesReportColumn> sortBy, HashMap<QACasesReportColumn, Object> filter, 
+			LinkedHashMap<QACasesReportColumn,Boolean> sortBy, HashMap<QACasesReportColumn, Object> filter, 
 			int startLine, int pageLenght) {
 		List<QACasesReportLine> lines = new ArrayList<QACasesReportLine>();
 		for (int i = 1; i < pageLenght; i++) {
