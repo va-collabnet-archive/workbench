@@ -19,18 +19,15 @@ package org.ihtsdo.mojo.maven.rf1;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -50,7 +47,7 @@ import org.dwfa.util.id.Type5UuidFactory;
  * <br>
  * 
  * <b>INPUTS:</b><br>
- * The pom needs to configure the following parameters for the <code>rf1-language-gb-us-to-arf</code> goal.
+ * The pom needs to configure the following parameters for the <code>rf1-textdefinitions-to-arf</code> goal.
  * <pre>
  * &lt;targetSub&gt; subdirectoryname -- working sub directly under build directory
  *
