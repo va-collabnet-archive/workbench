@@ -93,7 +93,7 @@ public class WsClientDataConverter {
 		result.setComponentName(component.getComponentName());
 		result.setComponentUuid(UUID.fromString(component.getComponentUuid()));
 		if(component.getSctid() != null && !component.getSctid().equals("null")){
-			System.err.println(component.getSctid());
+			//System.err.println(component.getSctid());
 			result.setSctid(Long.valueOf(component.getSctid()));
 		}
 		return result;
