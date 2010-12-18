@@ -165,7 +165,7 @@ public class DescSearchResultsTablePopupListener extends MouseAdapter implements
                                 }
                             }
 
-                            addRefsetItems(popup, excludeConcept, excludeDesc, excludeRel, excludeContains);
+                            addRefsetItems(popup, excludeConcept, excludeDesc, excludeRel, excludeContains, descUuid);
                             break;
                         default:
                         }
@@ -248,19 +248,19 @@ public class DescSearchResultsTablePopupListener extends MouseAdapter implements
     }
 
     private void addRefsetItems(JPopupMenu popup, boolean excludesConcept, boolean excludesDesc, boolean excludesRel,
-            boolean excludesContains) throws FileNotFoundException, IOException, ClassNotFoundException {
+            boolean excludesContains, UUID descUuid) throws FileNotFoundException, IOException, ClassNotFoundException {
         // adding grouping clauses (OR, AND, !OR, !AND) - these are always displayed
         File groupingFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/grouping");
         JMenu newSubMenuGrouping = new JMenu(groupingFile.getName());
         popup.add(newSubMenuGrouping);
-        ProcessPopupUtil.addSubmenMenuItems(newSubMenuGrouping, groupingFile, config.getWorker());
+        ProcessPopupUtil.addSubmenMenuItems(newSubMenuGrouping, groupingFile, config.getWorker(), descUuid);
 
         // sub-menu for "concept-contains-desc" and "concept-contains-rel"
         if (!excludesContains) {
             File containsFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/contains");
             JMenu newSubMenuContains = new JMenu(containsFile.getName());
             popup.add(newSubMenuContains);
-            ProcessPopupUtil.addSubmenMenuItems(newSubMenuContains, containsFile, config.getWorker());
+            ProcessPopupUtil.addSubmenMenuItems(newSubMenuContains, containsFile, config.getWorker(), descUuid);
         }
 
         // sub-menu for concept based clauses e.g. concept is, concept is child of
@@ -268,12 +268,12 @@ public class DescSearchResultsTablePopupListener extends MouseAdapter implements
             File conceptFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/concept");
             JMenu newSubMenuConcept = new JMenu(conceptFile.getName());
             popup.add(newSubMenuConcept);
-            ProcessPopupUtil.addSubmenMenuItems(newSubMenuConcept, conceptFile, config.getWorker());
+            ProcessPopupUtil.addSubmenMenuItems(newSubMenuConcept, conceptFile, config.getWorker(), descUuid);
             // sub-menu for diff
             conceptFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/diff");
             newSubMenuConcept = new JMenu(conceptFile.getName());
             popup.add(newSubMenuConcept);
-            ProcessPopupUtil.addSubmenMenuItems(newSubMenuConcept, conceptFile, config.getWorker());
+            ProcessPopupUtil.addSubmenMenuItems(newSubMenuConcept, conceptFile, config.getWorker(), descUuid);
         }
 
         // sub-menu for desc based clauses e.g. desc is, desc is child of
@@ -281,7 +281,7 @@ public class DescSearchResultsTablePopupListener extends MouseAdapter implements
             File descFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/desc");
             JMenu newSubMenuDesc = new JMenu(descFile.getName());
             popup.add(newSubMenuDesc);
-            ProcessPopupUtil.addSubmenMenuItems(newSubMenuDesc, descFile, config.getWorker());
+            ProcessPopupUtil.addSubmenMenuItems(newSubMenuDesc, descFile, config.getWorker(), descUuid);
         }
 
         // sub-menu for rel based clauses e.g. rel is
@@ -289,7 +289,7 @@ public class DescSearchResultsTablePopupListener extends MouseAdapter implements
             File relFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/rel");
             JMenu newSubMenuRel = new JMenu(relFile.getName());
             popup.add(newSubMenuRel);
-            ProcessPopupUtil.addSubmenMenuItems(newSubMenuRel, relFile, config.getWorker());
+            ProcessPopupUtil.addSubmenMenuItems(newSubMenuRel, relFile, config.getWorker(), descUuid);
         }
 
     }
