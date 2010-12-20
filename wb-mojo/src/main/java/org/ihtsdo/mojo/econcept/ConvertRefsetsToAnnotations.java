@@ -120,8 +120,12 @@ public class ConvertRefsetsToAnnotations extends AbstractMojo {
                                 if (cd.getDescription().equals(desc.getText())) {
                                     found = true;
                                     System.out.println("\nFound: " + cd);
-                                    System.out.println("Member Count: "
+                                    if (eConcept.getRefsetMembers() != null) {
+                                        System.out.println("Member Count: "
                                             + eConcept.getRefsetMembers().size());
+                                    } else {
+                                        System.out.println("Null Refset Members. ");
+                                    }
                                     eConcept.writeExternal(aodos);
                                     eConcept.getRefsetMembers().clear();
                                     eConcept.setAnnotationStyleRefset(true);
