@@ -15,6 +15,13 @@
       <version>2.2.1</version>
     </dependency>
     <dependency>
+      <groupId>org.ihtsdo</groupId>
+      <artifactId>wb-mojo</artifactId>
+      <version>${project.version}</version>
+      <type>maven-plugin</type>
+      <optional>false</optional>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.7</version>

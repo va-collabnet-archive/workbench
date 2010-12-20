@@ -168,6 +168,10 @@ public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConcep
                         + roKey + " mutableKey: " + mutableKey + " processedCount: " + processedCount
                         + " countToProcess: " + countToProcess);
             }
+            AceLog.getAppLog().info(
+                    "Parallel concept iterator finished.\n" + " First: " + first + " last: " + last + " roKey: "
+                        + roKey + " mutableKey: " + mutableKey + " processedCount: " + processedCount
+                        + " countToProcess: " + countToProcess +" fetchKind = "+fetchKind);
             return true;
         } finally {
             roCursor.close();

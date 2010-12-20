@@ -130,11 +130,9 @@ public class ConceptBdb extends ComponentBdb {
 
     private void iterateConceptData(I_ProcessUnfetchedConceptData processor, int executors) throws IOException,
             InterruptedException, ExecutionException {
-    	//AceLog.getAppLog().info("Iterate in parallel. Executors: " + executors);
-        IdentifierSet ids = (IdentifierSet) processor.getNidSet();
+        IdentifierSet ids = (IdentifierSet) getReadOnlyConceptIdSet();
         int cardinality = ids.cardinality();
         int idsPerParallelConceptIterator = cardinality / executors;
-    	//AceLog.getAppLog().info("Iterate in parallel. idsPerParallelConceptIterator: " + idsPerParallelConceptIterator);
         I_IterateIds idsItr = ids.iterator();
         List<Future<Boolean>> futures = new ArrayList<Future<Boolean>>(executors + 1);
         List<ParallelConceptIterator> pcis = new ArrayList<ParallelConceptIterator>();
@@ -152,9 +150,6 @@ public class ConceptBdb extends ComponentBdb {
             }
             sum = sum + count;
             ParallelConceptIterator pci = new ParallelConceptIterator(first, last, count, processor, readOnly, mutable);
-//        	AceLog.getAppLog().info("Iterate in parallel. first: " + first + 
-//        			" last: " + last +
-//        			" count: " + count);
             Future<Boolean> f = iteratorService.submit(pci);
 
             futures.add(f);

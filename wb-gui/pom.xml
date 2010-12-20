@@ -138,15 +138,6 @@
                     <useReleaseProfile>false</useReleaseProfile>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.dwfa</groupId>
-                <artifactId>pbl-mojo</artifactId>
-                <version>1.6</version>
-                <configuration>
-                    <cubitProject>cubitci</cubitProject>
-                    <siteRoot>vodb</siteRoot>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 </project>

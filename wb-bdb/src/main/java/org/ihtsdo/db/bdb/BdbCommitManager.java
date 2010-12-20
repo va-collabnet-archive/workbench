@@ -7,6 +7,8 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,6 +29,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.TermComponentDataCheckSelectionListener;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
@@ -70,6 +73,12 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public class BdbCommitManager {
 
+    /**
+     * <p>
+     * listeners
+     * </p>
+     */
+    private static ICommitListener[] listeners = new ICommitListener[0];
 	private static Semaphore dbWriterPermit = new Semaphore(50);
 	private static Semaphore luceneWriterPermit = new Semaphore(50);
 	
@@ -77,9 +86,9 @@ public class BdbCommitManager {
 		new ThreadGroup("commit manager threads");
 	
 	private static class ConceptWriter implements Runnable {
-		private Concept c;
+        private final Concept c;
 
-		public ConceptWriter(Concept c) {
+        public ConceptWriter(final Concept c) {
 			super();
 			this.c = c;
 		}
@@ -90,7 +99,7 @@ public class BdbCommitManager {
 				while (c.isUnwritten() && ! c.isCanceled()) {
 					Bdb.getConceptDb().writeConcept(c);
 				}
-			} catch (Exception e) {
+            } catch (final Exception e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			}
 			dbWriterPermit.release();
@@ -98,10 +107,10 @@ public class BdbCommitManager {
 	}
 
 	private static class LuceneWriter implements Runnable {
-	    private int batchSize = 200;
-		private IdentifierSet descNidsToWrite;
+        private final int batchSize = 200;
+        private final IdentifierSet descNidsToWrite;
 
-		public LuceneWriter(IdentifierSet descNidsToCommit) {
+        public LuceneWriter(final IdentifierSet descNidsToCommit) {
 			super();
 			this.descNidsToWrite = descNidsToCommit;
 		}
@@ -109,12 +118,12 @@ public class BdbCommitManager {
 		@Override
 		public void run() {
 			try {
-				ArrayList<Description> toIndex = new ArrayList<Description>(batchSize + 1);
-				I_IterateIds idItr = descNidsToWrite.iterator();
+                ArrayList<Description> toIndex = new ArrayList<Description>(this.batchSize + 1);
+                final I_IterateIds idItr = this.descNidsToWrite.iterator();
 				int count = 0;
 				while (idItr.next()) {
 				    count++;
-					Description d = (Description) Bdb.getComponent(idItr.nid());
+                    final Description d = (Description) Bdb.getComponent(idItr.nid());
 					toIndex.add(d);
 					if (count > batchSize) {
 					    count = 0;
@@ -123,7 +132,7 @@ public class BdbCommitManager {
 					}
 				}
 				LuceneManager.writeToLucene(toIndex);
-			} catch (Exception e) {
+            } catch (final Exception e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			}
 			luceneWriterPermit.release();
@@ -147,8 +156,8 @@ public class BdbCommitManager {
 		return lastCancel;
 	}
 
-	public static void addUncommittedNoChecks(I_ExtendByRef extension) {
-		RefsetMember<?, ?> member = (RefsetMember<?, ?>) extension;
+    public static void addUncommittedNoChecks(final I_ExtendByRef extension) {
+        final RefsetMember<?, ?> member = (RefsetMember<?, ?>) extension;
 		addUncommittedNoChecks(member.getEnclosingConcept());
 	}
 
@@ -183,7 +192,7 @@ public class BdbCommitManager {
 	}
 
 	private static AtomicReference<Concept> lastUncommitted = new AtomicReference<Concept>();
-	public static void addUncommittedNoChecks(I_GetConceptData concept) {
+	public static void addUncommittedNoChecks(final I_GetConceptData concept) {
         if (Bdb.watchList.containsKey(concept.getNid())) {
             AceLog.getAppLog().info(
                     "---@@@ Adding uncommitted NO checks: "
@@ -197,19 +206,19 @@ public class BdbCommitManager {
 	    }
 		try {
 			writeUncommitted(c);
-		} catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	private static void flushUncommitted() throws InterruptedException {
-	    Concept c = lastUncommitted.getAndSet(null);
+        final Concept c = lastUncommitted.getAndSet(null);
 	    if (c != null) {
             writeUncommitted(c);
 	    }
 	}
 	
-    private static void writeUncommitted(Concept c) throws InterruptedException {
+    private static void writeUncommitted(final Concept c) throws InterruptedException {
         if (c != null) {
             if (Bdb.watchList.containsKey(c.getNid())) {
                 AceLog.getAppLog().info(
@@ -222,26 +231,26 @@ public class BdbCommitManager {
         }
     }
 
-	public static void addUncommitted(I_ExtendByRef extension) {
-		RefsetMember<?, ?> member = (RefsetMember<?, ?>) extension;
+    public static void addUncommitted(final I_ExtendByRef extension) {
+        final RefsetMember<?, ?> member = (RefsetMember<?, ?>) extension;
 		addUncommitted(member.getEnclosingConcept());
 	}
 
 	private static class SetNidsForCid implements Runnable {
 	    Concept concept;
-        public SetNidsForCid(Concept concept) {
+        public SetNidsForCid(final Concept concept) {
             super();
             this.concept = concept;
         }
         @Override
         public void run() {
             try {
-                Collection<Integer> nids = concept.getAllNids();
-                NidCNidMapBdb nidCidMap = Bdb.getNidCNidMap();
-                for (int nid : nids) {
-                    nidCidMap.setCNidForNid(concept.getNid(), nid);
+                final Collection<Integer> nids = this.concept.getAllNids();
+                final NidCNidMapBdb nidCidMap = Bdb.getNidCNidMap();
+                for (final int nid : nids) {
+                    nidCidMap.setCNidForNid(this.concept.getNid(), nid);
                 }
-            } catch (IOException e) {
+            } catch (final IOException e) {
                AceLog.getAppLog().alertAndLogException(e);
             }
         }
@@ -251,7 +260,7 @@ public class BdbCommitManager {
 		if (igcd == null) {
 			return;
 		}
-		Concept concept = (Concept) igcd;
+        final Concept concept = (Concept) igcd;
         dataCheckMap.remove(concept);
 		if (concept.isUncommitted() == false) {
 			removeUncommitted(concept);
@@ -270,18 +279,18 @@ public class BdbCommitManager {
 		try {
 		    
 		    if (performCreationTests) {
-	            Set<AlertToDataConstraintFailure> warningsAndErrors = new HashSet<AlertToDataConstraintFailure>();
+                final Set<AlertToDataConstraintFailure> warningsAndErrors = new HashSet<AlertToDataConstraintFailure>();
 	            dataCheckMap.put(concept, warningsAndErrors);
-	            for (I_TestDataConstraints test : creationTests) {
+                for (final I_TestDataConstraints test : creationTests) {
 	                try {
 	                    warningsAndErrors.addAll(test.test(concept, false));
-	                    Collection<RefsetMember<?, ?>> extensions = concept.getExtensions();
-	                    for (RefsetMember<?, ?> extension : extensions) {
+                        final Collection<RefsetMember<?, ?>> extensions = concept.getExtensions();
+                        for (final RefsetMember<?, ?> extension : extensions) {
 	                        if (extension.isUncommitted()) {
 	                            warningsAndErrors.addAll(test.test(extension, false));
 	                        }
 	                    }
-	                } catch (Exception e) {
+                    } catch (final Exception e) {
 	                    AceLog.getEditLog().alertAndLogException(e);
 	                }
 	            }
@@ -291,7 +300,7 @@ public class BdbCommitManager {
 			dbWriterPermit.acquire();
 			dbWriterService.execute(new SetNidsForCid(concept));
 			dbWriterService.execute(new ConceptWriter(concept));
-		} catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
 			throw new RuntimeException(e);
 		}
 		SwingUtilities.invokeLater(new UpdateFrames(concept));
@@ -300,7 +309,7 @@ public class BdbCommitManager {
 	private static class UpdateFrames implements Runnable {
 	    Concept c;
 	    
-        public UpdateFrames(Concept c) {
+        public UpdateFrames(final Concept c) {
             super();
             this.c = c;
         }
@@ -308,8 +317,8 @@ public class BdbCommitManager {
         @Override
         public void run() {
             if (getActiveFrame() != null) {
-                I_ConfigAceFrame activeFrame = getActiveFrame();
-                for (I_ConfigAceFrame frameConfig : activeFrame.getDbConfig()
+                final I_ConfigAceFrame activeFrame = getActiveFrame();
+                for (final I_ConfigAceFrame frameConfig : activeFrame.getDbConfig()
                         .getAceFrames()) {
                     frameConfig.setCommitEnabled(true);
                     updateAlerts();
@@ -326,9 +335,9 @@ public class BdbCommitManager {
 	private static I_ConfigAceFrame getActiveFrame() {
 		try {
 			return Terms.get().getActiveAceFrameConfig();
-		} catch (TerminologyException e) {
+        } catch (final TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
-		} catch (IOException e) {
+        } catch (final IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return null;
@@ -340,6 +349,8 @@ public class BdbCommitManager {
     	lastCommit = Bdb.gVersion.incrementAndGet();
 		Svn.rwl.acquireUninterruptibly();
 		boolean passedRelease = false;
+		
+		AceLog.getAppLog().info("BDBCommitManager commit called");
     	try {
             synchronized (uncommittedCNids) {
                 synchronized (uncommittedCNidsNoChecks) {
@@ -348,29 +359,29 @@ public class BdbCommitManager {
                     int errorCount = 0;
                     int warningCount = 0;
                     if (performCreationTests) {
-                        NidBitSetItrBI uncommittedCNidItr = uncommittedCNids.iterator();
+                        final NidBitSetItrBI uncommittedCNidItr = uncommittedCNids.iterator();
                         dataCheckMap.clear();
                         while (uncommittedCNidItr.next()) {
-                            List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
-                            Concept concept = Concept.get(uncommittedCNidItr.nid());
+                            final List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
+                            final Concept concept = Concept.get(uncommittedCNidItr.nid());
                             dataCheckMap.put(concept, warningsAndErrors);
-                            for (I_TestDataConstraints test : commitTests) {
+                            for (final I_TestDataConstraints test : commitTests) {
                                 try {
                                     warningsAndErrors.addAll(test.test(concept, true));
-                                    Collection<RefsetMember<?, ?>> extensions = concept.getExtensions();
-                                    for (RefsetMember<?, ?> extension : extensions) {
+                                    final Collection<RefsetMember<?, ?>> extensions = concept.getExtensions();
+                                    for (final RefsetMember<?, ?> extension : extensions) {
                                         if (extension.isUncommitted()) {
                                             warningsAndErrors.addAll(test.test(extension, true));
                                         }
                                     }
-                                    for (AlertToDataConstraintFailure alert: warningsAndErrors) {
+                                    for (final AlertToDataConstraintFailure alert : warningsAndErrors) {
                                         if (alert.getAlertType().equals(ALERT_TYPE.ERROR)) {
                                             errorCount++;
                                         } else if (alert.getAlertType().equals(ALERT_TYPE.WARNING)) {
                                             warningCount++;
                                         }
                                     }
-                                } catch (Exception e) {
+                                } catch (final Exception e) {
                                     AceLog.getEditLog().alertAndLogException(e);
                                 }
                             }
@@ -392,7 +403,7 @@ public class BdbCommitManager {
                             });
                         } else {
                             if (SwingUtilities.isEventDispatchThread()) {
-                                int selection = JOptionPane.showConfirmDialog(
+                                final int selection = JOptionPane.showConfirmDialog(
                                     new JFrame(),
                                     "Do you want to continue with commit?",
                                     "Warnings Detected",
@@ -403,7 +414,7 @@ public class BdbCommitManager {
                                     SwingUtilities.invokeAndWait(new Runnable() {
                                         @Override
                                         public void run() {
-                                            int selection = JOptionPane.showConfirmDialog(
+                                            final int selection = JOptionPane.showConfirmDialog(
                                                 new JFrame(),
                                                 "Do you want to continue with commit?",
                                                 "Warnings Detected",
@@ -412,7 +423,7 @@ public class BdbCommitManager {
                                         }
                                         
                                     });
-                                } catch (InvocationTargetException e) {
+                                } catch (final InvocationTargetException e) {
                                     AceLog.getAppLog().alertAndLogException(e);
                                     performCommit = false;
                                 }
@@ -422,8 +433,8 @@ public class BdbCommitManager {
                     
                     if (performCommit) {
                         KindOfComputer.reset();
-                        long commitTime = System.currentTimeMillis();
-                        IntSet sapNidsFromCommit = Bdb.getSapDb().commit(
+                        final long commitTime = System.currentTimeMillis();
+                        final IntSet sapNidsFromCommit = Bdb.getSapDb().commit(
                                 commitTime);
 
                         if (writeChangeSets && sapNidsFromCommit.size() > 0) {
@@ -439,7 +450,7 @@ public class BdbCommitManager {
                             case MUTABLE_ONLY:
                                 uncommittedCNidsNoChecks.or(uncommittedCNids);
                                 if (uncommittedCNidsNoChecks.cardinality() > 0) {
-                                    ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
+                                    final ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
                                         uncommittedCNidsNoChecks, commitTime,
                                         sapNidsFromCommit, changeSetPolicy.convert(), 
                                         changeSetWriterThreading, 
@@ -456,11 +467,12 @@ public class BdbCommitManager {
                                 throw new RuntimeException("Can't handle policy: " + changeSetPolicy);
                             }
                         }
+                        notifyCommit();
                         uncommittedCNids.clear();
                         uncommittedCNidsNoChecks = Terms.get().getEmptyIdSet();
 
                         luceneWriterPermit.acquire();
-                        IdentifierSet descNidsToCommit = new IdentifierSet((IdentifierSet) uncommittedDescNids);
+                        final IdentifierSet descNidsToCommit = new IdentifierSet((IdentifierSet) uncommittedDescNids);
                         uncommittedDescNids.clear();
                         luceneWriterService.execute(new LuceneWriter(descNidsToCommit));
                         dataCheckMap.clear();
@@ -470,13 +482,13 @@ public class BdbCommitManager {
             if (performCommit) {
                 Bdb.sync();
             }
-        } catch (IOException e1) {
+        } catch (final IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
-        } catch (InterruptedException e1) {
+        } catch (final InterruptedException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
-        } catch (ExecutionException e1) {
+        } catch (final ExecutionException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
-        } catch (TerminologyException e1) {
+        } catch (final TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } finally {
         	if (!passedRelease) {
@@ -500,16 +512,16 @@ public class BdbCommitManager {
             public void run() {
                 try {
 					if (Terms.get().getActiveAceFrameConfig() != null) {
-					    for (I_ConfigAceFrame frameConfig: 
-					    		Terms.get().getActiveAceFrameConfig().getDbConfig().getAceFrames()) {
+                        for (final I_ConfigAceFrame frameConfig : Terms.get().getActiveAceFrameConfig().getDbConfig()
+                                .getAceFrames()) {
 					        frameConfig.fireCommit();
 					        frameConfig.setCommitEnabled(false);
 					    }
                         updateAlerts();
 					}
-				} catch (TerminologyException e) {
+                } catch (final TerminologyException e) {
 					AceLog.getAppLog().alertAndLogException(e);
-				} catch (IOException e) {
+                } catch (final IOException e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
             }
@@ -524,16 +536,16 @@ public class BdbCommitManager {
             public void run() {
                 try {
 					if (Terms.get().getActiveAceFrameConfig() != null) {
-					    for (I_ConfigAceFrame frameConfig: 
-					    		Terms.get().getActiveAceFrameConfig().getDbConfig().getAceFrames()) {
+                        for (final I_ConfigAceFrame frameConfig : Terms.get().getActiveAceFrameConfig().getDbConfig()
+                                .getAceFrames()) {
 					        frameConfig.fireCommit();
 					        frameConfig.setCommitEnabled(false);
 					    }
 					}
                     updateAlerts();
-				} catch (TerminologyException e) {
+                } catch (final TerminologyException e) {
 					AceLog.getAppLog().alertAndLogException(e);
-				} catch (IOException e) {
+                } catch (final IOException e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
             }
@@ -552,7 +564,7 @@ public class BdbCommitManager {
     				uncommittedCNids.clear();
     				Bdb.getSapDb().commit(Long.MIN_VALUE);
     				dataCheckMap.clear();
-    			} catch (IOException e1) {
+                } catch (final IOException e1) {
     				AceLog.getAppLog().alertAndLogException(e1);
     			}
     		}
@@ -561,20 +573,19 @@ public class BdbCommitManager {
     	updateFrames();
     }
 
-	private static void handleCanceledConcepts(I_RepresentIdSet uncommittedCNids2)
-			throws IOException {
-		NidBitSetItrBI idItr = uncommittedCNids2.iterator();
+    private static void handleCanceledConcepts(final I_RepresentIdSet uncommittedCNids2) throws IOException {
+        final NidBitSetItrBI idItr = uncommittedCNids2.iterator();
 		while (idItr.next()) {
-			Concept c = Concept.get(idItr.nid());
+            final Concept c = Concept.get(idItr.nid());
 			if (c.isCanceled()) {
 				Terms.get().forget(c);
 			}
 		}
 	}
 
-    public static void forget(I_ConceptAttributeVersioned attr) throws IOException {
-        Concept c = Bdb.getConcept(attr.getConId());
-        ConceptAttributes a = (ConceptAttributes) attr;
+    public static void forget(final I_ConceptAttributeVersioned attr) throws IOException {
+        final Concept c = Bdb.getConcept(attr.getConId());
+        final ConceptAttributes a = (ConceptAttributes) attr;
         if (a.getTime() != Long.MAX_VALUE) {
             // Only need to forget additional versions;
             if (a.revisions == null) {
@@ -582,15 +593,15 @@ public class BdbCommitManager {
                 "Cannot forget a committed component.");
             } else {
                 synchronized (a.revisions) {
-                    List<ConceptAttributesRevision> toRemove = new ArrayList<ConceptAttributesRevision>();
-                    Iterator<ConceptAttributesRevision> ri = a.revisions.iterator();
+                    final List<ConceptAttributesRevision> toRemove = new ArrayList<ConceptAttributesRevision>();
+                    final Iterator<ConceptAttributesRevision> ri = a.revisions.iterator();
                     while (ri.hasNext()) {
-                        ConceptAttributesRevision ar = ri.next();
+                        final ConceptAttributesRevision ar = ri.next();
                         if (ar.getTime() == Long.MAX_VALUE) {
                             toRemove.add(ar);
                         }
                     }
-                    for (ConceptAttributesRevision r: toRemove) {
+                    for (final ConceptAttributesRevision r : toRemove) {
                         a.removeRevision(r);
                         r.sapNid = -1;
                     }
@@ -604,9 +615,9 @@ public class BdbCommitManager {
         Terms.get().addUncommittedNoChecks(c);
     }
 
-	public static void forget(I_RelVersioned rel) throws IOException {
-	    Concept c = Bdb.getConcept(rel.getC1Id());
-	    Relationship r = (Relationship) rel;
+    public static void forget(final I_RelVersioned rel) throws IOException {
+        final Concept c = Bdb.getConcept(rel.getC1Id());
+        final Relationship r = (Relationship) rel;
 	    if (r.getTime() != Long.MAX_VALUE) {
 	        // Only need to forget additional versions;
 	        if (r.revisions == null) {
@@ -614,15 +625,15 @@ public class BdbCommitManager {
 	            "Cannot forget a committed component.");
 	        } else {
 	            synchronized (r.revisions) {
-                    List<RelationshipRevision> toRemove = new ArrayList<RelationshipRevision>();
-	                Iterator<RelationshipRevision> ri = r.revisions.iterator();
+                    final List<RelationshipRevision> toRemove = new ArrayList<RelationshipRevision>();
+                    final Iterator<RelationshipRevision> ri = r.revisions.iterator();
 	                while (ri.hasNext()) {
-	                    RelationshipRevision rr = ri.next();
+                        final RelationshipRevision rr = ri.next();
 	                    if (rr.getTime() == Long.MAX_VALUE) {
                             toRemove.add(rr);
 	                    }
 	                }
-                    for (RelationshipRevision tr: toRemove) {
+                    for (final RelationshipRevision tr : toRemove) {
                         r.removeRevision(tr);
                     }
 	            }
@@ -637,9 +648,9 @@ public class BdbCommitManager {
 	    Terms.get().addUncommittedNoChecks(c);
 	}
 
-	public static void forget(I_DescriptionVersioned desc) throws IOException {
-		Description d = (Description) desc;
-		Concept c = Bdb.getConcept(d.getConceptNid());
+    public static void forget(final I_DescriptionVersioned desc) throws IOException {
+        final Description d = (Description) desc;
+        final Concept c = Bdb.getConcept(d.getConceptNid());
 		if (d.getTime() != Long.MAX_VALUE) {
 		    // Only need to forget additional versions;
 		    if (d.revisions == null) {
@@ -647,15 +658,15 @@ public class BdbCommitManager {
 		            "Cannot forget a committed component.");
 		    } else {
 		        synchronized (d.revisions) {
-		            List<DescriptionRevision> toRemove = new ArrayList<DescriptionRevision>();
-		            Iterator<DescriptionRevision> di = d.revisions.iterator();
+                    final List<DescriptionRevision> toRemove = new ArrayList<DescriptionRevision>();
+                    final Iterator<DescriptionRevision> di = d.revisions.iterator();
 		            while (di.hasNext()) {
-		                DescriptionRevision dr = di.next();
+                        final DescriptionRevision dr = di.next();
 		                if (dr.getTime() == Long.MAX_VALUE) {
 		                    toRemove.add(dr);
 		                }
 		            }
-                    for (DescriptionRevision tr: toRemove) {
+                    for (final DescriptionRevision tr : toRemove) {
                         d.removeRevision(tr);
                         tr.sapNid = -1;
                     }
@@ -672,15 +683,15 @@ public class BdbCommitManager {
 		Terms.get().addUncommittedNoChecks(c);
 	}
 
-	public static void forget(I_GetConceptData concept) throws IOException {
-		Concept c = (Concept) concept;
+    public static void forget(final I_GetConceptData concept) throws IOException {
+        final Concept c = (Concept) concept;
 		Bdb.getConceptDb().forget(c);
 	}
 
     @SuppressWarnings("unchecked")
-    public static void forget(I_ExtendByRef extension) throws IOException {
-		RefsetMember m = (RefsetMember) extension;
-        Concept c = Bdb.getConcept(m.getRefsetId());
+    public static void forget(final I_ExtendByRef extension) throws IOException {
+        final RefsetMember m = (RefsetMember) extension;
+        final Concept c = Bdb.getConcept(m.getRefsetId());
         if (m.getTime() != Long.MAX_VALUE) {
             // Only need to forget additional versions;
             if (m.revisions == null) {
@@ -688,15 +699,15 @@ public class BdbCommitManager {
                     "Cannot forget a committed component.");
             } else {
                 synchronized (m.revisions) {
-                    List<RefsetRevision<?,?>> toRemove = new ArrayList<RefsetRevision<?,?>>();
-                    Iterator<?> mi =  m.revisions.iterator();
+                    final List<RefsetRevision<?, ?>> toRemove = new ArrayList<RefsetRevision<?, ?>>();
+                    final Iterator<?> mi = m.revisions.iterator();
                     while (mi.hasNext()) {
-                        RefsetRevision<?,?> mr = (RefsetRevision<?, ?>) mi.next();
+                        final RefsetRevision<?, ?> mr = (RefsetRevision<?, ?>) mi.next();
                         if (mr.getTime() == Long.MAX_VALUE) {
                             toRemove.add(mr);
                         }
                     }
-                    for (RefsetRevision tr: toRemove) {
+                    for (final RefsetRevision tr : toRemove) {
                         m.removeRevision(tr);
                         tr.sapNid = -1;
                     }
@@ -712,28 +723,28 @@ public class BdbCommitManager {
         Terms.get().addUncommittedNoChecks(c);
 	}
 
-	private static void loadTests(String directory,
-			List<I_TestDataConstraints> list) {
-		File componentPluginDir = new File(pluginRoot + File.separator
+	private static void loadTests(final String directory,
+			final List<I_TestDataConstraints> list) {
+		final File componentPluginDir = new File(pluginRoot + File.separator
 				+ directory);
-		File[] plugins = componentPluginDir.listFiles(new FilenameFilter() {
-			public boolean accept(File arg0, String fileName) {
+        final File[] plugins = componentPluginDir.listFiles(new FilenameFilter() {
+            public boolean accept(final File arg0, final String fileName) {
 				return fileName.toLowerCase().endsWith(".task");
 			}
 
 		});
 
 		if (plugins != null) {
-			for (File f : plugins) {
+            for (final File f : plugins) {
 				try {
-					FileInputStream fis = new FileInputStream(f);
-					BufferedInputStream bis = new BufferedInputStream(fis);
-					ObjectInputStream ois = new ObjectInputStream(bis);
-					I_TestDataConstraints test = (I_TestDataConstraints) ois
+                    final FileInputStream fis = new FileInputStream(f);
+                    final BufferedInputStream bis = new BufferedInputStream(fis);
+                    final ObjectInputStream ois = new ObjectInputStream(bis);
+					final I_TestDataConstraints test = (I_TestDataConstraints) ois
 							.readObject();
 					ois.close();
 					list.add(test);
-				} catch (Exception e) {
+                } catch (final Exception e) {
 					AceLog.getAppLog().alertAndLog(Level.WARNING,
 							"Processing: " + f.getAbsolutePath(), e);
 				}
@@ -743,14 +754,14 @@ public class BdbCommitManager {
 
     private static void doUpdate() {
         try {
-            for (Frame f : OpenFrames.getFrames()) {
+            for (final Frame f : OpenFrames.getFrames()) {
                 if (AceFrame.class.isAssignableFrom(f.getClass())) {
-                    AceFrame af = (AceFrame) f;
-                    ACE aceInstance = af.getCdePanel();
+                    final AceFrame af = (AceFrame) f;
+                    final ACE aceInstance = af.getCdePanel();
                     aceInstance.getDataCheckListScroller();
                     aceInstance.getUncommittedListModel().clear();
 
-                    for (Collection<AlertToDataConstraintFailure> alerts : dataCheckMap.values()) {
+                    for (final Collection<AlertToDataConstraintFailure> alerts : dataCheckMap.values()) {
                         aceInstance.getUncommittedListModel().addAll(alerts);
                     }
                     if (aceInstance.getUncommittedListModel().size() > 0) {
@@ -762,7 +773,7 @@ public class BdbCommitManager {
                         }
                         // show data checks tab...
                     } else {
-                        for (TermComponentDataCheckSelectionListener l : aceInstance.getDataCheckListeners()) {
+                        for (final TermComponentDataCheckSelectionListener l : aceInstance.getDataCheckListeners()) {
                             l.setSelection(null);
                         }
                         // hide data checks tab...
@@ -775,7 +786,7 @@ public class BdbCommitManager {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             AceLog.getAppLog().warning(e.toString());
         }
     }
@@ -812,8 +823,8 @@ public class BdbCommitManager {
 		}
 	}
 
-	private static void removeUncommittedUpdateFrame(Concept concept) {
-		for (I_ConfigAceFrame frameConfig : getActiveFrame().getDbConfig()
+	private static void removeUncommittedUpdateFrame(final Concept concept) {
+		for (final I_ConfigAceFrame frameConfig : getActiveFrame().getDbConfig()
 				.getAceFrames()) {
 			try {
 				frameConfig.removeUncommitted(concept);
@@ -821,7 +832,7 @@ public class BdbCommitManager {
 				if (uncommittedCNids.cardinality() == 0) {
 					frameConfig.setCommitEnabled(false);
 				}
-			} catch (Exception e) {
+            } catch (final Exception e) {
 				AceLog.getAppLog().warning(e.toString());
 			}
 		}
@@ -829,7 +840,7 @@ public class BdbCommitManager {
 
 	public static Set<Concept> getUncommitted() {
 	    try {
-	        Set<Concept> returnSet = new HashSet<Concept>();
+            final Set<Concept> returnSet = new HashSet<Concept>();
 	        NidBitSetItrBI cNidItr = uncommittedCNids.iterator();
 	        while (cNidItr.next()) {
 	            returnSet.add(Concept.get(cNidItr.nid()));
@@ -839,39 +850,38 @@ public class BdbCommitManager {
                 returnSet.add(Concept.get(cNidItr.nid()));
             }
 	        return returnSet;
-	    } catch (IOException e) {
+        } catch (final IOException e) {
 	        throw new RuntimeException(e);
 	    }
 	}
 
 	public static List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings() {
-		List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
+        final List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
         try {
-        	NidBitSetItrBI cNidItr = uncommittedCNids.iterator();
+            final NidBitSetItrBI cNidItr = uncommittedCNids.iterator();
             while (cNidItr.next()) {
 			try {
-				Concept toTest = Concept.get(cNidItr.nid());
-				for (I_TestDataConstraints test : commitTests) {
+                    final Concept toTest = Concept.get(cNidItr.nid());
+                    for (final I_TestDataConstraints test : commitTests) {
 					try {
-						for (AlertToDataConstraintFailure failure : test.test(
-								toTest, true)) {
+                            for (final AlertToDataConstraintFailure failure : test.test(toTest, true)) {
 							warningsAndErrors.add(failure);
 						}
-					} catch (Exception e) {
+                        } catch (final Exception e) {
 						AceLog.getEditLog().alertAndLogException(e);
 					}
 				}
-			} catch (IOException e) {
+                } catch (final IOException e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			}
 		}
-        } catch (IOException e) {
+        } catch (final IOException e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
 		return warningsAndErrors;
 	}
 
-	public static void addUncommittedDescNid(int dNid) {
+    public static void addUncommittedDescNid(final int dNid) {
 		uncommittedDescNids.setMember(dNid);
 	}
 
@@ -902,6 +912,7 @@ public class BdbCommitManager {
 		AceLog.getAppLog().info("Awaiting termination of changeSetWriterService.");
 		changeSetWriterService.awaitTermination(90, TimeUnit.MINUTES);
 		AceLog.getAppLog().info("BdbCommitManager is shutdown.");
+        notifyShutdown();
 	}
 
 	public static void writeImmediate(Concept concept) {
@@ -916,13 +927,80 @@ public class BdbCommitManager {
         return performCommitTests;
     }
 
-    public static void setCheckCreationDataEnabled(boolean enabled) {
+    public static void setCheckCreationDataEnabled(final boolean enabled) {
         performCreationTests = enabled;
     }
 
-    public static void setCheckCommitDataEnabled(boolean enabled) {
+    public static void setCheckCommitDataEnabled(final boolean enabled) {
         performCommitTests = enabled;
     }
 
+    /**
+     * <p>
+     * Register a commit listener
+     * </p>
+     * @param listener
+     */
+    public static void addCommitListener(final ICommitListener listener) {
+        if (listener != null) {
+            listeners = (ICommitListener[]) ArrayUtils.add(listeners, listener);
+        }
+    }
 
+    /**
+     * <p>
+     * Remove the commit listener
+     * </p>
+     * @param listener
+     */
+    public static void removeCommitListener(final ICommitListener listener) {
+        if (listener != null) {
+            listeners = (ICommitListener[]) ArrayUtils.removeElement(listeners, listener);
+        }
+    }
+
+    /**
+     * <p>
+     * Remove all registered commit listener
+     * </p>
+     */
+    public static void removeAllCommitListeners() {
+        if (listeners != null && listeners.length > 0) {
+            listeners = new ICommitListener[0];
+        }
+    }
+
+    /**
+     * <p>
+     * notify the commit event
+     * </p>
+     */
+    private static void notifyShutdown() {
+        if (listeners != null && listeners.length > 0) {
+            for (final ICommitListener listener : listeners) {
+                try {
+                    listener.shutdown();
+                } catch (final Exception exception) {
+                    // @todo handle exception
+                    exception.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private static void notifyCommit() {
+        if (listeners != null && listeners.length > 0) {
+            final CommitEvent event;
+            event = new CommitEvent(uncommittedCNidsNoChecks);
+            for (final ICommitListener listener : listeners) {
+                try {
+                    listener.afterCommit(event);
+                } catch (final Exception exception) {
+                    // @todo handle exception
+                    exception.printStackTrace();
+                }
+            }
+        }
+
+    }
 }

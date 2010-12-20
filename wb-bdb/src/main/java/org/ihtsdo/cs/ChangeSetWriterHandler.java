@@ -23,6 +23,7 @@ import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 
@@ -57,6 +58,21 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 		this.permit = permit;
 		this.cNidsToWrite = cNidsToWrite;
 		changedCount = cNidsToWrite.cardinality();
+		
+		if(changedCount > 0) {
+			try {
+            NidBitSetItrBI uncommittedCNidItr2 = this.cNidsToWrite.iterator();
+            while (uncommittedCNidItr2.next()) {
+            	Concept concept = Concept.get(uncommittedCNidItr2.nid());
+               // AceLog.getAppLog().info("ChangeSetWriterHandler contructor changed concept = "+concept.toLongString());
+            }
+			}catch(Exception e) {
+				AceLog.getAppLog().severe("ChangeSetWriterHandler contructor", e);
+			}
+        }
+		
+		
+		
 		this.commitTime = commitTime;
 		this.commitTimeStr = TimeUtil.formatDate(commitTime) + 
 		    "; gVer: " + Bdb.gVersion.incrementAndGet() + 
@@ -91,9 +107,11 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
             activity.setProgressInfoLower("Iterating over concepts...");
             switch (changeSetWriterThreading) {
             case MULTI_THREAD:
+            	AceLog.getAppLog().info("MULTI_THREAD");
                 Bdb.getConceptDb().iterateConceptDataInParallel(this);
                 break;
             case SINGLE_THREAD:
+            	AceLog.getAppLog().info("SINGLE_THREAD");
                 Bdb.getConceptDb().iterateConceptDataInSequence(this);
                break;
             default:
