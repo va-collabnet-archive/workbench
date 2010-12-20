@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
+
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -46,7 +46,6 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.ace.util.TupleVersionComparator;
 import org.dwfa.ace.util.TupleVersionPart;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -249,7 +248,7 @@ public abstract class AbstractExportSpecification implements ExportSpecification
          *
          * @throws Exception error creating the extensionMap
          */
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({ "unchecked", "rawtypes" })
         public ExtensionProcessor() throws Exception {
             extensionMap.put(RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid(), new StringExtensionProcessor());
             extensionMap.put(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid(), new ConceptExtensionProcessor());
@@ -428,7 +427,6 @@ public abstract class AbstractExportSpecification implements ExportSpecification
 
             if (thinExtByRefVersioned.getMemberId() != 0) {
                 idParts = termFactory.getId(thinExtByRefVersioned.getMemberId()).getVersions();
-                fixIdTimeAndModule(tuple, idParts);
             } else {
                 idParts = new ArrayList<I_IdPart>(1);
                 idParts.add(getIdUuidSctIdPart(thinExtByRefVersioned, tuple));
@@ -450,37 +448,6 @@ public abstract class AbstractExportSpecification implements ExportSpecification
                     getInitialText());
 
             return extensionDto;
-        }
-
-        /**
-         * Fixes the id part that have been set to a version after the extension was exported.
-         *
-         * @param tuple I_ThinExtByRefPart
-         * @param idParts list of I_IdPart
-         * @throws TerminologyException
-         * @throws IOException
-         */
-        private void fixIdTimeAndModule(I_ThinExtByRefPart tuple,
-                List<I_IdPart> idParts) throws TerminologyException,
-                IOException {
-            I_IdPart latestIdPart = null;
-
-            for (I_IdPart iIdPart : idParts) {
-                if (iIdPart.getSource() == snomedIntId
-                        && (latestIdPart == null || (latestIdPart != null && iIdPart
-                                .getVersion() > latestIdPart.getVersion()))) {
-                    latestIdPart = iIdPart;
-                }
-            }
-            if (latestIdPart != null
-                    && tuple.getVersion() < latestIdPart.getVersion()) {
-                I_IdPart fixedPart = latestIdPart.duplicate();
-                fixedPart.setVersion(tuple.getVersion());
-                fixedPart.setPathId(tuple.getPathId());
-
-                idParts.add(fixedPart);
-                idParts.remove(latestIdPart);
-            }
         }
 
         /**

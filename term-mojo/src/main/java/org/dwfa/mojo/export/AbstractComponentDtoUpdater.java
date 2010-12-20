@@ -264,7 +264,7 @@ public abstract class AbstractComponentDtoUpdater {
 
         // If there is no sct id the concept is not live (previously released)
         conceptDto.setLive(sctIdPart != null);
-        if (sctIdPart == null) {
+        if (sctIdPart == null && check.isActive(tuple.getStatusId())) {
             sctIdPart = new ThinIdPart();
 
             sctIdPart.setPathId(tuple.getPathId());
@@ -274,7 +274,9 @@ public abstract class AbstractComponentDtoUpdater {
             sctIdPart.setVersion(tuple.getVersion());
         }
 
-        setIdentifier(conceptDto, idVersions, type, uuid, sctIdPart, latest);
+        if (sctIdPart != null) {
+            setIdentifier(conceptDto, idVersions, type, uuid, sctIdPart, latest);
+        }
     }
 
     /**
@@ -448,11 +450,11 @@ public abstract class AbstractComponentDtoUpdater {
         descriptionDto.setStatusCode(ArchitectonicAuxiliary.getSnomedDescriptionStatusId(
                 termFactory.getConcept(tuple.getStatusId()).getUids()) + "");
 
-		if ("-1".equals(descriptionDto.getStatusCode())) {
-			if (tuple.getStatusId() == conceptNonCurrentStatus.getNid()) {
-				descriptionDto.setStatusCode("8");
-			}
-		}
+        if ("-1".equals(descriptionDto.getStatusCode())) {
+            if (tuple.getStatusId() == conceptNonCurrentStatus.getNid()) {
+                descriptionDto.setStatusCode("8");
+            }
+        }
 
         addUuidSctIdIndentifierToConceptDto(descriptionDto, tuple, idParts, TYPE.DESCRIPTION, tuple.getDescId(), latest);
 
@@ -480,11 +482,11 @@ public abstract class AbstractComponentDtoUpdater {
      * @return String or null if no active FSN
      */
     protected String getFsn(Collection<I_DescriptionTuple> descriptionTuples) {
-    	List<I_DescriptionTuple> descriptionTupleList = new ArrayList<I_DescriptionTuple>();
+        List<I_DescriptionTuple> descriptionTupleList = new ArrayList<I_DescriptionTuple>();
         for (I_DescriptionTuple iDescriptionTuple : descriptionTuples) {
-        	if(fullySpecifiedDescriptionType.getConceptId() == iDescriptionTuple.getTypeId()){
-        		descriptionTupleList.add(iDescriptionTuple);
-        	}
+            if(fullySpecifiedDescriptionType.getConceptId() == iDescriptionTuple.getTypeId()){
+                descriptionTupleList.add(iDescriptionTuple);
+            }
         }
         Collections.sort(descriptionTupleList, new TupleVersionComparator());
 
