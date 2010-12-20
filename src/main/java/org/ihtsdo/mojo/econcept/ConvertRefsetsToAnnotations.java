@@ -123,12 +123,11 @@ public class ConvertRefsetsToAnnotations extends AbstractMojo {
                                     if (eConcept.getRefsetMembers() != null) {
                                         System.out.println("Member Count: "
                                             + eConcept.getRefsetMembers().size());
+                                        eConcept.writeExternal(aodos);
+                                        eConcept.getRefsetMembers().clear();
                                     } else {
                                         System.out.println("Null Refset Members. ");
                                     }
-                                    eConcept.writeExternal(aodos);
-                                    eConcept.getRefsetMembers().clear();
-                                    eConcept.setAnnotationStyleRefset(true);
                                     break;
                                 }
                             }
@@ -137,8 +136,7 @@ public class ConvertRefsetsToAnnotations extends AbstractMojo {
                                         + eConcept + "\n\nConcept descriptor: \n"
                                         + cd);
                             }
-
-
+                            eConcept.setAnnotationStyleRefset(true);
                         }
                         eConcept.writeExternal(codos);
                         int read = conceptsRead.incrementAndGet();
