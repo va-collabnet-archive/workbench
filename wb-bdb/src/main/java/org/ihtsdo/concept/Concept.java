@@ -112,8 +112,12 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     public static Concept get(EConcept eConcept) throws IOException {
         int conceptNid = Bdb.uuidToNid(eConcept.getConceptAttributes().getPrimordialComponentUuid());
+        System.out.println("Concept get conceptNid = "+conceptNid);
+        
         assert conceptNid != Integer.MAX_VALUE : "no conceptNid for uuids";
+        System.out.println("Concept get 1");
         Concept c = get(conceptNid);
+        System.out.println("Concept get 2");
         //return populateFromEConcept(eConcept, c);
         return mergeWithEConcept(eConcept, c, false);
     }
