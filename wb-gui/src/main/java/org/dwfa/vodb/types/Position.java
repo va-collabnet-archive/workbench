@@ -280,7 +280,13 @@ public class Position implements I_Position {
                     position.getPath().getConceptNid());
                 PathBI path = Terms.get().getPath(pathConcept.getUids());
                 positions.add(Terms.get().newPosition(path, position.getVersion()));
-            } catch (IOException ex) {
+                
+            } 
+            catch(NullPointerException npe){
+            	AceLog.getAppLog().alertAndLogException(npe.getCause());
+            }
+            
+            catch (IOException ex) {
             if (ex.getCause() != null && NoMappingException.class.isAssignableFrom(ex.getCause().getClass())) {
                 AceLog.getAppLog().alertAndLogException(ex.getCause());
             } else {
