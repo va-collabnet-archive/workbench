@@ -465,9 +465,6 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                           new I_ConceptualizeUniversally[] { GRANT_RELATIONSHIP }),
                     GRANTED_PERMISSION("Granted permission",
                           new I_ConceptualizeUniversally[] { GRANT_RELATIONSHIP }),
-
-
-
                     MODIFY_CONFIG_PERMISSION("Modify configuration settings permission",
                           new I_ConceptualizeUniversally[] { GRANT_RELATIONSHIP, ADMIN_ROLE, SME_ROLE, REVIEWER_ROLE, AUTHOR_ROLE, OWNER_ROLE }),
                     CREATE_DELETE_USERS_PERMISSION("Create and delete users permission",
@@ -833,6 +830,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
     						new I_ConceptualizeUniversally[] { PROJECT_MANAGER_ROLE }),
     				VIEW_PROJECT_REPORTS_PERMISSION("view project reports permission",
     	    	    		new I_ConceptualizeUniversally[] { PROJECT_MANAGER_ROLE }),
+    	    		REASSINGNMENTS_PERMISSION("reassignments permission",
+    	    				new I_ConceptualizeUniversally[] { PROJECT_MANAGER_ROLE }),
     	    CONFIGURATION_MANAGER_ROLE("configuration role",
     	    	    new I_ConceptualizeUniversally[] { USER_ROLE }),
     	    	    MODIFY_EDITOR_MODE_PERMISSION("editor mode permission", 
