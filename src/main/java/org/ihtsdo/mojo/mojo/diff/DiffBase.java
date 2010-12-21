@@ -50,6 +50,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.RelAssertionType;
 
 /**
  *
@@ -461,6 +462,24 @@ public class DiffBase extends AbstractMojo {
 
 	protected List<Integer> v2_relationship_type_filter_int;
 
+	/**
+	 * Optional assertion type to filter v1
+	 * 
+	 * @parameter
+	 */
+	protected String v1_assertion_type_filter;
+
+	protected RelAssertionType v1_assertion_type_filter_enum;
+
+	/**
+	 * Optional assertion type to filter v2
+	 * 
+	 * @parameter
+	 */
+	protected String v2_assertion_type_filter;
+
+	protected RelAssertionType v2_assertion_type_filter_enum;
+
 	protected NidSetBI current_status;
 
 	protected NidSetBI isa_type;
@@ -468,6 +487,8 @@ public class DiffBase extends AbstractMojo {
 	protected NidSetBI pref_type;
 
 	protected NidSetBI fsn_type;
+
+	protected int classifier_type;
 
 	protected Precedence precedence = Precedence.PATH;
 
@@ -722,6 +743,18 @@ public class DiffBase extends AbstractMojo {
 				this.v1_relationship_type_filter, "v1_relationship_type_filter");
 		this.v2_relationship_type_filter_int = buildConceptEnum(
 				this.v2_relationship_type_filter, "v2_relationship_type_filter");
+		if (this.v1_assertion_type_filter != null) {
+			this.v1_assertion_type_filter_enum = RelAssertionType
+					.valueOf(this.v1_assertion_type_filter);
+		}
+		logConfig("v1_assertion_type_filter_enum", ""
+				+ this.v1_assertion_type_filter_enum);
+		if (this.v2_assertion_type_filter != null) {
+			this.v2_assertion_type_filter_enum = RelAssertionType
+					.valueOf(this.v2_assertion_type_filter);
+		}
+		logConfig("v2_assertion_type_filter_enum", ""
+				+ this.v2_assertion_type_filter_enum);
 	}
 
 	protected void listConcepts(String tag,
@@ -858,6 +891,8 @@ public class DiffBase extends AbstractMojo {
 							ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
 									.getUids()).getNid());
 		}
+		classifier_type = tf.getConcept(
+				ArchitectonicAuxiliary.Concept.SNOROCKET.getUids()).getNid();
 	}
 
 	private HashMap<Integer, String> concept_cache = new HashMap<Integer, String>();
@@ -1033,7 +1068,6 @@ public class DiffBase extends AbstractMojo {
 	protected int concepts_filtered = 0;
 
 	protected void compareAttributes(I_GetConceptData c) throws Exception {
-		I_TermFactory tf = Terms.get();
 		List<? extends I_ConceptAttributeTuple> a1s = c
 				.getConceptAttributeTuples(null, allowed_position1, precedence,
 						contradiction_mgr);
@@ -1116,7 +1150,6 @@ public class DiffBase extends AbstractMojo {
 	}
 
 	protected void compareDescriptions(I_GetConceptData c) throws Exception {
-		I_TermFactory tf = Terms.get();
 		List<? extends I_DescriptionTuple> d1s = c.getDescriptionTuples(null,
 				null, allowed_position1, precedence, contradiction_mgr);
 		List<? extends I_DescriptionTuple> d2s = c.getDescriptionTuples(null,
@@ -1190,11 +1223,30 @@ public class DiffBase extends AbstractMojo {
 	}
 
 	protected void compareRelationships(I_GetConceptData c) throws Exception {
-		I_TermFactory tf = Terms.get();
-		List<? extends I_RelTuple> d1s = c.getSourceRelTuples(null, null,
-				allowed_position1, precedence, contradiction_mgr);
-		List<? extends I_RelTuple> d2s = c.getSourceRelTuples(null, null,
-				allowed_position2, precedence, contradiction_mgr);
+		List<? extends I_RelTuple> d1s = (this.v1_assertion_type_filter_enum == null ? c
+				.getSourceRelTuples(null, null, allowed_position1, precedence,
+						contradiction_mgr) : c.getSourceRelTuples(null, null,
+				allowed_position1, precedence, contradiction_mgr,
+				classifier_type, v1_assertion_type_filter_enum));
+		List<? extends I_RelTuple> d2s = (this.v2_assertion_type_filter_enum == null ? c
+				.getSourceRelTuples(null, null, allowed_position2, precedence,
+						contradiction_mgr) : c.getSourceRelTuples(null, null,
+				allowed_position2, precedence, contradiction_mgr,
+				classifier_type, v2_assertion_type_filter_enum));
+		if (debug_p) {
+			for (I_RelTuple d1 : c.getSourceRelTuples(null, null, null,
+					precedence, contradiction_mgr)) {
+				System.out.println("D: " + d1);
+			}
+			System.out.println("P1: " + allowed_position1);
+			System.out.println("P2: " + allowed_position2);
+			for (I_RelTuple d1 : d1s) {
+				System.out.println("D1: " + d1);
+			}
+			for (I_RelTuple d2 : d2s) {
+				System.out.println("D2: " + d2);
+			}
+		}
 		for (I_RelTuple d2 : d2s) {
 			relationships++;
 			if (!testRelationshipFilter(d2, v2_relationship_status_filter_int,
