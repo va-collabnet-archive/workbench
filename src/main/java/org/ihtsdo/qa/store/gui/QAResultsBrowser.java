@@ -201,6 +201,9 @@ public class QAResultsBrowser extends JPanel {
 			TerminologyComponent path = (TerminologyComponent) comboBox2.getSelectedItem();
 			String time = (String) comboBox3.getSelectedItem();
 			coordinate = new QACoordinate(database.getDatabaseUuid(), path.getComponentUuid(), time);
+			if(startLine < 1){
+				startLine = 1;
+			}
 			updateTable1(coordinate);
 		}
 	}
