@@ -58,7 +58,6 @@ public class ConceptAttributes
 
     public ConceptAttributes(TkConceptAttributes eAttr, Concept c) throws IOException {
         super(eAttr, c.getNid());
-        System.out.println("ConceptAttributes TkConceptAttributes eAttr= "+eAttr);
         defined = eAttr.isDefined();
         if (eAttr.getRevisionList() != null) {
             revisions = new CopyOnWriteArrayList<ConceptAttributesRevision>();
