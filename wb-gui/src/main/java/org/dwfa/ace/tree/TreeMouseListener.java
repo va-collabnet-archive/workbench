@@ -172,8 +172,8 @@ public class TreeMouseListener extends MouseAdapter {
                             boolean excludeContains = true;
                             if (refsetSpecHelper.isDescriptionComputeType()) {
                                 // show AND, OR, !AND, !OR
-                                // show desc clauses
-                                excludeDesc = false;
+                                // do not show desc clauses (as taxonomy view represents concepts, not descriptions)
+                                excludeDesc = true;
                             } else if (refsetSpecHelper.isRelationshipComputeType()) {
                                 // show AND, OR, !AND, !OR
                                 // show rel clauses
