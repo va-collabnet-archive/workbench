@@ -470,8 +470,8 @@ public class QAStoreBIImpl implements QAStoreBI {
 			request.setFilter(wsFilter);
 			request.setQaCoordinate(wsQaCoord);
 			request.setSorteBy(wsSorteBy);
-			request.setStartLine(12);
-			request.setPageLenght(123);
+			request.setStartLine(startLine);
+			request.setPageLenght(pageLenght);
 			request.setRuleUuid(ruleUuid.toString());
 			QACasesReportLinesByPageResponse wsResponse = service.getQACasesReportLinesByPage(request);
 			
@@ -483,14 +483,15 @@ public class QAStoreBIImpl implements QAStoreBI {
 			reportPage.setInitialLine(wsResponse.getInitialLine());
 			WsQACasesReportLine[] wslines = wsResponse.getLines();
 			List<QACasesReportLine> lines = new ArrayList<QACasesReportLine>();
-			for (WsQACasesReportLine wsQACasesReportLine : wslines) {
-				
-				QACase qaCase = WsClientDataConverter.wsCaseToCase(wsQACasesReportLine.getQaCase());
-				TerminologyComponent component = WsClientDataConverter.wsComponentToTerminologyComponent(wsQACasesReportLine.getComponent());
-				DispositionStatus disposition = WsClientDataConverter.wsDipsStatusToDispStatus(wsQACasesReportLine.getDispositionStatus());
-				QACasesReportLine line = new QACasesReportLine(qaCase, component, disposition);
-				lines.add(line);
-				
+			if(wslines != null){
+				for (WsQACasesReportLine wsQACasesReportLine : wslines) {
+					QACase qaCase = WsClientDataConverter.wsCaseToCase(wsQACasesReportLine.getQaCase());
+					TerminologyComponent component = WsClientDataConverter.wsComponentToTerminologyComponent(wsQACasesReportLine.getComponent());
+					DispositionStatus disposition = WsClientDataConverter.wsDipsStatusToDispStatus(wsQACasesReportLine.getDispositionStatus());
+					QACasesReportLine line = new QACasesReportLine(qaCase, component, disposition);
+					lines.add(line);
+					
+				}
 			}
 			reportPage.setLines(lines);
 			
