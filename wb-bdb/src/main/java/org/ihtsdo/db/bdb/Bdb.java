@@ -233,6 +233,7 @@ public class Bdb {
 	private static ConcurrentHashMap<String, Integer> sapNidCache = new ConcurrentHashMap<String, Integer>();
 	
 	public static int getSapNid(TkRevision version) {
+		System.out.println("Bdb getSapNid TkRevision version = "+version);
 		assert version.getTime() != 0: "Time is 0; was it initialized?";
 		assert version.getTime() != Long.MIN_VALUE: "Time is Long.MIN_VALUE; was it initialized?";
 		assert version.getStatusUuid() != null: "Status is null; was it initialized?";
@@ -244,6 +245,9 @@ public class Bdb {
 		if (sapNid != null) {
 			return sapNid;
 		}
+		System.out.println("Bdb getSapNid TkRevision version getStatusUuid = "+version.getStatusUuid());
+		System.out.println("Bdb getSapNid TkRevision version.getAuthorUuid() = "+version.getAuthorUuid());
+		System.out.println("Bdb getSapNid TkRevision version.getPathUuid() = "+version.getPathUuid());
 		sapNid = statusAtPositionDb.getSapNid(
 				uuidToNid(version.getStatusUuid()), 
 				uuidToNid(version.getAuthorUuid()),
@@ -467,6 +471,7 @@ public class Bdb {
 	}
 
 	public static int uuidToNid(UUID uuid) {
+		System.out.println("Bdb uuidToNid uuid = "+uuid);
 		return uuidsToNidMapDb.uuidToNid(uuid);
 	}
 

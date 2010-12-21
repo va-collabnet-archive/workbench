@@ -892,6 +892,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     // So that the size of this class is kept limited ?
     protected ConceptComponent(TkComponent<?> eComponent, int enclosingConceptNid) throws IOException {
         super();
+        System.out.println("ConceptComponent eComponent = "+eComponent +" enclosingConceptNid = "+enclosingConceptNid);
         assert eComponent != null;
         this.nid = Bdb.uuidToNid(eComponent.primordialUuid);
         assert this.nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;

@@ -127,6 +127,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             throws IOException {
         c.setAnnotationStyleRefset(eConcept.isAnnotationStyleRefset());
         TkConceptAttributes eAttr = eConcept.getConceptAttributes();
+        System.out.println("mergeWithEConcept TkConceptAttributes eAttr = "+eAttr);
         if (eAttr != null) {
             if (c.getConceptAttributes() == null) {
                 setAttributesFromEConcept(c, eAttr);
@@ -246,6 +247,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             TkConceptAttributes eAttr) throws IOException {
         assert eAttr != null;
         ConceptAttributes attr = new ConceptAttributes(eAttr, c);
+        System.out.println("setAttributesFromEConcept ConceptAttributes attr = "+attr);
         c.data.set(attr);
     }
 
