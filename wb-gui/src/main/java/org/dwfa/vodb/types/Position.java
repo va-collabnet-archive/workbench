@@ -284,7 +284,8 @@ public class Position implements I_Position {
             } 
             
             catch(Exception npe){
-            	AceLog.getAppLog().alertAndLogException(npe.getCause());
+            	//AceLog.getAppLog().alertAndLogException(npe.getCause());
+            	System.out.println("readPositionSet error thrown "+npe.getCause());
             }
             
             /*catch(NullPointerException npe){
