@@ -282,7 +282,12 @@ public class Position implements I_Position {
                 positions.add(Terms.get().newPosition(path, position.getVersion()));
                 
             } 
-            catch(NullPointerException npe){
+            
+            catch(Exception npe){
+            	AceLog.getAppLog().alertAndLogException(npe.getCause());
+            }
+            
+            /*catch(NullPointerException npe){
             	AceLog.getAppLog().alertAndLogException(npe.getCause());
             }
             
@@ -298,7 +303,7 @@ public class Position implements I_Position {
             } else {
                 throw new IOException(ex);
             }
-        }
+        }*/
     }
     return positions;
 }
