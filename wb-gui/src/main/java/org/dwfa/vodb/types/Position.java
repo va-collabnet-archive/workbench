@@ -273,7 +273,7 @@ public class Position implements I_Position {
     public static Set<PositionBI> readPositionSet(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int size = in.readInt();
         Set<PositionBI> positions = Collections.synchronizedSet(new HashSet<PositionBI>(size));
-        for (int i = 0; i < size; i++) {
+        /*for (int i = 0; i < size; i++) {
             try {
                 PositionBI position = readPosition(in);
                 I_GetConceptData pathConcept = Terms.get().getConcept(
@@ -286,7 +286,7 @@ public class Position implements I_Position {
             catch(Exception npe){
             	//AceLog.getAppLog().alertAndLogException(npe.getCause());
             	System.out.println("readPositionSet error thrown "+npe.getCause());
-            }
+            }*/
             
             /*catch(NullPointerException npe){
             	AceLog.getAppLog().alertAndLogException(npe.getCause());
@@ -304,8 +304,8 @@ public class Position implements I_Position {
             } else {
                 throw new IOException(ex);
             }
-        }*/
-    }
+        }
+    }*/
     return positions;
 }
 
