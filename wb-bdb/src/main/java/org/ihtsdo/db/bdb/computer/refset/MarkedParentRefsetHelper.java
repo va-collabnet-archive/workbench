@@ -49,6 +49,10 @@ public class MarkedParentRefsetHelper extends RefsetHelper implements I_HelpMark
         this.parentRefsetId = getParentRefset();
     }
 
+    public int getParentRefsetId() {
+        return parentRefsetId;
+    }
+
     /* (non-Javadoc)
 	 * @see org.ihtsdo.db.bdb.computer.refset.I_HelpMarkedParentRefsets#addParentMembers(java.lang.Integer)
 	 */
@@ -149,7 +153,7 @@ public class MarkedParentRefsetHelper extends RefsetHelper implements I_HelpMark
             null,
             getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
 
-        if (targetParentRefsets == null || targetParentRefsets.size() == 0) {
+        if (targetParentRefsets == null || targetParentRefsets.isEmpty()) {
         	AceLog.getAppLog().warning("Unable to locate parent member refset for '"
                 + memberRefset.getInitialText() + "'");
         }

@@ -104,7 +104,7 @@ public class AddConceptInArenaToRefset extends AbstractTask {
             
             //get refset 
             I_GetConceptData refsetConcept = Terms.get().getConcept(refset.ids);
-            if (refsetConcept == null) { 
+            if (refsetConcept == null || refsetConcept.isCanceled()) { 
                 throw new TerminologyException("A working refset has not been selected.");
             }
             
@@ -113,6 +113,11 @@ public class AddConceptInArenaToRefset extends AbstractTask {
              Terms.get().getMemberRefsetHelper(tf.getActiveAceFrameConfig(), refsetConcept.getConceptNid(),
         		   member.getConceptNid()).addToRefset(conceptToAdd.getNid());
    
+             if (refsetConcept.isAnnotationStyleRefset()) {
+                 Terms.get().addUncommitted(conceptToAdd);
+             } else {
+                 Terms.get().addUncommitted(refsetConcept);
+              }
 
             host.unlink();
 

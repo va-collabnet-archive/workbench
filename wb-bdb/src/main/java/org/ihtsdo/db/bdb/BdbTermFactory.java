@@ -1121,6 +1121,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         if (refsetConcept.isAnnotationStyleRefset()) {
             ConceptComponent<?,?> referencedComponent = (ConceptComponent<?, ?>) Bdb.getComponent(referencedComponentNid);
             referencedComponent.addAnnotation(member);
+            member.enclosingConceptNid = Bdb.getConceptNid(referencedComponentNid);
         } else {
             refsetConcept.getExtensions().add(member);
         }

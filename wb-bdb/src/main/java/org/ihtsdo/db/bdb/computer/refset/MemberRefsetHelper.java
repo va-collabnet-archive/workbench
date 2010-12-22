@@ -43,19 +43,22 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 @AllowDataCheckSuppression
 public class MemberRefsetHelper extends RefsetHelper implements I_HelpMemberRefsets {
 
-    private Logger logger = Logger.getLogger(MemberRefsetHelper.class.getName());
+    private static final Logger logger = Logger.getLogger(MemberRefsetHelper.class.getName());
 
     private int memberTypeId;
     private int memberRefsetId;
 
-    private MarkedParentRefsetHelper markedParentHelper;
+    private MarkedParentRefsetHelper markedParentHelper = null;
 
     public MemberRefsetHelper(I_ConfigAceFrame frameConfig, int memberRefsetId, int memberTypeId) throws Exception {
         super(frameConfig);
         setMemberRefsetId(memberRefsetId);
         setMemberTypeId(memberTypeId);
-        markedParentHelper = new MarkedParentRefsetHelper(frameConfig, memberRefsetId, memberTypeId);
-
+        MarkedParentRefsetHelper mph = new MarkedParentRefsetHelper(frameConfig, memberRefsetId, memberTypeId);
+        if (mph.getParentRefsetId() != Integer.MIN_VALUE) {
+            markedParentHelper = new MarkedParentRefsetHelper(frameConfig, memberRefsetId, memberTypeId);
+        }
+ 
     }
 
     /* (non-Javadoc)
@@ -116,14 +119,18 @@ public class MemberRefsetHelper extends RefsetHelper implements I_HelpMemberRefs
 	 * @see org.ihtsdo.db.bdb.computer.refset.I_HelpMemberRefsets#addMarkedParents(java.lang.Integer)
 	 */
     public void addMarkedParents(Integer... conceptIds) throws Exception {
-        markedParentHelper.addParentMembers(conceptIds);
+        if (markedParentHelper != null) {
+            markedParentHelper.addParentMembers(conceptIds);
+        }
     }
 
     /* (non-Javadoc)
 	 * @see org.ihtsdo.db.bdb.computer.refset.I_HelpMemberRefsets#removeMarkedParents(java.lang.Integer)
 	 */
     public void removeMarkedParents(Integer... conceptIds) throws Exception {
-        markedParentHelper.removeParentMembers(conceptIds);
+        if (markedParentHelper != null) {
+            markedParentHelper.removeParentMembers(conceptIds);
+        }
     }
 
     /* (non-Javadoc)

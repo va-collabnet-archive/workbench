@@ -107,6 +107,20 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                 if (hasUncommittedId(cc)) {
                     return true;
                 }
+                if (hasUncommittedAnnotation(cc)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+        private boolean hasUncommittedAnnotation(ConceptComponent<?, ?> cc) {
+        if (cc != null && cc.annotations != null) {
+            for (RefsetMemberChronicleBI rmc : cc.annotations) {
+                if (rmc.isUncommitted()) {
+                    return true;
+                }
             }
         }
         return false;

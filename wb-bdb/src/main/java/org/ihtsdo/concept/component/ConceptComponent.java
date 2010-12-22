@@ -730,12 +730,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             annotations = new ConcurrentSkipListSet<RefsetMemberChronicleBI>(
                     new Comparator<RefsetMemberChronicleBI>() {
 
-                @Override
-                public int compare(RefsetMemberChronicleBI t, RefsetMemberChronicleBI t1) {
-                    return t.getNid() - t1.getNid();
-                }
-                
-            });
+                        @Override
+                        public int compare(RefsetMemberChronicleBI t, RefsetMemberChronicleBI t1) {
+                            return t.getNid() - t1.getNid();
+                        }
+                    });
         }
         modified();
         return annotations.add(annotation);
@@ -754,11 +753,15 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
      */
     protected void modified() {
         try {
-            if (Bdb.getNidCNidMap() != null && Bdb.getNidCNidMap().hasConcept(enclosingConceptNid)) {
-                Concept c = Bdb.getConcept(enclosingConceptNid);
-                if (c != null) {
-                    c.modified();
+            if (enclosingConceptNid != Integer.MIN_VALUE) {
+                if (Bdb.getNidCNidMap() != null && Bdb.getNidCNidMap().hasConcept(enclosingConceptNid)) {
+                    Concept c = Bdb.getConcept(enclosingConceptNid);
+                    if (c != null) {
+                        c.modified();
+                    }
                 }
+            } else {
+               AceLog.getAppLog().warning("No enclosingConceptNid for: " + this);                 
             }
         } catch (IOException e) {
             AceLog.getAppLog().alertAndLogException(e);
