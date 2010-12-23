@@ -166,11 +166,13 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
                 // get the latest version
                 I_ExtendByRefPart latestPart = null;
+                AceLog.getAppLog().info("extension.getMutableParts() size = "+extension.getMutableParts().size());
                 for (I_ExtendByRefPart part : extension.getMutableParts()) {
                     if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
                         latestPart = part;
                     }
                 }
+                AceLog.getAppLog().info("RefsetHelper hasRefsetExtension latestPart = "+latestPart);
                 if (extProps.validate(latestPart)) {
                     return true;
                 }
