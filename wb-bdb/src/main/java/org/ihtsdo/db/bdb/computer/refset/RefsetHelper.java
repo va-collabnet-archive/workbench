@@ -179,6 +179,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
                 }
                 }
                 else{
+                	AceLog.getAppLog().info("Has refset but no mutable parts thus returning true");
                 	return true;
                 }
             }
