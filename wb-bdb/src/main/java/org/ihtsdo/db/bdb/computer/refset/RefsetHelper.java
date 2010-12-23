@@ -163,7 +163,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
                         + Bdb.getConceptForComponent(componentNid).toLongString()));
             }
             if (extension != null && extension.getRefsetId() == refsetId) {
-
+            	AceLog.getAppLog().info("extension = "+extension);
                 // get the latest version
                 I_ExtendByRefPart latestPart = null;
                 AceLog.getAppLog().info("extension.getMutableParts() size = "+extension.getMutableParts().size());
@@ -177,6 +177,9 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
                 if (extProps.validate(latestPart)) {
                     return true;
                 }
+                }
+                else{
+                	return true;
                 }
             }
         }
