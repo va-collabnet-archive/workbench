@@ -346,7 +346,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
                 writeOrigin(path, origin, config);
             }
             pathMap.put(path.getConceptNid(), (Path) path);
-            logger.info("Wrote path : " + path + "pathmap size = "+pathMap.size());
+            logger.info("Wrote path : " + path + "pathmap size = "+pathMap.size() +" using a key of "+path.getConceptNid());
         } catch (Exception e) {
             throw new TerminologyException("Unable to write path: " + path, e);
         }
