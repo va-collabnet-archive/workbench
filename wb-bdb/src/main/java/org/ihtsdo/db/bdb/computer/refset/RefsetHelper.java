@@ -173,8 +173,10 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
                     }
                 }
                 AceLog.getAppLog().info("RefsetHelper hasRefsetExtension latestPart = "+latestPart);
+                if(latestPart != null){
                 if (extProps.validate(latestPart)) {
                     return true;
+                }
                 }
             }
         }
