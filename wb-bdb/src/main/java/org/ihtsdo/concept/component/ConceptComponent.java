@@ -809,10 +809,12 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         } else {
             buf.append(" !!! Invalid sapNid. Cannot compute path, time, status. !!! ");
         }
+        buf.append(" extraVersions: ");
+        buf.append(revisions);
         buf.append(" xtraIds:");
         buf.append(additionalIdVersions);
-        buf.append(" xtraVersions: ");
-        buf.append(revisions);
+        buf.append(" annotations:");
+        buf.append(annotations);
         buf.append("};");
         return buf.toString();
     }
