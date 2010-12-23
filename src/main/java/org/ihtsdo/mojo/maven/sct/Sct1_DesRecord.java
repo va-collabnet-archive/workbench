@@ -84,23 +84,34 @@ class Sct1_DesRecord implements Comparable<Object>, Serializable {
 
     // method required for object to be sortable (comparable) in arrays
     public int compareTo(Object obj) {
-        Sct1_DesRecord tmp = (Sct1_DesRecord) obj;
-        if (this.desSnoId < tmp.desSnoId) {
-            return -1; // instance less than received
-        } else if (this.desSnoId > tmp.desSnoId) {
-            return 1; // instance greater than received
+        Sct1_DesRecord o2 = (Sct1_DesRecord) obj;
+        int thisMore = 1;
+        int thisLess = -1;
+        // DESCRIPTION UUID
+        if (this.desUuidMsb > o2.desUuidMsb) {
+            return thisMore;
+        } else if (this.desUuidMsb < o2.desUuidMsb) {
+            return thisLess;
         } else {
-            if (this.pathIdx < tmp.pathIdx) {
-                return -1; // instance less than received
-            } else if (this.pathIdx > tmp.pathIdx) {
-                return 1; // instance greater than received
+            if (this.desUuidLsb > o2.desUuidLsb) {
+                return thisMore;
+            } else if (this.desUuidLsb < o2.desUuidLsb) {
+                return thisLess;
             } else {
-                if (this.revTime < tmp.revTime) {
-                    return -1; // instance less than received
-                } else if (this.revTime > tmp.revTime) {
-                    return 1; // instance greater than received
+                // Path
+                if (this.pathIdx > o2.pathIdx) {
+                    return thisMore;
+                } else if (this.pathIdx < o2.pathIdx) {
+                    return thisLess;
                 } else {
-                    return 0; // instance == received
+                    // Revision
+                    if (this.revTime > o2.revTime) {
+                        return thisMore;
+                    } else if (this.revTime < o2.revTime) {
+                        return thisLess;
+                    } else {
+                        return 0; // EQUAL
+                    }
                 }
             }
         }
