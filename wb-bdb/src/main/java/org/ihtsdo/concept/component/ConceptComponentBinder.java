@@ -88,7 +88,11 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 						}
 					}
 				}
-				conceptComponent.readComponentFromBdb(input);
+ 				try {
+					conceptComponent.merge(factory.create(enclosingConcept, input));
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
 			} else {
  				try {
 					if (conceptComponent == null) {
