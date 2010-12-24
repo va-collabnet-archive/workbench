@@ -308,12 +308,14 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                 for (ConceptComponent<?, ?> cc : ccList) {
                     if (cc.getTime() == Long.MIN_VALUE) {
                         toRemove.add(cc);
+                        cc.clearVersions();
                         Concept.componentsCRHM.remove(cc.getNid());
                     } else {
                         if (cc.revisions != null) {
                         List<Revision> revisionToRemove = new ArrayList<Revision>();
                         for (Revision r: cc.revisions) {
                             if (r.getTime() == Long.MIN_VALUE) {
+                                cc.clearVersions();
                                 revisionToRemove.add(r);
                             }
                         }
@@ -323,6 +325,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                         }
                     }
                 }
+                
                 ccList.removeAll(toRemove);
             }
         }
