@@ -677,7 +677,7 @@ public class Description
 	}
 
 	@Override
-	protected void clearVersions() {
+	public void clearVersions() {
 		versions = null;
 	}
 

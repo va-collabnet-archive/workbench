@@ -909,7 +909,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
     }
 
-    protected abstract void clearVersions();
+    public abstract void clearVersions();
 
     public Concept getEnclosingConcept() {
         try {

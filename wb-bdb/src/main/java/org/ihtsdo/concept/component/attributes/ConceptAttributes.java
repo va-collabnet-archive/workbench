@@ -556,7 +556,7 @@ public class ConceptAttributes
 	}
 
 	@Override
-	protected void clearVersions() {
+	public void clearVersions() {
 		versions = null;
 	}
 

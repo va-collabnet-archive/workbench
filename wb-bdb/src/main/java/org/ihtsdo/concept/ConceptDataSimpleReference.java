@@ -275,6 +275,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 				for (int i = ccList.size() -1; i > -1; i--) {
 					if (ccList.get(i).getTime() == Long.MIN_VALUE) {
 							toRemove.add(i);
+							ccList.get(i).clearVersions();
 					}
 				}
 				for (int i: toRemove) {

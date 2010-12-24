@@ -566,7 +566,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 
 
 	@Override
-	protected void clearVersions() {
+	public void clearVersions() {
 		versions = null;
 	}
     @Override
