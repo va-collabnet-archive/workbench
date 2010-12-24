@@ -164,7 +164,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
 
     @Override
-    public AddDescriptionSet getDescriptions() throws IOException {
+    public AddDescriptionSet getDescriptions() throws IOException {    
         if (descriptions.get() == null) {
             descriptions.compareAndSet(null, new AddDescriptionSet(getList(new DescriptionBinder(),
                     OFFSETS.DESCRIPTIONS, enclosingConcept)));
