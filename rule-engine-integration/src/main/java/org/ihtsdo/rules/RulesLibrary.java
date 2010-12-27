@@ -23,6 +23,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,6 +33,8 @@ import java.util.UUID;
 
 import javax.swing.JOptionPane;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.XMLConfiguration;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.agent.KnowledgeAgent;
@@ -874,5 +878,32 @@ public class RulesLibrary {
 		}
 
 		return result;
+	}
+	
+	public static URL getDocumentationUrlForRuleUUID(UUID ruleUuid) throws ConfigurationException {
+		URL url = null;
+		
+		XMLConfiguration config = new XMLConfiguration("rules/rules-documentation-config.xml");
+		String template = config.getString("urlTemplate");
+		System.out.println("Template: " + template);
+		Object rules = config.getProperty("rules.rule.uuid");
+		if(rules instanceof Collection)
+		{
+			System.out.println("Number of rules: " + ((Collection) rules).size());
+			for (int i = 0; i<= ((Collection) rules).size()-1; i++) {
+				System.out.println(i + "- UUID: " + config.getString("rules.rule(" + i + ").uuid"));
+				System.out.println(i + "- Address: " + config.getString("rules.rule(" + i + ").address"));
+				
+				if (ruleUuid.equals(UUID.fromString(config.getString("rules.rule(" + i + ").uuid")))) {
+					String urlString = template.replace("*", config.getString("rules.rule(" + i + ").address"));
+					try {
+						url = new URL(urlString);
+					} catch (MalformedURLException e) {
+						//do nothing, url = null
+					}
+				}
+			}
+		}
+		return url;
 	}
 }
