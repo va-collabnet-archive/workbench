@@ -191,18 +191,18 @@ public class UploadToQADatabase extends AbstractMojo {
 	private void loadFindings() throws SQLException {      
 		Statement statement = (com.mysql.jdbc.Statement)con.createStatement();
 		statement.execute("SET UNIQUE_CHECKS=0; ");
-		statement.execute("ALTER TABLE QA_Finding DISABLE KEYS");
+		statement.execute("ALTER TABLE qa_finding DISABLE KEYS");
 
 
-		con.createStatement().execute("TRUNCATE TABLE QA_Finding");
+		con.createStatement().execute("TRUNCATE TABLE qa_finding");
 		// Define the query we are going to execute
 		String statementText = "LOAD DATA LOCAL INFILE '" + findings.getAbsolutePath() + "' " +
-		"INTO TABLE QA_Finding IGNORE 1 LINES " +
-		"(finding_uid, database_uid, path_uid, run_id, rule_uid, QA_component_uid, detail, QA_component_name)";
+		"INTO TABLE qa_finding IGNORE 1 LINES " +
+		"(finding_uid, database_uid, path_uid, run_id, rule_uid, qa_component_uid, detail, qa_component_name)";
 
 		statement.execute(statementText);
 
-		statement.execute("ALTER TABLE QA_Finding ENABLE KEYS");
+		statement.execute("ALTER TABLE qa_finding ENABLE KEYS");
 		statement.execute("SET UNIQUE_CHECKS=1; ");
 	}
 
@@ -265,7 +265,7 @@ public class UploadToQADatabase extends AbstractMojo {
 
 		statement.close();
 
-		statementText = "INSERT INTO QA_RUN (run_id, database_uid, path_uid,name, viewpoint_time, start_time, end_time,context_name,context_configuration,run_configuration,path_name)" +
+		statementText = "INSERT INTO qa_run (run_id, database_uid, path_uid,name, viewpoint_time, start_time, end_time,context_name,context_configuration,run_configuration,path_name)" +
 		" values (?,?,?,?,?,?,?,?,?,?,?) " ;
 
 //		String statementText = "INSERT INTO QA_RUN (run_id, database_uid, path_uid,name,context_name,context_configuration,run_configuration)" +
