@@ -106,6 +106,8 @@ public class RulesLibrary {
 	public static KindOfCacheBI myStaticIsACache;
 	public static TerminologyHelperDroolsWorkbench terminologyHelperCache;
 	
+	public enum INFERRED_VIEW_ORIGIN {CLASSIFIER, CONSTRAINTED_NORMAL_FORM};
+	
 	public static TerminologyHelperDroolsWorkbench getTerminologyHelper() {
 		if (terminologyHelperCache == null) {
 			terminologyHelperCache =  new TerminologyHelperDroolsWorkbench();
@@ -124,12 +126,25 @@ public class RulesLibrary {
 			boolean onlyUncommittedContent, I_ConfigAceFrame config) 
 	throws Exception {
 		RulesContextHelper contextHelper = new RulesContextHelper(config);
-		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper);
+		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper, INFERRED_VIEW_ORIGIN.CLASSIFIER);
 	}
-
-
+	
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
 			boolean onlyUncommittedContent, I_ConfigAceFrame config, RulesContextHelper contextHelper) 
+	throws Exception {
+		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper, INFERRED_VIEW_ORIGIN.CLASSIFIER);
+	}
+	
+	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
+			boolean onlyUncommittedContent, I_ConfigAceFrame config, INFERRED_VIEW_ORIGIN inferredOrigin) 
+	throws Exception {
+		RulesContextHelper contextHelper = new RulesContextHelper(config);
+		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper, inferredOrigin);
+	}
+
+	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
+			boolean onlyUncommittedContent, I_ConfigAceFrame config, RulesContextHelper contextHelper, 
+			INFERRED_VIEW_ORIGIN inferredOrigin) 
 	throws Exception {
 		KnowledgeBase kbase = contextHelper.getKnowledgeBaseForContext(context, config);
 		ResultsCollectorWorkBench results = new ResultsCollectorWorkBench();
@@ -149,7 +164,7 @@ public class RulesLibrary {
 
 				ConceptVersionBI conceptBi = Ts.get().getConceptVersion(config.getCoordinate(), concept.getNid());
 
-				DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version");
+				DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version", inferredOrigin);
 
 				ksession.insert(testConcept);
 
