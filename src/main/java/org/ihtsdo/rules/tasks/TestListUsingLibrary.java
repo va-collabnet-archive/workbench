@@ -44,6 +44,7 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.rules.RulesLibrary;
+import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
 import org.ihtsdo.rules.RulesResultsPanel;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 
@@ -125,7 +126,8 @@ public class TestListUsingLibrary extends AbstractTask {
 				I_GetConceptData conceptInList = model.getElementAt(i);
 				
 				ResultsCollectorWorkBench resultsCollector = RulesLibrary.checkConcept(conceptInList, 
-						Terms.get().getConcept(RefsetAuxiliary.Concept.BATCH_QA_CONTEXT.getUids()), false, config);
+						Terms.get().getConcept(RefsetAuxiliary.Concept.BATCH_QA_CONTEXT.getUids()), false, 
+						config, INFERRED_VIEW_ORIGIN.CONSTRAINTED_NORMAL_FORM);
 
 				results.put(conceptInList, resultsCollector.getAlertList());
 				
