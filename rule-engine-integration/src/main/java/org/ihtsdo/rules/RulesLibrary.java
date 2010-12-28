@@ -812,7 +812,8 @@ public class RulesLibrary {
 
 	public static boolean isIncludedInRefsetSpec(I_GetConceptData refset, I_GetConceptData candidateConcept, I_ConfigAceFrame config) {
 		boolean result = false;
-
+		System.out.println("************ Starting test computation *****************");
+		Long start = System.currentTimeMillis();
 		try {
 			RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, config);
 			I_GetConceptData refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
@@ -858,7 +859,6 @@ public class RulesLibrary {
 
 			I_GetConceptData selectedConcept = candidateConcept;
 
-			System.out.println("************ Starting test computation *****************");
 			System.out.println("Refset spec = " + refsetSpec.toString());
 			System.out.println("Refset = " + refset.toString());
 			System.out.println("Concept to test = " + selectedConcept.toString());
@@ -867,7 +867,7 @@ public class RulesLibrary {
 			result = query.execute(selectedConcept, activities);
 
 			System.out.println("++++++++++++++ Result = " + result);
-			System.out.println("************ Finished test computation *****************");
+			System.out.println("************ Finished test computation in " + (System.currentTimeMillis() - start) + " ms. *****************");
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 			try {
