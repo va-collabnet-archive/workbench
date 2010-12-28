@@ -11,18 +11,24 @@ public class ResultsItem {
 	
 	public enum Severity {
 		
-		ERROR(UUID.fromString("f9545a20-12cf-11e0-ac64-0800200c9a66")),
-		WARNING(UUID.fromString("f9545a21-12cf-11e0-ac64-0800200c9a66")),
-		NOTIFICATION(UUID.fromString("f9545a22-12cf-11e0-ac64-0800200c9a66"));
+		ERROR(UUID.fromString("f9545a20-12cf-11e0-ac64-0800200c9a66"), "Error"),
+		WARNING(UUID.fromString("f9545a21-12cf-11e0-ac64-0800200c9a66"), "Warning"),
+		NOTIFICATION(UUID.fromString("f9545a22-12cf-11e0-ac64-0800200c9a66"), "Notification");
 		
 		private final UUID severityUuid;
+		private final String name;
 		
-		Severity(UUID severityUuid) {
+		Severity(UUID severityUuid, String name) {
 			this.severityUuid = severityUuid;
+			this.name = name;
 		}
 
 		public UUID getSeverityUuid() {
 			return severityUuid;
+		}
+
+		public String getName() {
+			return name;
 		}
 		
 	}
