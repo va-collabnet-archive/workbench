@@ -61,6 +61,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
+import org.dwfa.ace.task.commit.AlertToDataConstraintFailure.ALERT_TYPE;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.task.refset.spec.compute.RefsetComputeType;
 import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
@@ -82,6 +83,7 @@ import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.helper.ResultsItem;
+import org.ihtsdo.tk.helper.ResultsItem.Severity;
 import org.ihtsdo.tk.helper.templates.AbstractTemplate;
 import org.ihtsdo.tk.helper.templates.AbstractTemplate.TemplateType;
 import org.ihtsdo.tk.helper.templates.DescriptionTemplate;
@@ -102,12 +104,12 @@ public class RulesLibrary {
 	/** The CONCEPT MODEL knowledge package identifier */
 	public static int CONCEPT_MODEL_PKG = 0;
 	public static int LINGUISTIC_GUIDELINES_PKG = 1;
-	
+
 	public static KindOfCacheBI myStaticIsACache;
 	public static TerminologyHelperDroolsWorkbench terminologyHelperCache;
-	
+
 	public enum INFERRED_VIEW_ORIGIN {CLASSIFIER, CONSTRAINTED_NORMAL_FORM};
-	
+
 	public static TerminologyHelperDroolsWorkbench getTerminologyHelper() {
 		if (terminologyHelperCache == null) {
 			terminologyHelperCache =  new TerminologyHelperDroolsWorkbench();
@@ -117,24 +119,24 @@ public class RulesLibrary {
 			return terminologyHelperCache;
 		}
 	}
-	
+
 	public static KindOfCacheBI setupIsACache() throws TerminologyException, Exception {
-			return myStaticIsACache = Ts.get().getCache(Terms.get().getActiveAceFrameConfig().getCoordinate());
+		return myStaticIsACache = Ts.get().getCache(Terms.get().getActiveAceFrameConfig().getCoordinate());
 	}
-	
+
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
 			boolean onlyUncommittedContent, I_ConfigAceFrame config) 
 	throws Exception {
 		RulesContextHelper contextHelper = new RulesContextHelper(config);
 		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper, INFERRED_VIEW_ORIGIN.CLASSIFIER);
 	}
-	
+
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
 			boolean onlyUncommittedContent, I_ConfigAceFrame config, RulesContextHelper contextHelper) 
 	throws Exception {
 		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper, INFERRED_VIEW_ORIGIN.CLASSIFIER);
 	}
-	
+
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
 			boolean onlyUncommittedContent, I_ConfigAceFrame config, INFERRED_VIEW_ORIGIN inferredOrigin) 
 	throws Exception {
@@ -149,11 +151,11 @@ public class RulesLibrary {
 		KnowledgeBase kbase = contextHelper.getKnowledgeBaseForContext(context, config);
 		ResultsCollectorWorkBench results = new ResultsCollectorWorkBench();
 		if (kbase != null) {
-//			int a1 = kbase.getKnowledgePackages().size();
-//			int a2 = kbase.getKnowledgePackages().iterator().next().getRules().size();
+			//			int a1 = kbase.getKnowledgePackages().size();
+			//			int a2 = kbase.getKnowledgePackages().iterator().next().getRules().size();
 			if (!(kbase.getKnowledgePackages().size() == 0) && 
 					!(kbase.getKnowledgePackages().size() == 1 &&
-					kbase.getKnowledgePackages().iterator().next().getRules().size() == 0)) { 
+							kbase.getKnowledgePackages().iterator().next().getRules().size() == 0)) { 
 
 				StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 
@@ -174,8 +176,18 @@ public class RulesLibrary {
 				//ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
 
 				for (ResultsItem resultsItem : results.getResultsItems() ) {
+					ALERT_TYPE alertType = ALERT_TYPE.ERROR;
+
+					if (resultsItem.getSeverity() != null && !resultsItem.getSeverity().isEmpty()) {
+						if (resultsItem.getSeverity().trim().equals(Severity.NOTIFICATION.getSeverityUuid().toString())) {
+							alertType = ALERT_TYPE.INFORMATIONAL;
+						} else if (resultsItem.getSeverity().trim().equals(Severity.WARNING.getSeverityUuid().toString())) {
+							alertType = ALERT_TYPE.WARNING;
+						}
+					}
+
 					results.getAlertList().add(new AlertToDataConstraintFailure(
-							AlertToDataConstraintFailure.ALERT_TYPE.ERROR, 
+							alertType, 
 							resultsItem.getErrorCode() + " - " + resultsItem.getMessage(), 
 							concept));
 				}
@@ -894,10 +906,10 @@ public class RulesLibrary {
 
 		return result;
 	}
-	
+
 	public static URL getDocumentationUrlForRuleUUID(UUID ruleUuid) throws ConfigurationException {
 		URL url = null;
-		
+
 		XMLConfiguration config = new XMLConfiguration("rules/rules-documentation-config.xml");
 		String template = config.getString("urlTemplate");
 		System.out.println("Template: " + template);
@@ -908,7 +920,7 @@ public class RulesLibrary {
 			for (int i = 0; i<= ((Collection) rules).size()-1; i++) {
 				System.out.println(i + "- UUID: " + config.getString("rules.rule(" + i + ").uuid"));
 				System.out.println(i + "- Address: " + config.getString("rules.rule(" + i + ").address"));
-				
+
 				if (ruleUuid.equals(UUID.fromString(config.getString("rules.rule(" + i + ").uuid")))) {
 					String urlString = template.replace("*", config.getString("rules.rule(" + i + ").address"));
 					try {
