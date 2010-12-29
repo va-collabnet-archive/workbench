@@ -133,7 +133,7 @@
 					<!-- <execution> <phase>generate-resources</phase> <id>bcs-read-all</id> 
 						<goals> <goal>bcs-read-all</goal> </goals> <configuration> <changeSetDir>rules/changesets</changeSetDir> 
 						</configuration> </execution> -->
-					<execution>
+					<!-- <execution>
 						<phase>generate-resources</phase>
 						<id>import-refset-spec-directory</id>
 						<goals>
@@ -142,7 +142,7 @@
 						<configuration>
 							<inputDir>${project.build.directory}/generated-resources/refsets</inputDir>
 						</configuration>
-					</execution>
+					</execution> -->
 					<execution>
 						<id>run-qa</id>
 						<phase>process-resources</phase>
