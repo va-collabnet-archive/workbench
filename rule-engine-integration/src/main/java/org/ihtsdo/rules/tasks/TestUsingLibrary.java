@@ -27,7 +27,6 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.commit.AbstractConceptTest;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -92,7 +91,7 @@ public class TestUsingLibrary extends AbstractConceptTest {
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 			return RulesLibrary.checkConcept(concept, 
 					tf.getConcept(RefsetAuxiliary.Concept.REALTIME_QA_CONTEXT.getUids()), false, 
-					config, INFERRED_VIEW_ORIGIN.CONSTRAINTED_NORMAL_FORM).getAlertList();
+					config, INFERRED_VIEW_ORIGIN.CONSTRAINT_NORMAL_FORM).getAlertList();
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
 		}
