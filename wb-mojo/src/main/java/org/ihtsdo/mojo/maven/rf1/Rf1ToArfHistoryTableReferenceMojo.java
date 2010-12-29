@@ -414,23 +414,26 @@ public class Rf1ToArfHistoryTableReferenceMojo extends AbstractMojo implements S
         } // WHILE (EACH CONCEPTS DIRECTORY) *
     }
 
-    private int compareMember(Rf1HistoryTableReference htrA, Rf1HistoryTableReference hrtB) {
-        if (htrA.componentSid < hrtB.componentSid) {
+    private int compareMember(Rf1HistoryTableReference htrA, Rf1HistoryTableReference htrB) {
+        if (htrA.componentSid < htrB.componentSid) {
             return 4; // DROPPED instance less than received
-        } else if (htrA.componentSid > hrtB.componentSid) {
+        } else if (htrA.componentSid > htrB.componentSid) {
             return 3; // ADDED instance greater than received
         } else {
-            if (htrA.referencedSid < hrtB.referencedSid) {
+            if (htrA.referencedSid < htrB.referencedSid) {
                 return 4; // DROPPED instance less than received
-            } else if (htrA.referencedSid > hrtB.referencedSid) {
+            } else if (htrA.referencedSid > htrB.referencedSid) {
                 return 3; // ADDED instance greater than received
             } else {
-                if (htrA.referenceType < hrtB.referenceType) {
+                if (htrA.referenceType < htrB.referenceType) {
                     return 4; // DROPPED instance less than received
-                } else if (htrA.referenceType > hrtB.referenceType) {
+                } else if (htrA.referenceType > htrB.referenceType) {
                     return 3; // ADDED instance greater than received
                 } else {
-                    return 1; // SAME instance == received
+                    if (htrA.status == htrB.status)
+                        return 1; // SAME instance == received
+                    else
+                        return 2; // MODIFIED
                 }
             }
         }

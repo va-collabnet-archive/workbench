@@ -400,6 +400,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     private static UUID uuidSourceSnomedRt;
 
     private SimpleDateFormat arfSimpleDateFormat;
+    private SimpleDateFormat arfSimpleDateFormatDot;
 
     private class ARFFile {
         File file;
@@ -907,6 +908,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         getLog().info("    Target Build Directory: " + tDir);
 
         arfSimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        arfSimpleDateFormatDot = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 
         ObjectOutputStream oosCon = null;
         ObjectOutputStream oosDes = null;
@@ -1184,7 +1186,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     || isPrimitiveStr.startsWith("T"))
                 isPrimitive = 1;
             // Effective Date
-            long revTime = arfSimpleDateFormat.parse(line[EFFECTIVE_DATE]).getTime();
+            long revTime = convertDateStrToTime(line[EFFECTIVE_DATE]);
             // Path UUID
             int pathIdx = lookupYPathIdx(line[PATH_UUID]);
 
@@ -1238,16 +1240,27 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
             // DESCRIPTION_TYPE = 5;
             int descriptionType = lookupYDesTypeUuidIdx(line[DESCRIPTION_TYPE_UUID]);
-            //            int descriptionType = lookupDesTypeIdx(line[DESCRIPTION_TYPE_UUID]);
             // LANGUAGE_CODE = 6;
             String langCodeStr = line[LANGUAGE_CODE_STR];
             // EFFFECTIVE_DATE = 7;
-            long revTime = arfSimpleDateFormat.parse(line[EFFECTIVE_DATE]).getTime();
+            long revTime = convertDateStrToTime(line[EFFECTIVE_DATE]);
             // PATH_UUID = 8;
             int pathIdx = lookupYPathIdx(line[PATH_UUID]);
 
             Sct1_DesRecord tmpDesRec = new Sct1_DesRecord(uuidDes, status, uuidCon, termStr,
                     capitalization, descriptionType, langCodeStr, revTime, pathIdx);
+            
+            // :!!!:DEBUG:
+//            if (tmpDesRec.conUuidMsb == -8120194779924901686L
+//                    && tmpDesRec.conUuidLsb == -6989461898667750587L) {
+//                System.out.println(":!!!:DEBUG: ################ " + tmpDesRec.conSnoId);
+//                System.out.println(":!!!:DEBUG: ... conSnoId   = " + tmpDesRec.conSnoId);
+//                System.out.println(":!!!:DEBUG: ... conUuidLsb = " + tmpDesRec.conUuidLsb);
+//                System.out.println(":!!!:DEBUG: ... conUuidMsb = " + tmpDesRec.conUuidMsb);
+//                System.out.println(":!!!:DEBUG: ... termText   = " + tmpDesRec.termText);
+//            }
+            // :!!!:DEBUG:END 
+
 
             try {
                 oos.writeUnshared(tmpDesRec);
@@ -1301,7 +1314,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // GROUP = 7;
             int group = Integer.parseInt(line[GROUP]);
             // EFFECTIVE_DATE = 8;  // yyyy-MM-dd HH:mm:ss
-            long revTime = arfSimpleDateFormat.parse(line[EFFECTIVE_DATE]).getTime();
+            long revTime = convertDateStrToTime(line[EFFECTIVE_DATE]);
             // PATH_UUID = 9;
             int pathIdx = lookupYPathIdx(line[PATH_UUID]);
 
@@ -1344,7 +1357,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // STATUS_UUID = 3;
             int status = lookupYStatusUuidIdx(line[STATUS_UUID]);
             // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
-            long revTime = arfSimpleDateFormat.parse(line[EFFECTIVE_DATE]).getTime();
+            long revTime = convertDateStrToTime(line[EFFECTIVE_DATE]);
             // PATH_UUID = 5;
             int pathIdx = lookupYPathIdx(line[PATH_UUID]);
 
@@ -1389,7 +1402,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // REFERENCED_COMPONENT_UUID = 3;
             UUID uuidComponent = UUID.fromString(line[REFERENCED_COMPONENT_UUID]);
             // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
-            long revTime = arfSimpleDateFormat.parse(line[EFFECTIVE_DATE]).getTime();
+            long revTime = convertDateStrToTime(line[EFFECTIVE_DATE]);
             // PATH_UUID = 5;
             int pathIdx = lookupYPathIdx(line[PATH_UUID]);
             // EXT_VALUE_UUID = 6;
@@ -1443,7 +1456,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // REFERENCED_COMPONENT_UUID = 3;
             UUID uuidComponent = UUID.fromString(line[REFERENCED_COMPONENT_UUID]);
             // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
-            long revTime = arfSimpleDateFormat.parse(line[EFFECTIVE_DATE]).getTime();
+            long revTime = convertDateStrToTime(line[EFFECTIVE_DATE]);
             // PATH_UUID = 5;
             int pathIdx = lookupYPathIdx(line[PATH_UUID]);
             // EXT_VALUE_UUID = 6;
@@ -1491,7 +1504,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // REFERENCED_COMPONENT_UUID = 3;
             UUID uuidComponent = UUID.fromString(line[REFERENCED_COMPONENT_UUID]);
             // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
-            long revTime = arfSimpleDateFormat.parse(line[EFFECTIVE_DATE]).getTime();
+            long revTime = convertDateStrToTime(line[EFFECTIVE_DATE]);
             // PATH_UUID = 5;
             int pathIdx = lookupYPathIdx(line[PATH_UUID]);
             // CONCEPT_EXT_VALUE_UUID = 6;
@@ -1539,7 +1552,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // REFERENCED_COMPONENT_UUID = 3;
             UUID uuidComponent = UUID.fromString(line[REFERENCED_COMPONENT_UUID]);
             // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
-            long revTime = arfSimpleDateFormat.parse(line[EFFECTIVE_DATE]).getTime();
+            long revTime = convertDateStrToTime(line[EFFECTIVE_DATE]);
             // PATH_UUID = 5;
             int pathIdx = lookupYPathIdx(line[PATH_UUID]);
             // CONCEPT_EXT_VALUE_UUID = 6;
@@ -2733,6 +2746,39 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             throw new MojoFailureException("IO Exception -- Step #7");
         }
 
+        // :!!!:DEBUG:
+//        boolean readMoreBug = true;
+//        boolean nextBug = false;
+//        int bugCount = 0;
+//        while (readMoreBug) {
+//            Object bugO;
+//            try {
+//                bugO = oisDes.readObject();
+//                if (bugO instanceof Sct1_DesRecord || nextBug == true) {
+//                    Sct1_DesRecord bugDes = (Sct1_DesRecord) bugO;
+//                    if (bugDes.conUuidMsb == -8120194779924901686L
+//                            && bugDes.conUuidLsb == -6989461898667750587L) {
+//                        System.out.println(":!!!:DEBUG: ...  ## count ## " + bugCount);
+//                        System.out.println(":!!!:DEBUG: ... conSnoId   = " + bugDes.conSnoId);
+//                        System.out.println(":!!!:DEBUG: ... conUuidLsb = " + bugDes.conUuidLsb);
+//                        System.out.println(":!!!:DEBUG: ... conUuidMsb = " + bugDes.conUuidMsb);
+//                        System.out.println(":!!!:DEBUG: ... termText   = " + bugDes.termText);
+//                        nextBug = !nextBug;
+//                    }
+//                } else 
+//                    readMoreBug = false;
+//                    
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                readMoreBug = false;
+//            } catch (ClassNotFoundException e) {
+//                e.printStackTrace();
+//                readMoreBug = false;
+//            }
+//            bugCount++;
+//        } 
+        // :!!!:DEBUG:END 
+        
         int countCon = 0;
         int countDes = 0;
         int countRel = 0;
@@ -2906,15 +2952,17 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             } else {
 //                if (debug) {
 //                    getLog().info(
-//                            "--- Case what case is this??? -- Step 4" + " theCon=\t" + theCon
+//                            "!!! Case what case is this??? -- Step 4" + " theCon=\t" + theCon
 //                                    + "\ttheDes=\t" + theDes + "\ttheRel=\t" + theRel
 //                                    + "\ttheRelDest\t" + theRelDest);
-//                    getLog().info("--- --- concept SNOMED id =" + theCon);
-//                    getLog().info("--- --- concept counter   #" + countCon);
-//                    getLog().info("--- --- description       \"" + desList.get(0).termText + "\"");
-//                    getLog().info("--- \r\n");
+//                    getLog().info("!!! --- concept UUID id   =" + theCon);
+//                    getLog().info("!!! --- concept SNOMED id =" + conList.get(0).conSnoId);
+//                    
+//                    getLog().info("!!! --- concept counter   #" + countCon);
+//                    getLog().info("!!! --- description       \"" + desList.get(0).termText + "\"");
+//                    getLog().info("!!! \r\n");
 //                }
-                throw new MojoFailureException("Case not implemented -- executeMojoStep6()");
+                throw new MojoFailureException("Case not implemented -- executeMojoStep7()");
             }
 
             if (conNext == null && desNext == null && relNext == null)
@@ -4671,9 +4719,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
         if (d1.desUuidMsb == d2.desUuidMsb && d1.desUuidLsb == d2.desUuidLsb) {
             if ((d1.status == d2.status) && (d1.conSnoId == d2.conSnoId)
-                    && d1.termText.equals(d2.termText) && (d1.capStatus == d2.capStatus)
+                    && d1.termText.contentEquals(d2.termText) && (d1.capStatus == d2.capStatus)
                     && (d1.descriptionType == d2.descriptionType)
-                    && d1.languageCode.equals(d2.languageCode))
+                    && d1.languageCode.contentEquals(d2.languageCode))
                 return 1; // SAME
             else
                 return 2; // MODIFIED
@@ -5147,6 +5195,13 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             e.printStackTrace();
         }
 
+    }
+    
+    private long convertDateStrToTime(String date) throws ParseException {
+        if (date.contains("."))
+            return (arfSimpleDateFormatDot.parse(date)).getTime();
+        else
+            return arfSimpleDateFormat.parse(date).getTime();
     }
 
     private void countCheck(int count1, int count2, int same, int modified, int added, int dropped) {

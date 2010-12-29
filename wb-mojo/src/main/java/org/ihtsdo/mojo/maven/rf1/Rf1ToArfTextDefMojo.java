@@ -64,7 +64,7 @@ import org.dwfa.util.id.Type5UuidFactory;
  * @requiresDependencyResolution compile
  * @requiresProject false
  */
-public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
+public class Rf1ToArfTextDefMojo extends AbstractMojo implements Serializable {
 
     /**
      * 
@@ -393,7 +393,10 @@ public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
             return 3; // ADDED instance greater than received
 
         } else {
-            return 1; // SAME
+            if (a1.status == a2.status && a1.definition.contentEquals(a2.definition))
+                return 1; // SAME
+            else
+                return 2; // MODIFIED
         }
     }
 
