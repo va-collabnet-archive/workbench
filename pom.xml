@@ -32,9 +32,43 @@
             <type>zip</type>
             <version>trek-SCT-EN-ES-USDE-VTMVMP-1.0-SNAPSHOT</version>
 	</dependency>
+	<dependency>
+			 <groupId>org.ihtsdo</groupId>
+            <artifactId>mrcm-refset-specs</artifactId>
+            <type>zip</type>
+            <version>0.0.1-SNAPSHOT</version>
+	</dependency>
   </dependencies>
   <build>
 		<plugins>
+		 <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>extract-dependencies</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.ihtsdo.sample.mv</groupId>
+                                    <artifactId>database</artifactId>
+                                    <type>zip</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.ihtsdo</groupId>
+                                    <artifactId>mrcm-refset-specs</artifactId>
+                                    <type>zip</type>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/generated-resources</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 		<plugin>
 				<groupId>org.ihtsdo</groupId>
 				<artifactId>wb-mojo</artifactId>
@@ -52,22 +86,6 @@
 					</dependency>
 				</dependencies>
 				<executions>
-					<execution>
-						<!-- unjar databse from dependencies-->
-						<id>write-directories</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>write-directories</goal>
-						</goals>
-						<configuration>
-							<targetSubDir>generated-resources</targetSubDir>
-							<runtimeArtifacts>
-								<!-- <runtimeArtifact>com.termmed:sample-database-qa</runtimeArtifact> -->
-								<runtimeArtifact>org.ihtsdo.sample.mv:database</runtimeArtifact> 
-								<!-- <runtimeArtifact>org.ihtsdo.sample:full-database</runtimeArtifact> -->
-							</runtimeArtifacts>
-						</configuration>
-					</execution>
 					<execution>
 						<id>vodb-open</id>
 						<phase>generate-resources</phase>
@@ -101,6 +119,26 @@
 							</editPaths>
 						</configuration>
 					</execution>
+					<!-- <execution>
+						<phase>generate-resources</phase>
+						<id>bcs-read-all</id>
+						<goals>
+							<goal>bcs-read-all</goal>
+						</goals>
+						<configuration>
+							<changeSetDir>rules/changesets</changeSetDir>
+						</configuration>
+					</execution> -->
+					<execution>
+						<phase>generate-resources</phase>
+						<id>import-refset-spec-directory</id>
+						<goals>
+							<goal>import-refset-spec-directory</goal>
+						</goals>
+						<configuration>
+							<inputDir>${project.build.directory}/generated-resources/refsets</inputDir>
+						</configuration>
+					</execution>
 					<execution>
 						<id>run-qa</id>
 						<phase>process-resources</phase>
@@ -114,7 +152,7 @@
 							<test_time>2011.11.16 11:00:00</test_time>
 							<context_uuid>d974c480-f9b9-3ea1-91e8-b0a4b756a17d</context_uuid>
 							<pkgName>QA-Package</pkgName>
-							<pkgUrl>http://127.0.0.1:8080/drools-guvnor/org.drools.guvnor.Guvnor/package/ihtsdo-qa/qa-package</pkgUrl>
+							<pkgUrl>http://mgr.servers.aceworkspace.net:50008/drools-guvnor/org.drools.guvnor.Guvnor/package/ihtsdo-qa/qa-package</pkgUrl>
 						</configuration>
 					</execution>
 					<execution>
@@ -124,9 +162,9 @@
 							<goal>upload-to-qa-db</goal>
 						</goals>
 						<configuration>
-							<url>jdbc:mysql://localhost:3306/qa_db</url>
-							<username>manu</username>
-							<password>manu</password>
+							<url>jdbc:mysql://mgr.servers.aceworkspace.net:50010/qa_db</url>
+							<username>root</username>
+							<password>snomed11</password>
 						</configuration>
 					</execution>
 					<execution>
