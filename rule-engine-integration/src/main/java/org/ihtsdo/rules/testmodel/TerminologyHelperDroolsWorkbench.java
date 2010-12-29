@@ -80,12 +80,16 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		try {
 			I_TermFactory tf = Terms.get();
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-			result = RulesLibrary.isIncludedInRefsetSpec(tf.getConcept(UUID.fromString(refsetUUID)), 
-					tf.getConcept(UUID.fromString(conceptUUID)), config);
+			I_GetConceptData refsetConcept = tf.getConcept(UUID.fromString(refsetUUID));
+			I_GetConceptData concept = tf.getConcept(UUID.fromString(conceptUUID));
+			if (refsetConcept != null && concept != null) {
+				result = RulesLibrary.isIncludedInRefsetSpec(refsetConcept, 
+						concept, config);
+			}
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			// error, reported as not member
 		} catch (IOException e) {
-			e.printStackTrace();
+			// error, reported as not member
 		}
 		return result;
 	}
