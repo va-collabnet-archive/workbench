@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
 	<scm>
 		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/qa-runner</connection>
@@ -8,68 +8,83 @@
 		<url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/qa-runner</url>
 	</scm>
 
-  <groupId>com.termmed</groupId>
-  <artifactId>qa-runner</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
-  <name>qa-runner</name>
-  <url>http://maven.apache.org</url>
+	<groupId>com.termmed</groupId>
+	<artifactId>qa-runner</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<name>qa-runner</name>
+	<url>http://maven.apache.org</url>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-	<dependency>
-			 <groupId>org.ihtsdo.sample.mv</groupId>
-            <artifactId>database</artifactId>
-            <type>zip</type>
-            <version>trek-SCT-EN-ES-USDE-VTMVMP-1.0-SNAPSHOT</version>
-	</dependency>
-	<dependency>
-			 <groupId>org.ihtsdo</groupId>
-            <artifactId>mrcm-refset-specs</artifactId>
-            <type>zip</type>
-            <version>0.0.1-SNAPSHOT</version>
-	</dependency>
-  </dependencies>
-  <build>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- <dependency>
+			<groupId>org.ihtsdo.sample.mv</groupId>
+			<artifactId>database</artifactId>
+			<type>zip</type>
+			<version>trek-SCT-EN-ES-USDE-VTMVMP-1.0-SNAPSHOT</version>
+		</dependency>  -->
+		<dependency>
+			<!-- this project contains the berkeley database directory that the bundle 
+				will use. -->
+			<groupId>org.ihtsdo.sample</groupId>
+			<artifactId>database-sync</artifactId>
+			<type>zip</type>
+			<version>1.0-1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>mrcm-refset-specs</artifactId>
+			<type>zip</type>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+	<build>
 		<plugins>
-		 <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>extract-dependencies</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.ihtsdo.sample.mv</groupId>
-                                    <artifactId>database</artifactId>
-                                    <type>zip</type>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.ihtsdo</groupId>
-                                    <artifactId>mrcm-refset-specs</artifactId>
-                                    <type>zip</type>
-                                </artifactItem>
-                            </artifactItems>
-                            <outputDirectory>${project.build.directory}/generated-resources</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-		<plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>extract-dependencies</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<!-- <artifactItem>
+									<groupId>org.ihtsdo.sample.mv</groupId>
+									<artifactId>database</artifactId>
+									<type>zip</type>
+								</artifactItem> -->
+								<artifactItem>
+									<!-- this project contains the berkeley database directory that 
+										the bundle will use. -->
+									<groupId>org.ihtsdo.sample</groupId>
+									<artifactId>database-sync</artifactId>
+									<type>zip</type>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.ihtsdo</groupId>
+									<artifactId>mrcm-refset-specs</artifactId>
+									<type>zip</type>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.build.directory}/generated-resources</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.ihtsdo</groupId>
 				<artifactId>wb-mojo</artifactId>
 				<version>2.6.0-trek-8-SNAPSHOT</version>
@@ -119,16 +134,9 @@
 							</editPaths>
 						</configuration>
 					</execution>
-					<!-- <execution>
-						<phase>generate-resources</phase>
-						<id>bcs-read-all</id>
-						<goals>
-							<goal>bcs-read-all</goal>
-						</goals>
-						<configuration>
-							<changeSetDir>rules/changesets</changeSetDir>
-						</configuration>
-					</execution> -->
+					<!-- <execution> <phase>generate-resources</phase> <id>bcs-read-all</id> 
+						<goals> <goal>bcs-read-all</goal> </goals> <configuration> <changeSetDir>rules/changesets</changeSetDir> 
+						</configuration> </execution> -->
 					<execution>
 						<phase>generate-resources</phase>
 						<id>import-refset-spec-directory</id>
@@ -187,14 +195,14 @@
 		</plugins>
 	</build>
 	<profiles>
-        <profile>
-            <id>ramdisk</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <build>
-                <directory>/Volumes/ramdisk/maven-targets/${groupId}-${artifactId}/</directory>
-            </build>
-        </profile>
-  </profiles>
+		<profile>
+			<id>ramdisk</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<directory>/Volumes/ramdisk/maven-targets/${groupId}-${artifactId}/</directory>
+			</build>
+		</profile>
+	</profiles>
 </project>
