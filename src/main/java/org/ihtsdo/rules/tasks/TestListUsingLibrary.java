@@ -127,7 +127,7 @@ public class TestListUsingLibrary extends AbstractTask {
 				
 				ResultsCollectorWorkBench resultsCollector = RulesLibrary.checkConcept(conceptInList, 
 						Terms.get().getConcept(RefsetAuxiliary.Concept.BATCH_QA_CONTEXT.getUids()), false, 
-						config, INFERRED_VIEW_ORIGIN.CONSTRAINTED_NORMAL_FORM);
+						config, INFERRED_VIEW_ORIGIN.CONSTRAINT_NORMAL_FORM);
 
 				results.put(conceptInList, resultsCollector.getAlertList());
 				

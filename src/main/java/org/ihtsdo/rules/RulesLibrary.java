@@ -28,7 +28,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.JOptionPane;
@@ -85,9 +87,9 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.helper.ResultsItem;
 import org.ihtsdo.tk.helper.ResultsItem.Severity;
 import org.ihtsdo.tk.helper.templates.AbstractTemplate;
-import org.ihtsdo.tk.helper.templates.AbstractTemplate.TemplateType;
 import org.ihtsdo.tk.helper.templates.DescriptionTemplate;
 import org.ihtsdo.tk.helper.templates.RelationshipTemplate;
+import org.ihtsdo.tk.helper.templates.AbstractTemplate.TemplateType;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.DescriptionSpec;
 import org.ihtsdo.tk.spec.RelSpec;
@@ -108,7 +110,11 @@ public class RulesLibrary {
 	public static KindOfCacheBI myStaticIsACache;
 	public static TerminologyHelperDroolsWorkbench terminologyHelperCache;
 
-	public enum INFERRED_VIEW_ORIGIN {CLASSIFIER, CONSTRAINTED_NORMAL_FORM};
+	public enum INFERRED_VIEW_ORIGIN {CLASSIFIER, CONSTRAINT_NORMAL_FORM};
+
+	public static I_IntSet allRels;
+	public static I_IntSet histRels;
+	public static I_IntSet CptModelRels;
 
 	public static TerminologyHelperDroolsWorkbench getTerminologyHelper() {
 		if (terminologyHelperCache == null) {
@@ -932,5 +938,67 @@ public class RulesLibrary {
 			}
 		}
 		return url;
+	}
+
+
+	public static I_IntSet getHistoricalRels() throws TerminologyException, IOException{
+
+		if (histRels == null) {
+			histRels = Terms.get().newIntSet();
+			Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
+			descendants = getDescendants(descendants, Terms.get().getConcept(UUID.fromString("f323b5dd-1f97-3873-bcbc-3563663dda14")));
+			for (I_GetConceptData loopConcept : descendants) {
+				histRels.add(loopConcept.getNid());
+			}
+		}
+		return histRels;
+	}
+
+	public static I_IntSet getConceptModelRels() throws TerminologyException, IOException{
+
+		if (CptModelRels == null ) {
+			CptModelRels = Terms.get().newIntSet();
+			CptModelRels = Terms.get().newIntSet();
+			Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
+			descendants = getDescendants(descendants, Terms.get().getConcept(UUID.fromString("6155818b-09ed-388e-82ce-caa143423e99")));
+			for (I_GetConceptData loopConcept : descendants) {
+				CptModelRels.add(loopConcept.getNid());
+			}
+		}
+		return CptModelRels;
+	}
+	public static I_IntSet getAllRels() throws TerminologyException, IOException{
+
+		if (allRels == null) {
+			allRels = Terms.get().newIntSet();
+			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+			allRels.addAll(config.getDestRelTypes().getSetValues());
+			allRels.addAll(getConceptModelRels().getSetValues());
+			allRels.addAll(getHistoricalRels().getSetValues());
+		}
+		return allRels;
+	}
+
+	public static Set<I_GetConceptData> getDescendants(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
+		try {
+			I_TermFactory termFactory = Terms.get();
+			//TODO: get config as parameter
+			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+			Set<I_GetConceptData> childrenSet = new HashSet<I_GetConceptData>();
+			childrenSet.addAll(concept.getDestRelOrigins(config.getAllowedStatus(), 
+					config.getDestRelTypes(), config.getViewPositionSetReadOnly()
+					, config.getPrecedence(), config.getConflictResolutionStrategy()));
+			descendants.addAll(childrenSet);
+			for (I_GetConceptData loopConcept : childrenSet) {
+				descendants = getDescendants(descendants, loopConcept);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return descendants;
 	}
 }
