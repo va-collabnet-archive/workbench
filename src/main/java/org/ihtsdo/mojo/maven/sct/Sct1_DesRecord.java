@@ -16,8 +16,13 @@
  */
 package org.ihtsdo.mojo.maven.sct;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.UUID;
 
 import org.dwfa.util.id.Type3UuidFactory;
@@ -117,6 +122,55 @@ class Sct1_DesRecord implements Comparable<Object>, Serializable {
         }
     }
 
+    public static Sct1_DesRecord[] parseDescriptions(Sct1File sct1File) throws IOException {
+
+        int count = Sct1File.countFileLines(sct1File);
+        Sct1_DesRecord[] a = new Sct1_DesRecord[count];
+
+        BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(
+                sct1File.file), "UTF-8"));
+        int descriptions = 0;
+
+        int DESCRIPTIONID = 0;
+        int DESCRIPTIONSTATUS = 1;
+        int CONCEPTID = 2;
+        int TERM = 3;
+        int INITIALCAPITALSTATUS = 4;
+        int DESCRIPTIONTYPE = 5;
+        int LANGUAGECODE = 6;
+
+        // Header row
+        r.readLine();
+
+        while (r.ready()) {
+            String[] line = r.readLine().split(TAB_CHARACTER);
+
+            // DESCRIPTIONID
+            long descriptionId = Long.parseLong(line[DESCRIPTIONID]);
+            // DESCRIPTIONSTATUS
+            int status = Integer.parseInt(line[DESCRIPTIONSTATUS]);
+            // CONCEPTID
+            long conSnoId = Long.parseLong(line[CONCEPTID]);
+            // TERM
+            String text = line[TERM];
+            // INITIALCAPITALSTATUS
+            int capStatus = Integer.parseInt(line[INITIALCAPITALSTATUS]);
+            // DESCRIPTIONTYPE
+            int typeInt = Integer.parseInt(line[DESCRIPTIONTYPE]);
+            // LANGUAGECODE
+            String lang = line[LANGUAGECODE];
+
+            // Save to sortable array
+            a[descriptions] = new Sct1_DesRecord(descriptionId, status, conSnoId, text, capStatus,
+                    typeInt, lang);
+            descriptions++;
+
+        }
+        Arrays.sort(a);
+        
+        return a;
+    }
+    
     // Create string to show some input fields for exception reporting
     // DESCRIPTIONID    DESCRIPTIONSTATUS   CONCEPTID   TERM    INITIALCAPITALSTATUS    DESCRIPTIONTYPE LANGUAGECODE
     public static String toStringHeader() {
