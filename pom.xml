@@ -26,20 +26,18 @@
 			<version>3.8.1</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.ihtsdo.sample.mv</groupId>
 			<artifactId>database</artifactId>
 			<type>zip</type>
 			<version>trek-SCT-EN-ES-USDE-VTMVMP-1.0-SNAPSHOT</version>
-		</dependency>  -->
-		<dependency>
-			<!-- this project contains the berkeley database directory that the bundle 
-				will use. -->
+		</dependency> 
+		<!--  <dependency>
 			<groupId>org.ihtsdo.sample</groupId>
 			<artifactId>database-sync</artifactId>
 			<type>zip</type>
 			<version>1.0-1-SNAPSHOT</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>mrcm-refset-specs</artifactId>
@@ -61,18 +59,16 @@
 						</goals>
 						<configuration>
 							<artifactItems>
-								<!-- <artifactItem>
+								<artifactItem>
 									<groupId>org.ihtsdo.sample.mv</groupId>
 									<artifactId>database</artifactId>
 									<type>zip</type>
-								</artifactItem> -->
-								<artifactItem>
-									<!-- this project contains the berkeley database directory that 
-										the bundle will use. -->
+								</artifactItem> 
+								<!-- <artifactItem>
 									<groupId>org.ihtsdo.sample</groupId>
 									<artifactId>database-sync</artifactId>
 									<type>zip</type>
-								</artifactItem>
+								</artifactItem>-->
 								<artifactItem>
 									<groupId>org.ihtsdo</groupId>
 									<artifactId>mrcm-refset-specs</artifactId>
