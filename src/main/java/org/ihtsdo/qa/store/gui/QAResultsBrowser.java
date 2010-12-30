@@ -111,11 +111,11 @@ public class QAResultsBrowser extends JPanel {
 	}
 
 	private void updatePageCounters() {
-		label12.setText(String.valueOf(startLine));
-		label13.setText(String.valueOf(finalLine));
-		label15.setText(String.valueOf(totalLines));
-		button3.setEnabled(startLine > 1);
-		button4.setEnabled(finalLine < totalLines);
+		startLineLable.setText(String.valueOf(startLine));
+		endLineLabel.setText(String.valueOf(finalLine));
+		totalLinesLabel.setText(String.valueOf(totalLines));
+		previousButton.setEnabled(startLine > 1);
+		nextButton.setEnabled(finalLine < totalLines);
 		panel3.revalidate();
 	}
 
@@ -386,13 +386,13 @@ public class QAResultsBrowser extends JPanel {
 		comboBox4 = new JComboBox();
 		label7 = new JLabel();
 		hSpacer1 = new JPanel(null);
-		button3 = new JButton();
-		label12 = new JLabel();
+		previousButton = new JButton();
+		startLineLable = new JLabel();
 		label16 = new JLabel();
-		label13 = new JLabel();
+		endLineLabel = new JLabel();
 		label14 = new JLabel();
-		label15 = new JLabel();
-		button4 = new JButton();
+		totalLinesLabel = new JLabel();
+		nextButton = new JButton();
 
 		//======== this ========
 		setLayout(new GridBagLayout());
@@ -627,23 +627,23 @@ public class QAResultsBrowser extends JPanel {
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- button3 ----
-			button3.setText("<");
-			button3.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			button3.addActionListener(new ActionListener() {
+			//---- previousButton ----
+			previousButton.setText("<");
+			previousButton.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			previousButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					button3ActionPerformed(e);
 				}
 			});
-			panel3.add(button3, new GridBagConstraints(12, 0, 1, 1, 0.0, 0.0,
+			panel3.add(previousButton, new GridBagConstraints(12, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- label12 ----
-			label12.setText("0");
-			label12.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(label12, new GridBagConstraints(13, 0, 1, 1, 0.0, 0.0,
+			//---- startLineLable ----
+			startLineLable.setText("0");
+			startLineLable.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			panel3.add(startLineLable, new GridBagConstraints(13, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
 
@@ -654,10 +654,10 @@ public class QAResultsBrowser extends JPanel {
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- label13 ----
-			label13.setText("0");
-			label13.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(label13, new GridBagConstraints(15, 0, 1, 1, 0.0, 0.0,
+			//---- endLineLabel ----
+			endLineLabel.setText("0");
+			endLineLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			panel3.add(endLineLabel, new GridBagConstraints(15, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
 
@@ -668,23 +668,23 @@ public class QAResultsBrowser extends JPanel {
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- label15 ----
-			label15.setText("0");
-			label15.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(label15, new GridBagConstraints(17, 0, 1, 1, 0.0, 0.0,
+			//---- totalLinesLabel ----
+			totalLinesLabel.setText("0");
+			totalLinesLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			panel3.add(totalLinesLabel, new GridBagConstraints(17, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- button4 ----
-			button4.setText(">");
-			button4.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			button4.addActionListener(new ActionListener() {
+			//---- nextButton ----
+			nextButton.setText(">");
+			nextButton.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			nextButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					button4ActionPerformed(e);
 				}
 			});
-			panel3.add(button4, new GridBagConstraints(18, 0, 1, 1, 0.0, 0.0,
+			panel3.add(nextButton, new GridBagConstraints(18, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 0), 0, 0));
 		}
@@ -727,12 +727,12 @@ public class QAResultsBrowser extends JPanel {
 	private JComboBox comboBox4;
 	private JLabel label7;
 	private JPanel hSpacer1;
-	private JButton button3;
-	private JLabel label12;
+	private JButton previousButton;
+	private JLabel startLineLable;
 	private JLabel label16;
-	private JLabel label13;
+	private JLabel endLineLabel;
 	private JLabel label14;
-	private JLabel label15;
-	private JButton button4;
+	private JLabel totalLinesLabel;
+	private JButton nextButton;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

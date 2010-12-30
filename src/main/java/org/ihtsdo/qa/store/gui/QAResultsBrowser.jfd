@@ -802,7 +802,7 @@
            </object> 
           </void> 
           <void property="name"> 
-           <string>button3</string> 
+           <string>previousButton</string> 
           </void> 
           <void method="addEvent"> 
            <object class="com.jformdesigner.model.FormEvent"> 
@@ -837,7 +837,7 @@
            </object> 
           </void> 
           <void property="name"> 
-           <string>label12</string> 
+           <string>startLineLable</string> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -883,7 +883,7 @@
            <object idref="Font1"/> 
           </void> 
           <void property="name"> 
-           <string>label13</string> 
+           <string>endLineLabel</string> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -929,7 +929,7 @@
            <object idref="Font1"/> 
           </void> 
           <void property="name"> 
-           <string>label15</string> 
+           <string>totalLinesLabel</string> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -952,7 +952,7 @@
            <object idref="Font0"/> 
           </void> 
           <void property="name"> 
-           <string>button4</string> 
+           <string>nextButton</string> 
           </void> 
           <void method="addEvent"> 
            <object class="com.jformdesigner.model.FormEvent"> 
