@@ -845,13 +845,13 @@ public class RulesLibrary {
 
 	public static boolean isIncludedInRefsetSpec(I_GetConceptData refset, I_GetConceptData candidateConcept, I_ConfigAceFrame config) {
 		boolean result = false;
-		System.out.println("************ Starting test computation *****************");
+//		System.out.println("************ Starting test computation *****************");
 		Long start = System.currentTimeMillis();
 		try {
 			RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, config);
 			I_GetConceptData refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
-			AceLog.getAppLog().info("Refset: " + refset.getInitialText() + " " + refset.getUids().get(0));
-			AceLog.getAppLog().info("Refset spec: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
+//			AceLog.getAppLog().info("Refset: " + refset.getInitialText() + " " + refset.getUids().get(0));
+//			AceLog.getAppLog().info("Refset spec: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
 			RefsetComputeType computeType = RefsetComputeType.CONCEPT; // default
 			if (refsetSpecHelper.isDescriptionComputeType()) {
 				computeType = RefsetComputeType.DESCRIPTION;
@@ -892,15 +892,15 @@ public class RulesLibrary {
 
 			I_GetConceptData selectedConcept = candidateConcept;
 
-			System.out.println("Refset spec = " + refsetSpec.toString());
-			System.out.println("Refset = " + refset.toString());
-			System.out.println("Concept to test = " + selectedConcept.toString());
+//			System.out.println("Refset spec = " + refsetSpec.toString());
+//			System.out.println("Refset = " + refset.toString());
+//			System.out.println("Concept to test = " + selectedConcept.toString());
 
 			List<I_ShowActivity> activities = new ArrayList<I_ShowActivity>();
 			result = query.execute(selectedConcept, activities);
 
-			System.out.println("++++++++++++++ Result = " + result);
-			System.out.println("************ Finished test computation in " + (System.currentTimeMillis() - start) + " ms. *****************");
+//			System.out.println("++++++++++++++ Result = " + result);
+//			System.out.println("************ Finished test computation in " + (System.currentTimeMillis() - start) + " ms. *****************");
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 			try {
