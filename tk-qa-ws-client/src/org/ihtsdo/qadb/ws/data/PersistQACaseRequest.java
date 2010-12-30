@@ -1,6 +1,6 @@
 
 /**
- * Component.java
+ * PersistQACaseRequest.java
  *
  * This file was auto-generated from WSDL
  * by the Apache Axis2 version: 1.5.2  Built on : Sep 06, 2010 (09:42:47 CEST)
@@ -10,16 +10,17 @@
             
 
             /**
-            *  Component bean class
+            *  PersistQACaseRequest bean class
             */
         
-        public  class Component
+        public  class PersistQACaseRequest
         implements org.apache.axis2.databinding.ADBBean{
-        /* This type was generated from the piece of schema that had
-                name = Component
-                Namespace URI = http://www.ihtsdo.org/qadb/qadb-service/
-                Namespace Prefix = ns1
-                */
+        
+                public static final javax.xml.namespace.QName MY_QNAME = new javax.xml.namespace.QName(
+                "http://www.ihtsdo.org/qadb/qadb-service/",
+                "PersistQACaseRequest",
+                "ns1");
+
             
 
         private static java.lang.String generatePrefix(java.lang.String namespace) {
@@ -32,118 +33,30 @@
         
 
                         /**
-                        * field for ComponentUuid
+                        * field for QaCase
                         */
 
                         
-                                    protected java.lang.String localComponentUuid ;
+                                    protected org.ihtsdo.qadb.ws.data.Case localQaCase ;
                                 
 
                            /**
                            * Auto generated getter method
-                           * @return java.lang.String
+                           * @return org.ihtsdo.qadb.ws.data.Case
                            */
-                           public  java.lang.String getComponentUuid(){
-                               return localComponentUuid;
+                           public  org.ihtsdo.qadb.ws.data.Case getQaCase(){
+                               return localQaCase;
                            }
 
                            
                         
                             /**
                                * Auto generated setter method
-                               * @param param ComponentUuid
+                               * @param param QaCase
                                */
-                               public void setComponentUuid(java.lang.String param){
+                               public void setQaCase(org.ihtsdo.qadb.ws.data.Case param){
                             
-                                            this.localComponentUuid=param;
-                                    
-
-                               }
-                            
-
-                        /**
-                        * field for ComponentName
-                        */
-
-                        
-                                    protected java.lang.String localComponentName ;
-                                
-                           /*  This tracker boolean wil be used to detect whether the user called the set method
-                          *   for this attribute. It will be used to determine whether to include this field
-                           *   in the serialized XML
-                           */
-                           protected boolean localComponentNameTracker = false ;
-                           
-
-                           /**
-                           * Auto generated getter method
-                           * @return java.lang.String
-                           */
-                           public  java.lang.String getComponentName(){
-                               return localComponentName;
-                           }
-
-                           
-                        
-                            /**
-                               * Auto generated setter method
-                               * @param param ComponentName
-                               */
-                               public void setComponentName(java.lang.String param){
-                            
-                                       if (param != null){
-                                          //update the setting tracker
-                                          localComponentNameTracker = true;
-                                       } else {
-                                          localComponentNameTracker = false;
-                                              
-                                       }
-                                   
-                                            this.localComponentName=param;
-                                    
-
-                               }
-                            
-
-                        /**
-                        * field for Sctid
-                        */
-
-                        
-                                    protected java.lang.String localSctid ;
-                                
-                           /*  This tracker boolean wil be used to detect whether the user called the set method
-                          *   for this attribute. It will be used to determine whether to include this field
-                           *   in the serialized XML
-                           */
-                           protected boolean localSctidTracker = false ;
-                           
-
-                           /**
-                           * Auto generated getter method
-                           * @return java.lang.String
-                           */
-                           public  java.lang.String getSctid(){
-                               return localSctid;
-                           }
-
-                           
-                        
-                            /**
-                               * Auto generated setter method
-                               * @param param Sctid
-                               */
-                               public void setSctid(java.lang.String param){
-                            
-                                       if (param != null){
-                                          //update the setting tracker
-                                          localSctidTracker = true;
-                                       } else {
-                                          localSctidTracker = false;
-                                              
-                                       }
-                                   
-                                            this.localSctid=param;
+                                            this.localQaCase=param;
                                     
 
                                }
@@ -177,15 +90,15 @@
 
 
         
-               org.apache.axiom.om.OMDataSource dataSource =
-                       new org.apache.axis2.databinding.ADBDataSource(this,parentQName){
+                org.apache.axiom.om.OMDataSource dataSource =
+                       new org.apache.axis2.databinding.ADBDataSource(this,MY_QNAME){
 
                  public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException {
-                       Component.this.serialize(parentQName,factory,xmlWriter);
+                       PersistQACaseRequest.this.serialize(MY_QNAME,factory,xmlWriter);
                  }
                };
                return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(
-               parentQName,factory,dataSource);
+               MY_QNAME,factory,dataSource);
             
        }
 
@@ -235,119 +148,23 @@
                    java.lang.String namespacePrefix = registerPrefix(xmlWriter,"http://www.ihtsdo.org/qadb/qadb-service/");
                    if ((namespacePrefix != null) && (namespacePrefix.trim().length() > 0)){
                        writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","type",
-                           namespacePrefix+":Component",
+                           namespacePrefix+":PersistQACaseRequest",
                            xmlWriter);
                    } else {
                        writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","type",
-                           "Component",
+                           "PersistQACaseRequest",
                            xmlWriter);
                    }
 
                
                    }
                
-                                    namespace = "";
-                                    if (! namespace.equals("")) {
-                                        prefix = xmlWriter.getPrefix(namespace);
-
-                                        if (prefix == null) {
-                                            prefix = generatePrefix(namespace);
-
-                                            xmlWriter.writeStartElement(prefix,"componentUuid", namespace);
-                                            xmlWriter.writeNamespace(prefix, namespace);
-                                            xmlWriter.setPrefix(prefix, namespace);
-
-                                        } else {
-                                            xmlWriter.writeStartElement(namespace,"componentUuid");
-                                        }
-
-                                    } else {
-                                        xmlWriter.writeStartElement("componentUuid");
-                                    }
-                                
-
-                                          if (localComponentUuid==null){
-                                              // write the nil attribute
-                                              
-                                                     throw new org.apache.axis2.databinding.ADBException("componentUuid cannot be null!!");
-                                                  
-                                          }else{
-
+                                            if (localQaCase==null){
+                                                 throw new org.apache.axis2.databinding.ADBException("qaCase cannot be null!!");
+                                            }
+                                           localQaCase.serialize(new javax.xml.namespace.QName("","qaCase"),
+                                               factory,xmlWriter);
                                         
-                                                   xmlWriter.writeCharacters(localComponentUuid);
-                                            
-                                          }
-                                    
-                                   xmlWriter.writeEndElement();
-                              if (localComponentNameTracker){
-                                    namespace = "";
-                                    if (! namespace.equals("")) {
-                                        prefix = xmlWriter.getPrefix(namespace);
-
-                                        if (prefix == null) {
-                                            prefix = generatePrefix(namespace);
-
-                                            xmlWriter.writeStartElement(prefix,"componentName", namespace);
-                                            xmlWriter.writeNamespace(prefix, namespace);
-                                            xmlWriter.setPrefix(prefix, namespace);
-
-                                        } else {
-                                            xmlWriter.writeStartElement(namespace,"componentName");
-                                        }
-
-                                    } else {
-                                        xmlWriter.writeStartElement("componentName");
-                                    }
-                                
-
-                                          if (localComponentName==null){
-                                              // write the nil attribute
-                                              
-                                                     throw new org.apache.axis2.databinding.ADBException("componentName cannot be null!!");
-                                                  
-                                          }else{
-
-                                        
-                                                   xmlWriter.writeCharacters(localComponentName);
-                                            
-                                          }
-                                    
-                                   xmlWriter.writeEndElement();
-                             } if (localSctidTracker){
-                                    namespace = "";
-                                    if (! namespace.equals("")) {
-                                        prefix = xmlWriter.getPrefix(namespace);
-
-                                        if (prefix == null) {
-                                            prefix = generatePrefix(namespace);
-
-                                            xmlWriter.writeStartElement(prefix,"sctid", namespace);
-                                            xmlWriter.writeNamespace(prefix, namespace);
-                                            xmlWriter.setPrefix(prefix, namespace);
-
-                                        } else {
-                                            xmlWriter.writeStartElement(namespace,"sctid");
-                                        }
-
-                                    } else {
-                                        xmlWriter.writeStartElement("sctid");
-                                    }
-                                
-
-                                          if (localSctid==null){
-                                              // write the nil attribute
-                                              
-                                                     throw new org.apache.axis2.databinding.ADBException("sctid cannot be null!!");
-                                                  
-                                          }else{
-
-                                        
-                                                   xmlWriter.writeCharacters(localSctid);
-                                            
-                                          }
-                                    
-                                   xmlWriter.writeEndElement();
-                             }
                     xmlWriter.writeEndElement();
                
 
@@ -510,33 +327,15 @@
                  java.util.ArrayList attribList = new java.util.ArrayList();
 
                 
-                                      elementList.add(new javax.xml.namespace.QName("",
-                                                                      "componentUuid"));
-                                 
-                                        if (localComponentUuid != null){
-                                            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localComponentUuid));
-                                        } else {
-                                           throw new org.apache.axis2.databinding.ADBException("componentUuid cannot be null!!");
-                                        }
-                                     if (localComponentNameTracker){
-                                      elementList.add(new javax.xml.namespace.QName("",
-                                                                      "componentName"));
-                                 
-                                        if (localComponentName != null){
-                                            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localComponentName));
-                                        } else {
-                                           throw new org.apache.axis2.databinding.ADBException("componentName cannot be null!!");
-                                        }
-                                    } if (localSctidTracker){
-                                      elementList.add(new javax.xml.namespace.QName("",
-                                                                      "sctid"));
-                                 
-                                        if (localSctid != null){
-                                            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localSctid));
-                                        } else {
-                                           throw new org.apache.axis2.databinding.ADBException("sctid cannot be null!!");
-                                        }
+                            elementList.add(new javax.xml.namespace.QName("",
+                                                                      "qaCase"));
+                            
+                            
+                                    if (localQaCase==null){
+                                         throw new org.apache.axis2.databinding.ADBException("qaCase cannot be null!!");
                                     }
+                                    elementList.add(localQaCase);
+                                
 
                 return new org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl(qName, elementList.toArray(), attribList.toArray());
             
@@ -561,9 +360,9 @@
         * Postcondition: If this object is an element, the reader is positioned at its end element
         *                If this object is a complex type, the reader is positioned at the end element of its outer element
         */
-        public static Component parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception{
-            Component object =
-                new Component();
+        public static PersistQACaseRequest parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception{
+            PersistQACaseRequest object =
+                new PersistQACaseRequest();
 
             int event;
             java.lang.String nillableValue = null;
@@ -587,10 +386,10 @@
 
                     java.lang.String type = fullTypeName.substring(fullTypeName.indexOf(":")+1);
                     
-                            if (!"Component".equals(type)){
+                            if (!"PersistQACaseRequest".equals(type)){
                                 //find namespace for the prefix
                                 java.lang.String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
-                                return (Component)org.ihtsdo.qadb.ws.data.ExtensionMapper.getTypeObject(
+                                return (PersistQACaseRequest)org.ihtsdo.qadb.ws.data.ExtensionMapper.getTypeObject(
                                      nsUri,type,reader);
                               }
                         
@@ -615,12 +414,9 @@
                                     
                                     while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
                                 
-                                    if (reader.isStartElement() && new javax.xml.namespace.QName("","componentUuid").equals(reader.getName())){
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("","qaCase").equals(reader.getName())){
                                 
-                                    java.lang.String content = reader.getElementText();
-                                    
-                                              object.setComponentUuid(
-                                                    org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
+                                                object.setQaCase(org.ihtsdo.qadb.ws.data.Case.Factory.parse(reader));
                                               
                                         reader.next();
                                     
@@ -630,43 +426,7 @@
                                     // A start element we are not expecting indicates an invalid parameter was passed
                                     throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getLocalName());
                                 }
-                            
-                                    
-                                    while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
-                                
-                                    if (reader.isStartElement() && new javax.xml.namespace.QName("","componentName").equals(reader.getName())){
-                                
-                                    java.lang.String content = reader.getElementText();
-                                    
-                                              object.setComponentName(
-                                                    org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
-                                              
-                                        reader.next();
-                                    
-                              }  // End of if for expected property start element
-                                
-                                    else {
-                                        
-                                    }
-                                
-                                    
-                                    while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
-                                
-                                    if (reader.isStartElement() && new javax.xml.namespace.QName("","sctid").equals(reader.getName())){
-                                
-                                    java.lang.String content = reader.getElementText();
-                                    
-                                              object.setSctid(
-                                                    org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
-                                              
-                                        reader.next();
-                                    
-                              }  // End of if for expected property start element
-                                
-                                    else {
-                                        
-                                    }
-                                  
+                              
                             while (!reader.isStartElement() && !reader.isEndElement())
                                 reader.next();
                             

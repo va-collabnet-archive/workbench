@@ -44,7 +44,7 @@
         //creating the operations
         org.apache.axis2.description.AxisOperation __operation;
 
-        _operations = new org.apache.axis2.description.AxisOperation[15];
+        _operations = new org.apache.axis2.description.AxisOperation[16];
         
                    __operation = new org.apache.axis2.description.OutInAxisOperation();
                 
@@ -205,7 +205,7 @@
                    __operation = new org.apache.axis2.description.OutInAxisOperation();
                 
 
-            __operation.setName(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/", "getQADatabase"));
+            __operation.setName(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/", "persistQACase"));
 	    _service.addOperation(__operation);
 	    
 
@@ -217,13 +217,25 @@
                    __operation = new org.apache.axis2.description.OutInAxisOperation();
                 
 
-            __operation.setName(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/", "getFinding"));
+            __operation.setName(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/", "getQADatabase"));
 	    _service.addOperation(__operation);
 	    
 
 	    
 	    
             _operations[14]=__operation;
+            
+        
+                   __operation = new org.apache.axis2.description.OutInAxisOperation();
+                
+
+            __operation.setName(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/", "getFinding"));
+	    _service.addOperation(__operation);
+	    
+
+	    
+	    
+            _operations[15]=__operation;
             
         
         }
@@ -298,7 +310,7 @@
                      * Auto generated method signature
                      * 
                      * @see org.ihtsdo.qadb.ws.QadbService#getCase
-                     * @param caseRequest156
+                     * @param caseRequest167
                     
                      */
 
@@ -306,7 +318,7 @@
 
                             public  org.ihtsdo.qadb.ws.data.GetCaseResponse getCase(
 
-                            org.ihtsdo.qadb.ws.data.CaseRequest caseRequest156)
+                            org.ihtsdo.qadb.ws.data.CaseRequest caseRequest167)
                         
 
                     throws java.rmi.RemoteException
@@ -333,7 +345,7 @@
                     
                                                     
                                                     env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
-                                                    caseRequest156,
+                                                    caseRequest167,
                                                     optimizeContent(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/",
                                                     "getCase")));
                                                 
@@ -417,12 +429,12 @@
                 * Auto generated method signature for Asynchronous Invocations
                 * 
                 * @see org.ihtsdo.qadb.ws.QadbService#startgetCase
-                    * @param caseRequest156
+                    * @param caseRequest167
                 
                 */
                 public  void startgetCase(
 
-                 org.ihtsdo.qadb.ws.data.CaseRequest caseRequest156,
+                 org.ihtsdo.qadb.ws.data.CaseRequest caseRequest167,
 
                   final org.ihtsdo.qadb.ws.QadbServiceCallbackHandler callback)
 
@@ -447,7 +459,7 @@
                                     
                                                     
                                                     env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
-                                                    caseRequest156,
+                                                    caseRequest167,
                                                     optimizeContent(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/",
                                                     "getCase")));
                                                 
@@ -563,7 +575,7 @@
                      * Auto generated method signature
                      * 
                      * @see org.ihtsdo.qadb.ws.QadbService#getQACasesReportLinesByPage
-                     * @param qACasesReportLinesByPageRequest158
+                     * @param qACasesReportLinesByPageRequest169
                     
                      */
 
@@ -571,7 +583,7 @@
 
                             public  org.ihtsdo.qadb.ws.data.QACasesReportLinesByPageResponse getQACasesReportLinesByPage(
 
-                            org.ihtsdo.qadb.ws.data.QACasesReportLinesByPageRequest qACasesReportLinesByPageRequest158)
+                            org.ihtsdo.qadb.ws.data.QACasesReportLinesByPageRequest qACasesReportLinesByPageRequest169)
                         
 
                     throws java.rmi.RemoteException
@@ -598,7 +610,7 @@
                     
                                                     
                                                     env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
-                                                    qACasesReportLinesByPageRequest158,
+                                                    qACasesReportLinesByPageRequest169,
                                                     optimizeContent(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/",
                                                     "getQACasesReportLinesByPage")));
                                                 
@@ -682,12 +694,12 @@
                 * Auto generated method signature for Asynchronous Invocations
                 * 
                 * @see org.ihtsdo.qadb.ws.QadbService#startgetQACasesReportLinesByPage
-                    * @param qACasesReportLinesByPageRequest158
+                    * @param qACasesReportLinesByPageRequest169
                 
                 */
                 public  void startgetQACasesReportLinesByPage(
 
-                 org.ihtsdo.qadb.ws.data.QACasesReportLinesByPageRequest qACasesReportLinesByPageRequest158,
+                 org.ihtsdo.qadb.ws.data.QACasesReportLinesByPageRequest qACasesReportLinesByPageRequest169,
 
                   final org.ihtsdo.qadb.ws.QadbServiceCallbackHandler callback)
 
@@ -712,7 +724,7 @@
                                     
                                                     
                                                     env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
-                                                    qACasesReportLinesByPageRequest158,
+                                                    qACasesReportLinesByPageRequest169,
                                                     optimizeContent(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/",
                                                     "getQACasesReportLinesByPage")));
                                                 
@@ -1342,7 +1354,7 @@
                      * Auto generated method signature
                      * 
                      * @see org.ihtsdo.qadb.ws.QadbService#getRule
-                     * @param ruleRequest164
+                     * @param ruleRequest175
                     
                      */
 
@@ -1350,7 +1362,7 @@
 
                             public  org.ihtsdo.qadb.ws.data.RuleResponse getRule(
 
-                            org.ihtsdo.qadb.ws.data.RuleRequest ruleRequest164)
+                            org.ihtsdo.qadb.ws.data.RuleRequest ruleRequest175)
                         
 
                     throws java.rmi.RemoteException
@@ -1377,7 +1389,7 @@
                     
                                                     
                                                     env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
-                                                    ruleRequest164,
+                                                    ruleRequest175,
                                                     optimizeContent(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/",
                                                     "getRule")));
                                                 
@@ -1461,12 +1473,12 @@
                 * Auto generated method signature for Asynchronous Invocations
                 * 
                 * @see org.ihtsdo.qadb.ws.QadbService#startgetRule
-                    * @param ruleRequest164
+                    * @param ruleRequest175
                 
                 */
                 public  void startgetRule(
 
-                 org.ihtsdo.qadb.ws.data.RuleRequest ruleRequest164,
+                 org.ihtsdo.qadb.ws.data.RuleRequest ruleRequest175,
 
                   final org.ihtsdo.qadb.ws.QadbServiceCallbackHandler callback)
 
@@ -1491,7 +1503,7 @@
                                     
                                                     
                                                     env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
-                                                    ruleRequest164,
+                                                    ruleRequest175,
                                                     optimizeContent(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/",
                                                     "getRule")));
                                                 
@@ -1607,7 +1619,7 @@
                      * Auto generated method signature
                      * 
                      * @see org.ihtsdo.qadb.ws.QadbService#getAllPathsForDatabase
-                     * @param allPathsForDatabaseRequest166
+                     * @param allPathsForDatabaseRequest177
                     
                      */
 
@@ -1615,7 +1627,7 @@
 
                             public  org.ihtsdo.qadb.ws.data.AllPathsForDatabaseResponse getAllPathsForDatabase(
 
-                            org.ihtsdo.qadb.ws.data.AllPathsForDatabaseRequest allPathsForDatabaseRequest166)
+                            org.ihtsdo.qadb.ws.data.AllPathsForDatabaseRequest allPathsForDatabaseRequest177)
                         
 
                     throws java.rmi.RemoteException
@@ -1642,7 +1654,7 @@
                     
                                                     
                                                     env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
-                                                    allPathsForDatabaseRequest166,
+                                                    allPathsForDatabaseRequest177,
                                                     optimizeContent(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/",
                                                     "getAllPathsForDatabase")));
                                                 
@@ -1726,12 +1738,12 @@
                 * Auto generated method signature for Asynchronous Invocations
                 * 
                 * @see org.ihtsdo.qadb.ws.QadbService#startgetAllPathsForDatabase
-                    * @param allPathsForDatabaseRequest166
+                    * @param allPathsForDatabaseRequest177
                 
                 */
                 public  void startgetAllPathsForDatabase(
 
-                 org.ihtsdo.qadb.ws.data.AllPathsForDatabaseRequest allPathsForDatabaseRequest166,
+                 org.ihtsdo.qadb.ws.data.AllPathsForDatabaseRequest allPathsForDatabaseRequest177,
 
                   final org.ihtsdo.qadb.ws.QadbServiceCallbackHandler callback)
 
@@ -1756,7 +1768,7 @@
                                     
                                                     
                                                     env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
-                                                    allPathsForDatabaseRequest166,
+                                                    allPathsForDatabaseRequest177,
                                                     optimizeContent(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/",
                                                     "getAllPathsForDatabase")));
                                                 
@@ -1872,7 +1884,7 @@
                      * Auto generated method signature
                      * 
                      * @see org.ihtsdo.qadb.ws.QadbService#getExecution
-                     * @param executionRequest168
+                     * @param executionRequest179
                     
                      */
 
@@ -1880,7 +1892,7 @@
 
                             public  org.ihtsdo.qadb.ws.data.ExecutionResponse getExecution(
 
-                            org.ihtsdo.qadb.ws.data.ExecutionRequest executionRequest168)
+                            org.ihtsdo.qadb.ws.data.ExecutionRequest executionRequest179)
                         
 
                     throws java.rmi.RemoteException
@@ -1907,7 +1919,7 @@
                     
                                                     
                                                     env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
-                                                    executionRequest168,
+                                                    executionRequest179,
                                                     optimizeContent(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/",
                                                     "getExecution")));
                                                 
@@ -1991,12 +2003,12 @@
                 * Auto generated method signature for Asynchronous Invocations
                 * 
                 * @see org.ihtsdo.qadb.ws.QadbService#startgetExecution
-                    * @param executionRequest168
+                    * @param executionRequest179
                 
                 */
                 public  void startgetExecution(
 
-                 org.ihtsdo.qadb.ws.data.ExecutionRequest executionRequest168,
+                 org.ihtsdo.qadb.ws.data.ExecutionRequest executionRequest179,
 
                   final org.ihtsdo.qadb.ws.QadbServiceCallbackHandler callback)
 
@@ -2021,7 +2033,7 @@
                                     
                                                     
                                                     env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
-                                                    executionRequest168,
+                                                    executionRequest179,
                                                     optimizeContent(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/",
                                                     "getExecution")));
                                                 
@@ -2908,7 +2920,7 @@
                      * Auto generated method signature
                      * 
                      * @see org.ihtsdo.qadb.ws.QadbService#getComponent
-                     * @param componentRequest176
+                     * @param componentRequest187
                     
                      */
 
@@ -2916,7 +2928,7 @@
 
                             public  org.ihtsdo.qadb.ws.data.ComponentResponse getComponent(
 
-                            org.ihtsdo.qadb.ws.data.ComponentRequest componentRequest176)
+                            org.ihtsdo.qadb.ws.data.ComponentRequest componentRequest187)
                         
 
                     throws java.rmi.RemoteException
@@ -2943,7 +2955,7 @@
                     
                                                     
                                                     env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
-                                                    componentRequest176,
+                                                    componentRequest187,
                                                     optimizeContent(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/",
                                                     "getComponent")));
                                                 
@@ -3027,12 +3039,12 @@
                 * Auto generated method signature for Asynchronous Invocations
                 * 
                 * @see org.ihtsdo.qadb.ws.QadbService#startgetComponent
-                    * @param componentRequest176
+                    * @param componentRequest187
                 
                 */
                 public  void startgetComponent(
 
-                 org.ihtsdo.qadb.ws.data.ComponentRequest componentRequest176,
+                 org.ihtsdo.qadb.ws.data.ComponentRequest componentRequest187,
 
                   final org.ihtsdo.qadb.ws.QadbServiceCallbackHandler callback)
 
@@ -3057,7 +3069,7 @@
                                     
                                                     
                                                     env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
-                                                    componentRequest176,
+                                                    componentRequest187,
                                                     optimizeContent(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/",
                                                     "getComponent")));
                                                 
@@ -3173,7 +3185,7 @@
                      * Auto generated method signature
                      * 
                      * @see org.ihtsdo.qadb.ws.QadbService#getRulesReportLinesByPage
-                     * @param rulesReportLinesByPageRequest178
+                     * @param rulesReportLinesByPageRequest189
                     
                      */
 
@@ -3181,7 +3193,7 @@
 
                             public  org.ihtsdo.qadb.ws.data.RulesReportLinesByPageResponse getRulesReportLinesByPage(
 
-                            org.ihtsdo.qadb.ws.data.RulesReportLinesByPageRequest rulesReportLinesByPageRequest178)
+                            org.ihtsdo.qadb.ws.data.RulesReportLinesByPageRequest rulesReportLinesByPageRequest189)
                         
 
                     throws java.rmi.RemoteException
@@ -3208,7 +3220,7 @@
                     
                                                     
                                                     env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
-                                                    rulesReportLinesByPageRequest178,
+                                                    rulesReportLinesByPageRequest189,
                                                     optimizeContent(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/",
                                                     "getRulesReportLinesByPage")));
                                                 
@@ -3292,12 +3304,12 @@
                 * Auto generated method signature for Asynchronous Invocations
                 * 
                 * @see org.ihtsdo.qadb.ws.QadbService#startgetRulesReportLinesByPage
-                    * @param rulesReportLinesByPageRequest178
+                    * @param rulesReportLinesByPageRequest189
                 
                 */
                 public  void startgetRulesReportLinesByPage(
 
-                 org.ihtsdo.qadb.ws.data.RulesReportLinesByPageRequest rulesReportLinesByPageRequest178,
+                 org.ihtsdo.qadb.ws.data.RulesReportLinesByPageRequest rulesReportLinesByPageRequest189,
 
                   final org.ihtsdo.qadb.ws.QadbServiceCallbackHandler callback)
 
@@ -3322,7 +3334,7 @@
                                     
                                                     
                                                     env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
-                                                    rulesReportLinesByPageRequest178,
+                                                    rulesReportLinesByPageRequest189,
                                                     optimizeContent(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/",
                                                     "getRulesReportLinesByPage")));
                                                 
@@ -3694,16 +3706,16 @@
                     /**
                      * Auto generated method signature
                      * 
-                     * @see org.ihtsdo.qadb.ws.QadbService#getQADatabase
-                     * @param qADatabaseRequest182
+                     * @see org.ihtsdo.qadb.ws.QadbService#persistQACase
+                     * @param persistQACaseRequest193
                     
                      */
 
                     
 
-                            public  org.ihtsdo.qadb.ws.data.QADatabaseResponse getQADatabase(
+                            public  void persistQACase(
 
-                            org.ihtsdo.qadb.ws.data.QADatabaseRequest qADatabaseRequest182)
+                            org.ihtsdo.qadb.ws.data.PersistQACaseRequest persistQACaseRequest193)
                         
 
                     throws java.rmi.RemoteException
@@ -3712,6 +3724,177 @@
               org.apache.axis2.context.MessageContext _messageContext = null;
               try{
                org.apache.axis2.client.OperationClient _operationClient = _serviceClient.createClient(_operations[13].getName());
+              _operationClient.getOptions().setAction("http://www.ihtsdo.org/qadb/qadb-service/persistQACase");
+              _operationClient.getOptions().setExceptionToBeThrownOnSOAPFault(true);
+
+              
+              
+                  addPropertyToOperationClient(_operationClient,org.apache.axis2.description.WSDL2Constants.ATTR_WHTTP_QUERY_PARAMETER_SEPARATOR,"&");
+              
+
+              // create a message context
+              _messageContext = new org.apache.axis2.context.MessageContext();
+
+              
+
+              // create SOAP envelope with that payload
+              org.apache.axiom.soap.SOAPEnvelope env = null;
+                    
+                                                    
+                                                    env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
+                                                    persistQACaseRequest193,
+                                                    optimizeContent(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/",
+                                                    "persistQACase")));
+                                                
+        //adding SOAP soap_headers
+         _serviceClient.addHeadersToEnvelope(env);
+        // set the message context with that soap envelope
+        _messageContext.setEnvelope(env);
+
+        // add the message contxt to the operation client
+        _operationClient.addMessageContext(_messageContext);
+
+        //execute the operation client
+        _operationClient.execute(true);
+
+         
+                return;
+            
+         }catch(org.apache.axis2.AxisFault f){
+
+            org.apache.axiom.om.OMElement faultElt = f.getDetail();
+            if (faultElt!=null){
+                if (faultExceptionNameMap.containsKey(faultElt.getQName())){
+                    //make the fault by reflection
+                    try{
+                        java.lang.String exceptionClassName = (java.lang.String)faultExceptionClassNameMap.get(faultElt.getQName());
+                        java.lang.Class exceptionClass = java.lang.Class.forName(exceptionClassName);
+                        java.lang.Exception ex=
+                                (java.lang.Exception) exceptionClass.newInstance();
+                        //message class
+                        java.lang.String messageClassName = (java.lang.String)faultMessageMap.get(faultElt.getQName());
+                        java.lang.Class messageClass = java.lang.Class.forName(messageClassName);
+                        java.lang.Object messageObject = fromOM(faultElt,messageClass,null);
+                        java.lang.reflect.Method m = exceptionClass.getMethod("setFaultMessage",
+                                   new java.lang.Class[]{messageClass});
+                        m.invoke(ex,new java.lang.Object[]{messageObject});
+                        
+
+                        throw new java.rmi.RemoteException(ex.getMessage(), ex);
+                    }catch(java.lang.ClassCastException e){
+                       // we cannot intantiate the class - throw the original Axis fault
+                        throw f;
+                    } catch (java.lang.ClassNotFoundException e) {
+                        // we cannot intantiate the class - throw the original Axis fault
+                        throw f;
+                    }catch (java.lang.NoSuchMethodException e) {
+                        // we cannot intantiate the class - throw the original Axis fault
+                        throw f;
+                    } catch (java.lang.reflect.InvocationTargetException e) {
+                        // we cannot intantiate the class - throw the original Axis fault
+                        throw f;
+                    }  catch (java.lang.IllegalAccessException e) {
+                        // we cannot intantiate the class - throw the original Axis fault
+                        throw f;
+                    }   catch (java.lang.InstantiationException e) {
+                        // we cannot intantiate the class - throw the original Axis fault
+                        throw f;
+                    }
+                }else{
+                    throw f;
+                }
+            }else{
+                throw f;
+            }
+            } finally {
+                _messageContext.getTransportOut().getSender().cleanup(_messageContext);
+            }
+        }
+            
+                /**
+                * Auto generated method signature for Asynchronous Invocations
+                * 
+                * @see org.ihtsdo.qadb.ws.QadbService#startpersistQACase
+                    * @param persistQACaseRequest193
+                
+                */
+                public  void startpersistQACase(
+
+                 org.ihtsdo.qadb.ws.data.PersistQACaseRequest persistQACaseRequest193,
+
+                  final org.ihtsdo.qadb.ws.QadbServiceCallbackHandler callback)
+
+                throws java.rmi.RemoteException{
+
+              org.apache.axis2.client.OperationClient _operationClient = _serviceClient.createClient(_operations[13].getName());
+             _operationClient.getOptions().setAction("http://www.ihtsdo.org/qadb/qadb-service/persistQACase");
+             _operationClient.getOptions().setExceptionToBeThrownOnSOAPFault(true);
+
+              
+              
+                  addPropertyToOperationClient(_operationClient,org.apache.axis2.description.WSDL2Constants.ATTR_WHTTP_QUERY_PARAMETER_SEPARATOR,"&");
+              
+
+
+              // create SOAP envelope with that payload
+              org.apache.axiom.soap.SOAPEnvelope env=null;
+              final org.apache.axis2.context.MessageContext _messageContext = new org.apache.axis2.context.MessageContext();
+
+                    
+                                    //Style is Doc.
+                                    
+                                                    
+                                                    env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
+                                                    persistQACaseRequest193,
+                                                    optimizeContent(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/",
+                                                    "persistQACase")));
+                                                
+        // adding SOAP soap_headers
+         _serviceClient.addHeadersToEnvelope(env);
+        // create message context with that soap envelope
+        _messageContext.setEnvelope(env);
+
+        // add the message context to the operation client
+        _operationClient.addMessageContext(_messageContext);
+
+
+                    
+                            // Nothing to pass as the callback!!!
+                        
+
+          org.apache.axis2.util.CallbackReceiver _callbackReceiver = null;
+        if ( _operations[13].getMessageReceiver()==null &&  _operationClient.getOptions().isUseSeparateListener()) {
+           _callbackReceiver = new org.apache.axis2.util.CallbackReceiver();
+          _operations[13].setMessageReceiver(
+                    _callbackReceiver);
+        }
+
+           //execute the operation client
+           _operationClient.execute(false);
+
+                    }
+                
+                    /**
+                     * Auto generated method signature
+                     * 
+                     * @see org.ihtsdo.qadb.ws.QadbService#getQADatabase
+                     * @param qADatabaseRequest195
+                    
+                     */
+
+                    
+
+                            public  org.ihtsdo.qadb.ws.data.QADatabaseResponse getQADatabase(
+
+                            org.ihtsdo.qadb.ws.data.QADatabaseRequest qADatabaseRequest195)
+                        
+
+                    throws java.rmi.RemoteException
+                    
+                    {
+              org.apache.axis2.context.MessageContext _messageContext = null;
+              try{
+               org.apache.axis2.client.OperationClient _operationClient = _serviceClient.createClient(_operations[14].getName());
               _operationClient.getOptions().setAction("http://www.ihtsdo.org/qadb/qadb-service/getQADatabase");
               _operationClient.getOptions().setExceptionToBeThrownOnSOAPFault(true);
 
@@ -3730,7 +3913,7 @@
                     
                                                     
                                                     env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
-                                                    qADatabaseRequest182,
+                                                    qADatabaseRequest195,
                                                     optimizeContent(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/",
                                                     "getQADatabase")));
                                                 
@@ -3814,18 +3997,18 @@
                 * Auto generated method signature for Asynchronous Invocations
                 * 
                 * @see org.ihtsdo.qadb.ws.QadbService#startgetQADatabase
-                    * @param qADatabaseRequest182
+                    * @param qADatabaseRequest195
                 
                 */
                 public  void startgetQADatabase(
 
-                 org.ihtsdo.qadb.ws.data.QADatabaseRequest qADatabaseRequest182,
+                 org.ihtsdo.qadb.ws.data.QADatabaseRequest qADatabaseRequest195,
 
                   final org.ihtsdo.qadb.ws.QadbServiceCallbackHandler callback)
 
                 throws java.rmi.RemoteException{
 
-              org.apache.axis2.client.OperationClient _operationClient = _serviceClient.createClient(_operations[13].getName());
+              org.apache.axis2.client.OperationClient _operationClient = _serviceClient.createClient(_operations[14].getName());
              _operationClient.getOptions().setAction("http://www.ihtsdo.org/qadb/qadb-service/getQADatabase");
              _operationClient.getOptions().setExceptionToBeThrownOnSOAPFault(true);
 
@@ -3844,7 +4027,7 @@
                                     
                                                     
                                                     env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
-                                                    qADatabaseRequest182,
+                                                    qADatabaseRequest195,
                                                     optimizeContent(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/",
                                                     "getQADatabase")));
                                                 
@@ -3945,9 +4128,9 @@
                         
 
           org.apache.axis2.util.CallbackReceiver _callbackReceiver = null;
-        if ( _operations[13].getMessageReceiver()==null &&  _operationClient.getOptions().isUseSeparateListener()) {
+        if ( _operations[14].getMessageReceiver()==null &&  _operationClient.getOptions().isUseSeparateListener()) {
            _callbackReceiver = new org.apache.axis2.util.CallbackReceiver();
-          _operations[13].setMessageReceiver(
+          _operations[14].setMessageReceiver(
                     _callbackReceiver);
         }
 
@@ -3960,7 +4143,7 @@
                      * Auto generated method signature
                      * 
                      * @see org.ihtsdo.qadb.ws.QadbService#getFinding
-                     * @param findingRequest184
+                     * @param findingRequest197
                     
                      */
 
@@ -3968,7 +4151,7 @@
 
                             public  org.ihtsdo.qadb.ws.data.FindingResponse getFinding(
 
-                            org.ihtsdo.qadb.ws.data.FindingRequest findingRequest184)
+                            org.ihtsdo.qadb.ws.data.FindingRequest findingRequest197)
                         
 
                     throws java.rmi.RemoteException
@@ -3976,7 +4159,7 @@
                     {
               org.apache.axis2.context.MessageContext _messageContext = null;
               try{
-               org.apache.axis2.client.OperationClient _operationClient = _serviceClient.createClient(_operations[14].getName());
+               org.apache.axis2.client.OperationClient _operationClient = _serviceClient.createClient(_operations[15].getName());
               _operationClient.getOptions().setAction("http://www.ihtsdo.org/qadb/qadb-service/getFinding");
               _operationClient.getOptions().setExceptionToBeThrownOnSOAPFault(true);
 
@@ -3995,7 +4178,7 @@
                     
                                                     
                                                     env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
-                                                    findingRequest184,
+                                                    findingRequest197,
                                                     optimizeContent(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/",
                                                     "getFinding")));
                                                 
@@ -4079,18 +4262,18 @@
                 * Auto generated method signature for Asynchronous Invocations
                 * 
                 * @see org.ihtsdo.qadb.ws.QadbService#startgetFinding
-                    * @param findingRequest184
+                    * @param findingRequest197
                 
                 */
                 public  void startgetFinding(
 
-                 org.ihtsdo.qadb.ws.data.FindingRequest findingRequest184,
+                 org.ihtsdo.qadb.ws.data.FindingRequest findingRequest197,
 
                   final org.ihtsdo.qadb.ws.QadbServiceCallbackHandler callback)
 
                 throws java.rmi.RemoteException{
 
-              org.apache.axis2.client.OperationClient _operationClient = _serviceClient.createClient(_operations[14].getName());
+              org.apache.axis2.client.OperationClient _operationClient = _serviceClient.createClient(_operations[15].getName());
              _operationClient.getOptions().setAction("http://www.ihtsdo.org/qadb/qadb-service/getFinding");
              _operationClient.getOptions().setExceptionToBeThrownOnSOAPFault(true);
 
@@ -4109,7 +4292,7 @@
                                     
                                                     
                                                     env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
-                                                    findingRequest184,
+                                                    findingRequest197,
                                                     optimizeContent(new javax.xml.namespace.QName("http://www.ihtsdo.org/qadb/qadb-service/",
                                                     "getFinding")));
                                                 
@@ -4210,9 +4393,9 @@
                         
 
           org.apache.axis2.util.CallbackReceiver _callbackReceiver = null;
-        if ( _operations[14].getMessageReceiver()==null &&  _operationClient.getOptions().isUseSeparateListener()) {
+        if ( _operations[15].getMessageReceiver()==null &&  _operationClient.getOptions().isUseSeparateListener()) {
            _callbackReceiver = new org.apache.axis2.util.CallbackReceiver();
-          _operations[14].setMessageReceiver(
+          _operations[15].setMessageReceiver(
                     _callbackReceiver);
         }
 
@@ -4533,6 +4716,20 @@
 
             }
         
+            private  org.apache.axiom.om.OMElement  toOM(org.ihtsdo.qadb.ws.data.PersistQACaseRequest param, boolean optimizeContent)
+            throws org.apache.axis2.AxisFault {
+
+            
+                        try{
+                             return param.getOMElement(org.ihtsdo.qadb.ws.data.PersistQACaseRequest.MY_QNAME,
+                                          org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+                        } catch(org.apache.axis2.databinding.ADBException e){
+                            throw org.apache.axis2.AxisFault.makeFault(e);
+                        }
+                    
+
+            }
+        
             private  org.apache.axiom.om.OMElement  toOM(org.ihtsdo.qadb.ws.data.QADatabaseRequest param, boolean optimizeContent)
             throws org.apache.axis2.AxisFault {
 
@@ -4724,6 +4921,27 @@
 
                                                             org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
                                                             emptyEnvelope.getBody().addChild(param.getOMElement(org.ihtsdo.qadb.ws.data.RulesReportLinesByPageRequest.MY_QNAME,factory));
+                                                            return emptyEnvelope;
+                                                        } catch(org.apache.axis2.databinding.ADBException e){
+                                                            throw org.apache.axis2.AxisFault.makeFault(e);
+                                                        }
+                                                
+
+                                        }
+                                
+                             
+                             /* methods to provide back word compatibility */
+
+                             
+                                    
+                                        private  org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory, org.ihtsdo.qadb.ws.data.PersistQACaseRequest param, boolean optimizeContent)
+                                        throws org.apache.axis2.AxisFault{
+
+                                             
+                                                    try{
+
+                                                            org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
+                                                            emptyEnvelope.getBody().addChild(param.getOMElement(org.ihtsdo.qadb.ws.data.PersistQACaseRequest.MY_QNAME,factory));
                                                             return emptyEnvelope;
                                                         } catch(org.apache.axis2.databinding.ADBException e){
                                                             throw org.apache.axis2.AxisFault.makeFault(e);
@@ -4931,6 +5149,13 @@
                 if (org.ihtsdo.qadb.ws.data.AllComponentsResponse.class.equals(type)){
                 
                            return org.ihtsdo.qadb.ws.data.AllComponentsResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+                    
+
+                }
+           
+                if (org.ihtsdo.qadb.ws.data.PersistQACaseRequest.class.equals(type)){
+                
+                           return org.ihtsdo.qadb.ws.data.PersistQACaseRequest.Factory.parse(param.getXMLStreamReaderWithoutCaching());
                     
 
                 }

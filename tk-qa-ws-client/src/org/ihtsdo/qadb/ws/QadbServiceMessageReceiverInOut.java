@@ -38,230 +38,245 @@
 
             if("getCase".equals(methodName)){
                 
-                org.ihtsdo.qadb.ws.data.GetCaseResponse getCaseResponse7 = null;
+                org.ihtsdo.qadb.ws.data.GetCaseResponse getCaseResponse8 = null;
 	                        org.ihtsdo.qadb.ws.data.CaseRequest wrappedParam =
                                                              (org.ihtsdo.qadb.ws.data.CaseRequest)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     org.ihtsdo.qadb.ws.data.CaseRequest.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               getCaseResponse7 =
+                                               getCaseResponse8 =
                                                    
                                                    
                                                          skel.getCase(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), getCaseResponse7, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), getCaseResponse8, false);
                                     } else 
 
             if("getQACasesReportLinesByPage".equals(methodName)){
                 
-                org.ihtsdo.qadb.ws.data.QACasesReportLinesByPageResponse qACasesReportLinesByPageResponse9 = null;
+                org.ihtsdo.qadb.ws.data.QACasesReportLinesByPageResponse qACasesReportLinesByPageResponse10 = null;
 	                        org.ihtsdo.qadb.ws.data.QACasesReportLinesByPageRequest wrappedParam =
                                                              (org.ihtsdo.qadb.ws.data.QACasesReportLinesByPageRequest)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     org.ihtsdo.qadb.ws.data.QACasesReportLinesByPageRequest.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               qACasesReportLinesByPageResponse9 =
+                                               qACasesReportLinesByPageResponse10 =
                                                    
                                                    
                                                          skel.getQACasesReportLinesByPage(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), qACasesReportLinesByPageResponse9, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), qACasesReportLinesByPageResponse10, false);
                                     } else 
 
             if("getAllDispositionStatus".equals(methodName)){
                 
-                org.ihtsdo.qadb.ws.data.AllDispositionStatusResponse allDispositionStatusResponse11 = null;
-	                        allDispositionStatusResponse11 =
+                org.ihtsdo.qadb.ws.data.AllDispositionStatusResponse allDispositionStatusResponse12 = null;
+	                        allDispositionStatusResponse12 =
                                                      
                                                  skel.getAllDispositionStatus()
                                                 ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), allDispositionStatusResponse11, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), allDispositionStatusResponse12, false);
                                     } else 
 
             if("getAllRules".equals(methodName)){
                 
-                org.ihtsdo.qadb.ws.data.AllRulesResponse allRulesResponse13 = null;
-	                        allRulesResponse13 =
+                org.ihtsdo.qadb.ws.data.AllRulesResponse allRulesResponse14 = null;
+	                        allRulesResponse14 =
                                                      
                                                  skel.getAllRules()
                                                 ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), allRulesResponse13, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), allRulesResponse14, false);
                                     } else 
 
             if("getRule".equals(methodName)){
                 
-                org.ihtsdo.qadb.ws.data.RuleResponse ruleResponse15 = null;
+                org.ihtsdo.qadb.ws.data.RuleResponse ruleResponse16 = null;
 	                        org.ihtsdo.qadb.ws.data.RuleRequest wrappedParam =
                                                              (org.ihtsdo.qadb.ws.data.RuleRequest)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     org.ihtsdo.qadb.ws.data.RuleRequest.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               ruleResponse15 =
+                                               ruleResponse16 =
                                                    
                                                    
                                                          skel.getRule(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), ruleResponse15, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), ruleResponse16, false);
                                     } else 
 
             if("getAllPathsForDatabase".equals(methodName)){
                 
-                org.ihtsdo.qadb.ws.data.AllPathsForDatabaseResponse allPathsForDatabaseResponse17 = null;
+                org.ihtsdo.qadb.ws.data.AllPathsForDatabaseResponse allPathsForDatabaseResponse18 = null;
 	                        org.ihtsdo.qadb.ws.data.AllPathsForDatabaseRequest wrappedParam =
                                                              (org.ihtsdo.qadb.ws.data.AllPathsForDatabaseRequest)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     org.ihtsdo.qadb.ws.data.AllPathsForDatabaseRequest.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               allPathsForDatabaseResponse17 =
+                                               allPathsForDatabaseResponse18 =
                                                    
                                                    
                                                          skel.getAllPathsForDatabase(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), allPathsForDatabaseResponse17, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), allPathsForDatabaseResponse18, false);
                                     } else 
 
             if("getExecution".equals(methodName)){
                 
-                org.ihtsdo.qadb.ws.data.ExecutionResponse executionResponse19 = null;
+                org.ihtsdo.qadb.ws.data.ExecutionResponse executionResponse20 = null;
 	                        org.ihtsdo.qadb.ws.data.ExecutionRequest wrappedParam =
                                                              (org.ihtsdo.qadb.ws.data.ExecutionRequest)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     org.ihtsdo.qadb.ws.data.ExecutionRequest.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               executionResponse19 =
+                                               executionResponse20 =
                                                    
                                                    
                                                          skel.getExecution(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), executionResponse19, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), executionResponse20, false);
                                     } else 
 
             if("getAllDatabases".equals(methodName)){
                 
-                org.ihtsdo.qadb.ws.data.AllDatabasesResponse allDatabasesResponse21 = null;
-	                        allDatabasesResponse21 =
+                org.ihtsdo.qadb.ws.data.AllDatabasesResponse allDatabasesResponse22 = null;
+	                        allDatabasesResponse22 =
                                                      
                                                  skel.getAllDatabases()
                                                 ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), allDatabasesResponse21, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), allDatabasesResponse22, false);
                                     } else 
 
             if("getAllSeverities".equals(methodName)){
                 
-                org.ihtsdo.qadb.ws.data.AllSeveritiesResponse allSeveritiesResponse23 = null;
-	                        allSeveritiesResponse23 =
+                org.ihtsdo.qadb.ws.data.AllSeveritiesResponse allSeveritiesResponse24 = null;
+	                        allSeveritiesResponse24 =
                                                      
                                                  skel.getAllSeverities()
                                                 ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), allSeveritiesResponse23, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), allSeveritiesResponse24, false);
                                     } else 
 
             if("getAllPaths".equals(methodName)){
                 
-                org.ihtsdo.qadb.ws.data.AllPathsResponse allPathsResponse25 = null;
-	                        allPathsResponse25 =
+                org.ihtsdo.qadb.ws.data.AllPathsResponse allPathsResponse26 = null;
+	                        allPathsResponse26 =
                                                      
                                                  skel.getAllPaths()
                                                 ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), allPathsResponse25, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), allPathsResponse26, false);
                                     } else 
 
             if("getComponent".equals(methodName)){
                 
-                org.ihtsdo.qadb.ws.data.ComponentResponse componentResponse27 = null;
+                org.ihtsdo.qadb.ws.data.ComponentResponse componentResponse28 = null;
 	                        org.ihtsdo.qadb.ws.data.ComponentRequest wrappedParam =
                                                              (org.ihtsdo.qadb.ws.data.ComponentRequest)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     org.ihtsdo.qadb.ws.data.ComponentRequest.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               componentResponse27 =
+                                               componentResponse28 =
                                                    
                                                    
                                                          skel.getComponent(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), componentResponse27, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), componentResponse28, false);
                                     } else 
 
             if("getRulesReportLinesByPage".equals(methodName)){
                 
-                org.ihtsdo.qadb.ws.data.RulesReportLinesByPageResponse rulesReportLinesByPageResponse29 = null;
+                org.ihtsdo.qadb.ws.data.RulesReportLinesByPageResponse rulesReportLinesByPageResponse30 = null;
 	                        org.ihtsdo.qadb.ws.data.RulesReportLinesByPageRequest wrappedParam =
                                                              (org.ihtsdo.qadb.ws.data.RulesReportLinesByPageRequest)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     org.ihtsdo.qadb.ws.data.RulesReportLinesByPageRequest.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               rulesReportLinesByPageResponse29 =
+                                               rulesReportLinesByPageResponse30 =
                                                    
                                                    
                                                          skel.getRulesReportLinesByPage(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), rulesReportLinesByPageResponse29, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), rulesReportLinesByPageResponse30, false);
                                     } else 
 
             if("getAllComponents".equals(methodName)){
                 
-                org.ihtsdo.qadb.ws.data.AllComponentsResponse allComponentsResponse31 = null;
-	                        allComponentsResponse31 =
+                org.ihtsdo.qadb.ws.data.AllComponentsResponse allComponentsResponse32 = null;
+	                        allComponentsResponse32 =
                                                      
                                                  skel.getAllComponents()
                                                 ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), allComponentsResponse31, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), allComponentsResponse32, false);
+                                    } else 
+
+            if("persistQACase".equals(methodName)){
+                
+                org.ihtsdo.qadb.ws.data.PersistQACaseRequest wrappedParam =
+                                                             (org.ihtsdo.qadb.ws.data.PersistQACaseRequest)fromOM(
+                                    msgContext.getEnvelope().getBody().getFirstElement(),
+                                    org.ihtsdo.qadb.ws.data.PersistQACaseRequest.class,
+                                    getEnvelopeNamespaces(msgContext.getEnvelope()));
+                                                
+                                               
+                                                         skel.persistQACase(wrappedParam)
+                                                    ;
+                                            
+                                        envelope = getSOAPFactory(msgContext).getDefaultEnvelope();
                                     } else 
 
             if("getQADatabase".equals(methodName)){
                 
-                org.ihtsdo.qadb.ws.data.QADatabaseResponse qADatabaseResponse33 = null;
+                org.ihtsdo.qadb.ws.data.QADatabaseResponse qADatabaseResponse36 = null;
 	                        org.ihtsdo.qadb.ws.data.QADatabaseRequest wrappedParam =
                                                              (org.ihtsdo.qadb.ws.data.QADatabaseRequest)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     org.ihtsdo.qadb.ws.data.QADatabaseRequest.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               qADatabaseResponse33 =
+                                               qADatabaseResponse36 =
                                                    
                                                    
                                                          skel.getQADatabase(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), qADatabaseResponse33, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), qADatabaseResponse36, false);
                                     } else 
 
             if("getFinding".equals(methodName)){
                 
-                org.ihtsdo.qadb.ws.data.FindingResponse findingResponse35 = null;
+                org.ihtsdo.qadb.ws.data.FindingResponse findingResponse38 = null;
 	                        org.ihtsdo.qadb.ws.data.FindingRequest wrappedParam =
                                                              (org.ihtsdo.qadb.ws.data.FindingRequest)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     org.ihtsdo.qadb.ws.data.FindingRequest.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               findingResponse35 =
+                                               findingResponse38 =
                                                    
                                                    
                                                          skel.getFinding(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), findingResponse35, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), findingResponse38, false);
                                     
             } else {
               throw new java.lang.RuntimeException("method not found");
@@ -549,6 +564,20 @@
             
                         try{
                              return param.getOMElement(org.ihtsdo.qadb.ws.data.AllComponentsResponse.MY_QNAME,
+                                          org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+                        } catch(org.apache.axis2.databinding.ADBException e){
+                            throw org.apache.axis2.AxisFault.makeFault(e);
+                        }
+                    
+
+            }
+        
+            private  org.apache.axiom.om.OMElement  toOM(org.ihtsdo.qadb.ws.data.PersistQACaseRequest param, boolean optimizeContent)
+            throws org.apache.axis2.AxisFault {
+
+            
+                        try{
+                             return param.getOMElement(org.ihtsdo.qadb.ws.data.PersistQACaseRequest.MY_QNAME,
                                           org.apache.axiom.om.OMAbstractFactory.getOMFactory());
                         } catch(org.apache.axis2.databinding.ADBException e){
                             throw org.apache.axis2.AxisFault.makeFault(e);
@@ -1051,6 +1080,13 @@
                 if (org.ihtsdo.qadb.ws.data.AllComponentsResponse.class.equals(type)){
                 
                            return org.ihtsdo.qadb.ws.data.AllComponentsResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+                    
+
+                }
+           
+                if (org.ihtsdo.qadb.ws.data.PersistQACaseRequest.class.equals(type)){
+                
+                           return org.ihtsdo.qadb.ws.data.PersistQACaseRequest.Factory.parse(param.getXMLStreamReaderWithoutCaching());
                     
 
                 }

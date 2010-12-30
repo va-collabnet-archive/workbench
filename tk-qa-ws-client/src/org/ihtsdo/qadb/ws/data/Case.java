@@ -531,6 +531,66 @@
                                }
                             
 
+                        /**
+                        * field for PathUuid
+                        */
+
+                        
+                                    protected java.lang.String localPathUuid ;
+                                
+
+                           /**
+                           * Auto generated getter method
+                           * @return java.lang.String
+                           */
+                           public  java.lang.String getPathUuid(){
+                               return localPathUuid;
+                           }
+
+                           
+                        
+                            /**
+                               * Auto generated setter method
+                               * @param param PathUuid
+                               */
+                               public void setPathUuid(java.lang.String param){
+                            
+                                            this.localPathUuid=param;
+                                    
+
+                               }
+                            
+
+                        /**
+                        * field for DatabaseUuid
+                        */
+
+                        
+                                    protected java.lang.String localDatabaseUuid ;
+                                
+
+                           /**
+                           * Auto generated getter method
+                           * @return java.lang.String
+                           */
+                           public  java.lang.String getDatabaseUuid(){
+                               return localDatabaseUuid;
+                           }
+
+                           
+                        
+                            /**
+                               * Auto generated setter method
+                               * @param param DatabaseUuid
+                               */
+                               public void setDatabaseUuid(java.lang.String param){
+                            
+                                            this.localDatabaseUuid=param;
+                                    
+
+                               }
+                            
+
      /**
      * isReaderMTOMAware
      * @return true if the reader supports MTOM
@@ -947,6 +1007,74 @@
                                     
                                    xmlWriter.writeEndElement();
                              }
+                                    namespace = "";
+                                    if (! namespace.equals("")) {
+                                        prefix = xmlWriter.getPrefix(namespace);
+
+                                        if (prefix == null) {
+                                            prefix = generatePrefix(namespace);
+
+                                            xmlWriter.writeStartElement(prefix,"pathUuid", namespace);
+                                            xmlWriter.writeNamespace(prefix, namespace);
+                                            xmlWriter.setPrefix(prefix, namespace);
+
+                                        } else {
+                                            xmlWriter.writeStartElement(namespace,"pathUuid");
+                                        }
+
+                                    } else {
+                                        xmlWriter.writeStartElement("pathUuid");
+                                    }
+                                
+
+                                          if (localPathUuid==null){
+                                              // write the nil attribute
+                                              
+                                                     throw new org.apache.axis2.databinding.ADBException("pathUuid cannot be null!!");
+                                                  
+                                          }else{
+
+                                        
+                                                   xmlWriter.writeCharacters(localPathUuid);
+                                            
+                                          }
+                                    
+                                   xmlWriter.writeEndElement();
+                             
+                                    namespace = "";
+                                    if (! namespace.equals("")) {
+                                        prefix = xmlWriter.getPrefix(namespace);
+
+                                        if (prefix == null) {
+                                            prefix = generatePrefix(namespace);
+
+                                            xmlWriter.writeStartElement(prefix,"databaseUuid", namespace);
+                                            xmlWriter.writeNamespace(prefix, namespace);
+                                            xmlWriter.setPrefix(prefix, namespace);
+
+                                        } else {
+                                            xmlWriter.writeStartElement(namespace,"databaseUuid");
+                                        }
+
+                                    } else {
+                                        xmlWriter.writeStartElement("databaseUuid");
+                                    }
+                                
+
+                                          if (localDatabaseUuid==null){
+                                              // write the nil attribute
+                                              
+                                                     throw new org.apache.axis2.databinding.ADBException("databaseUuid cannot be null!!");
+                                                  
+                                          }else{
+
+                                        
+                                                   xmlWriter.writeCharacters(localDatabaseUuid);
+                                            
+                                          }
+                                    
+                                   xmlWriter.writeEndElement();
+                             
                     xmlWriter.writeEndElement();
                
 
@@ -1214,6 +1342,24 @@
                                            throw new org.apache.axis2.databinding.ADBException("effectiveTime cannot be null!!");
                                         }
                                     }
+                                      elementList.add(new javax.xml.namespace.QName("",
+                                                                      "pathUuid"));
+                                 
+                                        if (localPathUuid != null){
+                                            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localPathUuid));
+                                        } else {
+                                           throw new org.apache.axis2.databinding.ADBException("pathUuid cannot be null!!");
+                                        }
+                                    
+                                      elementList.add(new javax.xml.namespace.QName("",
+                                                                      "databaseUuid"));
+                                 
+                                        if (localDatabaseUuid != null){
+                                            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localDatabaseUuid));
+                                        } else {
+                                           throw new org.apache.axis2.databinding.ADBException("databaseUuid cannot be null!!");
+                                        }
+                                    
 
                 return new org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl(qName, elementList.toArray(), attribList.toArray());
             
@@ -1497,7 +1643,45 @@
                                     else {
                                         
                                     }
-                                  
+                                
+                                    
+                                    while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
+                                
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("","pathUuid").equals(reader.getName())){
+                                
+                                    java.lang.String content = reader.getElementText();
+                                    
+                                              object.setPathUuid(
+                                                    org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
+                                              
+                                        reader.next();
+                                    
+                              }  // End of if for expected property start element
+                                
+                                else{
+                                    // A start element we are not expecting indicates an invalid parameter was passed
+                                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getLocalName());
+                                }
+                            
+                                    
+                                    while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
+                                
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("","databaseUuid").equals(reader.getName())){
+                                
+                                    java.lang.String content = reader.getElementText();
+                                    
+                                              object.setDatabaseUuid(
+                                                    org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
+                                              
+                                        reader.next();
+                                    
+                              }  // End of if for expected property start element
+                                
+                                else{
+                                    // A start element we are not expecting indicates an invalid parameter was passed
+                                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getLocalName());
+                                }
+                              
                             while (!reader.isStartElement() && !reader.isEndElement())
                                 reader.next();
                             

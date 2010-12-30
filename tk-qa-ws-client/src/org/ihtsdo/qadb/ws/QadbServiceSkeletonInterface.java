@@ -191,6 +191,20 @@
         /**
          * Auto generated method signature
          * 
+                                    * @param persistQACaseRequest
+         */
+
+        
+                public void persistQACase
+                (
+                  org.ihtsdo.qadb.ws.data.PersistQACaseRequest persistQACaseRequest
+                 )
+            ;
+        
+         
+        /**
+         * Auto generated method signature
+         * 
                                     * @param qADatabaseRequest
          */
 
