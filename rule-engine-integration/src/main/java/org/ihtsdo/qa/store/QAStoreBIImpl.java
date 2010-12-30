@@ -471,7 +471,8 @@ public class QAStoreBIImpl implements QAStoreBI {
 			IntStrKeyValue[] wsFilter = null;
 			WsClientDataConverter.qaCaseFilterToWsQaCaseFilter(filter, wsFilter);
 			IntBoolKeyValue[] wsSorteBy = null;
-			WsClientDataConverter.qaCaseSortToWsQaCaseSort(sortBy, wsSorteBy);
+			
+			wsSorteBy = WsClientDataConverter.qaCaseSortToWsQaCaseSort(sortBy);
 			
 			org.ihtsdo.qadb.ws.data.QACoordinate wsQaCoord = new org.ihtsdo.qadb.ws.data.QACoordinate(); 
 			WsClientDataConverter.qaCoordinateToWsQaCoordinate(qaCoordinate, wsQaCoord);
