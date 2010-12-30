@@ -41,7 +41,8 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Tests if the refset spec is self referencing i.e. has a "is member of" clause that directly or indirectly refers to
+ * Tests if the refset spec is self referencing i.e. has a "is member of" clause
+ * that directly or indirectly refers to
  * itself.
  * 
  * @author Christine Hill
@@ -70,8 +71,7 @@ public class TestForSelfReferencingRefsetSpec extends AbstractExtensionTest {
     }
 
     @Override
-    public List<AlertToDataConstraintFailure> test(I_ExtendByRef extension, boolean forCommit)
-            throws TaskFailedException {
+    public List<AlertToDataConstraintFailure> test(I_ExtendByRef extension, boolean forCommit) throws TaskFailedException {
         try {
             ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
 
@@ -89,8 +89,7 @@ public class TestForSelfReferencingRefsetSpec extends AbstractExtensionTest {
             alertType = AlertToDataConstraintFailure.ALERT_TYPE.ERROR;
 
             I_GetConceptData refsetSpecConcept = termFactory.getConcept(extension.getRefsetId());
-            I_GetConceptData specifiesRefsetRel =
-                    termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
+            I_GetConceptData specifiesRefsetRel = termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
             I_GetConceptData memberRefset = getLatestRelationshipTarget(refsetSpecConcept, specifiesRefsetRel);
             if (memberRefset == null) { // not a refset spec being edited
                 return alertList;
@@ -121,21 +120,18 @@ public class TestForSelfReferencingRefsetSpec extends AbstractExtensionTest {
 
         try {
             RefsetSpecQuery q =
-                    RefsetQueryFactory.createQuery(configFrame, termFactory, specHelper.getRefsetSpecConcept(),
-                        specHelper.getMemberRefsetConcept(), computeType);
+                    RefsetQueryFactory.createQuery(configFrame, termFactory, specHelper.getRefsetSpecConcept(), specHelper
+                        .getMemberRefsetConcept(), computeType);
             Set<Integer> nestedRefsetIds = q.getNestedRefsets();
             if (nestedRefsetIds.contains(specHelper.getMemberRefsetConcept().getConceptNid())) {
-                alertList
-                    .add(new AlertToDataConstraintFailure(alertType,
-                        formatAlertMessage("Self referencing refset detected (direct)"), specHelper
-                            .getRefsetSpecConcept()));
+                alertList.add(new AlertToDataConstraintFailure(alertType,
+                    formatAlertMessage("Self referencing refset detected (direct)"), specHelper.getRefsetSpecConcept()));
                 return alertList;
             }
 
             if (invalidIds.contains(specHelper.getMemberRefsetConcept().getConceptNid())) {
                 alertList.add(new AlertToDataConstraintFailure(alertType,
-                    formatAlertMessage("Self referencing refset detected (indirect)"), specHelper
-                        .getRefsetSpecConcept()));
+                    formatAlertMessage("Self referencing refset detected (indirect)"), specHelper.getRefsetSpecConcept()));
                 return alertList;
             }
 
@@ -143,10 +139,16 @@ public class TestForSelfReferencingRefsetSpec extends AbstractExtensionTest {
                 RefsetSpec nestedSpecHelper = new RefsetSpec(termFactory.getConcept(nestedRefsetId), true, configFrame);
                 HashSet<Integer> nestedInvalidIds = new HashSet<Integer>();
                 nestedInvalidIds.addAll(invalidIds);
-                Integer memberRefsetId = specHelper.getMemberRefsetConcept().getConceptNid();
-                if (memberRefsetId != null) {
-                    nestedInvalidIds.add(memberRefsetId);
-                    alertList.addAll(verifyRefsetSpec(nestedSpecHelper, alertList, configFrame, nestedInvalidIds));
+                if (nestedSpecHelper.getMemberRefsetConcept() != null && nestedSpecHelper.getRefsetSpecConcept() != null) {
+                    Integer memberRefsetId = specHelper.getMemberRefsetConcept().getConceptNid();
+                    if (memberRefsetId != null) {
+                        nestedInvalidIds.add(memberRefsetId);
+                        alertList.addAll(verifyRefsetSpec(nestedSpecHelper, alertList, configFrame, nestedInvalidIds));
+                    }
+                } else {
+                    alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
+                        formatAlertMessage("Invalid refset used in a member-of clause: "
+                            + termFactory.getConcept(nestedRefsetId).getInitialText()), specHelper.getRefsetSpecConcept()));
                 }
             }
         } catch (Exception e) {
