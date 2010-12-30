@@ -74,37 +74,29 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
     private PositionBI v1_is = null;
     private PositionBI v2_is = null;
-    
+
     public PositionBI getV1Is() {
-		return v1_is;
-	}
+        return v1_is;
+    }
 
-	public void setV1Is(PositionBI position) {
-		v1_is = position;
-	}
+    public void setV1Is(PositionBI position) {
+        v1_is = position;
+    }
 
-	public PositionBI getV2Is() {
-		return v2_is;
-	}
+    public PositionBI getV2Is() {
+        return v2_is;
+    }
 
-	public void setV2Is(PositionBI position) {
-		v2_is = position;
-	}
+    public void setV2Is(PositionBI position) {
+        v2_is = position;
+    }
 
     public ArrayList<RefsetSpecComponent> getAllComponents() {
         return allComponents;
     }
 
     public enum GROUPING_TYPE {
-        OR(RefsetAuxiliary.Concept.REFSET_OR_GROUPING, true),
-        AND(RefsetAuxiliary.Concept.REFSET_AND_GROUPING, true),
-        CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, true),
-        NOT_CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, false),
-        CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, true),
-        NOT_CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, false),
-        V1(RefsetAuxiliary.Concept.DIFFERENCE_V1_GROUPING, true),
-        V2(RefsetAuxiliary.Concept.DIFFERENCE_V2_GROUPING, true)
-        ;
+        OR(RefsetAuxiliary.Concept.REFSET_OR_GROUPING, true), AND(RefsetAuxiliary.Concept.REFSET_AND_GROUPING, true), CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, true), NOT_CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, false), CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, true), NOT_CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, false), V1(RefsetAuxiliary.Concept.DIFFERENCE_V1_GROUPING, true), V2(RefsetAuxiliary.Concept.DIFFERENCE_V2_GROUPING, true);
 
         private int nid;
         private boolean truth;
@@ -139,8 +131,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     private boolean allComponentsNeedsResort = true;
     private boolean continueComputation = true;
 
-    public RefsetSpecQuery(I_GetConceptData groupingConcept, int refsetSpecNid, I_ConfigAceFrame config)
-            throws Exception {
+    public RefsetSpecQuery(I_GetConceptData groupingConcept, int refsetSpecNid, I_ConfigAceFrame config) throws Exception {
         super(refsetSpecNid, config);
         // create query object (statements + any sub-queries)
         executionOrderComparator = new RefsetSpecCalculationOrderComparator();
@@ -165,23 +156,21 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         return statements;
     }
 
-	private GROUPING_TYPE getGroupingTypeFromConcept(I_GetConceptData concept)
-			throws TerminologyException, IOException {
-		for (GROUPING_TYPE gt : GROUPING_TYPE.values()) {
-			if (concept.getConceptNid() == gt.nid)
-				return gt;
-		}
-		throw new TerminologyException("No valid grouping token specified : "
-				+ concept.getInitialText());
-	}
+    private GROUPING_TYPE getGroupingTypeFromConcept(I_GetConceptData concept) throws TerminologyException, IOException {
+        for (GROUPING_TYPE gt : GROUPING_TYPE.values()) {
+            if (concept.getConceptNid() == gt.nid)
+                return gt;
+        }
+        throw new TerminologyException("No valid grouping token specified : " + concept.getInitialText());
+    }
 
     public RefsetSpecQuery addSubquery(I_GetConceptData groupingConcept) throws Exception {
         RefsetSpecQuery subquery = new RefsetSpecQuery(groupingConcept, getRefsetSpecNid(), config);
- 		if (this.getV1Is() != null)
-			subquery.setV1Is(this.getV1Is());
-		if (this.getV2Is() != null)
-			subquery.setV2Is(this.getV2Is());
-	    subqueries.add(subquery);
+        if (this.getV1Is() != null)
+            subquery.setV1Is(this.getV1Is());
+        if (this.getV2Is() != null)
+            subquery.setV2Is(this.getV2Is());
+        subqueries.add(subquery);
         allComponents.add(subquery);
         allComponentsNeedsResort = true;
         return subquery;
@@ -209,18 +198,16 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
     public RefsetSpecStatement addDescStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
             I_AmTermComponent constraint, int refsetSpecNid) throws Exception {
-        RefsetSpecStatement statement =
-                new DescStatement(useNotQualifier, groupingToken, constraint, refsetSpecNid, config);
+        RefsetSpecStatement statement = new DescStatement(useNotQualifier, groupingToken, constraint, refsetSpecNid, config);
         statements.add(statement);
         allComponents.add(statement);
         allComponentsNeedsResort = true;
         return statement;
     }
 
-    public RefsetSpecStatement addDescStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
-            String constraint, int refsetSpecNid) throws Exception {
-        RefsetSpecStatement statement =
-                new DescStatement(useNotQualifier, groupingToken, constraint, refsetSpecNid, config);
+    public RefsetSpecStatement addDescStatement(boolean useNotQualifier, I_GetConceptData groupingToken, String constraint,
+            int refsetSpecNid) throws Exception {
+        RefsetSpecStatement statement = new DescStatement(useNotQualifier, groupingToken, constraint, refsetSpecNid, config);
         statements.add(statement);
         allComponents.add(statement);
         allComponentsNeedsResort = true;
@@ -305,8 +292,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         case AND:
             if (statements.size() == 0 && subqueries.size() == 0) {
                 activity.complete();
-                activity.setProgressInfoLower("Spec is invalid - dangling AND.");
-                throw new TerminologyException("Spec is invalid - dangling AND.\n" + this.toString());
+                //activity.setProgressInfoLower("Spec is invalid - dangling AND.");
+                //throw new TerminologyException("Spec is invalid - dangling AND.\n" + this.toString());
             }
 
             for (RefsetSpecComponent component : allComponents) {
@@ -326,8 +313,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         case OR:
             if (statements.size() == 0 && subqueries.size() == 0) {
                 activity.complete();
-                activity.setProgressInfoLower("Spec is invalid - dangling OR.");
-                throw new TerminologyException("Spec is invalid - dangling OR.\n" + this.toString());
+                //activity.setProgressInfoLower("Spec is invalid - dangling OR.");
+                //throw new TerminologyException("Spec is invalid - dangling OR.\n" + this.toString());
             }
 
             for (RefsetSpecComponent component : allComponents) {
@@ -348,8 +335,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         case NOT_CONCEPT_CONTAINS_DESC:
             if (statements.size() == 0 && subqueries.size() == 0) {
                 activity.complete();
-                activity.setProgressInfoLower("Spec is invalid - dangling concept-contains-desc.");
-                throw new TerminologyException("Spec is invalid - dangling concept-contains-desc.");
+                //activity.setProgressInfoLower("Spec is invalid - dangling concept-contains-desc.");
+                //throw new TerminologyException("Spec is invalid - dangling concept-contains-desc.");
             }
             for (RefsetSpecComponent component : allComponents) {
                 if (!continueComputation) {
@@ -368,8 +355,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         case NOT_CONCEPT_CONTAINS_REL:
             if (statements.size() == 0 && subqueries.size() == 0) {
                 activity.complete();
-                activity.setProgressInfoLower("Spec is invalid - dangling concept-contains-rel.");
-                throw new TerminologyException("Spec is invalid - dangling concept-contains-rel.");
+                //activity.setProgressInfoLower("Spec is invalid - dangling concept-contains-rel.");
+                //throw new TerminologyException("Spec is invalid - dangling concept-contains-rel.");
             }
 
             for (RefsetSpecComponent component : allComponents) {
@@ -386,46 +373,45 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             }
 
             break;
-		case V1:
-		case V2:
-			// TODO - EKM
-			if (statements.size() == 0 && subqueries.size() == 0) {
-				activity.complete();
-				activity.setProgressInfoLower("Spec is invalid - dangling "
-						+ groupingType + ".");
-				throw new TerminologyException("Spec is invalid - dangling "
-						+ groupingType + ".\n" + this.toString());
-			}
+        case V1:
+        case V2:
+            // TODO - EKM
+            if (statements.size() == 0 && subqueries.size() == 0) {
+                activity.complete();
+                activity.setProgressInfoLower("Spec is invalid - dangling " + groupingType + ".");
+                throw new TerminologyException("Spec is invalid - dangling " + groupingType + ".\n" + this.toString());
+            }
 
-			for (RefsetSpecComponent component : allComponents) {
-				if (!continueComputation) {
-					throw new ComputationCanceled("Compute cancelled");
-				}
-				activity.setProgressInfoLower("Initializing...");
-				if (possibleConcepts == null) {
-					possibleConcepts = component.getPossibleConcepts(
-							parentPossibleConcepts, activities);
-				} else {
-					possibleConcepts.or(component.getPossibleConcepts(
-							parentPossibleConcepts, activities));
-				}
-				activity.setValue(activity.getValue() + 1);
-			}
-			break;
-		default:
-			throw new TerminologyException("Unknown grouping type.");
-		}
+            for (RefsetSpecComponent component : allComponents) {
+                if (!continueComputation) {
+                    throw new ComputationCanceled("Compute cancelled");
+                }
+                activity.setProgressInfoLower("Initializing...");
+                if (possibleConcepts == null) {
+                    possibleConcepts = component.getPossibleConcepts(parentPossibleConcepts, activities);
+                } else {
+                    possibleConcepts.or(component.getPossibleConcepts(parentPossibleConcepts, activities));
+                }
+                activity.setValue(activity.getValue() + 1);
+            }
+            break;
+        default:
+            throw new TerminologyException("Unknown grouping type.");
+        }
         long endTime = System.currentTimeMillis();
         long elapsed = endTime - startTime;
         String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
         AceLog.getAppLog().info(this + " possibleConceptTime: " + elapsedStr);
+        if (possibleConcepts == null) {
+            possibleConcepts = Terms.get().getEmptyIdSet();
+        }
         setPossibleConceptsCount(possibleConcepts.cardinality());
         String incomingCount = "All";
         if (parentPossibleConcepts != null) {
             incomingCount = "" + parentPossibleConcepts.cardinality();
         }
-        activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; Incoming count: " + incomingCount
-            + "; Outgoing count: " + possibleConcepts.cardinality());
+        activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; Incoming count: " + incomingCount + "; Outgoing count: "
+            + possibleConcepts.cardinality());
 
         activity.complete();
         if (!continueComputation) {
@@ -484,11 +470,10 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         }
     }
 
-	public boolean execute(I_AmTermComponent component,
-			Collection<I_ShowActivity> activities) throws IOException,
-			TerminologyException, ComputationCanceled {
-		return execute(component, null, null, null, activities);
-	}
+    public boolean execute(I_AmTermComponent component, Collection<I_ShowActivity> activities) throws IOException,
+            TerminologyException, ComputationCanceled {
+        return execute(component, null, null, null, activities);
+    }
 
     /**
      * Executes the specified query.
@@ -497,8 +482,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
      * @throws TerminologyException
      * @throws IOException
      */
-    public boolean execute(I_AmTermComponent component, GROUPING_TYPE version, I_Position v1_is, I_Position v2_is, Collection<I_ShowActivity> activities) throws IOException,
-            TerminologyException, ComputationCanceled {
+    public boolean execute(I_AmTermComponent component, GROUPING_TYPE version, I_Position v1_is, I_Position v2_is,
+            Collection<I_ShowActivity> activities) throws IOException, TerminologyException, ComputationCanceled {
 
         if (!continueComputation) {
             throw new ComputationCanceled("Compute cancelled");
@@ -513,7 +498,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         switch (groupingType) {
         case AND:
             if (statements.size() == 0 && subqueries.size() == 0) {
-                throw new TerminologyException("Spec is invalid - dangling AND.");
+                //throw new TerminologyException("Spec is invalid - dangling AND.");
             }
 
             for (RefsetSpecComponent specComponent : allComponents) {
@@ -532,8 +517,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             return true;
         case OR:
             if (statements.size() == 0 && subqueries.size() == 0) {
-                throw new TerminologyException("Spec is invalid - dangling OR.\n\n" + this.toString() + "\n\n"
-                    + Terms.get().getConcept(getRefsetSpecNid()).toLongString());
+                //throw new TerminologyException("Spec is invalid - dangling OR.\n\n" + this.toString() + "\n\n"
+                //    + Terms.get().getConcept(getRefsetSpecNid()).toLongString());
             }
 
             for (RefsetSpecComponent specComponent : allComponents) {
@@ -558,45 +543,40 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             return executeConceptContainsRel(component, version, v1_is, v2_is, activities);
         case NOT_CONCEPT_CONTAINS_REL:
             return !executeConceptContainsRel(component, version, v1_is, v2_is, activities);
-		case V1:
-		case V2:
-			if (statements.size() == 0 && subqueries.size() == 0) {
-				throw new TerminologyException("Spec is invalid - dangling "
-						+ groupingType
-						+ ".\n\n"
-						+ this.toString()
-						+ "\n\n"
-						+ Terms.get().getConcept(getRefsetSpecNid())
-								.toLongString());
-			}
-			// Implicit OR ??
-			for (RefsetSpecComponent specComponent : allComponents) {
-				if (!continueComputation) {
-					throw new ComputationCanceled("Compute cancelled");
-				}
-				if (specComponent.execute(component, groupingType, v1_is,
-						v2_is, activities)) {
-					// exit the OR statement early, as at least one statement
-					// has returned true
-					return true;
-				}
-			}
-			// no queries or statements have returned true, therefore the OR
-			// will return false
-			return false;
-		default:
-			throw new TerminologyException("Unknown grouping type.");
-		}
+        case V1:
+        case V2:
+            if (statements.size() == 0 && subqueries.size() == 0) {
+                throw new TerminologyException("Spec is invalid - dangling " + groupingType + ".\n\n" + this.toString()
+                    + "\n\n" + Terms.get().getConcept(getRefsetSpecNid()).toLongString());
+            }
+            // Implicit OR ??
+            for (RefsetSpecComponent specComponent : allComponents) {
+                if (!continueComputation) {
+                    throw new ComputationCanceled("Compute cancelled");
+                }
+                if (specComponent.execute(component, groupingType, v1_is, v2_is, activities)) {
+                    // exit the OR statement early, as at least one statement
+                    // has returned true
+                    return true;
+                }
+            }
+            // no queries or statements have returned true, therefore the OR
+            // will return false
+            return false;
+        default:
+            throw new TerminologyException("Unknown grouping type.");
+        }
 
     }
 
-    private boolean executeConceptContainsDesc(I_AmTermComponent component, GROUPING_TYPE version, I_Position v1_is, I_Position v2_is, Collection<I_ShowActivity> activities)
-            throws TerminologyException, IOException, ComputationCanceled {
+    private boolean executeConceptContainsDesc(I_AmTermComponent component, GROUPING_TYPE version, I_Position v1_is,
+            I_Position v2_is, Collection<I_ShowActivity> activities) throws TerminologyException, IOException,
+            ComputationCanceled {
         if (!continueComputation) {
             throw new ComputationCanceled("Compute cancelled");
         }
         if (statements.size() == 0 && subqueries.size() == 0) {
-            throw new TerminologyException("Spec is invalid - dangling concept-contains-desc.");
+            //throw new TerminologyException("Spec is invalid - dangling concept-contains-desc.");
         }
 
         I_GetConceptData descriptionConcept = (I_GetConceptData) component;
@@ -644,13 +624,14 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         return false; // no descriptions met criteria
     }
 
-    private boolean executeConceptContainsRel(I_AmTermComponent component, GROUPING_TYPE version, I_Position v1_is, I_Position v2_is, Collection<I_ShowActivity> activities)
-            throws TerminologyException, IOException, ComputationCanceled {
+    private boolean executeConceptContainsRel(I_AmTermComponent component, GROUPING_TYPE version, I_Position v1_is,
+            I_Position v2_is, Collection<I_ShowActivity> activities) throws TerminologyException, IOException,
+            ComputationCanceled {
         if (!continueComputation) {
             throw new ComputationCanceled("Compute cancelled");
         }
         if (statements.size() == 0 && subqueries.size() == 0) {
-            throw new TerminologyException("Spec is invalid - dangling concept-contains-rel.");
+            //throw new TerminologyException("Spec is invalid - dangling concept-contains-rel.");
         }
 
         I_GetConceptData relQueryConcept = (I_GetConceptData) component;
@@ -850,8 +831,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         case AND:
             if (statements.size() == 0 && subqueries.size() == 0) {
                 activity.complete();
-                activity.setProgressInfoLower("Spec is invalid - dangling AND.");
-                throw new TerminologyException("Spec is invalid - dangling AND.\n" + this.toString());
+                //   activity.setProgressInfoLower("Spec is invalid - dangling AND.");
+                //   throw new TerminologyException("Spec is invalid - dangling AND.\n" + this.toString());
             }
 
             for (RefsetSpecComponent component : allComponents) {
@@ -872,8 +853,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         case OR:
             if (statements.size() == 0 && subqueries.size() == 0) {
                 activity.complete();
-                activity.setProgressInfoLower("Spec is invalid - dangling AND.");
-                throw new TerminologyException("Spec is invalid - dangling OR.");
+                // activity.setProgressInfoLower("Spec is invalid - dangling AND.");
+                // throw new TerminologyException("Spec is invalid - dangling OR.");
             }
 
             for (RefsetSpecComponent component : allComponents) {
@@ -892,10 +873,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             break;
         case CONCEPT_CONTAINS_DESC:
             activity.complete();
-            activity
-                .setProgressInfoLower("Concept-contains-desc is not supported within a description refset calculation.");
-            throw new TerminologyException(
-                "Concept-contains-desc is not supported within a description refset calculation.");
+            activity.setProgressInfoLower("Concept-contains-desc is not supported within a description refset calculation.");
+            throw new TerminologyException("Concept-contains-desc is not supported within a description refset calculation.");
         case NOT_CONCEPT_CONTAINS_DESC:
             activity.complete();
             activity
@@ -904,10 +883,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                 "NOT Concept-contains-desc is not supported within a description refset calculation.");
         case CONCEPT_CONTAINS_REL:
             activity.complete();
-            activity
-                .setProgressInfoLower("Concept-contains-rel is not supported within a description refset calculation.");
-            throw new TerminologyException(
-                "Concept-contains-rel is not supported within a description refset calculation.");
+            activity.setProgressInfoLower("Concept-contains-rel is not supported within a description refset calculation.");
+            throw new TerminologyException("Concept-contains-rel is not supported within a description refset calculation.");
         case NOT_CONCEPT_CONTAINS_REL:
             activity.complete();
             activity
@@ -921,6 +898,9 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         long minutes = elapsedTime / 60000;
         long seconds = (elapsedTime % 60000) / 1000;
         AceLog.getAppLog().info(this + " possibleConceptTime: " + minutes + " minutes, " + seconds + " seconds.");
+        if (possibleDescriptions == null) {
+            possibleDescriptions = Terms.get().getEmptyIdSet();
+        }
         setPossibleConceptsCount(possibleDescriptions.cardinality());
         String incomingCount = "All";
         if (parentPossibleDescriptions != null) {

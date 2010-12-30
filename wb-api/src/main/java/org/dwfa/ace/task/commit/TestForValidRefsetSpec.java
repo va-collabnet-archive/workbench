@@ -43,8 +43,10 @@ import org.dwfa.util.bean.Spec;
 /**
  * Tests if the refset spec is valid.
  * 1. a concept clause may never be used in a description-based compute refset.
- * 2. a description clause is only valid in a concept-based compute refset when it falls under a "concept contains desc"
+ * 2. a description clause is only valid in a concept-based compute refset when
+ * it falls under a "concept contains desc"
  * grouping clause.
+ * 3. test for dangling AND/ORs. These are removed and a warning displayed.
  * 
  * @author Christine Hill
  * 
@@ -72,8 +74,7 @@ public class TestForValidRefsetSpec extends AbstractExtensionTest {
     }
 
     @Override
-    public List<AlertToDataConstraintFailure> test(I_ExtendByRef extension, boolean forCommit)
-            throws TaskFailedException {
+    public List<AlertToDataConstraintFailure> test(I_ExtendByRef extension, boolean forCommit) throws TaskFailedException {
         try {
             ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
 
@@ -91,8 +92,7 @@ public class TestForValidRefsetSpec extends AbstractExtensionTest {
             alertType = AlertToDataConstraintFailure.ALERT_TYPE.ERROR;
 
             I_GetConceptData refsetSpecConcept = termFactory.getConcept(extension.getRefsetId());
-            I_GetConceptData specifiesRefsetRel =
-                    termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
+            I_GetConceptData specifiesRefsetRel = termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
             I_GetConceptData memberRefset = getLatestRelationshipTarget(refsetSpecConcept, specifiesRefsetRel);
             if (memberRefset == null) { // not a refset spec being edited
                 return alertList;
@@ -122,12 +122,13 @@ public class TestForValidRefsetSpec extends AbstractExtensionTest {
         }
 
         try {
-            RefsetSpecQuery q = RefsetQueryFactory.createQuery(termFactory.getActiveAceFrameConfig(), termFactory, specHelper
-                .getRefsetSpecConcept(), specHelper.getMemberRefsetConcept(), computeType);
+            RefsetSpecQuery q =
+                    RefsetQueryFactory.createQuery(termFactory.getActiveAceFrameConfig(), termFactory, specHelper
+                        .getRefsetSpecConcept(), specHelper.getMemberRefsetConcept(), computeType);
             Set<String> dangleWarnings = new HashSet<String>(RefsetQueryFactory.removeDangles(q));
-            for (String warning: dangleWarnings) {
-                alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.WARNING, formatAlertMessage(warning),
-                    specHelper.getRefsetSpecConcept()));
+            for (String warning : dangleWarnings) {
+                alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.ERROR,
+                    formatAlertMessage(warning), specHelper.getRefsetSpecConcept()));
             }
         } catch (Exception e) {
             alertList.add(new AlertToDataConstraintFailure(alertType, formatAlertMessage(e.getLocalizedMessage()),
