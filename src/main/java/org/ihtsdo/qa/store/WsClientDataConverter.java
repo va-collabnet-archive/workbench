@@ -2,6 +2,7 @@ package org.ihtsdo.qa.store;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -116,8 +117,18 @@ public class WsClientDataConverter {
 	
 	}
 
-	public static void qaCaseSortToWsQaCaseSort(LinkedHashMap<QACasesReportColumn, Boolean> sortBy, IntBoolKeyValue[] wsSorteBy) {
-	
+	public static IntBoolKeyValue[]  qaCaseSortToWsQaCaseSort(LinkedHashMap<QACasesReportColumn, Boolean> sorteBy) {
+		IntBoolKeyValue[] result = new IntBoolKeyValue[sorteBy.size()];
+		Set<QACasesReportColumn> keySet = sorteBy.keySet();
+		int j = 0;
+		for (QACasesReportColumn qaCasesReportColumn : keySet) {
+			IntBoolKeyValue sort = new IntBoolKeyValue();
+			sort.setKey(qaCasesReportColumn.getColumnNumber());
+			sort.setValue(sorteBy.get(qaCasesReportColumn));
+			result[j] = sort;
+			j++;
+		}
+		return result;
 	}
 
 	public static QACase wsCaseToCase(Case qaCase) {
