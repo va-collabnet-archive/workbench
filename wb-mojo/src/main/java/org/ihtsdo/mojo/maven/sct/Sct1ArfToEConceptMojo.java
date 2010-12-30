@@ -202,7 +202,7 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private static final boolean debug = true;
+    private static final boolean debug = false;
     private int countEConWritten;
     private int statCon;
     private int statDes;
@@ -2020,11 +2020,19 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         final int MATCH = 0;
         final int AFTER = 1;
 
-//        if (rel.relSnoId == 2020422026 || id.denotationLong == 2020422026) {
-//            System.out.println(":!!!:DEBUG @@ rel.relSnoId      == " + rel.relSnoId);
-//            System.out.println(":!!!:DEBUG @@ id.denotationLong == " + id.denotationLong);
-//            System.out.println(":!!!:DEBUG @@ id.userIdx        == " + id.userIdx);
-//        }
+
+        if (debug) {
+            if (rel.relSnoId == 2455349029L || id.denotationLong == 2455349029L) {
+                System.out.println(":!!!:DEBUG @@ rel.relSnoId      == " + rel.relSnoId);
+                System.out.println(":!!!:DEBUG @@ id.denotationLong == " + id.denotationLong);
+                System.out.println(":!!!:DEBUG @@ id.userIdx        == " + id.userIdx);
+            }
+            if (rel.relSnoId == 2671123026L || id.denotationLong == 2671123026L) {
+                System.out.println(":!!!:DEBUG @@ rel.relSnoId      == " + rel.relSnoId);
+                System.out.println(":!!!:DEBUG @@ id.denotationLong == " + id.denotationLong);
+                System.out.println(":!!!:DEBUG @@ id.userIdx        == " + id.userIdx);
+            }
+        }
 
         if (id.primaryUuidMsb > rel.relUuidMsb)
             return AFTER;
@@ -2032,10 +2040,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             return AFTER;
 
         if (id.primaryUuidMsb == rel.relUuidMsb && id.primaryUuidLsb == rel.relUuidLsb) {
-//            if (id.userIdx == 0)
-//                System.out.println(":!!!:DEBUG -- checkIdRelMatched id.userIdx == 0");
-//            if (id.denotationLong == 2020422026)
-//                System.out.println(":!!!:DEBUG -- checkIdRelMatched id.denot... == 2020422026");
             return MATCH;
         }
 
@@ -2950,18 +2954,18 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 // UNCONNECTED CONCEPT theCon ==theDes !=theRel !=theRelDest
                 createEConcept(conList, desList, null, null, addRsByCon, addRsByRs, dos);
             } else {
-//                if (debug) {
-//                    getLog().info(
-//                            "!!! Case what case is this??? -- Step 4" + " theCon=\t" + theCon
-//                                    + "\ttheDes=\t" + theDes + "\ttheRel=\t" + theRel
-//                                    + "\ttheRelDest\t" + theRelDest);
-//                    getLog().info("!!! --- concept UUID id   =" + theCon);
-//                    getLog().info("!!! --- concept SNOMED id =" + conList.get(0).conSnoId);
-//                    
-//                    getLog().info("!!! --- concept counter   #" + countCon);
-//                    getLog().info("!!! --- description       \"" + desList.get(0).termText + "\"");
-//                    getLog().info("!!! \r\n");
-//                }
+                if (debug) {
+                    getLog().info(
+                            "!!! Case what case is this??? -- Step 4" + " theCon=\t" + theCon
+                                    + "\ttheDes=\t" + theDes + "\ttheRel=\t" + theRel
+                                    + "\ttheRelDest\t" + theRelDest);
+                    getLog().info("!!! --- concept UUID id   =" + theCon);
+                    getLog().info("!!! --- concept SNOMED id =" + conList.get(0).conSnoId);
+                    
+                    getLog().info("!!! --- concept counter   #" + countCon);
+                    getLog().info("!!! --- description       \"" + desList.get(0).termText + "\"");
+                    getLog().info("!!! \r\n");
+                }
                 throw new MojoFailureException("Case not implemented -- executeMojoStep7()");
             }
 
@@ -4469,16 +4473,19 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 while ((r1 < count1) && (r2 < count2)) {
 
                     // :!!!:DEBUG:
-//                    if (a1[r1].relSnoId == 752469027 || a2[r2].relSnoId == 752469027) {
-//                        int tmpCompare = compareRelationship(a1[r1], a2[r2]);
-//                        System.out.println("!!! ");
-//                        System.out.println("!!! CASE == " + tmpCompare);
-//                        System.out.println("!!! a1[r1] @ " + revTime + " = " + a1[r1].toString());
-//                        System.out.println("!!! ");
-//                        System.out.println("!!! a2[r2] @ " + revTime + " = " + a2[r2].toString());
-//                        System.out.println("!!! ");
-//                    }
-                    // 
+                    if (debug)
+                        if ((a1[r1].relSnoId == 2455349029L || a2[r2].relSnoId == 2455349029L)
+                                || (a1[r1].relSnoId == 2671123026L || a2[r2].relSnoId == 2671123026L)) {
+                            int tmpCompare = compareRelationship(a1[r1], a2[r2]);
+                            System.out.println("!!! ");
+                            System.out.println("!!! CASE == " + tmpCompare);
+                            System.out.println("!!! a1[r1] @ " + revTime + " = "
+                                    + a1[r1].toString());
+                            System.out.println("!!! ");
+                            System.out.println("!!! a2[r2] @ " + revTime + " = "
+                                    + a2[r2].toString());
+                            System.out.println("!!! ");
+                        }
 
                     switch (compareRelationship(a1[r1], a2[r2])) {
                     case 1: // SAME RELATIONSHIP, SAME SNOMED_ID skip to next
@@ -4505,6 +4512,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                             oosIds.writeUnshared(idOnlyChange);
                         }
 
+                        a1[r1] = a2[r2];
                         r1++;
                         r2++;
                         nSidOnlyChange++;
