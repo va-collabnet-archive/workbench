@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.*;
 
 import org.ihtsdo.qa.store.QAStoreBI;
 import org.ihtsdo.qa.store.model.QACoordinate;
@@ -61,6 +62,7 @@ public class QAStorePanel extends JPanel {
 		panel3 = new JPanel();
 
 		//======== this ========
+		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new GridBagLayout());
 		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
 		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0, 0, 0};

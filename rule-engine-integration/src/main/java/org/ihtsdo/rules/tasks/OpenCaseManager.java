@@ -18,10 +18,12 @@ package org.ihtsdo.rules.tasks;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.util.Collection;
+import java.util.Properties;
 
 import javax.swing.JFrame;
 
@@ -100,9 +102,16 @@ public class OpenCaseManager extends AbstractTask {
 			
 			JFrame frame = new JFrame("QA Frame");
 			frame.setPreferredSize(new Dimension(1024,768));
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-			frame.getContentPane().add(new QAStorePanel(new QAStoreBIImpl("http://10.0.0.4:8080/axis2/services/qadb-service")), BorderLayout.CENTER);
+			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			Properties props = new Properties();
+			String endpoint = null;
+			try{
+				props.load(new FileInputStream("rules/qa_ws.properties"));
+				endpoint = props.getProperty("ws_endpoint");
+			}catch (IOException e) {
+				 e.printStackTrace();
+			}
+			frame.getContentPane().add(new QAStorePanel(new QAStoreBIImpl(endpoint)), BorderLayout.CENTER);
 
 			//Display the window.
 			frame.pack();

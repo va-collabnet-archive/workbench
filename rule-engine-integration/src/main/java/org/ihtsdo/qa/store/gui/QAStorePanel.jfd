@@ -36,6 +36,17 @@
         <boolean>true</boolean> 
        </void> 
       </object> 
+      <void method="setProperty"> 
+       <string>border</string> 
+       <object class="javax.swing.border.EmptyBorder"> 
+        <object class="java.awt.Insets"> 
+         <int>5</int> 
+         <int>5</int> 
+         <int>5</int> 
+         <int>5</int> 
+        </object> 
+       </object> 
+      </void> 
       <void property="name"> 
        <string>this</string> 
       </void> 
