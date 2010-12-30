@@ -370,19 +370,19 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                     if (needsCompute) {
                         Long lastComputeTime = spec.getLastComputeTime();
                         if (lastComputeTime == null) {
-                            computeStatusValueLabel.setText("spec has never been computed");
+                            computeStatusValueLabel.setText("never computed");
                             computeStatusValueLabel.setForeground(Color.red);
                         } else {
-                            computeStatusValueLabel.setText("spec has been modified since last compute");
+                            computeStatusValueLabel.setText("modified since last compute");
                             computeStatusValueLabel.setForeground(Color.red);
                         }
                     } else {
                         Long lastComputeTime = spec.getLastComputeTime();
                         if (lastComputeTime == null) {
-                            computeStatusValueLabel.setText("spec is new (yet to be modified) and has never been computed");
+                            computeStatusValueLabel.setText("never  computed");
                             computeStatusValueLabel.setForeground(Color.black);
                         } else {
-                            computeStatusValueLabel.setText("spec unmodified since last compute");
+                            computeStatusValueLabel.setText("unmodified since last compute");
                             computeStatusValueLabel.setForeground(Color.black);
                         }
                     }
