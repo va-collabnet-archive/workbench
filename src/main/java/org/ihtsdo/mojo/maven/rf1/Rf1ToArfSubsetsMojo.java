@@ -107,6 +107,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
     private static UUID uuidCurrent;
     private static String uuidCurrentStr;
     private static UUID uuidRetired;
+    private static String uuidRetiredStr;
 
     /**
      * Start date (inclusive)
@@ -229,6 +230,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
         uuidCurrent = ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next();
         uuidCurrentStr = uuidCurrent.toString();
         uuidRetired = ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next();
+        uuidRetiredStr = uuidRetired.toString();
 
         getLog().info("::: Target Directory: " + tDir);
         getLog().info("::: Target Sub Directory:     " + tSubDir);
@@ -366,9 +368,9 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
         sb.append(uuid.toString() + TAB_CHARACTER);
         // STATUS_UUID
         if (m.getStatus() == 0)
-            sb.append(uuidCurrent + TAB_CHARACTER);
+            sb.append(uuidCurrentStr + TAB_CHARACTER);
         else
-            sb.append(uuidRetired + TAB_CHARACTER);
+            sb.append(uuidRetiredStr + TAB_CHARACTER);
         // COMPONENT_UUID ... of member's referenced (concept, description, ...) component
         uuid = Type3UuidFactory.fromSNOMED(m.memberId);
         sb.append(uuid.toString() + TAB_CHARACTER);
@@ -568,16 +570,21 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
                 while ((r1 < count1) && (r2 < count2)) {
 
                     // :!!!:DEBUG
-                    if (a1[r1].memberId == 370698009 || a2[r2].memberId == 370698009) {
-                        System.out.println(":!!!:DEBUG: ... " + yRevDateStr );
-                        System.out.println(":!!!:DEBUG: origSubsetId " + a1[r1].origSubsetId + " , "
-                                + a2[r2].origSubsetId);
-                        System.out.println(":!!!:DEBUG: memberId " + a1[r1].memberId + " , "
-                                + a2[r2].memberId);
-                        System.out.println(":!!!:DEBUG: status " + a1[r1].status + " , "
-                                + a2[r2].status);
-                        System.out.println(":!!!:DEBUG: compare == " + compareMember(a1[r1], a2[r2]));
-                    }
+//                    if (a1[r1].memberId == 370698009 || a2[r2].memberId == 370698009) {
+//                        System.out.println(":!!!:DEBUG: ... " + yRevDateStr);
+//                        System.out.println(":!!!:DEBUG: origSubsetId a1[r1]=" + a1[r1].origSubsetId
+//                                + " , a2[r2]=" + a2[r2].origSubsetId);
+//                        System.out.println(":!!!:DEBUG: memberId a1[r1]=" + a1[r1].memberId + " ,a2[r2]="
+//                                + a2[r2].memberId);
+//                        System.out.println(":!!!:DEBUG: status " + a1[r1].status + " , "
+//                                + a2[r2].status);
+//                        System.out.println(":!!!:DEBUG: a1[r1].memberId=="
+//                                + Type3UuidFactory.fromSNOMED(a1[r1].memberId));
+//                        System.out.println(":!!!:DEBUG: a2[r2].memberId=="
+//                                + Type3UuidFactory.fromSNOMED(a2[r2].memberId));
+//                        System.out.println(":!!!:DEBUG: compare == "
+//                                + compareMember(a1[r1], a2[r2]));
+//                    }
 
                     switch (compareMember(a1[r1], a2[r2])) {
                     case 1: // SAME, skip to next
