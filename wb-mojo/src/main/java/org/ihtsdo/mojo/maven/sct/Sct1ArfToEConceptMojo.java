@@ -1251,13 +1251,14 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     capitalization, descriptionType, langCodeStr, revTime, pathIdx);
             
             // :!!!:DEBUG:
+//            if (debug)
 //            if (tmpDesRec.conUuidMsb == -8120194779924901686L
 //                    && tmpDesRec.conUuidLsb == -6989461898667750587L) {
-//                System.out.println(":!!!:DEBUG: ################ " + tmpDesRec.conSnoId);
-//                System.out.println(":!!!:DEBUG: ... conSnoId   = " + tmpDesRec.conSnoId);
-//                System.out.println(":!!!:DEBUG: ... conUuidLsb = " + tmpDesRec.conUuidLsb);
-//                System.out.println(":!!!:DEBUG: ... conUuidMsb = " + tmpDesRec.conUuidMsb);
-//                System.out.println(":!!!:DEBUG: ... termText   = " + tmpDesRec.termText);
+//                getLog().info(":!!!:DEBUG: ################ " + tmpDesRec.conSnoId);
+//                getLog().info(":!!!:DEBUG: ... conSnoId   = " + tmpDesRec.conSnoId);
+//                getLog().info(":!!!:DEBUG: ... conUuidLsb = " + tmpDesRec.conUuidLsb);
+//                getLog().info(":!!!:DEBUG: ... conUuidMsb = " + tmpDesRec.conUuidMsb);
+//                getLog().info(":!!!:DEBUG: ... termText   = " + tmpDesRec.termText);
 //            }
             // :!!!:DEBUG:END 
 
@@ -2023,14 +2024,14 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
         if (debug) {
             if (rel.relSnoId == 2455349029L || id.denotationLong == 2455349029L) {
-                System.out.println(":!!!:DEBUG @@ rel.relSnoId      == " + rel.relSnoId);
-                System.out.println(":!!!:DEBUG @@ id.denotationLong == " + id.denotationLong);
-                System.out.println(":!!!:DEBUG @@ id.userIdx        == " + id.userIdx);
+                getLog().info(":!!!:DEBUG @@ rel.relSnoId      == " + rel.relSnoId);
+                getLog().info(":!!!:DEBUG @@ id.denotationLong == " + id.denotationLong);
+                getLog().info(":!!!:DEBUG @@ id.userIdx        == " + id.userIdx);
             }
             if (rel.relSnoId == 2671123026L || id.denotationLong == 2671123026L) {
-                System.out.println(":!!!:DEBUG @@ rel.relSnoId      == " + rel.relSnoId);
-                System.out.println(":!!!:DEBUG @@ id.denotationLong == " + id.denotationLong);
-                System.out.println(":!!!:DEBUG @@ id.userIdx        == " + id.userIdx);
+                getLog().info(":!!!:DEBUG @@ rel.relSnoId      == " + rel.relSnoId);
+                getLog().info(":!!!:DEBUG @@ id.denotationLong == " + id.denotationLong);
+                getLog().info(":!!!:DEBUG @@ id.userIdx        == " + id.userIdx);
             }
         }
 
@@ -2762,11 +2763,11 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 //                    Sct1_DesRecord bugDes = (Sct1_DesRecord) bugO;
 //                    if (bugDes.conUuidMsb == -8120194779924901686L
 //                            && bugDes.conUuidLsb == -6989461898667750587L) {
-//                        System.out.println(":!!!:DEBUG: ...  ## count ## " + bugCount);
-//                        System.out.println(":!!!:DEBUG: ... conSnoId   = " + bugDes.conSnoId);
-//                        System.out.println(":!!!:DEBUG: ... conUuidLsb = " + bugDes.conUuidLsb);
-//                        System.out.println(":!!!:DEBUG: ... conUuidMsb = " + bugDes.conUuidMsb);
-//                        System.out.println(":!!!:DEBUG: ... termText   = " + bugDes.termText);
+//                        getLog().info(":!!!:DEBUG: ...  ## count ## " + bugCount);
+//                        getLog().info(":!!!:DEBUG: ... conSnoId   = " + bugDes.conSnoId);
+//                        getLog().info(":!!!:DEBUG: ... conUuidLsb = " + bugDes.conUuidLsb);
+//                        getLog().info(":!!!:DEBUG: ... conUuidMsb = " + bugDes.conUuidMsb);
+//                        getLog().info(":!!!:DEBUG: ... termText   = " + bugDes.termText);
 //                        nextBug = !nextBug;
 //                    }
 //                } else 
@@ -3009,6 +3010,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         getLog().info("*** Sct1ArfToEConcept STEP #7 COMPLETED -- CREATE eCONCEPTS ***\r\n");
     }
 
+    private static final UUID debugUuid01 = UUID.fromString("a06e367d-d93a-3769-9242-0a7c399e3d15");
+    private static final UUID debugUuid02 = UUID.fromString("56d1a403-1866-57ac-bb84-8f822fc22f83");
+        
     private void createEConcept(ArrayList<Sct1_ConRecord> conList,
             ArrayList<Sct1_DesRecord> desList, ArrayList<Sct1_RelRecord> relList,
             ArrayList<Sct1_RelDestRecord> relDestList, ArrayList<Sct1_RefSetRecord> rsByConList,
@@ -3034,9 +3038,13 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         UUID theConUUID = new UUID(cRec0.conUuidMsb, cRec0.conUuidLsb);
 
         // :DEBUG:
-        //        if (theConUUID.equals(UUID.fromString("8857ca3c-eeed-57e9-ba25-5d7f3a4ba160"))) 
-        //            getLog().info("FOUND IT");
-
+        if (debug) {
+            if (theConUUID.equals(debugUuid01))
+                getLog().info(":!!!:DEBUG: FOUND IT: White line of hoof");
+            if (theConUUID.equals(debugUuid02))
+                getLog().info(":!!!:DEBUG: FOUND IT: History Table References");
+        }
+        
         EConcept ec = new EConcept();
         ec.setPrimordialUuid(theConUUID);
 
@@ -4477,14 +4485,14 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                         if ((a1[r1].relSnoId == 2455349029L || a2[r2].relSnoId == 2455349029L)
                                 || (a1[r1].relSnoId == 2671123026L || a2[r2].relSnoId == 2671123026L)) {
                             int tmpCompare = compareRelationship(a1[r1], a2[r2]);
-                            System.out.println("!!! ");
-                            System.out.println("!!! CASE == " + tmpCompare);
-                            System.out.println("!!! a1[r1] @ " + revTime + " = "
+                            getLog().info("!!! ");
+                            getLog().info("!!! CASE == " + tmpCompare);
+                            getLog().info("!!! a1[r1] @ " + revTime + " = "
                                     + a1[r1].toString());
-                            System.out.println("!!! ");
-                            System.out.println("!!! a2[r2] @ " + revTime + " = "
+                            getLog().info("!!! ");
+                            getLog().info("!!! a2[r2] @ " + revTime + " = "
                                     + a2[r2].toString());
-                            System.out.println("!!! ");
+                            getLog().info("!!! ");
                         }
 
                     switch (compareRelationship(a1[r1], a2[r2])) {
@@ -4941,7 +4949,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 // :!!!: count "not kept"
             }
 //            if (conceptOneID == 391181005 && roleTypeSnoId == 116680003 && conceptTwoID == 6254007) {
-//                System.out.println(":!!!:DEBUG: found 391181005-116680003-6254007");
+//                getLog().info(":!!!:DEBUG: found 391181005-116680003-6254007");
 //            }
         }
 
@@ -5044,11 +5052,11 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
             // :!!!:DEBUG
 //            if (uuid.toString().compareToIgnoreCase("8003f34d-e069-57a5-b7db-919fec994ced") == 0)
-//                System.out.println("!!!:PARSE: 8003f34d-e069-57a5-b7db-919fec994ced... Rel="
+//                getLog().info("!!!:PARSE: 8003f34d-e069-57a5-b7db-919fec994ced... Rel="
 //                        + a[i].relSnoId + ":" + a[i].c1SnoId + "-" + a[i].roleTypeSnoId + "-"
 //                        + a[i].c2SnoId + " G" + a[i].group + " RG(" + GroupListStr + ")");
 //            if (a[i].c1SnoId == 391181005 && a[i].roleTypeSnoId == 116680003 && a[i].c2SnoId == 6254007) {
-//                System.out.println(":!!!:DEBUG: found 391181005-116680003-6254007 (compute uuids)");
+//                getLog().info(":!!!:DEBUG: found 391181005-116680003-6254007 (compute uuids)");
 //            }
 
             // UPDATE SNOMED ID
