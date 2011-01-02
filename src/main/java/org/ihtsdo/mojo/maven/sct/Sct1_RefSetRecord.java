@@ -1,6 +1,8 @@
 package org.ihtsdo.mojo.maven.sct;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Serializable {
@@ -166,4 +168,41 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
             }
         }
     }
+    
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("::: REFSET MEMBER RECORD :::");
+        sb.append("\r\n::: referencedComponentUuid "
+                + new UUID(this.referencedComponentUuidMsb, this.referencedComponentUuidLsb));
+
+        sb.append("\r\n::: (envelop) conUuid " + new UUID(this.conUuidMsb, this.conUuidLsb));
+
+        sb.append("\r\n::: referencedComponentUuid "
+                + new UUID(this.referencedComponentUuidMsb, this.referencedComponentUuidLsb));
+
+        sb.append("\r\n::: refsetMemberUuid "
+                + new UUID(this.refsetMemberUuidMsb, this.refsetMemberUuidLsb));
+
+        sb.append("\r\n::: status " + this.status);
+
+        Date d = new Date(this.revTime);
+        String pattern = "yyyy-MM-dd hh:mm:ss";
+        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
+        formatter.format(d);
+
+        sb.append("\r\n::: revision date " + formatter.format(d).toString());
+        
+        if (this.valueType == Sct1_RefSetRecord.ValueType.STRING)
+            sb.append("\r\n::: value string " + this.valueString);
+        else if (this.valueType == Sct1_RefSetRecord.ValueType.BOOLEAN)
+            sb.append("\r\n::: value boolean " + this.valueBoolean);
+        else if (this.valueType == Sct1_RefSetRecord.ValueType.INTEGER)
+            sb.append("\r\n::: value integer " + this.valueInt);
+        else if (this.valueType == Sct1_RefSetRecord.ValueType.CONCEPT)
+            sb.append("\r\n::: value concept " + new UUID(this.valueConUuidMsb, this.valueConUuidLsb));
+        sb.append("\r\n:::\r\n");
+
+        return sb.toString();
+    }
+    
 }
