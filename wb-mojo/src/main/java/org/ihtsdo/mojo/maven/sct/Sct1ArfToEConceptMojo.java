@@ -202,7 +202,7 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private static final boolean debug = false;
+    private static final boolean debug = true;
     private int countEConWritten;
     private int statCon;
     private int statDes;
@@ -3010,8 +3010,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         getLog().info("*** Sct1ArfToEConcept STEP #7 COMPLETED -- CREATE eCONCEPTS ***\r\n");
     }
 
-    private static final UUID debugUuid01 = UUID.fromString("a06e367d-d93a-3769-9242-0a7c399e3d15");
-    private static final UUID debugUuid02 = UUID.fromString("56d1a403-1866-57ac-bb84-8f822fc22f83");
+    private static final UUID debugUuid01 = UUID.fromString("0e2687b7-db28-5a01-b968-b98865648f2b");
         
     private void createEConcept(ArrayList<Sct1_ConRecord> conList,
             ArrayList<Sct1_DesRecord> desList, ArrayList<Sct1_RelRecord> relList,
@@ -3040,9 +3039,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         // :DEBUG:
         if (debug) {
             if (theConUUID.equals(debugUuid01))
-                getLog().info(":!!!:DEBUG: FOUND IT: White line of hoof");
-            if (theConUUID.equals(debugUuid02))
-                getLog().info(":!!!:DEBUG: FOUND IT: History Table References");
+                getLog().info(":!!!:DEBUG: FOUND IT: Non-human Subset");
         }
         
         EConcept ec = new EConcept();
@@ -3319,7 +3316,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             Sct1_RefSetRecord r = null;
             boolean hasMembersToProcess = false;
             if (rsmIdx < rsmMax) {
-                r = rsByRsList.get(rsmIdx);
+                r = rsByRsList.get(rsmIdx++);
                 hasMembersToProcess = true;
             }
             while (hasMembersToProcess) {
