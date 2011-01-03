@@ -37,9 +37,9 @@ public class ERefsetIntMember extends TkRefsetIntMember {
         statusUuid = Terms.get().nidToUuid(part.getStatusId());
         time = part.getTime();
         if (partCount > 1) {
-            extraVersions = new ArrayList<TkRefsetIntRevision>(partCount - 1);
+            revisions = new ArrayList<TkRefsetIntRevision>(partCount - 1);
             for (int i = 1; i < partCount; i++) {
-                extraVersions.add(new ERefsetIntRevision((I_ExtendByRefPartInt) m.getMutableParts().get(i)));
+                revisions.add(new ERefsetIntRevision((I_ExtendByRefPartInt) m.getMutableParts().get(i)));
             }
         }
     }
