@@ -28,6 +28,7 @@ import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.rmi.RemoteException;
 import java.security.PrivilegedActionException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,6 +40,7 @@ import java.util.logging.Level;
 
 import javax.activation.DataHandler;
 import javax.security.auth.login.LoginException;
+import javax.swing.JOptionPane;
 
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
@@ -56,6 +58,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.process.WorkspaceActiveException;
 import org.dwfa.bpa.worker.Worker;
 import org.dwfa.bpa.worker.task.I_GetWorkFromQueue;
+import org.dwfa.util.LogWithAlerts;
 
 import com.collabnet.ce.soap50.types.SoapFieldValues;
 import com.collabnet.ce.soap50.types.SoapFilter;
@@ -82,6 +85,7 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
     private String userNameStr;
     private String userPwdStr;
     private HashMap<String, String> categoryBpMap;
+    private boolean disabled = false;
 
     // :NYI:!!!: CollabAuthenticator extends Authenticator see MailAuthenticator
     // :NYI:!!!: public class SvnPrompter implements PromptUserPassword3
@@ -92,8 +96,7 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
      * @param desc
      * @throws Exception
      */
-    public CollabInboxQueueWorker(Configuration config, UUID id, String desc, I_SelectProcesses selector)
-            throws Exception {
+    public CollabInboxQueueWorker(Configuration config, UUID id, String desc, I_SelectProcesses selector) throws Exception {
         super(config, id, desc);
         props = new Properties();
 
@@ -145,8 +148,27 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
         categoryBpMap.put(tmpStr.substring(0, splitIdx), tmpStr.substring(splitIdx + 1));
 
         // :NYI:!!!: ADD Authenticator. PROMPTS FOR PWD IF NOT PRESENT.
+        if (!validLoginDetails()) {
+            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Invalid CollabNet username or password.", "",
+                JOptionPane.ERROR_MESSAGE);
+            disabled = true;
+            return;
+        }
 
         this.setPluginForInterface(I_GetWorkFromQueue.class, this);
+    }
+
+    public boolean validLoginDetails() {
+        try {
+            CollabNetSoapConnection sfc = new CollabNetSoapConnection(repoUrlStr);
+            String sessionId = sfc.login(userNameStr, userPwdStr);
+            // CLOSE SESSION
+            sfc.logoff(sessionId);
+        } catch (RemoteException e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -181,213 +203,216 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
      * @see java.lang.Runnable#run()
      */
     public void run() {
-        logger.info("RUN: starting CollabInboxQueueWorker.run() ... " + this.getWorkerDesc());
+        if (!disabled) {
+            logger.info("RUN: starting CollabInboxQueueWorker.run() ... " + this.getWorkerDesc());
 
-        Transaction t;
-        while (true) {
-            try {
-                // OPEN CONNECTION (URL_STR)
-                CollabNetSoapConnection sfc = new CollabNetSoapConnection(repoUrlStr);
-                logger.info("RUN: connection object: " + sfc.toString());
+            Transaction t;
+            while (true) {
+                try {
+                    // OPEN CONNECTION (URL_STR)
+                    CollabNetSoapConnection sfc = new CollabNetSoapConnection(repoUrlStr);
 
-                // OPEN SESSION (USER_STR, PWD_STR)
-                String sessionId = sfc.login(userNameStr, userPwdStr);
-                logger.info("RUN:         sessionId: " + sessionId);
+                    logger.info("RUN: connection object: " + sfc.toString());
 
-                // TRACKER (URL_STR, sessionId)
-                TrackerAppSoapUtil tracker = new TrackerAppSoapUtil(repoUrlStr, sessionId);
-                logger.info("RUN:         trackerId: " + repoTrackerIdStr);
-                logger.info("RUN:           tracker: " + tracker);
+                    // OPEN SESSION (USER_STR, PWD_STR)
+                    String sessionId = sfc.login(userNameStr, userPwdStr);
+                    logger.info("RUN:         sessionId: " + sessionId);
 
-                // SETUP ARTIFACT FILTER
-                SoapFilter sfStatusA = new SoapFilter();
-                sfStatusA.setName("status");
-                sfStatusA.setValue("Master ready to download");
-                SoapFilter sfStatusB = new SoapFilter();
-                sfStatusB.setName("status");
-                sfStatusB.setValue("Detail ready to download");
-                SoapFilter sfStatusC = new SoapFilter();
-                sfStatusC.setName("status");
-                sfStatusC.setValue("Unreviewed ready to download");
-                SoapFilter[] sf = new SoapFilter[] { sfStatusA, sfStatusB, sfStatusC };
+                    // TRACKER (URL_STR, sessionId)
+                    TrackerAppSoapUtil tracker = new TrackerAppSoapUtil(repoUrlStr, sessionId);
+                    logger.info("RUN:         trackerId: " + repoTrackerIdStr);
+                    logger.info("RUN:           tracker: " + tracker);
 
-                // GET FILTERED LIST OF ARTIFACTS
-                List<ArtifactSoapRow> arts = tracker.getArtifactList(repoTrackerIdStr, sf);
+                    // SETUP ARTIFACT FILTER
+                    SoapFilter sfStatusA = new SoapFilter();
+                    sfStatusA.setName("status");
+                    sfStatusA.setValue("Master ready to download");
+                    SoapFilter sfStatusB = new SoapFilter();
+                    sfStatusB.setName("status");
+                    sfStatusB.setValue("Detail ready to download");
+                    SoapFilter sfStatusC = new SoapFilter();
+                    sfStatusC.setName("status");
+                    sfStatusC.setValue("Unreviewed ready to download");
+                    SoapFilter[] sf = new SoapFilter[] { sfStatusA, sfStatusB, sfStatusC };
 
-                // :NYI: list tracker fields
+                    // GET FILTERED LIST OF ARTIFACTS
+                    List<ArtifactSoapRow> arts = tracker.getArtifactList(repoTrackerIdStr, sf);
 
-                // LOOP THROUGH TRACKER ARTIFACTS
-                String artifactId = null; // :WAS: issueExternalArtfId
-                for (ArtifactSoapRow asr : arts) {
-                    // only look at the artifacts assigned to this user
-                    if (userNameStr.equals(asr.getAssignedToUsername())) {
-                        logArtfSoapRow(asr);
-                        artifactId = asr.getId();
+                    // :NYI: list tracker fields
 
-                        // SETUP DOWNLOAD ATTACHMENT DIRECTORY
-                        // File downloadDir = new File("src/test/java");
+                    // LOOP THROUGH TRACKER ARTIFACTS
+                    String artifactId = null; // :WAS: issueExternalArtfId
+                    for (ArtifactSoapRow asr : arts) {
+                        // only look at the artifacts assigned to this user
+                        if (userNameStr.equals(asr.getAssignedToUsername())) {
+                            logArtfSoapRow(asr);
+                            artifactId = asr.getId();
 
-                        AttachmentSoapList attachList = tracker.listAttachments(artifactId);
-                        AttachmentSoapRow[] attachSoapRowArray = attachList.getDataRows();
-                        // :!!!:NYI: should only have one attachment
-                        // Get DataOjbect to be able to change values
-                        ArtifactSoapDO asdo = tracker.getArtifactData(sessionId, artifactId);
-                        logArtfSoapDO(asdo);
+                            // SETUP DOWNLOAD ATTACHMENT DIRECTORY
+                            // File downloadDir = new File("src/test/java");
 
-                        AttachmentSoapRow attachSoapRow = null;
-                        for (int i = 0; i < attachSoapRowArray.length; i++) {
-                            attachSoapRow = attachSoapRowArray[i];
-                            logAttachSoapRow(attachSoapRow);
+                            AttachmentSoapList attachList = tracker.listAttachments(artifactId);
+                            AttachmentSoapRow[] attachSoapRowArray = attachList.getDataRows();
+                            // :!!!:NYI: should only have one attachment
+                            // Get DataOjbect to be able to change values
+                            ArtifactSoapDO asdo = tracker.getArtifactData(sessionId, artifactId);
+                            logArtfSoapDO(asdo);
 
-                            // DOWNLOAD ATTACHMENT
-                            String fName = attachSoapRow.getFileName();
-                            String fRawId = attachSoapRow.getRawFileId();
-                            // String fStoredId =
-                            // attachSoapRow.getStoredFileId();
-                            String attachmentId = attachSoapRow.getAttachmentId();
-                            DataHandler dh = tracker.downloadAttachment(artifactId, fName, fRawId);
+                            AttachmentSoapRow attachSoapRow = null;
+                            for (int i = 0; i < attachSoapRowArray.length; i++) {
+                                attachSoapRow = attachSoapRowArray[i];
+                                logAttachSoapRow(attachSoapRow);
 
-                            String fileName = dh.getName().toLowerCase();
-                            logger.info("RUN:  attachment file name:  " + fileName);
+                                // DOWNLOAD ATTACHMENT
+                                String fName = attachSoapRow.getFileName();
+                                String fRawId = attachSoapRow.getRawFileId();
+                                // String fStoredId =
+                                // attachSoapRow.getStoredFileId();
+                                String attachmentId = attachSoapRow.getAttachmentId();
+                                DataHandler dh = tracker.downloadAttachment(artifactId, fName, fRawId);
 
-                            if (fName.endsWith("bp")) {
+                                String fileName = dh.getName().toLowerCase();
+                                logger.info("RUN:  attachment file name:  " + fileName);
 
-                                t = this.getActiveTransaction();
+                                if (fName.endsWith("bp")) {
 
-                                // :DEBUG:BEGIN:
-                                ObjectInputStream ois = new ObjectInputStream(dh.getInputStream());
-                                I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
-                                process.setProperty("A: ID_ARTF", artifactId);
+                                    t = this.getActiveTransaction();
 
-                                process.setProperty("A: COLLABNET_ARTIFACT_SUBMITTER", asdo.getCreatedBy());
+                                    // :DEBUG:BEGIN:
+                                    ObjectInputStream ois = new ObjectInputStream(dh.getInputStream());
+                                    I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
+                                    process.setProperty("A: ID_ARTF", artifactId);
 
-                                this.queue.write(process, t);
+                                    process.setProperty("A: COLLABNET_ARTIFACT_SUBMITTER", asdo.getCreatedBy());
 
-                                // DELETE ATTACHMENT
-                                tracker.deleteAttachment(artifactId, attachmentId);
+                                    this.queue.write(process, t);
 
-                                // SET STATUS
-                                if (asdo.getStatus().equalsIgnoreCase("Unreviewed ready to download")) {
-                                    asdo.setStatus("Unreviewed in progress");
-                                } else {
-                                    asdo.setStatus("Detail in process");
-                                }
+                                    // DELETE ATTACHMENT
+                                    tracker.deleteAttachment(artifactId, attachmentId);
 
-                                tracker.setArtifactData(asdo, "Detail downloaded for next step.");
+                                    // SET STATUS
+                                    if (asdo.getStatus().equalsIgnoreCase("Unreviewed ready to download")) {
+                                        asdo.setStatus("Unreviewed in progress");
+                                    } else {
+                                        asdo.setStatus("Detail in process");
+                                    }
 
-                                this.commitTransactionIfActive();
+                                    tracker.setArtifactData(asdo, "Detail downloaded for next step.");
 
-                            } else if (fName.endsWith("csv")) {
-                                // String contentType = dh.getContentType();
-                                // String name = dh.getName();
+                                    this.commitTransactionIfActive();
 
-                                File file = new File(fName);
-                                FileOutputStream fos = new FileOutputStream(file);
-                                dh.writeTo(fos);
-                                fos.close();
-                                logger.info("RUN:  attachment file saved:  " + file);
+                                } else if (fName.endsWith("csv")) {
+                                    // String contentType = dh.getContentType();
+                                    // String name = dh.getName();
 
-                                // ** READ ** each CSV line
-                                FileReader fr = new FileReader(file);
-                                BufferedReader br = new BufferedReader(fr);
-                                String eachLine = br.readLine();
+                                    File file = new File(fName);
+                                    FileOutputStream fos = new FileOutputStream(file);
+                                    dh.writeTo(fos);
+                                    fos.close();
+                                    logger.info("RUN:  attachment file saved:  " + file);
 
-                                if (eachLine != null) {
-                                    String[] csvHeader = parseLine(eachLine);
+                                    // ** READ ** each CSV line
+                                    FileReader fr = new FileReader(file);
+                                    BufferedReader br = new BufferedReader(fr);
+                                    String eachLine = br.readLine();
 
-                                    // if (csvHeader.length < 1)
+                                    if (eachLine != null) {
+                                        String[] csvHeader = parseLine(eachLine);
 
-                                    // READ IN ALL "VALID" ROWS
-                                    ArrayList<String[]> fileRows = new ArrayList<String[]>();
-                                    eachLine = br.readLine();
-                                    while (eachLine != null) {
-                                        String[] row = parseLine(eachLine);
-                                        // CHECK IF "VALID"
-                                        if (row.length > 1 && row[0].length() > 0 && row.length == csvHeader.length) {
-                                            fileRows.add(row);
-                                        }
-                                        // READ NEXT CSV LINE
+                                        // if (csvHeader.length < 1)
+
+                                        // READ IN ALL "VALID" ROWS
+                                        ArrayList<String[]> fileRows = new ArrayList<String[]>();
                                         eachLine = br.readLine();
+                                        while (eachLine != null) {
+                                            String[] row = parseLine(eachLine);
+                                            // CHECK IF "VALID"
+                                            if (row.length > 1 && row[0].length() > 0 && row.length == csvHeader.length) {
+                                                fileRows.add(row);
+                                            }
+                                            // READ NEXT CSV LINE
+                                            eachLine = br.readLine();
+                                        }
+                                        br.close();
+                                        file.delete();
+
+                                        int rowCounter = 1;
+                                        Integer rowTotal = Integer.valueOf(fileRows.size());
+                                        for (String[] csvRow : fileRows) {
+
+                                            t = this.getActiveTransaction();
+                                            // CREATE BP AND SAVE BP
+                                            String processName =
+                                                    asdo.getTitle() + " (detail#" + Integer.toString(rowCounter) + ")";
+
+                                            String bpStr = categoryBpMap.get(asdo.getCategory());
+
+                                            // I_EncodeBusinessProcess newProcess =
+                                            // (I_EncodeBusinessProcess)
+                                            // Class.forName("org.kp.bpa.KpetBusinessProcess").newInstance();
+                                            I_EncodeBusinessProcess newProcess =
+                                                    (I_EncodeBusinessProcess) Class.forName(bpStr).newInstance();
+                                            newProcess.setName(processName);
+
+                                            newProcess.setProperty("A: CATEGORY", asdo.getCategory());
+                                            newProcess.setProperty("A: CUSTOMER", asdo.getCustomer());
+
+                                            newProcess.setProperty("A: ID_ARTF", "NA");
+                                            newProcess.setProperty("A: ID_ARTF_PARENT", asdo.getId());
+
+                                            newProcess.setProperty("A: SEND_STATUS", "Detail ready to download");
+                                            newProcess.setProperty("A: SEND_TO_USER", "username");
+                                            newProcess.setProperty("A: SEND_COMMENT", "Remotely updated.");
+                                            newProcess.setProperty("A: ROW", rowCounter);
+                                            newProcess.setProperty("A: ROW_TOTAL", rowTotal);
+
+                                            StringBuilder sb = new StringBuilder();
+                                            for (int ci = 0; ci < csvHeader.length; ci++)
+                                                sb.append("<html>" + csvHeader[ci] + ": " + csvRow[ci] + "<br>");
+                                            newProcess.setProperty("A: MESSAGE", sb.toString());
+
+                                            // Set artifact description.
+                                            sb = new StringBuilder();
+                                            for (int ci = 0; ci < csvHeader.length; ci++)
+                                                sb.append(csvHeader[ci] + ": " + csvRow[ci] + "\r\n");
+                                            if (asdo.getDescription().length() > 0)
+                                                newProcess.setProperty("A: DESCRIPTION", asdo.getDescription() + "\r\n"
+                                                    + sb.toString());
+                                            else
+                                                newProcess.setProperty("A: DESCRIPTION", sb.toString());
+
+                                            this.queue.write(newProcess, t);
+
+                                            // SET STATUS
+                                            asdo.setStatus("Master in process");
+                                            tracker.setArtifactData(asdo, "Master downloaded.");
+
+                                            this.commitTransactionIfActive();
+
+                                            rowCounter = rowCounter + 1;
+                                        }
                                     }
-                                    br.close();
-                                    file.delete();
+                                } // if (fName.endsWith("csv"))
 
-                                    int rowCounter = 1;
-                                    Integer rowTotal = Integer.valueOf(fileRows.size());
-                                    for (String[] csvRow : fileRows) {
+                            }
 
-                                        t = this.getActiveTransaction();
-                                        // CREATE BP AND SAVE BP
-                                        String processName =
-                                                asdo.getTitle() + " (detail#" + Integer.toString(rowCounter) + ")";
-
-                                        String bpStr = categoryBpMap.get(asdo.getCategory());
-
-                                        // I_EncodeBusinessProcess newProcess =
-                                        // (I_EncodeBusinessProcess)
-                                        // Class.forName("org.kp.bpa.KpetBusinessProcess").newInstance();
-                                        I_EncodeBusinessProcess newProcess =
-                                                (I_EncodeBusinessProcess) Class.forName(bpStr).newInstance();
-                                        newProcess.setName(processName);
-
-                                        newProcess.setProperty("A: CATEGORY", asdo.getCategory());
-                                        newProcess.setProperty("A: CUSTOMER", asdo.getCustomer());
-
-                                        newProcess.setProperty("A: ID_ARTF", "NA");
-                                        newProcess.setProperty("A: ID_ARTF_PARENT", asdo.getId());
-
-                                        newProcess.setProperty("A: SEND_STATUS", "Detail ready to download");
-                                        newProcess.setProperty("A: SEND_TO_USER", "username");
-                                        newProcess.setProperty("A: SEND_COMMENT", "Remotely updated.");
-                                        newProcess.setProperty("A: ROW", rowCounter);
-                                        newProcess.setProperty("A: ROW_TOTAL", rowTotal);
-
-                                        StringBuilder sb = new StringBuilder();
-                                        for (int ci = 0; ci < csvHeader.length; ci++)
-                                            sb.append("<html>" + csvHeader[ci] + ": " + csvRow[ci] + "<br>");
-                                        newProcess.setProperty("A: MESSAGE", sb.toString());
-
-                                        // Set artifact description.
-                                        sb = new StringBuilder();
-                                        for (int ci = 0; ci < csvHeader.length; ci++)
-                                            sb.append(csvHeader[ci] + ": " + csvRow[ci] + "\r\n");
-                                        if (asdo.getDescription().length() > 0)
-                                            newProcess.setProperty("A: DESCRIPTION", asdo.getDescription() + "\r\n"
-                                                + sb.toString());
-                                        else
-                                            newProcess.setProperty("A: DESCRIPTION", sb.toString());
-
-                                        this.queue.write(newProcess, t);
-
-                                        // SET STATUS
-                                        asdo.setStatus("Master in process");
-                                        tracker.setArtifactData(asdo, "Master downloaded.");
-
-                                        this.commitTransactionIfActive();
-
-                                        rowCounter = rowCounter + 1;
-                                    }
-                                }
-                            } // if (fName.endsWith("csv"))
-
+                            logger.info("RUN:  priority SoapDO  " + asdo.getPriority());
                         }
-
-                        logger.info("RUN:  priority SoapDO  " + asdo.getPriority());
                     }
+
+                    // CLOSE SESSION
+                    sfc.logoff(sessionId);
+                    logger.info("[INFO] logoff successful for \"" + sessionId + "\"");
+
+                } catch (Throwable ex) {
+                    this.discardActiveTransaction();
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
 
-                // CLOSE SESSION
-                sfc.logoff(sessionId);
-                logger.info("[INFO] logoff successful for \"" + sessionId + "\"");
-
-            } catch (Throwable ex) {
-                this.discardActiveTransaction();
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
+                logger.info("RUN: sleeping CollabInboxQueueWorker.run() ... " + this.getWorkerDesc());
+                this.sleep();
+                logger.info("RUN: waking CollabInboxQueueWorker.run() ... " + this.getWorkerDesc());
             }
-
-            logger.info("RUN: sleeping CollabInboxQueueWorker.run() ... " + this.getWorkerDesc());
-            this.sleep();
-            logger.info("RUN: waking CollabInboxQueueWorker.run() ... " + this.getWorkerDesc());
         }
     }
 

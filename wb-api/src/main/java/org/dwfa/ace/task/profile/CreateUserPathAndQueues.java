@@ -47,9 +47,13 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.bpa.worker.task.I_GetWorkFromQueue;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.jini.ElectronicAddress;
 import org.dwfa.queue.QueueServer;
+import org.dwfa.queue.QueueWorkerSpec;
+import org.dwfa.queue.bpa.worker.CollabInboxQueueWorker;
+import org.dwfa.queue.bpa.worker.CollabOutboxQueueWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -186,11 +190,11 @@ public class CreateUserPathAndQueues extends AbstractTask {
         createQueue(config, "inbox", inboxName, userQueueRoot, nodeInboxAddress);
     }
 
-    public void createCollabnetInbox(I_ConfigAceFrame config, String inboxName, File userQueueRoot, String nodeInboxAddress,
-            String newQueueName, String collabnetUsername, String collabnetPassword) {
+    public boolean createCollabnetInbox(I_ConfigAceFrame config, String inboxName, File userQueueRoot,
+            String nodeInboxAddress, String newQueueName, String collabnetUsername, String collabnetPassword) {
         config.getQueueAddressesToShow().add(inboxName);
-        createQueue(config, "collabnet.inbox", inboxName, userQueueRoot, nodeInboxAddress, newQueueName, collabnetUsername,
-            collabnetPassword);
+        return createQueue(config, "collabnet.inbox", inboxName, userQueueRoot, nodeInboxAddress, newQueueName,
+            collabnetUsername, collabnetPassword);
     }
 
     public void createOutbox(I_ConfigAceFrame config, String outboxName, File userQueueRoot, String nodeInboxAddress) {
@@ -198,14 +202,14 @@ public class CreateUserPathAndQueues extends AbstractTask {
         createQueue(config, "outbox", outboxName, userQueueRoot, nodeInboxAddress);
     }
 
-    public void createCollabnetOutbox(I_ConfigAceFrame config, String outboxName, File userQueueRoot,
+    public boolean createCollabnetOutbox(I_ConfigAceFrame config, String outboxName, File userQueueRoot,
             String nodeInboxAddress, String newQueueName, String collabnetUsername, String collabnetPassword) {
         config.getQueueAddressesToShow().add(outboxName);
-        createQueue(config, "collabnet.outbox", outboxName, userQueueRoot, nodeInboxAddress, newQueueName,
+        return createQueue(config, "collabnet.outbox", outboxName, userQueueRoot, nodeInboxAddress, newQueueName,
             collabnetUsername, collabnetPassword);
     }
 
-    private void createQueue(I_ConfigAceFrame config, String queueType, String queueName, File userQueueRoot,
+    private boolean createQueue(I_ConfigAceFrame config, String queueType, String queueName, File userQueueRoot,
             String nodeInboxAddress, String newQueueName, String collabnetUsername, String collabnetPassword) {
 
         try {
@@ -245,6 +249,30 @@ public class CreateUserPathAndQueues extends AbstractTask {
             fw.write(configTemplateString);
             fw.close();
 
+            Configuration configuration =
+                    ConfigurationProvider.getInstance(new String[] { newQueueConfig.getCanonicalPath() }, getClass()
+                        .getClassLoader());
+            QueueWorkerSpec[] workerSpecs =
+                    (QueueWorkerSpec[]) configuration.getEntry(QueueServer.class.getName(), "workerSpecs",
+                        QueueWorkerSpec[].class);
+            for (int i = 0; i < workerSpecs.length; i++) {
+                I_GetWorkFromQueue worker = workerSpecs[i].create(configuration);
+
+                if (queueType.equals("collabnet.inbox")) {
+                    CollabInboxQueueWorker inboxWorker = (CollabInboxQueueWorker) worker;
+                    if (!inboxWorker.validLoginDetails()) {
+                        newQueueConfig.delete();
+                        return false;
+                    }
+                } else if (queueType.equals("collabnet.outbox")) {
+                    CollabOutboxQueueWorker outboxWorker = (CollabOutboxQueueWorker) worker;
+                    if (!outboxWorker.validLoginDetails()) {
+                        newQueueConfig.delete();
+                        return false;
+                    }
+                }
+            }
+
             config.getDbConfig().getQueues().add(FileIO.getRelativePath(newQueueConfig));
             Configuration queueConfig = ConfigurationProvider.getInstance(new String[] { newQueueConfig.getAbsolutePath() });
             Entry[] entries =
@@ -256,6 +284,7 @@ public class CreateUserPathAndQueues extends AbstractTask {
                     break;
                 }
             }
+
             if (QueueServer.started(newQueueConfig)) {
                 AceLog.getAppLog().info("Queue already started: " + newQueueConfig.toURI().toURL().toExternalForm());
             } else {
@@ -265,6 +294,8 @@ public class CreateUserPathAndQueues extends AbstractTask {
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
+        return true;
+
     }
 
     private void createQueue(I_ConfigAceFrame config, String queueType, String queueName, File userQueueRoot,

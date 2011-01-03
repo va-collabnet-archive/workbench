@@ -164,8 +164,12 @@ public class NewCollabNetQueuePanel extends JPanel {
     }
 
     public String getCollabnetUserName() {
-        String selectedFullName = (String) collabnetUserComboBox.getSelectedItem();
-        return collabnetUsers.get(selectedFullName);
+        if (collabnetUsers.size() == 0) {
+            return null;
+        } else {
+            String selectedFullName = (String) collabnetUserComboBox.getSelectedItem();
+            return collabnetUsers.get(selectedFullName);
+        }
     }
 
     public I_GetConceptData getWorkbenchUser() {

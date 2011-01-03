@@ -36,6 +36,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import javax.security.auth.login.LoginException;
+import javax.swing.JOptionPane;
 
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
@@ -55,6 +56,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.process.WorkspaceActiveException;
 import org.dwfa.bpa.worker.Worker;
 import org.dwfa.bpa.worker.task.I_GetWorkFromQueue;
+import org.dwfa.util.LogWithAlerts;
 
 import com.collabnet.ce.soap50.types.SoapFieldValues;
 import com.collabnet.ce.soap50.webservices.cemain.ProjectMemberSoapList;
@@ -85,6 +87,7 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
     private String userNameStr;
     private String userPwdStr;
     private String projectId;
+    private boolean disabled = false;
 
     public CollabOutboxQueueWorker(Configuration config, UUID id, String desc, I_SelectProcesses selector)
             throws ConfigurationException, LoginException, IOException, PrivilegedActionException {
@@ -97,8 +100,7 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
             repoUrlStr = (String) this.config.getEntry(this.getClass().getName(), "repoUrlStr", String.class);
             props.put("repo.url.str", repoUrlStr);
 
-            repoTrackerIdStr =
-                    (String) this.config.getEntry(this.getClass().getName(), "repoTrackerIdStr", String.class);
+            repoTrackerIdStr = (String) this.config.getEntry(this.getClass().getName(), "repoTrackerIdStr", String.class);
             props.put("repo.trackid.str", repoTrackerIdStr);
 
             // LOGIN SESSION PARAMETERS
@@ -114,6 +116,13 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
 
             // Open connection so that we can write a list of collabnet users to
             // file for later use
+            if (!validLoginDetails()) {
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Invalid CollabNet username or password.",
+                    "", JOptionPane.ERROR_MESSAGE);
+                disabled = true;
+                return;
+            }
+
             CollabNetSoapConnection sfc = new CollabNetSoapConnection(repoUrlStr);
             String sessionId = sfc.login(userNameStr, userPwdStr);
             writeUsersToFile(sfc, sessionId, projectId);
@@ -126,6 +135,19 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
         }
 
         this.setPluginForInterface(I_GetWorkFromQueue.class, this);
+    }
+
+    public boolean validLoginDetails() {
+        try {
+            CollabNetSoapConnection sfc = new CollabNetSoapConnection(repoUrlStr);
+            String sessionId = sfc.login(userNameStr, userPwdStr);
+            // CLOSE SESSION
+            sfc.logoff(sessionId);
+        } catch (RemoteException e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -160,60 +182,62 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
      * @see java.lang.Runnable#run()
      */
     public void run() {
-        // check of any *.bp in the outbox directory
-        // For each BP submit Tracker Artifact to Collabnet
+        if (!disabled) {
+            // check of any *.bp in the outbox directory
+            // For each BP submit Tracker Artifact to Collabnet
 
-        Transaction t;
-        while (true) {
-            try {
-                BusinessProcess.validateAddress(this.queue.getNodeInboxAddress(), null);
-                while (true) {
-                    logger.info("RUN: CollabOutboxQueueWorker.run() ... " + this.getWorkerDesc());
-                    t = this.getActiveTransaction();
+            Transaction t;
+            while (true) {
+                try {
+                    BusinessProcess.validateAddress(this.queue.getNodeInboxAddress(), null);
+                    while (true) {
+                        logger.info("RUN: CollabOutboxQueueWorker.run() ... " + this.getWorkerDesc());
+                        t = this.getActiveTransaction();
 
-                    I_EncodeBusinessProcess process = this.queue.take(selector, t);
-                    logger.info(this.getWorkerDesc() + " found process: " + process);
+                        I_EncodeBusinessProcess process = this.queue.take(selector, t);
+                        logger.info(this.getWorkerDesc() + " found process: " + process);
+
+                        try {
+                            BusinessProcess.validateAddress(process.getOriginator(), process.getProcessID());
+                        } catch (TaskFailedException ex) {
+                            logger.info(this.getWorkerDesc() + " found missing or malformed origin for process: " + process
+                                + " setting origin to queue's node inbox address");
+                            process.setOriginator(this.queue.getNodeInboxAddress());
+
+                        }
+
+                        if (doCollabNetDelivery(process, t)) {
+                            this.commitTransactionIfActive();
+                        } else {
+                            this.discardActiveTransaction();
+                            logger.info("Worker: " + this.getWorkerDesc() + " (" + this.getId()
+                                + ") cannot deliver process to: " + process.getDestination());
+                        }
+
+                    }
+
+                } catch (NoMatchingEntryException ex) {
 
                     try {
-                        BusinessProcess.validateAddress(process.getOriginator(), process.getProcessID());
-                    } catch (TaskFailedException ex) {
-                        logger.info(this.getWorkerDesc() + " found missing or malformed origin for process: " + process
-                            + " setting origin to queue's node inbox address");
-                        process.setOriginator(this.queue.getNodeInboxAddress());
-
+                        this.abortActiveTransaction();
+                    } catch (Exception e) {
+                        logger.log(Level.SEVERE, "Worker: " + this.getWorkerDesc() + " (" + this.getId() + ") "
+                            + e.getMessage(), e);
                     }
 
-                    if (doCollabNetDelivery(process, t)) {
-                        this.commitTransactionIfActive();
-                    } else {
-                        this.discardActiveTransaction();
-                        logger.info("Worker: " + this.getWorkerDesc() + " (" + this.getId()
-                            + ") cannot deliver process to: " + process.getDestination());
+                    if (logger.isLoggable(Level.FINE)) {
+                        logger.fine(this.getWorkerDesc() + " (" + this.getId() + ") started sleep.");
+                    }
+                    this.sleep();
+                    if (logger.isLoggable(Level.FINE)) {
+                        logger.fine(this.getWorkerDesc() + " (" + this.getId() + ") awake.");
                     }
 
+                } catch (Throwable ex) {
+                    this.discardActiveTransaction();
+                    ex.printStackTrace();
+                    logger.log(Level.SEVERE, this.getWorkerDesc(), ex);
                 }
-
-            } catch (NoMatchingEntryException ex) {
-
-                try {
-                    this.abortActiveTransaction();
-                } catch (Exception e) {
-                    logger.log(Level.SEVERE, "Worker: " + this.getWorkerDesc() + " (" + this.getId() + ") "
-                        + e.getMessage(), e);
-                }
-
-                if (logger.isLoggable(Level.FINE)) {
-                    logger.fine(this.getWorkerDesc() + " (" + this.getId() + ") started sleep.");
-                }
-                this.sleep();
-                if (logger.isLoggable(Level.FINE)) {
-                    logger.fine(this.getWorkerDesc() + " (" + this.getId() + ") awake.");
-                }
-
-            } catch (Throwable ex) {
-                this.discardActiveTransaction();
-                ex.printStackTrace();
-                logger.log(Level.SEVERE, this.getWorkerDesc(), ex);
             }
         }
     }
@@ -246,9 +270,8 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
 
         // CREATE ARTIFACT
         ArtifactSoapDO asdo =
-                tracker.createArtifact(repoTrackerIdStr, artTitle, artDescription, group, category, sendStatus,
-                    customer, priority, estimatedHours, sendToUser, releasedId, sfv, attachName, attachMimeType,
-                    attachmentFileId);
+                tracker.createArtifact(repoTrackerIdStr, artTitle, artDescription, group, category, sendStatus, customer,
+                    priority, estimatedHours, sendToUser, releasedId, sfv, attachName, attachMimeType, attachmentFileId);
 
         tracker.setArtifactData(asdo, sendComment);
 
@@ -358,8 +381,7 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
         return false;
     }
 
-    private void writeUsersToFile(CollabNetSoapConnection sfc, String sessionId, String projectId)
-            throws RemoteException {
+    private void writeUsersToFile(CollabNetSoapConnection sfc, String sessionId, String projectId) throws RemoteException {
         try {
 
             String fileName = "config" + File.separator + "collabnet-users.txt";

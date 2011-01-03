@@ -164,13 +164,24 @@ public class GetCollabNetQueuePanelDataTask extends AbstractTask {
                     File userQueueRoot = new File("queues");
 
                     // Create CollabNet inbox
-                    queueCreator.createCollabnetInbox(config, workbenchUser.getInitialText() + "-collabnet.inbox",
-                        userQueueRoot, workbenchUser.getInitialText() + "-collabnet.inbox", workbenchUser.getInitialText()
-                            + "-collabnet.inbox", collabnetUserName, collabnetUserPassword);
+                    boolean validInbox =
+                            queueCreator.createCollabnetInbox(config, workbenchUser.getInitialText() + "-collabnet.inbox",
+                                userQueueRoot, workbenchUser.getInitialText() + "-collabnet.inbox", workbenchUser
+                                    .getInitialText()
+                                    + "-collabnet.inbox", collabnetUserName, collabnetUserPassword);
+                    if (!validInbox) {
+                        return Condition.ITEM_CANCELED;
+                    }
                     // Create CollabNet outbox
-                    queueCreator.createCollabnetOutbox(config, workbenchUser.getInitialText() + "-collabnet.outbox",
-                        userQueueRoot, workbenchUser.getInitialText() + "-collabnet.outbox", workbenchUser.getInitialText()
-                            + "-collabnet.outbox", collabnetUserName, collabnetUserPassword);
+                    boolean validOutbox =
+                            queueCreator.createCollabnetOutbox(config, workbenchUser.getInitialText() + "-collabnet.outbox",
+                                userQueueRoot, workbenchUser.getInitialText() + "-collabnet.outbox", workbenchUser
+                                    .getInitialText()
+                                    + "-collabnet.outbox", collabnetUserName, collabnetUserPassword);
+
+                    if (!validOutbox) {
+                        return Condition.ITEM_CANCELED;
+                    }
 
                     return Condition.ITEM_COMPLETE;
 
