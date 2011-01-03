@@ -804,19 +804,26 @@ public class RulesLibrary {
 			String guvnorEnumerationText = "'" + propertyName + "' : [";
 			for (I_ExtendByRef loopMember : Terms.get().getRefsetExtensionMembers(refset.getConceptNid())) {
 
-				I_ExtendByRefPartCid lastPart = (I_ExtendByRefPartCid) loopMember.getTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), 
-						config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getMutablePart();
-				ConceptVersionBI loopConcept = Ts.get().getConceptVersion(config.getCoordinate(),lastPart.getC1id());
+//				I_ExtendByRefPartCid lastPart = (I_ExtendByRefPartCid) loopMember.getTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), 
+//						config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getMutablePart();
+				ConceptVersionBI loopConcept = Ts.get().getConceptVersion(config.getCoordinate(),loopMember.getComponentNid());
 
-				String name = "";
-
-				if (loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).size() > 0) {
-					name = loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).iterator().next().getText();
-				} else if (loopConcept.getDescsActive().size() > 0){
-					name = loopConcept.getDescsActive().iterator().next().getText();
-				} else {
-					name = "no description found";
+				String name = "no description found";
+				
+				for (DescriptionVersionBI loopDescription : loopConcept.getDescsActive()) {
+					if (loopDescription.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()
+							&& loopDescription.getLang().toLowerCase().startsWith("en")) {
+						name = loopDescription.getText();
+					}
 				}
+
+//				if (loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).size() > 0) {
+//					name = loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).iterator().next().getText();
+//				} else if (loopConcept.getDescsActive().size() > 0){
+//					name = loopConcept.getDescsActive().iterator().next().getText();
+//				} else {
+//					name = "no description found";
+//				}
 
 				guvnorEnumerationText = guvnorEnumerationText + "'" + loopConcept.getPrimUuid();
 				guvnorEnumerationText = guvnorEnumerationText + "=" + name;
