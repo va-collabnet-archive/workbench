@@ -59,9 +59,6 @@ public class TkConcept {
                 conceptAttributes = new TkConceptAttributes(in, readDataVersion);
             }
         }
-        if (primordialUuid.equals(UUID.fromString("0e2687b7-db28-5a01-b968-b98865648f2b"))) {
-            System.out.println("found: " + primordialUuid);
-        }
         int descCount = in.readInt();
         if (descCount > 0) {
             descriptions = new ArrayList<TkDescription>(descCount);
