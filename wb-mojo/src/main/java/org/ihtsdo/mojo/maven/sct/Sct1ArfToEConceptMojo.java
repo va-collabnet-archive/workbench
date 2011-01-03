@@ -71,6 +71,7 @@ import org.ihtsdo.etypes.ERefsetStrMember;
 import org.ihtsdo.etypes.ERefsetStrRevision;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipRevision;
+import org.ihtsdo.mojo.econcept.ConceptDescriptor;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
@@ -319,6 +320,14 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
      * @required
      */
     private UUID uuidUser;
+    
+    /**
+     * Watch concepts
+     * 
+     * @parameter
+     */
+    private List<ConceptDescriptor> conceptsToWatch;
+
 
     public void setUuidUser(String uuidStr) {
         uuidUser = UUID.fromString(uuidStr);
@@ -771,7 +780,20 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
     }
 
+    HashMap<UUID, ConceptDescriptor> conceptsToWatchMap;
+    
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+           conceptsToWatchMap =
+                    new HashMap<UUID, ConceptDescriptor>();
+
+            if (conceptsToWatch != null) {
+                for (ConceptDescriptor cd : conceptsToWatch) {
+                    conceptsToWatchMap.put(UUID.fromString(cd.getUuid()), cd);
+                }
+            }
+
+        
         getLog().info("::: BEGIN Sct1ArfToEConcept");
 
         // SHOW build directory from POM file
@@ -3561,6 +3583,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             countRefsetMaster++;
 
             ec.setRefsetMembers(listErm);
+            if (conceptsToWatchMap.containsKey(ec.primordialUuid)) {
+                getLog().info("Found watch concept after adding refset members: "
+                        + ec);
+            }
         }
 
         try {
