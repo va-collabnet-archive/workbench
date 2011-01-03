@@ -33,7 +33,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
-import java.io.StreamTokenizer;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
@@ -203,7 +202,6 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private static final boolean debug = true;
     private int countEConWritten;
     private int statCon;
     private int statDes;
@@ -327,6 +325,13 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
      * @parameter
      */
     private List<ConceptDescriptor> conceptsToWatch;
+
+    /**
+     * Watch concepts
+     * 
+     * @parameter default-value="false"
+     */
+    private boolean debug;
 
 
     public void setUuidUser(String uuidStr) {
@@ -1686,7 +1691,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         getLog().info("*** Sct1ArfToEConcept STEP #3 COMPLETED -- GATHER DESTINATION RELs ***\r\n");
     }
 
-    private void executeMojoStep4() {
+    private void executeMojoStep4() throws MojoFailureException {
         getLog().info("*** Sct1ArfToEConcept STEP #4 BEGINNING -- MATCH IDs ***");
         long start = System.currentTimeMillis();
         int nWrite = 0; // counter for memory optimization for object files writing
@@ -1927,14 +1932,14 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             aRel = null;
 
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            throw new MojoFailureException("FileNotFoundException");
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            throw new MojoFailureException("IOException");
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            throw new MojoFailureException("ClassNotFoundException");
         }
 
         getLog().info(
@@ -2693,13 +2698,13 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            throw new MojoFailureException("File Not Found -- Step 3");
+            throw new MojoFailureException("File Not Found -- Step 6 Sort");
         } catch (IOException e) {
             e.printStackTrace();
-            throw new MojoFailureException("IO Exception -- Step 3");
+            throw new MojoFailureException("IO Exception -- Step 6 Sort");
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            throw new MojoFailureException("ClassNotFoundException -- Step 6 Sort");
         }
         getLog().info(
                 "*** MASTER SORT TIME: " + ((System.currentTimeMillis() - start) / 1000)
@@ -3031,8 +3036,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         getLog().info("*** ECONCEPTS WRITTEN TO FILE = " + countEConWritten);
         getLog().info("*** Sct1ArfToEConcept STEP #7 COMPLETED -- CREATE eCONCEPTS ***\r\n");
     }
-
-    private static final UUID debugUuid01 = UUID.fromString("0e2687b7-db28-5a01-b968-b98865648f2b");
         
     private void createEConcept(ArrayList<Sct1_ConRecord> conList,
             ArrayList<Sct1_DesRecord> desList, ArrayList<Sct1_RelRecord> relList,
@@ -3057,12 +3060,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         Collections.sort(conList);
         Sct1_ConRecord cRec0 = conList.get(0);
         UUID theConUUID = new UUID(cRec0.conUuidMsb, cRec0.conUuidLsb);
-
-        // :DEBUG:
-        if (debug) {
-            if (theConUUID.equals(debugUuid01))
-                getLog().info(":!!!:DEBUG: FOUND IT: Non-human Subset");
-        }
         
         EConcept ec = new EConcept();
         ec.setPrimordialUuid(theConUUID);
@@ -3515,7 +3512,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                         }
                     } else
                         hasMembersToProcess = false;
-
+                    
                     // :!!!:NYI: tmp.setAdditionalIdComponents(additionalIdComponents);
                     listErm.add(tmp);
                 } else if (r.valueType == Sct1_RefSetRecord.ValueType.STRING) {
@@ -4453,7 +4450,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             throws Exception {
         int count1, count2; // records in arrays 1 & 2
         String fName1, fName2; // file path name
-        int pathID;
         long revTime;
         Sct1_RelRecord[] a1, a2, a3 = null;
 
@@ -5185,13 +5181,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         getLog().info(
                 "Output time: " + count + " records, " + (System.currentTimeMillis() - start)
                         + " milliseconds");
-    }
-
-    private void skipLineOne(StreamTokenizer st) throws IOException {
-        int tokenType = st.nextToken();
-        while (tokenType != StreamTokenizer.TT_EOL) {
-            tokenType = st.nextToken();
-        }
     }
 
     private void stateSave(String wDir) {
