@@ -248,6 +248,7 @@ public class Rf1ToArfTextDefMojo extends AbstractMojo implements Serializable {
         Iterator<List<RF1File>> dit = fileListList.iterator(); // Directory Iterator
         while (dit.hasNext()) {
             List<RF1File> fl = dit.next(); // File List
+            Collections.sort(fl);
             Iterator<RF1File> fit = fl.iterator(); // File Iterator 
             while (fit.hasNext()) {
                 RF1File f2 = fit.next();
@@ -259,7 +260,7 @@ public class Rf1ToArfTextDefMojo extends AbstractMojo implements Serializable {
 
     private void processTextDefinitions(List<RF1File> fileList, BufferedWriter bwc)
             throws MojoFailureException, IOException, NoSuchAlgorithmException {
-        // :!!!: does this need to be added Collections.sort(fileListList);
+        Collections.sort(fileList);
 
         int count1, count2; // records in arrays 1 & 2
         String fName1, fName2; // file path name

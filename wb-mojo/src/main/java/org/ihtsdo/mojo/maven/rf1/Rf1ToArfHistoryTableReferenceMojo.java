@@ -43,6 +43,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
 import org.dwfa.util.id.Type5UuidFactory;
 
+import edu.emory.mathcs.backport.java.util.Collections;
+
 /**
  * <b>DESCRIPTION: </b><br>
  * 
@@ -295,6 +297,7 @@ public class Rf1ToArfHistoryTableReferenceMojo extends AbstractMojo implements S
         Iterator<List<RF1File>> dit = fileListList.iterator(); // Directory Iterator
         while (dit.hasNext()) {
             List<RF1File> fl = dit.next(); // File List
+            Collections.sort(fl);
             Iterator<RF1File> fit = fl.iterator(); // File Iterator
 
             if (fit == null || fit.hasNext() == false)
@@ -563,6 +566,7 @@ public class Rf1ToArfHistoryTableReferenceMojo extends AbstractMojo implements S
         Iterator<List<RF1File>> dit = fileListList.iterator(); // Directory Iterator
         while (dit.hasNext()) {
             List<RF1File> fl = dit.next(); // File List
+            Collections.sort(fl);
             Iterator<RF1File> fit = fl.iterator(); // File Iterator 
             while (fit.hasNext()) {
                 RF1File f2 = fit.next();
