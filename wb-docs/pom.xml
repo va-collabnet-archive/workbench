@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>wb-mmb</artifactId>
 		<groupId>org.ihtsdo</groupId>
-		<version>2.6.0-trek-8</version>
+		<version>2.6.0-trek-8-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>wb-docs</artifactId>
