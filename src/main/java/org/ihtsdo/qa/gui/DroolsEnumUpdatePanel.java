@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import javax.swing.*;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -259,6 +260,7 @@ public class DroolsEnumUpdatePanel extends JPanel {
 				for (I_GetConceptData member : members) {
 					droolsEnumListModel.addElement(member);
 				}
+				droolEnumList.revalidate();
 			}
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -423,6 +425,7 @@ public class DroolsEnumUpdatePanel extends JPanel {
 
 			//======== scrollPane2 ========
 			{
+				scrollPane2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 				scrollPane2.setViewportView(droolEnumList);
 			}
 			panel2.add(scrollPane2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
