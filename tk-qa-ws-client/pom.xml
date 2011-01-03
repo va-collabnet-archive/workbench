@@ -42,6 +42,56 @@
 		<sourceDirectory>${basedir}/src</sourceDirectory>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.axis2</groupId>
+				<artifactId>axis2-wsdl2code-maven-plugin</artifactId>
+				<version>1.5.2</version>
+				<executions>
+					<execution>
+						<phase>clean</phase>
+						<goals>
+							<goal>wsdl2code</goal>
+						</goals>
+						<configuration>
+							<packageName>org.ihtsdo.qadb.service</packageName>
+							<wsdlFile>resources/qadb-service.wsdl</wsdlFile>
+							<generateServerSide>true</generateServerSide>
+							<generateServicesXml>false</generateServicesXml>
+							<generateServerSideInterface>true</generateServerSideInterface>
+							<generateAllClasses>true</generateAllClasses>
+							<outputDirectory>${basedir}</outputDirectory>
+							<!-- <syncMode>sync</syncMode> -->
+							<overWrite>true</overWrite>
+							<packageName>org.ihtsdo.qadb.ws</packageName>
+							<namespaceURIs>
+								<namespaceURI>
+									<uri>http://schemas.xmlsoap.org/wsdl/soap/</uri>
+									<packageName>org.ihtsdo.qadb.soap</packageName>
+								</namespaceURI>
+								<namespaceURI>
+									<uri>http://www.ihtsdo.org/qadb/qadb-service/</uri>
+									<packageName>org.ihtsdo.qadb.ws.data</packageName>
+								</namespaceURI>
+								<namespaceURI>
+									<uri>http://www.w3.org/2004/06/xmlmime</uri>
+									<packageName>org.ihtsdo.qadb.ws.xmlmime</packageName>
+								</namespaceURI>
+								<namespaceURI>
+									<uri>http://schemas.xmlsoap.org/soap/encoding/</uri>
+									<packageName>org.ihtsdo.qadb.ws.soap</packageName>
+								</namespaceURI>
+							</namespaceURIs>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.axis2</groupId>
+						<artifactId>axis2</artifactId>
+						<version>1.5.2</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.0.2</version>
