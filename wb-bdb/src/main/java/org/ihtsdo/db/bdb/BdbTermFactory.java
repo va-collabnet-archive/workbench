@@ -1163,14 +1163,19 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     @Override
     public PathBI newPath(final Collection<? extends PositionBI> origins, final I_GetConceptData pathConcept,
             I_ConfigAceFrame commitConfig) throws TerminologyException, IOException {
+    	AceLog.getEditLog().info("BdbTermFactory newPath Called");
         assert pathConcept != null && pathConcept.getConceptNid() != 0;
+        AceLog.getEditLog().info("BdbTermFactory newPath pathConcept != null && pathConcept.getConceptNid() != 0");
         final ArrayList<PositionBI> originList = new ArrayList<PositionBI>();
         if (origins != null) {
+        	AceLog.getEditLog().info("BdbTermFactory newPath origins != null");
             originList.addAll(origins);
         }
+        AceLog.getEditLog().info("BdbTermFactory newPath creating new path");
         final Path newPath = new Path(pathConcept.getConceptNid(), originList);
-        AceLog.getEditLog().fine("writing new path: \n" + newPath);
+        AceLog.getEditLog().info("writing new path: \n" + newPath);
         this.pathManager.write(newPath, commitConfig);
+        AceLog.getEditLog().info("BdbTermFactory newPath about to return new Path");
         return newPath;
     }
 
