@@ -61,6 +61,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure.ALERT_TYPE;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
@@ -81,6 +82,7 @@ import org.ihtsdo.testmodel.DrConcept;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.KindOfCacheBI;
+import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.helper.ResultsItem;
@@ -1024,5 +1026,69 @@ public class RulesLibrary {
 			e.printStackTrace();
 		}
 		return descendants;
+	}
+	
+	/**
+	 * Calculates a set of valid users - a user is valid is they are a child of the User concept in the top hierarchy,
+	 * and have a description of type "user inbox".
+	 * 
+	 * @return The set of valid users.
+	 */
+	public static Set<I_GetConceptData> getUsers() {
+		HashSet<I_GetConceptData> validUsers = new HashSet<I_GetConceptData>();
+		I_ConfigAceFrame config = null;
+		try {
+			config = Terms.get().getActiveAceFrameConfig();
+		} catch (TerminologyException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			I_GetConceptData userParent =
+				Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
+
+			I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
+			I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+			Set<Integer> currentStatuses = helper.getCurrentStatusIds();
+
+			Set<? extends I_GetConceptData> allUsers = userParent.getDestRelOrigins(config.getAllowedStatus(),
+					allowedTypes, config.getViewPositionSetReadOnly(), Precedence.TIME,
+					config.getConflictResolutionStrategy());
+			I_GetConceptData descriptionType =
+				Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
+			I_IntSet descAllowedTypes = Terms.get().newIntSet();
+			descAllowedTypes.add(descriptionType.getConceptNid());
+
+			for (I_GetConceptData user : allUsers) {
+
+				I_DescriptionTuple latestTuple = null;
+				long latestVersion = Long.MIN_VALUE;
+
+				List<? extends I_DescriptionTuple> descriptionResults =
+					user.getDescriptionTuples(null, descAllowedTypes, Terms.get()
+							.getActiveAceFrameConfig().getViewPositionSetReadOnly(),
+							Precedence.TIME, config.getConflictResolutionStrategy());
+				for (I_DescriptionTuple descriptionTuple : descriptionResults) {
+					if (descriptionTuple.getTime() > latestVersion) {
+						latestVersion = descriptionTuple.getTime();
+						latestTuple = descriptionTuple;
+					}
+				}
+				if (latestTuple != null) {
+					for (int currentStatusId : currentStatuses) {
+						if (latestTuple.getStatusNid() == currentStatusId) {
+							validUsers.add(user);
+						}
+					}
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return validUsers;
 	}
 }

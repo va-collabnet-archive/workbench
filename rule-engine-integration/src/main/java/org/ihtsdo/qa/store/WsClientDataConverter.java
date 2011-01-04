@@ -2,7 +2,6 @@ package org.ihtsdo.qa.store;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -20,9 +19,9 @@ import org.ihtsdo.qadb.ws.data.IntBoolKeyValue;
 import org.ihtsdo.qadb.ws.data.IntStrKeyValue;
 
 public class WsClientDataConverter {
-	public static IntStrKeyValue[] filterToWsFilter(HashMap<RulesReportColumn, Object> filter, IntStrKeyValue[] wsFilter) {
+	public static IntStrKeyValue[] filterToWsFilter(HashMap<RulesReportColumn, Object> filter) {
+		IntStrKeyValue[] wsFilter = new IntStrKeyValue[filter.size()];
 		if(filter != null && !filter.isEmpty()){
-			wsFilter = new IntStrKeyValue[filter.size()];
 			Set<RulesReportColumn> filterSet = filter.keySet();
 			int j = 0;
 			for (RulesReportColumn filterElement : filterSet) {
@@ -113,8 +112,18 @@ public class WsClientDataConverter {
 		return result;
 	}
 
-	public static void qaCaseFilterToWsQaCaseFilter(HashMap<QACasesReportColumn, Object> filter, IntStrKeyValue[] wsFilter) {
-	
+	public static IntStrKeyValue[] qaCaseFilterToWsQaCaseFilter(HashMap<QACasesReportColumn, Object> filter) {
+		IntStrKeyValue[] wsFilter = new IntStrKeyValue[filter.size()];
+		Iterable<QACasesReportColumn> keySet = filter.keySet();
+		int j = 0;
+		for (QACasesReportColumn qaCasesReportColumn : keySet) {
+			IntStrKeyValue f = new IntStrKeyValue();
+			f.setKey(qaCasesReportColumn.getColumnNumber());
+			f.setValue(filter.get(qaCasesReportColumn).toString());
+			wsFilter[j] = f;
+			j++;
+		}
+		return wsFilter;
 	}
 
 	public static IntBoolKeyValue[]  qaCaseSortToWsQaCaseSort(LinkedHashMap<QACasesReportColumn, Boolean> sorteBy) {

@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
@@ -33,7 +34,9 @@ import javax.swing.border.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.task.refset.rfc.ModifyUserRolePanel.UserComboBoxListener;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.qa.gui.ObjectTransferHandler;
 import org.ihtsdo.qa.store.QAStoreBI;
@@ -41,9 +44,12 @@ import org.ihtsdo.qa.store.model.DispositionStatus;
 import org.ihtsdo.qa.store.model.QACase;
 import org.ihtsdo.qa.store.model.QACoordinate;
 import org.ihtsdo.qa.store.model.Rule;
+import org.ihtsdo.qa.store.model.Severity;
 import org.ihtsdo.qa.store.model.view.QACasesReportColumn;
 import org.ihtsdo.qa.store.model.view.QACasesReportLine;
 import org.ihtsdo.qa.store.model.view.QACasesReportPage;
+import org.ihtsdo.qa.store.model.view.RulesReportColumn;
+import org.ihtsdo.rules.RulesLibrary;
 
 /**
  * @author Guillermo Reynoso
@@ -64,6 +70,7 @@ public class QACasesBrowser extends JPanel {
 	private int finalLine = 0;
 	private int totalLines = 0;
 	private ObjectTransferHandler th = null;
+	private HashMap<QACasesReportColumn, Object> filter;
 
 	public QACasesBrowser(QAStoreBI store, QACoordinate coordinate, Rule rule) {
 		try {
@@ -75,6 +82,8 @@ public class QACasesBrowser extends JPanel {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		filter = new HashMap<QACasesReportColumn, Object>();
 		
 		this.store = store;
 		this.coordinate = coordinate;
@@ -104,14 +113,41 @@ public class QACasesBrowser extends JPanel {
 		String[][] data = null;
 		tableModel = new CaseTableModel();
 
+		Set<I_GetConceptData> users = RulesLibrary.getUsers();
+		
 		Object[] values = dispositionStatuses.toArray();
 		table1.setModel(tableModel);
 		table1.setTransferHandler(th);
 		table1.setDragEnabled(true);
+		Object[] userArray = new Object[users.size() + 1];
+		int j = 1;
+		userArray[0] = "";
+		for (Object user : users) {
+			userArray[j] = ((I_GetConceptData)user).toString();
+			j++;
+		}
+		JComboBox usersCombo = new JComboBox(userArray);
+		usersCombo.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent item) {
+				if (item.getStateChange() == ItemEvent.SELECTED) {
+					Object[] row = tableModel.getRow(table1.getSelectedRow());
+					QACase qacase = (QACase) row[7];
+					String assignedTo = (String) item.getItem();
+					qacase.setAssignedTo(assignedTo);
+					QACasesBrowser.this.store.persistQACase(qacase);
+				}
+			}
+		});
+		TableColumn assignedToColumn = table1.getColumnModel().getColumn(5);
+		assignedToColumn.setCellEditor(new DefaultCellEditor(usersCombo));
+		
+		
 		TableColumn col = table1.getColumnModel().getColumn(4);
-		JComboBox myComboBox = new JComboBox(values);
+		JComboBox dispoCombo = new JComboBox(values);
+		col.setCellEditor(new DefaultCellEditor(dispoCombo));
 
-		myComboBox.addItemListener(new ItemListener() {
+		dispoCombo.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent item) {
 				if (item.getStateChange() == ItemEvent.SELECTED) {
@@ -144,7 +180,6 @@ public class QACasesBrowser extends JPanel {
 			}
 		});
 		
-		col.setCellEditor(new DefaultCellEditor(myComboBox));
 
 		if (coordinate != null && rule != null) {
 			setupPanel(store, coordinate, rule);
@@ -182,7 +217,7 @@ public class QACasesBrowser extends JPanel {
 
 		setupStatusCombo();
 		setupDispositionCombo();
-		textField1.setText("");
+		conceptNameTextField.setText("");
 		showFilters = false;
 		filterButton.setText("Show filters");
 		// updateTable1();
@@ -195,7 +230,8 @@ public class QACasesBrowser extends JPanel {
 		LinkedHashMap<QACasesReportColumn, Boolean> sortBy = new LinkedHashMap<QACasesReportColumn, Boolean>();
 		sortBy.put(QACasesReportColumn.CONCEPT_NAME, true);
 
-		HashMap<QACasesReportColumn, Object> filter = new HashMap<QACasesReportColumn, Object>();
+		updateFilters(filter);
+		
 		Integer selectedPageLengh = Integer.parseInt((String) comboBox6.getSelectedItem());
 		QACasesReportPage page = store.getQACasesReportLinesByPage(coordinate, rule.getRuleUuid(), sortBy, filter, startLine, selectedPageLengh);
 		List<QACasesReportLine> lines = page.getLines();
@@ -205,38 +241,6 @@ public class QACasesBrowser extends JPanel {
 		updatePageCounters();
 		for (QACasesReportLine line : lines) {
 			boolean lineApproved = true;
-			// if (showFilters) {
-			// if (comboBox4.getSelectedIndex() != 0){
-			// String selectedStatus = (String) comboBox4.getSelectedItem();
-			// if (selectedStatus.equals("Open")) {
-			// if (!line.getQaCase().isActive()) {
-			// lineApproved = false;
-			// }
-			// } else if (selectedStatus.equals("Closed")) {
-			// if (line.getQaCase().isActive()) {
-			// lineApproved = false;
-			// }
-			// }
-			// }
-			// if (comboBox5.getSelectedIndex() != 0){
-			// DispositionStatus selectedDisposition = (DispositionStatus)
-			// comboBox5.getSelectedItem();
-			// if
-			// (!line.getDisposition().getDispositionStatusUuid().equals(selectedDisposition.getDispositionStatusUuid()))
-			// {
-			// lineApproved = false;
-			// }
-			// }
-			// String filterText = textField1.getText().trim().toLowerCase();
-			// if (!filterText.isEmpty()) {
-			// if
-			// (!line.getComponent().getComponentName().toLowerCase().contains(filterText))
-			// {
-			// lineApproved = false;
-			// }
-			// }
-			// }
-
 			if (lineApproved) {
 				List<Object> row = new ArrayList<Object>();
 				row.add(line.getComponent().getComponentUuid().toString());
@@ -258,23 +262,49 @@ public class QACasesBrowser extends JPanel {
 		table1.repaint();
 	}
 
+	private void updateFilters(HashMap<QACasesReportColumn, Object> filter) {
+		filter.clear();
+		if (showFilters) {
+			String conceptNameFilter = conceptNameTextField.getText();
+			if(conceptNameFilter != null && !conceptNameFilter.trim().equals("")){
+				filter.put(QACasesReportColumn.CONCEPT_NAME, conceptNameFilter);
+			}
+			String statusFilter = (String) statusComboBox.getSelectedItem();
+			if(!statusFilter.equals("Any")){
+				if(statusFilter.equals("Open")){
+					filter.put(QACasesReportColumn.STATUS, "Open");
+				}else if(statusFilter.equalsIgnoreCase("Closed")){
+					filter.put(QACasesReportColumn.STATUS, "Closed");
+				}
+			}
+			Object dispoObj = dispoStatusComboBox.getSelectedItem();
+			if(dispoObj != null && dispoObj instanceof DispositionStatus){
+				DispositionStatus dispStatus = (DispositionStatus)dispoObj;
+				filter.put(QACasesReportColumn.DISPOSITION, dispStatus.getDispositionStatusUuid().toString());
+			}
+				
+		}
+	}
+
 	private void clearTable1() {
 		tableModel.clearData();
+		table1.revalidate();
+		table1.repaint();
 	}
 
 	private void setupDispositionCombo() {
-		comboBox5.removeAllItems();
-		comboBox5.addItem("Any");
+		dispoStatusComboBox.removeAllItems();
+		dispoStatusComboBox.addItem("Any");
 		for (DispositionStatus loopStatus : dispositionStatuses) {
-			comboBox5.addItem(loopStatus);
+			dispoStatusComboBox.addItem(loopStatus);
 		}
 	}
 
 	private void setupStatusCombo() {
-		comboBox4.removeAllItems();
-		comboBox4.addItem("Any");
-		comboBox4.addItem("Open");
-		comboBox4.addItem("Closed");
+		statusComboBox.removeAllItems();
+		statusComboBox.addItem("Any");
+		statusComboBox.addItem("Open");
+		statusComboBox.addItem("Closed");
 	}
 
 	private void setupSortByCombo() {
@@ -343,9 +373,9 @@ public class QACasesBrowser extends JPanel {
 		label11 = new JLabel();
 		label4 = new JLabel();
 		label5 = new JLabel();
-		textField1 = new JTextField();
-		comboBox4 = new JComboBox();
-		comboBox5 = new JComboBox();
+		conceptNameTextField = new JTextField();
+		statusComboBox = new JComboBox();
+		dispoStatusComboBox = new JComboBox();
 		panel2 = new JPanel();
 		scrollPane1 = new JScrollPane();
 		table1 = new JTable();
@@ -480,7 +510,7 @@ public class QACasesBrowser extends JPanel {
 		//======== panel4 ========
 		{
 			panel4.setLayout(new GridBagLayout());
-			((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
+			((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {395, 0, 0, 0};
 			((GridBagLayout)panel4.getLayout()).rowHeights = new int[] {0, 0, 0};
 			((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
 			((GridBagLayout)panel4.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
@@ -489,26 +519,26 @@ public class QACasesBrowser extends JPanel {
 			label11.setText("Concept name");
 			panel4.add(label11, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+				new Insets(0, 0, 5, 15), 0, 0));
 
 			//---- label4 ----
 			label4.setText("Status");
 			panel4.add(label4, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+				new Insets(0, 0, 5, 15), 0, 0));
 
 			//---- label5 ----
 			label5.setText("Disposition");
 			panel4.add(label5, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 0), 0, 0));
-			panel4.add(textField1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+			panel4.add(conceptNameTextField, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
-			panel4.add(comboBox4, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+				new Insets(0, 0, 0, 15), 0, 0));
+			panel4.add(statusComboBox, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
-			panel4.add(comboBox5, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
+				new Insets(0, 0, 0, 15), 0, 0));
+			panel4.add(dispoStatusComboBox, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 0), 0, 0));
 		}
@@ -655,9 +685,9 @@ public class QACasesBrowser extends JPanel {
 	private JLabel label11;
 	private JLabel label4;
 	private JLabel label5;
-	private JTextField textField1;
-	private JComboBox comboBox4;
-	private JComboBox comboBox5;
+	private JTextField conceptNameTextField;
+	private JComboBox statusComboBox;
+	private JComboBox dispoStatusComboBox;
 	private JPanel panel2;
 	private JScrollPane scrollPane1;
 	private JTable table1;
@@ -696,6 +726,7 @@ public class QACasesBrowser extends JPanel {
 		
 		public void clearData() {
 			dataList = new ArrayList<Object[]>();
+			data = new Object[0][8];
 		}
 
 		public void addData(List<Object> row) {
@@ -736,7 +767,7 @@ public class QACasesBrowser extends JPanel {
 		}
 		
 		public boolean isCellEditable(int x, int y) {
-			if (y == 4) {
+			if (y == 4 || y == 5) {
 				return true;
 			}
 			return false;
