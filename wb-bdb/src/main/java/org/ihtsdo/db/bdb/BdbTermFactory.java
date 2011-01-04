@@ -1173,7 +1173,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         }
         AceLog.getEditLog().info("BdbTermFactory newPath creating new path");
         final Path newPath = new Path(pathConcept.getConceptNid(), originList);
-        AceLog.getEditLog().info("writing new path: \n" + newPath);
+        AceLog.getEditLog().info("BdbTermFactory writing new path: \n" + newPath);
         this.pathManager.write(newPath, commitConfig);
         AceLog.getEditLog().info("BdbTermFactory newPath about to return new Path");
         return newPath;

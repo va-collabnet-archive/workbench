@@ -337,8 +337,10 @@ public class BdbPathManager implements I_Manage<PathBI> {
         try {
             // write path
 
+        	logger.info("BDBPathManager write about to create propMap");
             RefsetPropertyMap propMap =
                     new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, path.getConceptNid());
+            logger.info("BDBPathManager write helperGetter.get(config).newRefsetExtension");
             helperGetter.get(config).newRefsetExtension(ReferenceConcepts.REFSET_PATHS.getNid(),
                 ReferenceConcepts.PATH.getNid(), EConcept.REFSET_TYPES.CID, propMap, config);
             logger.info("BDBPathManager write getPathRefsetConcept() = "+getPathRefsetConcept().toLongString());
