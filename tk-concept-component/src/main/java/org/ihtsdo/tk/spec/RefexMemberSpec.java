@@ -9,7 +9,7 @@ import java.io.ObjectOutputStream;
  * @author kec
  *
  */
-public class RefsetMemberSpec implements SpecBI {
+public class RefexMemberSpec implements SpecBI {
     /**
 	 * 
 	 */

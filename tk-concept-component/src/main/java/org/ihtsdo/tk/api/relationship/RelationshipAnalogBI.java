@@ -4,7 +4,8 @@ import java.beans.PropertyVetoException;
 
 import org.ihtsdo.tk.api.TypedComponentAnalogBI;
 
-public interface RelationshipAnalogBI extends TypedComponentAnalogBI, RelationshipVersionBI {
+public interface RelationshipAnalogBI<A extends RelationshipAnalogBI>
+        extends TypedComponentAnalogBI, RelationshipVersionBI<A> {
 
 
 	public void setDestinationNid(int nid) throws PropertyVetoException;

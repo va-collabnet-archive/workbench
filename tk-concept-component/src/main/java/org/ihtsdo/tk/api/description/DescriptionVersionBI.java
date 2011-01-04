@@ -3,10 +3,10 @@ package org.ihtsdo.tk.api.description;
 import org.ihtsdo.tk.api.AnalogGeneratorBI;
 import org.ihtsdo.tk.api.TypedComponentVersionBI;
 
-public interface DescriptionVersionBI 
+public interface DescriptionVersionBI<A extends DescriptionAnalogBI>
 	extends TypedComponentVersionBI, 
 			DescriptionChronicleBI, 
-			AnalogGeneratorBI<DescriptionAnalogBI> {
+			AnalogGeneratorBI<A> {
 	
 	public String getText();
 

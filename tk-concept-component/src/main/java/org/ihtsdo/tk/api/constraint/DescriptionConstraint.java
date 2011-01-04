@@ -5,8 +5,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 public class DescriptionConstraint implements ConstraintBI {
@@ -57,21 +57,21 @@ public class DescriptionConstraint implements ConstraintBI {
 		return text;
 	}
 
-	public ConceptVersionBI getConcept(Coordinate c) throws IOException {
+	public ConceptVersionBI getConcept(ViewCoordinate c) throws IOException {
 		return conceptSpec.get(c);
 	}
 
-	public ConceptVersionBI getDescType(Coordinate c) throws IOException {
+	public ConceptVersionBI getDescType(ViewCoordinate c) throws IOException {
 		return descTypeSpec.get(c);
 	}
 
 
 	public int getConceptNid() throws IOException {
-		return Ts.get().uuidsToNid(conceptSpec.getUuids());
+		return Ts.get().getNidForUuids(conceptSpec.getUuids());
 	}
 
 	public int getDescTypeNid() throws IOException {
-		return Ts.get().uuidsToNid(descTypeSpec.getUuids());
+		return Ts.get().getNidForUuids(descTypeSpec.getUuids());
 	}
 
     

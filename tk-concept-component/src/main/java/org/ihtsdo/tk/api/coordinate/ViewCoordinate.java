@@ -1,6 +1,12 @@
-package org.ihtsdo.tk.api;
+package org.ihtsdo.tk.api.coordinate;
 
-public class Coordinate {
+import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.PositionSetBI;
+import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.RelAssertionType;
+
+public class ViewCoordinate {
 
     private Precedence precedence;
     private PositionSetBI positionSet;
@@ -11,7 +17,7 @@ public class Coordinate {
     private int classifierNid;
     private RelAssertionType relAssertionType;
 
-    public Coordinate(Precedence precedence, PositionSetBI positionSet,
+    public ViewCoordinate(Precedence precedence, PositionSetBI positionSet,
             NidSetBI allowedStatusNids, NidSetBI isaTypeNids,
             ContradictionManagerBI contradictionManager,
             int languageNid,

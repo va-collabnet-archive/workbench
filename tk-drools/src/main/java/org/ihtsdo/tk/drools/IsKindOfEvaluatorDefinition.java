@@ -30,8 +30,8 @@ import org.drools.rule.VariableRestriction.VariableContextEntry;
 import org.drools.spi.Evaluator;
 import org.drools.spi.FieldValue;
 import org.drools.spi.InternalReadAccessor;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
@@ -99,7 +99,7 @@ public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
 				} else {
 					throw new UnsupportedOperationException("Can't convert: " + value1);
 				}
-				Coordinate coordinate = possibleKind.getCoordinate();	
+				ViewCoordinate coordinate = possibleKind.getCoordinate();	
 				ConceptVersionBI parentKind = null;
 				
 				if (ConceptVersionBI.class.isAssignableFrom(value2.getClass())) {

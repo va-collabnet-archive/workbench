@@ -127,7 +127,7 @@ public class RulesLibrary {
 	}
 
 	public static KindOfCacheBI setupIsACache() throws TerminologyException, Exception {
-		return myStaticIsACache = Ts.get().getCache(Terms.get().getActiveAceFrameConfig().getCoordinate());
+		return myStaticIsACache = Ts.get().getCache(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
 	}
 
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
@@ -170,7 +170,7 @@ public class RulesLibrary {
 				ksession.setGlobal("resultsCollector", results);
 				ksession.setGlobal("terminologyHelper", getTerminologyHelper());
 
-				ConceptVersionBI conceptBi = Ts.get().getConceptVersion(config.getCoordinate(), concept.getNid());
+				ConceptVersionBI conceptBi = Ts.get().getConceptVersion(config.getViewCoordinate(), concept.getNid());
 
 				DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version", inferredOrigin);
 
@@ -205,7 +205,7 @@ public class RulesLibrary {
 						DescriptionTemplate dtemplate = (DescriptionTemplate) template;
 						if (!textList.contains(dtemplate.getText())) {
 							textList.add(dtemplate.getText());
-							DescriptionVersionBI description = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getCoordinate(),
+							DescriptionVersionBI description = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getViewCoordinate(),
 									UUID.fromString(dtemplate.getComponentUuid()));
 							DescriptionSpec dSpec = SpecFactory.get(description);
 							if (dtemplate.getText() != null) {
@@ -793,7 +793,7 @@ public class RulesLibrary {
 
 	public static void updateGuvnorEnumerations(I_GetConceptData refset, RulesDeploymentPackageReference kPack, I_ConfigAceFrame config) {
 		try {
-			ConceptVersionBI refsetBI = Ts.get().getConceptVersion(config.getCoordinate(), refset.getUids());
+			ConceptVersionBI refsetBI = Ts.get().getConceptVersion(config.getViewCoordinate(), refset.getUids());
 			String propertyName = "";
 			int guvnorDescriptionsSize = refsetBI.getDescsActive(ArchitectonicAuxiliary.Concept.GUVNOR_ENUM_PROPERTY_DESC_TYPE.localize().getNid()).size();
 			if (guvnorDescriptionsSize < 1 || guvnorDescriptionsSize > 1) {
@@ -806,7 +806,7 @@ public class RulesLibrary {
 
 //				I_ExtendByRefPartCid lastPart = (I_ExtendByRefPartCid) loopMember.getTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), 
 //						config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getMutablePart();
-				ConceptVersionBI loopConcept = Ts.get().getConceptVersion(config.getCoordinate(),loopMember.getComponentNid());
+				ConceptVersionBI loopConcept = Ts.get().getConceptVersion(config.getViewCoordinate(),loopMember.getComponentNid());
 
 				String name = "no description found";
 				

@@ -4,7 +4,8 @@ import java.beans.PropertyVetoException;
 
 import org.ihtsdo.tk.api.TypedComponentAnalogBI;
 
-public interface DescriptionAnalogBI extends TypedComponentAnalogBI, DescriptionVersionBI {
+public interface DescriptionAnalogBI<A extends DescriptionAnalogBI>
+        extends TypedComponentAnalogBI, DescriptionVersionBI<A> {
 
     public void setInitialCaseSignificant(boolean capStatus) throws PropertyVetoException;
     public void setLang(String lang) throws PropertyVetoException;
