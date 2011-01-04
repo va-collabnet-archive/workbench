@@ -86,7 +86,7 @@ public class DrComponentHelper {
 
 			if (inferredOrigin == INFERRED_VIEW_ORIGIN.CLASSIFIER) {
 				for (RelationshipVersionBI relTuple : oldStyleConcept.getSourceRelTuples(config.getAllowedStatus(), 
-						allRels, 
+						null, 
 						config.getViewPositionSetReadOnly(), config.getPrecedence(), 
 						config.getConflictResolutionStrategy(), config.getClassifierConcept().getNid(), 
 						RelAssertionType.INFERRED)) {
@@ -106,7 +106,28 @@ public class DrComponentHelper {
 					concept.getOutgoingRelationships().add(loopRel);
 					inferredRolesSet.getRelationships().add(loopRel);
 				}
-			} else if (inferredOrigin == INFERRED_VIEW_ORIGIN.CONSTRAINT_NORMAL_FORM) {
+			} else if (inferredOrigin == INFERRED_VIEW_ORIGIN.FULL) {
+				for (RelationshipVersionBI relTuple : oldStyleConcept.getSourceRelTuples(config.getAllowedStatus(), 
+						null, 
+						config.getViewPositionSetReadOnly(), config.getPrecedence(), 
+						config.getConflictResolutionStrategy())) {
+					DrRelationship loopRel = new DrRelationship();
+					loopRel.setModifierUuid("someUuid");
+					loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
+					loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
+					loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
+					loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()).toString());
+					loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
+					loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
+					loopRel.setRelGroup(relTuple.getGroup());
+					loopRel.setStatusUuid(tf.nidToUuid(relTuple.getStatusNid()).toString());
+					loopRel.setTime(relTuple.getTime());
+					loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
+					loopRel.setFactContextName(factContextName);
+					concept.getOutgoingRelationships().add(loopRel);
+					inferredRolesSet.getRelationships().add(loopRel);
+				}
+			}else if (inferredOrigin == INFERRED_VIEW_ORIGIN.CONSTRAINT_NORMAL_FORM) {
 				// TODO implement CONSTRAINT_NORMAL_FORM calculation
 				RelationshipsDAO rDao=new RelationshipsDAO();
 				InheritedRelationships inhRel = rDao.getInheritedRelationships(oldStyleConcept);
