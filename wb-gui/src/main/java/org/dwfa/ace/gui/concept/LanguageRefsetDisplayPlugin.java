@@ -108,7 +108,7 @@ public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements Table
         if (this.pluginImage == null) {
             try {
                 if (this.languageConcept.getImages() != null) {
-                    for (I_ImageVersioned image : this.languageConcept.getImages()) {
+                    for (I_ImageVersioned<?> image : this.languageConcept.getImages()) {
                         for (I_ImageTuple imageTuple : image.getTuples()) {
                             if (imageTuple.getTextDescription().toLowerCase().contains("24x24")) {
                                 pluginIcon = new ImageIcon(imageTuple.getImage());

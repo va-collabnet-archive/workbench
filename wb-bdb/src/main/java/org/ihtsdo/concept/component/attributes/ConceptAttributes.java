@@ -30,25 +30,24 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 
 public class ConceptAttributes
         extends ConceptComponent<ConceptAttributesRevision, ConceptAttributes>
-        implements I_ConceptAttributeVersioned,
-        I_ConceptAttributePart,
-        ConAttrAnalogBI {
+        implements I_ConceptAttributeVersioned<ConceptAttributesRevision>,
+        I_ConceptAttributePart<ConceptAttributesRevision>,
+        ConAttrAnalogBI<ConceptAttributesRevision> {
 
     private boolean defined;
 
@@ -74,7 +73,8 @@ public class ConceptAttributes
 
        public class Version
             extends ConceptComponent<ConceptAttributesRevision, ConceptAttributes>.Version
-            implements I_ConceptAttributeTuple, I_ConceptAttributePart {
+            implements I_ConceptAttributeTuple<ConceptAttributesRevision>,
+                       I_ConceptAttributePart<ConceptAttributesRevision> {
 
         public Version() {
             super();
@@ -103,14 +103,14 @@ public class ConceptAttributes
         }
 
         @Override
-        public ConceptAttributes.Version getVersion(Coordinate c)
+        public ConceptAttributes.Version getVersion(ViewCoordinate c)
                 throws ContraditionException {
             return ConceptAttributes.this.getVersion(c);
         }
 
         @Override
         public Collection<ConceptAttributes.Version> getVersions(
-                Coordinate c) {
+                ViewCoordinate c) {
             return ConceptAttributes.this.getVersions(c);
         }
 
@@ -558,7 +558,7 @@ public class ConceptAttributes
     }
 
     @Override
-    public ConceptAttributes.Version getVersion(Coordinate c)
+    public ConceptAttributes.Version getVersion(ViewCoordinate c)
             throws ContraditionException {
         List<ConceptAttributes.Version> vForC = getVersions(c);
         if (vForC.size() == 0) {
@@ -571,7 +571,7 @@ public class ConceptAttributes
     }
 
     @Override
-    public List<ConceptAttributes.Version> getVersions(Coordinate c) {
+    public List<ConceptAttributes.Version> getVersions(ViewCoordinate c) {
         List<Version> returnTuples = new ArrayList<Version>(2);
         computer.addSpecifiedVersions(c.getAllowedStatusNids(), (NidSetBI) null, c.getPositionSet(),
                 returnTuples, getVersions(), c.getPrecedence(), c.getContradictionManager());

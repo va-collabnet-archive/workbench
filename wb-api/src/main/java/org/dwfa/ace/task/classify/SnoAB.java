@@ -98,7 +98,7 @@ public class SnoAB {
         List<SnoRel> returnSnoRels = new ArrayList<SnoRel>();
         try {
             Collection<? extends I_RelVersioned> relList = cBean.getSourceRels();
-            for (I_RelVersioned rel : relList) { // FOR EACH [C1, C2] PAIR
+            for (I_RelVersioned<?> rel : relList) { // FOR EACH [C1, C2] PAIR
                 // FIND MOST_RECENT REL PART, ON HIGHEST_PRIORITY_PATH
                 I_RelPart rp1 = null;
                 for (PositionBI pos : posList) { // FOR EACH PATH POSITION

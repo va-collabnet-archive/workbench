@@ -141,7 +141,7 @@ public class LoadBdb extends AbstractMojo {
 							+ RelationshipBinder.encountered + " written: "
 							+ RelationshipBinder.written);
 			getLog().info(
-					"Reset members encountered: "
+					"Refexes encountered: "
 							+ RefsetMemberBinder.encountered + " written: "
 							+ RefsetMemberBinder.written);
 

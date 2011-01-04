@@ -438,7 +438,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
                 int dnid = Integer.parseInt(doc.get("dnid"));
                 if (cnid == concept.getConceptNid())
                     continue;
-                I_DescriptionVersioned potential_fsn = termFactory.getDescription(dnid, cnid);
+                I_DescriptionVersioned<?> potential_fsn = termFactory.getDescription(dnid, cnid);
                 for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
                     if (actives.contains(part_search.getStatusNid())
                         && part_search.getTypeNid() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE

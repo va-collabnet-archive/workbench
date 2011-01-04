@@ -1,9 +1,11 @@
 package org.ihtsdo.concept.component.refset;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.refsetmember.Boolean.BooleanMember;
 import org.ihtsdo.concept.component.refsetmember.Long.LongMember;
 import org.ihtsdo.concept.component.refsetmember.cid.CidMember;
@@ -34,10 +36,19 @@ import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetMember;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.ihtsdo.concept.Concept;
+import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.BdbCommitManager;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.amend.InvalidAmendmentSpec;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 
 public class RefsetMemberFactory {
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     public RefsetMember create(int nid, int typeNid, int enclosingConceptNid,
             TupleInput input) throws IOException {
         REFSET_TYPES memberType;
@@ -115,5 +126,131 @@ public class RefsetMemberFactory {
                 throw new UnsupportedOperationException(
                         "Can't handle member type: " + refsetMember.getType());
         }
+    }
+
+       public static RefsetMember<?, ?> createNoTx(RefexAmendmentSpec res,
+            EditCoordinate ec, long time)
+            throws IOException, InvalidAmendmentSpec {
+        RefsetMember<?, ?> member = createBlank(res);
+        Concept refexColCon = (Concept) Ts.get().getConcept(res.getRefexColNid());
+        int refexNid = Bdb.uuidToNid(res.getMemberUUID());
+        member.nid = refexNid;
+        if (refexColCon.isAnnotationStyleRefex()) {
+            member.enclosingConceptNid = Ts.get().getConceptNidForNid(res.getRcNid());
+            Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, refexNid);
+            Ts.get().getComponent(res.getRcNid()).addAnnotation(member);
+       } else {
+            member.enclosingConceptNid = refexColCon.getNid();
+            Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, refexNid);
+            refexColCon.getData().add(member);
+        }
+        for (int i = 0; i < ec.getEditPaths().length; i++) {
+            if (i == 0) {
+                member.setStatusAtPositionNid(
+                        Bdb.getSapNid(res.getInt(RefexProperty.STATUS_NID),
+                        ec.getAuthorNid(),
+                        ec.getEditPaths()[i],
+                        time));
+                member.primordialUNid =
+                        Bdb.getUuidDb().addUuid(res.getMemberUUID());
+                try {
+                    res.setPropertiesExceptSap(member);
+                } catch (PropertyVetoException ex) {
+                    throw new InvalidAmendmentSpec("RefexAmendmentSpec: " + res, ex);
+                }
+
+            } else {
+                member.makeAnalog(res.getInt(RefexProperty.STATUS_NID),
+                        ec.getAuthorNid(),
+                        ec.getEditPaths()[i],
+                        time);
+            }
+
+        }
+        if (refexColCon.isAnnotationStyleRefex()) {
+            Bdb.getConceptDb().writeConcept(
+                    Bdb.getConcept(Bdb.getNidCNidMap().getCNid(res.getRcNid())));
+        } else {
+            Bdb.getConceptDb().writeConcept(refexColCon);
+        }
+        return member;
+    }
+
+    public static RefsetMember<?, ?> create(RefexAmendmentSpec res,
+            EditCoordinate ec)
+            throws IOException, InvalidAmendmentSpec {
+        RefsetMember<?, ?> member = createBlank(res);
+        Concept refexColCon = (Concept) Ts.get().getConcept(res.getRefexColNid());
+        int refexNid = Bdb.uuidToNid(res.getMemberUUID());
+        member.nid = refexNid;
+        if (refexColCon.isAnnotationStyleRefex()) {
+            member.enclosingConceptNid = Ts.get().getConceptNidForNid(res.getRcNid());
+            Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, refexNid);
+            Ts.get().getComponent(res.getRcNid()).addAnnotation(member);
+       } else {
+            member.enclosingConceptNid = refexColCon.getNid();
+            Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, refexNid);
+            refexColCon.getData().add(member);
+        }
+        for (int i = 0; i < ec.getEditPaths().length; i++) {
+            if (i == 0) {
+                member.setStatusAtPositionNid(
+                        Bdb.getSapNid(res.getInt(RefexProperty.STATUS_NID),
+                        ec.getAuthorNid(),
+                        ec.getEditPaths()[i],
+                        Long.MAX_VALUE));
+                member.primordialUNid =
+                        Bdb.getUuidDb().addUuid(res.getMemberUUID());
+                try {
+                    res.setPropertiesExceptSap(member);
+                } catch (PropertyVetoException ex) {
+                    throw new InvalidAmendmentSpec("RefexAmendmentSpec: " + res, ex);
+                }
+
+            } else {
+                member.makeAnalog(res.getInt(RefexProperty.STATUS_NID),
+                        ec.getAuthorNid(),
+                        ec.getEditPaths()[i],
+                        Long.MAX_VALUE);
+            }
+
+        }
+        return member;
+    }
+
+    private static RefsetMember<?, ?> createBlank(RefexAmendmentSpec res) {
+        switch (res.getMemberType()) {
+            case BOOLEAN:
+                return new BooleanMember();
+            case CID:
+                return new CidMember();
+            case CID_CID:
+                return new CidCidMember();
+            case CID_CID_CID:
+                return new CidCidCidMember();
+            case CID_CID_STR:
+                return new CidCidStrMember();
+            case CID_INT:
+                return new CidIntMember();
+            case CID_STR:
+                return new CidStrMember();
+            case INT:
+                return new IntMember();
+            case CID_FLOAT:
+                return new CidFloatMember();
+            case MEMBER:
+                return new MembershipMember();
+            case STR:
+                return new StrMember();
+            case CID_LONG:
+                return new CidLongMember();
+            case LONG:
+                return new LongMember();
+
+            default:
+                throw new UnsupportedOperationException(
+                        "Can't handle member type: " + res.getMemberType());
+        }
+
     }
 }

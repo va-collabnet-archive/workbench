@@ -210,7 +210,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
         List<SnoRel> keepRels = new ArrayList<SnoRel>();
 
         // FOR ALL SOURCE RELS
-        for (I_RelVersioned rel : concept.getSourceRels()) {
+        for (I_RelVersioned<?> rel : concept.getSourceRels()) {
             // FIND MOST_RECENT REL PART, ON HIGHEST_PRIORITY_PATH
             I_RelPart rPart1 = null;
             for (PositionBI pos : fromPathPos) { // PATHS_IN_PRIORITY_ORDER

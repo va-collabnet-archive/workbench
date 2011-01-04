@@ -146,7 +146,7 @@ public class DescTupleFileUtil {
                 int dNid = termFactory.uuidToNative(descUuid);
                 I_GetConceptData concept = termFactory.getConcept(conceptId);
 
-                I_DescriptionVersioned idv = termFactory.getDescription(dNid);
+                I_DescriptionVersioned<?> idv = termFactory.getDescription(dNid);
                 I_GetConceptData typeConcept = termFactory.getConcept(typeUuid);
                 I_GetConceptData statusConcept = termFactory.getConcept(statusUuid);
                 I_GetConceptData pathConcept = termFactory.getConcept((UUID) importConfig.getProperty("pathUuid"));

@@ -30,11 +30,12 @@ import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 
-public interface I_DescriptionVersioned extends I_AmTermComponent, DescriptionAnalogBI {
+public interface I_DescriptionVersioned<A extends DescriptionAnalogBI>
+        extends I_AmTermComponent, DescriptionAnalogBI<A> {
 
-    public boolean addVersion(I_DescriptionPart newPart);
+    public boolean addVersion(I_DescriptionPart<A> newPart);
 
-    public List<? extends I_DescriptionPart> getMutableParts();
+    public List<? extends I_DescriptionPart<A>> getMutableParts();
 
     public int versionCount();
 
@@ -44,7 +45,7 @@ public interface I_DescriptionVersioned extends I_AmTermComponent, DescriptionAn
 
     public int getDescId();
 
-    public List<? extends I_DescriptionTuple> getTuples();
+    public List<? extends I_DescriptionTuple<A>> getTuples();
 
     /**
      * @param returnConflictResolvedLatestState
@@ -53,7 +54,7 @@ public interface I_DescriptionVersioned extends I_AmTermComponent, DescriptionAn
      * @throws TerminologyException
      * @throws IOException
      */
-    public List<? extends I_DescriptionTuple> getTuples(ContradictionManagerBI contradictionManager) throws TerminologyException,
+    public List<? extends I_DescriptionTuple<A>> getTuples(ContradictionManagerBI contradictionManager) throws TerminologyException,
             IOException;
 
     /**
@@ -63,12 +64,12 @@ public interface I_DescriptionVersioned extends I_AmTermComponent, DescriptionAn
      * @throws TerminologyException
      * @throws IOException
      */
-    public List<? extends I_DescriptionPart> getVersions(ContradictionManagerBI contradictionManager) throws TerminologyException,
+    public List<? extends I_DescriptionPart<A>> getVersions(ContradictionManagerBI contradictionManager) throws TerminologyException,
             IOException;
 
-    public I_DescriptionTuple getFirstTuple();
+    public I_DescriptionTuple<A> getFirstTuple();
 
-    public I_DescriptionTuple getLastTuple();
+    public I_DescriptionTuple<A> getLastTuple();
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
@@ -93,7 +94,7 @@ public interface I_DescriptionVersioned extends I_AmTermComponent, DescriptionAn
      * @throws TerminologyException
      */
     public void addTuples(NidSetBI allowedStatus, NidSetBI allowedTypes, PositionSetBI positionSet,
-            List<I_DescriptionTuple> matchingTuples, Precedence precedence, ContradictionManagerBI contradictionMgr)
+            List<I_DescriptionTuple<A>> matchingTuples, Precedence precedence, ContradictionManagerBI contradictionMgr)
             throws TerminologyException, IOException;
 
     public void convertIds(I_MapNativeToNative jarToDbNativeMap);

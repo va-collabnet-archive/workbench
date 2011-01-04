@@ -1,6 +1,8 @@
 package org.ihtsdo.concept.component.refsetmember.cidLong;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
+import java.util.Collection;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
@@ -10,18 +12,21 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_long.RefexCnidLongAnalogBI;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.cidlong.TkRefsetCidLongRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
-import java.util.Collection;
-import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
-import org.ihtsdo.tk.api.refset.RefsetMemberVersionBI;
 
 public class CidLongRevision extends RefsetRevision<CidLongRevision, CidLongMember>
-        implements I_ExtendByRefPartCidLong {
+        implements I_ExtendByRefPartCidLong<CidLongRevision>, RefexCnidLongAnalogBI<CidLongRevision> {
 
     private int c1Nid;
     private long longValue;
@@ -145,7 +150,7 @@ public class CidLongRevision extends RefsetRevision<CidLongRevision, CidLongMemb
     }
 
     @Override
-    public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
+    public I_ExtendByRefPart<CidLongRevision> makePromotionPart(PathBI promotionPath) {
         // TODO
         throw new UnsupportedOperationException();
     }
@@ -185,7 +190,7 @@ public class CidLongRevision extends RefsetRevision<CidLongRevision, CidLongMemb
     
     
     @Override
-    public CidLongMember.Version getVersion(Coordinate c)
+    public CidLongMember.Version getVersion(ViewCoordinate c)
             throws ContraditionException {
         return (CidLongMember.Version) ((CidLongMember) primordialComponent).getVersion(c);
     }
@@ -196,9 +201,39 @@ public class CidLongRevision extends RefsetRevision<CidLongRevision, CidLongMemb
     }
 
     @Override
-    public Collection<? extends RefsetMemberVersionBI> getVersions(
-            Coordinate c) {
+    public Collection<? extends RefexVersionBI<CidLongRevision>> getVersions(
+            ViewCoordinate c) {
         return ((CidLongMember) primordialComponent).getVersions(c);
     }
+
+	@Override
+	public void setLong1(long l) throws PropertyVetoException {
+		this.longValue = l;
+        modified();
+	}
+	@Override
+	public void setCnid1(int cnid) throws PropertyVetoException {
+		this.c1Nid = cnid;
+        modified();
+	}
+
+	public int getCnid1() {
+		return c1Nid;
+	}
+
+	@Override
+	public long getLong1() {
+		return this.longValue;
+	}
+
+    
+	protected TK_REFSET_TYPE getTkRefsetType() {
+		return TK_REFSET_TYPE.CID_LONG;
+	}
+
+	protected void addSpecProperties(RefexAmendmentSpec rcs) {
+		rcs.with(RefexProperty.CNID1, getCnid1());
+		rcs.with(RefexProperty.LONG1, getLong1());
+	}
 
 }

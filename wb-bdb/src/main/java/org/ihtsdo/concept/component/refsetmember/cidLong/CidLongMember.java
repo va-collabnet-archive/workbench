@@ -1,6 +1,9 @@
 package org.ihtsdo.concept.component.refsetmember.cidLong;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
@@ -11,16 +14,19 @@ import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
+import org.ihtsdo.tk.api.refex.type_cnid_long.RefexCnidLongAnalogBI;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.cidlong.TkRefsetCidLongMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidlong.TkRefsetCidLongRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
-import java.util.ArrayList;
-import java.util.List;
 
 public class CidLongMember
-        extends RefsetMember<CidLongRevision, CidLongMember> {
+        extends RefsetMember<CidLongRevision, CidLongMember>
+		implements RefexCnidLongAnalogBI<CidLongRevision> {
 
     private static VersionComputer<RefsetMember<CidLongRevision, CidLongMember>.Version> computer =
             new VersionComputer<RefsetMember<CidLongRevision, CidLongMember>.Version>();
@@ -115,7 +121,7 @@ public class CidLongMember
     }
 
     @Override
-    public I_AmPart makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+    public CidLongRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
         if (getTime() == time && getPathNid() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
@@ -190,4 +196,37 @@ public class CidLongMember
         }
         return (List<Version>) versions;
     }
+
+	@Override
+	public long getLong1() {
+		return this.longValue;
+	}
+
+	@Override
+	public void setLong1(long l) throws PropertyVetoException {
+		this.longValue = l;
+		modified();
+	}
+
+	@Override
+	public void setCnid1(int cnid1) throws PropertyVetoException {
+		this.c1Nid = cnid1;
+		modified();
+	}
+
+	@Override
+	public int getCnid1() {
+		return c1Nid;
+	}
+    
+	protected TK_REFSET_TYPE getTkRefsetType() {
+		return TK_REFSET_TYPE.CID_LONG;
+	}
+
+	protected void addSpecProperties(RefexAmendmentSpec rcs) {
+		rcs.with(RefexProperty.CNID1, getCnid1());
+		rcs.with(RefexProperty.LONG1, getLong1());
+	}
+
+    
 }

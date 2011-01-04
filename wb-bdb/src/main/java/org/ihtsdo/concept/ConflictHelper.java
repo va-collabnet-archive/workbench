@@ -14,6 +14,7 @@ import org.dwfa.ace.task.conflict.detector.AttrTupleConflictComparator;
 import org.dwfa.ace.task.conflict.detector.DescriptionTupleConflictComparator;
 import org.dwfa.ace.task.conflict.detector.RelTupleConflictComparator;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.concept.component.description.DescriptionRevision;
 import org.ihtsdo.tk.api.PositionBI;
 
 public class ConflictHelper {
@@ -63,7 +64,7 @@ public class ConflictHelper {
       Set<I_DescriptionTuple> commonTuples = null;
       for (PositionBI p : config.getViewPositionSet()) {
           PositionSetReadOnly positionSet = new PositionSetReadOnly(p);
-         List<I_DescriptionTuple> tuplesForPosition = cb.getDescriptionTuples(config.getAllowedStatus(), null,
+         List<I_DescriptionTuple<DescriptionRevision>> tuplesForPosition = cb.getDescriptionTuples(config.getAllowedStatus(), null,
                positionSet, 
                config.getPrecedence(), config.getConflictResolutionStrategy());
          if (commonTuples == null) {

@@ -11,7 +11,7 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 
@@ -20,7 +20,8 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class RelationshipRevision
         extends Revision<RelationshipRevision, Relationship>
-        implements I_RelPart, RelationshipAnalogBI {
+        implements I_RelPart<RelationshipRevision>,
+                   RelationshipAnalogBI<RelationshipRevision> {
 
     private int characteristicNid;
     private int group;
@@ -246,14 +247,14 @@ public class RelationshipRevision
     }
 
     @Override
-    public Relationship.Version getVersion(Coordinate c)
+    public Relationship.Version getVersion(ViewCoordinate c)
             throws ContraditionException {
         return primordialComponent.getVersion(c);
     }
 
     @Override
     public Collection<Relationship.Version> getVersions(
-            Coordinate c) {
+            ViewCoordinate c) {
         return primordialComponent.getVersions(c);
     }
 

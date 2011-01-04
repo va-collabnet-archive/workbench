@@ -25,37 +25,39 @@ import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.amend.TerminologyAmendmentBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.db.DbDependency;
 import org.ihtsdo.tk.db.EccsDependency;
 
 public class BdbTerminologyStore implements TerminologyStoreDI {
 
 	@Override
-	public ComponentBI getComponent(int nid) throws IOException {
-		return (ComponentBI) Bdb.getComponent(nid);
+	public ComponentChroncileBI<?> getComponent(int nid) throws IOException {
+		return (ComponentChroncileBI<?>) Bdb.getComponent(nid);
 	}
 
 	@Override
-	public ComponentBI getComponent(UUID... uuids) throws IOException {
+	public ComponentChroncileBI<?> getComponent(UUID... uuids) throws IOException {
 		return getComponent(Bdb.uuidToNid(uuids));
 	}
 
 	@Override
-	public ComponentBI getComponent(Collection<UUID> uuids) throws IOException {
+	public ComponentChroncileBI<?> getComponent(Collection<UUID> uuids) throws IOException {
 		return getComponent(Bdb.uuidsToNid(uuids));
 	}
 
 	@Override
-	public ComponentVersionBI getComponentVersion(Coordinate coordinate, int nid) throws IOException, ContraditionException {
+	public ComponentVersionBI getComponentVersion(ViewCoordinate coordinate, int nid) throws IOException, ContraditionException {
 		ComponentBI component = getComponent(nid);
 		if (Concept.class.isAssignableFrom(component.getClass())) {
 			return new ConceptVersion((Concept) component, coordinate);
@@ -64,32 +66,32 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 	}
 
 	@Override
-	public ComponentVersionBI getComponentVersion(Coordinate c, UUID... uuids) throws IOException, ContraditionException {
+	public ComponentVersionBI getComponentVersion(ViewCoordinate c, UUID... uuids) throws IOException, ContraditionException {
 		return getComponentVersion(c, Bdb.uuidToNid(uuids));
 	}
 
 	@Override
-	public ComponentVersionBI getComponentVersion(Coordinate c, Collection<UUID> uuids) throws IOException, ContraditionException {
+	public ComponentVersionBI getComponentVersion(ViewCoordinate c, Collection<UUID> uuids) throws IOException, ContraditionException {
 		return getComponentVersion(c, Bdb.uuidsToNid(uuids));
 	}
 
 	@Override
-	public ConceptVersionBI getConceptVersion(Coordinate c, int cNid) throws IOException {
+	public ConceptVersionBI getConceptVersion(ViewCoordinate c, int cNid) throws IOException {
 		return new ConceptVersion(Bdb.getConcept(cNid), c);
 	}
 
 	@Override
-	public ConceptVersionBI getConceptVersion(Coordinate c, UUID... uuids) throws IOException {
+	public ConceptVersionBI getConceptVersion(ViewCoordinate c, UUID... uuids) throws IOException {
 		return getConceptVersion(c, Bdb.uuidToNid(uuids));
 	}
 
 	@Override
-	public ConceptVersionBI getConceptVersion(Coordinate c, Collection<UUID> uuids) throws IOException {
+	public ConceptVersionBI getConceptVersion(ViewCoordinate c, Collection<UUID> uuids) throws IOException {
 		return getConceptVersion(c, Bdb.uuidsToNid(uuids));
 	}
 
 	@Override
-	public TerminologySnapshotDI getSnapshot(Coordinate c) {
+	public TerminologySnapshotDI getSnapshot(ViewCoordinate c) {
 		return new BdbTerminologySnapshot(this, c);
 	}
 
@@ -149,13 +151,21 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 		return getConcept(Bdb.uuidsToNid(uuids));
 	}
 
-	@Override
 	public int uuidsToNid(UUID... uuids) throws IOException {
 		return Bdb.uuidToNid(uuids);
 	}
 
-	@Override
 	public int uuidsToNid(Collection<UUID> uuids) throws IOException {
+		return Bdb.uuidsToNid(uuids);
+	}
+
+	@Override
+	public int getNidForUuids(UUID... uuids) throws IOException {
+		return Bdb.uuidToNid(uuids);
+	}
+
+	@Override
+	public int getNidForUuids(Collection<UUID> uuids) throws IOException {
 		return Bdb.uuidsToNid(uuids);
 	}
 
@@ -218,6 +228,11 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     	return true;
     }
 
+    @Override
+    public boolean hasUuid(UUID memberUUID) {
+        return Bdb.hasUuid(memberUUID);
+    }
+
     private class ConceptGetter implements I_ProcessUnfetchedConceptData {
     	NidBitSetBI cNids;
     	Map<Integer, ConceptChronicleBI> conceptMap = new ConcurrentHashMap<Integer, ConceptChronicleBI>();
@@ -269,9 +284,9 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     private class ConceptVersionGetter implements I_ProcessUnfetchedConceptData {
     	NidBitSetBI cNids;
     	Map<Integer, ConceptVersionBI> conceptMap = new ConcurrentHashMap<Integer, ConceptVersionBI>();
-    	Coordinate coordinate;
+    	ViewCoordinate coordinate;
     	
-		public ConceptVersionGetter(NidBitSetBI cNids, Coordinate c) {
+		public ConceptVersionGetter(NidBitSetBI cNids, ViewCoordinate c) {
 			super();
 			this.cNids = cNids;
 			this.coordinate = c;
@@ -306,7 +321,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     	
     }
 	@Override
-	public Map<Integer, ConceptVersionBI> getConceptVersions(Coordinate c,
+	public Map<Integer, ConceptVersionBI> getConceptVersions(ViewCoordinate c,
 			NidBitSetBI cNids) throws IOException {
 		ConceptVersionGetter processor = new ConceptVersionGetter(cNids, c);
     	try {
@@ -323,11 +338,16 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 	}
 
 	@Override
-	public KindOfCacheBI getCache(Coordinate coordinate) throws Exception {
+	public KindOfCacheBI getCache(ViewCoordinate coordinate) throws Exception {
 		TypeCache c = new IsaCache(Bdb.getConceptDb().getConceptNidSet());
 		c.setup(coordinate);
 		c.getLatch().await();
 		return c;
+	}
+
+	@Override
+	public TerminologyAmendmentBI getAmender(EditCoordinate ec, ViewCoordinate vc) {
+		return new BdbAmender(ec, vc);
 	}
 
     

@@ -19,7 +19,8 @@ package org.dwfa.ace.api;
 import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 
 
-public interface I_RelTuple extends I_AmTypedTuple, RelationshipAnalogBI {
+public interface I_RelTuple<A extends RelationshipAnalogBI> extends
+        I_AmTypedTuple<A>, RelationshipAnalogBI<A> {
 
     public int getC1Id();
 
@@ -29,16 +30,19 @@ public interface I_RelTuple extends I_AmTypedTuple, RelationshipAnalogBI {
 
     public int getCharacteristicId();
 
+    @Override
     public int getGroup();
 
     public int getRefinabilityId();
 
+    @Override
     public void setStatusId(int statusId);
 
     public void setCharacteristicId(int characteristicId);
 
     public void setRefinabilityId(int refinabilityId);
 
+    @Override
     public void setGroup(int group);
 
     /**
@@ -46,10 +50,12 @@ public interface I_RelTuple extends I_AmTypedTuple, RelationshipAnalogBI {
      */
     public I_RelPart duplicate();
 
+    @Override
     public I_RelPart getMutablePart();
 
-    public I_RelVersioned getRelVersioned();
+    public I_RelVersioned<A> getRelVersioned();
 
-    public I_RelVersioned getFixedPart();
+    @Override
+    public I_RelVersioned<A> getFixedPart();
 
 }

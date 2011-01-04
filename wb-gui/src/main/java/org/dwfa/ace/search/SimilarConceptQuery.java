@@ -41,7 +41,7 @@ public class SimilarConceptQuery {
         // Get text, all unique words...
         TreeSet<String> uniqueWords = new TreeSet<String>();
         TreeSet<String> commonWords = new TreeSet<String>();
-        for (I_DescriptionVersioned dv : concept.getDescriptions()) {
+        for (I_DescriptionVersioned<?> dv : concept.getDescriptions()) {
             TreeSet<String> uniqueDescriptionWords = new TreeSet<String>();
             for (I_DescriptionPart part : dv.getMutableParts()) {
                 String[] parts = part.getText().toLowerCase().split("\\s+");

@@ -1,6 +1,9 @@
 package org.ihtsdo.concept.component.refsetmember.cidFloat;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
@@ -10,15 +13,18 @@ import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
+import org.ihtsdo.tk.api.refex.type_cnid_float.RefexCnidFloatAnalogBI;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.cidflt.TkRefsetCidFloatMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidflt.TkRefsetCidFloatRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
-import java.util.ArrayList;
-import java.util.List;
 
-public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMember> {
+public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMember>
+	implements RefexCnidFloatAnalogBI<CidFloatRevision> {
 
     private static VersionComputer<RefsetMember<CidFloatRevision, CidFloatMember>.Version> computer =
             new VersionComputer<RefsetMember<CidFloatRevision, CidFloatMember>.Version>();
@@ -185,4 +191,36 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
         }
         return (List<Version>) versions;
     }
+
+	@Override
+	public void setCnid1(int cnid) throws PropertyVetoException {
+		this.c1Nid = cnid;
+		modified();
+	}
+
+	@Override
+	public int getCnid1() {
+		return c1Nid;
+	}
+
+	@Override
+	public void setFloat1(float f) throws PropertyVetoException {
+		this.floatValue = f;
+		modified();
+	}
+
+	@Override
+	public float getFloat1() {
+		return this.floatValue;
+	}
+	
+	protected TK_REFSET_TYPE getTkRefsetType() {
+		return TK_REFSET_TYPE.CID_FLOAT;
+	}
+
+	protected void addSpecProperties(RefexAmendmentSpec rcs) {
+		rcs.with(RefexProperty.CNID1, getCnid1());
+		rcs.with(RefexProperty.FLOAT1, getFloat1());
+	}
+
 }

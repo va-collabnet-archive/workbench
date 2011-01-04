@@ -16,9 +16,11 @@
  */
 package org.dwfa.ace.api.ebr;
 
-public interface I_ExtendByRefPartStr extends I_ExtendByRefPart {
+import org.ihtsdo.tk.api.refex.type_str.RefexStrAnalogBI;
 
-    public I_ExtendByRefPartStr duplicate();
+public interface I_ExtendByRefPartStr<A extends RefexStrAnalogBI<A>> extends I_ExtendByRefPart<A> {
+
+    public I_ExtendByRefPartStr<A> duplicate();
 
     public String getStringValue();
 

@@ -17,11 +17,13 @@
 package org.dwfa.ace.api;
 
 import java.io.IOException;
+import org.ihtsdo.tk.api.AnalogBI;
 
 import org.ihtsdo.tk.api.ComponentVersionBI;
 
-public interface I_AmTuple extends I_AmPart, ComponentVersionBI {
+public interface I_AmTuple<T extends AnalogBI> extends I_AmPart<T>, ComponentVersionBI {
 
+    @Override
     public int getNid();
 
     public I_AmTermComponent getFixedPart();

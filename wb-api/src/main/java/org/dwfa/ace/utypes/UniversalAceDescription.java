@@ -48,7 +48,7 @@ public class UniversalAceDescription implements Serializable {
         this.versions = new ArrayList<UniversalAceDescriptionPart>(count);
     }
     
-    public UniversalAceDescription(I_DescriptionVersioned desc) throws IOException, TerminologyException {
+    public UniversalAceDescription(I_DescriptionVersioned<?> desc) throws IOException, TerminologyException {
         super();
         UniversalAceDescription universal = new UniversalAceDescription(
         		Terms.get().getUids(desc.getDescId()), Terms.get().getUids(desc.getConceptNid()),

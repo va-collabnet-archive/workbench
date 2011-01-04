@@ -113,7 +113,7 @@ public class AddConceptInArenaToRefset extends AbstractTask {
              Terms.get().getMemberRefsetHelper(tf.getActiveAceFrameConfig(), refsetConcept.getConceptNid(),
         		   member.getConceptNid()).addToRefset(conceptToAdd.getNid());
    
-             if (refsetConcept.isAnnotationStyleRefset()) {
+             if (refsetConcept.isAnnotationStyleRefex()) {
                  Terms.get().addUncommitted(conceptToAdd);
              } else {
                  Terms.get().addUncommitted(refsetConcept);

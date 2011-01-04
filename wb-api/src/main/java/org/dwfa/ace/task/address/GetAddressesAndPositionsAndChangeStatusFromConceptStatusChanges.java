@@ -136,7 +136,7 @@ public class GetAddressesAndPositionsAndChangeStatusFromConceptStatusChanges ext
                 if (inboxDesc == null) {
                     worker.getLogger().info("Cannot find inbox for: " + pathConcept.getInitialText());
                     worker.getLogger().info(" inboxDescTypeList: " + inboxDescTypeList.getListArray());
-                    for (I_DescriptionVersioned desc : pathConcept.getDescriptions()) {
+                    for (I_DescriptionVersioned<?> desc : pathConcept.getDescriptions()) {
                         for (I_DescriptionTuple tuple : desc.getTuples()) {
                             worker.getLogger().info(" desc tuple: " + tuple);
                         }

@@ -8,16 +8,15 @@ import org.dwfa.ace.api.Terms;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.ext.I_ConceptualizeExternally;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 
 public class ConceptAttributesRevision extends Revision<ConceptAttributesRevision, ConceptAttributes>
-        implements I_ConceptAttributePart, ConAttrAnalogBI {
+        implements I_ConceptAttributePart<ConceptAttributesRevision>, ConAttrAnalogBI<ConceptAttributesRevision> {
 
     private boolean defined = false;
 
@@ -140,14 +139,14 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
     }
 
     @Override
-    public ConceptAttributes.Version getVersion(Coordinate c)
+    public ConceptAttributes.Version getVersion(ViewCoordinate c)
             throws ContraditionException {
         return primordialComponent.getVersion(c);
     }
 
     @Override
     public Collection<ConceptAttributes.Version> getVersions(
-            Coordinate c) {
+            ViewCoordinate c) {
         return primordialComponent.getVersions(c);
     }
 
@@ -168,4 +167,6 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
         }
         return buf.toString();
     }
+    
+    
 }

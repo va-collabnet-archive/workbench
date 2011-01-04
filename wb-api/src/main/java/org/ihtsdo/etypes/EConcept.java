@@ -367,10 +367,12 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
         }
     }
     
+    @Override
 	public List<TkMedia> getImages() {
         return media;
     }
 
+    @Override
     public void setImages(List<TkMedia> images) {
         this.media = images;
     }
@@ -382,10 +384,11 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
     /**
      * Returns a string representation of the object.
      */
+    @Override
     public String toString() {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
 
-        buff.append(this.getClass().getSimpleName() + ": ");
+        buff.append(this.getClass().getSimpleName()).append(": ");
         buff.append("\n   primordial UUID: ");
         buff.append(this.primordialUuid);
         buff.append("\n   ConceptAttributes: \n\t");
@@ -406,6 +409,7 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
      * 
      * @return a hash code value for this <tt>EConcept</tt>.
      */
+    @Override
     public int hashCode() {
         return this.conceptAttributes.primordialUuid.hashCode();
     }

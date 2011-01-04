@@ -16,10 +16,12 @@
  */
 package org.dwfa.ace.api.ebr;
 
-public interface I_ExtendByRefPartBoolean extends I_ExtendByRefPart {
+import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanAnalogBI;
 
-    public boolean getBooleanValue();
+public interface I_ExtendByRefPartBoolean<A extends RefexBooleanAnalogBI<A>> extends I_ExtendByRefPart<A> {
 
-    public void setBooleanValue(boolean value);
+    boolean getBooleanValue();
+
+    void setBooleanValue(boolean value);
 
 }

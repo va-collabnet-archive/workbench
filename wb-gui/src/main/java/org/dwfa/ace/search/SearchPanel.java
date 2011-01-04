@@ -97,7 +97,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            model.setDescriptions(new ArrayList<I_DescriptionVersioned>());
+            model.setDescriptions(new ArrayList<I_DescriptionVersioned<?>>());
             searchPhraseField.selectAll();
             searchPhraseField.requestFocusInWindow();
         }
@@ -218,7 +218,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
                     QueryBean qb = (QueryBean) ois.readObject();
                     ois.close();
                     setQuery(qb);
-                    model.setDescriptions(new ArrayList<I_DescriptionVersioned>());
+                    model.setDescriptions(new ArrayList<I_DescriptionVersioned<?>>());
                     // startSearch();
                 }
 
@@ -760,21 +760,21 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         		return;
         	}
             setShowProgress(true);
-            model.setDescriptions(new ArrayList<I_DescriptionVersioned>());
+            model.setDescriptions(new ArrayList<I_DescriptionVersioned<?>>());
             ACE.threadPool.execute(new SearchRefsetWorker(this, model, 
             		(I_GetConceptData) refsetIdentityField.getTermComponent(), config));
         	
         } else if (searchPhraseField.getText().length() > 1) {
             if (checkLuceneQuery(searchPhraseField.getText())) {
                 setShowProgress(true);
-                model.setDescriptions(new ArrayList<I_DescriptionVersioned>());
+                model.setDescriptions(new ArrayList<I_DescriptionVersioned<?>>());
                 ACE.threadPool.execute(new SearchStringWorker(this, model, searchPhraseField.getText(), config,
                     searchTypeCombo.getSelectedItem().equals(LUCENE_QUERY)));
             }
         } else if (searchPhraseField.getText().length() == 0) {
             if (this.extraCriterion.size() > 0) {
                 setShowProgress(true);
-                model.setDescriptions(new ArrayList<I_DescriptionVersioned>());
+                model.setDescriptions(new ArrayList<I_DescriptionVersioned<?>>());
                 ACE.threadPool.execute(new SearchAllWorker(this, model, config));
             } else {
                 JOptionPane.showMessageDialog(getRootPane(),

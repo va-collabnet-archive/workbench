@@ -98,7 +98,7 @@ public final class ConceptDescriptionFacade {
      */
     public List<? extends I_DescriptionVersioned> getUncommittedDescriptions(final I_GetConceptData concept) throws Exception {
         List<I_DescriptionVersioned> uncommitted = new ArrayList<I_DescriptionVersioned>();
-        for (I_DescriptionVersioned descv: concept.getDescriptions()) {
+        for (I_DescriptionVersioned<?> descv: concept.getDescriptions()) {
             for (I_DescriptionTuple p: descv.getTuples()) {
                 if (p.getTime() == Long.MAX_VALUE) {
                     uncommitted.add(descv);

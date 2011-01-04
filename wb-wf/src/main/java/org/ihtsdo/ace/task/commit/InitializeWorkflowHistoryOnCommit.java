@@ -183,7 +183,7 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
     	
     	TimePathId tpId = times.first();
     	
-    	for (I_DescriptionVersioned desc : concept.getDescriptions()) 
+    	for (I_DescriptionVersioned<?> desc : concept.getDescriptions())
     	{
     		if (desc.getTimePathSet().size() > 1)
     			return true;
@@ -197,7 +197,7 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
     		}
     	}
 
-    	for (I_RelVersioned srcRels : concept.getSourceRels()) 
+    	for (I_RelVersioned<?> srcRels : concept.getSourceRels())
     	{
     		if (srcRels.getTimePathSet().size() > 1)
     			return true;
@@ -211,7 +211,7 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
     		}
     	}
 
-    	for (I_RelVersioned destRels : concept.getDestRels()) 
+    	for (I_RelVersioned<?> destRels : concept.getDestRels())
     	{
     		if (destRels.getTimePathSet().size() > 1)
     			return true;
@@ -225,7 +225,7 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
     		}
     	}
 
-    	for (I_ImageVersioned img : concept.getImages()) 
+    	for (I_ImageVersioned<?> img : concept.getImages())
     	{
     		if (img.getTimePathSet().size() > 1)
     			return true;

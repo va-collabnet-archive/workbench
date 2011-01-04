@@ -78,7 +78,7 @@ public class KindOfComputer {
 			try {
 				if (isaCache == null) {
 					IsaCache tempIsaCache = new IsaCache(Bdb.getConceptDb().getConceptNidSet());
-					tempIsaCache.setup(Terms.get().getActiveAceFrameConfig().getCoordinate());
+					tempIsaCache.setup(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
 					isaCache = tempIsaCache;
 				}
 			} catch (Exception e) {

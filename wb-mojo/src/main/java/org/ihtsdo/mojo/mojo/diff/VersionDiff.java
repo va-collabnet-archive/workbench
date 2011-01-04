@@ -317,8 +317,8 @@ public class VersionDiff extends DiffBase {
 		I_TermFactory tf = Terms.get();
 		I_ConceptAttributePart a1 = null;
 		I_ConceptAttributePart a2 = null;
-		for (I_ConceptAttributePart a : c.getConceptAttributes()
-				.getMutableParts()) {
+                I_ConceptAttributeVersioned<?> attr = c.getConceptAttributes();
+		for (I_ConceptAttributePart a : attr.getMutableParts()) {
 			// Find the greatest version <= the one of interest
 			if (a.getPathNid() != pos1.getPath().getConceptNid()
 					&& a.getTime() <= pos1.getTime()
@@ -430,7 +430,7 @@ public class VersionDiff extends DiffBase {
 
 	private void compareDescriptionsOrig(I_GetConceptData c) throws Exception {
 		I_TermFactory tf = Terms.get();
-		for (I_DescriptionVersioned d : c.getDescriptions()) {
+		for (I_DescriptionVersioned<?> d : c.getDescriptions()) {
 			descriptions++;
 			I_DescriptionPart d1 = null;
 			I_DescriptionPart d2 = null;
@@ -638,7 +638,7 @@ public class VersionDiff extends DiffBase {
 	private void compareRelationshipsOrig(I_GetConceptData c, PathBI path)
 			throws Exception {
 		I_TermFactory tf = Terms.get();
-		for (I_RelVersioned d : c.getSourceRels()) {
+		for (I_RelVersioned<?> d : c.getSourceRels()) {
 			relationships++;
 			I_RelPart r1 = null;
 			I_RelPart r2 = null;
@@ -947,7 +947,7 @@ public class VersionDiff extends DiffBase {
 		ArrayList<Integer> ret = new ArrayList<Integer>();
 		I_TermFactory tf = Terms.get();
 		I_GetConceptData c = tf.getConcept(concept_id);
-		for (I_RelVersioned d : c.getDestRels()) {
+		for (I_RelVersioned<?> d : c.getDestRels()) {
 			I_RelPart dm = null;
 			for (I_RelPart dd : d.getMutableParts()) {
 				if (dd.getPathId() != path.getConceptNid())

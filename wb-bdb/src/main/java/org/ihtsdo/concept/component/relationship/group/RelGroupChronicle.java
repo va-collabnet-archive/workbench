@@ -11,8 +11,9 @@ import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
-import org.ihtsdo.tk.api.refset.RefsetMemberChronicleBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
@@ -68,13 +69,13 @@ public class RelGroupChronicle implements RelGroupChronicleBI {
 	}
 
 	@Override
-	public RelGroupVersionBI getVersion(Coordinate c)
+	public RelGroupVersionBI getVersion(ViewCoordinate c)
 			throws ContraditionException {
 		return new RelGroupVersion(this, c);
 	}
 
 	@Override
-	public Collection<? extends RelGroupVersionBI> getVersions(Coordinate c) {
+	public Collection<? extends RelGroupVersionBI> getVersions(ViewCoordinate c) {
 		return Arrays.asList(new RelGroupVersionBI[] { new RelGroupVersion(this, c) });
 	}
 
@@ -105,14 +106,32 @@ public class RelGroupChronicle implements RelGroupChronicleBI {
 	}
 
     @Override
-    public boolean addAnnotation(RefsetMemberChronicleBI annotation) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public boolean addAnnotation(RefexChronicleBI<?> annotation) {
+        throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override
-    public Collection<? extends RefsetMemberChronicleBI> getAnnotations() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Collection<? extends RefexChronicleBI<?>> getAnnotations() {
+        throw new UnsupportedOperationException("Not supported.");
     }
+
+	@Override
+	public Collection<? extends RefexChronicleBI<?>> getRefexes()
+			throws IOException {
+        throw new UnsupportedOperationException("Not supported.");
+	}
+
+	@Override
+	public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
+			ViewCoordinate xyz) throws IOException {
+        throw new UnsupportedOperationException("Not supported.");
+	}
+
+	@Override
+	public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
+			ViewCoordinate xyz) throws IOException {
+        throw new UnsupportedOperationException("Not supported.");
+	}
 
 
 }

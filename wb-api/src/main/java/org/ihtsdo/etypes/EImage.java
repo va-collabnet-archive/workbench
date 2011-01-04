@@ -19,7 +19,7 @@ public class EImage extends TkMedia {
         super(in, dataVersion);
     }
 
-    public EImage(I_ImageVersioned imageVer) throws TerminologyException, IOException {
+    public EImage(I_ImageVersioned<?> imageVer) throws TerminologyException, IOException {
         EConcept.convertId(Terms.get().getId(imageVer.getNid()), this);
         int partCount = imageVer.getMutableParts().size();
         I_ImagePart part = imageVer.getMutableParts().get(0);

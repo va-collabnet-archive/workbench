@@ -54,6 +54,7 @@ public class DescriptionTableRenderer extends AceTableRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
             int row, int column) {
+            
         JLabel renderComponent =
                 (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         boolean same = false;
@@ -70,6 +71,9 @@ public class DescriptionTableRenderer extends AceTableRenderer {
             renderComponent.setForeground(UIManager.getColor("Table.selectionForeground"));
         }
 
+        if (value == null) {
+            return renderComponent;
+        }
         if (StringWithDescTuple.class.isAssignableFrom(value.getClass())) {
             StringWithDescTuple swt = (StringWithDescTuple) value;
             if (swt == null || swt.getTuple() == null) {

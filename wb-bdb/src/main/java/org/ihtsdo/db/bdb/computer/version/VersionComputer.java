@@ -15,12 +15,12 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper.RELATIVE_POSITION;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 
@@ -80,7 +80,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                 matchingTuples, versions, precedencePolicy, contradictionManager);
     }
 
-    public void addSpecifiedRelVersions(List<V> matchingVersions, List<V> versions, Coordinate c) {
+    public void addSpecifiedRelVersions(List<V> matchingVersions, List<V> versions, ViewCoordinate c) {
         if (c.getPositionSet() == null || c.getPositionSet().size() < 1) {
             addSpecifiedVersionsNullPositions(c.getAllowedStatusNids(), null, 
             		matchingVersions, versions, c.getPrecedence(),
@@ -167,7 +167,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                     }
                 }
                 if (mapper.onRoute(part)) {
-                    if (partsForPosition.size() == 0) {
+                    if (partsForPosition.isEmpty()) {
                         partsForPosition.add(part);
                     } else {
                         List<V> partsToCompare =

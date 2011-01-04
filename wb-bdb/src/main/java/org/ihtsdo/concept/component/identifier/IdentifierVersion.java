@@ -8,7 +8,6 @@ import java.util.UUID;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersion;
-import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.bind.ThinVersionHelper;

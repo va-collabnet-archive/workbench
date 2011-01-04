@@ -1,5 +1,6 @@
 package org.ihtsdo.concept.component.refsetmember.Boolean;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.Collection;
 
@@ -11,16 +12,20 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.concept.component.refsetmember.Boolean.BooleanMember.Version;
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.refset.RefsetMemberVersionBI;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanAnalogBI;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMember>
-        implements I_ExtendByRefPartBoolean {
+        implements I_ExtendByRefPartBoolean<BooleanRevision>, RefexBooleanAnalogBI<BooleanRevision> {
 
     private boolean booleanValue;
 
@@ -133,7 +138,7 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
     }
 
     @Override
-    public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
+    public I_ExtendByRefPart<BooleanRevision> makePromotionPart(PathBI promotionPath) {
         // TODO
         throw new UnsupportedOperationException();
     }
@@ -159,7 +164,7 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
     }
 
     @Override
-    public BooleanMember.Version getVersion(Coordinate c)
+    public BooleanMember.Version getVersion(ViewCoordinate c)
             throws ContraditionException {
         return (Version) ((BooleanMember) primordialComponent).getVersion(c);
     }
@@ -170,8 +175,29 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
     }
 
     @Override
-    public Collection<? extends RefsetMemberVersionBI> getVersions(
-            Coordinate c) {
+    public Collection<? extends RefexVersionBI<BooleanRevision>> getVersions(
+            ViewCoordinate c) {
         return ((BooleanMember) primordialComponent).getVersions(c);
     }
+
+	@Override
+	public void setBoolean1(boolean l) throws PropertyVetoException {
+		this.booleanValue = l;
+		modified();
+		
+	}
+
+	@Override
+	public boolean getBoolean1() {
+		return this.booleanValue;
+	}
+	
+	protected TK_REFSET_TYPE getTkRefsetType() {
+		return TK_REFSET_TYPE.BOOLEAN;
+	}
+
+	protected void addSpecProperties(RefexAmendmentSpec rcs) {
+		rcs.with(RefexProperty.BOOLEAN1, getBoolean1());
+	}
+
 }

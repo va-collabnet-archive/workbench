@@ -14,17 +14,16 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
-import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 public class DescriptionRevision
         extends Revision<DescriptionRevision, Description>
-        implements I_DescriptionPart, DescriptionAnalogBI {
+        implements I_DescriptionPart<DescriptionRevision>, DescriptionAnalogBI<DescriptionRevision> {
 
     @SuppressWarnings("unused")
     private static Charset utf8 = Charset.forName("UTF-8");
@@ -304,7 +303,7 @@ public class DescriptionRevision
     }
 
     @Override
-    public Description.Version getVersion(Coordinate c)
+    public Description.Version getVersion(ViewCoordinate c)
             throws ContraditionException {
         return primordialComponent.getVersion(c);
     }
@@ -316,7 +315,7 @@ public class DescriptionRevision
 
     @Override
     public Collection<Description.Version> getVersions(
-            Coordinate c) {
+            ViewCoordinate c) {
         return primordialComponent.getVersions(c);
     }
 

@@ -236,7 +236,7 @@ public class VodbCreateNewPath extends AbstractMojo {
         
         getLog().info("VodbCreateNewPath createNewPathConcept new Concept id = "+pathConcept.getConceptNid());
         //getLog().error("VodbCreateNewPath createNewPathConcept new Concept id = "+pathConcept.getConceptNid());
-        for (I_DescriptionVersioned desc: pathConcept.getDescriptions()) {
+        for (I_DescriptionVersioned<?> desc: pathConcept.getDescriptions()) {
         	getLog().info("VodbCreateNewPath createNewPathConcept getDescriptions descID = "+desc.getDescId());
         	for (I_DescriptionPart desl : desc.getMutableParts()) {
         		getLog().info("VodbCreateNewPath createNewPathConcept dscParth text = "+desl.getText());

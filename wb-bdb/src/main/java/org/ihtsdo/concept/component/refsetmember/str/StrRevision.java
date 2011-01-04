@@ -1,6 +1,8 @@
 package org.ihtsdo.concept.component.refsetmember.str;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
+import java.util.Collection;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
@@ -8,19 +10,21 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_str.RefexStrAnalogBI;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
-import java.util.Collection;
-import org.ihtsdo.concept.component.refsetmember.membership.MembershipMember;
-import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
-import org.ihtsdo.tk.api.refset.RefsetMemberVersionBI;
 
 public class StrRevision extends RefsetRevision<StrRevision, StrMember>
-        implements I_ExtendByRefPartStr {
+        implements I_ExtendByRefPartStr<StrRevision>, RefexStrAnalogBI<StrRevision> {
 
     private String stringValue;
 
@@ -134,7 +138,7 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
     }
 
     @Override
-    public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
+    public I_ExtendByRefPart<StrRevision> makePromotionPart(PathBI promotionPath) {
         // TODO
         throw new UnsupportedOperationException();
     }
@@ -165,7 +169,7 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
     
         
     @Override
-    public StrMember.Version getVersion(Coordinate c)
+    public StrMember.Version getVersion(ViewCoordinate c)
             throws ContraditionException {
         return (StrMember.Version) ((StrMember) primordialComponent).getVersion(c);
     }
@@ -176,9 +180,27 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
     }
 
     @Override
-    public Collection<? extends RefsetMemberVersionBI> getVersions(
-            Coordinate c) {
+    public Collection<? extends RefexVersionBI<StrRevision>> getVersions(
+            ViewCoordinate c) {
         return ((StrMember) primordialComponent).getVersions(c);
     }
+
+	@Override
+	public void setStr1(String str) throws PropertyVetoException {
+		this.stringValue = str;
+		modified();
+	}
+
+	@Override
+	public String getStr1() {
+		return stringValue;
+	}
+	protected TK_REFSET_TYPE getTkRefsetType() {
+		return TK_REFSET_TYPE.STR;
+	}
+
+	protected void addSpecProperties(RefexAmendmentSpec rcs) {
+		rcs.with(RefexProperty.STRING1, getStr1());
+	}
 
 }

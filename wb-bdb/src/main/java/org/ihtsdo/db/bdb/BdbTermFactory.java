@@ -64,9 +64,9 @@ import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.I_WriteDirectToDb;
 import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.RefsetPropertyMap;
+import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
-import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
@@ -105,6 +105,7 @@ import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_FetchConceptFromCursor;
 import org.ihtsdo.concept.I_ProcessConceptData;
+import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.concept.component.description.Description;
@@ -153,11 +154,10 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 import com.sleepycat.je.DatabaseException;
-import org.ihtsdo.concept.component.ConceptComponent;
-import org.ihtsdo.tk.api.refset.RefsetMemberChronicleBI;
 
 public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_Search {
 
@@ -337,7 +337,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             component = ((Concept) component).getConceptAttributes();
         }
         ComponentChroncileBI<?> cc = (ComponentChroncileBI<?>) component;
-        for (RefsetMemberChronicleBI annotation: cc.getAnnotations()) {
+        for (RefexChronicleBI annotation: cc.getAnnotations()) {
             returnValues.add((I_ExtendByRef) annotation);
         }
         return returnValues;
@@ -1118,7 +1118,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                 member.addVersion(revision);
             }
         }
-        if (refsetConcept.isAnnotationStyleRefset()) {
+        if (refsetConcept.isAnnotationStyleRefex()) {
             ConceptComponent<?,?> referencedComponent = (ConceptComponent<?, ?>) Bdb.getComponent(referencedComponentNid);
             referencedComponent.addAnnotation(member);
             member.enclosingConceptNid = Bdb.getConceptNid(referencedComponentNid);
@@ -1585,7 +1585,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         private List<I_TestSearchResults> checkList;
         private I_ConfigAceFrame config;
         private Pattern p;
-        Collection<I_DescriptionVersioned> matches;
+        Collection<I_DescriptionVersioned<?>> matches;
     	private NidBitSetBI nidSet;
     	
     	public NidBitSetBI getNidSet() {
@@ -1594,7 +1594,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
         public RegexSearcher(CountDownLatch conceptLatch, I_TrackContinuation tracker, Semaphore checkSemaphore,
                 List<I_TestSearchResults> checkList, I_ConfigAceFrame config, Pattern p,
-                Collection<I_DescriptionVersioned> matches) throws IOException {
+                Collection<I_DescriptionVersioned<?>> matches) throws IOException {
             super();
             this.conceptLatch = conceptLatch;
             this.tracker = tracker;
@@ -1641,7 +1641,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public void searchRegex(I_TrackContinuation tracker, Pattern p, Collection<I_DescriptionVersioned> matches,
+    public void searchRegex(I_TrackContinuation tracker, Pattern p, Collection<I_DescriptionVersioned<?>> matches,
             CountDownLatch conceptLatch, List<I_TestSearchResults> checkList, I_ConfigAceFrame config)
             throws DatabaseException, IOException {
         Stopwatch timer = null;
@@ -1751,7 +1751,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         int cidTypeNid = REFSET_TYPES.CID.getTypeNid();
         int normalMemberNid = ReferenceConcepts.NORMAL_MEMBER.getNid();
         for (RefsetMember<?, ?> m : members) {
-            for (RefsetMember.Version v : m.getVersions(frameConfig.getCoordinate())) {
+            for (RefsetMember.Version v : m.getVersions(frameConfig.getViewCoordinate())) {
                 if (allowedStatus.contains(v.getStatusNid()) && v.getTypeNid() == cidTypeNid) {
                     if (((I_ExtendByRefPartCid) v).getC1id() == normalMemberNid) {
                         if (Terms.get().hasConcept(m.getComponentId())) {

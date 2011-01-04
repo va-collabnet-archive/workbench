@@ -1,5 +1,6 @@
 package org.ihtsdo.concept.component.relationship.group;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -7,8 +8,9 @@ import java.util.List;
 import java.util.UUID;
 
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
-import org.ihtsdo.tk.api.refset.RefsetMemberChronicleBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
@@ -18,7 +20,32 @@ public class RelGroupVersion
         implements RelGroupVersionBI {
 
     private RelGroupChronicleBI rg;
-    private int authorNid;
+
+	public Collection<? extends RefexChronicleBI<?>> getRefexes()
+			throws IOException {
+		return rg.getRefexes();
+	}
+
+	public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
+			ViewCoordinate xyz) throws IOException {
+		return rg.getCurrentRefexes(xyz);
+	}
+
+	public boolean addAnnotation(RefexChronicleBI<?> annotation)
+			throws IOException {
+		return rg.addAnnotation(annotation);
+	}
+
+	public Collection<? extends RefexChronicleBI<?>> getAnnotations()
+			throws IOException {
+		return rg.getAnnotations();
+	}
+
+	public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
+			ViewCoordinate xyz) throws IOException {
+		return rg.getCurrentAnnotations(xyz);
+	}
+	private int authorNid;
     private int statusNid;
     private int pathNid;
     private long time = Long.MIN_VALUE;
@@ -27,9 +54,9 @@ public class RelGroupVersion
     public UUID getPrimUuid() {
         return rg.getPrimUuid();
     }
-    private Coordinate coordinate;
+    private ViewCoordinate coordinate;
 
-    public RelGroupVersion(RelGroupChronicleBI rg, Coordinate coordinate) {
+    public RelGroupVersion(RelGroupChronicleBI rg, ViewCoordinate coordinate) {
         assert rg != null;
         assert coordinate != null;
         this.rg = rg;
@@ -86,13 +113,13 @@ public class RelGroupVersion
     }
 
     @Override
-    public RelGroupVersionBI getVersion(Coordinate c)
+    public RelGroupVersionBI getVersion(ViewCoordinate c)
             throws ContraditionException {
         return rg.getVersion(c);
     }
 
     @Override
-    public Collection<? extends RelGroupVersionBI> getVersions(Coordinate c) {
+    public Collection<? extends RelGroupVersionBI> getVersions(ViewCoordinate c) {
         return Arrays.asList(new RelGroupVersionBI[]{new RelGroupVersion(this, c)});
     }
 
@@ -151,18 +178,8 @@ public class RelGroupVersion
         return false;
     }
 
-    @Override
-    public boolean addAnnotation(RefsetMemberChronicleBI annotation) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Collection<? extends RefsetMemberChronicleBI> getAnnotations() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public int getSapNid() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+	@Override
+	public int getSapNid() {
+		throw new UnsupportedOperationException();
+	}
 }

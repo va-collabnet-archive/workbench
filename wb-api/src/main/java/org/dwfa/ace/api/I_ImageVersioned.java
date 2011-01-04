@@ -28,7 +28,8 @@ import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.media.MediaAnalogBI;
 
-public interface I_ImageVersioned extends I_AmTermComponent, MediaAnalogBI {
+public interface I_ImageVersioned<A extends MediaAnalogBI>
+        extends I_AmTermComponent, MediaAnalogBI<A> {
 
     public byte[] getImage();
 
