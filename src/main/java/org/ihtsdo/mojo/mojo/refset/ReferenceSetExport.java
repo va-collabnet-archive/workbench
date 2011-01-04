@@ -268,7 +268,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
         return latest;
     }
 
-    private void processDescription(I_DescriptionVersioned versionedDesc) throws Exception {
+    private void processDescription(I_DescriptionVersioned<?> versionedDesc) throws Exception {
         boolean exportableVersionFound = false;
         I_DescriptionPart latest = null;
         for (I_DescriptionPart part : versionedDesc.getMutableParts()) {
@@ -296,7 +296,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     }
 
     @SuppressWarnings("deprecation")
-    private void processRelationship(I_RelVersioned versionedRel) throws Exception {
+    private void processRelationship(I_RelVersioned<?> versionedRel) throws Exception {
         if (testSpecification(versionedRel.getC2Id())) {
             boolean exportableVersionFound = false;
             I_RelPart latest = null;
