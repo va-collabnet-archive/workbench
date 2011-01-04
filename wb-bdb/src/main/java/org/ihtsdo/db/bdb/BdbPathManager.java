@@ -236,9 +236,12 @@ public class BdbPathManager implements I_Manage<PathBI> {
 
     @SuppressWarnings("unchecked")
     private Path getFromDisk(int cNid) throws IOException {
+    	logger.info("BdbPathManager getFromDisk called cNid = "+cNid);
         try {
-
+        	logger.info("BdbPathManager getFromDisk called getPathRefsetConcept() = "+getPathRefsetConcept().toLongString());
+        	logger.info("BdbPathManager getFromDisk called getPathRefsetConcept().getExtensions().size() = "+getPathRefsetConcept().getExtensions().size());
             for (RefsetMember extPart : getPathRefsetConcept().getExtensions()) {
+            	logger.info("getFromDisk cNid = "+cNid +" extPart = "+extPart);
             	AceLog.getAppLog().info("getFromDisk cNid = "+cNid +" extPart = "+extPart);
                 CidMember conceptExtension = (CidMember) extPart;
                 int pathId = conceptExtension.getC1Nid();
