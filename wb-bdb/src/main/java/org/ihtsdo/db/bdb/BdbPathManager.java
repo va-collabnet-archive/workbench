@@ -338,6 +338,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
                     new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, path.getConceptNid());
             helperGetter.get(config).newRefsetExtension(ReferenceConcepts.REFSET_PATHS.getNid(),
                 ReferenceConcepts.PATH.getNid(), EConcept.REFSET_TYPES.CID, propMap, config);
+            logger.info("BDBPathManager write getPathRefsetConcept() = "+getPathRefsetConcept().toLongString());
             BdbCommitManager.addUncommittedNoChecks(getPathRefsetConcept());
 
             // write position
