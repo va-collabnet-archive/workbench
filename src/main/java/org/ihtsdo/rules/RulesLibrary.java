@@ -60,7 +60,6 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure.ALERT_TYPE;
@@ -87,9 +86,9 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.helper.ResultsItem;
 import org.ihtsdo.tk.helper.ResultsItem.Severity;
 import org.ihtsdo.tk.helper.templates.AbstractTemplate;
+import org.ihtsdo.tk.helper.templates.AbstractTemplate.TemplateType;
 import org.ihtsdo.tk.helper.templates.DescriptionTemplate;
 import org.ihtsdo.tk.helper.templates.RelationshipTemplate;
-import org.ihtsdo.tk.helper.templates.AbstractTemplate.TemplateType;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.DescriptionSpec;
 import org.ihtsdo.tk.spec.RelSpec;
@@ -108,6 +107,7 @@ public class RulesLibrary {
 	public static int LINGUISTIC_GUIDELINES_PKG = 1;
 
 	public static KindOfCacheBI myStaticIsACache;
+	public static KindOfCacheBI myStaticIsACacheRefsetSpec;
 	public static TerminologyHelperDroolsWorkbench terminologyHelperCache;
 
 	public enum INFERRED_VIEW_ORIGIN {CLASSIFIER, CONSTRAINT_NORMAL_FORM};
@@ -127,7 +127,10 @@ public class RulesLibrary {
 	}
 
 	public static KindOfCacheBI setupIsACache() throws TerminologyException, Exception {
-		return myStaticIsACache = Ts.get().getCache(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+		myStaticIsACache = Ts.get().getCache(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+		RefsetSpecQuery.myStaticIsACache = myStaticIsACache;
+		myStaticIsACacheRefsetSpec = RefsetSpecQuery.myStaticIsACache;
+		return myStaticIsACache;
 	}
 
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
@@ -858,7 +861,7 @@ public class RulesLibrary {
 			RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, config);
 			I_GetConceptData refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
 //			AceLog.getAppLog().info("Refset: " + refset.getInitialText() + " " + refset.getUids().get(0));
-//			AceLog.getAppLog().info("Refset spec: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
+//			AceLog.getAppLog().info("Checking Refset spec: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
 			RefsetComputeType computeType = RefsetComputeType.CONCEPT; // default
 			if (refsetSpecHelper.isDescriptionComputeType()) {
 				computeType = RefsetComputeType.DESCRIPTION;
@@ -905,6 +908,20 @@ public class RulesLibrary {
 
 			List<I_ShowActivity> activities = new ArrayList<I_ShowActivity>();
 			result = query.execute(selectedConcept, activities);
+			
+//			ArrayList<RefsetSpecComponent> components = query.getAllComponents();
+//			
+//			boolean resultByComponents = false;
+//			for (RefsetSpecComponent loopComponent : components) {
+//				try {
+//					ConceptStatement loopConceptStatement = (ConceptStatement) loopComponent;
+//					//loopConceptStatement..getTokenEnum().equals(loopConceptStatement.getTokenEnum().CONCEPT_IS);
+//				} catch (Exception e) {
+//					// skip, unknown component
+//				}
+//				
+//			}
+			
 
 //			System.out.println("++++++++++++++ Result = " + result);
 //			System.out.println("************ Finished test computation in " + (System.currentTimeMillis() - start) + " ms. *****************");
