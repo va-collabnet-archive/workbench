@@ -257,7 +257,7 @@ public class BatchQACheck extends AbstractMojo {
 					String ruleUid = (String) loopRule.getMetaData().get("UUID");
 					String description = (String) loopRule.getMetaData().get("DESCRIPTION");
 					String ditaUid = (String) loopRule.getMetaData().get("DITA_UID");
-					Integer severity = (Integer) loopRule.getMetaData().get("SEVERITY");
+					String severityUid = (String) loopRule.getMetaData().get("SEVERITY");
 					String ruleCode = (String) loopRule.getMetaData().get("RULE_CODE");
 					I_GetConceptData roleInContext = contextHelper.getRoleInContext(ruleUid, context); // STATUS
 
@@ -270,7 +270,7 @@ public class BatchQACheck extends AbstractMojo {
 //					} else {
 //						rulePw.print("default" + "\t");// Status
 //					}
-					rulePw.print(severity + "\t");
+					rulePw.print(severityUid + "\t");
 					rulePw.print(loopPackage.getName() + "\t");
 					rulePw.print(loopPackage.getUrl() + "\t");
 					rulePw.print(ditaUid + "\t");
@@ -303,7 +303,7 @@ public class BatchQACheck extends AbstractMojo {
 					ruleElement.appendChild(statusElement);
 
 					Element severityElement = document.createElement("severity");
-					severityElement.appendChild(document.createTextNode("Severity: " + severity));
+					severityElement.appendChild(document.createTextNode("Severity: " + severityUid));
 					ruleElement.appendChild(severityElement);
 
 					if(ditaUid != null){
