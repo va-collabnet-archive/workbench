@@ -112,7 +112,7 @@ public class RulesLibrary {
 	public static KindOfCacheBI myStaticIsACacheRefsetSpec;
 	public static TerminologyHelperDroolsWorkbench terminologyHelperCache;
 
-	public enum INFERRED_VIEW_ORIGIN {CLASSIFIER, CONSTRAINT_NORMAL_FORM};
+	public enum INFERRED_VIEW_ORIGIN {CLASSIFIER, CONSTRAINT_NORMAL_FORM, FULL};
 
 	public static I_IntSet allRels;
 	public static I_IntSet histRels;

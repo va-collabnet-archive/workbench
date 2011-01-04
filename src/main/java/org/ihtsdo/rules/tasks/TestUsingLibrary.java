@@ -91,7 +91,7 @@ public class TestUsingLibrary extends AbstractConceptTest {
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 			return RulesLibrary.checkConcept(concept, 
 					tf.getConcept(RefsetAuxiliary.Concept.REALTIME_QA_CONTEXT.getUids()), false, 
-					config, INFERRED_VIEW_ORIGIN.CONSTRAINT_NORMAL_FORM).getAlertList();
+					config, INFERRED_VIEW_ORIGIN.FULL).getAlertList();
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
 		}
