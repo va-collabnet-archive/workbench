@@ -1013,6 +1013,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             throws IOException {
         assert referencedComponentNid != 0 : " invalid referencedComponentNid for refset: " + refsetConcept;
         RefsetMember<?, ?> member = null;
+        AceLog.getEditLog().info("BdbTermFactory createMember type = "+type);
         switch (type) {
         case BOOLEAN:
             member =

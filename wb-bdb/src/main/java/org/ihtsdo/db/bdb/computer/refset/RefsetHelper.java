@@ -237,6 +237,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
         }
         // create a new extension (with a part for each path the user is
         // editing)
+        AceLog.getEditLog().info("RefsetHelper getOrCreateRefsetExtension makeMemberAndSetup");
         return makeMemberAndSetup(refsetId, componentId, type, propMap, memberUuid);
     }
 
@@ -254,6 +255,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
         if (hasCurrentRefsetExtension(refsetId, componentId, propMap)) {
             return false;
         }
+        AceLog.getEditLog().info("RefsetHelper newRefsetExtension getOrCreateRefsetExtension refsetId = "+refsetId+" componentId = "+componentId +" type = "+type);
         getOrCreateRefsetExtension(refsetId, componentId, type, propMap, UUID.randomUUID());
         return true;
     }
