@@ -1109,16 +1109,16 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         }
         
         AceLog.getEditLog().info("BdbTermFactory setupNewMember statusNid = "+statusNid +" getUserNid(config) = "+getUserNid(config)+" time = "+time);
-        
+        AceLog.getEditLog().info("BdbTermFactory setupNewMember config.getEditingPathSet() size = "+config.getEditingPathSet().size()+" member.primordialSapNid = "+member.primordialSapNid); 
         assert config.getEditingPathSet().size() > 0 : "Empty editing path set. Must have at least one editing path.";
         for (final PathBI p : config.getEditingPathSet()) {
-        	AceLog.getEditLog().info("BdbTermFactory setupNewMember p.getConceptNid() = "+p.getConceptNid() +" config.getEditingPathSet() size = "+config.getEditingPathSet().size());
+        	AceLog.getEditLog().info("BdbTermFactory setupNewMember1 p.getConceptNid() = "+p.getConceptNid());
             if (member.primordialSapNid == Integer.MIN_VALUE) {
                 member.primordialSapNid =
                         Bdb.getSapDb().getSapNid(statusNid, getUserNid(config), p.getConceptNid(), time);
                 propMap.setPropertiesExceptSap((I_ExtendByRefPart) member);
             } else {
-            	AceLog.getEditLog().info("BdbTermFactory setupNewMember p.getConceptNid() = "+p.getConceptNid() );
+            	AceLog.getEditLog().info("BdbTermFactory setupNewMember2 p.getConceptNid() = "+p.getConceptNid() );
                 final I_ExtendByRefPart revision = (I_ExtendByRefPart) member.makeAnalog(statusNid, p.getConceptNid(), time);
                 propMap.setProperties(revision);
                 member.addVersion(revision);
