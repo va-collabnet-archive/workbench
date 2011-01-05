@@ -18,6 +18,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.ihtsdo.rules.RulesLibrary;
+import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.tk.helper.ResultsItem;
@@ -97,7 +98,7 @@ public class TestListPanel extends JPanel {
 			I_GetConceptData loopConcept = (I_GetConceptData) list1Model.getElementAt(i);
 			I_GetConceptData context = (I_GetConceptData) comboBox1.getSelectedItem();
 			try {
-				ResultsCollectorWorkBench results = RulesLibrary.checkConcept(loopConcept, context, false, config, contextHelper);
+				ResultsCollectorWorkBench results = RulesLibrary.checkConcept(loopConcept, context, false, config, contextHelper, INFERRED_VIEW_ORIGIN.FULL);
 				for (ResultsItem resultsItem : results.getResultsItems()) {
 					table1Model.addRow(
 							new String[] {loopConcept.toString(), "[" + resultsItem.getErrorCode() + "] " + resultsItem.getMessage()});
