@@ -268,7 +268,7 @@ public abstract class AbstractComponentDtoUpdater {
             sctIdPart = new ThinIdPart();
 
             sctIdPart.setPathId(tuple.getPathId());
-            sctIdPart.setSource(snomedIntId.getConceptId());
+            sctIdPart.setSource(unspecifiedUuid.getConceptId());
             sctIdPart.setSourceId(uuidSnomedDbMapHandler.getWithGeneration(uuid, getNamespace(idVersions, tuple), type, getProject(tuple)));
             sctIdPart.setStatusId(activeConcept.getConceptId());
             sctIdPart.setVersion(tuple.getVersion());
