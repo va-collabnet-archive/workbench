@@ -129,7 +129,9 @@ public class BdbPathManager implements I_Manage<PathBI> {
 
     private BdbPathManager() throws TerminologyException {
         try {
+        	AceLog.getAppLog().info("BdbPathManager()");
             editPath = new Path(ReferenceConcepts.TERM_AUXILIARY_PATH.getNid(), null);
+            AceLog.getAppLog().info("BdbPathManager setupPathMap");
             setupPathMap();
         } catch (Exception e) {
             throw new TerminologyException("Unable to initialise path management.", e);
@@ -213,11 +215,15 @@ public class BdbPathManager implements I_Manage<PathBI> {
             pathMap = new ConcurrentHashMap<Integer, Path>();
 
             try {
+            	logger.info("BdbPathManager setupPathMap getPathRefsetConcept");
                 getPathRefsetConcept();
-
+                logger.info("BdbPathManager setupPathMap getPathRefsetConcept().getExtensions().size"+getPathRefsetConcept().getExtensions().size());
                 for (RefsetMember extPart : getPathRefsetConcept().getExtensions()) {
+                	logger.info("BdbPathManager setupPathMap extPart ="+extPart);
                     CidMember conceptExtension = (CidMember) extPart;
+                    logger.info("BdbPathManager setupPathMap conceptExtension ="+conceptExtension);
                     int pathId = conceptExtension.getC1Nid();
+                    logger.info("BdbPathManager setupPathMap pathId ="+pathId);
                     pathMap.put(pathId, new Path(pathId, getPathOriginsFromDb(pathId)));
                 }
 
