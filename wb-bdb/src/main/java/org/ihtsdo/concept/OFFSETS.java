@@ -21,8 +21,8 @@ public enum OFFSETS {
 	DATA_SIZE(4, IMAGES),
 	HEADER_SIZE(0, DATA_SIZE);
 	
-	public static int CURRENT_FORMAT_VERSION = 3;
-
+	//public static int CURRENT_FORMAT_VERSION = 3;
+	public static int CURRENT_FORMAT_VERSION = 1;
 	
 	protected int offset;
 	protected int bytes;
