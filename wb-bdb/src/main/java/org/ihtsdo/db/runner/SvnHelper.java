@@ -42,7 +42,7 @@ import org.tigris.subversion.javahl.Revision;
 
 /**
  * Common SVN helper methods used by the Ace Runner and AceLoginDialog.
- *
+ * 
  * @author ean dungey
  * @author kec
  */
@@ -60,6 +60,7 @@ public class SvnHelper {
     private Class<?> jiniClass;
     private static boolean connectToSubversion = false;
     private Map<String, SubversionData> subversionMap = new HashMap<String, SubversionData>();
+    private int numberOfNonUserDirsInProfilesDir = 2; // startup and shutdown
 
     public Map<String, SubversionData> getSubversionMap() {
         return subversionMap;
@@ -224,6 +225,13 @@ public class SvnHelper {
         if (new File("profiles").exists()) {
             if (aceProperties.getProperty("last-profile-dir") != null) {
                 // A checkout has previously completed.
+                return;
+            }
+            File profilesFolder = new File("profiles");
+            File[] subFolders = profilesFolder.listFiles();
+
+            if (subFolders.length > numberOfNonUserDirsInProfilesDir) {
+                // a checkout has previously completed
                 return;
             }
         }
