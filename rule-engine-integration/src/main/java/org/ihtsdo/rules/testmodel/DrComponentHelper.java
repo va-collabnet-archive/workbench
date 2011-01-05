@@ -89,7 +89,7 @@ public class DrComponentHelper {
 			int statedAndInferred = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP.getUids());
 
 			if (inferredOrigin == INFERRED_VIEW_ORIGIN.CLASSIFIER) {
-				for (RelationshipVersionBI relTuple : oldStyleConcept.getSourceRelTuples(config.getAllowedStatus(), 
+				for (RelationshipVersionBI<?> relTuple : oldStyleConcept.getSourceRelTuples(config.getAllowedStatus(), 
 						null, 
 						config.getViewPositionSetReadOnly(), config.getPrecedence(), 
 						config.getConflictResolutionStrategy(), config.getClassifierConcept().getNid(), 
@@ -115,7 +115,7 @@ public class DrComponentHelper {
 					}
 				}
 			} else if (inferredOrigin == INFERRED_VIEW_ORIGIN.FULL) {
-				for (RelationshipVersionBI relTuple : oldStyleConcept.getSourceRelTuples(config.getAllowedStatus(), 
+				for (RelationshipVersionBI<?> relTuple : oldStyleConcept.getSourceRelTuples(config.getAllowedStatus(), 
 						null, 
 						config.getViewPositionSetReadOnly(), config.getPrecedence(), 
 						config.getConflictResolutionStrategy())) {
@@ -256,30 +256,30 @@ public class DrComponentHelper {
 				}
 			}
 
-			for (RelationshipVersionBI relTuple : oldStyleConcept.getSourceRelTuples(config.getAllowedStatus(), 
-					allRels, 
-					config.getViewPositionSetReadOnly(), config.getPrecedence(), 
-					config.getConflictResolutionStrategy(), config.getClassifierConcept().getNid(), 
-					RelAssertionType.STATED)) {
-				DrRelationship loopRel = new DrRelationship();
-				loopRel.setModifierUuid("someUuid");
-				loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
-				loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
-				loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
-				loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()).toString());
-				loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
-				loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
-				loopRel.setRelGroup(relTuple.getGroup());
-				loopRel.setStatusUuid(tf.nidToUuid(relTuple.getStatusNid()).toString());
-				loopRel.setTime(relTuple.getTime());
-				loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
-				loopRel.setFactContextName(factContextName);
-				concept.getOutgoingRelationships().add(loopRel);
-				statedRolesSet.getRelationships().add(loopRel);
-			}
-
-			concept.getDefiningRoleSets().add(statedRolesSet);
-			concept.getDefiningRoleSets().add(inferredRolesSet);
+//			for (RelationshipVersionBI relTuple : oldStyleConcept.getSourceRelTuples(config.getAllowedStatus(), 
+//					allRels, 
+//					config.getViewPositionSetReadOnly(), config.getPrecedence(), 
+//					config.getConflictResolutionStrategy(), config.getClassifierConcept().getNid(), 
+//					RelAssertionType.STATED)) {
+//				DrRelationship loopRel = new DrRelationship();
+//				loopRel.setModifierUuid("someUuid");
+//				loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
+//				loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
+//				loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
+//				loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()).toString());
+//				loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
+//				loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
+//				loopRel.setRelGroup(relTuple.getGroup());
+//				loopRel.setStatusUuid(tf.nidToUuid(relTuple.getStatusNid()).toString());
+//				loopRel.setTime(relTuple.getTime());
+//				loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
+//				loopRel.setFactContextName(factContextName);
+//				concept.getOutgoingRelationships().add(loopRel);
+//				statedRolesSet.getRelationships().add(loopRel);
+//			}
+//
+//			concept.getDefiningRoleSets().add(statedRolesSet);
+//			concept.getDefiningRoleSets().add(inferredRolesSet);
 
 			// TODO: incoming rels is heavy on performance, evaluate requirements
 			//			for (RelationshipVersionBI relTuple : conceptBi.getRelsIncomingActive()) {
