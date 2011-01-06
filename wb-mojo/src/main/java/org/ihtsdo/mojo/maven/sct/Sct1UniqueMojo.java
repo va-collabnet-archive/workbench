@@ -62,9 +62,7 @@ public class Sct1UniqueMojo extends AbstractMojo implements Serializable {
 
     /**
      * Stop date (inclusive)
-     * 
      * @parameter
-     * @required
      */
     private String dateStop;
     private Date dateStopObj;
