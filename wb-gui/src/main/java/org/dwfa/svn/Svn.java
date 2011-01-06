@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -208,7 +208,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
@@ -312,7 +312,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
@@ -341,7 +341,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
@@ -398,7 +398,7 @@ public class Svn implements I_HandleSubversion {
                             }
 					} else if (s.isModified()) {
 						if (s.getRepositoryTextStatus() == StatusKind.modified) {
-							// Conflict exists. 
+							// Conflict exists.
 							AceLog.getAppLog().warning("File has been modified locally and on server: " + s.getPath());
 							StringBuffer msg = new StringBuffer();
 							msg.append("<html>File has been modified locally and on server: <br><br>&nbsp;>&nbsp;>&nbsp;>&nbsp;");
@@ -415,14 +415,6 @@ public class Svn implements I_HandleSubversion {
 						}
 
 					}
-				} else if (s.isIgnored() == false && new File(s.getPath()).exists() && s.getPath().contains(".llog") == false) {
-					int depth = Depth.infinity;
-					boolean force = false;
-					boolean noIgnores = false;
-					boolean addParents = true;
-					Svn.getSvnClient().add(s.getPath(), depth, force, noIgnores, addParents);
-					SvnLog.info("Adding: " + s.getPath());
-					newFiles++;
 				} else if (s.isIgnored() == false && new File(s.getPath()).exists()
                         && s.getPath().contains(".llog") == false && !s.getPath().contains(".bp.write-pending")
                         && !s.getPath().contains(".bp.take-pending")) {
@@ -434,7 +426,7 @@ public class Svn implements I_HandleSubversion {
                         SvnLog.info("Adding: " + s.getPath());
                         newFiles++;
                     } else if (s.isDeleted() && s.getRepositoryTextStatus() == StatusKind.deleted) {
-					// prevent tree conflict. 
+					// prevent tree conflict.
 					SvnLog.info("Preventing dual deletion tree conflict by reverting local copy: " + s.getPath());
 					revert(s);
 				} else {
@@ -552,7 +544,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
@@ -582,7 +574,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
@@ -716,7 +708,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
@@ -744,7 +736,7 @@ public class Svn implements I_HandleSubversion {
 			SvnLog.info("starting database update");
 			Svn.getSvnClient().setPrompt(authenticator);
 			try {
-				
+
 				try {
 					Terms.get().close();
 				} catch (IOException e) {
@@ -796,7 +788,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
@@ -854,7 +846,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
@@ -1107,7 +1099,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
@@ -1166,7 +1158,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
@@ -1226,7 +1218,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
