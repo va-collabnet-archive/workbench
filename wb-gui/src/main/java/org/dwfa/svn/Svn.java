@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -73,7 +73,7 @@ public class Svn implements I_HandleSubversion {
 		SVN_KIT;
     };
 	private static boolean connectedToSvn = false;
-	
+
 	private static int svnNotConnectedWarningCount = 0;
 	public static int maxSvnNotConnectedWarningCount = 1;
 
@@ -95,7 +95,7 @@ public class Svn implements I_HandleSubversion {
 				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: getSvnClient()" );				
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: getSvnClient()" );
 			}
 			return null;
 		}
@@ -198,7 +198,7 @@ public class Svn implements I_HandleSubversion {
 				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: status()" );				
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: status()" );
 			}
 			return null;
 		}
@@ -219,7 +219,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
@@ -294,7 +294,7 @@ public class Svn implements I_HandleSubversion {
 				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: cleanup()" );				
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: cleanup()" );
 			}
 			return;
 		}
@@ -328,7 +328,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
@@ -347,7 +347,7 @@ public class Svn implements I_HandleSubversion {
 				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: commit()" );				
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: commit()" );
 			}
 			return;
 		}
@@ -362,7 +362,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
@@ -419,7 +419,7 @@ public class Svn implements I_HandleSubversion {
                             }
 					} else if (s.isModified()) {
 						if (s.getRepositoryTextStatus() == StatusKind.modified) {
-							// Conflict exists. 
+							// Conflict exists.
 							AceLog.getAppLog().warning("File has been modified locally and on server: " + s.getPath());
 							StringBuffer msg = new StringBuffer();
 							msg.append("<html>File has been modified locally and on server: <br><br>&nbsp;>&nbsp;>&nbsp;>&nbsp;");
@@ -436,14 +436,6 @@ public class Svn implements I_HandleSubversion {
 						}
 
 					}
-				} else if (s.isIgnored() == false && new File(s.getPath()).exists() && s.getPath().contains(".llog") == false) {
-					int depth = Depth.infinity;
-					boolean force = false;
-					boolean noIgnores = false;
-					boolean addParents = true;
-					Svn.getSvnClient().add(s.getPath(), depth, force, noIgnores, addParents);
-					SvnLog.info("Adding: " + s.getPath());
-					newFiles++;
 				} else if (s.isIgnored() == false && new File(s.getPath()).exists()
                         && s.getPath().contains(".llog") == false && !s.getPath().contains(".bp.write-pending")
                         && !s.getPath().contains(".bp.take-pending")) {
@@ -455,7 +447,7 @@ public class Svn implements I_HandleSubversion {
                         SvnLog.info("Adding: " + s.getPath());
                         newFiles++;
                     } else if (s.isDeleted() && s.getRepositoryTextStatus() == StatusKind.deleted) {
-					// prevent tree conflict. 
+					// prevent tree conflict.
 					SvnLog.info("Preventing dual deletion tree conflict by reverting local copy: " + s.getPath());
 					revert(s);
 				} else {
@@ -521,7 +513,7 @@ public class Svn implements I_HandleSubversion {
 				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: purge()" );				
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: purge()" );
 			}
 			return;
 		}
@@ -578,7 +570,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
@@ -597,7 +589,7 @@ public class Svn implements I_HandleSubversion {
 				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: revert()" );				
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: revert()" );
 			}
 			return;
 		}
@@ -613,7 +605,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
@@ -698,7 +690,7 @@ public class Svn implements I_HandleSubversion {
 				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: revert()" );				
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: revert()" );
 			}
 			return;
 		}
@@ -714,7 +706,7 @@ public class Svn implements I_HandleSubversion {
 				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: update()" );				
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: update()" );
 			}
 			return;
 		}
@@ -757,7 +749,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
@@ -776,7 +768,7 @@ public class Svn implements I_HandleSubversion {
 				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: updateDatabase()" );				
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: updateDatabase()" );
 			}
 			return;
 		}
@@ -790,7 +782,7 @@ public class Svn implements I_HandleSubversion {
 			SvnLog.info("starting database update");
 			Svn.getSvnClient().setPrompt(authenticator);
 			try {
-				
+
 				try {
 					Terms.get().close();
 				} catch (IOException e) {
@@ -842,7 +834,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
@@ -861,7 +853,7 @@ public class Svn implements I_HandleSubversion {
 				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: checkout()" );				
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: checkout()" );
 			}
 			return;
 		}
@@ -905,7 +897,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
@@ -923,7 +915,7 @@ public class Svn implements I_HandleSubversion {
 				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: handleAuthentication()" );				
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: handleAuthentication()" );
 			}
 			return;
 		}
@@ -1132,7 +1124,7 @@ public class Svn implements I_HandleSubversion {
 				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: unlock()" );				
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: unlock()" );
 			}
 			return;
 		}
@@ -1168,7 +1160,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
@@ -1187,7 +1179,7 @@ public class Svn implements I_HandleSubversion {
 				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: svnLock()" );				
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: svnLock()" );
 			}
 			return;
 		}
@@ -1202,7 +1194,7 @@ public class Svn implements I_HandleSubversion {
 				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: lock()" );				
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: lock()" );
 			}
 			return;
 		}
@@ -1237,7 +1229,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
@@ -1256,7 +1248,7 @@ public class Svn implements I_HandleSubversion {
 				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: doImport()" );				
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: doImport()" );
 			}
 			return;
 		}
@@ -1302,7 +1294,7 @@ public class Svn implements I_HandleSubversion {
 			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				String elapsed = "Elapsed time: " + 
+				String elapsed = "Elapsed time: " +
 					TimeUtil.getElapsedTimeString(elapsedTime);
 				activity.setProgressInfoLower(elapsed);
 				activity.complete();
@@ -1322,7 +1314,7 @@ public class Svn implements I_HandleSubversion {
 				JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: switchToReadOnlyMirror()" );				
+				AceLog.getAppLog().info("Skipping SVN task as not connected to SVN: switchToReadOnlyMirror()" );
 			}
 			return;
 		}
