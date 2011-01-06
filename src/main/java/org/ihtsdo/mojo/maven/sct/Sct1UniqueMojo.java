@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -35,6 +37,10 @@ import org.apache.maven.plugin.MojoFailureException;
  * 
  * ASSUMPTION: both directories have same number of date-aligned files
  * 
+ * &lt;dateStart&gt; yyyy.mm.dd -- filter excludes files before startDate
+ * &lt;dateStop&gt;  yyyy.mm.dd -- filter excludes files after stopDate
+
+ * 
  * @author marc
  *
  * @goal sct1-unique
@@ -46,6 +52,22 @@ public class Sct1UniqueMojo extends AbstractMojo implements Serializable {
 
     private static final String FILE_SEPARATOR = File.separator;
     private static final String LINE_TERMINATOR = "\r\n";
+
+    /**
+     * Start date (inclusive)
+     * @parameter
+     */
+    private String dateStart;
+    private Date dateStartObj;
+
+    /**
+     * Stop date (inclusive)
+     * 
+     * @parameter
+     * @required
+     */
+    private String dateStop;
+    private Date dateStopObj;
 
     /**
      * Location of the build directory.
@@ -110,6 +132,12 @@ public class Sct1UniqueMojo extends AbstractMojo implements Serializable {
             String out1stDir, String out2ndDir, String dupDir) throws ParseException,
             MojoFailureException, IOException {
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.ss HH:mm:ss");
+        if (dateStartObj != null)
+            getLog().info("::: Start date (inclusive) = " + sdf.format(dateStartObj));
+        if (dateStopObj != null)
+            getLog().info(":::  Stop date (inclusive) = " + sdf.format(dateStopObj));
+        
         String fPathIn1stDir = tDir + FILE_SEPARATOR + tSubDir + in1stDir;
         String fPathIn2ndDir = tDir + FILE_SEPARATOR + tSubDir + in2ndDir;
         String fPathOut1stDir = tDir + FILE_SEPARATOR + tSubDir + out1stDir;
@@ -121,10 +149,19 @@ public class Sct1UniqueMojo extends AbstractMojo implements Serializable {
         getLog().info("::: Output 1st: " + fPathOut1stDir);
         getLog().info("::: Output 2nd: " + fPathOut2ndDir);
 
-        List<Sct1File> in1stFiles = Sct1File.getSctFiles(tDir.getAbsolutePath(), tSubDir, in1stDir,
-                "descriptions", ".txt");
-        List<Sct1File> in2ndFiles = Sct1File.getSctFiles(tDir.getAbsolutePath(), tSubDir, in2ndDir,
-                "descriptions", ".txt");
+        List<Sct1File> in1stFiles = null;
+        List<Sct1File> in2ndFiles = null;
+        if (dateStartObj == null && dateStopObj == null) {
+            in1stFiles = Sct1File.getSctFiles(tDir.getAbsolutePath(), tSubDir, in1stDir,
+                    "descriptions", ".txt");
+            in2ndFiles = Sct1File.getSctFiles(tDir.getAbsolutePath(), tSubDir, in2ndDir,
+                    "descriptions", ".txt");
+        } else {
+            in1stFiles = Sct1File.getSctFiles(tDir.getAbsolutePath(), tSubDir, in1stDir,
+                    "descriptions", ".txt", dateStartObj, dateStopObj);
+            in2ndFiles = Sct1File.getSctFiles(tDir.getAbsolutePath(), tSubDir, in2ndDir,
+                    "descriptions", ".txt", dateStartObj, dateStopObj);
+        }
 
         getLog().info(":::  Input 1st " + in1stFiles.toString());
         getLog().info(":::  Input 2nd " + in2ndFiles.toString());
@@ -252,5 +289,40 @@ public class Sct1UniqueMojo extends AbstractMojo implements Serializable {
 
         }
     }
+    
+    public String getDateStart() {
+        return this.dateStart;
+    }
+
+    public void setDateStart(String sStart) throws MojoFailureException {
+        this.dateStart = sStart;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+        try {
+            this.dateStartObj = formatter.parse(sStart + " 00:00:00");
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new MojoFailureException("SimpleDateFormat yyyy.MM.dd dateStart parse error: "
+                    + sStart);
+        }
+        getLog().info("::: START DATE (INCLUSIVE) " + this.dateStart);
+    }
+
+    public String getDateStop() {
+        return this.dateStop;
+    }
+
+    public void setDateStop(String sStop) throws MojoFailureException {
+        this.dateStop = sStop;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+        try {
+            this.dateStopObj = formatter.parse(sStop + " 23:59:59");
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new MojoFailureException("SimpleDateFormat yyyy.MM.dd dateStop parse error: "
+                    + sStop);
+        }
+        getLog().info(":::  STOP DATE (INCLUSIVE) " + this.dateStop);
+    }
+
 
 }

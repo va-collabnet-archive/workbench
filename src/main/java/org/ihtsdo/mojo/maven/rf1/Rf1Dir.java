@@ -17,8 +17,6 @@
 package org.ihtsdo.mojo.maven.rf1;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
