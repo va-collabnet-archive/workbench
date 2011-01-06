@@ -152,8 +152,10 @@ public class BdbPathManager implements I_Manage<PathBI> {
 
     public PathBI get(int nid) throws IOException, TerminologyException {
         if (exists(nid)) {
+        	AceLog.getAppLog().info("BdbPathManager exists get nid = "+nid);
             return pathMap.get(nid);
         } else {
+        	AceLog.getAppLog().info("BdbPathManager not exists get nid = "+nid);
             PathBI p = getFromDisk(nid);
             if (p != null) {
                 return p;
@@ -234,10 +236,10 @@ public class BdbPathManager implements I_Manage<PathBI> {
 
     @SuppressWarnings("unchecked")
     private Path getFromDisk(int cNid) throws IOException {
-    	logger.info("BdbPathManager getFromDisk called cNid = "+cNid);
         try {
 
             for (RefsetMember extPart : getPathRefsetConcept().getExtensions()) {
+            	AceLog.getAppLog().info("getFromDisk cNid = "+cNid +" extPart = "+extPart);
                 CidMember conceptExtension = (CidMember) extPart;
                 int pathId = conceptExtension.getC1Nid();
                 if (pathId == cNid) {

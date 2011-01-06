@@ -1013,7 +1013,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             throws IOException {
         assert referencedComponentNid != 0 : " invalid referencedComponentNid for refset: " + refsetConcept;
         RefsetMember<?, ?> member = null;
-        AceLog.getEditLog().info("BdbTermFactory createMember type = "+type);
         switch (type) {
         case BOOLEAN:
             member =
@@ -1107,18 +1106,13 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         if (propMap.containsKey(REFSET_PROPERTY.STATUS)) {
             statusNid = propMap.getInt(REFSET_PROPERTY.STATUS);
         }
-        
-        AceLog.getEditLog().info("BdbTermFactory setupNewMember statusNid = "+statusNid +" getUserNid(config) = "+getUserNid(config)+" time = "+time);
-        AceLog.getEditLog().info("BdbTermFactory setupNewMember config.getEditingPathSet() size = "+config.getEditingPathSet().size()+" member.primordialSapNid = "+member.primordialSapNid); 
         assert config.getEditingPathSet().size() > 0 : "Empty editing path set. Must have at least one editing path.";
         for (final PathBI p : config.getEditingPathSet()) {
-        	AceLog.getEditLog().info("BdbTermFactory setupNewMember1 p.getConceptNid() = "+p.getConceptNid());
             if (member.primordialSapNid == Integer.MIN_VALUE) {
                 member.primordialSapNid =
                         Bdb.getSapDb().getSapNid(statusNid, getUserNid(config), p.getConceptNid(), time);
                 propMap.setPropertiesExceptSap((I_ExtendByRefPart) member);
             } else {
-            	AceLog.getEditLog().info("BdbTermFactory setupNewMember2 p.getConceptNid() = "+p.getConceptNid() );
                 final I_ExtendByRefPart revision = (I_ExtendByRefPart) member.makeAnalog(statusNid, p.getConceptNid(), time);
                 propMap.setProperties(revision);
                 member.addVersion(revision);
@@ -1169,19 +1163,14 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     @Override
     public PathBI newPath(final Collection<? extends PositionBI> origins, final I_GetConceptData pathConcept,
             I_ConfigAceFrame commitConfig) throws TerminologyException, IOException {
-    	AceLog.getEditLog().info("BdbTermFactory newPath Called");
         assert pathConcept != null && pathConcept.getConceptNid() != 0;
-        AceLog.getEditLog().info("BdbTermFactory newPath pathConcept != null && pathConcept.getConceptNid() != 0");
         final ArrayList<PositionBI> originList = new ArrayList<PositionBI>();
         if (origins != null) {
-        	AceLog.getEditLog().info("BdbTermFactory newPath origins != null");
             originList.addAll(origins);
         }
-        AceLog.getEditLog().info("BdbTermFactory newPath creating new path");
         final Path newPath = new Path(pathConcept.getConceptNid(), originList);
-        AceLog.getEditLog().info("BdbTermFactory writing new path: \n" + newPath);
+        AceLog.getEditLog().fine("writing new path: \n" + newPath);
         this.pathManager.write(newPath, commitConfig);
-        AceLog.getEditLog().info("BdbTermFactory newPath about to return new Path");
         return newPath;
     }
 

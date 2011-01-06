@@ -22,6 +22,7 @@ public enum OFFSETS {
 	HEADER_SIZE(0, DATA_SIZE);
 	
 	public static int CURRENT_FORMAT_VERSION = 3;
+
 	
 	protected int offset;
 	protected int bytes;
