@@ -129,9 +129,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
 
     private BdbPathManager() throws TerminologyException {
         try {
-        	AceLog.getAppLog().info("BdbPathManager()");
             editPath = new Path(ReferenceConcepts.TERM_AUXILIARY_PATH.getNid(), null);
-            AceLog.getAppLog().info("BdbPathManager setupPathMap");
             setupPathMap();
         } catch (Exception e) {
             throw new TerminologyException("Unable to initialise path management.", e);
@@ -154,10 +152,8 @@ public class BdbPathManager implements I_Manage<PathBI> {
 
     public PathBI get(int nid) throws IOException, TerminologyException {
         if (exists(nid)) {
-        	AceLog.getAppLog().info("BdbPathManager exists get nid = "+nid);
             return pathMap.get(nid);
         } else {
-        	AceLog.getAppLog().info("BdbPathManager not exists get nid = "+nid);
             PathBI p = getFromDisk(nid);
             if (p != null) {
                 return p;
@@ -215,15 +211,11 @@ public class BdbPathManager implements I_Manage<PathBI> {
             pathMap = new ConcurrentHashMap<Integer, Path>();
 
             try {
-            	logger.info("BdbPathManager setupPathMap getPathRefsetConcept");
                 getPathRefsetConcept();
-                logger.info("BdbPathManager setupPathMap getPathRefsetConcept().getExtensions().size"+getPathRefsetConcept().getExtensions().size());
+
                 for (RefsetMember extPart : getPathRefsetConcept().getExtensions()) {
-                	logger.info("BdbPathManager setupPathMap extPart ="+extPart);
                     CidMember conceptExtension = (CidMember) extPart;
-                    logger.info("BdbPathManager setupPathMap conceptExtension ="+conceptExtension);
                     int pathId = conceptExtension.getC1Nid();
-                    logger.info("BdbPathManager setupPathMap pathId ="+pathId);
                     pathMap.put(pathId, new Path(pathId, getPathOriginsFromDb(pathId)));
                 }
 
@@ -244,11 +236,8 @@ public class BdbPathManager implements I_Manage<PathBI> {
     private Path getFromDisk(int cNid) throws IOException {
     	logger.info("BdbPathManager getFromDisk called cNid = "+cNid);
         try {
-        	logger.info("BdbPathManager getFromDisk called getPathRefsetConcept() = "+getPathRefsetConcept().toLongString());
-        	logger.info("BdbPathManager getFromDisk called getPathRefsetConcept().getExtensions().size() = "+getPathRefsetConcept().getExtensions().size());
+
             for (RefsetMember extPart : getPathRefsetConcept().getExtensions()) {
-            	logger.info("getFromDisk cNid = "+cNid +" extPart = "+extPart);
-            	AceLog.getAppLog().info("getFromDisk cNid = "+cNid +" extPart = "+extPart);
                 CidMember conceptExtension = (CidMember) extPart;
                 int pathId = conceptExtension.getC1Nid();
                 if (pathId == cNid) {
@@ -343,13 +332,10 @@ public class BdbPathManager implements I_Manage<PathBI> {
         try {
             // write path
 
-        	logger.info("BDBPathManager write about to create propMap");
             RefsetPropertyMap propMap =
                     new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, path.getConceptNid());
-            logger.info("BDBPathManager write helperGetter.get(config).newRefsetExtension");
             helperGetter.get(config).newRefsetExtension(ReferenceConcepts.REFSET_PATHS.getNid(),
                 ReferenceConcepts.PATH.getNid(), EConcept.REFSET_TYPES.CID, propMap, config);
-            logger.info("BDBPathManager write getPathRefsetConcept() = "+getPathRefsetConcept().toLongString());
             BdbCommitManager.addUncommittedNoChecks(getPathRefsetConcept());
 
             // write position
@@ -358,7 +344,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
                 writeOrigin(path, origin, config);
             }
             pathMap.put(path.getConceptNid(), (Path) path);
-            logger.info("Wrote path : " + path + "pathmap size = "+pathMap.size() +" using a key of "+path.getConceptNid());
+            logger.info("Wrote path : " + path);
         } catch (Exception e) {
             throw new TerminologyException("Unable to write path: " + path, e);
         }
