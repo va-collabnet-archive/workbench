@@ -1,5 +1,5 @@
 SET TARGETDIR=.
-SET workbench.version=impl-uktc-1.0-SNAPSHOT
+REM SET workbench.version=impl-uktc-1.0-SNAPSHOT
 
 
 REM SET TARGETLOG=AceWB.txt
