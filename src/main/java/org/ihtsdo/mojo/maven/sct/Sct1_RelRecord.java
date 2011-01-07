@@ -170,7 +170,13 @@ class Sct1_RelRecord implements Comparable<Object>, Serializable {
                     } else if (this.revTime < tmp.revTime) {
                         return thisLess;
                     } else {
-                        return 0; // EQUAL
+                        if (this.userIdx > tmp.userIdx) {
+                            return thisMore;
+                        } else if (this.userIdx < tmp.userIdx) {
+                            return thisLess;
+                        } else {
+                            return 0; // EQUAL
+                        }
                     }
                 }
             }

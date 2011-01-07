@@ -97,14 +97,14 @@ public class Sct1_IdRecord implements Comparable<Sct1_IdRecord>, Serializable {
                 } else if (this.pathIdx < o.pathIdx) {
                     return thisLess;
                 } else {
-                    if (this.userIdx > o.userIdx) {
+                    if (this.revTime > o.revTime) {
                         return thisMore;
-                    } else if (this.userIdx < o.userIdx) {
+                    } else if (this.revTime < o.revTime) {
                         return thisLess;
                     } else {
-                        if (this.revTime > o.revTime) {
+                        if (this.userIdx > o.userIdx) {
                             return thisMore;
-                        } else if (this.revTime < o.revTime) {
+                        } else if (this.userIdx < o.userIdx) {
                             return thisLess;
                         } else {
                             return 0; // EQUAL
