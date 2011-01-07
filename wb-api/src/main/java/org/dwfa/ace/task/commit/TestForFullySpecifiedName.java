@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.queryParser.QueryParser;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -34,7 +35,6 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.SNOMED;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -62,13 +62,11 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
     }
 
     @Override
-    public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit)
-            throws TaskFailedException {
+    public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit) throws TaskFailedException {
         try {
 
             ArrayList<I_DescriptionVersioned> descriptions = new ArrayList<I_DescriptionVersioned>();
-            List<? extends I_DescriptionTuple> descriptionTupleList =
-                    getDescriptionTupleList(concept, getFrameConfig());
+            List<? extends I_DescriptionTuple> descriptionTupleList = getDescriptionTupleList(concept, getFrameConfig());
             for (I_DescriptionTuple desc : descriptionTupleList) {
                 descriptions.add(desc.getDescVersioned());
             }
@@ -94,17 +92,8 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                 getConceptSafe(Terms.get(), ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
         if (fsn_type == null)
             return alertList;
-        I_GetConceptData snomedRoot = getConceptSafe(Terms.get(), SNOMED.Concept.ROOT.getUids());
-        if (snomedRoot == null)
-            return alertList;
-        if (!snomedRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
-            .getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
-            getFrameConfig().getConflictResolutionStrategy())) {
-            return alertList;
-        }
         I_IntSet actives = getActiveStatus(Terms.get());
-        HashMap<String, ArrayList<I_DescriptionVersioned>> langs =
-                new HashMap<String, ArrayList<I_DescriptionVersioned>>();
+        HashMap<String, ArrayList<I_DescriptionVersioned>> langs = new HashMap<String, ArrayList<I_DescriptionVersioned>>();
         for (I_DescriptionVersioned desc : descriptions) {
             for (I_DescriptionPart part : desc.getMutableParts()) {
                 if (!actives.contains(part.getStatusNid()))
@@ -113,8 +102,8 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                     if (part.getText().matches(".*\\(\\?+\\).*") && part.getTime() == Long.MAX_VALUE) {
                         alertList.add(new AlertToDataConstraintFailure(
                             (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
-                                      : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
-                            "<html>Unedited semantic tag: " + part.getText(), concept));
+                                      : AlertToDataConstraintFailure.ALERT_TYPE.WARNING), "<html>Unedited semantic tag: "
+                                + part.getText(), concept));
                     }
                     String lang = part.getLang();
                     if (langs.get(lang) != null) {
@@ -134,12 +123,13 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                     }
                     if (part.getTime() == Long.MAX_VALUE && !part.getText().equals("New Fully Specified Description")) {
                         String filteredDescription = part.getText();
-                        // remove all non-alphanumeric characters and replace with a space - this is to stop these
-                        // characters causing issues with the lucene search
-                        filteredDescription = filteredDescription.replaceAll("[^a-zA-Z0-9]", " ");
+
+                        // filteredDescription = filteredDescription.replaceAll("[^a-zA-Z0-9]", " ");
+                        // new removal using native lucene escaping
+                        filteredDescription = QueryParser.escape(filteredDescription);
                         SearchResult result = Terms.get().doLuceneSearch(filteredDescription);
                         search: for (int i = 0; i < result.topDocs.totalHits; i++) {
-                            Document doc = result.searcher.doc(i);
+                            Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
                             int cnid = Integer.parseInt(doc.get("cnid"));
                             int dnid = Integer.parseInt(doc.get("dnid"));
                             if (cnid == concept.getConceptNid())
@@ -169,9 +159,9 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
             }
         }
         if (langs.get("en") == null)
-            alertList.add(new AlertToDataConstraintFailure(
-                (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
-                          : AlertToDataConstraintFailure.ALERT_TYPE.WARNING), "<html>No FSN for en", concept));
+            alertList.add(new AlertToDataConstraintFailure((forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
+                                                                     : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
+                "<html>No FSN for en", concept));
         return alertList;
     }
 }
