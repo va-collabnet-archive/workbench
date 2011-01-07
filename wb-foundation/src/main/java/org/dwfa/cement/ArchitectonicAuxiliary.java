@@ -63,7 +63,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
         b.append("became crucial for Peirce in his later work. However, his belief in a structured philosophy related ");
         b.append("systematically to all other scientific disciplines was important to him throughout his philosophical ");
         b.append("life.");
-        b.append("<center><img src='ace:1c4214ec-147a-11db-ac5d-0800200c9a66$f4d2fabc-7e96-3b3a-a348-ae867ba74029'></center><br>");
+        //b.append("<center><img src='ace:1c4214ec-147a-11db-ac5d-0800200c9a66$f4d2fabc-7e96-3b3a-a348-ae867ba74029'></center><br>");
         b.append("Source:  <a href='http://www.iep.utm.edu/p/PeirceAr.htm'>The Internet Encyclopedia of Philosophy</a>");
         b.append("</html>");
         return b.toString();
