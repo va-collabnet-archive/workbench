@@ -314,7 +314,7 @@ public class Rf1ToArfTextDefMojo extends AbstractMojo implements Serializable {
                     nSame++;
                     break;
 
-                case 2: // MODIFIED
+                case 2: // MODIFIED (STATUS CHANGED)
                     // Write history
                     writeArf(a2[r2], yRevDateStr, bwc);
                     // Update master via pointer assignment
@@ -387,18 +387,21 @@ public class Rf1ToArfTextDefMojo extends AbstractMojo implements Serializable {
         } // WHILE (EACH CONCEPTS INPUT FILE)
     } // WHILE (EACH CONCEPTS DIRECTORY) *
 
-    private int compareVersion(Rf1TextDef a1, Rf1TextDef a2) {
-        if (a1.conceptSid < a2.conceptSid) {
+    private int compareVersion(Rf1TextDef a1, Rf1TextDef a2) {        
+        if (a1.conceptSid < a2.conceptSid)
             return 4; // DROPPED instance less than received
-        } else if (a1.conceptSid > a2.conceptSid) {
+        else if (a1.conceptSid > a2.conceptSid)
             return 3; // ADDED instance greater than received
 
-        } else {
-            if (a1.status == a2.status && a1.definition.contentEquals(a2.definition))
-                return 1; // SAME
-            else
-                return 2; // MODIFIED
-        }
+        else if (a1.definition.compareTo(a2.definition) < 0)
+            return 4; // DROPPED instance less than received
+        else if (a1.definition.compareTo(a2.definition) > 0)
+            return 3; // ADDED instance greater than received
+        
+        else if (a1.status != a2.status)
+            return 2; // STATUS MODIFIED
+            
+        return 1; // SAME
     }
 
     private void countCheck(int count1, int count2, int same, int modified, int added, int dropped) {
