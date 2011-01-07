@@ -70,7 +70,7 @@ import org.ihtsdo.etypes.ERefsetStrMember;
 import org.ihtsdo.etypes.ERefsetStrRevision;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipRevision;
-import org.ihtsdo.mojo.econcept.ConceptDescriptor;
+// import org.ihtsdo.mojo.econcept.ConceptDescriptor;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
@@ -319,12 +319,14 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
      */
     private UUID uuidUser;
     
-    /**
-     * Watch concepts
-     * 
-     * @parameter
-     */
-    private List<ConceptDescriptor> conceptsToWatch;
+//    /**
+//     * Watch concepts
+//     * 
+//     * @parameter
+//     */
+//    private List<ConceptDescriptor> conceptsToWatch;
+//    HashMap<UUID, ConceptDescriptor> conceptsToWatchMap;
+
 
     /**
      * Watch concepts
@@ -784,19 +786,16 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             i++;
         }
     }
-
-    HashMap<UUID, ConceptDescriptor> conceptsToWatchMap;
     
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-           conceptsToWatchMap =
-                    new HashMap<UUID, ConceptDescriptor>();
-
-            if (conceptsToWatch != null) {
-                for (ConceptDescriptor cd : conceptsToWatch) {
-                    conceptsToWatchMap.put(UUID.fromString(cd.getUuid()), cd);
-                }
-            }
+//           conceptsToWatchMap =
+//                    new HashMap<UUID, ConceptDescriptor>();
+//            if (conceptsToWatch != null) {
+//                for (ConceptDescriptor cd : conceptsToWatch) {
+//                    conceptsToWatchMap.put(UUID.fromString(cd.getUuid()), cd);
+//                }
+//            }
 
         
         getLog().info("::: BEGIN Sct1ArfToEConcept");
@@ -3570,10 +3569,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             countRefsetMaster++;
 
             ec.setRefsetMembers(listErm);
-            if (conceptsToWatchMap.containsKey(ec.primordialUuid)) {
-                getLog().info("Found watch concept after adding refset members: "
-                        + ec);
-            }
+//            if (conceptsToWatchMap.containsKey(ec.primordialUuid)) {
+//                getLog().info("Found watch concept after adding refset members: "
+//                        + ec);
+//            }
         }
 
         try {
