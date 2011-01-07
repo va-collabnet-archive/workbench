@@ -43,12 +43,13 @@ public class MemoriousJTabbedPane extends JTabbedPane {
 
 	@Override
 	public void removeTabAt(int index) {
+		boolean removedTabWasSelected = (index == getSelectedIndex());
 		// Clean references to removed tab
 		while (registeredIndexes.remove(new Integer(index)));
 		// Remove tab with superclass method
 		super.removeTabAt(index);
 		// Do nothing if the first and only selected tab was removed
-		if (registeredIndexes.size() > 1) {
+		if (registeredIndexes.size() > 1 && removedTabWasSelected) {
 			// Remove last selected tab, is the automatic one
 			registeredIndexes.remove(registeredIndexes.size()-1);
 			// Update registered indexes to the right, now that we have one less tab
