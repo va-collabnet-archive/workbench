@@ -301,11 +301,15 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 			assert Bdb.getUuidDb().searchForUuid(uuids.iterator().next()) 
 				== false: " Attempt to add duplicate uuid: " + uuids;
 				*/
-			int newNid = sequence.getAndIncrement();
+			
 			for (UUID uuid : uuids) {
+				int newNid = sequence.getAndIncrement();
 				mutableUuidsToNidMap.put(uuid, newNid);
+				return newNid;
 			}
-			return newNid;
+			
+			return -1;
+			
 		} finally {
 			w.unlock();
 		}
