@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,6 +26,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.queryParser.QueryParser;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -59,13 +60,13 @@ import org.ihtsdo.lucene.SearchResult;
  * relationships (member refset -> refset identity, remaining concepts ->
  * supporting refset)
  * This task also sets the destination inbox.
- *
+ * 
  * Required input to this task is the name of the refset being created.
- *
+ * 
  * @author Chrissy Hill
  * @author Perry Reid
  * @version 3, October 2009
- *
+ * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec", type = BeanType.TASK_BEAN) })
 public class CreateRefsetMetaDataTask extends AbstractTask {
@@ -163,7 +164,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
      * Handles actions required by the task after normal task completion (such
      * as moving a
      * process to another user's input queue).
-     *
+     * 
      * @return void
      * @param process The currently executing Workflow process
      * @param worker The worker currently executing this task
@@ -180,7 +181,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
      * a small user interface to the user which allows them to specify the
      * characteristics
      * of this refset to be created.
-     *
+     * 
      * @return The exit condition of the task
      * @param process The currently executing Workflow process
      * @param worker The worker currently executing this task
@@ -212,7 +213,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 
     /**
      * Creates the new refset.
-     *
+     * 
      * @return void
      * @param process The currently executing Workflow process
      * @param worker The worker currently executing this task
@@ -415,16 +416,11 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
         if (descriptionType.getNid() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid()) {
             String filteredDescription = description;
             filteredDescription = filteredDescription.trim();
-            filteredDescription = filteredDescription.replaceAll("[\\s]+", " ");
-
-            // remove all non-alphanumeric characters and replace with a space - this is to stop these characters
-            // causing issues with the lucene search
-            filteredDescription = filteredDescription.replaceAll("[\\s]", " AND ");
-            filteredDescription = filteredDescription.replaceAll("[^a-zA-Z0-9]", " ");
-
+            // new removal using native lucene escaping
+            filteredDescription = QueryParser.escape(filteredDescription);
             SearchResult result = termFactory.doLuceneSearch(filteredDescription);
             for (int i = 0; i < result.topDocs.totalHits; i++) {
-                Document doc = result.searcher.doc(i);
+                Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
                 int cnid = Integer.parseInt(doc.get("cnid"));
                 int dnid = Integer.parseInt(doc.get("dnid"));
                 if (cnid == concept.getConceptNid())
