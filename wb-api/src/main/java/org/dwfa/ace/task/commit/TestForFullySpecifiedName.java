@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -95,14 +95,6 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                 getConceptSafe(Terms.get(), ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
         if (fsn_type == null)
             return alertList;
-        I_GetConceptData snomedRoot = getConceptSafe(Terms.get(), SNOMED.Concept.ROOT.getUids());
-        if (snomedRoot == null)
-            return alertList;
-        if (!snomedRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
-            .getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
-            getFrameConfig().getConflictResolutionStrategy())) {
-            return alertList;
-        }
         I_IntSet actives = getActiveStatus(Terms.get());
         HashMap<String, ArrayList<I_DescriptionVersioned>> langs =
                 new HashMap<String, ArrayList<I_DescriptionVersioned>>();
@@ -135,14 +127,11 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                     }
                     if (part.getTime() == Long.MAX_VALUE && !part.getText().equals("New Fully Specified Description")) {
                         String filteredDescription = part.getText();
-                        // remove all non-alphanumeric characters and replace with a space - this is to stop these
-                        // characters causing issues with the lucene search
-                        // filteredDescription = filteredDescription.replaceAll("[^a-zA-Z0-9]", " ");
-                        // new removal using native lucene escaping 
+                        // new removal using native lucene escaping
                         filteredDescription = QueryParser.escape(filteredDescription);
                         SearchResult result = Terms.get().doLuceneSearch(filteredDescription);
                         search: for (int i = 0; i < result.topDocs.totalHits; i++) {
-                            Document doc = result.searcher.doc(i);
+                            Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
                             int cnid = Integer.parseInt(doc.get("cnid"));
                             int dnid = Integer.parseInt(doc.get("dnid"));
                             if (cnid == concept.getConceptNid())
