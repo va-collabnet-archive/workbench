@@ -120,7 +120,6 @@ public class ImageRevisionTest {
         img.revisions = null;
         img.nid = 1;
         img.primordialSapNid = 1; 
-        img.primordialUNid = 1;
         img.versions = null; 
 
         obj.primordialComponent = img; 
@@ -138,7 +137,6 @@ public class ImageRevisionTest {
         img.revisions = null;
         img.nid = 2;
         img.primordialSapNid = 2; 
-        img.primordialUNid = 2;
         img.versions = null; 
 
         obj.primordialComponent = img; 

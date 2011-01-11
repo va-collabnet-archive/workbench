@@ -123,7 +123,6 @@ public class CidCidCidMemberTest {
          
         obj.nid = 1;
         obj.primordialSapNid = 1; 
-        obj.primordialUNid = 1;
         
         return obj; 
     }
@@ -144,7 +143,6 @@ public class CidCidCidMemberTest {
          
         obj.nid = 2;
         obj.primordialSapNid = 2; 
-        obj.primordialUNid = 2;
         
         return obj; 
     }

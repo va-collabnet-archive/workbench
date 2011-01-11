@@ -151,8 +151,7 @@ public class RefsetMemberFactory {
                         ec.getAuthorNid(),
                         ec.getEditPaths()[i],
                         time));
-                member.primordialUNid =
-                        Bdb.getUuidDb().addUuid(res.getMemberUUID());
+                member.setPrimUuid(res.getMemberUUID());
                 try {
                     res.setPropertiesExceptSap(member);
                 } catch (PropertyVetoException ex) {
@@ -199,8 +198,7 @@ public class RefsetMemberFactory {
                         ec.getAuthorNid(),
                         ec.getEditPaths()[i],
                         Long.MAX_VALUE));
-                member.primordialUNid =
-                        Bdb.getUuidDb().addUuid(res.getMemberUUID());
+                member.setPrimUuid(res.getMemberUUID());
                 try {
                     res.setPropertiesExceptSap(member);
                 } catch (PropertyVetoException ex) {

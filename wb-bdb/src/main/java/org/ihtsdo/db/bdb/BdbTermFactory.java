@@ -862,7 +862,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         a.enclosingConceptNid = cNid;
         newC.setConceptAttributes(a);
         a.setDefined(isDefined);
-        a.primordialUNid = Bdb.getUuidsToNidMap().getUNid(newConceptUuid);
+        a.setPrimUuid(newConceptUuid);
         a.primordialSapNid = Integer.MIN_VALUE;
 
         for (PathBI p : aceFrameConfig.getEditingPathSet()) {
@@ -926,7 +926,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         d.enclosingConceptNid = c.getNid();
         d.nid = Bdb.uuidToNid(descUuid);
         Bdb.getNidCNidMap().setCNidForNid(c.getNid(), d.nid);
-        d.primordialUNid = Bdb.getUuidsToNidMap().getUNid(descUuid);
+        d.setPrimUuid(descUuid);
         d.setLang(lang);
         d.setText(text);
         d.setInitialCaseSignificant(false);
@@ -1096,7 +1096,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         member.refsetNid = refsetConcept.getNid();
         Bdb.getNidCNidMap().setCNidForNid(refsetConcept.getNid(), member.nid);
         member.referencedComponentNid = referencedComponentNid;
-        member.primordialUNid = Bdb.getUuidsToNidMap().getUNid(primordialUuid);
+        member.setPrimUuid(primordialUuid);
         member.primordialSapNid = Integer.MIN_VALUE;
         int statusNid = ReferenceConcepts.CURRENT.getNid();
         long time = Long.MAX_VALUE;
@@ -1219,7 +1219,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         r.enclosingConceptNid = c.getNid();
         r.nid = Bdb.uuidToNid(newRelUid);
         Bdb.getNidCNidMap().setCNidForNid(c.getNid(), r.nid);
-        r.primordialUNid = Bdb.getUuidsToNidMap().getUNid(newRelUid);
+        r.setPrimUuid(newRelUid);
         int parentId = relDestination.getNid();
         r.setC2Id(parentId);
         r.setTypeId(relType.getNid());
@@ -1261,7 +1261,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         r.enclosingConceptNid = c.getNid();
         r.nid = Bdb.uuidToNid(newRelUid);
         Bdb.getNidCNidMap().setCNidForNid(c.getNid(), r.nid);
-        r.primordialUNid = Bdb.getUuidsToNidMap().getUNid(newRelUid);
+        r.setPrimUuid(newRelUid);
         r.setC2Id(c2Nid);
         r.setTypeId(relTypeNid);
         r.setRefinabilityId(relRefinabilityNid);
@@ -1285,7 +1285,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         r.enclosingConceptNid = c.getNid();
         r.nid = Bdb.uuidToNid(newRelUid);
         Bdb.getNidCNidMap().setCNidForNid(c.getNid(), r.nid);
-        r.primordialUNid = Bdb.getUuidsToNidMap().getUNid(newRelUid);
+        r.setPrimUuid(newRelUid);
         r.setC2Id(c2Nid);
         r.setTypeId(relTypeNid);
         r.setRefinabilityId(relRefinabilityNid);
@@ -1895,7 +1895,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         Concept c = Concept.get(conceptNid);
         Image img = new Image();
         img.nid = uuidToNative(imageUuid);
-        img.primordialUNid = Bdb.getUuidsToNidMap().getUNid(imageUuid);
+        img.setPrimUuid(imageUuid);
         img.enclosingConceptNid = c.getNid();
         Bdb.getNidCNidMap().setCNidForNid(conceptNid, img.nid);
         img.setImage(image);

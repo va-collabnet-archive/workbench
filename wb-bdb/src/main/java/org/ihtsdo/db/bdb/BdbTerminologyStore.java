@@ -170,7 +170,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 	}
 
 	@Override
-	public List<UUID> getUuidsForNid(int nid) {
+	public List<UUID> getUuidsForNid(int nid) throws IOException {
 		return Bdb.getUuidsToNidMap().getUuidsForNid(nid);
 	}
 
@@ -184,6 +184,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 		ChangeSetWriterHandler.removeWriter(key);
     }
 
+    @Override
     public ChangeSetGeneratorBI createDtoChangeSetGenerator(File changeSetFileName, 
 			File changeSetTempFileName, 
 			ChangeSetGenerationPolicy policy) {
@@ -211,6 +212,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 		return latestDependencies;
 	}
 
+    @Override
     public boolean satisfiesDependencies(Collection<DbDependency> dependencies) {
     	if (dependencies != null) {
         	try {

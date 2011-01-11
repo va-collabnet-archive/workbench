@@ -13,7 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class NidCNidMapBdbTest {
-	private static final int TEST_SIZE = 50000;
+	private static final int TEST_SIZE = 5000;
 	String dbTarget;
 
 	@Before

@@ -263,11 +263,13 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 	}
 
 
+        @Override
 	public Collection<? extends RefexChronicleBI<?>> getAnnotations() {
             return ConceptComponent.this.getAnnotations();
         }
 
-    @SuppressWarnings("rawtypes")
+        @SuppressWarnings("rawtypes")
+        @Override
         public boolean addAnnotation(RefexChronicleBI annotation) {
             return ConceptComponent.this.addAnnotation(annotation);
         }
@@ -553,7 +555,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public UUID getPrimUuid() {
-            return Bdb.getUuidDb().getUuid(primordialUNid);
+            return new UUID(primordialMSB, primordialLSB);
         }
 
         public Version removeDuplicates(Version dup1, Version dup2) {
@@ -758,13 +760,15 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
      * primordial: first created or developed
      * 
      */
-    public int primordialUNid = Integer.MIN_VALUE;
+    public long primordialMSB = Long.MIN_VALUE;
+    public long primordialLSB = Long.MIN_VALUE;
     public CopyOnWriteArrayList<R> revisions;
     protected ArrayList<IdentifierVersion> additionalIdVersions;
     private ArrayList<IdVersion> idVersions;
     public ConcurrentSkipListSet<RefexChronicleBI<?>> annotations;
 
     @SuppressWarnings("rawtypes")
+    @Override
     public boolean addAnnotation(RefexChronicleBI annotation) {
         if (annotations == null) {
             annotations = new ConcurrentSkipListSet<RefexChronicleBI<?>>(
@@ -780,6 +784,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         return annotations.add(annotation);
     }
 
+    @Override
     public Collection<? extends RefexChronicleBI<?>> getAnnotations() {
         if (annotations == null) {
             return Collections.unmodifiableCollection(
@@ -828,7 +833,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         buf.append("nid:");
         buf.append(nid);
         buf.append(" pUuid:");
-        buf.append(Bdb.getUuidDb().getUuid(primordialUNid));
+        buf.append(getPrimUuid());
         buf.append(" sap: ");
         if (primordialSapNid == Integer.MIN_VALUE) {
             buf.append("Integer.MIN_VALUE");
@@ -928,7 +933,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         this.enclosingConceptNid = enclosingConceptNid;
         readComponentFromBdb(input);
         Bdb.getNidCNidMap().setCNidForNid(this.enclosingConceptNid, this.nid);
-        assert this.primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
+        assert this.primordialLSB != Long.MIN_VALUE &&
+                this.primordialMSB != Long.MIN_VALUE :
+                    "Processing nid: " + enclosingConceptNid;
         assert nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
         assert nid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
     }
@@ -943,15 +950,22 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         this.enclosingConceptNid = enclosingConceptNid;
         Bdb.getNidCNidMap().setCNidForNid(this.enclosingConceptNid, this.nid);
         this.primordialSapNid = Bdb.getSapNid(eComponent);
-        this.primordialUNid = Bdb.getUuidsToNidMap().getUNid(eComponent.getPrimordialComponentUuid());
+        this.setPrimUuid(eComponent.getPrimordialComponentUuid());
         convertId(eComponent.additionalIds);
-        assert this.primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
+       assert this.primordialLSB != Long.MIN_VALUE &&
+                this.primordialMSB != Long.MIN_VALUE :
+                    "Processing nid: " + enclosingConceptNid;
         assert nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
         assert nid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
     }
 
     public ConceptComponent() {
         Bdb.gVersion.incrementAndGet();
+    }
+
+    public void setPrimUuid(UUID prim) {
+        this.primordialMSB = prim.getMostSignificantBits();
+        this.primordialLSB = prim.getLeastSignificantBits();
     }
 
     public ConceptComponent<R, C> merge(C another) {
@@ -1095,7 +1109,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
      */
     @Override
     public boolean isSetup() {
-        assert primordialUNid != Integer.MIN_VALUE;
+       assert this.primordialLSB != Long.MIN_VALUE &&
+                this.primordialMSB != Long.MIN_VALUE :
+                    "Processing nid: " + enclosingConceptNid;
         return primordialSapNid != Integer.MAX_VALUE;
     }
 
@@ -1113,7 +1129,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     private void readIdentifierFromBdb(TupleInput input) {
         // nid, list size, and conceptNid are read already by the binder...
-        primordialUNid = input.readInt();
+        primordialMSB = input.readLong();
+        primordialLSB = input.readLong();
         int listSize = input.readShort();
         if (listSize != 0) {
             additionalIdVersions = new ArrayList<IdentifierVersion>(listSize);
@@ -1156,8 +1173,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     private void writeIdentifierToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
         assert primordialSapNid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
-        assert primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
-        output.writeInt(primordialUNid);
+       assert this.primordialLSB != Long.MIN_VALUE &&
+                this.primordialMSB != Long.MIN_VALUE :
+                    "Processing nid: " + enclosingConceptNid;
+        output.writeLong(primordialMSB);
+        output.writeLong(primordialLSB);
         List<IdentifierVersion> partsToWrite = new ArrayList<IdentifierVersion>();
         if (additionalIdVersions != null) {
             for (IdentifierVersion p : additionalIdVersions) {
@@ -1214,7 +1234,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     @Override
     public final Object getDenotation() {
-        return Bdb.getUuidDb().getUuid(primordialUNid);
+        return getPrimUuid();
     }
 
     @Override
@@ -1230,7 +1250,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     @Override
     public final List<UUID> getUUIDs() {
         List<UUID> returnValues = new ArrayList<UUID>();
-        returnValues.add(Bdb.getUuidDb().getUuid(primordialUNid));
+        returnValues.add(getPrimUuid());
         if (additionalIdVersions != null) {
             for (IdentifierVersion idv : additionalIdVersions) {
                 if (IdentifierVersionUuid.class.isAssignableFrom(idv.getClass())) {
@@ -1379,6 +1399,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     @Deprecated
+    @Override
     public final Set<TimePathId> getTimePathSet() {
         Set<TimePathId> set = new TreeSet<TimePathId>();
         set.add(new TimePathId(getVersion(), getPathNid()));
@@ -1397,7 +1418,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     public Object getDenotation(int authorityNid) throws IOException, TerminologyException {
         if (getAuthorityNid() == authorityNid) {
-            return Bdb.getUuidDb().getUuid(primordialUNid);
+            return getPrimUuid();
         }
         for (I_IdPart id : getMutableIdParts()) {
             if (id.getAuthorityNid() == authorityNid) {
@@ -1510,6 +1531,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     @Deprecated
+    @Override
     public final void setStatusId(int statusId) {
         if (getTime() != Long.MAX_VALUE) {
             throw new UnsupportedOperationException(
@@ -1522,6 +1544,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
     }
 
+    @Override
     public final void setStatusNid(int statusId) {
         if (getTime() != Long.MAX_VALUE) {
             throw new UnsupportedOperationException(
@@ -1539,6 +1562,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         throw new UnsupportedOperationException("Use makeAnalog instead.");
     }
 
+    @Override
     public final ArrayIntList getPartComponentNids() {
         ArrayIntList resultList = getVariableVersionNids();
         resultList.add(getPathNid());
@@ -1576,7 +1600,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         if (this.primordialSapNid != another.primordialSapNid) {
             return false;
         }
-        if (this.primordialUNid != another.primordialUNid) {
+        if (this.primordialLSB != another.primordialLSB) {
+            return false;
+        }
+        if (this.primordialMSB != another.primordialMSB) {
             return false;
         }
         if (this.additionalIdVersions != null && another.additionalIdVersions == null) {
@@ -1616,28 +1643,41 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     @SuppressWarnings("unchecked")
     public String validate(ConceptComponent<?, ?> another) throws IOException {
         assert another != null;
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         String validationResults = null;
 
         if (this.nid != another.nid) {
-            buf.append("\tConceptComponent.nid not equal: \n" + "\t\tthis.nid = " + this.nid + "\n"
-                    + "\t\tanother.nid = " + another.nid + "\n");
+            buf.append("\tConceptComponent.nid not equal: \n\t\t"
+                    + "this.nid = ").append(this.nid).
+                    append("\n" + "\t\tanother.nid = ").
+                    append(another.nid).append("\n");
         }
         if (this.primordialSapNid != another.primordialSapNid) {
-            buf.append("\tConceptComponent.primordialSapNid not equal: \n" + "\t\tthis.primordialSapNid = "
-                    + this.primordialSapNid + "\n" + "\t\tanother.primordialSapNid = " + another.primordialSapNid + "\n");
+            buf.append("\tConceptComponent.primordialSapNid not equal: \n" +
+                    "\t\tthis.primordialSapNid = ").append(
+                    this.primordialSapNid).append(
+                    "\n" + "\t\tanother.primordialSapNid = ").append(
+                    another.primordialSapNid).append(
+                    "\n");
         }
 
-        if (this.primordialUNid != another.primordialUNid) {
-            buf.append("\tConceptComponent.primordialUNid not equal: \n" + "\t\tthis.primordialUNid = "
-                    + this.primordialUNid + "\n" + "\t\tanother.primordialUNid = " + another.primordialUNid + "\n");
+        if (this.primordialLSB != another.primordialLSB &&
+                this.primordialMSB != another.primordialMSB) {
+            buf.append("\tConceptComponent.primordialUNid not equal: \n" +
+                    "\t\tthis.primordialUNid = ").append(
+                    this.getPrimUuid()).append("\n" +
+                    "\t\tanother.primordialUNid = ").append(
+                    another.getPrimUuid()).append("\n");
         }
 
         if (this.additionalIdVersions != null) {
             if (this.additionalIdVersions.equals(another.additionalIdVersions) == false) {
-                buf.append("\tConceptComponent.additionalIdentifierParts not equal: \n"
-                        + "\t\tthis.additionalIdentifierParts = " + this.additionalIdVersions + "\n"
-                        + "\t\tanother.additionalIdentifierParts = " + another.additionalIdVersions + "\n");
+                buf.append("\tConceptComponent.additionalIdentifierParts "
+                        + "not equal: \n" +
+                        "\t\tthis.additionalIdentifierParts = ").append(
+                        this.additionalIdVersions).append("\n" +
+                        "\t\tanother.additionalIdentifierParts = ").append(
+                        another.additionalIdVersions).append("\n");
             }
         }
 
@@ -1725,7 +1765,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     @Override
     public UUID getPrimUuid() {
-        return Bdb.getUuidDb().getUuid(primordialUNid);
+        return new UUID(this.primordialMSB, this.primordialLSB);
     }
 
     public ArrayList<IdentifierVersion> getAdditionalIdentifierParts() {
