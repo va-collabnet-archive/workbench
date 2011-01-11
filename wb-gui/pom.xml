@@ -22,7 +22,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>wb-gui</artifactId>
-    <name>Workbench GUI</name>
+    <name>${branch}: Workbench GUI</name>
     <url> https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/vodb/site/index.html </url>
     <inceptionYear>2005</inceptionYear>
     <description>Workbench Editor GUI </description>
@@ -106,13 +106,6 @@
     	<dependency>
     		<groupId>org.ihtsdo</groupId>
     		<artifactId>tk-drools</artifactId>
-    		<version>${project.version}</version>
-    		<type>jar</type>
-    		<optional>false</optional>
-    	</dependency>
-    	<dependency>
-    		<groupId>org.ihtsdo</groupId>
-    		<artifactId>rule-engine-integration</artifactId>
     		<version>${project.version}</version>
     		<type>jar</type>
     		<optional>false</optional>

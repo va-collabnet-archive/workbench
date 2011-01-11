@@ -7,7 +7,7 @@
   </parent>
   <artifactId>wb-bdb-mojo</artifactId>
   <packaging>maven-plugin</packaging>
-  <name>Workbench Berkeley Database Mojo</name>
+  <name>${branch}: Workbench Berkeley Database Mojo</name>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>

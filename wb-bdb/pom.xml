@@ -6,7 +6,7 @@
         	<version>2.6.2-trek-rsrb-4-SNAPSHOT</version>
         </parent>
 	<artifactId>wb-bdb</artifactId>
-	<name>Workbench Berkeley Database</name>
+	<name>${branch}: Workbench Berkeley Database</name>
 	<dependencies>
 		<dependency>
 			<groupId>com.sleepycat</groupId>
