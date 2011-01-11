@@ -19,7 +19,7 @@ public class NidDataFromBdb implements I_GetNidData {
 
 	public static enum REF_TYPE {SOFT, WEAK};
 	
-	private static REF_TYPE refType = REF_TYPE.SOFT;
+	private static REF_TYPE refType = REF_TYPE.WEAK;
 
 	private Future<byte[]> readOnlyFuture;
 	private Future<byte[]> readWriteFuture;

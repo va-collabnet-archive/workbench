@@ -64,6 +64,15 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         new AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>>();
     private AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>> refsetComponentMap =
         new AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>>();
+    
+    @Override
+    public void diet() {
+        if (!isUnwritten()) {
+            refsetMembersMap.set(null);
+            refsetComponentMap.set(null);
+            refsetMembers.set(null);
+       }
+      }
 
     public ConceptDataSimpleReference(Concept enclosingConcept) throws IOException {
         super(new NidDataFromBdb(enclosingConcept.getNid()));

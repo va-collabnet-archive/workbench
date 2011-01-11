@@ -105,4 +105,6 @@ public interface I_ManageConceptData {
 
     public boolean isLeafByDestRels(I_ConfigAceFrame aceConfig) throws IOException;
 
+    public void diet();
+
 }
