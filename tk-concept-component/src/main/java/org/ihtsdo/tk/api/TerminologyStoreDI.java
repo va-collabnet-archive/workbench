@@ -47,7 +47,7 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
 
     int getConceptNidForNid(int nid) throws IOException;
 
-    List<UUID> getUuidsForNid(int nid);
+    List<UUID> getUuidsForNid(int nid) throws IOException;
 
     int getNidForUuids(UUID... uuids) throws IOException;
 
