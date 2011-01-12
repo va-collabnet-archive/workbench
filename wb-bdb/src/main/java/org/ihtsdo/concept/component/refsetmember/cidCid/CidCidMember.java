@@ -25,18 +25,18 @@ import org.ihtsdo.tk.dto.concept.component.refset.cidcid.TkRefsetCidCidRevision;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember> 
+public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
 	implements I_ExtendByRefPartCidCid {
 
-	private static VersionComputer<RefsetMember<CidCidRevision, CidCidMember>.Version> computer = 
+	private static VersionComputer<RefsetMember<CidCidRevision, CidCidMember>.Version> computer =
 		new VersionComputer<RefsetMember<CidCidRevision, CidCidMember>.Version>();
 
 	protected VersionComputer<RefsetMember<CidCidRevision, CidCidMember>.Version> getVersionComputer() {
 		return computer;
 	}
 
-	public class Version 
-	extends RefsetMember<CidCidRevision, CidCidMember>.Version 
+	public class Version
+	extends RefsetMember<CidCidRevision, CidCidMember>.Version
 	implements I_ExtendByRefVersion, I_ExtendByRefPartCidCid {
 
 		private Version() {
@@ -90,7 +90,7 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
 			}
 			CidCidMember.this.setC2Nid(c2id);
 		}
-		
+
 		@Override
 		public ERefsetCidCidMember getERefsetMember() throws TerminologyException, IOException {
 			return new ERefsetCidCidMember(this);
@@ -100,15 +100,15 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
 		public ERefsetCidCidRevision getERefsetRevision() throws TerminologyException, IOException {
 			return new ERefsetCidCidRevision(this);
 		}
-		
+
 	}
 
 	private int c1Nid;
 	private int c2Nid;
 
-	public CidCidMember(Concept enclosingConcept, 
+	public CidCidMember(Concept enclosingConcept,
 			TupleInput input) throws IOException {
-		super(enclosingConcept, 
+		super(enclosingConcept,
 				input);
 	}
 
@@ -137,14 +137,16 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
 		}
 		return false;
 	}
- 
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;
         if (CidCidMember.class.isAssignableFrom(obj.getClass())) {
             CidCidMember another = (CidCidMember) obj;
-            return this.c1Nid == another.c1Nid && this.c2Nid == another.c2Nid;
+            return this.c1Nid == another.c1Nid && this.c2Nid == another.c2Nid &&
+            this.nid == another.nid &&
+            this.referencedComponentNid == another.referencedComponentNid;
         }
         return false;
     }
@@ -230,7 +232,7 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
 	 */
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();  
+        StringBuffer buf = new StringBuffer();
         buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" c1Nid: ");
 		addNidToBuffer(buf, c1Nid);

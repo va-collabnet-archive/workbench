@@ -28,17 +28,17 @@ import com.sleepycat.bind.tuple.TupleOutput;
 public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMember>
 	implements I_ExtendByRefPartCidCidCid {
 
-	private static VersionComputer<RefsetMember<CidCidCidRevision, CidCidCidMember>.Version> computer = 
+	private static VersionComputer<RefsetMember<CidCidCidRevision, CidCidCidMember>.Version> computer =
 		new VersionComputer<RefsetMember<CidCidCidRevision, CidCidCidMember>.Version>();
 
 	protected VersionComputer<RefsetMember<CidCidCidRevision, CidCidCidMember>.Version> getVersionComputer() {
 		return computer;
 	}
 
-	
-	
-	public class Version 
-	extends RefsetMember<CidCidCidRevision, CidCidCidMember>.Version 
+
+
+	public class Version
+	extends RefsetMember<CidCidCidRevision, CidCidCidMember>.Version
 	implements I_ExtendByRefVersion, I_ExtendByRefPartCidCidCid {
 
 		private Version() {
@@ -110,7 +110,7 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 			}
 			CidCidCidMember.this.setC3Nid(c3id);
 		}
-		
+
 		@Override
 		public ERefsetCidCidCidMember getERefsetMember() throws TerminologyException, IOException {
 			return new ERefsetCidCidCidMember(this);
@@ -121,7 +121,7 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 			return new ERefsetCidCidCidRevision(this);
 		}
 
-	
+
 	}
 
 	private int c1Nid;
@@ -132,7 +132,7 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 		super(enclosingConcept, input);
 	}
 
-	public CidCidCidMember(TkRefsetCidCidCidMember refsetMember, 
+	public CidCidCidMember(TkRefsetCidCidCidMember refsetMember,
 			Concept enclosingConcept) throws IOException {
 		super(refsetMember, enclosingConcept);
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
@@ -146,7 +146,7 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 		}
 	}
 
-    
+
     public CidCidCidMember() {
 		super();
 	}
@@ -157,9 +157,11 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
             return false;
         if (CidCidCidMember.class.isAssignableFrom(obj.getClass())) {
             CidCidCidMember another = (CidCidCidMember) obj;
-            return this.c1Nid == another.c1Nid 
+            return this.c1Nid == another.c1Nid
                 && this.c2Nid == another.c2Nid
-                && this.c3Nid == another.c3Nid;
+                && this.c3Nid == another.c3Nid
+                && this.nid == another.nid
+                && this.referencedComponentNid == another.referencedComponentNid;
         }
         return false;
     }
@@ -167,8 +169,8 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
     @Override
     public int hashCode() {
         return HashFunction.hashCode(new int[] { c1Nid, c2Nid, c3Nid });
-    }	
-    
+    }
+
     @Override
 	protected boolean membersEqual(
 			ConceptComponent<CidCidCidRevision, CidCidCidMember> obj) {
@@ -265,7 +267,7 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 	 */
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();  
+        StringBuffer buf = new StringBuffer();
         buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" c1Nid: ");
 		addNidToBuffer(buf, c1Nid);

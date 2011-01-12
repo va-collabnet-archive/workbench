@@ -27,16 +27,16 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMember>
 	implements I_ExtendByRefPartCidCidString {
-	
-	private static VersionComputer<RefsetMember<CidCidStrRevision, CidCidStrMember>.Version> computer = 
+
+	private static VersionComputer<RefsetMember<CidCidStrRevision, CidCidStrMember>.Version> computer =
 		new VersionComputer<RefsetMember<CidCidStrRevision, CidCidStrMember>.Version>();
 
 	protected VersionComputer<RefsetMember<CidCidStrRevision, CidCidStrMember>.Version> getVersionComputer() {
 		return computer;
 	}
 
-	public class Version 
-	extends RefsetMember<CidCidStrRevision, CidCidStrMember>.Version 
+	public class Version
+	extends RefsetMember<CidCidStrRevision, CidCidStrMember>.Version
 	implements I_ExtendByRefVersion, I_ExtendByRefPartCidCidString {
 
 		private Version() {
@@ -158,8 +158,9 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
             return false;
         if (CidCidStrMember.class.isAssignableFrom(obj.getClass())) {
             CidCidStrMember another = (CidCidStrMember) obj;
-            return this.c1Nid == another.c1Nid 
-                && this.c2Nid == another.c2Nid;
+            return this.c1Nid == another.c1Nid
+                && this.c2Nid == another.c2Nid && this.nid == another.nid
+                && this.referencedComponentNid == another.referencedComponentNid;
         }
         return false;
     }
@@ -167,8 +168,8 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
     @Override
     public int hashCode() {
         return HashFunction.hashCode(new int[] { c1Nid, c2Nid });
-    }   
-    
+    }
+
 
 	@Override
 	protected boolean membersEqual(
@@ -252,7 +253,7 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
 	public String getStringValue() {
 		return strValue;
 	}
-	
+
     public String getStrValue() {
         return strValue;
     }
@@ -261,7 +262,7 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
         this.strValue = strValue;
         modified();
     }
-    
+
     public void setStrValue(String strValue) {
         this.strValue = strValue;
         modified();
@@ -277,7 +278,7 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
 	 */
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();  
+        StringBuffer buf = new StringBuffer();
         buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" c1Nid: ");
 		addNidToBuffer(buf, c1Nid);
