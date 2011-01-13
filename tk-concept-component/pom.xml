@@ -19,7 +19,7 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>tk-concept-component</artifactId>
-	<name>Toolkit Concepts &amp; Concept Components</name>
+	<name>${branch}: Toolkit Concepts &amp; Concept Components</name>
     <dependencies>
 	    <dependency>
 			<groupId>org.drools</groupId>

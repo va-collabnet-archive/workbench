@@ -7,7 +7,7 @@
         <version>2.6.0-trek-uuid-nid-cache-11-SNAPSHOT</version>
     </parent>
     <artifactId>wb-bdb</artifactId>
-    <name>Workbench Berkeley Database</name>
+    <name>${branch}: Workbench Berkeley Database</name>
     <dependencies>
         <dependency>
             <groupId>com.sleepycat</groupId>

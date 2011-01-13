@@ -181,7 +181,7 @@ public class UuidToNidMapBdb extends ComponentBdb {
                 usedMemory = maxMemory - Runtime.getRuntime().freeMemory();
                 percentageUsed = ((double) usedMemory) / maxMemory;
                 AceLog.getAppLog().
-                        info("UuidToNidMapBdb finishedrecover memory. "
+                        info("UuidToNidMapBdb finished recover memory. "
                         + "Percent used: " + percentageUsed);
             }
         });

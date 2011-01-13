@@ -19,7 +19,7 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>tk-arena-spec</artifactId>
-	<name>Toolkit Arena DROOLS Rules Spec</name>
+	<name>${branch}: Toolkit Arena DROOLS Rules Spec</name>
     <dependencies>
 	    <dependency>
 			<groupId>${project.groupId}</groupId>
