@@ -82,11 +82,11 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 
     public void addSpecifiedRelVersions(List<V> matchingVersions, List<V> versions, Coordinate c) {
         if (c.getPositionSet() == null || c.getPositionSet().size() < 1) {
-            addSpecifiedVersionsNullPositions(c.getAllowedStatusNids(), c.getIsaTypeNids(), 
+            addSpecifiedVersionsNullPositions(c.getAllowedStatusNids(), null, 
             		matchingVersions, versions, c.getPrecedence(),
                     c.getContradictionManager(), null);
         } else {
-            addSpecifiedVersionsWithPositions(c.getAllowedStatusNids(), c.getIsaTypeNids(), 
+            addSpecifiedVersionsWithPositions(c.getAllowedStatusNids(), null, 
             		c.getPositionSet(), matchingVersions, versions, c.getPrecedence(),
                     c.getContradictionManager(),  null);
         }

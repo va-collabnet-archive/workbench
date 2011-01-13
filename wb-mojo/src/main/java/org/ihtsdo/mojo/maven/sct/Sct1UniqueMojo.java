@@ -19,7 +19,6 @@ package org.ihtsdo.mojo.maven.sct;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
@@ -88,7 +87,8 @@ public class Sct1UniqueMojo extends AbstractMojo implements Serializable {
     private String sct1Out2ndDir;
 
     /**
-     * @parameter 
+     * @parameter
+     * @required
      */
     private String sct1Dupl2ndDir;
 
@@ -135,13 +135,11 @@ public class Sct1UniqueMojo extends AbstractMojo implements Serializable {
         boolean success2 = (new File(fPathOut2ndDir)).mkdirs();
         if (success2)
             getLog().info("::: Output 2nd: " + fPathOut2ndDir);
-
-        if (dupDir != null) {
-            fPathDupl2ndDir = tDir + FILE_SEPARATOR + tSubDir + dupDir;
-            boolean successDupl = (new File(fPathDupl2ndDir)).mkdirs();
-            if (successDupl)
-                getLog().info("::: Duplicates: " + fPathDupl2ndDir);
-        }
+        
+        fPathDupl2ndDir = tDir + FILE_SEPARATOR + tSubDir + dupDir;
+        boolean successDupl = (new File(fPathDupl2ndDir)).mkdirs();
+        if (successDupl)
+            getLog().info("::: Duplicates: " + fPathDupl2ndDir);
 
         int totalFiles = in1stFiles.size();
         if (in2ndFiles.size() != totalFiles) {
@@ -158,23 +156,24 @@ public class Sct1UniqueMojo extends AbstractMojo implements Serializable {
             Sct1File f1 = in1stFiles.get(i);
             Sct1File f2 = in2ndFiles.get(i);
 
-            SctYDesRecord[] a1 = Sct1File.parseDescriptions(f1);
-            SctYDesRecord[] a2 = Sct1File.parseDescriptions(f2);
+            Sct1_DesRecord[] a1 = Sct1_DesRecord.parseDescriptions(f1);
+            Sct1_DesRecord[] a2 = Sct1_DesRecord.parseDescriptions(f2);
 
             BufferedWriter bw1 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
                     fPathOut1stDir + FILE_SEPARATOR + f1.file.getName()), "UTF-8"));
             BufferedWriter bw2 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
                     fPathOut2ndDir + FILE_SEPARATOR + f2.file.getName()), "UTF-8"));
 
-            bw1.write(SctYDesRecord.toStringHeader() + LINE_TERMINATOR);
-            bw2.write(SctYDesRecord.toStringHeader() + LINE_TERMINATOR);
+            bw1.write(Sct1_DesRecord.toStringHeader() + LINE_TERMINATOR);
+            bw2.write(Sct1_DesRecord.toStringHeader() + LINE_TERMINATOR);
 
-            BufferedWriter bwDupl = null;
-            if (fPathDupl2ndDir != null) {
-                bwDupl = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                        fPathDupl2ndDir + FILE_SEPARATOR + "dupl_" + f2.file.getName()), "UTF-8"));
-                bwDupl.write(SctYDesRecord.toStringHeader() + LINE_TERMINATOR);
-            }
+            BufferedWriter bwDupl = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+                    fPathDupl2ndDir + FILE_SEPARATOR + "dupl_" + f2.file.getName()), "UTF-8"));
+            bwDupl.write(Sct1_DesRecord.toStringHeader() + LINE_TERMINATOR);
+
+            BufferedWriter bwExcept = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+                    fPathDupl2ndDir + FILE_SEPARATOR + "exceptions_" + f2.file.getName()), "UTF-8"));
+            bwExcept.write(Sct1_DesRecord.toStringHeader() + LINE_TERMINATOR);
 
             // COMPARE AND WRITE TO OUTPUT FILES
             int idx1 = 0;
@@ -187,22 +186,35 @@ public class Sct1UniqueMojo extends AbstractMojo implements Serializable {
             int countKeep2nd = 0;
 
             while (idx1 < max1 && idx2 < max2) {
-                if (a1[idx1].desSnoId < a2[idx2].desSnoId) {
+                if (a1[idx1].desUuidMsb == a2[idx2].desUuidMsb
+                        && a1[idx1].desUuidLsb == a2[idx2].desUuidLsb) {
+                    // SAME ID, KEEP ONLY PRIMARY
+                    bw1.write(a1[idx1].toString() + LINE_TERMINATOR);
+                    countKeep1st++;
+                    
+                    // RECORD DUPLICATES
+                    bwDupl.write(a2[idx2].toString() + LINE_TERMINATOR);
+                    
+                    // RECORD EXCEPTIONS
+                    if (a1[idx1].languageCode.compareTo(a2[idx2].languageCode) != 0)
+                        bwExcept.write(a2[idx2].toString() + LINE_TERMINATOR);
+                        
+                    idx1++;
+                    idx2++;
+                } else if (a1[idx1].desUuidMsb < a2[idx2].desUuidMsb) {
+                    // PRIMARY DIFFERENT, NOT IN LANGUAGE EDITION
+                    bw1.write(a1[idx1].toString() + LINE_TERMINATOR);
+                    countKeep1st++;
+                    idx1++;
+                } else if (a1[idx1].desUuidMsb == a2[idx2].desUuidMsb
+                        && a1[idx1].desUuidLsb < a2[idx2].desUuidLsb) {
                     // PRIMARY DIFFERENT
                     bw1.write(a1[idx1].toString() + LINE_TERMINATOR);
                     countKeep1st++;
                     idx1++;
-                } else if (a1[idx1].desSnoId == a2[idx2].desSnoId) {
-                    // SAME ID, KEEP ONLY PRIMARY
-                    bw1.write(a1[idx1].toString() + LINE_TERMINATOR);
-                    countKeep1st++;
-                    if (bwDupl != null)
-                        bwDupl.write(a2[idx2].toString() + LINE_TERMINATOR);
-
-                    idx1++;
-                    idx2++;
+                    
                 } else {
-                    // SECONDARY DIFFERENT
+                    // SECONDARY DIFFERENT, UNIQUE TO LANGUAGE EDITION
                     bw2.write(a2[idx2].toString() + LINE_TERMINATOR);
                     countKeep2nd++;
                     idx2++;
@@ -227,6 +239,8 @@ public class Sct1UniqueMojo extends AbstractMojo implements Serializable {
             bw2.close();
             if (bwDupl != null)
                 bwDupl.close();
+            if (bwExcept != null)
+                bwExcept.close();
 
             getLog().info(
                     "::: File 1st: " + f1.file.getName() + " in=" + a1.length + " out="

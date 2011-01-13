@@ -6,8 +6,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_BindConceptComponents;
 import org.ihtsdo.db.bdb.Bdb;
@@ -87,7 +88,11 @@ public class ConceptComponentBinder<V extends Revision<V, C>, C extends ConceptC
                         }
                     }
                 }
-                conceptComponent.readComponentFromBdb(input);
+                try {
+                    conceptComponent.merge(factory.create(enclosingConcept, input));
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
             } else {
                 try {
                     if (conceptComponent == null) {

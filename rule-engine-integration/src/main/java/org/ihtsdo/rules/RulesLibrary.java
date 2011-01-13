@@ -23,14 +23,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.JOptionPane;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.XMLConfiguration;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.agent.KnowledgeAgent;
@@ -57,6 +63,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
+import org.dwfa.ace.task.commit.AlertToDataConstraintFailure.ALERT_TYPE;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.task.refset.spec.compute.RefsetComputeType;
 import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
@@ -78,10 +85,11 @@ import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.helper.ResultsItem;
+import org.ihtsdo.tk.helper.ResultsItem.Severity;
 import org.ihtsdo.tk.helper.templates.AbstractTemplate;
-import org.ihtsdo.tk.helper.templates.AbstractTemplate.TemplateType;
 import org.ihtsdo.tk.helper.templates.DescriptionTemplate;
 import org.ihtsdo.tk.helper.templates.RelationshipTemplate;
+import org.ihtsdo.tk.helper.templates.AbstractTemplate.TemplateType;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.DescriptionSpec;
 import org.ihtsdo.tk.spec.RelSpec;
@@ -98,10 +106,16 @@ public class RulesLibrary {
 	/** The CONCEPT MODEL knowledge package identifier */
 	public static int CONCEPT_MODEL_PKG = 0;
 	public static int LINGUISTIC_GUIDELINES_PKG = 1;
-	
+
 	public static KindOfCacheBI myStaticIsACache;
 	public static TerminologyHelperDroolsWorkbench terminologyHelperCache;
-	
+
+	public enum INFERRED_VIEW_ORIGIN {CLASSIFIER, CONSTRAINT_NORMAL_FORM};
+
+	public static I_IntSet allRels;
+	public static I_IntSet histRels;
+	public static I_IntSet CptModelRels;
+
 	public static TerminologyHelperDroolsWorkbench getTerminologyHelper() {
 		if (terminologyHelperCache == null) {
 			terminologyHelperCache =  new TerminologyHelperDroolsWorkbench();
@@ -111,30 +125,43 @@ public class RulesLibrary {
 			return terminologyHelperCache;
 		}
 	}
-	
+
 	public static KindOfCacheBI setupIsACache() throws TerminologyException, Exception {
-			return myStaticIsACache = Ts.get().getCache(Terms.get().getActiveAceFrameConfig().getCoordinate());
+		return myStaticIsACache = Ts.get().getCache(Terms.get().getActiveAceFrameConfig().getCoordinate());
 	}
-	
+
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
 			boolean onlyUncommittedContent, I_ConfigAceFrame config) 
 	throws Exception {
 		RulesContextHelper contextHelper = new RulesContextHelper(config);
-		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper);
+		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper, INFERRED_VIEW_ORIGIN.CLASSIFIER);
 	}
-
 
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
 			boolean onlyUncommittedContent, I_ConfigAceFrame config, RulesContextHelper contextHelper) 
 	throws Exception {
+		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper, INFERRED_VIEW_ORIGIN.CLASSIFIER);
+	}
+
+	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
+			boolean onlyUncommittedContent, I_ConfigAceFrame config, INFERRED_VIEW_ORIGIN inferredOrigin) 
+	throws Exception {
+		RulesContextHelper contextHelper = new RulesContextHelper(config);
+		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper, inferredOrigin);
+	}
+
+	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
+			boolean onlyUncommittedContent, I_ConfigAceFrame config, RulesContextHelper contextHelper, 
+			INFERRED_VIEW_ORIGIN inferredOrigin) 
+	throws Exception {
 		KnowledgeBase kbase = contextHelper.getKnowledgeBaseForContext(context, config);
 		ResultsCollectorWorkBench results = new ResultsCollectorWorkBench();
 		if (kbase != null) {
-//			int a1 = kbase.getKnowledgePackages().size();
-//			int a2 = kbase.getKnowledgePackages().iterator().next().getRules().size();
+			//			int a1 = kbase.getKnowledgePackages().size();
+			//			int a2 = kbase.getKnowledgePackages().iterator().next().getRules().size();
 			if (!(kbase.getKnowledgePackages().size() == 0) && 
 					!(kbase.getKnowledgePackages().size() == 1 &&
-					kbase.getKnowledgePackages().iterator().next().getRules().size() == 0)) { 
+							kbase.getKnowledgePackages().iterator().next().getRules().size() == 0)) { 
 
 				StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 
@@ -145,7 +172,7 @@ public class RulesLibrary {
 
 				ConceptVersionBI conceptBi = Ts.get().getConceptVersion(config.getCoordinate(), concept.getNid());
 
-				DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version");
+				DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version", inferredOrigin);
 
 				ksession.insert(testConcept);
 
@@ -155,8 +182,18 @@ public class RulesLibrary {
 				//ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
 
 				for (ResultsItem resultsItem : results.getResultsItems() ) {
+					ALERT_TYPE alertType = ALERT_TYPE.ERROR;
+
+					if (resultsItem.getSeverity() != null && !resultsItem.getSeverity().isEmpty()) {
+						if (resultsItem.getSeverity().trim().equals(Severity.NOTIFICATION.getSeverityUuid().toString())) {
+							alertType = ALERT_TYPE.INFORMATIONAL;
+						} else if (resultsItem.getSeverity().trim().equals(Severity.WARNING.getSeverityUuid().toString())) {
+							alertType = ALERT_TYPE.WARNING;
+						}
+					}
+
 					results.getAlertList().add(new AlertToDataConstraintFailure(
-							AlertToDataConstraintFailure.ALERT_TYPE.ERROR, 
+							alertType, 
 							resultsItem.getErrorCode() + " - " + resultsItem.getMessage(), 
 							concept));
 				}
@@ -767,19 +804,26 @@ public class RulesLibrary {
 			String guvnorEnumerationText = "'" + propertyName + "' : [";
 			for (I_ExtendByRef loopMember : Terms.get().getRefsetExtensionMembers(refset.getConceptNid())) {
 
-				I_ExtendByRefPartCid lastPart = (I_ExtendByRefPartCid) loopMember.getTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), 
-						config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getMutablePart();
-				ConceptVersionBI loopConcept = Ts.get().getConceptVersion(config.getCoordinate(),lastPart.getC1id());
+//				I_ExtendByRefPartCid lastPart = (I_ExtendByRefPartCid) loopMember.getTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), 
+//						config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getMutablePart();
+				ConceptVersionBI loopConcept = Ts.get().getConceptVersion(config.getCoordinate(),loopMember.getComponentNid());
 
-				String name = "";
-
-				if (loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).size() > 0) {
-					name = loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).iterator().next().getText();
-				} else if (loopConcept.getDescsActive().size() > 0){
-					name = loopConcept.getDescsActive().iterator().next().getText();
-				} else {
-					name = "no description found";
+				String name = "no description found";
+				
+				for (DescriptionVersionBI loopDescription : loopConcept.getDescsActive()) {
+					if (loopDescription.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()
+							&& loopDescription.getLang().toLowerCase().startsWith("en")) {
+						name = loopDescription.getText();
+					}
 				}
+
+//				if (loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).size() > 0) {
+//					name = loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).iterator().next().getText();
+//				} else if (loopConcept.getDescsActive().size() > 0){
+//					name = loopConcept.getDescsActive().iterator().next().getText();
+//				} else {
+//					name = "no description found";
+//				}
 
 				guvnorEnumerationText = guvnorEnumerationText + "'" + loopConcept.getPrimUuid();
 				guvnorEnumerationText = guvnorEnumerationText + "=" + name;
@@ -808,12 +852,13 @@ public class RulesLibrary {
 
 	public static boolean isIncludedInRefsetSpec(I_GetConceptData refset, I_GetConceptData candidateConcept, I_ConfigAceFrame config) {
 		boolean result = false;
-
+//		System.out.println("************ Starting test computation *****************");
+		Long start = System.currentTimeMillis();
 		try {
 			RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, config);
 			I_GetConceptData refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
-			AceLog.getAppLog().info("Refset: " + refset.getInitialText() + " " + refset.getUids().get(0));
-			AceLog.getAppLog().info("Refset spec: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
+//			AceLog.getAppLog().info("Refset: " + refset.getInitialText() + " " + refset.getUids().get(0));
+//			AceLog.getAppLog().info("Refset spec: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
 			RefsetComputeType computeType = RefsetComputeType.CONCEPT; // default
 			if (refsetSpecHelper.isDescriptionComputeType()) {
 				computeType = RefsetComputeType.DESCRIPTION;
@@ -854,16 +899,15 @@ public class RulesLibrary {
 
 			I_GetConceptData selectedConcept = candidateConcept;
 
-			System.out.println("************ Starting test computation *****************");
-			System.out.println("Refset spec = " + refsetSpec.toString());
-			System.out.println("Refset = " + refset.toString());
-			System.out.println("Concept to test = " + selectedConcept.toString());
+//			System.out.println("Refset spec = " + refsetSpec.toString());
+//			System.out.println("Refset = " + refset.toString());
+//			System.out.println("Concept to test = " + selectedConcept.toString());
 
 			List<I_ShowActivity> activities = new ArrayList<I_ShowActivity>();
 			result = query.execute(selectedConcept, activities);
 
-			System.out.println("++++++++++++++ Result = " + result);
-			System.out.println("************ Finished test computation *****************");
+//			System.out.println("++++++++++++++ Result = " + result);
+//			System.out.println("************ Finished test computation in " + (System.currentTimeMillis() - start) + " ms. *****************");
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 			try {
@@ -874,5 +918,94 @@ public class RulesLibrary {
 		}
 
 		return result;
+	}
+
+	public static URL getDocumentationUrlForRuleUUID(UUID ruleUuid) throws ConfigurationException {
+		URL url = null;
+
+		XMLConfiguration config = new XMLConfiguration("rules/rules-documentation-config.xml");
+		String template = config.getString("urlTemplate");
+		System.out.println("Template: " + template);
+		Object rules = config.getProperty("rules.rule.uuid");
+		if(rules instanceof Collection)
+		{
+			System.out.println("Number of rules: " + ((Collection) rules).size());
+			for (int i = 0; i<= ((Collection) rules).size()-1; i++) {
+				System.out.println(i + "- UUID: " + config.getString("rules.rule(" + i + ").uuid"));
+				System.out.println(i + "- Address: " + config.getString("rules.rule(" + i + ").address"));
+
+				if (ruleUuid.equals(UUID.fromString(config.getString("rules.rule(" + i + ").uuid")))) {
+					String urlString = template.replace("*", config.getString("rules.rule(" + i + ").address"));
+					try {
+						url = new URL(urlString);
+					} catch (MalformedURLException e) {
+						//do nothing, url = null
+					}
+				}
+			}
+		}
+		return url;
+	}
+
+
+	public static I_IntSet getHistoricalRels() throws TerminologyException, IOException{
+
+		if (histRels == null) {
+			histRels = Terms.get().newIntSet();
+			Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
+			descendants = getDescendants(descendants, Terms.get().getConcept(UUID.fromString("f323b5dd-1f97-3873-bcbc-3563663dda14")));
+			for (I_GetConceptData loopConcept : descendants) {
+				histRels.add(loopConcept.getNid());
+			}
+		}
+		return histRels;
+	}
+
+	public static I_IntSet getConceptModelRels() throws TerminologyException, IOException{
+
+		if (CptModelRels == null ) {
+			CptModelRels = Terms.get().newIntSet();
+			CptModelRels = Terms.get().newIntSet();
+			Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
+			descendants = getDescendants(descendants, Terms.get().getConcept(UUID.fromString("6155818b-09ed-388e-82ce-caa143423e99")));
+			for (I_GetConceptData loopConcept : descendants) {
+				CptModelRels.add(loopConcept.getNid());
+			}
+		}
+		return CptModelRels;
+	}
+	public static I_IntSet getAllRels() throws TerminologyException, IOException{
+
+		if (allRels == null) {
+			allRels = Terms.get().newIntSet();
+			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+			allRels.addAll(config.getDestRelTypes().getSetValues());
+			allRels.addAll(getConceptModelRels().getSetValues());
+			allRels.addAll(getHistoricalRels().getSetValues());
+		}
+		return allRels;
+	}
+
+	public static Set<I_GetConceptData> getDescendants(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
+		try {
+			I_TermFactory termFactory = Terms.get();
+			//TODO: get config as parameter
+			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+			Set<I_GetConceptData> childrenSet = new HashSet<I_GetConceptData>();
+			childrenSet.addAll(concept.getDestRelOrigins(config.getAllowedStatus(), 
+					config.getDestRelTypes(), config.getViewPositionSetReadOnly()
+					, config.getPrecedence(), config.getConflictResolutionStrategy()));
+			descendants.addAll(childrenSet);
+			for (I_GetConceptData loopConcept : childrenSet) {
+				descendants = getDescendants(descendants, loopConcept);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return descendants;
 	}
 }

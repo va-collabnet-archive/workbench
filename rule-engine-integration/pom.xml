@@ -1,9 +1,10 @@
+<?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
-		<version>2.6.0-trek-8-uktc-SNAPSHOT</version>
+		<version>2.6.0-trek-10-uktc-SNAPSHOT</version>
 	</parent>
 	<artifactId>rule-engine-integration</artifactId>
 	<name>Rules engine integration</name>
@@ -45,7 +46,7 @@
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-api</artifactId>
 			<version>${project.version}</version>
-		 <type>jar</type>
+			<type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
@@ -68,34 +69,39 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-		    <groupId>com.googlecode.sardine</groupId>
-		    <artifactId>sardine</artifactId>
-		    <version>129</version>
+			<groupId>com.googlecode.sardine</groupId>
+			<artifactId>sardine</artifactId>
+			<version>129</version>
 		</dependency>
 		<dependency>
-		    <groupId>commons-codec</groupId>
-		    <artifactId>commons-codec</artifactId>
-		    <version>1.4</version>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.4</version>
 		</dependency>
 		<dependency>
-		    <groupId>commons-logging</groupId>
-		    <artifactId>commons-logging</artifactId>
-		    <version>1.1.1</version>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.1.1</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.apache.httpcomponents</groupId>
-		    <artifactId>httpclient</artifactId>
-		    <version>4.0.1</version>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.0.1</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.apache.httpcomponents</groupId>
-		    <artifactId>httpcore</artifactId>
-		    <version>4.0.1</version>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<version>4.0.1</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.ihtsdo</groupId>
-		    <artifactId>tk-qa-ws-client</artifactId>
-		    <version>${project.version}</version>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>tk-qa-ws-client</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-configuration</groupId>
+			<artifactId>commons-configuration</artifactId>
+			<version>1.6</version>
 		</dependency>
 	</dependencies>
 	<build>

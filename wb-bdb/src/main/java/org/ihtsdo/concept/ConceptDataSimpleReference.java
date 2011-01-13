@@ -107,6 +107,20 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                 if (hasUncommittedId(cc)) {
                     return true;
                 }
+                if (hasUncommittedAnnotation(cc)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+        private boolean hasUncommittedAnnotation(ConceptComponent<?, ?> cc) {
+        if (cc != null && cc.annotations != null) {
+            for (RefsetMemberChronicleBI rmc : cc.annotations) {
+                if (rmc.isUncommitted()) {
+                    return true;
+                }
             }
         }
         return false;
@@ -150,7 +164,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
 
     @Override
-    public AddDescriptionSet getDescriptions() throws IOException {
+    public AddDescriptionSet getDescriptions() throws IOException {    
         if (descriptions.get() == null) {
             descriptions.compareAndSet(null, new AddDescriptionSet(getList(new DescriptionBinder(),
                     OFFSETS.DESCRIPTIONS, enclosingConcept)));
@@ -294,12 +308,14 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                 for (ConceptComponent<?, ?> cc : ccList) {
                     if (cc.getTime() == Long.MIN_VALUE) {
                         toRemove.add(cc);
+                        cc.clearVersions();
                         Concept.componentsCRHM.remove(cc.getNid());
                     } else {
                         if (cc.revisions != null) {
                         List<Revision> revisionToRemove = new ArrayList<Revision>();
                         for (Revision r: cc.revisions) {
                             if (r.getTime() == Long.MIN_VALUE) {
+                                cc.clearVersions();
                                 revisionToRemove.add(r);
                             }
                         }
@@ -309,6 +325,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                         }
                     }
                 }
+                
                 ccList.removeAll(toRemove);
             }
         }

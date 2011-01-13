@@ -27,12 +27,12 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.commit.AbstractConceptTest;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.rules.RulesLibrary;
+import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
 
 
 /**
@@ -90,7 +90,8 @@ public class TestUsingLibrary extends AbstractConceptTest {
 			I_TermFactory tf = Terms.get();
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 			return RulesLibrary.checkConcept(concept, 
-					tf.getConcept(RefsetAuxiliary.Concept.REALTIME_QA_CONTEXT.getUids()), false, config).getAlertList();
+					tf.getConcept(RefsetAuxiliary.Concept.REALTIME_QA_CONTEXT.getUids()), false, 
+					config, INFERRED_VIEW_ORIGIN.CONSTRAINT_NORMAL_FORM).getAlertList();
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
 		}

@@ -304,7 +304,7 @@ public class NidCNidMapBdb extends ComponentBdb {
 	}
 
 	public boolean hasConcept(int cNid) {
-	    assert cNid > Integer.MIN_VALUE: "Invalid cNid: " + cNid;
+	    assert cNid > Integer.MIN_VALUE: "Invalid cNid == Integer.MIN_VALUE: " + cNid;
 	    assert cNid <= Bdb.getUuidsToNidMap().getCurrentMaxNid(): "Invalid cNid: " + cNid + " currentMax: " + Bdb.getUuidsToNidMap().getCurrentMaxNid();
 		int mapIndex = (cNid  - Integer.MIN_VALUE) / NID_CNID_MAP_SIZE;
 		int indexInMap = (cNid  - Integer.MIN_VALUE) % NID_CNID_MAP_SIZE;

@@ -45,7 +45,7 @@ class Sct1_RelRecord implements Comparable<Object>, Serializable {
     int refinability; // REFINABILITY
     int group; // RELATIONSHIPGROUP
     boolean exceptionFlag; // to handle Concept ID change exception
-    int path; // index
+    int pathIdx; // index
     long revTime;
     
     /** user: 0=unassigned, 1=inferred/classifier */
@@ -112,7 +112,7 @@ class Sct1_RelRecord implements Comparable<Object>, Serializable {
         this.group = grp; // RELATIONSHIPGROUP
         this.exceptionFlag = false;
         
-        this.path = pathIdx;
+        this.pathIdx = pathIdx;
         this.userIdx = userIdx;
     }
     
@@ -137,12 +137,14 @@ class Sct1_RelRecord implements Comparable<Object>, Serializable {
         this.refinability = refinability; // REFINABILITY
         this.group = group; // RELATIONSHIPGROUP
         this.exceptionFlag = false; // to handle Concept ID change exception
-        this.path = pathIdx;
+        this.pathIdx = pathIdx;
         this.revTime = revTime;
         this.userIdx = 0; // ARF Input Format does not have a field for user id.
     }
 
     // method required for object to be sortable (comparable) in arrays
+    // SORT ORDER MATTERS WHEN ATTACHING IDS
+    // THIS SORT MUST RETAIN UUID AT THE PRIMARY SORT ORDER
     public int compareTo(Object obj) {
         Sct1_RelRecord tmp = (Sct1_RelRecord) obj;
         // :yyy: return this.uuid.compareTo(tmp.uuid);
@@ -158,9 +160,9 @@ class Sct1_RelRecord implements Comparable<Object>, Serializable {
             } else if (relUuidLsb < tmp.relUuidLsb) {
                 return thisLess;
             } else {
-                if (this.path > tmp.path) {
+                if (this.pathIdx > tmp.pathIdx) {
                     return thisMore;
-                } else if (this.path < tmp.path) {
+                } else if (this.pathIdx < tmp.pathIdx) {
                     return thisLess;
                 } else {
                     if (this.revTime > tmp.revTime) {

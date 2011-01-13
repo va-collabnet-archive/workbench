@@ -502,7 +502,21 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 		        LANGUAGE_REFSET_FR_CA(new String[] { "french-canadian language refset", "french-canadian language refset" }, 
 		        		new I_ConceptualizeUniversally[] {LANGUAGE_REFSET}),
         
-        ;		
+		   TEXT_WITH_DIALECT_VARIANTS(new String[] { "Text with dialect variants", "Text with dialect variants" }, 
+		        	    		new I_ConceptualizeUniversally[] {REFSET_IDENTITY}),
+		        EN_TEXT_WITH_DIALECT_VARIANTS(new String[] { "EN Text with dialect variants", "EN Text with dialect variants" }, 
+				        	    	new I_ConceptualizeUniversally[] {TEXT_WITH_DIALECT_VARIANTS}),
+				     EN_US_TEXT_VARIANTS(new String[] { "United States of America English text variants", "en-US text variants" }, 
+						        	new I_ConceptualizeUniversally[] {EN_TEXT_WITH_DIALECT_VARIANTS}),
+					 EN_UK_TEXT_VARIANTS(new String[] { "United Kingdom English text variants", "en-UK text variants" }, 
+								    new I_ConceptualizeUniversally[] {EN_TEXT_WITH_DIALECT_VARIANTS}),
+					 EN_AU_TEXT_VARIANTS(new String[] { "Australian English text variants", "en-AU text variants" }, 
+									new I_ConceptualizeUniversally[] {EN_TEXT_WITH_DIALECT_VARIANTS}),
+					 EN_CA_TEXT_VARIANTS(new String[] { "Canadian English text variants", "en-CA text variants" }, 
+									new I_ConceptualizeUniversally[] {EN_TEXT_WITH_DIALECT_VARIANTS}),
+					 EN_NZ_TEXT_VARIANTS(new String[] { "New Zealand English text variants", "en-NZ text variants" }, 
+									new I_ConceptualizeUniversally[] {EN_TEXT_WITH_DIALECT_VARIANTS}),
+       ;		
 
         private ArrayList<UUID> conceptUids = new ArrayList<UUID>();
 

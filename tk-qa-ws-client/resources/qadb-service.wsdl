@@ -90,7 +90,7 @@
             	<xsd:sequence>
             		<xsd:element name="componentUuid" type="xsd:string">
             		</xsd:element>
-            		<xsd:element name="componentName" type="xsd:string">
+            		<xsd:element maxOccurs="1" minOccurs="0" name="componentName" type="xsd:string">
             		</xsd:element>
             		<xsd:element maxOccurs="1" minOccurs="0" name="sctid" type="xsd:string"/>
             	</xsd:sequence>
@@ -127,7 +127,8 @@
             <xsd:complexType name="Case">
             	<xsd:sequence>
             		<xsd:element name="caseUuid" type="xsd:string"/>
-            		<xsd:element maxOccurs="1" minOccurs="0" name="rule" type="tns:Rule"/>
+            		<xsd:element maxOccurs="1" minOccurs="0" name="rule" type="tns:Rule">
+            		</xsd:element>
             		<xsd:element maxOccurs="1" minOccurs="0" name="component" type="tns:Component">
             		</xsd:element>
             		<xsd:element name="isActive" type="xsd:boolean"/>
@@ -141,10 +142,14 @@
             		</xsd:element>
             		<xsd:element maxOccurs="1" minOccurs="0" name="dispositionAnnotation" type="xsd:string">
             		</xsd:element>
-            		<xsd:element maxOccurs="1" minOccurs="0" name="detail" type="xsd:string"/>
+            		<xsd:element maxOccurs="1" minOccurs="0" name="detail" type="xsd:string">
+            		</xsd:element>
             		<xsd:element maxOccurs="1" minOccurs="0" name="assignedTo" type="xsd:string">
             		</xsd:element>
-            		<xsd:element maxOccurs="1" minOccurs="0" name="effectiveTime" type="xsd:date"/>
+            		<xsd:element maxOccurs="1" minOccurs="0" name="effectiveTime" type="xsd:date">
+            		</xsd:element>
+            		<xsd:element name="pathUuid" type="xsd:string"/>
+            		<xsd:element name="databaseUuid" type="xsd:string"/>
             	</xsd:sequence>
             </xsd:complexType>
 
@@ -152,7 +157,7 @@
             	<xsd:sequence>
             		<xsd:element name="dispositionStatusUuid" type="xsd:string">
             		</xsd:element>
-            		<xsd:element name="name" type="xsd:string"/>
+            		<xsd:element maxOccurs="1" minOccurs="0" name="name" type="xsd:string"/>
             	</xsd:sequence>
             </xsd:complexType>
             <xsd:element name="getAllRules">
@@ -402,6 +407,13 @@
             		<xsd:element name="dispositionStatus" type="tns:DispositionStatus"/>
             	</xsd:sequence>
             </xsd:complexType>
+            <xsd:element name="PersistQACaseRequest">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="qaCase" type="tns:Case"/>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
 </xsd:schema>
   </wsdl:types>
   <wsdl:message name="getAllComponentsRequest">
@@ -436,12 +448,18 @@
     <wsdl:part name="parameters" element="tns:AllComponentsResponse">
     </wsdl:part>
   </wsdl:message>
+  <wsdl:message name="persistQACaseResponse">
+  </wsdl:message>
   <wsdl:message name="getQADatabaseResponse">
     <wsdl:part name="parameters" element="tns:QADatabaseResponse">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="getFindingResponse">
     <wsdl:part name="parameters" element="tns:FindingResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="persistQACaseRequest">
+    <wsdl:part name="parameters" element="tns:PersistQACaseRequest">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="getAllDispositionStatusRequest">
@@ -603,6 +621,12 @@
       <wsdl:output message="tns:getQACasesReportLinesByPageResponse">
     </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="persistQACase">
+      <wsdl:input message="tns:persistQACaseRequest">
+    </wsdl:input>
+      <wsdl:output message="tns:persistQACaseResponse">
+    </wsdl:output>
+    </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="qadb-binding" type="tns:qadb-data">
     <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
@@ -734,6 +758,15 @@
     </wsdl:operation>
     <wsdl:operation name="getQACasesReportLinesByPage">
       <soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/getQACasesReportLinesByPage"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="persistQACase">
+      <soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/persistQACase"/>
       <wsdl:input>
         <soap:body use="literal"/>
       </wsdl:input>

@@ -78,8 +78,8 @@ public class PerformQA implements I_ProcessConcepts {
 
 	@Override
 	public void processConcept(I_GetConceptData loopConcept) throws Exception {
-		//testing cut-off, skip all after 2000
-		if (count < 2001 && myStaticIsACache.isKindOf(loopConcept.getConceptNid(), snomedRoot.getConceptNid())) {
+		//testing cut-off, skip all after 2000 -- count < 2001 && 
+		if (myStaticIsACache.isKindOf(loopConcept.getConceptNid(), snomedRoot.getConceptNid())) {
 			//snomedRoot.isParentOfOrEqualTo(loopConcept)
 			//, config.getAllowedStatus(), 
 			//destRels, config.getViewPositionSetReadOnly(), 

@@ -136,7 +136,7 @@ public enum ProcessAttachmentKeys {
     EDITORIAL_BOARD_ROLE_INBOX,
     QUEUE_UTIL_CONTRACT,
     LAST_USER_TASKID,
-    
+    QUEUE_UTIL_CONTRACT_UUID,
     ;
 
     public String getAttachmentKey() {

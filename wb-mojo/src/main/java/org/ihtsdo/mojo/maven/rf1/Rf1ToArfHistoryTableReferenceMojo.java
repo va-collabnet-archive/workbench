@@ -30,6 +30,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -42,6 +43,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
 import org.dwfa.util.id.Type5UuidFactory;
+
 
 /**
  * <b>DESCRIPTION: </b><br>
@@ -295,6 +297,7 @@ public class Rf1ToArfHistoryTableReferenceMojo extends AbstractMojo implements S
         Iterator<List<RF1File>> dit = fileListList.iterator(); // Directory Iterator
         while (dit.hasNext()) {
             List<RF1File> fl = dit.next(); // File List
+            Collections.sort(fl);
             Iterator<RF1File> fit = fl.iterator(); // File Iterator
 
             if (fit == null || fit.hasNext() == false)
@@ -414,23 +417,26 @@ public class Rf1ToArfHistoryTableReferenceMojo extends AbstractMojo implements S
         } // WHILE (EACH CONCEPTS DIRECTORY) *
     }
 
-    private int compareMember(Rf1HistoryTableReference htrA, Rf1HistoryTableReference hrtB) {
-        if (htrA.componentSid < hrtB.componentSid) {
+    private int compareMember(Rf1HistoryTableReference htrA, Rf1HistoryTableReference htrB) {
+        if (htrA.componentSid < htrB.componentSid) {
             return 4; // DROPPED instance less than received
-        } else if (htrA.componentSid > hrtB.componentSid) {
+        } else if (htrA.componentSid > htrB.componentSid) {
             return 3; // ADDED instance greater than received
         } else {
-            if (htrA.referencedSid < hrtB.referencedSid) {
+            if (htrA.referencedSid < htrB.referencedSid) {
                 return 4; // DROPPED instance less than received
-            } else if (htrA.referencedSid > hrtB.referencedSid) {
+            } else if (htrA.referencedSid > htrB.referencedSid) {
                 return 3; // ADDED instance greater than received
             } else {
-                if (htrA.referenceType < hrtB.referenceType) {
+                if (htrA.referenceType < htrB.referenceType) {
                     return 4; // DROPPED instance less than received
-                } else if (htrA.referenceType > hrtB.referenceType) {
+                } else if (htrA.referenceType > htrB.referenceType) {
                     return 3; // ADDED instance greater than received
                 } else {
-                    return 1; // SAME instance == received
+                    if (htrA.status == htrB.status)
+                        return 1; // SAME instance == received
+                    else
+                        return 2; // MODIFIED
                 }
             }
         }
@@ -560,6 +566,7 @@ public class Rf1ToArfHistoryTableReferenceMojo extends AbstractMojo implements S
         Iterator<List<RF1File>> dit = fileListList.iterator(); // Directory Iterator
         while (dit.hasNext()) {
             List<RF1File> fl = dit.next(); // File List
+            Collections.sort(fl);
             Iterator<RF1File> fit = fl.iterator(); // File Iterator 
             while (fit.hasNext()) {
                 RF1File f2 = fit.next();

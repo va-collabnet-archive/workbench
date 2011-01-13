@@ -31,6 +31,7 @@ public class Sct1_IdRecord implements Comparable<Sct1_IdRecord>, Serializable {
     
     // SOURCE ID -- DENOTATION
     String denotation;
+    long denotationLong;
     
     // STATUS UUID
     // ArchitectonicAuxiliary.Concept.CURRENT.getUids().get(0)
@@ -39,18 +40,42 @@ public class Sct1_IdRecord implements Comparable<Sct1_IdRecord>, Serializable {
     // EFFECTIVE DATE
     long revTime;
    
-    // PATH UUID
-    int path;
+    // PATH
+    int pathIdx;
+    
+    // USER
+    int userIdx;    
 
+    // :NYI:HACK:
+    // UUID allocation called only from ARF input
+    // so far, only String identifiers are supported for ARF ids.
     public Sct1_IdRecord(UUID uuidPrimaryId, int sourceSystemIdx, String idFromSourceSystem,
-            int status, long revDateTime, int pathIdx) {
+            int status, long revDateTime, int pathIdx, int userIdx) {
         this.primaryUuidMsb = uuidPrimaryId.getMostSignificantBits(); // CONCEPTID/PRIMARYID
         this.primaryUuidLsb = uuidPrimaryId.getLeastSignificantBits(); // CONCEPTID/PRIMARYID
         this.srcSystemIdx = sourceSystemIdx;
         this.denotation = idFromSourceSystem;
+        this.denotationLong = Long.MAX_VALUE;
         this.status = status;
         this.revTime = revDateTime;
-        this.path = pathIdx;
+        this.pathIdx = pathIdx;
+        this.userIdx = userIdx;
+    }
+
+    // :NYI:HACK:
+    // long long UUID called only from SCT1 input
+    // in this case, the denotation is always long for the SNOMED_ID 
+    public Sct1_IdRecord(long uuidPrimaryMsb, long uuidPrimaryLsb, int sourceSystemIdx, long idFromSourceSystem,
+            int status, long revDateTime, int pathIdx, int uIdx) {
+        this.primaryUuidMsb = uuidPrimaryMsb; // MSB CONCEPTID/PRIMARYID
+        this.primaryUuidLsb = uuidPrimaryLsb; // LSB CONCEPTID/PRIMARYID
+        this.srcSystemIdx = sourceSystemIdx;
+        this.denotation = null;
+        this.denotationLong = idFromSourceSystem;
+        this.status = status;
+        this.revTime = revDateTime;
+        this.pathIdx = pathIdx;
+        this.userIdx = uIdx;
     }
 
     @Override
@@ -67,22 +92,27 @@ public class Sct1_IdRecord implements Comparable<Sct1_IdRecord>, Serializable {
             } else if (primaryUuidLsb < o.primaryUuidLsb) {
                 return thisLess;
             } else {
-                if (this.path > o.path) {
+                if (this.pathIdx > o.pathIdx) {
                     return thisMore;
-                } else if (this.path < o.path) {
+                } else if (this.pathIdx < o.pathIdx) {
                     return thisLess;
                 } else {
-                    if (this.revTime > o.revTime) {
+                    if (this.userIdx > o.userIdx) {
                         return thisMore;
-                    } else if (this.revTime < o.revTime) {
+                    } else if (this.userIdx < o.userIdx) {
                         return thisLess;
                     } else {
-                        return 0; // EQUAL
+                        if (this.revTime > o.revTime) {
+                            return thisMore;
+                        } else if (this.revTime < o.revTime) {
+                            return thisLess;
+                        } else {
+                            return 0; // EQUAL
+                        }
                     }
                 }
             }
         }
-    }
-    
+    }    
     
 }

@@ -1,7 +1,7 @@
 package org.ihtsdo.qa.store.model.view;
 
 public enum RulesReportColumn {
-	RULE_NAME(1), RULE_CODE(2), CATEGORY(3), SEVERITY(4), OPEN(5), CLOSED(6), ESCALATED(7), DEFERRED(8), CLEARED(9);
+	RULE_NAME(1), RULE_CODE(2), CATEGORY(3), SEVERITY(4), OPEN(5), CLOSED(6), ESCALATED(7), DEFERRED(8), CLEARED(9),IN_DISCUTION(10);
 
 	private Integer columnNumber;
 

@@ -1,21 +1,18 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
-		<version>2.6.0-trek-8-uktc-SNAPSHOT</version>
+		<version>2.6.0-trek-10-uktc-SNAPSHOT</version>
 	</parent>
-
 	<artifactId>tk-qa-ws-client</artifactId>
 	<packaging>jar</packaging>
 	<name>QA Database Web Service Client</name>
 	<url>http://maven.apache.org</url>
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
@@ -41,6 +38,56 @@
 	<build>
 		<sourceDirectory>${basedir}/src</sourceDirectory>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.axis2</groupId>
+				<artifactId>axis2-wsdl2code-maven-plugin</artifactId>
+				<version>1.5.2</version>
+				<executions>
+					<execution>
+						<phase>clean</phase>
+						<goals>
+							<goal>wsdl2code</goal>
+						</goals>
+						<configuration>
+							<packageName>org.ihtsdo.qadb.service</packageName>
+							<wsdlFile>${basedir}/resources/qadb-service.wsdl</wsdlFile>
+							<generateServerSide>true</generateServerSide>
+							<generateServicesXml>false</generateServicesXml>
+							<generateServerSideInterface>true</generateServerSideInterface>
+							<generateAllClasses>true</generateAllClasses>
+							<outputDirectory>${basedir}</outputDirectory>
+							<!-- <syncMode>sync</syncMode> -->
+							<overWrite>true</overWrite>
+							<packageName>org.ihtsdo.qadb.ws</packageName>
+							<namespaceURIs>
+								<namespaceURI>
+									<uri>http://schemas.xmlsoap.org/wsdl/soap/</uri>
+									<packageName>org.ihtsdo.qadb.soap</packageName>
+								</namespaceURI>
+								<namespaceURI>
+									<uri>http://www.ihtsdo.org/qadb/qadb-service/</uri>
+									<packageName>org.ihtsdo.qadb.ws.data</packageName>
+								</namespaceURI>
+								<namespaceURI>
+									<uri>http://www.w3.org/2004/06/xmlmime</uri>
+									<packageName>org.ihtsdo.qadb.ws.xmlmime</packageName>
+								</namespaceURI>
+								<namespaceURI>
+									<uri>http://schemas.xmlsoap.org/soap/encoding/</uri>
+									<packageName>org.ihtsdo.qadb.ws.soap</packageName>
+								</namespaceURI>
+							</namespaceURIs>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.axis2</groupId>
+						<artifactId>axis2</artifactId>
+						<version>1.5.2</version>
+					</dependency>
+				</dependencies>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>

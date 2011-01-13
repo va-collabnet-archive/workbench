@@ -2,6 +2,7 @@ package org.ihtsdo.qa.store;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -113,16 +114,82 @@ public class WsClientDataConverter {
 	}
 
 	public static void qaCaseFilterToWsQaCaseFilter(HashMap<QACasesReportColumn, Object> filter, IntStrKeyValue[] wsFilter) {
+	
 	}
 
-	public static void qaCaseSortToWsQaCaseSort(LinkedHashMap<QACasesReportColumn, Boolean> sortBy, IntBoolKeyValue[] wsSorteBy) {
+	public static IntBoolKeyValue[]  qaCaseSortToWsQaCaseSort(LinkedHashMap<QACasesReportColumn, Boolean> sorteBy) {
+		IntBoolKeyValue[] result = new IntBoolKeyValue[sorteBy.size()];
+		Set<QACasesReportColumn> keySet = sorteBy.keySet();
+		int j = 0;
+		for (QACasesReportColumn qaCasesReportColumn : keySet) {
+			IntBoolKeyValue sort = new IntBoolKeyValue();
+			sort.setKey(qaCasesReportColumn.getColumnNumber());
+			sort.setValue(sorteBy.get(qaCasesReportColumn));
+			result[j] = sort;
+			j++;
+		}
+		return result;
 	}
 
 	public static QACase wsCaseToCase(Case qaCase) {
 		QACase result = new QACase();
+		result.setCaseUuid(UUID.fromString(qaCase.getCaseUuid()));
+		result.setActive(qaCase.getIsActive());
 		result.setAssignedTo(qaCase.getAssignedTo());
+		if(qaCase.getComponent() != null){
+			result.setComponentUuid(UUID.fromString(qaCase.getComponent().getComponentUuid()));
+		}
+		if(qaCase.getDatabaseUuid() != null){
+			result.setDatabaseUuid(UUID.fromString(qaCase.getDatabaseUuid()));
+		}
+		result.setDetail(qaCase.getDetail());
+		result.setDispositionAnnotation(qaCase.getDispositionAnnotation());
+		try{
+			result.setDispositionReasonUuid(UUID.fromString(qaCase.getDispositionReasonUuid()));
+		}catch (Exception e) {}
+		result.setDispositionStatusDate(qaCase.getDispositionStatusDate());
+		result.setDispositionStatusEditor(qaCase.getDispositionStatusEditor());
+		result.setDispositionStatusUuid(UUID.fromString(qaCase.getDispositionStatus().getDispositionStatusUuid()));
+		result.setPathUuid(UUID.fromString(qaCase.getPathUuid()));
+		result.setRuleUuid(UUID.fromString(qaCase.getRule().getRuleUuid()));
 		result.setEffectiveTime(qaCase.getEffectiveTime());
 		result.setActive(qaCase.getIsActive());
+		return result;
+	}
+
+	public static Case caseToWsCase(QACase qaCase) {
+		Case result = new Case();
+		result.setAssignedTo(qaCase.getAssignedTo());
+		result.setCaseUuid(qaCase.getCaseUuid().toString());
+		
+		Component component = new Component();
+		if(qaCase.getComponentUuid() != null){
+			component.setComponentUuid(qaCase.getComponentUuid().toString());
+		}
+		result.setComponent(component );
+		if(qaCase.getDatabaseUuid() != null){
+			result.setDatabaseUuid(qaCase.getDatabaseUuid().toString());
+		}
+		result.setDetail(qaCase.getDetail());
+		result.setDispositionAnnotation(qaCase.getDispositionAnnotation());
+		if(qaCase.getDispositionReasonUuid() != null){
+			result.setDispositionReasonUuid(qaCase.getDispositionReasonUuid().toString());
+		}
+		org.ihtsdo.qadb.ws.data.DispositionStatus dispStatus = new org.ihtsdo.qadb.ws.data.DispositionStatus();
+		if(qaCase.getDispositionStatusUuid() != null){
+			dispStatus.setDispositionStatusUuid(qaCase.getDispositionStatusUuid().toString());
+		}
+		result.setDispositionStatus(dispStatus );
+		result.setDispositionStatusDate(qaCase.getDispositionStatusDate());
+		result.setDispositionStatusEditor(qaCase.getDispositionStatusEditor());
+		result.setEffectiveTime(qaCase.getEffectiveTime());
+		result.setIsActive(qaCase.isActive());
+		result.setPathUuid(qaCase.getPathUuid().toString());
+		org.ihtsdo.qadb.ws.data.Rule rule = new org.ihtsdo.qadb.ws.data.Rule();
+		if(qaCase.getRuleUuid() != null){
+			rule.setRuleUuid(qaCase.getRuleUuid().toString());
+		}
+		result.setRule(rule );
 		return result;
 	}
 

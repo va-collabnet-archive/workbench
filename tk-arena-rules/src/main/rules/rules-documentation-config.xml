@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<urlTemplate>file://rules/*</urlTemplate>
+	<rules>
+		<rule>
+			<uuid>e6e3fbd0-11f7-11e0-ac64-0800200c9a66</uuid>
+			<address>pages/item/e6e3fbd0-11f7-11e0-ac64-0800200c9a66.html</address>
+		</rule>
+		<rule>
+			<uuid>e6e3fbd0-11f7-11e0-ac64-0800200c9a67</uuid>
+			<address>pages/item/e6e3fbd0-11f7-11e0-ac64-0800200c9a67.html</address>
+		</rule>
+	</rules>
+</config>

@@ -64,7 +64,7 @@ import org.dwfa.util.id.Type5UuidFactory;
  * @requiresDependencyResolution compile
  * @requiresProject false
  */
-public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
+public class Rf1ToArfTextDefMojo extends AbstractMojo implements Serializable {
 
     /**
      * 
@@ -248,6 +248,7 @@ public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
         Iterator<List<RF1File>> dit = fileListList.iterator(); // Directory Iterator
         while (dit.hasNext()) {
             List<RF1File> fl = dit.next(); // File List
+            Collections.sort(fl);
             Iterator<RF1File> fit = fl.iterator(); // File Iterator 
             while (fit.hasNext()) {
                 RF1File f2 = fit.next();
@@ -259,7 +260,7 @@ public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
 
     private void processTextDefinitions(List<RF1File> fileList, BufferedWriter bwc)
             throws MojoFailureException, IOException, NoSuchAlgorithmException {
-        // :!!!: does this need to be added Collections.sort(fileListList);
+        Collections.sort(fileList);
 
         int count1, count2; // records in arrays 1 & 2
         String fName1, fName2; // file path name
@@ -393,7 +394,10 @@ public class Rf1ToArfTextDef extends AbstractMojo implements Serializable {
             return 3; // ADDED instance greater than received
 
         } else {
-            return 1; // SAME
+            if (a1.status == a2.status && a1.definition.contentEquals(a2.definition))
+                return 1; // SAME
+            else
+                return 2; // MODIFIED
         }
     }
 

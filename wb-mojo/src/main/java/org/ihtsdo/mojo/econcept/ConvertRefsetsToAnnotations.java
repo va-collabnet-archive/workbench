@@ -23,6 +23,7 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -42,6 +43,12 @@ import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
  */
 public class ConvertRefsetsToAnnotations extends AbstractMojo {
 
+    /**
+     * Watch concepts
+     * 
+     * @parameter
+     */
+    private List<ConceptDescriptor> conceptsToWatch;
     /**
      * Refsets to convert
      * 
@@ -70,7 +77,6 @@ public class ConvertRefsetsToAnnotations extends AbstractMojo {
      * @required
      */
     private String outputDir;
-    
     private AtomicInteger conceptsRead = new AtomicInteger();
 
     @Override
@@ -89,6 +95,16 @@ public class ConvertRefsetsToAnnotations extends AbstractMojo {
             for (ConceptDescriptor cd : refsetsToConvert) {
                 refsetsToConvertMap.put(UUID.fromString(cd.getUuid()), cd);
             }
+
+            HashMap<UUID, ConceptDescriptor> conceptsToWatchMap =
+                    new HashMap<UUID, ConceptDescriptor>();
+
+            if (conceptsToWatch != null) {
+                for (ConceptDescriptor cd : conceptsToWatch) {
+                    conceptsToWatchMap.put(UUID.fromString(cd.getUuid()), cd);
+                }
+            }
+
 
             for (String fname : conceptsFileNames) {
                 File conceptsInFile = new File(inputDir, fname);
@@ -112,31 +128,48 @@ public class ConvertRefsetsToAnnotations extends AbstractMojo {
                 try {
                     System.out.print(conceptsRead + "-");
                     while (true) {
+                        boolean foundWatchConcept = false;
+                        String watchConceptStr = "";
                         EConcept eConcept = new EConcept(in);
-                        if (refsetsToConvertMap.containsKey(eConcept.primordialUuid)) {
-                            ConceptDescriptor cd = refsetsToConvertMap.get(eConcept.primordialUuid);
-                            boolean found = false;
-                            for (TkDescription desc : eConcept.descriptions) {
-                                if (cd.getDescription().equals(desc.getText())) {
-                                    found = true;
-                                    System.out.println("\nFound: " + cd);
-                                    System.out.println("Member Count: "
-                                            + eConcept.getRefsetMembers().size());
-                                    eConcept.writeExternal(aodos);
-                                    eConcept.getRefsetMembers().clear();
-                                    eConcept.setAnnotationStyleRefset(true);
-                                    break;
-                                }
-                            }
-                            if (!found) {
+                        if (conceptsToWatchMap.containsKey(eConcept.primordialUuid)) {
+                            ConceptDescriptor cd = conceptsToWatchMap.get(eConcept.primordialUuid);
+                            foundWatchConcept = validateConceptDescriptor(eConcept, cd);
+                            if (!foundWatchConcept) {
                                 throw new MojoExecutionException("No desc for concept: "
                                         + eConcept + "\n\nConcept descriptor: \n"
                                         + cd);
                             }
+                            watchConceptStr = eConcept.toString();
+                            getLog().info("Found watch concept before: " + watchConceptStr);
+                        }
+                        if (refsetsToConvertMap.containsKey(eConcept.primordialUuid)) {
+                            ConceptDescriptor cd = refsetsToConvertMap.get(eConcept.primordialUuid);
+                            boolean found = validateConceptDescriptor(eConcept, cd);
+                            if (found) {
+                                if (eConcept.getRefsetMembers() != null) {
+                                    System.out.println("Member Count: "
+                                            + eConcept.getRefsetMembers().size());
+                                    eConcept.writeExternal(aodos);
+                                    eConcept.getRefsetMembers().clear();
+                                } else {
+                                    System.out.println("Null Refset Members. ");
+                                }
 
-
+                            } else {
+                                throw new MojoExecutionException("No desc for concept: "
+                                        + eConcept + "\n\nConcept descriptor: \n"
+                                        + cd);
+                            }
+                            eConcept.setAnnotationStyleRefset(true);
                         }
                         eConcept.writeExternal(codos);
+                        if (foundWatchConcept) {
+                            if (watchConceptStr.equals(eConcept.toString())) {
+                                getLog().info("Found watch concept after unchanged.");
+                            } else {
+                                getLog().info("Found watch concept after CHANGED: " + eConcept.toString());
+                            }
+                        }
                         int read = conceptsRead.incrementAndGet();
                         if (read % 1000 == 0) {
                             if (read % 80000 == 0) {
@@ -164,5 +197,18 @@ public class ConvertRefsetsToAnnotations extends AbstractMojo {
             throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
         }
 
+    }
+
+    private boolean validateConceptDescriptor(EConcept eConcept,
+            ConceptDescriptor cd) throws IOException {
+        boolean found = false;
+        for (TkDescription desc : eConcept.descriptions) {
+            if (cd.getDescription().equals(desc.getText())) {
+                found = true;
+                System.out.println("\nFound: " + cd);
+                break;
+            }
+        }
+        return found;
     }
 }

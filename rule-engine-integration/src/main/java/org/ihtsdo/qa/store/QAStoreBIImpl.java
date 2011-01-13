@@ -34,6 +34,7 @@ import org.ihtsdo.qadb.ws.data.AllPathsForDatabaseResponse;
 import org.ihtsdo.qadb.ws.data.AllPathsResponse;
 import org.ihtsdo.qadb.ws.data.AllRulesResponse;
 import org.ihtsdo.qadb.ws.data.AllSeveritiesResponse;
+import org.ihtsdo.qadb.ws.data.Case;
 import org.ihtsdo.qadb.ws.data.Component;
 import org.ihtsdo.qadb.ws.data.ComponentRequest;
 import org.ihtsdo.qadb.ws.data.ComponentResponse;
@@ -41,6 +42,7 @@ import org.ihtsdo.qadb.ws.data.Database;
 import org.ihtsdo.qadb.ws.data.DispositionStatusCount_type0;
 import org.ihtsdo.qadb.ws.data.IntBoolKeyValue;
 import org.ihtsdo.qadb.ws.data.IntStrKeyValue;
+import org.ihtsdo.qadb.ws.data.PersistQACaseRequest;
 import org.ihtsdo.qadb.ws.data.QACasesReportLinesByPageRequest;
 import org.ihtsdo.qadb.ws.data.QACasesReportLinesByPageResponse;
 import org.ihtsdo.qadb.ws.data.QADatabaseRequest;
@@ -52,10 +54,17 @@ import org.ihtsdo.qadb.ws.data.WsQACasesReportLine;
 
 public class QAStoreBIImpl implements QAStoreBI {
 	
-	private String url = "http://localhost:8080/axis2/services/qadb-service";
+	private String url = "http://mgr.servers.aceworkspace.net:50008/axis2/services/qadb-service";
 	
 	public QAStoreBIImpl(String url) {
-		this.url = url;
+		System.out.println("#######################################################");
+		System.out.println();
+		System.out.println(url);
+		System.out.println();
+		System.out.println("#######################################################");
+		if(url != null){
+			this.url = url;
+		}
 	}
 
 	public QAStoreBIImpl() {
@@ -462,7 +471,8 @@ public class QAStoreBIImpl implements QAStoreBI {
 			IntStrKeyValue[] wsFilter = null;
 			WsClientDataConverter.qaCaseFilterToWsQaCaseFilter(filter, wsFilter);
 			IntBoolKeyValue[] wsSorteBy = null;
-			WsClientDataConverter.qaCaseSortToWsQaCaseSort(sortBy, wsSorteBy);
+			
+			wsSorteBy = WsClientDataConverter.qaCaseSortToWsQaCaseSort(sortBy);
 			
 			org.ihtsdo.qadb.ws.data.QACoordinate wsQaCoord = new org.ihtsdo.qadb.ws.data.QACoordinate(); 
 			WsClientDataConverter.qaCoordinateToWsQaCoordinate(qaCoordinate, wsQaCoord);
@@ -470,8 +480,8 @@ public class QAStoreBIImpl implements QAStoreBI {
 			request.setFilter(wsFilter);
 			request.setQaCoordinate(wsQaCoord);
 			request.setSorteBy(wsSorteBy);
-			request.setStartLine(12);
-			request.setPageLenght(123);
+			request.setStartLine(startLine);
+			request.setPageLenght(pageLenght);
 			request.setRuleUuid(ruleUuid.toString());
 			QACasesReportLinesByPageResponse wsResponse = service.getQACasesReportLinesByPage(request);
 			
@@ -483,14 +493,15 @@ public class QAStoreBIImpl implements QAStoreBI {
 			reportPage.setInitialLine(wsResponse.getInitialLine());
 			WsQACasesReportLine[] wslines = wsResponse.getLines();
 			List<QACasesReportLine> lines = new ArrayList<QACasesReportLine>();
-			for (WsQACasesReportLine wsQACasesReportLine : wslines) {
-				
-				QACase qaCase = WsClientDataConverter.wsCaseToCase(wsQACasesReportLine.getQaCase());
-				TerminologyComponent component = WsClientDataConverter.wsComponentToTerminologyComponent(wsQACasesReportLine.getComponent());
-				DispositionStatus disposition = WsClientDataConverter.wsDipsStatusToDispStatus(wsQACasesReportLine.getDispositionStatus());
-				QACasesReportLine line = new QACasesReportLine(qaCase, component, disposition);
-				lines.add(line);
-				
+			if(wslines != null){
+				for (WsQACasesReportLine wsQACasesReportLine : wslines) {
+					QACase qaCase = WsClientDataConverter.wsCaseToCase(wsQACasesReportLine.getQaCase());
+					TerminologyComponent component = WsClientDataConverter.wsComponentToTerminologyComponent(wsQACasesReportLine.getComponent());
+					DispositionStatus disposition = WsClientDataConverter.wsDipsStatusToDispStatus(wsQACasesReportLine.getDispositionStatus());
+					QACasesReportLine line = new QACasesReportLine(qaCase, component, disposition);
+					lines.add(line);
+					
+				}
 			}
 			reportPage.setLines(lines);
 			
@@ -559,8 +570,18 @@ public class QAStoreBIImpl implements QAStoreBI {
 
 	@Override
 	public void persistQACase(QACase qaCase) {
-		// TODO Auto-generated method stub
-
+		try {
+			QadbServiceStub service = new QadbServiceStub(url);
+			PersistQACaseRequest request = new PersistQACaseRequest();
+			
+			Case wsQaCase = WsClientDataConverter.caseToWsCase(qaCase);
+			request.setQaCase(wsQaCase);
+			service.persistQACase(request);
+		} catch (AxisFault e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override

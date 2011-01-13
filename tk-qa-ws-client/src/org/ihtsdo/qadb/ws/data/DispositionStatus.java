@@ -68,6 +68,12 @@
                         
                                     protected java.lang.String localName ;
                                 
+                           /*  This tracker boolean wil be used to detect whether the user called the set method
+                          *   for this attribute. It will be used to determine whether to include this field
+                           *   in the serialized XML
+                           */
+                           protected boolean localNameTracker = false ;
+                           
 
                            /**
                            * Auto generated getter method
@@ -85,6 +91,14 @@
                                */
                                public void setName(java.lang.String param){
                             
+                                       if (param != null){
+                                          //update the setting tracker
+                                          localNameTracker = true;
+                                       } else {
+                                          localNameTracker = false;
+                                              
+                                       }
+                                   
                                             this.localName=param;
                                     
 
@@ -221,7 +235,7 @@
                                           }
                                     
                                    xmlWriter.writeEndElement();
-                             
+                              if (localNameTracker){
                                     namespace = "";
                                     if (! namespace.equals("")) {
                                         prefix = xmlWriter.getPrefix(namespace);
@@ -255,7 +269,7 @@
                                           }
                                     
                                    xmlWriter.writeEndElement();
-                             
+                             }
                     xmlWriter.writeEndElement();
                
 
@@ -426,7 +440,7 @@
                                         } else {
                                            throw new org.apache.axis2.databinding.ADBException("dispositionStatusUuid cannot be null!!");
                                         }
-                                    
+                                     if (localNameTracker){
                                       elementList.add(new javax.xml.namespace.QName("",
                                                                       "name"));
                                  
@@ -435,7 +449,7 @@
                                         } else {
                                            throw new org.apache.axis2.databinding.ADBException("name cannot be null!!");
                                         }
-                                    
+                                    }
 
                 return new org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl(qName, elementList.toArray(), attribList.toArray());
             
@@ -544,11 +558,10 @@
                                     
                               }  // End of if for expected property start element
                                 
-                                else{
-                                    // A start element we are not expecting indicates an invalid parameter was passed
-                                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getLocalName());
-                                }
-                              
+                                    else {
+                                        
+                                    }
+                                  
                             while (!reader.isStartElement() && !reader.isEndElement())
                                 reader.next();
                             

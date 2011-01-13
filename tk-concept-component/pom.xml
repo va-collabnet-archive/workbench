@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<!--
 		! Copyright (c) 2010 International Health Terminology Standards
@@ -11,17 +12,16 @@
 		License for the specific language governing permissions and !
 		limitations under the License.
 	-->
-
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
-		<version>2.6.0-trek-8-uktc-SNAPSHOT</version>
+		<version>2.6.0-trek-10-uktc-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>tk-concept-component</artifactId>
 	<name>Toolkit Concepts &amp; Concept Components</name>
-    <dependencies>
-	    <dependency>
+	<dependencies>
+		<dependency>
 			<groupId>org.drools</groupId>
 			<artifactId>drools-core</artifactId>
 			<version>${drools.version}</version>
@@ -46,14 +46,14 @@
 			<version>3.4.2.v_883_R34x</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.antlr</groupId>
-		    <artifactId>antlr-runtime</artifactId>
-		    <version>3.1.3</version>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr-runtime</artifactId>
+			<version>3.1.3</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.mvel</groupId>
-		    <artifactId>mvel2</artifactId>
-		    <version>2.0.10</version>
+			<groupId>org.mvel</groupId>
+			<artifactId>mvel2</artifactId>
+			<version>2.0.10</version>
 		</dependency>
-    </dependencies>
-</project>    
+	</dependencies>
+</project>
