@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -204,7 +204,7 @@ public class CollectionEditorContainer extends JPanel {
 
     int lastDividerLocation = -1;
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
     private JComponent processBuilder;
@@ -226,7 +226,7 @@ public class CollectionEditorContainer extends JPanel {
         this.ace = ace;
         this.list = list;
         this.processBuilder = descListProcessBuilderPanel;
-        conceptPanel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_LIST_VIEW, ace, 
+        conceptPanel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_LIST_VIEW, ace,
         		LINK_TYPE.LIST_LINK, true,
             Integer.MIN_VALUE);
         conceptPanel.setLinkedList(list);
@@ -353,8 +353,6 @@ public class CollectionEditorContainer extends JPanel {
             }
         }
 
-        listEditorTopPanel.add(new Toggle32x32(new ImageIcon(ACE.class.getResource("/32x32/plain/branch_delete.png"))),
-            c);
         return listEditorTopPanel;
 
     }
