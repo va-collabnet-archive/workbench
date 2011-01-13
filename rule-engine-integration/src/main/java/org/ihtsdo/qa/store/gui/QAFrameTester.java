@@ -20,8 +20,8 @@ public class QAFrameTester {
 		frame.setPreferredSize(new Dimension(1024,768));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		frame.getContentPane().add(new QAStorePanel(new QAStoreBIImpl()), BorderLayout.CENTER);
-		//frame.getContentPane().add(new QAStorePanel(new QAStoreStubImpl()), BorderLayout.CENTER);
+		//frame.getContentPane().add(new QAStorePanel(new QAStoreBIImpl()), BorderLayout.CENTER);
+		frame.getContentPane().add(new QAStorePanel(new QAStoreStubImpl()), BorderLayout.CENTER);
 
 		//Display the window.
 		frame.pack();
