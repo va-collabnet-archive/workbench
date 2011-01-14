@@ -9,7 +9,7 @@
     <groupId>org.ihtsdo</groupId>
     <artifactId>wb-mmb</artifactId>
     <version>2.6.2-trek-rsrb-4-SNAPSHOT</version>
-    <name>${branch}: Workbench modules multi-module build</name>
+    <name>${branch}: (MMP) Workbench Toolkit</name>
     <packaging>pom</packaging>
     <description>multi-module build for the Workbench modules (dwfa-pom, foundation, 
                  dwfa-mojo, core, ace-api, vodb and term-mojo)
@@ -20,7 +20,7 @@
         <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/branches/wb-toolkit_trek-rsrb/?root=workbench;&amp;system=exsy1002</url>
     </scm>
     <properties>
-        <branch>trek-rsrb</branch>
+        <branch>rsrb</branch>
         <ace.devstyle.version>1.1-SNAPSHOT</ace.devstyle.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <drools.version>5.1.1</drools.version>
