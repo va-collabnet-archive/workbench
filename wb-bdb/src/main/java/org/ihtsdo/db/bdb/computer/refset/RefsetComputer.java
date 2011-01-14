@@ -52,6 +52,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             this.computer = computer;
         }
 
+      @Override
         public void actionPerformed(ActionEvent e) {
             canceled = true;
             List<ParallelConceptIterator> pcis = computer.getParallelConceptIterators();
@@ -62,6 +63,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
                 a.cancel();
                 a.setProgressInfoLower("Cancelled.");
             }
+            activity.removeStopActionListener(this);
         }
     }
 
@@ -88,7 +90,8 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
     private I_ConfigAceFrame frameConfig;
     private RefsetSpec specHelper;
     private ComputeType computeType;
-	private IsaCache isaCache;
+	 private IsaCache isaCache;
+    private StopActionListener stopListener;
 
     public RefsetComputer(int refsetNid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig,
             I_RepresentIdSet possibleIds, HashSet<I_ShowActivity> activities) throws Exception {
@@ -104,12 +107,14 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         conceptCount = possibleIds.cardinality();
 
         activity =
-                Terms.get().newActivityPanel(true, frameConfig, "Computing refset: " + refsetConcept.toString(), true);
+                Terms.get().newActivityPanel(true, frameConfig, 
+                "Computing refset: " + refsetConcept.toString(), true);
         activities.add(activity);
         activity.setIndeterminate(true);
         activity.setProgressInfoUpper("Computing refset: " + refsetConcept.toString());
         activity.setProgressInfoLower("Setting up the computer...");
-        activity.addStopActionListener(new StopActionListener(this));
+        stopListener = new StopActionListener(this);
+        activity.addStopActionListener(stopListener);
         ActivityViewer.addActivity(activity);
 
         this.query = query;
@@ -316,6 +321,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             }
         }
         activity.complete();
+        activity.removeStopActionListener(this.stopListener);
     }
 
     public AtomicInteger getProcessedCount() {
