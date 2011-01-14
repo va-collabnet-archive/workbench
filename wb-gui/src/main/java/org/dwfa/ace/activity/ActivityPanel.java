@@ -75,11 +75,11 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
                    // nothing to report. ;
                }
            }
-           
+           showActivityListeners.clear();
            for (ActionListener sal: stopActionListeners.keySet()) {
                sal.actionPerformed(e);
            }
-            
+           stopActionListeners.clear();
         }
         
     }
@@ -528,5 +528,10 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
 				// Nothing to do...
 			}
         }
+        showActivityListeners.clear();
+        for (ActionListener sal2: stopActionListeners.keySet()) {
+           sal2.actionPerformed(null);
+        }
+        stopActionListeners.clear();
     }
 }
