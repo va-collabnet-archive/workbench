@@ -46,16 +46,13 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
 	private enum ComputeType { CONCEPT, DESCRIPTION };
     public class StopActionListener implements ActionListener {
 
-        RefsetComputer computer;
-
-        public StopActionListener(RefsetComputer computer) {
-            this.computer = computer;
+        public StopActionListener() {
         }
 
       @Override
         public void actionPerformed(ActionEvent e) {
             canceled = true;
-            List<ParallelConceptIterator> pcis = computer.getParallelConceptIterators();
+            List<ParallelConceptIterator> pcis = getParallelConceptIterators();
             for (ParallelConceptIterator pci : pcis) {
                 pci.stop();
             }
@@ -113,7 +110,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         activity.setIndeterminate(true);
         activity.setProgressInfoUpper("Computing refset: " + refsetConcept.toString());
         activity.setProgressInfoLower("Setting up the computer...");
-        stopListener = new StopActionListener(this);
+        stopListener = new StopActionListener();
         activity.addStopActionListener(stopListener);
         ActivityViewer.addActivity(activity);
 
