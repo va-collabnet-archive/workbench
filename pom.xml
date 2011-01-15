@@ -36,9 +36,9 @@
         needs of their end users.
     </description>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-2.6.0-trek-8</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-2.6.0-trek-8</developerConnection>
-        <url>https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-2.6.0-trek-8</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit_trek</connection>
+        <developerConnection>https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit_trek</developerConnection>
+        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/branches/wb-toolkit_trek/?root=workbench&amp;system=exsy1002</url>
     </scm>
     <properties>
         <branch>trek</branch>
@@ -46,7 +46,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <drools.version>5.1.1</drools.version>
         <org.apache.lucene.version>3.0.3</org.apache.lucene.version>
-        <wb-icons-version>1.0.3</wb-icons-version>
+        <wb-icons-version>1.0.4-SNAPSHOT</wb-icons-version>
         <je.version>4.1.6</je.version>
         <svnusername>${relusername}</svnusername>
         <svnpassword>${relpassword}</svnpassword>
