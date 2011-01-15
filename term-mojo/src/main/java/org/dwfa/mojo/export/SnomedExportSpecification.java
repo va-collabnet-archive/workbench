@@ -268,7 +268,8 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
      *
      * for each of the latest concept descriptions
      * get latest active descriptions for a preferred, synonyms and unspecifieds terms
-     * If the extension is inactive, check the description is inactive
+     * If the extension is active and preferred check the description is still the preferred term
+     * If the extension is active and acceptable check the description is not US term
      * If the extension is active, check the description is active
      *
      * @param componentDto ComponentDto
@@ -291,39 +292,51 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
 
                 extensionSet.put(currentDescription.getDescId(), currentLanguageExtensions);
                 I_ThinExtByRefPartConcept latestPart = (I_ThinExtByRefPartConcept) TupleVersionPart.getLatestPart(currentLanguageExtensions.getVersions());
-                // retire inactive descriptions and active US terms that are Acceptable type
-                if (!editedNationally && (getLangaugeType(currentDescription.getTypeId()) == rf2AcceptableDescriptionTypeNid
-                        && currentDescription.getLang().equals(EN_US) && check.isActive(latestPart.getStatusId()))
-                        || (!check.isDescriptionActive(currentDescription.getStatusId()) && check.isActive(latestPart.getStatusId()))) {
-                    I_ThinExtByRefPartConcept updatedPart = (I_ThinExtByRefPartConcept) latestPart.duplicate();
-                    currentLanguageExtensions.addVersion(updatedPart);
-                    updatedPart.setStatusId(retiredConcept.getNid());
-                    updatedPart.setPathId(releasePart.getPathId());
-                    updatedPart.setVersion(releasePart.getVersion());
-                // Check for status or type update
-                } else if (!editedNationally && ((check.isDescriptionActive(currentDescription.getStatusId()) && !check.isActive(latestPart.getStatusId()))
-                                || (check.isDescriptionActive(currentDescription.getStatusId()) && latestPart.getC1id() != getLangaugeType(currentDescription.getTypeId())))
-                                && ! (getLangaugeType(currentDescription.getTypeId()) == rf2AcceptableDescriptionTypeNid
-                                        && currentDescription.getLang().equals(EN_US))) {
-                    int status = (check.isDescriptionActive(currentDescription.getStatusId())) ? activeConcept.getNid() : retiredConcept.getNid();
-                    I_ThinExtByRefPartConcept updatedPart = (I_ThinExtByRefPartConcept) latestPart.duplicate();
-                    currentLanguageExtensions.addVersion(updatedPart);
-                    updatedPart.setStatusId(status);
-                    // only update the type if active
-                    if (status == activeConcept.getNid()) {
-                        updatedPart.setC1id(getLangaugeType(currentDescription.getTypeId()));
+
+                //Leave edited extension as is
+                if (!editedNationally) {
+                    //Retire extensions for inactive descriptions
+                    if (!check.isDescriptionActive(currentDescription.getStatusId()) && check.isActive(latestPart.getStatusId())) {
+                        retireExtension(currentLanguageExtensions, latestPart);
+                    //If extension is active so is the description
+                    } else if(check.isActive(latestPart.getStatusId())) {
+                        if (getLangaugeType(currentDescription.getTypeId()) == rf2PreferredDescriptionTypeNid){
+                            if (currentDescription.getDescId() != latestPreferredTerm.getDescId()) {
+                                retireExtension(currentLanguageExtensions, latestPart);
+                            }
+                        } else if(getLangaugeType(currentDescription.getTypeId()) == rf2AcceptableDescriptionTypeNid) {
+                            if (currentDescription.getLang().equals(EN_US)) {
+                                retireExtension(currentLanguageExtensions, latestPart);
+                            } else if(latestPart.getC1id() != getLangaugeType(currentDescription.getTypeId())){
+                                I_ThinExtByRefPartConcept updatedPart = (I_ThinExtByRefPartConcept) latestPart.duplicate();
+                                currentLanguageExtensions.addVersion(updatedPart);
+                                updatedPart.setC1id(getLangaugeType(currentDescription.getTypeId()));
+                                updatedPart.setPathId(releasePart.getPathId());
+                                updatedPart.setVersion(releasePart.getVersion());
+                            }
+                        }
+                    //If the description is active the extension is not
+                    } else if (check.isDescriptionActive(currentDescription.getStatusId())) {
+                        if (getLangaugeType(currentDescription.getTypeId()) == rf2PreferredDescriptionTypeNid){
+                            if (currentDescription.getDescId() == latestPreferredTerm.getDescId()) {
+                                I_ThinExtByRefPartConcept updatedPart = (I_ThinExtByRefPartConcept) latestPart.duplicate();
+                                currentLanguageExtensions.addVersion(updatedPart);
+                                updatedPart.setStatusId(activeConcept.getNid());
+                                updatedPart.setC1id(getLangaugeType(currentDescription.getTypeId()));
+                                updatedPart.setPathId(releasePart.getPathId());
+                                updatedPart.setVersion(releasePart.getVersion());
+                            }
+                        } else if(getLangaugeType(currentDescription.getTypeId()) == rf2AcceptableDescriptionTypeNid) {
+                            if (!currentDescription.getLang().equals(EN_US)) {
+                                I_ThinExtByRefPartConcept updatedPart = (I_ThinExtByRefPartConcept) latestPart.duplicate();
+                                currentLanguageExtensions.addVersion(updatedPart);
+                                updatedPart.setStatusId(activeConcept.getNid());
+                                updatedPart.setC1id(getLangaugeType(currentDescription.getTypeId()));
+                                updatedPart.setPathId(releasePart.getPathId());
+                                updatedPart.setVersion(releasePart.getVersion());
+                            }
+                        }
                     }
-                    updatedPart.setPathId(releasePart.getPathId());
-                    updatedPart.setVersion(releasePart.getVersion());
-                // retire old preferred terms.
-                } else if (check.isActive(latestPart.getStatusId())
-                        && latestPart.getC1id() == rf2PreferredDescriptionTypeNid
-                        && currentLanguageExtensions.getComponentId() != latestPreferredTerm.getDescId()) {
-                    I_ThinExtByRefPartConcept updatedPart = (I_ThinExtByRefPartConcept) latestPart.duplicate();
-                    currentLanguageExtensions.addVersion(updatedPart);
-                    updatedPart.setStatusId(retiredConcept.getNid());
-                    updatedPart.setPathId(releasePart.getPathId());
-                    updatedPart.setVersion(releasePart.getVersion());
                 }
 
                 componentDto.getDescriptionExtensionDtos().addAll(
@@ -348,6 +361,20 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
                 setAdrsExtension(componentDto, acceptableDescriptionTuple, rf2AcceptableDescriptionTypeNid);
             }
         }
+    }
+
+    /**
+     * Creates a retired version for the extension
+     *
+     * @param currentLanguageExtensions I_ThinExtByRefVersioned
+     * @param latestPart I_ThinExtByRefPartConcept
+     */
+    private void retireExtension(I_ThinExtByRefVersioned currentLanguageExtensions, I_ThinExtByRefPartConcept latestPart) {
+        I_ThinExtByRefPartConcept updatedPart = (I_ThinExtByRefPartConcept) latestPart.duplicate();
+        currentLanguageExtensions.addVersion(updatedPart);
+        updatedPart.setStatusId(retiredConcept.getNid());
+        updatedPart.setPathId(releasePart.getPathId());
+        updatedPart.setVersion(releasePart.getVersion());
     }
 
     /**
