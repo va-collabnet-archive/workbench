@@ -99,7 +99,7 @@ public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
 				} else {
 					throw new UnsupportedOperationException("Can't convert: " + value1);
 				}
-				ViewCoordinate coordinate = possibleKind.getCoordinate();	
+				ViewCoordinate coordinate = possibleKind.getViewCoordinate();	
 				ConceptVersionBI parentKind = null;
 				
 				if (ConceptVersionBI.class.isAssignableFrom(value2.getClass())) {

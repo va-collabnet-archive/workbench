@@ -18,36 +18,13 @@
 		<version>2.6.0-trek-12-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>tk-concept-component</artifactId>
-	<name>${branch}: Toolkit DTOs &amp; API </name>
+	<artifactId>tk-helpers</artifactId>
+	<name>${branch}: Toolkit Helpers</name>
     <dependencies>
 	    <dependency>
-			<groupId>org.drools</groupId>
-			<artifactId>drools-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.drools</groupId>
-			<artifactId>drools-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.drools</groupId>
-			<artifactId>drools-compiler</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.drools</groupId>
-			<artifactId>drools-templates</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jdt</groupId>
-			<artifactId>core</artifactId>
-		</dependency>
-		<dependency>
-		    <groupId>org.antlr</groupId>
-		    <artifactId>antlr-runtime</artifactId>
-		</dependency>
-		<dependency>
-		    <groupId>org.mvel</groupId>
-		    <artifactId>mvel2</artifactId>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>tk-concept-component</artifactId>
+			<version>${project.version}</version>
 		</dependency>
     </dependencies>
 </project>    

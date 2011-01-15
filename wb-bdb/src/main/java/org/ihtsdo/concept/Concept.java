@@ -1563,6 +1563,21 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 			ViewCoordinate xyz) throws IOException {
 		return getConceptAttributes().getCurrentRefexes(xyz);
 	}
+   
+   
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc) 
+           throws IOException {
+		Collection<? extends RefexChronicleBI<?>> refexes = getRefsetMembers();
+        List<RefexVersionBI<?>> returnValues = new ArrayList<RefexVersionBI<?>>(refexes.size());
+        for (RefexChronicleBI<?> refex: refexes) {
+        	for (RefexVersionBI<?> version: refex.getVersions(vc)) {
+        		returnValues.add(version);
+        	}
+        }
+        return Collections.unmodifiableCollection(returnValues);
+   }
+
 
 	@Override
 	public boolean addAnnotation(RefexChronicleBI<?> annotation) throws IOException {

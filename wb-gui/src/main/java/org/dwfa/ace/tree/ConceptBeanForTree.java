@@ -57,8 +57,6 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
-import org.ihtsdo.tk.api.amend.InvalidAmendmentSpec;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
 import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -71,6 +69,14 @@ import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 
 public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<ConceptBeanForTree> {
     I_GetConceptData bean;
+
+   public Collection<? extends RefexChronicleBI<?>> getRefsetMembers() throws IOException {
+      return bean.getRefsetMembers();
+   }
+
+   public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc) throws IOException {
+      return bean.getCurrentRefsetMembers(vc);
+   }
 
     public boolean isUncommitted() {
         return bean.isUncommitted();

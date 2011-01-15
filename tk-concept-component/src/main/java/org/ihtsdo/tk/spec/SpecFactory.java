@@ -14,11 +14,12 @@ public class SpecFactory {
 	}
 	
 	public static DescriptionSpec get(DescriptionVersionBI desc) throws IOException {
-		
-		return new DescriptionSpec(desc.getUUIDs().toArray(new UUID[]{}), 
+		DescriptionSpec ds = new DescriptionSpec(desc.getUUIDs().toArray(new UUID[]{}), 
 				get(Ts.get().getConcept(desc.getConceptNid())), 
 				get(Ts.get().getConcept(desc.getTypeNid())), 
 				desc.getText());
+      ds.setLangText(desc.getText());
+      return ds;
 	}
 
 }

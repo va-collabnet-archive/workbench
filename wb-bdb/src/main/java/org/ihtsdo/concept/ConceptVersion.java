@@ -92,7 +92,7 @@ public class ConceptVersion implements ConceptVersionBI {
     }
 
     @Override
-    public ViewCoordinate getCoordinate() {
+    public ViewCoordinate getViewCoordinate() {
         return xyz;
     }
 
@@ -638,7 +638,21 @@ public class ConceptVersion implements ConceptVersionBI {
     public ConceptChronicleBI getChronicle() {
         return concept;
     }
-    
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers() throws IOException {
+      return concept.getCurrentRefsetMembers(xyz);
+   }
+
+   @Override
+   public Collection<? extends RefexChronicleBI<?>> getRefsetMembers() throws IOException {
+      return concept.getRefsetMembers();
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc) throws IOException {
+      return concept.getCurrentRefsetMembers(vc);
+   }
  }
     
 		

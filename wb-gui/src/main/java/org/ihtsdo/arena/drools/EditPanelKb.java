@@ -38,6 +38,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.drools.IsKindOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsMemberOfEvaluatorDefinition; //TODO this
+import org.ihtsdo.tk.drools.IsMissingDescForDialectEvaluatorDefinition;
 import org.ihtsdo.tk.drools.SatisfiesConstraintEvaluatorDefinition;
 import org.ihtsdo.tk.spec.SpecBI;
 
@@ -79,9 +80,12 @@ public class EditPanelKb implements Runnable {
 			builderConfig.setOption(EvaluatorOption.get(
 					SatisfiesConstraintEvaluatorDefinition.SATISFIES_CONSTRAINT.getOperatorString(),
 					new SatisfiesConstraintEvaluatorDefinition()));
-			builderConfig.setOption(EvaluatorOption.get( //TODO this
+			builderConfig.setOption(EvaluatorOption.get( 
 					IsMemberOfEvaluatorDefinition.IS_MEMBER_OF.getOperatorString(),
 					new IsMemberOfEvaluatorDefinition()));
+			builderConfig.setOption(EvaluatorOption.get( 
+					IsMissingDescForDialectEvaluatorDefinition.IS_MISSING_DESC_FOR.getOperatorString(),
+					new IsMissingDescForDialectEvaluatorDefinition()));
 			
 			KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
 

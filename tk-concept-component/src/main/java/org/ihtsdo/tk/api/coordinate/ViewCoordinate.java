@@ -7,7 +7,7 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 
 public class ViewCoordinate {
-
+   
     private Precedence precedence;
     private PositionSetBI positionSet;
     private NidSetBI allowedStatusNids;

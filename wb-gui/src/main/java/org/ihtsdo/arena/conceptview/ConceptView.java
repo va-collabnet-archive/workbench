@@ -114,6 +114,27 @@ public class ConceptView extends JPanel {
                         gbc.gridy = 0;
 
 
+                        CollapsePanel cpe = new CollapsePanel("concept", settings);
+                        add(cpe, gbc);
+                        gbc.gridy++;
+                        I_TermFactory tf = Terms.get();
+
+                        //get refsets
+                        List<? extends I_ExtendByRef> memberRefsets = tf.getAllExtensionsForComponent(concept.getConceptNid());
+
+                        if (memberRefsets != null) {
+                            for (I_ExtendByRef extn : memberRefsets) {
+                                int refsetNid = extn.getRefsetId();
+                                List<? extends I_ExtendByRefPart> currentRefsets = tf.getRefsetHelper(config).getAllCurrentRefsetExtensions(refsetNid, concept.getConceptNid());
+                                for (I_ExtendByRefPart cr : currentRefsets) {
+                                    DragPanelExtension ce = getExtensionComponent(refsetNid);
+                                    cpe.addToggleComponent(ce);
+                                    add(ce, gbc);
+                                    gbc.gridy++;
+                                }
+                            }
+                        }
+
                         CollapsePanel cpd = new CollapsePanel("descriptions", settings);
                         add(cpd, gbc);
                         gbc.gridy++;
@@ -127,34 +148,6 @@ public class ConceptView extends JPanel {
                         }
 
                         ViewCoordinate coordinate = config.getViewCoordinate();
-
-                        //TODO here
-                        CollapsePanel cpe = new CollapsePanel("concept extensions", settings);
-                        boolean cpeAdded = false;
-                        I_TermFactory tf = Terms.get();
-
-                        //get refsets
-                        List<? extends I_ExtendByRef> memberRefsets = tf.getAllExtensionsForComponent(concept.getConceptNid());
-
-                        if (memberRefsets != null) {
-                            for (I_ExtendByRef extn : memberRefsets) {
-
-                                int refsetNid = extn.getRefsetId();
-                                List<? extends I_ExtendByRefPart> currentRefsets = tf.getRefsetHelper(config).getAllCurrentRefsetExtensions(refsetNid, concept.getConceptNid());
-                                for (I_ExtendByRefPart cr : currentRefsets) {
-                                    if (!cpeAdded) {
-                                        add(cpe, gbc);
-                                        gbc.gridy++;
-                                        cpeAdded = true;
-                                    }
-                                    DragPanelExtension ce = getExtensionComponent(refsetNid);
-                                    cpe.addToggleComponent(ce);
-                                    add(ce, gbc);
-                                    gbc.gridy++;
-                                }
-                            }
-                        }
-                        //TODO to here
 
                         CollapsePanel cpr = new CollapsePanel("relationships", settings);
                         boolean cprAdded = false;
@@ -196,7 +189,7 @@ public class ConceptView extends JPanel {
                         }
 
                         if (templates.size() > 0) {
-                            CollapsePanel cptemplate = new CollapsePanel("templates", settings);
+                            CollapsePanel cptemplate = new CollapsePanel("aggregate templates & warnings", settings);
                             add(cptemplate, gbc);
                             gbc.gridy++;
                             for (Entry<SpecBI, Integer> entry : templates.entrySet()) {

@@ -59,6 +59,13 @@ public class UuidT5Generator {
         return get(null, name);
     }
 
+    
+   public static UUID getDescUuid(String text, 
+           UUID langPrimUuid, 
+           UUID conceptPrimUuid) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+      return get(langPrimUuid, text + conceptPrimUuid.toString());
+   }
+
     /**
      * This routine adapted from org.safehaus.uuid.UUID,
      * which is licensed under Apache 2.

@@ -15,6 +15,8 @@ import org.ihtsdo.tk.db.DbDependency;
 
 public interface TerminologyStoreDI extends TerminologyTransactionDI {
 
+    ViewCoordinate getMetadataVC() throws IOException;
+    
     TerminologySnapshotDI getSnapshot(ViewCoordinate vc);
 
     ComponentChroncileBI<?> getComponent(int nid) throws IOException;

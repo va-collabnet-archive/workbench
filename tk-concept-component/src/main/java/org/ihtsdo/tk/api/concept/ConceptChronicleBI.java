@@ -6,8 +6,11 @@ import java.util.Collection;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.media.MediaChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 
@@ -29,4 +32,12 @@ public interface ConceptChronicleBI extends
     boolean isAnnotationStyleRefex() throws IOException;
 
     void setAnnotationStyleRefex(boolean annotationSyleRefex);
+    
+    Collection<? extends RefexChronicleBI<?>> getRefsetMembers() 
+            throws IOException;
+
+    Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc) 
+            throws IOException;
+
+
 }

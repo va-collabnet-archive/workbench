@@ -12,63 +12,70 @@ import org.ihtsdo.tk.api.constraint.ConstraintCheckType;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.media.MediaVersionBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 
 public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI {
 	
-	public ViewCoordinate getCoordinate();
+	ViewCoordinate getViewCoordinate();
         
-        public ConceptChronicleBI getChronicle();
+   ConceptChronicleBI getChronicle();
 	
-	public ConAttrVersionBI getConAttrsActive() throws IOException, ContraditionException;
+	ConAttrVersionBI getConAttrsActive() throws IOException, ContraditionException;
 	
-	public DescriptionVersionBI getPreferredDescription() throws IOException, ContraditionException;
-	public DescriptionVersionBI getFullySpecifiedDescription() throws IOException, ContraditionException;
-	public Collection<? extends DescriptionVersionBI> getSynonyms() throws IOException;
+	DescriptionVersionBI getPreferredDescription() throws IOException, ContraditionException;
+	DescriptionVersionBI getFullySpecifiedDescription() throws IOException, ContraditionException;
+	Collection<? extends DescriptionVersionBI> getSynonyms() throws IOException;
 
-	public Collection<? extends DescriptionVersionBI> getDescsActive() throws IOException, ContraditionException;
-	public Collection<? extends DescriptionVersionBI> getDescsActive(int typeNid) throws IOException, ContraditionException;
-	public Collection<? extends DescriptionVersionBI> getDescsActive(NidSetBI typeNids) throws IOException, ContraditionException;
+	Collection<? extends DescriptionVersionBI> getDescsActive() throws IOException, ContraditionException;
+	Collection<? extends DescriptionVersionBI> getDescsActive(int typeNid) throws IOException, ContraditionException;
+	Collection<? extends DescriptionVersionBI> getDescsActive(NidSetBI typeNids) throws IOException, ContraditionException;
 
-	public Collection<? extends RelationshipVersionBI> getRelsOutgoingActive() throws IOException, ContraditionException;
-	public Collection<? extends RelationshipVersionBI> getRelsIncomingActive() throws IOException, ContraditionException;
-	public Collection<? extends MediaVersionBI> getMediaActive() throws IOException, ContraditionException;
+	Collection<? extends RelationshipVersionBI> getRelsOutgoingActive() throws IOException, ContraditionException;
+	Collection<? extends RelationshipVersionBI> getRelsIncomingActive() throws IOException, ContraditionException;
+	Collection<? extends MediaVersionBI> getMediaActive() throws IOException, ContraditionException;
 
-	public Collection<? extends ConceptVersionBI> getRelsOutgoingDestinations() throws IOException;
-	public Collection<? extends ConceptVersionBI> getRelsOutgoingDestinations(int typeNid) throws IOException;
-	public Collection<? extends ConceptVersionBI> getRelsOutgoingDestinations(NidSetBI typeNids) throws IOException;
-	public Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsIsa() throws IOException;
+	Collection<? extends ConceptVersionBI> getRelsOutgoingDestinations() throws IOException;
+	Collection<? extends ConceptVersionBI> getRelsOutgoingDestinations(int typeNid) throws IOException;
+	Collection<? extends ConceptVersionBI> getRelsOutgoingDestinations(NidSetBI typeNids) throws IOException;
+	Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsIsa() throws IOException;
 	
-	public Collection<? extends ConceptVersionBI> getRelsIncomingOrigins() throws IOException;
-	public Collection<? extends ConceptVersionBI> getRelsIncomingOrigins(int typeNid) throws IOException;
-	public Collection<? extends ConceptVersionBI> getRelsIncomingOrigins(NidSetBI typeNids) throws IOException;
-	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsIsa() throws IOException;
+	Collection<? extends ConceptVersionBI> getRelsIncomingOrigins() throws IOException;
+	Collection<? extends ConceptVersionBI> getRelsIncomingOrigins(int typeNid) throws IOException;
+	Collection<? extends ConceptVersionBI> getRelsIncomingOrigins(NidSetBI typeNids) throws IOException;
+	Collection<? extends ConceptVersionBI> getRelsIncomingOriginsIsa() throws IOException;
 
-	public Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsActive() throws IOException, ContraditionException;
-	public Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsActive(int typeNid) throws IOException, ContraditionException;
-	public Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsActive(NidSetBI typeNids) throws IOException, ContraditionException;
-	public Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsActiveIsa() throws IOException, ContraditionException;
+	Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsActive() throws IOException, ContraditionException;
+	Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsActive(int typeNid) throws IOException, ContraditionException;
+	Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsActive(NidSetBI typeNids) throws IOException, ContraditionException;
+	Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsActiveIsa() throws IOException, ContraditionException;
 
-	public int[] getRelsOutgoingDestinationsNidsActiveIsa() throws IOException;
+	int[] getRelsOutgoingDestinationsNidsActiveIsa() throws IOException;
 
-	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive() throws IOException, ContraditionException;
-	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive(int typeNid) throws IOException, ContraditionException;
-	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive(NidSetBI typeNids) throws IOException, ContraditionException;
-	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActiveIsa() throws IOException, ContraditionException;
+	Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive() throws IOException, ContraditionException;
+	Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive(int typeNid) throws IOException, ContraditionException;
+	Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive(NidSetBI typeNids) throws IOException, ContraditionException;
+	Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActiveIsa() throws IOException, ContraditionException;
+   
+   @Override
+   Collection<? extends RelGroupVersionBI> getRelGroups() throws IOException, ContraditionException;
+
+   Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers() 
+            throws IOException;
+
+
 	
 
-	public Collection<? extends RelGroupVersionBI> getRelGroups() throws IOException, ContraditionException;
-
-	public boolean isKindOf(ConceptVersionBI parentKind) throws IOException;
+	boolean isKindOf(ConceptVersionBI parentKind) throws IOException;
 	
-	public boolean satisfies(ConstraintBI constraint, 
+	boolean satisfies(ConstraintBI constraint, 
 			ConstraintCheckType subjectCheck,
 			ConstraintCheckType propertyCheck,
 			ConstraintCheckType valueCheck) throws IOException, ContraditionException;
 	//TODO
 	
-	public boolean isMember(int evalRefsetNid) throws IOException; 
+	boolean isMember(int evalRefsetNid) throws IOException; 
 	
 	//TODO to here
 

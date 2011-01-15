@@ -4,18 +4,22 @@ package org.ihtsdo.arena.drools
 #list any import classes here.
 import java.util.Map;
 
+import org.ihtsdo.helper.dialect.DialectHelper;
+
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 import org.ihtsdo.tk.spec.DescriptionSpec;
 import org.ihtsdo.tk.spec.SpecFactory;
 
+import org.ihtsdo.tk.example.binding.Language;
 import org.ihtsdo.tk.example.binding.Snomed;
 import org.ihtsdo.tk.example.binding.SnomedConstraints;
 import org.ihtsdo.tk.example.binding.SnomedRelType;
 import org.ihtsdo.tk.example.binding.SnomedRelSpec;
 import org.ihtsdo.tk.example.binding.Taxonomies;
 import org.ihtsdo.tk.example.binding.WbDescType;
+
 
 
 #declare any global variables here
@@ -75,11 +79,38 @@ rule "no FSN"
    		    									  SpecFactory.get($c), 
    		    									  WbDescType.FULLY_SPECIFIED, 
    		    									  $d.getText() + " (ADD TAG (NO FSN))"), 
-   		    									  $d.getNid());
+   		    									  $c.getNid());
 		} 	
    		System.out.println("concept failing FS_SEMANTIC_TAG constraint found: \n" + $c.toString());
 end
 
+rule "missing Dialect description EN_UK"
+	
+	when
+		$c : ConceptVersionBI(this isMissingDescFor Language.EN_UK);
+	then 
+		for (DescriptionVersionBI $d : $c.getDescsActive()) {
+         if (DialectHelper.isMissingDescForDialect($d,
+              Language.EN_UK.get($c.getViewCoordinate()).getNid(), $c.getViewCoordinate())) {
+   		    templates.put(DialectHelper.getDescriptionSpecForDialect($d,
+               Language.EN_UK, $c.getViewCoordinate()), $c.getNid());
+         }
+		} 	
+end
+
+rule "missing Dialect description EN_US"
+	
+	when
+		$c : ConceptVersionBI(this isMissingDescFor Language.EN_US);
+	then 
+		for (DescriptionVersionBI $d : $c.getDescsActive()) {
+         if (DialectHelper.isMissingDescForDialect($d,
+              Language.EN_US.get($c.getViewCoordinate()).getNid(), $c.getViewCoordinate())) {
+   		    templates.put(DialectHelper.getDescriptionSpecForDialect($d,
+               Language.EN_US, $c.getViewCoordinate()), $c.getNid());
+         }
+		} 	
+end
 
 rule "isKindOf refset concept and not satisfies FINDING_SITE_OUT constraint"
 	
