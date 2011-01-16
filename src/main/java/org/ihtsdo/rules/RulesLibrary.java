@@ -212,7 +212,7 @@ public class RulesLibrary {
 							textList.add(dtemplate.getText());
 							DescriptionVersionBI description = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getViewCoordinate(),
 									UUID.fromString(dtemplate.getComponentUuid()));
-							DescriptionSpec dSpec = SpecFactory.get(description);
+							DescriptionSpec dSpec = SpecFactory.get(description, config.getViewCoordinate());
 							if (dtemplate.getText() != null) {
 								dSpec.setDescText(dtemplate.getText());
 							}
