@@ -31,6 +31,7 @@ import org.drools.spi.Evaluator;
 import org.drools.spi.FieldValue;
 import org.drools.spi.InternalReadAccessor;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
@@ -102,7 +103,7 @@ public class IsMemberOfEvaluatorDefinition implements EvaluatorDefinition {
 				} else {
 					throw new UnsupportedOperationException("Can't convert: " + value1);
 				}
-				//Coordinate coordinate = possibleMember.getCoordinate();	 //TODO don't think I need this
+				ViewCoordinate vc = possibleMember.getViewCoordinate();
 				ConceptVersionBI possibleRefsetCV = null;
 				ConceptSpec possibleRefset = null;
 				
@@ -113,7 +114,7 @@ public class IsMemberOfEvaluatorDefinition implements EvaluatorDefinition {
 					evalRefsetNid = possibleRefsetCV.getNid();
 				} else if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
 					possibleRefset = (ConceptSpec) value2;
-					evalRefsetNid = possibleRefset.getNid();
+					evalRefsetNid = possibleRefset.get(vc).getNid();
 				} else if (ConceptFact.class.isAssignableFrom(value2.getClass())) {
 					ConceptFact fact = (ConceptFact) value2;
 					possibleRefsetCV = (ConceptVersionBI) fact.getConcept();
