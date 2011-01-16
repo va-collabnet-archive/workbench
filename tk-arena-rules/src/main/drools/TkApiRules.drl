@@ -56,8 +56,8 @@ rule "FSN not satisfies desc constraint"
 							  this satisfiesConstraint[x,e,x] SnomedConstraints.FS_SEMANTIC_TAG);
 	then 
 
-		   for (DescriptionVersionBI $d : $c.getDescsActive(WbDescType.FULLY_SPECIFIED.getNid())) {
-   		    	templates.put(new DescriptionSpec($d.getUUIDs(), #from c
+		   for (DescriptionVersionBI $d : $c.getDescsActive(WbDescType.FULLY_SPECIFIED.get($c.getViewCoordinate()).getNid())) {
+   		    	templates.put(new  DescriptionSpec($d.getUUIDs(), #from c
    		    									  SpecFactory.get($c), 
    		    									  WbDescType.FULLY_SPECIFIED, 
    		    									  $d.getText() + " (ADD TAG)"), 
@@ -74,7 +74,7 @@ rule "no FSN"
 		$c : ConceptVersionBI(this not satisfiesConstraint[x,e,x] SnomedConstraints.FS_SEMANTIC_TAG);
 	then 
 
-		for (DescriptionVersionBI $d : $c.getDescsActive(WbDescType.PREFERRED.getNid())) {
+		for (DescriptionVersionBI $d : $c.getDescsActive(WbDescType.PREFERRED.get($c.getViewCoordinate()).getNid())) {
    		    	templates.put(new DescriptionSpec($d.getUUIDs(), #from c
    		    									  SpecFactory.get($c), 
    		    									  WbDescType.FULLY_SPECIFIED, 

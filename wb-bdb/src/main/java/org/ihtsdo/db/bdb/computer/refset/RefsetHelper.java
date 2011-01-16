@@ -48,7 +48,10 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbTermFactory;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 
 @AllowDataCheckSuppression
 public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
@@ -154,24 +157,22 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
     public boolean hasRefsetExtension(int refsetId, int componentNid, final RefsetPropertyMap extProps)
             throws Exception {
         access();
-        List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(componentNid, true);
-        for (I_ExtendByRef extension : extensions) {
+        Collection<? extends RefexChronicleBI<?>> extensions = Ts.get().getComponent(componentNid).getRefexes();
+        for (RefexChronicleBI extension : extensions) {
 
             if (extension == null) {
                 AceLog.getAppLog().alertAndLogException(
                     new Exception("Null extension in list: " + extensions + " from component: "
                         + Bdb.getConceptForComponent(componentNid).toLongString()));
             }
-            if (extension != null && extension.getRefsetId() == refsetId) {
+            if (extension != null && extension.getCollectionNid() == refsetId) {
 
                 // get the latest version
-                I_ExtendByRefPart latestPart = null;
-                for (I_ExtendByRefPart part : extension.getMutableParts()) {
-                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
-                        latestPart = part;
-                    }
+                ComponentVersionBI latestPart = extension.getVersion(config.getViewCoordinate());
+                if (latestPart == null) {
+                   return false;
                 }
-                if (extProps.validate(latestPart)) {
+                if (extProps.validate((I_ExtendByRefPart) latestPart)) {
                     return true;
                 }
             }

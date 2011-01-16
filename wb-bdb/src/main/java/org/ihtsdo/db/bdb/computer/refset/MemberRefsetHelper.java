@@ -188,6 +188,8 @@ public class MemberRefsetHelper extends RefsetHelper implements I_HelpMemberRefs
 	 * @see org.ihtsdo.db.bdb.computer.refset.I_HelpMemberRefsets#addToRefset(int)
 	 */
     public boolean addToRefset(int conceptId) throws Exception {
+       
+       
         boolean extAdded = newRefsetExtension(getMemberRefsetId(), conceptId, REFSET_TYPES.CID,
             new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, getMemberTypeId()),
             getConfig());

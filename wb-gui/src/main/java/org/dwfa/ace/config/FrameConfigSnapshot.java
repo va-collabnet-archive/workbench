@@ -70,6 +70,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
@@ -84,6 +85,10 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     I_ConfigAceFrame baseFrame;
+
+   public EditCoordinate getEditCoordinate() {
+      return baseFrame.getEditCoordinate();
+   }
 
     public void setRelAssertionType(RelAssertionType relAssertionType) {
         baseFrame.setRelAssertionType(relAssertionType);

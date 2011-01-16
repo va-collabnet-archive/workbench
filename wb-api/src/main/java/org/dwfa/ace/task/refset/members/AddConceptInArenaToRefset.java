@@ -39,8 +39,13 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
+import org.ihtsdo.tk.api.amend.TerminologyAmendmentBI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset/membership", type = BeanType.TASK_BEAN) })
 public class AddConceptInArenaToRefset extends AbstractTask {
@@ -72,11 +77,13 @@ public class AddConceptInArenaToRefset extends AbstractTask {
         }
     }
 
+   @Override
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
 
     }
 
+   @Override
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
         try {
@@ -87,7 +94,8 @@ public class AddConceptInArenaToRefset extends AbstractTask {
             	positionSet.add(tf.newPosition(path, Integer.MAX_VALUE));
             }
             
-            I_HostConceptPlugins host = (I_HostConceptPlugins) worker.readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name());
+            I_HostConceptPlugins host = (I_HostConceptPlugins) 
+                    worker.readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name());
             
             
             //get concept to add
@@ -108,18 +116,23 @@ public class AddConceptInArenaToRefset extends AbstractTask {
                 throw new TerminologyException("A working refset has not been selected.");
             }
             
+            TerminologyAmendmentBI ammender = 
+                    Ts.get().getAmender(config.getEditCoordinate(), 
+                    config.getViewCoordinate()); 
             
             //add to refset
-             Terms.get().getMemberRefsetHelper(tf.getActiveAceFrameConfig(), refsetConcept.getConceptNid(),
-        		   member.getConceptNid()).addToRefset(conceptToAdd.getNid());
-   
-             if (refsetConcept.isAnnotationStyleRefex()) {
-                 Terms.get().addUncommitted(conceptToAdd);
-             } else {
-                 Terms.get().addUncommitted(refsetConcept);
-              }
+            RefexAmendmentSpec refexSpec = 
+                    new RefexAmendmentSpec(TK_REFSET_TYPE.CID, 
+                    conceptToAdd.getNid(), refsetConcept.getNid());
+            refexSpec.with(RefexAmendmentSpec.RefexProperty.CNID1, 
+                    member.getConceptNid());
+            ammender.amendIfNotCurrent(refexSpec); 
 
-            host.unlink();
+            if (refsetConcept.isAnnotationStyleRefex()) {
+                 Terms.get().addUncommitted(conceptToAdd);
+            } else {
+                 Terms.get().addUncommitted(refsetConcept);
+            }
 
             return Condition.CONTINUE;
             
@@ -130,10 +143,12 @@ public class AddConceptInArenaToRefset extends AbstractTask {
 		}
     }
 
+   @Override
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;
     }
 
+   @Override
     public int[] getDataContainerIds() {
         return new int[] {};
     }

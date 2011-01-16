@@ -263,12 +263,14 @@ public class RefsetPropertyMap {
                 }
                 break;
             case PATH:
-                if (!entry.getValue().equals(part.getPathId())) {
+                if (!entry.getValue().equals(part.getPathNid())) {
                     return false;
                 }
                 break;
             case STATUS:
-                // done during makeAnalog;
+                if (!entry.getValue().equals(part.getStatusNid())) {
+                    return false;
+                }
                 break;
             case STRING_VALUE:
                 if (!I_ExtendByRefPartStr.class.isAssignableFrom(part.getClass())) {

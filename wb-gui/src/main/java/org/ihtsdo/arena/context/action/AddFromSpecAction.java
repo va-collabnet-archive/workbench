@@ -59,7 +59,7 @@ public class AddFromSpecAction extends AbstractAction {
 		Terms.get().newDescription(UUID.randomUUID(),  Terms.get().getConcept(concept.getNid()), 
 				descSpec.getLangText(), 
 				descSpec.getDescText(), 
-				Terms.get().getConcept(descSpec.getDescTypeSpec().getNid()), 
+				Terms.get().getConcept(descSpec.getDescTypeSpec().get(concept.getViewCoordinate()).getNid()), 
 				config, ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
 		Terms.get().addUncommitted(Terms.get().getConcept(concept.getNid()));
 	}
@@ -73,8 +73,8 @@ public class AddFromSpecAction extends AbstractAction {
 			I_GetConceptData originConcept = Terms.get().getConcept(concept.getNid());
 			I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), 
 					originConcept, 
-					relSpec.getRelTypeSpec().getNid(), 
-					relSpec.getDestinationSpec().getNid(),
+					relSpec.getRelTypeSpec().get(concept.getViewCoordinate()).getNid(), 
+					relSpec.getDestinationSpec().get(concept.getViewCoordinate()).getNid(),
 					ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid(), 
 					ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.localize().getNid(), 
 					0, 

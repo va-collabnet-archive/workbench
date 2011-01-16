@@ -10,4 +10,12 @@ public class TermAux {
 		new ConceptSpec("is a (relationship type)", 
 						UUID.fromString("46bccdc4-8fb6-11db-b606-0800200c9a66"));
 
+	public static ConceptSpec CURRENT = 
+		new ConceptSpec("current (active status type)", 
+						UUID.fromString("2faa9261-8fb2-11db-b606-0800200c9a66"));
+
+	public static ConceptSpec RETIRED = 
+		new ConceptSpec("retired (inactive status type)", 
+						UUID.fromString("e1956e7b-08b4-3ad0-ab02-b411869f1c09"));
+
 }

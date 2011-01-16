@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.TooManyListenersException;
 import java.util.Map.Entry;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -447,7 +448,7 @@ public class ConceptView extends JPanel {
             this.desc = desc;
             t = new Timer(1000, this);
             t.start();
-            c = Terms.get().getConcept(desc.getConceptSpec().getNid());
+            c = Terms.get().getConcept(desc.getConceptSpec().get(config.getViewCoordinate()).getNid());
         }
 
         public void insertUpdate(DocumentEvent e) {
@@ -737,13 +738,17 @@ public class ConceptView extends JPanel {
         descPanel.add(descLabel, gbc);
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.gridx++;
-        TermComponentLabel typeLabel = getLabel(desc.getDescTypeSpec().getNid(), true);
+        TermComponentLabel typeLabel = getLabel(desc.getDescTypeSpec().get(config.getViewCoordinate()).getNid(), true);
         descPanel.add(typeLabel, gbc);
         typeLabel.addPropertyChangeListener("termComponent", new PropertyChangeListener() {
 
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                desc.setDescTypeSpec(SpecFactory.get((I_GetConceptData) evt.getNewValue()));
+            try {
+               desc.setDescTypeSpec(SpecFactory.get((I_GetConceptData) evt.getNewValue()));
+            } catch (IOException ex) {
+               Logger.getLogger(ConceptView.class.getName()).log(Level.SEVERE, null, ex);
+            }
             }
         });
 
@@ -788,7 +793,11 @@ public class ConceptView extends JPanel {
 
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                spec.setRelTypeSpec(SpecFactory.get((I_GetConceptData) evt.getNewValue()));
+            try {
+               spec.setRelTypeSpec(SpecFactory.get((I_GetConceptData) evt.getNewValue()));
+            } catch (IOException ex) {
+               Logger.getLogger(ConceptView.class.getName()).log(Level.SEVERE, null, ex);
+            }
             }
         });
         gbc.gridx++;
@@ -801,7 +810,11 @@ public class ConceptView extends JPanel {
 
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                spec.setDestinationSpec(SpecFactory.get((I_GetConceptData) evt.getNewValue()));
+            try {
+               spec.setDestinationSpec(SpecFactory.get((I_GetConceptData) evt.getNewValue()));
+            } catch (IOException ex) {
+               Logger.getLogger(ConceptView.class.getName()).log(Level.SEVERE, null, ex);
+            }
             }
         });
         return relPanel;

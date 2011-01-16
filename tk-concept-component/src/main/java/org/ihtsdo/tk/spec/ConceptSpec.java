@@ -213,10 +213,6 @@ public class ConceptSpec implements SpecBI {
         this.relSpecs = relSpecs;
     }
 
-    public int getNid() throws IOException {
-    	return Ts.get().getNidForUuids(uuids);
-    }
-
     @Override
     public String toString() {
         return "ConceptSpec{" + description + "; " + Arrays.asList(uuids) +

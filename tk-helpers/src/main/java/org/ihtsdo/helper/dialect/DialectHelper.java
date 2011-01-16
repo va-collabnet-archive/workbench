@@ -194,7 +194,7 @@ public class DialectHelper {
            throws UnsupportedDialectOrLanguage, IOException {
       return getDescriptionSpecForDialect(
               desc,
-              dialectSpec.getNid(), vc);
+              dialectSpec.get(vc).getNid(), vc);
    }
 
    public static DescriptionSpec getDescriptionSpecForDialect(

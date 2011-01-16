@@ -30,4 +30,14 @@ public class EditCoordinate {
 	public int[] getEditPaths() {
 		return editPaths;
 	}
+   
+   
+   @Override
+   public String toString() {
+      StringBuilder sb = new StringBuilder();
+      sb.append("authorNid: ").append(authorNid);
+      sb.append("editPaths: ").append(editPaths);           
+      return sb.toString();
+   }
+
 }

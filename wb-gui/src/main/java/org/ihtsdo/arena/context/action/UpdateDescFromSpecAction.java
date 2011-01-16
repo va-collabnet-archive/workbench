@@ -20,15 +20,10 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;//THIS
-import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
-import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
-import org.ihtsdo.tk.drools.facts.ComponentFact;
 import org.ihtsdo.tk.drools.facts.DescSpecFact;
-import org.ihtsdo.tk.drools.facts.DescFact;
 import org.ihtsdo.tk.drools.facts.SpecFact;
 import org.ihtsdo.tk.drools.facts.RelSpecFact;
 import org.ihtsdo.tk.spec.DescriptionSpec;
@@ -71,7 +66,7 @@ public class UpdateDescFromSpecAction extends AbstractAction {
 			DescriptionVersionBI desc = (DescriptionVersionBI) descObject;
 			DescriptionSpec descSpec = ((DescSpecFact) spec).getDescSpec(); 
 			
-			if (desc.getTypeNid() == descSpec.getDescTypeSpec().getNid() && !(desc.getText().equals(descSpec.getDescText()))) { //if desc type is equal and text has changed, retire and make new
+			if (desc.getTypeNid() == descSpec.getDescTypeSpec().get(component.getViewCoordinate()).getNid() && !(desc.getText().equals(descSpec.getDescText()))) { //if desc type is equal and text has changed, retire and make new
 				
 				//description
 				if (DescSpecFact.class.isAssignableFrom(spec.getClass())) {
@@ -79,7 +74,7 @@ public class UpdateDescFromSpecAction extends AbstractAction {
 					Terms.get().newDescription(UUID.randomUUID(),  Terms.get().getConcept(concept.getNid()), 
 							descSpec.getLangText(), 
 							descSpec.getDescText(), 
-							Terms.get().getConcept(descSpec.getDescTypeSpec().getNid()), 
+							Terms.get().getConcept(descSpec.getDescTypeSpec().get(component.getViewCoordinate()).getNid()), 
 							config, ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
 					Terms.get().addUncommitted(Terms.get().getConcept(concept.getNid()));
 				}
@@ -91,8 +86,8 @@ public class UpdateDescFromSpecAction extends AbstractAction {
 					I_GetConceptData originConcept = Terms.get().getConcept(concept.getNid());
 					I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), 
 							originConcept, 
-							relSpec.getRelTypeSpec().getNid(), 
-							relSpec.getDestinationSpec().getNid(),
+							relSpec.getRelTypeSpec().get(component.getViewCoordinate()).getNid(), 
+							relSpec.getDestinationSpec().get(component.getViewCoordinate()).getNid(),
 							ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid(), 
 							ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.localize().getNid(), 
 							0, 

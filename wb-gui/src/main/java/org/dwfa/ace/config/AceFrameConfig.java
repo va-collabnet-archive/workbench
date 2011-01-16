@@ -124,10 +124,12 @@ import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
+import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
@@ -1045,6 +1047,15 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         }
         addListeners();
     }
+
+   @Override
+   public EditCoordinate getEditCoordinate() {
+      
+      NidSet editPaths = new NidSet(editingPathSet);
+      return new EditCoordinate(getDbConfig().getUserConcept().getNid(), 
+              editPaths);
+   }
+
 
     @Override
     public I_GetConceptData getClassifierConcept() {

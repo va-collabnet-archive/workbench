@@ -61,6 +61,9 @@ public class BdbAmender implements TerminologyAmendmentBI {
         if (Ts.get().hasUuid(res.getMemberUUID())) {
             ComponentChroncileBI<?> component = 
                     Ts.get().getComponent(res.getMemberUUID());
+            if (component == null) {
+               return null;
+            }
             if (res.getMemberType() == 
                     TK_REFSET_TYPE.classToType(component.getClass())) {
                 return (RefsetMember<?,?>) component;

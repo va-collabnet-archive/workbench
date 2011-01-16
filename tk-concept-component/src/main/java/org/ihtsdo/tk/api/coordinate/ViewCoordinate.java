@@ -78,4 +78,21 @@ public class ViewCoordinate {
     public void setRelAssertionType(RelAssertionType relAssertionType) {
         this.relAssertionType = relAssertionType;
     }
+
+   @Override
+   public String toString() {
+      StringBuilder sb = new StringBuilder();
+      sb.append("precedence: ").append(precedence);
+      sb.append("positions: ").append(positionSet);
+      sb.append("allowedStatus: ").append(allowedStatusNids);
+      sb.append("isaTypes: ").append(isaTypeNids);
+      sb.append("contradiction: ").append(contradictionManager);
+      sb.append("language: ").append(languageNid);
+      sb.append("classifier: ").append(classifierNid);
+      sb.append("relAssertionType: ").append(relAssertionType);
+            
+      return sb.toString();
+   }
+    
+    
 }

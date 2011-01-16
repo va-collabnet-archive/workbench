@@ -78,6 +78,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
@@ -570,6 +571,11 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     public I_IntList getTableDescPreferenceList() {
         return frameConfig.getTableDescPreferenceList();
     }
+
+   @Override
+   public EditCoordinate getEditCoordinate() {
+      return frameConfig.getEditCoordinate();
+   }
 
     private class RefsetParentOnlyFilter implements I_FilterTaxonomyRels {
 

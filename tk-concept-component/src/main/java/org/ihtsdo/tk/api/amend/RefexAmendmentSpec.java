@@ -45,6 +45,7 @@ import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrAnalogBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.example.binding.TermAux;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
 /**
@@ -155,10 +156,12 @@ public final class RefexAmendmentSpec {
 
     public RefexAmendmentSpec(TK_REFSET_TYPE memberType,
             int rcNid, int collectionNid,
-            UUID memberUuid) {
+            UUID memberUuid) throws IOException {
         this.memberType = memberType;
         this.properties.put(RefexProperty.RC_NID, rcNid);
         this.properties.put(RefexProperty.COLLECTION_NID, collectionNid);
+        this.properties.put(RefexProperty.STATUS_NID, 
+                TermAux.CURRENT.get(Ts.get().getMetadataVC()).getNid());
         if (memberUuid != null) {
             this.properties.put(RefexProperty.MEMBER_UUID, memberUuid);
         }
@@ -299,7 +302,10 @@ public final class RefexAmendmentSpec {
             switch (entry.getKey()) {
                 case MEMBER_UUID:
                     try {
-                        version.setNid(Ts.get().getNidForUuids((UUID) entry.getValue()));
+                        int nid = Ts.get().getNidForUuids((UUID) entry.getValue());
+                        if (version.getNid() != nid) {
+                           version.setNid(nid);
+                        }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }

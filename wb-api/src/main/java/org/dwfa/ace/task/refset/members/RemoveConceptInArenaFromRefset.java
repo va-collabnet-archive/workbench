@@ -39,8 +39,13 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
+import org.ihtsdo.tk.api.amend.TerminologyAmendmentBI;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.example.binding.TermAux;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset/membership", type = BeanType.TASK_BEAN) })
 public class RemoveConceptInArenaFromRefset extends AbstractTask {
@@ -71,11 +76,13 @@ public class RemoveConceptInArenaFromRefset extends AbstractTask {
         }
     }
 
+   @Override
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
 
     }
 
+   @Override
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
         try {
@@ -107,12 +114,27 @@ public class RemoveConceptInArenaFromRefset extends AbstractTask {
                 throw new TerminologyException("A working refset has not been selected.");
             }
  
+                        
+            TerminologyAmendmentBI ammender = 
+                    Ts.get().getAmender(config.getEditCoordinate(), 
+                    config.getViewCoordinate()); 
+            
             //add to refset
-             Terms.get().getMemberRefsetHelper(tf.getActiveAceFrameConfig(), refsetConcept.getConceptNid(),
-        		   member.getConceptNid()).removeFromRefset(conceptToAdd.getNid());
-   
+            RefexAmendmentSpec refexSpec = 
+                    new RefexAmendmentSpec(TK_REFSET_TYPE.CID, 
+                    conceptToAdd.getNid(), refsetConcept.getNid());
+            refexSpec.with(RefexAmendmentSpec.RefexProperty.CNID1, 
+                    member.getConceptNid());
+            refexSpec.with(RefexAmendmentSpec.RefexProperty.STATUS_NID, 
+                    TermAux.RETIRED.get(config.getViewCoordinate()).getNid());
+            
+            ammender.amendIfNotCurrent(refexSpec); 
 
-            host.unlink();
+            if (refsetConcept.isAnnotationStyleRefex()) {
+                 Terms.get().addUncommitted(conceptToAdd);
+            } else {
+                 Terms.get().addUncommitted(refsetConcept);
+            }
 
             return Condition.CONTINUE;
             
@@ -123,10 +145,12 @@ public class RemoveConceptInArenaFromRefset extends AbstractTask {
 		}
     }
 
+   @Override
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;
     }
 
+   @Override
     public int[] getDataContainerIds() {
         return new int[] {};
     }

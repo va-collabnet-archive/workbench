@@ -66,7 +66,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
             super(index);
         }
 
-        public RefexAmendmentSpec getRefexEditSpec() {
+        public RefexAmendmentSpec getRefexEditSpec() throws IOException {
             if (index >= 0) {
                 return revisions.get(index).getRefexEditSpec();
             } else {
@@ -624,7 +624,8 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
         }
     }
     
-    public RefexAmendmentSpec getRefexEditSpec() {
+   @Override
+    public RefexAmendmentSpec getRefexEditSpec() throws IOException {
     	RefexAmendmentSpec rcs = new RefexAmendmentSpec(getTkRefsetType(), 
         		getReferencedComponentNid(), getRefsetId(), getPrimUuid());
     	addSpecProperties(rcs);

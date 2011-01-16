@@ -48,6 +48,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public interface I_ConfigAceFrame extends I_HandleSubversion {
@@ -630,6 +631,8 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public Precedence getPrecedence();
     
     public ViewCoordinate getViewCoordinate();
+    
+    public EditCoordinate getEditCoordinate();
     
     public void quit();
 

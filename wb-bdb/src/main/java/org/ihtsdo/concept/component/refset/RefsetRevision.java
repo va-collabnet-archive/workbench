@@ -12,6 +12,7 @@ import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import java.io.IOException;
 
 public abstract class RefsetRevision
 			<V extends RefsetRevision<V, C>, 
@@ -118,7 +119,7 @@ public abstract class RefsetRevision
 	}
 
 	@Override
-    public RefexAmendmentSpec getRefexEditSpec() {
+    public RefexAmendmentSpec getRefexEditSpec() throws IOException {
     	RefexAmendmentSpec rcs = new RefexAmendmentSpec(getTkRefsetType(), 
     			primordialComponent.getReferencedComponentNid(), 
     			primordialComponent.getRefsetId(),

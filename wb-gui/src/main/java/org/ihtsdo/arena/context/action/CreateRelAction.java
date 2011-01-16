@@ -31,7 +31,7 @@ public class CreateRelAction extends AbstractAction {
 			ConceptFact origin, ConceptSpec type, ConceptFact destination) throws IOException {
 		super(actionName);
 		this.origin = origin.getConcept();
-		relTypeNid = type.getNid();
+		relTypeNid = type.get(this.origin.getViewCoordinate()).getNid();
 		destNid = destination.getConcept().getNid();
 	}
 

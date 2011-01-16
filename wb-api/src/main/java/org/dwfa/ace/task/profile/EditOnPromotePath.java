@@ -68,12 +68,18 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class EditOnPromotePath implements I_ConfigAceFrame {
     I_ConfigAceFrame config;
 
+   public EditCoordinate getEditCoordinate() {
+      return config.getEditCoordinate();
+   }
+
+  
     @Override
     public void setRelAssertionType(RelAssertionType relAssertionType) {
         config.setRelAssertionType(relAssertionType);
