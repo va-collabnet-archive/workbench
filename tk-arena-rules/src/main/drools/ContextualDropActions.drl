@@ -7,6 +7,7 @@ import java.util.Collection;
 import org.ihtsdo.concept.Concept;
 
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
@@ -62,7 +63,7 @@ import org.ihtsdo.tk.example.binding.WbDescType;
 #declare any global variables here
 
 global Collection actions;
-
+global ViewCoordinate vc;
 
 rule "rule 1" #concept onto different SNOMED concept
 	
@@ -144,8 +145,10 @@ rule "rule 7" #rel onto rel (in group)
 	
 	when
 			$dropTarget: RelFact(context == Context.DROP_TARGET)
-			$dropObject: RelFact(context == Context.DROP_OBJECT, component == $dropTarget.component,
-			component.group != 0, component.time != Long.MAX_VALUE)
+			$dropObject: RelFact(context == Context.DROP_OBJECT, 
+                              component == $dropTarget.component,
+			                     component.group != 0, 
+                              component.time != Long.MAX_VALUE)
 		
 	then
 		actions.add(new UngroupRelAction("ungroup", $dropObject));
@@ -157,8 +160,11 @@ rule "rule 8" #desc onto concept
 	when
 		(and
 			($dropTarget: ConceptFact(context == Context.DROP_TARGET))
-			($dropObject: DescFact(context == Context.DROP_OBJECT, component.conceptNid != $dropTarget.component.conceptNid,
-				component.time != Long.MAX_VALUE, component.typeNid != Snomed.FULLY_SPECIFIED_DESCRIPTION_TYPE.nid))
+			($dropObject: DescFact(context == Context.DROP_OBJECT, 
+            component.conceptNid != $dropTarget.component.conceptNid,
+				component.time != Long.MAX_VALUE))
+         (eval($dropObject.getDesc().getTypeNid() != 
+                  Snomed.FULLY_SPECIFIED_DESCRIPTION_TYPE.get(vc).getNid()))
 		)
 		
 	then
@@ -169,7 +175,9 @@ end
 rule "rule 9" #rel (w/o group) onto rel group"
 	when
 		$dropTarget: RelGroupFact(context == Context.DROP_TARGET)
-		$dropObject: RelFact(context == Context.DROP_OBJECT, component.group == 0, component.time != Long.MAX_VALUE)
+		$dropObject: RelFact(context == Context.DROP_OBJECT, 
+                           component.group == 0, 
+                           component.time != Long.MAX_VALUE)
 		
 	then
 		actions.add(new MoveToRelGroupAction("move rel", $dropObject, $dropTarget));

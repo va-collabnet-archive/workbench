@@ -68,6 +68,7 @@ import org.ihtsdo.arena.context.action.DropActionPanel;
 import org.ihtsdo.arena.drools.EditPanelKb;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
@@ -406,7 +407,7 @@ public abstract class  DragPanel<T extends Object> extends JPanel implements Tra
 	
 	private static KnowledgeBase kbase;
 	
-
+   
 	public boolean isInGroup() {
 		return inGroup;
 	}
@@ -418,7 +419,7 @@ public abstract class  DragPanel<T extends Object> extends JPanel implements Tra
 	public DragPanel(ConceptViewSettings settings) {
 		super();
 		setup(settings);
-	}
+ 	}
 
 	public DragPanel(LayoutManager layout, ConceptViewSettings settings) {
 		super(layout);
@@ -454,6 +455,7 @@ public abstract class  DragPanel<T extends Object> extends JPanel implements Tra
 				}
 				try {
 					ksession.setGlobal("actions", actionList);
+					ksession.setGlobal("vc", this.settings.getHost().getConfig().getViewCoordinate());
 					if (AceLog.getAppLog().isLoggable(Level.FINE)) {
 						AceLog.getAppLog().fine("dropTarget: " + thingToDrag);
 						AceLog.getAppLog().fine("thingToDrop: " + thingToDrop);

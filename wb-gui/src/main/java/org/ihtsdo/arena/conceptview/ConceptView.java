@@ -937,6 +937,7 @@ public class ConceptView extends JPanel {
                 }
                 try {
                     ksession.setGlobal("actions", actionList);
+					     ksession.setGlobal("vc", config.getViewCoordinate());
                     if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                         AceLog.getAppLog().fine("dropTarget: " + concept);
                         AceLog.getAppLog().fine("thingToDrop: " + thingToDrop);

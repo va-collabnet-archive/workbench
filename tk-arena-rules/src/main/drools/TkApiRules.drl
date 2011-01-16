@@ -7,6 +7,7 @@ import java.util.Map;
 import org.ihtsdo.helper.dialect.DialectHelper;
 
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 import org.ihtsdo.tk.spec.DescriptionSpec;
@@ -25,6 +26,7 @@ import org.ihtsdo.tk.example.binding.WbDescType;
 #declare any global variables here
 
 global Map templates;
+global ViewCoordinate vc;
 
 // Parameters for satisfiesConstraint: x = don't care, e = equals, k = kind of, r = regex
 

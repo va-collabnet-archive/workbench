@@ -142,6 +142,7 @@ public class EditPanelKb implements Runnable {
 			try {
 				ViewCoordinate coordinate = config.getViewCoordinate();
 				ksession.setGlobal("templates", templates);
+            ksession.setGlobal("vc", coordinate);
 				ksession.insert(Ts.get().getConceptVersion(coordinate, c.getNid()));
 				ksession.fireAllRules();
 			} catch (IOException e) {
