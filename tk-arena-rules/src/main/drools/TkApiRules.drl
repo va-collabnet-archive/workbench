@@ -156,7 +156,7 @@ rule "double spaces"
 		$d : DescriptionVersionBI(text matches ".*garbage to disable this rule match \\s\\s.*") from $c.descsActive
 	then 
    		System.out.println("Double spaces found: \n" + $c.toString());
-   		DescriptionSpec dSpec = SpecFactory.get($d);
+   		DescriptionSpec dSpec = SpecFactory.get($d, vc);
    		dSpec.setDescText($d.getText().replace("  ", " "));
    		templates.put(dSpec, $c.getNid());
 end

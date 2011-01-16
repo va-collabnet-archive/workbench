@@ -23,7 +23,7 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI> ex
     public enum SubPanels { REFEX, ALERT, TEMPLATE };
     
     private List<JComponent> refexSubPanels = new ArrayList<JComponent>();
-   private List<JComponent> alertSubPanels = new ArrayList<JComponent>(); 
+    private List<JComponent> alertSubPanels = new ArrayList<JComponent>(); 
     private List<JComponent> templateSubPanels = new ArrayList<JComponent>(); 
 
      public List<JComponent> getAlertSubPanels() {

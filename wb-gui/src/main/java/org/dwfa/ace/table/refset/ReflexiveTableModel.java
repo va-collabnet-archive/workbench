@@ -260,7 +260,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
             super.finished();
             if (getProgress() != null) {
                 getProgress().getProgressBar().setIndeterminate(false);
-                if (conceptsToFetch.size() == 0) {
+                if (conceptsToFetch.isEmpty()) {
                     getProgress().getProgressBar().setValue(1);
                 } else {
                     getProgress().getProgressBar().setValue(conceptsToFetch.size());
@@ -473,6 +473,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         	                    + columns[columnIndex].invokeOnObjectType);
         	            }
     	            }
+    	        } catch (IndexOutOfBoundsException e) {
+                 AceLog.getAppLog().info("ReflexiveTableModel: " + e.toString());
     	        } catch (Exception e) {
     	            AceLog.getAppLog().alertAndLogException(e);
     	        }
@@ -494,7 +496,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         if (allTuples == null || tableComponentId == Integer.MIN_VALUE) {
             return " ";
         }
-        if (allTuples.size() == 0 && rowIndex == 0) {
+        if (allTuples.isEmpty() && rowIndex == 0) {
             return " ";
         }
         if (rowIndex < 0) {

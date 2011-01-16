@@ -210,8 +210,8 @@ public class DialectHelper {
                  Ts.get().getConcept(desc.getConceptNid()).getPrimUuid());
          
          DescriptionSpec ds = new DescriptionSpec(new UUID[]{descUuid},
-                 SpecFactory.get(Ts.get().getConcept(desc.getConceptNid())),
-                 SpecFactory.get(Ts.get().getConcept(desc.getTypeNid())),
+                 SpecFactory.get(Ts.get().getConcept(desc.getConceptNid()), vc),
+                 SpecFactory.get(Ts.get().getConcept(desc.getTypeNid()), vc),
                  variantText);
          ds.setLangText(desc.getLang());
          return ds;

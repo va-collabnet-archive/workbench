@@ -83,13 +83,13 @@ public class ViewCoordinate {
    public String toString() {
       StringBuilder sb = new StringBuilder();
       sb.append("precedence: ").append(precedence);
-      sb.append("positions: ").append(positionSet);
-      sb.append("allowedStatus: ").append(allowedStatusNids);
-      sb.append("isaTypes: ").append(isaTypeNids);
-      sb.append("contradiction: ").append(contradictionManager);
-      sb.append("language: ").append(languageNid);
-      sb.append("classifier: ").append(classifierNid);
-      sb.append("relAssertionType: ").append(relAssertionType);
+      sb.append(" \npositions: ").append(positionSet);
+      sb.append(" \nallowedStatus: ").append(allowedStatusNids);
+      sb.append(" \nisaTypes: ").append(isaTypeNids);
+      sb.append(" \ncontradiction: ").append(contradictionManager);
+      sb.append(" \nlanguage: ").append(languageNid);
+      sb.append(" \nclassifier: ").append(classifierNid);
+      sb.append(" \nrelAssertionType: ").append(relAssertionType);
             
       return sb.toString();
    }
