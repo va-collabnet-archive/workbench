@@ -104,8 +104,8 @@ public class RegenerateAllMarkedParents extends AbstractMojo implements I_Proces
 
         config.setViewPositions(null);
 
-        activeIntSet.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-        activeIntSet.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+        getActiveIntSet().add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+        getActiveIntSet().add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -150,6 +150,16 @@ public class RegenerateAllMarkedParents extends AbstractMojo implements I_Proces
                 }
             }
         }
+    }
+
+    /**
+     * @return the activeIntSet
+     */
+    private final I_IntSet getActiveIntSet() {
+        if (activeIntSet == null) {
+            activeIntSet = termFactory.newIntSet();
+        }
+        return activeIntSet;
     }
 
     /**
