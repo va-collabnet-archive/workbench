@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import javax.swing.ImageIcon;
@@ -644,4 +645,28 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void setRelAssertionType(RelAssertionType relAssertionType);
 
+	// WOrkflow-Based
+    public boolean isAutoApproveOn();
+    
+    public void setAutoApprove(boolean b);
+
+    public boolean isOverrideOn();
+    
+    public void setOverride(boolean b);
+    
+    public void setWorkflowRoles(TreeSet<? extends I_GetConceptData> roles);
+    
+    public TreeSet<? extends I_GetConceptData> getWorkflowRoles();
+
+	public void setWorkflowStates(TreeSet<? extends I_GetConceptData> states);
+
+    public TreeSet<? extends I_GetConceptData> getWorkflowStates();
+
+	public void setWorkflowActions(TreeSet<? extends I_GetConceptData> actions);
+
+    public TreeSet<? extends I_GetConceptData> getWorkflowActions();
+
+	public TreeSet<UUID> getAllAvailableWorkflowActionUids();
+
+	public void setAllAvailableWorkflowActionUids(TreeSet<UUID> actions);
 }

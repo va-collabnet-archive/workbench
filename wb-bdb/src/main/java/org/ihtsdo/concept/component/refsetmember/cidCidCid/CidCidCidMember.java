@@ -341,6 +341,11 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 	}
 
 	@Override
+	public int getPartsHashCode() {
+		return HashFunction.hashCode(new int[]{ getC1id(), getC2id(), getC3id() });
+	}
+	
+	@Override
 	public int getCnid2() {
 		return c2Nid;
 	}

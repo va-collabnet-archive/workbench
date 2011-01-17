@@ -9,6 +9,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.concept.component.refsetmember.Long.LongMember.Version;
 import org.ihtsdo.tk.api.ContraditionException;
@@ -190,4 +191,8 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
 		rcs.with(RefexProperty.LONG1, getLong1());
 	}
 
+	@Override
+	public int getPartsHashCode() {
+		return HashFunction.hashCode(new int[]{ new Long(getLongValue()).hashCode()});
+	}
 }

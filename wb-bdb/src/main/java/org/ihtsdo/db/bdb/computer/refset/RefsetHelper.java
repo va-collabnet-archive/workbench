@@ -36,6 +36,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -284,6 +285,51 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
                     I_ExtendByRefPartCid clone =
                             (I_ExtendByRefPartCid) latestPart.makeAnalog(ReferenceConcepts.RETIRED.getNid(), latestPart
+                                .getPathNid(), Long.MAX_VALUE);
+                    extension.addVersion(clone);
+                    if (isAutocommitActive()) {
+                        Terms.get().addUncommittedNoChecks(extension);
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see
+     * org.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#retireStrRefsetExtension
+     * (int, int, org.dwfa.ace.api.RefsetPropertyMap)
+     */
+    public boolean retireRefsetStrExtension(int refsetId, int conceptId, final RefsetPropertyMap extProps)
+            throws Exception {
+
+        access();
+        // check subject is not already a member
+        for (I_ExtendByRef extension : Terms.get().getAllExtensionsForComponent(conceptId)) {
+
+            if (extension.getRefsetId() == refsetId) {
+
+                // get the latest version
+                I_ExtendByRefPart latestPart = null;
+                for (I_ExtendByRefPart part : extension.getMutableParts()) {
+                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
+                        latestPart = part;
+                    }
+                }
+
+                if (!extProps.hasProperty(RefsetPropertyMap.REFSET_PROPERTY.STATUS)) {
+                    extProps.with(RefsetPropertyMap.REFSET_PROPERTY.STATUS, ReferenceConcepts.CURRENT.getNid());
+                }
+
+                if (extProps.validate(latestPart)) {
+
+                    // found a member to retire
+
+                	I_ExtendByRefPartStr clone =
+                            (I_ExtendByRefPartStr) latestPart.makeAnalog(ReferenceConcepts.RETIRED.getNid(), latestPart
                                 .getPathNid(), Long.MAX_VALUE);
                     extension.addVersion(clone);
                     if (isAutocommitActive()) {

@@ -9,6 +9,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.db.bdb.Bdb;
@@ -299,4 +300,9 @@ public class CidCidCidRevision extends RefsetRevision<CidCidCidRevision, CidCidC
 		rcs.with(RefexProperty.CNID3, getCnid3());
 	}
     
+	@Override
+	public int getPartsHashCode() {
+		return HashFunction.hashCode(new int[]{ getC1id(), getC2id(), getC3id() });
+	}
+
 }

@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import javax.swing.ImageIcon;
@@ -1303,4 +1304,64 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     public void setShowPromotionTab(Boolean show) {
         frameConfig.setShowPromotionTab(show);
     }
+
+	@Override
+	public boolean isAutoApproveOn() {
+		return frameConfig.isAutoApproveOn();
+	}
+
+	@Override
+	public boolean isOverrideOn() {
+		return frameConfig.isOverrideOn();
+	}
+
+	@Override
+	public void setAutoApprove(boolean b) {
+		frameConfig.setAutoApprove(b);
+	}
+
+	@Override
+	public void setOverride(boolean b) {
+		frameConfig.setOverride(b);
+	}
+
+	@Override
+	public TreeSet<? extends I_GetConceptData> getWorkflowRoles() {
+		return frameConfig.getWorkflowRoles();
+	}
+
+	@Override
+	public void setWorkflowRoles(TreeSet<? extends I_GetConceptData> roles) {
+		frameConfig.setWorkflowRoles(roles);
+	}
+
+	@Override
+	public TreeSet<? extends I_GetConceptData> getWorkflowStates() {
+		return frameConfig.getWorkflowStates();
+	}
+
+	@Override
+	public void setWorkflowStates(TreeSet<? extends I_GetConceptData> states) {
+		frameConfig.setWorkflowStates(states);
+	}
+	
+	@Override
+	public TreeSet<? extends I_GetConceptData> getWorkflowActions() {
+		return frameConfig.getWorkflowActions();
+	}
+
+	@Override
+	public void setWorkflowActions(TreeSet<? extends I_GetConceptData> actions) {
+		frameConfig.setWorkflowActions(actions);
+	}
+
+	@Override
+	public TreeSet<UUID> getAllAvailableWorkflowActionUids() {
+		return frameConfig.getAllAvailableWorkflowActionUids();
+	}
+
+	@Override
+	public void setAllAvailableWorkflowActionUids(TreeSet<UUID> actions) {
+		frameConfig.setAllAvailableWorkflowActionUids(actions);
+	}
 }

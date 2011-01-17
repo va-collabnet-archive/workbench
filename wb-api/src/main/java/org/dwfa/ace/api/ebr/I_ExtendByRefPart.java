@@ -46,4 +46,5 @@ public interface I_ExtendByRefPart<T extends RefexAnalogBI<T>>
 
     public I_ExtendByRefPart<T> makePromotionPart(PathBI promotionPath);
 
+    public int getPartsHashCode();
 }

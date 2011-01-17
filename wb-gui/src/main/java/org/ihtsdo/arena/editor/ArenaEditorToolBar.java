@@ -4,18 +4,27 @@ package org.ihtsdo.arena.editor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.TransferHandler;
 
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.config.AceFrame;
+import org.dwfa.ace.config.AceFrameConfig;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.editor.EditorActions.HistoryAction;
 import org.ihtsdo.arena.editor.EditorActions.NewAction;
 import org.ihtsdo.arena.editor.EditorActions.OpenAction;
 import org.ihtsdo.arena.editor.EditorActions.PrintAction;
 import org.ihtsdo.arena.editor.EditorActions.SaveAction;
+import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.util.mxGraphActions;
@@ -96,6 +105,50 @@ public class ArenaEditorToolBar extends JToolBar
         zoomCombo.setMaximumRowCount(9);
         add(zoomCombo);
 
+        addSeparator();
+        
+        final JToggleButton autoApproval = new JToggleButton("Auto Approval");
+        autoApproval.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				boolean aa;
+				
+				if (autoApproval.isSelected())
+					aa = true;
+				else
+					aa = false;
+				
+				try {
+					Terms.get().getActiveAceFrameConfig().setAutoApprove(aa);
+				} catch (TerminologyException e1) {
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				
+			}
+        
+    	});
+        
+        
+        
+		try {
+
+	        AceFrameConfig config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
+	        AceFrame ace = config.getAceFrame();
+	        JTabbedPane tp = ace.getCdePanel().getConceptTabs();
+	        int index = tp.getSelectedIndex();
+			
+			if (isAutoApprovalAvailable(index))
+		        add(autoApproval);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		
         // Sets the zoom in the zoom combo the current value
         mxIEventListener scaleTracker = new mxIEventListener()
         {
@@ -179,4 +232,13 @@ public class ArenaEditorToolBar extends JToolBar
             }
         });
     }
+
+	private boolean isAutoApprovalAvailable(int index) throws Exception {
+		EditorCategoryRefsetSearcher categegorySearcher = new EditorCategoryRefsetSearcher();
+		
+		// Get Modeler
+		String modelerStr = Terms.get().getActiveAceFrameConfig().getUsername();
+		
+		return categegorySearcher.isAutomaticApprovalAvailable(WorkflowHelper.lookupModeler(modelerStr));
+	}
 }

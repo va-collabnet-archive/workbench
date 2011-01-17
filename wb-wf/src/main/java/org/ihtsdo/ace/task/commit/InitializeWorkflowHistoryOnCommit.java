@@ -36,31 +36,29 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.Map;
 import java.util.UUID;
 
-import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_ImageVersioned;
-import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.ace.api.I_Identify;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.task.commit.AbstractConceptTest;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.tapi.TerminologyException;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.cement.WorkflowAuxiliary;
-import org.ihtsdo.time.TimeUtil;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryJavaBean;
+import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
+import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetSearcher;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
-import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetHelper;
+import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefsetSearcher;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 
 /* 
@@ -75,6 +73,7 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
     private static final int DATA_VERSION = 1;
     private static final String ALERT_MESSAGE = "<html>Empty value found:<br><font color='blue'>%1$s</font><br>Please enter a value before commit...";
     
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(DATA_VERSION);
     }
@@ -90,45 +89,69 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
     public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit)
             throws TaskFailedException {
         try {
+            WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
 
         	I_TermFactory tf = getTermFactory();
             WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter();
 			        	
-            if ((isDataChecksPassed()) &&			// Passed Previous Datachecks
-        	    (!writer.isInUse() &&				// Not in the middle of an existing commit 
-        	     conceptMayBeInitialized(concept)))		// Concept not already in and existing Workflow (if so, don't re-init)
+            if (!WorkflowHistoryRefsetWriter.isInUse()) // Not in the middle of an existing commit 
         	{
-	            // @ToDo Single Editing path allowed only
-	            writer.setPath(tf.getConcept(tf.getActiveAceFrameConfig().getEditingPathSet().iterator().next().getConceptNid()));
+				WorkflowHistoryRefsetWriter.lockMutex();
+
+				// Path
+	            writer.setPathUid(Terms.get().nidToUuid(concept.getConceptAttributes().getPathNid()));
+
+	            // Modeler
+	            writer.setModelerUid(WorkflowHelper.getCurrentModeler().getPrimUuid());
+
+	            // Concept & FSN
+	            writer.setConceptUid(concept.getUids().iterator().next());
+	            writer.setFSN(WorkflowHelper.identifyFSN(concept));
+
+	            // Use Case (Deprecated)
+            	writer.setUseCaseUid(ArchitectonicAuxiliary.Concept.WORKFLOW_CONCEPTS.getPrimoridalUid());
 	        	
-	            String modelerStr = tf.getActiveAceFrameConfig().getUsername();
-	            writer.setModeler(WorkflowRefsetHelper.lookupModeler(modelerStr));
+            	// Action
+            	UUID actionUid = identifyAction();
+                writer.setActionUid(actionUid);
 	            
-	            writer.setConceptId(concept.getUids().iterator().next());
-	            writer.setFSN(WorkflowRefsetHelper.identifyFSN(concept));
+                // State
+                UUID initialState = identifyNextState(writer.getModelerUid(), concept, actionUid);
+                writer.setStateUid(initialState);
 	            
-	            if (isEditUseCase(concept))
-	            {
-	            	writer.setUseCase(tf.getConcept(WorkflowAuxiliary.Concept.EDIT_USE_CASE.getUids()));
-	                writer.setAction(getInitialAction(WorkflowAuxiliary.Concept.EDIT_USE_CASE));
-	                writer.setState(getInitialState(WorkflowAuxiliary.Concept.EDIT_USE_CASE));
+                // Worfklow Id
+                WorkflowHistoryJavaBean latestBean = searcher.getLatestWfHxJavaBeanForConcept(concept);
+	            if (!isConceptInCurrentWorkflow(latestBean))
+	            	writer.setWorkflowUid(UUID.randomUUID());
+	            else
+	            	writer.setWorkflowUid(latestBean.getWorkflowId());
+
+	            // Set auto approved based on AceFrameConfig setting
+	            if (tf.getActiveAceFrameConfig().isAutoApproveOn()) {
+	            	writer.setAutoApproved(true);
+	            	
+	            	// Identify and overwrite Accept Action
+	            	UUID acceptActionUid = identifyAcceptAction();
+	            	writer.setActionUid(acceptActionUid);
+
+	            	// Identify and overwrite Next State
+	            	UUID nextState = identifyNextState(writer.getModelerUid(), concept, acceptActionUid);
+					writer.setStateUid(nextState);
+	            } else
+	            	writer.setAutoApproved(false);
 	                
-	            } else {
-	            	writer.setUseCase(tf.getConcept(WorkflowAuxiliary.Concept.NEW_USE_CASE.getUids()));
-	                writer.setAction(getInitialAction(WorkflowAuxiliary.Concept.NEW_USE_CASE));
-	                writer.setState(getInitialState(WorkflowAuxiliary.Concept.NEW_USE_CASE));
-	            }
+	            // Override
+	            writer.setOverride(tf.getActiveAceFrameConfig().isOverrideOn());
 	
-				writer.setWorkflowId(UUID.randomUUID());
-	            writer.setTimeStamp(getConceptTimeStamp(concept));
+	            // TimeStamps
+		        java.util.Date today = new java.util.Date();
+		        writer.setTimeStamp(today.getTime());
+		        writer.setRefsetColumnTimeStamp(today.getTime());
 				            
+		        // Write Member
 				WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
-				
-				writer.lockMutex();
 				writer.addMember();
-		        tf.addUncommitted(tf.getConcept(refset.getRefsetConcept()));
-				Terms.get().commit();
-				writer.unLockMutex();				
+		        Terms.get().addUncommitted(refset.getRefsetConcept());
 			}
 
             // return alerts;
@@ -138,156 +161,159 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
         }
     }
 
-    private I_TermFactory getTermFactory() {
+	private UUID identifyAction() {
+    	UUID commitActionUid = null;
+    	try
+    	{
+	    	for (I_GetConceptData action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
+	    	{
+	    		List<? extends I_RelTuple> relList = WorkflowHelper.getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
+    
+	    		for (I_RelTuple rel : relList)
+	    		{
+	    			if (rel != null && 
+	        			rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_BEGIN_WF_CONCEPT.getPrimoridalUid()).getConceptNid())
+    {
+	    				List<? extends I_RelTuple> commitRelList = WorkflowHelper.getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE);
+    
+	    	    		for (I_RelTuple commitRel : commitRelList)
+	    	    		{
+							if (commitRel != null &&
+								commitRel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_SINGLE_COMMIT.getPrimoridalUid()).getConceptNid())
+    {
+								commitActionUid = action.getPrimUuid();
+							}
+	    	    		}
+
+	    	    		if (commitActionUid != null)
+	    	    			break;
+	    			}
+				}
+	    	}
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
+
+    	return commitActionUid;
+	}
+    	 
+	private I_TermFactory getTermFactory() {
         return Terms.get();
     }
-    
-    private boolean isEditUseCase(I_GetConceptData concept) throws Exception
+
+    private boolean isConceptInCurrentWorkflow(WorkflowHistoryJavaBean latestBean) throws Exception
     {
-    	// Other tests go here
-    	if (conceptFoundInDatabase(concept))
-    		return true;
-    	else 
+    	if (latestBean == null)
     		return false;
-    }
-    
-    @SuppressWarnings("unchecked")
-	private String getConceptTimeStamp(I_GetConceptData concept) throws IOException 
-    {
-
-        java.util.Date today = new java.util.Date();
-
-//    	List<I_ConceptAttributePart> parts = (List<I_ConceptAttributePart>) concept.getConceptAttributes().getMutableParts();
-//    	 I_ConceptAttributePart latestVersion = parts.get(parts.size() - 1);
-    	 
-    	 return TimeUtil.getDateFormat().format(today);
-    }
-
-    private I_GetConceptData getInitialState(WorkflowAuxiliary.Concept useCase) throws TerminologyException, IOException {
-    	if (useCase == WorkflowAuxiliary.Concept.EDIT_USE_CASE)
-    		return getTermFactory().getConcept(WorkflowAuxiliary.Concept.CHANGED.getUids());
     	else
-    		return getTermFactory().getConcept(WorkflowAuxiliary.Concept.NEW.getUids());
-    }
+    	{
+    		I_GetConceptData action = Terms.get().getConcept(latestBean.getAction());
 
-    private I_GetConceptData getInitialAction(WorkflowAuxiliary.Concept useCase) throws TerminologyException, IOException {
-    	return getTermFactory().getConcept(WorkflowAuxiliary.Concept.EMPTY.getUids());
-    }
+    		List<? extends I_RelTuple> relList = WorkflowHelper.getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
 
-    private boolean conceptFoundInDatabase(I_GetConceptData concept) throws Exception 
+    		for (I_RelTuple rel : relList)
     {
-    	TreeSet<TimePathId> times = (TreeSet<TimePathId>)concept.getConceptAttributes().getTimePathSet();
+    			if (rel != null && 
+    				rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACCEPT_ACTION.getPrimoridalUid()).getConceptNid())
+    				return false;
+    		}
+    	}
     	
-    	if (times.size() > 1)
     		return true;
-    	
-    	TimePathId tpId = times.first();
-    	
-    	for (I_DescriptionVersioned<?> desc : concept.getDescriptions())
-    	{
-    		if (desc.getTimePathSet().size() > 1)
-    			return true;
-    		else 
-    		{
-        		TimePathId testTPId = desc.getTimePathSet().iterator().next();
-        		
-        		if (testTPId.getPathId() != tpId.getPathId() ||
-        			testTPId.getTime() != tpId.getTime())
-        			return true;
-    		}
-    	}
-
-    	for (I_RelVersioned<?> srcRels : concept.getSourceRels())
-    	{
-    		if (srcRels.getTimePathSet().size() > 1)
-    			return true;
-    		else 
-    		{
-        		TimePathId testTPId = srcRels.getTimePathSet().iterator().next();
-        		
-        		if (testTPId.getPathId() != tpId.getPathId() ||
-        			testTPId.getTime() != tpId.getTime())
-        			return true;
-    		}
-    	}
-
-    	for (I_RelVersioned<?> destRels : concept.getDestRels())
-    	{
-    		if (destRels.getTimePathSet().size() > 1)
-    			return true;
-    		else 
-    		{
-        		TimePathId testTPId = destRels.getTimePathSet().iterator().next();
-        		
-        		if (testTPId.getPathId() != tpId.getPathId() ||
-        			testTPId.getTime() != tpId.getTime())
-        			return true;
-    		}
-    	}
-
-    	for (I_ImageVersioned<?> img : concept.getImages())
-    	{
-    		if (img.getTimePathSet().size() > 1)
-    			return true;
-    		else 
-    		{
-        		TimePathId testTPId = img.getTimePathSet().iterator().next();
-        		
-        		if (testTPId.getPathId() != tpId.getPathId() ||
-        			testTPId.getTime() != tpId.getTime())
-        			return true;
-    		}
-    	}
-    	
-    	return false;
-    	
-    	/*
-    	Iterator<I_GetConceptData> itr = Terms.get().getConceptIterator();
-    	
-    	while (itr.hasNext())
-    	{
-    		I_GetConceptData con =  (I_GetConceptData)itr.next();
-    		
-    		if (con.getUids().equals(concept.getUids()))
-    			return true;
-    	}
-
-    	return false;
-    	*/
-    	
-    	
-    //	I_IntSet ids = Terms.get().getConceptNids();
-    	
-    //	return ids.contains(concept.getConceptNid());
     }
-    
-    private boolean conceptMayBeInitialized(I_GetConceptData concept) throws Exception
-    {
-    	WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
     	
-    	SortedSet<WorkflowHistoryJavaBean> beanList = searcher.searchForWFHistory(concept);
-    
-    	if ((beanList == null) || (beanList.size() == 0))
-    		return true;
-    	else
-	    	return beanList.first().getState().equals(Terms.get().getConcept(WorkflowAuxiliary.Concept.DONE.getUids())); 			
-    }
-
-    private boolean isDataChecksPassed() {
-/*
- *     	List<AlertToDataConstraintFailure> results = Terms.get().getCommitErrorsAndWarnings();
- 
     	
+	private UUID identifyNextState(UUID modelerUid, I_GetConceptData concept, UUID commitActionUid) 
+    		{
+		I_GetConceptData initialState = null;
+        boolean existsInDb = isConceptInDatabase(concept);
+        		
 		try {
-			for (AlertToDataConstraintFailure dataCheckResult : results) {
-				if (dataCheckResult.equals(AlertToDataConstraintFailure.ALERT_TYPE.ERROR))
-					return false;
+        	WorkflowHistoryRefsetSearcher wfSearcher = new WorkflowHistoryRefsetSearcher();
+
+			if (wfSearcher.getTotalCountByConcept(concept) > 0)
+				initialState = Terms.get().getConcept(wfSearcher.getLatestWfHxJavaBeanForConcept(concept).getState());
+			else 
+    	{
+				for (I_GetConceptData state : Terms.get().getActiveAceFrameConfig().getWorkflowStates())
+    		{
+					List<? extends I_RelTuple> relList = WorkflowHelper.getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE);
+
+		    		for (I_RelTuple rel : relList)
+    	{
+		    			if (rel != null && 
+							((existsInDb && (rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EXISTING_CONCEPT.getPrimoridalUid()).getConceptNid())) ||
+							 (!existsInDb && (rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_NEW_CONCEPT.getPrimoridalUid()).getConceptNid()))))
+    		{
+							initialState = state;
+    		}
+    	}
+
+		    		if (initialState != null)
+		    			break;
+    		}
+    	}
+    	
+			EditorCategoryRefsetSearcher categorySearcher = new EditorCategoryRefsetSearcher();
+			I_GetConceptData modeler = Terms.get().getConcept(modelerUid);
+			I_GetConceptData category = categorySearcher.searchForCategoryForConceptByModeler(modeler, concept);
+    	
+			StateTransitionRefsetSearcher nextStateSearcher = new StateTransitionRefsetSearcher();
+			Map<I_GetConceptData, I_GetConceptData> possibleActions = nextStateSearcher.searchForPossibleActionsAndFinalStates(category.getConceptNid(), initialState.getConceptNid());
+    	
+			for (I_GetConceptData transitionAction : possibleActions.keySet())
+    	{
+				if (transitionAction.getPrimUuid().equals(commitActionUid))
+					return possibleActions.get(transitionAction).getPrimUuid();
 			}
 		} catch (Exception e) {
-			AceLog.getEditLog().alertAndLogException(e);
+			e.printStackTrace();
 		}
-*/		
-		return true;
-    }
-}    	
+    		
+		return null;
+    	}
 
+	private boolean isConceptInDatabase(I_GetConceptData concept) {
+		boolean hasBeenReleased = false;
+    	
+		try {
+			WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
+			int SnomedId = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids());
+    	
+			I_Identify idVersioned = Terms.get().getId(concept.getConceptNid());
+	        for (I_IdPart idPart : idVersioned.getMutableIdParts()) {
+	            if (idPart.getAuthorityNid() == SnomedId) 
+	            	hasBeenReleased = true;
+	        }
+    	
+			if (!hasBeenReleased && (searcher.getTotalCountByConcept(concept) == 0))
+				return false;
+		} catch (Exception e) {
+			e.printStackTrace();
+    }
+    
+    		return true;
+    }
+
+	private UUID identifyAcceptAction() {
+ 
+		try
+		{
+			for (I_GetConceptData action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
+			{
+				List<? extends I_RelTuple> useCaseRel = WorkflowHelper.getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
+    	
+				for (I_RelTuple rel : useCaseRel)
+				{
+					if (rel != null &&
+						rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACCEPT_ACTION.getPrimoridalUid()).getConceptNid())
+						return action.getPrimUuid();
+				}
+			}
+		} catch (Exception e ) {
+			e.printStackTrace();
+		}
+		return null;
+    }
+
+}    	

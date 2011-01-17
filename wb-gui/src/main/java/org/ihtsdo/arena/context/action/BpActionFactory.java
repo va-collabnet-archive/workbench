@@ -65,6 +65,27 @@ public class BpActionFactory {
 		};
 	}
 	
+	public Action makeDisabled(File processfile) {
+		try {
+			BpAction act = new BpAction(processfile.toURI().toURL(), frameConfig, host);
+			act.setEnabled(false);
+			return act;
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLog(null,
+					Level.SEVERE,
+					"processing: " + processfile, e);
+			AceLog.getAppLog().alertAndLogException(e);
+		} 
+
+		return new AbstractAction() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// nothing to do...
+			}
+		};
+	}
 	
 	public Collection<Action> getProcessActions(File menuDir) {
 		Collection<Action> actions = new ArrayList<Action>();

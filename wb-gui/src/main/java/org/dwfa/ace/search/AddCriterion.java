@@ -34,13 +34,19 @@ public class AddCriterion implements ActionListener {
     /**
      * @param searchPanel
      */
-    AddCriterion(I_MakeCriterionPanel searchPanel) {
+    public AddCriterion(I_MakeCriterionPanel searchPanel) {
         this.searchPanel = searchPanel;
     }
 
     public void actionPerformed(ActionEvent e) {
         try {
+        	if (SearchPanel.class.isInstance(searchPanel))
             searchPanel.getCriterionPanels().add(searchPanel.makeCriterionPanel());
+        	else
+        	{
+        		WorkflowHistoryCriterionPanel panel = ((MySearchPanel)searchPanel).makeCriterionPanel();
+        		((MySearchPanel)searchPanel).getWorkflowHistoryCriterionPanels().add(panel);
+        	}
         } catch (ClassNotFoundException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (InstantiationException e1) {

@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -131,6 +132,7 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
@@ -357,6 +359,18 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private transient AceFrame aceFrame;
 
     private transient BundleType bundleType;
+
+    private boolean autoApprovedOn = false;
+    
+    private boolean overrideOn = false;
+    
+    private TreeSet<? extends I_GetConceptData> workflowRoles = null;
+
+    private TreeSet<? extends I_GetConceptData> workflowStates = null;
+
+    private TreeSet<? extends I_GetConceptData> workflowActions = null;
+
+    private TreeSet<UUID> availableWorkflowActions = null;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -3170,5 +3184,80 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     }
 
+	@Override
+	public boolean isAutoApproveOn() {
+		
+		return autoApprovedOn;
+	}
 
+	@Override
+	public void setAutoApprove(boolean b) {
+
+			this.autoApprovedOn = b;
+	}
+	
+	
+	@Override
+	public boolean isOverrideOn() {
+		
+		return overrideOn;
+	}
+
+	@Override
+	public void setOverride(boolean b) {
+
+			this.overrideOn = b;
+	}
+
+	@Override
+	public TreeSet<? extends I_GetConceptData> getWorkflowRoles() {
+		if (workflowRoles == null)
+			WorkflowHelper.updateWorkflowUserRoles();
+		
+		return workflowRoles;
+	}
+
+	@Override
+	public void setWorkflowRoles(TreeSet<? extends I_GetConceptData> roles) {
+		workflowRoles = roles;
+	}
+
+	@Override
+	public TreeSet<? extends I_GetConceptData> getWorkflowStates() {
+		if (workflowStates == null)
+			WorkflowHelper.updateWorkflowStates();
+		
+		return workflowStates;
+	}
+
+	@Override
+	public void setWorkflowStates(TreeSet<? extends I_GetConceptData> states) {
+		workflowStates = states;
+	}
+	
+	@Override
+	public TreeSet<? extends I_GetConceptData> getWorkflowActions() {
+		if (workflowActions == null)
+			WorkflowHelper.updateWorkflowActions();
+		
+		return workflowActions;
+	}
+
+	@Override
+	public void setWorkflowActions(TreeSet<? extends I_GetConceptData> actions) {
+		workflowActions = actions;
+	}
+
+	@Override
+	public TreeSet<UUID> getAllAvailableWorkflowActionUids() {
+		if (availableWorkflowActions == null)
+			WorkflowHelper.updateWorkflowActions();
+		
+		return availableWorkflowActions;
+	}
+
+	@Override
+	public void setAllAvailableWorkflowActionUids(TreeSet<UUID> actions) {
+		availableWorkflowActions = actions;
+	}
 }

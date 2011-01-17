@@ -64,9 +64,9 @@ import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.I_WriteDirectToDb;
 import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.RefsetPropertyMap;
-import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
@@ -83,6 +83,7 @@ import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.search.I_Search;
 import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
+import org.dwfa.ace.search.SearchWfHistoryStringWorker.WfHxProgressUpdator;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
@@ -102,6 +103,7 @@ import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
+import org.ihtsdo.ace.task.search.I_TestWorkflowHistorySearchResults;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_FetchConceptFromCursor;
 import org.ihtsdo.concept.I_ProcessConceptData;
@@ -156,6 +158,8 @@ import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
+import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
+import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetSearcher;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -1486,6 +1490,61 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         public boolean continueWork() {
             return tracker.continueWork();
         }
+    }
+    @Override
+	public //CountDownLatch 
+	void searchWfHx(I_TrackContinuation tracker, Collection<WorkflowHistoryJavaBean> matches,
+									//CountDownLatch latch, 
+									List<I_TestWorkflowHistorySearchResults> checkList,I_ConfigAceFrame config, 
+									WfHxProgressUpdator updater)
+			throws Exception
+    {
+    	Stopwatch timer = new Stopwatch();
+        ;
+        timer.start();
+
+        WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
+
+    	//updater.setIndeterminate(true);
+    	//updater.setProgressInfo("Starting StandardAnalyzer lucene query...");
+    	long startTime = System.currentTimeMillis();
+        //updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime)
+         //       + " ms.");
+        throw new Exception();
+        /*
+        SortedSet<WorkflowHistoryJavaBean> searchFindings = searcher.getAllWfHxSortedByTime(); 
+        
+        
+        AceLog.getAppLog().info("StandardAnalyzer query returned " + searchFindings.size() + " hits");
+//        updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime)
+//                + " ms. Hits: " + searchFindings.size());
+
+        //CountDownLatch hitLatch = new CountDownLatch(searchFindings.size());
+//        updater.setHits(searchFindings.size());
+//        updater.setIndeterminate(false);
+
+        Iterator<WorkflowHistoryJavaBean> itr = searchFindings.iterator();
+        while (itr.hasNext())
+        {
+        	WorkflowHistoryJavaBean bean = (WorkflowHistoryJavaBean)itr.next(); 
+        
+            ACE.threadPool.execute(new CheckAndProcessWorkflowHistoryMatch(//hitLatch, 
+            		updater, bean, matches,
+            		checkList, config));
+        }
+        
+        if (AceLog.getAppLog().isLoggable(Level.INFO)) {
+            if (tracker.continueWork()) {
+                AceLog.getAppLog().info("Search time 1: " + timer.getElapsedTime());
+            } else {
+                AceLog.getAppLog().info("Search 1 Canceled. Elapsed time: " + timer.getElapsedTime());
+            }
+        }
+                timer.stop();
+
+        */
+        
+       // return hitLatch;
     }
 
     @Override

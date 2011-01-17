@@ -22,6 +22,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JList;
@@ -40,7 +41,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryJavaBean;
+import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetSearcher;
 
 
@@ -86,7 +87,7 @@ public class AddRefsetToListView extends AbstractTask {
             JList conceptList = configFrame.getBatchConceptList();            
             model = (I_ModelTerminologyList) conceptList.getModel();            
             WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
-            Map<I_GetConceptData, WorkflowHistoryJavaBean> members = searcher.listWFHistoryRefsetMembers();
+            Map<I_GetConceptData, WorkflowHistoryJavaBean> members = new HashMap<I_GetConceptData, WorkflowHistoryJavaBean>();
             
             System.out.println("<==========Member's size=======>" + members.size());   
             int modelSize= model.getSize();
@@ -102,12 +103,6 @@ public class AddRefsetToListView extends AbstractTask {
             
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
-            throw new TaskFailedException(e);
-        } catch (IntrospectionException e) {
-            throw new TaskFailedException(e);
-        } catch (IllegalAccessException e) {
-            throw new TaskFailedException(e);
-        } catch (InvocationTargetException e) {
             throw new TaskFailedException(e);
         } catch (TerminologyException e) {
             throw new TaskFailedException(e);

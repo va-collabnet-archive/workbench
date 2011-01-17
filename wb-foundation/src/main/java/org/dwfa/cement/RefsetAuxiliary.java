@@ -256,6 +256,7 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             WORKFLOW_HISTORY(new String[] {"history workflow refset", "history workflow refset" }, WORKFLOW), 
             EDITOR_CATEGORY(new String[] {"editor category workflow refset", "editor category workflow refset" }, WORKFLOW), 
             SEMANTIC_AREA_HIERARCHY(new String[] {"semantic area hierarchy workflow refset", "semantic area hierarchy workflow refset" }, WORKFLOW), 
+            SEMANTIC_AREA_SEARCH(new String[] {"semantic area search workflow refset", "semantic area search workflow refset" }, WORKFLOW),
             STATE_TRANSITION(new String[] {"state transition workflow refset", "state transition workflow refset" }, WORKFLOW), 
             
 

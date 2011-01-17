@@ -261,6 +261,11 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
     }
 
 	@Override
+	public int getPartsHashCode() {
+		return HashFunction.hashCode(new int[]{ getStringValue().hashCode()});
+	}
+	
+	@Override
 	public void setStr1(String str) throws PropertyVetoException {
 		this.stringValue = str;
 		modified();

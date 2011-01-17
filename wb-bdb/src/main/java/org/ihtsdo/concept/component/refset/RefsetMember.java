@@ -228,6 +228,11 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
         }
 
         @Override
+		public int getPartsHashCode() {
+			return getMutablePart().getPartsHashCode();
+		}		
+
+        @Override
         public int getReferencedComponentNid() {
             return RefsetMember.this.getReferencedComponentNid();
         }

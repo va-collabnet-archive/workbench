@@ -9,6 +9,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
@@ -200,4 +201,8 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
 		rcs.with(RefexProperty.INTEGER1, this.intValue);
 	}
 
+	@Override
+	public int getPartsHashCode() {
+		return HashFunction.hashCode(new int[]{ getIntValue()});
+	}
 }

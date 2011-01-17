@@ -428,6 +428,11 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
         return (List<Version>) versions;
     }
     
+	@Override
+	public int getPartsHashCode() {
+		return HashFunction.hashCode(new int[]{ getC1id(), getC2id(), getStringValue().hashCode() });
+	}
+	    
 	protected TK_REFSET_TYPE getTkRefsetType() {
 		return TK_REFSET_TYPE.CID_CID_STR;
 	}

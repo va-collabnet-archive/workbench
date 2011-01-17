@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import javax.swing.ImageIcon;
@@ -1180,4 +1181,64 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
     public void setShowPromotionTab(Boolean show) {
         config.setShowPromotionTab(show);
     }
+
+	@Override
+	public boolean isAutoApproveOn() {
+		return config.isAutoApproveOn();
+	}
+
+	@Override
+	public boolean isOverrideOn() {
+		return config.isOverrideOn();
+	}
+
+	@Override
+	public void setAutoApprove(boolean b) {
+		config.setAutoApprove(b);
+	}
+
+	@Override
+	public void setOverride(boolean b) {
+		config.setOverride(b);
+	}
+
+	@Override
+	public TreeSet<UUID> getAllAvailableWorkflowActionUids() {
+		return config.getAllAvailableWorkflowActionUids();
+	}
+
+	@Override
+	public TreeSet<? extends I_GetConceptData> getWorkflowActions() {
+		return config.getWorkflowActions();
+	}
+
+	@Override
+	public TreeSet<? extends I_GetConceptData> getWorkflowRoles() {
+		return config.getWorkflowRoles();
+	}
+
+	@Override
+	public TreeSet<? extends I_GetConceptData> getWorkflowStates() {
+		return config.getWorkflowStates();
+	}
+
+	@Override
+	public void setAllAvailableWorkflowActionUids(TreeSet<UUID> actions) {
+		config.setAllAvailableWorkflowActionUids(actions);
+	}
+
+	@Override
+	public void setWorkflowActions(TreeSet<? extends I_GetConceptData> actions) {
+		config.setWorkflowActions(actions);
+	}
+
+	@Override
+	public void setWorkflowRoles(TreeSet<? extends I_GetConceptData> roles) {
+		config.setWorkflowRoles(roles);
+	}
+
+	@Override
+	public void setWorkflowStates(TreeSet<? extends I_GetConceptData> states) {
+		config.setWorkflowStates(states);
+	}
 }

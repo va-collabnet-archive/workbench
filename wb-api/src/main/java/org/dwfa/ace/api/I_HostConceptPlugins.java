@@ -121,6 +121,10 @@ public interface I_HostConceptPlugins extends I_ContainTermComponent {
         DATA_CHECK_LINK, LIST_LINK, ARENA_LINK
     };
 
+    public enum WORKFLOW_USE_CASES {
+        NEW, EDIT;
+    };
+
     public boolean getShowHistory();
 
     public boolean getShowRefsets();

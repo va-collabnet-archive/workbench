@@ -22,15 +22,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
@@ -42,13 +45,29 @@ import org.drools.logger.KnowledgeRuntimeLogger;
 import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.config.AceFrame;
+import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.bpa.process.I_Work;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.ScrollablePanel;
 import org.ihtsdo.arena.context.action.BpActionFactory;
 import org.ihtsdo.arena.drools.EditPanelKb;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.workflow.WorkflowHandlerBI;
+import org.ihtsdo.tk.api.workflow.WorkflowHistoryJavaBeanBI;
 import org.ihtsdo.util.swing.GuiUtil;
+import org.ihtsdo.workflow.WorkflowHandler;
+import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
+import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetSearcher;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
@@ -141,6 +160,10 @@ public class ConceptViewRenderer extends JLayeredPane
 
 
 	private JToggleButton workflowToggleButton;
+	private JToggleButton oopsButton;
+
+	private static String workflowActionPathPrefix = "plugins/workflow/advanceWF/";
+	private static String workflowActionPathPostfix = "WFAction.bp";
 
 		
     /**
@@ -149,12 +172,12 @@ public class ConceptViewRenderer extends JLayeredPane
     public ConceptViewRenderer(Object cellObj,
             final mxGraphComponent graphContainer, ACE ace)
     {
-    	
-		try {
-			contextualConceptActionsKBase = EditPanelKb.setupKb(new File("drools-rules/ContextualConceptActionsPanel.drl"));
-		} catch (IOException e1) {
-			throw new RuntimeException(e1);
-		}
+//    	
+//		try {
+//			contextualConceptActionsKBase = EditPanelKb.setupKb(new File("drools-rules/ContextualConceptActionsPanel.drl"));
+//		} catch (IOException e1) {
+//			throw new RuntimeException(e1);
+//		}
 		workflowPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
         this.cell = (mxCell) cellObj;
         this.graphContainer = graphContainer;
@@ -222,27 +245,180 @@ public class ConceptViewRenderer extends JLayeredPane
 				JToggleButton button = (JToggleButton) e.getSource();
 				if (button.isSelected()) {
 		            remove(scrollPane);
-		            Collection<Action> actions = getKbActions();
+		            //Collection<Action> actions = getKbActions();
+		            WorkflowHandlerBI wfHandler = new WorkflowHandler();
+		            Collection<? extends WorkflowHistoryJavaBeanBI> possibleActions = null;
+		            Collection<UUID> availableActions = null;
+		            		        	
+		            try {
+						ViewCoordinate coordinate = settings.getConfig().getViewCoordinate();
+			            ConceptVersionBI concept = Ts.get().getConceptVersion(coordinate, settings.getConcept().getPrimUuid());
+			            availableActions = wfHandler.getAllAvailableWorkflowActionUids();
+			            possibleActions = wfHandler.getAvailableWorkflowActions(concept);
+		            } catch (IOException e1) {
+						e1.printStackTrace();
+					} catch (ContraditionException e2) {
+						e2.printStackTrace();
+					}
+					
 		            workflowPanel.removeAll();
-		            for (Action a: actions) {
-		            	JButton actionButton = new JButton(a);
+
+		            AceFrameConfig config;
+					try {
+						config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
+				        AceFrame ace = config.getAceFrame();
+				        JTabbedPane tp = ace.getCdePanel().getConceptTabs();
+				        int index = tp.getSelectedIndex();
+				        
+				        
+			            BpActionFactory actionFactory = new BpActionFactory(settings.getConfig(), settings.getHost());
+			            
+				        for (UUID action: availableActions) {
+
+		            		JButton actionButton = new JButton();
+							
+		            		Action a = actionFactory.make(new File("plugins/workflow/advanceWF/AdvanceWorkflow.bp"));
+		            		actionButton.setAction(a);
+		            		
 		            	actionButton.setHorizontalTextPosition(SwingConstants.CENTER);
 		            	actionButton.setVerticalTextPosition(SwingConstants.BOTTOM);
+			            	actionButton.setText(Terms.get().getConcept(action).getInitialText());
+		
 		            	actionButton.addActionListener(new ActionListener() {
 							
 							@Override
 							public void actionPerformed(ActionEvent e) {
+									
+									try 
+									{
+							            final I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+								        
+								        // Get Worker
+							            I_Work worker;
+							            if (config.getWorker().isExecuting()) {
+								            worker = config.getWorker().getTransactionIndependentClone();
+								        } else {
+								            worker = config.getWorker();
+								        }
+								        
+	
+								        worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), WorkflowHelper.lookupAction(e.getActionCommand()).getPrimUuid());
+
 								workflowToggleButton.doClick();
+		    			    			
+		    			    			updateOopsButton(settings.getConcept());
+		    			    			
+									} catch (Exception e1) {
+										e1.printStackTrace();
+									}
 							}
 						});
+
+			        		if (wfHandler.isActiveAction(possibleActions, action))
+				        		actionButton.setEnabled(true);
+				        	else
+				        		actionButton.setEnabled(false);
+
 		            	workflowPanel.add(actionButton);
 		            }
+					} catch (TerminologyException e2) {
+						// TODO Auto-generated catch block
+						e2.printStackTrace();
+					} catch (IOException e2) {
+						// TODO Auto-generated catch block
+						e2.printStackTrace();
+					}
+
+					oopsButton = new JToggleButton("Undo");
+		            oopsButton.setToolTipText("Undo last action on this concept");
+
+		            oopsButton.setHorizontalTextPosition(SwingConstants.CENTER);
+	            	oopsButton.setVerticalTextPosition(SwingConstants.BOTTOM);
+
+		            oopsButton.setSelected(false);
+
+		            oopsButton.addActionListener(new ActionListener() {
+
+		            	@Override
+		    			public void actionPerformed(ActionEvent e) {
+
+		    				try {
+
+		    					if (settings.getConcept() != null) {
+		    						WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
+		    						WorkflowHistoryJavaBean latestWfHxJavaBean = searcher.getLatestWfHxJavaBeanForConcept(settings.getConcept());
+		    						UUID latestModelerUUID = latestWfHxJavaBean.getModeler();
+		    			            UUID currentModelerUUID = WorkflowHelper.getCurrentModeler().getPrimUuid();
+		    			            boolean autoApproved = latestWfHxJavaBean.getAutoApproved();
+
+		    			            // See if state prevents retirement
+		    			            if (currentModelerUUID.equals(latestModelerUUID) && !autoApproved)
+		    						{
+		    			    			WorkflowHelper.retireWorkflowHistoryRow(latestWfHxJavaBean);
+		    			    			updateOopsButton(settings.getConcept());
+		    			    			workflowToggleButton.doClick();
+		    						}
+		    					} else {
+		    						throw new Exception("Must have a concept to reverse workflow on");
+		    					}
+
+		    				} catch (TerminologyException e1) {
+		    					e1.printStackTrace();
+		    				} catch (IOException e1) {
+		    					e1.printStackTrace();
+		    				} catch (Exception e1) {
+								e1.printStackTrace();
+							}
+		    			}
+
+		    			});
+
+	    			updateOopsButton(settings.getConcept());
+		            workflowPanel.add(oopsButton);
+
 		            add(workflowScrollPane, BorderLayout.CENTER);
 					// Populate here...
 
 		            workflowPanel.setVisible(true);
 					scrollPane.setVisible(false);
 					GuiUtil.tickle(ConceptViewRenderer.this);
+//// 
+
+
+			        final JCheckBox override = new JCheckBox();
+			        override.setText("Override mode");
+			        override.setAlignmentY(LEFT_ALIGNMENT);
+
+			        override.addActionListener(new ActionListener() {
+
+			        	@Override
+						public void actionPerformed(ActionEvent e) {
+
+			        		boolean or;
+
+			        		if (override.isSelected()) {
+			        			override.setBackground(Color.red);
+			        			or = true;
+			        		} else { 
+			        			override.setBackground(new Color(240, 240, 240));
+			        			or = false;
+			        		}
+
+			        		try {
+								Terms.get().getActiveAceFrameConfig().setOverride(or);
+							} catch (TerminologyException e1) {
+								e1.printStackTrace();
+							} catch (IOException e1) {
+								e1.printStackTrace();
+							}
+			        	}
+
+					});
+			        
+			        workflowPanel.add(override);
+
+			        /////
+
 
 				} else {
 					workflowPanel.setVisible(false);
@@ -256,6 +432,9 @@ public class ConceptViewRenderer extends JLayeredPane
         workflowToggleButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
         footerPanel.add(workflowToggleButton, gbc);
         
+
+        gbc.gridx++;
+       
         gbc.weightx = 1;
         JPanel fillerPanel = new JPanel();
         fillerPanel.setBackground(footerPanel.getBackground());
@@ -360,4 +539,20 @@ public class ConceptViewRenderer extends JLayeredPane
 		}
     	
     }
+
+    private void updateOopsButton(I_GetConceptData concept) {		    	
+    	try 
+    	{
+	    	WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
+	    	
+	    	WorkflowHistoryJavaBean latestWfHxJavaBean = searcher.getLatestWfHxJavaBeanForConcept(concept);
+	
+    		if (latestWfHxJavaBean == null || WorkflowHelper.isBeginEndAction(latestWfHxJavaBean.getAction()))
+	    		oopsButton.setEnabled(false);
+	    	else
+	    		oopsButton.setEnabled(true);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
  }
+}

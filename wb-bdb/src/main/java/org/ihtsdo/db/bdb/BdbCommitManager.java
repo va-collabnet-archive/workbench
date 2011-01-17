@@ -67,6 +67,7 @@ import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
 
 public class BdbCommitManager {
 
@@ -458,6 +459,8 @@ public class BdbCommitManager {
                         }
                         uncommittedCNids.clear();
                         uncommittedCNidsNoChecks = Terms.get().getEmptyIdSet();
+
+            			WorkflowHistoryRefsetWriter.unLockMutex();
 
                         luceneWriterPermit.acquire();
                         IdentifierSet descNidsToCommit = new IdentifierSet((IdentifierSet) uncommittedDescNids);

@@ -12,7 +12,10 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_TrackContinuation;
 import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
+import org.dwfa.ace.search.SearchWfHistoryStringWorker.WfHxProgressUpdator;
 import org.dwfa.ace.task.search.I_TestSearchResults;
+import org.ihtsdo.ace.task.search.I_TestWorkflowHistorySearchResults;
+import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 
 public interface I_Search {
 
@@ -42,5 +45,12 @@ public interface I_Search {
 			CountDownLatch latch, List<I_TestSearchResults> checkList,
 			I_ConfigAceFrame config) throws IOException,
 			ParseException;
+
+	public void searchWfHx(I_TrackContinuation tracker, 
+			Collection<WorkflowHistoryJavaBean> matches,
+			//CountDownLatch latch, 
+			List<I_TestWorkflowHistorySearchResults> checkList,
+			I_ConfigAceFrame config, WfHxProgressUpdator updater)
+			throws Exception;
 
 }

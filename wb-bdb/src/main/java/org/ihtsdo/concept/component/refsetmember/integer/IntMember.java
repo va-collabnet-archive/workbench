@@ -273,6 +273,11 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
 		return TK_REFSET_TYPE.INT;
 	}
 
+	@Override
+	public int getPartsHashCode() {
+		return HashFunction.hashCode(new int[]{ getIntValue()});
+	}
+	
 	protected void addSpecProperties(RefexAmendmentSpec rcs) {
 		rcs.with(RefexProperty.INTEGER1, this.intValue);
 	}

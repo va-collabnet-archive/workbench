@@ -152,6 +152,7 @@ import org.dwfa.ace.queue.NewQueueListener;
 import org.dwfa.ace.refset.RefsetSpecEditor;
 import org.dwfa.ace.refset.RefsetSpecPanel;
 import org.dwfa.ace.search.SearchPanel;
+import org.dwfa.ace.search.MySearchPanel;
 import org.dwfa.ace.table.refset.RefsetDefaults;
 import org.dwfa.ace.table.refset.RefsetDefaultsConcept;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -960,9 +961,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                         showSearchToggle.setSelected(false);
                     }
                     int splitLoc = upperLowerSplit.getDividerLocation();
-                    upperLowerSplit.setBottomComponent(signpostPanel);
+                    upperLowerSplit.setBottomComponent(wfSearchPanel);
                     upperLowerSplit.setDividerLocation(splitLoc);
-                    shownContainer = signpostPanel;
+                    shownContainer = wfSearchPanel;
                 }
                 if (hidden) {
                     // AceLog.getAppLog().info("showing bottom panel");
@@ -990,6 +991,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             resizePalttes();
             if (showSearchToggle.isSelected()) {
                 searchPanel.focusOnInput();
+            }
+            if (showSignpostPanelToggle.isSelected()) {
+            	wfSearchPanel.focusOnInput();
             }
         }
 
@@ -1236,6 +1240,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public SearchPanel searchPanel;
 
+    public MySearchPanel wfSearchPanel;
+
     public JSplitPane upperLowerSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
     public JSplitPane termTreeConceptSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -1474,6 +1480,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
         searchPanel = new SearchPanel(aceFrameConfig, this);
         searchPanel.addComponentListener(new ResizePalettesListener());
+        wfSearchPanel = new MySearchPanel(aceFrameConfig, this);
+        wfSearchPanel.addComponentListener(new ResizePalettesListener());
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
@@ -1756,13 +1764,13 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         termTreeConceptSplit.setLastDividerLocation(aceFrameConfig.getTreeTermDividerLoc());
 
         upperLowerSplit.setTopComponent(termTreeConceptSplit);
-        upperLowerSplit.setBottomComponent(searchPanel);
+        upperLowerSplit.setBottomComponent(wfSearchPanel);
         upperLowerSplit.setOneTouchExpandable(true);
         upperLowerSplit.setContinuousLayout(true);
         upperLowerSplit.setResizeWeight(1);
         upperLowerSplit.setLastDividerLocation(500);
         upperLowerSplit.setDividerLocation(2000);
-        searchPanel.setMinimumSize(new Dimension(0, 0));
+        wfSearchPanel.setMinimumSize(new Dimension(0, 0));
 
         JPanel content = new JPanel();
         content.setLayout(new GridBagLayout());
@@ -3077,6 +3085,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         searchPanel.removeLinkedComponent(component);
     }
 
+    public void addWfSearchLinkedComponent(I_ContainTermComponent component) {
+        wfSearchPanel.addLinkedComponent(component);
+    }
+
+    public void removeWfSearchLinkedComponent(I_ContainTermComponent component) {
+    	wfSearchPanel.removeLinkedComponent(component);
+    }
+
     private static Timer swingTimer = new Timer(500, null);
     static {
         swingTimer.start();
@@ -3607,6 +3623,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         return searchPanel;
     }
 
+    public MySearchPanel getWfSearchPanel() {
+        return wfSearchPanel;
+    }
     int refsetTabIndex = -2;
 
     public boolean refsetTabIsSelected() {
@@ -3616,6 +3635,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public I_DescriptionTuple getSearchResultsSelection() {
         return searchPanel.getSearchResultsSelection();
+    }
+
+    public I_DescriptionTuple getWorkflowHistorySearchResultsSelection() {
+        return wfSearchPanel.getSearchResultsSelection();
     }
 
     public void showRefsetSpecPanel() {

@@ -273,6 +273,11 @@ public class LongMember extends RefsetMember<LongRevision, LongMember>
         return (List<Version>) versions;
     }
     
+	@Override
+	public int getPartsHashCode() {
+		return HashFunction.hashCode(new int[]{ new Long(getLongValue()).hashCode()});
+	}
+
 	protected TK_REFSET_TYPE getTkRefsetType() {
 		return TK_REFSET_TYPE.LONG;
 	}

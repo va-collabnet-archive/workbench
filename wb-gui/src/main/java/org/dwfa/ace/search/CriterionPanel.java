@@ -132,7 +132,7 @@ public class CriterionPanel extends JPanel {
 
     JPanel editorPanel = new JPanel();
 
-    private JComboBox criterionCombo;
+    protected JComboBox criterionCombo;
 
     public CriterionPanel(I_MakeCriterionPanel searchPanel, I_TestSearchResults beanToSet)
             throws ClassNotFoundException, InstantiationException, IllegalAccessException {
@@ -140,6 +140,10 @@ public class CriterionPanel extends JPanel {
 
     }
 
+    public CriterionPanel(boolean dumbVal) {
+    	super(new GridBagLayout());
+    }
+    
     public CriterionPanel(I_MakeCriterionPanel searchPanel, I_TestSearchResults beanToSet,
             List<I_TestSearchResults> criterionOptions) throws ClassNotFoundException, InstantiationException,
             IllegalAccessException {

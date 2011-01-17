@@ -286,6 +286,14 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
     }
 
 	@Override
+	public int getPartsHashCode() {
+		if (getBooleanValue())
+			return 1;
+		else 
+			return 0;
+	}
+	
+	@Override
 	public boolean getBoolean1() {
 		return this.booleanValue;
 	}

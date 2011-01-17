@@ -353,6 +353,12 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
 		return TK_REFSET_TYPE.CID_CID;
 	}
 
+	@Override
+	public int getPartsHashCode() {
+		return HashFunction.hashCode(new int[]{ getC1id(), getC2id()});
+	}
+
+	@Override
 	protected void addSpecProperties(RefexAmendmentSpec rcs) {
 		rcs.with(RefexProperty.CNID1, getCnid1());
 		rcs.with(RefexProperty.CNID2, getCnid2());

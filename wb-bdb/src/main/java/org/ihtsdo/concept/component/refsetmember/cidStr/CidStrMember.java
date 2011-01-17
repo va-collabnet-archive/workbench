@@ -335,6 +335,10 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember> imp
 		this.strValue = str;
 		modified();
 	}
+		@Override
+	public int getPartsHashCode() {
+		return HashFunction.hashCode(new int[]{ getC1id(), getStringValue().hashCode()});
+	}
 
 	@Override
 	public int getCnid1() {
