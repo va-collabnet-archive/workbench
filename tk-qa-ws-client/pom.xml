@@ -1,14 +1,15 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
-		<version>2.6.0-trek-12-SNAPSHOT</version>
+		<version>2.6.0-trek-11-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>tk-qa-ws-client</artifactId>
 	<packaging>jar</packaging>
-	<name>${branch}: QA Database Web Service Client</name>
+	<name>QA Database Web Service Client</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -38,7 +39,6 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<sourceDirectory>${basedir}/src</sourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.axis2</groupId>
@@ -46,18 +46,18 @@
 				<version>1.5.2</version>
 				<executions>
 					<execution>
-						<phase>clean</phase>
+						<phase>compile</phase>
 						<goals>
 							<goal>wsdl2code</goal>
 						</goals>
 						<configuration>
 							<packageName>org.ihtsdo.qadb.service</packageName>
-							<wsdlFile>${basedir}/resources/qadb-service.wsdl</wsdlFile>
+							<wsdlFile>${basedir}/src/main/resources/qadb-service.wsdl</wsdlFile>
 							<generateServerSide>true</generateServerSide>
 							<generateServicesXml>false</generateServicesXml>
 							<generateServerSideInterface>true</generateServerSideInterface>
 							<generateAllClasses>true</generateAllClasses>
-							<outputDirectory>${basedir}</outputDirectory>
+							<outputDirectory>${project.build.directory}</outputDirectory>
 							<!-- <syncMode>sync</syncMode> -->
 							<overWrite>true</overWrite>
 							<packageName>org.ihtsdo.qadb.ws</packageName>
@@ -98,6 +98,14 @@
 					<source>1.6</source>
 					<target>1.6</target>
 				</configuration>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
