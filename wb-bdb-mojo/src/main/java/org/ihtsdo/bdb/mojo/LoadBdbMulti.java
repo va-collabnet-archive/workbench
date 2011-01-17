@@ -245,6 +245,8 @@ public class LoadBdbMulti extends AbstractMojo {
 
                     RefsetMemberFactory.createNoTx(newPathSpec, ec, startTime);
                     RefsetMemberFactory.createNoTx(newOriginSpec, ec, startTime);
+                    getLog().info("Added path: " + spec.getPathConcept().getDescription() +
+                            " with origin: " + spec.getOriginConcept().getDescription());
 
 
 
@@ -314,7 +316,7 @@ public class LoadBdbMulti extends AbstractMojo {
         List<File> dialectFiles = FileIO.recursiveGetFiles(
                 new File(generatedResources, "spelling-variants"),
                 "variants_", ".txt", false);
-        if (dialectFiles != null) {
+        if (dialectFiles != null && dialectFiles.size() > 0) {
             I_ConfigAceFrame config = DefaultConfig.newProfile();
 
             int authorNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.USER.getUids());
@@ -395,6 +397,9 @@ public class LoadBdbMulti extends AbstractMojo {
                 BdbCommitManager.addUncommitted(enTextWithVariantsRefexColl);
                 BdbCommitManager.addUncommitted(dialectVariantsRefexColl);
             }
+        } else {
+           getLog().warn("No dialect files found in " + 
+                   new File(generatedResources, "spelling-variants").getAbsolutePath());
         }
     }
 
