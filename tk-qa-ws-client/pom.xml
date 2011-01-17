@@ -7,9 +7,11 @@
 		<version>2.6.0-trek-11-SNAPSHOT</version>
 	</parent>
 
+	<groupId>org.ihtsdo</groupId>
 	<artifactId>tk-qa-ws-client</artifactId>
 	<packaging>jar</packaging>
 	<name>QA Database Web Service Client</name>
+	<version>2.6.0-trek-11-SNAPSHOT</version>
 	<url>http://maven.apache.org</url>
 
 	<properties>
