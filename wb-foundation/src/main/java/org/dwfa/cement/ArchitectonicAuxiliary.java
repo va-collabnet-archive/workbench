@@ -1093,10 +1093,10 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 	            WORKFLOW_BATCH_COMMIT("Workflow batch commit", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
 	            WORKFLOW_BEGIN_WF_CONCEPT("Workflow begin action", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
 	            WORKFLOW_END_WF_CONCEPT("Workflow end action", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
-	            WORKFLOW_ACTIVE_MODELER("Workflow active modeler", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
+	            WORKFLOW_ACTIVE_MODELER("Workflow active editor", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
 	            WORKFLOW_AUTOMOTAIC_APPROVAL("Workflow automatic approval", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
-	            WORKFLOW_LEAD_MODELER("Workflow lead modeler", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
-	            WORKFLOW_DEFAULT_MODELER("Workflow default modeler", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
+	            WORKFLOW_LEAD_MODELER("Workflow lead editor", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
+	            WORKFLOW_DEFAULT_MODELER("Workflow default editor", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
 	            
 	            // Workflow Attribute Types
 	            WORKFLOW_ATTRIBUTES("Workflow attributes", new I_ConceptualizeUniversally[] { WORKFLOW_CONCEPTS }), 
@@ -1105,7 +1105,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 	            WORKFLOW_ACTION("Workflow action", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }), 
 	            WORKFLOW_EDITOR_CATEGORY("Workflow editor category", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }), 
 	            WORKFLOW_EDITOR_HIERARCHY("Workflow editory hierarchy", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }), 
-	            WORKFLOW_MODELER_VALUE("Workflow modeler status", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }), 
+	            WORKFLOW_MODELER_VALUE("Workflow editor status", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }), 
 
 	            // Workflow Attribute Types (Driving Workflow)
 	            WORKFLOW_ACTION_VALUE("Workflow action value", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }), 
