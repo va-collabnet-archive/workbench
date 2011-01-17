@@ -15,12 +15,14 @@ public class DragPanelRel extends ComponentVersionDragPanel<RelationshipVersionB
 	private static final long serialVersionUID = 1L;
 
 	
-	public DragPanelRel(ConceptViewSettings settings) {
-		super(settings);
+	public DragPanelRel(ConceptViewSettings settings,
+           CollapsePanel parentCollapsePanel) {
+		super(settings, parentCollapsePanel);
 	}
 
-	public DragPanelRel(LayoutManager layout, ConceptViewSettings settings) {
-		super(layout, settings);
+	public DragPanelRel(LayoutManager layout, ConceptViewSettings settings,
+           CollapsePanel parentCollapsePanel) {
+		super(layout, settings, parentCollapsePanel);
 	}
 
 	@Override

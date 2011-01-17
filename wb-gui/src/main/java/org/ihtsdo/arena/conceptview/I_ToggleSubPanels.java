@@ -6,7 +6,7 @@
 package org.ihtsdo.arena.conceptview;
 
 import java.util.EnumSet;
-import org.ihtsdo.arena.conceptview.ComponentVersionDragPanel.SubPanels;
+import org.ihtsdo.arena.conceptview.ComponentVersionDragPanel.SubPanelTypes;
 
 /**
  *
@@ -15,6 +15,6 @@ import org.ihtsdo.arena.conceptview.ComponentVersionDragPanel.SubPanels;
 public interface I_ToggleSubPanels {
 
     void setVisible(boolean visible);
-    void showSubPanels(EnumSet<SubPanels> panels);
+    void showSubPanels(EnumSet<SubPanelTypes> panels);
 
 }

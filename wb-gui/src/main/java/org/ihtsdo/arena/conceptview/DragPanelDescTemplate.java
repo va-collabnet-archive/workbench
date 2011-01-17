@@ -5,7 +5,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.util.EnumSet;
 
 import javax.swing.TransferHandler;
-import org.ihtsdo.arena.conceptview.ComponentVersionDragPanel.SubPanels;
+import org.ihtsdo.arena.conceptview.ComponentVersionDragPanel.SubPanelTypes;
 
 import org.ihtsdo.tk.spec.DescriptionSpec;
 
@@ -60,7 +60,7 @@ public class DragPanelDescTemplate extends DragPanel<DescriptionSpec> implements
 	}
 
     @Override
-    public void showSubPanels(EnumSet<SubPanels> panels) {
+    public void showSubPanels(EnumSet<SubPanelTypes> panels) {
         // nothing to do...;
     }
 	

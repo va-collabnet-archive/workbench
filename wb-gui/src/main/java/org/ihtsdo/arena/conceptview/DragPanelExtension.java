@@ -15,12 +15,14 @@ public class DragPanelExtension extends ComponentVersionDragPanel<ComponentVersi
 	private static final long serialVersionUID = 1L;
 
 	
-	public DragPanelExtension(ConceptViewSettings settings) {
-		super(settings);
+	public DragPanelExtension(ConceptViewSettings settings,
+           CollapsePanel parentCollapsePanel) {
+		super(settings, parentCollapsePanel);
 	}
 
-	public DragPanelExtension(LayoutManager layout, ConceptViewSettings settings) {
-		super(layout, settings);
+	public DragPanelExtension(LayoutManager layout, ConceptViewSettings settings,
+           CollapsePanel parentCollapsePanel) {
+		super(layout, settings, parentCollapsePanel);
 	}
 
 	@Override

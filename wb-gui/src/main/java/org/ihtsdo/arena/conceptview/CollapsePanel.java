@@ -41,8 +41,8 @@ public class CollapsePanel extends JPanel {
    int refexCount = 1;
    int templateCount = 1;
    int alertCount = 1;
-   EnumSet<ComponentVersionDragPanel.SubPanels> subpanelsToShow = 
-           EnumSet.noneOf(ComponentVersionDragPanel.SubPanels.class);
+   EnumSet<ComponentVersionDragPanel.SubPanelTypes> subpanelsToShow = 
+           EnumSet.noneOf(ComponentVersionDragPanel.SubPanelTypes.class);
    Set<I_ToggleSubPanels> components = new HashSet<I_ToggleSubPanels>();
    private JButton alertsButton;
    private JButton extrasButton;
@@ -158,7 +158,7 @@ public class CollapsePanel extends JPanel {
          @Override
          public void actionPerformed(ActionEvent e) {
             refex = !refex;
-            showSubpanels(refex, ComponentVersionDragPanel.SubPanels.REFEX);
+            showSubpanels(refex, ComponentVersionDragPanel.SubPanelTypes.REFEX);
             for (JComponent jc: refexPanels) {
                jc.setVisible(refex);
             }
@@ -185,7 +185,7 @@ public class CollapsePanel extends JPanel {
    }
 
    private void showSubpanels(boolean show,
-           ComponentVersionDragPanel.SubPanels subpanel) {
+           ComponentVersionDragPanel.SubPanelTypes subpanel) {
       if (show) {
          subpanelsToShow.add(subpanel);
       } else {
@@ -216,7 +216,7 @@ public class CollapsePanel extends JPanel {
             for (JComponent jc: templatePanels) {
                jc.setVisible(templates);
             }
-              showSubpanels(templates, ComponentVersionDragPanel.SubPanels.TEMPLATE);
+              showSubpanels(templates, ComponentVersionDragPanel.SubPanelTypes.TEMPLATE);
             ((JButton) e.getSource()).setIcon(templates ? hideTemplates
                     : showTemplates);
          }
@@ -256,7 +256,7 @@ public class CollapsePanel extends JPanel {
             for (JComponent jc: alertPanels) {
                jc.setVisible(alerts);
             }
-             showSubpanels(alerts, ComponentVersionDragPanel.SubPanels.ALERT);
+             showSubpanels(alerts, ComponentVersionDragPanel.SubPanelTypes.ALERT);
             ((JButton) e.getSource()).setIcon(alerts ? hideAlerts
                     : showAlerts);
          }
