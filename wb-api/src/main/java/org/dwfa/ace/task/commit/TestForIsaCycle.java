@@ -64,11 +64,12 @@ public class TestForIsaCycle extends AbstractConceptTest {
 
             boolean foundCycle = false;
             String error = SnoTable.updatePrefs(false);
-            if (error != null) {
+            // TODO MARC to fix up after re-implementing the classifier. 
+            /* if (error != null) {
                 alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
                     "<html>" + error, concept));
                 
-            } else {
+            } else { */
                 for (I_RelVersioned rv : usrl) {
                     List<? extends I_RelTuple> rvtl = rv.getTuples();
                     for (I_RelTuple rt : rvtl) {
@@ -87,8 +88,6 @@ public class TestForIsaCycle extends AbstractConceptTest {
                 if (foundCycle)
                     alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
                         "<html>Added IS_A relationship will create a cycle. ", concept));
-
-            }
             return alertList;
         } catch (IOException e) {
            throw new TaskFailedException(e);
