@@ -17,7 +17,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.tk.api.RelAssertionType;
-import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 public class RelationshipsDAO {
 

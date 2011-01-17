@@ -4,8 +4,9 @@
 
 package org.ihtsdo.qa.gui;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.GridBagLayout;
+
+import javax.swing.JPanel;
 
 /**
  * @author Guillermo Reynoso

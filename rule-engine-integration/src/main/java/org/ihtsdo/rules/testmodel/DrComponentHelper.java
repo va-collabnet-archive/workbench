@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;

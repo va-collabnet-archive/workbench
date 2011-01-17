@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import javax.swing.*;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -32,6 +31,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
