@@ -209,6 +209,7 @@
 					<artifactId>tools</artifactId>
 					<version>any</version>
 					<scope>system</scope>
+					<systemPath>${java.home}\..\lib\tools.jar</systemPath>
 				</dependency>
 			</dependencies>
 		</profile>
