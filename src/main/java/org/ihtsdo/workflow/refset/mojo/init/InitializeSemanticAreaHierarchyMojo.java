@@ -12,8 +12,8 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.ihtsdo.mojo.maven.MojoUtil;
-import org.ihtsdo.workflow.refset.semhier.SemanticAreaHierarchyRefset;
-import org.ihtsdo.workflow.refset.semhier.SemanticAreaHierarchyRefsetWriter;
+import org.ihtsdo.workflow.refset.semHier.SemanticAreaHierarchyRefset;
+import org.ihtsdo.workflow.refset.semHier.SemanticAreaHierarchyRefsetWriter;
 
 /**
  * @author Jesse Efron
@@ -32,25 +32,39 @@ public class InitializeSemanticAreaHierarchyMojo extends AbstractMojo {
      */
     private File targetDirectory;
     
+    /**
+     * Location of the build directory.
+     * 
+     * @parameter expression="${project.build.sourceDirectory}"
+     * @required
+     */
+    private File baseDirectory;
+
+    /**
+     * The name of the database to create. All sql inserts will be against this
+     * database.
+     * 
+     * @parameter
+     * @required
+     */
+    private String filePath;
+
+    private String basePath = "/../resources/";
+
     public void execute() throws MojoExecutionException, MojoFailureException 
     {
-        SemanticAreaHierarchyRefset refset = new SemanticAreaHierarchyRefset();
         System.setProperty("java.awt.headless", "true");
         try {
-            try {
-                if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName(), this.getClass(), targetDirectory)) {
-                    return;
-                }
-            } catch (NoSuchAlgorithmException e) {
-                throw new MojoExecutionException(e.getLocalizedMessage(), e);
-            }
 
+            String resourceFilePath = baseDirectory.getAbsoluteFile() + basePath + filePath;
+            System.out.println(resourceFilePath);
+
+            SemanticAreaHierarchyRefset refset = new SemanticAreaHierarchyRefset();
             I_TermFactory tf = Terms.get();
 
             SemanticAreaHierarchyRefsetWriter writer = new SemanticAreaHierarchyRefsetWriter();
 
-            File f= new File("src/main/resources/textRefset/semParRefset.txt");
-            Scanner scanner = new Scanner(f);
+            Scanner scanner = new Scanner(new File(resourceFilePath));
 
             while (scanner.hasNextLine())
             {
@@ -61,14 +75,11 @@ public class InitializeSemanticAreaHierarchyMojo extends AbstractMojo {
             	writer.setParentSemanticArea(columns[1]);
 
             	writer.addMember();
+            }
 
-    	        Collection<? extends I_ExtendByRef> extVersions = Terms.get().getRefsetExtensionMembers(refset.getRefsetId());
-    	        int size = extVersions.size();
-            };
-            
-	        tf.addUncommitted(tf.getConcept(refset.getRefsetConcept()));
+            // Single RefCompId, so commit at end
 
-	        //RefsetReaderUtility.getContents(refset.getRefsetId());
+            Terms.get().addUncommitted(writer.getRefsetConcept());
 		} catch (Exception e) {
 			e.printStackTrace();
 			e.getMessage();

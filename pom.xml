@@ -145,6 +145,11 @@
 			<scope>test</scope>
 			<optional>false</optional>
 		</dependency>
+		<dependency>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>wb-bdb</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<resources>
@@ -187,7 +192,6 @@
 					<artifactId>tools</artifactId>
 					<version>any</version>
 					<scope>system</scope>
-					<systemPath>${java.home}\..\lib\tools.jar</systemPath>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -204,7 +208,6 @@
 					<artifactId>tools</artifactId>
 					<version>any</version>
 					<scope>system</scope>
-					<systemPath>${java.home}/../lib/tools.jar</systemPath>
 				</dependency>
 			</dependencies>
 		</profile>
