@@ -1,0 +1,920 @@
+<?xml version="1.0" encoding="UTF-8"?><wsdl:definitions name="qadb-service" targetNamespace="http://www.ihtsdo.org/qadb/qadb-service/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.ihtsdo.org/qadb/qadb-service/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+    <wsdl:types><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.ihtsdo.org/qadb/qadb-service/">
+	<xsd:element name="ComponentRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="componentUuid" type="xsd:string"></xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ComponentResponse" type="tns:Component">
+	</xsd:element>
+	<xsd:element name="RuleRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ruleUuid" type="xsd:string"></xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="RuleResponse" type="tns:Rule"></xsd:element>
+	<xsd:complexType name="Severity">
+		<xsd:sequence>
+			<xsd:element name="severityUuid" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+			<xsd:element name="status" type="xsd:int" maxOccurs="1" minOccurs="0"></xsd:element>
+			<xsd:element name="name" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+			<xsd:element name="description" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+			<xsd:element name="author" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+
+	<xsd:element name="FindingRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="findingUuid" type="xsd:string"></xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="FindingResponse" type="tns:Finding">
+	</xsd:element>
+
+	<xsd:complexType name="Execution">
+		<xsd:sequence>
+			<xsd:element name="executionUuid" type="xsd:string"></xsd:element>
+			<xsd:element name="name" type="xsd:string"></xsd:element>
+			<xsd:element name="date" type="xsd:date"></xsd:element>
+			<xsd:element name="description" type="xsd:string"></xsd:element>
+			<xsd:element name="contextName" type="xsd:string"></xsd:element>
+			<xsd:element name="startTime" type="xsd:dateTime"></xsd:element>
+			<xsd:element name="endTime" type="xsd:dateTime"></xsd:element>
+			<xsd:element name="pathUuid" type="xsd:string"></xsd:element>
+			<xsd:element name="viewPointTime" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+            <xsd:complexType name="Rule">
+            	<xsd:sequence>
+            		<xsd:element name="ruleUuid" type="xsd:string"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="name" type="xsd:string"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="description" type="xsd:string"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="status" type="xsd:int"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="severity" type="tns:Severity"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="packageName" type="xsd:string"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="packageUrl" type="xsd:string"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="ditaUuid" type="xsd:string"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="ruleCode" type="xsd:string"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="category" type="xsd:string"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="expectedResult" type="xsd:string"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="suggestedResolution"
+            			type="xsd:string" maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="example" type="xsd:string"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="standingIssues" type="xsd:string"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="isWhitelistAllowed"
+            			type="xsd:boolean" maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="isWhitelistResetAllowed"
+            			type="xsd:boolean" maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="isWhitelistResetWhenClosed"
+            			type="xsd:boolean" maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="ditaDocumentationLinkUuid"
+            			type="xsd:string" maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="ditaGeneratedTopicUuid"
+            			type="xsd:string" maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="modifiedBy" type="xsd:string"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="documentationUrl"
+            			type="xsd:string" maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="effectiveTime" type="xsd:date"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+            
+            <xsd:complexType name="Component">
+            	<xsd:sequence>
+            		<xsd:element name="componentUuid"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element name="componentName"
+            			type="xsd:string" maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="sctid" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="Finding">
+            	<xsd:sequence>
+            		<xsd:element name="findingUuid" type="xsd:string"></xsd:element>
+            		<xsd:element name="execution" type="xsd:string"></xsd:element>
+            		<xsd:element name="rule" type="tns:Rule"></xsd:element>
+            		<xsd:element name="component" type="tns:Component"></xsd:element>
+            		<xsd:element name="details" type="xsd:string"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="ExecutionRequest">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="executionUuid" type="xsd:string"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="ExecutionResponse"
+            	type="tns:Execution">
+            </xsd:element>
+            <xsd:element name="CaseRequest">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="caseUuid" type="xsd:string"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="getCaseResponse" type="tns:Case">
+            </xsd:element>
+            
+            <xsd:complexType name="Case">
+            	<xsd:sequence>
+            		<xsd:element name="caseUuid" type="xsd:string"></xsd:element>
+            		<xsd:element name="rule" type="tns:Rule"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="component" type="tns:Component"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="isActive" type="xsd:boolean"></xsd:element>
+            		<xsd:element name="dispositionStatus"
+            			type="tns:DispositionStatus" maxOccurs="1"
+            			minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="dispositionReasonUuid"
+            			type="xsd:string" maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="dispositionStatusDate"
+            			type="xsd:date" maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="dispositionStatusEditor"
+            			type="xsd:string" maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="dispositionAnnotation"
+            			type="xsd:string" maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="detail" type="xsd:string"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="assignedTo" type="xsd:string"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="effectiveTime" type="xsd:date"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="pathUuid" type="xsd:string"></xsd:element>
+            		<xsd:element name="databaseUuid" type="xsd:string"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="DispositionStatus">
+            	<xsd:sequence>
+            		<xsd:element name="dispositionStatusUuid"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element name="name" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="getAllRules">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="AllRulesResponse">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="rule"
+            				type="tns:Rule" maxOccurs="unbounded" minOccurs="1">
+            			</xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            
+            <xsd:element name="getAllComponents">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="in" type="xsd:string"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="AllComponentsResponse">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="component" type="tns:Component" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="getAllDatabases">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="in" type="xsd:string"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="AllDatabasesResponse">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="database" type="tns:Database" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+
+            <xsd:complexType name="Database">
+            	<xsd:sequence>
+            		<xsd:element name="databaseUuid"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element name="name" type="xsd:string"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="getAllSeverities">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="in" type="xsd:string"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="AllSeveritiesResponse">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="severity" type="tns:Severity" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="getAllDispositionStatus">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="in" type="xsd:string"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="AllDispositionStatusResponse">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="dispositionStatus" type="tns:DispositionStatus" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="RulesReportLinesByPageRequest">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="qaCoordinate"
+            				type="tns:QACoordinate">
+            			</xsd:element>
+            			<xsd:element name="sortedBy" type="tns:IntBoolKeyValue" maxOccurs="unbounded" minOccurs="0">
+            			</xsd:element>
+            			<xsd:element name="filter" type="tns:IntStrKeyValue" maxOccurs="unbounded" minOccurs="0">
+            			</xsd:element>
+            			<xsd:element name="startLine" type="xsd:int" maxOccurs="1" minOccurs="0">
+            			</xsd:element>
+            			<xsd:element name="pageLenght" type="xsd:int" maxOccurs="1" minOccurs="0">
+            			</xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="RulesReportLinesByPageResponse">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="rulesReportLine"
+            				type="tns:RulesReportLine" maxOccurs="unbounded"
+            				minOccurs="0">
+            			</xsd:element>
+            			<xsd:element name="sortedBy"
+            				type="tns:IntBoolKeyValue" maxOccurs="unbounded" minOccurs="0">
+            			</xsd:element>
+            			<xsd:element name="filter"
+            				type="tns:IntStrKeyValue" maxOccurs="unbounded" minOccurs="0">
+            			</xsd:element>
+            			<xsd:element name="initialLine"
+            				type="xsd:int" maxOccurs="1" minOccurs="0">
+            			</xsd:element>
+            			<xsd:element name="finalLine" type="xsd:int" maxOccurs="1" minOccurs="0">
+            			</xsd:element>
+            			<xsd:element name="totalLines"
+            				type="xsd:int" maxOccurs="1" minOccurs="0">
+            			</xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+
+            <xsd:complexType name="QACoordinate">
+            	<xsd:sequence>
+            		<xsd:element name="databaseUuid"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element name="pathUuid" type="xsd:string"></xsd:element>
+            		<xsd:element name="viewPointTime" type="xsd:string"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+            
+            
+            
+            <xsd:complexType name="IntBoolKeyValue">
+            	<xsd:sequence>
+            		<xsd:element name="key" type="xsd:int"></xsd:element>
+            		<xsd:element name="value" type="xsd:boolean"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="IntStrKeyValue">
+            	<xsd:sequence>
+            		<xsd:element name="key" type="xsd:int"></xsd:element>
+            		<xsd:element name="value" type="xsd:string"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="RulesReportLine">
+            	<xsd:sequence>
+            		<xsd:element name="rule" type="tns:Rule"></xsd:element>
+            		<xsd:element name="statusCount" maxOccurs="unbounded" minOccurs="0">
+            			<xsd:complexType>
+            				<xsd:sequence>
+            					<xsd:element name="status"
+            						type="xsd:boolean">
+            					</xsd:element>
+            					<xsd:element name="count"
+            						type="xsd:int">
+            					</xsd:element>
+            				</xsd:sequence>
+            			</xsd:complexType>
+            		</xsd:element>
+            		<xsd:element name="dispositionStatusCount" maxOccurs="unbounded" minOccurs="0">
+            			<xsd:complexType>
+            				<xsd:sequence>
+            					<xsd:element
+            						name="dispositionStatusUuid" type="xsd:string">
+            					</xsd:element>
+            					<xsd:element
+            						name="dispositionStatusCount" type="xsd:int">
+            					</xsd:element>
+            				</xsd:sequence>
+            			</xsd:complexType>
+            		</xsd:element>
+            		<xsd:element name="lastExecutionTime" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+
+            
+            <xsd:element name="AllPathsForDatabaseRequest">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="databaseUuid" type="xsd:string"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="AllPathsForDatabaseResponse">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="paths" type="tns:Component" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="AllPathsResponse">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="paths" type="tns:Component" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="QADatabaseRequest">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="databaseUuid" type="xsd:string"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="QADatabaseResponse">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="database" type="tns:Database" maxOccurs="1" minOccurs="0"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="QACasesReportLinesByPageRequest">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="qaCoordinate"
+            				type="tns:QACoordinate">
+            			</xsd:element>
+            			<xsd:element name="ruleUuid"
+            				type="xsd:string">
+            			</xsd:element>
+            			<xsd:element name="sorteBy"
+            				type="tns:IntBoolKeyValue" maxOccurs="unbounded"
+            				minOccurs="0">
+            			</xsd:element>
+            			<xsd:element name="filter"
+            				type="tns:IntStrKeyValue" maxOccurs="unbounded"
+            				minOccurs="0">
+            			</xsd:element>
+            			<xsd:element name="startLine" type="xsd:int">
+            			</xsd:element>
+            			<xsd:element name="pageLenght"
+            				type="xsd:int">
+            			</xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="QACasesReportLinesByPageResponse">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="lines"
+            				type="tns:WsQACasesReportLine" maxOccurs="unbounded"
+            				minOccurs="0">
+            			</xsd:element>
+            			<xsd:element name="sortBy"
+            				type="tns:IntBoolKeyValue" maxOccurs="unbounded"
+            				minOccurs="0">
+            			</xsd:element>
+            			<xsd:element name="filter"
+            				type="tns:IntStrKeyValue" maxOccurs="unbounded"
+            				minOccurs="0">
+            			</xsd:element>
+            			<xsd:element name="initialLine"
+            				type="xsd:int">
+            			</xsd:element>
+            			<xsd:element name="finalLine" type="xsd:int">
+            			</xsd:element>
+            			<xsd:element name="totalLines"
+            				type="xsd:int">
+            			</xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+
+            <xsd:complexType name="WsQACasesReportLine">
+            	<xsd:sequence>
+            		<xsd:element name="qaCase" type="tns:Case"></xsd:element>
+            		<xsd:element name="component"
+            			type="tns:Component">
+            		</xsd:element>
+            		<xsd:element name="dispositionStatus" type="tns:DispositionStatus"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="PersistQACaseRequest">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="qaCase" type="tns:Case"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="getAllCategories">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="in" type="xsd:string"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="AllCategoriesResponse">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="categories" type="tns:WsCategory" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+
+            <xsd:complexType name="WsCategory">
+            	<xsd:sequence>
+            		<xsd:element name="categoryUuid"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element name="name" type="xsd:string"></xsd:element>
+            		<xsd:element name="description" type="xsd:string"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="author" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+            		<xsd:element name="status" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="PersistsQARuleRequest">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="rule" type="tns:Rule"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="persistsQARuleResponse">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="out" type="xsd:string"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="persistsQARuleFault">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="persistsQARuleFault"
+            				type="xsd:string">
+            			</xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+</xsd:schema></wsdl:types>
+    <wsdl:message name="getComponentRequest">
+    	<wsdl:part name="parameters" element="tns:ComponentRequest"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getComponentResponse">
+    	<wsdl:part name="parameters" element="tns:ComponentResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getRuleRequest">
+    	<wsdl:part name="parameters" element="tns:RuleRequest"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getRuleResponse">
+    	<wsdl:part name="parameters" element="tns:RuleResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getFindingRequest">
+    	<wsdl:part name="parameters" element="tns:FindingRequest"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getFindingResponse">
+    	<wsdl:part name="parameters" element="tns:FindingResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getExecutionRequest">
+    	<wsdl:part name="parameters" element="tns:ExecutionRequest"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getExecutionResponse">
+    	<wsdl:part name="parameters" element="tns:ExecutionResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getCaseRequest">
+    	<wsdl:part name="parameters" element="tns:CaseRequest"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getCaseResponse">
+    	<wsdl:part name="parameters" element="tns:getCaseResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllRulesRequest">
+    </wsdl:message>
+    <wsdl:message name="getAllRulesResponse">
+    	<wsdl:part name="parameters" element="tns:AllRulesResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllComponentsRequest">
+    </wsdl:message>
+    <wsdl:message name="getAllComponentsResponse">
+    	<wsdl:part name="parameters" element="tns:AllComponentsResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllDatabasesRequest">
+    </wsdl:message>
+    <wsdl:message name="getAllDatabasesResponse">
+    	<wsdl:part name="parameters" element="tns:AllDatabasesResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllSeveritiesRequest">
+    </wsdl:message>
+    <wsdl:message name="getAllSeveritiesResponse">
+    	<wsdl:part name="parameters" element="tns:AllSeveritiesResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllDispositionStatusRequest">
+    </wsdl:message>
+    <wsdl:message name="getAllDispositionStatusResponse">
+    	<wsdl:part name="parameters" element="tns:AllDispositionStatusResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getRulesReportLinesByPageRequest">
+    	<wsdl:part name="parameters" element="tns:RulesReportLinesByPageRequest"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getRulesReportLinesByPageResponse">
+    	<wsdl:part name="parameters" element="tns:RulesReportLinesByPageResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllPathsForDatabaseRequest">
+    	<wsdl:part name="parameters" element="tns:AllPathsForDatabaseRequest"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllPathsForDatabaseResponse">
+    	<wsdl:part name="parameters" element="tns:AllPathsForDatabaseResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllPathsRequest">
+    </wsdl:message>
+    <wsdl:message name="getAllPathsResponse">
+    	<wsdl:part name="parameters" element="tns:AllPathsResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getQADatabaseRequest">
+    	<wsdl:part name="parameters" element="tns:QADatabaseRequest"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getQADatabaseResponse">
+    	<wsdl:part name="parameters" element="tns:QADatabaseResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getQACasesReportLinesByPageRequest">
+    	<wsdl:part name="parameters" element="tns:QACasesReportLinesByPageRequest"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getQACasesReportLinesByPageResponse">
+    	<wsdl:part name="parameters" element="tns:QACasesReportLinesByPageResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="persistQACaseRequest">
+    	<wsdl:part name="parameters" element="tns:PersistQACaseRequest"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="persistQACaseResponse">
+    </wsdl:message>
+    <wsdl:message name="getAllCategoriesRequest">
+    </wsdl:message>
+    <wsdl:message name="getAllCategoriesResponse">
+    	<wsdl:part name="parameters" element="tns:AllCategoriesResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="persistsQARuleRequest">
+    	<wsdl:part name="parameters" element="tns:PersistsQARuleRequest"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="persistsQARuleResponse">
+    </wsdl:message>
+    <wsdl:message name="persistsQARuleFault">
+    	<wsdl:part name="parameters" element="tns:persistsQARuleFault"></wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="qadb-data">
+    	<wsdl:operation name="getComponent">
+    		<wsdl:input message="tns:getComponentRequest"></wsdl:input>
+    		<wsdl:output message="tns:getComponentResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getRule">
+    		<wsdl:input message="tns:getRuleRequest"></wsdl:input>
+    		<wsdl:output message="tns:getRuleResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getFinding">
+    		<wsdl:input message="tns:getFindingRequest"></wsdl:input>
+    		<wsdl:output message="tns:getFindingResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getExecution">
+    		<wsdl:input message="tns:getExecutionRequest"></wsdl:input>
+    		<wsdl:output message="tns:getExecutionResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getCase">
+    		<wsdl:input message="tns:getCaseRequest"></wsdl:input>
+    		<wsdl:output message="tns:getCaseResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getAllRules">
+    		<wsdl:input message="tns:getAllRulesRequest"></wsdl:input>
+    		<wsdl:output message="tns:getAllRulesResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getAllComponents">
+    		<wsdl:input message="tns:getAllComponentsRequest"></wsdl:input>
+    		<wsdl:output message="tns:getAllComponentsResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getAllDatabases">
+    		<wsdl:input message="tns:getAllDatabasesRequest"></wsdl:input>
+    		<wsdl:output message="tns:getAllDatabasesResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getAllSeverities">
+    		<wsdl:input message="tns:getAllSeveritiesRequest"></wsdl:input>
+    		<wsdl:output message="tns:getAllSeveritiesResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getAllDispositionStatus">
+    		<wsdl:input message="tns:getAllDispositionStatusRequest"></wsdl:input>
+    		<wsdl:output message="tns:getAllDispositionStatusResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getRulesReportLinesByPage">
+    		<wsdl:input message="tns:getRulesReportLinesByPageRequest"></wsdl:input>
+    		<wsdl:output message="tns:getRulesReportLinesByPageResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getAllPathsForDatabase">
+    		<wsdl:input message="tns:getAllPathsForDatabaseRequest"></wsdl:input>
+    		<wsdl:output message="tns:getAllPathsForDatabaseResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getAllPaths">
+    		<wsdl:input message="tns:getAllPathsRequest"></wsdl:input>
+    		<wsdl:output message="tns:getAllPathsResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getQADatabase">
+    		<wsdl:input message="tns:getQADatabaseRequest"></wsdl:input>
+    		<wsdl:output message="tns:getQADatabaseResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getQACasesReportLinesByPage">
+    		<wsdl:input message="tns:getQACasesReportLinesByPageRequest"></wsdl:input>
+    		<wsdl:output message="tns:getQACasesReportLinesByPageResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="persistQACase">
+    		<wsdl:input message="tns:persistQACaseRequest"></wsdl:input>
+    		<wsdl:output message="tns:persistQACaseResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getAllCategories">
+    		<wsdl:input message="tns:getAllCategoriesRequest"></wsdl:input>
+    		<wsdl:output message="tns:getAllCategoriesResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="persistsQARule">
+    		<wsdl:input message="tns:persistsQARuleRequest"></wsdl:input>
+    		<wsdl:output message="tns:persistsQARuleResponse"></wsdl:output>
+            <wsdl:fault name="fault" message="tns:persistsQARuleFault"></wsdl:fault>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="qadb-binding" type="tns:qadb-data">
+    	<soap:binding style="document"
+    		transport="http://schemas.xmlsoap.org/soap/http" />
+    	<wsdl:operation name="getComponent">
+    		<soap:operation
+    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getComponent" />
+    		<wsdl:input>
+    			<soap:body use="literal" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getRule">
+    		<soap:operation
+    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getRule" />
+    		<wsdl:input>
+    			<soap:body use="literal" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getFinding">
+    		<soap:operation
+    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getFinding" />
+    		<wsdl:input>
+    			<soap:body use="literal" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getExecution">
+    		<soap:operation
+    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getExecution" />
+    		<wsdl:input>
+    			<soap:body use="literal" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getCase">
+    		<soap:operation
+    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getCase" />
+    		<wsdl:input>
+    			<soap:body use="literal" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getAllRules">
+    		<soap:operation
+    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllRules" />
+    		<wsdl:input>
+    			<soap:body use="literal" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getAllComponents">
+    		<soap:operation
+    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllComponents" />
+    		<wsdl:input>
+    			<soap:body use="literal" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getAllDatabases">
+    		<soap:operation
+    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllDatabases" />
+    		<wsdl:input>
+    			<soap:body use="literal" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getAllSeverities">
+    		<soap:operation
+    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllSeverities" />
+    		<wsdl:input>
+    			<soap:body use="literal" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getAllDispositionStatus">
+    		<soap:operation
+    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllDispositionStatus" />
+    		<wsdl:input>
+    			<soap:body use="literal" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getRulesReportLinesByPage">
+    		<soap:operation
+    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getRulesReportLinesByPage" />
+    		<wsdl:input>
+    			<soap:body use="literal" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getAllPathsForDatabase">
+    		<soap:operation
+    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllPathsForDatabase" />
+    		<wsdl:input>
+    			<soap:body use="literal" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getAllPaths">
+    		<soap:operation
+    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllPaths" />
+    		<wsdl:input>
+    			<soap:body use="literal" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getQADatabase">
+    		<soap:operation
+    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getQADatabase" />
+    		<wsdl:input>
+    			<soap:body use="literal" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getQACasesReportLinesByPage">
+    		<soap:operation
+    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getQACasesReportLinesByPage" />
+    		<wsdl:input>
+    			<soap:body use="literal" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="persistQACase">
+    		<soap:operation
+    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/persistQACase" />
+    		<wsdl:input>
+    			<soap:body use="literal" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getAllCategories">
+    		<soap:operation
+    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllCategories" />
+    		<wsdl:input>
+    			<soap:body use="literal" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="persistsQARule">
+    		<soap:operation
+    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/persistsQARule" />
+    		<wsdl:input>
+    			<soap:body use="literal" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal" />
+    		</wsdl:output>
+    		<wsdl:fault name="fault">
+    			<soap:fault use="literal" name="fault" />
+    		</wsdl:fault>
+    	</wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="qadb-service">
+		<wsdl:port name="qadb-serviceport" binding="tns:qadb-binding">
+			<soap:address location="http://127.0.0.1:8080/axis2/services/qadb-service" />
+		</wsdl:port>
+	</wsdl:service></wsdl:definitions>
