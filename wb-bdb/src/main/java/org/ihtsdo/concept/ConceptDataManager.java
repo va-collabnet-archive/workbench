@@ -26,6 +26,7 @@ import org.ihtsdo.db.util.NidPairForRel;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import org.ihtsdo.concept.component.AnnotationStyleBinder;
+import org.ihtsdo.tk.api.NidSetBI;
 
 /**
  * File format:<br>
@@ -305,6 +306,31 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
     /*
      * (non-Javadoc)
      * 
+     * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#getDestRels()
+     */
+    @Override
+    public List<Relationship> getDestRels(NidSetBI allowedTypes) throws IOException {
+
+        List<Relationship> destRels = new ArrayList<Relationship>();
+        for (NidPairForRel pair : Bdb.getDestRelPairs(enclosingConcept.getNid())) {
+            if (allowedTypes.contains(pair.getTypeNid())) {
+                int relNid = pair.getRelNid();
+                int conceptNid = Bdb.getNidCNidMap().getCNid(relNid);
+                Concept c = Bdb.getConceptForComponent(conceptNid);
+                if (c != null) {
+                    Relationship r = c.getRelationship(relNid);
+                    if (r != null) {
+                        destRels.add(r);
+                    }
+                }
+            }
+        }
+        return destRels;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see
      * org.ihtsdo.db.bdb.concept.I_ManageConceptData#add(org.ihtsdo.db.bdb.concept
      * .component.description.Description)
@@ -366,7 +392,6 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
         getImageNids().add(img.nid);
         modified();
     }
-
 
     public abstract boolean hasComponent(int nid) throws IOException;
 

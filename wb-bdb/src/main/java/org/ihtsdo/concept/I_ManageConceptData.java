@@ -19,6 +19,7 @@ import org.ihtsdo.concept.ConceptDataManager.AddDescriptionSet;
 import org.ihtsdo.concept.ConceptDataManager.AddImageSet;
 import org.ihtsdo.concept.ConceptDataManager.AddMemberSet;
 import org.ihtsdo.concept.ConceptDataManager.AddSrcRelSet;
+import org.ihtsdo.tk.api.NidSetBI;
 
 public interface I_ManageConceptData {
 
@@ -59,6 +60,8 @@ public interface I_ManageConceptData {
      * @throws IOException
      */
     public List<Relationship> getDestRels() throws IOException;
+    
+    public List<Relationship> getDestRels(NidSetBI allowedTypes) throws IOException;
 
     public void set(ConceptAttributes attr) throws IOException;
 

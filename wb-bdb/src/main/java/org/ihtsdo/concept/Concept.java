@@ -735,6 +735,13 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return data.getDestRels();
     }
 
+    public Collection<Relationship> getDestRels(NidSetBI allowedTypes) throws IOException {
+        if (isCanceled()) {
+            return new ArrayList<Relationship>();
+        }
+        return data.getDestRels(allowedTypes);
+    }
+
     @Override
     public Collection<RefsetMember<?, ?>> getExtensions() throws IOException {
         if (isCanceled()) {
@@ -1391,8 +1398,12 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         ViewCoordinate coordinate = new ViewCoordinate(precedencePolicy, 
         		positions, allowedStatus, allowedTypes, contradictionManager, Integer.MIN_VALUE, classifierNid, relAssertionType);
         List<Relationship.Version> actualValues = new ArrayList<Relationship.Version>();
-        for (Relationship rel : getDestRels()) {
-        	actualValues.addAll(rel.getVersions(coordinate));
+        for (Relationship rel : getDestRels(coordinate.getIsaTypeNids())) {
+                for (Relationship.Version relv: rel.getVersions(coordinate)) {
+                    if (coordinate.getIsaTypeNids().contains(relv.getTypeNid())) {
+                        actualValues.addAll(rel.getVersions(coordinate));
+                    }
+                }
         }        
         return actualValues;
     }
