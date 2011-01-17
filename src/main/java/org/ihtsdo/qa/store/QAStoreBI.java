@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 
+import org.ihtsdo.qa.store.model.Category;
 import org.ihtsdo.qa.store.model.DispositionStatus;
 import org.ihtsdo.qa.store.model.Execution;
 import org.ihtsdo.qa.store.model.Finding;
@@ -45,6 +46,9 @@ public interface QAStoreBI {
 	
 	public List<Severity> getAllSeverities();
 	public Severity getSeverity(UUID severityUuid);
+
+	public List<Category> getAllCategories();
+	public Category getCategory(UUID categoryUuid);
 	
 	public List<QACase> getAllQACases(QACoordinate coordinate);
 	public List<QACase> getQACasesForComponent(QACoordinate coordinate, UUID componentUuid);

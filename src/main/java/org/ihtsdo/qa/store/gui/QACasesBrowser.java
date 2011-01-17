@@ -14,9 +14,9 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -30,26 +30,20 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.border.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.task.refset.rfc.ModifyUserRolePanel.UserComboBoxListener;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.qa.gui.ObjectTransferHandler;
 import org.ihtsdo.qa.store.QAStoreBI;
 import org.ihtsdo.qa.store.model.DispositionStatus;
 import org.ihtsdo.qa.store.model.QACase;
 import org.ihtsdo.qa.store.model.QACoordinate;
 import org.ihtsdo.qa.store.model.Rule;
-import org.ihtsdo.qa.store.model.Severity;
 import org.ihtsdo.qa.store.model.view.QACasesReportColumn;
 import org.ihtsdo.qa.store.model.view.QACasesReportLine;
 import org.ihtsdo.qa.store.model.view.QACasesReportPage;
-import org.ihtsdo.qa.store.model.view.RulesReportColumn;
-import org.ihtsdo.rules.RulesLibrary;
 
 /**
  * @author Guillermo Reynoso
@@ -73,15 +67,15 @@ public class QACasesBrowser extends JPanel {
 	private HashMap<QACasesReportColumn, Object> filter;
 
 	public QACasesBrowser(QAStoreBI store, QACoordinate coordinate, Rule rule) {
-		try {
-			th = new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), null);
-		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			th = new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), null);
+//		} catch (TerminologyException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		
 		filter = new HashMap<QACasesReportColumn, Object>();
 		
@@ -100,20 +94,9 @@ public class QACasesBrowser extends JPanel {
 		label10.setText("");
 		label13.setText("");
 
-		final LinkedHashSet<String> columnNames = new LinkedHashSet<String>();
-		columnNames.add("Concept UUID");
-		columnNames.add("Concept Sctid");
-		columnNames.add("Concept Name");
-		columnNames.add("Status");
-		columnNames.add("Disposition");
-		columnNames.add("Assigned to");
-		columnNames.add("Time");
-		columnNames.add("Case");
-
-		String[][] data = null;
 		tableModel = new CaseTableModel();
 
-		Set<I_GetConceptData> users = RulesLibrary.getUsers();
+		Set<I_GetConceptData> users = new HashSet<I_GetConceptData>(); //RulesLibrary.getUsers();
 		
 		Object[] values = dispositionStatuses.toArray();
 		table1.setModel(tableModel);

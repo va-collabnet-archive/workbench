@@ -10,11 +10,11 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.swing.*;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.border.*;
+import javax.swing.JTabbedPane;
+import javax.swing.border.EmptyBorder;
 
 import org.ihtsdo.qa.store.QAStoreBI;
 import org.ihtsdo.qa.store.model.QACoordinate;
@@ -35,7 +35,9 @@ public class QAStorePanel extends JPanel {
 	public QAStorePanel(QAStoreBI store) {
 		this.store = store;
 		initComponents();
+		
 		resultsPanel = new QAResultsBrowser(store);
+		resultsPanel.setParentTabbedPanel(tabbedPane1);
 		panel2.add(resultsPanel, BorderLayout.CENTER);
 		casesPanel = new QACasesBrowser(store, null, null);
 		panel3.add(casesPanel, BorderLayout.CENTER);
@@ -49,10 +51,12 @@ public class QAStorePanel extends JPanel {
 	}
 	
 	private void table1MouseClicked(MouseEvent e) {
-		QACoordinate coordinate = resultsPanel.getQACoordinate();
-		int selectedRow = resultsPanel.getTable().getSelectedRow();
-		Rule rule = (Rule) resultsPanel.getTable().getValueAt(selectedRow, 1);
-		casesPanel.setupPanel(store, coordinate, rule);
+		if(e.getClickCount() == 1){
+			QACoordinate coordinate = resultsPanel.getQACoordinate();
+			int selectedRow = resultsPanel.getTable().getSelectedRow();
+			Rule rule = (Rule) resultsPanel.getTable().getValueAt(selectedRow, 1);
+			casesPanel.setupPanel(store, coordinate, rule);
+		}
 	}
 
 	private void initComponents() {

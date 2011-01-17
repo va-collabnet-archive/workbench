@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import org.ihtsdo.qa.store.model.Category;
 import org.ihtsdo.qa.store.model.DispositionStatus;
 import org.ihtsdo.qa.store.model.Execution;
 import org.ihtsdo.qa.store.model.Finding;
@@ -404,6 +405,18 @@ public class QAStoreStubImpl implements QAStoreBI {
 				return loopSeverity;
 			}
 		}
+		return null;
+	}
+
+	@Override
+	public List<Category> getAllCategories() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Category getCategory(UUID categoryUuid) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

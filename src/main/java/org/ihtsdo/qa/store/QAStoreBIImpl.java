@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.axis2.AxisFault;
+import org.ihtsdo.qa.store.model.Category;
 import org.ihtsdo.qa.store.model.DispositionStatus;
 import org.ihtsdo.qa.store.model.Execution;
 import org.ihtsdo.qa.store.model.Finding;
@@ -25,7 +26,9 @@ import org.ihtsdo.qa.store.model.view.QACasesReportPage;
 import org.ihtsdo.qa.store.model.view.RulesReportColumn;
 import org.ihtsdo.qa.store.model.view.RulesReportLine;
 import org.ihtsdo.qa.store.model.view.RulesReportPage;
+import org.ihtsdo.qadb.ws.PersistsQARuleFaultException;
 import org.ihtsdo.qadb.ws.QadbServiceStub;
+import org.ihtsdo.qadb.ws.data.AllCategoriesResponse;
 import org.ihtsdo.qadb.ws.data.AllComponentsResponse;
 import org.ihtsdo.qadb.ws.data.AllDatabasesResponse;
 import org.ihtsdo.qadb.ws.data.AllDispositionStatusResponse;
@@ -43,13 +46,17 @@ import org.ihtsdo.qadb.ws.data.DispositionStatusCount_type0;
 import org.ihtsdo.qadb.ws.data.IntBoolKeyValue;
 import org.ihtsdo.qadb.ws.data.IntStrKeyValue;
 import org.ihtsdo.qadb.ws.data.PersistQACaseRequest;
+import org.ihtsdo.qadb.ws.data.PersistsQARuleRequest;
 import org.ihtsdo.qadb.ws.data.QACasesReportLinesByPageRequest;
 import org.ihtsdo.qadb.ws.data.QACasesReportLinesByPageResponse;
 import org.ihtsdo.qadb.ws.data.QADatabaseRequest;
 import org.ihtsdo.qadb.ws.data.QADatabaseResponse;
+import org.ihtsdo.qadb.ws.data.RuleRequest;
+import org.ihtsdo.qadb.ws.data.RuleResponse;
 import org.ihtsdo.qadb.ws.data.RulesReportLinesByPageRequest;
 import org.ihtsdo.qadb.ws.data.RulesReportLinesByPageResponse;
 import org.ihtsdo.qadb.ws.data.StatusCount_type0;
+import org.ihtsdo.qadb.ws.data.WsCategory;
 import org.ihtsdo.qadb.ws.data.WsQACasesReportLine;
 
 public class QAStoreBIImpl implements QAStoreBI {
@@ -94,10 +101,25 @@ public class QAStoreBIImpl implements QAStoreBI {
 
 	@Override
 	public Rule getRule(UUID ruleUuid) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		Rule result = null;
+		QadbServiceStub service = null;
+		try {
+			service = new QadbServiceStub(url);
 
+			RuleRequest ruleRequest = new RuleRequest();
+			ruleRequest.setRuleUuid(ruleUuid.toString());
+			RuleResponse response = service.getRule(ruleRequest);
+
+			result = WsClientDataConverter.wsRuleToRule(response.getRuleResponse());
+
+		} catch (AxisFault e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
 	@Override
 	public Finding getFinding(UUID findingUuid) {
 		// TODO Auto-generated method stub
@@ -555,8 +577,19 @@ public class QAStoreBIImpl implements QAStoreBI {
 
 	@Override
 	public void persistRule(Rule rule) {
-		// TODO Auto-generated method stub
-
+		try {
+			QadbServiceStub service = new QadbServiceStub(url);
+			PersistsQARuleRequest wsRuleRequest = new PersistsQARuleRequest();
+			org.ihtsdo.qadb.ws.data.Rule wsRule = WsClientDataConverter.ruleToWsdlRule(rule);
+			wsRuleRequest.setRule(wsRule);
+			service.persistsQARule(wsRuleRequest);
+		} catch (AxisFault e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		} catch (PersistsQARuleFaultException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -591,6 +624,32 @@ public class QAStoreBIImpl implements QAStoreBI {
 	public void persistQADatabase(QADatabase database) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public List<Category> getAllCategories() {
+		List<Category> result = null;
+		try {
+			QadbServiceStub service = new QadbServiceStub(url);
+			
+		AllCategoriesResponse response = service.getAllCategories();
+			WsCategory[] categories = response.getCategories();
+			result = new ArrayList<Category>();
+			for (WsCategory wsCategory : categories) {
+				Category category = WsClientDataConverter.wsCategoryToCategory(wsCategory);
+				result.add(category);
+			}
+		} catch (AxisFault e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	@Override
+	public Category getCategory(UUID categoryUuid) {
+		return null;
 	}
 
 }

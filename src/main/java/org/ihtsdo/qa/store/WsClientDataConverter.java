@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.UUID;
 
+import org.ihtsdo.qa.store.model.Category;
 import org.ihtsdo.qa.store.model.DispositionStatus;
 import org.ihtsdo.qa.store.model.QACase;
 import org.ihtsdo.qa.store.model.QACoordinate;
@@ -17,6 +18,7 @@ import org.ihtsdo.qadb.ws.data.Case;
 import org.ihtsdo.qadb.ws.data.Component;
 import org.ihtsdo.qadb.ws.data.IntBoolKeyValue;
 import org.ihtsdo.qadb.ws.data.IntStrKeyValue;
+import org.ihtsdo.qadb.ws.data.WsCategory;
 
 public class WsClientDataConverter {
 	public static IntStrKeyValue[] filterToWsFilter(HashMap<RulesReportColumn, Object> filter) {
@@ -65,11 +67,16 @@ public class WsClientDataConverter {
 		}
 		result.setName(wsRule.getName());
 		result.setCategory(wsRule.getCategory());
-		Severity severity = new Severity(null, wsRule.getSeverity(), null);
-		result.setSeverity(severity);
+		org.ihtsdo.qadb.ws.data.Severity wsSeverity = wsRule.getSeverity();
+		if(wsSeverity != null && wsSeverity.getSeverityUuid() != null){
+			Severity severity = new Severity(UUID.fromString(wsSeverity.getSeverityUuid()),wsSeverity.getName(),null);
+			result.setSeverity(severity);
+		}
 		result.setDescription(wsRule.getDescription());
 		result.setDitaDocumentationLinkUuid(wsRule.getDitaDocumentationLinkUuid());
+		result.setEffectiveTime(wsRule.getEffectiveTime());
 		result.setDitaGeneratedTopicUuid(wsRule.getDitaGeneratedTopicUuid());
+		result.setDocumentationUrl(wsRule.getDocumentationUrl());
 		if(wsRule.getDitaUuid() != null && !wsRule.equals("")){
 			result.setDitaUuid(UUID.fromString(wsRule.getDitaUuid()));
 		}
@@ -200,6 +207,50 @@ public class WsClientDataConverter {
 		}
 		result.setRule(rule );
 		return result;
+	}
+
+	public static Category wsCategoryToCategory(WsCategory wsCategory) {
+		Category result = new Category();
+		result.setDescription(wsCategory.getDescription());
+		result.setName(wsCategory.getName());
+		result.setCategoryUuid(UUID.fromString(wsCategory.getCategoryUuid()));
+		return result;
+	}
+
+	public static org.ihtsdo.qadb.ws.data.Rule ruleToWsdlRule(Rule rule) {
+		org.ihtsdo.qadb.ws.data.Rule wsRule = new org.ihtsdo.qadb.ws.data.Rule();
+		wsRule.setCategory(rule.getCategory());
+		wsRule.setDescription(rule.getDescription());
+		wsRule.setDitaDocumentationLinkUuid(rule.getDitaDocumentationLinkUuid());
+		wsRule.setDitaGeneratedTopicUuid(rule.getDitaGeneratedTopicUuid());
+		wsRule.setDocumentationUrl(rule.getDocumentationUrl());
+		if (rule.getDitaUuid() != null) {
+			wsRule.setDitaUuid(rule.getDitaUuid().toString());
+		}
+		wsRule.setExample(rule.getExample());
+		wsRule.setExpectedResult(rule.getExpectedResult());
+		wsRule.setIsWhitelistAllowed(rule.isWhitelistAllowed());
+		wsRule.setIsWhitelistResetAllowed(rule.isWhitelistResetAllowed());
+		wsRule.setIsWhitelistResetWhenClosed(rule.isWhitelistResetWhenClosed());
+		wsRule.setModifiedBy(rule.getModifiedBy());
+		wsRule.setName(rule.getName());
+		wsRule.setPackageName(rule.getPackageName());
+		wsRule.setPackageUrl(rule.getPackageUrl());
+		wsRule.setRuleCode(rule.getRuleCode());
+		wsRule.setRuleUuid(rule.getRuleUuid().toString());
+		if(rule.getSeverity() != null){
+			org.ihtsdo.qadb.ws.data.Severity severity = new org.ihtsdo.qadb.ws.data.Severity();
+			severity.setName(rule.getSeverity().getName());
+			UUID severityUuid = rule.getSeverity().getSeverityUuid();
+			if(severityUuid!= null){
+				severity.setSeverityUuid(severityUuid.toString());
+			}
+			wsRule.setSeverity(severity);
+		}
+		wsRule.setStandingIssues(rule.getStandingIssues());
+		wsRule.setStatus(rule.getStatus());
+		wsRule.setSuggestedResolution(rule.getSuggestedResolution());
+		return wsRule;
 	}
 
 }
