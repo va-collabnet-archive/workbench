@@ -91,69 +91,74 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
         try {
             WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
 
-        	I_TermFactory tf = getTermFactory();
-            WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter();
-			        	
-            if (!WorkflowHistoryRefsetWriter.isInUse()) // Not in the middle of an existing commit 
-        	{
-				WorkflowHistoryRefsetWriter.lockMutex();
-
-				// Path
-	            writer.setPathUid(Terms.get().nidToUuid(concept.getConceptAttributes().getPathNid()));
-
-	            // Modeler
-	            writer.setModelerUid(WorkflowHelper.getCurrentModeler().getPrimUuid());
-
-	            // Concept & FSN
-	            writer.setConceptUid(concept.getUids().iterator().next());
-	            writer.setFSN(WorkflowHelper.identifyFSN(concept));
-
-	            // Use Case (Deprecated)
-            	writer.setUseCaseUid(ArchitectonicAuxiliary.Concept.WORKFLOW_CONCEPTS.getPrimoridalUid());
-	        	
-            	// Action
-            	UUID actionUid = identifyAction();
-                writer.setActionUid(actionUid);
-	            
-                // State
-                UUID initialState = identifyNextState(writer.getModelerUid(), concept, actionUid);
-                writer.setStateUid(initialState);
-	            
-                // Worfklow Id
-                WorkflowHistoryJavaBean latestBean = searcher.getLatestWfHxJavaBeanForConcept(concept);
-	            if (!isConceptInCurrentWorkflow(latestBean))
-	            	writer.setWorkflowUid(UUID.randomUUID());
-	            else
-	            	writer.setWorkflowUid(latestBean.getWorkflowId());
-
-	            // Set auto approved based on AceFrameConfig setting
-	            if (tf.getActiveAceFrameConfig().isAutoApproveOn()) {
-	            	writer.setAutoApproved(true);
-	            	
-	            	// Identify and overwrite Accept Action
-	            	UUID acceptActionUid = identifyAcceptAction();
-	            	writer.setActionUid(acceptActionUid);
-
-	            	// Identify and overwrite Next State
-	            	UUID nextState = identifyNextState(writer.getModelerUid(), concept, acceptActionUid);
-					writer.setStateUid(nextState);
-	            } else
-	            	writer.setAutoApproved(false);
-	                
-	            // Override
-	            writer.setOverride(tf.getActiveAceFrameConfig().isOverrideOn());
+            I_GetConceptData modeler = WorkflowHelper.getCurrentModeler();
+            
+            if (WorkflowHelper.isActiveModeler(modeler))
+            {
+	        	I_TermFactory tf = getTermFactory();
+	            WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter();
+				        	
+	            if (!WorkflowHistoryRefsetWriter.isInUse()) // Not in the middle of an existing commit 
+	        	{
+					WorkflowHistoryRefsetWriter.lockMutex();
 	
-	            // TimeStamps
-		        java.util.Date today = new java.util.Date();
-		        writer.setTimeStamp(today.getTime());
-		        writer.setRefsetColumnTimeStamp(today.getTime());
-				            
-		        // Write Member
-				WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
-				writer.addMember();
-		        Terms.get().addUncommitted(refset.getRefsetConcept());
-			}
-
+					// Path
+		            writer.setPathUid(Terms.get().nidToUuid(concept.getConceptAttributes().getPathNid()));
+	
+		            // Modeler
+		            writer.setModelerUid(WorkflowHelper.getCurrentModeler().getPrimUuid());
+	
+		            // Concept & FSN
+		            writer.setConceptUid(concept.getUids().iterator().next());
+		            writer.setFSN(WorkflowHelper.identifyFSN(concept));
+	
+		            // Use Case (Deprecated)
+	            	writer.setUseCaseUid(ArchitectonicAuxiliary.Concept.WORKFLOW_CONCEPTS.getPrimoridalUid());
+		        	
+	            	// Action
+	            	UUID actionUid = identifyAction();
+	                writer.setActionUid(actionUid);
+		            
+	                // State
+	                UUID initialState = identifyNextState(writer.getModelerUid(), concept, actionUid);
+	                writer.setStateUid(initialState);
+		            
+	                // Worfklow Id
+	                WorkflowHistoryJavaBean latestBean = searcher.getLatestWfHxJavaBeanForConcept(concept);
+		            if (!isConceptInCurrentWorkflow(latestBean))
+		            	writer.setWorkflowUid(UUID.randomUUID());
+		            else
+		            	writer.setWorkflowUid(latestBean.getWorkflowId());
+	
+		            // Set auto approved based on AceFrameConfig setting
+		            if (tf.getActiveAceFrameConfig().isAutoApproveOn()) {
+		            	writer.setAutoApproved(true);
+		            	
+		            	// Identify and overwrite Accept Action
+		            	UUID acceptActionUid = identifyAcceptAction();
+		            	writer.setActionUid(acceptActionUid);
+	
+		            	// Identify and overwrite Next State
+		            	UUID nextState = identifyNextState(writer.getModelerUid(), concept, acceptActionUid);
+						writer.setStateUid(nextState);
+		            } else
+		            	writer.setAutoApproved(false);
+		                
+		            // Override
+		            writer.setOverride(tf.getActiveAceFrameConfig().isOverrideOn());
+		
+		            // TimeStamps
+			        java.util.Date today = new java.util.Date();
+			        writer.setTimeStamp(today.getTime());
+			        writer.setRefsetColumnTimeStamp(today.getTime());
+					            
+			        // Write Member
+					WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
+					writer.addMember();
+			        Terms.get().addUncommitted(refset.getRefsetConcept());
+				}
+            }
+            
             // return alerts;
             return new ArrayList<AlertToDataConstraintFailure>();
         } catch (Exception e) {

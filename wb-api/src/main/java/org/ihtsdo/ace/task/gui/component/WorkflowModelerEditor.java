@@ -49,7 +49,7 @@ public class WorkflowModelerEditor extends AbstractComboEditor {
 
     			if (isLeadModeler(modeler))
     				modelers.add(modeler);
-    			else if (WorkflowHelper.isCurrentModeler(modeler))
+    			else if (WorkflowHelper.isActiveModeler(modeler))
 					activeModelers.add(modeler);
 				else
 					inactiveModelers.add(modeler);
