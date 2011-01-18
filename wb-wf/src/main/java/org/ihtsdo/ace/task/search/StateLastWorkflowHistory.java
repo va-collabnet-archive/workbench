@@ -2,6 +2,7 @@ package org.ihtsdo.ace.task.search;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
@@ -41,7 +42,10 @@ public class StateLastWorkflowHistory extends AbstractWorkflowHistorySearchTest 
 			if (this.testState == null)
 			{
 				try {
-	   				this.testState = Terms.get().getActiveAceFrameConfig().getWorkflowStates().iterator().next();
+               Iterator<? extends I_GetConceptData> itr = Terms.get().getActiveAceFrameConfig().getWorkflowStates().iterator();
+               if (itr.hasNext()) {
+                  this.testState = itr.next();
+               }
 	            } catch (Exception e) {
 	            	e.printStackTrace();
 	            }

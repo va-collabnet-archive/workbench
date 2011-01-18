@@ -123,6 +123,9 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 	
 	private Set<String> searchForEditorCategoryListByModeler(I_GetConceptData modeler) throws Exception 
 	{
+      if (modeler == null) {
+         return new HashSet<String>();
+      }
 		List<I_ExtendByRefPartStr> l = helper.getAllCurrentRefsetExtensions(refsetId, modeler.getNid());
 		Set<String> results = new HashSet<String>();
 		

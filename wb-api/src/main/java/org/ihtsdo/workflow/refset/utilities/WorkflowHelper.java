@@ -304,7 +304,7 @@ public class WorkflowHelper {
 
 		if (!modelers.containsKey(name))
 		{
-			if (!getDefaultModeler().getInitialText().equalsIgnoreCase(name))
+			if (getDefaultModeler() != null && !getDefaultModeler().getInitialText().equalsIgnoreCase(name))
 			{
 				AceLog.getAppLog().alertAndLog(Level.WARNING, unrecognizedLoginMessage, new Exception(unrecognizedLoginMessage));
 	
