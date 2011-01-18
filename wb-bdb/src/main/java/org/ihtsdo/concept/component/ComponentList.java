@@ -11,7 +11,10 @@ public class ComponentList<E> extends CopyOnWriteArrayList<E> {
 	private static final long serialVersionUID = 1L;
 
 	public ComponentList(Collection<? extends E> c) {
-		super(c);
+		super();
+      for (E d: c) {
+         addDirect(d);
+      }
 	}
 
 	public final boolean addDirect(E e) {
