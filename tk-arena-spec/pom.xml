@@ -15,11 +15,11 @@
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
-		<version>2.6.0-trek-8-SNAPSHOT</version>
+		<version>2.6.0-trek-7-kp-1-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>tk-arena-spec</artifactId>
-	<name>Toolkit Arena DROOLS Rules Spec</name>
+	<name>${branch}: Toolkit Arena DROOLS Rules Spec</name>
     <dependencies>
 	    <dependency>
 			<groupId>${project.groupId}</groupId>

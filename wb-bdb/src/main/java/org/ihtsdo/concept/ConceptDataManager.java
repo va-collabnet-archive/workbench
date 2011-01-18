@@ -40,7 +40,9 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
         public AddDescriptionSet(Collection<? extends Description> c) {
             super(new ComponentComparator());
-            addAll(c);
+            for (Description d: c) {
+               addDirect(d);
+            }
         }
 
         @Override
@@ -54,7 +56,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
             }
         }
         
-        public boolean addDirect(Description e) {
+        public final boolean addDirect(Description e) {
             return super.add(e);
         }
     }
@@ -65,8 +67,10 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
         public AddSrcRelSet(Collection<? extends Relationship> c) {
             super(new ComponentComparator());
-            addAll(c);
-        }
+            for (Relationship d: c) {
+               addDirect(d);
+            }
+         }
 
         @Override
         public boolean add(Relationship e) {
@@ -82,7 +86,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
                 throw new RuntimeException(e1);
             }
         }
-        public boolean addDirect(Relationship e) {
+        public final boolean addDirect(Relationship e) {
             return super.add(e);
         }
     }
@@ -93,8 +97,10 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
         public AddImageSet(Collection<? extends Image> c) {
             super(new ComponentComparator());
-            addAll(c);
-        }
+            for (Image d: c) {
+               addDirect(d);
+            }
+         }
 
         @Override
         public boolean add(Image e) {
@@ -106,7 +112,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
                 throw new RuntimeException(e1);
             }
         }
-        public boolean addDirect(Image e) {
+        public final boolean addDirect(Image e) {
             return super.add(e);
         }
     }
@@ -117,8 +123,10 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
         public AddMemberSet(Collection<? extends RefsetMember<?, ?>> c) {
             super(new ComponentComparator());
-            addAll(c);
-        }
+            for (RefsetMember d: c) {
+               addDirect(d);
+            }
+         }
 
         @Override
         public boolean add(RefsetMember<?, ?> e) {
@@ -131,7 +139,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
                 throw new RuntimeException(e1);
             }
         }
-        public boolean addDirect(RefsetMember<?, ?> e) {
+        public final boolean addDirect(RefsetMember<?, ?> e) {
             return super.add(e);
         }
     }

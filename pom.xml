@@ -9,7 +9,7 @@
     <groupId>org.ihtsdo</groupId>
     <artifactId>wb-mmb</artifactId>
     <version>2.6.0-trek-7-kp-1-SNAPSHOT</version>
-    <name>KP BRANCH -- Workbench modules multi-module build</name>
+    <name>${branch}: (MMP) Workbench Toolkit</name>
     <packaging>pom</packaging>
     <description>KP BRANCH --- multi-module build for the Workbench modules (dwfa-pom, foundation, 
                  dwfa-mojo, core, ace-api, vodb and term-mojo)</description>
@@ -19,6 +19,7 @@
         <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/branches/wb-mmb-2.6.0-trek-kaiser/?root=workbench&amp;system=exsy1002</url>
     </scm>
     <properties>
+       <branch>kp</branch>
         <ace.devstyle.version>1.1-SNAPSHOT</ace.devstyle.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <drools.version>5.1.1</drools.version>

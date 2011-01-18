@@ -75,11 +75,11 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
                    // nothing to report. ;
                }
            }
-           
+           showActivityListeners.clear();
            for (ActionListener sal: stopActionListeners.keySet()) {
                sal.actionPerformed(e);
            }
-            
+           stopActionListeners.clear();
         }
         
     }
@@ -513,10 +513,6 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         return canceled;
     }
 
-    public void setCanceled(boolean canceled) {
-        this.canceled = canceled;
-    }
-
     public void cancel() {
     	this.canceled = true;
         this.complete = true;
@@ -528,5 +524,10 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
 				// Nothing to do...
 			}
         }
+        showActivityListeners.clear();
+        for (ActionListener stopListener: stopActionListeners.keySet()) {
+           stopListener.actionPerformed(null);
+        }
+        stopActionListeners.clear();
     }
 }

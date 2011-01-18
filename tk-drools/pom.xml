@@ -6,7 +6,7 @@
 		<version>2.6.0-trek-7-kp-1-SNAPSHOT</version>
 	</parent>
 	<artifactId>tk-drools</artifactId>
-	<name>Toolkit extensions for drools</name>
+	<name>${branch}: Toolkit extensions for drools</name>
 	<url>http://maven.apache.org</url>
 	<repositories>
 		<repository>
