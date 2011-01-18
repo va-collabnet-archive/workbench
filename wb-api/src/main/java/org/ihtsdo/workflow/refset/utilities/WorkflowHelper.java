@@ -271,11 +271,11 @@ public class WorkflowHelper {
    	   		return prefTermStr;
 	}
 
-	public static boolean isCurrentModeler(String name) throws Exception
+	public static boolean isActiveModeler(String name) throws Exception
 	{
 		I_GetConceptData modeler = lookupModeler(name);
 
-		return isCurrentModeler(modeler);
+		return isActiveModeler(modeler);
 	}
 
 	public static Set<String> getModelerKeySet() {
@@ -306,7 +306,7 @@ public class WorkflowHelper {
 		{
 			if (getDefaultModeler() != null && !getDefaultModeler().getInitialText().equalsIgnoreCase(name))
 			{
-				AceLog.getAppLog().alertAndLog(Level.WARNING, unrecognizedLoginMessage, new Exception(unrecognizedLoginMessage));
+				AceLog.getAppLog().log(Level.WARNING, unrecognizedLoginMessage);
 	
 				for (I_GetConceptData modeler : modelers.values())
 				{
@@ -624,7 +624,7 @@ public class WorkflowHelper {
         return retList;
     }
 
-	public static boolean isCurrentModeler(I_GetConceptData modeler) throws TerminologyException, IOException {
+	public static boolean isActiveModeler(I_GetConceptData modeler) throws TerminologyException, IOException {
 		List<? extends I_RelTuple> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_MODELER_VALUE);
 		
 		for (I_RelTuple rel : relList)
