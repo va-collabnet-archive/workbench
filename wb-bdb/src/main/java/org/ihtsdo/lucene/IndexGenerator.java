@@ -11,39 +11,46 @@ import org.ihtsdo.tk.api.NidBitSetBI;
 
 public class IndexGenerator implements I_ProcessConceptData {
 
-	private IndexWriter writer;
-	private NidBitSetBI nidSet;
-	
-	public NidBitSetBI getNidSet() {
-		return nidSet;
-	}
-	
-	public IndexGenerator(IndexWriter writer) throws IOException {
-		super();
-		this.writer = writer;
-		this.nidSet  = Bdb.getConceptDb().getConceptNidSet();
-	}
+    private IndexWriter writer;
+    private NidBitSetBI nidSet;
+    private int lineCounter = 0;
+    private int descCounter = 0;
+    private int conceptCounter = 0;
+    private int feedbackInterval =  1000;
+ 
+    @Override
+    public NidBitSetBI getNidSet() {
+        return nidSet;
+    }
 
+    public IndexGenerator(IndexWriter writer) throws IOException {
+        super();
+        this.writer = writer;
+        this.nidSet = Bdb.getConceptDb().getConceptNidSet();
+    }
 
-	@Override
-	public void processConceptData(Concept concept) throws Exception {
-        int counter = 0;
-        int optimizeInterval = 10000;
-        for (Description d: concept.getDescriptions()) {
-             writer.addDocument(LuceneManager.createDoc(d));
-            counter = counter++;
-            if (counter == optimizeInterval) {
-                writer.optimize();
-                counter = 0;
-            }
+    @Override
+    public void processConceptData(Concept concept) throws Exception {
+        conceptCounter++;
+       for (Description d : concept.getDescriptions()) {
+            writer.addDocument(LuceneManager.createDoc(d));
+            descCounter++;
+            
+            if (descCounter % feedbackInterval == 0) {
+                System.out.print(".");
+                lineCounter++;
+                if (lineCounter > 80) {
+                    lineCounter = 0;
+                    System.out.println();
+                    System.out.print("c:" + conceptCounter + 
+                            " d:" + descCounter);
+                }
+             }
         }
-	}
+    }
 
-
-	@Override
-	public boolean continueWork() {
-		return true;
-	}
-
-
+    @Override
+    public boolean continueWork() {
+        return true;
+    }
 }

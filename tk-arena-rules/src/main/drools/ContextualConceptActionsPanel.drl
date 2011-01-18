@@ -28,6 +28,7 @@ import org.ihtsdo.arena.spec.Refsets;
 
 global Collection actions;
 global BpActionFactory actionFactory;
+global ViewCoordinate vc;
 
 rule "add from directory"
 	when

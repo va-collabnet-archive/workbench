@@ -66,200 +66,200 @@ global Collection actions;
 global ViewCoordinate vc;
 
 rule "rule 1" #concept onto different SNOMED concept
-	
-	when
-		(and 
-			($dropTarget: ConceptFact(this isKindOf Taxonomies.SNOMED, context == Context.DROP_TARGET))
-			($dropObject: ConceptFact(context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
-		)
-	then 
-		actions.add(new CreateRelAction("Is-a", $dropTarget, Snomed.IS_A, $dropObject));
+   
+   when
+      (and 
+         ($dropTarget: ConceptFact(this isKindOf Taxonomies.SNOMED, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+   then 
+      actions.add(new CreateRelAction("Is-a", $dropTarget, Snomed.IS_A, $dropObject));
 end
 
 
 rule "rule 2" #concept onto SNOMED clinical finiding concpet
-	
-	when
-		(and 
-			($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
-			($dropObject: ConceptFact(context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
-		)
-	then 
-		actions.add(new CreateRelAction("finding-site", $dropTarget, Snomed.FINDING_SITE, $dropObject));
+   
+   when
+      (and 
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+   then 
+      actions.add(new CreateRelAction("finding-site", $dropTarget, Snomed.FINDING_SITE, $dropObject));
 end
 
 
 rule "rule 3" #concept onto NOT snomed concept 
-	
-	when
-		(and 
-			($dropTarget: ConceptFact(this not isKindOf Taxonomies.SNOMED, context == Context.DROP_TARGET))
-			($dropObject: ConceptFact(context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
-		)
-	then 
-		actions.add(new CreateRelAction("is-a", $dropTarget, TermAux.IS_A, $dropObject));
+   
+   when
+      (and 
+         ($dropTarget: ConceptFact(this not isKindOf Taxonomies.SNOMED, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+   then 
+      actions.add(new CreateRelAction("is-a", $dropTarget, TermAux.IS_A, $dropObject));
 end
 
 
 rule "rule 4" #concept onto same concept
-	
-	when
-			$dropTarget: ComponentFact(context == Context.DROP_TARGET)
-			$dropObject: ComponentFact(context == Context.DROP_OBJECT, component == $dropTarget.component, 
-				component.time != Long.MAX_VALUE)
-			not $groupConcept: RelGroupFact(context == Context.DROP_TARGET)
-			
-			
-	then 
-		actions.add(new RetireAction("retire", $dropObject));
-		actions.add(new CloneAction("clone", $dropObject));
-		actions.add(new CloneAndRetireAction("clone & retire", $dropObject));
+   
+   when
+         $dropTarget: ComponentFact(context == Context.DROP_TARGET)
+         $dropObject: ComponentFact(context == Context.DROP_OBJECT, component == $dropTarget.component, 
+            component.time != Long.MAX_VALUE)
+         not $groupConcept: RelGroupFact(context == Context.DROP_TARGET)
+         
+         
+   then 
+      actions.add(new RetireAction("retire", $dropObject));
+      actions.add(new CloneAction("clone", $dropObject));
+      actions.add(new CloneAndRetireAction("clone & retire", $dropObject));
 end
 
 rule "rule 5" #template onto concept
-	
-	when
-		(and 
-			($dropTarget: ConceptFact(context == Context.DROP_TARGET)) 
-			($dropObject: DescSpecFact(context == Context.DROP_OBJECT))
-		)
+   
+   when
+      (and 
+         ($dropTarget: ConceptFact(context == Context.DROP_TARGET)) 
+         ($dropObject: DescSpecFact(context == Context.DROP_OBJECT))
+      )
 
-	then 
-		actions.add(new AddFromSpecAction("add desc", $dropTarget, $dropObject));
-		actions.add(new UpdateDescFromSpecAction("update desc", $dropTarget, $dropObject));
+   then 
+      actions.add(new AddFromSpecAction("add desc", $dropTarget, $dropObject));
+      actions.add(new UpdateDescFromSpecAction("update desc", $dropTarget, $dropObject));
 end
 
 rule "rule 6" #rel template onto concept
-	
-	when
-		(and 
-			($dropTarget: ConceptFact(context == Context.DROP_TARGET))
-			($dropObject: RelSpecFact(context == Context.DROP_OBJECT))
-		)
+   
+   when
+      (and 
+         ($dropTarget: ConceptFact(context == Context.DROP_TARGET))
+         ($dropObject: RelSpecFact(context == Context.DROP_OBJECT))
+      )
 
-	then 
-		actions.add(new AddFromSpecAction("add rel", $dropTarget, $dropObject));
+   then 
+      actions.add(new AddFromSpecAction("add rel", $dropTarget, $dropObject));
 end
 
 rule "rule 7" #rel onto rel (in group)
-	
-	when
-			$dropTarget: RelFact(context == Context.DROP_TARGET)
-			$dropObject: RelFact(context == Context.DROP_OBJECT, 
+   
+   when
+         $dropTarget: RelFact(context == Context.DROP_TARGET)
+         $dropObject: RelFact(context == Context.DROP_OBJECT, 
                               component == $dropTarget.component,
-			                     component.group != 0, 
+                              component.group != 0, 
                               component.time != Long.MAX_VALUE)
-		
-	then
-		actions.add(new UngroupRelAction("ungroup", $dropObject));
-		
+      
+   then
+      actions.add(new UngroupRelAction("ungroup", $dropObject));
+      
 end
 
 rule "rule 8" #desc onto concept
 
-	when
-		(and
-			($dropTarget: ConceptFact(context == Context.DROP_TARGET))
-			($dropObject: DescFact(context == Context.DROP_OBJECT, 
-            component.conceptNid != $dropTarget.component.conceptNid,
-				component.time != Long.MAX_VALUE))
+   when
+      (and
+         ($dropTarget: ConceptFact(context == Context.DROP_TARGET))
+         ($dropObject: DescFact(context == Context.DROP_OBJECT, 
+                                component.conceptNid != $dropTarget.component.conceptNid,
+                                component.time != Long.MAX_VALUE))
          (eval($dropObject.getDesc().getTypeNid() != 
-                  Snomed.FULLY_SPECIFIED_DESCRIPTION_TYPE.get(vc).getNid()))
-		)
-		
-	then
-		actions.add(new CopyDescAction("copy desc", $dropObject, $dropTarget));
-		actions.add(new MoveDescAction("move desc", $dropObject, $dropTarget));
+                   Snomed.FULLY_SPECIFIED_DESCRIPTION_TYPE.get(vc).getNid()))
+      )
+      
+   then
+      actions.add(new CopyDescAction("copy desc", $dropObject, $dropTarget));
+      actions.add(new MoveDescAction("move desc", $dropObject, $dropTarget));
 end
 
 rule "rule 9" #rel (w/o group) onto rel group"
-	when
-		$dropTarget: RelGroupFact(context == Context.DROP_TARGET)
-		$dropObject: RelFact(context == Context.DROP_OBJECT, 
+   when
+      $dropTarget: RelGroupFact(context == Context.DROP_TARGET)
+      $dropObject: RelFact(context == Context.DROP_OBJECT, 
                            component.group == 0, 
                            component.time != Long.MAX_VALUE)
-		
-	then
-		actions.add(new MoveToRelGroupAction("move rel", $dropObject, $dropTarget));
-		actions.add(new CopyToRelGroupAction("copy rel", $dropObject, $dropTarget));
+      
+   then
+      actions.add(new MoveToRelGroupAction("move rel", $dropObject, $dropTarget));
+      actions.add(new CopyToRelGroupAction("copy rel", $dropObject, $dropTarget));
 end
  
 rule "rule 10" #rel w/group onto different rel group"
-	when
-		$dropTarget: RelGroupFact(context == Context.DROP_TARGET)
-		$dropObject: RelFact(context == Context.DROP_OBJECT, component.group != 0, component.time != Long.MAX_VALUE,
-			component.conceptNid != $dropTarget.component.conceptNid || 
-			(component.conceptNid == $dropTarget.component.conceptNid && component.group != $dropTarget.component.relGroup))
-	then
-		actions.add(new MoveToRelGroupAction("move to rel group", $dropObject, $dropTarget));
-		actions.add(new CopyToRelGroupAction("copy to rel group", $dropObject, $dropTarget));
+   when
+      $dropTarget: RelGroupFact(context == Context.DROP_TARGET)
+      $dropObject: RelFact(context == Context.DROP_OBJECT, component.group != 0, component.time != Long.MAX_VALUE,
+         component.conceptNid != $dropTarget.component.conceptNid || 
+         (component.conceptNid == $dropTarget.component.conceptNid && component.group != $dropTarget.component.relGroup))
+   then
+      actions.add(new MoveToRelGroupAction("move to rel group", $dropObject, $dropTarget));
+      actions.add(new CopyToRelGroupAction("copy to rel group", $dropObject, $dropTarget));
 end
 
 rule "rule 11" #rel onto concept"
 
-	when
-	$dropTarget: ConceptFact(context == Context.DROP_TARGET)
-	$dropObject: RelFact(context == Context.DROP_OBJECT, component.conceptNid != $dropTarget.component.conceptNid,
-		component.time != Long.MAX_VALUE)
-	
-	then
-	actions.add(new CopyRelAction("copy rel", $dropObject, $dropTarget));
-	actions.add(new MoveRelAction("move rel", $dropObject, $dropTarget));
-	
+   when
+   $dropTarget: ConceptFact(context == Context.DROP_TARGET)
+   $dropObject: RelFact(context == Context.DROP_OBJECT, component.conceptNid != $dropTarget.component.conceptNid,
+      component.time != Long.MAX_VALUE)
+   
+   then
+   actions.add(new CopyRelAction("copy rel", $dropObject, $dropTarget));
+   actions.add(new MoveRelAction("move rel", $dropObject, $dropTarget));
+   
 end
 
 
 
 rule "rule 11.1" #clone rel (in rel group) onto concept
 
-	when
-	
-	$dropTarget: ConceptFact(context == Context.DROP_TARGET)
-	$dropObject: RelFact(context == Context.DROP_OBJECT, component.group != 0,
-		component.conceptNid == $dropTarget.component.conceptNid, component.time != Long.MAX_VALUE) 
-	
-	then
-	actions.add(new CloneRelAction("clone rel", $dropObject));
-	
+   when
+   
+   $dropTarget: ConceptFact(context == Context.DROP_TARGET)
+   $dropObject: RelFact(context == Context.DROP_OBJECT, component.group != 0,
+      component.conceptNid == $dropTarget.component.conceptNid, component.time != Long.MAX_VALUE) 
+   
+   then
+   actions.add(new CloneRelAction("clone rel", $dropObject));
+   
 end
 
 rule "rule 12" #rel group onto same concept"
 
-	when
-	#concept  origin
-	$dropTarget: ConceptFact(context == Context.DROP_TARGET)
-	$dropObject: RelGroupFact(context == Context.DROP_OBJECT, component.conceptNid == $dropTarget.component.conceptNid)
-	
-	then
-	actions.add(new CloneRelGroupAction("clone rel group", $dropObject, $dropTarget));
-	actions.add(new UngroupRelGroupAction("ungroup", $dropObject, $dropTarget));
-	
-	
+   when
+   #concept  origin
+   $dropTarget: ConceptFact(context == Context.DROP_TARGET)
+   $dropObject: RelGroupFact(context == Context.DROP_OBJECT, component.conceptNid == $dropTarget.component.conceptNid)
+   
+   then
+   actions.add(new CloneRelGroupAction("clone rel group", $dropObject, $dropTarget));
+   actions.add(new UngroupRelGroupAction("ungroup", $dropObject, $dropTarget));
+   
+   
 end
 
 
 rule "rule 12.1" #rel group onto concept"
 
-	when
-	#concept != origin
-	$dropTarget: ConceptFact(context == Context.DROP_TARGET)
-	$dropObject: RelGroupFact(context == Context.DROP_OBJECT, component.conceptNid != $dropTarget.component.conceptNid)
-	
-	then
-	actions.add(new CopyRelGroupAction("copy rel group", $dropObject, $dropTarget));
-	actions.add(new MoveRelGroupAction("move rel group", $dropObject, $dropTarget));
-	
+   when
+   #concept != origin
+   $dropTarget: ConceptFact(context == Context.DROP_TARGET)
+   $dropObject: RelGroupFact(context == Context.DROP_OBJECT, component.conceptNid != $dropTarget.component.conceptNid)
+   
+   then
+   actions.add(new CopyRelGroupAction("copy rel group", $dropObject, $dropTarget));
+   actions.add(new MoveRelGroupAction("move rel group", $dropObject, $dropTarget));
+   
 end
 
 
 
 
 rule "rule 13" #rel template onto rel group"
-	when
-	$dropObject: RelSpecFact(context == Context.DROP_TARGET)
-	$dropTarget: RelGroupFact(context == Context.DROP_OBJECT)
+   when
+   $dropObject: RelSpecFact(context == Context.DROP_TARGET)
+   $dropTarget: RelGroupFact(context == Context.DROP_OBJECT)
 
-	
-	then
-	actions.add(new AddToRelGroupAction("add to rel group", $dropTarget, $dropObject)); 
+   
+   then
+   actions.add(new AddToRelGroupAction("add to rel group", $dropTarget, $dropObject)); 
 end

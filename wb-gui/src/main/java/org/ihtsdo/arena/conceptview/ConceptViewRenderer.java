@@ -77,108 +77,88 @@ import com.mxgraph.view.mxGraph;
  * @author Administrator
  * 
  */
-public class ConceptViewRenderer extends JLayeredPane
-{
+public class ConceptViewRenderer extends JLayeredPane {
 
-	private class RendererComponentAdaptor extends ComponentAdapter implements AncestorListener {
+    private class RendererComponentAdaptor extends ComponentAdapter implements AncestorListener {
 
-		@Override
-		public void componentMoved(ComponentEvent e) {
-			settings.hideNavigator();
-		}
+        @Override
+        public void componentMoved(ComponentEvent e) {
+            settings.hideNavigator();
+        }
 
-		@Override
-		public void componentResized(ComponentEvent e) {
-			settings.hideNavigator();
-		}
+        @Override
+        public void componentResized(ComponentEvent e) {
+            settings.hideNavigator();
+        }
 
-		@Override
-		public void ancestorMoved(AncestorEvent event) {
-			settings.hideNavigator();
-		}
+        @Override
+        public void ancestorMoved(AncestorEvent event) {
+            settings.hideNavigator();
+        }
 
-		@Override
-		public void ancestorRemoved(AncestorEvent event) {
-			settings.hideNavigator();
-		}
+        @Override
+        public void ancestorRemoved(AncestorEvent event) {
+            settings.hideNavigator();
+        }
 
-		@Override
-		public void ancestorAdded(AncestorEvent event) {
-			settings.hideNavigator();
-		}
-		
-	}
+        @Override
+        public void ancestorAdded(AncestorEvent event) {
+            settings.hideNavigator();
+        }
+    }
     /**
      * 
      */
     private static final long serialVersionUID = 2106746763664760745L;
-
- 
     /**
      * 
      */
     protected static ConceptViewRenderer dragSource = null;
-
     /**
      * 
      */
     protected static int sourceRow = 0;
-
     /**
      * 
      */
     protected mxCell cell;
-
     /**
      * 
      */
     protected mxGraphComponent graphContainer;
-
     /**
      * 
      */
     protected mxGraph graph;
-
     /**
      * 
      */
     public JComponent renderedComponent;
+    private ConceptViewSettings settings;
+    private ConceptViewTitle title;
+    private ScrollablePanel workflowPanel = new ScrollablePanel(new FlowLayout(FlowLayout.LEADING, 10, 10));
+    private JScrollPane workflowScrollPane = new JScrollPane(workflowPanel,
+            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    private KnowledgeBase contextualConceptActionsKBase;
+    private JScrollPane scrollPane;
+    private JToggleButton workflowToggleButton;
+    private JToggleButton oopsButton;
+    private static String workflowActionPathPrefix = "plugins/workflow/advanceWF/";
+    private static String workflowActionPathPostfix = "WFAction.bp";
 
-	private ConceptViewSettings settings;
-
-
-	private ConceptViewTitle title;
-
-	private ScrollablePanel workflowPanel = new ScrollablePanel(new FlowLayout(FlowLayout.LEADING, 10, 10));
-	private JScrollPane workflowScrollPane = new JScrollPane(workflowPanel, 
-			ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
-			ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-	private KnowledgeBase contextualConceptActionsKBase;
-
-
-	private JScrollPane scrollPane;
-
-
-	private JToggleButton workflowToggleButton;
-	private JToggleButton oopsButton;
-
-	private static String workflowActionPathPrefix = "plugins/workflow/advanceWF/";
-	private static String workflowActionPathPostfix = "WFAction.bp";
-
-		
     /**
      * 
      */
     public ConceptViewRenderer(Object cellObj,
-            final mxGraphComponent graphContainer, ACE ace)
-    {
-//    	
-//		try {
-//			contextualConceptActionsKBase = EditPanelKb.setupKb(new File("drools-rules/ContextualConceptActionsPanel.drl"));
-//		} catch (IOException e1) {
-//			throw new RuntimeException(e1);
-//		}
-		workflowPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+            final mxGraphComponent graphContainer, ACE ace) {
+
+        try {
+            contextualConceptActionsKBase = EditPanelKb.setupKb(new File("drools-rules/ContextualConceptActionsPanel.drl"));
+        } catch (IOException e1) {
+            throw new RuntimeException(e1);
+        }
+        workflowPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
         this.cell = (mxCell) cellObj;
         this.graphContainer = graphContainer;
         this.graph = graphContainer.getGraph();
@@ -193,32 +173,31 @@ public class ConceptViewRenderer extends JLayeredPane
 
         scrollPane = null;
 
-         if (graph.getModel().getChildCount(cell) == 0)  {
-             renderedComponent = settings.getComponent(ace.getAceFrameConfig());
-             if (JScrollPane.class.isAssignableFrom(renderedComponent.getClass())) {
-                 scrollPane = (JScrollPane) renderedComponent;
-             } else {
-                 scrollPane = new JScrollPane(renderedComponent);
-             }
+        if (graph.getModel().getChildCount(cell) == 0) {
+            renderedComponent = settings.getComponent(ace.getAceFrameConfig());
+            if (JScrollPane.class.isAssignableFrom(renderedComponent.getClass())) {
+                scrollPane = (JScrollPane) renderedComponent;
+            } else {
+                scrollPane = new JScrollPane(renderedComponent);
+            }
         }
 
-		if (scrollPane != null) {
+        if (scrollPane != null) {
             add(scrollPane, BorderLayout.CENTER);
             scrollPane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             scrollPane.getViewport().setBackground(Color.WHITE);
             scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
             setOpaque(true);
-			scrollPane.getVerticalScrollBar().addAdjustmentListener(
-					new AdjustmentListener() {
+            scrollPane.getVerticalScrollBar().addAdjustmentListener(
+                    new AdjustmentListener() {
 
-						public void adjustmentValueChanged(AdjustmentEvent e) {
-							graphContainer.refresh();
-						}
-
-					});
-			scrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 0, 1, Color.GRAY));
-		}
+                        public void adjustmentValueChanged(AdjustmentEvent e) {
+                            graphContainer.refresh();
+                        }
+                    });
+            scrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 0, 1, Color.GRAY));
+        }
 
 
         JPanel footerPanel = new JPanel();
@@ -232,215 +211,216 @@ public class ConceptViewRenderer extends JLayeredPane
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
 
-                
+
         gbc.gridx++;
         workflowToggleButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/16x16/plain/media_step_forward.png")));
         workflowToggleButton.setToolTipText("show context sensitive actions available for this concept...");
         workflowToggleButton.setSelected(false);
-        
+
         workflowToggleButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JToggleButton button = (JToggleButton) e.getSource();
-				if (button.isSelected()) {
-		            remove(scrollPane);
-		            //Collection<Action> actions = getKbActions();
-		            WorkflowHandlerBI wfHandler = new WorkflowHandler();
-		            Collection<? extends WorkflowHistoryJavaBeanBI> possibleActions = null;
-		            Collection<UUID> availableActions = null;
-		            		        	
-		            try {
-						ViewCoordinate coordinate = settings.getConfig().getViewCoordinate();
-			            ConceptVersionBI concept = Ts.get().getConceptVersion(coordinate, settings.getConcept().getPrimUuid());
-			            availableActions = wfHandler.getAllAvailableWorkflowActionUids();
-			            possibleActions = wfHandler.getAvailableWorkflowActions(concept);
-		            } catch (IOException e1) {
-						e1.printStackTrace();
-					} catch (ContraditionException e2) {
-						e2.printStackTrace();
-					}
-					
-		            workflowPanel.removeAll();
 
-		            AceFrameConfig config;
-					try {
-						config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
-				        AceFrame ace = config.getAceFrame();
-				        JTabbedPane tp = ace.getCdePanel().getConceptTabs();
-				        int index = tp.getSelectedIndex();
-				        
-				        
-			            BpActionFactory actionFactory = new BpActionFactory(settings.getConfig(), settings.getHost());
-			            
-				        for (UUID action: availableActions) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JToggleButton button = (JToggleButton) e.getSource();
+                if (button.isSelected()) {
+                    remove(scrollPane);
+                    workflowPanel.removeAll();
 
-		            		JButton actionButton = new JButton();
-							
-		            		Action a = actionFactory.make(new File("plugins/workflow/advanceWF/AdvanceWorkflow.bp"));
-		            		actionButton.setAction(a);
-		            		
-		            	actionButton.setHorizontalTextPosition(SwingConstants.CENTER);
-		            	actionButton.setVerticalTextPosition(SwingConstants.BOTTOM);
-			            	actionButton.setText(Terms.get().getConcept(action).getInitialText());
-		
-		            	actionButton.addActionListener(new ActionListener() {
-							
-							@Override
-							public void actionPerformed(ActionEvent e) {
-									
-									try 
-									{
-							            final I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-								        
-								        // Get Worker
-							            I_Work worker;
-							            if (config.getWorker().isExecuting()) {
-								            worker = config.getWorker().getTransactionIndependentClone();
-								        } else {
-								            worker = config.getWorker();
-								        }
-								        
-	
-								        worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), WorkflowHelper.lookupAction(e.getActionCommand()).getPrimUuid());
+                    Collection<Action> actions = getKbActions();
+                    for (Action a : actions) {
+                        workflowPanel.add(new JButton(a));
+                    }
 
-								workflowToggleButton.doClick();
-		    			    			
-		    			    			updateOopsButton(settings.getConcept());
-		    			    			
-									} catch (Exception e1) {
-										e1.printStackTrace();
-									}
-							}
-						});
+                    WorkflowHandlerBI wfHandler = new WorkflowHandler();
+                    Collection<? extends WorkflowHistoryJavaBeanBI> possibleActions = null;
+                    Collection<UUID> availableActions = null;
+                    try {
+                        ViewCoordinate coordinate = settings.getConfig().getViewCoordinate();
+                        ConceptVersionBI concept = Ts.get().getConceptVersion(coordinate, settings.getConcept().getPrimUuid());
+                        availableActions = wfHandler.getAllAvailableWorkflowActionUids();
+                        possibleActions = wfHandler.getAvailableWorkflowActions(concept);
+                    } catch (IOException e1) {
+                        AceLog.getAppLog().alertAndLogException(e1);
+                    } catch (ContraditionException e2) {
+                        AceLog.getAppLog().alertAndLogException(e2);
+                    }
 
-			        		if (wfHandler.isActiveAction(possibleActions, action))
-				        		actionButton.setEnabled(true);
-				        	else
-				        		actionButton.setEnabled(false);
 
-		            	workflowPanel.add(actionButton);
-		            }
-					} catch (TerminologyException e2) {
-						// TODO Auto-generated catch block
-						e2.printStackTrace();
-					} catch (IOException e2) {
-						// TODO Auto-generated catch block
-						e2.printStackTrace();
-					}
+                    AceFrameConfig config;
+                    try {
+                        config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
+                        AceFrame ace = config.getAceFrame();
+                        JTabbedPane tp = ace.getCdePanel().getConceptTabs();
+                        int index = tp.getSelectedIndex();
 
-					oopsButton = new JToggleButton("Undo");
-		            oopsButton.setToolTipText("Undo last action on this concept");
 
-		            oopsButton.setHorizontalTextPosition(SwingConstants.CENTER);
-	            	oopsButton.setVerticalTextPosition(SwingConstants.BOTTOM);
+                        BpActionFactory actionFactory = new BpActionFactory(settings.getConfig(), settings.getHost());
+                        File wfBpFile = new File("plugins/workflow/advanceWF/AdvanceWorkflow.bp");
+                        if (wfBpFile.exists()) {
+                            for (UUID action : availableActions) {
 
-		            oopsButton.setSelected(false);
+                                JButton actionButton = new JButton();
 
-		            oopsButton.addActionListener(new ActionListener() {
+                                Action a = actionFactory.make(new File("plugins/workflow/advanceWF/AdvanceWorkflow.bp"));
+                                actionButton.setAction(a);
 
-		            	@Override
-		    			public void actionPerformed(ActionEvent e) {
+                                actionButton.setHorizontalTextPosition(SwingConstants.CENTER);
+                                actionButton.setVerticalTextPosition(SwingConstants.BOTTOM);
+                                actionButton.setText(Terms.get().getConcept(action).getInitialText());
 
-		    				try {
+                                actionButton.addActionListener(new ActionListener() {
 
-		    					if (settings.getConcept() != null) {
-		    						WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
-		    						WorkflowHistoryJavaBean latestWfHxJavaBean = searcher.getLatestWfHxJavaBeanForConcept(settings.getConcept());
-		    						UUID latestModelerUUID = latestWfHxJavaBean.getModeler();
-		    			            UUID currentModelerUUID = WorkflowHelper.getCurrentModeler().getPrimUuid();
-		    			            boolean autoApproved = latestWfHxJavaBean.getAutoApproved();
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
 
-		    			            // See if state prevents retirement
-		    			            if (currentModelerUUID.equals(latestModelerUUID) && !autoApproved)
-		    						{
-		    			    			WorkflowHelper.retireWorkflowHistoryRow(latestWfHxJavaBean);
-		    			    			updateOopsButton(settings.getConcept());
-		    			    			workflowToggleButton.doClick();
-		    						}
-		    					} else {
-		    						throw new Exception("Must have a concept to reverse workflow on");
-		    					}
+                                        try {
+                                            final I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-		    				} catch (TerminologyException e1) {
-		    					e1.printStackTrace();
-		    				} catch (IOException e1) {
-		    					e1.printStackTrace();
-		    				} catch (Exception e1) {
-								e1.printStackTrace();
-							}
-		    			}
+                                            // Get Worker
+                                            I_Work worker;
+                                            if (config.getWorker().isExecuting()) {
+                                                worker = config.getWorker().getTransactionIndependentClone();
+                                            } else {
+                                                worker = config.getWorker();
+                                            }
 
-		    			});
 
-	    			updateOopsButton(settings.getConcept());
-		            workflowPanel.add(oopsButton);
+                                            worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), WorkflowHelper.lookupAction(e.getActionCommand()).getPrimUuid());
 
-		            add(workflowScrollPane, BorderLayout.CENTER);
-					// Populate here...
+                                            workflowToggleButton.doClick();
 
-		            workflowPanel.setVisible(true);
-					scrollPane.setVisible(false);
-					GuiUtil.tickle(ConceptViewRenderer.this);
+                                            updateOopsButton(settings.getConcept());
+
+                                        } catch (Exception e1) {
+                                            AceLog.getAppLog().alertAndLogException(e1);
+                                        }
+                                    }
+                                });
+
+                                if (wfHandler.isActiveAction(possibleActions, action)) {
+                                    actionButton.setEnabled(true);
+                                } else {
+                                    actionButton.setEnabled(false);
+                                }
+
+                                workflowPanel.add(actionButton);
+                            }
+                        }
+                    } catch (TerminologyException e2) {
+                        AceLog.getAppLog().alertAndLogException(e2);
+                    } catch (IOException e2) {
+                        AceLog.getAppLog().alertAndLogException(e2);
+                    }
+
+                    oopsButton = new JToggleButton("Undo");
+                    oopsButton.setToolTipText("Undo last action on this concept");
+
+                    oopsButton.setHorizontalTextPosition(SwingConstants.CENTER);
+                    oopsButton.setVerticalTextPosition(SwingConstants.BOTTOM);
+
+                    oopsButton.setSelected(false);
+
+                    oopsButton.addActionListener(new ActionListener() {
+
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+
+                            try {
+
+                                if (settings.getConcept() != null) {
+                                    WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
+                                    WorkflowHistoryJavaBean latestWfHxJavaBean = searcher.getLatestWfHxJavaBeanForConcept(settings.getConcept());
+                                    UUID latestModelerUUID = latestWfHxJavaBean.getModeler();
+                                    UUID currentModelerUUID = WorkflowHelper.getCurrentModeler().getPrimUuid();
+                                    boolean autoApproved = latestWfHxJavaBean.getAutoApproved();
+
+                                    // See if state prevents retirement
+                                    if (currentModelerUUID.equals(latestModelerUUID) && !autoApproved) {
+                                        WorkflowHelper.retireWorkflowHistoryRow(latestWfHxJavaBean);
+                                        updateOopsButton(settings.getConcept());
+                                        workflowToggleButton.doClick();
+                                    }
+                                } else {
+                                    throw new Exception("Must have a concept to reverse workflow on");
+                                }
+
+                            } catch (TerminologyException e1) {
+                                AceLog.getAppLog().alertAndLogException(e1);
+                            } catch (IOException e1) {
+                                AceLog.getAppLog().alertAndLogException(e1);
+                            } catch (Exception e1) {
+                                AceLog.getAppLog().alertAndLogException(e1);
+                            }
+                        }
+                    });
+
+                    updateOopsButton(settings.getConcept());
+                    workflowPanel.add(oopsButton);
+
+                    add(workflowScrollPane, BorderLayout.CENTER);
+                    // Populate here...
+
+                    workflowPanel.setVisible(true);
+                    scrollPane.setVisible(false);
+                    GuiUtil.tickle(ConceptViewRenderer.this);
 //// 
 
 
-			        final JCheckBox override = new JCheckBox();
-			        override.setText("Override mode");
-			        override.setAlignmentY(LEFT_ALIGNMENT);
+                    final JCheckBox override = new JCheckBox();
+                    override.setText("Override mode");
+                    override.setAlignmentY(LEFT_ALIGNMENT);
 
-			        override.addActionListener(new ActionListener() {
+                    override.addActionListener(new ActionListener() {
 
-			        	@Override
-						public void actionPerformed(ActionEvent e) {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
 
-			        		boolean or;
+                            boolean or;
 
-			        		if (override.isSelected()) {
-			        			override.setBackground(Color.red);
-			        			or = true;
-			        		} else { 
-			        			override.setBackground(new Color(240, 240, 240));
-			        			or = false;
-			        		}
+                            if (override.isSelected()) {
+                                override.setBackground(Color.red);
+                                or = true;
+                            } else {
+                                override.setBackground(new Color(240, 240, 240));
+                                or = false;
+                            }
 
-			        		try {
-								Terms.get().getActiveAceFrameConfig().setOverride(or);
-							} catch (TerminologyException e1) {
-								e1.printStackTrace();
-							} catch (IOException e1) {
-								e1.printStackTrace();
-							}
-			        	}
+                            try {
+                                Terms.get().getActiveAceFrameConfig().setOverride(or);
+                            } catch (TerminologyException e1) {
+                                AceLog.getAppLog().alertAndLogException(e1);
+                            } catch (IOException e1) {
+                                AceLog.getAppLog().alertAndLogException(e1);
+                            }
+                        }
+                    });
 
-					});
-			        
-			        workflowPanel.add(override);
+                    workflowPanel.add(override);
 
-			        /////
+                    /////
 
 
-				} else {
-					workflowPanel.setVisible(false);
-		            remove(workflowScrollPane);
-		            add(scrollPane, BorderLayout.CENTER);
-					scrollPane.setVisible(true);
-				}
-			}
-		});
-        
+                } else {
+                    workflowPanel.setVisible(false);
+                    remove(workflowScrollPane);
+                    add(scrollPane, BorderLayout.CENTER);
+                    scrollPane.setVisible(true);
+                }
+            }
+        });
+
         workflowToggleButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
         footerPanel.add(workflowToggleButton, gbc);
-        
+
 
         gbc.gridx++;
-       
+
         gbc.weightx = 1;
         JPanel fillerPanel = new JPanel();
         fillerPanel.setBackground(footerPanel.getBackground());
-        
+
         footerPanel.add(fillerPanel, gbc);
-        
+
         gbc.weightx = 0;
         gbc.gridx++;
         JButton cancelButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/delete.png")));
@@ -448,14 +428,14 @@ public class ConceptViewRenderer extends JLayeredPane
         cancelButton.addActionListener(new CancelActionListener());
         cancelButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
         footerPanel.add(cancelButton, gbc);
-        
+
         gbc.gridx++;
         JButton commitButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/check.png")));
         commitButton.setToolTipText("commit changes to concept");
         commitButton.addActionListener(new CommitActionListener());
         commitButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
         footerPanel.add(commitButton, gbc);
-        
+
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.SOUTHEAST;
         footerPanel.add(settings.getResizeLabel(), gbc);
@@ -472,57 +452,52 @@ public class ConceptViewRenderer extends JLayeredPane
     }
 
     private void updateLabel() {
-    	title.updateTitle();
+        title.updateTitle();
     }
 
-	private Collection<Action> getKbActions() {
-		Collection<Action> actions = new ArrayList<Action>();
-		
-		try {
-			StatefulKnowledgeSession ksession = contextualConceptActionsKBase.newStatefulKnowledgeSession();
-			boolean uselogger = false;
-			
-			KnowledgeRuntimeLogger logger = null;
-			if (uselogger) {
-				logger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
-			}
-			try {
-				
-				ViewCoordinate coordinate = settings.getConfig().getViewCoordinate();
-				ksession.setGlobal("vc", coordinate);
-				ksession.setGlobal("actions", actions);
-				ksession.setGlobal("actionFactory", new BpActionFactory(settings.getConfig(), 
-						settings.getHost()));
-				if (settings.getConcept() != null) {
-					ksession.insert(Ts.get().getConceptVersion(coordinate, settings.getConcept().getNid()));
-				} else {
-					ksession.insert("null concept");
-				}
-				ksession.fireAllRules();
-			} catch (IOException e) {
-				AceLog.getAppLog().alertAndLogException(e);
-			} finally {
-				if (logger != null) {
-					logger.close();
-				}
-			}
-		} catch (Throwable e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		}
-		return actions;
-	}
+    private Collection<Action> getKbActions() {
+        Collection<Action> actions = new ArrayList<Action>();
 
-	
+        try {
+            StatefulKnowledgeSession ksession = contextualConceptActionsKBase.newStatefulKnowledgeSession();
+            boolean uselogger = false;
+
+            KnowledgeRuntimeLogger logger = null;
+            if (uselogger) {
+                logger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+            }
+            try {
+
+                ViewCoordinate coordinate = settings.getConfig().getViewCoordinate();
+                ksession.setGlobal("vc", coordinate);
+                ksession.setGlobal("actions", actions);
+                ksession.setGlobal("actionFactory", new BpActionFactory(settings.getConfig(),
+                        settings.getHost()));
+                if (settings.getConcept() != null) {
+                    ksession.insert(Ts.get().getConceptVersion(coordinate, settings.getConcept().getNid()));
+                } else {
+                    ksession.insert("null concept");
+                }
+                ksession.fireAllRules();
+            } catch (IOException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            } finally {
+                if (logger != null) {
+                    logger.close();
+                }
+            }
+        } catch (Throwable e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+        return actions;
+    }
 
     /**
      * 
      */
-    public static ConceptViewRenderer getVertex(Component component)
-    {
-        while (component != null)
-        {
-            if (component instanceof ConceptViewRenderer)
-            {
+    public static ConceptViewRenderer getVertex(Component component) {
+        while (component != null) {
+            if (component instanceof ConceptViewRenderer) {
                 return (ConceptViewRenderer) component;
             }
             component = component.getParent();
@@ -533,26 +508,25 @@ public class ConceptViewRenderer extends JLayeredPane
 
     private class HostListener implements PropertyChangeListener {
 
-		@Override
-		public void propertyChange(PropertyChangeEvent evt) {
-			updateLabel();
-		}
-    	
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            updateLabel();
+        }
     }
 
-    private void updateOopsButton(I_GetConceptData concept) {		    	
-    	try 
-    	{
-	    	WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
-	    	
-	    	WorkflowHistoryJavaBean latestWfHxJavaBean = searcher.getLatestWfHxJavaBeanForConcept(concept);
-	
-    		if (latestWfHxJavaBean == null || WorkflowHelper.isBeginEndAction(latestWfHxJavaBean.getAction()))
-	    		oopsButton.setEnabled(false);
-	    	else
-	    		oopsButton.setEnabled(true);
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    	}
- }
+    private void updateOopsButton(I_GetConceptData concept) {
+        try {
+            WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
+
+            WorkflowHistoryJavaBean latestWfHxJavaBean = searcher.getLatestWfHxJavaBeanForConcept(concept);
+
+            if (latestWfHxJavaBean == null || WorkflowHelper.isBeginEndAction(latestWfHxJavaBean.getAction())) {
+                oopsButton.setEnabled(false);
+            } else {
+                oopsButton.setEnabled(true);
+            }
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+    }
 }

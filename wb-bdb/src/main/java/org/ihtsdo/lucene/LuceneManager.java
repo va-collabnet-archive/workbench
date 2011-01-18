@@ -130,13 +130,14 @@ public class LuceneManager {
         writer.setMaxBufferedDocs(1000);
 
         IndexGenerator indexer = new IndexGenerator(writer);
+        AceLog.getAppLog().info("Starting index time: " + timer.getElapsedTime());
         Bdb.getConceptDb().iterateConceptDataInSequence(indexer);
 
-        AceLog.getAppLog().info("Optimizing index time: " + timer.getElapsedTime());
+        AceLog.getAppLog().info("\nOptimizing index start time: " + timer.getElapsedTime());
         writer.optimize();
         writer.commit();
         if (AceLog.getAppLog().isLoggable(Level.INFO)) {
-            AceLog.getAppLog().info("Index time: " + timer.getElapsedTime());
+            AceLog.getAppLog().info("Total index time: " + timer.getElapsedTime());
             timer.stop();
         }
     }

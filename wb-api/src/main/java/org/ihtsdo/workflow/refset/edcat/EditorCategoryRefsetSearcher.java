@@ -57,10 +57,9 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 		// Get Editor Categories
 		Set<String> currentModelerPropertySet = searchForEditorCategoryListByModeler(modeler);
 		
-		if (currentModelerPropertySet.size() == 0)
-			throw new Exception("Couldn't find Modeler requested");
-		else if (currentModelerPropertySet.size() == 1)
-		{
+		if (currentModelerPropertySet.isEmpty()) {
+                    return null;
+                } else if (currentModelerPropertySet.size() == 1) {
 			// Only Category, must be all
 			String role = ((EditorCategoryRefset)refset).getSemanticTag(currentModelerPropertySet.iterator().next());
 			
