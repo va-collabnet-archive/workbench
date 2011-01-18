@@ -566,7 +566,12 @@ public class WorkflowHelper {
         ArrayList<WorkflowHistoryJavaBean> retList = new ArrayList<WorkflowHistoryJavaBean>();
 
 		// Get Editor Category by modeler and Concept
-        int categoryNid = categegorySearcher.searchForCategoryForConceptByModeler(modeler, concept).getConceptNid();
+        I_GetConceptData category = categegorySearcher.searchForCategoryForConceptByModeler(modeler, concept);
+        if (category == null) {
+            return new ArrayList<WorkflowHistoryJavaBean>();
+        }
+        
+        int categoryNid = category.getConceptNid();
 
 		// Get Current WF Status for Concept
         SortedSet<WorkflowHistoryJavaBean> beanList = historySearcher.getWfHxByConcept(concept);
