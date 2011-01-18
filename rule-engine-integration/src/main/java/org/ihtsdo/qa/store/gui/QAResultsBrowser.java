@@ -62,11 +62,14 @@ public class QAResultsBrowser extends JPanel {
 	LinkedHashMap<RulesReportColumn, Boolean> sortBy = null;
 	private JTabbedPane parentTabbedPanel = null;
 	private List<Category> allCategories;
+	private Rule rule = null;
 
-	public QAResultsBrowser(QAStoreBI store) {
+	public QAResultsBrowser(QAStoreBI store, JTabbedPane parentTabbedPane) {
 		this.store = store;
 		allCategories = store.getAllCategories();
 		initComponents();
+		this.parentTabbedPanel = parentTabbedPane;
+		
 		panel4.setVisible(false);
 		dispositionStatuses = new LinkedHashSet<DispositionStatus>();
 		dispositionStatuses.addAll(store.getAllDispositionStatus());
@@ -101,8 +104,14 @@ public class QAResultsBrowser extends JPanel {
 
 	}
 
-	public void setParentTabbedPanel(JTabbedPane parentTabbedPanel) {
-		this.parentTabbedPanel = parentTabbedPanel;
+	public Rule getRule() {
+		int selectedRow = table1.getSelectedRow();
+		Object[] rowData = tableModel.getRow(selectedRow);
+		if(rule != null && rule.getRuleUuid().toString().equals(rowData[12].toString())){
+			return rule;
+		}
+		rule = store.getRule(UUID.fromString(rowData[12].toString()));
+		return rule;
 	}
 
 	private void setupSortByCombo() {
@@ -351,9 +360,9 @@ public class QAResultsBrowser extends JPanel {
 			}
 
 			if (!tabExists) {
-				Rule  rule = store.getRule(UUID.fromString(rowData[12].toString()));
-				RulesDetailsPanel rulesDetailsPanel = new RulesDetailsPanel(store, rule,allCategories,severities);
 				
+				rule = getRule(); 
+				RulesDetailsPanel rulesDetailsPanel = new RulesDetailsPanel(store, rule,allCategories,severities);
 				parentTabbedPanel.addTab(ruleName.substring(0, 7) + "...", null, rulesDetailsPanel, ruleName);
 				initTabComponent(parentTabbedPanel.getTabCount() - 1);
 				parentTabbedPanel.setSelectedIndex(parentTabbedPanel.getTabCount() - 1);

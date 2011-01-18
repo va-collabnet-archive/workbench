@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.axis2.AxisFault;
+import org.apache.axis.AxisFault;
 import org.ihtsdo.qa.store.model.Category;
 import org.ihtsdo.qa.store.model.DispositionStatus;
 import org.ihtsdo.qa.store.model.Execution;
