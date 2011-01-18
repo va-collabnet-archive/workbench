@@ -1,7 +1,9 @@
 package org.ihtsdo.qa.store;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -9,6 +11,7 @@ import org.ihtsdo.qa.store.model.Category;
 import org.ihtsdo.qa.store.model.DispositionStatus;
 import org.ihtsdo.qa.store.model.QACase;
 import org.ihtsdo.qa.store.model.QACoordinate;
+import org.ihtsdo.qa.store.model.QaCaseComment;
 import org.ihtsdo.qa.store.model.Rule;
 import org.ihtsdo.qa.store.model.Severity;
 import org.ihtsdo.qa.store.model.TerminologyComponent;
@@ -18,6 +21,7 @@ import org.ihtsdo.qadb.ws.data.Case;
 import org.ihtsdo.qadb.ws.data.Component;
 import org.ihtsdo.qadb.ws.data.IntBoolKeyValue;
 import org.ihtsdo.qadb.ws.data.IntStrKeyValue;
+import org.ihtsdo.qadb.ws.data.QACaseComment;
 import org.ihtsdo.qadb.ws.data.WsCategory;
 
 public class WsClientDataConverter {
@@ -170,6 +174,24 @@ public class WsClientDataConverter {
 		result.setRuleUuid(UUID.fromString(qaCase.getRule().getRuleUuid()));
 		result.setEffectiveTime(qaCase.getEffectiveTime());
 		result.setActive(qaCase.getIsActive());
+		List<QaCaseComment> comments = null;
+		QACaseComment[] wsCaseComments = qaCase.getComments();
+		if(wsCaseComments != null && wsCaseComments.length > 0){
+			comments = new ArrayList<QaCaseComment>();
+			for (QACaseComment qaCaseComment : wsCaseComments) {
+				QaCaseComment comment = new QaCaseComment();
+				comment.setAuthor(qaCaseComment.getAuthor());
+				comment.setComment(qaCaseComment.getComment());
+				comment.setCommentUuid(UUID.fromString(qaCaseComment.getCommentUuid()));
+				comment.setEffectiveTime(qaCaseComment.getEffectiveTime());
+				if(qaCaseComment.getStatus() != null){
+					comment.setStatus(qaCaseComment.getStatus().intValue());
+				}
+				comments.add(comment);
+			}
+		}
+		result.setComments(comments);
+		
 		return result;
 	}
 

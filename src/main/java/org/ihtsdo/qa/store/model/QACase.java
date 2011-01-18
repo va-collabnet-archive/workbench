@@ -18,7 +18,7 @@ public class QACase extends ViewPointSpecificObject {
 	private String detail;
 	private String assignedTo;
 	private Date effectiveTime;
-	private List<String> comments;
+	private List<QaCaseComment> comments;
 
 	public QACase() {
 	}
@@ -119,11 +119,11 @@ public class QACase extends ViewPointSpecificObject {
 		this.effectiveTime = effectiveTime;
 	}
 
-	public List<String> getComments() {
+	public List<QaCaseComment> getComments() {
 		return comments;
 	}
 
-	public void setComments(List<String> comments) {
+	public void setComments(List<QaCaseComment> comments) {
 		this.comments = comments;
 	}
 

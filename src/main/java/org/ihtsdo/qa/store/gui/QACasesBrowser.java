@@ -8,12 +8,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
@@ -28,6 +24,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -40,10 +37,13 @@ import org.ihtsdo.qa.store.QAStoreBI;
 import org.ihtsdo.qa.store.model.DispositionStatus;
 import org.ihtsdo.qa.store.model.QACase;
 import org.ihtsdo.qa.store.model.QACoordinate;
+import org.ihtsdo.qa.store.model.QADatabase;
 import org.ihtsdo.qa.store.model.Rule;
+import org.ihtsdo.qa.store.model.TerminologyComponent;
 import org.ihtsdo.qa.store.model.view.QACasesReportColumn;
 import org.ihtsdo.qa.store.model.view.QACasesReportLine;
 import org.ihtsdo.qa.store.model.view.QACasesReportPage;
+import org.ihtsdo.qadb.ws.data.Component;
 
 /**
  * @author Guillermo Reynoso
@@ -65,8 +65,14 @@ public class QACasesBrowser extends JPanel {
 	private int totalLines = 0;
 	private ObjectTransferHandler th = null;
 	private HashMap<QACasesReportColumn, Object> filter;
+	private JTabbedPane parentTabbedPanel = null;
+	
+	private  QAResultsBrowser resultsPanel;
+	private TerminologyComponent headerComponent; 
+	private QADatabase qaDatabase;
+	private QACase selectedCase;
 
-	public QACasesBrowser(QAStoreBI store, QACoordinate coordinate, Rule rule) {
+	public QACasesBrowser(QAStoreBI store, QAResultsBrowser resultsPanel, JTabbedPane parentTabbedPanel) {
 //		try {
 //			th = new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), null);
 //		} catch (TerminologyException e) {
@@ -80,8 +86,8 @@ public class QACasesBrowser extends JPanel {
 		filter = new HashMap<QACasesReportColumn, Object>();
 		
 		this.store = store;
-		this.coordinate = coordinate;
-		this.rule = rule;
+		this.resultsPanel = resultsPanel;
+		this.parentTabbedPanel = parentTabbedPanel;
 		initComponents();
 		dispositionStatuses = new LinkedHashSet<DispositionStatus>();
 		dispositionStatuses.addAll(store.getAllDispositionStatus());
@@ -143,29 +149,8 @@ public class QACasesBrowser extends JPanel {
 			}
 		});
 		
-		table1.addMouseListener(new MouseListener() {
-			@Override
-			public void mouseReleased(MouseEvent arg0) {}
-			@Override
-			public void mousePressed(MouseEvent arg0) {}
-			@Override
-			public void mouseExited(MouseEvent arg0) {}
-			@Override
-			public void mouseEntered(MouseEvent arg0) {}
-			@Override
-			public void mouseClicked(MouseEvent event) {
-				if(event.getClickCount() == 2){
-					int selectedRow = table1.getSelectedRow();
-					Object[] row = tableModel.getRow(selectedRow);
-					QACaseViewer caseViewer = new QACaseViewer(row[0], row[1], row[2], row[3], row[4], row[5], row[6]);
-					caseViewer.setVisible(true);
-				}
-			}
-		});
-		
-
 		if (coordinate != null && rule != null) {
-			setupPanel(store, coordinate, rule);
+			setupPanel(store);
 		}
 
 		setupPageLinesCombo();
@@ -181,18 +166,21 @@ public class QACasesBrowser extends JPanel {
 		comboBox6.addItem("100");
 	}
 
-	public void setupPanel(QAStoreBI store, QACoordinate coordinate, Rule rule) {
+	public void setupPanel(QAStoreBI store) {
 		this.store = store;
-		this.coordinate = coordinate;
-		this.rule = rule;
+		this.coordinate = resultsPanel.getQACoordinate();
+		this.rule = resultsPanel.getRule();
 
 		panel4.setVisible(false);
 
 		clearTable1();
 
-		label7.setText(store.getQADatabase(coordinate.getDatabaseUuid()).getName());
-		if (store.getComponent(coordinate.getPathUuid()) != null) {
-			label8.setText(store.getComponent(coordinate.getPathUuid()).getComponentName());
+		QADatabase qaDatabase = getQaDatabase(coordinate.getDatabaseUuid()); 
+		label7.setText(qaDatabase.getName());
+		
+		this.headerComponent = getHeaderComponent(coordinate.getPathUuid());
+		if (headerComponent != null) {
+			label8.setText(headerComponent.getComponentName());
 		}
 		label9.setText(coordinate.getViewPointTime());
 		label10.setText(rule.getRuleCode());
@@ -205,6 +193,22 @@ public class QACasesBrowser extends JPanel {
 		filterButton.setText("Show filters");
 		// updateTable1();
 		updatePageCounters();
+	}
+
+	private QADatabase getQaDatabase(UUID databaseUuid) {
+		if(qaDatabase != null && qaDatabase.getDatabaseUuid().equals(databaseUuid)){
+			return qaDatabase;
+		}
+		qaDatabase = store.getQADatabase(databaseUuid);
+		return qaDatabase;
+	}
+
+	private TerminologyComponent getHeaderComponent(UUID pathUuid) {
+		if(headerComponent != null && headerComponent.getComponentUuid().equals(pathUuid)){
+			return headerComponent;
+		}
+		headerComponent = store.getComponent(coordinate.getPathUuid());;
+		return headerComponent;
 	}
 
 	private void updateTable1() {
@@ -332,6 +336,37 @@ public class QACasesBrowser extends JPanel {
 		Integer selectedPageLengh = Integer.parseInt((String) comboBox6.getSelectedItem());
 		startLine = startLine + selectedPageLengh;
 		updateTable1();
+	}
+
+	private void table1MouseClicked(MouseEvent e) {
+		if (e.getClickCount() == 2) {
+			int tabCount = parentTabbedPanel.getTabCount();
+			int selectedRow = table1.getSelectedRow();
+			Object[] rowData = tableModel.getRow(selectedRow);
+			String conceptName = rowData[2].toString();
+			boolean tabExists = false;
+			for (int i = 0; i < tabCount; i++) {
+				if (parentTabbedPanel.getTitleAt(i).equals(conceptName.substring(0, 7) + "...")) {
+					tabExists = true;
+					parentTabbedPanel.setSelectedIndex(i);
+				}
+			}
+
+			if (!tabExists) {
+				Rule  rule = resultsPanel.getRule();
+				TerminologyComponent component = new TerminologyComponent();
+				component.setComponentName(rowData[2].toString());
+				component.setComponentUuid(UUID.fromString(rowData[1].toString()));
+				component.setSctid(rowData[1] != null ? Long.parseLong(rowData[2].toString())  :  null);
+				
+				selectedCase = (QACase) rowData[7];
+				
+				QACaseDetailsPanel rulesDetailsPanel = new QACaseDetailsPanel(rule,component,selectedCase);
+				parentTabbedPanel.addTab(conceptName.substring(0, 7) + "...", null, rulesDetailsPanel, conceptName);
+				//initTabComponent(parentTabbedPanel.getTabCount() - 1);
+				parentTabbedPanel.setSelectedIndex(parentTabbedPanel.getTabCount() - 1);
+			}
+		}
 	}
 
 	private void initComponents() {
@@ -539,6 +574,14 @@ public class QACasesBrowser extends JPanel {
 
 			//======== scrollPane1 ========
 			{
+
+				//---- table1 ----
+				table1.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						table1MouseClicked(e);
+					}
+				});
 				scrollPane1.setViewportView(table1);
 			}
 			panel2.add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
@@ -750,9 +793,6 @@ public class QACasesBrowser extends JPanel {
 		}
 		
 		public boolean isCellEditable(int x, int y) {
-			if (y == 4 || y == 5) {
-				return true;
-			}
 			return false;
 		}
 		

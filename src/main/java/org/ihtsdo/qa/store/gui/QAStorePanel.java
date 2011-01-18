@@ -36,10 +36,9 @@ public class QAStorePanel extends JPanel {
 		this.store = store;
 		initComponents();
 		
-		resultsPanel = new QAResultsBrowser(store);
-		resultsPanel.setParentTabbedPanel(tabbedPane1);
+		resultsPanel = new QAResultsBrowser(store, tabbedPane1);
 		panel2.add(resultsPanel, BorderLayout.CENTER);
-		casesPanel = new QACasesBrowser(store, null, null);
+		casesPanel = new QACasesBrowser(store, resultsPanel, tabbedPane2);
 		panel3.add(casesPanel, BorderLayout.CENTER);
 		
 		resultsPanel.getTable().addMouseListener(new MouseAdapter() {
@@ -52,10 +51,7 @@ public class QAStorePanel extends JPanel {
 	
 	private void table1MouseClicked(MouseEvent e) {
 		if(e.getClickCount() == 1){
-			QACoordinate coordinate = resultsPanel.getQACoordinate();
-			int selectedRow = resultsPanel.getTable().getSelectedRow();
-			Rule rule = (Rule) resultsPanel.getTable().getValueAt(selectedRow, 1);
-			casesPanel.setupPanel(store, coordinate, rule);
+			casesPanel.setupPanel(store);
 		}
 	}
 
