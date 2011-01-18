@@ -96,7 +96,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     }
 
     public enum GROUPING_TYPE {
-        OR(RefsetAuxiliary.Concept.REFSET_OR_GROUPING, true), AND(RefsetAuxiliary.Concept.REFSET_AND_GROUPING, true), CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, true), NOT_CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, false), CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, true), NOT_CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, false), V1(RefsetAuxiliary.Concept.DIFFERENCE_V1_GROUPING, true), V2(RefsetAuxiliary.Concept.DIFFERENCE_V2_GROUPING, true);
+        OR(RefsetAuxiliary.Concept.REFSET_OR_GROUPING, true), NEGATED_OR(RefsetAuxiliary.Concept.REFSET_OR_GROUPING, false), AND(RefsetAuxiliary.Concept.REFSET_AND_GROUPING, true), NEGATED_AND(RefsetAuxiliary.Concept.REFSET_AND_GROUPING, false), CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, true), NOT_CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, false), CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, true), NOT_CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, false), V1(RefsetAuxiliary.Concept.DIFFERENCE_V1_GROUPING, true), V2(RefsetAuxiliary.Concept.DIFFERENCE_V2_GROUPING, true);
 
         private int nid;
         private boolean truth;
@@ -131,7 +131,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     private boolean allComponentsNeedsResort = true;
     private boolean continueComputation = true;
 
-    public RefsetSpecQuery(I_GetConceptData groupingConcept, int refsetSpecNid, I_ConfigAceFrame config) throws Exception {
+    public RefsetSpecQuery(I_GetConceptData groupingConcept, boolean groupingTypeTruth, int refsetSpecNid,
+            I_ConfigAceFrame config) throws Exception {
         super(refsetSpecNid, config);
         // create query object (statements + any sub-queries)
         executionOrderComparator = new RefsetSpecCalculationOrderComparator();
@@ -141,7 +142,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         statements = new ArrayList<RefsetSpecStatement>();
         allComponents = new ArrayList<RefsetSpecComponent>();
 
-        this.groupingType = getGroupingTypeFromConcept(groupingConcept);
+        this.groupingType = getGroupingTypeFromConcept(groupingConcept, groupingTypeTruth);
         termFactory = Terms.get();
 
         totalStatementCount = 0;
@@ -156,16 +157,20 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         return statements;
     }
 
-    private GROUPING_TYPE getGroupingTypeFromConcept(I_GetConceptData concept) throws TerminologyException, IOException {
+    private GROUPING_TYPE getGroupingTypeFromConcept(I_GetConceptData concept, boolean groupingTypeTruth)
+            throws TerminologyException, IOException {
         for (GROUPING_TYPE gt : GROUPING_TYPE.values()) {
-            if (concept.getConceptNid() == gt.nid)
-                return gt;
+            if (concept.getConceptNid() == gt.nid) {
+                if (groupingTypeTruth == gt.truth) {
+                    return gt;
+                }
+            }
         }
         throw new TerminologyException("No valid grouping token specified : " + concept.getInitialText());
     }
 
-    public RefsetSpecQuery addSubquery(I_GetConceptData groupingConcept) throws Exception {
-        RefsetSpecQuery subquery = new RefsetSpecQuery(groupingConcept, getRefsetSpecNid(), config);
+    public RefsetSpecQuery addSubquery(I_GetConceptData groupingConcept, boolean groupingTypeTruth) throws Exception {
+        RefsetSpecQuery subquery = new RefsetSpecQuery(groupingConcept, groupingTypeTruth, getRefsetSpecNid(), config);
         if (this.getV1Is() != null)
             subquery.setV1Is(this.getV1Is());
         if (this.getV2Is() != null)
@@ -290,6 +295,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         // process all statements and subqueries
         switch (groupingType) {
         case AND:
+        case NEGATED_OR:
             if (statements.size() == 0 && subqueries.size() == 0) {
                 activity.complete();
                 //activity.setProgressInfoLower("Spec is invalid - dangling AND.");
@@ -311,6 +317,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             break;
 
         case OR:
+        case NEGATED_AND:
             if (statements.size() == 0 && subqueries.size() == 0) {
                 activity.complete();
                 //activity.setProgressInfoLower("Spec is invalid - dangling OR.");
@@ -497,6 +504,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         // process all statements and subqueries
         switch (groupingType) {
         case AND:
+        case NEGATED_OR:
             if (statements.size() == 0 && subqueries.size() == 0) {
                 //throw new TerminologyException("Spec is invalid - dangling AND.");
             }
@@ -516,6 +524,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             // return true
             return true;
         case OR:
+        case NEGATED_AND:
             if (statements.size() == 0 && subqueries.size() == 0) {
                 //throw new TerminologyException("Spec is invalid - dangling OR.\n\n" + this.toString() + "\n\n"
                 //    + Terms.get().getConcept(getRefsetSpecNid()).toLongString());
@@ -687,8 +696,14 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         case AND:
             groupingType = GROUPING_TYPE.OR;
             break;
+        case NEGATED_AND:
+            groupingType = GROUPING_TYPE.AND;
+            break;
         case OR:
             groupingType = GROUPING_TYPE.AND;
+            break;
+        case NEGATED_OR:
+            groupingType = GROUPING_TYPE.OR;
             break;
         case CONCEPT_CONTAINS_REL:
             groupingType = GROUPING_TYPE.NOT_CONCEPT_CONTAINS_REL;
@@ -829,10 +844,9 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         // process all statements and subqueries
         switch (groupingType) {
         case AND:
+        case NEGATED_OR:
             if (statements.size() == 0 && subqueries.size() == 0) {
                 activity.complete();
-                //   activity.setProgressInfoLower("Spec is invalid - dangling AND.");
-                //   throw new TerminologyException("Spec is invalid - dangling AND.\n" + this.toString());
             }
 
             for (RefsetSpecComponent component : allComponents) {
@@ -849,12 +863,10 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             }
 
             break;
-
         case OR:
+        case NEGATED_AND:
             if (statements.size() == 0 && subqueries.size() == 0) {
                 activity.complete();
-                // activity.setProgressInfoLower("Spec is invalid - dangling AND.");
-                // throw new TerminologyException("Spec is invalid - dangling OR.");
             }
 
             for (RefsetSpecComponent component : allComponents) {
