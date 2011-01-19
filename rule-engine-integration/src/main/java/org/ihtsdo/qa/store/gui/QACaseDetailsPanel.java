@@ -13,9 +13,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +35,8 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.qa.store.QAStoreBI;
 import org.ihtsdo.qa.store.model.DispositionStatus;
 import org.ihtsdo.qa.store.model.QACase;
@@ -42,6 +44,7 @@ import org.ihtsdo.qa.store.model.QADatabase;
 import org.ihtsdo.qa.store.model.QaCaseComment;
 import org.ihtsdo.qa.store.model.Rule;
 import org.ihtsdo.qa.store.model.TerminologyComponent;
+import org.ihtsdo.rules.RulesLibrary;
 
 /**
  * @author Guillermo Reynoso
@@ -70,14 +73,20 @@ public class QACaseDetailsPanel extends JPanel {
 		this.headerComponent = headerComponent;
 		this.qaDatabase = qaDatabase;
 		this.store = store;
-		currentUser = "Guiermo";//Terms.get().getActiveAceFrameConfig().getUsername();
-		users = new HashSet<I_GetConceptData>(); //RulesLibrary.getUsers();
-		
-		assignedTo.addItem("");
-		assignedTo.addItem("Ale");
-		assignedTo.addItem("Alo");
-		assignedTo.addItem("Cesar");
-		assignedTo.addItem("Manu");
+		try {
+			currentUser = Terms.get().getActiveAceFrameConfig().getUsername();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		users = RulesLibrary.getUsers();
+//		
+//		assignedTo.addItem("");
+//		assignedTo.addItem("Ale");
+//		assignedTo.addItem("Alo");
+//		assignedTo.addItem("Cesar");
+//		assignedTo.addItem("Manu");
 		for (Object user : users) {
 			assignedTo.addItem(((I_GetConceptData)user).toString());
 		}

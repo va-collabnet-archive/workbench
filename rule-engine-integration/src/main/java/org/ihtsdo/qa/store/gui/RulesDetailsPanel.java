@@ -16,6 +16,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
+import javax.swing.*;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -226,50 +227,60 @@ public class RulesDetailsPanel extends JPanel {
 		panel3 = new JPanel();
 		saveButton = new JButton();
 
-		// ======== this ========
+		//======== this ========
 		setBorder(null);
 		setLayout(new BorderLayout());
 
-		// ======== tabbedPane1 ========
+		//======== tabbedPane1 ========
 		{
 
-			// ======== scrollBar1 ========
+			//======== scrollBar1 ========
 			{
 
-				// ======== panel1 ========
+				//======== panel1 ========
 				{
 					panel1.setBorder(new EmptyBorder(5, 5, 5, 5));
 					panel1.setLayout(new GridBagLayout());
-					((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 114, 367, 102, 0 };
-					((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 25, 25, 39, 39, 39, 0, 25, 25, 25, 0, 0, 0 };
-					((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 0.0, 1.0, 0.0, 1.0E-4 };
-					((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
+					((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {114, 367, 102, 0};
+					((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {25, 25, 39, 39, 39, 0, 25, 25, 20, 0};
+					((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {0.0, 1.0, 0.0, 1.0E-4};
+					((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
-					// ---- label1 ----
+					//---- label1 ----
 					label1.setText("Rule name:");
 					label1.setVerticalAlignment(SwingConstants.TOP);
-					panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+					panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
-					// ---- ruleNameTextArea ----
+					//---- ruleNameTextArea ----
 					ruleNameTextArea.setEditable(false);
-					panel1.add(ruleNameTextArea, new GridBagConstraints(1, 0, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+					panel1.add(ruleNameTextArea, new GridBagConstraints(1, 0, 2, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
 
-					// ---- label2 ----
+					//---- label2 ----
 					label2.setText("Description");
 					label2.setVerticalAlignment(SwingConstants.TOP);
-					panel1.add(label2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+					panel1.add(label2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
-					// ---- ruleDescriptionTextArea ----
+					//---- ruleDescriptionTextArea ----
 					ruleDescriptionTextArea.setEditable(false);
-					panel1.add(ruleDescriptionTextArea, new GridBagConstraints(1, 1, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+					panel1.add(ruleDescriptionTextArea, new GridBagConstraints(1, 1, 2, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
 
-					// ---- label3 ----
+					//---- label3 ----
 					label3.setText("Expected Resolution");
 					label3.setVerticalAlignment(SwingConstants.TOP);
 					label3.setLabelFor(erpResTextArea);
-					panel1.add(label3, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+					panel1.add(label3, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
-					// ---- erpResTextArea ----
+					//---- erpResTextArea ----
 					erpResTextArea.setLineWrap(true);
 					erpResTextArea.addKeyListener(new KeyAdapter() {
 						@Override
@@ -277,14 +288,18 @@ public class RulesDetailsPanel extends JPanel {
 							erpResTextAreaKeyPressed(e);
 						}
 					});
-					panel1.add(erpResTextArea, new GridBagConstraints(1, 2, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+					panel1.add(erpResTextArea, new GridBagConstraints(1, 2, 2, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
 
-					// ---- label4 ----
+					//---- label4 ----
 					label4.setText("Resolution");
 					label4.setVerticalAlignment(SwingConstants.TOP);
-					panel1.add(label4, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+					panel1.add(label4, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
-					// ---- resolutionTextArea ----
+					//---- resolutionTextArea ----
 					resolutionTextArea.setLineWrap(true);
 					resolutionTextArea.addKeyListener(new KeyAdapter() {
 						@Override
@@ -292,14 +307,18 @@ public class RulesDetailsPanel extends JPanel {
 							resolutionTextAreaKeyPressed(e);
 						}
 					});
-					panel1.add(resolutionTextArea, new GridBagConstraints(1, 3, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+					panel1.add(resolutionTextArea, new GridBagConstraints(1, 3, 2, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
 
-					// ---- label5 ----
+					//---- label5 ----
 					label5.setText("Example");
 					label5.setVerticalAlignment(SwingConstants.TOP);
-					panel1.add(label5, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+					panel1.add(label5, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
-					// ---- exampleTextArea ----
+					//---- exampleTextArea ----
 					exampleTextArea.setLineWrap(true);
 					exampleTextArea.addKeyListener(new KeyAdapter() {
 						@Override
@@ -307,15 +326,21 @@ public class RulesDetailsPanel extends JPanel {
 							exampleTextAreaKeyPressed(e);
 						}
 					});
-					panel1.add(exampleTextArea, new GridBagConstraints(1, 4, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
-					panel1.add(separator1, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+					panel1.add(exampleTextArea, new GridBagConstraints(1, 4, 2, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
+					panel1.add(separator1, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
-					// ---- label6 ----
+					//---- label6 ----
 					label6.setText("Documentation URL");
 					label6.setVerticalAlignment(SwingConstants.TOP);
-					panel1.add(label6, new GridBagConstraints(0, 6, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+					panel1.add(label6, new GridBagConstraints(0, 6, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
-					// ---- docuUrlTextArea ----
+					//---- docuUrlTextArea ----
 					docuUrlTextArea.setLineWrap(true);
 					docuUrlTextArea.addKeyListener(new KeyAdapter() {
 						@Override
@@ -323,14 +348,18 @@ public class RulesDetailsPanel extends JPanel {
 							docuUrlTextAreaKeyPressed(e);
 						}
 					});
-					panel1.add(docuUrlTextArea, new GridBagConstraints(1, 6, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+					panel1.add(docuUrlTextArea, new GridBagConstraints(1, 6, 2, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
 
-					// ---- label7 ----
+					//---- label7 ----
 					label7.setText("DITA topic link");
 					label7.setVerticalAlignment(SwingConstants.TOP);
-					panel1.add(label7, new GridBagConstraints(0, 7, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+					panel1.add(label7, new GridBagConstraints(0, 7, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
-					// ---- ditaDocLinkUidTextArea ----
+					//---- ditaDocLinkUidTextArea ----
 					ditaDocLinkUidTextArea.setLineWrap(true);
 					ditaDocLinkUidTextArea.addKeyListener(new KeyAdapter() {
 						@Override
@@ -338,14 +367,18 @@ public class RulesDetailsPanel extends JPanel {
 							ditaDocLinkUidTextAreaKeyPressed(e);
 						}
 					});
-					panel1.add(ditaDocLinkUidTextArea, new GridBagConstraints(1, 7, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+					panel1.add(ditaDocLinkUidTextArea, new GridBagConstraints(1, 7, 2, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
 
-					// ---- label8 ----
+					//---- label8 ----
 					label8.setText("Dita generated topic");
 					label8.setVerticalAlignment(SwingConstants.TOP);
-					panel1.add(label8, new GridBagConstraints(0, 8, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+					panel1.add(label8, new GridBagConstraints(0, 8, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 5), 0, 0));
 
-					// ---- ditaGeneratedTopicTextArea ----
+					//---- ditaGeneratedTopicTextArea ----
 					ditaGeneratedTopicTextArea.setLineWrap(true);
 					ditaGeneratedTopicTextArea.addKeyListener(new KeyAdapter() {
 						@Override
@@ -353,100 +386,141 @@ public class RulesDetailsPanel extends JPanel {
 							ditaGeneratedTopicTextAreaKeyPressed(e);
 						}
 					});
-					panel1.add(ditaGeneratedTopicTextArea, new GridBagConstraints(1, 8, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+					panel1.add(ditaGeneratedTopicTextArea, new GridBagConstraints(1, 8, 2, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 0), 0, 0));
 				}
 				scrollBar1.setViewportView(panel1);
 			}
 			tabbedPane1.addTab("Rule Details", scrollBar1);
 
-			// ======== scrollPane1 ========
+
+			//======== scrollPane1 ========
 			{
 
-				// ======== panel2 ========
+				//======== panel2 ========
 				{
 					panel2.setBorder(new EmptyBorder(5, 5, 5, 5));
 					panel2.setLayout(new GridBagLayout());
-					((GridBagLayout) panel2.getLayout()).columnWidths = new int[] { 85, 0, 207, 85, 63, 232, 127, 0, 0 };
-					((GridBagLayout) panel2.getLayout()).rowHeights = new int[] { 26, 25, 0, 0, 0, 0, 0, 0, 26, 0, 0 };
-					((GridBagLayout) panel2.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4 };
-					((GridBagLayout) panel2.getLayout()).rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
+					((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {85, 0, 207, 85, 63, 232, 127, 0, 0};
+					((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {26, 25, 0, 0, 0, 0, 0, 0, 26, 0, 0};
+					((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
+					((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
-					// ---- label9 ----
+					//---- label9 ----
 					label9.setText("UUID");
-					panel2.add(label9, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+					panel2.add(label9, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
-					// ---- ruleUuidTextArea ----
+					//---- ruleUuidTextArea ----
 					ruleUuidTextArea.setEditable(false);
-					panel2.add(ruleUuidTextArea, new GridBagConstraints(1, 0, 5, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+					panel2.add(ruleUuidTextArea, new GridBagConstraints(1, 0, 5, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
-					// ---- label14 ----
+					//---- label14 ----
 					label14.setText("Rule Code");
-					panel2.add(label14, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+					panel2.add(label14, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
-					// ---- ruleCodeTextArea ----
+					//---- ruleCodeTextArea ----
 					ruleCodeTextArea.addKeyListener(new KeyAdapter() {
 						@Override
 						public void keyPressed(KeyEvent e) {
 							ruleCodeTextAreaKeyPressed(e);
 						}
 					});
-					panel2.add(ruleCodeTextArea, new GridBagConstraints(1, 1, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+					panel2.add(ruleCodeTextArea, new GridBagConstraints(1, 1, 2, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
-					// ---- statusLabel ----
+					//---- statusLabel ----
 					statusLabel.setText("Status");
-					panel2.add(statusLabel, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
-					panel2.add(statusLabelText, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+					panel2.add(statusLabel, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
+					panel2.add(statusLabelText, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
-					// ---- label11 ----
+					//---- label11 ----
 					label11.setText("Category");
 					label11.setHorizontalAlignment(SwingConstants.LEFT);
-					panel2.add(label11, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+					panel2.add(label11, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
-					// ---- categoryComboBox ----
+					//---- categoryComboBox ----
 					categoryComboBox.addItemListener(new ItemListener() {
 						@Override
 						public void itemStateChanged(ItemEvent e) {
 							categoryComboBoxItemStateChanged(e);
 						}
 					});
-					panel2.add(categoryComboBox, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+					panel2.add(categoryComboBox, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
-					// ---- label12 ----
+					//---- label12 ----
 					label12.setText("Severity");
-					panel2.add(label12, new GridBagConstraints(4, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+					panel2.add(label12, new GridBagConstraints(4, 2, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
-					// ---- severityComboBox ----
+					//---- severityComboBox ----
 					severityComboBox.addItemListener(new ItemListener() {
 						@Override
 						public void itemStateChanged(ItemEvent e) {
 							severityComboBoxItemStateChanged(e);
 						}
 					});
-					panel2.add(severityComboBox, new GridBagConstraints(5, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
-					panel2.add(separator2, new GridBagConstraints(0, 3, 8, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+					panel2.add(severityComboBox, new GridBagConstraints(5, 2, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
+					panel2.add(separator2, new GridBagConstraints(0, 3, 8, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
 
-					// ---- whiteListAllowed ----
+					//---- whiteListAllowed ----
 					whiteListAllowed.setText("Whitelist allowed");
-					panel2.add(whiteListAllowed, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+					panel2.add(whiteListAllowed, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
-					// ---- whiteListResetAllowed ----
+					//---- whiteListResetAllowed ----
 					whiteListResetAllowed.setText("Whitelist reset allowed");
-					panel2.add(whiteListResetAllowed, new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+					panel2.add(whiteListResetAllowed, new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
-					// ---- whiteLIstWhenClosedAllowed ----
+					//---- whiteLIstWhenClosedAllowed ----
 					whiteLIstWhenClosedAllowed.setText("Whitelist reset when closed allowed");
-					panel2.add(whiteLIstWhenClosedAllowed, new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
-					panel2.add(separator3, new GridBagConstraints(0, 7, 8, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+					panel2.add(whiteLIstWhenClosedAllowed, new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
+					panel2.add(separator3, new GridBagConstraints(0, 7, 8, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
 
-					// ---- label13 ----
+					//---- label13 ----
 					label13.setText("Modified by");
-					panel2.add(label13, new GridBagConstraints(0, 8, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
-					panel2.add(modifiedByLabel, new GridBagConstraints(2, 8, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+					panel2.add(label13, new GridBagConstraints(0, 8, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
+					panel2.add(modifiedByLabel, new GridBagConstraints(2, 8, 2, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
-					// ---- label10 ----
+					//---- label10 ----
 					label10.setText("Last modification date");
-					panel2.add(label10, new GridBagConstraints(0, 9, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
-					panel2.add(modifiedDateLabel, new GridBagConstraints(2, 9, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+					panel2.add(label10, new GridBagConstraints(0, 9, 2, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 5), 0, 0));
+					panel2.add(modifiedDateLabel, new GridBagConstraints(2, 9, 2, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 5), 0, 0));
 				}
 				scrollPane1.setViewportView(panel2);
 			}
@@ -455,11 +529,11 @@ public class RulesDetailsPanel extends JPanel {
 		}
 		add(tabbedPane1, BorderLayout.CENTER);
 
-		// ======== panel3 ========
+		//======== panel3 ========
 		{
 			panel3.setLayout(new FlowLayout(FlowLayout.RIGHT, 0, 0));
 
-			// ---- saveButton ----
+			//---- saveButton ----
 			saveButton.setText("Save");
 			saveButton.addActionListener(new ActionListener() {
 				@Override
@@ -470,7 +544,6 @@ public class RulesDetailsPanel extends JPanel {
 			panel3.add(saveButton);
 		}
 		add(panel3, BorderLayout.SOUTH);
-		// JFormDesigner - End of component initialization
 		// //GEN-END:initComponents
 	}
 
