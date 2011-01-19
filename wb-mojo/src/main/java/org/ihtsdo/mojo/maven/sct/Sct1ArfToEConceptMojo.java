@@ -5387,7 +5387,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             String name = files[i].getName().toUpperCase();
 
             if (files[i].isFile() && name.endsWith(postfix.toUpperCase())
-                    && name.startsWith(prefix.toUpperCase())) {
+                    && name.contains(prefix.toUpperCase())) {
                 list.add(files[i]);
             }
             if (files[i].isDirectory()) {
