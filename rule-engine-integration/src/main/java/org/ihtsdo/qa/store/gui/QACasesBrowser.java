@@ -32,6 +32,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
 import org.ihtsdo.qa.gui.ObjectTransferHandler;
 import org.ihtsdo.qa.store.QAStoreBI;
 import org.ihtsdo.qa.store.model.DispositionStatus;
@@ -44,6 +45,7 @@ import org.ihtsdo.qa.store.model.view.QACasesReportColumn;
 import org.ihtsdo.qa.store.model.view.QACasesReportLine;
 import org.ihtsdo.qa.store.model.view.QACasesReportPage;
 import org.ihtsdo.qadb.ws.data.Component;
+import org.ihtsdo.rules.RulesLibrary;
 
 /**
  * @author Guillermo Reynoso
@@ -71,7 +73,8 @@ public class QACasesBrowser extends JPanel {
 	private TerminologyComponent headerComponent; 
 	private QADatabase qaDatabase;
 	private QACase selectedCase;
-
+	private TerminologyComponent selectedCaseComponent;
+	
 	public QACasesBrowser(QAStoreBI store, QAResultsBrowser resultsPanel, JTabbedPane parentTabbedPanel) {
 //		try {
 //			th = new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), null);
@@ -102,52 +105,9 @@ public class QACasesBrowser extends JPanel {
 
 		tableModel = new CaseTableModel();
 
-		Set<I_GetConceptData> users = new HashSet<I_GetConceptData>(); //RulesLibrary.getUsers();
-		
-		Object[] values = dispositionStatuses.toArray();
 		table1.setModel(tableModel);
 		table1.setTransferHandler(th);
 		table1.setDragEnabled(true);
-		Object[] userArray = new Object[users.size() + 1];
-		int j = 1;
-		userArray[0] = "";
-		for (Object user : users) {
-			userArray[j] = ((I_GetConceptData)user).toString();
-			j++;
-		}
-		JComboBox usersCombo = new JComboBox(userArray);
-		usersCombo.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent item) {
-				if (item.getStateChange() == ItemEvent.SELECTED) {
-					Object[] row = tableModel.getRow(table1.getSelectedRow());
-					QACase qacase = (QACase) row[7];
-					String assignedTo = (String) item.getItem();
-					qacase.setAssignedTo(assignedTo);
-					QACasesBrowser.this.store.persistQACase(qacase);
-				}
-			}
-		});
-		TableColumn assignedToColumn = table1.getColumnModel().getColumn(5);
-		assignedToColumn.setCellEditor(new DefaultCellEditor(usersCombo));
-		
-		
-		TableColumn col = table1.getColumnModel().getColumn(4);
-		JComboBox dispoCombo = new JComboBox(values);
-		col.setCellEditor(new DefaultCellEditor(dispoCombo));
-
-		dispoCombo.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent item) {
-				if (item.getStateChange() == ItemEvent.SELECTED) {
-					Object[] row = tableModel.getRow(table1.getSelectedRow());
-					QACase qacase = (QACase) row[7];
-					DispositionStatus caseDispStatus = (DispositionStatus) item.getItem();
-					qacase.setDispositionStatusUuid(caseDispStatus.getDispositionStatusUuid());
-					QACasesBrowser.this.store.persistQACase(qacase);
-				}
-			}
-		});
 		
 		if (coordinate != null && rule != null) {
 			setupPanel(store);
@@ -207,8 +167,16 @@ public class QACasesBrowser extends JPanel {
 		if(headerComponent != null && headerComponent.getComponentUuid().equals(pathUuid)){
 			return headerComponent;
 		}
-		headerComponent = store.getComponent(coordinate.getPathUuid());;
+		headerComponent = store.getComponent(pathUuid);;
 		return headerComponent;
+	}
+
+	public TerminologyComponent getSelectedCaseComponent(UUID componentUuid) {
+		if(selectedCaseComponent != null && selectedCaseComponent.getComponentUuid().equals(componentUuid)){
+			return selectedCaseComponent;
+		}
+		selectedCaseComponent = store.getComponent(componentUuid);;
+		return selectedCaseComponent;
 	}
 
 	private void updateTable1() {
@@ -346,27 +314,39 @@ public class QACasesBrowser extends JPanel {
 			String conceptName = rowData[2].toString();
 			boolean tabExists = false;
 			for (int i = 0; i < tabCount; i++) {
-				if (parentTabbedPanel.getTitleAt(i).equals(conceptName.substring(0, 7) + "...")) {
-					tabExists = true;
-					parentTabbedPanel.setSelectedIndex(i);
+				if(conceptName.length() > 7){
+					if (parentTabbedPanel.getTitleAt(i).equals(conceptName.substring(0, 7) + "...")) {
+						tabExists = true;
+						parentTabbedPanel.setSelectedIndex(i);
+					}
+				}else{
+					if (parentTabbedPanel.getTitleAt(i).equals(conceptName)) {
+						tabExists = true;
+						parentTabbedPanel.setSelectedIndex(i);
+					}
 				}
 			}
 
 			if (!tabExists) {
 				Rule  rule = resultsPanel.getRule();
-				TerminologyComponent component = new TerminologyComponent();
-				component.setComponentName(rowData[2].toString());
-				component.setComponentUuid(UUID.fromString(rowData[1].toString()));
-				component.setSctid(rowData[1] != null ? Long.parseLong(rowData[2].toString())  :  null);
+				TerminologyComponent component = getSelectedCaseComponent(UUID.fromString(rowData[0].toString()));
 				
 				selectedCase = (QACase) rowData[7];
 				
-				QACaseDetailsPanel rulesDetailsPanel = new QACaseDetailsPanel(rule,component,selectedCase);
-				parentTabbedPanel.addTab(conceptName.substring(0, 7) + "...", null, rulesDetailsPanel, conceptName);
-				//initTabComponent(parentTabbedPanel.getTabCount() - 1);
+				QACaseDetailsPanel rulesDetailsPanel = new QACaseDetailsPanel(rule,component,selectedCase, dispositionStatuses, headerComponent,qaDatabase,store);
+				if(conceptName.length() > 7){
+					parentTabbedPanel.addTab(conceptName.substring(0, 7) + "...", null, rulesDetailsPanel, conceptName);
+				}else{
+					parentTabbedPanel.addTab(conceptName, null, rulesDetailsPanel, conceptName);
+				}
+				initTabComponent(parentTabbedPanel.getTabCount() - 1);
 				parentTabbedPanel.setSelectedIndex(parentTabbedPanel.getTabCount() - 1);
 			}
 		}
+	}
+	
+	private void initTabComponent(int i) {
+		parentTabbedPanel.setTabComponentAt(i, new ButtonTabComponent(parentTabbedPanel));
 	}
 
 	private void initComponents() {

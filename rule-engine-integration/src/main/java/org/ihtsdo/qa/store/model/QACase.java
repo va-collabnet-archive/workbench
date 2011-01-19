@@ -17,8 +17,26 @@ public class QACase extends ViewPointSpecificObject {
 	private String dispositionAnnotation;
 	private String detail;
 	private String assignedTo;
+	private String assignmentEditor;
+	private Date assignmentDate;
 	private Date effectiveTime;
 	private List<QaCaseComment> comments;
+
+	public String getAssignmentEditor() {
+		return assignmentEditor;
+	}
+
+	public void setAssignmentEditor(String assignmentEditor) {
+		this.assignmentEditor = assignmentEditor;
+	}
+
+	public Date getAssignmentDate() {
+		return assignmentDate;
+	}
+
+	public void setAssignmentDate(Date assignmentDate) {
+		this.assignmentDate = assignmentDate;
+	}
 
 	public QACase() {
 	}
