@@ -10,7 +10,7 @@
   <artifactId>wb-sample-pa</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>SCT Mini Project Assembly</name>
+  <name>SCT Mini (MMP) Assembly</name>
   <description>Workbench IDE Project Assembly</description>
   <scm>
     <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/wb-sample-pa/trunk</connection>
@@ -19,25 +19,20 @@
   </scm>
   <properties>
     <!-- must be trek as it has the required wb-mojo changes -->
-    <wb-toolkit.version>2.6.0-trek-rsrb-2-SNAPSHOT</wb-toolkit.version>
+    <wb-toolkit.version>2.6.0-trek-12-SNAPSHOT</wb-toolkit.version>
     <org.dwfa.jini.version>2.1</org.dwfa.jini.version>
-    <org.apache.lucene.version>3.0.2</org.apache.lucene.version>
-    <baseline.database.version>2010-07-31-SNAPSHOT</baseline.database.version>
+    <org.apache.lucene.version>3.0.3</org.apache.lucene.version>
+    <baseline.database.version>2010.01.31-build-1-SNAPSHOT</baseline.database.version>
     <berkeleydb.svn.url>https://csfe.aceworkspace.net/svn/repos/workbench/wb-sample-pa/berkeley-db</berkeleydb.svn.url>
     <poi.version>3.6</poi.version>
     <tika.version>0.4</tika.version>
+    <wb-icons-version>1.0.3-SNAPSHOT</wb-icons-version>
   </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.ihtsdo.sample</groupId>
-        <artifactId>ihtsdo-generate-econcepts</artifactId>
-        <version>${baseline.database.version}</version>
-        <type>zip</type>
-      </dependency>
-      <dependency>
-        <groupId>org.ihtsdo.sample</groupId>
-        <artifactId>sct-mini-release</artifactId>
+        <groupId>org.ihtsdo.sct</groupId>
+        <artifactId>sct-en-mini</artifactId>
         <version>${baseline.database.version}</version>
         <type>zip</type>
       </dependency>
@@ -50,7 +45,7 @@
       <dependency>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-icons</artifactId>
-        <version>1.0.1</version>
+        <version>${wb-icons-version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -78,7 +73,7 @@
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-ide-admin-bp</artifactId>
         <type>zip</type>
-        <version>1.5-SNAPSHOT</version>
+        <version>1.7-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.ihtsdo</groupId>
@@ -96,7 +91,7 @@
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-ide-user-bp</artifactId>
         <type>zip</type>
-        <version>1.6-SNAPSHOT</version>
+        <version>1.7-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.dwfa.jini</groupId>
@@ -316,6 +311,9 @@
     </profile>
     <profile>
       <id>svn-db-commit</id>
+    </profile>
+    <profile>
+        <id>generate-db</id>
     </profile>
   </profiles>
 </project>

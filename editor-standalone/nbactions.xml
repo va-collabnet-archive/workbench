@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>CUSTOM-execute</actionName>
+            <displayName>execute</displayName>
+            <recursive>false</recursive>
+            <goals>
+                <goal>exec:exec</goal>
+            </goals>
+            <properties>
+                <skipTests>true</skipTests>
+            </properties>
+        </action>
+        <action>
+            <actionName>CUSTOM-exec offline</actionName>
+            <displayName>exec offline</displayName>
+            <recursive>false</recursive>
+            <goals>
+                <goal>exec:exec</goal>
+            </goals>
+            <properties>
+                <skipTests>true</skipTests>
+            </properties>
+        </action>
+        <action>
+            <actionName>CUSTOM-update-tk</actionName>
+            <displayName>update-tk</displayName>
+            <recursive>false</recursive>
+            <goals>
+                <goal>initialize</goal>
+            </goals>
+            <properties>
+                <skipTests>true</skipTests>
+            </properties>
+            <activatedProfiles>
+                <activatedProfile>update-tk</activatedProfile>
+            </activatedProfiles>
+        </action>
+    </actions>
