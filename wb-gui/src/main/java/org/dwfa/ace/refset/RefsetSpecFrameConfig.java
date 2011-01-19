@@ -78,6 +78,7 @@ import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
@@ -85,39 +86,38 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     I_ConfigAceFrame frameConfig;
 
     public void quit() {
-		frameConfig.quit();
-	}
+        frameConfig.quit();
+    }
 
-	public Coordinate getCoordinate() {
-		return frameConfig.getCoordinate();
-	}
+    public Coordinate getCoordinate() {
+        return frameConfig.getCoordinate();
+    }
 
-	public Set<PathBI> getPromotionPathSet() {
-		return frameConfig.getPromotionPathSet();
-	}
+    public Set<PathBI> getPromotionPathSet() {
+        return frameConfig.getPromotionPathSet();
+    }
 
-	public Set<PositionBI> getViewPositionSet() {
-		return frameConfig.getViewPositionSet();
-	}
+    public Set<PositionBI> getViewPositionSet() {
+        return frameConfig.getViewPositionSet();
+    }
 
-	public void setViewPositions(Set<PositionBI> positions) {
-		frameConfig.setViewPositions(positions);
-	}
+    public void setViewPositions(Set<PositionBI> positions) {
+        frameConfig.setViewPositions(positions);
+    }
 
-	public void addViewPosition(PositionBI p) {
-		frameConfig.addViewPosition(p);
-	}
+    public void addViewPosition(PositionBI p) {
+        frameConfig.addViewPosition(p);
+    }
 
-	public void removeViewPosition(PositionBI p) {
-		frameConfig.removeViewPosition(p);
-	}
+    public void removeViewPosition(PositionBI p) {
+        frameConfig.removeViewPosition(p);
+    }
 
-	public void replaceViewPosition(PositionBI oldPosition,
-			PositionBI newPosition) {
-		frameConfig.replaceViewPosition(oldPosition, newPosition);
-	}
+    public void replaceViewPosition(PositionBI oldPosition, PositionBI newPosition) {
+        frameConfig.replaceViewPosition(oldPosition, newPosition);
+    }
 
-	public I_ShowActivity getTopActivity() {
+    public I_ShowActivity getTopActivity() {
         return frameConfig.getTopActivity();
     }
 
@@ -434,8 +434,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         return frameConfig.getRefsetInSpecEditor();
     }
 
-    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException,
-            IOException {
+    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException, IOException {
         return frameConfig.getRefsetPreferencesForToggle(toggle);
     }
 
@@ -456,8 +455,8 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
                 allowedTypes.add(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.localize().getNid());
                 List<? extends I_RelTuple> markedParentRefset =
                         refset.getSourceRelTuples(frameConfig.getAllowedStatus(), allowedTypes, frameConfig
-                            .getViewPositionSetReadOnly(), frameConfig.getPrecedence(),
-                            frameConfig.getConflictResolutionStrategy());
+                            .getViewPositionSetReadOnly(), frameConfig.getPrecedence(), frameConfig
+                            .getConflictResolutionStrategy());
                 for (I_RelTuple rel : markedParentRefset) {
                     if (!refsetsToShow.contains(rel.getC2Id())) {
                         refsetsToShow.add(rel.getC2Id());
@@ -483,16 +482,15 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
             I_IntList refsets = getRefsetsToShowInTaxonomy();
             for (int rootNid : frameConfig.getRoots().getSetValues()) {
                 I_GetConceptData rootConcept = Terms.get().getConcept(rootNid);
-                for (I_ExtendByRef ext: 
-                	Terms.get().getAllExtensionsForComponent(rootConcept.getNid())) {
-                	if (ext != null && refsets.contains(ext.getRefsetId())) {
-                		List<? extends I_ExtendByRefVersion> tuples =
-                			ext.getTuples(frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(),
-                					frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
-                		if (tuples != null && tuples.size() > 0) {
-                			refsetRoots.add(rootNid);
-                		}
-                	}
+                for (I_ExtendByRef ext : Terms.get().getAllExtensionsForComponent(rootConcept.getNid())) {
+                    if (ext != null && refsets.contains(ext.getRefsetId())) {
+                        List<? extends I_ExtendByRefVersion> tuples =
+                                ext.getTuples(frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(),
+                                    frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
+                        if (tuples != null && tuples.size() > 0) {
+                            refsetRoots.add(rootNid);
+                        }
+                    }
                 }
             }
         } catch (IOException e) {
@@ -553,9 +551,8 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
     private class RefsetParentOnlyFilter implements I_FilterTaxonomyRels {
 
-        public void filter(I_GetConceptData node, List<? extends I_RelTuple> srcRels,
-                List<? extends I_RelTuple> destRels, I_ConfigAceFrame frameConfig) throws TerminologyException,
-                IOException {
+        public void filter(I_GetConceptData node, List<? extends I_RelTuple> srcRels, List<? extends I_RelTuple> destRels,
+                I_ConfigAceFrame frameConfig) throws TerminologyException, IOException {
 
             List<I_RelTuple> relsToRemove = new ArrayList<I_RelTuple>();
             for (I_RelTuple rt : srcRels) {
@@ -591,8 +588,8 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
                 if (getRefsetsToShowInTaxonomy().contains(ext.getRefsetId())) {
                     if (EConcept.REFSET_TYPES.nidToType(ext.getTypeId()) == EConcept.REFSET_TYPES.CID) {
                         List<I_ExtendByRefVersion> returnTuples = new ArrayList<I_ExtendByRefVersion>();
-                        ext.addTuples(getAllowedStatus(), getViewPositionSetReadOnly(), returnTuples, 
-                            frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
+                        ext.addTuples(getAllowedStatus(), getViewPositionSetReadOnly(), returnTuples, frameConfig
+                            .getPrecedence(), frameConfig.getConflictResolutionStrategy());
                         if (returnTuples.size() > 0) {
                             return false;
                         }
@@ -645,7 +642,6 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     public VetoableChangeSupport getVetoSupport() {
         return frameConfig.getVetoSupport();
     }
-
 
     public MasterWorker getWorker() {
         return frameConfig.getWorker();
@@ -1035,7 +1031,6 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.setVetoSupport(vetoSupport);
     }
 
-
     public void setWorker(MasterWorker worker) {
         frameConfig.setWorker(worker);
     }
@@ -1084,7 +1079,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.svnImport(svd);
     }
 
-    public List<String> svnList(SubversionData svd) throws TaskFailedException {
+    public List<String> svnList(SubversionData svd) throws TaskFailedException, ClientException {
         return frameConfig.svnList(svd);
     }
 
@@ -1125,11 +1120,11 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     }
 
     public void svnUnlock(SubversionData svd, File toUnlock, PromptUserPassword3 authenticator, boolean interactive)
-            throws TaskFailedException {
+            throws TaskFailedException, ClientException {
         frameConfig.svnUnlock(svd, toUnlock, authenticator, interactive);
     }
 
-    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException {
+    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException, ClientException {
         frameConfig.svnUnlock(svd, toUnLock);
     }
 
@@ -1222,7 +1217,6 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     public void addPromotionPath(PathBI p) {
         frameConfig.addPromotionPath(p);
     }
-
 
     public void removePromotionPath(PathBI p) {
         frameConfig.removePromotionPath(p);

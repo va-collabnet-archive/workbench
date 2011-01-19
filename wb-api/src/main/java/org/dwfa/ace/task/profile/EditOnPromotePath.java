@@ -68,38 +68,37 @@ import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class EditOnPromotePath implements I_ConfigAceFrame {
     I_ConfigAceFrame config;
 
+    public void quit() {
+        config.quit();
+    }
 
-	public void quit() {
-		config.quit();
-	}
+    public Coordinate getCoordinate() {
+        return config.getCoordinate();
+    }
 
-	public Coordinate getCoordinate() {
-		return config.getCoordinate();
-	}
+    public Set<PathBI> getPromotionPathSet() {
+        return config.getPromotionPathSet();
+    }
 
-	public Set<PathBI> getPromotionPathSet() {
-		return config.getPromotionPathSet();
-	}
+    public void addViewPosition(PositionBI p) {
+        config.addViewPosition(p);
+    }
 
-	public void addViewPosition(PositionBI p) {
-		config.addViewPosition(p);
-	}
+    public void removeViewPosition(PositionBI p) {
+        config.removeViewPosition(p);
+    }
 
-	public void removeViewPosition(PositionBI p) {
-		config.removeViewPosition(p);
-	}
+    public void replaceViewPosition(PositionBI oldPosition, PositionBI newPosition) {
+        config.replaceViewPosition(oldPosition, newPosition);
+    }
 
-	public void replaceViewPosition(PositionBI oldPosition,
-			PositionBI newPosition) {
-		config.replaceViewPosition(oldPosition, newPosition);
-	}
-
-	public I_ShowActivity getTopActivity() {
+    public I_ShowActivity getTopActivity() {
         return config.getTopActivity();
     }
 
@@ -412,8 +411,7 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         return config.getRefsetInSpecEditor();
     }
 
-    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException,
-            IOException {
+    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException, IOException {
         return config.getRefsetPreferencesForToggle(toggle);
     }
 
@@ -1045,7 +1043,7 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         config.svnImport(svd);
     }
 
-    public List<String> svnList(SubversionData svd) throws TaskFailedException {
+    public List<String> svnList(SubversionData svd) throws TaskFailedException, ClientException {
         return config.svnList(svd);
     }
 
@@ -1086,11 +1084,11 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
     }
 
     public void svnUnlock(SubversionData svd, File toUnlock, PromptUserPassword3 authenticator, boolean interactive)
-            throws TaskFailedException {
+            throws TaskFailedException, ClientException {
         config.svnUnlock(svd, toUnlock, authenticator, interactive);
     }
 
-    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException {
+    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException, ClientException {
         config.svnUnlock(svd, toUnLock);
     }
 

@@ -127,6 +127,7 @@ import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
@@ -332,7 +333,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     // 45
     private I_GetConceptData classificationRoleRoot;
-    
+
     // 46
     private Precedence precedence;
 
@@ -418,8 +419,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         // 21
         try {
             if (defaultImageType == null) {
-                defaultImageType =
-                        AceConfig.getVodb().getConcept(ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE.getUids());
+                defaultImageType = AceConfig.getVodb().getConcept(ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE.getUids());
             }
             out.writeObject(AceConfig.getVodb().nativeToUuid(defaultImageType.getConceptNid()));
         } catch (TerminologyException e) {
@@ -468,9 +468,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             out.writeObject(keyStr);
             IntList il = new IntList();
             for (I_GetConceptData concept : tabHistoryMap.get(keyStr)) {
-            	if (concept.isCanceled() != true) {
+                if (concept.isCanceled() != true) {
                     il.add(concept.getConceptNid());
-            	}
+                }
             }
             IntList.writeIntList(out, il);
         }
@@ -534,7 +534,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
         // 45
         writeConceptAsId(classificationRoleRoot, out);
-        
+
         // 46; 47 changed implementation class
         out.writeObject(precedence);
 
@@ -610,8 +610,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
             if (objDataVersion >= 8) {
                 try {
-                    defaultStatus =
-                            Terms.get().getConcept(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+                    defaultStatus = Terms.get().getConcept(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
                     defaultDescriptionType =
                             Terms.get().getConcept(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
                     defaultRelationshipType =
@@ -632,8 +631,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                                 AceConfig.getVodb().getId(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getNid());
                     defaultDescriptionType =
                             Terms.get().getConcept(
-                                AceConfig.getVodb().getId(
-                                    ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids()).getNid());
+                                AceConfig.getVodb().getId(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids())
+                                    .getNid());
                     defaultRelationshipType =
                             Terms.get().getConcept(
                                 AceConfig.getVodb().getId(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getNid());
@@ -643,8 +642,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                                     .getNid());
                     defaultRelationshipRefinability =
                             Terms.get().getConcept(
-                                AceConfig.getVodb().getId(
-                                    ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()).getNid());
+                                AceConfig.getVodb().getId(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids())
+                                    .getNid());
                 } catch (Exception e) {
                     IOException newEx = new IOException();
                     newEx.initCause(e);
@@ -682,8 +681,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                     }
                 } catch (Exception e) {
                     if (uuidList != null) {
-                        AceLog.getAppLog().severe(
-                            "Exception processing hierarchy selection with uuid list: " + uuidList);
+                        AceLog.getAppLog().severe("Exception processing hierarchy selection with uuid list: " + uuidList);
                     }
                     AceLog.getAppLog().alertAndLogException(e);
                     hierarchySelection = null;
@@ -991,10 +989,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             } else {
                 classificationRoleRoot = null;
             }
-            
+
             if (objDataVersion == 46) {
-            	PRECEDENCE p = (PRECEDENCE) in.readObject();
-            	precedence = p.getTkPrecedence();
+                PRECEDENCE p = (PRECEDENCE) in.readObject();
+                precedence = p.getTkPrecedence();
                 if (precedence == null) {
                     precedence = Precedence.PATH;
                 }
@@ -1006,7 +1004,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             } else {
                 precedence = Precedence.PATH;
             }
-              
 
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -1088,6 +1085,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#isActive()
      */
     public boolean isActive() {
@@ -1096,6 +1094,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#setActive(boolean)
      */
     public void setActive(boolean active) {
@@ -1104,6 +1103,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getAllowedStatus()
      */
     public I_IntSet getAllowedStatus() {
@@ -1112,6 +1112,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#setAllowedStatus(org.dwfa.ace.api
      * .IntSet)
@@ -1122,6 +1123,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getDescTypes()
      */
     public I_IntSet getDescTypes() {
@@ -1130,6 +1132,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#setDescTypes(org.dwfa.ace.api.IntSet
      * )
@@ -1140,6 +1143,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getFrameName()
      */
     public String getFrameName() {
@@ -1148,6 +1152,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#setFrameName(java.lang.String)
      */
     public void setFrameName(String frameName) {
@@ -1156,6 +1161,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#setViewPositions(java.util.Set)
      */
     public void setViewPositions(Set<PositionBI> positions) {
@@ -1180,10 +1186,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    JOptionPane.showMessageDialog(aceFrame, "<html>Selecting too many view positions may <br>"+
-                                                                  "cause the application to run out of memory.",
-                        "warning",
-                        JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(aceFrame, "<html>Selecting too many view positions may <br>"
+                        + "cause the application to run out of memory.", "warning", JOptionPane.WARNING_MESSAGE);
                 }
             });
         }
@@ -1191,6 +1195,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getVetoSupport()
      */
     public VetoableChangeSupport getVetoSupport() {
@@ -1199,6 +1204,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @seeorg.dwfa.ace.config.I_ConfigAceFrame#setVetoSupport(java.beans.
      * VetoableChangeSupport)
      */
@@ -1208,6 +1214,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getBounds()
      */
     public Rectangle getBounds() {
@@ -1216,6 +1223,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#setBounds(java.awt.Rectangle)
      */
     public void setBounds(Rectangle bounds) {
@@ -1224,6 +1232,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getSourceRelTypes()
      */
     public I_IntSet getSourceRelTypes() {
@@ -1232,6 +1241,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#setSourceRelTypes(org.dwfa.ace.api
      * .IntSet)
@@ -1242,6 +1252,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getDestRelTypes()
      */
     public I_IntSet getDestRelTypes() {
@@ -1250,6 +1261,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#setDestRelTypes(org.dwfa.ace.api
      * .IntSet)
@@ -1260,6 +1272,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#addEditingPath(org.dwfa.vodb.types
      * .Path)
@@ -1270,6 +1283,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#removeEditingPath(org.dwfa.vodb.
      * types.Path)
@@ -1280,6 +1294,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#replaceEditingPath(org.dwfa.vodb
      * .types.Path, org.dwfa.vodb.types.Path)
@@ -1291,6 +1306,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditingPathSet()
      */
     public Set<PathBI> getEditingPathSet() {
@@ -1299,6 +1315,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#addEditingPath(org.dwfa.vodb.types
      * .Path)
@@ -1309,6 +1326,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#removeEditingPath(org.dwfa.vodb.
      * types.Path)
@@ -1319,6 +1337,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#replaceEditingPath(org.dwfa.vodb
      * .types.Path, org.dwfa.vodb.types.Path)
@@ -1330,6 +1349,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditingPathSet()
      */
     public Set<PathBI> getPromotionPathSet() {
@@ -1338,6 +1358,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#addViewPosition(org.dwfa.ace.api
      * .I_Position)
@@ -1353,6 +1374,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#removeViewPosition(org.dwfa.ace.
      * api.I_Position)
@@ -1368,6 +1390,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#replaceViewPosition(org.dwfa.ace
      * .api.I_Position, org.dwfa.ace.api.I_Position)
@@ -1384,6 +1407,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getViewPositionSet()
      */
     public Set<PositionBI> getViewPositionSet() {
@@ -1392,6 +1416,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getChildrenExpandedNodes()
      */
     public I_IntSet getChildrenExpandedNodes() {
@@ -1400,6 +1425,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getParentExpandedNodes()
      */
     public I_IntSet getParentExpandedNodes() {
@@ -1408,6 +1434,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#addPropertyChangeListener(java.beans
      * .PropertyChangeListener)
@@ -1418,6 +1445,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#fireCommit()
      */
     public void fireCommit() {
@@ -1426,6 +1454,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#addPropertyChangeListener(java.lang
      * .String, java.beans.PropertyChangeListener)
@@ -1436,6 +1465,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#removePropertyChangeListener(java
      * .beans.PropertyChangeListener)
@@ -1446,6 +1476,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#removePropertyChangeListener(java
      * .lang.String, java.beans.PropertyChangeListener)
@@ -1456,6 +1487,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getRoots()
      */
     public I_IntSet getRoots() {
@@ -1464,6 +1496,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#setRoots(org.dwfa.ace.api.IntSet)
      */
@@ -1475,6 +1508,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditDescTypePopup()
      */
     public I_IntList getEditDescTypePopup() {
@@ -1483,6 +1517,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditRelCharacteristicPopup()
      */
     public I_IntList getEditRelCharacteristicPopup() {
@@ -1491,6 +1526,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditRelRefinabiltyPopup()
      */
     public I_IntList getEditRelRefinabiltyPopup() {
@@ -1499,6 +1535,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditRelTypePopup()
      */
     public I_IntList getEditRelTypePopup() {
@@ -1507,6 +1544,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditStatusTypePopup()
      */
     public I_IntList getEditStatusTypePopup() {
@@ -1515,6 +1553,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#setEditDescTypePopup(org.dwfa.ace
      * .api.IntSet)
@@ -1525,6 +1564,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#setEditRelCharacteristicPopup(org
      * .dwfa.ace.api.IntSet)
@@ -1535,6 +1575,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#setEditRelRefinabiltyPopup(org.dwfa
      * .ace.api.IntSet)
@@ -1545,6 +1586,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#setEditRelTypePopup(org.dwfa.ace
      * .api.IntSet)
@@ -1555,6 +1597,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#setEditStatusTypePopup(org.dwfa.
      * ace.api.IntSet)
@@ -1565,6 +1608,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getInferredViewTypes()
      */
     public I_IntSet getInferredViewTypes() {
@@ -1573,6 +1617,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#setInferredViewTypes(org.dwfa.ace
      * .api.IntSet)
@@ -1583,6 +1628,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getStatedViewTypes()
      */
     public I_IntSet getStatedViewTypes() {
@@ -1591,6 +1637,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#setStatedViewTypes(org.dwfa.ace.
      * api.IntSet)
@@ -1601,6 +1648,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getDefaultDescriptionType()
      */
     public I_GetConceptData getDefaultDescriptionType() {
@@ -1616,6 +1664,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#getDefaultRelationshipCharacteristic
      * ()
@@ -1632,6 +1681,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#getDefaultRelationshipRefinability()
      */
@@ -1647,6 +1697,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getDefaultRelationshipType()
      */
     public I_GetConceptData getDefaultRelationshipType() {
@@ -1661,6 +1712,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getDefaultStatus()
      */
     public I_GetConceptData getDefaultStatus() {
@@ -1675,6 +1727,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getTreeDescPreferenceList()
      */
     public I_IntList getTreeDescPreferenceList() {
@@ -1683,6 +1736,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getTableDescPreferenceList()
      */
     public I_IntList getTableDescPreferenceList() {
@@ -1691,6 +1745,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#getLongLabelDescPreferenceList()
      */
@@ -1700,6 +1755,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#getShortLabelDescPreferenceList()
      */
@@ -1709,6 +1765,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getTreeTermDividerLoc()
      */
     public int getTreeTermDividerLoc() {
@@ -1717,6 +1774,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#setTreeTermDividerLoc(int)
      */
     public void setTreeTermDividerLoc(int termTreeDividerLoc) {
@@ -1725,6 +1783,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getHierarchySelection()
      */
     public I_GetConceptData getHierarchySelection() {
@@ -1754,6 +1813,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getWorker()
      */
     public MasterWorker getWorker() {
@@ -1762,6 +1822,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @seeorg.dwfa.ace.config.I_ConfigAceFrame#setWorker(org.dwfa.bpa.worker.
      * MasterWorker)
      */
@@ -1774,6 +1835,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getStatusMessage()
      */
     public String getStatusMessage() {
@@ -1782,6 +1844,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.dwfa.ace.config.I_ConfigAceFrame#setStatusMessage(java.lang.String)
      */
@@ -2100,7 +2163,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         }
     }
 
-    public List<String> svnList(SubversionData svd) throws TaskFailedException {
+    public List<String> svnList(SubversionData svd) throws TaskFailedException, ClientException {
         aceFrame.setupSvn();
         return Svn.list(svd);
     }
@@ -2117,12 +2180,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public void svnUnlock(SubversionData svd, File toUnlock, PromptUserPassword3 authenticator, boolean interactive)
-            throws TaskFailedException {
+            throws TaskFailedException, ClientException {
         aceFrame.setupSvn();
         Svn.unlock(svd, toUnlock, authenticator, interactive);
     }
 
-    public void svnUnlock(SubversionData svd, File toUnlock) throws TaskFailedException {
+    public void svnUnlock(SubversionData svd, File toUnlock) throws TaskFailedException, ClientException {
         aceFrame.setupSvn();
         Svn.unlock(svd, toUnlock, getAuthenticator(svd), true);
     }
@@ -2392,8 +2455,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return visibleRefsets.contains(refsetType.name() + toggle.toString());
     }
 
-    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException,
-            IOException {
+    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException, IOException {
         if (refsetPreferencesMap == null) {
             try {
                 refsetPreferencesMap = setupRefsetPreferences();
@@ -2638,8 +2700,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 + "', will continue with existing value '" + getConflictResolutionStrategy().getClass() + "'", e);
         } catch (IllegalAccessException e) {
             alertAndLog("Cannot instanciate resolution strategy of type '" + conflictResolutionStrategyClass
-                + "' due to permissions, will continue with existing value '"
-                + getConflictResolutionStrategy().getClass() + "'", e);
+                + "' due to permissions, will continue with existing value '" + getConflictResolutionStrategy().getClass()
+                + "'", e);
         }
     }
 
@@ -2685,25 +2747,25 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public I_GetConceptData getRefsetInSpecEditor() {
-        if (aceFrame != null && aceFrame.getCdePanel() != null) 
+        if (aceFrame != null && aceFrame.getCdePanel() != null)
             return aceFrame.getCdePanel().getRefsetInSpecEditor();
         return null;
     }
 
     public I_ExtendByRef getSelectedRefsetClauseInSpecEditor() {
-        if (aceFrame != null && aceFrame.getCdePanel() != null) 
+        if (aceFrame != null && aceFrame.getCdePanel() != null)
             return aceFrame.getCdePanel().getSelectedRefsetClauseInSpecEditor();
         return null;
     }
 
     public JTree getTreeInSpecEditor() {
-        if (aceFrame != null && aceFrame.getCdePanel() != null) 
+        if (aceFrame != null && aceFrame.getCdePanel() != null)
             return aceFrame.getCdePanel().getTreeInSpecEditor();
         return null;
     }
 
     public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {
-        if (aceFrame != null && aceFrame.getCdePanel() != null) 
+        if (aceFrame != null && aceFrame.getCdePanel() != null)
             return aceFrame.getCdePanel().getRefsetSpecInSpecEditor();
         return null;
     }
@@ -2773,13 +2835,13 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public I_IntList getLanguagePreferenceList() {
         if (languagePreferenceList == null) {
             languagePreferenceList = new IntList();
-        } 
+        }
         if (languagePreferenceList.size() == 0) {
-        	try {
-				languagePreferenceList.add(ArchitectonicAuxiliary.Concept.EN_US.localize().getNid());
-			} catch (Exception e) {
-				AceLog.getAppLog().alertAndLogException(e);
-			}
+            try {
+                languagePreferenceList.add(ArchitectonicAuxiliary.Concept.EN_US.localize().getNid());
+            } catch (Exception e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
         }
         return languagePreferenceList;
     }
@@ -2979,7 +3041,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     public I_ShowActivity getTopActivity() {
         if (aceFrame != null) {
-           return aceFrame.getCdePanel().getTopActivity();
+            return aceFrame.getCdePanel().getTopActivity();
         }
         return null;
     }
@@ -2997,7 +3059,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         this.searchWithDescTypeFilter = searchWithDescTypeFilter;
         this.changeSupport.firePropertyChange("searchWithDescTypeFilter", old, searchWithDescTypeFilter);
     }
-    
+
     public Precedence getPrecedence() {
         return precedence;
     }
@@ -3006,7 +3068,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         Precedence old = this.precedence;
         this.precedence = precedence;
         this.changeSupport.firePropertyChange("precedence", old, precedence);
-        this.changeSupport.firePropertyChange("viewPositions", null, this.viewPositions);        
+        this.changeSupport.firePropertyChange("viewPositions", null, this.viewPositions);
     }
 
     public void setSelectedPreferencesTab(String tabName) {
@@ -3063,19 +3125,19 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         aceFrame.getCdePanel().setShowPromotionTab(show);
     }
 
-	@Override
-	public Coordinate getCoordinate() {
-		if (languagePreferenceList != null && languagePreferenceList.size()>1) {
-			return  new Coordinate(getPrecedence(), getViewPositionSetReadOnly(), 
-					getAllowedStatus(), getDestRelTypes(), getConflictResolutionStrategy(), languagePreferenceList.get(0));
-		} else {
-			return  new Coordinate(getPrecedence(), getViewPositionSetReadOnly(), 
-					getAllowedStatus(), getDestRelTypes(), getConflictResolutionStrategy(), Integer.MAX_VALUE);
-		}
-	}
+    @Override
+    public Coordinate getCoordinate() {
+        if (languagePreferenceList != null && languagePreferenceList.size() > 1) {
+            return new Coordinate(getPrecedence(), getViewPositionSetReadOnly(), getAllowedStatus(), getDestRelTypes(),
+                getConflictResolutionStrategy(), languagePreferenceList.get(0));
+        } else {
+            return new Coordinate(getPrecedence(), getViewPositionSetReadOnly(), getAllowedStatus(), getDestRelTypes(),
+                getConflictResolutionStrategy(), Integer.MAX_VALUE);
+        }
+    }
 
-	@Override
-	public void quit() {
-		aceFrame.getCdePanel().quit();
-	}
+    @Override
+    public void quit() {
+        aceFrame.getCdePanel().quit();
+    }
 }

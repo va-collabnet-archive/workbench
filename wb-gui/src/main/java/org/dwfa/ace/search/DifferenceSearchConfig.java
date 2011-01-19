@@ -68,42 +68,38 @@ import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class DifferenceSearchConfig implements I_ConfigAceFrame {
 
     I_ConfigAceFrame frameConfig;
 
+    public void quit() {
+        frameConfig.quit();
+    }
 
-	public void quit() {
-		frameConfig.quit();
-	}
+    public Coordinate getCoordinate() {
+        return frameConfig.getCoordinate();
+    }
 
+    public Set<PathBI> getPromotionPathSet() {
+        return frameConfig.getPromotionPathSet();
+    }
 
-	public Coordinate getCoordinate() {
-		return frameConfig.getCoordinate();
-	}
+    public void addViewPosition(PositionBI p) {
+        frameConfig.addViewPosition(p);
+    }
 
+    public void removeViewPosition(PositionBI p) {
+        frameConfig.removeViewPosition(p);
+    }
 
-	public Set<PathBI> getPromotionPathSet() {
-		return frameConfig.getPromotionPathSet();
-	}
+    public void replaceViewPosition(PositionBI oldPosition, PositionBI newPosition) {
+        frameConfig.replaceViewPosition(oldPosition, newPosition);
+    }
 
-
-	public void addViewPosition(PositionBI p) {
-		frameConfig.addViewPosition(p);
-	}
-
-	public void removeViewPosition(PositionBI p) {
-		frameConfig.removeViewPosition(p);
-	}
-
-	public void replaceViewPosition(PositionBI oldPosition,
-			PositionBI newPosition) {
-		frameConfig.replaceViewPosition(oldPosition, newPosition);
-	}
-
-	public I_ShowActivity getTopActivity() {
+    public I_ShowActivity getTopActivity() {
         return frameConfig.getTopActivity();
     }
 
@@ -407,8 +403,7 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         return frameConfig.getRefsetInSpecEditor();
     }
 
-    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException,
-            IOException {
+    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException, IOException {
         return frameConfig.getRefsetPreferencesForToggle(toggle);
     }
 
@@ -1012,7 +1007,7 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         frameConfig.svnImport(svd);
     }
 
-    public List<String> svnList(SubversionData svd) throws TaskFailedException {
+    public List<String> svnList(SubversionData svd) throws TaskFailedException, ClientException {
         return frameConfig.svnList(svd);
     }
 
@@ -1053,11 +1048,11 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
     }
 
     public void svnUnlock(SubversionData svd, File toUnlock, PromptUserPassword3 authenticator, boolean interactive)
-            throws TaskFailedException {
+            throws TaskFailedException, ClientException {
         frameConfig.svnUnlock(svd, toUnlock, authenticator, interactive);
     }
 
-    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException {
+    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException, ClientException {
         frameConfig.svnUnlock(svd, toUnLock);
     }
 

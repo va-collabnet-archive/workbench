@@ -70,6 +70,7 @@ import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 /**
@@ -84,32 +85,31 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     I_ConfigAceFrame baseFrame;
 
-	public void quit() {
-		baseFrame.quit();
-	}
+    public void quit() {
+        baseFrame.quit();
+    }
 
-	public Coordinate getCoordinate() {
-		return baseFrame.getCoordinate();
-	}
+    public Coordinate getCoordinate() {
+        return baseFrame.getCoordinate();
+    }
 
-	public Set<PathBI> getPromotionPathSet() {
-		return baseFrame.getPromotionPathSet();
-	}
+    public Set<PathBI> getPromotionPathSet() {
+        return baseFrame.getPromotionPathSet();
+    }
 
-	public void addViewPosition(PositionBI p) {
-		baseFrame.addViewPosition(p);
-	}
+    public void addViewPosition(PositionBI p) {
+        baseFrame.addViewPosition(p);
+    }
 
-	public void removeViewPosition(PositionBI p) {
-		baseFrame.removeViewPosition(p);
-	}
+    public void removeViewPosition(PositionBI p) {
+        baseFrame.removeViewPosition(p);
+    }
 
-	public void replaceViewPosition(PositionBI oldPosition,
-			PositionBI newPosition) {
-		baseFrame.replaceViewPosition(oldPosition, newPosition);
-	}
+    public void replaceViewPosition(PositionBI oldPosition, PositionBI newPosition) {
+        baseFrame.replaceViewPosition(oldPosition, newPosition);
+    }
 
-	public I_ShowActivity getTopActivity() {
+    public I_ShowActivity getTopActivity() {
         return baseFrame.getTopActivity();
     }
 
@@ -334,11 +334,11 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
     }
 
     public void svnUnlock(SubversionData svd, File toUnlock, PromptUserPassword3 authenticator, boolean interactive)
-            throws TaskFailedException {
+            throws TaskFailedException, ClientException {
         baseFrame.svnUnlock(svd, toUnlock, authenticator, interactive);
     }
 
-    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException {
+    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException, ClientException {
         baseFrame.svnUnlock(svd, toUnLock);
     }
 
@@ -372,7 +372,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         baseFrame.svnUpdate(svd, authenticator, interactive);
     }
 
-    public List<String> svnList(SubversionData svd) throws TaskFailedException {
+    public List<String> svnList(SubversionData svd) throws TaskFailedException, ClientException {
         return baseFrame.svnList(svd);
     }
 
@@ -1033,8 +1033,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         return baseFrame.getQueueAddressesToShow();
     }
 
-    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException,
-            IOException {
+    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException, IOException {
         return baseFrame.getRefsetPreferencesForToggle(toggle);
     }
 
@@ -1234,7 +1233,6 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         baseFrame.addPromotionPath(p);
     }
 
- 
     public void removePromotionPath(PathBI p) {
         baseFrame.removePromotionPath(p);
     }
