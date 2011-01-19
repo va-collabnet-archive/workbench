@@ -208,7 +208,14 @@
             		<xsd:element name="databaseUuid" type="xsd:string"
             			maxOccurs="1" minOccurs="0">
             		</xsd:element>
-            		<xsd:element name="comments" type="tns:QACaseComment" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+            		<xsd:element name="comments"
+            			type="tns:QACaseComment" maxOccurs="unbounded"
+            			minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="assignmentEditor"
+            			type="xsd:string" maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="assignmentDate" type="xsd:date" maxOccurs="1" minOccurs="0"></xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
 
