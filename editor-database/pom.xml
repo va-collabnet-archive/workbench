@@ -26,8 +26,12 @@
    <properties>
       <berkeleydb.directory>${basedir}/berkeley-db</berkeleydb.directory>
    </properties>
-   <build>
-      <plugins>
+
+   <profiles>
+      <profile>
+         <id>standard</id>
+         <build>
+            <plugins>
 
       <!--
         Generation process:
@@ -43,87 +47,83 @@
           - if using SVN, commit the updated database (add missing files) [prepare-package]
           - produce assembly [package]
       -->
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <executions>
-               <execution>
-                  <id>attach-database</id>
-                  <configuration>
-                     <descriptors>
-                        <descriptor>src/main/assembly/database.xml</descriptor>
-                     </descriptors>
-                  </configuration>
-                  <goals>
-                     <goal>single</goal>
-                  </goals>
-                  <phase>package</phase>
-               </execution>
-            </executions>
-         </plugin>
-         <plugin>
-            <groupId>org.ihtsdo</groupId>
-            <artifactId>wb-mojo</artifactId>
-            <executions>
-               <execution>
-                  <id>write-change-set-directories</id>
-                  <phase>generate-sources</phase>
-                  <goals>
-                     <goal>write-directories</goal>
-                  </goals>
-                  <configuration>
-                     <targetSubDir>change-sets</targetSubDir>
-                     <runtimeArtifacts>
-                        <runtimeArtifact>org.ihtsdo.sample:profiles</runtimeArtifact>
-                     </runtimeArtifacts>
-                  </configuration>
-               </execution>
-               <execution>
-                  <id>vodb-open</id>
-                  <phase>generate-resources</phase>
-                  <goals>
-                     <goal>vodb-open</goal>
-                  </goals>
-                  <configuration>
-                     <vodbDirectory>${berkeleydb.directory}</vodbDirectory>
-                  </configuration>
-               </execution>
-               <execution>
-                  <id>bcs-read-all</id>
-                  <phase>generate-resources</phase>
-                  <goals>
-                     <goal>bcs-read-all</goal>
-                  </goals>
-                  <configuration>
-                     <changeSetDir>target/change-sets</changeSetDir>
-                  </configuration>
-               </execution>
-               <execution>
-                  <id>vodb-commit</id>
-                  <phase>process-resources</phase>
-                  <goals>
-                     <goal>vodb-commit</goal>
-                  </goals>
-               </execution>
-               <execution>
-                  <id>vodb-close</id>
-                  <phase>process-resources</phase>
-                  <goals>
-                     <goal>vodb-close</goal>
-                  </goals>
-               </execution>
-            </executions>
-         </plugin>
-      </plugins>
-   </build>
-   <profiles>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-assembly-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>attach-database</id>
+                        <configuration>
+                           <descriptors>
+                              <descriptor>src/main/assembly/database.xml</descriptor>
+                           </descriptors>
+                        </configuration>
+                        <goals>
+                           <goal>single</goal>
+                        </goals>
+                        <phase>package</phase>
+                     </execution>
+                  </executions>
+               </plugin>
+               <plugin>
+                  <groupId>org.ihtsdo</groupId>
+                  <artifactId>wb-mojo</artifactId>
+                  <executions>
+                     <execution>
+                        <id>write-change-set-directories</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                           <goal>write-directories</goal>
+                        </goals>
+                        <configuration>
+                           <targetSubDir>change-sets</targetSubDir>
+                           <runtimeArtifacts>
+                              <runtimeArtifact>org.ihtsdo.sample:profiles</runtimeArtifact>
+                           </runtimeArtifacts>
+                        </configuration>
+                     </execution>
+                     <execution>
+                        <id>vodb-open</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                           <goal>vodb-open</goal>
+                        </goals>
+                        <configuration>
+                           <vodbDirectory>${berkeleydb.directory}</vodbDirectory>
+                        </configuration>
+                     </execution>
+                     <execution>
+                        <id>bcs-read-all</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                           <goal>bcs-read-all</goal>
+                        </goals>
+                        <configuration>
+                           <changeSetDir>target/change-sets</changeSetDir>
+                        </configuration>
+                     </execution>
+                     <execution>
+                        <id>vodb-commit</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                           <goal>vodb-commit</goal>
+                        </goals>
+                     </execution>
+                     <execution>
+                        <id>vodb-close</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                           <goal>vodb-close</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>         
+      </profile>
+         
       <profile>
          <id>generate-db</id>
-         <activation>
-            <property>
-               <name>!env</name>
-            </property>
-         </activation>
          <build>
             <plugins>
                <plugin>
@@ -151,7 +151,7 @@
                         <configuration>
                            <targetSubDir>generated-resources/jbin</targetSubDir>
                            <runtimeArtifacts>
-                              <runtimeArtifact>org.ihtsdo.sample:ihtsdo-generate-econcepts</runtimeArtifact>
+                              <runtimeArtifact>org.ihtsdo.sct:sct-en-mini</runtimeArtifact>
                            </runtimeArtifacts>
                         </configuration>
                      </execution>
@@ -554,22 +554,22 @@
                               <String>cement.jbin</String>
                               <String>sctSiEConcepts.jbin</String>
                            </conceptsFileNames>
-                            <initialPaths>                       
-                                <path>
-                                    <pathConcept>
-                                        <description>SNOMED Core</description>
-                                        <uuidStrs>
-                                            <String>8c230474-9f11-30ce-9cad-185a96fd03a2</String>
-                                        </uuidStrs>
-                                    </pathConcept>
-                                    <originConcept>
-                                        <description>Workbench Auxiliary</description>
-                                        <uuidStrs>
-                                            <String>2faa9260-8fb2-11db-b606-0800200c9a66</String>
-                                        </uuidStrs>
-                                    </originConcept>
-                                </path>
-                            </initialPaths>
+                           <initialPaths>                       
+                              <path>
+                                 <pathConcept>
+                                    <description>SNOMED Core</description>
+                                    <uuidStrs>
+                                       <String>8c230474-9f11-30ce-9cad-185a96fd03a2</String>
+                                    </uuidStrs>
+                                 </pathConcept>
+                                 <originConcept>
+                                    <description>Workbench Auxiliary</description>
+                                    <uuidStrs>
+                                       <String>2faa9260-8fb2-11db-b606-0800200c9a66</String>
+                                    </uuidStrs>
+                                 </originConcept>
+                              </path>
+                           </initialPaths>
                         </configuration>
                      </execution>
                   </executions>
@@ -606,12 +606,6 @@
       </profile>
       <profile>
          <id>svn-db</id>
-         <activation>
-        <!-- activeByDefault is cancelled by other profiles. This is equivalent -->
-            <file>
-               <exists>pom.xml</exists>
-            </file>
-         </activation>
          <build>
             <plugins>
                <plugin>
