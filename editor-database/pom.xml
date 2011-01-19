@@ -173,7 +173,17 @@
                            </output>
                         </configuration>
                      </execution>
-                     <execution>
+                      <execution>
+                        <id>vodb-open</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                           <goal>vodb-open</goal>
+                        </goals>
+                        <configuration>
+                           <vodbDirectory>${berkeleydb.directory}</vodbDirectory>
+                        </configuration>
+                     </execution>
+                    <execution>
                         <id>vodb-set-default-config</id>
                         <phase>generate-resources</phase>
                         <goals>
@@ -523,6 +533,20 @@
                               </SimpleUniversalAcePath>
                            </origins>
                         </configuration>
+                     </execution>
+                     <execution>
+                        <id>vodb-commit</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                           <goal>vodb-commit</goal>
+                        </goals>
+                     </execution>
+                     <execution>
+                        <id>vodb-close</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                           <goal>vodb-close</goal>
+                        </goals>
                      </execution>
                      <execution>
                         <id>vodb-mutable-to-readonly</id>
