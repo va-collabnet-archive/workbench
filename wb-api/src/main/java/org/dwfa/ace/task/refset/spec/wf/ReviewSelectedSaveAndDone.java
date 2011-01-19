@@ -43,10 +43,14 @@ import javax.swing.SwingUtilities;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.InstructAndWait;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.db.HasUncommittedChanges;
+import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -108,10 +112,25 @@ public class ReviewSelectedSaveAndDone extends AbstractTask {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent e) {
-            returnCondition = Condition.CONTINUE;
-            done = true;
-            synchronized (ReviewSelectedSaveAndDone.this) {
-                ReviewSelectedSaveAndDone.this.notifyAll();
+            if (Terms.get().getUncommitted().size() > 0) {
+                for (I_Transact c : Terms.get().getUncommitted()) {
+                    AceLog.getAppLog().warning("Uncommitted changes to: " + ((I_GetConceptData) c).toLongString());
+
+                }
+                HasUncommittedChanges.askToCommit(process);
+            }
+            if (Terms.get().getUncommitted().size() > 0) {
+                if (!DwfaEnv.isHeadless()) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "There are uncommitted changes - please cancel or commit before continuing.", "",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                returnCondition = Condition.CONTINUE;
+                done = true;
+                synchronized (ReviewSelectedSaveAndDone.this) {
+                    ReviewSelectedSaveAndDone.this.notifyAll();
+                }
             }
         }
     }
@@ -122,21 +141,36 @@ public class ReviewSelectedSaveAndDone extends AbstractTask {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent e) {
-            returnCondition = Condition.ITEM_CANCELED;
-            try {
-                process.setProperty(ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey(), new UUID[] { config
-                    .getDbConfig().getUserConcept().getUids().iterator().next() });
-                I_GetConceptData refsetConcept = config.getRefsetInSpecEditor();
-                if (refsetConcept != null) {
-                    process.setProperty(ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey(), refsetConcept.getUids()
-                        .iterator().next());
+            if (Terms.get().getUncommitted().size() > 0) {
+                for (I_Transact c : Terms.get().getUncommitted()) {
+                    AceLog.getAppLog().warning("Uncommitted changes to: " + ((I_GetConceptData) c).toLongString());
+
                 }
-                done = true;
-            } catch (Exception e1) {
-                e1.printStackTrace();
+                HasUncommittedChanges.askToCommit(process);
             }
-            synchronized (ReviewSelectedSaveAndDone.this) {
-                ReviewSelectedSaveAndDone.this.notifyAll();
+            if (Terms.get().getUncommitted().size() > 0) {
+                if (!DwfaEnv.isHeadless()) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "There are uncommitted changes - please cancel or commit before continuing.", "",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                returnCondition = Condition.ITEM_CANCELED;
+                try {
+                    process.setProperty(ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey(), new UUID[] { config
+                        .getDbConfig().getUserConcept().getUids().iterator().next() });
+                    I_GetConceptData refsetConcept = config.getRefsetInSpecEditor();
+                    if (refsetConcept != null) {
+                        process.setProperty(ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey(), refsetConcept.getUids()
+                            .iterator().next());
+                    }
+                    done = true;
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+                synchronized (ReviewSelectedSaveAndDone.this) {
+                    ReviewSelectedSaveAndDone.this.notifyAll();
+                }
             }
         }
     }
@@ -147,10 +181,25 @@ public class ReviewSelectedSaveAndDone extends AbstractTask {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent e) {
-            returnCondition = Condition.PREVIOUS;
-            done = true;
-            synchronized (ReviewSelectedSaveAndDone.this) {
-                ReviewSelectedSaveAndDone.this.notifyAll();
+            if (Terms.get().getUncommitted().size() > 0) {
+                for (I_Transact c : Terms.get().getUncommitted()) {
+                    AceLog.getAppLog().warning("Uncommitted changes to: " + ((I_GetConceptData) c).toLongString());
+
+                }
+                HasUncommittedChanges.askToCommit(process);
+            }
+            if (Terms.get().getUncommitted().size() > 0) {
+                if (!DwfaEnv.isHeadless()) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "There are uncommitted changes - please cancel or commit before continuing.", "",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                returnCondition = Condition.PREVIOUS;
+                done = true;
+                synchronized (ReviewSelectedSaveAndDone.this) {
+                    ReviewSelectedSaveAndDone.this.notifyAll();
+                }
             }
         }
     }
@@ -185,10 +234,8 @@ public class ReviewSelectedSaveAndDone extends AbstractTask {
         reviewButton.addActionListener(new ReviewActionListener());
         c.gridx++;
 
-        JButton saveButton =
-                new JButton(new ImageIcon(InstructAndWait.class.getResource("/24x24/plain/inbox_into.png")));
-        saveButton
-            .setToolTipText("Save to TODO queue - choose this option if you want to finish this work at a later date");
+        JButton saveButton = new JButton(new ImageIcon(InstructAndWait.class.getResource("/24x24/plain/inbox_into.png")));
+        saveButton.setToolTipText("Save to TODO queue - choose this option if you want to finish this work at a later date");
         workflowPanel.add(saveButton, c);
         saveButton.addActionListener(new SaveActionListener());
         c.gridx++;

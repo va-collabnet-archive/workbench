@@ -106,14 +106,13 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent e) {
-        	if (Terms.get().getUncommitted().size() > 0) {
-        		for (I_Transact c: Terms.get().getUncommitted()) {
-        			AceLog.getAppLog().warning("Uncommitted changes to: " 
-        					+ ((I_GetConceptData) c).toLongString());
-        			
-        		}
-        		HasUncommittedChanges.askToCommit(process);
-        	}
+            if (Terms.get().getUncommitted().size() > 0) {
+                for (I_Transact c : Terms.get().getUncommitted()) {
+                    AceLog.getAppLog().warning("Uncommitted changes to: " + ((I_GetConceptData) c).toLongString());
+
+                }
+                HasUncommittedChanges.askToCommit(process);
+            }
             if (Terms.get().getUncommitted().size() > 0) {
                 if (!DwfaEnv.isHeadless()) {
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
@@ -136,10 +135,25 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent e) {
-            returnCondition = Condition.ITEM_CANCELED;
-            done = true;
-            synchronized (PreviousNextOrCancel.this) {
-                PreviousNextOrCancel.this.notifyAll();
+            if (Terms.get().getUncommitted().size() > 0) {
+                for (I_Transact c : Terms.get().getUncommitted()) {
+                    AceLog.getAppLog().warning("Uncommitted changes to: " + ((I_GetConceptData) c).toLongString());
+
+                }
+                HasUncommittedChanges.askToCommit(process);
+            }
+            if (Terms.get().getUncommitted().size() > 0) {
+                if (!DwfaEnv.isHeadless()) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "There are uncommitted changes - please cancel or commit before continuing.", "",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                returnCondition = Condition.ITEM_CANCELED;
+                done = true;
+                synchronized (PreviousNextOrCancel.this) {
+                    PreviousNextOrCancel.this.notifyAll();
+                }
             }
         }
     }
