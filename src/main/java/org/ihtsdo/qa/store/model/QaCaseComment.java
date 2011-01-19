@@ -1,5 +1,6 @@
 package org.ihtsdo.qa.store.model;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
@@ -48,5 +49,11 @@ public class QaCaseComment {
 
 	public void setAuthor(String author) {
 		this.author = author;
+	}
+	
+	@Override
+	public String toString() {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+		return "["+author+"]" + " <B>" + comment + "</B> <i><" + sdf.format(effectiveTime) + "></i>";
 	}
 }

@@ -174,6 +174,8 @@ public class WsClientDataConverter {
 		result.setRuleUuid(UUID.fromString(qaCase.getRule().getRuleUuid()));
 		result.setEffectiveTime(qaCase.getEffectiveTime());
 		result.setActive(qaCase.getIsActive());
+		result.setAssignmentEditor(qaCase.getAssignmentEditor());
+		result.setAssignmentDate(qaCase.getAssignmentDate());
 		List<QaCaseComment> comments = null;
 		QACaseComment[] wsCaseComments = qaCase.getComments();
 		if(wsCaseComments != null && wsCaseComments.length > 0){
@@ -221,6 +223,8 @@ public class WsClientDataConverter {
 		result.setDispositionStatusDate(qaCase.getDispositionStatusDate());
 		result.setDispositionStatusEditor(qaCase.getDispositionStatusEditor());
 		result.setEffectiveTime(qaCase.getEffectiveTime());
+		result.setAssignmentDate(qaCase.getAssignmentDate());
+		result.setAssignmentEditor(qaCase.getAssignmentEditor());
 		result.setIsActive(qaCase.isActive());
 		result.setPathUuid(qaCase.getPathUuid().toString());
 		org.ihtsdo.qadb.ws.data.Rule rule = new org.ihtsdo.qadb.ws.data.Rule();
