@@ -114,7 +114,7 @@ public class OpenCaseManager extends AbstractTask {
 			frame.getContentPane().add(new QAStorePanel(new QAStoreBIImpl(endpoint)), BorderLayout.CENTER);
 
 			//Display the window.
-			frame.setTitle("IHTSDO QA Cases Manager");
+			frame.setTitle("IHTSDO QA Case Manager");
 			frame.pack();
 			frame.setVisible(true);
 			

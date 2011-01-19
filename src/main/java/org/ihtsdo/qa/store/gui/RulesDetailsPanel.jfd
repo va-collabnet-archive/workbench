@@ -48,7 +48,7 @@
              </void> 
              <void method="setProperty"> 
               <string>$rowSpecs</string> 
-              <string>20, 20, 34, 34, 34, 0, 20, 20, 20, 0, 0</string> 
+              <string>20, 20, 34, 34, 34, 0, 20, 20, 20</string> 
              </void> 
              <void method="setProperty"> 
               <string>$hGap</string> 

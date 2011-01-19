@@ -8,17 +8,18 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
-import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -31,8 +32,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.qa.gui.ObjectTransferHandler;
 import org.ihtsdo.qa.store.QAStoreBI;
 import org.ihtsdo.qa.store.model.DispositionStatus;
@@ -44,8 +45,6 @@ import org.ihtsdo.qa.store.model.TerminologyComponent;
 import org.ihtsdo.qa.store.model.view.QACasesReportColumn;
 import org.ihtsdo.qa.store.model.view.QACasesReportLine;
 import org.ihtsdo.qa.store.model.view.QACasesReportPage;
-import org.ihtsdo.qadb.ws.data.Component;
-import org.ihtsdo.rules.RulesLibrary;
 
 /**
  * @author Guillermo Reynoso
@@ -76,15 +75,15 @@ public class QACasesBrowser extends JPanel {
 	private TerminologyComponent selectedCaseComponent;
 	
 	public QACasesBrowser(QAStoreBI store, QAResultsBrowser resultsPanel, JTabbedPane parentTabbedPanel) {
-//		try {
-//			th = new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), null);
-//		} catch (TerminologyException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		try {
+			th = new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), null);
+		} catch (TerminologyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		filter = new HashMap<QACasesReportColumn, Object>();
 		
@@ -108,6 +107,17 @@ public class QACasesBrowser extends JPanel {
 		table1.setModel(tableModel);
 		table1.setTransferHandler(th);
 		table1.setDragEnabled(true);
+		
+		TableColumn conceptUuidCol = table1.getColumnModel().getColumn(0);
+		TableColumn conceptSctidCol =table1.getColumnModel().getColumn(1);
+		
+		conceptUuidCol.setPreferredWidth(0);
+		conceptUuidCol.setMinWidth(0);
+		conceptUuidCol.setMaxWidth(0);
+
+		conceptSctidCol.setPreferredWidth(0);
+		conceptSctidCol.setMinWidth(0);
+		conceptSctidCol.setMaxWidth(0);
 		
 		if (coordinate != null && rule != null) {
 			setupPanel(store);
@@ -238,6 +248,8 @@ public class QACasesBrowser extends JPanel {
 				filter.put(QACasesReportColumn.DISPOSITION, dispStatus.getDispositionStatusUuid().toString());
 			}
 				
+		}else{
+			filter.put(QACasesReportColumn.STATUS, "Open");
 		}
 	}
 

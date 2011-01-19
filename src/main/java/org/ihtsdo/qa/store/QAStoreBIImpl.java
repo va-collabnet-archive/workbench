@@ -441,30 +441,33 @@ public class QAStoreBIImpl implements QAStoreBI {
 
 			List<RulesReportLine> lines = new ArrayList<RulesReportLine>();
 			org.ihtsdo.qadb.ws.data.RulesReportLine[] wsReportLines = response.getRulesReportLine();
-			for (org.ihtsdo.qadb.ws.data.RulesReportLine wsRulesReportLine : wsReportLines) {
-				RulesReportLine ruleReportLine = new RulesReportLine();
-
-				HashMap<UUID, Integer> dispositionStatusCounts = new HashMap<UUID, Integer>();
-				DispositionStatusCount_type0[] wsDispositionStatusCounts = wsRulesReportLine.getDispositionStatusCount();
-				for (DispositionStatusCount_type0 wsDispositionStatusCount : wsDispositionStatusCounts) {
-					dispositionStatusCounts.put(UUID.fromString(wsDispositionStatusCount.getDispositionStatusUuid()), wsDispositionStatusCount.getDispositionStatusCount());
+			if(wsReportLines != null){
+				
+				for (org.ihtsdo.qadb.ws.data.RulesReportLine wsRulesReportLine : wsReportLines) {
+					RulesReportLine ruleReportLine = new RulesReportLine();
+	
+					HashMap<UUID, Integer> dispositionStatusCounts = new HashMap<UUID, Integer>();
+					DispositionStatusCount_type0[] wsDispositionStatusCounts = wsRulesReportLine.getDispositionStatusCount();
+					for (DispositionStatusCount_type0 wsDispositionStatusCount : wsDispositionStatusCounts) {
+						dispositionStatusCounts.put(UUID.fromString(wsDispositionStatusCount.getDispositionStatusUuid()), wsDispositionStatusCount.getDispositionStatusCount());
+					}
+					ruleReportLine.setDispositionStatusCount(dispositionStatusCounts);
+	
+					HashMap<Boolean, Integer> statusCounts = new HashMap<Boolean, Integer>();
+					StatusCount_type0[] wsStatusCounts = wsRulesReportLine.getStatusCount();
+					for (StatusCount_type0 wsStatusCount : wsStatusCounts) {
+						statusCounts.put(wsStatusCount.getStatus(), wsStatusCount.getCount());
+					}
+					ruleReportLine.setStatusCount(statusCounts);
+	
+					Rule rule = null;
+					org.ihtsdo.qadb.ws.data.Rule wsRule = wsRulesReportLine.getRule();
+	
+					rule = WsClientDataConverter.wsRuleToRule(wsRule);
+	
+					ruleReportLine.setRule(rule);
+					lines.add(ruleReportLine);
 				}
-				ruleReportLine.setDispositionStatusCount(dispositionStatusCounts);
-
-				HashMap<Boolean, Integer> statusCounts = new HashMap<Boolean, Integer>();
-				StatusCount_type0[] wsStatusCounts = wsRulesReportLine.getStatusCount();
-				for (StatusCount_type0 wsStatusCount : wsStatusCounts) {
-					statusCounts.put(wsStatusCount.getStatus(), wsStatusCount.getCount());
-				}
-				ruleReportLine.setStatusCount(statusCounts);
-
-				Rule rule = null;
-				org.ihtsdo.qadb.ws.data.Rule wsRule = wsRulesReportLine.getRule();
-
-				rule = WsClientDataConverter.wsRuleToRule(wsRule);
-
-				ruleReportLine.setRule(rule);
-				lines.add(ruleReportLine);
 			}
 			result.setLines(lines);
 
