@@ -1,6 +1,8 @@
 package org.ihtsdo.qa.store;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -78,7 +80,9 @@ public class WsClientDataConverter {
 		}
 		result.setDescription(wsRule.getDescription());
 		result.setDitaDocumentationLinkUuid(wsRule.getDitaDocumentationLinkUuid());
-		result.setEffectiveTime(wsRule.getEffectiveTime());
+		if(wsRule.getEffectiveTime() != null){
+			result.setEffectiveTime(wsRule.getEffectiveTime().getTime());
+		}
 		result.setDitaGeneratedTopicUuid(wsRule.getDitaGeneratedTopicUuid());
 		result.setDocumentationUrl(wsRule.getDocumentationUrl());
 		if(wsRule.getDitaUuid() != null && !wsRule.equals("")){
@@ -185,7 +189,9 @@ public class WsClientDataConverter {
 				comment.setAuthor(qaCaseComment.getAuthor());
 				comment.setComment(qaCaseComment.getComment());
 				comment.setCommentUuid(UUID.fromString(qaCaseComment.getCommentUuid()));
-				comment.setEffectiveTime(qaCaseComment.getEffectiveTime());
+				if(qaCaseComment.getEffectiveTime() != null){
+					comment.setEffectiveTime(qaCaseComment.getEffectiveTime().getTime());
+				}
 				if(qaCaseComment.getStatus() != null){
 					comment.setStatus(qaCaseComment.getStatus().intValue());
 				}

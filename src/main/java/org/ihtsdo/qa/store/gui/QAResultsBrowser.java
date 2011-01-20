@@ -8,11 +8,12 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
@@ -163,6 +165,7 @@ public class QAResultsBrowser extends JPanel {
 		setupCategoryCombo();
 		setupPageLinesCombo();
 		updatePageCounters();
+		setupOrderCombo();
 		setupSortByCombo();
 		filterChanged = false;
 	}
@@ -177,6 +180,12 @@ public class QAResultsBrowser extends JPanel {
 		return rule;
 	}
 
+	private void setupOrderCombo(){
+		orderCombo.removeAllItems();
+		orderCombo.addItem("Ascendent");
+		orderCombo.addItem("Descendent");
+	}
+	
 	private void setupSortByCombo() {
 		sortByComboBox.removeAllItems();
 		sortByComboBox.addItem(RulesReportColumn.RULE_NAME);
@@ -215,8 +224,9 @@ public class QAResultsBrowser extends JPanel {
 	private void setupCategoryCombo() {
 		categoryComboBox.removeAllItems();
 		categoryComboBox.addItem("Any");
-		categoryComboBox.addItem("Concept model");
-		categoryComboBox.addItem("Descriptions model");
+		for (Category category : allCategories) {
+			categoryComboBox.addItem(category);
+		}
 	}
 
 	private void setupSeverityCombo() {
@@ -354,14 +364,15 @@ public class QAResultsBrowser extends JPanel {
 			if (ruleNameFilter != null && !ruleNameFilter.trim().equals("")) {
 				filter.put(RulesReportColumn.RULE_NAME, ruleNameFilter);
 			}
-			String categoryFilter = (String) categoryComboBox.getSelectedItem();
-			if (categoryFilter != null && !categoryFilter.equals("Any")) {
-				filter.put(RulesReportColumn.CATEGORY, categoryFilter);
+			Object categoryFilter =  categoryComboBox.getSelectedItem();
+			if(categoryFilter != null && categoryFilter instanceof Category){
+				Category category = (Category)categoryFilter;
+				filter.put(RulesReportColumn.CATEGORY, category.getCategoryUuid());
 			}
 			Object severityObj = severityComboBox.getSelectedItem();
 			if (severityObj != null && severityObj instanceof Severity) {
 				Severity severityFilter = (Severity) severityObj;
-				filter.put(RulesReportColumn.SEVERITY, severityFilter);
+				filter.put(RulesReportColumn.SEVERITY, severityFilter.getSeverityUuid());
 			}
 			String statusFilter = (String) statusComboBox.getSelectedItem();
 			if (!statusFilter.equals("Any")) {
@@ -464,7 +475,7 @@ public class QAResultsBrowser extends JPanel {
 			if (selectedItem instanceof RulesReportColumn) {
 				RulesReportColumn column = (RulesReportColumn) selectedItem;
 				sortBy.clear();
-				sortBy.put(column, true);
+				sortBy.put(column, orderCombo.getSelectedItem().toString().equals("Ascendent"));
 			}
 		}
 	}
@@ -493,6 +504,17 @@ public class QAResultsBrowser extends JPanel {
 		filterChanged = true;
 	}
 
+	private void orderComboItemStateChanged(ItemEvent e) {
+		if (e.getStateChange() == ItemEvent.SELECTED) {
+			Object selectedItem = sortByComboBox.getSelectedItem();
+			if (selectedItem instanceof RulesReportColumn) {
+				RulesReportColumn column = (RulesReportColumn) selectedItem;
+				sortBy.clear();
+				sortBy.put(column, sortByComboBox.getSelectedItem().toString().equals("Ascendent"));
+			}
+		}
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -501,12 +523,14 @@ public class QAResultsBrowser extends JPanel {
 		label2 = new JLabel();
 		label3 = new JLabel();
 		label17 = new JLabel();
+		label12 = new JLabel();
 		comboBox1 = new JComboBox();
 		comboBox2 = new JComboBox();
 		comboBox3 = new JComboBox();
 		button1 = new JButton();
 		button2 = new JButton();
 		sortByComboBox = new JComboBox();
+		orderCombo = new JComboBox();
 		panel4 = new JPanel();
 		label11 = new JLabel();
 		label8 = new JLabel();
@@ -537,6 +561,7 @@ public class QAResultsBrowser extends JPanel {
 		nextButton = new JButton();
 
 		//======== this ========
+		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new GridBagLayout());
 		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
 		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0};
@@ -546,9 +571,9 @@ public class QAResultsBrowser extends JPanel {
 		//======== panel1 ========
 		{
 			panel1.setLayout(new GridBagLayout());
-			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 107, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 107, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 			((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0};
-			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
 
 			//---- label1 ----
@@ -571,9 +596,15 @@ public class QAResultsBrowser extends JPanel {
 
 			//---- label17 ----
 			label17.setText("Sort by");
-			panel1.add(label17, new GridBagConstraints(11, 0, 1, 1, 0.0, 0.0,
+			panel1.add(label17, new GridBagConstraints(10, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
+
+			//---- label12 ----
+			label12.setText("Order");
+			panel1.add(label12, new GridBagConstraints(11, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 
 			//---- comboBox1 ----
 			comboBox1.addItemListener(new ItemListener() {
@@ -641,9 +672,20 @@ public class QAResultsBrowser extends JPanel {
 					sortByComboBoxItemStateChanged(e);
 				}
 			});
-			panel1.add(sortByComboBox, new GridBagConstraints(11, 1, 1, 1, 0.0, 0.0,
+			panel1.add(sortByComboBox, new GridBagConstraints(10, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- orderCombo ----
+			orderCombo.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					orderComboItemStateChanged(e);
+				}
+			});
+			panel1.add(orderCombo, new GridBagConstraints(11, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -897,12 +939,14 @@ public class QAResultsBrowser extends JPanel {
 	private JLabel label2;
 	private JLabel label3;
 	private JLabel label17;
+	private JLabel label12;
 	private JComboBox comboBox1;
 	private JComboBox comboBox2;
 	private JComboBox comboBox3;
 	private JButton button1;
 	private JButton button2;
 	private JComboBox sortByComboBox;
+	private JComboBox orderCombo;
 	private JPanel panel4;
 	private JLabel label11;
 	private JLabel label8;
