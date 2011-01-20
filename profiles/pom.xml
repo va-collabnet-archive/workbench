@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>profiles</artifactId>
   <packaging>pom</packaging>
-  <name>Workbench Bundle Profiles</name>
+  <name>SCT Mini Profiles</name>
   <description>wb-bundle profiles</description>
   <build>
     <plugins>
