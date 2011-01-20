@@ -60,7 +60,7 @@ public class QACaseDetailsPanel extends JPanel {
 	private DefaultListModel commentsModel;
 	private TerminologyComponent headerComponent;
 	private QADatabase qaDatabase;
-	private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+     	private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 	private QAStoreBI store;
 	private String currentUser;
 	
