@@ -1,4 +1,5 @@
 /*
+
  * Created by JFormDesigner on Thu Nov 25 12:27:48 GMT-03:00 2010
  */
 
@@ -78,10 +79,8 @@ public class QACasesBrowser extends JPanel {
 		try {
 			th = new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), null);
 		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

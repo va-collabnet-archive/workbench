@@ -178,7 +178,7 @@
               <string>javax.swing.JLabel</string> 
               <void method="setProperty"> 
                <string>text</string> 
-               <string>Expected Resolution</string> 
+               <string>Expected pattern</string> 
               </void> 
               <void method="setProperty"> 
                <string>verticalAlignment</string> 
@@ -242,7 +242,7 @@
               <string>javax.swing.JLabel</string> 
               <void method="setProperty"> 
                <string>text</string> 
-               <string>Resolution</string> 
+               <string>Suggested resolution</string> 
               </void> 
               <void method="setProperty"> 
                <string>verticalAlignment</string> 

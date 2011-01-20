@@ -343,7 +343,7 @@ public class QAStoreStubImpl implements QAStoreBI {
 	public List<QACasesReportLine> getQACasesReportLines(
 			QACoordinate qaCoordinate, UUID ruleUuid) {
 		List<QACasesReportLine> lines = new ArrayList<QACasesReportLine>();
-		Date time = Calendar.getInstance().getTime();
+		Calendar time = Calendar.getInstance();
 		Random randomGenerator = new Random();
 		for (TerminologyComponent loopComponent : getSampleComponents()) {
 			QACase loopCase = new QACase();

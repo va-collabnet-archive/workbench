@@ -17,7 +17,7 @@
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
-        <string>0, 0:1.0, 0:1.0</string> 
+        <string>0:1.0, 0:1.0</string> 
        </void> 
        <void method="setProperty"> 
         <string>$hGap</string> 
@@ -52,59 +52,6 @@
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormContainer"> 
-        <string>javax.swing.JPanel</string> 
-        <object class="com.jformdesigner.model.FormLayoutManager"> 
-         <class>java.awt.GridBagLayout</class> 
-         <void method="setProperty"> 
-          <string>$columnSpecs</string> 
-          <string>0, 0</string> 
-         </void> 
-         <void method="setProperty"> 
-          <string>$rowSpecs</string> 
-          <string>0</string> 
-         </void> 
-         <void method="setProperty"> 
-          <string>$hGap</string> 
-          <int>5</int> 
-         </void> 
-         <void method="setProperty"> 
-          <string>$vGap</string> 
-          <int>5</int> 
-         </void> 
-         <void method="setProperty"> 
-          <string>$alignLeft</string> 
-          <boolean>true</boolean> 
-         </void> 
-         <void method="setProperty"> 
-          <string>$alignTop</string> 
-          <boolean>true</boolean> 
-         </void> 
-        </object> 
-        <void property="name"> 
-         <string>panel1</string> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JLabel</string> 
-          <void method="setProperty"> 
-           <string>text</string> 
-           <string>QA Store panel</string> 
-          </void> 
-          <void property="name"> 
-           <string>label1</string> 
-          </void> 
-         </object> 
-         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-          <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-         </object> 
-        </void> 
-       </object> 
-       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-        <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-       </object> 
-      </void> 
-      <void method="add"> 
-       <object class="com.jformdesigner.model.FormContainer"> 
         <string>javax.swing.JTabbedPane</string> 
         <object class="com.jformdesigner.model.FormLayoutManager"> 
          <class>javax.swing.JTabbedPane</class> 
@@ -133,10 +80,6 @@
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
         <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-        <void method="setProperty"> 
-         <string>gridy</string> 
-         <int>1</int> 
-        </void> 
        </object> 
       </void> 
       <void method="add"> 
@@ -171,7 +114,7 @@
         <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
         <void method="setProperty"> 
          <string>gridy</string> 
-         <int>2</int> 
+         <int>1</int> 
         </void> 
        </object> 
       </void> 

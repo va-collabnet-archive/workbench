@@ -16,7 +16,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
-import javax.swing.*;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -137,6 +136,7 @@ public class RulesDetailsPanel extends JPanel {
 		rule.setWhitelistResetAllowed(whiteListResetAllowed.isSelected());
 		rule.setWhitelistResetWhenClosed(whiteLIstWhenClosedAllowed.isSelected());
 		store.persistRule(rule);
+		
 		saveButton.setEnabled(false);
 	}
 
@@ -273,7 +273,7 @@ public class RulesDetailsPanel extends JPanel {
 						new Insets(0, 0, 5, 0), 0, 0));
 
 					//---- label3 ----
-					label3.setText("Expected Resolution");
+					label3.setText("Expected pattern");
 					label3.setVerticalAlignment(SwingConstants.TOP);
 					label3.setLabelFor(erpResTextArea);
 					panel1.add(label3, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
@@ -293,7 +293,7 @@ public class RulesDetailsPanel extends JPanel {
 						new Insets(0, 0, 5, 0), 0, 0));
 
 					//---- label4 ----
-					label4.setText("Resolution");
+					label4.setText("Suggested resolution");
 					label4.setVerticalAlignment(SwingConstants.TOP);
 					panel1.add(label4, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,

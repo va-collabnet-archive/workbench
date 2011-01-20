@@ -11,14 +11,11 @@ import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 
 import org.ihtsdo.qa.store.QAStoreBI;
-import org.ihtsdo.qa.store.model.QACoordinate;
-import org.ihtsdo.qa.store.model.Rule;
 
 /**
  * @author Guillermo Reynoso
@@ -57,8 +54,6 @@ public class QAStorePanel extends JPanel {
 
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-		panel1 = new JPanel();
-		label1 = new JLabel();
 		tabbedPane1 = new JTabbedPane();
 		panel2 = new JPanel();
 		tabbedPane2 = new JTabbedPane();
@@ -68,27 +63,9 @@ public class QAStorePanel extends JPanel {
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new GridBagLayout());
 		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
-		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0, 0, 0};
+		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0, 0};
 		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-		((GridBagLayout)getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0, 1.0E-4};
-
-		//======== panel1 ========
-		{
-			panel1.setLayout(new GridBagLayout());
-			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0, 0};
-			((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0};
-			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0E-4};
-			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
-
-			//---- label1 ----
-			label1.setText("QA Store panel");
-			panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
-		}
-		add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 5, 0), 0, 0));
+		((GridBagLayout)getLayout()).rowWeights = new double[] {1.0, 1.0, 1.0E-4};
 
 		//======== tabbedPane1 ========
 		{
@@ -100,7 +77,7 @@ public class QAStorePanel extends JPanel {
 			tabbedPane1.addTab("QA Rules", panel2);
 
 		}
-		add(tabbedPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+		add(tabbedPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 5, 0), 0, 0));
 
@@ -114,15 +91,13 @@ public class QAStorePanel extends JPanel {
 			tabbedPane2.addTab("Cases", panel3);
 
 		}
-		add(tabbedPane2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+		add(tabbedPane2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 0, 0), 0, 0));
 		// JFormDesigner - End of component initialization  //GEN-END:initComponents
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-	private JPanel panel1;
-	private JLabel label1;
 	private JTabbedPane tabbedPane1;
 	private JPanel panel2;
 	private JTabbedPane tabbedPane2;
