@@ -66,22 +66,49 @@
                   </executions>
                </plugin>
                <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-dependency-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>extract-dependencies</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                           <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                           <artifactItems>
+                              <artifactItem>
+                                 <groupId>org.ihtsdo.sct</groupId>
+                                 <artifactId>sct-all-version-sct-en-es-vtmvmp</artifactId>
+                                 <type>zip</type>
+                              </artifactItem>
+                           </artifactItems>
+                           <outputDirectory>${project.build.directory}/generated-resources/pre</outputDirectory>
+                        </configuration>
+                     </execution>
+                     <execution>
+                        <id>unpack-spelling-variants</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                           <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                           <artifactItems>
+                              <artifactItem>                                             
+                                 <groupId>org.ihtsdo.sample</groupId>
+                                 <artifactId>profiles</artifactId>
+                                 <type>zip</type>
+                              </artifactItem>
+                           </artifactItems>
+                           <outputDirectory>${project.build.directory}/generated-resources/jbin</outputDirectory>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+               <plugin>
                   <groupId>org.ihtsdo</groupId>
                   <artifactId>wb-mojo</artifactId>
                   <executions>
-                     <execution>
-                        <id>write-change-set-directories</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                           <goal>write-directories</goal>
-                        </goals>
-                        <configuration>
-                           <targetSubDir>change-sets</targetSubDir>
-                           <runtimeArtifacts>
-                              <runtimeArtifact>org.ihtsdo.sample:profiles</runtimeArtifact>
-                           </runtimeArtifacts>
-                        </configuration>
-                     </execution>
                      <execution>
                         <id>vodb-open</id>
                         <phase>generate-resources</phase>
@@ -138,23 +165,67 @@
                   </configuration>
                </plugin>
                <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-assembly-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>attach-database</id>
+                        <configuration>
+                           <descriptors>
+                              <descriptor>src/main/assembly/database.xml</descriptor>
+                           </descriptors>
+                        </configuration>
+                        <goals>
+                           <goal>single</goal>
+                        </goals>
+                        <phase>package</phase>
+                     </execution>
+                  </executions>
+               </plugin>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-dependency-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>extract-dependencies</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                           <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                           <artifactItems>
+                              <artifactItem>
+                                 <groupId>org.ihtsdo.sct</groupId>
+                                 <artifactId>sct-en-mini</artifactId>
+                                 <type>zip</type>
+                              </artifactItem>
+                           </artifactItems>
+                           <outputDirectory>${project.build.directory}/generated-resources/jbin</outputDirectory>
+                        </configuration>
+                     </execution>
+                     <execution>
+                        <id>unpack-spelling-variants</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                           <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                           <artifactItems>
+                              <artifactItem>                                             
+                                 <groupId>org.ihtsdo.sct</groupId>
+                                 <artifactId>sct-en-mini</artifactId>
+                                 <type>zip</type>
+                              </artifactItem>
+                           </artifactItems>
+                           <outputDirectory>${project.build.directory}/generated-resources/jbin</outputDirectory>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+               <plugin>
                   <groupId>org.ihtsdo</groupId>
                   <artifactId>wb-mojo</artifactId>
                   <executions>
-                     <execution>
-								<!-- unjar sct-econcepts from dependencies-->
-                        <id>write-directories</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                           <goal>write-directories</goal>
-                        </goals>
-                        <configuration>
-                           <targetSubDir>generated-resources/jbin</targetSubDir>
-                           <runtimeArtifacts>
-                              <runtimeArtifact>org.ihtsdo.sct:sct-en-mini</runtimeArtifact>
-                           </runtimeArtifacts>
-                        </configuration>
-                     </execution>
                      <execution>
                         <id>export-cement-as-econcept</id>
                         <phase>generate-sources</phase>
@@ -173,7 +244,7 @@
                            </output>
                         </configuration>
                      </execution>
-                      <execution>
+                     <execution>
                         <id>vodb-open</id>
                         <phase>generate-resources</phase>
                         <goals>
@@ -183,7 +254,7 @@
                            <vodbDirectory>${berkeleydb.directory}</vodbDirectory>
                         </configuration>
                      </execution>
-                    <execution>
+                     <execution>
                         <id>vodb-set-default-config</id>
                         <phase>generate-resources</phase>
                         <goals>

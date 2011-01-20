@@ -1,72 +1,84 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<parent>
-		<groupId>org.ihtsdo.sample</groupId>
-		<artifactId>wb-sample-pa</artifactId>
-		<version>1.0-SNAPSHOT</version>
-	</parent>
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>java-binding</artifactId>
-	<name>Workbench Bundle Java Binding</name>
-	<description>project that generates a java binding so that java developers can reference
-		terminology content from their programs in a safe, versioned, and reproducible manner. </description>
-	<dependencies>
-		<dependency>
-			<groupId>org.ihtsdo.sample</groupId>
-			<artifactId>editor-database</artifactId>
-			<version>${project.version}</version>
-      <type>zip</type>
-		</dependency>
-	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>add-source</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>add-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>${project.build.directory}/generated-sources/main/java</source>
-							</sources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.ihtsdo</groupId>
-				<artifactId>wb-mojo</artifactId>
-				<extensions>true</extensions>
-                <version>${wb-toolkit.version}</version>
-				<executions>
-					<execution>
-						<id>write-directories</id>
-						<phase>initialize</phase>
-						<goals>
-							<goal>write-directories</goal>
-						</goals>
-						<configuration>
-							<targetSubDir>generated-resources/</targetSubDir>
-              <runtimeArtifacts>
-                <runtimeArtifact>${project.groupId}:editor-database</runtimeArtifact>
-              </runtimeArtifacts>
-						</configuration>
-					</execution>
-					<execution>
-						<id>vodb-open</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>vodb-open</goal>
-						</goals>
-						<configuration>
-							<vodbDirectory>${project.build.directory}/generated-resources/berkeley-db</vodbDirectory>
-							<useExistingDb>true</useExistingDb>
-						</configuration>
-					</execution>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>org.ihtsdo.sample</groupId>
+        <artifactId>wb-sample-pa</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>java-binding</artifactId>
+    <name>SCT Mini Java Binding</name>
+    <description>project that generates a java binding so that java developers can reference
+		terminology content from their programs in a safe, versioned, and reproducible manner. 
+    </description>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>editor-database</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/main/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>editor-database</artifactId>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/generated-resources</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>            
+            <plugin>
+                <groupId>org.ihtsdo</groupId>
+                <artifactId>wb-mojo</artifactId>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>vodb-open</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>vodb-open</goal>
+                        </goals>
+                        <configuration>
+                            <vodbDirectory>${project.build.directory}/generated-resources/berkeley-db</vodbDirectory>
+                            <useExistingDb>true</useExistingDb>
+                        </configuration>
+                    </execution>
 <!--
 					<execution>
 						<id>generate-concept-spec-refset</id>
@@ -93,15 +105,15 @@
 						</configuration>
 					</execution>
 -->
-					<execution>
-						<id>vodb-close</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>vodb-close</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+                    <execution>
+                        <id>vodb-close</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>vodb-close</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
