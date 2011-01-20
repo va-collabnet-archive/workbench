@@ -17,15 +17,19 @@
 package org.dwfa.ace.task.refset.sme;
 
 import java.awt.Component;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -172,6 +176,7 @@ public class GetCollabNetQueuePanelDataTask extends AbstractTask {
                     if (!validInbox) {
                         return Condition.ITEM_CANCELED;
                     }
+
                     // Create CollabNet outbox
                     boolean validOutbox =
                             queueCreator.createCollabnetOutbox(config, workbenchUser.getInitialText() + "-collabnet.outbox",
@@ -181,6 +186,32 @@ public class GetCollabNetQueuePanelDataTask extends AbstractTask {
 
                     if (!validOutbox) {
                         return Condition.ITEM_CANCELED;
+                    }
+                    String userDirStr = "profiles" + File.separator + workbenchUser.getInitialText();
+                    File userDir = new File(userDirStr);
+
+                    File profileFile = new File(userDir, workbenchUser.getInitialText() + ".ace");
+
+                    // read old profile from disk
+                    FileInputStream fis = new FileInputStream(profileFile);
+
+                    BufferedInputStream bis = new BufferedInputStream(fis);
+                    ObjectInputStream ois = new ObjectInputStream(bis);
+                    I_ConfigAceDb modifiedProfile = (I_ConfigAceDb) ois.readObject();
+                    ois.close();
+
+                    List<I_ConfigAceFrame> configs = modifiedProfile.getAceFrames();
+
+                    for (I_ConfigAceFrame modifiedProfileConfig : configs) {
+                        modifiedProfileConfig.getQueueAddressesToShow().add(
+                            workbenchUser.getInitialText() + "-collabnet.inbox");
+                        modifiedProfileConfig.getQueueAddressesToShow().add(
+                            workbenchUser.getInitialText() + "-collabnet.outbox");
+
+                    }
+
+                    if (configs.size() >= 1) {
+                        process.setProperty(profilePropName, configs.get(0));
                     }
 
                     return Condition.ITEM_COMPLETE;

@@ -49,7 +49,7 @@ import org.dwfa.util.io.FileIO;
 public class SaveNewProfile extends AbstractTask {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 
@@ -84,11 +84,12 @@ public class SaveNewProfile extends AbstractTask {
 
             profileToSave.setFrameName(profileToSave.getUsername() + " editor");
 
-            I_ConfigAceFrame currentProfile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            I_ConfigAceFrame currentProfile =
+                    (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
             I_ConfigAceDb currentDbProfile = currentProfile.getDbConfig();
 
-             String userDirStr = "profiles" + File.separator + profileToSave.getUsername();
+            String userDirStr = "profiles" + File.separator + profileToSave.getUsername();
             File userDir = new File(userDirStr);
             File changeSetRoot = new File(userDir, "changesets");
             changeSetRoot.mkdirs();
@@ -99,6 +100,12 @@ public class SaveNewProfile extends AbstractTask {
             newDbProfile.setDbFolder(currentDbProfile.getDbFolder());
             newDbProfile.setProfileFile(profileFile);
             newDbProfile.setUsername(profileToSave.getUsername());
+
+            for (String queueToShow : profileToSave.getQueueAddressesToShow()) {
+                if (queueToShow.contains("-collabnet")) {
+                    newDbProfile.getQueues().add("queues" + File.separator + queueToShow + File.separator + "queue.config");
+                }
+            }
 
             // write new profile to disk
             FileOutputStream fos = new FileOutputStream(profileFile);
@@ -114,13 +121,14 @@ public class SaveNewProfile extends AbstractTask {
             shutdownFolder.mkdirs();
 
             BundleType bundleType = currentProfile.getBundleType();
-            String workingCopyStr = FileIO.getNormalizedRelativePath(currentProfile.getDbConfig().getProfileFile().getParentFile());
+            String workingCopyStr =
+                    FileIO.getNormalizedRelativePath(currentProfile.getDbConfig().getProfileFile().getParentFile());
             boolean deleteProfile = false;
-           switch (bundleType) {
+            switch (bundleType) {
             case STAND_ALONE:
                 break;
             default:
-            	deleteProfile = true;
+                deleteProfile = true;
                 SubversionData creatorSvd = new SubversionData(null, workingCopyStr);
                 currentProfile.svnCompleteRepoInfo(creatorSvd);
                 String sequenceToFind = "src/main/profiles/";
@@ -147,25 +155,26 @@ public class SaveNewProfile extends AbstractTask {
                 String profileDirRepoUrl = creatorSvd.getRepositoryUrlStr().substring(0, sequenceEnd);
                 String repositoryUrlStr = profileDirRepoUrl + profileToSave.getUsername();
                 String workingCopyStrForNewUser = "profiles" + File.separator + profileToSave.getUsername();
-                
+
                 SubversionData svd = new SubversionData(repositoryUrlStr, workingCopyStrForNewUser);
                 currentProfile.svnImport(svd);
+
+                worker.getLogger().info("Starting commits for: " + currentProfile.getSubversionMap().keySet());
+
+                for (Entry<String, SubversionData> entry : currentProfile.getSubversionMap().entrySet()) {
+
+                    if (!entry.getKey().replace('\\', '/').equalsIgnoreCase(I_ConfigAceDb.MUTABLE_DB_LOC)) {
+                        worker.getLogger().info("commit: " + entry);
+                        CommitAllSvnEntries.commit(currentProfile, entry.getValue(), entry.getKey());
+                    } else {
+                        worker.getLogger().info("suppressed commit for: " + entry);
+                    }
+                }
             }
-       		worker.getLogger().info("Starting commits for: " + currentProfile.getSubversionMap().keySet());
-       	
-            for (Entry<String, SubversionData> entry: currentProfile.getSubversionMap().entrySet()) {
-            	
-            	if (!entry.getKey().replace('\\', '/').equalsIgnoreCase(I_ConfigAceDb.MUTABLE_DB_LOC)) {
-                	worker.getLogger().info("commit: " + entry);
-                	CommitAllSvnEntries.commit(currentProfile, entry.getValue(), entry.getKey());
-            	} else {
-                	worker.getLogger().info("suppressed commit for: " + entry);
-            	}
-            }
-            
+
             if (deleteProfile) {
-               	worker.getLogger().info("Recursive delete for: " + newDbProfile.getProfileFile().getParent());
-            	FileIO.recursiveDelete(newDbProfile.getProfileFile().getParentFile());
+                worker.getLogger().info("Recursive delete for: " + newDbProfile.getProfileFile().getParent());
+                FileIO.recursiveDelete(newDbProfile.getProfileFile().getParentFile());
             }
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
