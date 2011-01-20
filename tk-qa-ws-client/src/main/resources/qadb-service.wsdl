@@ -118,7 +118,7 @@
             		<xsd:element name="documentationUrl"
             			type="xsd:string" maxOccurs="1" minOccurs="0">
             		</xsd:element>
-            		<xsd:element name="effectiveTime" type="xsd:date"
+            		<xsd:element name="effectiveTime" type="xsd:dateTime"
             			maxOccurs="1" minOccurs="0">
             		</xsd:element>
             	</xsd:sequence>
@@ -185,7 +185,7 @@
             			type="xsd:string" maxOccurs="1" minOccurs="0">
             		</xsd:element>
             		<xsd:element name="dispositionStatusDate"
-            			type="xsd:date" maxOccurs="1" minOccurs="0">
+            			type="xsd:dateTime" maxOccurs="1" minOccurs="0">
             		</xsd:element>
             		<xsd:element name="dispositionStatusEditor"
             			type="xsd:string" maxOccurs="1" minOccurs="0">
@@ -199,7 +199,7 @@
             		<xsd:element name="assignedTo" type="xsd:string"
             			maxOccurs="1" minOccurs="0">
             		</xsd:element>
-            		<xsd:element name="effectiveTime" type="xsd:date"
+            		<xsd:element name="effectiveTime" type="xsd:dateTime"
             			maxOccurs="1" minOccurs="0">
             		</xsd:element>
             		<xsd:element name="pathUuid" type="xsd:string"
@@ -215,7 +215,7 @@
             		<xsd:element name="assignmentEditor"
             			type="xsd:string" maxOccurs="1" minOccurs="0">
             		</xsd:element>
-            		<xsd:element name="assignmentDate" type="xsd:date" maxOccurs="1" minOccurs="0"></xsd:element>
+            		<xsd:element name="assignmentDate" type="xsd:dateTime" maxOccurs="1" minOccurs="0"></xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
 
@@ -567,7 +567,7 @@
             	<xsd:sequence>
             		<xsd:element name="commentUuid" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
             		<xsd:element name="effectiveTime"
-            			type="xsd:date" maxOccurs="1" minOccurs="0">
+            			type="xsd:dateTime" maxOccurs="1" minOccurs="0">
             		</xsd:element>
             		<xsd:element name="status" type="xsd:integer" maxOccurs="1" minOccurs="0"></xsd:element>
             		<xsd:element name="comment" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
