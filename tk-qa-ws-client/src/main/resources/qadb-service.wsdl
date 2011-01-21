@@ -574,6 +574,29 @@
             		<xsd:element name="author" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
+            <xsd:element name="persistQACaseList">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="qaCaseList" type="tns:Case" maxOccurs="unbounded" minOccurs="1"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="persistQACaseListResponse">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="out" type="xsd:string"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="persistQACaseListFault">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="persistQACaseListFault"
+            				type="xsd:string">
+            			</xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
 </xsd:schema></wsdl:types>
     <wsdl:message name="getComponentRequest">
     	<wsdl:part name="parameters" element="tns:ComponentRequest"></wsdl:part>
@@ -677,6 +700,14 @@
     <wsdl:message name="persistsQARuleFault">
     	<wsdl:part name="parameters" element="tns:persistsQARuleFault"></wsdl:part>
     </wsdl:message>
+    <wsdl:message name="persistQACaseListRequest">
+    	<wsdl:part name="parameters" element="tns:persistQACaseList"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="persistQACaseListResponse">
+    </wsdl:message>
+    <wsdl:message name="persistQACaseListFault">
+    	<wsdl:part name="parameters" element="tns:persistQACaseListFault"></wsdl:part>
+    </wsdl:message>
     <wsdl:portType name="qadb-data">
     	<wsdl:operation name="getComponent">
     		<wsdl:input message="tns:getComponentRequest"></wsdl:input>
@@ -750,6 +781,11 @@
     		<wsdl:input message="tns:persistsQARuleRequest"></wsdl:input>
     		<wsdl:output message="tns:persistsQARuleResponse"></wsdl:output>
             <wsdl:fault name="fault" message="tns:persistsQARuleFault"></wsdl:fault>
+        </wsdl:operation>
+    	<wsdl:operation name="persistQACaseList">
+    		<wsdl:input message="tns:persistQACaseListRequest"></wsdl:input>
+    		<wsdl:output message="tns:persistQACaseListResponse"></wsdl:output>
+            <wsdl:fault name="fault" message="tns:persistQACaseListFault"></wsdl:fault>
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="qadb-binding" type="tns:qadb-data">
@@ -928,6 +964,19 @@
     	<wsdl:operation name="persistsQARule">
     		<soap:operation
     			soapAction="http://www.ihtsdo.org/qadb/qadb-service/persistsQARule" />
+    		<wsdl:input>
+    			<soap:body use="literal" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal" />
+    		</wsdl:output>
+    		<wsdl:fault name="fault">
+    			<soap:fault use="literal" name="fault" />
+    		</wsdl:fault>
+    	</wsdl:operation>
+    	<wsdl:operation name="persistQACaseList">
+    		<soap:operation
+    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/persistQACaseList" />
     		<wsdl:input>
     			<soap:body use="literal" />
     		</wsdl:input>
