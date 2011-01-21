@@ -80,8 +80,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
-public abstract class ReflexiveTableModel extends AbstractTableModel implements PropertyChangeListener,
-        I_HoldRefsetData {
+public abstract class ReflexiveTableModel extends AbstractTableModel implements PropertyChangeListener, I_HoldRefsetData {
 
     protected BitSet checkedRows = new BitSet();
 
@@ -296,7 +295,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
     }
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 
@@ -432,11 +431,11 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         NidBitSetBI conceptNids = Terms.get().getEmptyIdSet();
         try {
             allTuplesLock.acquireUninterruptibly();
-
-            for (int rowIndex = 0; rowIndex < allTuples.size(); rowIndex++) {
+            List<I_ExtendByRefVersion> allTuplesCopy = new ArrayList<I_ExtendByRefVersion>(allTuples);
+            for (int rowIndex = 0; rowIndex < allTuplesCopy.size(); rowIndex++) {
                 for (int columnIndex = 0; columnIndex < columns.length; columnIndex++) {
                     try {
-                        I_ExtendByRefVersion tuple = allTuples.get(rowIndex);
+                        I_ExtendByRefVersion tuple = allTuplesCopy.get(rowIndex);
                         if (columns[columnIndex] != null && columns[columnIndex].invokeOnObjectType != null) {
                             switch (columns[columnIndex].invokeOnObjectType) {
                             case CONCEPT_COMPONENT:
@@ -531,8 +530,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                         if (tf.hasConcept(id)) {
                             value =
                                     columns[columnIndex].getReadMethod().invoke(
-                                        Terms.get().getConcept(tuple.getComponentId()),
-                                        columns[columnIndex].readParamaters);
+                                        Terms.get().getConcept(tuple.getComponentId()), columns[columnIndex].readParamaters);
                         } else {
                             try {
                                 I_DescriptionVersioned desc = tf.getDescription(id);
@@ -545,9 +543,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                         }
 
                     } else {
-                        value =
-                                columns[columnIndex].getReadMethod().invoke(
-                                    Terms.get().getConcept(tuple.getComponentId()));
+                        value = columns[columnIndex].getReadMethod().invoke(Terms.get().getConcept(tuple.getComponentId()));
                     }
                     break;
                 case COMPONENT:
@@ -570,8 +566,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                     } else {
                         try {
                             I_ExtendByRefPart part = tuple.getMutablePart();
-                            if (columns[columnIndex].getReadMethod().getDeclaringClass().isAssignableFrom(
-                                part.getClass())) {
+                            if (columns[columnIndex].getReadMethod().getDeclaringClass().isAssignableFrom(part.getClass())) {
                                 value = columns[columnIndex].getReadMethod().invoke(part);
                             } else {
                                 if (I_ExtendByRefPartBoolean.class.isAssignableFrom(part.getClass())) {
@@ -625,12 +620,10 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                                     tf.getConcept(id).getDescTuple(host.getConfig().getTableDescPreferenceList(),
                                         host.getConfig());
                             if (desc != null) {
-                                addToValueCache(rowIndex, columnIndex,
-                                    new StringWithExtTuple(desc.getText(), tuple, id));
+                                addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(desc.getText(), tuple, id));
                                 return values.get(rowColumnToLong(rowIndex, columnIndex));
                             }
-                            addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(Integer.toString(id), tuple,
-                                id));
+                            addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(Integer.toString(id), tuple, id));
                             return values.get(rowColumnToLong(rowIndex, columnIndex));
 
                         } else if (tf.hasExtension(id)) {
@@ -644,8 +637,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                                 I_ExtendByRefVersion obj = tuples.iterator().next();
                                 I_GetConceptData componentRefset = Terms.get().getConcept(obj.getRefsetId());
                                 I_DescriptionTuple refsetDesc =
-                                        componentRefset.getDescTuple(host.getConfig().getTableDescPreferenceList(),
-                                            host.getConfig());
+                                        componentRefset.getDescTuple(host.getConfig().getTableDescPreferenceList(), host
+                                            .getConfig());
                                 StringBuffer buff = new StringBuffer();
                                 buff.append("<html>");
                                 buff.append(refsetDesc.getText());
@@ -653,27 +646,25 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                                 // @TODO replace this test with a call to determine
                                 // "refset purpose" once the purpose is available.
                                 if (refsetDesc.getText().toLowerCase().endsWith("refset spec")) {
-                                    RefsetSpecTreeCellRenderer renderer =
-                                            new RefsetSpecTreeCellRenderer(host.getConfig());
+                                    RefsetSpecTreeCellRenderer renderer = new RefsetSpecTreeCellRenderer(host.getConfig());
                                     buff.append(renderer.getHtmlRendering(obj));
                                 } else {
                                     buff.append(obj.getMutablePart().toString());
                                 }
 
-                                addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(buff.toString(), tuple,
-                                    id));
+                                addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(buff.toString(), tuple, id));
                                 return values.get(rowColumnToLong(rowIndex, columnIndex));
                             } else {
                                 tuples =
-                                        (List<I_ExtendByRefVersion>) ext.getTuples(null, config
-                                            .getViewPositionSetReadOnly(), config.getPrecedence(), config
-                                            .getConflictResolutionStrategy());
+                                        (List<I_ExtendByRefVersion>) ext.getTuples(null,
+                                            config.getViewPositionSetReadOnly(), config.getPrecedence(), config
+                                                .getConflictResolutionStrategy());
                                 if (tuples.size() > 0) {
                                     I_ExtendByRefVersion obj = tuples.iterator().next();
                                     I_GetConceptData componentRefset = Terms.get().getConcept(obj.getRefsetId());
                                     I_DescriptionTuple refsetDesc =
-                                            componentRefset.getDescTuple(host.getConfig().getTableDescPreferenceList(),
-                                                host.getConfig());
+                                            componentRefset.getDescTuple(host.getConfig().getTableDescPreferenceList(), host
+                                                .getConfig());
                                     StringBuffer buff = new StringBuffer();
                                     buff.append("<html>");
                                     buff.append(refsetDesc.getText());
@@ -688,8 +679,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                                         buff.append(obj.getMutablePart().toString());
                                     }
 
-                                    addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(buff.toString(),
-                                        tuple, id));
+                                    addToValueCache(rowIndex, columnIndex,
+                                        new StringWithExtTuple(buff.toString(), tuple, id));
                                     return values.get(rowColumnToLong(rowIndex, columnIndex));
                                 }
                             }
@@ -720,8 +711,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                     return new StringWithExtTuple((String) value, tuple, id, false, true);
                 }
 
-                AceLog.getAppLog().alertAndLogException(
-                    new Exception("Can't handle column type: " + columns[columnIndex]));
+                AceLog.getAppLog().alertAndLogException(new Exception("Can't handle column type: " + columns[columnIndex]));
             } catch (Exception e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }
