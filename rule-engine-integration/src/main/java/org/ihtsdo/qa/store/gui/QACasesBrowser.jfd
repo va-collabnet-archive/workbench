@@ -1009,7 +1009,7 @@
           <string>javax.swing.JLabel</string> 
           <void method="setProperty"> 
            <string>text</string> 
-           <string>Assigne to</string> 
+           <string>Assign to</string> 
           </void> 
           <void property="name"> 
            <string>label17</string> 

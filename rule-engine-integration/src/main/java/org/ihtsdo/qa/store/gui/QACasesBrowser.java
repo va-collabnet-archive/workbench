@@ -153,10 +153,10 @@ public class QACasesBrowser extends JPanel {
 		}
 		
 		batchAssigneTo.addItem("");
-		batchAssigneTo.addItem("Ale");
-		batchAssigneTo.addItem("Alo");
-		batchAssigneTo.addItem("Cesar");
-		batchAssigneTo.addItem("Manu");
+//		batchAssigneTo.addItem("Ale");
+//		batchAssigneTo.addItem("Alo");
+//		batchAssigneTo.addItem("Cesar");
+//		batchAssigneTo.addItem("Manu");
 		for (I_GetConceptData user : users) {
 			batchAssigneTo.addItem(user.toString());
 		}
@@ -811,7 +811,7 @@ public class QACasesBrowser extends JPanel {
 			((GridBagLayout)panel5.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 			//---- label17 ----
-			label17.setText("Assigne to");
+			label17.setText("Assign to");
 			panel5.add(label17, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
