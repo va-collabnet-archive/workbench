@@ -26,6 +26,7 @@ import org.ihtsdo.qa.store.model.view.QACasesReportPage;
 import org.ihtsdo.qa.store.model.view.RulesReportColumn;
 import org.ihtsdo.qa.store.model.view.RulesReportLine;
 import org.ihtsdo.qa.store.model.view.RulesReportPage;
+import org.ihtsdo.qadb.ws.PersistQACaseListFaultException;
 import org.ihtsdo.qadb.ws.PersistsQARuleFaultException;
 import org.ihtsdo.qadb.ws.QadbServiceStub;
 import org.ihtsdo.qadb.ws.data.AllCategoriesResponse;
@@ -45,6 +46,7 @@ import org.ihtsdo.qadb.ws.data.Database;
 import org.ihtsdo.qadb.ws.data.DispositionStatusCount_type0;
 import org.ihtsdo.qadb.ws.data.IntBoolKeyValue;
 import org.ihtsdo.qadb.ws.data.IntStrKeyValue;
+import org.ihtsdo.qadb.ws.data.PersistQACaseList;
 import org.ihtsdo.qadb.ws.data.PersistQACaseRequest;
 import org.ihtsdo.qadb.ws.data.PersistsQARuleRequest;
 import org.ihtsdo.qadb.ws.data.QACasesReportLinesByPageRequest;
@@ -653,6 +655,33 @@ public class QAStoreBIImpl implements QAStoreBI {
 	@Override
 	public Category getCategory(UUID categoryUuid) {
 		return null;
+	}
+
+	@Override
+	public void persistQACaseList(List<QACase> qaCaseList) throws Exception {
+		try {
+			QadbServiceStub service = new QadbServiceStub(url);
+			PersistQACaseList qaListRequest = new PersistQACaseList();
+			
+			Case[] wsCaseList = new Case[qaCaseList.size()];
+			int i = 0;
+			for (QACase qaCase2 : qaCaseList) {
+				Case wsQaCase = WsClientDataConverter.caseToWsCase(qaCase2);
+				wsCaseList[i] = wsQaCase;
+				i++;
+			}
+			qaListRequest.setQaCaseList(wsCaseList );
+			service.persistQACaseList(qaListRequest);
+		} catch (AxisFault e) {
+			e.printStackTrace();
+			throw e;
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			throw e;
+		} catch (PersistQACaseListFaultException e) {
+			e.printStackTrace();
+			throw new RemoteException(e.getMessage());
+		}
 	}
 
 }

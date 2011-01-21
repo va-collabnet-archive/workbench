@@ -84,5 +84,6 @@ public interface QAStoreBI {
 	public void persistExecution(Execution execution);
 	public void persistQACase(QACase qaCase);
 	public void persistQADatabase(QADatabase database);
+	public void persistQACaseList(List<QACase> qaCaseList) throws  Exception;
 	
 }

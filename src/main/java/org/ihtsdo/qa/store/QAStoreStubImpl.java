@@ -420,4 +420,10 @@ public class QAStoreStubImpl implements QAStoreBI {
 		return null;
 	}
 
+	@Override
+	public void persistQACaseList(List<QACase> qaCaseList) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

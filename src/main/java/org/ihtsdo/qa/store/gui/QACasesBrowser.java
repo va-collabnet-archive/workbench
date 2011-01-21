@@ -5,6 +5,7 @@
 
 package org.ihtsdo.qa.store.gui;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -16,9 +17,11 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.JButton;
@@ -26,13 +29,17 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.qa.gui.ObjectTransferHandler;
@@ -46,6 +53,7 @@ import org.ihtsdo.qa.store.model.TerminologyComponent;
 import org.ihtsdo.qa.store.model.view.QACasesReportColumn;
 import org.ihtsdo.qa.store.model.view.QACasesReportLine;
 import org.ihtsdo.qa.store.model.view.QACasesReportPage;
+import org.ihtsdo.rules.RulesLibrary;
 
 /**
  * @author Guillermo Reynoso
@@ -74,6 +82,7 @@ public class QACasesBrowser extends JPanel {
 	private QADatabase qaDatabase;
 	private QACase selectedCase;
 	private TerminologyComponent selectedCaseComponent;
+	private Set<I_GetConceptData> users;
 	
 	public QACasesBrowser(QAStoreBI store, QAResultsBrowser resultsPanel, JTabbedPane parentTabbedPanel) {
 		try {
@@ -84,6 +93,8 @@ public class QACasesBrowser extends JPanel {
 			e.printStackTrace();
 		}
 		
+		users = RulesLibrary.getUsers();
+
 		filter = new HashMap<QACasesReportColumn, Object>();
 		
 		this.store = store;
@@ -107,8 +118,9 @@ public class QACasesBrowser extends JPanel {
 		table1.setTransferHandler(th);
 		table1.setDragEnabled(true);
 		
-		TableColumn conceptUuidCol = table1.getColumnModel().getColumn(0);
-		TableColumn conceptSctidCol =table1.getColumnModel().getColumn(1);
+		TableColumn conceptUuidCol = table1.getColumnModel().getColumn(tableModel.CONCEPT_UUID);
+		TableColumn conceptSctidCol =table1.getColumnModel().getColumn(tableModel.CONCEPT_SCTID);
+		TableColumn rowCheckBoxCol =table1.getColumnModel().getColumn(tableModel.ROW_CHECKBOX);
 		
 		conceptUuidCol.setPreferredWidth(0);
 		conceptUuidCol.setMinWidth(0);
@@ -117,6 +129,38 @@ public class QACasesBrowser extends JPanel {
 		conceptSctidCol.setPreferredWidth(0);
 		conceptSctidCol.setMinWidth(0);
 		conceptSctidCol.setMaxWidth(0);
+		
+		rowCheckBoxCol.setPreferredWidth(20);
+		rowCheckBoxCol.setMinWidth(20);
+		rowCheckBoxCol.setMaxWidth(20);
+		
+		tableModel.addTableModelListener(new TableModelListener() {
+			@Override
+			public void tableChanged(TableModelEvent e) {
+				int col = e.getColumn();
+				if(col == tableModel.ROW_CHECKBOX){
+					batchAssigneTo.setEnabled(true);
+					batchDispositionStatus.setEnabled(true);
+					bathcSaveButton.setEnabled(true);
+					messageLabel.setText("");
+				}
+			}
+		});
+		
+		batchDispositionStatus.addItem("");
+		for (DispositionStatus dispStatus : dispositionStatuses) {
+			batchDispositionStatus.addItem(dispStatus);
+		}
+		
+		batchAssigneTo.addItem("");
+		batchAssigneTo.addItem("Ale");
+		batchAssigneTo.addItem("Alo");
+		batchAssigneTo.addItem("Cesar");
+		batchAssigneTo.addItem("Manu");
+		for (I_GetConceptData user : users) {
+			batchAssigneTo.addItem(user.toString());
+		}
+		
 		
 		if (coordinate != null && rule != null) {
 			setupPanel(store);
@@ -208,6 +252,7 @@ public class QACasesBrowser extends JPanel {
 			if (lineApproved) {
 				List<Object> row = new ArrayList<Object>();
 				row.add(line.getComponent().getComponentUuid().toString());
+				row.add(false);
 				row.add(String.valueOf(line.getComponent().getSctid()));
 				row.add(line.getComponent().getComponentName());
 				if (line.getQaCase().isActive()) {
@@ -322,7 +367,7 @@ public class QACasesBrowser extends JPanel {
 			int tabCount = parentTabbedPanel.getTabCount();
 			int selectedRow = table1.getSelectedRow();
 			Object[] rowData = tableModel.getRow(selectedRow);
-			String conceptName = rowData[2].toString();
+			String conceptName = rowData[tableModel.CONCEPT_NAME].toString();
 			boolean tabExists = false;
 			for (int i = 0; i < tabCount; i++) {
 				if(conceptName.length() > 7){
@@ -342,7 +387,7 @@ public class QACasesBrowser extends JPanel {
 				Rule  rule = resultsPanel.getRule();
 				TerminologyComponent component = getSelectedCaseComponent(UUID.fromString(rowData[0].toString()));
 				
-				selectedCase = (QACase) rowData[7];
+				selectedCase = (QACase) rowData[tableModel.CASE];
 				
 				QACaseDetailsPanel rulesDetailsPanel = new QACaseDetailsPanel(rule,component,selectedCase, dispositionStatuses, headerComponent,qaDatabase,store);
 				if(conceptName.length() > 7){
@@ -358,6 +403,69 @@ public class QACasesBrowser extends JPanel {
 	
 	private void initTabComponent(int i) {
 		parentTabbedPanel.setTabComponentAt(i, new ButtonTabComponent(parentTabbedPanel));
+	}
+	private void bathcSaveButtonActionPerformed(ActionEvent e) {
+		List<QACase> qaCaseList = new ArrayList<QACase>();
+		for (int i = startLine-1; i < finalLine; i++) {
+			Object[] row = tableModel.getRow(i);
+			
+			if(row[tableModel.ROW_CHECKBOX] instanceof Boolean){
+				if((Boolean)row[tableModel.ROW_CHECKBOX]){
+					Object qaCaseObject = row[tableModel.CASE];
+					if(qaCaseObject != null && qaCaseObject instanceof QACase){
+						QACase qaCase = (QACase)qaCaseObject;
+						Object selectedBatchDispoStatusObject = batchDispositionStatus.getSelectedItem();
+						DispositionStatus selectedDispoStatus = null;
+						if(selectedBatchDispoStatusObject instanceof DispositionStatus){
+							selectedDispoStatus = (DispositionStatus)selectedBatchDispoStatusObject;
+						}
+						String caseAssignedTo = qaCase.getAssignedTo() == null ? "" : qaCase.getAssignedTo();
+						if((!caseAssignedTo.equals(batchAssigneTo.getSelectedItem()) && !batchAssigneTo.getSelectedItem().toString().equals("")) 
+								|| (selectedDispoStatus != null && !selectedDispoStatus.getDispositionStatusUuid().equals(qaCase.getDispositionStatusUuid()))){
+							boolean caseChanged = false;
+							if(!batchAssigneTo.getSelectedItem().toString().equals("")){
+								qaCase.setAssignedTo(batchAssigneTo.getSelectedItem().toString());
+								caseChanged = true;
+							}
+							if(selectedDispoStatus != null){
+								qaCase.setDispositionStatusUuid(selectedDispoStatus.getDispositionStatusUuid());
+								caseChanged = true;
+							}
+							if(caseChanged){
+								qaCaseList.add(qaCase);
+							}
+						}
+					}
+				}
+			}
+		}
+		if(!qaCaseList.isEmpty()){
+			try {
+				store.persistQACaseList(qaCaseList);
+				batchAssigneTo.setEnabled(false);
+				batchAssigneTo.setEnabled(false);
+				bathcSaveButton.setEnabled(false);
+				messageLabel.setText("Rows Updated succesfully");
+				for (int i = startLine-1; i < finalLine; i++) {
+					tableModel.setValueAt(false, i, tableModel.ROW_CHECKBOX);
+					QACase qaCase = (QACase)tableModel.getValueAt(i, tableModel.CASE);
+					tableModel.setValueAt(qaCase.getAssignedTo(), i, tableModel.ASSIGNED_TO);
+
+					for (DispositionStatus currentDisop : dispositionStatuses) {
+						if(qaCase.getDispositionStatusUuid().equals(currentDisop.getDispositionStatusUuid())){
+							tableModel.setValueAt(currentDisop, i, tableModel.DISPOSITION_STATUS);
+						}
+					}
+				}
+			} catch (Exception e1) {
+				e1.printStackTrace();
+				for (int i = startLine-1; i < finalLine; i++) {
+					tableModel.setValueAt(false, i, tableModel.ROW_CHECKBOX);
+				}
+				messageLabel.setForeground(Color.RED);
+				messageLabel.setText("Problems updating cases, please try again later.");
+			}
+		}
 	}
 
 	private void initComponents() {
@@ -378,6 +486,7 @@ public class QACasesBrowser extends JPanel {
 		comboBox1 = new JComboBox();
 		searchButton = new JButton();
 		filterButton = new JButton();
+		separator1 = new JSeparator();
 		panel4 = new JPanel();
 		label11 = new JLabel();
 		label4 = new JLabel();
@@ -400,14 +509,22 @@ public class QACasesBrowser extends JPanel {
 		label20 = new JLabel();
 		totalLinesLabel = new JLabel();
 		nextButton = new JButton();
+		separator2 = new JSeparator();
+		panel5 = new JPanel();
+		label17 = new JLabel();
+		batchAssigneTo = new JComboBox();
+		label19 = new JLabel();
+		batchDispositionStatus = new JComboBox();
+		messageLabel = new JLabel();
+		bathcSaveButton = new JButton();
 
 		//======== this ========
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new GridBagLayout());
 		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
-		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0};
+		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 12, 0, 0, 0, 9, 22, 0};
 		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-		((GridBagLayout)getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4};
+		((GridBagLayout)getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0E-4};
 
 		//======== panel1 ========
 		{
@@ -514,7 +631,10 @@ public class QACasesBrowser extends JPanel {
 		}
 		add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 5, 0), 0, 0));
+			new Insets(0, 0, 2, 0), 0, 0));
+		add(separator1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 2, 0), 0, 0));
 
 		//======== panel4 ========
 		{
@@ -553,7 +673,7 @@ public class QACasesBrowser extends JPanel {
 		}
 		add(panel4, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 5, 0), 0, 0));
+			new Insets(0, 0, 2, 0), 0, 0));
 
 		//======== panel2 ========
 		{
@@ -581,7 +701,7 @@ public class QACasesBrowser extends JPanel {
 		}
 		add(panel2, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 5, 0), 0, 0));
+			new Insets(0, 0, 2, 0), 0, 0));
 
 		//======== panel3 ========
 		{
@@ -677,6 +797,63 @@ public class QACasesBrowser extends JPanel {
 		}
 		add(panel3, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 2, 0), 0, 0));
+		add(separator2, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 2, 0), 0, 0));
+
+		//======== panel5 ========
+		{
+			panel5.setLayout(new GridBagLayout());
+			((GridBagLayout)panel5.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0};
+			((GridBagLayout)panel5.getLayout()).rowHeights = new int[] {0, 0};
+			((GridBagLayout)panel5.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel5.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+
+			//---- label17 ----
+			label17.setText("Assigne to");
+			panel5.add(label17, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- batchAssigneTo ----
+			batchAssigneTo.setToolTipText("Select cases from the above table to make multiple assignment");
+			batchAssigneTo.setEnabled(false);
+			panel5.add(batchAssigneTo, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- label19 ----
+			label19.setText("Disposition status");
+			panel5.add(label19, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- batchDispositionStatus ----
+			batchDispositionStatus.setToolTipText("Select cases from the above table to change disposition statuces");
+			batchDispositionStatus.setEnabled(false);
+			panel5.add(batchDispositionStatus, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+			panel5.add(messageLabel, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- bathcSaveButton ----
+			bathcSaveButton.setText("Save");
+			bathcSaveButton.setEnabled(false);
+			bathcSaveButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					bathcSaveButtonActionPerformed(e);
+				}
+			});
+			panel5.add(bathcSaveButton, new GridBagConstraints(7, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+				new Insets(0, 0, 0, 0), 0, 0));
+		}
+		add(panel5, new GridBagConstraints(0, 6, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 0, 0), 0, 0));
 		// //GEN-END:initComponents
 	}
@@ -698,6 +875,7 @@ public class QACasesBrowser extends JPanel {
 	private JComboBox comboBox1;
 	private JButton searchButton;
 	private JButton filterButton;
+	private JSeparator separator1;
 	private JPanel panel4;
 	private JLabel label11;
 	private JLabel label4;
@@ -720,12 +898,31 @@ public class QACasesBrowser extends JPanel {
 	private JLabel label20;
 	private JLabel totalLinesLabel;
 	private JButton nextButton;
+	private JSeparator separator2;
+	private JPanel panel5;
+	private JLabel label17;
+	private JComboBox batchAssigneTo;
+	private JLabel label19;
+	private JComboBox batchDispositionStatus;
+	private JLabel messageLabel;
+	private JButton bathcSaveButton;
 	// //GEN-END:variables
 	
 	class CaseTableModel extends AbstractTableModel {
 		private static final long serialVersionUID = -2582804161676112393L;
 
-		private String[] columnNames = { "Concept UUID", 
+		public final Integer CONCEPT_UUID = 0;
+		public final Integer ROW_CHECKBOX = 1;
+		public final Integer CONCEPT_SCTID = 2;
+		public final Integer CONCEPT_NAME = 3;
+		public final Integer STATUS = 4;
+		public final Integer DISPOSITION_STATUS = 5;
+		public final Integer ASSIGNED_TO = 6;
+		public final Integer TIME = 7;
+		public final Integer CASE = 8;
+		
+		private String[] columnNames = { "Concept UUID",
+				" ",
 				"Concept Sctid", 
 				"Concept Name", 
 				"Status", 
@@ -780,13 +977,20 @@ public class QACasesBrowser extends JPanel {
 
 		@Override
 		public Class<?> getColumnClass(int columnIndex) {
-			return super.getColumnClass(columnIndex);
+			if(getValueAt(0, columnIndex) != null){
+				return getValueAt(0, columnIndex).getClass();
+			}else{
+				return super.getColumnClass(columnIndex);
+			}
 		}
 		
 		public boolean isCellEditable(int x, int y) {
+			if(y == ROW_CHECKBOX){
+				return true;
+			}
 			return false;
 		}
-		
+
 	}
 
 }
