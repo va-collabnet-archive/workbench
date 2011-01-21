@@ -1167,29 +1167,34 @@ public class RefsetSpecPanel extends JPanel {
 
         @Override
         public void columnMarginChanged(ChangeEvent arg0) {
+
             int rowCount = table.getRowCount();
             int columnCount = table.getColumnCount();
 
-            for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-                double rowPreferredHeight = 0;
-                for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
-                    Component comp =
-                            table.getCellRenderer(rowIndex, columnIndex).getTableCellRendererComponent(table,
-                                table.getModel().getValueAt(rowIndex, columnIndex), false, false, rowIndex, columnIndex);
+            if (table.getModel().getRowCount() == table.getRowCount()
+                && table.getModel().getColumnCount() == table.getColumnCount()) {
+                for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+                    double rowPreferredHeight = 0;
+                    for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+                        Component comp =
+                                table.getCellRenderer(rowIndex, columnIndex).getTableCellRendererComponent(table,
+                                    table.getModel().getValueAt(rowIndex, columnIndex), false, false, rowIndex, columnIndex);
 
-                    int currentRowHeight = table.getRowHeight(rowIndex);
-                    int currentRowWidth = table.getColumnModel().getColumn(columnIndex).getWidth();
+                        int currentRowHeight = table.getRowHeight(rowIndex);
+                        int currentRowWidth = table.getColumnModel().getColumn(columnIndex).getWidth();
 
-                    comp.setSize(currentRowWidth, currentRowHeight);
+                        comp.setSize(currentRowWidth, currentRowHeight);
 
-                    double dPreferredHeight = comp.getPreferredSize().getHeight();
-                    if (dPreferredHeight > rowPreferredHeight) {
-                        rowPreferredHeight = dPreferredHeight;
-                        // set the new row height based on the preferred height of the cell component
-                        table.setRowHeight(rowIndex, (int) dPreferredHeight);
+                        double dPreferredHeight = comp.getPreferredSize().getHeight();
+                        if (dPreferredHeight > rowPreferredHeight) {
+                            rowPreferredHeight = dPreferredHeight;
+                            // set the new row height based on the preferred height of the cell component
+                            table.setRowHeight(rowIndex, (int) dPreferredHeight);
+                        }
                     }
                 }
             }
+
         }
 
         @Override

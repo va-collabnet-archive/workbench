@@ -10,11 +10,11 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 public class SelectableReflexiveTableModel extends ReflexiveRefsetTableModel {
 
     /**
-	 * 
+	 *
 	 */
-	private static final long serialVersionUID = 1L;
-	
-	private HashMap<Integer, Boolean> selectedTuplesMap = new HashMap<Integer, Boolean>();
+    private static final long serialVersionUID = 1L;
+
+    private HashMap<Integer, Boolean> selectedTuplesMap = new HashMap<Integer, Boolean>();
 
     public SelectableReflexiveTableModel(I_HostConceptPlugins host, ReflexiveRefsetFieldData[] columns) {
         super(host, columns);
@@ -31,6 +31,7 @@ public class SelectableReflexiveTableModel extends ReflexiveRefsetTableModel {
         }
 
         return super.getValueAt(rowIndex, columnIndex);
+
     }
 
     public Set<Integer> getSelectedTuples() {
@@ -45,12 +46,14 @@ public class SelectableReflexiveTableModel extends ReflexiveRefsetTableModel {
     }
 
     public void setValueAt(Object value, int row, int col) {
+
         if (col == getColumnCount() - 1) {
             int tupleId = allTuples.get(row).getMemberId();
             selectedTuplesMap.put(tupleId, (Boolean) value);
         } else {
             super.setValueAt(value, row, col);
         }
+
     }
 
     public int getColumnCount() {

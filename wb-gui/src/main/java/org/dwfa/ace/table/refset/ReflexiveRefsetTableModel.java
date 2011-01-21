@@ -49,6 +49,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 
 public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
+    I_ChangeTableInSwing tableChangedSwingWorker;
 
     /**
      *
@@ -95,6 +96,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
 
         @Override
         protected Boolean construct() throws Exception {
+
             if (refConWorker != null) {
                 refConWorker.stop();
             }
@@ -249,21 +251,25 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                     if (stopWork) {
                         return false;
                     }
+
                     if (allTuples == null) {
                         AceLog.getAppLog().info("all tuples for RefsetMemberTableModel is  null");
                         return false;
                     }
+
                     if (addPart) {
                         allTuples.add(ebrTuple);
                     } else {
                         allTuples.remove(ebrTuple);
                     }
+
                 }
             }
 
             refConWorker = new ReferencedConceptsSwingWorker();
             refConWorker.start();
             return true;
+
         }
 
         @Override
@@ -328,6 +334,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
         if (tableChangeWorker != null) {
             tableChangeWorker.setStopWork(true);
         }
+
         allTuples = null;
         values = null;
         allExtensions = null;
@@ -341,6 +348,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
             this.tableComponentId = host.getTermComponent().getNid();
         }
         fireTableDataChanged();
+
     }
 
     public I_GetConceptData getPromotionRefsetIdentityConcept() {
@@ -358,10 +366,25 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
 
     @Override
     protected I_ChangeTableInSwing getTableChangedSwingWorker(int tableComponentId2, Integer promotionFilterId) {
-        return new TableChangedSwingWorker(tableComponentId2, promotionFilterId);
+
+        if (tableChangedSwingWorker == null) {
+            tableChangedSwingWorker = new TableChangedSwingWorker(tableComponentId2, promotionFilterId);
+        } else {
+            while (!tableChangedSwingWorker.isDone()) {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            tableChangedSwingWorker = new TableChangedSwingWorker(tableComponentId2, promotionFilterId);
+        }
+        return tableChangedSwingWorker;
     }
 
     public Set<Integer> getSelectedTuples() {
+
         Set<Integer> memberNids = new HashSet<Integer>(checkedRows.cardinality());
         for (int i = checkedRows.nextSetBit(0); i >= 0; i = checkedRows.nextSetBit(i + 1)) {
             if (i < allTuples.size()) {
@@ -383,6 +406,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
             }
         }
         return memberNids;
+
     }
 
     public void clearSelectedTuples() {
