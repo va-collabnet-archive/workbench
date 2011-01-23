@@ -309,6 +309,20 @@ public class ChangeReport extends DiffBase {
 				+ "\n";
 	}
 
+	@Override
+	protected void deletedRelationship(I_GetConceptData c, I_RelTuple d)
+			throws Exception {
+		super.deletedRelationship(c, d);
+		startChange(c);
+		changes += "<tr><td>" + "Deleted relationship" + "</td><td>"
+				+ getConceptName(d.getTypeNid()) + "<br>"
+				+ getConceptPreferredDescription(d.getDestinationNid())
+				+ "</td><td>" + "" + "</td></tr>";
+		changes_xml += startElement("deleted_relationship")
+				+ relationshipElement(d) + endElement("deleted_relationship")
+				+ "\n";
+	}
+
 	protected void listChangedRelationship(I_GetConceptData c, I_RelTuple d1,
 			I_RelTuple d2) throws Exception {
 		startChange(c);
@@ -589,11 +603,11 @@ public class ChangeReport extends DiffBase {
 			return all_concepts;
 		} else {
 			all_concepts = super.getAllConcepts();
-			for (int id : test_concepts) {
-				UUID uuid = Type3UuidFactory.fromSNOMED(id);
-				I_GetConceptData c = tf.getConcept(uuid);
-				all_concepts.add(0, c.getConceptNid());
-			}
+			// for (int id : test_concepts) {
+			// UUID uuid = Type3UuidFactory.fromSNOMED(id);
+			// I_GetConceptData c = tf.getConcept(uuid);
+			// all_concepts.add(0, c.getConceptNid());
+			// }
 		}
 		return all_concepts;
 	}
@@ -636,7 +650,7 @@ public class ChangeReport extends DiffBase {
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
-			test_p = false;
+			// test_p = false;
 			test_descendants_p = false;
 			//
 			super.execute();
@@ -653,6 +667,14 @@ public class ChangeReport extends DiffBase {
 			int i = 0;
 			for (int id : all_concepts) {
 				I_GetConceptData c = tf.getConcept(id);
+				// if (!c.getUUIDs()
+				// .contains(
+				// UUID.fromString("39f56845-f221-3ca7-9d21-8ed6d4e5e7de")))
+				// continue;
+				// if (!c.getUUIDs()
+				// .contains(
+				// UUID.fromString("e5be1abb-8e77-31c1-b8ff-8a11621d1762")))
+				// continue;
 				changes = "";
 				changes_xml = "";
 				if (debug_p)

@@ -929,7 +929,7 @@ public class DiffBase extends AbstractMojo {
 		for (int id : Arrays.asList(pref_type.getSetValues()[0],
 				fsn_type.getSetValues()[0])) {
 			for (I_DescriptionTuple d : ds) {
-				if (d.getTypeNid() == id)
+				if (d.getTypeNid() == id && d.getLang().equals("en"))
 					return d.getText();
 			}
 		}
@@ -1083,7 +1083,7 @@ public class DiffBase extends AbstractMojo {
 			System.out.println("P2: " + allowed_position2);
 			System.out.println("A1: " + a1);
 			System.out.println("A2: " + a2);
-                        I_ConceptAttributeVersioned<?> attr = c.getConceptAttributes();
+			I_ConceptAttributeVersioned<?> attr = c.getConceptAttributes();
 			for (I_ConceptAttributePart a : attr.getMutableParts()) {
 				System.out.println("A:  " + a);
 			}
@@ -1290,6 +1290,31 @@ public class DiffBase extends AbstractMojo {
 			if (!found && this.added_relationships)
 				addedRelationship(c, d2);
 		}
+		//
+		for (I_RelTuple d1 : d1s) {
+			// relationships++;
+			if (!testRelationshipFilter(d1, v1_relationship_status_filter_int,
+					v1_relationship_type_filter_int,
+					v1_relationship_characteristic_filter_int,
+					v1_relationship_refinability_filter_int))
+				continue;
+			boolean found = false;
+			for (I_RelTuple d2 : d2s) {
+				if (d2.getRelId() == d1.getRelId()) {
+					found = true;
+					if (!testRelationshipFilter(d2,
+							v2_relationship_status_filter_int,
+							v2_relationship_type_filter_int,
+							v2_relationship_characteristic_filter_int,
+							v2_relationship_refinability_filter_int))
+						continue;
+					// relationships_filtered++;
+					break;
+				}
+			}
+			if (!found && this.deleted_relationships)
+				deletedRelationship(c, d1);
+		}
 	}
 
 	protected void addedConcept(I_GetConceptData c) throws Exception {
@@ -1353,6 +1378,11 @@ public class DiffBase extends AbstractMojo {
 	protected void addedRelationship(I_GetConceptData c, I_RelTuple d)
 			throws Exception {
 		incr(this.added_relationship_change);
+	}
+
+	protected void deletedRelationship(I_GetConceptData c, I_RelTuple d)
+			throws Exception {
+		incr(this.deleted_relationship_change);
 	}
 
 	protected void changedRelationshipStatus(I_GetConceptData c, I_RelTuple d1,
