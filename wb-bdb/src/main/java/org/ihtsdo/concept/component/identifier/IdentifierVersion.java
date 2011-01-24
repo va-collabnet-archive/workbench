@@ -21,7 +21,8 @@ import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_HandleFutureStatusAtPositionSetup {
+public abstract class IdentifierVersion implements I_IdPart, I_IdVersion,
+        I_HandleFutureStatusAtPositionSetup {
 
     private static StatusAtPositionBdb sapBdb = Bdb.getSapDb();
 
@@ -47,7 +48,7 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
     protected IdentifierVersion(TkIdentifier idv) {
         super();
         this.statusAtPositionNid =
-                sapBdb.getSapNid(Bdb.uuidToNid(idv.getStatusUuid()), 
+                sapBdb.getSapNid(Bdb.uuidToNid(idv.getStatusUuid()),
                 		Bdb.uuidToNid(idv.getAuthorUuid()),
                 		Bdb.uuidToNid(idv.getPathUuid()), idv.getTime());
         this.authorityNid = Bdb.uuidToNid(idv.getAuthorityUuid());
@@ -61,6 +62,7 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
      * (non-Javadoc)
      * @see org.ihtsdo.db.bdb.concept.component.I_HandleDeferredStatusAtPositionSetup#isSetup()
      */
+   @Override
     public boolean isSetup() {
         return statusAtPositionNid != Integer.MAX_VALUE;
     }
@@ -69,6 +71,7 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
      * (non-Javadoc)
      * @see org.ihtsdo.db.bdb.concept.component.I_HandleDeferredStatusAtPositionSetup#setStatusAtPositionNid(int)
      */
+   @Override
     public void setStatusAtPositionNid(int sapNid) {
         this.statusAtPositionNid = sapNid;
     }
@@ -127,11 +130,12 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
     public int getStatusNid() {
         return sapBdb.getStatusNid(statusAtPositionNid);
     }
-    
+
     public int getAuthorId() {
     	return sapBdb.getAuthorNid(statusAtPositionNid);
     }
 
+   @Override
     public int getAuthorNid() {
     	return sapBdb.getAuthorNid(statusAtPositionNid);
     }
@@ -155,11 +159,20 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
     public void setStatusId(int statusId) {
         throw new UnsupportedOperationException();
     }
-    
+
 
     @Override
     public void setVersion(int version) {
         throw new UnsupportedOperationException();
+    }
+
+
+    public void setTime(long time) {
+       if (getTime() != Long.MAX_VALUE) {
+          throw new UnsupportedOperationException("Time alreay committed.");
+       }
+       this.statusAtPositionNid =
+               sapBdb.getSapNid(getStatusId(), getAuthorId(), getPathId(), time);
     }
 
      @Override
@@ -188,10 +201,11 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
      * (non-Javadoc)
      * @see java.lang.Object#toString()
      */
+   @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
 
-        buf.append("sap:" + statusAtPositionNid);
+        buf.append("sap:").append(statusAtPositionNid);
         buf.append(" authority:");
         ConceptComponent.addNidToBuffer(buf, authorityNid);
         buf.append(" path:");

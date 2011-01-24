@@ -1,60 +1,155 @@
 package org.ihtsdo.arena.conceptview;
 
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
 import java.awt.datatransfer.DataFlavor;
+import java.io.IOException;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
 
 import javax.swing.TransferHandler;
+import org.dwfa.ace.TermComponentLabel;
+import org.ihtsdo.tk.Ts;
 
 import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
+import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 
-public class DragPanelExtension extends ComponentVersionDragPanel<ComponentVersionBI> {
+public class DragPanelExtension
+        extends ComponentVersionDragPanel<RefexVersionBI<?>> {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+   /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
 
-	
-	public DragPanelExtension(ConceptViewSettings settings,
-           CollapsePanel parentCollapsePanel) {
-		super(settings, parentCollapsePanel);
-	}
+   public DragPanelExtension(ConceptViewSettings settings,
+           CollapsePanel parentCollapsePanel, RefexVersionBI<?> refex)
+           throws IOException {
+      super(settings, parentCollapsePanel, refex);
+      layoutExtension();
+   }
 
-	public DragPanelExtension(LayoutManager layout, ConceptViewSettings settings,
-           CollapsePanel parentCollapsePanel) {
-		super(layout, settings, parentCollapsePanel);
-	}
+   public DragPanelExtension(LayoutManager layout, ConceptViewSettings settings,
+           CollapsePanel parentCollapsePanel, RefexVersionBI<?> refex)
+           throws IOException {
+      super(layout, settings, parentCollapsePanel, refex);
+      layoutExtension();
+   }
 
-	@Override
-	public DataFlavor[] getTransferDataFlavors() {
-		return new DataFlavor[] { DragPanelDataFlavors.conceptFlavor };
-	}
-	
-	@Override
-	public DataFlavor getNativeDataFlavor() {
-		return DragPanelDataFlavors.conceptFlavor ;
-	}
+   @Override
+   public DataFlavor[] getTransferDataFlavors() {
+      return new DataFlavor[]{DragPanelDataFlavors.conceptFlavor};
+   }
 
-	@Override
-	public boolean isDataFlavorSupported(DataFlavor flavor) {
-		return false;
-	}
+   @Override
+   public DataFlavor getNativeDataFlavor() {
+      return DragPanelDataFlavors.conceptFlavor;
+   }
 
-	@Override
-	protected int getTransferMode() {
-		return TransferHandler.COPY;
-	}
-	
-	public ComponentVersionBI getThingToDrag() {
-		return thingToDrag;
-	}
-	
-	public ComponentVersionBI getDraggedThing() {
-		return thingToDrag;
-	}
+   @Override
+   public boolean isDataFlavorSupported(DataFlavor flavor) {
+      return false;
+   }
 
-	public void setDraggedThing(ComponentVersionBI component) {
-		// handle drop...;
-	}
+   @Override
+   protected int getTransferMode() {
+      return TransferHandler.COPY;
+   }
 
+   @Override
+   public RefexVersionBI<?> getThingToDrag() {
+      return thingToDrag;
+   }
+
+   public RefexVersionBI<?> getRefexV() {
+      return thingToDrag;
+   }
+
+   public ComponentVersionBI getDraggedThing() {
+      return thingToDrag;
+   }
+
+   public void setDraggedThing(ComponentVersionBI component) {
+      // handle drop...;
+   }
+
+   public void layoutExtension() throws IOException {
+      setLayout(new GridBagLayout());
+      boolean canDrop = false;
+      TerminologyStoreDI ts = Ts.get();
+
+      setBorder(BorderFactory.createRaisedBevelBorder());
+      JLabel extensionLabel = getJLabel(" ");
+      extensionLabel.setBackground(Color.RED);
+      extensionLabel.setOpaque(true);
+      setDropPopupInset(extensionLabel.getPreferredSize().width);
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.anchor = GridBagConstraints.NORTHWEST;
+      gbc.weightx = 0;
+      gbc.weighty = 0;
+      gbc.fill = GridBagConstraints.BOTH;
+      gbc.gridheight = 1;
+      gbc.gridwidth = 1;
+      gbc.gridx = 0;
+      gbc.gridy = 0;
+      add(extensionLabel, gbc);
+      gbc.anchor = GridBagConstraints.NORTHWEST;
+      gbc.gridx++;
+      TermComponentLabel typeLabel = getLabel(getRefexV().getCollectionNid(), canDrop);
+      add(typeLabel, gbc);
+      gbc.gridx++;
+      add(new JSeparator(SwingConstants.VERTICAL), gbc);
+      gbc.weightx = 1;
+      gbc.gridx++;
+
+      if (RefexCnidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
+         int cnid = ((RefexCnidVersionBI) getRefexV()).getCnid1();
+         TermComponentLabel ext = getLabel(cnid, canDrop);
+         add(ext, gbc);
+         gbc.gridx++;
+      }
+      if (RefexCnidCnidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
+         int cnid = ((RefexCnidCnidVersionBI) getRefexV()).getCnid1();
+         TermComponentLabel ext = getLabel(cnid, canDrop);
+         add(ext, gbc);
+         gbc.gridx++;
+      }
+      if (RefexCnidCnidCnidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
+         int cnid = ((RefexCnidCnidCnidVersionBI) getRefexV()).getCnid1();
+         TermComponentLabel ext = getLabel(cnid, canDrop);
+         add(ext, gbc);
+         gbc.gridx++;
+      }
+
+      if (RefexStrVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
+         String text = ((RefexStrVersionBI) getRefexV()).getStr1();
+         FixedWidthJEditorPane textPane = new FixedWidthJEditorPane();
+         textPane.setEditable(canDrop);
+         textPane.setOpaque(false);
+         textPane.setFont(textPane.getFont().deriveFont(getSettings().getFontSize()));
+         textPane.setText(getRefexV().toUserString());
+         add(textPane, gbc);
+         gbc.gridx++;
+      }
+
+      if (RefexIntVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
+         int value = ((RefexIntVersionBI) getRefexV()).getInt1();
+         JLabel valueLabel = new JLabel(Integer.toString(value));
+         valueLabel.setOpaque(false);
+         valueLabel.setFont(valueLabel.getFont().deriveFont(getSettings().getFontSize()));
+         valueLabel.setText(getRefexV().toUserString());
+         add(valueLabel, gbc);
+         gbc.gridx++;
+      }
+   }
 }

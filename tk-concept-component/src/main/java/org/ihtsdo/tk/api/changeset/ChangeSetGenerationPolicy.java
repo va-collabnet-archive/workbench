@@ -2,19 +2,19 @@ package org.ihtsdo.tk.api.changeset;
 
 public enum ChangeSetGenerationPolicy {
     /**
-     * Don't generate change sets. 
+     * Don't generate change sets.
      */
-    OFF("no changeset"), 
+    OFF("no changeset"),
     /**
-     * Only include changes that represent the sapNids from the current commit. 
+     * Only include changes that represent the sapNids from the current commit.
      */
     INCREMENTAL("incremental changeset"),
     /**
-     * Only include sapNids that are written to the mutable database. 
+     * Only include sapNids that are written to the mutable database.
      */
     MUTABLE_ONLY("mutable-only changeset"),
     /**
-     * Include all changes. 
+     * Include all changes.
      */
     COMPREHENSIVE("comprehensive changeset");
 
@@ -29,4 +29,5 @@ public enum ChangeSetGenerationPolicy {
         return displayString;
     }
 
+    
 }

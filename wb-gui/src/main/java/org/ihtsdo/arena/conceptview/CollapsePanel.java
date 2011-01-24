@@ -34,15 +34,15 @@ public class CollapsePanel extends JPanel {
     */
    private static final long serialVersionUID = 1L;
    boolean collapsed = false;
-   boolean refex = false;
-   boolean templates = false;
-   boolean alerts = false;
-   boolean showExtras = false;
+   boolean refex = true;
+   boolean templates = true;
+   boolean alerts = true;
+   boolean showExtras = true;
    int refexCount = 1;
    int templateCount = 1;
    int alertCount = 1;
    EnumSet<ComponentVersionDragPanel.SubPanelTypes> subpanelsToShow = 
-           EnumSet.noneOf(ComponentVersionDragPanel.SubPanelTypes.class);
+           EnumSet.allOf(ComponentVersionDragPanel.SubPanelTypes.class);
    Set<I_ToggleSubPanels> components = new HashSet<I_ToggleSubPanels>();
    private JButton alertsButton;
    private JButton extrasButton;
@@ -127,10 +127,14 @@ public class CollapsePanel extends JPanel {
                jc.setVisible(showExtras);
             }
             for (I_ToggleSubPanels cvdp : components) {
-               cvdp.showSubPanels(subpanelsToShow);
-            }
-            ((JButton) e.getSource()).setIcon((showExtras ? hideExtrasIcon
-                    : showExtrasIcon));
+               if (showExtras) {
+                  cvdp.showSubPanels(subpanelsToShow);
+               } else {
+                  cvdp.hideSubPanels(subpanelsToShow);
+               }
+             }
+            ((JButton) e.getSource()).setIcon((showExtras ? showExtrasIcon
+                    : hideExtrasIcon));
          }
       });
       extrasButton.setPreferredSize(new Dimension(21, 16));
@@ -158,15 +162,9 @@ public class CollapsePanel extends JPanel {
          @Override
          public void actionPerformed(ActionEvent e) {
             refex = !refex;
-            showSubpanels(refex, ComponentVersionDragPanel.SubPanelTypes.REFEX);
-            for (JComponent jc: refexPanels) {
-               jc.setVisible(refex);
-            }
-            for (I_ToggleSubPanels jc : components) {
-               //jc.setVisible(!collapsed);
-            }
-            ((JButton) e.getSource()).setIcon((refex ? hideRefexes
-                    : showRefexes));
+            updateShowSubpanelSet(refex, ComponentVersionDragPanel.SubPanelTypes.REFEX);
+            ((JButton) e.getSource()).setIcon((refex ? showRefexes
+                    : hideRefexes));
          }
       });
       refexButton.setPreferredSize(new Dimension(21, 16));
@@ -184,15 +182,12 @@ public class CollapsePanel extends JPanel {
       return refexButton;
    }
 
-   private void showSubpanels(boolean show,
+   private void updateShowSubpanelSet(boolean show,
            ComponentVersionDragPanel.SubPanelTypes subpanel) {
       if (show) {
          subpanelsToShow.add(subpanel);
       } else {
          subpanelsToShow.remove(subpanel);
-      }
-      for (I_ToggleSubPanels cvdp : components) {
-         cvdp.showSubPanels(subpanelsToShow);
       }
    }
 
@@ -213,12 +208,9 @@ public class CollapsePanel extends JPanel {
          @Override
          public void actionPerformed(ActionEvent e) {
             templates = !templates;
-            for (JComponent jc: templatePanels) {
-               jc.setVisible(templates);
-            }
-              showSubpanels(templates, ComponentVersionDragPanel.SubPanelTypes.TEMPLATE);
-            ((JButton) e.getSource()).setIcon(templates ? hideTemplates
-                    : showTemplates);
+            updateShowSubpanelSet(templates, ComponentVersionDragPanel.SubPanelTypes.TEMPLATE);
+            ((JButton) e.getSource()).setIcon(templates ? showTemplates
+                    : hideTemplates);
          }
       });
       templatessButton.setPreferredSize(new Dimension(21, 16));
@@ -253,12 +245,9 @@ public class CollapsePanel extends JPanel {
          @Override
          public void actionPerformed(ActionEvent e) {
             alerts = !alerts;
-            for (JComponent jc: alertPanels) {
-               jc.setVisible(alerts);
-            }
-             showSubpanels(alerts, ComponentVersionDragPanel.SubPanelTypes.ALERT);
-            ((JButton) e.getSource()).setIcon(alerts ? hideAlerts
-                    : showAlerts);
+            updateShowSubpanelSet(alerts, ComponentVersionDragPanel.SubPanelTypes.ALERT);
+            ((JButton) e.getSource()).setIcon(alerts ? showAlerts
+                    : hideAlerts);
          }
       });
       alertsButton.setPreferredSize(new Dimension(21, 16));

@@ -53,14 +53,14 @@ public interface I_ManageConceptData {
     public Collection<Image> getImagesIfChanged() throws IOException;
 
     /**
-     * Destination rels are stored as a relid and a type id in 
+     * Destination rels are stored as a relid and a type id in
      * an array.
-     * 
+     *
      * @return
      * @throws IOException
      */
     public List<Relationship> getDestRels() throws IOException;
-    
+
     public List<Relationship> getDestRels(NidSetBI allowedTypes) throws IOException;
 
     public void set(ConceptAttributes attr) throws IOException;
@@ -120,4 +120,18 @@ public interface I_ManageConceptData {
     public boolean isAnnotationStyleRefset() throws IOException;
 
     public void setAnnotationStyleRefset(boolean annotationStyleRefset);
+
+    /*
+     * For single-concept commit.
+     * @param time
+     */
+
+    /**
+     *
+     * @param time
+     * @return sapNids from
+     */
+   public NidSetBI setCommitTime(long time);
+
+   public void cancel() throws IOException;
 }

@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.dwfa.ace.api.cs.ChangeSetPolicy;
+import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
@@ -16,8 +18,8 @@ import org.ihtsdo.concept.component.relationship.group.RelGroupVersion;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidSetBI;
-import org.ihtsdo.tk.api.amend.InvalidAmendmentSpec;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -43,6 +45,18 @@ import org.ihtsdo.tk.spec.ConceptSpec;
 public class ConceptVersion implements ConceptVersionBI {
 
     private Concept concept;
+
+   public void cancel() throws IOException {
+      concept.cancel();
+   }
+
+   public void commit(ChangeSetGenerationPolicy changeSetPolicy, ChangeSetGenerationThreadingPolicy changeSetWriterThreading) throws IOException {
+      concept.commit(changeSetPolicy, changeSetWriterThreading);
+   }
+
+   public void commit(ChangeSetPolicy changeSetPolicy, ChangeSetWriterThreading changeSetWriterThreading) throws IOException {
+      concept.commit(changeSetPolicy, changeSetWriterThreading);
+   }
 
     @Override
     public void setAnnotationStyleRefex(boolean annotationStyleRefset) {
@@ -569,12 +583,12 @@ public class ConceptVersion implements ConceptVersionBI {
 
     //TODO
     @Override
-    public boolean isMember(int collectionNid) throws IOException{ 
+    public boolean isMember(int collectionNid) throws IOException{
     	boolean isMember = false;
     	try{
-    	Collection<? extends RefexChronicleBI<?>> refexes = 
+    	Collection<? extends RefexChronicleBI<?>> refexes =
     		concept.getConceptAttributes().getCurrentRefexes(vc);
- 
+
     	if (refexes != null) {
     	for (RefexChronicleBI<?> refex : refexes) {
     		if (refex.getCollectionNid() == collectionNid) {
@@ -586,7 +600,7 @@ public class ConceptVersion implements ConceptVersionBI {
     	}catch (Exception e) {
     		throw new IOException(e); //AceLog.getAppLog().alertAndLogException(e);
         }
-    	
+
     }
 
 	@Override
@@ -653,5 +667,4 @@ public class ConceptVersion implements ConceptVersionBI {
       return concept.getCurrentRefsetMembers(vc);
    }
  }
-    
-		
+

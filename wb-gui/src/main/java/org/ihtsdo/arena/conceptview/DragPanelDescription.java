@@ -22,30 +22,32 @@ import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
-public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionVersionBI> {
+public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionAnalogBI> {
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
-    DescriptionAnalogBI desc;
 
     public DragPanelDescription(ConceptViewSettings settings,
-            CollapsePanel parentCollapsePanel, DescriptionAnalogBI desc)
+            CollapsePanel parentCollapsePanel, 
+            DescriptionAnalogBI desc)
             throws TerminologyException, IOException {
-        super(settings, parentCollapsePanel);
-        this.desc = desc;
+        super(settings, parentCollapsePanel, desc);
         layoutDescription();
     }
 
     public DragPanelDescription(LayoutManager layout, ConceptViewSettings settings,
-            CollapsePanel parentCollapsePanel, DescriptionAnalogBI desc)
+            CollapsePanel parentCollapsePanel,
+            DescriptionAnalogBI desc)
             throws TerminologyException, IOException {
-        super(layout, settings, parentCollapsePanel);
-        this.desc = desc;
+        super(layout, settings, parentCollapsePanel, desc);
         layoutDescription();
     }
 
+    private DescriptionAnalogBI getDesc() {
+       return getComponentVersion();
+    }
     @Override
     public DataFlavor[] getTransferDataFlavors() {
         return new DataFlavor[]{DragPanelDataFlavors.descVersionFlavor};
@@ -67,7 +69,7 @@ public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionV
     }
 
     @Override
-    public DescriptionVersionBI getThingToDrag() {
+    public DescriptionAnalogBI getThingToDrag() {
         return thingToDrag;
     }
 
@@ -81,12 +83,12 @@ public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionV
 
     private void layoutDescription() throws TerminologyException, IOException {
         boolean canDrop = false;
-        if (desc.getTime() == Long.MAX_VALUE) {
+        if (getDesc().getTime() == Long.MAX_VALUE) {
             setOpaque(true);
             setBackground(Color.YELLOW);
             canDrop = true;
         }
-        setupDrag(desc);
+        setupDrag(getDesc());
         setBorder(BorderFactory.createRaisedBevelBorder());
 
         JLabel descLabel = getJLabel(" ");
@@ -107,11 +109,11 @@ public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionV
         add(descLabel, gbc);
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.gridx++;
-        TermComponentLabel typeLabel = getLabel(desc.getTypeNid(), canDrop);
+        TermComponentLabel typeLabel = getLabel(getDesc().getTypeNid(), canDrop);
         add(typeLabel, gbc);
-        if (desc.isUncommitted()) {
+        if (getDesc().isUncommitted()) {
             typeLabel.addPropertyChangeListener("termComponent",
-                    new PropertyChangeManager<DescriptionAnalogBI>(desc) {
+                    new PropertyChangeManager<DescriptionAnalogBI>(getDesc()) {
 
                         @Override
                         protected void changeProperty(I_GetConceptData newValue) {
@@ -138,11 +140,11 @@ public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionV
         textPane.setEditable(canDrop);
         textPane.setOpaque(false);
         textPane.setFont(textPane.getFont().deriveFont(getSettings().getFontSize()));
-        textPane.setText(desc.getText());
+        textPane.setText(getDesc().getText());
         add(textPane, gbc);
         gbc.weightx = 0;
         gbc.gridx++;
-        String lang = desc.getLang();
+        String lang = getDesc().getLang();
         if (lang != null && lang.length() > 2) {
             lang = lang.substring(0, 2);
         }
@@ -151,7 +153,7 @@ public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionV
         add(langLabel, gbc);
         gbc.gridx++;
         String caseStr = "ci";
-        if (desc.isInitialCaseSignificant()) {
+        if (getDesc().isInitialCaseSignificant()) {
             caseStr = "Cs";
         }
         JLabel caseLabel = getJLabel(caseStr);
@@ -163,9 +165,13 @@ public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionV
         JButton collapseExpandButton = getCollapseExpandButton();
         add(collapseExpandButton, gbc);
 
-        if (desc.isUncommitted()) {
+        if (getDesc().isUncommitted()) {
             textPane.getDocument().addDocumentListener(
-                    new UpdateTextDocumentListener(textPane, desc));
+                    new UpdateTextDocumentListener(textPane, getDesc()));
         }
-    }
+        
+        addSubPanels(gbc);
+     }
+    
+    
 }

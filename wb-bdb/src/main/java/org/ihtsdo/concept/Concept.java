@@ -12,7 +12,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.ExecutionException;
 
 import jsr166y.ConcurrentReferenceHashMap;
 
@@ -38,6 +37,8 @@ import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.api.cs.ChangeSetPolicy;
+import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.log.AceLog;
@@ -76,8 +77,8 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
-import org.ihtsdo.tk.api.amend.InvalidAmendmentSpec;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -443,15 +444,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     @Override
     public void commit(int version, Set<TimePathId> values) throws IOException {
-        try {
-            if (ReadWriteDataVersion.get(nid) == data.getReadWriteDataVersion()) {
-            } else {
-            }
-        } catch (InterruptedException e) {
-            throw new IOException(e);
-        } catch (ExecutionException e) {
-            throw new IOException(e);
-        }
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -709,7 +702,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-        return getDescriptionTuples(config.getAllowedStatus(), 
+        return getDescriptionTuples(config.getAllowedStatus(),
                 config.getDescTypes(),
                 config.getViewPositionSetReadOnly(),
                 config.getPrecedence(),
@@ -1040,8 +1033,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             ContradictionManagerBI contradictionManager,
             int classifierNid, RelAssertionType relAssertionType)
             throws IOException, TerminologyException {
-    	
-        ViewCoordinate coordinate = new ViewCoordinate(precedencePolicy, 
+
+        ViewCoordinate coordinate = new ViewCoordinate(precedencePolicy,
         		positions, allowedStatus, allowedTypes, contradictionManager, Integer.MIN_VALUE, classifierNid, relAssertionType);
         List<Relationship.Version> actualValues = new ArrayList<Relationship.Version>();
         for (Relationship rel : getSourceRels()) {
@@ -1050,7 +1043,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                     actualValues.add(rv);
                 }
             }
-        }        
+        }
         return actualValues;
     }
 
@@ -1148,7 +1141,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     /**
      * Returns a longer - more complete - string representation of the object.
-     * 
+     *
      * @return
      */
     @Override
@@ -1231,6 +1224,10 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     @Override
     public boolean isUncommitted() {
         return data.isUncommitted();
+    }
+
+    public NidSetBI setCommitTime(long time) {
+       return data.setCommitTime(time);
     }
 
     public boolean isUnwritten() {
@@ -1394,8 +1391,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             ContradictionManagerBI contradictionManager,
             int classifierNid, RelAssertionType relAssertionType)
             throws IOException {
-    	
-        ViewCoordinate coordinate = new ViewCoordinate(precedencePolicy, 
+
+        ViewCoordinate coordinate = new ViewCoordinate(precedencePolicy,
         		positions, allowedStatus, allowedTypes, contradictionManager, Integer.MIN_VALUE, classifierNid, relAssertionType);
         List<Relationship.Version> actualValues = new ArrayList<Relationship.Version>();
         for (Relationship rel : getDestRels(coordinate.getIsaTypeNids())) {
@@ -1404,7 +1401,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                         actualValues.addAll(rel.getVersions(coordinate));
                     }
                 }
-        }        
+        }
         return actualValues;
     }
 
@@ -1574,10 +1571,10 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 			ViewCoordinate xyz) throws IOException {
 		return getConceptAttributes().getCurrentRefexes(xyz);
 	}
-   
-   
+
+
    @Override
-   public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc) 
+   public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc)
            throws IOException {
 		Collection<? extends RefexChronicleBI<?>> refexes = getRefsetMembers();
         List<RefexVersionBI<?>> returnValues = new ArrayList<RefexVersionBI<?>>(refexes.size());
@@ -1621,5 +1618,21 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     public Collection<? extends ConceptVersionBI> getVersions() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
+
+     public void commit(ChangeSetPolicy changeSetPolicy,
+            ChangeSetWriterThreading changeSetWriterThreading) throws IOException {
+       BdbCommitManager.commit(this, changeSetPolicy, changeSetWriterThreading);
+    }
+    @Override
+    public void commit(ChangeSetGenerationPolicy changeSetPolicy,
+            ChangeSetGenerationThreadingPolicy changeSetWriterThreading) throws IOException {
+       BdbCommitManager.commit(this, ChangeSetPolicy.get(changeSetPolicy),
+               ChangeSetWriterThreading.get(changeSetWriterThreading));
+    }
+
+   @Override
+   public void cancel() throws IOException {
+      data.cancel();
+      BdbCommitManager.fireCancel();
+   }
 }

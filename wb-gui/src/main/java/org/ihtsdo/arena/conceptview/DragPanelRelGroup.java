@@ -17,13 +17,13 @@ public class DragPanelRelGroup extends ComponentVersionDragPanel<RelGroupVersion
 
 	
 	public DragPanelRelGroup(ConceptViewSettings settings,
-           CollapsePanel parentCollapsePanel) {
-		super(settings, parentCollapsePanel);
+           CollapsePanel parentCollapsePanel, RelGroupVersionBI rgv) {
+		super(settings, parentCollapsePanel, rgv);
 	}
 
 	public DragPanelRelGroup(LayoutManager layout, ConceptViewSettings settings,
-           CollapsePanel parentCollapsePanel) {
-		super(layout, settings, parentCollapsePanel);
+           CollapsePanel parentCollapsePanel, RelGroupVersionBI rgv) {
+		super(layout, settings, parentCollapsePanel, rgv);
 	}
 
 	@Override

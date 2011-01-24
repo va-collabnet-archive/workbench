@@ -75,7 +75,7 @@ import com.mxgraph.view.mxGraph;
 
 /**
  * @author Administrator
- * 
+ *
  */
 public class ConceptViewRenderer extends JLayeredPane {
 
@@ -107,31 +107,31 @@ public class ConceptViewRenderer extends JLayeredPane {
         }
     }
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 2106746763664760745L;
     /**
-     * 
+     *
      */
     protected static ConceptViewRenderer dragSource = null;
     /**
-     * 
+     *
      */
     protected static int sourceRow = 0;
     /**
-     * 
+     *
      */
     protected mxCell cell;
     /**
-     * 
+     *
      */
     protected mxGraphComponent graphContainer;
     /**
-     * 
+     *
      */
     protected mxGraph graph;
     /**
-     * 
+     *
      */
     public JComponent renderedComponent;
     private ConceptViewSettings settings;
@@ -148,7 +148,7 @@ public class ConceptViewRenderer extends JLayeredPane {
     private static String workflowActionPathPostfix = "WFAction.bp";
 
     /**
-     * 
+     *
      */
     public ConceptViewRenderer(Object cellObj,
             final mxGraphComponent graphContainer, ACE ace) {
@@ -363,7 +363,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                     workflowPanel.setVisible(true);
                     scrollPane.setVisible(false);
                     GuiUtil.tickle(ConceptViewRenderer.this);
-//// 
+////
 
 
                     final JCheckBox override = new JCheckBox();
@@ -425,14 +425,14 @@ public class ConceptViewRenderer extends JLayeredPane {
         gbc.gridx++;
         JButton cancelButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/delete.png")));
         cancelButton.setToolTipText("cancel changes to concept");
-        cancelButton.addActionListener(new CancelActionListener());
+        cancelButton.addActionListener(new CancelActionListener(settings));
         cancelButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
         footerPanel.add(cancelButton, gbc);
 
         gbc.gridx++;
         JButton commitButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/check.png")));
         commitButton.setToolTipText("commit changes to concept");
-        commitButton.addActionListener(new CommitActionListener());
+        commitButton.addActionListener(new CommitActionListener(settings));
         commitButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
         footerPanel.add(commitButton, gbc);
 
@@ -493,7 +493,7 @@ public class ConceptViewRenderer extends JLayeredPane {
     }
 
     /**
-     * 
+     *
      */
     public static ConceptViewRenderer getVertex(Component component) {
         while (component != null) {

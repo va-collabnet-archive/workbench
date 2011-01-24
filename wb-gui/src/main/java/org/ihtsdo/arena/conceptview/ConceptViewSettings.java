@@ -40,17 +40,17 @@ import org.ihtsdo.arena.PreferencesNode;
 public class ConceptViewSettings extends ArenaComponentSettings {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
 	private static final int dataVersion = 1;
-	
+
 	public enum SIDE {RIGHT, LEFT};
 
 	// dataVersion = 1;
 	private Integer linkedTab = null;
-	
+
 	// transient
 	private ConceptView view;
 	private ConceptNavigator navigator;
@@ -77,12 +77,12 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 	public ConceptViewSettings() {
 		super();
 		this.linkedTab = 0;
-	}	
+	}
 	public ConceptViewSettings(Integer linkedTab) {
 		super();
 		this.linkedTab = linkedTab;
-	}	
-	
+	}
+
 	private class ConceptChangedListener implements PropertyChangeListener {
 
 		@Override
@@ -90,9 +90,9 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 			if (view != null) {
 				view.layoutConcept((I_GetConceptData) getHost().getTermComponent());
 			}
-			
+
 		}
-		
+
 	}
 	public ConceptView getView() {
 		return view;
@@ -128,6 +128,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 		return null;
 	}
 
+   @Override
 	public JComponent getLinkComponent() {
 		if (linkedTab != null) {
 			JButton goToLinkButton = new JButton(new AbstractAction(" "
@@ -155,24 +156,25 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 		buttons.add(navButton);
 		return buttons;
 	}
-	
+
 	public void hideNavigator() {
 		if (navButton.isSelected()) {
 			navButton.doClick();
 		}
 	}
-	
+
 	protected JToggleButton getNavigatorButton() {
 		JToggleButton button = new JToggleButton(new AbstractAction("", new ImageIcon(
                 ConceptViewRenderer.class.getResource("/16x16/plain/compass.png")))
         {
 
         	/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 1L;
 			boolean showNavigator = false;
-        	
+
+         @Override
             public void actionPerformed(ActionEvent e) {
             	showNavigator = !showNavigator;
            		JLayeredPane layers = renderer.getRootPane().getLayeredPane();
@@ -235,7 +237,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 				AceLog.getAppLog().alertAndLogException(e);
 			}
 		}
-		
+
 		if (getHost() != null) {
 			if (getHost().getTermComponent() != null) {
 		        try {
@@ -267,7 +269,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 		PreferencesNode templateNode = new PreferencesNode("templates", new JCheckBox("show templates: "));
 		componentNode.add(templateNode);
 		templateNode.add(new PreferencesNode("drools template", new JCheckBox("drools templates: ")));
-		
+
 		PreferencesNode filterNode = new PreferencesNode("filters", new JCheckBox("show filters: "));
 		filterNode.add(new PreferencesNode("drools filter", new JCheckBox("drools filters: ")));
 		componentNode.add(filterNode);

@@ -17,13 +17,14 @@ public class DragPanelDescTemplate extends DragPanel<DescriptionSpec> implements
 	private static final long serialVersionUID = 1L;
 
 	
-	public DragPanelDescTemplate(ConceptViewSettings settings) {
-		super(settings);
+	public DragPanelDescTemplate(ConceptViewSettings settings, 
+           DescriptionSpec ds) {
+		super(settings, ds);
 	}
 
 	public DragPanelDescTemplate(LayoutManager layout, 
-			ConceptViewSettings settings) {
-		super(layout, settings);
+			ConceptViewSettings settings, DescriptionSpec ds) {
+		super(layout, settings, ds);
 	}
 
 	@Override
@@ -61,6 +62,11 @@ public class DragPanelDescTemplate extends DragPanel<DescriptionSpec> implements
 
     @Override
     public void showSubPanels(EnumSet<SubPanelTypes> panels) {
+        // nothing to do...;
+    }
+	
+    @Override
+    public void hideSubPanels(EnumSet<SubPanelTypes> panels) {
         // nothing to do...;
     }
 	

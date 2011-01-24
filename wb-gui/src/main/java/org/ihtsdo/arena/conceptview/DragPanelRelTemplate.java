@@ -17,13 +17,13 @@ public class DragPanelRelTemplate extends DragPanel<RelSpec> implements I_Toggle
 	private static final long serialVersionUID = 1L;
 
 	
-	public DragPanelRelTemplate(ConceptViewSettings settings) {
-		super(settings);
+	public DragPanelRelTemplate(ConceptViewSettings settings, RelSpec rs) {
+		super(settings, rs);
 	}
 
 	public DragPanelRelTemplate(LayoutManager layout, 
-			ConceptViewSettings settings) {
-		super(layout, settings);
+			ConceptViewSettings settings, RelSpec rs) {
+		super(layout, settings, rs);
 	}
 
 	@Override
@@ -64,4 +64,11 @@ public class DragPanelRelTemplate extends DragPanel<RelSpec> implements I_Toggle
     public void showSubPanels(EnumSet<SubPanelTypes> panels) {
         // nothing to do...;
     }
+    
+    	
+    @Override
+    public void hideSubPanels(EnumSet<SubPanelTypes> panels) {
+        // nothing to do...;
+    }
+
 }

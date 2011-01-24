@@ -16,13 +16,13 @@ public class DragPanelRel extends ComponentVersionDragPanel<RelationshipVersionB
 
 	
 	public DragPanelRel(ConceptViewSettings settings,
-           CollapsePanel parentCollapsePanel) {
-		super(settings, parentCollapsePanel);
+           CollapsePanel parentCollapsePanel, RelationshipVersionBI rel) {
+		super(settings, parentCollapsePanel, rel);
 	}
 
 	public DragPanelRel(LayoutManager layout, ConceptViewSettings settings,
-           CollapsePanel parentCollapsePanel) {
-		super(layout, settings, parentCollapsePanel);
+           CollapsePanel parentCollapsePanel, RelationshipVersionBI rel) {
+		super(layout, settings, parentCollapsePanel, rel);
 	}
 
 	@Override
@@ -45,6 +45,7 @@ public class DragPanelRel extends ComponentVersionDragPanel<RelationshipVersionB
 		return TransferHandler.COPY;
 	}
 
+   @Override
 	public RelationshipVersionBI getThingToDrag() {
 		return thingToDrag;
 	}

@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,6 +57,8 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -69,6 +71,14 @@ import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 
 public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<ConceptBeanForTree> {
     I_GetConceptData bean;
+
+   public void cancel() throws IOException {
+      bean.cancel();
+   }
+
+   public void commit(ChangeSetGenerationPolicy changeSetPolicy, ChangeSetGenerationThreadingPolicy changeSetWriterThreading) throws IOException {
+      bean.commit(changeSetPolicy, changeSetWriterThreading);
+   }
 
    public Collection<? extends RefexChronicleBI<?>> getRefsetMembers() throws IOException {
       return bean.getRefsetMembers();
@@ -143,14 +153,14 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
     }
 
     @Override
-    public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedStatus, 
+    public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedStatus,
             NidSetBI allowedTypes,
             PositionSetBI positions,
             Precedence precedencePolicy,
             ContradictionManagerBI contradictionManager,
             int classifierNid,
             RelAssertionType relAssertionType) throws IOException, TerminologyException {
-        return bean.getDestRelTuples(allowedStatus, 
+        return bean.getDestRelTuples(allowedStatus,
                 allowedTypes,
                 positions,
                 precedencePolicy,
@@ -637,7 +647,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
     public Collection<? extends I_RelVersioned> getSourceRels() throws IOException {
         return bean.getSourceRels();
     }
- 
+
     public List<UUID> getUids() throws IOException {
         return bean.getUids();
     }
@@ -698,7 +708,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.getUniversalAceBean();
     }
 
- 
+
     public int getRelId() {
         return relId;
     }

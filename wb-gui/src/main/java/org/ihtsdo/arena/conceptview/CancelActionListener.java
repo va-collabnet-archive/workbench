@@ -7,10 +7,15 @@ import java.io.IOException;
 
 import javax.swing.JOptionPane;
 
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 
 public class CancelActionListener implements ActionListener {
+
+   ConceptViewSettings settings;
+
+   public CancelActionListener(ConceptViewSettings settings) {
+      this.settings = settings;
+   }
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -23,12 +28,10 @@ public class CancelActionListener implements ActionListener {
 			    JOptionPane.WARNING_MESSAGE);
 		if (n == JOptionPane.YES_OPTION) {
 			try {
-				Terms.get().cancel();
+				settings.getConcept().cancel();
 			} catch (IOException e1) {
 				AceLog.getAppLog().alertAndLogException(e1);
 			}
 		}
-
 	}
-
 }

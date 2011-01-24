@@ -66,8 +66,10 @@ import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
@@ -119,20 +121,21 @@ public class ConceptView extends JPanel {
                   gbc.gridy++;
                   I_TermFactory tf = Terms.get();
 
+                  ConceptVersionBI cv = Ts.get().getConceptVersion(
+                          config.getViewCoordinate(), concept.getNid());
                   //get refsets
-                  List<? extends I_ExtendByRef> memberRefsets = 
-                          tf.getAllExtensionsForComponent(concept.getConceptNid());
+                  Collection<? extends RefexVersionBI<?>> memberRefsets = cv.getCurrentRefsetMembers();
                   
                   if (memberRefsets != null) {
-                     for (I_ExtendByRef extn : memberRefsets) {
-                        int refsetNid = extn.getRefsetId();
+                     for (RefexVersionBI<?> extn : memberRefsets) {
+                        int refsetNid = extn.getCollectionNid();
                         List<? extends I_ExtendByRefPart> currentRefsets = 
                                 tf.getRefsetHelper(config).
                                  getAllCurrentRefsetExtensions(refsetNid, concept.getConceptNid());
                         cpe.setRefexCount(currentRefsets.size());
                         for (I_ExtendByRefPart cr : currentRefsets) {
                            DragPanelExtension ce = 
-                                   getExtensionComponent(refsetNid, cpe);
+                                   new DragPanelExtension(settings, cpe, extn);
                            cpe.addToggleComponent(ce);
                            add(ce, gbc);
                            cpe.getRefexPanels().add(ce);
@@ -144,6 +147,9 @@ public class ConceptView extends JPanel {
                   CollapsePanel cpd = new CollapsePanel("descriptions", settings);
                   add(cpd, gbc);
                   gbc.gridy++;
+                  int alertCount = 0;
+                  int refexCount = 0;
+                  int templateCount = 0;
                   for (I_DescriptionTuple desc : 
                           concept.getDescriptionTuples(config.getAllowedStatus(),
                           null, config.getViewPositionSetReadOnly(),
@@ -152,10 +158,13 @@ public class ConceptView extends JPanel {
                      cpd.addToggleComponent(dc);
                      add(dc, gbc);
                      gbc.gridy++;
+                     alertCount += dc.getAlertSubpanelCount();
+                     refexCount += dc.getRefexSubpanelCount();
+                     templateCount += dc.getTemplateSubpanelCount();
                   }
-                  cpd.setAlertCount(0);
-                  cpd.setRefexCount(0);
-                  cpd.setTemplateCount(0);
+                  cpd.setAlertCount(alertCount);
+                  cpd.setRefexCount(refexCount);
+                  cpd.setTemplateCount(templateCount);
                   
                   ViewCoordinate coordinate = config.getViewCoordinate();
                   
@@ -507,7 +516,7 @@ public class ConceptView extends JPanel {
    public DragPanelRelGroup getRelGroupComponent(RelGroupVersionBI group,
            CollapsePanel parentCollapsePanel) throws TerminologyException, IOException, ContraditionException {
       DragPanelRelGroup relGroupPanel = 
-              new DragPanelRelGroup(new GridBagLayout(), settings, parentCollapsePanel);
+              new DragPanelRelGroup(new GridBagLayout(), settings, parentCollapsePanel, group);
       relGroupPanel.setupDrag(group);
       relGroupPanel.setBorder(BorderFactory.createRaisedBevelBorder());
       JLabel relGroupLabel = getJLabel(" ");
@@ -542,59 +551,17 @@ public class ConceptView extends JPanel {
       return relGroupPanel;
       
    }
-   //TODO 
-   public DragPanelExtension getExtensionComponent(int refsetNid,
-           CollapsePanel parentCollapsePanel) throws TerminologyException, IOException, ContraditionException {
-      
-      DragPanelExtension extensionPanel = 
-              new DragPanelExtension(new GridBagLayout(), settings, parentCollapsePanel);
-      boolean canDrop = false;
-      TerminologyStoreDI ts = Ts.get();
-      ComponentBI refsetComponent = ts.getComponent(refsetNid);
-      
-      extensionPanel.setBorder(BorderFactory.createRaisedBevelBorder());
-      JLabel extensionLabel = getJLabel(" ");
-      extensionLabel.setBackground(Color.RED);
-      extensionLabel.setOpaque(true);
-      extensionPanel.setDropPopupInset(extensionLabel.getPreferredSize().width);
-      GridBagConstraints gbc = new GridBagConstraints();
-      gbc.anchor = GridBagConstraints.NORTHWEST;
-      gbc.weightx = 0;
-      gbc.weighty = 0;
-      gbc.fill = GridBagConstraints.BOTH;
-      gbc.gridheight = 1;
-      gbc.gridwidth = 1;
-      gbc.gridx = 0;
-      gbc.gridy = 0;
-      extensionPanel.add(extensionLabel, gbc);
-      gbc.anchor = GridBagConstraints.NORTHWEST;
-      gbc.gridx++;
-      TermComponentLabel typeLabel = getLabel(refsetNid, canDrop);
-      extensionPanel.add(typeLabel, gbc);
-      gbc.gridx++;
-      extensionPanel.add(new JSeparator(SwingConstants.VERTICAL), gbc);
-      gbc.weightx = 1;
-      gbc.gridx++;
-      FixedWidthJEditorPane textPane = new FixedWidthJEditorPane();
-      textPane.setEditable(canDrop);
-      textPane.setOpaque(false);
-      textPane.setFont(textPane.getFont().deriveFont(settings.getFontSize()));
-      textPane.setText(refsetComponent.toUserString());
-      extensionPanel.add(textPane, gbc);
-      
-      return extensionPanel;
-      
-   }
-   //TODO to here
 
    public DragPanelDescription getDescComponent(DescriptionAnalogBI desc,
            CollapsePanel parentCollapsePanel) throws TerminologyException, IOException {
-      return new DragPanelDescription(new GridBagLayout(), settings,
+      DragPanelDescription dragDescPanel = new DragPanelDescription(new GridBagLayout(), settings,
                  parentCollapsePanel, desc);
+      return dragDescPanel;
    }
    
    public DragPanelDescTemplate getDescTemplate(final DescriptionSpec desc) throws TerminologyException, IOException {
-      DragPanelDescTemplate descPanel = new DragPanelDescTemplate(new GridBagLayout(), settings);
+      DragPanelDescTemplate descPanel = 
+              new DragPanelDescTemplate(new GridBagLayout(), settings, desc);
       descPanel.setupDrag(desc);
       descPanel.setBorder(BorderFactory.createRaisedBevelBorder());
       JLabel descLabel = getJLabel("T");
@@ -643,7 +610,8 @@ public class ConceptView extends JPanel {
    
    public DragPanelRelTemplate getRelTemplate(final RelSpec spec) throws TerminologyException, IOException {
       ViewCoordinate coordinate = config.getViewCoordinate();
-      DragPanelRelTemplate relPanel = new DragPanelRelTemplate(new GridBagLayout(), settings);
+      DragPanelRelTemplate relPanel = 
+              new DragPanelRelTemplate(new GridBagLayout(), settings, spec);
       relPanel.setupDrag(spec);
       relPanel.setBorder(BorderFactory.createRaisedBevelBorder());
       JLabel relLabel = getJLabel("T");
@@ -699,7 +667,7 @@ public class ConceptView extends JPanel {
    public DragPanelRel getRelComponent(RelationshipVersionBI r,
            CollapsePanel parentCollapsePanel) throws TerminologyException, IOException {
       DragPanelRel relPanel = new DragPanelRel(new GridBagLayout(), settings,
-              parentCollapsePanel);
+              parentCollapsePanel, r);
       boolean canDrop = false;
       if (r.getTime() == Long.MAX_VALUE) {
          relPanel.setOpaque(true);

@@ -32,7 +32,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
-import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,8 +54,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.TransferHandler;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import org.drools.KnowledgeBase;
 import org.drools.logger.KnowledgeRuntimeLogger;
@@ -64,22 +61,18 @@ import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.dwfa.ace.TermLabelMaker;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.ScrollablePanel;
 import org.ihtsdo.arena.ScrollablePanel.ScrollDirection;
 import org.ihtsdo.arena.context.action.DropActionPanel;
 import org.ihtsdo.arena.drools.EditPanelKb;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 import org.ihtsdo.tk.drools.facts.Context;
 import org.ihtsdo.tk.drools.facts.FactFactory;
-import org.ihtsdo.tk.spec.DescriptionSpec;
 import org.ihtsdo.tk.spec.SpecBI;
 
 import sun.awt.dnd.SunDragSourceContextPeer;
@@ -417,13 +410,16 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
       this.inGroup = inGroup;
    }
 
-   public DragPanel(ConceptViewSettings settings) {
+   public DragPanel(ConceptViewSettings settings, T component) {
       super();
+      this.thingToDrag = component;
       setup(settings);
    }
 
-   public DragPanel(LayoutManager layout, ConceptViewSettings settings) {
+   public DragPanel(LayoutManager layout, 
+           ConceptViewSettings settings, T component) {
       super(layout);
+      this.thingToDrag = component;
       setup(settings);
    }
 
@@ -431,7 +427,8 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
       this.settings = settings;
       if (kbase == null) {
          try {
-            kbase = EditPanelKb.setupKb(new File("drools-rules/ContextualDropActions.drl"));
+            kbase = EditPanelKb.setupKb(
+                    new File("drools-rules/ContextualDropActions.drl"));
          } catch (IOException e) {
             throw new RuntimeException(e);
          }
@@ -486,9 +483,6 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
    private int dropPopupInset = 20;
 
    public void setupDrag(T thingToDrag) {
-      // I_RelTuple r
-      // List<I_RelTuple> group
-      // I_DescriptionVersioned desc
       this.thingToDrag = thingToDrag;
       if (this.transferHandler == null) {
          this.transferHandler = new DragPanelTransferHandler("draggedThing");
