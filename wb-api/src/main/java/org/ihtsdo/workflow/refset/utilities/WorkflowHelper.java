@@ -16,6 +16,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
@@ -103,36 +104,46 @@ public class WorkflowHelper {
 	public static I_GetConceptData getCurrentModeler() throws TerminologyException, IOException {
 		return modelers.get(Terms.get().getActiveAceFrameConfig().getUsername());
 	}
+	@SuppressWarnings("unchecked")
+	public static String identifyPrefTerm(I_GetConceptData con)  {
+    	Collection<I_DescriptionVersioned> c;
+        try {
+			for (I_DescriptionVersioned<?> descv: con.getDescriptions()) {
+			    for (I_DescriptionTuple p: descv.getTuples()) {
+					if (p.getTypeNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()).getNid())
+						return p.getText();
+			    }
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
+        return "";
+    }
 	@SuppressWarnings("unchecked")
 	public static String identifyFSN(I_GetConceptData con)  {
     	Collection<I_DescriptionVersioned> c;
 		try {
-   	   		I_IntList descType = Terms.get().newIntList();
-   	   		descType.add(fsnDescriptionTypeNid);
-   	   		return con.getDescTuple(descType, Terms.get().getActiveAceFrameConfig()).getText();
-/*
-			c = (Collection<I_DescriptionVersioned>) con.getDescriptions();
-
-	    	Iterator<I_DescriptionVersioned> itr = c.iterator();
-	    	I_TermFactory tf = Terms.get();
-
-	   		while (itr.hasNext())
-	   		{
-	   	   		I_DescriptionVersioned v = (I_DescriptionVersioned)itr.next();
-
-		   		for (I_DescriptionTuple tuple : v.getTuples())
-		   		{
-		   			if (tuple.getTypeNid() == tf.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()).getNid())
-		   				return tuple.getText();
+			for (I_DescriptionVersioned<?> descv: con.getDescriptions()) {
+			    for (I_DescriptionTuple p: descv.getTuples()) {
+					if (p.getTypeNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()).getNid())
+						return p.getText();
 		   		}
 	   		}
-*/
-   	   	} catch (Exception e) {
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
    		return "";
+		
     }
 /*
 	public static void retireWorkflowHistoryRow(WorkflowHistoryJavaBean wfhjb) {
@@ -213,62 +224,32 @@ public class WorkflowHelper {
 		WorkflowHistoryRefsetWriter.unLockMutex();
 	}
 
-	private static void updateModelers() throws TerminologyException, IOException
+	public static void updateModelers() throws TerminologyException, IOException 
 	{
     	modelers = new HashMap<String, I_GetConceptData>();
     	modelersUuids = new HashMap<String, UUID>();
     	I_TermFactory tf = Terms.get();
 
-		I_GetConceptData parentEditorConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IHTSDO.getPrimoridalUid());
+		I_GetConceptData parentEditorConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
 		Set<I_GetConceptData> editors = getChildren(parentEditorConcept);
 		editors.remove(parentEditorConcept);
 
 		for (I_GetConceptData editor : editors)
 		{
-	    	modelers.put(getSynonym(editor), editor);
+	    	modelers.put(getLoginId(editor), editor);
 		}
     }
 
-	private static String getSynonym(I_GetConceptData con) throws TerminologyException, IOException {
-    	Collection<? extends I_DescriptionVersioned> c =  con.getDescriptions();
-/*
-    	I_TermFactory tf = Terms.get();
-
-    	Iterator itr = c.iterator();
-
-    	while (itr.hasNext())
-   		{
-   	   		I_DescriptionVersioned v = (I_DescriptionVersioned)itr.next();
-
-	   		for (I_DescriptionTuple tuple : v.getTuples())
-	   		{
-	   			I_DescriptionTuple t = tuple;
-
-	   			if (tuple.getTypeNid() == tf.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()).getNid())
-	   				return tuple.getText();
-	   		}
-   		}
-
-   		return "";
-*/
-    		if (fsnDescriptionTypeNid == 0)
-    			fsnDescriptionTypeNid =  Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()).getNid();
-
-			int prefTermDescriptionTypeNid =  Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()).getNid();
-
-    		I_IntList descType = Terms.get().newIntList();
-   	   		descType.add(prefTermDescriptionTypeNid);
-
-   	   		String prefTermStr = con.getDescTuple(descType, Terms.get().getActiveAceFrameConfig()).getText();
-
+	private static String getLoginId(I_GetConceptData con) throws TerminologyException, IOException {
+    	String id = identifyPrefTerm(con);
    	   		// TODO Remove this as fix to deal with gen-user & two Alos
-   	   		if (prefTermStr.contains("-"))
+   	   		if (id.contains("-"))
 				WorkflowHelper.setDefaultModeler(con);
 
-   	   		if (prefTermStr.equalsIgnoreCase("alopez"))
-   	   			prefTermStr = "alejandro";
+   	   		if (id.equalsIgnoreCase("alopez"))
+   	   			id = "alejandro";
 
-   	   		return prefTermStr;
+   	   		return id;
 	}
 
 	public static boolean isActiveModeler(String name) throws Exception
@@ -502,14 +483,25 @@ public class WorkflowHelper {
 
 	public static I_GetConceptData lookupAction(String action) throws TerminologyException, IOException {
 		Set<? extends I_GetConceptData> allActions = Terms.get().getActiveAceFrameConfig().getWorkflowActions();
+		I_GetConceptData retVal = null;
 
 		for (I_GetConceptData actionConcept : allActions)
 		{
-			if (identifyFSN(actionConcept).equalsIgnoreCase(action.trim()))
-				return actionConcept;
+			String fsnStr = identifyFSN(actionConcept);
+			
+			if (fsnStr.equalsIgnoreCase(action.trim()))
+			{
+				retVal = actionConcept;
+			} else
+			{
+				String prefTermStr = identifyPrefTerm(actionConcept);
+				
+				if (prefTermStr.equalsIgnoreCase(action.trim()))
+					retVal = actionConcept;
+			}
 		}
 
-		return null;
+		return retVal;
 	}
 
 	public static I_GetConceptData lookupRoles(String role) throws TerminologyException, IOException {
@@ -547,7 +539,6 @@ public class WorkflowHelper {
 			for (I_RelTuple rel : relList)
 			{
 				if (rel != null &&
-	    			(rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_END_WF_CONCEPT.getPrimoridalUid()).getConceptNid()) ||
 	    			 rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_BEGIN_WF_CONCEPT.getPrimoridalUid()).getConceptNid())
 					return true;
 			}

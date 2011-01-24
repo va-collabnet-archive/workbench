@@ -89,17 +89,17 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
     public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit)
             throws TaskFailedException {
         try {
-            WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
+            if (!WorkflowHistoryRefsetWriter.isInUse()) // Not in the middle of an existing commit
+        	{
+            	WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
 
-            I_GetConceptData modeler = WorkflowHelper.getCurrentModeler();
+            	I_GetConceptData modeler = WorkflowHelper.getCurrentModeler();
 
-            if (modeler != null && WorkflowHelper.isActiveModeler(modeler))
-            {
-	        	I_TermFactory tf = getTermFactory();
-	            WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter();
+            	if (modeler != null && WorkflowHelper.isActiveModeler(modeler))
+            	{
+            		I_TermFactory tf = getTermFactory();
+            		WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter();
 
-	            if (!WorkflowHistoryRefsetWriter.isInUse()) // Not in the middle of an existing commit
-	        	{
 					WorkflowHistoryRefsetWriter.lockMutex();
 
 					// Path

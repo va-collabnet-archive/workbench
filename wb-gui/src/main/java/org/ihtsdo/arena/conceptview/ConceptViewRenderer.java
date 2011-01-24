@@ -144,8 +144,9 @@ public class ConceptViewRenderer extends JLayeredPane {
     private JScrollPane scrollPane;
     private JToggleButton workflowToggleButton;
     private JToggleButton oopsButton;
-    private static String workflowActionPathPrefix = "plugins/workflow/advanceWF/";
-    private static String workflowActionPathPostfix = "WFAction.bp";
+
+	private static String advanceWorkflowActionPath = "plugins/migration-wf/";
+    private static String advanceWorkflowActionFile = "AdvanceWorkflow.bp";
 
     /**
      *
@@ -253,58 +254,52 @@ public class ConceptViewRenderer extends JLayeredPane {
                         JTabbedPane tp = ace.getCdePanel().getConceptTabs();
                         int index = tp.getSelectedIndex();
 
-
+                        File wfBpFile = new File(advanceWorkflowActionPath + advanceWorkflowActionFile);
                         BpActionFactory actionFactory = new BpActionFactory(settings.getConfig(), settings.getHost());
-                        File wfBpFile = new File("plugins/workflow/advanceWF/AdvanceWorkflow.bp");
-                        if (wfBpFile.exists()) {
                             for (UUID action : availableActions) {
 
-                                JButton actionButton = new JButton();
+                            JButton actionButton = new JButton();
 
-                                Action a = actionFactory.make(new File("plugins/workflow/advanceWF/AdvanceWorkflow.bp"));
-                                actionButton.setAction(a);
+                            Action a = actionFactory.make(wfBpFile);
+                            actionButton.setAction(a);
 
-                                actionButton.setHorizontalTextPosition(SwingConstants.CENTER);
-                                actionButton.setVerticalTextPosition(SwingConstants.BOTTOM);
-                                actionButton.setText(Terms.get().getConcept(action).getInitialText());
+                            actionButton.setHorizontalTextPosition(SwingConstants.CENTER);
+                            actionButton.setVerticalTextPosition(SwingConstants.BOTTOM);
+                            actionButton.setText(Terms.get().getConcept(action).getInitialText());
 
-                                actionButton.addActionListener(new ActionListener() {
+                            actionButton.addActionListener(new ActionListener() {
 
-                                    @Override
-                                    public void actionPerformed(ActionEvent e) {
+                               @Override
+                                public void actionPerformed(ActionEvent e) {
 
-                                        try {
-                                            final I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+                                    try {
+                                       final I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-                                            // Get Worker
-                                            I_Work worker;
-                                            if (config.getWorker().isExecuting()) {
-                                                worker = config.getWorker().getTransactionIndependentClone();
-                                            } else {
-                                                worker = config.getWorker();
-                                            }
-
-
-                                            worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), WorkflowHelper.lookupAction(e.getActionCommand()).getPrimUuid());
-
-                                            workflowToggleButton.doClick();
-
-                                            updateOopsButton(settings.getConcept());
-
-                                        } catch (Exception e1) {
-                                            AceLog.getAppLog().alertAndLogException(e1);
+                                        // Get Worker
+                                        I_Work worker;
+                                        if (config.getWorker().isExecuting()) {
+                                            worker = config.getWorker().getTransactionIndependentClone();
+                                        } else {
+                                            worker = config.getWorker();
                                         }
+
+                                        worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), WorkflowHelper.lookupAction(e.getActionCommand()).getPrimUuid());
+                                        workflowToggleButton.doClick();
+                                        updateOopsButton(settings.getConcept());
+
+                                    } catch (Exception e1) {
+                                        AceLog.getAppLog().alertAndLogException(e1);
                                     }
-                                });
-
-                                if (wfHandler.isActiveAction(possibleActions, action)) {
-                                    actionButton.setEnabled(true);
-                                } else {
-                                    actionButton.setEnabled(false);
                                 }
+                            });
 
-                                workflowPanel.add(actionButton);
+                            if (wfHandler.isActiveAction(possibleActions, action)) {
+                                actionButton.setEnabled(true);
+                            } else {
+                                actionButton.setEnabled(false);
                             }
+
+                            workflowPanel.add(actionButton);
                         }
                     } catch (TerminologyException e2) {
                         AceLog.getAppLog().alertAndLogException(e2);

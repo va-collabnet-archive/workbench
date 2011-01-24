@@ -58,16 +58,10 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 		Set<String> currentModelerPropertySet = searchForEditorCategoryListByModeler(modeler);
 		
 		if (currentModelerPropertySet.isEmpty()) {
-                    return null;
-                } else if (currentModelerPropertySet.size() == 1) {
-			// Only Category, must be all
-			String role = ((EditorCategoryRefset)refset).getSemanticTag(currentModelerPropertySet.iterator().next());
-			
-			String defaultRoleString = "Clinical editor role All";
-			if (!role.equalsIgnoreCase("all"))
-				throw new Exception("Must be All Tag if only single result");
-			else
-				return WorkflowHelper.lookupRoles(defaultRoleString);
+            return null;
+        } else if (currentModelerPropertySet.size() == 1) {
+			String editorCategory = ((EditorCategoryRefset)refset).getEditorCategory(currentModelerPropertySet.iterator().next()).getInitialText();			
+			return WorkflowHelper.lookupRoles(editorCategory);
 		}
 		else
 		{
