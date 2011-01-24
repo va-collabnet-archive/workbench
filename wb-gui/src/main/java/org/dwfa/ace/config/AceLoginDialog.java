@@ -258,7 +258,8 @@ public class AceLoginDialog extends javax.swing.JDialog implements ActionListene
      */
     private File getProfile() throws TaskFailedException {
         if (profile == null) {
-            throw new TaskFailedException("No Profile selected.");
+            AceLog.getAppLog().info("### No profile selected - shutting down.");
+            System.exit(0);
         }
         return profile;
     }

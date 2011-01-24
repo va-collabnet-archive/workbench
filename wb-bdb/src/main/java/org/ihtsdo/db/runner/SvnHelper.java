@@ -267,7 +267,10 @@ public class SvnHelper {
 
             String selectedPath = profileMap.get(selectedProfile);
             if (selectedPath == null) {
-                return;
+                AceLog.getAppLog().info("### No profile selected - shutting down.");
+                connectToSubversion = false;
+                Svn.setConnectedToSvn(connectToSubversion);
+                System.exit(0);
             }
             if (selectedPath.startsWith("/")) {
                 selectedPath = selectedPath.substring(1);
