@@ -57,8 +57,7 @@ import org.dwfa.ace.tree.LineageTreeCellRenderer;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.util.swing.GuiUtil;
 
-public class LineagePlugin extends AbstractPlugin 
-	implements HierarchyListener {
+public class LineagePlugin extends AbstractPlugin implements HierarchyListener {
 
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
@@ -133,7 +132,6 @@ public class LineagePlugin extends AbstractPlugin
 
         lineageTree = new JTreeWithDragImage(host.getConfig());
         lineageTree.putClientProperty("JTree.lineStyle", "Angled");
-        // lineageTree.putClientProperty("JTree.lineStyle", "None");
         lineageTree.setLargeModel(true);
         lineageTree.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         lineageTree.setTransferHandler(new TerminologyTransferHandler(lineageTree));
@@ -162,28 +160,27 @@ public class LineagePlugin extends AbstractPlugin
         lineagePanel.add(lineageTree, c);
         lineageTree.setBorder(BorderFactory.createMatteBorder(1, 1, 0, 0, Color.GRAY));
 
-        c.weightx = 1.0;
         JPanel eastFiller = new JPanel();
         eastFiller.setMaximumSize(new Dimension(40, 20));
         eastFiller.setMinimumSize(new Dimension(40, 20));
         eastFiller.setPreferredSize(new Dimension(40, 20));
         eastFiller.setBackground(Color.white);
         eastFiller.setOpaque(true);
-        c.weightx = 1.0;
+        c.weightx = 0.0;
         c.gridx++;
         eastFiller.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.GRAY));
         lineagePanel.add(eastFiller, c);
 
-        lineagePanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(1, 1, 1, 3),
-            BorderFactory.createLineBorder(Color.GRAY)));
+        lineagePanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(1, 1, 1, 3), BorderFactory
+            .createLineBorder(Color.GRAY)));
         return lineagePanel;
     }
- 
+
     private void updateLineageModel() throws IOException, TerminologyException {
         DefaultTreeModel model = (DefaultTreeModel) lineageTree.getModel();
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("ROOT");
         model.setRoot(root);
- 
+
         I_GetConceptData bean = (I_GetConceptData) getHost().getTermComponent();
         if (bean != null) {
             lineageRenderer.setFocusBean(bean);
@@ -203,13 +200,13 @@ public class LineagePlugin extends AbstractPlugin
                 lineageTree.expandRow(i);
             }
             SwingUtilities.invokeLater(new Runnable() {
-				
-				@Override
-				public void run() {
-			        GuiUtil.tickle(lineageTree);
-			        GuiUtil.tickle(lineagePanel);
-				}
-			});
+
+                @Override
+                public void run() {
+                    GuiUtil.tickle(lineageTree);
+                    GuiUtil.tickle(lineagePanel);
+                }
+            });
         } else {
             root.add(new DefaultMutableTreeNode(" "));
             model.nodeStructureChanged(root);
@@ -217,8 +214,10 @@ public class LineagePlugin extends AbstractPlugin
     }
 
     private void addLineageToNode(List<List<I_GetConceptData>> lineage, DefaultMutableTreeNode root) {
-        Map<I_GetConceptData, DefaultMutableTreeNode> childrenNodes = new HashMap<I_GetConceptData, DefaultMutableTreeNode>();
-        Map<I_GetConceptData, List<List<I_GetConceptData>>> childrenLineage = new HashMap<I_GetConceptData, List<List<I_GetConceptData>>>();
+        Map<I_GetConceptData, DefaultMutableTreeNode> childrenNodes =
+                new HashMap<I_GetConceptData, DefaultMutableTreeNode>();
+        Map<I_GetConceptData, List<List<I_GetConceptData>>> childrenLineage =
+                new HashMap<I_GetConceptData, List<List<I_GetConceptData>>>();
         for (List<I_GetConceptData> parentLine : lineage) {
             childrenNodes.put(parentLine.get(0), new DefaultMutableTreeNode(parentLine.get(0)));
             if (childrenLineage.get(parentLine.get(0)) == null) {
@@ -239,12 +238,14 @@ public class LineagePlugin extends AbstractPlugin
         }
     }
 
-    private List<List<I_GetConceptData>> getLineage(I_GetConceptData bean, int depth) throws IOException, TerminologyException {
+    private List<List<I_GetConceptData>> getLineage(I_GetConceptData bean, int depth) throws IOException,
+            TerminologyException {
         List<List<I_GetConceptData>> lineage = new ArrayList<List<I_GetConceptData>>();
 
-        List<? extends I_RelTuple> sourceRelTuples = bean.getSourceRelTuples(getHost().getConfig().getAllowedStatus(),
-            getHost().getConfig().getDestRelTypes(), getHost().getConfig().getViewPositionSetReadOnly(), 
-            getHost().getConfig().getPrecedence(), getHost().getConfig().getConflictResolutionStrategy());
+        List<? extends I_RelTuple> sourceRelTuples =
+                bean.getSourceRelTuples(getHost().getConfig().getAllowedStatus(), getHost().getConfig().getDestRelTypes(),
+                    getHost().getConfig().getViewPositionSetReadOnly(), getHost().getConfig().getPrecedence(), getHost()
+                        .getConfig().getConflictResolutionStrategy());
         if ((sourceRelTuples.size() > 0) && (depth < 40)) {
             if (depth > 3) {
                 String test = "test";
@@ -278,20 +279,20 @@ public class LineagePlugin extends AbstractPlugin
         return TOGGLES.LINEAGE.getPluginId();
     }
 
-	@Override
-	public void hierarchyChanged(HierarchyEvent e) {
-		SwingUtilities.invokeLater(new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					updateLineageModel();
-				} catch (IOException e) {
-					AceLog.getAppLog().alertAndLogException(e);
-				} catch (TerminologyException e) {
-					AceLog.getAppLog().alertAndLogException(e);
-				}
-			}
-		});
-	}
+    @Override
+    public void hierarchyChanged(HierarchyEvent e) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    updateLineageModel();
+                } catch (IOException e) {
+                    AceLog.getAppLog().alertAndLogException(e);
+                } catch (TerminologyException e) {
+                    AceLog.getAppLog().alertAndLogException(e);
+                }
+            }
+        });
+    }
 }
