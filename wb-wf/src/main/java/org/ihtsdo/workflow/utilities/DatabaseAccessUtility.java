@@ -86,12 +86,10 @@ public class DatabaseAccessUtility {
 	
 		// Location of VODB
 		File vodbDirectory = new File("src/main/resources/berkeley-db");
-		System.out.println(vodbDirectory.getAbsolutePath());
 		Long cacheSize = Long.getLong("600000000");
 		boolean readOnly = false;
 	 
 		//Open Database
-//		log.write("Opening database");
 		Terms.openDefaultFactory(vodbDirectory, readOnly, cacheSize);
 		tf = Terms.get();
 

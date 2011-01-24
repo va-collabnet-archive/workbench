@@ -57,8 +57,7 @@ public class InitializeSemanticAreaHierarchyMojo extends AbstractMojo {
         try {
 
             String resourceFilePath = baseDirectory.getAbsoluteFile() + basePath + filePath;
-            System.out.println(resourceFilePath);
-
+ 
             SemanticAreaHierarchyRefset refset = new SemanticAreaHierarchyRefset();
             I_TermFactory tf = Terms.get();
 

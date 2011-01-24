@@ -36,7 +36,6 @@ public class WorkflowHandler implements WorkflowHandlerBI {
 	@Override
 	public Collection<? extends WorkflowHistoryJavaBeanBI> getAvailableWorkflowActions(ConceptVersionBI conVer) throws IOException, ContraditionException {
 		
-		//System.out.println("In ConVersion");
 		EditorCategoryRefsetSearcher searcher = null;		
 		List<WorkflowHistoryJavaBean> retSet = new ArrayList<WorkflowHistoryJavaBean>();
 		
@@ -49,7 +48,6 @@ public class WorkflowHandler implements WorkflowHandlerBI {
 			List<WorkflowHistoryJavaBean> possibleActions = WorkflowHelper.searchForPossibleActions(modeler, concept);
 			
 			for (int i = 0; i < possibleActions.size();i++) {
-				//System.out.println("Possible Action #" + i + ": " + possibleActions.get(i).toString());
 				retSet.add(possibleActions.get(i));
 			}
 			

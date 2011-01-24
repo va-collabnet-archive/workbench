@@ -210,7 +210,6 @@ public class ConflictIdentifier {
 				isSubstituted = true;
 
 			String s = currentPos.toString();
-			System.out.println("\n\nChecking: " + s);
 			if (compType != CONTRADICTION_INVESTIGATION_TYPE.REFSET)
 				currentVersion = getCurrentVersionByType(concept, compType, versionCoord, componentNid, memberNid);
 			else
@@ -224,7 +223,6 @@ public class ConflictIdentifier {
 					// See if version is visible by all view Paths
 					for (PositionForSet viewPos : foundPositions.keySet())
 					{ 
-						System.out.println("\n\nAgainst: " + viewPos);
 						boolean matchingComponentNid = true;
 						Version testVersion = foundPositions.get(viewPos).get(componentNid);
 						if (testVersion == null) {

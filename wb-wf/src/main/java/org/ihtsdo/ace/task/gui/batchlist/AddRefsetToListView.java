@@ -89,9 +89,7 @@ public class AddRefsetToListView extends AbstractTask {
             WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
             Map<I_GetConceptData, WorkflowHistoryJavaBean> members = new HashMap<I_GetConceptData, WorkflowHistoryJavaBean>();
             
-            System.out.println("<==========Member's size=======>" + members.size());   
             int modelSize= model.getSize();
-            System.out.println("<==========model's  size=======>" + modelSize);
             if(modelSize > 0){
             	model.clear();	               
             }

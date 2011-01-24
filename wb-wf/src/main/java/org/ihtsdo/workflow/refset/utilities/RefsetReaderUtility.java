@@ -64,13 +64,7 @@ public class RefsetReaderUtility extends RefsetUtility {
 	                	int refCompId = thinExtByRefTuple.getComponentId();
 	                	I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) thinExtByRefTuple.getMutablePart();
 	
-	                    if (part.getStringValue() == null) {
-	                    	System.out.println("AAA");
-	                    } else if (part.getStringValue().length() == 0) {
-	                    	System.out.println("BBB");
-	                    } else {
-	                    	contents.add(refCompId + part.getStringValue());
-	                    }
+	                    contents.add(refCompId + part.getStringValue());
 	                }
 	            }
 	        }

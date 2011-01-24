@@ -54,13 +54,9 @@ public class SemanticHierarchyDropDown extends AbstractWorkflowHistorySearchTest
 	            }
             } catch (Exception e) {
             	//e.printStackTrace();
-				System.out.println(e.getMessage());
             	testHierarchy = "observable_entity";
             }
-        } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
-
     }
 
     @Override
@@ -113,7 +109,6 @@ public class SemanticHierarchyDropDown extends AbstractWorkflowHistorySearchTest
         		refset = new SemanticAreaSearchRefset();
             if (testHierarchy == null || testHierarchy.length() == 0)
             {
-            	System.out.println("testHierarchy is null and bean is: " + bean.getFSN());
             	return false;
             }
             I_GetConceptData parentHierarchy = translateStringToHierarchy(testHierarchy);    		

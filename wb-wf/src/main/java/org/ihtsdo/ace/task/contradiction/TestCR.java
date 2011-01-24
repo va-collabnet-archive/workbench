@@ -73,32 +73,9 @@ public class TestCR extends AbstractTask {
     		// Report any conflicts
     		reporter.identifyInConceptListPanel(results.getConflictingNids());
     		
-    		// Single Change
-    		if (results.getUnreachableNids().size() == 0)
-    			System.out.println("\n\n\n\n\n\nNo Unreachable Concepts");
-    		else
-    		{
-	    		System.out.println("\n\n\n\n\n\nHere are the list of Unreachable Concepts");
-	    		Set<I_GetConceptData> set = results.getUnreachableConcepts();
-	    		for (I_GetConceptData con : set)
-	    		{
-	    			System.out.println(con.getInitialText());
-	    		}
-    		}
-    		
-    		if (results.getSingleNids().size() == 0)
-    			System.out.println("\n\nNo Single Concepts");
-    		else
-    		{
-    			System.out.println("\n\nHere are the list of Single Concepts");
-    			Set<I_GetConceptData> set = results.getSingleConcepts();
-	    		for (I_GetConceptData con : set)
-	    		{
-	    			System.out.println(con.getInitialText());
-	    		}
-    		}
-    		
-    		System.out.println(">End of List\n\n\n\n");
+    		// Some Changes
+    		Set<I_GetConceptData> set = results.getUnreachableConcepts();
+			set = results.getSingleConcepts();
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }

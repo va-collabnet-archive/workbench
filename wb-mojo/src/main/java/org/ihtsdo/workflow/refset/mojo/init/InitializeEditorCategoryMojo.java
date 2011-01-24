@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Scanner;
+import java.util.logging.Level;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -14,6 +15,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefset;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetWriter;
@@ -64,7 +66,6 @@ public class InitializeEditorCategoryMojo extends AbstractMojo {
             I_GetConceptData  currentReferencedCompId = null;
 
             String resourceFilePath = baseDirectory.getAbsoluteFile() + basePath + filePath;
-            System.out.println(resourceFilePath);
 
         	EditorCategoryRefset refset = new EditorCategoryRefset();
             I_TermFactory tf = Terms.get();
@@ -88,8 +89,7 @@ public class InitializeEditorCategoryMojo extends AbstractMojo {
             	
             Terms.get().addUncommitted(writer.getRefsetConcept());
         } catch (Exception e) {
-        	System.out.println("Failure with line: " + line);
-			throw new MojoExecutionException(e.getMessage());
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, line, e);
 		}
 	}
     

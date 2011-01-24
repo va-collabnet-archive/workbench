@@ -101,11 +101,9 @@ public class ContradictionReporter {
 		for (ConAttrVersionBI version : conAttrVersions)
 		{
 			String s = "\nCount: " + counter++;
-			System.out.println(s);
 			outputFile.write(s);
 			
 			s = "\tWith Values: " + version.toUserString();
-			System.out.println(s);
 			outputFile.write(s);
 		}
 
@@ -125,11 +123,9 @@ public class ContradictionReporter {
 			for (DescriptionVersionBI d : desc.getVersions(ViewCoordinate))
 			{
 				String s = "\nCount: " + counter++;
-				System.out.println(s);
 				outputFile.write(s);
 				
 				s = "\tWith Values: " + d.toUserString();
-				System.out.println(s);
 				outputFile.write(s);
 			}
 		}
@@ -152,11 +148,9 @@ public class ContradictionReporter {
 			for (RelationshipVersionBI r : desc.getVersions(ViewCoordinate))
 			{
 				String s = "\nCount: " + counter++;
-				System.out.println(s);
 				outputFile.write(s);
 				
 				s = "\tWith Values: " + r.toUserString();
-				System.out.println(s);
 				outputFile.write(s);
 			}
 		}
@@ -179,11 +173,9 @@ public class ContradictionReporter {
 			for (RelationshipVersionBI r : desc.getVersions(ViewCoordinate))
 			{
 				String s = "\nCount: " + counter++;
-				System.out.println(s);
 				outputFile.write(s);
 				
 				s = "\tWith Values: " + r.toUserString();
-				System.out.println(s);
 				outputFile.write(s);
 			}
 		}

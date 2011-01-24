@@ -8,12 +8,14 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -75,7 +77,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 			    (currentState == currentStatusNid))
 			{
 				WorkflowHistoryJavaBean b = WorkflowHelper.fillOutWorkflowHistoryJavaBean(Terms.get().nidToUuid(historyRow.getComponentNid()), latestVersion.getStringValue(), new Long(latestVersion.getTime()));
-System.out.println(b);
+
 				retMap.add(b);
 			}
 		}
@@ -159,14 +161,16 @@ System.out.println(b);
 			if (counter++ > 100) break;
 			
 			I_ExtendByRefPartStr props = (I_ExtendByRefPartStr)extension;
+			WorkflowHistoryJavaBean bean = null;
 		
 			if (props.getStringValue().length() > 0)
 			{
-				WorkflowHistoryJavaBean bean = WorkflowHelper.fillOutWorkflowHistoryJavaBean(Terms.get().nidToUuid(extension.getComponentNid()), props.getStringValue(), new Long(extension.getMutableParts().get(0).getTime()));
-				System.out.println("\n\nBean #" + counter + " with status: " + props.getStatusNid() + " has properties: " + bean);
+				bean = WorkflowHelper.fillOutWorkflowHistoryJavaBean(Terms.get().nidToUuid(extension.getComponentNid()), props.getStringValue(), new Long(extension.getMutableParts().get(0).getTime()));
 			}
 			else
-				System.out.println("\n\nBean #" + counter + " is badly formed");
+			{
+				AceLog.getAppLog().alertAndLog(Level.SEVERE, bean.toString(), new Exception("Failure in accessing Workflow History Refset"));
+			}
 
 			//outputFile.write("\n\nBean #" + counter + " with status UID: " + Terms.get().nativeToUuid(props.getStatusNid()).get(0) + " has properties: " + bean);
 		}

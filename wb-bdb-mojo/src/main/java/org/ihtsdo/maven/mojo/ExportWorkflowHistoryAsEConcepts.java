@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -21,15 +22,14 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
-import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 /**
  * Export the workflow history to initialize the WfHx refset in the database
@@ -143,9 +143,6 @@ public class ExportWorkflowHistoryAsEConcepts extends AbstractMojo {
 				row = ((String)textScanner.nextLine()).split("\t");
 				conceptCounter++;
 
-				if (conceptCounter % 2500 == 0)
-					System.out.println("----> Counting #" + conceptCounter);
-
 				if (!currentConceptUuid.equals(row[conceptIdPosition]))
 				{
 					finalizeCurrentEConcept(currentEConcept, memberList);
@@ -166,9 +163,6 @@ public class ExportWorkflowHistoryAsEConcepts extends AbstractMojo {
 
 	        Terms.get().close();
 	        Terms.set(origTF);
-
-			System.out.println("Counted a total of " + conceptCounter + " concepts.");
-			System.out.println("And put them in " + conceptGroupCounter + " groups.");
 
         } catch (Exception e) {
         	e.printStackTrace();
@@ -320,12 +314,10 @@ public class ExportWorkflowHistoryAsEConcepts extends AbstractMojo {
 			   			"</property>" +
 				"</properties>";
 		} catch (Exception e) {
-			System.out.println("Offending Row:");
-			System.out.println("Modeler: " + row[modelerPosition]);
-			System.out.println("State: " + row[statePosition]);
-			System.out.println("Action: " + row[actionPosition]);
-			return "";
+	        	AceLog.getAppLog().alertAndLog(Level.SEVERE, row.toString(), new Exception("Failure in creating Workflow History EConcepts"));
 		}
+
+		return "";
 	}
 
 	private UUID lookupModelerUid(String string) throws IOException, TerminologyException 

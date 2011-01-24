@@ -317,10 +317,6 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
  			i++;
  		}
  		
- 		
- 		
- 		System.out.println("Error Concept Count = " + errorConceptCount);
- 		
  		this.dataVector = convertToVector(data);
  
     	SwingUtilities.invokeLater(new Runnable() {

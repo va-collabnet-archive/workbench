@@ -2,7 +2,6 @@ package org.ihtsdo.workflow.refset.mojo.list;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,13 +13,11 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.mojo.maven.MojoUtil;
 import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefset;
 
 /**
@@ -89,24 +86,18 @@ public class ListStateTransitionMojo extends AbstractMojo {
                 	int refCompId = thinExtByRefTuple.getComponentId();
                 	I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) thinExtByRefTuple.getMutablePart();
 
-                    if (part.getStringValue() == null) {
-                    	System.out.println("AAA");
-                    } else if (part.getStringValue().length() == 0) {
-                    	System.out.println("BBB");
-                    } else {
-                    	results.add(refCompId + " *with* " + part.getStringValue());
-                    }
+                	results.add(refCompId + " *with* " + part.getStringValue());
                 }
             }
         }
-
+        
         return results;
     }
 
     private void printRefsetMembers(HashSet<String> members) {
     	Iterator itr = members.iterator();
     	while (itr.hasNext()) {
-    		System.out.println("Next: " + ((String)itr.next()));
+    		//System.out.println("Next: " + ((String)itr.next()));
     	}
     }
 
