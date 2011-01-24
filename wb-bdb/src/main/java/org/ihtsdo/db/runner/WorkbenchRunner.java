@@ -802,9 +802,9 @@ public class WorkbenchRunner {
 					AceLog.getAppLog().info("checkCustom custCN = "+custCN);
 					Object obj = ObjectCacheClassHandler.getInstClass(custCN);
 					if(obj != null) {
-						ObjectCache.put(CustomStatics.CUSTOMPROPSFN, cpfn);
-						ObjectCache.put(CustomStatics.CUSTOM_UI_CLASS, custCN);	
-						ObjectCache.put(CustomStatics.CUSTOMPROPS, custProps);
+						ObjectCache.INSTANCE.put(CustomStatics.CUSTOMPROPSFN, cpfn);
+						ObjectCache.INSTANCE.put(CustomStatics.CUSTOM_UI_CLASS, custCN);	
+						ObjectCache.INSTANCE.put(CustomStatics.CUSTOMPROPS, custProps);
 					}	
 				}	
 			}

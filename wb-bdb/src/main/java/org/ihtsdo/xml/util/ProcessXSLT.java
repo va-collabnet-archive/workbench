@@ -65,14 +65,14 @@ public class ProcessXSLT {
 			throws TransformerException, TransformerConfigurationException,
 			org.xml.sax.SAXException, java.io.FileNotFoundException, Exception {
 		// Hashtable h = ObjectCache.getMap();
-		Templates s = (Templates) ObjectCache.get(fileName);
+		Templates s = (Templates) ObjectCache.INSTANCE.get(fileName);
 		// System.out.println("2");
 		if (s == null) {
 			// System.out.println("3");
 			synchronized (ProcessXSLT.class) // make thread safe
 
 			{
-				s = (Templates) ObjectCache.get(fileName);
+				s = (Templates) ObjectCache.INSTANCE.get(fileName);
 				if (s == null)
 				// may have changed between first if and synch call...
 				{
@@ -83,7 +83,7 @@ public class ProcessXSLT {
 					TransformerFactory tFactory = TransformerFactory
 							.newInstance();
 					s = tFactory.newTemplates(new StreamSource(full));
-					ObjectCache.put(fileName, s);
+					ObjectCache.INSTANCE.put(fileName, s);
 				}
 			}
 		}
@@ -349,12 +349,12 @@ public class ProcessXSLT {
 		String def = "DEFAULTTRANSFORMER";
 		Transformer transformer = null;
 		// Hashtable h = ObjectCache.getMap();
-		transformer = (Transformer) ObjectCache.get(def);
+		transformer = (Transformer) ObjectCache.INSTANCE.get(def);
 
 		if (transformer == null) {
 			synchronized (ProcessXSLT.class) // make thread safe
 			{
-				transformer = (Transformer) ObjectCache.get(def);
+				transformer = (Transformer) ObjectCache.INSTANCE.get(def);
 				if (transformer == null)
 				// may have changed between first if and synch call...
 				{
@@ -366,7 +366,7 @@ public class ProcessXSLT {
 					props.put(OutputKeys.OMIT_XML_DECLARATION, "yes");
 					props.put(OutputKeys.INDENT, "yes");
 					transformer.setOutputProperties(props);
-					ObjectCache.put(def, transformer);
+					ObjectCache.INSTANCE.put(def, transformer);
 				}
 			}
 		}

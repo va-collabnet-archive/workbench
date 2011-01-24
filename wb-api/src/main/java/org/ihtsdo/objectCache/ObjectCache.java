@@ -5,29 +5,26 @@ package org.ihtsdo.objectCache;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+public enum ObjectCache {
 
-public class ObjectCache {
+	INSTANCE;
+	
+	private Hashtable<String, Object> cache;
+	private final Logger log = Logger.getLogger(ObjectCache.class.getName());
 
-	public static Hashtable cache;
-	private static final Logger log = Logger.getLogger(ObjectCache.class.getName());
-
-	//private static final Log log = LogFactory.getLog(ObjectCache.class);
-
-	public ObjectCache() {
-		super();
-		if(cache == null){
-			cache = new Hashtable();
-		}
+	private ObjectCache() {
+		cache = new Hashtable<String, Object>();
 	}
 
-	public static Object get(String key) {
+	public Object get(String key) {
 		Object o = null;
 		try {
-			if (getCache().get(key) != null) {
-				synchronized (ObjectCache.class) // make thread safe
+			if (cache.containsKey(key)){
+				synchronized (this) // make thread safe
 				{
 					o = cache.get(key);
 				}
@@ -39,12 +36,12 @@ public class ObjectCache {
 		return o;
 	}
 
-	public static boolean put(String key, Object o) {
+	public boolean put(String key, Object o) {
 		boolean ok = false;
 		try {
-			synchronized (ObjectCache.class) // make thread safe
+			synchronized (this) // make thread safe
 			{
-				getCache().put(key, o);
+				cache.put(key, o);
 				ok = true;
 			}
 
@@ -60,33 +57,16 @@ public class ObjectCache {
 	/**
 	 * Clear the cache.
 	 */
-	public static void clear() {
-		getCache().clear();
-	}
-
-	public static Hashtable getCache() {
-		
-		if(cache == null){
-			synchronized (ObjectCache.class) // make thread safe
-			{
-			cache = new Hashtable();
-			}
-		}
-		
-		return cache;
-	}
-
-	public static void setCache(Hashtable cache) {
-		ObjectCache.cache = cache;
+	public void clear() {
+		cache.clear();
 	}
 
 	/*
 	 * 
 	 * @return java.util.Enumeration
 	 */
-	public static java.util.Enumeration elements() {
-
-		return getCache().elements();
+	public Enumeration<Object> elements() {
+		return cache.elements();
 	}
 
 	/**
@@ -95,8 +75,8 @@ public class ObjectCache {
 	 * @param key
 	 *            The filename of the object.
 	 */
-	public static void remove(Object key) {
-		getCache().remove(key);
+	public void remove(Object key) {
+		cache.remove(key);
 	}
 
 	/**
@@ -104,28 +84,19 @@ public class ObjectCache {
 	 * 
 	 * @return int
 	 */
-	public static int size() {
-		return getCache().size();
+	public int size() {
+		return cache.size();
 	}
 
 	/**
 	 * Insert the method's description here. Creation date: (22/07/2002
 	 * 16:22:14)
 	 */
-	public static void debugOC() {
+	public void debugOC() {
 
-		Enumeration enum1;
-		String Key;
-		String Value;
-
-		// enum = oc.keys();
-		enum1 = ObjectCache.keys();
-		while (enum1.hasMoreElements()) {
-			Key = (String) enum1.nextElement();
-			// Value = (String) oc.get(Key).toString();
-			Value = (String) cache.get(Key).toString();
-			log.severe("OC Key = " + Key);
-			log.severe("OC Value = " + Value);
+		for(Entry<String, Object> entry : cache.entrySet()) {
+			log.severe("OC Key = " + entry.getKey());
+			log.severe("OC Value = " + entry.getValue());
 		}
 
 	}
@@ -135,9 +106,8 @@ public class ObjectCache {
 	 * 
 	 * @return java.util.Enumeration
 	 */
-	public static Enumeration keys() {
-
-		return getCache().keys();
+	public Enumeration<String> keys() {
+		return cache.keys();
 	}
 
 }

@@ -8,12 +8,12 @@ public class ObjectCacheClassHandler {
 	public static Object getInstClass(String Classname) {
 		Object Ob = null;
 
-		if (ObjectCache.get(Classname) != null) {
+		if (ObjectCache.INSTANCE.get(Classname) != null) {
 			// log.error("Classname found in cache "+Classname);
-			Ob = (Object) ObjectCache.get(Classname);
+			Ob = (Object) ObjectCache.INSTANCE.get(Classname);
 		}
 
-		if (ObjectCache.get(Classname) == null) {
+		if (ObjectCache.INSTANCE.get(Classname) == null) {
 			// log.error("Classname not found in cache "+Classname);
 			try {
 				Ob = instantiateClass(Classname);
@@ -22,7 +22,7 @@ public class ObjectCacheClassHandler {
 				AceLog.getAppLog().severe("Error instantiating a class called "
 								+ Classname, Ex);
 			}
-			ObjectCache.put(Classname, Ob);
+			ObjectCache.INSTANCE.put(Classname, Ob);
 		}
 		return Ob;
 	}

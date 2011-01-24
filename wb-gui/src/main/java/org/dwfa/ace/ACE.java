@@ -163,7 +163,6 @@ import org.dwfa.ace.task.gui.toptoggles.TopToggleTypes;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.ace.tree.TermTreeHelper;
-import org.dwfa.ace.utypes.UniversalIdList;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
@@ -802,8 +801,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     }
                     int version = ThinVersionHelper.convert(now.getTime());
                     AceLog.getEditLog().info("Starting commit: " + version + " (" + now.getTime() + ")");
-
-                    UniversalIdList uncommittedIds = new UniversalIdList();
 
                     if (writeChangeSets) {
                         if (uncommitted.size() > 0 || uncommittedNoChecks.size() > 0) {
@@ -1674,10 +1671,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private JComponent getContentPanel() throws Exception {
 
-        String custUI = (String) ObjectCache.get(CustomStatics.CUSTOM_UI_CLASS);
+        String custUI = (String) ObjectCache.INSTANCE.get(CustomStatics.CUSTOM_UI_CLASS);
 
         if (custUI != null && custUI.length() > 0) {
-            I_ReturnMainPanel cp = (I_ReturnMainPanel) ObjectCache.get(custUI);
+            I_ReturnMainPanel cp = (I_ReturnMainPanel) ObjectCache.INSTANCE.get(custUI);
             return cp.getContentPanel(this);
         }
 

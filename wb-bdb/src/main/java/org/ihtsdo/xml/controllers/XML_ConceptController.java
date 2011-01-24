@@ -168,7 +168,7 @@ public class XML_ConceptController {
 	public void add_I_GetConceptData(I_GetConceptData icd) throws Exception{
 		XML_I_GetConceptData  icX = new XML_I_GetConceptData(icd);
 		String key = icX.getOc_key();	
-		 addConceptsToRoot((Document)ObjectCache.get(key));
+		 addConceptsToRoot((Document)ObjectCache.INSTANCE.get(key));
 		 String uuid = icX.getUuid_key();
 		 //String intId = icX.getConIdi_S();
 		 AceXMLUtil.addtoUuidInt(uuid,icX.getConIdi());
@@ -190,7 +190,7 @@ public class XML_ConceptController {
 	public void add_Related_I_GetConceptData(I_GetConceptData icd, Node parent) throws Exception{
 		XML_I_GetConceptData  icX = new XML_I_GetConceptData(icd);
 		String key = icX.getOc_key();
-		Document conDoc = (Document)ObjectCache.get(key);
+		Document conDoc = (Document)ObjectCache.INSTANCE.get(key);
 		Element conRoot = conDoc.getDocumentElement();
 		Node ImpNewNode = parent.getOwnerDocument().importNode(conRoot, true);
 		parent.appendChild(ImpNewNode);

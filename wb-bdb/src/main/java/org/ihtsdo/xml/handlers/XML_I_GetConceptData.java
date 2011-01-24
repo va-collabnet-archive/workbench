@@ -189,7 +189,7 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 		oc_key = AceXMLUtil.getOc_key(conIdi);
 		//oc_key = CommonXMLStatics.CONCEPT_PRE + conIdi_S;
 		
-		if (ObjectCache.get(oc_key) == null) {
+		if (ObjectCache.INSTANCE.get(oc_key) == null) {
 			// create the new doc 
 			createNewConDoc();
 			// Add the ID
@@ -248,10 +248,10 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 						"Err thrown in XML_I_GetConceptData process", e);
 				e.printStackTrace();
 			}
-			ObjectCache.put(oc_key, Doc);
+			ObjectCache.INSTANCE.put(oc_key, Doc);
 	}
 		else {
-			Doc = (Document)ObjectCache.get(oc_key); 
+			Doc = (Document)ObjectCache.INSTANCE.get(oc_key); 
 		}
 	}
 	
@@ -266,7 +266,7 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 		System.out.println("process in debug method ");
 		conIdi = -1;
 		oc_key = AceXMLUtil.getOc_key(conIdi);
-		if (ObjectCache.get(oc_key) == null) {
+		if (ObjectCache.INSTANCE.get(oc_key) == null) {
 		// create the new doc 
 		createNewConDoc();	
 		
@@ -291,10 +291,10 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 		new XML_I_ExtendByRef(debug, ExtE);
 		parent.appendChild(ExtE);
 		
-		ObjectCache.put(oc_key, Doc);
+		ObjectCache.INSTANCE.put(oc_key, Doc);
 		}
 		else {
-			Doc = (Document)ObjectCache.get(oc_key); 
+			Doc = (Document)ObjectCache.INSTANCE.get(oc_key); 
 		}	
 	}
 	
