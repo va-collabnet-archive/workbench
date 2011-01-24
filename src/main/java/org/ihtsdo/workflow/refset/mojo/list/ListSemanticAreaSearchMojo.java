@@ -83,24 +83,18 @@ public class ListSemanticAreaSearchMojo extends AbstractMojo {
                 	int refCompId = thinExtByRefTuple.getComponentId();
                 	I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) thinExtByRefTuple.getMutablePart();
 
-                    if (part.getStringValue() == null) {
-                    	System.out.println("AAA");
-                    } else if (part.getStringValue().length() == 0) {
-                    	System.out.println("BBB");
-                    } else {
-                    	results.add(refCompId + " *with* " + part.getStringValue());
-                    }
+                	results.add(refCompId + " *with* " + part.getStringValue());
                 }
             }
         }
-
+        
         return results;
     }
 
     private void printRefsetMembers(HashSet<String> members) {
     	Iterator itr = members.iterator();
     	while (itr.hasNext()) {
-    		System.out.println("Next: " + ((String)itr.next()));
+    		//System.out.println("Next: " + ((String)itr.next()));
     	}
     }
 

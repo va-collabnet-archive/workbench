@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Scanner;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -12,6 +13,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.refset.semArea.SemanticAreaSearchRefset;
 import org.ihtsdo.workflow.refset.semArea.SemanticAreaSearchRefsetWriter;
@@ -62,7 +64,6 @@ public class InitializeSemanticAreaSearchMojo extends AbstractMojo {
         try {
             
             String resourceFilePath = baseDirectory.getAbsoluteFile() + basePath + filePath;
-            System.out.println(resourceFilePath);
 
         	SemanticAreaSearchRefset refset = new SemanticAreaSearchRefset();
             I_TermFactory tf = Terms.get();
@@ -80,7 +81,6 @@ public class InitializeSemanticAreaSearchMojo extends AbstractMojo {
 	}
 
     private void processV2StateTransitions(String resourceFilePath) throws TerminologyException, IOException {
-        System.out.println(resourceFilePath);
         processHierarchies(new File(resourceFilePath));
     }
     
@@ -103,8 +103,7 @@ public class InitializeSemanticAreaSearchMojo extends AbstractMojo {
 
         		writer.addMember();
         	} catch (Exception e) {
-        		e.printStackTrace();
-        		System.out.println("Row: " + line);
+            	AceLog.getAppLog().alertAndLog(Level.SEVERE, line, e);
         	}
         };
 

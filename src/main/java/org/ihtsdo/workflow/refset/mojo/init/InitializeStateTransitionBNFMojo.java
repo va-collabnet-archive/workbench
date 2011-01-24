@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Scanner;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -14,6 +15,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefset;
@@ -101,26 +103,16 @@ public class InitializeStateTransitionBNFMojo extends AbstractMojo {
         	UUID uuid = (UUID)ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids().iterator().next();
         	
         	Iterator architectonicIterator = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids().iterator();
-        	while (architectonicIterator.hasNext()) {
-        		System.out.println(architectonicIterator.next());
-        		
-        	}
-        	
         	
         	try {
-        
         	writer.setCategory(WorkflowHelper.lookupEditorCategory(columns[0]));
         	writer.setInitialState(WorkflowHelper.lookupState(columns[1]));
         	writer.setAction(WorkflowHelper.lookupAction(columns[2]));
         	writer.setFinalState(WorkflowHelper.lookupState(columns[3]));
 
         	writer.addMember();
-
-
         	} catch (Exception e) {
-        		e.printStackTrace();
-        		System.out.println("Row: " + line);
-        		
+            	AceLog.getAppLog().alertAndLog(Level.SEVERE, line, e);
         	}
         };
         

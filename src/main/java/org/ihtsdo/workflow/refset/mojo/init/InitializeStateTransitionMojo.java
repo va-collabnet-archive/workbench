@@ -3,6 +3,7 @@ package org.ihtsdo.workflow.refset.mojo.init;
 import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.logging.Level;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -10,6 +11,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefset;
@@ -61,7 +63,6 @@ public class InitializeStateTransitionMojo extends AbstractMojo {
         try {
 
             String resourceFilePath = baseDirectory.getAbsoluteFile() + basePath + filePath;
-            System.out.println(resourceFilePath);
 
         	StateTransitionRefset refset = new StateTransitionRefset();
             I_TermFactory tf = Terms.get();
@@ -76,7 +77,6 @@ public class InitializeStateTransitionMojo extends AbstractMojo {
 	}
 
     private void processStateTransitions(String resourceFilePath) throws TerminologyException, IOException {
-        System.out.println(resourceFilePath);
     	processTransitions(new File(resourceFilePath), Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_CONCEPTS.getUids()));
     }
 
@@ -107,8 +107,7 @@ public class InitializeStateTransitionMojo extends AbstractMojo {
 
         	writer.addMember();
         	} catch (Exception e) {
-        		e.printStackTrace();
-        		System.out.println("Row: " + line);
+            	AceLog.getAppLog().alertAndLog(Level.SEVERE, line, e);
         	}
         };
         
