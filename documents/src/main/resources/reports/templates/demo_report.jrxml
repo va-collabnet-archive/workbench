@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="0">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Title" fontName="Arial" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
+	<style name="Column header" forecolor="#FFFFFF" fontName="Arial" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="Arial" fontSize="12"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["/workspaces/Translation Module/documents/src/main/resources/documents/jasper_reports/"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="worklist" class="java.lang.String"/>
+	<field name="status" class="java.lang.String"/>
+	<field name="term" class="java.lang.String"/>
+	<field name="last user" class="java.lang.String"/>
+	<group name="worklist">
+		<groupExpression><![CDATA[$F{worklist}]]></groupExpression>
+		<groupHeader>
+			<band height="27">
+				<line>
+					<reportElement x="96" y="0" width="457" height="1" forecolor="#999999"/>
+				</line>
+				<textField>
+					<reportElement style="SubTitle" x="205" y="1" width="348" height="26" forecolor="#666666"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{worklist}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement mode="Opaque" x="97" y="1" width="108" height="26" forecolor="#B0023F" backcolor="#FFFFFF"/>
+					<textElement verticalAlignment="Middle">
+						<font size="20" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Worklist: ]]></text>
+				</staticText>
+				<line>
+					<reportElement x="96" y="26" width="457" height="1" forecolor="#999999"/>
+				</line>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="status">
+		<groupExpression><![CDATA[$F{status}]]></groupExpression>
+		<groupHeader>
+			<band height="50">
+				<textField>
+					<reportElement style="SubTitle" x="180" y="5" width="373" height="25" forecolor="#666666"/>
+					<textElement verticalAlignment="Middle">
+						<font size="16" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{status}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="109" y="5" width="71" height="25" isRemoveLineWhenBlank="true" forecolor="#2F1869"/>
+					<textElement verticalAlignment="Middle">
+						<font size="18" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Status:]]></text>
+				</staticText>
+				<frame>
+					<reportElement mode="Opaque" x="124" y="30" width="429" height="20" forecolor="#2F7BD0" backcolor="#2F7BD0"/>
+					<staticText>
+						<reportElement style="Column header" x="0" y="0" width="229" height="20"/>
+						<textElement/>
+						<text><![CDATA[term]]></text>
+					</staticText>
+					<staticText>
+						<reportElement style="Column header" x="229" y="0" width="200" height="20"/>
+						<textElement/>
+						<text><![CDATA[user]]></text>
+					</staticText>
+				</frame>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="62">
+				<textField>
+					<reportElement x="397" y="1" width="156" height="19" isPrintInFirstWholeBand="true" forecolor="#666666"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="13" isBold="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA["Total members " + $V{status_COUNT}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="124" y="0" width="429" height="1" forecolor="#2F7BD0"/>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="lastUserGroup">
+		<groupExpression><![CDATA[$F{last user}]]></groupExpression>
+	</group>
+	<group name="last user">
+		<groupExpression><![CDATA[$F{last user}]]></groupExpression>
+	</group>
+	<background>
+		<band height="822" splitType="Stretch">
+			<rectangle>
+				<reportElement x="-20" y="722" width="104" height="100" forecolor="#C5C5D9" backcolor="#C5C5D9"/>
+			</rectangle>
+			<line>
+				<reportElement x="-20" y="643" width="104" height="1" forecolor="#006699"/>
+			</line>
+			<rectangle>
+				<reportElement x="40" y="544" width="7" height="7" forecolor="#CCCCFF" backcolor="#CCCCFF"/>
+			</rectangle>
+			<rectangle>
+				<reportElement positionType="Float" x="-21" y="374" width="105" height="348" backcolor="#79A0DA"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="67" y="441" width="12" height="12" forecolor="#B0023F" backcolor="#B0023F"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="42" y="465" width="15" height="15" forecolor="#0178C7" backcolor="#0178C7"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="77" y="585" width="6" height="12" forecolor="#B0023F" backcolor="#B0023F"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="551" width="25" height="82" forecolor="#FFFFFF"/>
+				<textElement rotation="Left">
+					<font size="20" isBold="true"/>
+				</textElement>
+				<text><![CDATA[IHTSDO]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="47" y="561" width="10" height="10" forecolor="#101B8A" backcolor="#101B8A"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="6" y="655" width="13" height="13" forecolor="#B0023F" backcolor="#B0023F"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="23" y="388" width="33" height="245" forecolor="#FFFFFF"/>
+				<textElement rotation="Left"/>
+				<text><![CDATA[- global efforts for a common health terminology]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="52" y="496" width="13" height="13" forecolor="#6161F6" backcolor="#6161F6"/>
+			</rectangle>
+			<textField evaluationTime="Report">
+				<reportElement style="Column header" x="-20" y="791" width="103" height="20" forecolor="#000000"/>
+				<box leftPadding="4" rightPadding="4"/>
+				<textElement textAlignment="Center">
+					<font size="16" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="Column header" x="-21" y="722" width="105" height="69" forecolor="#000000"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="58" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="790" width="67" height="1"/>
+			</line>
+		</band>
+	</background>
+	<title>
+		<band height="152" splitType="Stretch">
+			<staticText>
+				<reportElement style="Title" x="0" y="0" width="555" height="104" forecolor="#79A0DA"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="54" isBold="false" pdfFontName="Helvetica"/>
+				</textElement>
+				<text><![CDATA[Worklist Members]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="SubTitle" x="326" y="104" width="203" height="48"/>
+				<textElement textAlignment="Right">
+					<font size="26"/>
+				</textElement>
+				<text><![CDATA[By Status]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="24" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="18" splitType="Stretch">
+			<rectangle>
+				<reportElement x="124" y="0" width="429" height="18" isRemoveLineWhenBlank="true" forecolor="#E3E8FF" backcolor="#E3E8FF">
+					<printWhenExpression><![CDATA[new Boolean( $V{status_COUNT}.intValue() % 2 ==0 )]]></printWhenExpression>
+				</reportElement>
+			</rectangle>
+			<textField>
+				<reportElement x="363" y="0" width="190" height="18"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{last user}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="137" y="0" width="189" height="18"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{term}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="48" splitType="Stretch">
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement style="Column header" x="424" y="20" width="131" height="20" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Column header" x="96" y="20" width="267" height="20" forecolor="#000000"/>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Worklist members report]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="822" splitType="Stretch">
+			<pieChart>
+				<chart isShowLegend="false">
+					<reportElement x="0" y="368" width="553" height="409"/>
+					<chartTitle>
+						<font size="16" isBold="true"/>
+						<titleExpression><![CDATA["Last user summary"]]></titleExpression>
+					</chartTitle>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset>
+					<keyExpression><![CDATA[$F{last user}]]></keyExpression>
+					<valueExpression><![CDATA[$V{lastUserGroup_COUNT}]]></valueExpression>
+					<labelExpression><![CDATA[$F{last user}]]></labelExpression>
+				</pieDataset>
+				<piePlot>
+					<plot/>
+					<itemLabel color="#000000" backgroundColor="#FFFFFF"/>
+				</piePlot>
+			</pieChart>
+			<pieChart>
+				<chart isShowLegend="false">
+					<reportElement x="0" y="0" width="555" height="355"/>
+					<chartTitle>
+						<font size="16" isBold="true"/>
+						<titleExpression><![CDATA["Status summary"]]></titleExpression>
+					</chartTitle>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset>
+					<keyExpression><![CDATA[$F{status}]]></keyExpression>
+					<valueExpression><![CDATA[$V{status_COUNT}]]></valueExpression>
+					<labelExpression><![CDATA[$F{status}]]></labelExpression>
+				</pieDataset>
+				<piePlot>
+					<plot/>
+					<itemLabel color="#000000" backgroundColor="#FFFFFF"/>
+				</piePlot>
+			</pieChart>
+		</band>
+	</summary>
+</jasperReport>

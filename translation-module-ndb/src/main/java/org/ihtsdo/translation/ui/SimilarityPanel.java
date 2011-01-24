@@ -1,0 +1,685 @@
+/*
+ * Created by JFormDesigner on Tue Oct 19 20:35:00 GMT-03:00 2010
+ */
+
+package org.ihtsdo.translation.ui;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.document.DocumentManager;
+import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.model.TranslationProject;
+import org.ihtsdo.project.model.WorkListMember;
+import org.ihtsdo.project.refset.LanguageMembershipRefset;
+import org.ihtsdo.translation.LanguageUtil;
+import org.ihtsdo.translation.SimilarityMatchedItem;
+import org.ihtsdo.translation.ui.ConfigTranslationModule.DefaultSimilaritySearchOption;
+
+/**
+ * @author Guillermo Reynoso
+ */
+public class SimilarityPanel extends JPanel {
+	private String sourceFSN;
+	private I_GetConceptData fsn;
+	private I_GetConceptData preferred;
+	private List<Integer> sourceIds;
+	private int targetId;
+	private I_GetConceptData concept;
+	private I_ConfigAceFrame config;
+	private CustomTableColumnModel columnModel;
+	private TranslationProject project;
+	private WorkListMember worklistMember;
+	
+	public SimilarityPanel() {
+		initComponents();
+		try {
+			this.config = Terms.get().getActiveAceFrameConfig();
+			fsn = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+			preferred =  Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		}
+		
+
+		refineCheckBox.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+				if(!refineCheckBox.isSelected()){
+					refinePanel.setVisible(false);
+					refinePanel.validate();
+				}else{
+					refinePanel.setVisible(true);
+					refinePanel.validate();
+				}
+			}
+		});
+		
+		searchButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				searchButtonActionPreformed(e);
+			}
+		});
+		similarityTable.setModel(new DefaultTableModel());
+		similarityTable.setCellSelectionEnabled(true);
+		table2.setModel(new DefaultTableModel());
+	}
+	
+
+	public void updateTabs(String sourceFSN, I_GetConceptData concept, List<Integer> sourceIds, int targetId,
+			TranslationProject translationProject, WorkListMember worklistMember){
+		ConfigTranslationModule confTrans = LanguageUtil.getDefaultTranslationConfig(translationProject);
+		
+		DefaultSimilaritySearchOption defSimSearch = confTrans.getDefaultSimilaritySearchOption();
+
+		if (defSimSearch==null){
+			defSimSearch=DefaultSimilaritySearchOption.FSN;
+		}
+		switch(defSimSearch){
+			case FSN:
+				rbFSN.setSelected(true);
+				break;
+			case PREFERRED:
+				rbPref.setSelected(true);
+				break;
+			case BOTH:
+				radioButton2.setSelected(true);
+				break;
+			default:
+				System.out.println("none of the others");
+				break;
+		}
+		
+		clearLingGuidelines();
+		clearTransMemory();
+		clearSimilarities();
+		this.project = translationProject;
+		this.worklistMember = worklistMember;
+		this.sourceFSN=sourceFSN;
+		this.concept=concept;
+		this.sourceIds=sourceIds;
+		this.targetId=targetId;
+		updateSimilarityTable(sourceFSN);
+		updateTransMemoryTable(sourceFSN);
+		updateGlossaryEnforcement();
+	}
+
+	/**
+	 * Update glossary enforcement.
+	 * 
+	 * @param query the query
+	 */
+	private void updateGlossaryEnforcement() {
+
+		try {
+			String results = LanguageUtil.getLinguisticGuidelines(concept);
+//			if (!results.isEmpty()){
+//				tabbedPane1.setTitleAt(2, "<html>Linguistic Guidelines<b><font color='red'>*</font></b></html>");
+//			}
+//			else{
+//				tabbedPane1.setTitleAt(2, "<html>Linguistic Guidelines</html>");
+//			}
+			editorPane1.setText(results);
+			editorPane1.revalidate();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	/**
+	 * Update trans memory table.
+	 * 
+	 * @param query the query
+	 */
+	private void updateTransMemoryTable(String query) {
+		// TODO fix language parameters
+
+		HashMap<String,String> results = DocumentManager.matchTranslationMemory(query);
+		String[] columnNames = {"Pattern Text",
+		"Translated to.."};
+		String[][] data = null;
+		DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
+			private static final long serialVersionUID = 1L;
+
+			public boolean isCellEditable(int x, int y) {
+				return false;
+			}
+		};
+
+		if (results.isEmpty()) {
+			tableModel.addRow(new String[] {"No results found","No results found"});
+		} else {
+			for (String key : results.keySet()) {
+				tableModel.addRow(new String[] {key,results.get(key)});
+			}
+		}
+		table2.setModel(tableModel);
+		similarityTable.setCellSelectionEnabled(true);
+		TableColumnModel cmodel = table2.getColumnModel(); 
+		TextAreaRenderer textAreaRenderer = new TextAreaRenderer();
+		cmodel.getColumn(0).setCellRenderer(textAreaRenderer); 
+		cmodel.getColumn(1).setCellRenderer(textAreaRenderer); 
+		table2.revalidate();
+	}
+
+	/**
+	 * Update similarity table.
+	 * 
+	 * @param query the query
+	 */
+	private void updateSimilarityTable(String query) {
+		List<Integer> types= new ArrayList<Integer>();
+		if (rbFSN.isSelected())
+			types.add(fsn.getConceptNid());
+		else
+			if (rbPref.isSelected())
+				types.add(preferred.getConceptNid());
+			else{
+				types.add(fsn.getConceptNid());
+				types.add(preferred.getConceptNid());
+			}
+
+		List<SimilarityMatchedItem> results = LanguageUtil.getSimilarityResults(query, sourceIds, targetId, types);
+		String[] columnNames;
+		columnNames = new String[] {"Source Text","Target Text", "Status", "Item"};
+		String[][] data = null;
+		DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
+			private static final long serialVersionUID = 1L;
+
+			public boolean isCellEditable(int x, int y) {
+				return false;
+			}
+		};
+		similarityTable.setModel(tableModel);
+		similarityTable.setCellSelectionEnabled(true);
+		columnModel = new CustomTableColumnModel();
+		similarityTable.setColumnModel(columnModel);
+		similarityTable.createDefaultColumnsFromModel();	
+		
+		TableColumn column = columnModel.getColumnByModelIndex(3);
+		columnModel.setColumnVisible(column, false);
+		
+		if (results.isEmpty()) {
+			tableModel.addRow(new String[] {query,"No matches found"});
+		} else {
+			for (SimilarityMatchedItem item : results) {
+				I_GetConceptData transStatus = null;
+				try {
+					I_GetConceptData targetLanguage = TerminologyProjectDAO.getTargetLanguageRefsetForProject(project, config);
+					LanguageMembershipRefset targetLangRefset = new LanguageMembershipRefset(targetLanguage, config);
+					transStatus = targetLangRefset.getPromotionRefset(config).getPromotionStatus(item.getConceptId(), config);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				tableModel.addRow(new Object[] {item.getSourceText(),item.getTargetText(),transStatus,item});
+			}
+		}
+
+		
+		TableColumnModel cmodel = similarityTable.getColumnModel(); 
+		TextAreaRenderer textAreaRenderer = new TextAreaRenderer();
+		cmodel.getColumn(0).setCellRenderer(textAreaRenderer); 
+		cmodel.getColumn(1).setCellRenderer(textAreaRenderer); 
+
+		similarityTable.revalidate();
+	}
+
+	private void searchButtonActionPreformed(ActionEvent e){
+		String query = searchTextField.getText();
+		if(!query.trim().equals("")){
+			updateSimilarityTable(query);
+		}
+	}
+
+	private void rbFSNActionPerformed(ActionEvent e) {
+		updateSimilarityTable(sourceFSN);
+		searchTextField.setText(sourceFSN);
+	}
+
+	private void rbPrefActionPerformed(ActionEvent e) {
+		updateSimilarityTable(sourceFSN);
+		searchTextField.setText(sourceFSN);
+	}
+
+	private void radioButton2ActionPerformed(ActionEvent e) {
+		updateSimilarityTable(sourceFSN);
+		searchTextField.setText(sourceFSN);
+	}
+
+	private void expandButtonActionPerformed(ActionEvent e) {
+		expandButton.setVisible(false);
+		final JDialog similarityDialog = new JDialog();
+		similarityDialog.setContentPane(similarityPanel);
+		similarityDialog.setModal(true);
+		similarityDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+		similarityDialog.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e){
+				expandButton.setVisible(true);
+				similarityDialog.dispose();
+				add(similarityPanel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
+			}
+		});
+		similarityDialog.setSize(new Dimension(700,550));
+		Dimension pantalla = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension ventana = similarityDialog.getSize();
+        similarityDialog.setLocation(
+            (pantalla.width - ventana.width) / 2,
+            (pantalla.height - ventana.height) / 2);
+        
+		similarityDialog.setVisible(true);
+		this.revalidate();
+		this.repaint();
+	}
+
+	private void clearSimilarities(){
+		String[] columnNames = {"Source Text",
+		"Target Text"};
+		String[][] data = null;
+		DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
+			private static final long serialVersionUID = 1L;
+
+			public boolean isCellEditable(int x, int y) {
+				return false;
+			}
+			
+		};
+		similarityTable.setCellSelectionEnabled(true);
+		similarityTable.setModel(tableModel);
+		similarityTable.revalidate();
+	}
+
+	private void clearLingGuidelines(){
+		editorPane1.setText("");
+		editorPane1.revalidate();
+	}
+
+	private void clearTransMemory(){
+		String[] columnNames = {"Pattern Text",
+		"Translated to.."};
+		String[][] data = null;
+		DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
+			private static final long serialVersionUID = 1L;
+
+			public boolean isCellEditable(int x, int y) {
+				return false;
+			}
+		};
+
+		table2.setModel(tableModel);
+		similarityTable.setCellSelectionEnabled(true);
+		table2.revalidate();
+	}
+
+	/**
+	 * This method shows a worklist member's  
+	 * similarity concept, in the context of the worklist member 
+	 * @param e
+	 */
+	private void table1MouseClicked(MouseEvent e) {
+		if(e.getClickCount() == 2){
+			DefaultTableModel tableModel = (DefaultTableModel)similarityTable.getModel();
+			int selected = similarityTable.getSelectedRow();
+			int columnCount = columnModel.getColumnCount(false);
+			if(columnCount == 4){
+				Object val = tableModel.getValueAt(selected, 3);
+				if(val instanceof SimilarityMatchedItem){
+					SimilarityMatchedItem item = (SimilarityMatchedItem)val;
+					try {
+						I_GetConceptData concept = Terms.get().getConcept(item.getConceptId());
+						TranslationConceptEditorRO editorRO = new TranslationConceptEditorRO();
+						
+						JDialog ro = new JDialog();
+						ro.setContentPane(editorRO);
+						ro.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+						ro.setSize(new Dimension(800,650));
+						Dimension pantalla = Toolkit.getDefaultToolkit().getScreenSize();
+				        Dimension ventana = ro.getSize();
+				        ro.setLocation(
+				            (pantalla.width - ventana.width) / 2,
+				            (pantalla.height - ventana.height) / 2);
+
+						
+						worklistMember.setId(item.getConceptId());
+						editorRO.updateUI(project, worklistMember);
+						ro.setVisible(true);
+					} catch (TerminologyException e1) {
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+
+	private void copyTargetButtonActionPerformed(ActionEvent e) {
+		int selectedRow = similarityTable.getSelectedRow();
+		if(selectedRow >= 0){
+			String target = similarityTable.getValueAt(selectedRow, 1).toString();
+			StringSelection strSel = new StringSelection(target);
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		    clipboard.setContents( strSel,strSel );
+		}
+	}
+	
+	private void initComponents() {
+		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+		similarityPanel = new JPanel();
+		label1 = new JLabel();
+		refinePanel = new JPanel();
+		searchTextField = new JTextField();
+		searchButton = new JButton();
+		scrollPane2 = new JScrollPane();
+		similarityTable = new ZebraJTable();
+		panel13 = new JPanel();
+		rbFSN = new JRadioButton();
+		rbPref = new JRadioButton();
+		radioButton2 = new JRadioButton();
+		refineCheckBox = new JCheckBox();
+		expandButton = new JButton();
+		panel1 = new JPanel();
+		label2 = new JLabel();
+		scrollPane3 = new JScrollPane();
+		table2 = new ZebraJTable();
+		panel15 = new JPanel();
+		label3 = new JLabel();
+		scrollPane4 = new JScrollPane();
+		editorPane1 = new JEditorPane();
+
+		//======== this ========
+		setBorder(new EmptyBorder(5, 5, 5, 5));
+		setLayout(new GridBagLayout());
+		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
+		((GridBagLayout)getLayout()).rowHeights = new int[] {255, 255, 250, 0};
+		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+		((GridBagLayout)getLayout()).rowWeights = new double[] {1.0, 1.0, 1.0, 1.0E-4};
+
+		//======== similarityPanel ========
+		{
+			similarityPanel.setBackground(new Color(238, 238, 238));
+			similarityPanel.setBorder(new CompoundBorder(
+				new EtchedBorder(),
+				new EmptyBorder(5, 5, 5, 5)));
+			similarityPanel.setLayout(new GridBagLayout());
+			((GridBagLayout)similarityPanel.getLayout()).columnWidths = new int[] {0, 0};
+			((GridBagLayout)similarityPanel.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0};
+			((GridBagLayout)similarityPanel.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+			((GridBagLayout)similarityPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0, 0.0, 1.0E-4};
+
+			//---- label1 ----
+			label1.setText("Similarity");
+			label1.setHorizontalAlignment(SwingConstants.LEFT);
+			similarityPanel.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
+
+			//======== refinePanel ========
+			{
+				refinePanel.setBackground(new Color(238, 238, 238));
+				refinePanel.setLayout(new GridBagLayout());
+				((GridBagLayout)refinePanel.getLayout()).columnWidths = new int[] {233, 0, 0};
+				((GridBagLayout)refinePanel.getLayout()).rowHeights = new int[] {0, 0};
+				((GridBagLayout)refinePanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0E-4};
+				((GridBagLayout)refinePanel.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+				refinePanel.setVisible(false);
+				refinePanel.add(searchTextField, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
+
+				//---- searchButton ----
+				searchButton.setAction(null);
+				searchButton.setText("Sea[r]ch");
+				searchButton.setMnemonic('R');
+				refinePanel.add(searchButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
+			}
+			similarityPanel.add(refinePanel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
+
+			//======== scrollPane2 ========
+			{
+
+				//---- similarityTable ----
+				similarityTable.setPreferredScrollableViewportSize(new Dimension(180, 200));
+				similarityTable.setFont(new Font("Verdana", Font.PLAIN, 12));
+				similarityTable.setModel(new DefaultTableModel());
+				similarityTable.setCellSelectionEnabled(true);
+				similarityTable.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						table1MouseClicked(e);
+					}
+				});
+				scrollPane2.setViewportView(similarityTable);
+			}
+			similarityPanel.add(scrollPane2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
+
+			//======== panel13 ========
+			{
+				panel13.setBackground(new Color(238, 238, 238));
+				panel13.setLayout(new GridBagLayout());
+				((GridBagLayout)panel13.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0};
+				((GridBagLayout)panel13.getLayout()).rowHeights = new int[] {0, 0};
+				((GridBagLayout)panel13.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
+				((GridBagLayout)panel13.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+
+				//---- rbFSN ----
+				rbFSN.setText("FSN");
+				rbFSN.setSelected(true);
+				rbFSN.setBackground(new Color(238, 238, 238));
+				rbFSN.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						rbFSNActionPerformed(e);
+					}
+				});
+				panel13.add(rbFSN, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
+
+				//---- rbPref ----
+				rbPref.setText("Preferred");
+				rbPref.setBackground(new Color(238, 238, 238));
+				rbPref.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						rbPrefActionPerformed(e);
+					}
+				});
+				panel13.add(rbPref, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
+
+				//---- radioButton2 ----
+				radioButton2.setText("Both");
+				radioButton2.setBackground(new Color(238, 238, 238));
+				radioButton2.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						radioButton2ActionPerformed(e);
+					}
+				});
+				panel13.add(radioButton2, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
+
+				//---- refineCheckBox ----
+				refineCheckBox.setText("Refine");
+				panel13.add(refineCheckBox, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
+
+				//---- expandButton ----
+				expandButton.setText("E[x]pand");
+				expandButton.setMnemonic('X');
+				expandButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						expandButtonActionPerformed(e);
+					}
+				});
+				panel13.add(expandButton, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+					new Insets(0, 0, 0, 0), 0, 0));
+			}
+			similarityPanel.add(panel13, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
+		}
+		add(similarityPanel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 5, 0), 0, 0));
+
+		//======== panel1 ========
+		{
+			panel1.setBorder(new CompoundBorder(
+				new EtchedBorder(),
+				new EmptyBorder(5, 5, 5, 5)));
+			panel1.setLayout(new GridBagLayout());
+			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0};
+			((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0};
+			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
+
+			//---- label2 ----
+			label2.setText("Translation Memory");
+			panel1.add(label2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
+
+			//======== scrollPane3 ========
+			{
+
+				//---- table2 ----
+				table2.setPreferredScrollableViewportSize(new Dimension(180, 200));
+				table2.setFont(new Font("Verdana", Font.PLAIN, 12));
+				scrollPane3.setViewportView(table2);
+			}
+			panel1.add(scrollPane3, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
+		}
+		add(panel1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 5, 0), 0, 0));
+
+		//======== panel15 ========
+		{
+			panel15.setBorder(new CompoundBorder(
+				new EtchedBorder(),
+				new EmptyBorder(5, 5, 5, 5)));
+			panel15.setLayout(new GridBagLayout());
+			((GridBagLayout)panel15.getLayout()).columnWidths = new int[] {0, 0};
+			((GridBagLayout)panel15.getLayout()).rowHeights = new int[] {0, 0, 0};
+			((GridBagLayout)panel15.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+			((GridBagLayout)panel15.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
+
+			//---- label3 ----
+			label3.setText("Editorial Guidelines");
+			panel15.add(label3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
+
+			//======== scrollPane4 ========
+			{
+
+				//---- editorPane1 ----
+				editorPane1.setContentType("text/html");
+				scrollPane4.setViewportView(editorPane1);
+			}
+			panel15.add(scrollPane4, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
+		}
+		add(panel15, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 0, 0), 0, 0));
+
+		//---- buttonGroup2 ----
+		ButtonGroup buttonGroup2 = new ButtonGroup();
+		buttonGroup2.add(rbFSN);
+		buttonGroup2.add(rbPref);
+		buttonGroup2.add(radioButton2);
+		// JFormDesigner - End of component initialization  //GEN-END:initComponents
+	}
+
+	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	private JPanel similarityPanel;
+	private JLabel label1;
+	private JPanel refinePanel;
+	private JTextField searchTextField;
+	private JButton searchButton;
+	private JScrollPane scrollPane2;
+	private ZebraJTable similarityTable;
+	private JPanel panel13;
+	private JRadioButton rbFSN;
+	private JRadioButton rbPref;
+	private JRadioButton radioButton2;
+	private JCheckBox refineCheckBox;
+	private JButton expandButton;
+	private JPanel panel1;
+	private JLabel label2;
+	private JScrollPane scrollPane3;
+	private ZebraJTable table2;
+	private JPanel panel15;
+	private JLabel label3;
+	private JScrollPane scrollPane4;
+	private JEditorPane editorPane1;
+	// JFormDesigner - End of variables declaration  //GEN-END:variables
+}
