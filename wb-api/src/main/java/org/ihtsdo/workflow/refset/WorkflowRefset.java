@@ -3,10 +3,13 @@ package org.ihtsdo.workflow.refset;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.RefsetAuxiliary.Concept;
 import org.dwfa.tapi.TerminologyException;
 
 
@@ -23,8 +26,9 @@ public abstract class WorkflowRefset
 	protected WorkflowRefsetFields fields = null;
 	protected String refsetName = null;
 	protected I_HelpRefsets helper = null;
-
-	public WorkflowRefset() throws TerminologyException, IOException {
+	
+	public WorkflowRefset(Concept con) throws IOException, TerminologyException {
+		this(con.localize().getNid(), con.toString());
 		helper = Terms.get().getRefsetHelper(Terms.get().getActiveAceFrameConfig());		
 	}
 	
@@ -34,6 +38,10 @@ public abstract class WorkflowRefset
 		setRefsetConcept(id);
 	}
 	
+	public WorkflowRefset() {
+
+	}
+
 	public void setRefsetId(int id) {
 		refsetId = id;
 		setRefsetConcept(id);
@@ -80,11 +88,11 @@ public abstract class WorkflowRefset
 		return s.substring(startIndex + "<value>".length(), endIndex);
 	}
 
-	private void setRefsetConcept(int nid) {
+	private void setRefsetConcept(int uid) {
 		try {
-			refset = Terms.get().getConcept(nid);
+			refset = Terms.get().getConcept(uid);
 		} catch (Exception e) {
-			e.printStackTrace();
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error retrieving Refset Concept: " + uid, e);
 		}
 	}
 	public abstract Collection<UUID> getRefsetUids() throws TerminologyException, IOException;
@@ -94,7 +102,7 @@ public abstract class WorkflowRefset
 		try {
 			return Terms.get().getConcept(UUID.fromString(UidString));
 		} catch (Exception e) {
-			e.printStackTrace();
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error retrieving Concept: " + UidString, e);
 		}
 		
 		return null;

@@ -2,10 +2,12 @@ package org.ihtsdo.workflow;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.workflow.WorkflowHistoryJavaBeanBI;
 
@@ -174,8 +176,8 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 		} catch (IOException io) {
 			return "Failed to identify referencedComponentId or WorkflowHistory" + 
 				   "\nError msg: " + io.getMessage();
-		} catch (TerminologyException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Failed to access fields of WorkflowHistoryJavaBean: " + this.toString(), e);
 			return "";
 		}
 	}

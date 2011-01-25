@@ -80,8 +80,6 @@ public class InitializeSemanticAreaHierarchyMojo extends AbstractMojo {
 
             Terms.get().addUncommitted(writer.getRefsetConcept());
 		} catch (Exception e) {
-			e.printStackTrace();
-			e.getMessage();
 			throw new MojoExecutionException(e.getMessage());
 		}
 

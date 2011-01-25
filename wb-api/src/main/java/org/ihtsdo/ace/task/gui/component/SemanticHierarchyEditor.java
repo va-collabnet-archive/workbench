@@ -21,10 +21,12 @@ import java.awt.Rectangle;
 import java.io.IOException;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.tasks.editor.AbstractComboEditor;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.refset.semArea.SemanticAreaSearchRefset;
@@ -34,19 +36,19 @@ public class SemanticHierarchyEditor extends AbstractComboEditor {
     @Override
     public EditorComponent setupEditor() {
     	SortedSet<String> hierarchies = new TreeSet<String>();
+		I_ExtendByRefPartStr props = null;
 
     	try {
     		SemanticAreaSearchRefset refset = new SemanticAreaSearchRefset();
-			
 			try {
 				for (I_ExtendByRef extension : Terms.get().getRefsetExtensionMembers(refset.getRefsetId())) 
 				{
-					I_ExtendByRefPartStr props = (I_ExtendByRefPartStr)extension;
+					props = (I_ExtendByRefPartStr)extension;
 				
 					hierarchies.add(props.getStringValue());
 		        }
 			} catch (Exception e) {
-				e.printStackTrace();
+            	AceLog.getAppLog().alertAndLog(Level.SEVERE, props.getStringValue(), e);
 			}
 
 			EditorComponent ec = new EditorComponent(hierarchies.toArray());
@@ -59,12 +61,8 @@ public class SemanticHierarchyEditor extends AbstractComboEditor {
 	    	ec.setBounds(r);
 	
 	    	return ec;
-		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, props.getStringValue(), e);
 		}
 		
 		return null;

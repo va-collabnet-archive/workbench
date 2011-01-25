@@ -1,8 +1,12 @@
 package org.ihtsdo.workflow.refset.semArea;
 
 import java.io.IOException;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.refset.WorkflowRefsetFields;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetWriter;
@@ -63,14 +67,12 @@ public class SemanticAreaSearchRefsetWriter extends WorkflowRefsetWriter
 		}
 
 		public String toString() {
-			try {
-				if (searchTerm == null)
-					throw new Exception("Search Term is NULL");
-				
-				return "\nSearch Term: " + searchTerm;
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
-				return "No Term";
+			try { 
+
+
+				return  "\nWorknSearch Term: " + searchTerm;
+			} catch (Exception io) {
+				return "Failed to identify searchTerm for SemanticAreaSearch Refset";
 			}
 		}
 
@@ -83,9 +85,19 @@ public class SemanticAreaSearchRefsetWriter extends WorkflowRefsetWriter
 
 		@Override
 		public boolean valuesExist() {
-			// TODO Auto-generated method stub
-			return ((getReferencedComponentId() != null) && 
-					(searchTerm != null));
+			boolean retVal = ((getReferencedComponentId() != null) && 
+							  (searchTerm != null));
+									
+			if (!retVal)
+			{
+				StringBuffer str = new StringBuffer();
+				str.append("\nError in adding to Semantic Area Search Refset");
+				str.append("\nReferencedComponentId:" + getReferencedComponentId());
+				str.append("\nsearchTerm:" + searchTerm);
+	        	AceLog.getAppLog().alertAndLog(Level.SEVERE, str.toString(), new Exception("Failure in updating Semantic Area Search Refset"));
+			}
+			
+			return retVal;
 		}
 	}
 

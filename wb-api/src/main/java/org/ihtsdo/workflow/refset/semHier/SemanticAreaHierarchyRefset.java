@@ -20,8 +20,7 @@ import org.ihtsdo.workflow.refset.WorkflowRefset;
 public class SemanticAreaHierarchyRefset extends WorkflowRefset 
 {
 	public SemanticAreaHierarchyRefset() throws IOException, TerminologyException {
-		super (RefsetAuxiliary.Concept.SEMANTIC_AREA_HIERARCHY.localize().getNid(),
-			RefsetAuxiliary.Concept.SEMANTIC_AREA_HIERARCHY.toString());
+		super (RefsetAuxiliary.Concept.SEMANTIC_AREA_HIERARCHY);
 	}
 	
 	public Collection<UUID> getRefsetUids() throws TerminologyException, IOException {

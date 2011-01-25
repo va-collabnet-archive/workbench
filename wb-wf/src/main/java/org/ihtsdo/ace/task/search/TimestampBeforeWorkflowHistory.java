@@ -6,8 +6,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -60,13 +62,11 @@ public class TimestampBeforeWorkflowHistory extends AbstractWorkflowHistorySearc
 
        		if (bean.getTimeStamp() < testTimestampBeforeThisDate)
             	return true;
-            else
-            	return false;
 		} catch (Exception e) {
-			System.out.println(e);
-			e.printStackTrace();
-			throw new TaskFailedException("Couldn't read search Timestamp Before Than!");
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Couldn't read search Timestamp Before Than", e);
 		}
+
+		return false;
     }
 
     public String getTestTimestampBefore() {

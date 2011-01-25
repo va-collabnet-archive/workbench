@@ -3,11 +3,13 @@ package org.ihtsdo.workflow.refset.utilities;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
@@ -44,12 +46,9 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 				helper.newRefsetExtension(refsetId, fields.getReferencedComponentId().getConceptNid(), REFSET_TYPES.STR, propMap, Terms.get().getActiveAceFrameConfig());
 				retVal = true;
 			} else
-				throw new Exception("Refset fields to add are not all populated");
+				return false;
 		} catch (Exception io) {
-			System.out.println("Failed adding member: " + refCompStr + " (" + fields.getReferencedComponentId().getConceptNid() + ")");
-			System.out.println("to refset: " + refsetName);
-			System.out.println("Attempting to add these properties: " + fields.toString());
-			System.out.println(io.getMessage());
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Failed to Add Member", io);
 		}
 
 		fields.cleanValues();
@@ -73,11 +72,7 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 				return true;
 			}
 		} catch (Exception io) {
-			System.out.println("\nFailed retiring member: " + refCompStr + " (" + fields.getReferencedComponentId().getConceptNid() + ")");
-			System.out.println("to refset: " + refsetName);
-			System.out.println("Attempting to retire these properties: " + fields.toString());
-			System.out.println(io.getMessage());
-			io.printStackTrace();
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Failed to retire member", io);
 		}
 		
 		fields.cleanValues();

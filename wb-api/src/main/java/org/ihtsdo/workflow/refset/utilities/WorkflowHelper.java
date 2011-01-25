@@ -19,7 +19,6 @@ import java.util.logging.Level;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_RelTuple;
@@ -224,19 +223,23 @@ public class WorkflowHelper {
 		WorkflowHistoryRefsetWriter.unLockMutex();
 	}
 
-	public static void updateModelers() throws TerminologyException, IOException 
+	public static void updateModelers() 
 	{
-    	modelers = new HashMap<String, I_GetConceptData>();
-    	modelersUuids = new HashMap<String, UUID>();
-    	I_TermFactory tf = Terms.get();
-
-		I_GetConceptData parentEditorConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
-		Set<I_GetConceptData> editors = getChildren(parentEditorConcept);
-		editors.remove(parentEditorConcept);
-
-		for (I_GetConceptData editor : editors)
-		{
-	    	modelers.put(getLoginId(editor), editor);
+		try {
+	    	modelers = new HashMap<String, I_GetConceptData>();
+	    	modelersUuids = new HashMap<String, UUID>();
+	    	I_TermFactory tf = Terms.get();
+	
+			I_GetConceptData parentEditorConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
+			Set<I_GetConceptData> editors = getChildren(parentEditorConcept);
+			editors.remove(parentEditorConcept);
+	
+			for (I_GetConceptData editor : editors)
+			{
+		    	modelers.put(getLoginId(editor), editor);
+			}
+		} catch (Exception e) {
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in updating modelers", e);
 		}
     }
 
@@ -275,7 +278,7 @@ public class WorkflowHelper {
 	 * @throws TerminologyException
 	 * @throws IOException
 	 */
-	public static I_GetConceptData lookupModeler(String name) throws TerminologyException, IOException
+	public static I_GetConceptData lookupModeler(String name) 
 	{
 		if (modelers == null)
 			updateModelers();
@@ -285,22 +288,26 @@ public class WorkflowHelper {
 
 		if (!modelers.containsKey(name))
 		{
-			if (getDefaultModeler() != null && !getDefaultModeler().getInitialText().equalsIgnoreCase(name))
-			{
-				AceLog.getAppLog().log(Level.WARNING, unrecognizedLoginMessage);
-
-				for (I_GetConceptData modeler : modelers.values())
+			try {
+				if (getDefaultModeler() != null && !getDefaultModeler().getInitialText().equalsIgnoreCase(name))
 				{
-					List<? extends I_RelTuple> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_MODELER_VALUE);
-
-					for (I_RelTuple rel : relList)
+					AceLog.getAppLog().log(Level.WARNING, unrecognizedLoginMessage);
+	
+					for (I_GetConceptData modeler : modelers.values())
 					{
-						if (rel != null &&
-						    rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_DEFAULT_MODELER.getPrimoridalUid()).getConceptNid())
-							return modeler;
+						List<? extends I_RelTuple> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_MODELER_VALUE);
+	
+						for (I_RelTuple rel : relList)
+						{
+							if (rel != null &&
+							    rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_DEFAULT_MODELER.getPrimoridalUid()).getConceptNid())
+								return modeler;
+						}
+	
 					}
-
 				}
+			} catch (Exception e ) {
+            	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Unable to lookup modeler: " + name, e);
 			}
 
 			return defaultModeler;
@@ -309,26 +316,30 @@ public class WorkflowHelper {
 			return modelers.get(name);
     }
 
-	public static I_GetConceptData getLeadModeler() throws TerminologyException, IOException
+	public static I_GetConceptData getLeadModeler()
 	{
-		if (leadModeler  == null)
-		{
-			if (modelers == null)
-				updateModelers();
-
-			for (I_GetConceptData modeler : modelers.values())
+		try {
+			if (leadModeler  == null)
 			{
-				List<? extends I_RelTuple> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_MODELER_VALUE);
-
-				for (I_RelTuple rel : relList)
+				if (modelers == null)
+					updateModelers();
+	
+				for (I_GetConceptData modeler : modelers.values())
 				{
-					if (rel != null &&
-					    rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_LEAD_MODELER.getPrimoridalUid()).getConceptNid())
-						leadModeler = modeler;
+					List<? extends I_RelTuple> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_MODELER_VALUE);
+	
+					for (I_RelTuple rel : relList)
+					{
+						if (rel != null &&
+						    rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_LEAD_MODELER.getPrimoridalUid()).getConceptNid())
+							leadModeler = modeler;
+					}
 				}
 			}
+		} catch (Exception e) {
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in identifying lead modeler", e);
 		}
-
+		
 		return leadModeler;
     }
 
@@ -516,17 +527,22 @@ public class WorkflowHelper {
 		return null;
 	}
 
-	public static List<? extends I_RelTuple> getWorkflowRelationship(I_GetConceptData concept, Concept desiredRelationship) throws TerminologyException, IOException
+	public static List<? extends I_RelTuple> getWorkflowRelationship(I_GetConceptData concept, Concept desiredRelationship) 
 	{
-		I_IntSet relType = Terms.get().newIntSet();
-		relType.add(Terms.get().getConcept(desiredRelationship.getPrimoridalUid()).getConceptNid());
-
-		List<? extends I_RelTuple> rels =  concept.getSourceRelTuples(allowedStatuses, relType, viewPositions, precedencePolicy, contractionResolutionStrategy);
-
-		if (rels.isEmpty())
-			return new LinkedList<I_RelTuple>();
-		else
-			return rels;
+		try 
+		{
+			I_IntSet relType = Terms.get().newIntSet();
+			relType.add(Terms.get().getConcept(desiredRelationship.getPrimoridalUid()).getConceptNid());
+	
+			List<? extends I_RelTuple> rels =  concept.getSourceRelTuples(allowedStatuses, relType, viewPositions, precedencePolicy, contractionResolutionStrategy);
+	
+			if (!rels.isEmpty())
+				return rels;
+		} catch (Exception e) {
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in getting workflow-based attribute", e);
+		}
+		
+		return new LinkedList<I_RelTuple>();
 	}
 
     public static boolean isBeginEndAction(UUID action) {

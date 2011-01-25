@@ -16,14 +16,8 @@ import org.ihtsdo.workflow.refset.WorkflowRefset;
 public abstract class WorkflowRefsetSearcher extends WorkflowRefset {
 	protected WorkflowRefset refset = null;
 
-	protected WorkflowRefsetSearcher() throws TerminologyException, IOException {
+	protected WorkflowRefsetSearcher() {
 		super();
-	}
-
-	public String listMembers() throws IOException, TerminologyException {
-		WorkflowRefsetReader reader = new WorkflowRefsetReader(refset);
-		
-		return reader.printContents(refset.getRefsetId());
 	}
 
 	public Collection<UUID> getRefsetUids() throws TerminologyException, IOException

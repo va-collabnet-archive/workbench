@@ -10,11 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
-import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -51,19 +53,23 @@ public class ConflictIdentifier {
 	private static PositionBI leastCommonAncestorForViewPosition = null;
 	private static PositionMapper conflictMapper = null;
 	private ViewCoordinate coord = null;
+	private I_ConfigAceFrame config;
 		
     public ConflictIdentifier() {
 		// Initialize the positions found for the concept
+		Set<HashSet<PositionBI>> sortedOrigins = new HashSet<HashSet<PositionBI>>();
+		Set<PositionBI> allOrigins = new HashSet<PositionBI>();
 		PositionSetBI positions = null;
 
-		try 
-		{
-			coord = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
-
-			positions = Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly();
-			Set<HashSet<PositionBI>> sortedOrigins = new HashSet<HashSet<PositionBI>>();
-			Set<PositionBI> allOrigins = new HashSet<PositionBI>();
+		try {
+			config = Terms.get().getActiveAceFrameConfig();
+		} catch (Exception e) {
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Failure to get Active Ace Frame", e);
+        	return;
+		}
 			
+		coord = config.getViewCoordinate();
+		positions = config.getViewPositionSetReadOnly();
 			
 			for (PositionBI viewPosParent : positions) 
 			{
@@ -86,14 +92,11 @@ public class ConflictIdentifier {
 	    		if (!leastCommonAncestorForViewPosition.isSubsequentOrEqualTo(vPos))
 	    			newSet.add(vPos);
 	    	
-	    	newSet.addAll(Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly());
+    	newSet.addAll(config.getViewPositionSetReadOnly());
 	    	newSet.add(leastCommonAncestorForViewPosition);
 	    	
-	    	conflictMapper = Bdb.getSapDb().getMapper(Terms.get().getActiveAceFrameConfig().getViewPositionSet().iterator().next());
+    	conflictMapper = Bdb.getSapDb().getMapper(config.getViewPositionSet().iterator().next());
 	    	conflictMapper.queueForSetup();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
     
 	public CONTRADICTION_RESULT inConflict(Concept concept) throws TerminologyException, IOException, ParseException 
@@ -184,7 +187,7 @@ public class ConflictIdentifier {
 			
 		} 
 		catch (Exception e) {
-			e.printStackTrace();
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in detecting contradictions for component: " + comp.toString(), e);
 		}
 
 		return CONTRADICTION_RESULT.CONTRADICTION;
@@ -233,7 +236,7 @@ public class ConflictIdentifier {
 						try {
 							retPosition = conflictMapper.relativePosition(currentVersion, testVersion);
 						} catch (Exception e) {
-							e.printStackTrace();
+			            	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in calling position mapper method", e);
 						}
 						
 						if (retPosition.equals(RELATIVE_POSITION.CONTRADICTION))
@@ -461,9 +464,9 @@ int ss = data.getRefsetMembers().size();
 		
 		public String toString() {
 			try {
-				return "\nPath: " + Terms.get().getPath(pathNid).toString() + "With Time: " + time + "\n";
+				return "\nRunning contradiction detection on view path: " + Terms.get().getPath(pathNid).toString() + "With Time: " + time + "\n";
 			} catch (Exception e) {
-				e.printStackTrace();
+            	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in accessing view path: " + pathNid, e);
 			}
 			
 			return "";
@@ -522,7 +525,7 @@ int ss = data.getRefsetMembers().size();
 				}
 			} 			
 		} catch (Exception e) {
-			e.printStackTrace();
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in identifying version of type: " + compType + "for component: " + componentNid, e);
 		}
 		
 		return currentVersion;
@@ -535,7 +538,7 @@ int ss = data.getRefsetMembers().size();
 		{
 			coordPosition = Terms.get().newPosition(Terms.get().getPath(version.getPathNid()), ThinVersionHelper.convert(version.getTime()));
 		} catch (Exception e) {
-			e.printStackTrace();
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in accessing path: " + version.getPathNid(), e);
 		}
 		
 		return coordPosition;
@@ -546,10 +549,12 @@ int ss = data.getRefsetMembers().size();
 		
 		try {
 			NidSetBI allowedStatusNids = coord.getAllowedStatusNids();
+			
+			// @TODO RETIRED?
 			allowedStatusNids.add(Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getPrimoridalUid()));
-			versionCoord = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
+			versionCoord = config.getViewCoordinate();
 		} catch (Exception e) {
-			e.printStackTrace();
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in accessing RETIRED concept", e);
 		} 
 
 		return versionCoord;
@@ -571,12 +576,13 @@ int ss = data.getRefsetMembers().size();
 	}
 
 	private ComponentVersionBI identifyLeastCommonAncestorVersion(Iterator<?> versions) {
-		try {
 			Map<PositionBI, ComponentVersionBI> possibleVersions = new HashMap<PositionBI,ComponentVersionBI>();
+		ComponentVersionBI v = null;
 			
+		try {
 			while(versions.hasNext())
 			{
-				ComponentVersionBI v = (ComponentVersionBI) versions.next();
+				v = (ComponentVersionBI) versions.next();
 				PositionBI p = Terms.get().newPosition(Terms.get().getPath(v.getPathNid()), ThinVersionHelper.convert(v.getTime()));
 		
 				if (leastCommonAncestorForViewPosition.isSubsequentOrEqualTo(p))
@@ -585,7 +591,7 @@ int ss = data.getRefsetMembers().size();
 			
 			return getLeastCommonAncestorVersion(possibleVersions);
 		} catch (Exception e) {
-			e.printStackTrace();
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in accessing path: " + v.getPathNid(), e);
 		}
 		
 		return null;
@@ -621,27 +627,14 @@ int ss = data.getRefsetMembers().size();
 
 	private int getLeastCommonRefsetAncestorHashCode(ComponentVersionBI leastCommonAncestorVersion, I_ExtendByRef member)
 	{
-		int hashCode = -1;
-		
-		try 
-		{
 			for (I_ExtendByRefPart version: member.getMutableParts())
 			{
 				if (leastCommonAncestorVersion.getTime() == version.getTime() &&
 					leastCommonAncestorVersion.getPathNid() == version.getPathNid())
-					if (hashCode >= 0)
-						throw new Exception("Cannot have two matches");
-				
-					hashCode = version.getPartsHashCode();
-			}
-			
-			if (hashCode < 0)
-				throw new Exception("Cannot Mutable Part and leastCommonAncestorVersion");
-		} catch (Exception e) {
-			e.printStackTrace();
+				return version.getPartsHashCode();
 		}
 		
-		return hashCode;
+		return -1;
 	}
 
 }

@@ -73,46 +73,16 @@ public  class SemanticAreaHierarchyRefsetSearcher extends WorkflowRefsetSearcher
 	}
 	
 	private String getSemanticTag(I_GetConceptData con) throws IOException, TerminologyException {
-    	Collection<I_DescriptionVersioned> c = (Collection<I_DescriptionVersioned>) con.getDescriptions();
     	
-    	Iterator<I_DescriptionVersioned> itr = c.iterator();
-   		
-/*
- *    		while (itr.hasNext())
- 
-   		{
-   	   		I_TermFactory tf = Terms.get();
-   	   		I_DescriptionVersioned v = (I_DescriptionVersioned)itr.next( );
-*/
-   	   		I_IntList descType = Terms.get().newIntList();
-   	   		descType.add(fullySpecifiedTermDescriptionTypeNid);
-   	   		I_DescriptionTuple tuple = con.getDescTuple(descType, Terms.get().getActiveAceFrameConfig());
+   		I_IntList descType = Terms.get().newIntList();
+   		descType.add(fullySpecifiedTermDescriptionTypeNid);
+   		I_DescriptionTuple tuple = con.getDescTuple(descType, Terms.get().getActiveAceFrameConfig());
 
-/*
- *    	   		for (I_DescriptionTuple tuple : con.getDescriptionTuples(
- 
-   	   				Terms.get().getActiveAceFrameConfig().getAllowedStatus(),
-   	   				Terms.get().getActiveAceFrameConfig().))
-	   		{
-	   			if ((tuple.getTypeNid() == fullySpecifiedTermDescriptionTypeNid) &&
-	   				(tuple.getStatusNid() == currentStatusNid))
-   				{
-*/
-   	   				String s = tuple.getText();
-	   				int startIndex = s.lastIndexOf('(');
-	   				int endIndex = s.lastIndexOf(')');
-	   				
-	   				if (startIndex < 0 || endIndex < 0)
-		   				System.out.println("S = " + s);
-	   				else
-	   					return s.substring(startIndex + 1, endIndex);
-/*
- * 	   		
-   				}
-  			}
-   		}
- */
-   		return "";
+		String s = tuple.getText();
+		int startIndex = s.lastIndexOf('(');
+		int endIndex = s.lastIndexOf(')');
+		
+		return s.substring(startIndex + 1, endIndex);
 	}
 
 	private Set<String> searchForParentTagBySemTag(String tag) throws Exception 

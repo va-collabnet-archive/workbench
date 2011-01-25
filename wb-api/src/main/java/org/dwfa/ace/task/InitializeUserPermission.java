@@ -70,7 +70,6 @@ public class InitializeUserPermission {
             };
 
 	        tf.addUncommitted(refset.getRefsetConcept());
-	        //RefsetReaderUtility.getContents(refset.getRefsetId());
         } catch (Exception e) {
 			e.printStackTrace();
 			e.getMessage();

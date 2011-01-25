@@ -49,7 +49,6 @@ public class InitializeStateTransition {
             processV2StateTransitions();
 
 	        tf.addUncommitted(refset.getRefsetConcept());
-	        //RefsetReaderUtility.getContents(refset.getRefsetId());
 		} catch (Exception e) {
 			e.printStackTrace();
 			e.getMessage();

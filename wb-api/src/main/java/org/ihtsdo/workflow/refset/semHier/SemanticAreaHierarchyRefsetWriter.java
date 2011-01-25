@@ -1,9 +1,11 @@
 package org.ihtsdo.workflow.refset.semHier;
 
 import java.io.IOException;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.refset.WorkflowRefsetFields;
@@ -91,10 +93,21 @@ public class SemanticAreaHierarchyRefsetWriter extends WorkflowRefsetWriter {
 
 		@Override
 		public boolean valuesExist() {
-			// TODO Auto-generated method stub
-			return ((getReferencedComponentId() != null) && 
+			boolean retVal = ((getReferencedComponentId() != null) && 
 					(parentSemanticArea != null) && (parentSemanticArea.length() > 0) && 
 					(childSemanticArea != null) && (childSemanticArea.length() > 0)); 
+									
+			if (!retVal)
+			{
+				StringBuffer str = new StringBuffer();
+				str.append("\nError in adding to Semantic Hierarchy Refset");
+				str.append("\nReferencedComponentId:" + getReferencedComponentId());
+				str.append("\nparentSemanticArea:" + parentSemanticArea);
+				str.append("\nchildSemanticArea:" + childSemanticArea);
+	        	AceLog.getAppLog().alertAndLog(Level.SEVERE, str.toString(), new Exception("Failure in updating Semantic Hierarchy Refset"));
+			}
+			
+			return retVal;
 		}
 	}
 

@@ -4,7 +4,7 @@ package org.ihtsdo.arena.editor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
+import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
@@ -17,7 +17,7 @@ import javax.swing.TransferHandler;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
-import org.dwfa.tapi.TerminologyException;
+import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.arena.editor.EditorActions.HistoryAction;
 import org.ihtsdo.arena.editor.EditorActions.NewAction;
 import org.ihtsdo.arena.editor.EditorActions.OpenAction;
@@ -122,10 +122,8 @@ public class ArenaEditorToolBar extends JToolBar
 				
 				try {
 					Terms.get().getActiveAceFrameConfig().setAutoApprove(aa);
-				} catch (TerminologyException e1) {
-					e1.printStackTrace();
-				} catch (IOException e1) {
-					e1.printStackTrace();
+				} catch (Exception e1) {
+		        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in setting Auto Approval", e1);
 				}
 				
 			}
@@ -145,7 +143,7 @@ public class ArenaEditorToolBar extends JToolBar
 		        add(autoApproval);
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in setting Auto Approval", e);
 		}
 
 		

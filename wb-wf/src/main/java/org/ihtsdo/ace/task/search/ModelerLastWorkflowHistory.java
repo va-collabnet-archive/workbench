@@ -47,16 +47,12 @@ public class ModelerLastWorkflowHistory extends AbstractWorkflowHistorySearchTes
             this.testModeler = (String) in.readObject();
 			if (this.testModeler == null)
 			{
-				try {
-					I_GetConceptData leadModeler = WorkflowHelper.getLeadModeler();
+				I_GetConceptData leadModeler = WorkflowHelper.getLeadModeler();
 					
-					if (leadModeler != null)
-						this.testModeler = WorkflowHelper.getLeadModeler().getInitialText();
-					else
-						this.testModeler = WorkflowHelper.lookupModeler(WorkflowHelper.getModelerKeySet().iterator().next()).getInitialText();
-				} catch (TerminologyException e) {
-					e.printStackTrace();
-				}
+				if (leadModeler != null)
+					this.testModeler = WorkflowHelper.getLeadModeler().getInitialText();
+				else
+					this.testModeler = WorkflowHelper.lookupModeler(WorkflowHelper.getModelerKeySet().iterator().next()).getInitialText();
 			}
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);

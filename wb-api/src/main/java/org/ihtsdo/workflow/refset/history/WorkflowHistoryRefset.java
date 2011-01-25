@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -13,6 +14,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -32,8 +34,7 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 	private static PositionSetReadOnly viewPos = null;
 	
 	public WorkflowHistoryRefset() throws IOException, TerminologyException {
-		super (RefsetAuxiliary.Concept.WORKFLOW_HISTORY.localize().getNid(),
-			RefsetAuxiliary.Concept.WORKFLOW_HISTORY.toString());
+		super (RefsetAuxiliary.Concept.WORKFLOW_HISTORY);
 		}
 
 	public Collection<UUID> getRefsetUids() throws TerminologyException, IOException {
@@ -162,7 +163,7 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 			try {
 				return getPreferredTerm(a).compareTo(getPreferredTerm(b));
 			} catch (Exception e) {
-				e.printStackTrace();
+	        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Couldn't Setup PreferredTermComparator", e);
 			}
 			
 			return 0;
@@ -174,21 +175,8 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 	private static class WfHxJavaBeanComparer implements Comparator<WorkflowHistoryJavaBean> {
 		@Override
 		public int compare(WorkflowHistoryJavaBean o1, WorkflowHistoryJavaBean o2) {
-			
-//			if (o1.equals(o2))
-//				try {
-//					System.out.println("O1: " + o1);
-//					System.out.println("\n\n\n02: " + o2);
-//					throw new Exception("Duplicate WF Histories Exist");
-//				} catch (Exception e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-			
 			if (o2.getConceptId().compareTo(o1.getConceptId()) != 0)
 				return o2.getConceptId().compareTo(o1.getConceptId());
-			//else if (o2.getWorkflowId().compareTo(o1.getWorkflowId()) != 0)
-			//	return o2.getWorkflowId().compareTo(o1.getWorkflowId());
 			else if (o2.getRefsetColumnTimeStamp().compareTo(o1.getRefsetColumnTimeStamp()) != 0)
 				return o2.getRefsetColumnTimeStamp().compareTo(o1.getRefsetColumnTimeStamp());
 			else 
@@ -214,8 +202,7 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 			try {
 				return (o1.getInitialText().toLowerCase().compareTo(o2.getInitialText().toLowerCase()));
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Failure in Compare Routine", e);
 			}
 			return -1;
 		}

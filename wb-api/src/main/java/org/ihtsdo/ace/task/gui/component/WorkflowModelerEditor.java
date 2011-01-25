@@ -22,10 +22,12 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.tasks.editor.AbstractComboEditor;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -92,15 +94,8 @@ public class WorkflowModelerEditor extends AbstractComboEditor {
 	    	ec.setBounds(r);
 	
 	    	return ec;
-		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Couldn't Set up Modeler Editor Constraint", e);
 		}
 		
 		return null;

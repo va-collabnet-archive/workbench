@@ -1,8 +1,10 @@
 package org.ihtsdo.workflow.refset.stateTrans;
 
 import java.io.IOException;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.refset.WorkflowRefsetFields;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetWriter;
@@ -138,10 +140,23 @@ public class StateTransitionRefsetWriter extends WorkflowRefsetWriter
 
 		@Override
 		public boolean valuesExist() {
-			return ((getReferencedComponentId() != null) && 
+			boolean retVal = ((getReferencedComponentId() != null) && 
 					(initialState != null) &&  
 					(action != null) &&  
 					(finalState != null));
+									
+			if (!retVal)
+			{
+				StringBuffer str = new StringBuffer();
+				str.append("\nError in adding to State Transition Refset");
+				str.append("\nReferencedComponentId:" + getReferencedComponentId());
+				str.append("\ninitialState:" + initialState);
+				str.append("\naction:" + action);
+				str.append("\nfinalState:" + finalState);
+	        	AceLog.getAppLog().alertAndLog(Level.SEVERE, str.toString(), new Exception("Failure in updating State Transition Refset"));
+			}
+			
+			return retVal;
 		}
 	}
 

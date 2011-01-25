@@ -165,7 +165,6 @@ public class ExportWorkflowHistoryAsEConcepts extends AbstractMojo {
 	        Terms.set(origTF);
 
         } catch (Exception e) {
-        	e.printStackTrace();
             throw new MojoExecutionException(e.getMessage(), e);
         }
     }

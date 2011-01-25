@@ -100,12 +100,6 @@ public class AddRefsetToListView extends AbstractTask {
             }
             
             return Condition.CONTINUE;
-        } catch (IllegalArgumentException e) {
-            throw new TaskFailedException(e);
-        } catch (TerminologyException e) {
-            throw new TaskFailedException(e);
-        } catch (IOException e) {
-            throw new TaskFailedException(e);
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }

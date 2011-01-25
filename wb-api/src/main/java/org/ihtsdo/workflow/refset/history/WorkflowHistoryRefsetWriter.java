@@ -2,9 +2,11 @@ package org.ihtsdo.workflow.refset.history;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
@@ -177,7 +179,7 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 			try {
 				setReferencedComponentId(Terms.get().getConcept(uid));
 			} catch (Exception e) {
-				e.printStackTrace();
+	        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error getting concept from database: " + uid, e);
 			}
 		}
 
@@ -227,13 +229,7 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 		}
 		
 		public UUID getConceptUid() {
-			try {
-				return getReferencedComponentId().getUids().get(0);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			
-			return null;
+			return getReferencedComponentId().getPrimUuid();
 		}
 
 		public UUID getUseCaseUid() {
@@ -310,11 +306,29 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 
 		@Override
 		public boolean valuesExist() {
-			return  workflowId != null &&
-					useCase != null && path != null &&
-					modeler != null && action != null &&
-					state != null && refsetColumnTimeStamp != null & 
-					fsn != null && fsn.length() > 0;
+			boolean retVal =  workflowId != null &&
+							  useCase != null && path != null &&
+							  modeler != null && action != null &&
+							  state != null && refsetColumnTimeStamp != null & 
+							  fsn != null && fsn.length() > 0;
+								
+			if (!retVal)
+			{
+				StringBuffer str = new StringBuffer();
+				str.append("\nError in adding to Workflow History Refset");
+				str.append("\nReferencedComponentId:" + getReferencedComponentId());
+				str.append("\nworkflowId:" + workflowId);
+				str.append("\nuseCase:" + useCase);
+				str.append("\npath:" + path);
+				str.append("\nmodeler:" + modeler);
+				str.append("\naction:" + useCase);
+				str.append("\nstate:" + state);
+				str.append("\nrefsetColumnTimeStamp:" + refsetColumnTimeStamp);
+				str.append("\nfsn:" + fsn);
+	        	AceLog.getAppLog().alertAndLog(Level.SEVERE, str.toString(), new Exception("Failure in updating Workflow History Refset"));
+			}
+			
+			return retVal;
 		}
 	}
 

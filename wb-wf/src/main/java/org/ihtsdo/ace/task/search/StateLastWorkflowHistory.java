@@ -5,10 +5,12 @@ import java.io.ObjectOutputStream;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -47,7 +49,7 @@ public class StateLastWorkflowHistory extends AbstractWorkflowHistorySearchTest 
                   this.testState = itr.next();
                }
 	            } catch (Exception e) {
-	            	e.printStackTrace();
+	            	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in initializing drop-down value", e);
 	            }
 			}
         } else {

@@ -2,9 +2,11 @@ package org.ihtsdo.ace.task.contradiction;
 
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
 
 public class ContradictionIdentificationResults {
@@ -39,7 +41,7 @@ public class ContradictionIdentificationResults {
 				sortedConcepts.add(con);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in getting concept from detection results", e);
 		}
 
 		return sortedConcepts;
@@ -55,7 +57,7 @@ public class ContradictionIdentificationResults {
 				sortedConcepts.add(con);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in getting concept from detection results", e);
 		}
 
 		return sortedConcepts;
@@ -71,7 +73,7 @@ public class ContradictionIdentificationResults {
 				sortedConcepts.add(con);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in getting concept from detection results", e);
 		}
 
 		return sortedConcepts;
@@ -87,7 +89,7 @@ public class ContradictionIdentificationResults {
 				sortedConcepts.add(con);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in getting concept from detection results", e);
 		}
 
 		return sortedConcepts;

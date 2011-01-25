@@ -20,10 +20,12 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.tasks.editor.AbstractComboEditor;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
@@ -53,7 +55,7 @@ public class WorkflowStateEditor extends AbstractComboEditor {
 					states.add(state);
     		}
 		} catch (Exception e) {
-			e.printStackTrace();
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Couldn't Set up State Editor Constraint", e);
 		}
     	
     	EditorComponent ec = new EditorComponent(states.toArray());

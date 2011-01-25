@@ -109,16 +109,7 @@ public class SearchWfHistoryStringWorker extends SwingWorker<I_UpdateProgress> i
 //        this.wfSearchPanel.setProgressInfo("   Searching lucene for " + patternString + "   ");
 //        this.wfSearchPanel.setProgressIndeterminate(true);
 
-        try {
 			searcher = new WorkflowHistoryRefsetSearcher();
-		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        
     }
 
   
@@ -213,14 +204,8 @@ public class SearchWfHistoryStringWorker extends SwingWorker<I_UpdateProgress> i
         public void actionPerformed(ActionEvent e) {
             if (continueWork) {
                 if (firstUpdate) {
-                	int searchSize = 0
-                	;
-					try {
-						searchSize = searcher.getTotalCount();
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
+                	int searchSize = searcher.getTotalCount();
+
                 	wfSearchPanel.setProgressInfo("   Starting Workflow History search   ");
                     if (searchSize > 0) {
                     	wfSearchPanel.setProgressIndeterminate(false);

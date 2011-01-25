@@ -5,12 +5,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.I_Work;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.workflow.WorkflowHandlerBI;
@@ -27,7 +30,7 @@ public class WorkflowHandler implements WorkflowHandlerBI {
 		try {
 			return Terms.get().getActiveAceFrameConfig().getAllAvailableWorkflowActionUids();
 		} catch (Exception e) {
-			e.printStackTrace();
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error retrieving ActiveAceFrameConfig: ", e);
 		}
 		
 		return null;
@@ -86,18 +89,13 @@ public class WorkflowHandler implements WorkflowHandlerBI {
 
 	@Override
 	public boolean isActiveAction(
-			Collection<? extends WorkflowHistoryJavaBeanBI> possibleActions,
-			UUID action) {
-		
-		try {
+			Collection<? extends WorkflowHistoryJavaBeanBI> possibleActions, UUID action) 
+	{
 			for (WorkflowHistoryJavaBeanBI bean : possibleActions)
 			{
 				if (bean.getAction().equals(action))
 					return true;
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 
  		return false;
 	}

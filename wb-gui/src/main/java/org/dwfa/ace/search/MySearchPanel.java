@@ -376,13 +376,7 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
             private static final long serialVersionUID = 1L;
 
             public void actionPerformed(ActionEvent evt) {
-                try {
 					startSearch();
- 				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					return;
-				}
             }
         });
 
@@ -547,15 +541,9 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
         gbc.gridy++;
         gbc.gridheight = 1;
 
-        try 
-        {
         	getWorkflowHistoryCriterionPanels().add(makeCriterionPanel());
         	layoutCriterion();
-        } 
-        catch (Exception e) 
-        {
-        	e.printStackTrace();
-        }
+        
 	
 		// Results below...
         gbc.gridx = 0;
@@ -663,8 +651,7 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
         this.doLayout();
     }
 
-    public WorkflowHistoryCriterionPanel makeCriterionPanel() throws ClassNotFoundException, InstantiationException,
-            IllegalAccessException {
+    public WorkflowHistoryCriterionPanel makeCriterionPanel() {
         return new WorkflowHistoryCriterionPanel(this);
     }
 
@@ -676,7 +663,7 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
         // searchSetting.setVisible(!show);
     }
 
-    private void startSearch() throws Exception {
+    private void startSearch() {
         lastSelectedRow = -1;
         updateExtraCriterion();
 

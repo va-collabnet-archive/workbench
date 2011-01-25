@@ -1,8 +1,10 @@
 package org.ihtsdo.workflow.refset.edcat;
 
 import java.io.IOException;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.refset.WorkflowRefsetFields;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetWriter;
@@ -89,8 +91,7 @@ public class EditorCategoryRefsetWriter extends WorkflowRefsetWriter
 					   "\nEditor Category = " + editorCategory.getInitialText() +
 					   "(" + editorCategory.getConceptNid() + ")";
 			} catch (IOException io) {
-				return "Fai" +
-						"led to identify referencedComponentId or editorCategory" + 
+				return "Failed to identify referencedComponentId or editorCategory" + 
 					   "\nError msg: " + io.getMessage();
 			}
 		}
@@ -104,9 +105,21 @@ public class EditorCategoryRefsetWriter extends WorkflowRefsetWriter
 
 		@Override
 		public boolean valuesExist() {
-			return ((getReferencedComponentId() != null) && 
+			boolean retVal =  ((getReferencedComponentId() != null) && 
 					(semanticArea != null) && (semanticArea.length() > 0) && 
 					(editorCategory != null));
+			
+			if (!retVal)
+			{
+				StringBuffer str = new StringBuffer();
+				str.append("\nError in adding to Editor Category Refset");
+				str.append("\nReferencedComponentId:" + getReferencedComponentId());
+				str.append("\nsemanticArea:" + semanticArea);
+				str.append("\neditorCategory:" + editorCategory);
+	        	AceLog.getAppLog().alertAndLog(Level.SEVERE, str.toString(), new Exception("Failure in updating Editor Category Refset"));
+			}
+			
+			return retVal;
 		}
 	}
 

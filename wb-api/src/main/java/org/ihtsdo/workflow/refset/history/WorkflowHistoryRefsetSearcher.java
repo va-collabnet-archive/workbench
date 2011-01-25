@@ -38,22 +38,40 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 	private int totalConcepts = 0;
 		
 	public WorkflowHistoryRefsetSearcher()
-		throws TerminologyException, IOException 
 	{
-		refset = new WorkflowHistoryRefset();
-		setRefsetName(refset.getRefsetName());
-		setRefsetId(refset.getRefsetId());
+		try {
+			refset = new WorkflowHistoryRefset();
+			setRefsetName(refset.getRefsetName());
+			setRefsetId(refset.getRefsetId());
 		
-		activeStatusNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.ACTIVE.getPrimoridalUid());
-		currentStatusNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid());
+			activeStatusNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.ACTIVE.getPrimoridalUid());
+			currentStatusNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid());
+		} catch (Exception e) {
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error creating Workflow History Refset Searcher", e);
+		}
 	}
 
-	public int getTotalCount() throws IOException {
-		return Terms.get().getRefsetExtensionMembers(refsetId).size();
+	public int getTotalCount() {
+		try {
+			return Terms.get().getRefsetExtensionMembers(refsetId).size();
+		} catch (Exception e) {
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Cant access workflow history refset", e);
+		}
+		
+		return 0;
 	}
 
-	public int getTotalCountByConcept(I_GetConceptData con) throws IOException {
+	public int getTotalCountByConcept(I_GetConceptData con) {
+		String term = null;
+
+		try {
+			term = con.getInitialText();
 		return Terms.get().getRefsetExtensionsForComponent(refsetId, con.getConceptNid()).size();
+		} catch (Exception e) {
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Cant access workflow history refset for concept: " + term, e);
+		}
+
+		return 0;
 	}
 
 
@@ -89,8 +107,11 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 	{
 		UUID currentWorkflowId = UUID.randomUUID();
 		long currentTimeStamp = 0;
+		String conceptTerm = "unknown concept";
 
 		try {
+			conceptTerm = con.getInitialText();
+
 			for (I_ExtendByRef historyRow : Terms.get().getRefsetExtensionsForComponent(refsetId, con.getConceptNid())) 
 			{
 				I_ExtendByRefPartStr latestVersion = (I_ExtendByRefPartStr)historyRow.getMutableParts().get(historyRow.getMutableParts().size() - 1);
@@ -113,7 +134,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error getting workflow history on Concept: " + conceptTerm, e);
 		}
 		
 		return currentWorkflowId;
@@ -122,8 +143,10 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 	public WorkflowHistoryJavaBean getLatestWfHxJavaBeanForConcept(I_GetConceptData con) 
 	{
 		WorkflowHistoryJavaBean mostCurrent = null;
+		String conceptTerm = "unknown concept";
 		
 		try {
+			conceptTerm = con.getInitialText();
 			for (I_ExtendByRef extension : Terms.get().getRefsetExtensionsForComponent(refsetId, con.getConceptNid()))
 			{
 				I_ExtendByRefPartStr props = (I_ExtendByRefPartStr)extension.getMutableParts().get(extension.getMutableParts().size() - 1);
@@ -143,7 +166,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error getting workflow history on Concept: " + conceptTerm, e);
 		}
 		
 		return mostCurrent;

@@ -5,10 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
@@ -78,9 +80,10 @@ public  class StateTransitionRefsetSearcher extends WorkflowRefsetSearcher
 				}
 			}
 		} catch (Exception e) {
-			System.out.println("testInitState: " + matchInitialStateNid);
-			System.out.println("On Row: " + props.getStringValue());
-			e.printStackTrace();
+			StringBuffer str = new StringBuffer();
+			str.append("\ntestInitState: " + matchInitialStateNid);
+			str.append("\nOn Row: " + props.getStringValue());
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, str.toString(), new Exception("Failure in updating Editor Category Refset"));
 		}
 		
 		return results;

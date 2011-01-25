@@ -121,15 +121,12 @@ public class WorkflowHistoryCriterionPanel extends CriterionPanel {
 
 	    }
 
-    public WorkflowHistoryCriterionPanel(I_MakeCriterionPanel searchPanel, I_TestWorkflowHistorySearchResults beanToSet)
-            throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public WorkflowHistoryCriterionPanel(I_MakeCriterionPanel searchPanel, I_TestWorkflowHistorySearchResults beanToSet) {
         this(searchPanel, beanToSet, new ArrayList<I_TestWorkflowHistorySearchResults>());
-
     }
 
     public WorkflowHistoryCriterionPanel(I_MakeCriterionPanel searchPanel, I_TestWorkflowHistorySearchResults beanToSet,
-            List<I_TestWorkflowHistorySearchResults> criterionOptions) throws ClassNotFoundException, InstantiationException,
-            IllegalAccessException {
+            List<I_TestWorkflowHistorySearchResults> criterionOptions) {
     	super(false);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.WEST;
@@ -222,15 +219,12 @@ public class WorkflowHistoryCriterionPanel extends CriterionPanel {
         add(editorPanel, gbc);
     }
 
-    public WorkflowHistoryCriterionPanel(I_MakeCriterionPanel searchPanel) throws ClassNotFoundException, InstantiationException,
-            IllegalAccessException {
+    public WorkflowHistoryCriterionPanel(I_MakeCriterionPanel searchPanel) {
         this(searchPanel, null);
     }
 
     @SuppressWarnings("unchecked")
-    public void setupWorkflowHistoryCriterionOptions(List<I_TestWorkflowHistorySearchResults> criterionOptions) throws ClassNotFoundException,
-            InstantiationException, IllegalAccessException {
-
+    public void setupWorkflowHistoryCriterionOptions(List<I_TestWorkflowHistorySearchResults> criterionOptions) {
           File searchPluginFolder = new File("search/workflow");
  
         this.criterionOptions = new ArrayList<I_TestWorkflowHistorySearchResults>();

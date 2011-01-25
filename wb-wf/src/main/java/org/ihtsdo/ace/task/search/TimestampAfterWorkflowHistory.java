@@ -8,8 +8,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -55,20 +57,18 @@ public class TimestampAfterWorkflowHistory extends AbstractWorkflowHistorySearch
     }
 
     @Override
-    public boolean test(WorkflowHistoryJavaBean bean, I_ConfigAceFrame frameConfig) throws TaskFailedException {
+    public boolean test(WorkflowHistoryJavaBean bean, I_ConfigAceFrame frameConfig)  {
     	try {
         	DateFormat dfm = new SimpleDateFormat(DEFAULT_TIME_STAMP);
         	long testTimestampAfterThisDate = dfm.parse(testTimestampAfter).getTime();
 
             if (bean.getTimeStamp() > testTimestampAfterThisDate)
             	return true;
-            else
-            	return false;
 		} catch (Exception e) {
-			System.out.println(e);
-			e.printStackTrace();
-			throw new TaskFailedException("Couldn't read search Timestamp After Than!");
+        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Couldn't read search Timestamp After Than", e);
 		}
+
+		return false;
     }
 
     public String getTestTimestampAfter() {

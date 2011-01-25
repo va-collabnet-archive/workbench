@@ -23,8 +23,7 @@ public class SemanticAreaSearchRefset extends WorkflowRefset  {
 	}
 
 	public SemanticAreaSearchRefset() throws IOException, TerminologyException {
-		super (RefsetAuxiliary.Concept.SEMANTIC_AREA_SEARCH.localize().getNid(),
-			RefsetAuxiliary.Concept.SEMANTIC_AREA_SEARCH.toString());
+		super (RefsetAuxiliary.Concept.SEMANTIC_AREA_SEARCH);
 	}
 
 
