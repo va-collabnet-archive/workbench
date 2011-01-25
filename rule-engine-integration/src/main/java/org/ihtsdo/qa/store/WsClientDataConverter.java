@@ -1,5 +1,6 @@
 package org.ihtsdo.qa.store;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -185,22 +186,33 @@ public class WsClientDataConverter {
 		if(wsCaseComments != null && wsCaseComments.length > 0){
 			comments = new ArrayList<QaCaseComment>();
 			for (QACaseComment qaCaseComment : wsCaseComments) {
-				QaCaseComment comment = new QaCaseComment();
-				comment.setAuthor(qaCaseComment.getAuthor());
-				comment.setComment(qaCaseComment.getComment());
-				comment.setCommentUuid(UUID.fromString(qaCaseComment.getCommentUuid()));
-				if(qaCaseComment.getEffectiveTime() != null){
-					comment.setEffectiveTime(qaCaseComment.getEffectiveTime().getTime());
-				}
-				if(qaCaseComment.getStatus() != null){
-					comment.setStatus(qaCaseComment.getStatus().intValue());
-				}
+				QaCaseComment comment = wsCommentToComment(qaCaseComment);
 				comments.add(comment);
 			}
 		}
 		result.setComments(comments);
 		
 		return result;
+	}
+
+	public static QaCaseComment wsCommentToComment(QACaseComment qaCaseComment) {
+		QaCaseComment comment = new QaCaseComment();
+		comment.setAuthor(qaCaseComment.getAuthor());
+		comment.setComment(qaCaseComment.getComment());
+		if(qaCaseComment.getCaseUuid()!= null){
+			comment.setCaseUuid(UUID.fromString(qaCaseComment.getCaseUuid()));
+		}
+		if(qaCaseComment.getCommentUuid()!= null){
+			comment.setCommentUuid(UUID.fromString(qaCaseComment.getCommentUuid()));
+		}
+		if(qaCaseComment.getEffectiveTime() != null){
+			comment.setEffectiveTime(qaCaseComment.getEffectiveTime().getTime());
+		}
+		if(qaCaseComment.getStatus() != null){
+			comment.setStatus(qaCaseComment.getStatus().intValue());
+		}
+		
+		return comment;
 	}
 
 	public static Case caseToWsCase(QACase qaCase) {
@@ -283,6 +295,22 @@ public class WsClientDataConverter {
 		wsRule.setStatus(rule.getStatus());
 		wsRule.setSuggestedResolution(rule.getSuggestedResolution());
 		return wsRule;
+	}
+
+	public static QACaseComment commentToWsComment(QaCaseComment comment) {
+		QACaseComment result = new QACaseComment();
+		result.setAuthor(comment.getAuthor());
+		if(comment.getCaseUuid() != null){
+			result.setCaseUuid(comment.getCaseUuid().toString());
+		}
+		result.setComment(comment.getComment());
+		if(comment.getCommentUuid() != null){
+			result.setCommentUuid(comment.getCommentUuid().toString());
+		}
+		if(comment.getStatus() != null){
+			result.setStatus(BigInteger.valueOf(comment.getStatus()));
+		}
+		return result;
 	}
 
 }

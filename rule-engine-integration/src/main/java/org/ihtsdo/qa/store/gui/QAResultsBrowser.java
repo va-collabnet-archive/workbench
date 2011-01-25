@@ -72,6 +72,7 @@ public class QAResultsBrowser extends JPanel {
 
 	public QAResultsBrowser(QAStoreBI store, JTabbedPane parentTabbedPane) {
 		this.store = store;
+		allCategories = new ArrayList<Category>();
 		allCategories = store.getAllCategories();
 		initComponents();
 		this.parentTabbedPanel = parentTabbedPane;

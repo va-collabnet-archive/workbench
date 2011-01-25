@@ -9,13 +9,15 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -25,6 +27,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -36,8 +39,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.Terms;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.qa.store.QAStoreBI;
 import org.ihtsdo.qa.store.model.DispositionStatus;
 import org.ihtsdo.qa.store.model.QACase;
@@ -45,14 +46,13 @@ import org.ihtsdo.qa.store.model.QADatabase;
 import org.ihtsdo.qa.store.model.QaCaseComment;
 import org.ihtsdo.qa.store.model.Rule;
 import org.ihtsdo.qa.store.model.TerminologyComponent;
-import org.ihtsdo.rules.RulesLibrary;
 
 /**
  * @author Guillermo Reynoso
  */
 public class QACaseDetailsPanel extends JPanel {
 	private static final long serialVersionUID = 4598159209452180160L;
-	
+
 	private Rule rule;
 	private TerminologyComponent component;
 	private QACase selectedCase;
@@ -61,12 +61,14 @@ public class QACaseDetailsPanel extends JPanel {
 	private DefaultListModel commentsModel;
 	private TerminologyComponent headerComponent;
 	private QADatabase qaDatabase;
-    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private QAStoreBI store;
 	private String currentUser;
-	
-	public QACaseDetailsPanel(Rule rule, TerminologyComponent component, QACase selectedCase, 
-				LinkedHashSet<DispositionStatus> dispositionStatuses, TerminologyComponent headerComponent, QADatabase qaDatabase, QAStoreBI store) {
+	private List<QaCaseComment> comments;
+	private CommentDialog commentDialog;
+
+	public QACaseDetailsPanel(Rule rule, TerminologyComponent component, QACase selectedCase, LinkedHashSet<DispositionStatus> dispositionStatuses, TerminologyComponent headerComponent,
+			QADatabase qaDatabase, QAStoreBI store) {
 		initComponents();
 		this.rule = rule;
 		this.component = component;
@@ -74,32 +76,32 @@ public class QACaseDetailsPanel extends JPanel {
 		this.headerComponent = headerComponent;
 		this.qaDatabase = qaDatabase;
 		this.store = store;
-		try {
-			currentUser = Terms.get().getActiveAceFrameConfig().getUsername();
-		} catch (TerminologyException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		users = RulesLibrary.getUsers();
+		// try {
+		// currentUser = Terms.get().getActiveAceFrameConfig().getUsername();
+		// } catch (TerminologyException e) {
+		// e.printStackTrace();
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// }
+		users = new HashSet<I_GetConceptData>();// RulesLibrary.getUsers();
 
-//		assignedTo.addItem("");
-//		assignedTo.addItem("Ale");
-//		assignedTo.addItem("Alo");
-//		assignedTo.addItem("Cesar");
-//		assignedTo.addItem("Manu");
+		// assignedTo.addItem("");
+		// assignedTo.addItem("Ale");
+		// assignedTo.addItem("Alo");
+		// assignedTo.addItem("Cesar");
+		// assignedTo.addItem("Manu");
 		for (Object user : users) {
-			assignedTo.addItem(((I_GetConceptData)user).toString());
+			assignedTo.addItem(((I_GetConceptData) user).toString());
 		}
 		assignedTo.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent item) {
-			
+
 			}
 		});
 		assignedTo.revalidate();
 		assignedTo.repaint();
-		
+
 		this.dispositionStatuses = dispositionStatuses;
 		for (DispositionStatus object : this.dispositionStatuses) {
 			dispositionStatusCombo.addItem(object);
@@ -111,11 +113,13 @@ public class QACaseDetailsPanel extends JPanel {
 		});
 		dispositionStatusCombo.revalidate();
 		dispositionStatusCombo.repaint();
-		
+
 		commentsModel = new DefaultListModel();
 		commentsList.setModel(commentsModel);
-		
+		comments = selectedCase.getComments();
+		commentDialog = new CommentDialog(new JDialog(),store,currentUser,selectedCase.getCaseUuid());
 		initFields();
+		saveButton.setEnabled(false);
 	}
 
 	private void initFields() {
@@ -131,29 +135,24 @@ public class QACaseDetailsPanel extends JPanel {
 		int dispoCount = dispositionStatusCombo.getItemCount();
 		for (int i = 0; i < dispoCount; i++) {
 			Object currentStatus = dispositionStatusCombo.getItemAt(i);
-			if(currentStatus instanceof DispositionStatus){
-				DispositionStatus currentDispo = (DispositionStatus)currentStatus;
-				if(currentDispo.getDispositionStatusUuid().equals(selectedCase.getDispositionStatusUuid())){
+			if (currentStatus instanceof DispositionStatus) {
+				DispositionStatus currentDispo = (DispositionStatus) currentStatus;
+				if (currentDispo.getDispositionStatusUuid().equals(selectedCase.getDispositionStatusUuid())) {
 					dispositionStatusCombo.setSelectedIndex(i);
 				}
 			}
 		}
-		
+
 		dispositionStatusEditionDate.setText(selectedCase.getDispositionStatusDate() == null ? "" : sdf.format(selectedCase.getDispositionStatusDate().getTime()));
 		dispositionStatusEditorLabel.setText(selectedCase.getDispositionStatusEditor() == null ? "" : selectedCase.getDispositionStatusEditor());
-		
+
 		assignedTo.setSelectedItem(selectedCase.getAssignedTo() == null ? "" : selectedCase.getAssignedTo());
 		by.setText(selectedCase.getAssignmentEditor());
 		assignedDate.setText(selectedCase.getAssignmentDate() == null ? "" : sdf.format(selectedCase.getAssignmentDate().getTime()));
-		
-		List<QaCaseComment> comments = selectedCase.getComments();
-		if(comments != null && !comments.isEmpty()){
-			for (QaCaseComment qaCaseComment : comments) {
-				commentsModel.addElement(qaCaseComment);
-			}
-		}
-		
-		//RULE DETAILS
+
+		initComments();
+
+		// RULE DETAILS
 		ruleUuidTxt.setText(rule.getRuleUuid().toString());
 		ruleCodeTxt.setText(rule.getRuleCode() == null ? "" : rule.getRuleCode());
 		databaseTextA.setText(qaDatabase.getName());
@@ -161,47 +160,87 @@ public class QACaseDetailsPanel extends JPanel {
 		whiteListAllowed.setSelected(rule.isWhitelistAllowed());
 		resetWhiteListAllowed.setSelected(rule.isWhitelistResetAllowed());
 	}
-	
+
+	private void initComments() {
+		commentsModel.clear();
+		if (comments != null && !comments.isEmpty()) {
+			for (QaCaseComment qaCaseComment : comments) {
+				commentsModel.addElement(qaCaseComment);
+			}
+		} else if (comments == null) {
+			comments = new ArrayList<QaCaseComment>();
+		}
+	}
+
 	private void saveButtonActionPerformed(ActionEvent e) {
-		String assignedStr = (String) assignedTo.getSelectedItem().toString();
+		Object selectedAssignedTo = assignedTo.getSelectedItem();
+		String assignedStr;
+		if (selectedAssignedTo != null) {
+			assignedStr = (String) selectedAssignedTo.toString();
+		} else {
+			assignedStr = "";
+		}
 		DispositionStatus selectedDispo = (DispositionStatus) dispositionStatusCombo.getSelectedItem();
 		String anotString = annotation.getText();
-		
-		if(!selectedDispo.getDispositionStatusUuid().equals(selectedCase.getDispositionStatusUuid())
-				|| !anotString.equals(selectedCase.getDispositionAnnotation() == null ? "" : selectedCase.getDispositionAnnotation()) 
-				|| (!assignedStr.equals("") && !assignedStr.equals(selectedCase.getAssignmentEditor() == null ? "" : selectedCase.getAssignmentEditor()))){
-			
+
+		if ((selectedCase.getComments() == null || comments.size() < selectedCase.getComments().size())
+				|| !selectedDispo.getDispositionStatusUuid().equals(selectedCase.getDispositionStatusUuid())
+				|| !anotString.equals(selectedCase.getDispositionAnnotation() == null ? "" : selectedCase.getDispositionAnnotation())
+				|| (!assignedStr.equals("") && !assignedStr.equals(selectedCase.getAssignmentEditor() == null ? "" : selectedCase.getAssignmentEditor()))) {
+
 			Calendar date = Calendar.getInstance();
-			if(!assignedStr.equals("") && !assignedStr.equals(selectedCase.getAssignmentEditor() == null ? "" : selectedCase.getAssignmentEditor())){
+			if (!assignedStr.equals("") && !assignedStr.equals(selectedCase.getAssignmentEditor() == null ? "" : selectedCase.getAssignmentEditor())) {
 				by.setText(currentUser);
 				assignedDate.setText(sdf.format(date.getTime()));
 				selectedCase.setAssignedTo(assignedStr);
 				selectedCase.setAssignmentEditor(by.getText());
 				selectedCase.setAssignmentDate(date);
 			}
-			
-			if(!selectedDispo.getDispositionStatusUuid().equals(selectedCase.getDispositionStatusUuid())){
+
+			if (!selectedDispo.getDispositionStatusUuid().equals(selectedCase.getDispositionStatusUuid())) {
 				selectedCase.setDispositionStatusUuid(selectedDispo.getDispositionStatusUuid());
 				dispositionStatusEditionDate.setText(sdf.format(date.getTime()));
 				dispositionStatusEditorLabel.setText(currentUser);
 				selectedCase.setDispositionStatusEditor(currentUser);
 				selectedCase.setDispositionStatusDate(date);
 			}
-			
-			if(!anotString.equals(selectedCase.getDispositionAnnotation() == null ? "" : selectedCase.getDispositionAnnotation())){
+
+			if (!anotString.equals(selectedCase.getDispositionAnnotation() == null ? "" : selectedCase.getDispositionAnnotation())) {
 				selectedCase.setDispositionAnnotation(anotString);
 				dispositionStatusEditionDate.setText(sdf.format(date.getTime()));
 				dispositionStatusEditorLabel.setText(currentUser);
 				selectedCase.setDispositionStatusEditor(currentUser);
 				selectedCase.setDispositionStatusDate(date);
 			}
+			if (selectedCase.getComments() == null || comments.size() < selectedCase.getComments().size()) {
+				selectedCase.setComments(comments);
+			}
 			store.persistQACase(selectedCase);
 		}
-	
+
+	}
+
+	private void addCommentButtonActionPerformed(ActionEvent e) {
+		QaCaseComment comment = commentDialog.showModalDialog();
+		comments.add(comment);
+		initComments();
+	}
+
+	private void assignedToItemStateChanged(ItemEvent e) {
+		saveButton.setEnabled(true);
+	}
+
+	private void dispositionStatusComboItemStateChanged(ItemEvent e) {
+		saveButton.setEnabled(true);
+	}
+
+	private void annotationKeyPressed(KeyEvent e) {
+		saveButton.setEnabled(true);
 	}
 
 	private void initComponents() {
-		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+		// JFormDesigner - Component initialization - DO NOT MODIFY
+		// //GEN-BEGIN:initComponents
 		panel1 = new JPanel();
 		tabbedPane1 = new JTabbedPane();
 		scrollPane2 = new JScrollPane();
@@ -237,7 +276,7 @@ public class QACaseDetailsPanel extends JPanel {
 		panel4 = new JPanel();
 		scrollPane4 = new JScrollPane();
 		commentsList = new JList();
-		button1 = new JButton();
+		addCommentButton = new JButton();
 		scrollPane6 = new JScrollPane();
 		panel5 = new JPanel();
 		label10 = new JLabel();
@@ -354,6 +393,14 @@ public class QACaseDetailsPanel extends JPanel {
 						panel3.add(label5, new GridBagConstraints(0, 6, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 5), 0, 0));
+
+						//---- dispositionStatusCombo ----
+						dispositionStatusCombo.addItemListener(new ItemListener() {
+							@Override
+							public void itemStateChanged(ItemEvent e) {
+								dispositionStatusComboItemStateChanged(e);
+							}
+						});
 						panel3.add(dispositionStatusCombo, new GridBagConstraints(1, 6, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 5), 0, 0));
@@ -363,6 +410,14 @@ public class QACaseDetailsPanel extends JPanel {
 						panel3.add(label6, new GridBagConstraints(2, 6, 2, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 5), 0, 0));
+
+						//---- annotation ----
+						annotation.addKeyListener(new KeyAdapter() {
+							@Override
+							public void keyPressed(KeyEvent e) {
+								annotationKeyPressed(e);
+							}
+						});
 						panel3.add(annotation, new GridBagConstraints(4, 6, 4, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 0), 0, 0));
@@ -393,6 +448,14 @@ public class QACaseDetailsPanel extends JPanel {
 						panel3.add(label7, new GridBagConstraints(0, 9, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 0, 5), 0, 0));
+
+						//---- assignedTo ----
+						assignedTo.addItemListener(new ItemListener() {
+							@Override
+							public void itemStateChanged(ItemEvent e) {
+								assignedToItemStateChanged(e);
+							}
+						});
 						panel3.add(assignedTo, new GridBagConstraints(1, 9, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 0, 5), 0, 0));
@@ -440,9 +503,15 @@ public class QACaseDetailsPanel extends JPanel {
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 0), 0, 0));
 
-						//---- button1 ----
-						button1.setText("Add");
-						panel4.add(button1, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+						//---- addCommentButton ----
+						addCommentButton.setText("Add");
+						addCommentButton.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								addCommentButtonActionPerformed(e);
+							}
+						});
+						panel4.add(addCommentButton, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 0, 0), 0, 0));
 					}
@@ -541,6 +610,7 @@ public class QACaseDetailsPanel extends JPanel {
 
 				//---- saveButton ----
 				saveButton.setText("Save");
+				saveButton.setEnabled(false);
 				saveButton.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -554,10 +624,11 @@ public class QACaseDetailsPanel extends JPanel {
 		add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 0, 0), 0, 0));
-		// JFormDesigner - End of component initialization  //GEN-END:initComponents
+		// //GEN-END:initComponents
 	}
 
-	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	// JFormDesigner - Variables declaration - DO NOT MODIFY
+	// //GEN-BEGIN:variables
 	private JPanel panel1;
 	private JTabbedPane tabbedPane1;
 	private JScrollPane scrollPane2;
@@ -593,7 +664,7 @@ public class QACaseDetailsPanel extends JPanel {
 	private JPanel panel4;
 	private JScrollPane scrollPane4;
 	private JList commentsList;
-	private JButton button1;
+	private JButton addCommentButton;
 	private JScrollPane scrollPane6;
 	private JPanel panel5;
 	private JLabel label10;
@@ -609,5 +680,5 @@ public class QACaseDetailsPanel extends JPanel {
 	private JCheckBox resetWhiteListAllowed;
 	private JPanel panel2;
 	private JButton saveButton;
-	// JFormDesigner - End of variables declaration  //GEN-END:variables
+	// JFormDesigner - End of variables declaration //GEN-END:variables
 }

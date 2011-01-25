@@ -17,6 +17,7 @@ import org.ihtsdo.qa.store.model.QACase;
 import org.ihtsdo.qa.store.model.QACaseVersion;
 import org.ihtsdo.qa.store.model.QACoordinate;
 import org.ihtsdo.qa.store.model.QADatabase;
+import org.ihtsdo.qa.store.model.QaCaseComment;
 import org.ihtsdo.qa.store.model.Rule;
 import org.ihtsdo.qa.store.model.Severity;
 import org.ihtsdo.qa.store.model.TerminologyComponent;
@@ -48,7 +49,9 @@ import org.ihtsdo.qadb.ws.data.IntBoolKeyValue;
 import org.ihtsdo.qadb.ws.data.IntStrKeyValue;
 import org.ihtsdo.qadb.ws.data.PersistQACaseList;
 import org.ihtsdo.qadb.ws.data.PersistQACaseRequest;
+import org.ihtsdo.qadb.ws.data.PersistQACommentRequest;
 import org.ihtsdo.qadb.ws.data.PersistsQARuleRequest;
+import org.ihtsdo.qadb.ws.data.QACaseComment;
 import org.ihtsdo.qadb.ws.data.QACasesReportLinesByPageRequest;
 import org.ihtsdo.qadb.ws.data.QACasesReportLinesByPageResponse;
 import org.ihtsdo.qadb.ws.data.QADatabaseRequest;
@@ -681,6 +684,19 @@ public class QAStoreBIImpl implements QAStoreBI {
 		} catch (PersistQACaseListFaultException e) {
 			e.printStackTrace();
 			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	@Override
+	public void persistQAComment(QaCaseComment comment) throws Exception {
+		QACaseComment wsComment = WsClientDataConverter.commentToWsComment(comment);
+		QadbServiceStub service = new QadbServiceStub(url);
+		PersistQACommentRequest persistRequest = new PersistQACommentRequest();
+		persistRequest.setQaComment(wsComment);
+		try{
+			service.persistQAComment(persistRequest);
+		}catch (Exception e) {
+			throw e;
 		}
 	}
 

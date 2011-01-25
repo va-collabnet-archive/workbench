@@ -14,6 +14,7 @@ import org.ihtsdo.qa.store.model.QACase;
 import org.ihtsdo.qa.store.model.QACaseVersion;
 import org.ihtsdo.qa.store.model.QACoordinate;
 import org.ihtsdo.qa.store.model.QADatabase;
+import org.ihtsdo.qa.store.model.QaCaseComment;
 import org.ihtsdo.qa.store.model.Rule;
 import org.ihtsdo.qa.store.model.Severity;
 import org.ihtsdo.qa.store.model.TerminologyComponent;
@@ -85,5 +86,6 @@ public interface QAStoreBI {
 	public void persistQACase(QACase qaCase);
 	public void persistQADatabase(QADatabase database);
 	public void persistQACaseList(List<QACase> qaCaseList) throws  Exception;
+	public void persistQAComment(QaCaseComment comment) throws Exception;
 	
 }
