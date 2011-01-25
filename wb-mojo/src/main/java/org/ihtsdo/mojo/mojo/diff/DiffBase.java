@@ -16,12 +16,15 @@
  */
 package org.ihtsdo.mojo.mojo.diff;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -43,7 +46,10 @@ import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
@@ -51,6 +57,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.RelAssertionType;
 
 /**
@@ -60,28 +67,28 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * The uuid for path1.
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected String path1_uuid;
 
 	/**
 	 * The uuid for path2.
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected String path2_uuid;
 
 	/**
 	 * The time for v1 in yyyy.mm.dd hh:mm:ss zzz format
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected String v1;
 
 	/**
 	 * The time for v2 in yyyy.mm.dd hh:mm:ss zzz format
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected String v2;
@@ -96,35 +103,35 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Set to true to include added concepts.
-	 *
+	 * 
 	 * @parameter default-value=true
 	 */
 	protected boolean added_concepts;
 
 	/**
 	 * Set to true to include deleted concepts.
-	 *
+	 * 
 	 * @parameter default-value=true
 	 */
 	protected boolean deleted_concepts;
 
 	/**
 	 * Set to true to include concepts with changed status.
-	 *
+	 * 
 	 * @parameter default-value=true
 	 */
 	protected boolean changed_concept_status;
 
 	/**
 	 * Set to true to include concepts with changed defined
-	 *
+	 * 
 	 * @parameter default-value=true
 	 */
 	protected boolean changed_defined;
 
 	/**
 	 * Optional list of concept status to filter v1 concept status changes
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v1_concept_status = new ArrayList<String>();
@@ -133,7 +140,7 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Optional list of concept status to filter v2 concept status changes
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v2_concept_status = new ArrayList<String>();
@@ -142,7 +149,7 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Optional list of isa to filter v1
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v1_isa_filter = new ArrayList<String>();
@@ -154,7 +161,7 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Optional list of isa to filter v2
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v2_isa_filter = new ArrayList<String>();
@@ -163,7 +170,7 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Optional list of concept status to filter v1 concept status
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v1_concept_status_filter = new ArrayList<String>();
@@ -172,7 +179,7 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Optional list of concept status to filter v2 concept status
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v2_concept_status_filter = new ArrayList<String>();
@@ -181,28 +188,28 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Set to true to include added descriptions.
-	 *
+	 * 
 	 * @parameter default-value=true
 	 */
 	protected boolean added_descriptions;
 
 	/**
 	 * Set to true to include deleted descriptions.
-	 *
+	 * 
 	 * @parameter default-value=true
 	 */
 	protected boolean deleted_descriptions;
 
 	/**
 	 * Set to true to include descriptions with changed status.
-	 *
+	 * 
 	 * @parameter default-value=true
 	 */
 	protected boolean changed_description_status;
 
 	/**
 	 * Optional list of description status to filter v1 changed status
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v1_description_status = new ArrayList<String>();
@@ -211,7 +218,7 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Optional list of description status to filter v2 changed status
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v2_description_status = new ArrayList<String>();
@@ -220,35 +227,35 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Set to true to include descriptions with changed term.
-	 *
+	 * 
 	 * @parameter default-value=true
 	 */
 	protected boolean changed_description_term;
 
 	/**
 	 * Set to true to include descriptions with changed type.
-	 *
+	 * 
 	 * @parameter default-value=true
 	 */
 	protected boolean changed_description_type;
 
 	/**
 	 * Set to true to include descriptions with changed language.
-	 *
+	 * 
 	 * @parameter default-value=true
 	 */
 	protected boolean changed_description_language;
 
 	/**
 	 * Set to true to include descriptions with changed case.
-	 *
+	 * 
 	 * @parameter default-value=true
 	 */
 	protected boolean changed_description_case;
 
 	/**
 	 * Optional list of description status to filter v1 status
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v1_description_status_filter = new ArrayList<String>();
@@ -257,7 +264,7 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Optional list of description status to filter v2 status
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v2_description_status_filter = new ArrayList<String>();
@@ -266,7 +273,7 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Optional list of description type to filter v1 type
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v1_description_type_filter = new ArrayList<String>();
@@ -275,7 +282,7 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Optional list of description type to filter v2 type
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v2_description_type_filter = new ArrayList<String>();
@@ -284,70 +291,70 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Optional regex to filter v1 term
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected String v1_description_term_filter = "";
 
 	/**
 	 * Optional regex to filter v2 term
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected String v2_description_term_filter = "";
 
 	/**
 	 * Optional regex to filter v1 lang
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected String v1_description_lang_filter = "";
 
 	/**
 	 * Optional regex to filter v2 lang
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected String v2_description_lang_filter = "";
 
 	/**
 	 * Optional filter on v1 case
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected Boolean v1_description_case_filter;
 
 	/**
 	 * Optional filter on v2 case
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected Boolean v2_description_case_filter;
 
 	/**
 	 * Set to true to include added relationships.
-	 *
+	 * 
 	 * @parameter default-value=true
 	 */
 	protected boolean added_relationships;
 
 	/**
 	 * Set to true to include deleted relationships.
-	 *
+	 * 
 	 * @parameter default-value=true
 	 */
 	protected boolean deleted_relationships;
 
 	/**
 	 * Set to true to include relationships with changed status.
-	 *
+	 * 
 	 * @parameter default-value=true
 	 */
 	protected boolean changed_relationship_status;
 
 	/**
 	 * Optional list of relationship status to filter v1
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v1_relationship_status = new ArrayList<String>();
@@ -356,7 +363,7 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Optional list of relationship status to filter v2
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v2_relationship_status = new ArrayList<String>();
@@ -365,35 +372,35 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Set to true to include relationships with changed characteristic.
-	 *
+	 * 
 	 * @parameter default-value=true
 	 */
 	protected boolean changed_relationship_characteristic;
 
 	/**
 	 * Set to true to include relationships with changed refinability.
-	 *
+	 * 
 	 * @parameter default-value=true
 	 */
 	protected boolean changed_relationship_refinability;
 
 	/**
 	 * Set to true to include relationships with changed type.
-	 *
+	 * 
 	 * @parameter default-value=true
 	 */
 	protected boolean changed_relationship_type;
 
 	/**
 	 * Set to true to include relationships with changed group.
-	 *
+	 * 
 	 * @parameter default-value=true
 	 */
 	protected boolean changed_relationship_group;
 
 	/**
 	 * Optional list of relationship status to filter v1
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v1_relationship_status_filter = new ArrayList<String>();
@@ -402,7 +409,7 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Optional list of relationship status to filter v2
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v2_relationship_status_filter = new ArrayList<String>();
@@ -411,7 +418,7 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Optional list of relationship characteristic to filter v1 characteristic
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v1_relationship_characteristic_filter = new ArrayList<String>();
@@ -420,7 +427,7 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Optional list of relationship characteristic to filter v2
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v2_relationship_characteristic_filter = new ArrayList<String>();
@@ -429,7 +436,7 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Optional list of relationship refinability to filter v1
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v1_relationship_refinability_filter = new ArrayList<String>();
@@ -438,7 +445,7 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Optional list of relationship refinability to filter v2
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v2_relationship_refinability_filter = new ArrayList<String>();
@@ -447,7 +454,7 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Optional list of relationship type to filter v1
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v1_relationship_type_filter = new ArrayList<String>();
@@ -456,7 +463,7 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Optional list of relationship type to filter v2
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected List<String> v2_relationship_type_filter = new ArrayList<String>();
@@ -465,7 +472,7 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Optional assertion type to filter v1
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected String v1_assertion_type_filter;
@@ -474,7 +481,7 @@ public class DiffBase extends AbstractMojo {
 
 	/**
 	 * Optional assertion type to filter v2
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected String v2_assertion_type_filter;
@@ -493,8 +500,7 @@ public class DiffBase extends AbstractMojo {
 
 	protected Precedence precedence = Precedence.PATH;
 
-	protected ContradictionManagerBI contradiction_mgr =
-           new IdentifyAllConflictStrategy();
+	protected ContradictionManagerBI contradiction_mgr = new IdentifyAllConflictStrategy();
 
 	protected int added_concept_change;
 
@@ -946,12 +952,15 @@ public class DiffBase extends AbstractMojo {
 			PositionSetBI pos) throws Exception {
 		ArrayList<Integer> ret = new ArrayList<Integer>();
 		HashSet<Integer> visited = new HashSet<Integer>();
+		HashMap<Integer, ArrayList<Integer>> children = new HashMap<Integer, ArrayList<Integer>>();
+		Ts.get().iterateConceptDataInParallel(new Processor(children, pos));
 		this.beg = System.currentTimeMillis();
-		getDescendants1(concept_id, pos, ret, visited);
+		getDescendants1(concept_id, children, pos, ret, visited);
 		return ret;
 	}
 
-	private void getDescendants1(int concept_id, PositionSetBI pos,
+	private void getDescendants1(int concept_id,
+			HashMap<Integer, ArrayList<Integer>> children, PositionSetBI pos,
 			ArrayList<Integer> ret, HashSet<Integer> visited) throws Exception {
 		if (visited.contains(concept_id))
 			return;
@@ -963,9 +972,15 @@ public class DiffBase extends AbstractMojo {
 		}
 		if (test_descendants_p && ret.size() >= 10000)
 			return;
-		for (int ch : getChildren1(concept_id, pos)) {
-			getDescendants1(ch, pos, ret, visited);
+		for (int ch : getChildren1(concept_id, children, pos)) {
+			getDescendants1(ch, children, pos, ret, visited);
 		}
+	}
+
+	private ArrayList<Integer> getChildren1(int concept_id,
+			HashMap<Integer, ArrayList<Integer>> children, PositionSetBI pos)
+			throws Exception {
+		return children.get(concept_id);
 	}
 
 	protected ArrayList<Integer> getChildren(int concept_id, PositionSetBI pos)
@@ -975,14 +990,59 @@ public class DiffBase extends AbstractMojo {
 
 	private ArrayList<Integer> getChildren1(int concept_id, PositionSetBI pos)
 			throws Exception {
-		ArrayList<Integer> ret = new ArrayList<Integer>();
 		I_TermFactory tf = Terms.get();
 		I_GetConceptData c = tf.getConcept(concept_id);
-		for (I_GetConceptData ch : c.getDestRelOrigins(current_status,
-				isa_type, pos, precedence, contradiction_mgr)) {
-			ret.add(ch.getConceptNid());
+		return getChildren1(c, pos);
+	}
+
+	private ArrayList<Integer> getChildren1(I_GetConceptData c,
+			PositionSetBI pos) throws Exception {
+		// Some may be dups
+		TreeSet<Integer> ret = new TreeSet<Integer>();
+		for (I_RelTuple rel : c.getDestRelTuples(current_status, isa_type, pos,
+				precedence, contradiction_mgr)) {
+			ret.add(rel.getC1Id());
 		}
-		return ret;
+		return new ArrayList<Integer>(ret);
+	}
+
+	private class Processor implements ProcessUnfetchedConceptDataBI {
+
+		AtomicInteger i = new AtomicInteger();
+		NidBitSetBI allConcepts;
+		PositionSetBI pos;
+		HashMap<Integer, ArrayList<Integer>> children;
+		long beg = System.currentTimeMillis();
+
+		public Processor(HashMap<Integer, ArrayList<Integer>> children,
+				PositionSetBI pos) throws IOException {
+			this.pos = pos;
+			allConcepts = Ts.get().getAllConceptNids();
+			this.children = children;
+		}
+
+		@Override
+		public void processUnfetchedConceptData(int cNid,
+				ConceptFetcherBI fetcher) throws Exception {
+			I_GetConceptData c = (I_GetConceptData) fetcher.fetch();
+			synchronized (children) {
+				children.put(cNid, getChildren1(c, pos));
+			}
+			if (i.incrementAndGet() % 10000 == 0) {
+				System.out.println("Processed getChildren: " + i + " "
+						+ ((System.currentTimeMillis() - this.beg) / 1000));
+			}
+		}
+
+		@Override
+		public NidBitSetBI getNidSet() throws IOException {
+			return allConcepts;
+		}
+
+		@Override
+		public boolean continueWork() {
+			return true;
+		}
 	}
 
 	protected void listPaths() throws Exception {
@@ -1429,7 +1489,7 @@ public class DiffBase extends AbstractMojo {
 		return all_concepts;
 	}
 
-   @Override
+	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			processConfig();

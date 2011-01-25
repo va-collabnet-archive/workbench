@@ -28,7 +28,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
+
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
@@ -37,21 +37,21 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.SNOMED;
 
 /**
- *
+ * 
  * @author kec
  */
 public abstract class ChangeReportBase extends DiffBase {
 
 	/**
 	 * Report directory.
-	 *
+	 * 
 	 * @parameter expression="${project.build.directory}/generated-resources"
 	 */
 	protected File report_dir;
 
 	/**
 	 * Concept per page
-	 *
+	 * 
 	 * @parameter default-value=100
 	 */
 	protected int concepts_per_page;
@@ -285,8 +285,7 @@ public abstract class ChangeReportBase extends DiffBase {
 		startChange(c);
 		changes += "<tr><td>" + "Added relationship" + "</td><td>" + ""
 				+ "</td><td>" + getConceptName(d.getTypeNid()) + "<br>"
-				+ getConceptName(d.getDestinationNid())
-				+ "</td></tr>";
+				+ getConceptName(d.getDestinationNid()) + "</td></tr>";
 		changes_xml += startElement("added_relationship")
 				+ relationshipElement(d) + endElement("added_relationship")
 				+ "\n";
@@ -299,8 +298,8 @@ public abstract class ChangeReportBase extends DiffBase {
 		startChange(c);
 		changes += "<tr><td>" + "Deleted relationship" + "</td><td>"
 				+ getConceptName(d.getTypeNid()) + "<br>"
-				+ getConceptName(d.getDestinationNid())
-				+ "</td><td>" + "" + "</td></tr>";
+				+ getConceptName(d.getDestinationNid()) + "</td><td>" + ""
+				+ "</td></tr>";
 		changes_xml += startElement("deleted_relationship")
 				+ relationshipElement(d) + endElement("deleted_relationship")
 				+ "\n";
@@ -571,13 +570,11 @@ public abstract class ChangeReportBase extends DiffBase {
 
 	protected List<Integer> test_concepts = Arrays.asList(146773003);
 
-	protected ArrayList<Integer> changed_concepts =
-           new ArrayList<Integer>();
+	protected ArrayList<Integer> changed_concepts = new ArrayList<Integer>();
 
-	protected ConcurrentHashMap<Integer, String> concept_to_page =
-           new ConcurrentHashMap<Integer, String>();
+	protected ConcurrentHashMap<Integer, String> concept_to_page = new ConcurrentHashMap<Integer, String>();
 
-   @Override
+	@Override
 	protected ArrayList<Integer> getAllConcepts() throws Exception {
 		ArrayList<Integer> all_concepts;
 		I_TermFactory tf = Terms.get();
@@ -633,6 +630,5 @@ public abstract class ChangeReportBase extends DiffBase {
 				+ valueElement("id", getConceptUUID(id))
 				+ endElement("concept_ref");
 	}
-
 
 }
