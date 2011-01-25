@@ -29,15 +29,15 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 
 /**
- *
+ * 
  * @goal change-report
- *
+ * 
  * @phase generate-resources
- *
+ * 
  * @requiresDependencyResolution compile
  */
 public class ChangeReport extends ChangeReportBase {
-   @Override
+	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			// test_p = false;
@@ -55,6 +55,7 @@ public class ChangeReport extends ChangeReportBase {
 							"UTF-8")));
 			out_xml.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 			out_xml.println(startElement("change_report"));
+			long beg = System.currentTimeMillis();
 			int i = 0;
 			for (int id : all_concepts) {
 				I_GetConceptData c = tf.getConcept(id);
@@ -75,7 +76,8 @@ public class ChangeReport extends ChangeReportBase {
 				compareRelationships(c);
 				i++;
 				if (i % 10000 == 0)
-					System.out.println("Processed: " + i);
+					System.out.println("Processed: " + i + " "
+							+ ((System.currentTimeMillis() - beg) / 1000));
 				if (changes.equals(""))
 					continue;
 				changed_concepts.add(id);
@@ -91,9 +93,13 @@ public class ChangeReport extends ChangeReportBase {
 				out.close();
 			out_xml.println(endElement("change_report"));
 			out_xml.close();
+			getLog().info("Generating summary report.");
 			doSummaryReport();
+			getLog().info("Generating concept order list.");
 			doConceptList(report_dir + "/concepts.html");
+			getLog().info("Sorting for alphabetic order list.");
 			sortConcepts(changed_concepts);
+			getLog().info("Generating alphabetic order list.");
 			doConceptList(report_dir + "/alpha.html");
 		} catch (Exception e) {
 			throw new MojoFailureException(e.getLocalizedMessage(), e);
