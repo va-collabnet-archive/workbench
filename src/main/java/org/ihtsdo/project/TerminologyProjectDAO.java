@@ -3755,7 +3755,7 @@ public class TerminologyProjectDAO {
 	}
 
 	public static I_ExtendByRefPart getLastExtensionPart(I_ExtendByRef extension) throws TerminologyException, IOException {
-		long lastVersion = Integer.MIN_VALUE;
+		long lastVersion = Long.MIN_VALUE;
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 		I_IntSet allowedStatus = Terms.get().newIntSet();
 		allowedStatus.addAll(config.getAllowedStatus().getSetValues());
@@ -3772,8 +3772,7 @@ public class TerminologyProjectDAO {
 		}
 
 		if (lastPart == null) {
-			lastPart = (I_ExtendByRefPart) extension;
-			//throw new TerminologyException("No parts on this viewpositionset.");
+			throw new TerminologyException("No parts on this viewpositionset.");
 		}
 
 		return lastPart;
