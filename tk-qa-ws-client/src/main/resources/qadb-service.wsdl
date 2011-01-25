@@ -566,12 +566,11 @@
             <xsd:complexType name="QACaseComment">
             	<xsd:sequence>
             		<xsd:element name="commentUuid" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
-            		<xsd:element name="effectiveTime"
-            			type="xsd:dateTime" maxOccurs="1" minOccurs="0">
-            		</xsd:element>
+            		<xsd:element name="effectiveTime" type="xsd:dateTime" maxOccurs="1" minOccurs="0"></xsd:element>
             		<xsd:element name="status" type="xsd:integer" maxOccurs="1" minOccurs="0"></xsd:element>
             		<xsd:element name="comment" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
             		<xsd:element name="author" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+            		<xsd:element name="caseUuid" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
             <xsd:element name="persistQACaseList">
@@ -594,6 +593,27 @@
             			<xsd:element name="persistQACaseListFault"
             				type="xsd:string">
             			</xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="persistQACommentRequest">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="qaComment" type="tns:QACaseComment"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="persistQACommentResponse">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="out" type="xsd:string"></xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="persistQACommentFault">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="persistQACommentFault" type="xsd:string"></xsd:element>
             		</xsd:sequence>
             	</xsd:complexType>
             </xsd:element>
@@ -708,6 +728,14 @@
     <wsdl:message name="persistQACaseListFault">
     	<wsdl:part name="parameters" element="tns:persistQACaseListFault"></wsdl:part>
     </wsdl:message>
+    <wsdl:message name="persistQACommentRequest">
+    	<wsdl:part name="parameters" element="tns:persistQACommentRequest"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="persistQACommentResponse">
+    </wsdl:message>
+    <wsdl:message name="persistQACommentFault">
+    	<wsdl:part name="parameters" element="tns:persistQACommentFault"></wsdl:part>
+    </wsdl:message>
     <wsdl:portType name="qadb-data">
     	<wsdl:operation name="getComponent">
     		<wsdl:input message="tns:getComponentRequest"></wsdl:input>
@@ -787,13 +815,16 @@
     		<wsdl:output message="tns:persistQACaseListResponse"></wsdl:output>
             <wsdl:fault name="fault" message="tns:persistQACaseListFault"></wsdl:fault>
         </wsdl:operation>
+    	<wsdl:operation name="persistQAComment">
+    		<wsdl:input message="tns:persistQACommentRequest"></wsdl:input>
+    		<wsdl:output message="tns:persistQACommentResponse"></wsdl:output>
+            <wsdl:fault name="fault" message="tns:persistQACommentFault"></wsdl:fault>
+        </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="qadb-binding" type="tns:qadb-data">
-    	<soap:binding style="document"
-    		transport="http://schemas.xmlsoap.org/soap/http" />
+    	<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
     	<wsdl:operation name="getComponent">
-    		<soap:operation
-    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getComponent" />
+    		<soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/getComponent" />
     		<wsdl:input>
     			<soap:body use="literal" />
     		</wsdl:input>
@@ -802,8 +833,7 @@
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getRule">
-    		<soap:operation
-    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getRule" />
+    		<soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/getRule" />
     		<wsdl:input>
     			<soap:body use="literal" />
     		</wsdl:input>
@@ -812,8 +842,7 @@
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getFinding">
-    		<soap:operation
-    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getFinding" />
+    		<soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/getFinding" />
     		<wsdl:input>
     			<soap:body use="literal" />
     		</wsdl:input>
@@ -822,8 +851,7 @@
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getExecution">
-    		<soap:operation
-    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getExecution" />
+    		<soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/getExecution" />
     		<wsdl:input>
     			<soap:body use="literal" />
     		</wsdl:input>
@@ -832,8 +860,7 @@
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getCase">
-    		<soap:operation
-    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getCase" />
+    		<soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/getCase" />
     		<wsdl:input>
     			<soap:body use="literal" />
     		</wsdl:input>
@@ -842,8 +869,7 @@
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getAllRules">
-    		<soap:operation
-    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllRules" />
+    		<soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllRules" />
     		<wsdl:input>
     			<soap:body use="literal" />
     		</wsdl:input>
@@ -852,8 +878,7 @@
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getAllComponents">
-    		<soap:operation
-    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllComponents" />
+    		<soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllComponents" />
     		<wsdl:input>
     			<soap:body use="literal" />
     		</wsdl:input>
@@ -862,8 +887,7 @@
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getAllDatabases">
-    		<soap:operation
-    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllDatabases" />
+    		<soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllDatabases" />
     		<wsdl:input>
     			<soap:body use="literal" />
     		</wsdl:input>
@@ -872,8 +896,7 @@
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getAllSeverities">
-    		<soap:operation
-    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllSeverities" />
+    		<soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllSeverities" />
     		<wsdl:input>
     			<soap:body use="literal" />
     		</wsdl:input>
@@ -882,8 +905,7 @@
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getAllDispositionStatus">
-    		<soap:operation
-    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllDispositionStatus" />
+    		<soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllDispositionStatus" />
     		<wsdl:input>
     			<soap:body use="literal" />
     		</wsdl:input>
@@ -892,8 +914,7 @@
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getRulesReportLinesByPage">
-    		<soap:operation
-    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getRulesReportLinesByPage" />
+    		<soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/getRulesReportLinesByPage" />
     		<wsdl:input>
     			<soap:body use="literal" />
     		</wsdl:input>
@@ -902,8 +923,7 @@
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getAllPathsForDatabase">
-    		<soap:operation
-    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllPathsForDatabase" />
+    		<soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllPathsForDatabase" />
     		<wsdl:input>
     			<soap:body use="literal" />
     		</wsdl:input>
@@ -912,8 +932,7 @@
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getAllPaths">
-    		<soap:operation
-    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllPaths" />
+    		<soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllPaths" />
     		<wsdl:input>
     			<soap:body use="literal" />
     		</wsdl:input>
@@ -922,8 +941,7 @@
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getQADatabase">
-    		<soap:operation
-    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getQADatabase" />
+    		<soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/getQADatabase" />
     		<wsdl:input>
     			<soap:body use="literal" />
     		</wsdl:input>
@@ -932,8 +950,7 @@
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getQACasesReportLinesByPage">
-    		<soap:operation
-    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getQACasesReportLinesByPage" />
+    		<soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/getQACasesReportLinesByPage" />
     		<wsdl:input>
     			<soap:body use="literal" />
     		</wsdl:input>
@@ -942,8 +959,7 @@
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="persistQACase">
-    		<soap:operation
-    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/persistQACase" />
+    		<soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/persistQACase" />
     		<wsdl:input>
     			<soap:body use="literal" />
     		</wsdl:input>
@@ -952,8 +968,7 @@
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getAllCategories">
-    		<soap:operation
-    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllCategories" />
+    		<soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/getAllCategories" />
     		<wsdl:input>
     			<soap:body use="literal" />
     		</wsdl:input>
@@ -962,8 +977,7 @@
     		</wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="persistsQARule">
-    		<soap:operation
-    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/persistsQARule" />
+    		<soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/persistsQARule" />
     		<wsdl:input>
     			<soap:body use="literal" />
     		</wsdl:input>
@@ -975,8 +989,19 @@
     		</wsdl:fault>
     	</wsdl:operation>
     	<wsdl:operation name="persistQACaseList">
-    		<soap:operation
-    			soapAction="http://www.ihtsdo.org/qadb/qadb-service/persistQACaseList" />
+    		<soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/persistQACaseList" />
+    		<wsdl:input>
+    			<soap:body use="literal" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal" />
+    		</wsdl:output>
+    		<wsdl:fault name="fault">
+    			<soap:fault use="literal" name="fault" />
+    		</wsdl:fault>
+    	</wsdl:operation>
+    	<wsdl:operation name="persistQAComment">
+    		<soap:operation soapAction="http://www.ihtsdo.org/qadb/qadb-service/persistQAComment" />
     		<wsdl:input>
     			<soap:body use="literal" />
     		</wsdl:input>
