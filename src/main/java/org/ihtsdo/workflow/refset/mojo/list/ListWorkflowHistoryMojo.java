@@ -30,7 +30,7 @@ public class ListWorkflowHistoryMojo extends AbstractMojo {
 			searcher = new WorkflowHistoryRefsetSearcher();
 	    	searcher.listWorkflowHistory();
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Couldn't list workflow history refset", e);
+			AceLog.getAppLog().log(Level.WARNING, "Couldn't list workflow history refset", e);
 		}
 	}
 }
