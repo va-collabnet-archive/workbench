@@ -285,7 +285,7 @@ public abstract class ChangeReportBase extends DiffBase {
 		startChange(c);
 		changes += "<tr><td>" + "Added relationship" + "</td><td>" + ""
 				+ "</td><td>" + getConceptName(d.getTypeNid()) + "<br>"
-				+ getConceptPreferredDescription(d.getDestinationNid())
+				+ getConceptName(d.getDestinationNid())
 				+ "</td></tr>";
 		changes_xml += startElement("added_relationship")
 				+ relationshipElement(d) + endElement("added_relationship")
@@ -299,7 +299,7 @@ public abstract class ChangeReportBase extends DiffBase {
 		startChange(c);
 		changes += "<tr><td>" + "Deleted relationship" + "</td><td>"
 				+ getConceptName(d.getTypeNid()) + "<br>"
-				+ getConceptPreferredDescription(d.getDestinationNid())
+				+ getConceptName(d.getDestinationNid())
 				+ "</td><td>" + "" + "</td></tr>";
 		changes_xml += startElement("deleted_relationship")
 				+ relationshipElement(d) + endElement("deleted_relationship")
@@ -314,10 +314,10 @@ public abstract class ChangeReportBase extends DiffBase {
 		changes += "<tr><td>"
 				+ "Changed relationship"
 				+ "</td><td>"
-				+ getConceptPreferredDescription(d1.getDestinationNid())
+				+ getConceptName(d1.getDestinationNid())
 				+ "</td><td>"
 				+ (d1.getDestinationNid() == d2.getDestinationNid() ? " "
-						: getConceptPreferredDescription(d2.getDestinationNid()))
+						: getConceptName(d2.getDestinationNid()))
 				+ "</td></tr>";
 		changes += "<tr><td align = \"right\">"
 				+ "status"
@@ -563,7 +563,7 @@ public abstract class ChangeReportBase extends DiffBase {
 		out.println("<h3>Changed concepts list</h3>");
 		for (int id : changed_concepts) {
 			out.println("<br>" + "<a href=\"" + concept_to_page.get(id) + "#"
-					+ id + "\">" + getConceptPreferredDescription(id) + "</a>");
+					+ id + "\">" + getConceptName(id) + "</a>");
 		}
 		printHtmlEnd();
 		out.close();
