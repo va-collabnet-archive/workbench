@@ -3772,7 +3772,8 @@ public class TerminologyProjectDAO {
 		}
 
 		if (lastPart == null) {
-			throw new TerminologyException("No parts on this viewpositionset.");
+			lastPart = (I_ExtendByRefPart) extension;
+			//throw new TerminologyException("No parts on this viewpositionset.");
 		}
 
 		return lastPart;
