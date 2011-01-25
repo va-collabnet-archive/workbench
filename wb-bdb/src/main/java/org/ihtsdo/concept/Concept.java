@@ -1278,6 +1278,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         data.setLastWrite(version);
     }
 
+   @Override
     public ConcurrentSkipListSet<RefsetMember<?, ?>> getRefsetMembers()
             throws IOException {
         return data.getRefsetMembers();

@@ -534,9 +534,9 @@ public class PositionMapper {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         Formatter f = new Formatter(buf);
-        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(this.getClass().getSimpleName()).append(": ");
         buf.append(" destination:");
         buf.append(destination);
         buf.append("\nsapNid|distance|time|path|status\n");

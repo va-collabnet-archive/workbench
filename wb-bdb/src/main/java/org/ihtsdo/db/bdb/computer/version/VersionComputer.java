@@ -25,7 +25,11 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 
-    private void handlePart(HashSet<V> partsForPosition, PositionMapper mapper, V part, Precedence precedencePolicy, ContradictionManagerBI contradictionManager, NidSetBI allowedStatus) throws RuntimeException {
+    private void handlePart(HashSet<V> partsForPosition,
+            PositionMapper mapper, V part,
+            Precedence precedencePolicy,
+            ContradictionManagerBI contradictionManager,
+            NidSetBI allowedStatus) throws RuntimeException {
         List<V> partsToCompare =
                 new ArrayList<V>(partsForPosition);
         for (V prevPartToTest : partsToCompare) {
@@ -81,6 +85,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 
     private class SortVersionsByTimeThenAuthor implements Comparator<V> {
 
+      @Override
         public int compare(V p1, V p2) {
 
             if (p1.getTime() < p2.getTime()) {
@@ -246,7 +251,9 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                     if (allowedTypes.contains(
                             ((I_AmTypedPart) part).getTypeNid()) == false) {
                         if (mapper.onRoute(part)) {
-                            handlePart(partsForPosition, mapper, part, precedencePolicy, contradictionManager, allowedStatus);
+                            handlePart(partsForPosition, mapper, part,
+                                    precedencePolicy, contradictionManager,
+                                    allowedStatus);
                             partsForPosition.remove(part);
                         }
                         continue nextpart;
@@ -256,7 +263,9 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                     if (partsForPosition.isEmpty()) {
                         partsForPosition.add(part);
                     } else {
-                        handlePart(partsForPosition, mapper, part, precedencePolicy, contradictionManager, allowedStatus);
+                        handlePart(partsForPosition, mapper, part,
+                                precedencePolicy, contradictionManager,
+                                allowedStatus);
                     }
                 }
             }
@@ -299,7 +308,8 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
         HashSet<V> rejectedVersions = new HashSet<V>();
         nextpart:
         for (V part : versions) {
-            if (part.getTime() == Long.MIN_VALUE || (filter != null && filter.pass(part))) {
+            if (part.getTime() == Long.MIN_VALUE ||
+                    (filter != null && filter.pass(part))) {
                 rejectedVersions.add(part);
                 continue nextpart;
             }

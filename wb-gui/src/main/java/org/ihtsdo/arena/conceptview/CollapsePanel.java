@@ -181,6 +181,7 @@ public class CollapsePanel extends JPanel {
             updateShowSubpanelSet(refex, ComponentVersionDragPanel.SubPanelTypes.REFEX);
             ((JButton) e.getSource()).setIcon((refex ? showRefexes
                     : hideRefexes));
+            updateSubpanels();
          }
       });
       refexButton.setPreferredSize(new Dimension(21, 16));
@@ -222,6 +223,7 @@ public class CollapsePanel extends JPanel {
             updateShowSubpanelSet(templates, ComponentVersionDragPanel.SubPanelTypes.TEMPLATE);
             ((JButton) e.getSource()).setIcon(templates ? showTemplates
                     : hideTemplates);
+            updateSubpanels();
          }
       });
       templatessButton.setPreferredSize(new Dimension(21, 16));
@@ -254,6 +256,7 @@ public class CollapsePanel extends JPanel {
             updateShowSubpanelSet(alerts, ComponentVersionDragPanel.SubPanelTypes.ALERT);
             ((JButton) e.getSource()).setIcon(alerts ? showAlerts
                     : hideAlerts);
+            updateSubpanels();
          }
       });
       alertsButton.setPreferredSize(new Dimension(21, 16));
@@ -269,6 +272,14 @@ public class CollapsePanel extends JPanel {
          alertsButton.setPreferredSize(emptyDimension);
       }
        return alertsButton;
+   }
+
+   private void updateSubpanels() {
+      for (I_ToggleSubPanels jc : components) {
+         if (!collapsed) {
+            jc.showSubPanels(subpanelsToShow);
+         }
+      }
    }
 
    private JButton getCollapseExpandButton() {
