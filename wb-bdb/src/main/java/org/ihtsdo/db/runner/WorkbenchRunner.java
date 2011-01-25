@@ -152,6 +152,7 @@ public class WorkbenchRunner {
 			activity.setProgressInfoUpper("Loading the database");
 			activity.setProgressInfoLower("Setting up the environment...");
 			activity.addRefreshActionListener(new ActionListener() {
+            @Override
 				public void actionPerformed(ActionEvent e) {
 					System.out.println("System.exit from activity action listener: "
 									+ e.getActionCommand());
@@ -234,6 +235,7 @@ public class WorkbenchRunner {
 					wbConfigFile = lastProfileDir;
 				} else {
 					String[] profileFiles = lastProfileDir.list(new FilenameFilter() {
+                  @Override
 								public boolean accept(File dir, String name) {
 									return name.endsWith(".ace");
 								}
@@ -307,7 +309,7 @@ public class WorkbenchRunner {
 				svnHelper.doChangeSetImport();
 			}
 			if (wbConfigFile != null && wbConfigFile.exists()
-					&& wbPropertiesFile.exists() && userProfile != null) {
+					&& wbPropertiesFile.exists()) {
 
 				// Put up a dialog to select the configuration file...
 				CountDownLatch latch = new CountDownLatch(1);
@@ -476,7 +478,7 @@ public class WorkbenchRunner {
 			}
 			if (queuesToRemove.size() > 0) {
 				AceConfig.config.getQueues().removeAll(queuesToRemove);
-				StringBuffer buff = new StringBuffer();
+				StringBuilder buff = new StringBuilder();
 				buff.append("<html><body>Removing queues that are not accessible: <br>");
 				for (String queue : queuesToRemove) {
 					buff.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
@@ -493,7 +495,6 @@ public class WorkbenchRunner {
 										+ queuesToRemove));
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			AceLog.getAppLog().alertAndLogException(e);
 			System.exit(0);
 		}
@@ -519,6 +520,7 @@ public class WorkbenchRunner {
 				try {
 					SwingUtilities.invokeAndWait(new Runnable() {
 
+                  @Override
 						public void run() {
 							parentFrame.setContentPane(new JLabel(
 									"The Terminology IDE is starting..."));
@@ -620,16 +622,19 @@ public class WorkbenchRunner {
 
 	private static class StartupFrameListener implements ListDataListener {
 
+      @Override
 		public void contentsChanged(ListDataEvent arg0) {
 			AceLog.getAppLog().info("Contents changed: " + arg0);
 
 		}
 
+      @Override
 		public void intervalAdded(ListDataEvent arg0) {
 			AceLog.getAppLog().info("intervalAdded: " + arg0);
 
 		}
 
+      @Override
 		public void intervalRemoved(ListDataEvent arg0) {
 			AceLog.getAppLog().info("intervalRemoved: " + arg0);
 
@@ -639,12 +644,13 @@ public class WorkbenchRunner {
 
 	private void handleNormalFrame(final I_ConfigAceFrame ace) {
 		SwingUtilities.invokeLater(new Runnable() {
+         @Override
 			public void run() {
 				try {
 					boolean startup = firstStartup;
 					firstStartup = false;
 					if (ace.getViewPositionSet() == null
-							|| ace.getViewPositionSet().size() == 0) {
+							|| ace.getViewPositionSet().isEmpty()) {
 						Set<PositionBI> viewPositions = new HashSet<PositionBI>();
 
 						viewPositions
@@ -690,6 +696,7 @@ public class WorkbenchRunner {
 			if (ace.getAdminUsername().equals(prompter.getUsername())
 					&& ace.getAdminPassword().equals(prompter.getPassword())) {
 				SwingUtilities.invokeLater(new Runnable() {
+               @Override
 					public void run() {
 						try {
 							boolean startup = firstStartup;
