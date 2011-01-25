@@ -34,12 +34,12 @@ import org.ihtsdo.tk.api.Precedence;
  * Assumptions: 1. Each path can participate as an origin only once 2. The
  * version/time element of each position reflects actual calendar time, and
  * future dates can be no greater than 1 year in the future.
- * 
+ *
  * Thoughts: a. Should the conflict matrix be a sparse matrix? Space vs
  * efficiency tradeoff.
- * 
+ *
  * @author kec
- * 
+ *
  */
 public class PositionMapper {
 
@@ -118,8 +118,7 @@ public class PositionMapper {
         assert version.getSapNid() < positionDistance.length : "sapNid: " + version.getSapNid()
                 + " length: " + positionDistance.length + " version: " + version;
         if (version.getTime() < Long.MAX_VALUE) {
-            return positionDistance[version.getSapNid()] >= 0
-                    && version.getTime() <= destination.getTime();
+            return positionDistance[version.getSapNid()] >= 0;
         } else if (destination.getTime() > System.currentTimeMillis()) {
             return positionDistance[version.getSapNid()] >= 0;
         }

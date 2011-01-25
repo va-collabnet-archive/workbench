@@ -20,6 +20,7 @@ import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
@@ -140,14 +141,34 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                     matchingVersions, versions, c.getPrecedence(),
                     c.getContradictionManager(), null);
         } else {
+           if (c.getRelAssertionType() == RelAssertionType.INFERRED) {
             addSpecifiedVersionsWithPositions(c.getAllowedStatusNids(), null,
                     c.getPositionSet(), matchingVersions, versions, c.getPrecedence(),
-                    c.getContradictionManager(), null);
-        }
+                    c.getContradictionManager(), new AuthorFilter(c.getClassifierNid()));
+           } else if (c.getRelAssertionType() == RelAssertionType.STATED) {
+            addSpecifiedVersionsWithPositions(c.getAllowedStatusNids(), null,
+                    c.getPositionSet(), matchingVersions, versions, c.getPrecedence(),
+                    c.getContradictionManager(), new AuthorAntiFilter(c.getClassifierNid()));
+           } else if (c.getRelAssertionType() == RelAssertionType.INFERRED_THEN_STATED) {
+              List<V> possibleValues = new ArrayList<V>();
+               addSpecifiedVersionsWithPositions(c.getAllowedStatusNids(), null,
+                    c.getPositionSet(), possibleValues, versions, c.getPrecedence(),
+                    c.getContradictionManager(), new AuthorFilter(c.getClassifierNid()));
+               if (possibleValues.isEmpty()) {
+                  addSpecifiedVersionsWithPositions(c.getAllowedStatusNids(), null,
+                    c.getPositionSet(), possibleValues, versions, c.getPrecedence(),
+                    c.getContradictionManager(), new AuthorAntiFilter(c.getClassifierNid()));
+               }
+               matchingVersions.addAll(possibleValues);
+           } else {
+              throw new RuntimeException("Can't handle: " +
+                      c.getRelAssertionType());
+           }
+         }
     }
 
     /**
-     * 
+     *
      * @param allowedStatus
      *            <code>null</code> is a wildcard.
      * @param allowedTypes
@@ -181,6 +202,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
             super(nids);
         }
 
+      @Override
         public boolean pass(V part) {
             return !super.pass(part);
         }
@@ -256,7 +278,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
     }
 
     /**
-     * 
+     *
      * @param allowedStatus
      * @param allowedTypes
      * @param specifiedVersions

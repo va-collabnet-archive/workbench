@@ -40,6 +40,7 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import org.ihtsdo.tk.api.RelAssertionType;
 
 public class Relationship extends ConceptComponent<RelationshipRevision, Relationship>
         implements I_RelVersioned<RelationshipRevision>,
@@ -401,11 +402,11 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     }
 
     /**
-     * Test method to check to see if two objects are equal in all respects. 
+     * Test method to check to see if two objects are equal in all respects.
      * @param another
      * @return either a zero length String, or a String containing a description of the
-     * validation failures. 
-     * @throws IOException 
+     * validation failures.
+     * @throws IOException
      */
     public String validate(Relationship another) throws IOException {
         assert another != null;
@@ -437,7 +438,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
                     + "\t\tanother.typeNid = " + another.getTypeNid() + "\n");
         }
 
-        // Compare the parents 
+        // Compare the parents
         buf.append(super.validate(another));
 
         return buf.toString();
@@ -779,6 +780,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         throw new UnsupportedOperationException("Use makeAnalog instead");
     }
 
+   @Override
     public Relationship getFixedPart() {
         return this;
     }
@@ -798,26 +800,32 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         versions = null;
     }
 
+   @Override
     public void setCharacteristicNid(int characteristicNid) {
         this.characteristicNid = characteristicNid;
     }
 
+   @Override
     public int getCharacteristicNid() {
         return characteristicNid;
     }
 
+   @Override
     public void setRefinabilityNid(int refinabilityNid) {
         this.refinabilityNid = refinabilityNid;
     }
 
+   @Override
     public int getRefinabilityNid() {
         return refinabilityNid;
     }
 
+   @Override
     public void setTypeNid(int typeNid) {
         this.typeNid = typeNid;
     }
 
+   @Override
     public int getTypeNid() {
         return typeNid;
     }
@@ -860,7 +868,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     public Relationship.Version getVersion(ViewCoordinate c)
             throws ContraditionException {
         List<Relationship.Version> vForC = getVersions(c);
-        if (vForC.size() == 0) {
+        if (vForC.isEmpty()) {
             return null;
         }
         if (vForC.size() > 1) {
@@ -871,52 +879,11 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
     @Override
     public List<Relationship.Version> getVersions(ViewCoordinate c) {
-        List<Version> possibleValues = new ArrayList<Version>(2);
-        computer.addSpecifiedRelVersions(possibleValues,
+        List<Version> returnValues = new ArrayList<Version>(2);
+         computer.addSpecifiedRelVersions(returnValues,
                 getVersions(),
                 c);
-
-        List<Relationship.Version> actualValues =
-                new ArrayList<Relationship.Version>(possibleValues.size());
-        switch (c.getRelAssertionType()) {
-            case INFERRED:
-                if (possibleValues.isEmpty()) {
-                    return possibleValues;
-                }
-                for (Relationship.Version rt : possibleValues) {
-                    if (rt.getAuthorNid() == c.getClassifierNid()) {
-                        actualValues.add(rt);
-                    }
-                }
-                return actualValues;
-            case INFERRED_THEN_STATED:
-                if (possibleValues.isEmpty() || possibleValues.size() == 1) {
-                    return possibleValues;
-                }
-                for (Relationship.Version rt : possibleValues) {
-                    if (rt.getAuthorNid() == c.getClassifierNid()) {
-                        actualValues.add(rt);
-                    }
-                }
-                if (actualValues.size() > 0) {
-                    return actualValues;
-                }
-                return possibleValues;
-            case STATED:
-                if (possibleValues.isEmpty()) {
-                    return possibleValues;
-                }
-                for (Relationship.Version rt : possibleValues) {
-                    if (rt.getAuthorNid() != c.getClassifierNid()) {
-                        actualValues.add(rt);
-                    }
-                }
-                return actualValues;
-            default:
-                throw new RuntimeException("Can't handle relAssertionType: "
-                        + c.getRelAssertionType());
-
-        }
+         return returnValues;
     }
 
     @Override

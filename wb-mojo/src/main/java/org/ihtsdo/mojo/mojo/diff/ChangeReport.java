@@ -93,7 +93,7 @@ public class ChangeReport extends ChangeReportBase {
 			out_xml.close();
 			doSummaryReport();
 			doConceptList(report_dir + "/concepts.html");
-			//sortConcepts(changed_concepts);
+			sortConcepts(changed_concepts);
 			doConceptList(report_dir + "/alpha.html");
 		} catch (Exception e) {
 			throw new MojoFailureException(e.getLocalizedMessage(), e);

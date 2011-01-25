@@ -371,7 +371,6 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
             Concept c = (Concept) fcfc.fetch();
             conceptMap.put(cNid, new ConceptVersion(c, coordinate));
          }
-
       }
 
       @Override
