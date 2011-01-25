@@ -82,10 +82,7 @@ public class InitializeUserPermissionMojo extends AbstractMojo {
             };
         
 	        tf.addUncommitted(refset.getRefsetConcept());
-	        //RefsetReaderUtility.getContents(refset.getRefsetId());
         } catch (Exception e) {
-			e.printStackTrace();
-			e.getMessage();
 			throw new MojoExecutionException(e.getMessage());
 		}
 	}

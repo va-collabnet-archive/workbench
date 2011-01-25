@@ -54,7 +54,6 @@ public class InitializeStateTransitionBNFMojo extends AbstractMojo {
             processV2StateTransitions();
 
 	        tf.addUncommitted(refset.getRefsetConcept());
-	        //RefsetReaderUtility.getContents(refset.getRefsetId());
 		} catch (Exception e) {
 			e.printStackTrace();
 			e.getMessage();
