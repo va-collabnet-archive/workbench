@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -60,17 +61,22 @@ public class ChangeReportParallel extends ChangeReportBase {
                  "UTF-8")));
          out_xml.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
          out_xml.println(startElement("change_report"));
-
+         getLog().info("starting iteration.");
          Ts.get().iterateConceptDataInSequence(new Processor());
+         getLog().info("finished iteration.");
 
          if (out != null) {
             out.close();
          }
          out_xml.println(endElement("change_report"));
          out_xml.close();
+         getLog().info("Generating summary report.");
          doSummaryReport();
+         getLog().info("Generating concept order list.");
          doConceptList(report_dir + "/concepts.html");
-         //sortConcepts(changed_concepts);
+         getLog().info("Sorting for alphabetic order list.");
+         sortConcepts(changed_concepts);
+         getLog().info("Generating alphabetic order list.");
          doConceptList(report_dir + "/alpha.html");
 
       } catch (Exception e) {
@@ -90,6 +96,9 @@ public class ChangeReportParallel extends ChangeReportBase {
       @Override
       public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
          I_GetConceptData c = (I_GetConceptData) fetcher.fetch();
+         if (c.getPrimUuid().equals(UUID.fromString("53798ccb-f784-3120-af08-2a0041e43bc3"))) {
+            getLog().info("Found test example: " + c);
+         }
          changes = "";
          changes_xml = "";
          if (debug_p) {

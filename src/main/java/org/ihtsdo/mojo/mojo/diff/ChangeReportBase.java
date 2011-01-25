@@ -571,8 +571,8 @@ public abstract class ChangeReportBase extends DiffBase {
 
 	protected List<Integer> test_concepts = Arrays.asList(146773003);
 
-	protected ConcurrentSkipListSet<Integer> changed_concepts =
-           new ConcurrentSkipListSet<Integer>();
+	protected ArrayList<Integer> changed_concepts =
+           new ArrayList<Integer>();
 
 	protected ConcurrentHashMap<Integer, String> concept_to_page =
            new ConcurrentHashMap<Integer, String>();
