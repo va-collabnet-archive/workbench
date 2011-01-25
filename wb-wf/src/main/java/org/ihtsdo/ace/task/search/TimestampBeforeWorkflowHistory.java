@@ -63,7 +63,7 @@ public class TimestampBeforeWorkflowHistory extends AbstractWorkflowHistorySearc
        		if (bean.getTimeStamp() < testTimestampBeforeThisDate)
             	return true;
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Couldn't read search Timestamp Before Than", e);
+			AceLog.getAppLog().log(Level.WARNING, "Couldn't read search Timestamp Before Than", e);
 		}
 
 		return false;

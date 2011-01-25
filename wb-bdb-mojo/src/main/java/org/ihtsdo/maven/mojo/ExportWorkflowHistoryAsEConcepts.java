@@ -313,7 +313,7 @@ public class ExportWorkflowHistoryAsEConcepts extends AbstractMojo {
 			   			"</property>" +
 				"</properties>";
 		} catch (Exception e) {
-	        	AceLog.getAppLog().alertAndLog(Level.SEVERE, row.toString(), new Exception("Failure in creating Workflow History EConcepts"));
+			AceLog.getAppLog().log(Level.WARNING, row.toString(), new Exception("Failure in creating Workflow History EConcepts"));
 		}
 
 		return "";

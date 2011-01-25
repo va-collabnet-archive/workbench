@@ -103,7 +103,7 @@ public class InitializeSemanticAreaSearchMojo extends AbstractMojo {
 
         		writer.addMember();
         	} catch (Exception e) {
-            	AceLog.getAppLog().alertAndLog(Level.SEVERE, line, e);
+        		AceLog.getAppLog().log(Level.WARNING, line, e);
         	}
         };
 

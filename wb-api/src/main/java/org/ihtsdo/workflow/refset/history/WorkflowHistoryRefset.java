@@ -163,7 +163,7 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 			try {
 				return getPreferredTerm(a).compareTo(getPreferredTerm(b));
 			} catch (Exception e) {
-	        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Couldn't Setup PreferredTermComparator", e);
+				AceLog.getAppLog().log(Level.WARNING, "Couldn't Setup PreferredTermComparator", e);
 			}
 			
 			return 0;
@@ -202,7 +202,7 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 			try {
 				return (o1.getInitialText().toLowerCase().compareTo(o2.getInitialText().toLowerCase()));
 			} catch (IOException e) {
-	        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Failure in Compare Routine", e);
+				AceLog.getAppLog().log(Level.WARNING, "Failure in Compare Routine", e);
 			}
 			return -1;
 		}

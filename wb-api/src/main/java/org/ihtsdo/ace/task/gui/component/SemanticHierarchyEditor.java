@@ -18,7 +18,6 @@ package org.ihtsdo.ace.task.gui.component;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import java.io.IOException;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -28,7 +27,6 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.tasks.editor.AbstractComboEditor;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.refset.semArea.SemanticAreaSearchRefset;
 
 public class SemanticHierarchyEditor extends AbstractComboEditor {
@@ -48,7 +46,7 @@ public class SemanticHierarchyEditor extends AbstractComboEditor {
 					hierarchies.add(props.getStringValue());
 		        }
 			} catch (Exception e) {
-            	AceLog.getAppLog().alertAndLog(Level.SEVERE, props.getStringValue(), e);
+				AceLog.getAppLog().log(Level.WARNING, props.getStringValue(), e);
 			}
 
 			EditorComponent ec = new EditorComponent(hierarchies.toArray());
@@ -62,7 +60,7 @@ public class SemanticHierarchyEditor extends AbstractComboEditor {
 	
 	    	return ec;
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, props.getStringValue(), e);
+			AceLog.getAppLog().log(Level.WARNING, props.getStringValue(), e);
 		}
 		
 		return null;

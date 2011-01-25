@@ -48,7 +48,7 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 			} else
 				return false;
 		} catch (Exception io) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Failed to Add Member", io);
+        	AceLog.getAppLog().log(Level.WARNING, "Failed to Add Member", io);
 		}
 
 		fields.cleanValues();
@@ -72,7 +72,7 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 				return true;
 			}
 		} catch (Exception io) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Failed to retire member", io);
+        	AceLog.getAppLog().log(Level.WARNING, "Failed to retire member", io);
 		}
 		
 		fields.cleanValues();

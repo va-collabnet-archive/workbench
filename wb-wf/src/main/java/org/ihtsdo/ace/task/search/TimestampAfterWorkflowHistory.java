@@ -65,7 +65,7 @@ public class TimestampAfterWorkflowHistory extends AbstractWorkflowHistorySearch
             if (bean.getTimeStamp() > testTimestampAfterThisDate)
             	return true;
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Couldn't read search Timestamp After Than", e);
+			AceLog.getAppLog().log(Level.WARNING, "Couldn't read search Timestamp After Than", e);
 		}
 
 		return false;

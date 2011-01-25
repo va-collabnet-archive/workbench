@@ -55,7 +55,7 @@ public class WorkflowStateEditor extends AbstractComboEditor {
 					states.add(state);
     		}
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Couldn't Set up State Editor Constraint", e);
+			AceLog.getAppLog().log(Level.WARNING, "Couldn't Set up State Editor Constraint", e);
 		}
     	
     	EditorComponent ec = new EditorComponent(states.toArray());

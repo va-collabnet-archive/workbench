@@ -64,7 +64,7 @@ public class ConflictIdentifier {
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Failure to get Active Ace Frame", e);
+        	AceLog.getAppLog().log(Level.WARNING, "Failure to get Active Ace Frame", e);
         	return;
 		}
 			
@@ -187,7 +187,7 @@ public class ConflictIdentifier {
 			
 		} 
 		catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in detecting contradictions for component: " + comp.toString(), e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error in detecting contradictions for component: " + comp.toString(), e);
 		}
 
 		return CONTRADICTION_RESULT.CONTRADICTION;
@@ -236,7 +236,7 @@ public class ConflictIdentifier {
 						try {
 							retPosition = conflictMapper.relativePosition(currentVersion, testVersion);
 						} catch (Exception e) {
-			            	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in calling position mapper method", e);
+			            	AceLog.getAppLog().log(Level.WARNING, "Error in calling position mapper method", e);
 						}
 						
 						if (retPosition.equals(RELATIVE_POSITION.CONTRADICTION))
@@ -466,7 +466,7 @@ int ss = data.getRefsetMembers().size();
 			try {
 				return "\nRunning contradiction detection on view path: " + Terms.get().getPath(pathNid).toString() + "With Time: " + time + "\n";
 			} catch (Exception e) {
-            	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in accessing view path: " + pathNid, e);
+            	AceLog.getAppLog().log(Level.WARNING, "Error in accessing view path: " + pathNid, e);
 			}
 			
 			return "";
@@ -525,7 +525,7 @@ int ss = data.getRefsetMembers().size();
 				}
 			} 			
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in identifying version of type: " + compType + "for component: " + componentNid, e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error in identifying version of type: " + compType + "for component: " + componentNid, e);
 		}
 		
 		return currentVersion;
@@ -538,7 +538,7 @@ int ss = data.getRefsetMembers().size();
 		{
 			coordPosition = Terms.get().newPosition(Terms.get().getPath(version.getPathNid()), ThinVersionHelper.convert(version.getTime()));
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in accessing path: " + version.getPathNid(), e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error in accessing path: " + version.getPathNid(), e);
 		}
 		
 		return coordPosition;
@@ -554,7 +554,7 @@ int ss = data.getRefsetMembers().size();
 			allowedStatusNids.add(Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getPrimoridalUid()));
 			versionCoord = config.getViewCoordinate();
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in accessing RETIRED concept", e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error in accessing RETIRED concept", e);
 		} 
 
 		return versionCoord;
@@ -591,7 +591,7 @@ int ss = data.getRefsetMembers().size();
 			
 			return getLeastCommonAncestorVersion(possibleVersions);
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in accessing path: " + v.getPathNid(), e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error in accessing path: " + v.getPathNid(), e);
 		}
 		
 		return null;

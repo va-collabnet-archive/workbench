@@ -46,7 +46,7 @@ public class StateWorkflowHistory extends AbstractWorkflowHistorySearchTest {
                   this.testState = itr.next();
                }
             } catch (Exception e) {
-            	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in initializing drop-down value", e);
+            	AceLog.getAppLog().log(Level.WARNING, "Error in initializing drop-down value", e);
             }
          }
       } else {

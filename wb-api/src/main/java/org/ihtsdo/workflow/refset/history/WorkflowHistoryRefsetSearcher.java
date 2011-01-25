@@ -47,7 +47,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 			activeStatusNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.ACTIVE.getPrimoridalUid());
 			currentStatusNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid());
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error creating Workflow History Refset Searcher", e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error creating Workflow History Refset Searcher", e);
 		}
 	}
 
@@ -55,7 +55,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		try {
 			return Terms.get().getRefsetExtensionMembers(refsetId).size();
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Cant access workflow history refset", e);
+        	AceLog.getAppLog().log(Level.WARNING, "Cant access workflow history refset", e);
 		}
 		
 		return 0;
@@ -68,7 +68,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 			term = con.getInitialText();
 		return Terms.get().getRefsetExtensionsForComponent(refsetId, con.getConceptNid()).size();
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Cant access workflow history refset for concept: " + term, e);
+        	AceLog.getAppLog().log(Level.WARNING, "Cant access workflow history refset for concept: " + term, e);
 		}
 
 		return 0;
@@ -134,7 +134,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 				}
 			}
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error getting workflow history on Concept: " + conceptTerm, e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error getting workflow history on Concept: " + conceptTerm, e);
 		}
 		
 		return currentWorkflowId;
@@ -166,7 +166,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 				}
 			}
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error getting workflow history on Concept: " + conceptTerm, e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error getting workflow history on Concept: " + conceptTerm, e);
 		}
 		
 		return mostCurrent;
@@ -192,7 +192,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 			}
 			else
 			{
-				AceLog.getAppLog().alertAndLog(Level.SEVERE, bean.toString(), new Exception("Failure in accessing Workflow History Refset"));
+				AceLog.getAppLog().log(Level.WARNING, bean.toString(), new Exception("Failure in accessing Workflow History Refset"));
 			}
 
 			//outputFile.write("\n\nBean #" + counter + " with status UID: " + Terms.get().nativeToUuid(props.getStatusNid()).get(0) + " has properties: " + bean);

@@ -170,7 +170,7 @@ public class SearchWfHistoryStringWorker extends SwingWorker<I_UpdateProgress> i
             if (ACE.editMode) {
                 AceLog.getAppLog().alertAndLogException(e);
             } else {
-                AceLog.getAppLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
+            	AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
             }
         }
         wfSearchPanel.removeStopActionListener(stopListener);

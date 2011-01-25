@@ -89,7 +89,7 @@ public class InitializeEditorCategoryMojo extends AbstractMojo {
             	
             Terms.get().addUncommitted(writer.getRefsetConcept());
         } catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, line, e);
+        	AceLog.getAppLog().log(Level.WARNING, line, e);
 		}
 	}
     

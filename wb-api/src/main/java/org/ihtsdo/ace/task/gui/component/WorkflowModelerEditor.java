@@ -95,7 +95,7 @@ public class WorkflowModelerEditor extends AbstractComboEditor {
 	
 	    	return ec;
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Couldn't Set up Modeler Editor Constraint", e);
+        	AceLog.getAppLog().log(Level.WARNING, "Couldn't Set up Modeler Editor Constraint", e);
 		}
 		
 		return null;

@@ -30,7 +30,7 @@ public class WorkflowHandler implements WorkflowHandlerBI {
 		try {
 			return Terms.get().getActiveAceFrameConfig().getAllAvailableWorkflowActionUids();
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error retrieving ActiveAceFrameConfig: ", e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error retrieving ActiveAceFrameConfig: ", e);
 		}
 		
 		return null;

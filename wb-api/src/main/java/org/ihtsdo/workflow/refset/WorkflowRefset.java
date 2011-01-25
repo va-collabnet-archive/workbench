@@ -92,7 +92,7 @@ public abstract class WorkflowRefset
 		try {
 			refset = Terms.get().getConcept(uid);
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error retrieving Refset Concept: " + uid, e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error retrieving Refset Concept: " + uid, e);
 		}
 	}
 	public abstract Collection<UUID> getRefsetUids() throws TerminologyException, IOException;
@@ -102,7 +102,7 @@ public abstract class WorkflowRefset
 		try {
 			return Terms.get().getConcept(UUID.fromString(UidString));
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error retrieving Concept: " + UidString, e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error retrieving Concept: " + UidString, e);
 		}
 		
 		return null;

@@ -38,7 +38,7 @@ public class WorkflowActionEditor extends AbstractComboEditor {
 			for (I_GetConceptData action : Terms.get().getActiveAceFrameConfig().getWorkflowActions()) 
 				editors.add(action);
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Couldn't Set up Action Editor Constraint", e);
+        	AceLog.getAppLog().log(Level.WARNING, "Couldn't Set up Action Editor Constraint", e);
 		}
 
     	EditorComponent ec = new EditorComponent(editors.toArray());

@@ -123,7 +123,7 @@ public class ArenaEditorToolBar extends JToolBar
 				try {
 					Terms.get().getActiveAceFrameConfig().setAutoApprove(aa);
 				} catch (Exception e1) {
-		        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in setting Auto Approval", e1);
+		        	AceLog.getAppLog().log(Level.WARNING, "Error in setting Auto Approval", e1);
 				}
 				
 			}
@@ -143,7 +143,7 @@ public class ArenaEditorToolBar extends JToolBar
 		        add(autoApproval);
 			
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in setting Auto Approval", e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error in setting Auto Approval", e);
 		}
 
 		

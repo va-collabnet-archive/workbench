@@ -11,7 +11,6 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.ConflictIdentifier;
-import org.ihtsdo.concept.I_FetchConceptFromCursor;
 import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
 import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.concept.ConflictIdentifier.CONTRADICTION_RESULT;
@@ -207,7 +206,7 @@ public class ContradictionConceptProcessor implements I_ProcessUnfetchedConceptD
 		set.setMember(Terms.get().getConcept(UUID.fromString("800e6651-a619-3edf-bb90-74ab279966c9")).getConceptNid());
 	*/
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in intializing Contradiction Concept Processor", e);
+			AceLog.getAppLog().log(Level.WARNING, "Error in intializing Contradiction Concept Processor", e);
 		}
 
 		setNidSet(set);

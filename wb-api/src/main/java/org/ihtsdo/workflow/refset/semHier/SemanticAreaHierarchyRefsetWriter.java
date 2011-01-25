@@ -104,7 +104,7 @@ public class SemanticAreaHierarchyRefsetWriter extends WorkflowRefsetWriter {
 				str.append("\nReferencedComponentId:" + getReferencedComponentId());
 				str.append("\nparentSemanticArea:" + parentSemanticArea);
 				str.append("\nchildSemanticArea:" + childSemanticArea);
-	        	AceLog.getAppLog().alertAndLog(Level.SEVERE, str.toString(), new Exception("Failure in updating Semantic Hierarchy Refset"));
+				AceLog.getAppLog().log(Level.WARNING, str.toString(), new Exception("Failure in updating Semantic Hierarchy Refset"));
 			}
 			
 			return retVal;

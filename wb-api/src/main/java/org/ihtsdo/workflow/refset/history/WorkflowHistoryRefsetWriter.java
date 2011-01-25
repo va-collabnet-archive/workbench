@@ -179,7 +179,7 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 			try {
 				setReferencedComponentId(Terms.get().getConcept(uid));
 			} catch (Exception e) {
-	        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error getting concept from database: " + uid, e);
+	        	AceLog.getAppLog().log(Level.WARNING, "Error getting concept from database: " + uid, e);
 			}
 		}
 
@@ -325,7 +325,7 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 				str.append("\nstate:" + state);
 				str.append("\nrefsetColumnTimeStamp:" + refsetColumnTimeStamp);
 				str.append("\nfsn:" + fsn);
-	        	AceLog.getAppLog().alertAndLog(Level.SEVERE, str.toString(), new Exception("Failure in updating Workflow History Refset"));
+	        	AceLog.getAppLog().log(Level.WARNING, str.toString(), new Exception("Failure in updating Workflow History Refset"));
 			}
 			
 			return retVal;

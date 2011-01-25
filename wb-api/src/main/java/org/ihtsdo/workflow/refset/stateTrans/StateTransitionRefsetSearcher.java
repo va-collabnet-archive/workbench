@@ -83,7 +83,7 @@ public  class StateTransitionRefsetSearcher extends WorkflowRefsetSearcher
 			StringBuffer str = new StringBuffer();
 			str.append("\ntestInitState: " + matchInitialStateNid);
 			str.append("\nOn Row: " + props.getStringValue());
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, str.toString(), new Exception("Failure in updating Editor Category Refset"));
+			AceLog.getAppLog().log(Level.WARNING, str.toString(), new Exception("Failure in updating Editor Category Refset"));
 		}
 		
 		return results;

@@ -177,7 +177,7 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 			return "Failed to identify referencedComponentId or WorkflowHistory" + 
 				   "\nError msg: " + io.getMessage();
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Failed to access fields of WorkflowHistoryJavaBean: " + this.toString(), e);
+			AceLog.getAppLog().log(Level.WARNING, "Failed to access fields of WorkflowHistoryJavaBean: " + this.toString(), e);
 			return "";
 		}
 	}

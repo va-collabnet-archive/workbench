@@ -41,7 +41,7 @@ public class ContradictionIdentificationResults {
 				sortedConcepts.add(con);
 			}
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in getting concept from detection results", e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error in getting concept from detection results", e);
 		}
 
 		return sortedConcepts;
@@ -57,7 +57,7 @@ public class ContradictionIdentificationResults {
 				sortedConcepts.add(con);
 			}
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in getting concept from detection results", e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error in getting concept from detection results", e);
 		}
 
 		return sortedConcepts;
@@ -73,7 +73,7 @@ public class ContradictionIdentificationResults {
 				sortedConcepts.add(con);
 			}
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in getting concept from detection results", e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error in getting concept from detection results", e);
 		}
 
 		return sortedConcepts;
@@ -89,7 +89,7 @@ public class ContradictionIdentificationResults {
 				sortedConcepts.add(con);
 			}
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in getting concept from detection results", e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error in getting concept from detection results", e);
 		}
 
 		return sortedConcepts;

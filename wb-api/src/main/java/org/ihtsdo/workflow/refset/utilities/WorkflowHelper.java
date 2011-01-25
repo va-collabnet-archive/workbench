@@ -239,7 +239,7 @@ public class WorkflowHelper {
 		    	modelers.put(getLoginId(editor), editor);
 			}
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in updating modelers", e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error in updating modelers", e);
 		}
     }
 
@@ -307,7 +307,7 @@ public class WorkflowHelper {
 					}
 				}
 			} catch (Exception e ) {
-            	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Unable to lookup modeler: " + name, e);
+            	AceLog.getAppLog().log(Level.WARNING, "Unable to lookup modeler: " + name, e);
 			}
 
 			return defaultModeler;
@@ -337,7 +337,7 @@ public class WorkflowHelper {
 				}
 			}
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in identifying lead modeler", e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error in identifying lead modeler", e);
 		}
 		
 		return leadModeler;
@@ -539,7 +539,7 @@ public class WorkflowHelper {
 			if (!rels.isEmpty())
 				return rels;
 		} catch (Exception e) {
-        	AceLog.getAppLog().alertAndLog(Level.SEVERE, "Error in getting workflow-based attribute", e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error in getting workflow-based attribute", e);
 		}
 		
 		return new LinkedList<I_RelTuple>();
