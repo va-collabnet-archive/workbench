@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -121,7 +121,7 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
 
     public class AddToList implements ActionListener {
 
-    	
+
         public void actionPerformed(ActionEvent e) {
         }
 
@@ -260,7 +260,7 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
 
     private class LinkEditor extends JLabel implements ChangeListener {
         /**
-		 * 
+		 *
 		 */
         private static final long serialVersionUID = 1L;
 
@@ -312,7 +312,7 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
     }
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 
@@ -351,7 +351,7 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
     private JButton addButton;
 
     private JButton removeButton;
-    
+
     //private JButton eraseButton;
 
     private LINK_TYPE linkType = LINK_TYPE.UNLINKED;
@@ -361,7 +361,7 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
     private JCheckBox workflowInProgress;
     private JCheckBox workflowCompleted;
     private JCheckBox pastReleases;
-    
+
     private int lastSelectedRow = -1;
 
     public MySearchPanel(I_ConfigAceFrame config, ACE ace) {
@@ -371,7 +371,7 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
         this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "search");
         this.getActionMap().put("search", new AbstractAction("Search on enter") {
             /**
-             * 
+             *
              */
             private static final long serialVersionUID = 1L;
 
@@ -393,11 +393,11 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
         gbc.weighty = 0;
 
 
-        
-        
+
+
 
         gbc.gridx++;
-        
+
         workflowInProgress = new JCheckBox();
         workflowInProgress.setText("Search Workflows In Progress");
         workflowInProgress.setSelected(true);
@@ -417,12 +417,12 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
         pastReleases.setSelected(false);
         pastReleases.setToolTipText("<html>Searches workflows from prior releases of SNOMED</html>");
         add(pastReleases, gbc);
-        
-        
-        
-        
+
+
+
+
         gbc.gridx++;
-        gbc.gridheight = 2;        
+        gbc.gridheight = 2;
         gbc.weightx = 0;
         gbc.fill = GridBagConstraints.NONE;
 
@@ -436,7 +436,7 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
 
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridx++;
-        gbc.gridheight = 1;        
+        gbc.gridheight = 1;
 
         gbc.weightx = 0.75;
         progressBar = new JProgressBar();
@@ -448,11 +448,11 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
         gbc.weightx = 0;
 
         gbc.fill = GridBagConstraints.NONE;
-        
+
 
         // row 0, double height
-        gbc.gridheight = 2;        
-        
+        gbc.gridheight = 2;
+
         searchSetting = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/preferences.png")));
         searchSetting.setVisible(false);
         gbc.gridx++;
@@ -541,20 +541,22 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
         gbc.gridy++;
         gbc.gridheight = 1;
 
-        	getWorkflowHistoryCriterionPanels().add(makeCriterionPanel());
+         if (getWorkflowHistoryCriterionPanels() != null) {
+            getWorkflowHistoryCriterionPanels().add(makeCriterionPanel());
+         }
         	layoutCriterion();
-        
-	
+
+
 		// Results below...
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridheight = 1;
- 
+
 		model = new WorkflowHistoryTableModel(new WORKFLOW_FIELD[] { WORKFLOW_FIELD.FSN }, config);
 		/*
-		 *         model = new WorkflowHistoryTableModel(new WORKFLOW_FIELD[] { 
+		 *         model = new WorkflowHistoryTableModel(new WORKFLOW_FIELD[] {
 		 *       		WORKFLOW_FIELD.FSN, 	WORKFLOW_FIELD.ACTION, 	WORKFLOW_FIELD.STATE,
-		 *       		WORKFLOW_FIELD.EDITOR,	WORKFLOW_FIELD.PATH, 	WORKFLOW_FIELD.TIMESTAMP}, 
+		 *       		WORKFLOW_FIELD.EDITOR,	WORKFLOW_FIELD.PATH, 	WORKFLOW_FIELD.TIMESTAMP},
 		 *       		config);
 		 */
 
@@ -651,6 +653,7 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
         this.doLayout();
     }
 
+   @Override
     public WorkflowHistoryCriterionPanel makeCriterionPanel() {
         return new WorkflowHistoryCriterionPanel(this);
     }
@@ -692,7 +695,7 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
 
     public void setProgressMaximum(int descCount) {
         progressBar.setMaximum(descCount);
-    } 
+    }
 
     public void setProgressValue(int i) {
         progressBar.setValue(i);
@@ -753,7 +756,7 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
         List<I_TestWorkflowHistorySearchResults> extraCriterionCopy = new ArrayList<I_TestWorkflowHistorySearchResults>(extraCriterion);
        /*
         if (showHistory.isSelected() == false) {
-        
+
             extraCriterionCopy.add(new ActiveConceptAndDescTest());
         }
         */
@@ -782,7 +785,7 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
 
     public void focusOnInput() {
         SwingUtilities.invokeLater(new Runnable() {
-            
+
             @Override
             public void run() {
             }

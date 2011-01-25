@@ -573,6 +573,7 @@ public class WorkbenchRunner {
 			} else {
 				SwingUtilities.invokeAndWait(new Runnable() {
 
+               @Override
 					public void run() {
 						parentFrame.setContentPane(new JLabel(
 								"The Terminology IDE is starting..."));

@@ -726,10 +726,12 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     if (showSearchToggle.isSelected()) {
                         showSearchToggle.setSelected(false);
                     }
-                    int splitLoc = upperLowerSplit.getDividerLocation();
-                    upperLowerSplit.setBottomComponent(wfSearchPanel);
-                    upperLowerSplit.setDividerLocation(splitLoc);
-                    shownContainer = wfSearchPanel;
+                    if (wfSearchPanel != null) {
+                     int splitLoc = upperLowerSplit.getDividerLocation();
+                     upperLowerSplit.setBottomComponent(wfSearchPanel);
+                     upperLowerSplit.setDividerLocation(splitLoc);
+                     shownContainer = wfSearchPanel;
+                    }
                 }
                 if (hidden) {
                     // AceLog.getAppLog().info("showing bottom panel");
@@ -759,7 +761,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 searchPanel.focusOnInput();
             }
             if (showSignpostPanelToggle.isSelected()) {
-            	wfSearchPanel.focusOnInput();
+               if (wfSearchPanel != null) {
+                  wfSearchPanel.focusOnInput();
+               }
             }
         }
 
@@ -1265,9 +1269,13 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
         searchPanel = new SearchPanel(aceFrameConfig, this);
         searchPanel.addComponentListener(new ResizePalettesListener());
-        wfSearchPanel = new MySearchPanel(aceFrameConfig, this);
-        wfSearchPanel.addComponentListener(new ResizePalettesListener());
-        GridBagConstraints c = new GridBagConstraints();
+       try {
+          wfSearchPanel = new MySearchPanel(aceFrameConfig, this);
+          wfSearchPanel.addComponentListener(new ResizePalettesListener());
+       } catch (Exception e) {
+          AceLog.getAppLog().alertAndLogException(e);
+       }
+               GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
         c.weightx = 1;
@@ -1549,13 +1557,15 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         termTreeConceptSplit.setLastDividerLocation(aceFrameConfig.getTreeTermDividerLoc());
 
         upperLowerSplit.setTopComponent(termTreeConceptSplit);
-        upperLowerSplit.setBottomComponent(wfSearchPanel);
-        upperLowerSplit.setOneTouchExpandable(true);
-        upperLowerSplit.setContinuousLayout(true);
-        upperLowerSplit.setResizeWeight(1);
-        upperLowerSplit.setLastDividerLocation(500);
-        upperLowerSplit.setDividerLocation(2000);
-        wfSearchPanel.setMinimumSize(new Dimension(0, 0));
+        if (wfSearchPanel != null) {
+            upperLowerSplit.setBottomComponent(wfSearchPanel);
+            upperLowerSplit.setOneTouchExpandable(true);
+            upperLowerSplit.setContinuousLayout(true);
+            upperLowerSplit.setResizeWeight(1);
+            upperLowerSplit.setLastDividerLocation(500);
+            upperLowerSplit.setDividerLocation(2000);
+            wfSearchPanel.setMinimumSize(new Dimension(0, 0));
+        }
 
         JPanel content = new JPanel();
         content.setLayout(new GridBagLayout());
@@ -2881,11 +2891,15 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     public void addWfSearchLinkedComponent(I_ContainTermComponent component) {
+       if (wfSearchPanel != null) {
         wfSearchPanel.addLinkedComponent(component);
+       }
     }
 
     public void removeWfSearchLinkedComponent(I_ContainTermComponent component) {
-    	wfSearchPanel.removeLinkedComponent(component);
+       if (wfSearchPanel != null) {
+         wfSearchPanel.removeLinkedComponent(component);
+       }
     }
 
     private static Timer swingTimer = new Timer(500, null);
@@ -3445,7 +3459,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     public I_DescriptionTuple getWorkflowHistorySearchResultsSelection() {
-        return wfSearchPanel.getSearchResultsSelection();
+       if (wfSearchPanel != null) {
+         return wfSearchPanel.getSearchResultsSelection();
+       }
+       return null;
     }
 
     public void showRefsetSpecPanel() {
