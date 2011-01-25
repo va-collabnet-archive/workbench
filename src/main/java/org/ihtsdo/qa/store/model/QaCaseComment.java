@@ -10,6 +10,15 @@ public class QaCaseComment {
 	private Integer status;
 	private String comment;
 	private String author;
+	private UUID caseUuid;
+
+	public UUID getCaseUuid() {
+		return caseUuid;
+	}
+
+	public void setCaseUuid(UUID caseUuid) {
+		this.caseUuid = caseUuid;
+	}
 
 	public UUID getCommentUuid() {
 		return commentUuid;
@@ -54,6 +63,7 @@ public class QaCaseComment {
 	@Override
 	public String toString() {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-		return "["+author+"]" + " <B>" + comment + "</B> <i><" + sdf.format(effectiveTime) + "></i>";
+		String et = effectiveTime == null ? "  " : sdf.format(effectiveTime);
+		return "<html>["+author+"]" + " <B>" + comment + "</B> <i>  - " + et + "</i></html>";
 	}
 }

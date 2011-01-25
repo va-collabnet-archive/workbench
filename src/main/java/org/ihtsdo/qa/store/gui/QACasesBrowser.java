@@ -85,15 +85,15 @@ public class QACasesBrowser extends JPanel {
 	private Set<I_GetConceptData> users;
 	
 	public QACasesBrowser(QAStoreBI store, QAResultsBrowser resultsPanel, JTabbedPane parentTabbedPanel) {
-		try {
-			th = new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), null);
-		} catch (TerminologyException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			th = new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), null);
+//		} catch (TerminologyException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		
-		users = RulesLibrary.getUsers();
+		users = new HashSet<I_GetConceptData>();//.getUsers();
 
 		filter = new HashMap<QACasesReportColumn, Object>();
 		
