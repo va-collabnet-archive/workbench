@@ -16,11 +16,11 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.Concept;
-import org.ihtsdo.concept.I_FetchConceptFromCursor;
 import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
 import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
@@ -129,10 +129,10 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
    }
 
    @Override
-   public void processUnfetchedConceptData(int cNid, I_FetchConceptFromCursor fcfc) throws Exception {
+   public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fcfc) throws Exception {
       if (cNidsToWrite.isMember(cNid)) {
          processedChangedCount.incrementAndGet();
-         Concept c = fcfc.fetch();
+         Concept c = (Concept) fcfc.fetch();
          for (ChangeSetGeneratorBI writer : writerListForHandler) {
             writer.setPolicy(changeSetPolicy);
             writer.writeChanges(c, commitTime);

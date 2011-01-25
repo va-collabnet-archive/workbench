@@ -19,7 +19,6 @@ import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.ConceptVersion;
-import org.ihtsdo.concept.I_FetchConceptFromCursor;
 import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
 import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
@@ -29,6 +28,7 @@ import org.ihtsdo.db.bdb.computer.kindof.TypeCache;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.KindOfCacheBI;
@@ -39,6 +39,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
@@ -76,9 +77,9 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
                  ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
 
 
-         ContradictionManagerBI contradictionManager = 
+         ContradictionManagerBI contradictionManager =
                  new IdentifyAllConflictStrategy();
-         
+
          int languageNid = getNidForUuids(
                  ArchitectonicAuxiliary.Concept.EN_US.getUids());
          int classifierNid = getNidForUuids(
@@ -288,6 +289,16 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
       return Bdb.hasUuid(memberUUID);
    }
 
+   @Override
+   public void iterateConceptDataInParallel(ProcessUnfetchedConceptDataBI processor) throws Exception {
+      Bdb.getConceptDb().iterateConceptDataInParallel(processor);
+   }
+
+   @Override
+   public void iterateConceptDataInSequence(ProcessUnfetchedConceptDataBI processor) throws Exception {
+      Bdb.getConceptDb().iterateConceptDataInSequence(processor);
+   }
+
    private class ConceptGetter implements I_ProcessUnfetchedConceptData {
 
       NidBitSetBI cNids;
@@ -305,9 +316,9 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
       @Override
       public void processUnfetchedConceptData(int cNid,
-              I_FetchConceptFromCursor fcfc) throws Exception {
+              ConceptFetcherBI fcfc) throws Exception {
          if (cNids.isMember(cNid)) {
-            Concept c = fcfc.fetch();
+            Concept c = (Concept) fcfc.fetch();
             conceptMap.put(cNid, c);
          }
 
@@ -355,9 +366,9 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
       @Override
       public void processUnfetchedConceptData(int cNid,
-              I_FetchConceptFromCursor fcfc) throws Exception {
+              ConceptFetcherBI fcfc) throws Exception {
          if (cNids.isMember(cNid)) {
-            Concept c = fcfc.fetch();
+            Concept c = (Concept) fcfc.fetch();
             conceptMap.put(cNid, new ConceptVersion(c, coordinate));
          }
 
@@ -404,4 +415,11 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
    public TerminologyAmendmentBI getAmender(EditCoordinate ec, ViewCoordinate vc) {
       return new BdbAmender(ec, vc);
    }
+
+   @Override
+   public NidBitSetBI getAllConceptNids() throws IOException {
+      return Bdb.getConceptDb().getReadOnlyConceptIdSet();
+   }
+
+
 }

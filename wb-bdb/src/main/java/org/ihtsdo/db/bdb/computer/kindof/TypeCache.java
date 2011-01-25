@@ -8,10 +8,10 @@ import java.util.logging.Level;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.concept.I_FetchConceptFromCursor;
 import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
 import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -45,7 +45,7 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 	public TypeCache() {
 		super();
 	}
-		
+
 	/* (non-Javadoc)
 	 * @see org.ihtsdo.db.bdb.computer.kindof.I_CacheKindOfRels#setup(org.ihtsdo.tk.api.Coordinate)
 	 */
@@ -58,15 +58,15 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 	}
 
 	private static int cacheCount = 1;
-	
+
 	@Override
 	public void run()  {
 		int cacheNum = cacheCount++;
-		AceLog.getAppLog().info("Starting cache setup: " + cacheNum + " " + 
+		AceLog.getAppLog().info("Starting cache setup: " + cacheNum + " " +
 				this.getClass().getSimpleName());
 		long startTime = System.currentTimeMillis();
 		try {
-			
+
 			Bdb.getConceptDb().iterateConceptDataInParallel(this);
 		} catch (Exception e) {
 			AceLog.getAppLog().log(Level.INFO, e.getLocalizedMessage(), e);
@@ -75,7 +75,7 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 		latch.countDown();
 		ready = !cancelled;
 		long elapsedTime = System.currentTimeMillis() - startTime;
-		AceLog.getAppLog().info("Finised cache setup: " + cacheNum 
+		AceLog.getAppLog().info("Finised cache setup: " + cacheNum
 				+ " in: " + elapsedTime);
 	}
 
@@ -86,7 +86,7 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 	public boolean isKindOf(int childNid, int parentNid) throws Exception {
 		return isKindOfNoLatch(childNid, parentNid);
 	}
-	
+
 	public void addParents(int cNid, I_RepresentIdSet parentNidSet) {
 		int[] parents = typeMap.get(cNid);
 		if (parents != null) {
@@ -118,7 +118,7 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 
 	@Override
 	public abstract void processUnfetchedConceptData(int cNid,
-			I_FetchConceptFromCursor fcfc) throws Exception;
+			ConceptFetcherBI fcfc) throws Exception;
 
     @Override
     public void setParallelConceptIterators(List<ParallelConceptIterator> pcis) {

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.ihtsdo.concept;
 
@@ -16,6 +16,7 @@ import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
+import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 
 public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConceptFromCursor {
 
@@ -25,7 +26,7 @@ public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConcep
         THREE
     };
 
-    private I_ProcessUnfetchedConceptData processor;
+    private ProcessUnfetchedConceptDataBI processor;
     private int first;
     private int last;
     private int countToProcess;
@@ -42,7 +43,7 @@ public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConcep
     private Thread currentThread;
     private boolean stop = false;
 
-    public ParallelConceptIterator(int first, int last, int count, I_ProcessUnfetchedConceptData processor,
+    public ParallelConceptIterator(int first, int last, int count, ProcessUnfetchedConceptDataBI processor,
             Database readOnly, Database mutable) {
         super();
         this.first = first;
@@ -205,7 +206,7 @@ public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConcep
     public void setCurrentThread(Thread currentThread) {
         this.currentThread = currentThread;
     }
-    
+
     public void stop() {
     	this.stop = true;
     }

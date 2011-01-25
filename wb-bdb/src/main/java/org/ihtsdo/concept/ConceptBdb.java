@@ -28,6 +28,7 @@ import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
+import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 
 public class ConceptBdb extends ComponentBdb {
 
@@ -36,9 +37,9 @@ public class ConceptBdb extends ComponentBdb {
     private static final ThreadGroup conDbThreadGroup = new ThreadGroup("concept db threads");
 
     private static final int processors = Runtime.getRuntime().availableProcessors();
-    
+
     private static final ExecutorService iteratorService =
-            Executors.newCachedThreadPool( 
+            Executors.newCachedThreadPool(
             new NamedThreadFactory(conDbThreadGroup, "parallel iterator service"));
 
     public ConceptBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv) throws IOException {
@@ -119,16 +120,16 @@ public class ConceptBdb extends ComponentBdb {
         iterateConceptData(new FetchConceptAdaptor(processor), processors * 2);
     }
 
-    public void iterateConceptDataInSequence(I_ProcessUnfetchedConceptData processor) throws Exception {
+    public void iterateConceptDataInSequence(ProcessUnfetchedConceptDataBI processor) throws Exception {
         iterateConceptData(processor, 1);
     }
 
-    public void iterateConceptDataInParallel(I_ProcessUnfetchedConceptData processor) throws Exception {
+    public void iterateConceptDataInParallel(ProcessUnfetchedConceptDataBI processor) throws Exception {
         iterateConceptData(processor, processors * 2);
     }
 
 
-    private void iterateConceptData(I_ProcessUnfetchedConceptData processor, int executors) throws IOException,
+    private void iterateConceptData(ProcessUnfetchedConceptDataBI processor, int executors) throws IOException,
             InterruptedException, ExecutionException {
     	//AceLog.getAppLog().info("Iterate in parallel. Executors: " + executors);
         IdentifierSet ids = (IdentifierSet) processor.getNidSet();
@@ -152,7 +153,7 @@ public class ConceptBdb extends ComponentBdb {
             }
             sum = sum + count;
             ParallelConceptIterator pci = new ParallelConceptIterator(first, last, count, processor, readOnly, mutable);
-//        	AceLog.getAppLog().info("Iterate in parallel. first: " + first + 
+//        	AceLog.getAppLog().info("Iterate in parallel. first: " + first +
 //        			" last: " + last +
 //        			" count: " + count);
             Future<Boolean> f = iteratorService.submit(pci);
@@ -160,8 +161,9 @@ public class ConceptBdb extends ComponentBdb {
             futures.add(f);
             pcis.add(pci);
         }
-
-        processor.setParallelConceptIterators(pcis);
+        if (I_ProcessUnfetchedConceptData.class.isAssignableFrom(processor.getClass())) {
+           ((I_ProcessUnfetchedConceptData) processor).setParallelConceptIterators(pcis);
+        }
 
         for (Future<Boolean> f : futures) {
             f.get();
@@ -201,7 +203,7 @@ public class ConceptBdb extends ComponentBdb {
     }
 
     /**
-     * 
+     *
      * @return a read-only bit set, with all concept identifiers set to true.
      * @throws IOException
      */
@@ -223,7 +225,7 @@ public class ConceptBdb extends ComponentBdb {
     }
 
     /**
-     * 
+     *
      * @return a mutable bit set, with all concept identifiers set to true.
      * @throws IOException
      */

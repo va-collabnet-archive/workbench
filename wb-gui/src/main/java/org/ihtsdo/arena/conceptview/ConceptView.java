@@ -54,7 +54,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
@@ -62,10 +61,8 @@ import org.ihtsdo.arena.ScrollablePanel;
 import org.ihtsdo.arena.context.action.DropActionPanel;
 import org.ihtsdo.arena.drools.EditPanelKb;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
@@ -82,18 +79,18 @@ import org.ihtsdo.tk.spec.SpecFactory;
 import org.ihtsdo.util.swing.GuiUtil;
 
 public class ConceptView extends JPanel {
-   
+
    public class LayoutConceptWorker extends SwingWorker<Map<SpecBI, Integer>, Boolean> {
-      
+
       public LayoutConceptWorker() {
          super();
       }
-      
+
       @Override
       protected Map<SpecBI, Integer> doInBackground() throws Exception {
          return kb.setConcept(concept);
       }
-      
+
       @Override
       protected void done() {
          try {
@@ -114,8 +111,8 @@ public class ConceptView extends JPanel {
                   gbc.gridwidth = 1;
                   gbc.gridx = 1;
                   gbc.gridy = 0;
-                  
-                  
+
+
                   CollapsePanel cpe = new CollapsePanel("concept", settings);
                   add(cpe, gbc);
                   gbc.gridy++;
@@ -125,16 +122,16 @@ public class ConceptView extends JPanel {
                           config.getViewCoordinate(), concept.getNid());
                   //get refsets
                   Collection<? extends RefexVersionBI<?>> memberRefsets = cv.getCurrentRefsetMembers();
-                  
+
                   if (memberRefsets != null) {
                      for (RefexVersionBI<?> extn : memberRefsets) {
                         int refsetNid = extn.getCollectionNid();
-                        List<? extends I_ExtendByRefPart> currentRefsets = 
+                        List<? extends I_ExtendByRefPart> currentRefsets =
                                 tf.getRefsetHelper(config).
                                  getAllCurrentRefsetExtensions(refsetNid, concept.getConceptNid());
                         cpe.setRefexCount(currentRefsets.size());
                         for (I_ExtendByRefPart cr : currentRefsets) {
-                           DragPanelExtension ce = 
+                           DragPanelExtension ce =
                                    new DragPanelExtension(settings, cpe, extn);
                            cpe.addToggleComponent(ce);
                            add(ce, gbc);
@@ -143,14 +140,14 @@ public class ConceptView extends JPanel {
                         }
                      }
                   }
-                  
+
                   CollapsePanel cpd = new CollapsePanel("descriptions", settings);
                   add(cpd, gbc);
                   gbc.gridy++;
                   int alertCount = 0;
                   int refexCount = 0;
                   int templateCount = 0;
-                  for (I_DescriptionTuple desc : 
+                  for (I_DescriptionTuple desc :
                           concept.getDescriptionTuples(config.getAllowedStatus(),
                           null, config.getViewPositionSetReadOnly(),
                           config.getPrecedence(), config.getConflictResolutionStrategy())) {
@@ -165,9 +162,9 @@ public class ConceptView extends JPanel {
                   cpd.setAlertCount(alertCount);
                   cpd.setRefexCount(refexCount);
                   cpd.setTemplateCount(templateCount);
-                  
+
                   ViewCoordinate coordinate = config.getViewCoordinate();
-                  
+
                   CollapsePanel cpr = new CollapsePanel("relationships", settings);
                   boolean cprAdded = false;
                   for (I_RelTuple r : rels) {
@@ -183,16 +180,12 @@ public class ConceptView extends JPanel {
                         gbc.gridy++;
                      }
                   }
-                  
-                  cpr.setAlertCount(0);
-                  cpr.setRefexCount(0);
-                  cpr.setTemplateCount(0);
-                  
+
                   try {
-                     Collection<? extends RelGroupVersionBI> group = 
+                     Collection<? extends RelGroupVersionBI> group =
                              Ts.get().getConceptVersion(coordinate, concept.getNid()).getRelGroups();
                      for (RelGroupVersionBI r : group) {
-                        Collection<? extends RelationshipVersionBI> currentRels = 
+                        Collection<? extends RelationshipVersionBI> currentRels =
                                 r.getCurrentRels(); //TODO getCurrentRels
                         if (!currentRels.isEmpty()) {
                            CollapsePanel cprg = new CollapsePanel("rel groups", settings);
@@ -202,7 +195,9 @@ public class ConceptView extends JPanel {
                               gbc.gridy++;
                               cprgAdded = true;
                            }
-                           
+                           cprg.setAlertCount(0);
+                           cprg.setTemplateCount(0);
+                           cprg.setRefexCount(0);
                            DragPanelRelGroup rgc = getRelGroupComponent(r, cprg);
                            cprg.addToggleComponent(rgc);
                            add(rgc, gbc);
@@ -212,9 +207,9 @@ public class ConceptView extends JPanel {
                   } catch (ContraditionException e) {
                      AceLog.getAppLog().alertAndLogException(e);
                   }
-                  
+
                   if (templates.size() > 0) {
-                     CollapsePanel cptemplate = 
+                     CollapsePanel cptemplate =
                              new CollapsePanel("aggregate extras", settings);
                      cptemplate.setTemplateCount(templates.size());
                      cptemplate.setRefexCount(0);
@@ -239,7 +234,7 @@ public class ConceptView extends JPanel {
                         }
                      }
                   }
-                  
+
                   gbc.weighty = 1;
                   add(new JPanel(), gbc);
                } catch (IOException e) {
@@ -255,9 +250,9 @@ public class ConceptView extends JPanel {
       }
    }
    private Object lastThingBeingDropped;
-   
+
    public void setupDrop(Object thingBeingDropped) {
-      
+
       if (thingBeingDropped != null) {
          if (lastThingBeingDropped == null
                  || thingBeingDropped.equals(lastThingBeingDropped) == false) {
@@ -280,11 +275,11 @@ public class ConceptView extends JPanel {
          actionList.clear();
          dropComponents.clear();
       }
-      
+
    }
-   
+
    public class DropPanelActionManager implements ActionListener, I_DispatchDragStatus {
-      
+
       private Timer timer;
       private boolean dragging = false;
       private JComponent dropPanel = new JLabel("dropPanel");
@@ -293,7 +288,7 @@ public class ConceptView extends JPanel {
       private boolean gridLayout = true;
       private JPanel sfp;
       private Collection<JComponent> addedDropComponents = new ArrayList<JComponent>();
-      
+
       public DropPanelActionManager() {
          super();
          new DropPanelProxy(this);
@@ -302,17 +297,17 @@ public class ConceptView extends JPanel {
       /* (non-Javadoc)
        * @see org.ihtsdo.arena.conceptview.I_DispatchDragStatus#dragStarted()
        */
-      
+
       @Override
       public void dragStarted() {
-         
+
          LayoutManager layout = new FlowLayout(FlowLayout.LEADING, 5, 5);
          sfp = new ScrollablePanel(layout);
          if (gridLayout) {
             layout = new GridLayout(0, 1, 5, 5);
             sfp = new JPanel(layout);
          }
-         
+
          sfp.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
          dropPanel = new JPanel(new GridLayout(1, 1));
          sfpScroller = new JScrollPane(sfp);
@@ -327,7 +322,7 @@ public class ConceptView extends JPanel {
       /* (non-Javadoc)
        * @see org.ihtsdo.arena.conceptview.I_DispatchDragStatus#dragFinished()
        */
-      
+
       @Override
       public void dragFinished() {
          timer.stop();
@@ -342,7 +337,7 @@ public class ConceptView extends JPanel {
       /* (non-Javadoc)
        * @see org.ihtsdo.arena.conceptview.I_DispatchDragStatus#actionPerformed(java.awt.event.ActionEvent)
        */
-      
+
       @Override
       public void actionPerformed(ActionEvent e) {
          if (dragging) {
@@ -389,13 +384,13 @@ public class ConceptView extends JPanel {
                } else {
                   setDragPanelVisible(false);
                }
-               
+
             }
          } else {
             setDragPanelVisible(false);
          }
       }
-      
+
       private void setDragPanelVisible(boolean visible) {
          if (visible) {
             if (ConceptView.this.isVisible()) {
@@ -421,15 +416,15 @@ public class ConceptView extends JPanel {
          }
       }
    }
-   
+
    private class UpdateTextTemplateDocumentListener implements DocumentListener, ActionListener {
-      
+
       FixedWidthJEditorPane editorPane;
       DescriptionSpec desc;
       Timer t;
       I_GetConceptData c;
       boolean update = false;
-      
+
       public UpdateTextTemplateDocumentListener(FixedWidthJEditorPane editorPane, DescriptionSpec desc) throws TerminologyException, IOException {
          super();
          this.editorPane = editorPane;
@@ -438,22 +433,22 @@ public class ConceptView extends JPanel {
          t.start();
          c = Terms.get().getConcept(desc.getConceptSpec().get(config.getViewCoordinate()).getNid());
       }
-      
+
       @Override
       public void insertUpdate(DocumentEvent e) {
          update = true;
       }
-      
+
       @Override
       public void removeUpdate(DocumentEvent e) {
          update = true;
       }
-      
+
       @Override
       public void changedUpdate(DocumentEvent e) {
          update = true;
       }
-      
+
       @Override
       public void actionPerformed(ActionEvent e) {
          if (update) {
@@ -463,7 +458,7 @@ public class ConceptView extends JPanel {
       }
    }
    /**
-    * 
+    *
     */
    private static final long serialVersionUID = 1L;
    private I_ConfigAceFrame config;
@@ -473,22 +468,22 @@ public class ConceptView extends JPanel {
    private Collection<Action> actionList = Collections.synchronizedCollection(new ArrayList<Action>());
    private KnowledgeBase kbase;
    private I_GetConceptData concept;
-   
+
    public I_GetConceptData getConcept() {
       return concept;
    }
-   
+
    public void setConcept(I_GetConceptData concept) {
       this.concept = concept;
    }
    private Collection<JComponent> dropComponents = Collections.synchronizedList(new ArrayList<JComponent>());
-   
+
    public ConceptView() throws TerminologyException, IOException {
       this.config = Terms.get().getActiveAceFrameConfig();
       kb = new EditPanelKb(config);
       addCommitListener(settings);
    }
-   
+
    public ConceptView(I_ConfigAceFrame config, ConceptViewSettings settings) {
       super();
       this.config = config;
@@ -496,26 +491,26 @@ public class ConceptView extends JPanel {
       kb = new EditPanelKb(config);
       addCommitListener(settings);
    }
-   
+
    private void addCommitListener(ConceptViewSettings settings) {
       settings.getConfig().addPropertyChangeListener("commit", new PropertyChangeListener() {
-         
+
          @Override
          public void propertyChange(PropertyChangeEvent evt) {
             layoutConcept(ConceptView.this.concept);
          }
       });
    }
-   
+
    public void layoutConcept(I_GetConceptData concept) {
       removeAll();
       this.concept = concept;
       (new LayoutConceptWorker()).execute();
    }
-   
+
    public DragPanelRelGroup getRelGroupComponent(RelGroupVersionBI group,
            CollapsePanel parentCollapsePanel) throws TerminologyException, IOException, ContraditionException {
-      DragPanelRelGroup relGroupPanel = 
+      DragPanelRelGroup relGroupPanel =
               new DragPanelRelGroup(new GridBagLayout(), settings, parentCollapsePanel, group);
       relGroupPanel.setupDrag(group);
       relGroupPanel.setBorder(BorderFactory.createRaisedBevelBorder());
@@ -547,9 +542,9 @@ public class ConceptView extends JPanel {
          relGroupPanel.add(dpr, gbc);
          gbc.gridy++;
       }
-      
+
       return relGroupPanel;
-      
+
    }
 
    public DragPanelDescription getDescComponent(DescriptionAnalogBI desc,
@@ -558,9 +553,9 @@ public class ConceptView extends JPanel {
                  parentCollapsePanel, desc);
       return dragDescPanel;
    }
-   
+
    public DragPanelDescTemplate getDescTemplate(final DescriptionSpec desc) throws TerminologyException, IOException {
-      DragPanelDescTemplate descPanel = 
+      DragPanelDescTemplate descPanel =
               new DragPanelDescTemplate(new GridBagLayout(), settings, desc);
       descPanel.setupDrag(desc);
       descPanel.setBorder(BorderFactory.createRaisedBevelBorder());
@@ -582,7 +577,7 @@ public class ConceptView extends JPanel {
       TermComponentLabel typeLabel = getLabel(desc.getDescTypeSpec().get(config.getViewCoordinate()).getNid(), true);
       descPanel.add(typeLabel, gbc);
       typeLabel.addPropertyChangeListener("termComponent", new PropertyChangeListener() {
-         
+
          @Override
          public void propertyChange(PropertyChangeEvent evt) {
             try {
@@ -592,7 +587,7 @@ public class ConceptView extends JPanel {
             }
          }
       });
-      
+
       gbc.gridx++;
       descPanel.add(new JSeparator(SwingConstants.VERTICAL), gbc);
       gbc.weightx = 1;
@@ -600,17 +595,17 @@ public class ConceptView extends JPanel {
       FixedWidthJEditorPane textPane = new FixedWidthJEditorPane();
       textPane.setEditable(true);
       textPane.setOpaque(false);
-      
+
       textPane.setFont(textPane.getFont().deriveFont(settings.getFontSize()));
       textPane.setText(desc.getDescText());
       descPanel.add(textPane, gbc);
       textPane.getDocument().addDocumentListener(new UpdateTextTemplateDocumentListener(textPane, desc));
       return descPanel;
    }
-   
+
    public DragPanelRelTemplate getRelTemplate(final RelSpec spec) throws TerminologyException, IOException {
       ViewCoordinate coordinate = config.getViewCoordinate();
-      DragPanelRelTemplate relPanel = 
+      DragPanelRelTemplate relPanel =
               new DragPanelRelTemplate(new GridBagLayout(), settings, spec);
       relPanel.setupDrag(spec);
       relPanel.setBorder(BorderFactory.createRaisedBevelBorder());
@@ -632,7 +627,7 @@ public class ConceptView extends JPanel {
       TermComponentLabel typeLabel = getLabel(spec.getRelTypeSpec().get(coordinate).getNid(), true);
       relPanel.add(typeLabel, gbc);
       typeLabel.addPropertyChangeListener("termComponent", new PropertyChangeListener() {
-         
+
          @Override
          public void propertyChange(PropertyChangeEvent evt) {
             try {
@@ -650,7 +645,7 @@ public class ConceptView extends JPanel {
       TermComponentLabel destLabel = getLabel(spec.getDestinationSpec().get(coordinate).getNid(), true);
       relPanel.add(destLabel, gbc);
       destLabel.addPropertyChangeListener("termComponent", new PropertyChangeListener() {
-         
+
          @Override
          public void propertyChange(PropertyChangeEvent evt) {
             try {
@@ -663,7 +658,7 @@ public class ConceptView extends JPanel {
       });
       return relPanel;
    }
-   
+
    public DragPanelRel getRelComponent(RelationshipVersionBI r,
            CollapsePanel parentCollapsePanel) throws TerminologyException, IOException {
       DragPanelRel relPanel = new DragPanelRel(new GridBagLayout(), settings,
@@ -693,7 +688,7 @@ public class ConceptView extends JPanel {
       gbc.gridx++;
       TermComponentLabel typeLabel = getLabel(r.getTypeNid(), canDrop);
       typeLabel.addPropertyChangeListener("termComponent", new PropertyChangeManager<RelationshipAnalogBI>((RelationshipAnalogBI) r) {
-         
+
          @Override
          protected void changeProperty(I_GetConceptData newValue) {
             try {
@@ -717,7 +712,7 @@ public class ConceptView extends JPanel {
       gbc.gridx++;
       TermComponentLabel destLabel = getLabel(r.getDestinationNid(), canDrop);
       typeLabel.addPropertyChangeListener("termComponent", new PropertyChangeManager<RelationshipAnalogBI>((RelationshipAnalogBI) r) {
-         
+
          @Override
          protected void changeProperty(I_GetConceptData newValue) {
             try {
@@ -737,14 +732,14 @@ public class ConceptView extends JPanel {
       relPanel.add(destLabel, gbc);
       return relPanel;
    }
-   
+
    private JLabel getJLabel(String text) {
       JLabel l = new JLabel(text);
       l.setFont(l.getFont().deriveFont(settings.getFontSize()));
       l.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
       return l;
    }
-   
+
    private TermComponentLabel getLabel(int nid, boolean canDrop)
            throws TerminologyException, IOException {
       TermComponentLabel termLabel = new TermComponentLabel();
@@ -756,7 +751,7 @@ public class ConceptView extends JPanel {
       termLabel.setTermComponent(Terms.get().getConcept(nid));
       return termLabel;
    }
-   
+
    private void getKbActions(Object thingToDrop) {
       if (kbase == null) {
          try {
@@ -771,12 +766,12 @@ public class ConceptView extends JPanel {
             I_GetConceptData conceptToDrop = (I_GetConceptData) thingToDrop;
             thingToDrop = Ts.get().getConceptVersion(config.getViewCoordinate(), conceptToDrop.getConceptNid());
          }
-         
+
          if (ComponentVersionBI.class.isAssignableFrom(thingToDrop.getClass())
                  || SpecBI.class.isAssignableFrom(thingToDrop.getClass())) {
             StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
             boolean uselogger = false;
-            
+
             KnowledgeRuntimeLogger logger = null;
             if (uselogger) {
                logger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);

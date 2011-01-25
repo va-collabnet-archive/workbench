@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.ihtsdo.db.bdb.computer.refset;
 
@@ -25,7 +25,6 @@ import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.ihtsdo.concept.Concept;
-import org.ihtsdo.concept.I_FetchConceptFromCursor;
 import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
 import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.concept.component.refset.RefsetMember;
@@ -35,12 +34,13 @@ import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public class RefsetComputer implements I_ProcessUnfetchedConceptData {
-	
+
 	private static final int SETUP_ISA_CACHE_THRESHOLD = 5000;
 
 	private enum ComputeType { CONCEPT, DESCRIPTION };
@@ -100,11 +100,11 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         this.refsetConcept = Bdb.getConcept(refsetNid);
         this.newMemberNids = Bdb.getConceptDb().getEmptyIdSet();
         this.retiredMemberNids = Bdb.getConceptDb().getEmptyIdSet();
-        
+
         conceptCount = possibleIds.cardinality();
 
         activity =
-                Terms.get().newActivityPanel(true, frameConfig, 
+                Terms.get().newActivityPanel(true, frameConfig,
                 "Computing refset: " + refsetConcept.toString(), true);
         activities.add(activity);
         activity.setIndeterminate(true);
@@ -128,7 +128,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         markedParentRefsetConcept =
                 (Concept) memberRefsetHelper.getMarkedParentRefsetForRefset(refsetConcept, frameConfig).iterator()
                     .next();
-        
+
         activity.setProgressInfoLower("Setting up is-a cache...");
         if (possibleIds.cardinality() > SETUP_ISA_CACHE_THRESHOLD) {
             isaCache = KindOfComputer.setupIsaCacheAndWait();
@@ -163,7 +163,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
     }
 
     @Override
-    public void processUnfetchedConceptData(int cNid, I_FetchConceptFromCursor fcfc) throws Exception {
+    public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fcfc) throws Exception {
         if (canceled) {
             if (!informed) {
                 activity.setProgressInfoLower("Cancelling.");
@@ -172,7 +172,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         }
 
         if (possibleCNids.isMember(cNid)) {
-            Concept concept = fcfc.fetch();
+            Concept concept = (Concept) fcfc.fetch();
             switch (computeType) {
 			case CONCEPT:
                 executeComponent(concept, cNid, cNid, frameConfig, activities);
@@ -189,7 +189,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
 
 			default:
 				throw new UnsupportedOperationException("Unknown compute type");
-			}           
+			}
         }
     }
 
@@ -258,10 +258,10 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             long elapsed = endTime - startTime;
             String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
             activity.setIndeterminate(true);
-            activity.setProgressInfoLower("Adding marked parents. Elapsed: " + elapsedStr 
+            activity.setProgressInfoLower("Adding marked parents. Elapsed: " + elapsedStr
                     + ";  Members: " + members.get() + " New: " + newMembers.get() + " Ret: "
                     + retiredMembers.get());
-            
+
             I_RepresentIdSet newParents = Bdb.getConceptDb().getEmptyIdSet();
             NidBitSetItrBI newMemberItr = newMemberNids.iterator();
             while (newMemberItr.next()) {
@@ -277,10 +277,10 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             long elapsed = endTime - startTime;
             String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
             activity.setIndeterminate(true);
-            activity.setProgressInfoLower("Removing old marked parents. Elapsed: " + elapsedStr 
+            activity.setProgressInfoLower("Removing old marked parents. Elapsed: " + elapsedStr
                     + ";  Members: " + members.get() + " New: " + newMembers.get() + " Ret: "
                     + retiredMembers.get());
-            
+
             retiredMemberNids.andNot(newMemberNids);
 
             I_RepresentIdSet parentsToRetire = Bdb.getConceptDb().getEmptyIdSet();

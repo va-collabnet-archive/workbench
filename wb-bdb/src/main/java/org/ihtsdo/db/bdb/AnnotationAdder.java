@@ -23,11 +23,11 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.Concept;
-import org.ihtsdo.concept.I_FetchConceptFromCursor;
 import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
 import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.concept.component.refset.RefsetMemberFactory;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
@@ -71,9 +71,9 @@ public class AnnotationAdder implements I_ProcessUnfetchedConceptData {
     }
 
     @Override
-    public void processUnfetchedConceptData(int cNid, I_FetchConceptFromCursor fcfc) throws Exception {
+    public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fcfc) throws Exception {
         if (conceptNids.isMember(cNid)) {
-            Concept c = fcfc.fetch();
+            Concept c = (Concept) fcfc.fetch();
             ConcurrentSkipListSet<TkRefsetAbstractMember<?>> set =
                     membersForConcept.get(cNid);
             for (TkRefsetAbstractMember<?> member : set) {

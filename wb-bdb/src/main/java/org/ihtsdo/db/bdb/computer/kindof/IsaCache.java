@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_FetchConceptFromCursor;
+import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
@@ -12,7 +13,7 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 public class IsaCache extends TypeCache {
 
 	private NidBitSetBI nidSet;
-	
+
 	public IsaCache(NidBitSetBI nidSet) {
 		super();
 		this.nidSet = nidSet;
@@ -20,10 +21,10 @@ public class IsaCache extends TypeCache {
 
 	@Override
 	public void processUnfetchedConceptData(int cNid,
-			I_FetchConceptFromCursor fcfc) throws Exception {
+			ConceptFetcherBI fcfc) throws Exception {
 		if (isCancelled() == false) {
 			IntSet parentSet = new IntSet();
-			Concept c = fcfc.fetch();
+			Concept c = (Concept) fcfc.fetch();
 			for (RelationshipChronicleBI relv : c.getRelsOutgoing()) {
 				for (RelationshipVersionBI rv : relv.getVersions()) {
 					if (types.contains(rv.getTypeNid())) {

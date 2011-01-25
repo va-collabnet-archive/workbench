@@ -29,8 +29,33 @@ import org.ihtsdo.arena.ArenaComponentSettings;
 
 public class CollapsePanel extends JPanel {
 
+     static final ImageIcon showAlerts = new ImageIcon(
+              ConceptViewRenderer.class.getResource(
+              "/16x16/plain/warning.png"));
+     static final ImageIcon hideAlerts =
+              new ImageIcon(getBlackAndWhite(showAlerts.getImage()));
+
+     static final ImageIcon showExtrasIcon = new ImageIcon(
+              ConceptViewRenderer.class.getResource(ArenaComponentSettings.IMAGE_PATH
+              + "minimize.gif"));
+     static final ImageIcon hideExtrasIcon = new ImageIcon(
+              ConceptViewRenderer.class.getResource(ArenaComponentSettings.IMAGE_PATH
+              + "maximize.gif"));
+
+     static final ImageIcon showRefexes = new ImageIcon(
+              ConceptViewRenderer.class.getResource(
+              "/16x16/plain/paperclip.png"));
+     static final ImageIcon hideRefexes =
+              new ImageIcon(getBlackAndWhite(showRefexes.getImage()));
+
+    static final ImageIcon showTemplates = new ImageIcon(
+              ConceptViewRenderer.class.getResource(
+              "/16x16/plain/lightbulb_on.png"));
+     static final ImageIcon hideTemplates =
+              new ImageIcon(getBlackAndWhite(showTemplates.getImage()));
+
    /**
-    * 
+    *
     */
    private static final long serialVersionUID = 1L;
    boolean collapsed = false;
@@ -38,17 +63,17 @@ public class CollapsePanel extends JPanel {
    boolean templates = true;
    boolean alerts = true;
    boolean showExtras = true;
-   int refexCount = 1;
-   int templateCount = 1;
-   int alertCount = 1;
-   EnumSet<ComponentVersionDragPanel.SubPanelTypes> subpanelsToShow = 
+   int refexCount = 0;
+   int templateCount = 0;
+   int alertCount = 0;
+   EnumSet<ComponentVersionDragPanel.SubPanelTypes> subpanelsToShow =
            EnumSet.allOf(ComponentVersionDragPanel.SubPanelTypes.class);
    Set<I_ToggleSubPanels> components = new HashSet<I_ToggleSubPanels>();
    private JButton alertsButton;
    private JButton extrasButton;
    private JButton refexButton;
    private JButton templatessButton;
-   
+
    private List<JComponent> alertPanels = new ArrayList<JComponent>();
    private List<JComponent> refexPanels = new ArrayList<JComponent>();
    private List<JComponent> templatePanels = new ArrayList<JComponent>();
@@ -88,11 +113,14 @@ public class CollapsePanel extends JPanel {
       add(toolBar2, BorderLayout.EAST);
    }
 
-   private BufferedImage getBlackAndWhite(Image disImage) {
-      BufferedImage image = new BufferedImage(disImage.getWidth(this), disImage.getHeight(this), BufferedImage.TYPE_INT_ARGB);
+   private static BufferedImage getBlackAndWhite(Image disImage) {
+      JPanel imageObserver = new JPanel();
+      BufferedImage image = new BufferedImage(disImage.getWidth(imageObserver),
+              disImage.getHeight(imageObserver),
+              BufferedImage.TYPE_INT_ARGB);
 
       Graphics2D graph = image.createGraphics();
-      graph.drawImage(disImage, 0, 0, this);
+      graph.drawImage(disImage, 0, 0, imageObserver);
 
       ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
       ColorConvertOp op = new ColorConvertOp(cs, null);
@@ -100,17 +128,11 @@ public class CollapsePanel extends JPanel {
    }
 
    private JButton getShowExtrasButton() {
-      final ImageIcon showExtrasIcon = new ImageIcon(
-              ConceptViewRenderer.class.getResource(ArenaComponentSettings.IMAGE_PATH
-              + "minimize.gif"));
-      final ImageIcon hideExtrasIcon = new ImageIcon(
-              ConceptViewRenderer.class.getResource(ArenaComponentSettings.IMAGE_PATH
-              + "maximize.gif"));
 
       extrasButton = new JButton(new AbstractAction("", showExtrasIcon) {
 
          /**
-          * 
+          *
           */
          private static final long serialVersionUID = 1L;
 
@@ -146,16 +168,10 @@ public class CollapsePanel extends JPanel {
    }
 
    private JButton getRefexButton() {
-      final ImageIcon showRefexes = new ImageIcon(
-              ConceptViewRenderer.class.getResource(
-              "/16x16/plain/paperclip.png"));
-      final ImageIcon hideRefexes =
-              new ImageIcon(getBlackAndWhite(showRefexes.getImage()));
-
       refexButton = new JButton(new AbstractAction("", showRefexes) {
 
          /**
-          * 
+          *
           */
          private static final long serialVersionUID = 1L;
 
@@ -192,16 +208,11 @@ public class CollapsePanel extends JPanel {
    }
 
    private JButton getTemplateButton() {
-      final ImageIcon showTemplates = new ImageIcon(
-              ConceptViewRenderer.class.getResource(
-              "/16x16/plain/lightbulb_on.png"));
-      final ImageIcon hideTemplates =
-              new ImageIcon(getBlackAndWhite(showTemplates.getImage()));
 
       templatessButton = new JButton(new AbstractAction("", showTemplates) {
 
          /**
-          * 
+          *
           */
          private static final long serialVersionUID = 1L;
 
@@ -229,16 +240,11 @@ public class CollapsePanel extends JPanel {
    }
 
    private JButton getAlertsButton() {
-      final ImageIcon showAlerts = new ImageIcon(
-              ConceptViewRenderer.class.getResource(
-              "/16x16/plain/warning.png"));
-      final ImageIcon hideAlerts =
-              new ImageIcon(getBlackAndWhite(showAlerts.getImage()));
 
       alertsButton = new JButton(new AbstractAction("", showAlerts) {
 
          /**
-          * 
+          *
           */
          private static final long serialVersionUID = 1L;
 
@@ -270,7 +276,7 @@ public class CollapsePanel extends JPanel {
               ConceptViewRenderer.class.getResource(ArenaComponentSettings.IMAGE_PATH + "minimize.gif"))) {
 
          /**
-          * 
+          *
           */
          private static final long serialVersionUID = 1L;
 
@@ -306,7 +312,7 @@ public class CollapsePanel extends JPanel {
    private static int emptyWidth = 21;
    private static int emptyHeight = 16;
    private Dimension emptyDimension = new Dimension(emptyWidth, emptyHeight);
-   
+
    public void setAlertCount(int alertCount) {
       this.alertCount = alertCount;
       if (alertCount == 0) {
@@ -315,6 +321,13 @@ public class CollapsePanel extends JPanel {
          alertsButton.setMaximumSize(emptyDimension);
          alertsButton.setMinimumSize(emptyDimension);
          alertsButton.setPreferredSize(emptyDimension);
+      } else {
+         if (alerts) {
+            alertsButton.setIcon(alerts ? showAlerts
+                    : hideAlerts);
+            alertsButton.setEnabled(true);
+         }
+
       }
   }
 
@@ -326,7 +339,12 @@ public class CollapsePanel extends JPanel {
          refexButton.setMaximumSize(emptyDimension);
          refexButton.setMinimumSize(emptyDimension);
          refexButton.setPreferredSize(emptyDimension);
-     }
+     } else {
+            refexButton.setIcon((refex ? showRefexes
+                    : hideRefexes));
+
+            refexButton.setEnabled(true);
+      }
   }
 
    public void setTemplateCount(int templateCount) {
@@ -337,10 +355,14 @@ public class CollapsePanel extends JPanel {
          templatessButton.setMaximumSize(emptyDimension);
          templatessButton.setMinimumSize(emptyDimension);
          templatessButton.setPreferredSize(emptyDimension);
+      } else {
+         templatessButton.setIcon(templates ? showTemplates
+                    : hideTemplates);
+         templatessButton.setEnabled(true);
       }
    }
-   
-   
+
+
    public List<JComponent> getAlertPanels() {
       return alertPanels;
    }

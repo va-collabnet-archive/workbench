@@ -7,7 +7,7 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 
 public class ViewCoordinate {
-   
+
     private Precedence precedence;
     private PositionSetBI positionSet;
     private NidSetBI allowedStatusNids;
@@ -25,9 +25,6 @@ public class ViewCoordinate {
             RelAssertionType relAssertionType) {
         super();
         assert precedence != null;
-        assert positionSet != null;
-        assert allowedStatusNids != null;
-        assert isaTypeNids != null;
         assert contradictionManager != null;
         this.precedence = precedence;
         this.positionSet = positionSet;
@@ -90,9 +87,9 @@ public class ViewCoordinate {
       sb.append(" \nlanguage: ").append(languageNid);
       sb.append(" \nclassifier: ").append(classifierNid);
       sb.append(" \nrelAssertionType: ").append(relAssertionType);
-            
+
       return sb.toString();
    }
-    
-    
+
+
 }

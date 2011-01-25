@@ -1,17 +1,13 @@
 package org.ihtsdo.concept;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.dwfa.ace.api.I_TrackContinuation;
-import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 
-public interface I_ProcessUnfetchedConceptData extends I_TrackContinuation {
+public interface I_ProcessUnfetchedConceptData extends I_TrackContinuation,
+        ProcessUnfetchedConceptDataBI {
 
-    public void processUnfetchedConceptData(int cNid, I_FetchConceptFromCursor fcfc) throws Exception;
-
-    public void setParallelConceptIterators(List<ParallelConceptIterator> pcis);
-    
-    public NidBitSetBI getNidSet() throws IOException;
-
+     public void setParallelConceptIterators(List<ParallelConceptIterator> pcis);
+     
 }

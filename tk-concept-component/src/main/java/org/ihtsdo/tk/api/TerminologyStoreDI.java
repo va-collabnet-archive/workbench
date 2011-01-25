@@ -16,7 +16,7 @@ import org.ihtsdo.tk.db.DbDependency;
 public interface TerminologyStoreDI extends TerminologyTransactionDI {
 
     ViewCoordinate getMetadataVC() throws IOException;
-    
+
     TerminologySnapshotDI getSnapshot(ViewCoordinate vc);
 
     ComponentChroncileBI<?> getComponent(int nid) throws IOException;
@@ -63,5 +63,14 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
 
     TerminologyAmendmentBI getAmender(EditCoordinate ec, ViewCoordinate vc);
 
-    public boolean hasUuid(UUID memberUUID);
+    boolean hasUuid(UUID memberUUID);
+
+    void iterateConceptDataInParallel(ProcessUnfetchedConceptDataBI processor)
+            throws Exception;
+
+    void iterateConceptDataInSequence(ProcessUnfetchedConceptDataBI processor)
+            throws Exception;
+
+    NidBitSetBI getAllConceptNids() throws IOException;
+
 }

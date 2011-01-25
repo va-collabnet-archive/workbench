@@ -2,6 +2,7 @@ package org.ihtsdo.concept;
 
 import java.io.IOException;
 import java.util.List;
+import org.ihtsdo.tk.api.ConceptFetcherBI;
 
 import org.ihtsdo.tk.api.NidBitSetBI;
 
@@ -16,11 +17,6 @@ public class FetchConceptAdaptor implements I_ProcessUnfetchedConceptData {
     }
 
     @Override
-    public void processUnfetchedConceptData(int cNid, I_FetchConceptFromCursor fcfc) throws Exception {
-        processor.processConceptData(fcfc.fetch());
-    }
-
-    @Override
     public boolean continueWork() {
         return processor.continueWork();
     }
@@ -28,7 +24,7 @@ public class FetchConceptAdaptor implements I_ProcessUnfetchedConceptData {
     @Override
     public void setParallelConceptIterators(List<ParallelConceptIterator> pcis) {
         // TODO Auto-generated method stub
-        
+
     }
 
 	@Override
@@ -36,5 +32,10 @@ public class FetchConceptAdaptor implements I_ProcessUnfetchedConceptData {
 		return processor.getNidSet();
 	}
 
-    
+   @Override
+   public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
+        processor.processConceptData((Concept) fetcher.fetch());
+   }
+
+
 }

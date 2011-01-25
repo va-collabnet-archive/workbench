@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.ihtsdo.concept.I_FetchConceptFromCursor;
 import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
 import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.db.bdb.Bdb;
@@ -31,15 +30,17 @@ import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
+import org.ihtsdo.concept.Concept;
+import org.ihtsdo.tk.api.ConceptFetcherBI;
 
 /**
  * All data for an individual component will be in the mutable, if modified
  * after the baseline (the baseline xref will be copied to mutable when a new
  * pair is added). Otherwise, all pairs (if any) will be in the read-only
  * database.
- * 
+ *
  * @author kec
- * 
+ *
  */
 public class Xref extends ComponentBdb implements I_ProcessUnfetchedConceptData {
 
@@ -217,7 +218,7 @@ public class Xref extends ComponentBdb implements I_ProcessUnfetchedConceptData 
 		// only need a read lock for sync,
 		// since underlying structure is concurrent...
 		rwl.readLock().lock();
-		
+
 		int word = (nid >>> segmentShift) & segmentMask;
 		locks[word].lock();
 		try {
@@ -277,7 +278,7 @@ public class Xref extends ComponentBdb implements I_ProcessUnfetchedConceptData 
 	public void forgetPair(int nid, NidPair pair) {
 		// only need a read lock for sync,
 		// since underlying structure is concurrent...
-		rwl.readLock().lock(); 
+		rwl.readLock().lock();
 		int word = (nid >>> segmentShift) & segmentMask;
 		locks[word].lock();
 		try {
@@ -330,8 +331,8 @@ public class Xref extends ComponentBdb implements I_ProcessUnfetchedConceptData 
 
 	@Override
 	public void processUnfetchedConceptData(int cNid,
-			I_FetchConceptFromCursor fcfc) throws Exception {
-		fcfc.fetch().updateXrefs();
+			ConceptFetcherBI fcfc) throws Exception {
+		((Concept) fcfc.fetch()).updateXrefs();
 	}
 
 	@Override
