@@ -498,7 +498,6 @@ public class DocumentManager {
 			for (int i = 0; i < words.length; i++) {
 				//&&!words[i].matches("[0-9\\.]*") // detect numeric
 				String wordToCheck = words[i];
-				//String wordToCheck = words[i].replaceAll("[^a-zA-Z0-9‡Ž’—œŸ–çƒêîò†„]", "");
 				if (wordToCheck.length() > 2 && !DocumentManager.existsInDictionary(wordToCheck,parsedLangCode) &&!words[i].matches("[0-9\\.]*")) {
 					spellCheckDialog.setLocationRelativeTo(frame);
 					spellCheckDialog.queryField.setText(wordToCheck);
