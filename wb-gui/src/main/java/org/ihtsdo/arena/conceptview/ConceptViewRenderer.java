@@ -261,37 +261,40 @@ public class ConceptViewRenderer extends JLayeredPane {
                GuiUtil.tickle(ConceptViewRenderer.this);
 ////
 
+               if (capWorkflow) {
 
-               final JCheckBox override = new JCheckBox();
-               override.setText("Override mode");
-               override.setAlignmentY(LEFT_ALIGNMENT);
+                  final JCheckBox override = new JCheckBox();
+                  override.setText("Override mode");
+                  override.setAlignmentY(LEFT_ALIGNMENT);
 
-               override.addActionListener(new ActionListener() {
+                  override.addActionListener(new ActionListener() {
 
-                  @Override
-                  public void actionPerformed(ActionEvent e) {
+                     @Override
+                     public void actionPerformed(ActionEvent e) {
 
-                     boolean or;
+                        boolean or;
 
-                     if (override.isSelected()) {
-                        override.setBackground(Color.red);
-                        or = true;
-                     } else {
-                        override.setBackground(new Color(240, 240, 240));
-                        or = false;
+                        if (override.isSelected()) {
+                           override.setBackground(Color.red);
+                           or = true;
+                        } else {
+                           override.setBackground(new Color(240, 240, 240));
+                           or = false;
+                        }
+
+                        try {
+                           Terms.get().getActiveAceFrameConfig().setOverride(or);
+                        } catch (TerminologyException e1) {
+                           AceLog.getAppLog().alertAndLogException(e1);
+                        } catch (IOException e1) {
+                           AceLog.getAppLog().alertAndLogException(e1);
+                        }
                      }
+                  });
 
-                     try {
-                        Terms.get().getActiveAceFrameConfig().setOverride(or);
-                     } catch (TerminologyException e1) {
-                        AceLog.getAppLog().alertAndLogException(e1);
-                     } catch (IOException e1) {
-                        AceLog.getAppLog().alertAndLogException(e1);
-                     }
-                  }
-               });
+                  workflowPanel.add(override);
+               }
 
-               workflowPanel.add(override);
 
                /////
 
@@ -305,66 +308,67 @@ public class ConceptViewRenderer extends JLayeredPane {
          }
 
          private void capWorkflowSetup(boolean capWorkflow, Collection<UUID> availableActions, File wfBpFile, WorkflowHandlerBI wfHandler, Collection<? extends WorkflowHistoryJavaBeanBI> possibleActions) {
-            if (capWorkflow)
-            try {
-               AceFrameConfig config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
-               AceFrame ace = config.getAceFrame();
-               JTabbedPane tp = ace.getCdePanel().getConceptTabs();
-               int index = tp.getSelectedIndex();
+            if (capWorkflow) {
+               try {
+                  AceFrameConfig config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
+                  AceFrame ace = config.getAceFrame();
+                  JTabbedPane tp = ace.getCdePanel().getConceptTabs();
+                  int index = tp.getSelectedIndex();
 
-               if (capWorkflow) {
-                  BpActionFactory actionFactory = new BpActionFactory(settings.getConfig(), settings.getHost());
-                  for (UUID action : availableActions) {
+                  if (capWorkflow) {
+                     BpActionFactory actionFactory = new BpActionFactory(settings.getConfig(), settings.getHost());
+                     for (UUID action : availableActions) {
 
-                     JButton actionButton = new JButton();
+                        JButton actionButton = new JButton();
 
-                     Action a = actionFactory.make(wfBpFile);
-                     actionButton.setAction(a);
+                        Action a = actionFactory.make(wfBpFile);
+                        actionButton.setAction(a);
 
-                     actionButton.setHorizontalTextPosition(SwingConstants.CENTER);
-                     actionButton.setVerticalTextPosition(SwingConstants.BOTTOM);
-                     actionButton.setText(Terms.get().getConcept(action).getInitialText());
+                        actionButton.setHorizontalTextPosition(SwingConstants.CENTER);
+                        actionButton.setVerticalTextPosition(SwingConstants.BOTTOM);
+                        actionButton.setText(Terms.get().getConcept(action).getInitialText());
 
-                     actionButton.addActionListener(new ActionListener() {
+                        actionButton.addActionListener(new ActionListener() {
 
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
+                           @Override
+                           public void actionPerformed(ActionEvent e) {
 
-                           try {
-                              final I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+                              try {
+                                 final I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-                              // Get Worker
-                              I_Work worker;
-                              if (config.getWorker().isExecuting()) {
-                                 worker = config.getWorker().getTransactionIndependentClone();
-                              } else {
-                                 worker = config.getWorker();
+                                 // Get Worker
+                                 I_Work worker;
+                                 if (config.getWorker().isExecuting()) {
+                                    worker = config.getWorker().getTransactionIndependentClone();
+                                 } else {
+                                    worker = config.getWorker();
+                                 }
+
+                                 worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), WorkflowHelper.lookupAction(e.getActionCommand()).getPrimUuid());
+                                 workflowToggleButton.doClick();
+                                 updateOopsButton(settings.getConcept());
+
+                              } catch (Exception e1) {
+                                 AceLog.getAppLog().alertAndLogException(e1);
                               }
-
-                              worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), WorkflowHelper.lookupAction(e.getActionCommand()).getPrimUuid());
-                              workflowToggleButton.doClick();
-                              updateOopsButton(settings.getConcept());
-
-                           } catch (Exception e1) {
-                              AceLog.getAppLog().alertAndLogException(e1);
                            }
+                        });
+
+                        if (wfHandler.isActiveAction(possibleActions, action)) {
+                           actionButton.setEnabled(true);
+                        } else {
+                           actionButton.setEnabled(false);
                         }
-                     });
 
-                     if (wfHandler.isActiveAction(possibleActions, action)) {
-                        actionButton.setEnabled(true);
-                     } else {
-                        actionButton.setEnabled(false);
+                        workflowPanel.add(actionButton);
                      }
-
-                     workflowPanel.add(actionButton);
                   }
-               }
 
-            } catch (TerminologyException e2) {
-               AceLog.getAppLog().alertAndLogException(e2);
-            } catch (IOException e2) {
-               AceLog.getAppLog().alertAndLogException(e2);
+               } catch (TerminologyException e2) {
+                  AceLog.getAppLog().alertAndLogException(e2);
+               } catch (IOException e2) {
+                  AceLog.getAppLog().alertAndLogException(e2);
+               }
             }
          }
 
