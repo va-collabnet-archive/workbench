@@ -77,6 +77,7 @@ public class CollapsePanel extends JPanel {
    private List<JComponent> alertPanels = new ArrayList<JComponent>();
    private List<JComponent> refexPanels = new ArrayList<JComponent>();
    private List<JComponent> templatePanels = new ArrayList<JComponent>();
+   private JButton collapseExpandButton;
 
    public boolean isCollapsed() {
       return collapsed;
@@ -164,6 +165,7 @@ public class CollapsePanel extends JPanel {
       extrasButton.setToolTipText("Hide/Show extra info for all group members");
       extrasButton.setOpaque(false);
       extrasButton.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 6));
+
       return extrasButton;
    }
 
@@ -283,7 +285,7 @@ public class CollapsePanel extends JPanel {
    }
 
    private JButton getCollapseExpandButton() {
-      JButton button = new JButton(new AbstractAction("", new ImageIcon(
+      collapseExpandButton = new JButton(new AbstractAction("", new ImageIcon(
               ConceptViewRenderer.class.getResource(ArenaComponentSettings.IMAGE_PATH + "minimize.gif"))) {
 
          /**
@@ -304,16 +306,13 @@ public class CollapsePanel extends JPanel {
                     : "minimize.gif"))));
          }
       });
-      button.setPreferredSize(new Dimension(21, 16));
-      button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-      button.setToolTipText("Collapse/Expand");
-      button.setOpaque(false);
-      button.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 6));
-      if (refexCount + templateCount + alertCount == 0) {
-         button.setIcon(null);
-         button.setEnabled(false);
-      }
-      return button;
+      collapseExpandButton.setPreferredSize(new Dimension(21, 16));
+      collapseExpandButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+      collapseExpandButton.setToolTipText("Collapse/Expand");
+      collapseExpandButton.setOpaque(false);
+      collapseExpandButton.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 6));
+      updateCollapse();
+      return collapseExpandButton;
    }
 
    public void addToggleComponent(I_ToggleSubPanels component) {
@@ -324,6 +323,13 @@ public class CollapsePanel extends JPanel {
    private static int emptyHeight = 16;
    private Dimension emptyDimension = new Dimension(emptyWidth, emptyHeight);
 
+   private void updateCollapse() {
+      if ((alertCount + refexCount + templateCount) == 0) {
+         collapseExpandButton.setVisible(false);
+      } else {
+         collapseExpandButton.setVisible(true);
+      }
+   }
    public void setAlertCount(int alertCount) {
       this.alertCount = alertCount;
       if (alertCount == 0) {
@@ -340,6 +346,7 @@ public class CollapsePanel extends JPanel {
          }
 
       }
+      updateCollapse();
   }
 
    public void setRefexCount(int refexCount) {
@@ -356,6 +363,7 @@ public class CollapsePanel extends JPanel {
 
             refexButton.setEnabled(true);
       }
+     updateCollapse();
   }
 
    public void setTemplateCount(int templateCount) {
@@ -371,6 +379,7 @@ public class CollapsePanel extends JPanel {
                     : hideTemplates);
          templatessButton.setEnabled(true);
       }
+     updateCollapse();
    }
 
 
