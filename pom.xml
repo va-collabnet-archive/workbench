@@ -10,6 +10,11 @@
 	<packaging>jar</packaging>
 	<name>project</name>
 	<url>http://maven.apache.org</url>
+	<scm>
+		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm/project-management-ndb</connection>
+		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm/project-management-ndb</developerConnection>
+		<url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm/project-management-ndb</url>
+	</scm>
 	<dependencies>
 	<dependency>
 			<groupId>junit</groupId>
