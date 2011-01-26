@@ -1,30 +1,43 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <scm>
-  <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/translation/translation-module-master-pom</connection>
-  <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/translation/translation-module-master-pom</developerConnection>
-  <url>https://csfe.aceworkspace.net/svn/repos/translation/translation-module-master-pom</url>
-  </scm>
+	<scm>
+		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm</connection>
+		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm</developerConnection>
+		<url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm/pom.xml</url>
+	</scm>
 
-  <groupId>org.ihtsdo</groupId>
-  <artifactId>translation-module-master-pom</artifactId>
-  <version>2.6.0-trek-12-SNAPSHOT</version>
-  <packaging>pom</packaging>
+	<groupId>org.ihtsdo</groupId>
+	<artifactId>translation-module-master-pom</artifactId>
+	<version>2.6.0-trek-12-SNAPSHOT</version>
+	<packaging>pom</packaging>
 
-  <name>translation-module-master-pom</name>
-  <url>http://maven.apache.org</url>
-  <properties>
-        <workbench.version>2.6.0-trek-12-SNAPSHOT</workbench.version>
-  </properties>
-  
-  <modules>
-  	<module>documents</module>
-  	<module>issue-management-ndb</module>
-  	<module>issue-repository-integration-ndb</module>
-  	<module>project-management-ndb</module>
-  	<module>document-management-ndb</module>
-  	<module>translation-module-ndb</module>
-  </modules>
+	<name>translation-module-master-pom</name>
+	<url>http://maven.apache.org</url>
+	<properties>
+		<workbench.version>2.6.0-trek-12-SNAPSHOT</workbench.version>
+	</properties>
+
+	<modules>
+		<module>documents</module>
+		<module>issue-management-ndb</module>
+		<module>issue-repository-integration-ndb</module>
+		<module>project-management-ndb</module>
+		<module>document-management-ndb</module>
+		<module>translation-module-ndb</module>
+	</modules>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>maestro_ihtsdo.wb-snapshots</id>
+			<name>IHTSDO Workbench Snapshots Repository</name>
+			<url>file:///extra_space/maestro/data/repository/wb-snapshots/</url>
+		</snapshotRepository>
+		<repository>
+			<id>maestro_ihtsdo.wb-releases</id>
+			<name>IHTSDO Workbench Releases Repository</name>
+			<url>file:///extra_space/maestro/data/repository/wb-releases/</url>
+		</repository>
+	</distributionManagement>
 </project>
