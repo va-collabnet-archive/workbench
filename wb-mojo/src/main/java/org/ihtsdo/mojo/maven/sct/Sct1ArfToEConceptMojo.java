@@ -297,6 +297,11 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     /**
      * @parameter default-value="false"
      */
+    private boolean rf2Mapping;
+
+    /**
+     * @parameter default-value="false"
+     */
     private boolean includeCTV3ID;
 
     /**
@@ -547,7 +552,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     private UUID[] zStatusUuidArray;
     private int zStatusUuidIdxCounter;
 
-    private int lookupYStatusUuidIdx(String statusUuidStr) {
+    private int lookupZStatusUuidIdx(String statusUuidStr) {
         Integer tmp = zStatusUuidMap.get(statusUuidStr);
         if (tmp == null) {
             zStatusUuidIdxCounter++;
@@ -564,7 +569,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     private UUID[] zDesTypeUuidArray;
     private int zDesTypeUuidIdxCounter;
 
-    private int lookupYDesTypeUuidIdx(String desTypeUuidStr) {
+    private int lookupZDesTypeUuidIdx(String desTypeUuidStr) {
         Integer tmp = zDesTypeUuidMap.get(desTypeUuidStr);
         if (tmp == null) {
             zDesTypeUuidIdxCounter++;
@@ -707,16 +712,17 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         try {
             // Status Array
             for (int idx = 0; idx < 12; idx++)
-                lookupYStatusUuidIdx(ArchitectonicAuxiliary.getStatusFromId(idx).getUids()
+                lookupZStatusUuidIdx(ArchitectonicAuxiliary.getStatusFromId(idx).getUids()
                         .iterator().next().toString());
 
             // DESCRIPTION TYPES
             // Setup the standard description types used in SNOMED
             for (int i = 0; i < 5; i++)
-                lookupYDesTypeUuidIdx(ArchitectonicAuxiliary.getSnomedDescriptionType(i).getUids()
+                lookupZDesTypeUuidIdx(ArchitectonicAuxiliary.getSnomedDescriptionType(i).getUids()
                         .iterator().next().toString());
-            lookupYDesTypeUuidIdx(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()
+            lookupZDesTypeUuidIdx(ArchitectonicAuxiliary.Concept.TEXT_DEFINITION_TYPE.getUids()
                     .iterator().next().toString());
+
             // RELATIONSHIP CHARACTERISTIC
             zRelCharArray = new UUID[6];
             for (int i = 0; i < 5; i++)
@@ -852,6 +858,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         statRsConFromArf = 0;
         statRsStrFromArf = 0;
 
+        getLog().info("::: RF2 Mapping: " + rf2Mapping);
         getLog().info("::: Target Directory: " + tDir);
         getLog().info("::: Target Sub Directory:     " + tSubDir);
 
@@ -1204,7 +1211,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // Status UUID
             UUID uuidCon = UUID.fromString(line[CONCEPT_UUID]);
             // Status
-            int conceptStatus = lookupYStatusUuidIdx(line[CONCEPT_STATUS]);
+            int conceptStatus = lookupZStatusUuidIdx(line[CONCEPT_STATUS]);
             // Primitive
             String isPrimitiveStr = line[ISPRIMITIVE];
             int isPrimitive = 0;
@@ -1245,13 +1252,17 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         int EFFECTIVE_DATE = 7;
         int PATH_UUID = 8;
 
+        int RF1_UNSPECIFIED = 0;
+        int RF1_PREFERRED = 1;
+        int RF1_SYNOMYM = 2;
+
         while (br.ready()) {
             String[] line = br.readLine().split(TAB_CHARACTER);
 
             // DESCRIPTION_UUID = 0;
             UUID uuidDes = UUID.fromString(line[DESCRIPTION_UUID]);
             // STATUS_UUID = 1;
-            int status = lookupYStatusUuidIdx(line[STATUS_UUID]);
+            int status = lookupZStatusUuidIdx(line[STATUS_UUID]);
             // CONCEPT_UUID = 2;
             UUID uuidCon = UUID.fromString(line[CONCEPT_UUID]);
             // TERM_STRING = 3;
@@ -1265,7 +1276,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 capitalization = 1;
 
             // DESCRIPTION_TYPE = 5;
-            int descriptionType = lookupYDesTypeUuidIdx(line[DESCRIPTION_TYPE_UUID]);
+            int descriptionType = lookupZDesTypeUuidIdx(line[DESCRIPTION_TYPE_UUID]);
+            if (rf2Mapping == true
+                    && (descriptionType == RF1_UNSPECIFIED || descriptionType == RF1_PREFERRED))
+                descriptionType = RF1_SYNOMYM;
             // LANGUAGE_CODE = 6;
             String langCodeStr = line[LANGUAGE_CODE_STR];
             // EFFFECTIVE_DATE = 7;
@@ -1327,7 +1341,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // RELATIONSHIP_UUID = 0;
             UUID uuidRelId = UUID.fromString(line[RELATIONSHIP_UUID]);
             // STATUS_UUID = 1;
-            int status = lookupYStatusUuidIdx(line[STATUS_UUID]);
+            int status = lookupZStatusUuidIdx(line[STATUS_UUID]);
             // C1_UUID = 2;
             UUID uuidC1 = UUID.fromString(line[C1_UUID]);
             // ROLE_TYPE_UUID = 3;
@@ -1382,7 +1396,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // ID_FROM_SOURCE_SYSTEM = 2;
             String idFromSourceSystem = line[ID_FROM_SOURCE_SYSTEM];
             // STATUS_UUID = 3;
-            int status = lookupYStatusUuidIdx(line[STATUS_UUID]);
+            int status = lookupZStatusUuidIdx(line[STATUS_UUID]);
             // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
             long revTime = convertDateStrToTime(line[EFFECTIVE_DATE]);
             // PATH_UUID = 5;
@@ -1425,7 +1439,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // MEMBER_UUID = 1;
             UUID uuidMember = UUID.fromString(line[MEMBER_UUID]);
             // STATUS_UUID = 2;
-            int status = lookupYStatusUuidIdx(line[STATUS_UUID]);
+            int status = lookupZStatusUuidIdx(line[STATUS_UUID]);
             // REFERENCED_COMPONENT_UUID = 3;
             UUID uuidComponent = UUID.fromString(line[REFERENCED_COMPONENT_UUID]);
             // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
@@ -1479,7 +1493,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // MEMBER_UUID = 1;
             UUID uuidMember = UUID.fromString(line[MEMBER_UUID]);
             // STATUS_UUID = 2;
-            int status = lookupYStatusUuidIdx(line[STATUS_UUID]);
+            int status = lookupZStatusUuidIdx(line[STATUS_UUID]);
             // REFERENCED_COMPONENT_UUID = 3;
             UUID uuidComponent = UUID.fromString(line[REFERENCED_COMPONENT_UUID]);
             // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
@@ -1527,7 +1541,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // MEMBER_UUID = 1;
             UUID uuidMember = UUID.fromString(line[MEMBER_UUID]);
             // STATUS_UUID = 2;
-            int status = lookupYStatusUuidIdx(line[STATUS_UUID]);
+            int status = lookupZStatusUuidIdx(line[STATUS_UUID]);
             // REFERENCED_COMPONENT_UUID = 3;
             UUID uuidComponent = UUID.fromString(line[REFERENCED_COMPONENT_UUID]);
             // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
@@ -1575,7 +1589,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // MEMBER_UUID = 1;
             UUID uuidMember = UUID.fromString(line[MEMBER_UUID]);
             // STATUS_UUID = 2;
-            int status = lookupYStatusUuidIdx(line[STATUS_UUID]);
+            int status = lookupZStatusUuidIdx(line[STATUS_UUID]);
             // REFERENCED_COMPONENT_UUID = 3;
             UUID uuidComponent = UUID.fromString(line[REFERENCED_COMPONENT_UUID]);
             // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
@@ -4851,6 +4865,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         int INITIALCAPITALSTATUS = 4;
         int DESCRIPTIONTYPE = 5;
         int LANGUAGECODE = 6;
+        
+        int RF1_UNSPECIFIED = 0;
+        int RF1_PREFERRED = 1;
+        int RF1_SYNOMYM = 2;
 
         // Header row
         r.readLine();
@@ -4870,6 +4888,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             int capStatus = Integer.parseInt(line[INITIALCAPITALSTATUS]);
             // DESCRIPTIONTYPE
             int typeInt = Integer.parseInt(line[DESCRIPTIONTYPE]);
+            if (rf2Mapping == true
+                    && (typeInt == RF1_UNSPECIFIED || typeInt == RF1_PREFERRED))
+                typeInt = RF1_SYNOMYM;
             // LANGUAGECODE
             String lang = line[LANGUAGECODE];
 

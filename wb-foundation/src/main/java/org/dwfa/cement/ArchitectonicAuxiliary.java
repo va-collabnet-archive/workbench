@@ -376,6 +376,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                            new I_ConceptualizeUniversally[] { ACCEPTABILITY, CORRECTNESS, }),
                      NOT_ACCEPTABLE("not acceptable",
                            new I_ConceptualizeUniversally[] { ACCEPTABILITY }),
+                     PREFERRED_ACCEPTABILITY("preferred acceptability",
+                           new I_ConceptualizeUniversally[] { ACCEPTABILITY }),
               DESCRIPTION_TYPE("description type",
                       new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
                   EXTERNAL_REFERENCE(new String[] {"external reference (description type)", "external reference"}, null,

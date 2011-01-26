@@ -158,6 +158,25 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
      * @required
      */
     private Rf1SubsetId[] rf1SubsetIds;
+    
+    /**
+     * @parameter default-value="false"
+     */
+    private boolean rf2Mapping;
+    
+    /**
+     * language concept -> acceptability -> acceptable UUID
+     * 
+     * @parameter default-value="51b45763-09c4-34eb-a303-062ba8e0c0e9"
+     */
+    private String uuidAcceptable;
+
+    /**
+     * language concept -> acceptability -> preferred acceptability UUID
+     * 
+     * @parameter default-value="15877c09-60d7-3464-bed8-635a98a7e5b2"
+     */
+    private String uuidPrefAccept;
 
     /**
      * Directory used to output the eConcept format files
@@ -234,6 +253,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
         uuidRetired = ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next();
         uuidRetiredStr = uuidRetired.toString();
 
+        getLog().info("::: RF2 Mapping: " + rf2Mapping);
         getLog().info("::: Target Directory: " + tDir);
         getLog().info("::: Target Sub Directory:     " + tSubDir);
 
@@ -383,16 +403,31 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
 
         if (sid.getSubsetTypeInt() == 1 || sid.getSubsetTypeInt() == 3)
             // Language (1) or Description (3) Subset Type
-            switch (m.memberValue) {
-            case 1: // Preferred Name
-                sb.append(PFT_UUID + LINE_TERMINATOR);
-                break;
-            case 2: // Synonym Name
-                sb.append(SYNONYM_UUID + LINE_TERMINATOR);
-                break;
-            case 3: // Fully Specified Name
-                sb.append(FSN_UUID + LINE_TERMINATOR);
-                break;
+            if (rf2Mapping) {
+                switch (m.memberValue) {
+                case 1: // Preferred Name --> "preferred acceptability"
+                    sb.append(uuidPrefAccept + LINE_TERMINATOR);
+                    break;
+                case 2: // Synonym Name --> "acceptable"
+                    sb.append(uuidAcceptable + LINE_TERMINATOR);
+                    break;
+                case 3: // Fully Specified Name -> "preferred acceptability"
+                    sb.append(uuidPrefAccept + LINE_TERMINATOR);
+                    break;
+                }
+            } else {
+                switch (m.memberValue) {
+                case 1: // Preferred Name
+                    sb.append(PFT_UUID + LINE_TERMINATOR);
+                    break;
+                case 2: // Synonym Name
+                    sb.append(SYNONYM_UUID + LINE_TERMINATOR);
+                    break;
+                case 3: // Fully Specified Name
+                    sb.append(FSN_UUID + LINE_TERMINATOR);
+                    break;
+                }
+
             }
         else if (sid.getSubsetTypeInt() == -1)
             // SNOMED_CONCEPT_VALUE
@@ -835,6 +870,30 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
             throw new MojoFailureException("RefToArfSubsetsMojo parse exception", e);
         }
 
+    }
+
+    public boolean isRf2Mapping() {
+        return rf2Mapping;
+    }
+
+    public void setRf2Mapping(boolean rf2Mapping) {
+        this.rf2Mapping = rf2Mapping;
+    }
+
+    public String getUuidAcceptable() {
+        return uuidAcceptable;
+    }
+
+    public void setUuidAcceptable(String uuidAcceptable) {
+        this.uuidAcceptable = uuidAcceptable;
+    }
+
+    public String getUuidPrefAccept() {
+        return uuidPrefAccept;
+    }
+
+    public void setUuidPrefAccept(String uuidPrefAccept) {
+        this.uuidPrefAccept = uuidPrefAccept;
     }
 
     public void setSubsetIds(Rf1SubsetId[] subsetIds) {
