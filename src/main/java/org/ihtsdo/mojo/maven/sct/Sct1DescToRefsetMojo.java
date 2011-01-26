@@ -82,6 +82,25 @@ public class Sct1DescToRefsetMojo extends AbstractMojo implements Serializable {
     private String inputDir;
 
     /**
+     * @parameter default-value="false"
+     */
+    private boolean rf2Mapping;
+    
+    /**
+     * language concept -> acceptability -> acceptable UUID
+     * 
+     * @parameter default-value="51b45763-09c4-34eb-a303-062ba8e0c0e9"
+     */
+    private String uuidAcceptable;
+
+    /**
+     * language concept -> acceptability -> preferred acceptability UUID
+     * 
+     * @parameter default-value="15877c09-60d7-3464-bed8-635a98a7e5b2"
+     */
+    private String uuidPrefAccept;
+
+    /**
      * Directory used to output the eConcept format files
      * Default value "/classes" set programmatically due to file separator
      * 
@@ -364,10 +383,20 @@ public class Sct1DescToRefsetMojo extends AbstractMojo implements Serializable {
         bw.write(path + TAB_CHARACTER);
 
         // SNOMED_CONCEPT_VALUE
-        if (m.descriptionType >= 0 && m.descriptionType < 4)
-            bw.write(decriptionTypeUuidStrArray[m.descriptionType] + LINE_TERMINATOR);
-        else
-            bw.write(decriptionTypeUuidStrArray[4] + LINE_TERMINATOR);
+        if (rf2Mapping) {
+            if (m.descriptionType == 1) // 1 == preferred ... preferred acceptability
+                bw.write(uuidPrefAccept + LINE_TERMINATOR);
+            else if (m.descriptionType == 3) // 3 == FSN ... preferred acceptability
+                bw.write(uuidPrefAccept + LINE_TERMINATOR);
+            else // 2 == synonym ... acceptable
+                // ... includes 0 = unspecified ... acceptable
+                bw.write(uuidAcceptable + LINE_TERMINATOR);
+        } else {
+            if (m.descriptionType >= 0 && m.descriptionType < 4)
+                bw.write(decriptionTypeUuidStrArray[m.descriptionType] + LINE_TERMINATOR);
+            else
+                bw.write(decriptionTypeUuidStrArray[4] + LINE_TERMINATOR);
+        }
     }
 
     private void countCheck(int count1, int count2, int same, int modified, int added, int dropped) {
