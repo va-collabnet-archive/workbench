@@ -139,7 +139,7 @@ public class TestContextualizedDescriptions extends TestCase {
 			assertEquals("New Description", newDescription.getText());
 			//			System.out.println("~~~~~~~~~~~~~~~ New description: " + newDescription.toString() + " - Acceptability: " + 
 			//					acceptabilityConcept.toString());
-			String newText = "Descripci—n de prueba (" + timeStamp.getTime() + ")";
+			String newText = "Descripcion de prueba (" + timeStamp.getTime() + ")";
 			newDescription.setText(newText);
 
 			newDescription.persistChanges();
