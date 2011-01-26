@@ -1,5 +1,5 @@
 /**
-Ä * Copyright (c) 2010 International Health Terminology Standards Development
+ * Copyright (c) 2010 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
