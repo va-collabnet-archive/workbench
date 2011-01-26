@@ -5,7 +5,7 @@
 	<scm>
 		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm</connection>
 		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm</developerConnection>
-		<url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm/pom.xml</url>
+		<url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm</url>
 	</scm>
 
 	<groupId>org.ihtsdo</groupId>

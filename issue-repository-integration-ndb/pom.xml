@@ -11,7 +11,12 @@
 	<name>issue-repository-integration</name>
 	<description>CollabNet Issue Repository Integration with New BDB</description>
 	<url>http://maven.apache.org</url>
-	<dependencies> 
+	<scm>
+		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm/issue-repository-integration-ndb</connection>
+		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm/issue-repository-integration-ndb</developerConnection>
+		<url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm/issue-repository-integration-ndb</url>
+	</scm>
+	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

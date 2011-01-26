@@ -11,6 +11,11 @@
 	<name>issue-management-ndb</name>
 	<description>CollabNet Issue Issue Management with New BDB</description>
 	<url>http://maven.apache.org</url>
+	<scm>
+		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm/issue-management-ndb</connection>
+		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm/issue-management-ndb</developerConnection>
+		<url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm/issue-management-ndb</url>
+	</scm>
 	<dependencies>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>

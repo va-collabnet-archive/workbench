@@ -1,47 +1,52 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.ihtsdo</groupId>
-  <artifactId>documents</artifactId>
-  <version>2.6.0-trek-12-SNAPSHOT</version>
-  <packaging>jar</packaging>
+	<groupId>org.ihtsdo</groupId>
+	<artifactId>documents</artifactId>
+	<version>2.6.0-trek-12-SNAPSHOT</version>
+	<packaging>jar</packaging>
 
-  <name>documents</name>
-  <url>http://maven.apache.org</url>
+	<name>documents</name>
+	<url>http://maven.apache.org</url>
+	<scm>
+		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm/documents</connection>
+		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm/documents</developerConnection>
+		<url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm/documents</url>
+	</scm>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <executions>
-              <execution>
-                  <id>bundle-documents</id>
-                  <configuration>
-                      <descriptors>
-                          <descriptor>src/main/assembly/documents.xml</descriptor>
-                      </descriptors>
-                  </configuration>
-                  <goals>
-                      <goal>single</goal>
-                  </goals>
-                  <phase>package</phase>
-              </execution>
-          </executions>
-      </plugin>
-    </plugins>
-  </build>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>bundle-documents</id>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/assembly/documents.xml</descriptor>
+							</descriptors>
+						</configuration>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
