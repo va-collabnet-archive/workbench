@@ -254,10 +254,12 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		}
 		
 		//Test last bucket
-		if (testConceptAgainstCheckboxes(singleWorkflowBucket, WorkflowInProgress, CompletedWorkflowInProgress, PastReleasesIncluded))
-				if (testSingleConcept(singleWorkflowBucket, checkList))
-						returnList.addAll(singleWorkflowBucket);
-		
+		if (!singleWorkflowBucket.isEmpty())
+		{
+			if (testConceptAgainstCheckboxes(singleWorkflowBucket, WorkflowInProgress, CompletedWorkflowInProgress, PastReleasesIncluded))
+					if (testSingleConcept(singleWorkflowBucket, checkList))
+							returnList.addAll(singleWorkflowBucket);
+		}		
 
 		return returnList;
 	}
