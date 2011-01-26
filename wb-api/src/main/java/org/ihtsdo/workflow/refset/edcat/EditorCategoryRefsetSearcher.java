@@ -10,6 +10,7 @@ import java.util.Set;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -81,7 +82,7 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 
 	private I_GetConceptData identifyModelerCategoryFromTag(I_GetConceptData modeler, String tag) throws Exception {
 		I_GetConceptData category = null;
-		List<I_ExtendByRefPartStr> l = helper.getAllCurrentRefsetExtensions(refsetId, modeler.getNid());
+		List<? extends I_ExtendByRef> l = Terms.get().getRefsetExtensionsForComponent(refsetId, modeler.getNid());
 		
 		for (int i = 0; i < l.size(); i++)
 		{
@@ -120,7 +121,7 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
       if (modeler == null) {
          return new HashSet<String>();
       }
-		List<I_ExtendByRefPartStr> l = helper.getAllCurrentRefsetExtensions(refsetId, modeler.getNid());
+		List<? extends I_ExtendByRef> l = Terms.get().getRefsetExtensionsForComponent(refsetId, modeler.getNid());
 		Set<String> results = new HashSet<String>();
 		
 		for (int i = 0; i < l.size(); i++)
