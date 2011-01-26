@@ -155,4 +155,16 @@
 			</plugin>
 		</plugins>
 	</build>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>maestro_ihtsdo.wb-snapshots</id>
+			<name>IHTSDO Workbench Snapshots Repository</name>
+			<url>file:///extra_space/maestro/data/repository/wb-snapshots/</url>
+		</snapshotRepository>
+		<repository>
+			<id>maestro_ihtsdo.wb-releases</id>
+			<name>IHTSDO Workbench Releases Repository</name>
+			<url>file:///extra_space/maestro/data/repository/wb-releases/</url>
+		</repository>
+	</distributionManagement>
 </project>
