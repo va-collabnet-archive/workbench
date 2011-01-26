@@ -128,7 +128,7 @@ public class TestPromotion extends TestCase {
 //			// System.out.println("~~~~~~~~~~~~~~~ New description: " +
 //			// newDescription.toString() + " - Acceptability: " +
 //			// acceptabilityConcept.toString());
-//			String newText = "Descripci—n de prueba (" + timeStamp.getTime() + ")";
+//			String newText = "Descripcion de prueba (" + timeStamp.getTime() + ")";
 //			newDescription.setText(newText);
 //			newDescription.persistChanges();
 //
@@ -190,7 +190,7 @@ public class TestPromotion extends TestCase {
 //			isOnEditPath = false;
 //			isOnPromotePath = false;
 //
-//			String newCambiadoText = "Descripci—n de prueba cambiado(" + timeStamp.getTime() + ")";
+//			String newCambiadoText = "Descripcion de prueba cambiado(" + timeStamp.getTime() + ")";
 //			newDescription.setText(newCambiadoText);
 //			newDescription.persistChanges();
 //			tf.commit();
