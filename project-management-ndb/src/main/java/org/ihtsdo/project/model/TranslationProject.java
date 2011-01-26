@@ -32,7 +32,7 @@ import org.ihtsdo.project.TerminologyProjectDAO;
  * 
  * TODO:
  * Project properties:
- * Colecci—n de business process
+ * Coleccion de business process
  * Issue management
  */
 public class TranslationProject implements I_TerminologyProject, Serializable {
