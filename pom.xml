@@ -10,6 +10,11 @@
 	<packaging>jar</packaging>
 	<name>translation-module</name>
 	<url>http://maven.apache.org</url>
+	<scm>
+		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm/translation-module-ndb</connection>
+		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm/translation-module-ndb</developerConnection>
+		<url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm/translation-module-ndb</url>
+	</scm>
 	<dependencies>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
