@@ -21,6 +21,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -63,6 +64,21 @@ public class Rf1Dir {
         this.fileNameContains = s.replace("/", FILE_SEPARATOR);
     }
 
+    public static List<RF1File> getRf1FileList(String wDir, String subDir, Rf1Dir[] inDirs,
+            ArrayList<String> filter, Date dateStart, Date dateStop) throws MojoFailureException {
+        
+        List<List<RF1File>> dirList = getRf1Files(wDir, subDir, inDirs, filter, dateStart, dateStop);
+        
+        // SORT FILES INTO DATE ORDER
+        List<RF1File> fileList = new ArrayList<RF1File>();
+        for (List<RF1File> a : dirList)
+            for (RF1File b : a)
+                fileList.add(b);
+        Collections.sort(fileList);
+        
+        return fileList;
+    }
+    
     public static List<List<RF1File>> getRf1Files(String wDir, String subDir, Rf1Dir[] inDirs,
             ArrayList<String> filter, Date dateStart, Date dateStop) throws MojoFailureException {
 
