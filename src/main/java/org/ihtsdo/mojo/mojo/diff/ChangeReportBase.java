@@ -27,8 +27,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
@@ -629,6 +632,70 @@ public abstract class ChangeReportBase extends DiffBase {
 				+ valueElement("name", getConceptName(id))
 				+ valueElement("id", getConceptUUID(id))
 				+ endElement("concept_ref");
+	}
+
+	@Override
+	public void execute() throws MojoExecutionException, MojoFailureException {
+		try {
+			// test_p = false;
+			super.execute();
+			report_dir.mkdirs();
+			String file_name = report_dir + "/" + "change_report.xml";
+			out_xml = new PrintWriter(new BufferedWriter(
+					new OutputStreamWriter(new FileOutputStream(file_name),
+							"UTF-8")));
+			out_xml.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+			out_xml.println(startElement("change_report"));
+			getLog().info("Starting process concepts.");
+			processConcepts();
+			getLog().info("Finished process concepts.");
+			if (out != null) {
+				out.close();
+			}
+			out_xml.println(endElement("change_report"));
+			out_xml.close();
+			getLog().info("Generating summary report.");
+			doSummaryReport();
+			getLog().info("Generating concept order list.");
+			doConceptList(report_dir + "/concepts.html");
+			getLog().info("Sorting for alphabetic order list.");
+			sortConcepts(changed_concepts);
+			getLog().info("Generating alphabetic order list.");
+			doConceptList(report_dir + "/alpha.html");
+
+		} catch (Exception e) {
+			throw new MojoFailureException(e.getLocalizedMessage(), e);
+		}
+	}
+
+	protected abstract void processConcepts() throws Exception;
+
+	protected void processConcept(I_GetConceptData c, int i, long beg)
+			throws Exception {
+		if (c.getPrimUuid().equals(
+				UUID.fromString("53798ccb-f784-3120-af08-2a0041e43bc3"))) {
+			getLog().info("Found test example: " + c);
+		}
+		changes = "";
+		changes_xml = "";
+		if (debug_p)
+			System.out.println("Concept: " + c.getInitialText());
+		compareAttributes(c);
+		compareDescriptions(c);
+		compareRelationships(c);
+		if (i % 10000 == 0)
+			System.out.println("Processed: " + i + " "
+					+ ((System.currentTimeMillis() - beg) / 1000));
+		if (!changes.equals("")) {
+			changed_concepts.add(c.getConceptNid());
+			getOut();
+			concept_to_page.put(c.getConceptNid(), cur_page);
+			out.println("<p><table border=\"1\" width=\"700\">"
+					+ "<col width=\"140\"/><col width=\"270\"/><col width=\"270\"/>"
+					+ changes + "</table>");
+			out_xml.println(startElement("changed_concept") + "\n"
+					+ changes_xml + endElement("changed_concept") + "\n");
+		}
 	}
 
 }
