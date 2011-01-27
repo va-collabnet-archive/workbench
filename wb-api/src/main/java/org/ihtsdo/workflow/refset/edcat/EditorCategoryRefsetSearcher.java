@@ -93,7 +93,7 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 			{
 				return ((EditorCategoryRefset)refset).getEditorCategory(props.getStringValue());
 			}
-			else if (key.equals("all"))
+			else if (key.startsWith("SNOMED CT Concept"))
 			{
 				category = ((EditorCategoryRefset)refset).getEditorCategory(props.getStringValue());
 			}
@@ -110,15 +110,12 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 			results.put(key, val);
 		}
 
-		if (!results.containsKey("all"))
-			throw new Exception("Multiple Hierarchies must have \"ANY\" Category");
-
 		return results;
 	}
 
 	private Set<String> searchForEditorCategoryListByModeler(I_GetConceptData modeler) throws Exception
 	{
-      if (modeler == null || helper == null) {
+      if (modeler == null) {
          return new HashSet<String>();
       }
 		List<? extends I_ExtendByRef> l = Terms.get().getRefsetExtensionsForComponent(refsetId, modeler.getNid());

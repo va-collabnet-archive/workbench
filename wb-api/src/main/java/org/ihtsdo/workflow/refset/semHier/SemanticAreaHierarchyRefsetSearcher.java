@@ -12,6 +12,7 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -87,7 +88,7 @@ public  class SemanticAreaHierarchyRefsetSearcher extends WorkflowRefsetSearcher
 
 	private Set<String> searchForParentTagBySemTag(String tag) throws Exception 
 	{
-		List<I_ExtendByRefPartStr> l = helper.getAllCurrentRefsetExtensions(refsetId, ((SemanticAreaHierarchyRefset)refset).getSemanticTagParentRelationship().getConceptNid());
+		List<? extends I_ExtendByRef> l = Terms.get().getRefsetExtensionsForComponent(refsetId, ((SemanticAreaHierarchyRefset)refset).getSemanticTagParentRelationship().getConceptNid());
 		Set<String> results = new HashSet<String>();
 		
 		for (int i = 0; i < l.size(); i++)

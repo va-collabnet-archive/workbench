@@ -9,6 +9,7 @@ import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -37,7 +38,7 @@ public  class StateTransitionRefsetSearcher extends WorkflowRefsetSearcher
 	{
 		Map<I_GetConceptData, I_GetConceptData> results = new HashMap<I_GetConceptData, I_GetConceptData> ();
 		I_ExtendByRefPartStr props = null;
-		List<I_ExtendByRefPartStr> l = null;
+		List<? extends I_ExtendByRef> l = null;
 
 		String categoryString = Terms.get().getConcept(categoryNid).getInitialText();
 		int categoryIndex = categoryString.length() - 1;
@@ -52,7 +53,7 @@ public  class StateTransitionRefsetSearcher extends WorkflowRefsetSearcher
 			if (allRoleUid.equals(role.getPrimUuid()) ||
 				(role.getInitialText().charAt(roleIndex) <= categoryString.charAt(categoryIndex)))
 			{
-				l = helper.getAllCurrentRefsetExtensions(refsetId,  role.getConceptNid());
+				l = Terms.get().getRefsetExtensionsForComponent(refsetId,  role.getConceptNid());
 				results.putAll(findPossibleActions(l, testInitialState));
 			}
 		}
@@ -60,7 +61,7 @@ public  class StateTransitionRefsetSearcher extends WorkflowRefsetSearcher
 		return results;
 	}
 	
-	private Map<I_GetConceptData, I_GetConceptData> findPossibleActions(List<I_ExtendByRefPartStr> l, int matchInitialStateNid) 
+	private Map<I_GetConceptData, I_GetConceptData> findPossibleActions(List<? extends I_ExtendByRef> l, int matchInitialStateNid) 
 	{
 		Map<I_GetConceptData, I_GetConceptData> results = new HashMap<I_GetConceptData, I_GetConceptData> ();
 		I_ExtendByRefPartStr props = null;
