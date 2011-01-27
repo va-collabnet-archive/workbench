@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -563,8 +564,6 @@ public class DiffBase extends AbstractMojo {
 
 	protected boolean test_p = false;
 
-	protected boolean test_descendants_p = false;
-
 	protected boolean debug_p = false;
 
 	protected void logConfig(String... str) throws Exception {
@@ -952,15 +951,37 @@ public class DiffBase extends AbstractMojo {
 			PositionSetBI pos) throws Exception {
 		ArrayList<Integer> ret = new ArrayList<Integer>();
 		HashSet<Integer> visited = new HashSet<Integer>();
-		HashMap<Integer, ArrayList<Integer>> children = new HashMap<Integer, ArrayList<Integer>>();
-		Ts.get().iterateConceptDataInParallel(new Processor(children, pos));
-		this.beg = System.currentTimeMillis();
-		getDescendants1(concept_id, children, pos, ret, visited);
+		if (concept_id == Terms.get().getConcept(SNOMED.Concept.ROOT.getUids())
+				.getNid()) {
+			ConcurrentHashMap<Integer, ArrayList<Integer>> children = new ConcurrentHashMap<Integer, ArrayList<Integer>>();
+			Ts.get().iterateConceptDataInParallel(new Processor(children, pos));
+			this.beg = System.currentTimeMillis();
+			getDescendants1(concept_id, children, pos, ret, visited);
+		} else {
+			this.beg = System.currentTimeMillis();
+			getDescendants2(concept_id, pos, ret, visited);
+		}
 		return ret;
 	}
 
 	private void getDescendants1(int concept_id,
-			HashMap<Integer, ArrayList<Integer>> children, PositionSetBI pos,
+			ConcurrentHashMap<Integer, ArrayList<Integer>> children,
+			PositionSetBI pos, ArrayList<Integer> ret, HashSet<Integer> visited)
+			throws Exception {
+		if (visited.contains(concept_id))
+			return;
+		ret.add(concept_id);
+		visited.add(concept_id);
+		if (ret.size() % 10000 == 0) {
+			System.out.println(ret.size() + " "
+					+ ((System.currentTimeMillis() - this.beg) / 1000));
+		}
+		for (int ch : getChildren1(concept_id, children, pos)) {
+			getDescendants1(ch, children, pos, ret, visited);
+		}
+	}
+
+	private void getDescendants2(int concept_id, PositionSetBI pos,
 			ArrayList<Integer> ret, HashSet<Integer> visited) throws Exception {
 		if (visited.contains(concept_id))
 			return;
@@ -970,16 +991,14 @@ public class DiffBase extends AbstractMojo {
 			System.out.println(ret.size() + " "
 					+ ((System.currentTimeMillis() - this.beg) / 1000));
 		}
-		if (test_descendants_p && ret.size() >= 10000)
-			return;
-		for (int ch : getChildren1(concept_id, children, pos)) {
-			getDescendants1(ch, children, pos, ret, visited);
+		for (int ch : getChildren1(concept_id, pos)) {
+			getDescendants2(ch, pos, ret, visited);
 		}
 	}
 
 	private ArrayList<Integer> getChildren1(int concept_id,
-			HashMap<Integer, ArrayList<Integer>> children, PositionSetBI pos)
-			throws Exception {
+			ConcurrentHashMap<Integer, ArrayList<Integer>> children,
+			PositionSetBI pos) throws Exception {
 		return children.get(concept_id);
 	}
 
@@ -1011,10 +1030,11 @@ public class DiffBase extends AbstractMojo {
 		AtomicInteger i = new AtomicInteger();
 		NidBitSetBI allConcepts;
 		PositionSetBI pos;
-		HashMap<Integer, ArrayList<Integer>> children;
+		ConcurrentHashMap<Integer, ArrayList<Integer>> children;
 		long beg = System.currentTimeMillis();
 
-		public Processor(HashMap<Integer, ArrayList<Integer>> children,
+		public Processor(
+				ConcurrentHashMap<Integer, ArrayList<Integer>> children,
 				PositionSetBI pos) throws IOException {
 			this.pos = pos;
 			allConcepts = Ts.get().getAllConceptNids();
@@ -1025,9 +1045,7 @@ public class DiffBase extends AbstractMojo {
 		public void processUnfetchedConceptData(int cNid,
 				ConceptFetcherBI fetcher) throws Exception {
 			I_GetConceptData c = (I_GetConceptData) fetcher.fetch();
-			synchronized (children) {
-				children.put(cNid, getChildren1(c, pos));
-			}
+			children.put(cNid, getChildren1(c, pos));
 			if (i.incrementAndGet() % 10000 == 0) {
 				System.out.println("Processed getChildren: " + i + " "
 						+ ((System.currentTimeMillis() - this.beg) / 1000));
