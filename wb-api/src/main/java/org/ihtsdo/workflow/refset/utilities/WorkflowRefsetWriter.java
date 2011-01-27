@@ -30,6 +30,7 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 	
 	protected WorkflowRefsetWriter() throws TerminologyException, IOException {
 		super();
+		helper = Terms.get().getRefsetHelper(Terms.get().getActiveAceFrameConfig());		
 	}
 
 	public boolean addMember() {

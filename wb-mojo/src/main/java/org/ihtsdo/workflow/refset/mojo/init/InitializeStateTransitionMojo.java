@@ -9,12 +9,10 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefset;
 import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefsetWriter;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -29,22 +27,6 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 public class InitializeStateTransitionMojo extends AbstractMojo {
 
     /**
-     * Location of the build directory.
-     * 
-     * @parameter expression="${project.build.directory}"
-     * @required
-     */
-    private File targetDirectory;
-
-    /**
-     * Location of the build directory.
-     * 
-     * @parameter expression="${project.build.sourceDirectory}"
-     * @required
-     */
-    private File baseDirectory;
-
-    /**
      * The name of the database to create. All sql inserts will be against this
      * database.
      * 
@@ -53,22 +35,14 @@ public class InitializeStateTransitionMojo extends AbstractMojo {
      */
     private String filePath;
 
-    private String basePath = "/../resources/";
-
     private StateTransitionRefsetWriter writer = null;
     
     public void execute() throws MojoExecutionException, MojoFailureException 
     {
         System.setProperty("java.awt.headless", "true");
         try {
-
-            String resourceFilePath = baseDirectory.getAbsoluteFile() + basePath + filePath;
-
-        	StateTransitionRefset refset = new StateTransitionRefset();
-            I_TermFactory tf = Terms.get();
-            
             writer = new StateTransitionRefsetWriter();
-            processStateTransitions(resourceFilePath);
+            processStateTransitions(filePath);
 		} catch (Exception e) {
 			e.printStackTrace();
 			e.getMessage();
@@ -81,8 +55,6 @@ public class InitializeStateTransitionMojo extends AbstractMojo {
     }
 
     private void processTransitions(File f, I_GetConceptData useType) throws TerminologyException, IOException {
-    	I_GetConceptData currentReferencedCompId = null;
-    
         Scanner scanner = new Scanner(f);
     	writer.setWorkflowType(useType);
 
