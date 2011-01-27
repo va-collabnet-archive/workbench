@@ -72,6 +72,8 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
+import javax.swing.JLabel;
+import org.ihtsdo.arena.WizardPanel;
 
 /**
  * @author Administrator
@@ -136,10 +138,13 @@ public class ConceptViewRenderer extends JLayeredPane {
    public JComponent renderedComponent;
    private ConceptViewSettings settings;
    private ConceptViewTitle title;
-   private ScrollablePanel workflowPanel = new ScrollablePanel(new FlowLayout(FlowLayout.LEADING, 10, 10));
+   private ScrollablePanel workflowPanel =
+           new ScrollablePanel(new FlowLayout(FlowLayout.LEADING, 10, 10));
    private JScrollPane workflowScrollPane = new JScrollPane(workflowPanel,
            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+   private WizardPanel wizardPanel;
+   private JScrollPane wizardScrollPane;
    private KnowledgeBase contextualConceptActionsKBase;
    private JScrollPane scrollPane;
    private JToggleButton workflowToggleButton;
@@ -153,7 +158,11 @@ public class ConceptViewRenderer extends JLayeredPane {
    public ConceptViewRenderer(Object cellObj,
            final mxGraphComponent graphContainer, ACE ace) {
 
-      try {
+      wizardPanel =
+           new WizardPanel(new FlowLayout(FlowLayout.LEADING, 10, 10), this);
+      wizardScrollPane = new JScrollPane(wizardPanel,
+           ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+           ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);      try {
          contextualConceptActionsKBase = EditPanelKb.setupKb(new File("drools-rules/ContextualConceptActionsPanel.drl"));
       } catch (IOException e1) {
          throw new RuntimeException(e1);
@@ -165,6 +174,7 @@ public class ConceptViewRenderer extends JLayeredPane {
       this.settings = (ConceptViewSettings) this.cell.getValue();
       this.settings.setup(ace, cell, graphContainer, graph, this);
       this.settings.addHostListener(new HostListener());
+      wizardPanel.add(new JLabel("Wizard Panel"));
       setLayout(new BorderLayout());
 
       title = new ConceptViewTitle(graph, cell, settings);
@@ -192,6 +202,7 @@ public class ConceptViewRenderer extends JLayeredPane {
          scrollPane.getVerticalScrollBar().addAdjustmentListener(
                  new AdjustmentListener() {
 
+                    @Override
                     public void adjustmentValueChanged(AdjustmentEvent e) {
                        graphContainer.refresh();
                     }
@@ -223,88 +234,91 @@ public class ConceptViewRenderer extends JLayeredPane {
          public void actionPerformed(ActionEvent e) {
             JToggleButton button = (JToggleButton) e.getSource();
             if (button.isSelected()) {
-               remove(scrollPane);
-               workflowPanel.removeAll();
-
-               Collection<Action> actions = getKbActions();
-               for (Action a : actions) {
-                  workflowPanel.add(new JButton(a));
+               if ((e.getModifiers() & ActionEvent.SHIFT_MASK) > 0) {
+                  showWizardPanel();
+               } else {
+                  scrollPane.setVisible(false);
+                  remove(scrollPane);
+                  workflowPanel.removeAll();
+                  setupWorkflow();
                }
+            } else {
+               showConceptPanel();
+            }
+         }
 
-               WorkflowHandlerBI wfHandler = new WorkflowHandler();
-               Collection<? extends WorkflowHistoryJavaBeanBI> possibleActions = null;
-               Collection<UUID> availableActions = null;
-               try {
-                  ViewCoordinate coordinate = settings.getConfig().getViewCoordinate();
-                  ConceptVersionBI concept = Ts.get().getConceptVersion(coordinate, settings.getConcept().getPrimUuid());
-                  availableActions = wfHandler.getAllAvailableWorkflowActionUids();
-                  possibleActions = wfHandler.getAvailableWorkflowActions(concept);
-               } catch (IOException e1) {
-                  AceLog.getAppLog().alertAndLogException(e1);
-               } catch (ContraditionException e2) {
-                  AceLog.getAppLog().alertAndLogException(e2);
-               }
+         private void setupWorkflow() {
+            Collection<Action> actions = getKbActions();
+            for (Action a : actions) {
+               workflowPanel.add(new JButton(a));
+            }
+
+            WorkflowHandlerBI wfHandler = new WorkflowHandler();
+            Collection<? extends WorkflowHistoryJavaBeanBI> possibleActions = null;
+            Collection<UUID> availableActions = null;
+            try {
+               ViewCoordinate coordinate = settings.getConfig().getViewCoordinate();
+               ConceptVersionBI concept = Ts.get().getConceptVersion(coordinate, settings.getConcept().getPrimUuid());
+               availableActions = wfHandler.getAllAvailableWorkflowActionUids();
+               possibleActions = wfHandler.getAvailableWorkflowActions(concept);
+            } catch (IOException e1) {
+               AceLog.getAppLog().alertAndLogException(e1);
+            } catch (ContraditionException e2) {
+               AceLog.getAppLog().alertAndLogException(e2);
+            }
 
 
-               File wfBpFile = new File(advanceWorkflowActionPath + advanceWorkflowActionFile);
-               boolean capWorkflow = wfBpFile.exists();
-               if (capWorkflow) {
-                  capWorkflowSetup(capWorkflow, availableActions, wfBpFile, wfHandler, possibleActions);
-                  capOopsButton();
-               }
+            File wfBpFile = new File(advanceWorkflowActionPath + advanceWorkflowActionFile);
+            boolean capWorkflow = wfBpFile.exists();
+            if (capWorkflow) {
+               capWorkflowSetup(capWorkflow, availableActions, wfBpFile, wfHandler, possibleActions);
+               capOopsButton();
+            }
 
-               add(workflowScrollPane, BorderLayout.CENTER);
-               // Populate here...
+            add(workflowScrollPane, BorderLayout.CENTER);
+            // Populate here...
 
-               workflowPanel.setVisible(true);
-               scrollPane.setVisible(false);
-               GuiUtil.tickle(ConceptViewRenderer.this);
+            workflowPanel.setVisible(true);
+            scrollPane.setVisible(false);
+            GuiUtil.tickle(ConceptViewRenderer.this);
 ////
 
-               if (capWorkflow) {
+            if (capWorkflow) {
 
-                  final JCheckBox override = new JCheckBox();
-                  override.setText("Override mode");
-                  override.setAlignmentY(LEFT_ALIGNMENT);
+               final JCheckBox override = new JCheckBox();
+               override.setText("Override mode");
+               override.setAlignmentY(LEFT_ALIGNMENT);
 
-                  override.addActionListener(new ActionListener() {
+               override.addActionListener(new ActionListener() {
 
-                     @Override
-                     public void actionPerformed(ActionEvent e) {
+                  @Override
+                  public void actionPerformed(ActionEvent e) {
 
-                        boolean or;
+                     boolean or;
 
-                        if (override.isSelected()) {
-                           override.setBackground(Color.red);
-                           or = true;
-                        } else {
-                           override.setBackground(new Color(240, 240, 240));
-                           or = false;
-                        }
-
-                        try {
-                           Terms.get().getActiveAceFrameConfig().setOverride(or);
-                        } catch (TerminologyException e1) {
-                           AceLog.getAppLog().alertAndLogException(e1);
-                        } catch (IOException e1) {
-                           AceLog.getAppLog().alertAndLogException(e1);
-                        }
+                     if (override.isSelected()) {
+                        override.setBackground(Color.red);
+                        or = true;
+                     } else {
+                        override.setBackground(new Color(240, 240, 240));
+                        or = false;
                      }
-                  });
 
-                  workflowPanel.add(override);
-               }
+                     try {
+                        Terms.get().getActiveAceFrameConfig().setOverride(or);
+                     } catch (TerminologyException e1) {
+                        AceLog.getAppLog().alertAndLogException(e1);
+                     } catch (IOException e1) {
+                        AceLog.getAppLog().alertAndLogException(e1);
+                     }
+                  }
+               });
 
-
-               /////
-
-
-            } else {
-               workflowPanel.setVisible(false);
-               remove(workflowScrollPane);
-               add(scrollPane, BorderLayout.CENTER);
-               scrollPane.setVisible(true);
+               workflowPanel.add(override);
             }
+
+
+            /////
          }
 
          private void capWorkflowSetup(boolean capWorkflow, Collection<UUID> availableActions, File wfBpFile, WorkflowHandlerBI wfHandler, Collection<? extends WorkflowHistoryJavaBeanBI> possibleActions) {
@@ -316,7 +330,9 @@ public class ConceptViewRenderer extends JLayeredPane {
                   int index = tp.getSelectedIndex();
 
                   if (capWorkflow) {
-                     BpActionFactory actionFactory = new BpActionFactory(settings.getConfig(), settings.getHost());
+                     BpActionFactory actionFactory =
+                             new BpActionFactory(settings.getConfig(),
+                             settings.getHost(), wizardPanel);
                      for (UUID action : availableActions) {
 
                         JButton actionButton = new JButton();
@@ -470,7 +486,8 @@ public class ConceptViewRenderer extends JLayeredPane {
       Collection<Action> actions = new ArrayList<Action>();
 
       try {
-         StatefulKnowledgeSession ksession = contextualConceptActionsKBase.newStatefulKnowledgeSession();
+         StatefulKnowledgeSession ksession =
+                 contextualConceptActionsKBase.newStatefulKnowledgeSession();
          boolean uselogger = false;
 
          KnowledgeRuntimeLogger logger = null;
@@ -482,10 +499,12 @@ public class ConceptViewRenderer extends JLayeredPane {
             ViewCoordinate coordinate = settings.getConfig().getViewCoordinate();
             ksession.setGlobal("vc", coordinate);
             ksession.setGlobal("actions", actions);
-            ksession.setGlobal("actionFactory", new BpActionFactory(settings.getConfig(),
-                    settings.getHost()));
+            ksession.setGlobal("actionFactory", new BpActionFactory(
+                    settings.getConfig(),
+                    settings.getHost(), wizardPanel));
             if (settings.getConcept() != null) {
-               ksession.insert(Ts.get().getConceptVersion(coordinate, settings.getConcept().getNid()));
+               ksession.insert(Ts.get().getConceptVersion(coordinate,
+                       settings.getConcept().getNid()));
             } else {
                ksession.insert("null concept");
             }
@@ -539,5 +558,22 @@ public class ConceptViewRenderer extends JLayeredPane {
       } catch (Exception e) {
          AceLog.getAppLog().alertAndLogException(e);
       }
+   }
+
+   public void showConceptPanel() {
+      wizardPanel.setVisible(false);
+      remove(wizardScrollPane);
+      workflowPanel.setVisible(false);
+      remove(workflowScrollPane);
+      add(scrollPane, BorderLayout.CENTER);
+      scrollPane.setVisible(true);
+   }
+
+   public void showWizardPanel() {
+      scrollPane.setVisible(false);
+      remove(scrollPane);
+      wizardPanel.setVisible(true);
+      add(wizardScrollPane, BorderLayout.CENTER);
+      GuiUtil.tickle(ConceptViewRenderer.this);
    }
 }

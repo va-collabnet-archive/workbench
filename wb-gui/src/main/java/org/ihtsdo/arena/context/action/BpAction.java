@@ -20,31 +20,36 @@ import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.worker.MasterWorker;
+import org.ihtsdo.arena.ScrollablePanel;
 
 public class BpAction extends AbstractAction {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
     private URL processURL;
     private I_ConfigAceFrame frameConfig;
     private I_HostConceptPlugins host;
+    private ScrollablePanel wizardPanel;
 
-	public BpAction(String processUrlStr, I_ConfigAceFrame frameConfig, 
-			I_HostConceptPlugins host) throws MalformedURLException, IOException, ClassNotFoundException {
-		this(new URL(processUrlStr), frameConfig, host);
+	public BpAction(String processUrlStr, I_ConfigAceFrame frameConfig,
+			I_HostConceptPlugins host, ScrollablePanel wizardPanel)
+           throws MalformedURLException, IOException, ClassNotFoundException {
+		this(new URL(processUrlStr), frameConfig, host, wizardPanel);
  	}
 
-	public BpAction(URL processUrl, I_ConfigAceFrame frameConfig, 
-			I_HostConceptPlugins host) throws MalformedURLException, IOException, ClassNotFoundException {
+	public BpAction(URL processUrl, I_ConfigAceFrame frameConfig,
+			I_HostConceptPlugins host, ScrollablePanel wizardPanel)
+           throws MalformedURLException, IOException, ClassNotFoundException {
 		super();
 		processURL =processUrl;
 		this.frameConfig = frameConfig;
 		this.host = host;
+      this.wizardPanel = wizardPanel;
         I_EncodeBusinessProcess process = getProcess();
-        	
+
         putValue(NAME, process.getName());
         putValue(SHORT_DESCRIPTION, process.getSubject());
         try {
@@ -96,23 +101,23 @@ public class BpAction extends AbstractAction {
 		try {
 			I_EncodeBusinessProcess process = getProcess();
 			MasterWorker worker = frameConfig.getWorker();
-			worker.writeAttachment(ProcessAttachmentKeys.I_GET_CONCEPT_DATA.name(), 
+			worker.writeAttachment(ProcessAttachmentKeys.I_GET_CONCEPT_DATA.name(),
 					host.getTermComponent());
-			worker.writeAttachment(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name(), 
+			worker.writeAttachment(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name(),
 					host);
-			worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), 
+			worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(),
 					frameConfig);
-			process.writeAttachment(ProcessAttachmentKeys.I_GET_CONCEPT_DATA.name(), 
+			worker.writeAttachment(WorkerAttachmentKeys.WIZARD_PANEL.name(),
+					wizardPanel);
+			process.writeAttachment(ProcessAttachmentKeys.I_GET_CONCEPT_DATA.name(),
 					host.getTermComponent());
-			process.writeAttachment(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name(), 
+			process.writeAttachment(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name(),
 					host);
-			process.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), 
+			process.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(),
 					frameConfig);
 			worker.execute(process);
 		} catch (Exception ex) {
 			AceLog.getAppLog().alertAndLogException(ex);
-		} 
-
+		}
 	}
-
 }
