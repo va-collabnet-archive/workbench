@@ -17,31 +17,32 @@ import javax.swing.SwingConstants;
 public class ScrollablePanel extends JPanel implements Scrollable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public enum ScrollDirection {LEFT_TO_RIGHT, TOP_TO_BOTTOM };
 
 	private ScrollDirection direction = ScrollDirection.TOP_TO_BOTTOM;
-	
-	
+
+
 	public ScrollablePanel() {
 		super();
-		setupAutoScroll();	
+		setupAutoScroll();
 	}
 
 	public ScrollablePanel(boolean isDoubleBuffered) {
 		super(isDoubleBuffered);
-		setupAutoScroll();	
+		setupAutoScroll();
 	}
 
 	public ScrollablePanel(boolean isDoubleBuffered, ScrollDirection direction) {
 		super(isDoubleBuffered);
-		setupAutoScroll();	
+		setupAutoScroll();
 		this.direction = direction;
 	}
 
 	private void setupAutoScroll() {
 		setAutoscrolls(true);
 		MouseMotionListener doScrollRectToVisible = new MouseMotionAdapter() {
+         @Override
 		          public void mouseDragged(MouseEvent e) {
 		             Rectangle r = new Rectangle(e.getX(), e.getY(), 1, 1);
 		             ((JPanel)e.getSource()).scrollRectToVisible(r);
@@ -52,46 +53,53 @@ public class ScrollablePanel extends JPanel implements Scrollable {
 
 	public ScrollablePanel(LayoutManager layout, boolean isDoubleBuffered) {
 		super(layout, isDoubleBuffered);
-		setupAutoScroll();	
+		setupAutoScroll();
 	}
 
 	public ScrollablePanel(LayoutManager layout, ScrollDirection direction) {
 		super(layout);
-		setupAutoScroll();	
+		setupAutoScroll();
 		this.direction = direction;
 	}
 
 	public ScrollablePanel(LayoutManager layout) {
 		super(layout);
-		setupAutoScroll();	
+		setupAutoScroll();
 	}
 
+   @Override
 	public void setBounds( int x, int y, int width, int height ) {
 		super.setBounds( x, y, getParent().getWidth(), height );
 	}
 
+   @Override
 	public Dimension getPreferredSize() {
 		return new Dimension( getPreferredWidth(), getPreferredHeight() );
 	}
 
+   @Override
 	public Dimension getPreferredScrollableViewportSize() {
 		return super.getPreferredSize();
 	}
 
+   @Override
 	public int getScrollableUnitIncrement( Rectangle visibleRect, int orientation, int direction ) {
 		int hundredth = ( orientation ==  SwingConstants.VERTICAL
 				? getParent().getHeight() : getParent().getWidth() ) / 100;
-		return ( hundredth == 0 ? 1 : hundredth ); 
+		return ( hundredth == 0 ? 1 : hundredth );
 	}
 
+   @Override
 	public int getScrollableBlockIncrement( Rectangle visibleRect, int orientation, int direction ) {
 		return orientation == SwingConstants.VERTICAL ? getParent().getHeight() : getParent().getWidth();
 	}
 
+   @Override
 	public boolean getScrollableTracksViewportWidth() {
 		return true;
 	}
 
+   @Override
 	public boolean getScrollableTracksViewportHeight() {
 		return false;
 	}

@@ -678,7 +678,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                for (int langId : langPrefOrder.getListValues()) {
                   for (I_DescriptionTuple d : descriptions) {
                      try {
-                        int tupleLangId = ArchitectonicAuxiliary.getLanguageConcept(d.getLang()).localize().getNid();
+                        int tupleLangId =
+                                ArchitectonicAuxiliary.getLanguageConcept(d.getLang()).localize().getNid();
                         if (tupleLangId == langId) {
                            matchedList.add(d);
                            if (matchedList.size() == 2) {

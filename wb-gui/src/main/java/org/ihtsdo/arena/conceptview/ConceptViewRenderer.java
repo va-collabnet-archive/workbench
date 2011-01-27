@@ -234,7 +234,8 @@ public class ConceptViewRenderer extends JLayeredPane {
          public void actionPerformed(ActionEvent e) {
             JToggleButton button = (JToggleButton) e.getSource();
             if (button.isSelected()) {
-               if ((e.getModifiers() & ActionEvent.SHIFT_MASK) > 0) {
+               if (((e.getModifiers() & ActionEvent.SHIFT_MASK) > 0) ||
+                       ((e.getModifiers() & ActionEvent.ALT_MASK) > 0)) {
                   showWizardPanel();
                } else {
                   scrollPane.setVisible(false);

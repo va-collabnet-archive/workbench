@@ -7,7 +7,7 @@ import java.util.HashSet;
 public class NidSet implements NidSetBI {
 
     private int[] setValues = new int[0];
-    
+
     public NidSet(int[] values) {
         super();
         this.setValues = new int[values.length];
@@ -51,22 +51,25 @@ public class NidSet implements NidSetBI {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.ace.api.I_IntSet#contains(int)
      */
+   @Override
     public boolean contains(int key) {
     	return Arrays.binarySearch(setValues, key) >= 0;
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.ace.api.I_IntSet#getSetValues()
      */
+   @Override
     public int[] getSetValues() {
         return setValues;
     }
 
+   @Override
      public synchronized void add(int key) {
         if (setValues.length == 0) {
             setValues = new int[1];
@@ -78,9 +81,7 @@ public class NidSet implements NidSetBI {
             }
             insertionPoint = -insertionPoint - 1;
             int[] newSet = new int[setValues.length + 1];
-            for (int i = 0; i < insertionPoint; i++) {
-                newSet[i] = setValues[i];
-            }
+            System.arraycopy(setValues, 0, newSet, 0, insertionPoint);
             newSet[insertionPoint] = key;
             for (int i = insertionPoint + 1; i < newSet.length; i++) {
                 newSet[i] = setValues[i - 1];
@@ -89,15 +90,14 @@ public class NidSet implements NidSetBI {
         }
     }
 
+   @Override
     public void remove(int key) {
         int insertionPoint = Arrays.binarySearch(setValues, key);
         if (insertionPoint < 0) {
             return;
         }
         int[] newSet = new int[setValues.length - 1];
-        for (int i = 0; i < insertionPoint; i++) {
-            newSet[i] = setValues[i];
-        }
+         System.arraycopy(setValues, 0, newSet, 0, insertionPoint);
         for (int i = insertionPoint + 1; i < setValues.length; i++) {
             newSet[i - 1] = setValues[i];
         }
@@ -106,9 +106,10 @@ public class NidSet implements NidSetBI {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.ace.api.I_IntSet#addAll(int[])
      */
+   @Override
     public synchronized NidSet addAll(int[] keys) {
     	HashSet<Integer> members = getAsSet();
     	for (int key: keys) {
@@ -120,9 +121,10 @@ public class NidSet implements NidSetBI {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.ace.api.I_IntSet#removeAll(int[])
      */
+   @Override
     public synchronized void removeAll(int[] keys) {
     	HashSet<Integer> members = getAsSet();
     	for (int key: keys) {
@@ -150,9 +152,10 @@ public class NidSet implements NidSetBI {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.ace.api.I_IntSet#clear()
      */
+   @Override
     public void clear() {
         setValues = new int[0];
      }
@@ -179,7 +182,7 @@ public class NidSet implements NidSetBI {
 	public int hashCode() {
 		return super.hashCode();
 	}
-	
+
 	@Override
 	public int size() {
 		return setValues.length;
@@ -192,7 +195,7 @@ public class NidSet implements NidSetBI {
 		}
 		return setValues[setValues.length - 1];
 	}
-	
+
 	@Override
 	public int getMin() {
 		if (setValues.length == 0) {
@@ -201,6 +204,7 @@ public class NidSet implements NidSetBI {
 		return setValues[0];
 	}
 
+   @Override
 	public boolean contiguous() {
 		if (setValues.length == 0) {
 			return true;

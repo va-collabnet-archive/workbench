@@ -5,14 +5,16 @@
 
 package org.ihtsdo.arena;
 
+import org.ihtsdo.swing.wizard.WizardBI;
 import java.awt.LayoutManager;
+import javax.swing.JPanel;
 import org.ihtsdo.arena.conceptview.ConceptViewRenderer;
 
 /**
  *
  * @author kec
  */
-public class WizardPanel extends ScrollablePanel {
+public class WizardPanel extends ScrollablePanel implements WizardBI {
 
    ConceptViewRenderer renderer;
 
@@ -50,11 +52,17 @@ public class WizardPanel extends ScrollablePanel {
       this.renderer = renderer;
    }
 
+   @Override
    public void setWizardPanelVisible(boolean visible) {
       if (visible) {
          renderer.showWizardPanel();
       } else {
          renderer.showConceptPanel();
       }
+   }
+
+   @Override
+   public JPanel getWizardPanel() {
+      return this;
    }
 }
