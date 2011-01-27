@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -60,7 +60,8 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public enum LANGUAGE_SORT_PREF {
         LANG_B4_TYPE("language before type"),
-        TYPE_B4_LANG("type before language");
+        TYPE_B4_LANG("type before language"),
+        LANG_REFEX("use language refex");
 
         private String desc;
 
@@ -96,7 +97,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     /**
      * Description types for display when the concept view has the use
      * preferences toggle on.
-     * 
+     *
      * @return
      */
     public I_IntSet getDescTypes();
@@ -104,7 +105,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     /**
      * Relationship types for display when the concept view has the use
      * preferences toggle on.
-     * 
+     *
      * @return
      */
     public I_IntSet getPrefFilterTypesForRel();
@@ -427,21 +428,21 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     /**
      * Processes can add and remove I_OverrideTaxonomyRenderer objects.
-     * 
+     *
      * @return
      */
     public List<I_OverrideTaxonomyRenderer> getTaxonomyRendererOverrideList();
 
     /**
      * Processes can add and remove I_FilterTaxonomyRels objects.
-     * 
+     *
      * @return
      */
     public List<I_FilterTaxonomyRels> getTaxonomyRelFilterList();
 
     /**
      * For storing history of concepts viewed by each component viewer.
-     * 
+     *
      * @return
      */
     public Map<String, List<I_GetConceptData>> getTabHistoryMap();
@@ -465,14 +466,14 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     /**
      * Sets the conflict resolution strategy for this profile
-     * 
+     *
      * @param conflictResolutionStrategy
      */
     void setConflictResolutionStrategy(I_ManageContradiction conflictResolutionStrategy);
 
     /**
      * Sets the conflict resolution strategy for this profile
-     * 
+     *
      * @param conflictResolutionStrategy
      */
     public <T extends I_ManageContradiction> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass);
@@ -537,7 +538,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     /**
      * Shows or hides as the activity viewer.
-     * 
+     *
      * @param show Whether to show the activity viewer.
      * @return
      */
@@ -572,7 +573,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public Collection<I_PluginToConceptPanel> getConceptPanelPlugins(HOST_ENUM host);
 
     /**
-     * 
+     *
      * @return A list of the default concept panel plugins for editing, that may
      *         be used to "reset the frame to defaults", or initialize a frame
      *         configuration. This list is static, and has no relationship to
@@ -581,7 +582,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public List<I_PluginToConceptPanel> getDefaultConceptPanelPluginsForEditor();
 
     /**
-     * 
+     *
      * @return A list of the default concept panel plugins for a viewer, that
      *         may be used to "reset the frame to defaults", or initialize a
      *         frame configuration. This list is static, and has no relationship
@@ -594,14 +595,14 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public I_DescriptionTuple getSearchResultsSelection();
 
     /**
-     * 
+     *
      * @param visible True if you wish to make the workflow details sheet
      *            visible. Otherwise false.
      */
     public void setShowWorkflowDetailSheet(boolean visible);
 
     /**
-     * 
+     *
      * @param dim dimensions of the workflow dimension sheet.
      */
     public void setWorkflowDetailSheetDimensions(Dimension dim);
@@ -609,13 +610,13 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     /**
      * Developers can place components on the details sheet for interaction with
      * the user.
-     * 
+     *
      * @return The JPanel that implements the workflow details sheet.
      */
     public JPanel getWorkflowDetailsSheet();
 
     /**
-     * 
+     *
      * @return a map of the path nids, and the color associated with that path.
      */
     public Map<Integer, Color> getPathColorMap();
@@ -626,36 +627,36 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void fireUpdateHierarchyView();
 
     public void refreshRefsetTab();
-    
+
     public void setPrecedence(Precedence precedence);
-    
+
     public Precedence getPrecedence();
-    
+
     public ViewCoordinate getViewCoordinate();
-    
+
     public EditCoordinate getEditCoordinate();
-    
+
     public void quit();
 
     public I_GetConceptData getClassifierConcept();
 
     public void setClassifierConcept(I_GetConceptData classifierConcept);
-    
+
     public RelAssertionType getRelAssertionType();
 
     public void setRelAssertionType(RelAssertionType relAssertionType);
 
 	// WOrkflow-Based
     public boolean isAutoApproveOn();
-    
+
     public void setAutoApprove(boolean b);
 
     public boolean isOverrideOn();
-    
+
     public void setOverride(boolean b);
-    
+
     public void setWorkflowRoles(TreeSet<? extends I_GetConceptData> roles);
-    
+
     public TreeSet<? extends I_GetConceptData> getWorkflowRoles();
 
 	public void setWorkflowStates(TreeSet<? extends I_GetConceptData> states);

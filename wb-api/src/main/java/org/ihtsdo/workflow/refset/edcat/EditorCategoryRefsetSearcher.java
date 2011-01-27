@@ -20,29 +20,29 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
 
 
 
-/* 
+/*
 * @author Jesse Efron
-* 
+*
 */
-public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher 
+public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 {
 	public EditorCategoryRefsetSearcher()
-			throws TerminologyException, IOException 
+			throws TerminologyException, IOException
 	{
 		refset = new EditorCategoryRefset();
-		
+
 		setRefsetName(refset.getRefsetName());
 		setRefsetId(refset.getRefsetId());
 	}
-	
+
 	public boolean isAutomaticApprovalAvailable(I_GetConceptData modeler) throws NumberFormatException, TerminologyException, IOException, Exception {
 		// Get Editor Categories
 		for (String prop : searchForEditorCategoryListByModeler(modeler))
 		{
 			I_GetConceptData val = ((EditorCategoryRefset)refset).getEditorCategory(prop);
-			
+
 			List<? extends I_RelTuple> relList = WorkflowHelper.getWorkflowRelationship(val, ArchitectonicAuxiliary.Concept.WORKFLOW_ROLE_VALUE);
-			
+
 			for (I_RelTuple rel : relList)
 			{
 				if (rel != null &&
@@ -50,18 +50,18 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 						return true;
 			}
 		}
-		
+
 		return false;
 	}
 	public I_GetConceptData searchForCategoryForConceptByModeler(I_GetConceptData modeler, I_GetConceptData con) throws Exception
 	{
 		// Get Editor Categories
 		Set<String> currentModelerPropertySet = searchForEditorCategoryListByModeler(modeler);
-		
+
 		if (currentModelerPropertySet.isEmpty()) {
             return null;
         } else if (currentModelerPropertySet.size() == 1) {
-			String editorCategory = ((EditorCategoryRefset)refset).getEditorCategory(currentModelerPropertySet.iterator().next()).getInitialText();			
+			String editorCategory = ((EditorCategoryRefset)refset).getEditorCategory(currentModelerPropertySet.iterator().next()).getInitialText();
 			return WorkflowHelper.lookupRoles(editorCategory);
 		}
 		else
@@ -69,26 +69,26 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 			SemanticAreaHierarchyRefsetSearcher searcher = new SemanticAreaHierarchyRefsetSearcher();
 
 			// Create map of tags-to-categories
-			Map<String, I_GetConceptData> hierarchyToCategoryMap = getHierarchyToCategoryMap(currentModelerPropertySet); 
-			
+			Map<String, I_GetConceptData> hierarchyToCategoryMap = getHierarchyToCategoryMap(currentModelerPropertySet);
+
 			// Find Tag
 			String tag = searcher.getConceptHierarchyTagFromEditorCategoryTags(con, hierarchyToCategoryMap.keySet());
-			
+
 			// Find category
 			return identifyModelerCategoryFromTag(modeler, tag);
 		}
-		
+
 	}
 
 	private I_GetConceptData identifyModelerCategoryFromTag(I_GetConceptData modeler, String tag) throws Exception {
 		I_GetConceptData category = null;
 		List<? extends I_ExtendByRef> l = Terms.get().getRefsetExtensionsForComponent(refsetId, modeler.getNid());
-		
+
 		for (int i = 0; i < l.size(); i++)
 		{
 			I_ExtendByRefPartStr props = (I_ExtendByRefPartStr)l.get(i);
 			String key = ((EditorCategoryRefset)refset).getSemanticTag(props.getStringValue());
-			
+
 			if (key.equalsIgnoreCase(tag))
 			{
 				return ((EditorCategoryRefset)refset).getEditorCategory(props.getStringValue());
@@ -103,33 +103,33 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 	}
 	private Map<String, I_GetConceptData> getHierarchyToCategoryMap(Set<String> set) throws Exception {
 		Map<String, I_GetConceptData> results = new HashMap<String, I_GetConceptData>();
-		
+
 		for (String props : set) {
 			String key = ((EditorCategoryRefset)refset).getSemanticTag(props);
 			I_GetConceptData val = ((EditorCategoryRefset)refset).getEditorCategory(props);
 			results.put(key, val);
 		}
-	
+
 		if (!results.containsKey("all"))
 			throw new Exception("Multiple Hierarchies must have \"ANY\" Category");
-		
+
 		return results;
 	}
-	
-	private Set<String> searchForEditorCategoryListByModeler(I_GetConceptData modeler) throws Exception 
+
+	private Set<String> searchForEditorCategoryListByModeler(I_GetConceptData modeler) throws Exception
 	{
-      if (modeler == null) {
+      if (modeler == null || helper == null) {
          return new HashSet<String>();
       }
 		List<? extends I_ExtendByRef> l = Terms.get().getRefsetExtensionsForComponent(refsetId, modeler.getNid());
 		Set<String> results = new HashSet<String>();
-		
+
 		for (int i = 0; i < l.size(); i++)
 		{
 			I_ExtendByRefPartStr props = (I_ExtendByRefPartStr)l.get(i);
 			results.add(props.getStringValue());
 		}
-		
+
 		return results;
 	}
 }

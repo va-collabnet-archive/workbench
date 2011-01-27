@@ -188,7 +188,7 @@ public class ConceptView extends JPanel {
                         Collection<? extends RelationshipVersionBI> currentRels =
                                 r.getCurrentRels(); //TODO getCurrentRels
                         if (!currentRels.isEmpty()) {
-                           CollapsePanel cprg = new CollapsePanel("rel groups", settings);
+                           CollapsePanel cprg = new CollapsePanel("relationship groups", settings);
                            boolean cprgAdded = false;
                            if (!cprgAdded) {
                               add(cprg, gbc);
@@ -532,7 +532,7 @@ public class ConceptView extends JPanel {
       gbc.gridx = 1;
       gbc.weightx = 1;
       gbc.gridheight = 1;
-      CollapsePanel cprg = new CollapsePanel("Group: ", settings);
+      CollapsePanel cprg = new CollapsePanel("group", settings);
       relGroupPanel.add(cprg, gbc);
       gbc.gridy++;
       for (RelationshipVersionBI r : group.getCurrentRels()) { //TODO getCurrentRels
