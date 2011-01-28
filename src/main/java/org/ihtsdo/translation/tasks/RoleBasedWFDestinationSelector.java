@@ -136,6 +136,8 @@ public class RoleBasedWFDestinationSelector extends AbstractTask {
                     null);
     		
     		process.setProperty(exit1PropName, destinationQueueName);
+    		process.setDestination(destinationQueueName);
+			process.validateDestination();
     		
 //    		ServiceID serviceID = null;
 //    		System.out.println(
