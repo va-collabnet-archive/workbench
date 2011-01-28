@@ -495,7 +495,14 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
 
             // NOT MORE TO COMPARE, HANDLE REMAINING CONCEPTS
             if (r1 < count1) {
-                getLog().info("ERROR: MISSED CROSSMAP RECORDS r1 < count1");
+                while (r1 < count1) {
+                    if (a1[r1].status != 1) { // if not RETIRED
+                        a1[r1].status = 1; // set to RETIRED
+                        writeToArfFile(a1[r1], dateStr, uuidPathStr, out);
+                    }
+                    r1++;
+                    nDrop++;
+                }
             }
 
             if (r2 < count2) {
