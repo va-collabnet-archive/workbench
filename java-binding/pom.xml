@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>java-binding</artifactId>
-    <name>SCT Mini Java Binding</name>
+    <name>${branch}: SCT Mini Java Binding</name>
     <description>project that generates a java binding so that java developers can reference
 		terminology content from their programs in a safe, versioned, and reproducible manner. 
     </description>

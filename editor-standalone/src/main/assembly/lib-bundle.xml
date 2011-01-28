@@ -23,6 +23,9 @@
       <unpack>false</unpack>
       <scope>runtime</scope>
       <includes>
+        <include>org.dwfa.jini:outrigger-dl</include>
+        <include>org.dwfa.jini:reggie-dl</include>
+        <include>org.dwfa.jini:mahalo-dl</include>
         <include>org.dwfa.jini:jsk-dl</include>
       </includes>
     </dependencySet>

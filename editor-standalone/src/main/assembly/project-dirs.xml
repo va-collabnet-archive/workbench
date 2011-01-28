@@ -24,6 +24,7 @@
                 <exclude>**/90_GotoNHS_Nice.bp</exclude>
                 <exclude>**/20_import_refset.bp</exclude>
                 <exclude>**/migration-wf/Advance*.bp</exclude>
+                <exclude>**/Create_new_CollabNet_queue.bp</exclude>
             </excludes>
             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>
