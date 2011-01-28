@@ -68,7 +68,7 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 				refCompStr = fields.getReferencedComponentId().getInitialText();
 
 				propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
-				helper.retireRefsetExtension(refsetId, fields.getReferencedComponentId().getConceptNid(), propMap);
+				helper.retireRefsetStrExtension(refsetId, fields.getReferencedComponentId().getConceptNid(), propMap);
 	
 				return true;
 			}
