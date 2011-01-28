@@ -48,7 +48,7 @@ public class CollapsePanel extends JPanel {
      static final ImageIcon hideRefexes =
               new ImageIcon(getBlackAndWhite(showRefexes.getImage()));
 
-    static final ImageIcon showTemplates = new ImageIcon(
+     static final ImageIcon showTemplates = new ImageIcon(
               ConceptViewRenderer.class.getResource(
               "/16x16/plain/lightbulb_on.png"));
      static final ImageIcon hideTemplates =
@@ -354,8 +354,8 @@ public class CollapsePanel extends JPanel {
          @Override
          public void actionPerformed(ActionEvent e) {
 
-            for (I_ToggleSubPanels jc : components) {
-               jc.setVisible(areExtrasShown());
+             for (I_ToggleSubPanels jc : components) {
+               jc.setVisible(collapseExpandButton.isSelected());
             }
             ((JButton) e.getSource()).setIcon(new ImageIcon(
                     CollapsePanel.class.getResource(ArenaComponentSettings.IMAGE_PATH
@@ -368,7 +368,6 @@ public class CollapsePanel extends JPanel {
       collapseExpandButton.setToolTipText("Collapse/Expand");
       collapseExpandButton.setOpaque(false);
       collapseExpandButton.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 6));
-      updateCollapse();
       return collapseExpandButton;
    }
 
@@ -380,11 +379,15 @@ public class CollapsePanel extends JPanel {
    private static int emptyHeight = 16;
    private Dimension emptyDimension = new Dimension(emptyWidth, emptyHeight);
 
-   private void updateCollapse() {
+   private void updateExtras() {
+      extrasButton.setIcon(new ImageIcon(
+                    CollapsePanel.class.getResource(ArenaComponentSettings.IMAGE_PATH
+                    + (areExtrasShown() ? "maximize.gif"
+                    : "minimize.gif"))));
       if ((alertCount + refexCount + templateCount) == 0) {
-         collapseExpandButton.setVisible(false);
+         extrasButton.setVisible(false);
       } else {
-         collapseExpandButton.setVisible(true);
+         extrasButton.setVisible(true);
       }
    }
    public void setAlertCount(int alertCount) {
@@ -403,7 +406,7 @@ public class CollapsePanel extends JPanel {
          }
 
       }
-      updateCollapse();
+      updateExtras();
   }
 
    public void setRefexCount(int refexCount) {
@@ -420,7 +423,7 @@ public class CollapsePanel extends JPanel {
 
             refexButton.setEnabled(true);
       }
-     updateCollapse();
+     updateExtras();
   }
 
    public void setTemplateCount(int templateCount) {
@@ -436,7 +439,7 @@ public class CollapsePanel extends JPanel {
                     : hideTemplates);
          templatessButton.setEnabled(true);
       }
-     updateCollapse();
+     updateExtras();
    }
 
 
