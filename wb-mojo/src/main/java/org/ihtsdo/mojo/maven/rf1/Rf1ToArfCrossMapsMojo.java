@@ -165,11 +165,16 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
     private class CrossMapRecord implements Comparable<Object> {
         long sctId;
         String targetCode;
+        int priority;
         int status;
 
-        public CrossMapRecord(long id, String code) {
+        public CrossMapRecord(long id, String code, int p) {
             sctId = id;
-            targetCode = code;
+            priority = p;
+            if (priority > 0)
+                targetCode = code + " [" + Integer.toString(priority) + "]";
+            else
+                targetCode = code;
             status = 0;
         }
 
@@ -182,8 +187,13 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
                 return thisMore;
             else if (this.sctId < o2.sctId)
                 return thisLess;
-            else
-                return 0; // EQUAL
+            else {
+                if (this.targetCode.compareTo(o2.targetCode) > 0)
+                    return thisMore;
+                else if (this.targetCode.compareTo(o2.targetCode) < 0)
+                    return thisLess;                
+            }
+            return 0; // EQUAL
         }
     }
 
@@ -299,10 +309,17 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
     private int compareCrossMapRecord(CrossMapRecord r1, CrossMapRecord r2) {
         if (r1.sctId > r2.sctId)
             return 3; // ADDED
-        else if (r1.sctId > r2.sctId)
+        else if (r1.sctId < r2.sctId)
             return 4; // DROPPED
-        else if (r1.sctId == r2.sctId && (r1.targetCode.compareTo(r2.targetCode) == 0))
-            return 1; // SAME
+        else if (r1.sctId == r2.sctId) {
+            int comp = r1.targetCode.compareTo(r2.targetCode);
+            if (comp == 0)
+                return 1; // SAME
+            else if (comp > 0)
+                return 3; // ADDED
+            else if (comp < 0)
+                return 4; // DROPPED  
+        }
         return 2; // MODIFIED
     }
 
@@ -340,6 +357,7 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
                 "UTF-8"));
 
         int MAPCONCEPTID = 1;
+        int MAPPRIORITY = 3;
         int MAPTARGETID = 4;
 
         // Header row
@@ -349,11 +367,12 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
         while (br.ready()) {
             String[] line = br.readLine().split(TAB_CHARACTER);
             long conceptId = Long.parseLong(line[MAPCONCEPTID]);
+            int priority = Integer.parseInt(line[MAPPRIORITY]);
             long targetId = Long.parseLong(line[MAPTARGETID]);
 
             String targetCode = mapTargetidTargetcode.get(targetId);
 
-            a[maps] = new CrossMapRecord(conceptId, targetCode);
+            a[maps] = new CrossMapRecord(conceptId, targetCode, priority);
 
             maps++;
         }

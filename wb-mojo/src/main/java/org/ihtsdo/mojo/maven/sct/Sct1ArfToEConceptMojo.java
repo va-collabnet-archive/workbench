@@ -3036,7 +3036,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         getLog().info("*** Sct1ArfToEConcept STEP #7 COMPLETED -- CREATE eCONCEPTS ***\r\n");
     }
         
-    private static final UUID debugUuid01 = UUID.fromString("132c4951-0632-55b9-81ee-d24480732ae5");
+    // ICD-0-3 == cff53f1a-1d11-5ae7-801e-d3301cfdbea0
+    private static final UUID debugUuid01 = UUID.fromString("cff53f1a-1d11-5ae7-801e-d3301cfdbea0");
     private static final UUID debugUuid02 = UUID.fromString("22949563-e40b-5121-81d9-ac7e38fcc956");
     private static final UUID debugUuid03 = UUID.fromString("3ca0d065-06b8-596c-8ca0-e4d2a605701c");
     
@@ -3073,7 +3074,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         ca.setDefined(cRec0.isprimitive == 0 ? true : false);
 
         ArrayList<TkIdentifier> tmpAdditionalIds = new ArrayList<TkIdentifier>();
-
+        
         // SNOMED ID, if present
         if (cRec0.conSnoId < Long.MAX_VALUE) {
             EIdentifierLong cid = new EIdentifierLong();
@@ -3288,7 +3289,19 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             List<UUID> listRefsetUuidMemberUuidForRefsetMember = new ArrayList<UUID>();
             List<UUID> listRefsetUuidMemberUuidForRel = new ArrayList<UUID>();
 
-            for (Sct1_RefSetRecord r : rsByConList) {
+            Collections.sort(rsByConList);
+            int length = rsByConList.size();
+            for (int rIdx = 0; rIdx < length; rIdx++) {
+                Sct1_RefSetRecord r = rsByConList.get(rIdx);
+                if (rIdx < length -1) {
+                    Sct1_RefSetRecord rNext = rsByConList.get(rIdx + 1);
+                    if (r.refsetUuidMsb == rNext.refsetUuidMsb
+                            && r.refsetUuidLsb == rNext.refsetUuidLsb
+                            && r.refsetMemberUuidMsb == rNext.refsetMemberUuidMsb
+                            && r.refsetMemberUuidLsb == rNext.refsetMemberUuidLsb)
+                        continue;
+                }
+                    
                 if (r.componentType == Sct1_RefSetRecord.ComponentType.CONCEPT) {
                     listRefsetUuidMemberUuidForCon.add(new UUID(r.refsetUuidMsb, r.refsetUuidLsb));
                     listRefsetUuidMemberUuidForCon.add(new UUID(r.refsetMemberUuidMsb,
@@ -3591,6 +3604,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
         try {
             ec.writeExternal(dos);
+            if (theConUUID.compareTo(debugUuid01) == 0) {
+                getLog().info(":!!!:DEBUG: "  + ec);
+            }
+
             countEConWritten++;
             if (countEConWritten % 50000 == 0)
                 getLog().info("  ... econcepts written " + countEConWritten);
