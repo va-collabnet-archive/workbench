@@ -17,6 +17,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<drools.version>5.1.1</drools.version>
 	</properties>
 
 	<dependencies>
@@ -30,14 +31,10 @@
 			<groupId>org.ihtsdo.sample.mv</groupId>
 			<artifactId>database</artifactId>
 			<type>zip</type>
-			<version>trek-SCT-EN-ES-USDE-VTMVMP-1.0-SNAPSHOT</version>
-		</dependency> 
-		<!--  <dependency>
-			<groupId>org.ihtsdo.sample</groupId>
-			<artifactId>database-sync</artifactId>
-			<type>zip</type>
-			<version>1.0-1-SNAPSHOT</version>
-		</dependency> -->
+			<version>trek-SCT-EN-ES-USDE-VTMVMP-1.1-SNAPSHOT</version>
+		</dependency>
+		<!-- <dependency> <groupId>org.ihtsdo.sample</groupId> <artifactId>database-sync</artifactId> 
+			<type>zip</type> <version>1.0-1-SNAPSHOT</version> </dependency> -->
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>mrcm-refset-specs</artifactId>
@@ -63,12 +60,9 @@
 									<groupId>org.ihtsdo.sample.mv</groupId>
 									<artifactId>database</artifactId>
 									<type>zip</type>
-								</artifactItem> 
-								<!-- <artifactItem>
-									<groupId>org.ihtsdo.sample</groupId>
-									<artifactId>database-sync</artifactId>
-									<type>zip</type>
-								</artifactItem>-->
+								</artifactItem>
+								<!-- <artifactItem> <groupId>org.ihtsdo.sample</groupId> <artifactId>database-sync</artifactId> 
+									<type>zip</type> </artifactItem> -->
 								<artifactItem>
 									<groupId>org.ihtsdo</groupId>
 									<artifactId>mrcm-refset-specs</artifactId>
@@ -83,17 +77,42 @@
 			<plugin>
 				<groupId>org.ihtsdo</groupId>
 				<artifactId>wb-mojo</artifactId>
-				<version>2.6.0-trek-8-SNAPSHOT</version>
+				<version>2.6.0-trek-12-SNAPSHOT</version>
 				<dependencies>
 					<dependency>
 						<groupId>org.ihtsdo</groupId>
 						<artifactId>wb-bdb</artifactId>
-						<version>2.6.0-trek-8-SNAPSHOT</version>
+						<version>2.6.0-trek-12-SNAPSHOT</version>
 					</dependency>
 					<dependency>
 						<groupId>org.apache.lucene</groupId>
 						<artifactId>lucene-core</artifactId>
 						<version>3.0.2</version>
+					</dependency>
+					<dependency>
+						<groupId>org.drools</groupId>
+						<artifactId>drools-core</artifactId>
+						<version>${drools.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.drools</groupId>
+						<artifactId>drools-api</artifactId>
+						<version>${drools.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.drools</groupId>
+						<artifactId>drools-compiler</artifactId>
+						<version>${drools.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.drools</groupId>
+						<artifactId>drools-templates</artifactId>
+						<version>${drools.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.mvel</groupId>
+						<artifactId>mvel2</artifactId>
+						<version>2.0.16</version>
 					</dependency>
 				</dependencies>
 				<executions>
@@ -133,14 +152,31 @@
 					<!-- <execution> <phase>generate-resources</phase> <id>bcs-read-all</id> 
 						<goals> <goal>bcs-read-all</goal> </goals> <configuration> <changeSetDir>rules/changesets</changeSetDir> 
 						</configuration> </execution> -->
+					<!-- <execution> <phase>generate-resources</phase> <id>import-refset-spec-directory</id> 
+						<goals> <goal>import-refset-spec-directory</goal> </goals> <configuration> 
+						<inputDir>${project.build.directory}/generated-resources/refsets</inputDir> 
+						</configuration> </execution> -->
 					<execution>
-						<phase>generate-resources</phase>
-						<id>import-refset-spec-directory</id>
+						<!-- Turn down the logger to default warning -->
+						<phase>process-resources</phase>
+						<id>set-log-to-warning</id>
 						<goals>
-							<goal>import-refset-spec-directory</goal>
+							<goal>ace-set-logs</goal>
 						</goals>
 						<configuration>
-							<inputDir>${project.build.directory}/generated-resources/refsets</inputDir>
+							<logSettings>
+								<setting>
+									<logger>org.dwfa.ace.log.AceLog.edit
+									</logger>
+									<level>WARNING</level>
+								</setting>
+							</logSettings>
+							<handlerSettings>
+								<setting>
+									<logger>root</logger>
+									<level>WARNING</level>
+								</setting>
+							</handlerSettings>
 						</configuration>
 					</execution>
 					<execution>
@@ -157,6 +193,29 @@
 							<context_uuid>d974c480-f9b9-3ea1-91e8-b0a4b756a17d</context_uuid>
 							<pkgName>QA-Package</pkgName>
 							<pkgUrl>http://mgr.servers.aceworkspace.net:50008/drools-guvnor/org.drools.guvnor.Guvnor/package/ihtsdo-qa/qa-package</pkgUrl>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- Turn down the logger to default info -->
+						<phase>process-resources</phase>
+						<id>set-log-to-info</id>
+						<goals>
+							<goal>ace-set-logs</goal>
+						</goals>
+						<configuration>
+							<logSettings>
+								<setting>
+									<logger>org.dwfa.ace.log.AceLog.edit
+									</logger>
+									<level>INFO</level>
+								</setting>
+							</logSettings>
+							<handlerSettings>
+								<setting>
+									<logger>root</logger>
+									<level>INFO</level>
+								</setting>
+							</handlerSettings>
 						</configuration>
 					</execution>
 					<execution>
