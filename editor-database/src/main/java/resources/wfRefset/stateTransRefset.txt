@@ -1,0 +1,52 @@
+Clinical editor role All	Approved workflow state	Review workflow action	For Review workflow state
+Clinical editor role All	Approved workflow state	Accept workflow action	Approved workflow state
+Clinical editor role All	Approved workflow state	Commit workflow action	Changed workflow state
+Clinical editor role All	Approved workflow state	Chief Terminologist review workflow action	For Chief Terminologist Review workflow state
+
+Clinical editor role All	Changed workflow state	Review workflow action	For Review workflow state
+Clinical editor role All	Changed workflow state	Accept workflow action	Approved workflow state
+Clinical editor role All	Changed workflow state	Commit workflow action	Changed workflow state
+Clinical editor role All	Changed workflow state	Chief Terminologist review workflow action	For Chief Terminologist Review workflow state
+
+Clinical editor role All	Concept having no prior workflow state	Commit workflow action	Changed workflow state
+Clinical editor role All	Concept having no prior workflow state	Accept workflow action	Approved workflow state
+Clinical editor role All	Concept having no prior workflow state	Review workflow action	For Review workflow state
+
+Clinical editor role All	Concept not previously existing workflow state	Commit workflow action	New workflow state
+
+Clinical editor role All	New workflow state	Commit workflow action	New workflow state
+Clinical editor role All	New workflow state	Review workflow action	For Review workflow state
+Clinical editor role All	New workflow state	Accept workflow action	Approved workflow state
+Clinical editor role All	New workflow state	Discuss workflow action	For discussion workflow state
+Clinical editor role All	New workflow state	Chief Terminologist review workflow action	For Chief Terminologist Review workflow state
+
+Clinical editor role All	For Review workflow state	Commit workflow action	Changed workflow state
+Clinical editor role All	For Review workflow state	Discuss workflow action	For discussion workflow state
+Clinical editor role All	For Review workflow state	Escalate workflow action	Escalated workflow state
+Clinical editor role B		For Review workflow state	Accept workflow action	Approved workflow state
+Clinical editor role C		For Review workflow state	Accept workflow action	Approved workflow state
+Clinical editor role D		For Review workflow state	Accept workflow action	Approved workflow state
+
+
+Clinical editor role All	For discussion workflow state	Commit workflow action	Changed workflow state
+Clinical editor role All	For discussion workflow state	Accept workflow action	Approved workflow state
+Clinical editor role All	For discussion workflow state	Review workflow action	For Review workflow state
+Clinical editor role All	For discussion workflow state	Escalate workflow action	Escalated workflow state
+
+Clinical editor role All	Escalated workflow state	Commit workflow action	Changed workflow state
+Clinical editor role B		Escalated workflow state	Accept workflow action	Approved workflow state
+Clinical editor role C		Escalated workflow state	Accept workflow action	Approved workflow state
+Clinical editor role D		Escalated workflow state	Accept workflow action	Approved workflow state
+
+Clinical editor role B		Escalated workflow state	Discuss workflow action	For discussion workflow state
+Clinical editor role C		Escalated workflow state	Discuss workflow action	For discussion workflow state
+Clinical editor role D		Escalated workflow state	Discuss workflow action	For discussion workflow state
+
+Clinical editor role All	Changed in batch workflow state	Commit workflow action	Changed workflow state
+Clinical editor role All	Changed in batch workflow state	Commit in batch workflow action	Changed in batch workflow state
+Clinical editor role All	Changed in batch workflow state	Accept workflow action	Approved workflow state
+Clinical editor role All	Changed in batch workflow state	Discuss workflow action	For discussion workflow state
+Clinical editor role All	Changed in batch workflow state	Review workflow action	For Review workflow state
+
+Clinical editor role All	For Chief Terminologist Review workflow state	Commit workflow action	Changed workflow state
+Clinical editor role D		For Chief Terminologist Review workflow state	Accept workflow action	Approved workflow state

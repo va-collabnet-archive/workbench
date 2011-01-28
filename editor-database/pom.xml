@@ -12,6 +12,16 @@
    <description>Workbench Editor Database</description>
    <dependencies>
       <dependency>
+         <groupId>org.ihtsdo</groupId>
+         <artifactId>mrcm-refset-specs</artifactId>
+         <type>zip</type>
+      </dependency>
+      <dependency>
+         <groupId>org.ihtsdo</groupId>
+         <artifactId>migration-wf-data</artifactId>
+         <type>zip</type>
+      </dependency>
+      <dependency>
          <groupId>org.ihtsdo.sct</groupId>
          <artifactId>sct-en-mini</artifactId>
          <type>zip</type>
@@ -22,138 +32,38 @@
          <version>${project.version}</version>
          <type>zip</type>
       </dependency>
+      <dependency>
+         <groupId>org.ihtsdo</groupId>
+         <artifactId>tk-spelling-variants</artifactId>
+         <version>${wb-toolkit.version}</version>
+         <type>zip</type>
+      </dependency>
    </dependencies>
    <properties>
-      <berkeleydb.directory>${basedir}/berkeley-db</berkeleydb.directory>
+      <berkeleydb.directory>${project.build.directory}/berkeley-db</berkeleydb.directory>
    </properties>
 
    <profiles>
-      <profile>
-         <id>standard</id>
-         <build>
-            <plugins>
-
       <!--
-        Generation process:
-          - unpack profiles to obtain changesets [generate-sources]
-          - if using SVN, checkout the location (this must exist, but it can be empty. It will be effectively an
-            update if the working copy already exists) [generate-sources]
-          - open database [generate-resources]
-          - apply changesets [generate-resources]
-          - if the database does not yet exist, generate it [generate-sources, process-sources, generate-resources,
-            process-resources]
-          - commit and close database [process-resources]
-          - generate read-only version [process-resources]
-          - if using SVN, commit the updated database (add missing files) [prepare-package]
-          - produce assembly [package]
+         Generation process:
+         - unpack profiles to obtain changesets [generate-sources]
+         - if using SVN, checkout the location (this must exist, but it can be empty. It will be effectively an
+         update if the working copy already exists) [generate-sources]
+         - open database [generate-resources]
+         - apply changesets [generate-resources]
+         - if the database does not yet exist, generate it [generate-sources, process-sources, generate-resources,
+         process-resources]
+         - commit and close database [process-resources]
+         - generate read-only version [process-resources]
+         - if using SVN, commit the updated database (add missing files) [prepare-package]
+         - produce assembly [package]
       -->
-               <plugin>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-assembly-plugin</artifactId>
-                  <executions>
-                     <execution>
-                        <id>attach-database</id>
-                        <configuration>
-                           <descriptors>
-                              <descriptor>src/main/assembly/database.xml</descriptor>
-                           </descriptors>
-                        </configuration>
-                        <goals>
-                           <goal>single</goal>
-                        </goals>
-                        <phase>package</phase>
-                     </execution>
-                  </executions>
-               </plugin>
-               <plugin>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-dependency-plugin</artifactId>
-                  <executions>
-                     <execution>
-                        <id>extract-dependencies</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                           <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                           <artifactItems>
-                              <artifactItem>
-                                 <groupId>org.ihtsdo.sct</groupId>
-                                 <artifactId>sct-all-version-sct-en-es-vtmvmp</artifactId>
-                                 <type>zip</type>
-                              </artifactItem>
-                           </artifactItems>
-                           <outputDirectory>${project.build.directory}/generated-resources/pre</outputDirectory>
-                        </configuration>
-                     </execution>
-                     <execution>
-                        <id>unpack-spelling-variants</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                           <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                           <artifactItems>
-                              <artifactItem>                                             
-                                 <groupId>org.ihtsdo.sample</groupId>
-                                 <artifactId>profiles</artifactId>
-                                 <type>zip</type>
-                              </artifactItem>
-                           </artifactItems>
-                           <outputDirectory>${project.build.directory}/generated-resources/jbin</outputDirectory>
-                        </configuration>
-                     </execution>
-                  </executions>
-               </plugin>
-               <plugin>
-                  <groupId>org.ihtsdo</groupId>
-                  <artifactId>wb-mojo</artifactId>
-                  <executions>
-                     <execution>
-                        <id>vodb-open</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                           <goal>vodb-open</goal>
-                        </goals>
-                        <configuration>
-                           <vodbDirectory>${berkeleydb.directory}</vodbDirectory>
-                        </configuration>
-                     </execution>
-                     <execution>
-                        <id>bcs-read-all</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                           <goal>bcs-read-all</goal>
-                        </goals>
-                        <configuration>
-                           <changeSetDir>target/change-sets</changeSetDir>
-                        </configuration>
-                     </execution>
-                     <execution>
-                        <id>vodb-commit</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                           <goal>vodb-commit</goal>
-                        </goals>
-                     </execution>
-                     <execution>
-                        <id>vodb-close</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                           <goal>vodb-close</goal>
-                        </goals>
-                     </execution>
-                  </executions>
-               </plugin>
-            </plugins>
-         </build>         
-      </profile>
          
       <profile>
          <id>generate-db</id>
          <build>
             <plugins>
-               <plugin>
+            <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-clean-plugin</artifactId>
                   <configuration>
@@ -204,7 +114,24 @@
                         </configuration>
                      </execution>
                      <execution>
-                        <id>unpack-spelling-variants</id>
+                        <id>extract-dependencies-mrcm</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                           <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                           <artifactItems>
+                              <artifactItem>
+                                <groupId>org.ihtsdo</groupId>
+                                 <artifactId>mrcm-refset-specs</artifactId>
+                                 <type>zip</type>
+                              </artifactItem>
+                           </artifactItems>
+                           <outputDirectory>${project.build.directory}/generated-resources/pre</outputDirectory>
+                        </configuration>
+                     </execution>
+                     <execution>
+                        <id>unpack-migration-wf-data</id>
                         <phase>generate-sources</phase>
                         <goals>
                            <goal>unpack</goal>
@@ -212,19 +139,48 @@
                         <configuration>
                            <artifactItems>
                               <artifactItem>                                             
-                                 <groupId>org.ihtsdo.sct</groupId>
-                                 <artifactId>sct-en-mini</artifactId>
+                                 <groupId>org.ihtsdo</groupId>
+                                 <artifactId>migration-wf-data</artifactId>
+                                 <type>zip</type>
+                              </artifactItem>
+                           </artifactItems>
+                           <outputDirectory>${project.build.directory}/generated-resources</outputDirectory>
+                        </configuration>
+                     </execution>
+                     <execution>
+                        <id>unpack-spelling-variants</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                           <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                           <artifactItems>
+                              <artifactItem>
+                                 <groupId>org.ihtsdo</groupId>
+                                 <artifactId>tk-spelling-variants</artifactId>
                                  <type>zip</type>
                               </artifactItem>
                            </artifactItems>
                            <outputDirectory>${project.build.directory}/generated-resources/jbin</outputDirectory>
                         </configuration>
-                     </execution>
-                  </executions>
+                     </execution>                     
+                      </executions> 
                </plugin>
                <plugin>
                   <groupId>org.ihtsdo</groupId>
                   <artifactId>wb-mojo</artifactId>
+                  <dependencies>
+                     <dependency>
+                        <groupId>org.ihtsdo</groupId>
+                        <artifactId>wb-bdb</artifactId>
+                        <version>${wb-toolkit.version}</version>
+                     </dependency>
+                     <dependency>
+                        <groupId>org.apache.lucene</groupId>
+                        <artifactId>lucene-core</artifactId>
+                        <version>${org.apache.lucene.version}</version>
+                     </dependency>
+                  </dependencies>
                   <executions>
                      <execution>
                         <id>export-cement-as-econcept</id>
@@ -243,7 +199,7 @@
                            <output>${project.build.directory}/generated-resources/jbin
                            </output>
                         </configuration>
-                     </execution>
+                     </execution> 
                      <execution>
                         <id>vodb-open</id>
                         <phase>generate-resources</phase>
@@ -274,6 +230,16 @@
                                  <description>Workbench Auxiliary</description>
                               </ConceptDescriptor>
                            </editPaths>
+                        </configuration>
+                     </execution>
+                     <execution>
+                        <id>import-refset-spec-directory</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                           <goal>import-refset-spec-directory</goal>
+                        </goals>
+                        <configuration>
+                           <inputDir>${project.build.directory}/generated-resources/pre/refsets</inputDir>
                         </configuration>
                      </execution>
                      <execution>
@@ -606,6 +572,46 @@
                         </configuration>
                      </execution>
                      <execution>
+                        <id>initialize-editor-category-refset</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                           <goal>initialize-editor-category-refset</goal>
+                        </goals>
+                        <configuration>
+                           <filePath>${project.build.directory}/generated-resources/migration-wf-data/edCatRefset.txt</filePath>
+                        </configuration>
+                     </execution>
+                     <execution>
+                        <id>initialize-state-transition-refset</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                           <goal>initialize-state-transition-refset</goal>
+                        </goals>
+                        <configuration>
+                           <filePath>${project.build.directory}/generated-resources/migration-wf-data/stateTransRefset.txt</filePath>
+                        </configuration>
+                     </execution>
+                     <execution>
+                        <id>initialize-semantic-area-hierarchy-refset</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                           <goal>initialize-semantic-area-hierarchy-refset</goal>
+                        </goals>
+                        <configuration>
+                           <filePath>${project.build.directory}/generated-resources/migration-wf-data/semParRefset.txt</filePath>
+                        </configuration>
+                     </execution>
+                     <execution>
+                        <id>initialize-semantic-area-search-refset</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                           <goal>initialize-semantic-area-search-refset</goal>
+                        </goals>
+                        <configuration>
+                           <filePath>${project.build.directory}/generated-resources/migration-wf-data/SemanticHierarchyMap.txt</filePath>
+                        </configuration>
+                     </execution>
+                     <execution>
                         <id>vodb-commit</id>
                         <phase>process-resources</phase>
                         <goals>
@@ -618,17 +624,7 @@
                         <goals>
                            <goal>vodb-close</goal>
                         </goals>
-                     </execution>
-                     <execution>
-                        <id>vodb-mutable-to-readonly</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                           <goal>vodb-mutable-to-readonly</goal>
-                        </goals>
-                        <configuration>
-                           <berkeleyDir>${berkeleydb.directory}</berkeleyDir>
-                        </configuration>
-                     </execution>
+                     </execution>  
                   </executions>
                </plugin>
                <plugin>
@@ -644,7 +640,7 @@
                         <configuration>
                            <berkeleyDir>${berkeleydb.directory}</berkeleyDir>
                            <generatedResources>${project.build.directory}/generated-resources/jbin</generatedResources>
-                           <moveToReadOnly>false</moveToReadOnly>
+                           <moveToReadOnly>true</moveToReadOnly>
                            <conceptsFileNames>
                               <String>cement.jbin</String>
                               <String>sctSiEConcepts.jbin</String>

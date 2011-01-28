@@ -11,9 +11,16 @@
    <modelVersion>4.0.0</modelVersion>
    <artifactId>editor-standalone</artifactId>
    <packaging>pom</packaging>
-   <name>SCT Mini Standalone Editor</name>
+   <name>${branch}: SCT Mini Standalone Editor</name>
    <description>Workbench Bundle Standalone Editor</description>
    <dependencies>
+      <dependency>
+         <groupId>org.ihtsdo</groupId>
+         <artifactId>wb-wf</artifactId>
+         <type>jar</type>
+         <scope>compile</scope>
+         <version>${wb-toolkit.version}</version>
+      </dependency>
       <dependency>
 			<!--
 			this project contains the berkeley database directory that the
@@ -421,6 +428,23 @@
                         <extractAndProcessSpec>
                            <filePatternStr>^org/dwfa/resources/core/icon.*</filePatternStr>
                            <destDir>generated-resources/config/icon</destDir>
+                        </extractAndProcessSpec>
+                        <extractAndProcessSpec>
+                           <filePatternStr>^org/ihtsdo/workflow/*.*txt</filePatternStr>
+                           <destDir>generated-resources/workflow</destDir>
+                           <substitutions>
+                              <substutionSpec>
+                                 <propertyName>org.dwfa.configname </propertyName>
+                                 <patternStr>UniqueConfig</patternStr>
+                                 <replacementStr />
+                                 <nullActionStr>EMPTY_STRING</nullActionStr>
+                              </substutionSpec>
+                              <substutionSpec>
+                                 <patternStr>"org.dwfa.discovery" </patternStr>
+                                 <replacementStr>org.dwfa.jini.ConfigUtil.getUniqueJvmGroup() </replacementStr>
+                                 <nullActionStr>REPLACE_LITERAL</nullActionStr>
+                              </substutionSpec>
+                           </substitutions>
                         </extractAndProcessSpec>
                      </specs>
                   </configuration>

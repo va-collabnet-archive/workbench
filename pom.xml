@@ -10,7 +10,7 @@
   <artifactId>wb-sample-pa</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>SCT Mini (MMP) Assembly</name>
+  <name>${branch}: SCT Mini (MMP) Assembly</name>
   <description>Workbench IDE Project Assembly</description>
   <scm>
     <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/wb-sample-pa/trunk</connection>
@@ -18,18 +18,36 @@
     <url>https://csfe.aceworkspace.net/svn/repos/workbench/wb-sample-pa/trunk</url>
   </scm>
   <properties>
+    <branch>migration</branch>
     <!-- must be trek as it has the required wb-mojo changes -->
     <wb-toolkit.version>2.6.0-trek-12-SNAPSHOT</wb-toolkit.version>
     <org.dwfa.jini.version>2.1</org.dwfa.jini.version>
-    <org.apache.lucene.version>3.0.3</org.apache.lucene.version>
+    <org.apache.lucene.version>3.0.2</org.apache.lucene.version>
     <baseline.database.version>2010.01.31-build-1-SNAPSHOT</baseline.database.version>
     <berkeleydb.svn.url>https://csfe.aceworkspace.net/svn/repos/workbench/wb-sample-pa/berkeley-db</berkeleydb.svn.url>
     <poi.version>3.6</poi.version>
     <tika.version>0.4</tika.version>
-    <wb-icons-version>1.0.3-SNAPSHOT</wb-icons-version>
+    <wb-icons-version>1.0.4-SNAPSHOT</wb-icons-version>
+    <org.ihtsdo.resources.version>1.5-SNAPSHOT</org.ihtsdo.resources.version>
+    <org.ihtsdo.admin.bp.version>1.7-SNAPSHOT</org.ihtsdo.admin.bp.version>
+    <org.ihtsdo.user.bp.version>1.7-SNAPSHOT</org.ihtsdo.user.bp.version>
+    <org.ihtsdo.mrcm.specs.version>0.0.1-SNAPSHOT</org.ihtsdo.mrcm.specs.version>
+    <org.ihtsdo.migration-wf-data>0.0.1-SNAPSHOT</org.ihtsdo.migration-wf-data>
   </properties>
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.ihtsdo</groupId>
+        <artifactId>migration-wf-data</artifactId>
+        <version>${org.ihtsdo.migration-wf-data}</version>
+        <type>zip</type>
+      </dependency>
+      <dependency>
+          <groupId>org.ihtsdo</groupId>
+          <artifactId>mrcm-refset-specs</artifactId>
+          <type>zip</type>
+          <version>${org.ihtsdo.mrcm.specs.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.ihtsdo.sct</groupId>
         <artifactId>sct-en-mini</artifactId>
@@ -39,7 +57,7 @@
       <dependency>
         <groupId>org.ihtsdo</groupId>
         <artifactId>ihtsdo-resources</artifactId>
-        <version>1.0</version>
+        <version>${org.ihtsdo.resources.version}</version>
         <scope>compile</scope>
       </dependency>
       <dependency>
@@ -73,7 +91,7 @@
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-ide-admin-bp</artifactId>
         <type>zip</type>
-        <version>1.7-SNAPSHOT</version>
+        <version>${org.ihtsdo.admin.bp.version}</version>
       </dependency>
       <dependency>
         <groupId>org.ihtsdo</groupId>
@@ -91,7 +109,7 @@
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-ide-user-bp</artifactId>
         <type>zip</type>
-        <version>1.7-SNAPSHOT</version>
+        <version>${org.ihtsdo.user.bp.version}</version>
       </dependency>
       <dependency>
         <groupId>org.dwfa.jini</groupId>

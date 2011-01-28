@@ -2,6 +2,16 @@
 <component>
     <fileSets>
         <fileSet>
+            <directory>target/generated-resources/workflow/</directory>
+            <lineEnding>keep</lineEnding>
+            <filtered>false</filtered>
+            <useStrictFiltering>false</useStrictFiltering>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <outputDirectory>workflow</outputDirectory>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
+        <fileSet>
             <directory>target/generated-resources/</directory>
             <lineEnding>keep</lineEnding>
             <filtered>false</filtered>
@@ -10,10 +20,10 @@
             <outputDirectory>/</outputDirectory>
             <excludes>
                 <exclude>config/ace.config</exclude>
-              <!-- TODO: check this, may just have been an oversight before -->
-                <exclude>processes/**</exclude>
-              <exclude>**/TestForEdgCType2Req.task</exclude>
-              <exclude>**/TestForEdgEType2Req.task</exclude>
+                <exclude>**/11_SME_Review.bp</exclude>
+                <exclude>**/90_GotoNHS_Nice.bp</exclude>
+                <exclude>**/20_import_refset.bp</exclude>
+                <exclude>**/migration-wf/Advance*.bp</exclude>
             </excludes>
             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>
@@ -27,6 +37,17 @@
             <outputDirectory>berkeley-db</outputDirectory>
             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/profiles</directory>
+            <outputDirectory>/profiles</outputDirectory>
+            <includes>
+                <include>**/*.eccs</include>
+                <include>**/*.ace</include>
+                <include>**/*.config</include>
+                <include>**/*.oos</include>
+                <include>**/*.bp</include>
+            </includes>
         </fileSet>
         <fileSet>
             <directory>src/main/config</directory>
@@ -65,6 +86,19 @@
             <useStrictFiltering>false</useStrictFiltering>
             <useDefaultExcludes>true</useDefaultExcludes>
             <outputDirectory>plugins/component/</outputDirectory>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/generated-resources/plugins/migration-wf</directory>
+            <lineEnding>keep</lineEnding>
+            <filtered>false</filtered>
+            <useStrictFiltering>false</useStrictFiltering>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <outputDirectory>/migration-wf</outputDirectory>
+            <includes>
+                <include>AdvanceWorkflow.bp</include>
+            </includes>
             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>
         </fileSet>

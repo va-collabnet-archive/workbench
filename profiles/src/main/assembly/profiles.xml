@@ -11,6 +11,7 @@
         <include>**/*.ace</include>
         <include>**/*.config</include>
         <include>**/*.oos</include>
+        <include>**/*.bp</include>
       </includes>
     </fileSet>
     <fileSet>

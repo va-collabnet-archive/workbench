@@ -4,7 +4,7 @@
   </formats>
   <fileSets>
     <fileSet>
-      <directory>./berkeley-db</directory>
+      <directory>${berkeleydb.directory}</directory>
       <outputDirectory>/berkeley-db</outputDirectory>
     </fileSet>
   </fileSets>
