@@ -149,24 +149,24 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
     public int compareTo(Sct1_RefSetRecord o) {
         int thisMore = 1;
         int thisLess = -1;
-        if (this.refsetUuidMsb < o.refsetUuidMsb) {
+        if (this.referencedComponentUuidMsb < o.referencedComponentUuidMsb) {
             return thisLess; // instance less than received
-        } else if (this.refsetUuidMsb > o.refsetUuidMsb) {
+        } else if (this.referencedComponentUuidMsb > o.referencedComponentUuidMsb) {
             return thisMore; // instance greater than received
         } else {
-            if (this.refsetUuidLsb < o.refsetUuidLsb) {
+            if (this.referencedComponentUuidLsb < o.referencedComponentUuidLsb) {
                 return thisLess;
-            } else if (this.refsetUuidLsb > o.refsetUuidLsb) {
+            } else if (this.referencedComponentUuidLsb > o.referencedComponentUuidLsb) {
                 return thisMore;
             } else {
-                if (this.referencedComponentUuidMsb < o.referencedComponentUuidMsb) {
+                if (this.refsetUuidMsb < o.refsetUuidMsb) {
                     return thisLess; // instance less than received
-                } else if (this.referencedComponentUuidMsb > o.referencedComponentUuidMsb) {
+                } else if (this.refsetUuidMsb > o.refsetUuidMsb) {
                     return thisMore; // instance greater than received
                 } else {
-                    if (this.referencedComponentUuidLsb < o.referencedComponentUuidLsb) {
+                    if (this.refsetUuidLsb < o.refsetUuidLsb) {
                         return thisLess;
-                    } else if (this.referencedComponentUuidLsb > o.referencedComponentUuidLsb) {
+                    } else if (this.refsetUuidLsb > o.refsetUuidLsb) {
                         return thisMore;
                     } else {
                         if (this.refsetMemberUuidMsb < o.refsetMemberUuidMsb) {
@@ -189,7 +189,7 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
                         }
                     }
                 }
-            }
+           }
         }
     }
         
