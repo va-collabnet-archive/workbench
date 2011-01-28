@@ -93,7 +93,7 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 			{
 				return ((EditorCategoryRefset)refset).getEditorCategory(props.getStringValue());
 			}
-			else if (key.startsWith("SNOMED CT Concept"))
+			else if (key.startsWith("SNOMED CT Concept") || key.equalsIgnoreCase("all"))
 			{
 				category = ((EditorCategoryRefset)refset).getEditorCategory(props.getStringValue());
 			}
