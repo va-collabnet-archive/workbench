@@ -62,37 +62,37 @@ public abstract class DwfInstance implements Serializable {
 
 
    /**
-    * TODO: should this be an enum?
+    * TODO: should this be an enum? A concept?
     * Key for the deadline to display in the queue
     * The drools execution update this value.
     */
    public static final String deadlineKey = "org.ihtsdo.dwf.deadlineKey";
    /**
-    * TODO: should this be an enum?
+    * TODO: should this be an enum? A concept?
     * Key for the priority type to display in the queue
     * The drools execution update this value.
     */
    private static final String priorityKey = "org.ihtsdo.dwf.priorityKey";
    /**
-    * TODO: should this be an enum?
+    * TODO: should this be an enum? A concept?
     * Key for the origin to display in the queue
     * The drools execution update this value.
     */
    private static final String originKey = "org.ihtsdo.dwf.originKey";
    /**
-    * TODO: should this be an enum?
+    * TODO: should this be an enum? A concept?
     * Key for the destination to deliver to
     * The drools execution update this value.
     */
    private static final String destinationKey = "org.ihtsdo.dwf.destinationKey";
    /**
-    * TODO: should this be an enum?
+    * TODO: should this be an enum? A concept?
     * Key for the subject to display in the queue
     * The drools execution update this value.
     */
    private static final String subjectKey = "org.ihtsdo.dwf.subjectKey";
    /**
-    * TODO: should this be an enum?
+    * TODO: should this be an enum? A concept?
     * Key for the message type to display in the queue
     * The drools execution update this value.
     */

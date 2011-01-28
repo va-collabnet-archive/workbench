@@ -58,16 +58,12 @@ public class CollapsePanel extends JPanel {
     *
     */
    private static final long serialVersionUID = 1L;
-   boolean collapsed = false;
-   boolean refex = true;
-   boolean templates = true;
-   boolean alerts = true;
-   boolean showExtras = true;
+
+
+
    int refexCount = 0;
    int templateCount = 0;
    int alertCount = 0;
-   EnumSet<ComponentVersionDragPanel.SubPanelTypes> subpanelsToShow =
-           EnumSet.allOf(ComponentVersionDragPanel.SubPanelTypes.class);
    Set<I_ToggleSubPanels> components = new HashSet<I_ToggleSubPanels>();
    private JButton alertsButton;
    private JButton extrasButton;
@@ -79,16 +75,75 @@ public class CollapsePanel extends JPanel {
    private List<JComponent> templatePanels = new ArrayList<JComponent>();
    private JButton collapseExpandButton;
 
-   public boolean isCollapsed() {
-      return collapsed;
+   private CollapsePanelPrefs prefs;
+
+   /**
+    * @return the refexesShown
+    */
+   public boolean areRefexesShown() {
+      return prefs.areRefexesShown();
    }
 
-   public void setCollapsed(boolean collapsed) {
-      this.collapsed = collapsed;
+   /**
+    * @param refexesShown the refexesShown to set
+    */
+   public void setRefexesShown(boolean refexesShown) {
+      prefs.setRefexesShown(refexesShown);
    }
 
-   public CollapsePanel(String labelStr, ArenaComponentSettings settings) {
+   /**
+    * @return the templatesShown
+    */
+   public boolean areTemplatesShown() {
+      return prefs.areTemplatesShown();
+   }
+
+   /**
+    * @param templatesShown the templatesShown to set
+    */
+   public void setTemplatesShown(boolean templatesShown) {
+      prefs.setAlertsShown(templatesShown);
+   }
+
+   /**
+    * @return the alertsShown
+    */
+   public boolean areAlertsShown() {
+      return prefs.areAlertsShown();
+   }
+
+   /**
+    * @param alertsShown the alertsShown to set
+    */
+   public void setAlertsShown(boolean alertsShown) {
+      prefs.setAlertsShown(alertsShown);
+   }
+
+   /**
+    * @return the extrasShown
+    */
+   public boolean areExtrasShown() {
+      return prefs.areExtrasShown();
+   }
+
+   /**
+    * @param extrasShown the extrasShown to set
+    */
+   public void setExtrasShown(boolean extrasShown) {
+      prefs.setExtrasShown(extrasShown);
+   }
+
+   /**
+    * @return the subpanelsToShow
+    */
+   public EnumSet<ComponentVersionDragPanel.SubPanelTypes> getSubpanelsToShow() {
+      return prefs.getSubpanelsToShow();
+   }
+
+   public CollapsePanel(String labelStr, ArenaComponentSettings settings,
+           CollapsePanelPrefs prefs) {
       super();
+      this.prefs = prefs;
       setBackground(Color.LIGHT_GRAY);
       setOpaque(true);
       setBorder(BorderFactory.createMatteBorder(1, 1, 0, 1, Color.GRAY));
@@ -139,24 +194,24 @@ public class CollapsePanel extends JPanel {
 
          @Override
          public void actionPerformed(ActionEvent e) {
-            showExtras = !showExtras;
+            setExtrasShown(!areExtrasShown());
             for (JComponent jc: refexPanels) {
-               jc.setVisible(showExtras);
+               jc.setVisible(areExtrasShown());
             }
             for (JComponent jc: alertPanels) {
-               jc.setVisible(showExtras);
+               jc.setVisible(areExtrasShown());
             }
             for (JComponent jc: templatePanels) {
-               jc.setVisible(showExtras);
+               jc.setVisible(areExtrasShown());
             }
             for (I_ToggleSubPanels cvdp : components) {
-               if (showExtras) {
-                  cvdp.showSubPanels(subpanelsToShow);
+               if (areExtrasShown()) {
+                  cvdp.showSubPanels(getSubpanelsToShow());
                } else {
-                  cvdp.hideSubPanels(subpanelsToShow);
+                  cvdp.hideSubPanels(getSubpanelsToShow());
                }
              }
-            ((JButton) e.getSource()).setIcon((showExtras ? showExtrasIcon
+            ((JButton) e.getSource()).setIcon((areExtrasShown() ? showExtrasIcon
                     : hideExtrasIcon));
          }
       });
@@ -179,13 +234,14 @@ public class CollapsePanel extends JPanel {
 
          @Override
          public void actionPerformed(ActionEvent e) {
-            refex = !refex;
-            updateShowSubpanelSet(refex, ComponentVersionDragPanel.SubPanelTypes.REFEX);
-            ((JButton) e.getSource()).setIcon((refex ? showRefexes
+            setRefexesShown(!areRefexesShown());
+            updateShowSubpanelSet(areRefexesShown(), ComponentVersionDragPanel.SubPanelTypes.REFEX);
+            ((JButton) e.getSource()).setIcon((areRefexesShown() ? showRefexes
                     : hideRefexes));
             updateSubpanels();
          }
       });
+      refexButton.setSelected(areRefexesShown());
       refexButton.setPreferredSize(new Dimension(21, 16));
       refexButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
       refexButton.setToolTipText("Hide/Show refexes");
@@ -204,9 +260,9 @@ public class CollapsePanel extends JPanel {
    private void updateShowSubpanelSet(boolean show,
            ComponentVersionDragPanel.SubPanelTypes subpanel) {
       if (show) {
-         subpanelsToShow.add(subpanel);
+         getSubpanelsToShow().add(subpanel);
       } else {
-         subpanelsToShow.remove(subpanel);
+         getSubpanelsToShow().remove(subpanel);
       }
    }
 
@@ -221,13 +277,14 @@ public class CollapsePanel extends JPanel {
 
          @Override
          public void actionPerformed(ActionEvent e) {
-            templates = !templates;
-            updateShowSubpanelSet(templates, ComponentVersionDragPanel.SubPanelTypes.TEMPLATE);
-            ((JButton) e.getSource()).setIcon(templates ? showTemplates
+            setTemplatesShown(!areTemplatesShown());
+            updateShowSubpanelSet(areTemplatesShown(), ComponentVersionDragPanel.SubPanelTypes.TEMPLATE);
+            ((JButton) e.getSource()).setIcon(areTemplatesShown() ? showTemplates
                     : hideTemplates);
             updateSubpanels();
          }
       });
+      templatessButton.setSelected(areTemplatesShown());
       templatessButton.setPreferredSize(new Dimension(21, 16));
       templatessButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
       templatessButton.setToolTipText("Hide/Show suggestions");
@@ -254,13 +311,14 @@ public class CollapsePanel extends JPanel {
 
          @Override
          public void actionPerformed(ActionEvent e) {
-            alerts = !alerts;
-            updateShowSubpanelSet(alerts, ComponentVersionDragPanel.SubPanelTypes.ALERT);
-            ((JButton) e.getSource()).setIcon(alerts ? showAlerts
+            setAlertsShown(!areAlertsShown());
+            updateShowSubpanelSet(areAlertsShown(), ComponentVersionDragPanel.SubPanelTypes.ALERT);
+            ((JButton) e.getSource()).setIcon(areAlertsShown() ? showAlerts
                     : hideAlerts);
             updateSubpanels();
          }
       });
+      alertsButton.setSelected(areAlertsShown());
       alertsButton.setPreferredSize(new Dimension(21, 16));
       alertsButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
       alertsButton.setToolTipText("Hide/Show warnings & errors");
@@ -278,8 +336,8 @@ public class CollapsePanel extends JPanel {
 
    private void updateSubpanels() {
       for (I_ToggleSubPanels jc : components) {
-         if (!collapsed) {
-            jc.showSubPanels(subpanelsToShow);
+         if (areExtrasShown()) {
+            jc.showSubPanels(getSubpanelsToShow());
          }
       }
    }
@@ -295,14 +353,13 @@ public class CollapsePanel extends JPanel {
 
          @Override
          public void actionPerformed(ActionEvent e) {
-            collapsed = !collapsed;
 
             for (I_ToggleSubPanels jc : components) {
-               jc.setVisible(!collapsed);
+               jc.setVisible(areExtrasShown());
             }
             ((JButton) e.getSource()).setIcon(new ImageIcon(
                     CollapsePanel.class.getResource(ArenaComponentSettings.IMAGE_PATH
-                    + (collapsed ? "maximize.gif"
+                    + (areExtrasShown() ? "maximize.gif"
                     : "minimize.gif"))));
          }
       });
@@ -339,8 +396,8 @@ public class CollapsePanel extends JPanel {
          alertsButton.setMinimumSize(emptyDimension);
          alertsButton.setPreferredSize(emptyDimension);
       } else {
-         if (alerts) {
-            alertsButton.setIcon(alerts ? showAlerts
+         if (areAlertsShown()) {
+            alertsButton.setIcon(areAlertsShown() ? showAlerts
                     : hideAlerts);
             alertsButton.setEnabled(true);
          }
@@ -358,7 +415,7 @@ public class CollapsePanel extends JPanel {
          refexButton.setMinimumSize(emptyDimension);
          refexButton.setPreferredSize(emptyDimension);
      } else {
-            refexButton.setIcon((refex ? showRefexes
+            refexButton.setIcon((areRefexesShown() ? showRefexes
                     : hideRefexes));
 
             refexButton.setEnabled(true);
@@ -375,7 +432,7 @@ public class CollapsePanel extends JPanel {
          templatessButton.setMinimumSize(emptyDimension);
          templatessButton.setPreferredSize(emptyDimension);
       } else {
-         templatessButton.setIcon(templates ? showTemplates
+         templatessButton.setIcon(areTemplatesShown() ? showTemplates
                     : hideTemplates);
          templatessButton.setEnabled(true);
       }

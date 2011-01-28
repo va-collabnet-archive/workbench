@@ -164,7 +164,7 @@ public class ConceptViewRenderer extends JLayeredPane {
            		new WizardPanel(new FlowLayout(FlowLayout.LEADING, 10, 10), this);
       wizardScrollPane = new JScrollPane(wizardPanel,
     		  		ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-    		  		ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);      
+    		  		ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
       try {
         	   contextualConceptActionsKBase = EditPanelKb.setupKb(new File("drools-rules/ContextualConceptActionsPanel.drl"));
       } catch (IOException e1) {
@@ -227,7 +227,8 @@ public class ConceptViewRenderer extends JLayeredPane {
 
 
       gbc.gridx++;
-      workflowToggleButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/16x16/plain/media_step_forward.png")));
+      workflowToggleButton = new JToggleButton(
+              new ImageIcon(ACE.class.getResource("/16x16/plain/media_step_forward.png")));
       workflowToggleButton.setToolTipText("show context sensitive actions available for this concept...");
       workflowToggleButton.setSelected(false);
 
@@ -272,13 +273,18 @@ public class ConceptViewRenderer extends JLayeredPane {
             }
 
 
-            File wfBpFile = new File(advanceWorkflowActionPath  + File.separator + advanceWorkflowActionFile);
+            File wfBpFile = new File(advanceWorkflowActionPath  +
+                    File.separator + advanceWorkflowActionFile);
             boolean capWorkflow = wfBpFile.exists();
             if (capWorkflow) {
-               capWorkflowSetup(capWorkflow, availableActions, wfBpFile, wfHandler, possibleActions);
+               capWorkflowSetup(capWorkflow, availableActions, wfBpFile,
+                       wfHandler, possibleActions);
                capOopsButton();
             } else {
-            	AceLog.getAppLog().log(Level.SEVERE, "Unable to find AdvanceWorkflow.bp file at path specified: " + advanceWorkflowActionPath + File.separator + advanceWorkflowActionFile, new FileNotFoundException());
+            	AceLog.getAppLog().log(Level.SEVERE,
+                       "Unable to find AdvanceWorkflow.bp file at path specified: " +
+                       advanceWorkflowActionPath + File.separator +
+                       advanceWorkflowActionFile, new FileNotFoundException());
             }
 
             add(workflowScrollPane, BorderLayout.CENTER);
@@ -327,7 +333,10 @@ public class ConceptViewRenderer extends JLayeredPane {
             /////
          }
 
-         private void capWorkflowSetup(boolean capWorkflow, Collection<UUID> availableActions, File wfBpFile, WorkflowHandlerBI wfHandler, Collection<? extends WorkflowHistoryJavaBeanBI> possibleActions) {
+         private void capWorkflowSetup(boolean capWorkflow,
+                 Collection<UUID> availableActions, File wfBpFile,
+                 WorkflowHandlerBI wfHandler,
+                 Collection<? extends WorkflowHistoryJavaBeanBI> possibleActions) {
             if (capWorkflow) {
                try {
                   AceFrameConfig config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
@@ -366,7 +375,8 @@ public class ConceptViewRenderer extends JLayeredPane {
                                     worker = config.getWorker();
                                  }
 
-                                 worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), WorkflowHelper.lookupAction(e.getActionCommand()).getPrimUuid());
+                                 worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(),
+                                         WorkflowHelper.lookupAction(e.getActionCommand()).getPrimUuid());
                                  workflowToggleButton.doClick();
                                  updateOopsButton(settings.getConcept());
 
@@ -411,10 +421,14 @@ public class ConceptViewRenderer extends JLayeredPane {
                   try {
 
                      if (settings.getConcept() != null) {
-                        WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
-                        WorkflowHistoryJavaBean latestWfHxJavaBean = searcher.getLatestWfHxJavaBeanForConcept(settings.getConcept());
-                        UUID latestModelerUUID = latestWfHxJavaBean.getModeler();
-                        UUID currentModelerUUID = WorkflowHelper.getCurrentModeler().getPrimUuid();
+                        WorkflowHistoryRefsetSearcher searcher =
+                                new WorkflowHistoryRefsetSearcher();
+                        WorkflowHistoryJavaBean latestWfHxJavaBean =
+                                searcher.getLatestWfHxJavaBeanForConcept(settings.getConcept());
+                        UUID latestModelerUUID =
+                                latestWfHxJavaBean.getModeler();
+                        UUID currentModelerUUID =
+                                WorkflowHelper.getCurrentModeler().getPrimUuid();
                         boolean autoApproved = latestWfHxJavaBean.getAutoApproved();
 
                         // See if state prevents retirement
@@ -456,14 +470,16 @@ public class ConceptViewRenderer extends JLayeredPane {
 
       gbc.weightx = 0;
       gbc.gridx++;
-      JButton cancelButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/delete.png")));
+      JButton cancelButton = new JButton(new ImageIcon(
+              ACE.class.getResource("/16x16/plain/delete.png")));
       cancelButton.setToolTipText("cancel changes to concept");
       cancelButton.addActionListener(new CancelActionListener(settings));
       cancelButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
       footerPanel.add(cancelButton, gbc);
 
       gbc.gridx++;
-      JButton commitButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/check.png")));
+      JButton commitButton = new JButton(new ImageIcon(
+              ACE.class.getResource("/16x16/plain/check.png")));
       commitButton.setToolTipText("commit changes to concept");
       commitButton.addActionListener(new CommitActionListener(settings));
       commitButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
@@ -549,11 +565,14 @@ public class ConceptViewRenderer extends JLayeredPane {
 
    private void updateOopsButton(I_GetConceptData concept) {
       try {
-         WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
+         WorkflowHistoryRefsetSearcher searcher =
+                 new WorkflowHistoryRefsetSearcher();
 
-         WorkflowHistoryJavaBean latestWfHxJavaBean = searcher.getLatestWfHxJavaBeanForConcept(concept);
+         WorkflowHistoryJavaBean latestWfHxJavaBean =
+                 searcher.getLatestWfHxJavaBeanForConcept(concept);
 
-         if (latestWfHxJavaBean == null || WorkflowHelper.isBeginEndAction(latestWfHxJavaBean.getAction())) {
+         if (latestWfHxJavaBean == null ||
+                 WorkflowHelper.isBeginEndAction(latestWfHxJavaBean.getAction())) {
             oopsButton.setEnabled(false);
          } else {
             oopsButton.setEnabled(true);

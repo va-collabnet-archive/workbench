@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TooManyListenersException;
@@ -80,6 +82,14 @@ import org.ihtsdo.util.swing.GuiUtil;
 
 public class ConceptView extends JPanel {
 
+   private void setupPrefMap() {
+      prefMap.put(PanelSection.CONCEPT, new CollapsePanelPrefs());
+       prefMap.put(PanelSection.DESC, new CollapsePanelPrefs());
+       prefMap.put(PanelSection.REL, new CollapsePanelPrefs());
+       prefMap.put(PanelSection.REL_GRP, new CollapsePanelPrefs());
+       prefMap.put(PanelSection.EXTRAS, new CollapsePanelPrefs());
+   }
+
    public class LayoutConceptWorker extends SwingWorker<Map<SpecBI, Integer>, Boolean> {
 
       public LayoutConceptWorker() {
@@ -113,7 +123,8 @@ public class ConceptView extends JPanel {
                   gbc.gridy = 0;
 
 
-                  CollapsePanel cpe = new CollapsePanel("concept", settings);
+                  CollapsePanel cpe = new CollapsePanel("concept", settings,
+                          prefMap.get(PanelSection.CONCEPT));
                   add(cpe, gbc);
                   gbc.gridy++;
                   I_TermFactory tf = Terms.get();
@@ -141,7 +152,8 @@ public class ConceptView extends JPanel {
                      }
                   }
 
-                  CollapsePanel cpd = new CollapsePanel("descriptions", settings);
+                  CollapsePanel cpd = new CollapsePanel("descriptions", settings,
+                          prefMap.get(PanelSection.DESC));
                   add(cpd, gbc);
                   gbc.gridy++;
                   int alertCount = 0;
@@ -165,7 +177,8 @@ public class ConceptView extends JPanel {
 
                   ViewCoordinate coordinate = config.getViewCoordinate();
 
-                  CollapsePanel cpr = new CollapsePanel("relationships", settings);
+                  CollapsePanel cpr = new CollapsePanel("relationships", settings,
+                          prefMap.get(PanelSection.REL));
                   boolean cprAdded = false;
                   for (I_RelTuple r : rels) {
                      if (r.getGroup() == 0) {
@@ -188,7 +201,8 @@ public class ConceptView extends JPanel {
                         Collection<? extends RelationshipVersionBI> currentRels =
                                 r.getCurrentRels(); //TODO getCurrentRels
                         if (!currentRels.isEmpty()) {
-                           CollapsePanel cprg = new CollapsePanel("relationship groups", settings);
+                           CollapsePanel cprg = new CollapsePanel("relationship groups", settings,
+                          prefMap.get(PanelSection.REL_GRP));
                            boolean cprgAdded = false;
                            if (!cprgAdded) {
                               add(cprg, gbc);
@@ -210,7 +224,8 @@ public class ConceptView extends JPanel {
 
                   if (templates.size() > 0) {
                      CollapsePanel cptemplate =
-                             new CollapsePanel("aggregate extras", settings);
+                             new CollapsePanel("aggregate extras", settings,
+                          prefMap.get(PanelSection.EXTRAS));
                      cptemplate.setTemplateCount(templates.size());
                      cptemplate.setRefexCount(0);
                      add(cptemplate, gbc);
@@ -465,9 +480,15 @@ public class ConceptView extends JPanel {
    private ConceptViewSettings settings;
    private EditPanelKb kb;
    private I_DispatchDragStatus dropPanelMgr = new DropPanelActionManager();
-   private Collection<Action> actionList = Collections.synchronizedCollection(new ArrayList<Action>());
+   private Collection<Action> actionList =
+           Collections.synchronizedCollection(new ArrayList<Action>());
    private KnowledgeBase kbase;
    private I_GetConceptData concept;
+   private enum PanelSection {CONCEPT,
+      DESC, REL, REL_GRP, EXTRAS};
+
+   private Map<PanelSection, CollapsePanelPrefs> prefMap =
+           new EnumMap<PanelSection, CollapsePanelPrefs>(PanelSection.class);
 
    public I_GetConceptData getConcept() {
       return concept;
@@ -476,13 +497,15 @@ public class ConceptView extends JPanel {
    public void setConcept(I_GetConceptData concept) {
       this.concept = concept;
    }
-   private Collection<JComponent> dropComponents = Collections.synchronizedList(new ArrayList<JComponent>());
+   private Collection<JComponent> dropComponents =
+           Collections.synchronizedList(new ArrayList<JComponent>());
 
    public ConceptView() throws TerminologyException, IOException {
       this.config = Terms.get().getActiveAceFrameConfig();
       kb = new EditPanelKb(config);
       addCommitListener(settings);
-   }
+      setupPrefMap();
+    }
 
    public ConceptView(I_ConfigAceFrame config, ConceptViewSettings settings) {
       super();
@@ -490,10 +513,12 @@ public class ConceptView extends JPanel {
       this.settings = settings;
       kb = new EditPanelKb(config);
       addCommitListener(settings);
-   }
+      setupPrefMap();
+  }
 
    private void addCommitListener(ConceptViewSettings settings) {
-      settings.getConfig().addPropertyChangeListener("commit", new PropertyChangeListener() {
+      settings.getConfig().addPropertyChangeListener("commit",
+              new PropertyChangeListener() {
 
          @Override
          public void propertyChange(PropertyChangeEvent evt) {
@@ -509,9 +534,11 @@ public class ConceptView extends JPanel {
    }
 
    public DragPanelRelGroup getRelGroupComponent(RelGroupVersionBI group,
-           CollapsePanel parentCollapsePanel) throws TerminologyException, IOException, ContraditionException {
+           CollapsePanel parentCollapsePanel)
+           throws TerminologyException, IOException, ContraditionException {
       DragPanelRelGroup relGroupPanel =
-              new DragPanelRelGroup(new GridBagLayout(), settings, parentCollapsePanel, group);
+              new DragPanelRelGroup(new GridBagLayout(), settings,
+              parentCollapsePanel, group);
       relGroupPanel.setupDrag(group);
       relGroupPanel.setBorder(BorderFactory.createRaisedBevelBorder());
       JLabel relGroupLabel = getJLabel(" ");
@@ -532,7 +559,8 @@ public class ConceptView extends JPanel {
       gbc.gridx = 1;
       gbc.weightx = 1;
       gbc.gridheight = 1;
-      CollapsePanel cprg = new CollapsePanel("group", settings);
+      CollapsePanel cprg = new CollapsePanel("group", settings,
+                          new CollapsePanelPrefs(prefMap.get(PanelSection.REL_GRP)));
       relGroupPanel.add(cprg, gbc);
       gbc.gridy++;
       for (RelationshipVersionBI r : group.getCurrentRels()) { //TODO getCurrentRels
@@ -548,13 +576,16 @@ public class ConceptView extends JPanel {
    }
 
    public DragPanelDescription getDescComponent(DescriptionAnalogBI desc,
-           CollapsePanel parentCollapsePanel) throws TerminologyException, IOException {
-      DragPanelDescription dragDescPanel = new DragPanelDescription(new GridBagLayout(), settings,
+           CollapsePanel parentCollapsePanel)
+           throws TerminologyException, IOException {
+      DragPanelDescription dragDescPanel =
+              new DragPanelDescription(new GridBagLayout(), settings,
                  parentCollapsePanel, desc);
       return dragDescPanel;
    }
 
-   public DragPanelDescTemplate getDescTemplate(final DescriptionSpec desc) throws TerminologyException, IOException {
+   public DragPanelDescTemplate getDescTemplate(final DescriptionSpec desc)
+           throws TerminologyException, IOException {
       DragPanelDescTemplate descPanel =
               new DragPanelDescTemplate(new GridBagLayout(), settings, desc);
       descPanel.setupDrag(desc);
@@ -574,16 +605,20 @@ public class ConceptView extends JPanel {
       descPanel.add(descLabel, gbc);
       gbc.anchor = GridBagConstraints.NORTHWEST;
       gbc.gridx++;
-      TermComponentLabel typeLabel = getLabel(desc.getDescTypeSpec().get(config.getViewCoordinate()).getNid(), true);
+      TermComponentLabel typeLabel =
+              getLabel(desc.getDescTypeSpec().get(config.getViewCoordinate()).getNid(), true);
       descPanel.add(typeLabel, gbc);
-      typeLabel.addPropertyChangeListener("termComponent", new PropertyChangeListener() {
+      typeLabel.addPropertyChangeListener("termComponent",
+              new PropertyChangeListener() {
 
          @Override
          public void propertyChange(PropertyChangeEvent evt) {
             try {
-               desc.setDescTypeSpec(SpecFactory.get((I_GetConceptData) evt.getNewValue(), config.getViewCoordinate()));
+               desc.setDescTypeSpec(SpecFactory.get((I_GetConceptData)
+                       evt.getNewValue(), config.getViewCoordinate()));
             } catch (IOException ex) {
-               Logger.getLogger(ConceptView.class.getName()).log(Level.SEVERE, null, ex);
+               Logger.getLogger(ConceptView.class.getName()).log(Level.SEVERE,
+                       null, ex);
             }
          }
       });
@@ -599,11 +634,13 @@ public class ConceptView extends JPanel {
       textPane.setFont(textPane.getFont().deriveFont(settings.getFontSize()));
       textPane.setText(desc.getDescText());
       descPanel.add(textPane, gbc);
-      textPane.getDocument().addDocumentListener(new UpdateTextTemplateDocumentListener(textPane, desc));
+      textPane.getDocument().addDocumentListener(
+              new UpdateTextTemplateDocumentListener(textPane, desc));
       return descPanel;
    }
 
-   public DragPanelRelTemplate getRelTemplate(final RelSpec spec) throws TerminologyException, IOException {
+   public DragPanelRelTemplate getRelTemplate(final RelSpec spec)
+           throws TerminologyException, IOException {
       ViewCoordinate coordinate = config.getViewCoordinate();
       DragPanelRelTemplate relPanel =
               new DragPanelRelTemplate(new GridBagLayout(), settings, spec);
@@ -624,9 +661,11 @@ public class ConceptView extends JPanel {
       relPanel.add(relLabel, gbc);
       gbc.anchor = GridBagConstraints.NORTHWEST;
       gbc.gridx++;
-      TermComponentLabel typeLabel = getLabel(spec.getRelTypeSpec().get(coordinate).getNid(), true);
+      TermComponentLabel typeLabel = getLabel(
+              spec.getRelTypeSpec().get(coordinate).getNid(), true);
       relPanel.add(typeLabel, gbc);
-      typeLabel.addPropertyChangeListener("termComponent", new PropertyChangeListener() {
+      typeLabel.addPropertyChangeListener("termComponent",
+              new PropertyChangeListener() {
 
          @Override
          public void propertyChange(PropertyChangeEvent evt) {

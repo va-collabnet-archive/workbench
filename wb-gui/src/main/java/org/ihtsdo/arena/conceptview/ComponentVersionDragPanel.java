@@ -24,26 +24,26 @@ import org.ihtsdo.arena.ArenaComponentSettings;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
-public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI> 
+public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
          extends DragPanel<T> implements I_ToggleSubPanels {
 
     /**
-    * 
+    *
     */
    private static final long serialVersionUID = 1L;
 
    public enum SubPanelTypes {
       REFEX, ALERT, TEMPLATE
    };
-   
-    
+
+
    private List<JComponent> refexSubPanels = new ArrayList<JComponent>();
    private List<JComponent> alertSubPanels = new ArrayList<JComponent>();
    private List<JComponent> templateSubPanels = new ArrayList<JComponent>();
    private JButton collapseExpandButton;
 
    private CollapsePanel parentCollapsePanel;
-   
+
    private boolean collapsed = false;
 
    public CollapsePanel getParentCollapsePanel() {
@@ -62,14 +62,14 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
       super(layout, settings, component);
       this.parentCollapsePanel = parentCollapsePanel;
    }
-   
+
    protected JLabel getJLabel(String text) {
       JLabel l = new JLabel(text);
       l.setFont(l.getFont().deriveFont(getSettings().getFontSize()));
       l.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
       return l;
    }
-   
+
    protected TermComponentLabel getLabel(int nid, boolean canDrop)
            throws IOException {
       try {
@@ -99,7 +99,7 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
          collapseExpandButton.setIcon(new ImageIcon(
                     CollapsePanel.class.getResource(ArenaComponentSettings.IMAGE_PATH
                     + (collapsed ? "maximize.gif"
-                    : "minimize.gif"))));     
+                    : "minimize.gif"))));
       }
       setPanelVisibility(refexSubPanels, panels, SubPanelTypes.REFEX);
       setPanelVisibility(alertSubPanels, panels, SubPanelTypes.ALERT);
@@ -113,7 +113,7 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
          collapseExpandButton.setIcon(new ImageIcon(
                     CollapsePanel.class.getResource(ArenaComponentSettings.IMAGE_PATH
                     + (collapsed ? "maximize.gif"
-                    : "minimize.gif"))));     
+                    : "minimize.gif"))));
       }
        setPanelVisibility(refexSubPanels, panels, null);
       setPanelVisibility(alertSubPanels, panels, null);
@@ -131,7 +131,7 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
          }
       }
    }
-   
+
    public List<JComponent> getAlertSubpanels() {
       return alertSubPanels;
    }
@@ -155,18 +155,18 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
    public int getTemplateSubpanelCount() {
       return templateSubPanels.size();
    }
-   
+
    public int getSubpanelCount() {
-      return getAlertSubpanelCount() + getRefexSubpanelCount() 
+      return getAlertSubpanelCount() + getRefexSubpanelCount()
               + getTemplateSubpanelCount();
    }
-   
+
    protected JButton getCollapseExpandButton() {
       collapseExpandButton = new JButton(new AbstractAction("", new ImageIcon(
               ConceptViewRenderer.class.getResource(ArenaComponentSettings.IMAGE_PATH + "minimize.gif"))) {
 
          /**
-          * 
+          *
           */
          private static final long serialVersionUID = 1L;
 
@@ -174,9 +174,9 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
          public void actionPerformed(ActionEvent e) {
             collapsed = !collapsed;
             if (collapsed) {
-               hideSubPanels(parentCollapsePanel.subpanelsToShow);
+               hideSubPanels(parentCollapsePanel.getSubpanelsToShow());
             } else {
-               showSubPanels(parentCollapsePanel.subpanelsToShow);
+               showSubPanels(parentCollapsePanel.getSubpanelsToShow());
             }
             ((JButton) e.getSource()).setIcon(new ImageIcon(
                     CollapsePanel.class.getResource(ArenaComponentSettings.IMAGE_PATH
@@ -189,14 +189,14 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
       collapseExpandButton.setToolTipText("Collapse/Expand");
       collapseExpandButton.setOpaque(false);
       collapseExpandButton.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 6));
-      if (getSubpanelCount() == -1/*TODO*/) {
+      if (getSubpanelCount() == 0) {
          collapseExpandButton.setIcon(null);
          collapseExpandButton.setEnabled(false);
       }
       return collapseExpandButton;
    }
 
-     
+
    protected T getComponentVersion() {
       return getThingToDrag();
    }
@@ -207,31 +207,35 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
       addTemplateSubpanels(gbc);
   }
 
-   
+
    public void addRefexPanels(GridBagConstraints gbc) throws IOException {
       gbc.gridy++;
       gbc.gridwidth = gbc.gridx;
       gbc.gridx = 1;
       gbc.weightx = 1;
-      gbc.fill = gbc.HORIZONTAL;
-      Collection<? extends RefexVersionBI<?>> refexes = 
-                getThingToDrag().getCurrentRefexes(getSettings().getConfig().getViewCoordinate());
+      gbc.fill = GridBagConstraints.HORIZONTAL;
+      Collection<? extends RefexVersionBI<?>> refexes =
+                getThingToDrag().getCurrentRefexes(
+              getSettings().getConfig().getViewCoordinate());
       for (RefexVersionBI<?> rx: refexes) {
-          DragPanelExtension dpe = new DragPanelExtension(getSettings(), null, rx);
+          DragPanelExtension dpe =
+                  new DragPanelExtension(getSettings(), null, rx);
           dpe.setBorder(BorderFactory.createEtchedBorder());
+          dpe.setVisible(parentCollapsePanel.areRefexesShown() &&
+                  parentCollapsePanel.areExtrasShown());
           add(dpe, gbc);
           refexSubPanels.add(dpe);
           gbc.gridy++;
       }
    }
-   
+
   public void addWarningPanels(GridBagConstraints gbc) throws IOException {
- 
+
   }
-  
-  
+
+
   public void addTemplateSubpanels(GridBagConstraints gbc) throws IOException {
- 
-  
+
+
   }
 }
