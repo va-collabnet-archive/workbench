@@ -3038,7 +3038,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         
     // ICD-0-3 == cff53f1a-1d11-5ae7-801e-d3301cfdbea0
     private static final UUID debugUuid01 = UUID.fromString("cff53f1a-1d11-5ae7-801e-d3301cfdbea0");
-    private static final UUID debugUuid02 = UUID.fromString("22949563-e40b-5121-81d9-ac7e38fcc956");
+    // UUID OF INTEREST
+    private static final UUID debugUuid02 = UUID.fromString("daa9598a-2ddb-5527-beda-ee4303a7656c");
     private static final UUID debugUuid03 = UUID.fromString("3ca0d065-06b8-596c-8ca0-e4d2a605701c");
     
     private void createEConcept(ArrayList<Sct1_ConRecord> conList,
@@ -3532,6 +3533,11 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     // :!!!:NYI: tmp.setAdditionalIdComponents(additionalIdComponents);
                     listErm.add(tmp);
                 } else if (r.valueType == Sct1_RefSetRecord.ValueType.STRING) {
+                    // :!!!:DEBUG:
+//                    UUID debugUuid = new UUID(r.refsetMemberUuidMsb, r.refsetMemberUuidLsb);
+//                    if (debugUuid.compareTo(debugUuid02) == 0) 
+//                        System.out.println(":!!!:DEBUG:");
+
                     ERefsetStrMember tmp = new ERefsetStrMember();
                     tmp.setRefsetUuid(new UUID(r.refsetUuidMsb, r.refsetUuidLsb));
                     tmp.setPrimordialComponentUuid(new UUID(r.refsetMemberUuidMsb,
@@ -3544,8 +3550,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     tmp.setStrValue(r.valueString);
 
                     if (rsmIdx < rsmMax) { // CHECK REVISIONS
-                        lastRefsetMemberUuidMsb = r.refsetUuidMsb;
-                        lastRefsetMemberUuidLsb = r.refsetUuidLsb;
+                        lastRefsetMemberUuidMsb = r.refsetMemberUuidMsb;
+                        lastRefsetMemberUuidLsb = r.refsetMemberUuidLsb;
                         r = rsByRsList.get(rsmIdx++);
                         if (r.refsetMemberUuidMsb == lastRefsetMemberUuidMsb
                                 && r.refsetMemberUuidLsb == lastRefsetMemberUuidLsb) {
@@ -3562,8 +3568,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                             do {
                                 // SET UP NEXT MEMBER
                                 if (rsmIdx < rsmMax) {
-                                    lastRefsetMemberUuidMsb = r.refsetUuidMsb;
-                                    lastRefsetMemberUuidLsb = r.refsetUuidLsb;
+                                    lastRefsetMemberUuidMsb = r.refsetMemberUuidMsb;
+                                    lastRefsetMemberUuidLsb = r.refsetMemberUuidLsb;
                                     r = rsByRsList.get(rsmIdx++);
                                     if (r.refsetMemberUuidMsb == lastRefsetMemberUuidMsb
                                             && r.refsetMemberUuidLsb == lastRefsetMemberUuidLsb) {
@@ -3604,9 +3610,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
         try {
             ec.writeExternal(dos);
-            if (theConUUID.compareTo(debugUuid01) == 0) {
-                getLog().info(":!!!:DEBUG: "  + ec);
-            }
+//            if (theConUUID.compareTo(debugUuid01) == 0) {
+//                getLog().info(":!!!:DEBUG: "  + ec);
+//            }
 
             countEConWritten++;
             if (countEConWritten % 50000 == 0)
