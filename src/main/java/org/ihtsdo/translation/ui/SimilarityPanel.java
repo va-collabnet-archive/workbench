@@ -72,6 +72,7 @@ public class SimilarityPanel extends JPanel {
 	private CustomTableColumnModel columnModel;
 	private TranslationProject project;
 	private WorkListMember worklistMember;
+	private JDialog similarityDialog;
 	
 	public SimilarityPanel() {
 		initComponents();
@@ -298,7 +299,7 @@ public class SimilarityPanel extends JPanel {
 
 	private void expandButtonActionPerformed(ActionEvent e) {
 		expandButton.setVisible(false);
-		final JDialog similarityDialog = new JDialog();
+		similarityDialog = new JDialog();
 		similarityDialog.setContentPane(similarityPanel);
 		similarityDialog.setModal(true);
 		similarityDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -380,7 +381,7 @@ public class SimilarityPanel extends JPanel {
 						I_GetConceptData concept = Terms.get().getConcept(item.getConceptId());
 						TranslationConceptEditorRO editorRO = new TranslationConceptEditorRO();
 						
-						JDialog ro = new JDialog();
+						JDialog ro = new JDialog(similarityDialog);
 						ro.setContentPane(editorRO);
 						ro.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 						ro.setSize(new Dimension(800,650));
@@ -389,9 +390,8 @@ public class SimilarityPanel extends JPanel {
 				        ro.setLocation(
 				            (pantalla.width - ventana.width) / 2,
 				            (pantalla.height - ventana.height) / 2);
-
-						
 						worklistMember.setId(item.getConceptId());
+						worklistMember.setUids(concept.getUUIDs());
 						editorRO.updateUI(project, worklistMember);
 						ro.setVisible(true);
 					} catch (TerminologyException e1) {
