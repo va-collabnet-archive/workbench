@@ -372,9 +372,18 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
 
             String targetCode = mapTargetidTargetcode.get(targetId);
 
-            a[maps] = new CrossMapRecord(conceptId, targetCode, priority);
+            if (targetCode != null) {
+                a[maps] = new CrossMapRecord(conceptId, targetCode, priority);
+                maps++;
+            } else {
+                getLog().info(
+                        "DATA ERROR: target not present: MAPCONCEPTID=" + line[MAPCONCEPTID]
+                                + " MAPPRIORITY=" + line[MAPPRIORITY] + " MAPTARGETID="
+                                + line[MAPTARGETID]);
+                a[maps] = new CrossMapRecord(conceptId, "TARGET_NOT_PRESENT", priority);
+                maps++;
+            }
 
-            maps++;
         }
         br.close();
 
