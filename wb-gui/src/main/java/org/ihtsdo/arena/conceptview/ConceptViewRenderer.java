@@ -19,10 +19,12 @@ import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -149,8 +151,8 @@ public class ConceptViewRenderer extends JLayeredPane {
    private JScrollPane scrollPane;
    private JToggleButton workflowToggleButton;
    private JToggleButton oopsButton;
-   private static String advanceWorkflowActionPath = "plugins/migration-wf/";
-   private static String advanceWorkflowActionFile = "AdvanceWorkflow.bp";
+   private final static String advanceWorkflowActionPath = "migration-wf";
+   private final String advanceWorkflowActionFile = "AdvanceWorkflow.bp";
 
    /**
     *
@@ -159,11 +161,12 @@ public class ConceptViewRenderer extends JLayeredPane {
            final mxGraphComponent graphContainer, ACE ace) {
 
       wizardPanel =
-           new WizardPanel(new FlowLayout(FlowLayout.LEADING, 10, 10), this);
+           		new WizardPanel(new FlowLayout(FlowLayout.LEADING, 10, 10), this);
       wizardScrollPane = new JScrollPane(wizardPanel,
-           ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-           ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);      try {
-         contextualConceptActionsKBase = EditPanelKb.setupKb(new File("drools-rules/ContextualConceptActionsPanel.drl"));
+    		  		ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+    		  		ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);      
+      try {
+        	   contextualConceptActionsKBase = EditPanelKb.setupKb(new File("drools-rules/ContextualConceptActionsPanel.drl"));
       } catch (IOException e1) {
          throw new RuntimeException(e1);
       }
@@ -242,7 +245,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                   remove(scrollPane);
                   workflowPanel.removeAll();
                   setupWorkflow();
-               }
+              }
             } else {
                showConceptPanel();
             }
@@ -269,11 +272,13 @@ public class ConceptViewRenderer extends JLayeredPane {
             }
 
 
-            File wfBpFile = new File(advanceWorkflowActionPath + advanceWorkflowActionFile);
+            File wfBpFile = new File(advanceWorkflowActionPath  + File.separator + advanceWorkflowActionFile);
             boolean capWorkflow = wfBpFile.exists();
             if (capWorkflow) {
                capWorkflowSetup(capWorkflow, availableActions, wfBpFile, wfHandler, possibleActions);
                capOopsButton();
+            } else {
+            	AceLog.getAppLog().log(Level.SEVERE, "Unable to find AdvanceWorkflow.bp file at path specified: " + advanceWorkflowActionPath + File.separator + advanceWorkflowActionFile, new FileNotFoundException());
             }
 
             add(workflowScrollPane, BorderLayout.CENTER);
@@ -470,9 +475,6 @@ public class ConceptViewRenderer extends JLayeredPane {
       footerPanel.setBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, Color.gray));
       add(footerPanel, BorderLayout.SOUTH);
 
-      //add(workflowPanel);
-      //workflowPanel.setVisible(false);
-      //workflowPanel.setBounds(0, 0, 100, 200);
       setMinimumSize(new Dimension(40, 20));
       RendererComponentAdaptor rca = new RendererComponentAdaptor();
       addAncestorListener(rca);
