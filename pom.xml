@@ -49,7 +49,7 @@
       <drools.version>5.1.1</drools.version>
       <mvel2.version>2.0.16</mvel2.version>
       <org.apache.lucene.version>3.0.3</org.apache.lucene.version>
-      <wb-icons-version>1.0.4-SNAPSHOT</wb-icons-version>
+      <wb-icons-version>1.0.4</wb-icons-version>
       <je.version>4.1.7</je.version>
       <svnusername>${relusername}</svnusername>
       <svnpassword>${relpassword}</svnpassword>
