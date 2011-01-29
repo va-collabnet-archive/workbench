@@ -24,10 +24,10 @@ public class CollapsePanelPrefs implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
-   private boolean extrasShown;
+   private boolean extrasShown = false;
    private EnumSet<ComponentVersionDragPanel.SubPanelTypes> subpanelsToShow =
            EnumSet.noneOf(ComponentVersionDragPanel.SubPanelTypes.class);
-
+   private boolean collapsed = false;
 
    public CollapsePanelPrefs(CollapsePanelPrefs other) {
       subpanelsToShow = other.subpanelsToShow.clone();
@@ -39,6 +39,7 @@ public class CollapsePanelPrefs implements Serializable {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
+        out.writeBoolean(collapsed);
         out.writeBoolean(extrasShown);
         out.writeObject(subpanelsToShow);
     }
@@ -47,6 +48,7 @@ public class CollapsePanelPrefs implements Serializable {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             //
+           collapsed = in.readBoolean();
            extrasShown = in.readBoolean();
            subpanelsToShow = (EnumSet<SubPanelTypes>) in.readObject();
         } else {
@@ -102,5 +104,15 @@ public class CollapsePanelPrefs implements Serializable {
          subpanelsToShow.remove(SubPanelTypes.TEMPLATE);
       }
    }
+
+   public boolean isCollapsed() {
+      return collapsed;
+   }
+
+   public void setCollapsed(boolean collapsed) {
+      this.collapsed = collapsed;
+   }
+
+
 
 }
