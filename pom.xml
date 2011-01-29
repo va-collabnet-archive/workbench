@@ -20,21 +20,21 @@
   <properties>
     <branch>migration</branch>
     <!-- must be trek as it has the required wb-mojo changes -->
-    <wb-toolkit.version>2.6.0-trek-12-SNAPSHOT</wb-toolkit.version>
+    <wb-toolkit.version>2.6.0-trek-12</wb-toolkit.version>
     <org.dwfa.jini.version>2.1</org.dwfa.jini.version>
     <org.apache.lucene.version>3.0.3</org.apache.lucene.version>
     <baseline.database.version>2010.01.31-build-1-SNAPSHOT</baseline.database.version>
     <berkeleydb.svn.url>https://csfe.aceworkspace.net/svn/repos/workbench/wb-sample-pa/berkeley-db</berkeleydb.svn.url>
     <poi.version>3.7</poi.version>
     <tika.version>0.4</tika.version>
-    <wb-icons-version>1.0.4-SNAPSHOT</wb-icons-version>
+    <wb-icons-version>1.0.4</wb-icons-version>
     <org.drools.version>5.1.1</org.drools.version>
     <org.mvel.version>2.0.16</org.mvel.version>
-    <org.ihtsdo.resources.version>1.5-SNAPSHOT</org.ihtsdo.resources.version>
-    <org.ihtsdo.admin.bp.version>1.7-SNAPSHOT</org.ihtsdo.admin.bp.version>
-    <org.ihtsdo.user.bp.version>1.7-SNAPSHOT</org.ihtsdo.user.bp.version>
-    <org.ihtsdo.mrcm.specs.version>0.0.1-SNAPSHOT</org.ihtsdo.mrcm.specs.version>
-    <org.ihtsdo.migration-wf-data>0.0.1-SNAPSHOT</org.ihtsdo.migration-wf-data>
+    <org.ihtsdo.resources.version>1.5</org.ihtsdo.resources.version>
+    <org.ihtsdo.admin.bp.version>1.7</org.ihtsdo.admin.bp.version>
+    <org.ihtsdo.user.bp.version>1.7</org.ihtsdo.user.bp.version>
+    <org.ihtsdo.mrcm.specs.version>0.0.1</org.ihtsdo.mrcm.specs.version>
+    <org.ihtsdo.migration-wf-data>0.0.1</org.ihtsdo.migration-wf-data>
   </properties>
   <dependencyManagement>
     <dependencies>
