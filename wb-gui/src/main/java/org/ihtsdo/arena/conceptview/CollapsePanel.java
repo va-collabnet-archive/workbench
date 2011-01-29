@@ -203,6 +203,7 @@ public class CollapsePanel extends JPanel {
                }
             }
             setExtrasIcon();
+            updateExtras();
          }
       });
       extrasButton.setPreferredSize(new Dimension(21, 16));
@@ -212,6 +213,7 @@ public class CollapsePanel extends JPanel {
       extrasButton.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 6));
       extrasButton.setSelected(areExtrasShown());
       setExtrasIcon();
+      updateExtras();
       return extrasButton;
    }
 
