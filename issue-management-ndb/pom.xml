@@ -8,7 +8,7 @@
 	</parent>
 	<artifactId>issue-management-ndb</artifactId>
 	<packaging>jar</packaging>
-	<name>issue-management-ndb</name>
+	<name>issue-management</name>
 	<description>CollabNet Issue Issue Management with New BDB</description>
 	<url>http://maven.apache.org</url>
 	<scm>
