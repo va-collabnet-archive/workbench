@@ -44,7 +44,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JList;
@@ -2265,6 +2264,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     public void setShowSignpostPanel(boolean show) {
         aceFrame.setShowSignpostPanel(show);
+
+    }
+
+    public void setShowWorkflowSignpostPanel(boolean show) {
+        aceFrame.setShowWorkflowSignpostPanel(show);
 
     }
 
