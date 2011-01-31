@@ -924,6 +924,10 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         frameConfig.setShowSignpostPanel(show);
     }
 
+    public void setShowWorkflowSignpostPanel(boolean show) {
+    	frameConfig.setShowWorkflowSignpostPanel(show);
+    }
+    
     public void setShowViewerImagesInTaxonomy(Boolean showViewerImagesInTaxonomy) {
         frameConfig.setShowViewerImagesInTaxonomy(showViewerImagesInTaxonomy);
     }

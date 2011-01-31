@@ -345,6 +345,8 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void setShowSignpostPanel(boolean show);
 
+    public void setShowWorkflowSignpostPanel(boolean show);
+
     public void setSignpostToggleVisible(boolean show);
 
     public void setSignpostToggleEnabled(boolean enabled);

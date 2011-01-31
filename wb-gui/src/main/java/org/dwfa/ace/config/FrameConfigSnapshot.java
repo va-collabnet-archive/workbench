@@ -772,6 +772,10 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     }
 
+    public void setShowWorkflowSignpostPanel(boolean show) {
+    	throw new UnsupportedOperationException();
+    }
+    
     public void setShowViewerImagesInTaxonomy(Boolean showViewerImagesInTaxonomy) {
         throw new UnsupportedOperationException();
 

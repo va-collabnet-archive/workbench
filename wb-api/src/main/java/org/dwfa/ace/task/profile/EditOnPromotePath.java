@@ -957,6 +957,10 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         config.setShowSignpostPanel(show);
     }
 
+    public void setShowWorkflowSignpostPanel(boolean show) {
+    	config.setShowWorkflowSignpostPanel(show);
+    }
+    
     public void setShowViewerImagesInTaxonomy(Boolean showViewerImagesInTaxonomy) {
         config.setShowViewerImagesInTaxonomy(showViewerImagesInTaxonomy);
     }

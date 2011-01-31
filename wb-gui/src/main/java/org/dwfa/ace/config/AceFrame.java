@@ -397,6 +397,10 @@ public class AceFrame extends ComponentFrame {
         getCdePanel().setShowSignpostPanel(show);
     }
 
+    public void setShowWorkflowSignpostPanel(boolean show) {
+        getCdePanel().setShowWorkflowSignpostPanel(show);
+    }
+
     public void setShowSignpostToggleVisible(boolean visible) {
         getCdePanel().setShowSignpostToggleVisible(visible);
     }

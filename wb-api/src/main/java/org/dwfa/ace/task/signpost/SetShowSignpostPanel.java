@@ -71,6 +71,8 @@ public class SetShowSignpostPanel extends AbstractTask {
             SwingUtilities.invokeAndWait(new Runnable() {
                 public void run() {
                     configFrame.setShowSignpostPanel(show);
+                    configFrame.setShowWorkflowSignpostPanel(false);
+
                 }
             });
 
