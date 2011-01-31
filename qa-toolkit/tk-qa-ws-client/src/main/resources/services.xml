@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This file was auto-generated from WSDL -->
+<!-- by the Apache Axis2 version: 1.5.2  Built on : Sep 06, 2010 (09:42:01 CEST) -->
+<serviceGroup>
+    <service name="qadb-service">
+        <messageReceivers>
+            <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out" class="org.ihtsdo.qadb.ws.QadbServiceMessageReceiverInOut"/>
+        </messageReceivers>
+        <parameter name="ServiceClass">org.ihtsdo.qadb.ws.QadbServiceImpl</parameter>
+        <parameter name="useOriginalwsdl">true</parameter>
+        <parameter name="modifyUserWSDLPortAddress">true</parameter>
+        <operation name="getCase" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://www.ihtsdo.org/qadb/qadb-service/">
+            <actionMapping>http://www.ihtsdo.org/qadb/qadb-service/getCase</actionMapping>
+            <outputActionMapping>http://www.ihtsdo.org/qadb/qadb-service/qadb-data/getCaseResponse</outputActionMapping>
+        </operation>
+        <operation name="getQACasesReportLinesByPage" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://www.ihtsdo.org/qadb/qadb-service/">
+            <actionMapping>http://www.ihtsdo.org/qadb/qadb-service/getQACasesReportLinesByPage</actionMapping>
+            <outputActionMapping>http://www.ihtsdo.org/qadb/qadb-service/qadb-data/getQACasesReportLinesByPageResponse</outputActionMapping>
+        </operation>
+        <operation name="getAllDispositionStatus" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://www.ihtsdo.org/qadb/qadb-service/">
+            <actionMapping>http://www.ihtsdo.org/qadb/qadb-service/getAllDispositionStatus</actionMapping>
+            <outputActionMapping>http://www.ihtsdo.org/qadb/qadb-service/qadb-data/getAllDispositionStatusResponse</outputActionMapping>
+        </operation>
+        <operation name="getAllRules" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://www.ihtsdo.org/qadb/qadb-service/">
+            <actionMapping>http://www.ihtsdo.org/qadb/qadb-service/getAllRules</actionMapping>
+            <outputActionMapping>http://www.ihtsdo.org/qadb/qadb-service/qadb-data/getAllRulesResponse</outputActionMapping>
+        </operation>
+        <operation name="getRule" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://www.ihtsdo.org/qadb/qadb-service/">
+            <actionMapping>http://www.ihtsdo.org/qadb/qadb-service/getRule</actionMapping>
+            <outputActionMapping>http://www.ihtsdo.org/qadb/qadb-service/qadb-data/getRuleResponse</outputActionMapping>
+        </operation>
+        <operation name="getAllPathsForDatabase" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://www.ihtsdo.org/qadb/qadb-service/">
+            <actionMapping>http://www.ihtsdo.org/qadb/qadb-service/getAllPathsForDatabase</actionMapping>
+            <outputActionMapping>http://www.ihtsdo.org/qadb/qadb-service/qadb-data/getAllPathsForDatabaseResponse</outputActionMapping>
+        </operation>
+        <operation name="getExecution" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://www.ihtsdo.org/qadb/qadb-service/">
+            <actionMapping>http://www.ihtsdo.org/qadb/qadb-service/getExecution</actionMapping>
+            <outputActionMapping>http://www.ihtsdo.org/qadb/qadb-service/qadb-data/getExecutionResponse</outputActionMapping>
+        </operation>
+        <operation name="getAllDatabases" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://www.ihtsdo.org/qadb/qadb-service/">
+            <actionMapping>http://www.ihtsdo.org/qadb/qadb-service/getAllDatabases</actionMapping>
+            <outputActionMapping>http://www.ihtsdo.org/qadb/qadb-service/qadb-data/getAllDatabasesResponse</outputActionMapping>
+        </operation>
+        <operation name="persistsQARule" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://www.ihtsdo.org/qadb/qadb-service/">
+            <actionMapping>http://www.ihtsdo.org/qadb/qadb-service/persistsQARule</actionMapping>
+            <outputActionMapping>http://www.ihtsdo.org/qadb/qadb-service/qadb-data/persistsQARuleResponse</outputActionMapping>
+            <faultActionMapping faultName="fault">http://www.ihtsdo.org/qadb/qadb-service/qadb-data/persistsQARule/Fault/fault</faultActionMapping>
+            <faultActionMapping faultName="persistsQARuleFault">urn:persistsQARulepersistsQARuleFault</faultActionMapping>
+        </operation>
+        <operation name="getAllSeverities" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://www.ihtsdo.org/qadb/qadb-service/">
+            <actionMapping>http://www.ihtsdo.org/qadb/qadb-service/getAllSeverities</actionMapping>
+            <outputActionMapping>http://www.ihtsdo.org/qadb/qadb-service/qadb-data/getAllSeveritiesResponse</outputActionMapping>
+        </operation>
+        <operation name="getAllPaths" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://www.ihtsdo.org/qadb/qadb-service/">
+            <actionMapping>http://www.ihtsdo.org/qadb/qadb-service/getAllPaths</actionMapping>
+            <outputActionMapping>http://www.ihtsdo.org/qadb/qadb-service/qadb-data/getAllPathsResponse</outputActionMapping>
+        </operation>
+        <operation name="getComponent" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://www.ihtsdo.org/qadb/qadb-service/">
+            <actionMapping>http://www.ihtsdo.org/qadb/qadb-service/getComponent</actionMapping>
+            <outputActionMapping>http://www.ihtsdo.org/qadb/qadb-service/qadb-data/getComponentResponse</outputActionMapping>
+        </operation>
+        <operation name="getAllCategories" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://www.ihtsdo.org/qadb/qadb-service/">
+            <actionMapping>http://www.ihtsdo.org/qadb/qadb-service/getAllCategories</actionMapping>
+            <outputActionMapping>http://www.ihtsdo.org/qadb/qadb-service/qadb-data/getAllCategoriesResponse</outputActionMapping>
+        </operation>
+        <operation name="getRulesReportLinesByPage" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://www.ihtsdo.org/qadb/qadb-service/">
+            <actionMapping>http://www.ihtsdo.org/qadb/qadb-service/getRulesReportLinesByPage</actionMapping>
+            <outputActionMapping>http://www.ihtsdo.org/qadb/qadb-service/qadb-data/getRulesReportLinesByPageResponse</outputActionMapping>
+        </operation>
+        <operation name="getAllComponents" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://www.ihtsdo.org/qadb/qadb-service/">
+            <actionMapping>http://www.ihtsdo.org/qadb/qadb-service/getAllComponents</actionMapping>
+            <outputActionMapping>http://www.ihtsdo.org/qadb/qadb-service/qadb-data/getAllComponentsResponse</outputActionMapping>
+        </operation>
+        <operation name="persistQACaseList" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://www.ihtsdo.org/qadb/qadb-service/">
+            <actionMapping>http://www.ihtsdo.org/qadb/qadb-service/persistQACaseList</actionMapping>
+            <outputActionMapping>http://www.ihtsdo.org/qadb/qadb-service/qadb-data/persistQACaseListResponse</outputActionMapping>
+            <faultActionMapping faultName="fault">http://www.ihtsdo.org/qadb/qadb-service/qadb-data/persistQACaseList/Fault/fault</faultActionMapping>
+            <faultActionMapping faultName="persistQACaseListFault">urn:persistQACaseListpersistQACaseListFault</faultActionMapping>
+        </operation>
+        <operation name="persistQACase" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://www.ihtsdo.org/qadb/qadb-service/">
+            <actionMapping>http://www.ihtsdo.org/qadb/qadb-service/persistQACase</actionMapping>
+            <outputActionMapping>http://www.ihtsdo.org/qadb/qadb-service/qadb-data/persistQACaseResponse</outputActionMapping>
+        </operation>
+        <operation name="persistQAComment" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://www.ihtsdo.org/qadb/qadb-service/">
+            <actionMapping>http://www.ihtsdo.org/qadb/qadb-service/persistQAComment</actionMapping>
+            <outputActionMapping>http://www.ihtsdo.org/qadb/qadb-service/qadb-data/persistQACommentResponse</outputActionMapping>
+            <faultActionMapping faultName="fault">http://www.ihtsdo.org/qadb/qadb-service/qadb-data/persistQAComment/Fault/fault</faultActionMapping>
+            <faultActionMapping faultName="persistQACommentFault">urn:persistQACommentpersistQACommentFault</faultActionMapping>
+        </operation>
+        <operation name="getQADatabase" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://www.ihtsdo.org/qadb/qadb-service/">
+            <actionMapping>http://www.ihtsdo.org/qadb/qadb-service/getQADatabase</actionMapping>
+            <outputActionMapping>http://www.ihtsdo.org/qadb/qadb-service/qadb-data/getQADatabaseResponse</outputActionMapping>
+        </operation>
+        <operation name="getFinding" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://www.ihtsdo.org/qadb/qadb-service/">
+            <actionMapping>http://www.ihtsdo.org/qadb/qadb-service/getFinding</actionMapping>
+            <outputActionMapping>http://www.ihtsdo.org/qadb/qadb-service/qadb-data/getFindingResponse</outputActionMapping>
+        </operation>
+    </service>
+</serviceGroup>

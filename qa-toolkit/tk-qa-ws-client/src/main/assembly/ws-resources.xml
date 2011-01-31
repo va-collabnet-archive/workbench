@@ -1,0 +1,16 @@
+<assembly>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <directory>src/main/resources</directory>
+      <outputDirectory>/resources</outputDirectory>
+      <includes>
+        <include>**/*.xml</include>
+        <include>**/*.wsdl</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+  <includeBaseDirectory>false</includeBaseDirectory>
+</assembly>
