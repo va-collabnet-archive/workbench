@@ -45,7 +45,6 @@ import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefsetSearcher;
 */
 public class WorkflowHelper {
 	private static HashMap<String, I_GetConceptData> modelers = null;
-	private static HashMap<String, UUID> modelersUuids = null;
 	private static I_IntSet allowedTypes = null;
 	private static I_IntSet allowedStatuses = null;
 	private static PositionSetReadOnly viewPositions = null;
@@ -53,7 +52,6 @@ public class WorkflowHelper {
 	private static I_ManageContradiction contractionResolutionStrategy = null;
 	private static I_GetConceptData leadModeler = null;
 	private static final String unrecognizedLoginMessage = "Login is unrecognlized.  You will be defaulted to generic-user workflow permissions";
-	private static int fsnDescriptionTypeNid = 0;
 	private static I_GetConceptData defaultModeler = null;
 
 	private static class WfHxConceptComparer implements Comparator<I_GetConceptData> {
@@ -62,8 +60,7 @@ public class WorkflowHelper {
 			try {
 				return (o1.getInitialText().toLowerCase().compareTo(o2.getInitialText().toLowerCase()));
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	        	AceLog.getAppLog().log(Level.SEVERE, "Error in creating WF Class WfHxConceptComparer", e);
 			}
 			return -1;
 		}
@@ -74,12 +71,8 @@ public class WorkflowHelper {
 		public int compare(UUID o1, UUID o2) {
 			try {
 				return (Terms.get().getConcept(o1).getInitialText().toLowerCase().compareTo(Terms.get().getConcept(o2).getInitialText().toLowerCase()));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TerminologyException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (Exception e) {
+	        	AceLog.getAppLog().log(Level.SEVERE, "Error in creating WF Class WfHxUidConceptComparer", e);
 			}
 			return -1;
 		}
@@ -94,9 +87,8 @@ public class WorkflowHelper {
 			viewPositions = Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly();
 			precedencePolicy = Terms.get().getActiveAceFrameConfig().getPrecedence();
 			contractionResolutionStrategy = Terms.get().getActiveAceFrameConfig().getConflictResolutionStrategy();
-			fsnDescriptionTypeNid =  Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()).getNid();
 		} catch (Exception e) {
-			e.printStackTrace();
+        	AceLog.getAppLog().log(Level.SEVERE, "Error in creating WF Class WorkflowHelper", e);
 		}
 	}
 
@@ -105,7 +97,6 @@ public class WorkflowHelper {
 	}
 	@SuppressWarnings("unchecked")
 	public static String identifyPrefTerm(I_GetConceptData con)  {
-    	Collection<I_DescriptionVersioned> c;
         try {
 			for (I_DescriptionVersioned<?> descv: con.getDescriptions()) {
 			    for (I_DescriptionTuple p: descv.getTuples()) {
@@ -113,19 +104,14 @@ public class WorkflowHelper {
 						return p.getText();
 			    }
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+        	AceLog.getAppLog().log(Level.SEVERE, "Error in identifying current editor", e);
 		}
 
         return "";
     }
 	@SuppressWarnings("unchecked")
 	public static String identifyFSN(I_GetConceptData con)  {
-    	Collection<I_DescriptionVersioned> c;
 		try {
 			for (I_DescriptionVersioned<?> descv: con.getDescriptions()) {
 			    for (I_DescriptionTuple p: descv.getTuples()) {
@@ -133,59 +119,14 @@ public class WorkflowHelper {
 						return p.getText();
 		   		}
 	   		}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+        	AceLog.getAppLog().log(Level.SEVERE, "Error in identifying current concept's FSN", e);
 		}
 
    		return "";
 		
     }
-/*
-	public static void retireWorkflowHistoryRow(WorkflowHistoryJavaBean wfhjb) {
-		System.out.println(wfhjb);
 
-		I_TermFactory tf = Terms.get();
-		WorkflowHistoryRefsetWriter writer;
-
-		try {
-			writer = new WorkflowHistoryRefsetWriter();
-
-			if (!WorkflowHistoryRefsetWriter.isInUse()) {
-
-				WorkflowHistoryRefsetWriter.lockMutex();
-
-				writer.setPathUid(wfhjb.getPath());
-				writer.setModelerUid(wfhjb.getModeler());
-				writer.setConceptUid(wfhjb.getConceptId());
-				writer.setFSN(wfhjb.getFSN());
-				writer.setUseCaseUid(wfhjb.getUseCase());
-				writer.setActionUid(wfhjb.getAction());
-				writer.setStateUid(wfhjb.getState());
-
-				writer.setWorkflowUid(wfhjb.getWorkflowId());
-
-				writer.setTimeStamp(System.currentTimeMillis());
-				writer.setRefsetColumnTimeStamp(wfhjb.getRefsetColumnTimeStamp());
-
-				writer.retireMember();
-				WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
-				tf.addUncommitted(refset.getRefsetConcept());
-
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (TerminologyException e) {
-			e.printStackTrace();
-		}
-
-		WorkflowHistoryRefsetWriter.unLockMutex();
-
-	}
-*/
 	public static void retireWorkflowHistoryRow(WorkflowHistoryJavaBean wfhjb)
  	{
 		WorkflowHistoryRefsetWriter writer;
@@ -213,12 +154,8 @@ public class WorkflowHelper {
 			Terms.get().addUncommitted(writer.getRefsetConcept());
 			Terms.get().commit();
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (TerminologyException e) {
-			e.printStackTrace();
-		} catch (Throwable e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+        	AceLog.getAppLog().log(Level.SEVERE, "Error in retiring workflow history row: " + wfhjb.toString(), e);
 		}
 		WorkflowHistoryRefsetWriter.unLockMutex();
 	}
@@ -227,8 +164,6 @@ public class WorkflowHelper {
 	{
 		try {
 	    	modelers = new HashMap<String, I_GetConceptData>();
-	    	modelersUuids = new HashMap<String, UUID>();
-	    	I_TermFactory tf = Terms.get();
 	
 			I_GetConceptData parentEditorConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
 			Set<I_GetConceptData> editors = getChildren(parentEditorConcept);
@@ -385,7 +320,7 @@ public class WorkflowHelper {
 
     		Terms.get().getActiveAceFrameConfig().setWorkflowRoles(sortedRoles);
     	} catch (Exception e) {
-    		e.printStackTrace();
+        	AceLog.getAppLog().log(Level.SEVERE, "Error in updating workflow user roles", e);
     	}
     }
 
@@ -402,7 +337,7 @@ public class WorkflowHelper {
 
     		Terms.get().getActiveAceFrameConfig().setWorkflowStates(sortedStates);
     	} catch (Exception e) {
-    		e.printStackTrace();
+        	AceLog.getAppLog().log(Level.SEVERE, "Error in updating workflow states", e);
     	}
     }
 
@@ -441,7 +376,7 @@ public class WorkflowHelper {
     		Terms.get().getActiveAceFrameConfig().setWorkflowActions(sortedActions);
     		Terms.get().getActiveAceFrameConfig().setAllAvailableWorkflowActionUids(sortedAvailableActions);
     	} catch (Exception e) {
-    		e.printStackTrace();
+        	AceLog.getAppLog().log(Level.SEVERE, "Error in updating workflow actions", e);
     	}
     }
 
@@ -559,7 +494,7 @@ public class WorkflowHelper {
 					return true;
 			}
     	} catch (Exception e) {
-    		e.printStackTrace();
+        	AceLog.getAppLog().log(Level.SEVERE, "Error in identifying if current action is a BEGIN-WORKFLOW action", e);
     	}
 
     	return false;
@@ -582,8 +517,6 @@ public class WorkflowHelper {
 
 		// Get Current WF Status for Concept
         SortedSet<WorkflowHistoryJavaBean> beanList = historySearcher.getWfHxByConcept(concept);
-        Iterator<WorkflowHistoryJavaBean> itr = beanList.iterator();
-
 
         if (beanList.size() > 0)
         {
