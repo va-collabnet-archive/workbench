@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
@@ -41,9 +41,9 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 		{
 			I_GetConceptData val = ((EditorCategoryRefset)refset).getEditorCategory(prop);
 
-			List<? extends I_RelTuple> relList = WorkflowHelper.getWorkflowRelationship(val, ArchitectonicAuxiliary.Concept.WORKFLOW_ROLE_VALUE);
+			List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(val, ArchitectonicAuxiliary.Concept.WORKFLOW_ROLE_VALUE);
 
-			for (I_RelTuple rel : relList)
+			for (I_RelVersioned rel : relList)
 			{
 				if (rel != null &&
 					rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_AUTOMOTAIC_APPROVAL.getPrimoridalUid()).getConceptNid())

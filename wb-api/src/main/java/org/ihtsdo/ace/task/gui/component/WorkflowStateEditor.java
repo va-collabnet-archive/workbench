@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.tasks.editor.AbstractComboEditor;
@@ -40,11 +40,11 @@ public class WorkflowStateEditor extends AbstractComboEditor {
     	try {
     		for (I_GetConceptData state : Terms.get().getActiveAceFrameConfig().getWorkflowStates())
     		{
-				List<? extends I_RelTuple> useCaseRels = WorkflowHelper.getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE);
+				List<I_RelVersioned> useCaseRels = WorkflowHelper.getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE);
 
 				boolean foundUseCase = false;
-				for (I_RelTuple rel : useCaseRels)
 				{
+					for (I_RelVersioned rel : useCaseRels)
 					if (rel != null &&
 					    (rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EXISTING_CONCEPT.getPrimoridalUid()).getConceptNid() ||
 						 rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_NEW_CONCEPT.getPrimoridalUid()).getConceptNid()))

@@ -26,6 +26,7 @@ import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.tasks.editor.AbstractComboEditor;
@@ -62,10 +63,10 @@ public class WorkflowModelerEditor extends AbstractComboEditor {
 			
 			for (I_GetConceptData modeler : inactiveModelers)
 			{
-				List<? extends I_RelTuple> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_MODELER_VALUE);
+				List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_MODELER_VALUE);
 
 				boolean foundDefaultModeler = false;
-				for (I_RelTuple rel : relList)
+				for (I_RelVersioned  rel : relList)
 				{
 					if (rel != null &&
 						rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_DEFAULT_MODELER.getPrimoridalUid()).getConceptNid()) 
@@ -102,9 +103,9 @@ public class WorkflowModelerEditor extends AbstractComboEditor {
     }
 
 	private boolean isLeadModeler(I_GetConceptData modeler) throws TerminologyException, IOException {
-		List<? extends I_RelTuple> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_MODELER_VALUE);
+		List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_MODELER_VALUE);
 
-		for (I_RelTuple rel : relList)
+		for (I_RelVersioned rel : relList)
 		{
 			if (rel != null &&
 				rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_LEAD_MODELER.getPrimoridalUid()).getConceptNid())

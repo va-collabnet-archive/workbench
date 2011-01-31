@@ -11,7 +11,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
@@ -310,9 +310,9 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 	    	for (WorkflowHistoryJavaBean wfHistoryItem : singleWorkflowBucket) {
 	    		I_GetConceptData state = Terms.get().getConcept(wfHistoryItem.getState());
 	    		
-	    		List<? extends I_RelTuple> relList = WorkflowHelper.getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
+	    		List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
 	    		
-	    		for (I_RelTuple rel : relList)
+	    		for (I_RelVersioned rel : relList)
 	    		{
 	    			if (rel != null && 
 	    				rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACCEPT_ACTION.getPrimoridalUid()).getConceptNid())

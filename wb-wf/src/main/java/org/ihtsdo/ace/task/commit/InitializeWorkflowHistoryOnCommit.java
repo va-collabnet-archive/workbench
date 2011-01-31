@@ -42,7 +42,7 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
-import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.commit.AbstractConceptTest;
@@ -172,16 +172,16 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
     	{
 	    	for (I_GetConceptData action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
 	    	{
-	    		List<? extends I_RelTuple> relList = WorkflowHelper.getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
+	    		List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
 
-	    		for (I_RelTuple rel : relList)
+	    		for (I_RelVersioned rel : relList)
 	    		{
 	    			if (rel != null &&
 	        			rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_BEGIN_WF_CONCEPT.getPrimoridalUid()).getConceptNid())
     {
-	    				List<? extends I_RelTuple> commitRelList = WorkflowHelper.getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE);
+	    				List<I_RelVersioned> commitRelList = WorkflowHelper.getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE);
 
-	    	    		for (I_RelTuple commitRel : commitRelList)
+	    	    		for (I_RelVersioned commitRel : commitRelList)
 	    	    		{
 							if (commitRel != null &&
 								commitRel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_SINGLE_COMMIT.getPrimoridalUid()).getConceptNid())
@@ -214,9 +214,9 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
     	{
     		I_GetConceptData action = Terms.get().getConcept(latestBean.getAction());
 
-    		List<? extends I_RelTuple> relList = WorkflowHelper.getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
+    		List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
 
-    		for (I_RelTuple rel : relList)
+    		for (I_RelVersioned rel : relList)
     {
     			if (rel != null &&
     				rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACCEPT_ACTION.getPrimoridalUid()).getConceptNid())
@@ -242,9 +242,9 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
     	{
 				for (I_GetConceptData state : Terms.get().getActiveAceFrameConfig().getWorkflowStates())
     		{
-					List<? extends I_RelTuple> relList = WorkflowHelper.getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE);
+					List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE);
 
-		    		for (I_RelTuple rel : relList)
+		    		for (I_RelVersioned rel : relList)
     	{
 		    			if (rel != null &&
 							((existsInDb && (rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EXISTING_CONCEPT.getPrimoridalUid()).getConceptNid())) ||
@@ -306,9 +306,9 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
 		{
 			for (I_GetConceptData action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
 			{
-				List<? extends I_RelTuple> useCaseRel = WorkflowHelper.getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
+				List<I_RelVersioned> useCaseRel = WorkflowHelper.getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
 
-				for (I_RelTuple rel : useCaseRel)
+				for (I_RelVersioned rel : useCaseRel)
 				{
 					if (rel != null &&
 						rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACCEPT_ACTION.getPrimoridalUid()).getConceptNid())
