@@ -112,7 +112,8 @@ public class OpenDroolsEnumUpdatePanel extends AbstractTask {
 			signpostPanel.add(new DroolsEnumUpdatePanel(config, null), BorderLayout.CENTER);
 			signpostPanel.revalidate();
 			config.setShowSignpostPanel(true);
-
+			config.setShowWorkflowSignpostPanel(false);
+			
 			return Condition.CONTINUE;
 		} catch (Exception e) {
 			throw new TaskFailedException(e);

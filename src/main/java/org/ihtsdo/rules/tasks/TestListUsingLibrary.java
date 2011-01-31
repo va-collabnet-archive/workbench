@@ -138,6 +138,8 @@ public class TestListUsingLibrary extends AbstractTask {
 			signpostPanel.add(new RulesResultsPanel(results), BorderLayout.CENTER);
 			signpostPanel.revalidate();
 			config.setShowSignpostPanel(true);
+			config.setShowWorkflowSignpostPanel(false);
+			
 			return Condition.CONTINUE;
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
