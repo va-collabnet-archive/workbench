@@ -184,8 +184,10 @@
 					<aarName>qadb</aarName>
 					<classesDirectory></classesDirectory>
 					<includeDependencies>true</includeDependencies>
+					<axis2AdminConsoleURL>http://mgr.servers.aceworkspace.net:50008/axis2/axis2-admin</axis2AdminConsoleURL> 
+					<!-- 
 					<axis2AdminConsoleURL>http://localhost:8080/axis2/axis2-admin</axis2AdminConsoleURL>
-					<!-- <axis2AdminConsoleURL>http://mgr.servers.aceworkspace.net:50008/axis2/axis2-admin</axis2AdminConsoleURL> -->
+					-->
 
 					<axis2AdminPassword>axis2</axis2AdminPassword>
 					<axis2AdminUser>admin</axis2AdminUser>
