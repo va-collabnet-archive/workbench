@@ -1,9 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.ihtsdo</groupId>
+		<artifactId>qa-toolkit</artifactId>
+		<version>2.6.0-trek-13-SNAPSHOT</version>
+	</parent>
 
 	<groupId>org.ihtsdo</groupId>
 	<artifactId>tk-qadb-ws</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>qadb</name>
@@ -28,7 +32,7 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>tk-qa-ws-client</artifactId>
-			<version>2.6.0-trek-12-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
@@ -139,7 +143,7 @@
 										<artifactItem>
 											<groupId>${project.groupId}</groupId>
 											<artifactId>tk-qadb-ws</artifactId>
-											<version>0.0.1-SNAPSHOT</version>
+											<version>${project.version}</version>
 											<type>zip</type>
 										</artifactItem>
 									</artifactItems>
@@ -157,7 +161,7 @@
 										<artifactItem>
 											<groupId>${project.groupId}</groupId>
 											<artifactId>tk-qa-ws-client</artifactId>
-											<version>2.6.0-trek-12-SNAPSHOT</version>
+											<version>${project.version}</version>
 											<type>zip</type>
 										</artifactItem>
 									</artifactItems>
@@ -193,11 +197,9 @@
 							<aarName>qadb</aarName>
 							<classesDirectory></classesDirectory>
 							<includeDependencies>true</includeDependencies>
-							 <axis2AdminConsoleURL>http://localhost:8080/axis2/axis2-admin</axis2AdminConsoleURL> 
-							<!--
-							<axis2AdminConsoleURL>http://mgr.servers.aceworkspace.net:50008/axis2/axis2-admin</axis2AdminConsoleURL>
-							 -->
-							 
+							<axis2AdminConsoleURL>http://localhost:8080/axis2/axis2-admin</axis2AdminConsoleURL>
+							<!-- <axis2AdminConsoleURL>http://mgr.servers.aceworkspace.net:50008/axis2/axis2-admin</axis2AdminConsoleURL> -->
+
 							<axis2AdminPassword>axis2</axis2AdminPassword>
 							<axis2AdminUser>admin</axis2AdminUser>
 							<servicesXmlFile>${project.build.directory}/resources/services.xml</servicesXmlFile>
