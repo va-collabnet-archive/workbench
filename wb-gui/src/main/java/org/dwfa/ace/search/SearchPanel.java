@@ -242,8 +242,8 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
                     }
                     if (linkType == LINK_TYPE.TREE_LINK) {
                         try {
-                            new ExpandPathToNodeStateListener((JTreeWithDragImage) config.getTreeInTaxonomyPanel(),
-                                config, cb);
+                            new ExpandPathToNodeStateListener((JTreeWithDragImage) config.getTreeInTaxonomyPanel(), config,
+                                cb);
                             config.setHierarchySelection(cb);
                         } catch (IOException e1) {
                             AceLog.getAppLog().alertAndLogException(e1);
@@ -309,7 +309,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
     private class LinkEditor extends JLabel implements ChangeListener {
         /**
-		 * 
+		 *
 		 */
         private static final long serialVersionUID = 1L;
 
@@ -361,7 +361,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
     }
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 
@@ -424,7 +424,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "search");
         this.getActionMap().put("search", new AbstractAction("Search on enter") {
             /**
-             * 
+             *
              */
             private static final long serialVersionUID = 1L;
 
@@ -460,7 +460,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         gbc.fill = GridBagConstraints.BOTH;
         searchTypeCombo = new JComboBox(QUERY_TYPES) {
             /**
-			 * 
+			 *
 			 */
             private static final long serialVersionUID = 1L;
 
@@ -564,8 +564,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         ImageIconList.add(ConceptPanel.TREE_LINK_ICON);
 
         LinkListModel linkSpinnerModel =
-                new LinkListModel(ImageIconList.toArray(new ImageIcon[ImageIconList.size()]), LINK_TYPE.UNLINKED
-                    .ordinal());
+                new LinkListModel(ImageIconList.toArray(new ImageIcon[ImageIconList.size()]), LINK_TYPE.UNLINKED.ordinal());
 
         linkSpinner = new JSpinner(linkSpinnerModel);
         linkSpinner.setBorder(BorderFactory.createEmptyBorder(3, 3, 2, 5));
@@ -707,8 +706,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         this.doLayout();
     }
 
-    public CriterionPanel makeCriterionPanel() throws ClassNotFoundException, InstantiationException,
-            IllegalAccessException {
+    public CriterionPanel makeCriterionPanel() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         return new CriterionPanel(this);
     }
 
@@ -739,8 +737,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
             } else {
                 JOptionPane.showMessageDialog(getRootPane(),
                     "<html>Unindexed search (a search with an empty query string),<br>"
-                        + "requires at least one advanced search criterion. ", "Search Error",
-                    JOptionPane.ERROR_MESSAGE);
+                        + "requires at least one advanced search criterion. ", "Search Error", JOptionPane.ERROR_MESSAGE);
             }
         } else {
             JOptionPane.showMessageDialog(getRootPane(), "The search string must be longer than 1 character: "
@@ -840,15 +837,18 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         this.linkType = type;
     }
 
-    public I_DescriptionTuple getSearchResultsSelection() { // TODO
+    public I_DescriptionTuple getSearchResultsSelection() {
         int selectedRow = lastSelectedRow;
         if (descTable.getSelectedRow() >= 0) {
             selectedRow = descTable.getSelectedRow();
         }
-        int modelRow = descTable.convertRowIndexToModel(selectedRow);
-        I_DescriptionTuple tuple = model.getDescription(modelRow);
-
-        return tuple;
+        if (selectedRow >= 0) {
+            int modelRow = descTable.convertRowIndexToModel(selectedRow);
+            I_DescriptionTuple tuple = model.getDescription(modelRow);
+            return tuple;
+        } else {
+            return null;
+        }
     }
 
     public List<CriterionPanel> getCriterionPanels() {

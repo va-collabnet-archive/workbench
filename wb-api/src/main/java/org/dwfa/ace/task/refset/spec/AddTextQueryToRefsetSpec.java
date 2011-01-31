@@ -21,6 +21,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
@@ -30,7 +31,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 public abstract class AddTextQueryToRefsetSpec extends AbstractAddRefsetSpecTask {
     /**
-	 * 
+	 *
 	 */
     private static final long serialVersionUID = 1L;
 
@@ -56,19 +57,24 @@ public abstract class AddTextQueryToRefsetSpec extends AbstractAddRefsetSpecTask
 
     protected abstract int getStructuralQueryTokenId() throws IOException, TerminologyException;
 
-    
     @Override
-    protected RefsetPropertyMap getRefsetPropertyMap(I_TermFactory tf, I_ConfigAceFrame configFrame)
-            throws IOException, TerminologyException {
-    	RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.CID_CID_STR);
+    protected RefsetPropertyMap getRefsetPropertyMap(I_TermFactory tf, I_ConfigAceFrame configFrame) throws IOException,
+            TerminologyException {
+        RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.CID_CID_STR);
         if (getClauseIsTrue()) {
-        	refsetMap.put(REFSET_PROPERTY.CID_ONE, trueNid);
+            refsetMap.put(REFSET_PROPERTY.CID_ONE, trueNid);
         } else {
-        	refsetMap.put(REFSET_PROPERTY.CID_ONE, falseNid);
+            refsetMap.put(REFSET_PROPERTY.CID_ONE, falseNid);
         }
-    	refsetMap.put(REFSET_PROPERTY.CID_TWO, getStructuralQueryTokenId());
-    	refsetMap.put(REFSET_PROPERTY.STRING_VALUE, "queue"); // TODO
-    	refsetMap.put(REFSET_PROPERTY.STATUS, configFrame.getDefaultStatus().getNid());
+        refsetMap.put(REFSET_PROPERTY.CID_TWO, getStructuralQueryTokenId());
+        I_DescriptionTuple selectedDescription = tf.getActiveAceFrameConfig().getSearchResultsSelection();
+        if (selectedDescription != null) {
+            refsetMap.put(REFSET_PROPERTY.STRING_VALUE, selectedDescription.getText());
+        } else {
+            refsetMap.put(REFSET_PROPERTY.STRING_VALUE, "No description selected in search panel");
+        }
+
+        refsetMap.put(REFSET_PROPERTY.STATUS, configFrame.getDefaultStatus().getNid());
         return refsetMap;
     }
 }
