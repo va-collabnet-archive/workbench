@@ -37,7 +37,7 @@
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2</artifactId>
-			<version>1.5.2</version>
+			<version>${axis2.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.ws.commons.axiom</groupId>
@@ -77,146 +77,132 @@
 
 	</dependencies>
 
-	<profiles>
-		<profile>
-			<id>deploy-aar</id>
-			<dependencies>
-			</dependencies>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-compiler-plugin</artifactId>
-						<version>2.0.2</version>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.0.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>install</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Packs the .xml and .properties -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>pack-ibatis-conf</id>
 						<configuration>
-							<source>1.6</source>
-							<target>1.6</target>
-							<fileSets>
-								<fileSet>
-									<includes>
-										<include>**/*.*</include>
-									</includes>
-								</fileSet>
-							</fileSets>
+							<descriptors>
+								<descriptor>${basedir}/src/main/assembly/profiles.xml</descriptor>
+							</descriptors>
 						</configuration>
-						<executions>
-							<execution>
-								<phase>install</phase>
-								<goals>
-									<goal>compile</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<!-- Packs the .xml and .properties -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>pack-ibatis-conf</id>
-								<configuration>
-									<descriptors>
-										<descriptor>src/main/assembly/profiles.xml</descriptor>
-									</descriptors>
-								</configuration>
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<phase>package</phase>
-							</execution>
-						</executions>
-					</plugin>
-					<!-- Unpacks .xml and .properties files to include in the aar file. because axis2 plugin don't use maven directory structure -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>unpack-ibatis-conf</id>
-								<phase>install</phase>
-								<goals>
-									<goal>unpack</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>${project.groupId}</groupId>
-											<artifactId>tk-qadb-ws</artifactId>
-											<version>${project.version}</version>
-											<type>zip</type>
-										</artifactItem>
-									</artifactItems>
-									<outputDirectory>${project.build.directory}</outputDirectory>
-								</configuration>
-							</execution>
-							<execution>
-								<id>unpac-ws-conf</id>
-								<phase>install</phase>
-								<goals>
-									<goal>unpack</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>${project.groupId}</groupId>
-											<artifactId>tk-qa-ws-client</artifactId>
-											<version>${project.version}</version>
-											<type>zip</type>
-										</artifactItem>
-									</artifactItems>
-									<outputDirectory>${project.build.directory}</outputDirectory>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-
-					<plugin>
-						<executions>
-							<execution>
-								<id>build aar</id>
-								<phase>install</phase>
-								<goals>
-									<goal>aar</goal>
-								</goals>
-							</execution>
-							<execution>
-								<id>deploy aar</id>
-								<phase>install</phase>
-								<goals>
-									<goal>deployaar</goal>
-								</goals>
-							</execution>
-						</executions>
-						<groupId>org.apache.axis2</groupId>
-						<artifactId>axis2-aar-maven-plugin</artifactId>
-						<version>1.5.3</version>
-						<extensions>true</extensions>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Unpacks .xml and .properties files to include in the aar file. because axis2 plugin don't use maven directory structure -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack-ibatis-conf</id>
+						<phase>install</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
 						<configuration>
-							<sourceDirectory>${basedir}/src/main/java</sourceDirectory>
-							<aarName>qadb</aarName>
-							<classesDirectory></classesDirectory>
-							<includeDependencies>true</includeDependencies>
-							<axis2AdminConsoleURL>http://localhost:8080/axis2/axis2-admin</axis2AdminConsoleURL>
-							<!-- <axis2AdminConsoleURL>http://mgr.servers.aceworkspace.net:50008/axis2/axis2-admin</axis2AdminConsoleURL> -->
-
-							<axis2AdminPassword>axis2</axis2AdminPassword>
-							<axis2AdminUser>admin</axis2AdminUser>
-							<servicesXmlFile>${project.build.directory}/resources/services.xml</servicesXmlFile>
-							<wsdlFile>${project.build.directory}/resources/qadb-service.wsdl</wsdlFile>
-							<fileSets>
-								<fileSet>
-									<directory>${project.build.directory}/ibatis-conf</directory>
-									<includes>
-										<include>**/*.xml</include>
-										<include>**/*.properties</include>
-									</includes>
-								</fileSet>
-							</fileSets>
+							<artifactItems>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>tk-qadb-ws</artifactId>
+									<version>${project.version}</version>
+									<type>zip</type>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.build.directory}</outputDirectory>
 						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+					</execution>
+					<execution>
+						<id>unpack-ws-conf</id>
+						<phase>install</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>tk-qa-ws-client</artifactId>
+									<version>${project.version}</version>
+									<type>zip</type>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<executions>
+					<execution>
+						<id>build aar</id>
+						<phase>install</phase>
+						<goals>
+							<goal>aar</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>deploy aar</id>
+						<phase>install</phase>
+						<goals>
+							<goal>deployaar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<groupId>org.apache.axis2</groupId>
+				<artifactId>axis2-aar-maven-plugin</artifactId>
+				<version>${axis2.version}</version>
+				<extensions>true</extensions>
+				<configuration>
+					<sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+					<aarName>qadb</aarName>
+					<classesDirectory></classesDirectory>
+					<includeDependencies>true</includeDependencies>
+					<axis2AdminConsoleURL>http://localhost:8080/axis2/axis2-admin</axis2AdminConsoleURL>
+					<!-- <axis2AdminConsoleURL>http://mgr.servers.aceworkspace.net:50008/axis2/axis2-admin</axis2AdminConsoleURL> -->
+
+					<axis2AdminPassword>axis2</axis2AdminPassword>
+					<axis2AdminUser>admin</axis2AdminUser>
+					<servicesXmlFile>${project.build.directory}/resources/services.xml</servicesXmlFile>
+					<wsdlFile>${project.build.directory}/resources/qadb-service.wsdl</wsdlFile>
+					<fileSets>
+						<fileSet>
+							<directory>${project.build.directory}/ibatis-conf</directory>
+							<includes>
+								<include>**/*.xml</include>
+								<include>**/*.properties</include>
+							</includes>
+						</fileSet>
+					</fileSets>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
