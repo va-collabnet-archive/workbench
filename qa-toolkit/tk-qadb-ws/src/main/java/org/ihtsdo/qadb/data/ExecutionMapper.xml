@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?> <!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ihtsdo.qadb.data.ExecutionMapper">
+	
+	<resultMap type="Execution" id="executionResultMap">
+		<result property="executionUuid" column="run_id"/>
+		<result property="name" column="name"/>
+		<result property="date" column="effective_time"/>
+		<result property="contextName" column="context_name"/>
+		<result property="startTime" column="start_time"/>
+		<result property="pathName" column="path_name"/>
+		<result property="endTime" column="end_time"/>
+	</resultMap>
+	
+	<select id="selectExecutionByUUID" parameterType="Execution" resultMap="executionResultMap">
+		SELECT * FROM qa_run 
+			WHERE 	run_id=#{executionUuid}
+	</select>
+	
+	<select id="selectDistinctPaths" resultType="Execution" resultMap="executionResultMap">
+		SELECT distinct path_uid, path_name FROM qa_db.qa_run
+	</select>
+
+	<select id="selectDistinctPathsForDatabase" parameterType="String" resultType="Execution" resultMap="executionResultMap">
+		SELECT distinct path_uid as pathUuid, path_name FROM qa_db.qa_run where database_uid = #{id}
+	</select>
+	
+	<select id="selectDistinctDatabaseUuidsForPaht" parameterType="String" resultType="String">
+		SELECT distinct database_uid FROM qa_db.qa_run where path_uid = #{id}
+	</select>
+	
+</mapper>

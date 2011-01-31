@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?> <!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ihtsdo.qadb.data.QACaseMapper">
+
+	<resultMap type="QACase" id="qaCaseResultMap">
+		<id property="caseUuid" column="case_uid" />
+		<result property="ruleUuid" column="rule_uid" />
+		<result property="componentUuid" column="QA_component" />
+		<result property="isActive" column="status" />
+		<result property="databaseUuid" column="database_uid" />
+		<result property="pathUuid" column="path_uid"/>
+		<result property="dispositionReasonUuid" column="disposition_reason_uid" />
+		<result property="dispositionStatusDate" column="disposition_status_date" typeHandler="CalendarTypeHandler"/>
+		<result property="dispositionStatusEditor" column="disposition_status_editor" />
+		<result property="dispositionAnnotation" column="disposition_annotation" />
+		<result property="detail" column="detail" />
+		<result property="assignedTo" column="assigned_to" />
+		<result property="effectiveTime" column="effective_time" typeHandler="CalendarTypeHandler"/>
+		<result property="assignmentEditor" column="assignment_editor" />
+		<result property="assignmentDate" column="assignment_date" typeHandler="CalendarTypeHandler"/>
+		<association property="dispositionStatus" column="disposition_status_uid"
+			javaType="DispositionStatus" select="selectCaseDispositionStatus" />
+		<association property="componentUuid" column="qa_component"
+			javaType="TerminologyComponent" select="selectTermComponentByUUID" />
+		<collection property="comments" javaType="ArrayList" column="case_uid" 
+			ofType="QAComment" select="selectComments" />
+	</resultMap>
+
+	<resultMap type="QAComment" id="caseCommentResultMap">
+		<id property="commentUuid" column="comment_uid" />
+		<result property="comment" column="comment" />
+		<result property="effectiveTime" column="effective_time" typeHandler="CalendarTypeHandler"/>
+		<result property="status" column="status"/>
+		<result property="author" column="author"/>
+	</resultMap>
+
+	<resultMap type="DispositionStatus" id="dispositionStatusResultMap">
+		<result property="dispositionStatusUuid" column="disposition_status_uid"/>
+		<result property="name" column="name"/>
+	</resultMap>
+
+	<update id="updateQaCase" parameterType="QACase" flushCache="true" >
+		update qa_case set
+			rule_uid = #{ruleUuid},
+			qa_component = #{componentUuid.componentUuid},
+			status = #{isActive},
+			database_uid = #{databaseUuid},
+			path_uid = #{pathUuid},
+			disposition_reason_uid = #{dispositionReasonUuid},
+			disposition_status_date = #{dispositionStatusDate, typeHandler=CalendarTypeHandler},
+			disposition_status_editor = #{dispositionStatusEditor},
+			disposition_annotation = #{dispositionAnnotation},
+			detail = #{detail},
+			assigned_to = #{assignedTo},
+			effective_time = #{effectiveTime, typeHandler=CalendarTypeHandler},
+			disposition_status_uid = #{dispositionStatus.dispositionStatusUuid},
+			assignment_date = #{assignmentDate, typeHandler=CalendarTypeHandler},
+			assignment_editor = #{assignmentEditor}
+		where case_uid = #{caseUuid}
+	</update>
+
+	<select id="selectCaseDispositionStatus" parameterType="String"
+		resultType="DispositionStatus" resultMap="dispositionStatusResultMap">
+		select * from qa_disposition_status where
+		disposition_status_uid = #{id}
+	</select>
+
+	<select id="selectQACaseByUUID" parameterType="QACase"
+		resultMap="qaCaseResultMap">
+		SELECT * FROM qa_case
+		WHERE case_uid=#{caseUuid}
+	</select>
+
+	<select id="selectCasesByCoordAndRule" parameterType="QACase"
+		resultMap="qaCaseResultMap">
+		SELECT * FROM qa_case
+		WHERE case_uid=#{caseUuid}
+	</select>
+
+	<select id="selectComments" parameterType="String" resultMap="caseCommentResultMap">
+		select * from qa_comment
+		where case_uid = #{id} 
+		order by effective_time desc
+	</select>
+
+	<select id="countRuleCases" resultMap="qaCaseResultMap"
+		parameterType="RuleFilterCoords">
+		select count(*)
+		from qa_db.qa_case c inner join qa_db.qa_rule r on c.rule_uid = r.rule_uid
+		where r.rule_uid = #{ruleUuid}
+		and c.database_uid = #{databaseUuid}
+		and c.path_uid = #{pathUuid}
+		<!--and c.effective_time <![CDATA[ < ]]> #{viewPointTime} -->
+	</select>
+
+	<select id="selectRuleCases" resultMap="qaCaseResultMap"
+		parameterType="RuleFilterCoords">
+		select *
+		from qa_db.qa_case c
+		inner join qa_db.qa_rule r on c.rule_uid = r.rule_uid
+		inner join qa_db.qa_component comp on c.QA_component = comp.component_uid
+		and r.rule_uid = #{ruleUuid}
+		and c.database_uid = #{databaseUuid}
+		and c.path_uid = #{pathUuid}
+		<if test="name != null">
+			and comp.name like #{name}
+		</if>
+		<!--and c.effective_time <![CDATA[ < ]]> #{viewPointTime} -->
+	</select>
+
+</mapper>

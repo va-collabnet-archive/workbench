@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?> <!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ihtsdo.qadb.data.TerminologyComponentMapper">
+	
+	<resultMap type="TerminologyComponent" id="termComponentResultMap">
+		<id property="componentUuid" column="component_uid"/>
+		<result property="componentName" column="name"/>
+		<result property="sctid" column="sctid"/>
+	</resultMap>
+	
+	<select id="selectTermComponentByUUID" parameterType="String" resultMap="termComponentResultMap">
+		SELECT * FROM qa_component 
+			WHERE 	component_uid = #{id} 
+	</select>
+	
+	<select id="selectAllComponents" resultMap="termComponentResultMap">
+		SELECT * FROM qa_component
+	</select>
+	
+</mapper>

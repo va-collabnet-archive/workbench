@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?> <!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ihtsdo.qadb.data.Severity">
+	
+	<resultMap type="Severity" id="severityResultMap">
+		<id property="severityUuid" column="severity_uid"/>
+		<result property="severityName" column="name"/>
+		<result property="severityStatus" column="status"/>
+		<result property="severityDescription" column="description"/>
+		<result property="severityAuthor" column="author"/>
+	</resultMap>
+	
+	<select id="selectAllSeverities" resultMap="severityResultMap">
+		select * from qa_severity
+	</select>
+	
+</mapper>

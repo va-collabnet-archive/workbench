@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?> <!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ihtsdo.qadb.data.FindingMapper">
+	
+	<resultMap type="Finding" id="findingResultMap">
+		<result property="findingUuid" column="finding_uid"/>
+		<result property="executionUuid" column="run_id"/>
+		<result property="ruleUuid" column="rule_uid"/>
+		<result property="componentUuid" column="QA_component"/>
+		<association property="executionUuid" column="run_id" javaType="Execution"
+			 select="selectExecution" />
+	</resultMap>
+	
+	<select id="selectFindingByUUID" parameterType="Finding" resultMap="findingResultMap">
+		SELECT * FROM qa_finding 
+			WHERE 	finding_uid=#{findingUuid}
+	</select>
+	
+	<select id="selectExecution" parameterType="Execution" 
+		resultMap="org.ihtsdo.qadb.data.ExecutionMapper.executionResultMap">
+		select * from qa_run where run_id = #{executionUuid}
+	</select>
+	
+</mapper>

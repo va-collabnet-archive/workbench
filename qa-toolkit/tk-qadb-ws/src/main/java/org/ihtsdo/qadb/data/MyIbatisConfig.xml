@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?> <!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<properties resource="properties/config.properties">
+		<property name="username" value="root" />
+		<property name="password" value="" />
+	</properties>
+
+	<settings>
+		<setting name="cacheEnabled" value="true"/>
+		<setting name="defaultExecutorType" value="BATCH"/>
+		<setting name="lazyLoadingEnabled"  value="false"/>
+	</settings>
+	<typeAliases>
+		<typeAlias alias="DispositionStatus" type="org.ihtsdo.qadb.data.DispositionStatus" />
+		<typeAlias alias="CalendarTypeHandler" type="org.ihtsdo.qadb.helper.CalendarTypeHandler" />
+		<typeAlias alias="Execution" type="org.ihtsdo.qadb.data.Execution" />
+		<typeAlias alias="Severity" type="org.ihtsdo.qadb.data.Severity" />
+		<typeAlias alias="Category" type="org.ihtsdo.qadb.data.Category" />
+		<typeAlias alias="Finding" type="org.ihtsdo.qadb.data.Finding" />
+		<typeAlias alias="QACase" type="org.ihtsdo.qadb.data.QACase" />
+		<typeAlias alias="QAComment" type="org.ihtsdo.qadb.data.QAComment" />
+		<typeAlias alias="QACaseVersion" type="org.ihtsdo.qadb.data.QACaseVersion" />
+		<typeAlias alias="QACoordinate" type="org.ihtsdo.qadb.data.QACoordinate" />
+		<typeAlias alias="QADatabase" type="org.ihtsdo.qadb.data.QADatabase" />
+		<typeAlias alias="Rule" type="org.ihtsdo.qadb.data.Rule" />
+		<typeAlias alias="TerminologyComponent" type="org.ihtsdo.qadb.data.TerminologyComponent" />
+		<typeAlias alias="ViewPointSpecificObject" type="org.ihtsdo.qadb.data.ViewPointSpecificObject" />
+		<typeAlias alias="RuleFilterCoords" type="org.ihtsdo.qadb.data.RuleFilterCoords" />
+		<typeAlias alias="DispStatusCount" type="org.ihtsdo.qadb.data.DispStatusCount" />
+	</typeAliases>
+
+	<typeHandlers>
+		<typeHandler handler="org.ihtsdo.qadb.helper.CalendarTypeHandler"
+			javaType="java.util.Calendar" jdbcType="TIMESTAMP" />
+	</typeHandlers>
+
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC">
+				<property name="closeConnection" value="true" />
+			</transactionManager>
+			<dataSource type="POOLED">
+				<property name="driver" value="${driver}" />
+				<property name="url" value="${url}" />
+				<property name="username" value="${username}" />
+				<property name="password" value="${password}" />
+				<property name="poolMaximumActiveConnections" value="10"/>
+			</dataSource>
+		</environment>
+	</environments>
+
+
+	<mappers>
+		<mapper resource="org/ihtsdo/qadb/data/ExecutionMapper.xml" />
+		<mapper resource="org/ihtsdo/qadb/data/FindingMapper.xml" />
+		<mapper resource="org/ihtsdo/qadb/data/QACaseMapper.xml" />
+		<mapper resource="org/ihtsdo/qadb/data/RuleMapper.xml" />
+		<mapper resource="org/ihtsdo/qadb/data/DispositionStatusMapper.xml" />
+		<mapper resource="org/ihtsdo/qadb/data/TerminologyComponentMapper.xml" />
+		<mapper resource="org/ihtsdo/qadb/data/QADatabaseMapper.xml" />
+		<mapper resource="org/ihtsdo/qadb/data/SeverityMapper.xml" />
+		<mapper resource="org/ihtsdo/qadb/data/CategoryMapper.xml" />
+		<mapper resource="org/ihtsdo/qadb/data/QACommentMapper.xml" />
+		<!-- <mapper resource="org/ihtsdo/qadb/data/QACaseVersionMapper.xml" /> 
+			<mapper resource="org/ihtsdo/qadb/data/QACoordinateMapper.xml" /> <mapper 
+			resource="org/ihtsdo/qadb/data/ViewPointSpecificObjectMapper.xml" /> <mapper 
+			resource="org/ihtsdo/qadb/data/RulesReportLineMapper.xml" / -->
+	</mappers>
+</configuration>

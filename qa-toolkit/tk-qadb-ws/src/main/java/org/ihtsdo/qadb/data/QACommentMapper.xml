@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ihtsdo.mybatis.gen.QACommentMapper">
+
+	<resultMap id="qaCommentResultMap" type="QAComment">
+		<id column="comment_uid" property="commentUuid" />
+		<result column="effective_time" property="effectiveTime" typeHandler="CalendarTypeHandler" />
+		<result column="status" property="status" />
+		<result column="author" property="author" />
+		<result column="case_uid" property="caseUuid" />
+	</resultMap>
+
+	<insert id="insertComment">
+		INSERT INTO qa_comment
+		(effective_time,
+		status,
+		comment,
+		author,
+		case_uid)
+		VALUES
+		(#{effectiveTime, typeHandler=CalendarTypeHandler},
+		#{status},
+		#{comment},
+		#{author},
+		#{caseUuid});
+	</insert>
+
+</mapper>

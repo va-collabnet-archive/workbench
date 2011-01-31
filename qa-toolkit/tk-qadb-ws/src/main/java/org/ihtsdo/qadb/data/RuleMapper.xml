@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?> <!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ihtsdo.qadb.data.RuleMapper">
+
+	<resultMap type="Rule" id="ruleResultMap">
+		<id property="ruleUuid" column="rule_uid" />
+		<result property="name" column="name" />
+		<result property="description" column="description" />
+		<result property="status" column="status" />
+		<result property="packageName" column="package_name" />
+		<result property="packageUrl" column="package_url" />
+		<result property="ruleCode" column="rule_code" />
+		<result property="category" column="rule_category" />
+		<result property="effectiveTime" column="effective_time"
+			typeHandler="CalendarTypeHandler" />
+		<result property="expectedResult" column="expected_result" />
+		<result property="suggestedResolution" column="suggested_resolution" />
+		<result property="example" column="example" />
+		<result property="standingIssues" column="standing_issues" />
+		<result property="isWhitelistAllowed" column="is_Whitelist_allowed" />
+		<result property="isWhitelistResetAllowed" column="is_Whitelist_reset_allowed" />
+		<result property="isWhitelistResetWhenClosed" column="is_Whitelist_reset_when_closed" />
+		<result property="ditaDocumentationLinkUuid" column="DITA_documentation_link_UID" />
+		<result property="ditaGeneratedTopicUuid" column="DITA_generated_topic_uid" />
+		<result property="documentationUrl" column="documentation_url" />
+		<result property="modifiedBy" column="modifed_by" />
+		<association property="severity" column="severity_uid"
+			javaType="Severity" select="selectRuleSeverity">
+		</association>
+	</resultMap>
+
+	<resultMap type="Severity" id="ruleSeverityResultMap">
+		<id property="severityUuid" column="severity_uid" />
+		<result property="severityName" column="name" />
+		<result property="severityStatus" column="status" />
+		<result property="severityDescription" column="description" />
+		<result property="severityAuthor" column="author" />
+	</resultMap>
+
+	<select id="selectRuleByUUID" parameterType="Rule" resultMap="ruleResultMap">
+		SELECT * FROM qa_rule
+		WHERE rule_uid=#{ruleUuid}
+	</select>
+
+	<select id="selectRulesByCoords" parameterType="RuleFilterCoords"
+		resultMap="ruleResultMap">
+		select * from qa_db.qa_rule r
+		inner join qa_severity s on
+		r.severity_uid = s.severity_uid
+		<trim prefix="WHERE" prefixOverrides="AND |OR ">
+			<if test="name != null">
+				r.name like #{name}
+			</if>
+			<if test="ruleCode != null">
+				AND r.rule_code like #{ruleCode}
+			</if>
+			<if test="ruleCategory != null">
+				AND r.rule_category = #{ruleCategory}
+			</if>
+			<if test="severity != null">
+				AND r.severity_uid = #{severity}
+			</if>
+		</trim>
+	</select>
+
+	<select id="selectStatusCount" parameterType="RuleFilterCoords"
+		resultType="int">
+		select count(*) as statusCount
+		from qa_db.qa_case c
+		inner join
+		qa_db.qa_rule r on c.rule_uid = r.rule_uid
+		where r.rule_uid =
+		#{ruleUuid}
+		and c.status = #{status}
+		and c.database_uid =
+		#{databaseUuid}
+		and c.path_uid = #{pathUuid}
+		<!-- and c.effective_time <![CDATA[ < ]]> #{viewPointTime} -->
+		group by c.status;
+	</select>
+
+
+
+	<select id="selectDispositionStatusCounts" parameterType="RuleFilterCoords"
+		resultType="DispStatusCount">
+		select d.disposition_status_uid as dispStatus, count(*) as statusCount
+		from qa_db.qa_case c
+		inner join qa_db.qa_rule r on c.rule_uid =
+		r.rule_uid
+		inner join qa_db.qa_disposition_status d on
+		c.disposition_status_uid =
+		d.disposition_status_uid
+		where r.rule_uid =
+		#{ruleUuid}
+		and c.database_uid = #{databaseUuid}
+		and c.path_uid =
+		#{pathUuid}
+		<!--and c.effective_time <![CDATA[ < ]]> #{viewPointTime} -->
+		group by c.disposition_status_uid;
+	</select>
+
+	<select id="selectAllRules" resultType="Rule" resultMap="ruleResultMap">
+		SELECT *
+		FROM qa_rule
+	</select>
+
+	<select id="selectRuleSeverity" parameterType="String"
+		resultMap="ruleSeverityResultMap">
+		select * from qa_severity where severity_uid =
+		#{id}
+	</select>
+
+	<update id="updateQaRule" parameterType="Rule">
+		update qa_rule set
+		status = #{status},
+		package_url = #{packageUrl},
+		package_name = #{packageName},
+		rule_category = #{category},
+		severity_uid = #{severity.severityUuid},
+		name = #{name},
+		description = #{description},
+		expected_result = #{expectedResult},
+		suggested_resolution = #{suggestedResolution},
+		example = #{example},
+		standing_issues = #{standingIssues},
+		is_Whitelist_allowed = #{isWhitelistAllowed},
+		is_Whitelist_reset_allowed = #{isWhitelistResetAllowed},
+		is_Whitelist_reset_when_closed = #{isWhitelistResetWhenClosed},
+		DITA_documentation_link_UID = #{ditaDocumentationLinkUuid},
+		DITA_generated_topic_uid = #{ditaGeneratedTopicUuid},
+		modifed_by = #{modifiedBy},
+		documentation_url = #{documentationUrl},
+		rule_code= #{ruleCode}
+		where rule_uid = #{ruleUuid}
+	</update>
+
+</mapper>
