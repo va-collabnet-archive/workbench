@@ -1,13 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.ihtsdo</groupId>
-		<artifactId>wb-mmb</artifactId>
-		<version>2.6.0-trek-12-SNAPSHOT</version>
-	</parent>
 
 	<groupId>org.ihtsdo</groupId>
 	<artifactId>tk-qa-ws-client</artifactId>
+	<version>2.6.0-trek-13-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>${branch}: QA Database Web Service Client</name>
 	<url>http://maven.apache.org</url>
