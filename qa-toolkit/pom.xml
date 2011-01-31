@@ -4,7 +4,7 @@
 
   <groupId>org.ihtsdo</groupId>
   <artifactId>qa-toolkit</artifactId>
-  <version>2.6.0-trek-12-SNAPSHOT</version>
+  <version>2.6.0-trek-13-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>qa-toolkit</name>
@@ -12,9 +12,11 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <axis2.version>1.5.3</axis2.version>
   </properties>
   
   <modules>
 		<module>tk-qa-ws-client</module>
+		<module>tk-qadb-ws</module>
   </modules>
 </project>
