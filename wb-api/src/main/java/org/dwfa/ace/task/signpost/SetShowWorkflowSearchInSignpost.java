@@ -60,6 +60,7 @@ public class SetShowWorkflowSearchInSignpost extends AbstractTask {
             I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
             configFrame.setShowWorkflowSignpostPanel(true);
+            configFrame.setShowSignpostPanel(false);
 
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
