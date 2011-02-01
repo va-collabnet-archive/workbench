@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
@@ -19,11 +21,16 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.ihtsdo.arena.ScrollablePanel;
+import org.ihtsdo.thread.NamedThreadFactory;
 
-public class BpAction extends AbstractAction {
+public class BpAction extends AbstractAction implements Runnable {
 
+   private static final ThreadGroup bpActionThreadGroup = new ThreadGroup("BpAction threads");
+   private static ExecutorService executorService = Executors.newCachedThreadPool(
+            new NamedThreadFactory(bpActionThreadGroup, "BpAction executor service"));
 	/**
 	 *
 	 */
@@ -33,6 +40,8 @@ public class BpAction extends AbstractAction {
     private I_ConfigAceFrame frameConfig;
     private I_HostConceptPlugins host;
     private ScrollablePanel wizardPanel;
+    private transient I_EncodeBusinessProcess process;
+    private transient MasterWorker worker;
 
 	public BpAction(String processUrlStr, I_ConfigAceFrame frameConfig,
 			I_HostConceptPlugins host, ScrollablePanel wizardPanel)
@@ -91,16 +100,16 @@ public class BpAction extends AbstractAction {
         BufferedInputStream bis = new BufferedInputStream(inStream);
         ObjectInputStream ois = new ObjectInputStream(bis);
 
-        I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
-		return process;
+        I_EncodeBusinessProcess bp = (I_EncodeBusinessProcess) ois.readObject();
+		return bp;
 	}
 
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		try {
-			I_EncodeBusinessProcess process = getProcess();
-			MasterWorker worker = frameConfig.getWorker();
+			process = getProcess();
+			worker = frameConfig.getWorker();
 			worker.writeAttachment(ProcessAttachmentKeys.I_GET_CONCEPT_DATA.name(),
 					host.getTermComponent());
 			worker.writeAttachment(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name(),
@@ -115,9 +124,18 @@ public class BpAction extends AbstractAction {
 					host);
 			process.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(),
 					frameConfig);
-			worker.execute(process);
+         executorService.submit(this);
 		} catch (Exception ex) {
 			AceLog.getAppLog().alertAndLogException(ex);
 		}
 	}
+
+   @Override
+   public void run() {
+      try {
+         worker.execute(process);
+      } catch (TaskFailedException ex) {
+         AceLog.getAppLog().alertAndLogException(ex);
+      }
+   }
 }
