@@ -51,7 +51,6 @@ import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
@@ -176,7 +175,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
       @Override
       public boolean remove(Object o) {
-         // TODO Auto-generated method stub
          return super.remove(o);
       }
 
@@ -261,11 +259,13 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
          return ConceptComponent.this.getCurrentAnnotations(xyz);
       }
 
+      @Override
       public Collection<? extends RefexChronicleBI<?>> getAnnotations() {
          return ConceptComponent.this.getAnnotations();
       }
 
       @SuppressWarnings("rawtypes")
+      @Override
       public boolean addAnnotation(RefexChronicleBI annotation) {
          return ConceptComponent.this.addAnnotation(annotation);
       }
@@ -763,6 +763,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
    public ConcurrentSkipListSet<RefexChronicleBI<?>> annotations;
 
    @SuppressWarnings("rawtypes")
+   @Override
    public boolean addAnnotation(RefexChronicleBI annotation) {
       if (annotations == null) {
          annotations = new ConcurrentSkipListSet<RefexChronicleBI<?>>(
@@ -778,6 +779,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       return annotations.add(annotation);
    }
 
+   @Override
    public Collection<? extends RefexChronicleBI<?>> getAnnotations() {
       if (annotations == null) {
          return Collections.unmodifiableCollection(
@@ -1509,6 +1511,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
    }
 
    @Deprecated
+   @Override
    public final void setStatusId(int statusId) {
       if (getTime() != Long.MAX_VALUE) {
          throw new UnsupportedOperationException(
@@ -1521,6 +1524,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       }
    }
 
+   @Override
    public final void setStatusNid(int statusId) {
       if (getTime() != Long.MAX_VALUE) {
          throw new UnsupportedOperationException(
@@ -1538,6 +1542,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       throw new UnsupportedOperationException("Use makeAnalog instead.");
    }
 
+   @Override
    public final ArrayIntList getPartComponentNids() {
       ArrayIntList resultList = getVariableVersionNids();
       resultList.add(getPathNid());
@@ -1615,28 +1620,23 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
    @SuppressWarnings("unchecked")
    public String validate(ConceptComponent<?, ?> another) throws IOException {
       assert another != null;
-      StringBuffer buf = new StringBuffer();
+      StringBuilder buf = new StringBuilder();
       String validationResults = null;
 
       if (this.nid != another.nid) {
-         buf.append("\tConceptComponent.nid not equal: \n" + "\t\tthis.nid = " + this.nid + "\n"
-                 + "\t\tanother.nid = " + another.nid + "\n");
+         buf.append("\tConceptComponent.nid not equal: \n" + "\t\tthis.nid = ").append(this.nid).append("\n" + "\t\tanother.nid = ").append(another.nid).append("\n");
       }
       if (this.primordialSapNid != another.primordialSapNid) {
-         buf.append("\tConceptComponent.primordialSapNid not equal: \n" + "\t\tthis.primordialSapNid = "
-                 + this.primordialSapNid + "\n" + "\t\tanother.primordialSapNid = " + another.primordialSapNid + "\n");
+         buf.append("\tConceptComponent.primordialSapNid not equal: \n" + "\t\tthis.primordialSapNid = ").append(this.primordialSapNid).append("\n" + "\t\tanother.primordialSapNid = ").append(another.primordialSapNid).append("\n");
       }
 
       if (this.primordialUNid != another.primordialUNid) {
-         buf.append("\tConceptComponent.primordialUNid not equal: \n" + "\t\tthis.primordialUNid = "
-                 + this.primordialUNid + "\n" + "\t\tanother.primordialUNid = " + another.primordialUNid + "\n");
+         buf.append("\tConceptComponent.primordialUNid not equal: \n" + "\t\tthis.primordialUNid = ").append(this.primordialUNid).append("\n" + "\t\tanother.primordialUNid = ").append(another.primordialUNid).append("\n");
       }
 
       if (this.additionalIdVersions != null) {
          if (this.additionalIdVersions.equals(another.additionalIdVersions) == false) {
-            buf.append("\tConceptComponent.additionalIdentifierParts not equal: \n"
-                    + "\t\tthis.additionalIdentifierParts = " + this.additionalIdVersions + "\n"
-                    + "\t\tanother.additionalIdentifierParts = " + another.additionalIdVersions + "\n");
+            buf.append("\tConceptComponent.additionalIdentifierParts not equal: \n" + "\t\tthis.additionalIdentifierParts = ").append(this.additionalIdVersions).append("\n" + "\t\tanother.additionalIdentifierParts = ").append(another.additionalIdVersions).append("\n");
          }
       }
 
