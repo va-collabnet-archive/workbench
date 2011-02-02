@@ -5300,7 +5300,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             int idmod, int idonly) {
 
         // CHECK COUNTS TO MASTER FILE1 RECORD COUNT
-        if ((same + modified + dropped + idmod) == count1) {
+        if ((same + modified + dropped + idmod + idonly) == count1) {
             getLog().info(
                     "PASSED1:: SAME+MODIFIED+DROPPED+MODIFIED_IDCHANGE+IDCHANGEONLY = " + same
                             + "+" + modified + "+" + dropped + "+" + idmod + "+" + idonly + " = "
@@ -5313,7 +5313,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
 
         // CHECK COUNTS TO UPDATE FILE2 RECORD COUNT
-        if ((same + modified + added + idmod) == count2) {
+        if ((same + modified + added + idmod + idonly) == count2) {
             getLog().info(
                     "PASSED2:: SAME+MODIFIED+ADDED+MODIFIED_IDCHANGE+IDCHANGEONLY   = " + same
                             + "+" + modified + "+" + added + "+" + idmod + "+" + idonly + " = "
