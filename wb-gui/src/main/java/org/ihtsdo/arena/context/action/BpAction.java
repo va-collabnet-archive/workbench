@@ -40,8 +40,6 @@ public class BpAction extends AbstractAction implements Runnable {
     private I_ConfigAceFrame frameConfig;
     private I_HostConceptPlugins host;
     private ScrollablePanel wizardPanel;
-    private transient I_EncodeBusinessProcess process;
-    private transient MasterWorker worker;
 
 	public BpAction(String processUrlStr, I_ConfigAceFrame frameConfig,
 			I_HostConceptPlugins host, ScrollablePanel wizardPanel)
@@ -107,9 +105,14 @@ public class BpAction extends AbstractAction implements Runnable {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		try {
-			process = getProcess();
-			worker = frameConfig.getWorker();
+      executorService.submit(this);
+	}
+
+   @Override
+   public void run() {
+      try {
+         I_EncodeBusinessProcess process = getProcess();
+			MasterWorker worker = frameConfig.getWorker();
 			worker.writeAttachment(ProcessAttachmentKeys.I_GET_CONCEPT_DATA.name(),
 					host.getTermComponent());
 			worker.writeAttachment(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name(),
@@ -124,16 +127,13 @@ public class BpAction extends AbstractAction implements Runnable {
 					host);
 			process.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(),
 					frameConfig);
-         executorService.submit(this);
-		} catch (Exception ex) {
-			AceLog.getAppLog().alertAndLogException(ex);
-		}
-	}
-
-   @Override
-   public void run() {
-      try {
          worker.execute(process);
+      } catch (FileNotFoundException ex) {
+         AceLog.getAppLog().alertAndLogException(ex);
+      } catch (IOException ex) {
+         AceLog.getAppLog().alertAndLogException(ex);
+      } catch (ClassNotFoundException ex) {
+         AceLog.getAppLog().alertAndLogException(ex);
       } catch (TaskFailedException ex) {
          AceLog.getAppLog().alertAndLogException(ex);
       }
