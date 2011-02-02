@@ -468,12 +468,12 @@ public class PropBasedTransWorkFlowStep4Outputs extends AbstractTask {
 			String[] parsedSubj=TerminologyProjectDAO.getParsedItemSubject(process.getSubject());
 			if (selectedNextStatus!=null){
 				workListMember.setActivityStatus(selectedNextStatus.ids[0]);
+				TerminologyProjectDAO.updateWorkListMemberMetadata(workListMember, config);
 				if (parsedSubj.length==TerminologyProjectDAO.subjectIndexes.values().length){
 					parsedSubj[TerminologyProjectDAO.subjectIndexes.STATUS_ID.ordinal()]=String.valueOf(selectedNextStatus.getLocalConcept().getNid());
 				}
 			}
 			if (returnCondition!=Condition.STOP){
-				TerminologyProjectDAO.updateWorkListMemberMetadata(workListMember, config);
 				Terms.get().commit();
 				parsedSubj[TerminologyProjectDAO.subjectIndexes.TAGS_ARRAY.ordinal()]="";
 
