@@ -1,7 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
+	<parent>
+		<groupId>org.ihtsdo</groupId>
+		<artifactId>ihtsdo-parent</artifactId>
+		<version>1</version>
+	</parent>
 	<scm>
 		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm</connection>
 		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm</developerConnection>
@@ -31,13 +35,13 @@
 	<distributionManagement>
 		<snapshotRepository>
 			<id>maestro_ihtsdo.wb-snapshots</id>
-			<name>IHTSDO Workbench Snapshots Repository</name>
-			<url>file:///extra_space/maestro/data/repository/wb-snapshots/</url>
+			<name>IHTSDO Snapshots Repository</name>
+			<url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/wb-snapshots/</url>
 		</snapshotRepository>
 		<repository>
 			<id>maestro_ihtsdo.wb-releases</id>
-			<name>IHTSDO Workbench Releases Repository</name>
-			<url>file:///extra_space/maestro/data/repository/wb-releases/</url>
+			<name>IHTSDO Releases Repository</name>
+			<url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/wb-releases/</url>
 		</repository>
 	</distributionManagement>
 </project>
