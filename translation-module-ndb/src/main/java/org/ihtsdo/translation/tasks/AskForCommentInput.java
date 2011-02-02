@@ -48,7 +48,7 @@ import org.ihtsdo.translation.RejectionReasonPopUpDialog;
  */
 @BeanList(specs = 
 { @Spec(directory = "tasks/translation tasks", type = BeanType.TASK_BEAN)})
-public class AskReasonForWorkListMemberRejection extends AbstractTask {
+public class AskForCommentInput extends AbstractTask {
 
 	private static final String HEADER_SEPARATOR = " // ";
 	private static final String COMMENT_HEADER_SEP = ": -";
@@ -115,11 +115,11 @@ public class AskReasonForWorkListMemberRejection extends AbstractTask {
 			
 			CommentsRefset commentsRefset = workList.getCommentsRefset(config);
 			
-			HashMap<I_GetConceptData,String> reason = new RejectionReasonPopUpDialog("Enter reason for rejection").showDialog();
+			HashMap<I_GetConceptData,String> reason = new RejectionReasonPopUpDialog("Enter comment").showDialog();
 			if(reason!= null && !reason.isEmpty()){
 				Set<I_GetConceptData> a = reason.keySet();
 				I_GetConceptData rejReason = a.iterator().next();
-				I_GetConceptData commentType = tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_REJECTION.getPrimoridalUid());
+				I_GetConceptData commentType = tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_COMMENT.getPrimoridalUid());
 				String fullName= config.getDbConfig().getFullName();
 				I_GetConceptData role=Terms.get().getConcept(stepRole.ids);
 				String comment = role + HEADER_SEPARATOR + fullName + COMMENT_HEADER_SEP + reason.get(rejReason);
