@@ -960,7 +960,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       // merge versions
       for (ConceptComponent<R, C>.Version v : another.getVersions()) {
          if (!currentSapNids.contains(v.getSapNid())) {
-            addRevision((R) v.getRevision());
+        	 // TODO Added to avoid failure if v.getRefision() returns null
+        	 // Therefore, must find proper solution
+        	 // Happens with EConcept import with EConcept = workflow history refset only
+        	 R rev = v.getRevision();
+        	 if (rev == null)
+        		 return this;
+
+        	 addRevision((R) rev);
          }
       }
 
