@@ -106,24 +106,31 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent e) {
-            if (Terms.get().getUncommitted().size() > 0) {
-                for (I_Transact c : Terms.get().getUncommitted()) {
-                    AceLog.getAppLog().warning("Uncommitted changes to: " + ((I_GetConceptData) c).toLongString());
+            if (hasValidInput()) {
+                if (Terms.get().getUncommitted().size() > 0) {
+                    for (I_Transact c : Terms.get().getUncommitted()) {
+                        AceLog.getAppLog().warning("Uncommitted changes to: " + ((I_GetConceptData) c).toLongString());
 
+                    }
+                    HasUncommittedChanges.askToCommit(process);
                 }
-                HasUncommittedChanges.askToCommit(process);
-            }
-            if (Terms.get().getUncommitted().size() > 0) {
-                if (!DwfaEnv.isHeadless()) {
-                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                        "There are uncommitted changes - please cancel or commit before continuing.", "",
-                        JOptionPane.ERROR_MESSAGE);
+                if (Terms.get().getUncommitted().size() > 0) {
+                    if (!DwfaEnv.isHeadless()) {
+                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "There are uncommitted changes - please cancel or commit before continuing.", "",
+                            JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    returnCondition = Condition.CONTINUE;
+                    done = true;
+                    synchronized (PreviousNextOrCancel.this) {
+                        PreviousNextOrCancel.this.notifyAll();
+                    }
                 }
             } else {
-                returnCondition = Condition.CONTINUE;
-                done = true;
-                synchronized (PreviousNextOrCancel.this) {
-                    PreviousNextOrCancel.this.notifyAll();
+                if (!DwfaEnv.isHeadless()) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), getInvalidInputMessage(), "",
+                        JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
@@ -166,6 +173,14 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
                 l.log(Level.SEVERE, e.getMessage(), e);
             }
         }
+    }
+
+    public String getInvalidInputMessage() {
+        return "Invalid input";
+    }
+
+    public boolean hasValidInput() {
+        return true;
     }
 
     public boolean isDone() {

@@ -28,11 +28,20 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+import org.apache.lucene.document.Document;
+import org.apache.lucene.queryParser.QueryParser;
+import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
+import org.ihtsdo.lucene.SearchResult;
 
 public abstract class AbstractSetUserAndPwdPNC extends PreviousNextOrCancel {
 
@@ -69,8 +78,10 @@ public abstract class AbstractSetUserAndPwdPNC extends PreviousNextOrCancel {
             synchronized (this) {
                 this.waitTillDone(worker.getLogger());
             }
+
             readInput(process);
             restore();
+
         } catch (InterruptedException e) {
             throw new TaskFailedException(e);
         } catch (InvocationTargetException e) {
@@ -81,10 +92,54 @@ public abstract class AbstractSetUserAndPwdPNC extends PreviousNextOrCancel {
             throw new TaskFailedException(e);
         } catch (IntrospectionException e) {
             throw new TaskFailedException(e);
-		} catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             throw new TaskFailedException(e);
-		}
+        }
         return returnCondition;
+    }
+
+    @Override
+    public String getInvalidInputMessage() {
+        return "Username must be unique - inputted username is in use.";
+    }
+
+    @Override
+    public boolean hasValidInput() {
+        try {
+            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            I_IntSet actives = helper.getCurrentStatusIntSet();
+
+            String userName = fullName.getText();
+
+            String filteredUserName = userName;
+            filteredUserName = filteredUserName.trim();
+
+            // new removal using native lucene escaping
+            filteredUserName = QueryParser.escape(filteredUserName);
+            SearchResult result;
+
+            result = Terms.get().doLuceneSearch(filteredUserName);
+
+            for (int i = 0; i < result.topDocs.totalHits; i++) {
+                Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
+                int cnid = Integer.parseInt(doc.get("cnid"));
+                int dnid = Integer.parseInt(doc.get("dnid"));
+
+                I_DescriptionVersioned potential_fsn = Terms.get().getDescription(dnid, cnid);
+                for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
+                    if (actives.contains(part_search.getStatusNid())
+                        && part_search.getTypeNid() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
+                            .localize().getNid() && part_search.getText().equals(userName)) {
+                        return false;
+                    }
+                }
+
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private class DoSwing extends SwingWorker<Boolean> {
@@ -140,9 +195,11 @@ public abstract class AbstractSetUserAndPwdPNC extends PreviousNextOrCancel {
 
     protected abstract void finalSetup();
 
-    protected abstract void readInput(I_EncodeBusinessProcess process) throws IntrospectionException, IllegalAccessException, InvocationTargetException;
+    protected abstract void readInput(I_EncodeBusinessProcess process) throws IntrospectionException,
+            IllegalAccessException, InvocationTargetException;
 
-    protected abstract void setupInput(I_EncodeBusinessProcess process) throws IllegalArgumentException, IntrospectionException, IllegalAccessException, InvocationTargetException;
+    protected abstract void setupInput(I_EncodeBusinessProcess process) throws IllegalArgumentException,
+            IntrospectionException, IllegalAccessException, InvocationTargetException;
 
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,

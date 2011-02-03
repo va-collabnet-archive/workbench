@@ -55,6 +55,11 @@ public class SetAdminUserAndPwdPNC extends AbstractSetUserAndPwdPNC {
         user.requestFocusInWindow();
     }
 
+    @Override
+    public boolean hasValidInput() {
+        return true;
+    }
+
     protected void readInput(I_EncodeBusinessProcess process) {
         config.setAdminUsername(user.getText());
         config.setAdminPassword(pwd.getText());
