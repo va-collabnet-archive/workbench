@@ -143,6 +143,7 @@ public class PromotionRefset extends Refset {
 
 	public void setPromotionStatus(int componentId, int statusConceptId) throws Exception {
 		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+		I_GetConceptData component = termFactory.getConcept(componentId);
 		boolean statusAlreadyPresent = false;
 		for (I_ExtendByRef promotionStatusMember : termFactory.getAllExtensionsForComponent(componentId, true)) {
 			if (promotionStatusMember.getRefsetId() == this.refsetId) {
@@ -166,6 +167,7 @@ public class PromotionRefset extends Refset {
 					promotionStatusMember.addVersion(newPromotionStatusPart);
 				}
 				termFactory.addUncommittedNoChecks(refsetConcept);
+				termFactory.addUncommittedNoChecks(component);
 				termFactory.addUncommittedNoChecks(promotionStatusMember);
 				//				termFactory.commit();
 			}
