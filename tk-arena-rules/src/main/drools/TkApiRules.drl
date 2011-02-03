@@ -21,8 +21,6 @@ import org.ihtsdo.tk.example.binding.SnomedRelType;
 import org.ihtsdo.tk.example.binding.SnomedRelSpec;
 import org.ihtsdo.tk.example.binding.Taxonomies;
 import org.ihtsdo.tk.example.binding.WbDescType;
-import org.ihtsdo.tk.example.binding.HistoricalRelSpec;
-
 
 import org.ihtsdo.tk.spec.RelSpec;
 import org.ihtsdo.tk.example.binding.HistoricalRelType;
