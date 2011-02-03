@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -54,13 +55,13 @@ import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * Path management.
- * 
+ *
  * Defines methods for obtaining and modifying paths. Paths are now
  * stored/defined in reference sets (extension by reference).
- * 
+ *
  * This implementation avoids the use of the redundant Path store and instead
  * marshals to to the Extension store (indirectly).
- * 
+ *
  */
 public class BdbPathManager implements I_Manage<PathBI> {
 
@@ -98,7 +99,8 @@ public class BdbPathManager implements I_Manage<PathBI> {
         }
     }
 
-    private static Logger logger = Logger.getLogger(BdbPathManager.class.getName());
+    private static final Logger logger =
+            Logger.getLogger(BdbPathManager.class.getName());
 
     private RefsetHelperGetter helperGetter = new RefsetHelperGetter();
 
@@ -136,6 +138,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
         }
     }
 
+   @Override
     public boolean exists(int cNid) throws IOException {
         if (pathMap.containsKey(cNid)) {
             return true;
@@ -150,6 +153,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
         return false;
     }
 
+   @Override
     public PathBI get(int nid) throws IOException, TerminologyException {
         if (exists(nid)) {
             return pathMap.get(nid);
@@ -196,6 +200,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
         }
     }
 
+   @Override
     public Set<PathBI> getAll() throws TerminologyException {
         return new HashSet<PathBI>(pathMap.values());
     }
@@ -327,6 +332,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
      * Add or update a path and all its origin positions NOTE it will not
      * automatically remove origins. This must be done explicitly with {@link #removeOrigin(PathBI, I_Position)}.
      */
+   @Override
     public void write(final PathBI path, I_ConfigAceFrame config) throws TerminologyException {
         try {
             // write path
@@ -335,15 +341,17 @@ public class BdbPathManager implements I_Manage<PathBI> {
                     new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, path.getConceptNid());
             helperGetter.get(config).newRefsetExtension(ReferenceConcepts.REFSET_PATHS.getNid(),
                 ReferenceConcepts.PATH.getNid(), EConcept.REFSET_TYPES.CID, propMap, config);
-            BdbCommitManager.addUncommittedNoChecks(getPathRefsetConcept());
 
+            Concept pathRefConcept = getPathRefsetConcept();
+            BdbCommitManager.addUncommittedNoChecks(pathRefConcept);
+            AceLog.getAppLog().info("Path refset: " + pathRefConcept.toLongString());
             // write position
 
             for (PositionBI origin : path.getOrigins()) {
                 writeOrigin(path, origin, config);
             }
             pathMap.put(path.getConceptNid(), (Path) path);
-            logger.info("Wrote path : " + path);
+            logger.log(Level.INFO, "Wrote path : {0}", path);
         } catch (Exception e) {
             throw new TerminologyException("Unable to write path: " + path, e);
         }
@@ -383,9 +391,13 @@ public class BdbPathManager implements I_Manage<PathBI> {
             // Create the new origin/position
             refsetHelper.newRefsetExtension(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(), path.getConceptNid(),
                 EConcept.REFSET_TYPES.CID_INT, propMap, config);
-            BdbCommitManager.addUncommittedNoChecks(getRefsetPathOriginsConcept());
+            Concept pathOriginRefConcept = getPathRefsetConcept();
+            BdbCommitManager.addUncommittedNoChecks(pathOriginRefConcept);
+            AceLog.getAppLog().info("Path origin refset: " +
+                    pathOriginRefConcept.toLongString());
+
             pathMap.put(path.getConceptNid(), (Path) path);
-            logger.info("Wrote origin path : " + origin + " to path " + path);
+            logger.log(Level.INFO, "Wrote origin path : {0} to path {1}", new Object[]{origin, path});
         } catch (Exception e) {
             throw new TerminologyException("Unable to write path origin: " + origin + " to path " + path, e);
         }
@@ -401,7 +413,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
             path.getOrigins().remove(origin);
             pathMap.put(path.getConceptNid(), (Path) path);
 
-            logger.info("Removed origin path : " + origin + " from path " + path);
+            logger.log(Level.INFO, "Removed origin path : {0} from path {1}", new Object[]{origin, path});
         } catch (Exception e) {
             throw new TerminologyException("Unable to remove path origin: " + origin + " from path " + path, e);
         }
