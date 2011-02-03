@@ -126,7 +126,7 @@ public class TestEnums extends TestCase {
 		assertEquals(3, contexts.size());
 
 		rulesPackageHelper.createNewRulesDeploymentPackage("Package reference one", 
-		"http://208.109.105.1:8080/drools-guvnor/org.drools.guvnor.Guvnor/package/qa4/qa4Demo");
+		"http://208.109.105.1:8080/drools-guvnor/org.drools.guvnor.Guvnor/package/qa4/qa4Demo", "greynoso", new String("greynoso").toCharArray());
 
 		List<RulesDeploymentPackageReference> packages = rulesPackageHelper.getAllRulesDeploymentPackages();
 		assertEquals(1, packages.size());

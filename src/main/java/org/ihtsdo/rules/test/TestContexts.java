@@ -92,7 +92,7 @@ public class TestContexts extends TestCase {
 		I_GetConceptData context3 = contextsIterator.next();
 
 		rulesPackageHelper.createNewRulesDeploymentPackage("Package reference one", 
-		"http://127.0.0.1:8080/drools-guvnor/org.drools.guvnor.Guvnor/package/org.ihtsdo/TESTING");
+		"http://127.0.0.1:8080/drools-guvnor/org.drools.guvnor.Guvnor/package/org.ihtsdo/TESTING", "greynoso", new String("greynoso").toCharArray());
 
 		List<RulesDeploymentPackageReference> packages = rulesPackageHelper.getAllRulesDeploymentPackages();
 		assertEquals(1, packages.size());

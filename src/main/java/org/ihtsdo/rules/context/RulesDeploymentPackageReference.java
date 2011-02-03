@@ -1,8 +1,10 @@
 package org.ihtsdo.rules.context;
 
+import java.net.Authenticator;
+import java.net.InetAddress;
+import java.net.PasswordAuthentication;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 import org.drools.KnowledgeBase;
@@ -14,16 +16,36 @@ public class RulesDeploymentPackageReference {
 
 	private String name;
 	private String url;
+	private String user;
+	private char[] password;
 	private Collection<UUID> uuids;
 
 	public RulesDeploymentPackageReference() {
 	}
 
-	public RulesDeploymentPackageReference(String name, String url, List<UUID> uuids) {
+	public RulesDeploymentPackageReference(String name, String url, String user, char[] password, Collection<UUID> uuids) {
 		super();
 		this.name = name;
 		this.url = url;
+		this.user = user;
+		this.password = password;
 		this.uuids = uuids;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	public char[] getPassword() {
+		return password;
+	}
+
+	public void setPassword(char[] password) {
+		this.password = password;
 	}
 
 	public String getName() {
@@ -51,6 +73,7 @@ public class RulesDeploymentPackageReference {
 	}
 
 	public byte[] getChangeSetXmlBytes() {
+		Authenticator.setDefault(new MyAuthenticator(user, password));
 		StringBuffer buff = new StringBuffer();
 		buff.append("<change-set xmlns='http://drools.org/drools-5.0/change-set'");
 		buff.append("		xmlns:xs='http://www.w3.org/2001/XMLSchema-instance'");
@@ -58,12 +81,36 @@ public class RulesDeploymentPackageReference {
 		buff.append("		<add>");
 		buff.append("			<resource source='");
 		buff.append(url);
-		//TODO: implement full authentication
+		// TODO: implement full authentication
 		buff.append("' type='PKG' basicAuthentication='enabled' username='empty' password='empty'/>");
 		buff.append("		</add>");
 		buff.append("</change-set>");
 
 		return buff.toString().getBytes();
+	}
+
+	public static class MyAuthenticator extends Authenticator {
+		
+		private String username;
+		private char[] password;
+
+		public MyAuthenticator(String username, char[] password) {
+			super();
+			this.username = username;
+			this.password = password;
+		}
+
+		// This method is called when a password-protected URL is accessed
+		protected PasswordAuthentication getPasswordAuthentication() {
+			// Get information about the request
+			String promptString = getRequestingPrompt();
+			String hostname = getRequestingHost();
+			InetAddress ipaddr = getRequestingSite();
+			int port = getRequestingPort();
+
+			// Return the information
+			return new PasswordAuthentication(this.username, this.password);
+		}
 	}
 
 	public String toString() {
@@ -73,18 +120,17 @@ public class RulesDeploymentPackageReference {
 	public KnowledgeBase updateKnowledgeBase() throws Exception {
 		return getKnowledgeBase(true);
 	}
-	
+
 	public KnowledgeBase getKnowledgeBase(boolean recreate) throws Exception {
-		return RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
-				getChangeSetXmlBytes(), recreate);
+		return RulesLibrary.getKnowledgeBase(uuids.iterator().next(), getChangeSetXmlBytes(), recreate);
 	}
-	
+
 	public Collection<Rule> getRules() throws Exception {
 		Collection<Rule> rules = new ArrayList<Rule>();
 		KnowledgeBase kbase = getKnowledgeBase(false);
 		if (kbase != null) {
 			for (KnowledgePackage kpackg : kbase.getKnowledgePackages()) {
-				//System.out.println("** pkg: " + kpackg.getName());
+				// System.out.println("** pkg: " + kpackg.getName());
 				for (Rule rule : kpackg.getRules()) {
 					rules.add(rule);
 				}
@@ -92,7 +138,7 @@ public class RulesDeploymentPackageReference {
 		}
 		return rules;
 	}
-	
+
 	public boolean validate() {
 		return RulesLibrary.validateDeploymentPackage(uuids.iterator().next(), getChangeSetXmlBytes());
 	}

@@ -38,11 +38,13 @@ public class RulesDeploymentPackageReferenceHelper {
 
 	}
 
-	public RulesDeploymentPackageReference createNewRulesDeploymentPackage(String name, String url) {
+	public RulesDeploymentPackageReference createNewRulesDeploymentPackage(String name, String url, String userName, char[] password) {
 		try {
 			RulesDeploymentPackageReference rulesPackage = new RulesDeploymentPackageReference();
 			rulesPackage.setName(name);
 			rulesPackage.setUrl(url);
+			rulesPackage.setUser(userName);
+			rulesPackage.setPassword(password);
 
 			I_TermFactory termFactory = Terms.get();
 			I_HelpRefsets refsetHelper;
@@ -147,7 +149,14 @@ public class RulesDeploymentPackageReferenceHelper {
 			for (I_ExtendByRefPart loopPart : currentExtensionParts) {
 				I_ExtendByRefPartStr strPart = (I_ExtendByRefPartStr) loopPart;
 				String metadata = strPart.getStringValue();
-				rulesPackage.setUrl(metadata);
+				String[] metadataSplit = metadata.split("\\|");
+				if(metadataSplit.length > 1){
+					rulesPackage.setUrl(metadataSplit[0]);
+					rulesPackage.setUser(metadataSplit[1]);
+					rulesPackage.setPassword(metadataSplit[2].toCharArray());
+				}else if(metadataSplit.length == 1){
+					rulesPackage.setUrl(metadataSplit[0]);
+				}
 			}
 
 			return rulesPackage;
@@ -179,7 +188,13 @@ public class RulesDeploymentPackageReferenceHelper {
 			I_GetConceptData rulesPackageRefset = termFactory.getConcept(
 					new UUID[] {RefsetAuxiliary.Concept.RULES_DEPLOYMENT_PKG_METADATA_REFSET.getUids().iterator().next()});
 
-			String metadata = rulesPackageNewVersion.getUrl();
+			StringBuffer passwordBuf = new StringBuffer();
+			if(rulesPackageNewVersion.getPassword() != null){
+				for (int i = 0; i < rulesPackageNewVersion.getPassword().length; i++) {
+					passwordBuf.append(rulesPackageNewVersion.getPassword()[i]);
+				}
+			}
+			String metadata = rulesPackageNewVersion.getUrl() + "|" + rulesPackageNewVersion.getUser() + "|" + passwordBuf.toString() ;
 
 			List<I_ExtendByRef> extensions = new ArrayList<I_ExtendByRef>();
 			extensions.addAll(termFactory.getAllExtensionsForComponent(rulesPackageConcept.getConceptNid()));

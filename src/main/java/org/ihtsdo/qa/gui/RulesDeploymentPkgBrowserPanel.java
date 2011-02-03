@@ -26,6 +26,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -149,8 +150,16 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 			for (int i = 0; i < components.length; i++) {
 				components[i].setEnabled(true);
 			}
-			textField1.setText(selectedRulesPackage.getName());
-			textField2.setText(selectedRulesPackage.getUrl());
+			nameTextField.setText(selectedRulesPackage.getName());
+			urlTextField.setText(selectedRulesPackage.getUrl());
+			userName.setText(selectedRulesPackage.getUser());
+			StringBuffer passwordBuf = new StringBuffer();
+			if(selectedRulesPackage.getPassword() != null){
+				for (int i = 0; i < selectedRulesPackage.getPassword().length; i++) {
+					passwordBuf.append(selectedRulesPackage.getPassword()[i]);
+				}
+			}
+			passwordField.setText(passwordBuf.toString());
 		}
 	}
 
@@ -163,9 +172,7 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 	}
 
 	private void button1ActionPerformed(ActionEvent e) {
-		// cancel
-		textField1.setText("");
-		textField2.setText("");
+		clearFields();
 		selectedRulesPackage = null;
 		panel1.setEnabled(false);
 		scrollPane2.setVisible(false);
@@ -184,10 +191,12 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 		// save
 		if (selectedRulesPackage == null) {
 			// new repo
-			selectedRulesPackage = rulesPackageHelper.createNewRulesDeploymentPackage(textField1.getText(), textField2.getText());
+			selectedRulesPackage = rulesPackageHelper.createNewRulesDeploymentPackage(nameTextField.getText(), urlTextField.getText(), userName.getText(), passwordField.getPassword());
 		} else {
-			selectedRulesPackage.setName(textField1.getText());
-			selectedRulesPackage.setUrl(textField2.getText());
+			selectedRulesPackage.setName(nameTextField.getText());
+			selectedRulesPackage.setUrl(urlTextField.getText());
+			selectedRulesPackage.setUser(userName.getText());
+			selectedRulesPackage.setPassword(passwordField.getPassword());
 			rulesPackageHelper.updateDeploymentPackageReference(selectedRulesPackage);
 		}
 		
@@ -211,8 +220,7 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 			e1.printStackTrace();
 		}
 		
-		textField1.setText("");
-		textField2.setText("");
+		clearFields();
 		selectedRulesPackage = null;
 		panel1.setEnabled(false);
 		scrollPane2.setVisible(false);
@@ -230,8 +238,7 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 
 	private void button3ActionPerformed(ActionEvent e) {
 		// new
-		textField1.setText("");
-		textField2.setText("");
+		clearFields();
 		selectedRulesPackage = null;
 		panel1.setEnabled(true);
 		updateTable1();
@@ -246,6 +253,13 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 		}
 		button5.setEnabled(false);
 		button3.setEnabled(false);
+	}
+
+	private void clearFields() {
+		nameTextField.setText("");
+		urlTextField.setText("");
+		userName.setText("");
+		passwordField.setText("");
 	}
 
 	private void button4ActionPerformed(ActionEvent e) {
@@ -265,8 +279,7 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 	private void button5ActionPerformed(ActionEvent e) {
 		//retire
 		rulesPackageHelper.retireRulesDeploymentPackageReference(selectedRulesPackage);
-		textField1.setText("");
-		textField2.setText("");
+		clearFields();
 		selectedRulesPackage = null;
 		panel1.setEnabled(false);
 		scrollPane2.setVisible(false);
@@ -308,9 +321,13 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 		list1 = new JList();
 		panel1 = new JPanel();
 		label3 = new JLabel();
-		textField1 = new JTextField();
+		nameTextField = new JTextField();
 		label4 = new JLabel();
-		textField2 = new JTextField();
+		urlTextField = new JTextField();
+		label5 = new JLabel();
+		userName = new JTextField();
+		label6 = new JLabel();
+		passwordField = new JPasswordField();
 		scrollPane2 = new JScrollPane();
 		table1 = new JTable();
 		panel2 = new JPanel();
@@ -366,26 +383,44 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 		//======== panel1 ========
 		{
 			panel1.setLayout(new GridBagLayout());
-			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0};
+			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0, 0};
 			((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0};
-			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0E-4};
 			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4};
 
 			//---- label3 ----
 			label3.setText("Name");
 			panel1.add(label3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 0), 0, 0));
-			panel1.add(textField1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(nameTextField, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 0), 0, 0));
 
 			//---- label4 ----
 			label4.setText("URL");
-			panel1.add(label4, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+			panel1.add(label4, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(urlTextField, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 0), 0, 0));
-			panel1.add(textField2, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+
+			//---- label5 ----
+			label5.setText("User");
+			panel1.add(label5, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(userName, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
+
+			//---- label6 ----
+			label6.setText("Password");
+			panel1.add(label6, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(passwordField, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 0), 0, 0));
 
@@ -393,7 +428,7 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 			{
 				scrollPane2.setViewportView(table1);
 			}
-			panel1.add(scrollPane2, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
+			panel1.add(scrollPane2, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 0), 0, 0));
 
@@ -444,7 +479,7 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 0, 0), 0, 0));
 			}
-			panel1.add(panel2, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0,
+			panel1.add(panel2, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0,
 				GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
 				new Insets(0, 0, 0, 0), 0, 0));
 		}
@@ -512,9 +547,13 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 	private JList list1;
 	private JPanel panel1;
 	private JLabel label3;
-	private JTextField textField1;
+	private JTextField nameTextField;
 	private JLabel label4;
-	private JTextField textField2;
+	private JTextField urlTextField;
+	private JLabel label5;
+	private JTextField userName;
+	private JLabel label6;
+	private JPasswordField passwordField;
 	private JScrollPane scrollPane2;
 	private JTable table1;
 	private JPanel panel2;
