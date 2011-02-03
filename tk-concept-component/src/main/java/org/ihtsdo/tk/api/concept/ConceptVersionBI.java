@@ -75,9 +75,12 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
 			ConstraintCheckType valueCheck) throws IOException, ContraditionException;
 	//TODO
 	
-	boolean isMember(int evalRefsetNid) throws IOException; 
+	boolean isMember(int evalRefsetNid) throws IOException;
 	
 	//TODO to here
+	
+	boolean hasHistoricalRels() throws IOException, ContraditionException;
+	boolean hasChildren() throws IOException, ContraditionException;
 
 
 }
