@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 
@@ -15,6 +18,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.cern.colt.map.OpenIntIntHashMap;
 import org.ihtsdo.concept.component.relationship.group.RelGroupVersion;
+import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidSetBI;
@@ -40,6 +44,7 @@ import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.example.binding.HistoricalRelType;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 public class ConceptVersion implements ConceptVersionBI {
@@ -601,6 +606,40 @@ public class ConceptVersion implements ConceptVersionBI {
     		throw new IOException(e); //AceLog.getAppLog().alertAndLogException(e);
         }
 
+    }
+    
+    @Override
+    public boolean hasHistoricalRels () throws IOException, ContraditionException {
+    	boolean history = false;
+    	ConceptSpec[] historicalTypes = HistoricalRelType.getHistoricalTypes();
+    	Collection<? extends RelationshipChronicleBI> outRels =  getRelsOutgoing();
+    	ViewCoordinate c = this.getViewCoordinate();
+    	I_TermFactory tf = Terms.get();
+    	if (outRels != null){
+    		for(ConceptSpec historicalType : historicalTypes){
+    			for(RelationshipChronicleBI outRel : outRels){
+					RelationshipVersionBI<?> vOutRel = outRel.getVersion(c);
+					int typeNid = vOutRel.getTypeNid();
+					UUID[] compUuids = historicalType.getUuids();
+					for (UUID compUuid: compUuids){
+						if (tf.nidToUuid(typeNid).compareTo(compUuid) == 0){ 
+							history = true;
+							}
+						}
+					}
+    			}
+    		}
+    	return history;
+    	} 
+    			
+    @Override 
+    public boolean hasChildren() throws IOException, ContraditionException{
+    	Collection<? extends RelationshipVersionBI> children = this.getRelsIncomingActive();
+    	if(children.size() == 0){
+    		return false;
+    	}
+    	
+    	return true;
     }
 
 	@Override
