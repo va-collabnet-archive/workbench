@@ -24,6 +24,8 @@ import org.ihtsdo.tk.example.binding.Taxonomies;
 import org.ihtsdo.tk.example.binding.WbDescType;
 import org.ihtsdo.arena.spec.Refsets; 
 
+import org.ihtsdo.tk.example.binding.HistoricalRelSpec; //this is new 
+
 #declare any global variables here
 
 global Collection actions;
@@ -33,7 +35,7 @@ global ViewCoordinate vc;
 rule "add from directory"
 	when
 		$c : ConceptVersionBI();
-	then 
+	then
 		actions.addAll(actionFactory.fromDir("plugins/component"));
 end
 
@@ -42,7 +44,7 @@ rule "add from other directory"
 		$c : ConceptVersionBI(
 				this isKindOf Taxonomies.REFSET_AUX);
 	then 
-		#actions.addAll(actionFactory.fromDir("plugins/component-test"));
+		actions.addAll(actionFactory.fromDir("plugins/component-test"));
 end
 
 rule "add if null concept in host"
@@ -80,6 +82,13 @@ rule "remove if in refset test2"
 		$c: ConceptVersionBI (this isMemberOf Refsets.TEST2); 
 	then 
 		actions.add(actionFactory.make(new File("plugins/remove-concept/remove_from_refset_test2.bp")));
+end
+
+rule "retire if no children"
+	when
+		$c: ConceptVersionBI (); 
+	then
+		actions.addAll(actionFactory.fromDir("plugins/retire"));
 end
 
 

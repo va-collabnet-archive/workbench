@@ -11,6 +11,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 import org.ihtsdo.tk.spec.DescriptionSpec;
+import org.ihtsdo.tk.spec.RelSpec;
 import org.ihtsdo.tk.spec.SpecFactory;
 
 import org.ihtsdo.tk.example.binding.Language;
@@ -20,7 +21,14 @@ import org.ihtsdo.tk.example.binding.SnomedRelType;
 import org.ihtsdo.tk.example.binding.SnomedRelSpec;
 import org.ihtsdo.tk.example.binding.Taxonomies;
 import org.ihtsdo.tk.example.binding.WbDescType;
+import org.ihtsdo.tk.example.binding.HistoricalRelSpec;
 
+
+import org.ihtsdo.tk.spec.RelSpec;
+import org.ihtsdo.tk.example.binding.HistoricalRelType;
+import java.util.ArrayList;
+import org.ihtsdo.tk.example.binding.RelSpecFromConcept;
+import javax.swing.JOptionPane;
 
 
 #declare any global variables here
@@ -122,6 +130,25 @@ rule "isKindOf refset concept and not satisfies FINDING_SITE_OUT constraint"
 	then 
    		System.out.println("isKindOf refset concept failing FINDING_SITE_OUT constraint found: \n" + $c.toString());
    		templates.put(SnomedRelSpec.FINDING_SITE, $c.getNid());
+end
+
+
+rule "isKindOf inactive status"
+	when
+		$c : ConceptVersionBI(this isKindOf Snomed.INACTIVE_STATUS, hasHistoricalRels == false);
+	then
+			JOptionPane.showMessageDialog(null, "Please select the appropriate historical relationships.");
+			ArrayList<RelSpec> relSpecs = new RelSpecFromConcept($c).getRelSpecs();
+			for (RelSpec relSpec: relSpecs){
+			templates.put(relSpec, $c.getNid());
+			}
+end
+
+rule "retiring current Rels"
+	when
+		$c : ConceptVersionBI( this isKindOf Snomed.INACTIVE_STATUS, hasHistoricalRels == true);
+	then
+		System.out.println("***!!! retiring concept !!!***");
 end
 
 

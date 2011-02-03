@@ -34,6 +34,7 @@ import org.ihtsdo.arena.context.action.RetireAction;
 import org.ihtsdo.arena.context.action.UngroupRelAction;
 import org.ihtsdo.arena.context.action.UngroupRelGroupAction;
 import org.ihtsdo.arena.context.action.UpdateDescFromSpecAction;
+import org.ihtsdo.arena.context.action.ReplaceAction;
 
 import org.ihtsdo.tk.drools.facts.ComponentFact;
 import org.ihtsdo.tk.drools.facts.ConAttrFact;
@@ -262,4 +263,15 @@ rule "rule 13" #rel template onto rel group"
    
    then
    actions.add(new AddToRelGroupAction("add to rel group", $dropTarget, $dropObject)); 
+end
+
+rule "rule 14" #historical rel template onto rel"
+	when
+		$dropObject : RelFact(context == Context.DROP_OBJECT);
+		$dropTarget : RelSpecFact(context == Context.DROP_TARGET);
+		$concept : ConceptVersionBI();
+		
+	then
+		actions.add(new ReplaceAction("Replace with", $dropObject,$dropTarget));
+		#String actionName, RelFact fact, ConceptFact concept, SpecFact<?> spec
 end
