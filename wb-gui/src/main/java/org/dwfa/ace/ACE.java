@@ -3254,22 +3254,30 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public void setEnabledNewInboxButton(boolean enable) {
         AceLog.getAppLog().info("set enable new inbox button: " + enable);
-        newInboxButton.setEnabled(enable);
+        if (newInboxButton != null) {
+            newInboxButton.setEnabled(enable);
+        }
     }
 
     public void setEnabledExistingInboxButton(boolean enable) {
         AceLog.getAppLog().info("set enable add-existing-inbox button: " + enable);
-        addExistingInboxButton.setEnabled(enable);
+        if (addExistingInboxButton != null) {
+            addExistingInboxButton.setEnabled(enable);
+        }
     }
 
     public void setEnabledMoveListenerButton(boolean enable) {
         AceLog.getAppLog().info("set enable move-listener button: " + enable);
-        moveListenerButton.setEnabled(enable);
+        if (moveListenerButton != null) {
+            moveListenerButton.setEnabled(enable);
+        }
     }
 
     public void setEnabledAllQueuesButton(boolean enable) {
         AceLog.getAppLog().info("set enable all queues button: " + enable);
-        showAllQueuesButton.setEnabled(enable);
+        if (showAllQueuesButton != null) {
+            showAllQueuesButton.setEnabled(enable);
+        }
     }
 
     public void setShowProcessBuilder(boolean show) {

@@ -23,7 +23,7 @@ import java.beans.SimpleBeanInfo;
 
 import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 
-public class SetQueueButtonVisibilityBeanInfo extends SimpleBeanInfo {
+public class EnableQueueButtonsBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
 
@@ -68,8 +68,8 @@ public class SetQueueButtonVisibilityBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(SetQueueButtonVisibility.class);
-        bd.setDisplayName("<html><font color='green'><center>Set visibility of<br>queue buttons");
+        BeanDescriptor bd = new BeanDescriptor(EnableQueueButtons.class);
+        bd.setDisplayName("<html><font color='green'><center>Enable/disable <br>queue buttons");
         return bd;
     }
 
