@@ -17,5 +17,6 @@ public interface I_ToggleSubPanels {
     void setVisible(boolean visible);
     void showSubPanels(EnumSet<SubPanelTypes> panels);
     void hideSubPanels(EnumSet<SubPanelTypes> panels);
+    boolean isExpanded();
 
 }

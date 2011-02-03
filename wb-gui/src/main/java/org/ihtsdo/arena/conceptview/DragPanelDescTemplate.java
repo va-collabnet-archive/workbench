@@ -12,17 +12,17 @@ import org.ihtsdo.tk.spec.DescriptionSpec;
 public class DragPanelDescTemplate extends DragPanel<DescriptionSpec> implements I_ToggleSubPanels {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
-	
-	public DragPanelDescTemplate(ConceptViewSettings settings, 
+
+	public DragPanelDescTemplate(ConceptViewSettings settings,
            DescriptionSpec ds) {
 		super(settings, ds);
 	}
 
-	public DragPanelDescTemplate(LayoutManager layout, 
+	public DragPanelDescTemplate(LayoutManager layout,
 			ConceptViewSettings settings, DescriptionSpec ds) {
 		super(layout, settings, ds);
 	}
@@ -31,7 +31,7 @@ public class DragPanelDescTemplate extends DragPanel<DescriptionSpec> implements
 	public DataFlavor[] getTransferDataFlavors() {
 		return new DataFlavor[] { DragPanelDataFlavors.descVersionFlavor };
 	}
-	
+
 	@Override
 	public DataFlavor getNativeDataFlavor() {
 		return DragPanelDataFlavors.descVersionFlavor ;
@@ -46,11 +46,11 @@ public class DragPanelDescTemplate extends DragPanel<DescriptionSpec> implements
 	protected int getTransferMode() {
 		return TransferHandler.COPY;
 	}
-	
+
 	public DescriptionSpec getThingToDrag() {
 		return thingToDrag;
 	}
-	
+
 	public DescriptionSpec getDraggedThing() {
 		return thingToDrag;
 	}
@@ -64,11 +64,16 @@ public class DragPanelDescTemplate extends DragPanel<DescriptionSpec> implements
     public void showSubPanels(EnumSet<SubPanelTypes> panels) {
         // nothing to do...;
     }
-	
+
     @Override
     public void hideSubPanels(EnumSet<SubPanelTypes> panels) {
         // nothing to do...;
     }
-	
-	
+
+   @Override
+   public boolean isExpanded() {
+      return false;
+   }
+
+
 }

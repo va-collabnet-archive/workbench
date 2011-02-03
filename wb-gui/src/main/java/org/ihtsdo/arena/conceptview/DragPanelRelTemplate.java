@@ -10,18 +10,18 @@ import org.ihtsdo.arena.conceptview.ComponentVersionDragPanel.SubPanelTypes;
 import org.ihtsdo.tk.spec.RelSpec;
 
 public class DragPanelRelTemplate extends DragPanel<RelSpec> implements I_ToggleSubPanels {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
-	
+
 	public DragPanelRelTemplate(ConceptViewSettings settings, RelSpec rs) {
 		super(settings, rs);
 	}
 
-	public DragPanelRelTemplate(LayoutManager layout, 
+	public DragPanelRelTemplate(LayoutManager layout,
 			ConceptViewSettings settings, RelSpec rs) {
 		super(layout, settings, rs);
 	}
@@ -30,7 +30,7 @@ public class DragPanelRelTemplate extends DragPanel<RelSpec> implements I_Toggle
 	public DataFlavor[] getTransferDataFlavors() {
 		return new DataFlavor[] { DragPanelDataFlavors.relVersionFlavor }; //from desc
 	}
-	
+
 	@Override
 	public DataFlavor getNativeDataFlavor() {
 		return DragPanelDataFlavors.relVersionFlavor ; //from desc
@@ -45,16 +45,16 @@ public class DragPanelRelTemplate extends DragPanel<RelSpec> implements I_Toggle
 	protected int getTransferMode() {
 		return TransferHandler.COPY;
 	}
-	
+
         @Override
 	public RelSpec getThingToDrag() {
 		return thingToDrag;
 	}
-	
+
 	public RelSpec getDraggedThing() {
 		return thingToDrag;
 	}
-	
+
 	@Override
 	public String getUserString(RelSpec obj) {
 		return obj.toString();
@@ -64,11 +64,17 @@ public class DragPanelRelTemplate extends DragPanel<RelSpec> implements I_Toggle
     public void showSubPanels(EnumSet<SubPanelTypes> panels) {
         // nothing to do...;
     }
-    
-    	
+
+
     @Override
     public void hideSubPanels(EnumSet<SubPanelTypes> panels) {
         // nothing to do...;
     }
+
+
+   @Override
+   public boolean isExpanded() {
+      return false;
+   }
 
 }

@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.ihtsdo.arena.conceptview;
 
 import java.io.IOException;
@@ -19,11 +18,10 @@ import org.ihtsdo.arena.conceptview.ComponentVersionDragPanel.SubPanelTypes;
 public class CollapsePanelPrefs implements Serializable {
 
    /**
-	 *
-	 */
-    private static final long serialVersionUID = 1L;
-
-    private static final int dataVersion = 1;
+    *
+    */
+   private static final long serialVersionUID = 1L;
+   private static final int dataVersion = 1;
    private boolean extrasShown = false;
    private EnumSet<ComponentVersionDragPanel.SubPanelTypes> subpanelsToShow =
            EnumSet.noneOf(ComponentVersionDragPanel.SubPanelTypes.class);
@@ -34,42 +32,41 @@ public class CollapsePanelPrefs implements Serializable {
    }
 
    public CollapsePanelPrefs() {
-
    }
 
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.writeInt(dataVersion);
-        out.writeBoolean(collapsed);
-        out.writeBoolean(extrasShown);
-        out.writeObject(subpanelsToShow);
-    }
-
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        int objDataVersion = in.readInt();
-        if (objDataVersion == dataVersion) {
-            //
-           collapsed = in.readBoolean();
-           extrasShown = in.readBoolean();
-           subpanelsToShow = (EnumSet<SubPanelTypes>) in.readObject();
-        } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);
-        }
-
-    }
-
-   public boolean areAlertsShown() {
-      return subpanelsToShow.contains(SubPanelTypes.ALERT);
+   private void writeObject(ObjectOutputStream out) throws IOException {
+      out.writeInt(dataVersion);
+      out.writeBoolean(collapsed);
+      out.writeBoolean(extrasShown);
+      out.writeObject(subpanelsToShow);
    }
 
-   public void setAlertsShown(boolean alertsShown) {
-      if (alertsShown) {
-         subpanelsToShow.add(SubPanelTypes.ALERT);
+   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+      int objDataVersion = in.readInt();
+      if (objDataVersion == dataVersion) {
+         //
+         collapsed = in.readBoolean();
+         extrasShown = in.readBoolean();
+         subpanelsToShow = (EnumSet<SubPanelTypes>) in.readObject();
       } else {
-         subpanelsToShow.remove(SubPanelTypes.ALERT);
+         throw new IOException("Can't handle dataversion: " + objDataVersion);
+      }
+
+   }
+
+   public void setShown(boolean shown, SubPanelTypes type) {
+      if (shown) {
+         subpanelsToShow.add(type);
+      } else {
+         subpanelsToShow.remove(type);
       }
    }
 
-   public boolean areExtrasShown() {
+   public boolean isShown(SubPanelTypes type) {
+      return subpanelsToShow.contains(type);
+   }
+
+   public boolean getExtrasShown() {
       return extrasShown;
    }
 
@@ -77,32 +74,8 @@ public class CollapsePanelPrefs implements Serializable {
       this.extrasShown = extrasShown;
    }
 
-   public boolean areRefexesShown() {
-      return subpanelsToShow.contains(SubPanelTypes.REFEX);
-   }
-
-   public void setRefexesShown(boolean refexesShown) {
-      if (refexesShown) {
-         subpanelsToShow.add(SubPanelTypes.REFEX);
-      } else {
-         subpanelsToShow.remove(SubPanelTypes.REFEX);
-      }
-   }
-
    public EnumSet<SubPanelTypes> getSubpanelsToShow() {
       return subpanelsToShow;
-   }
-
-   public boolean areTemplatesShown() {
-      return subpanelsToShow.contains(SubPanelTypes.TEMPLATE);
-   }
-
-   public void setTemplatesShown(boolean templatesShown) {
-      if (templatesShown) {
-         subpanelsToShow.add(SubPanelTypes.TEMPLATE);
-      } else {
-         subpanelsToShow.remove(SubPanelTypes.TEMPLATE);
-      }
    }
 
    public boolean isCollapsed() {
@@ -112,7 +85,4 @@ public class CollapsePanelPrefs implements Serializable {
    public void setCollapsed(boolean collapsed) {
       this.collapsed = collapsed;
    }
-
-
-
 }
