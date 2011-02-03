@@ -3126,6 +3126,26 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     @Override
+    public void setEnabledAllQueuesButton(boolean enable) {
+        aceFrame.getCdePanel().setEnabledAllQueuesButton(enable);
+    }
+
+    @Override
+    public void setEnabledExistingInboxButton(boolean enable) {
+        aceFrame.getCdePanel().setEnabledExistingInboxButton(enable);
+    }
+
+    @Override
+    public void setEnabledMoveListenerButton(boolean enable) {
+        aceFrame.getCdePanel().setEnabledMoveListenerButton(enable);
+    }
+
+    @Override
+    public void setEnabledNewInboxButton(boolean enable) {
+        aceFrame.getCdePanel().setEnabledNewInboxButton(enable);
+    }
+
+    @Override
     public Coordinate getCoordinate() {
         if (languagePreferenceList != null && languagePreferenceList.size() > 1) {
             return new Coordinate(getPrecedence(), getViewPositionSetReadOnly(), getAllowedStatus(), getDestRelTypes(),

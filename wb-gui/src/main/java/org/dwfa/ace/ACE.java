@@ -242,8 +242,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
             public void run() {
                 try {
-                    ObjectInputStream ois =
-                            new ObjectInputStream(new BufferedInputStream(new FileInputStream(processFile)));
+                    ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(processFile)));
                     I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
                     ois.close();
                     if (worker.isExecuting()) {
@@ -254,9 +253,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 } catch (Exception ex) {
 
                     worker.getLogger().log(Level.SEVERE, ex.getMessage(), ex);
-                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                        "<html>Exception processing action: " + action + "<p><p>" + ex.getMessage()
-                            + "<p><p>See log for details.");
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "<html>Exception processing action: "
+                        + action + "<p><p>" + ex.getMessage() + "<p><p>See log for details.");
                 }
             }
         };
@@ -429,11 +427,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 }
                 boolean isSelected = false;
                 if (isSelected) {
-                    componentPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 1,
-                        1, 1, Color.BLUE), BorderFactory.createEmptyBorder(1, 0, 0, 0)));
+                    componentPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 1, 1, 1,
+                        Color.BLUE), BorderFactory.createEmptyBorder(1, 0, 0, 0)));
                 } else {
-                    componentPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0,
-                        1, 0, Color.BLACK), BorderFactory.createEmptyBorder(1, 1, 0, 1)));
+                    componentPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,
+                        Color.BLACK), BorderFactory.createEmptyBorder(1, 1, 0, 1)));
                 }
 
                 addFocus(componentPanel, alert);
@@ -569,7 +567,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
      * if (commitInProgress) {
      * try {
      * to.abort();
-     * AceLog.getAppLog().alertAndLogException(new Exception("Cannot edit while a commit is in process."));
+     * AceLog.getAppLog().alertAndLogException(new
+     * Exception("Cannot edit while a commit is in process."));
      * } catch (IOException e) {
      * throw new RuntimeException(e);
      * }
@@ -586,7 +585,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
      * if (commitInProgress) {
      * try {
      * to.abort();
-     * AceLog.getAppLog().alertAndLogException(new Exception("Cannot edit while a commit is in process."));
+     * AceLog.getAppLog().alertAndLogException(new
+     * Exception("Cannot edit while a commit is in process."));
      * } catch (IOException e) {
      * throw new RuntimeException(e);
      * }
@@ -605,7 +605,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
      * AceLog.getEditLog().alertAndLogException(e);
      * }
      * }
-     * List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
+     * List<AlertToDataConstraintFailure> warningsAndErrors = new
+     * ArrayList<AlertToDataConstraintFailure>();
      * dataCheckMap.put(uncommittedBean, warningsAndErrors);
      * for (I_TestDataConstraints test : creationTests) {
      * try {
@@ -752,8 +753,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 synchronized (uncommittedNoChecks) {
                     boolean testFailures = false;
                     Set<I_Transact> testFailureSet = new HashSet<I_Transact>();
-                    List<AlertToDataConstraintFailure> warningsAndErrors =
-                            new ArrayList<AlertToDataConstraintFailure>();
+                    List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
                     AceLog.getEditLog().info("Uncommitted count: " + uncommitted.size());
                     AceLog.getEditLog().finer("Uncommitted set: " + uncommitted);
                     for (I_Transact to : uncommitted) {
@@ -1028,8 +1028,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     getRootPane().getLayeredPane().moveToFront(subversionPalette);
                     deselectOthers(showSubversionButton);
                 }
-                subversionPalette.togglePalette(((JToggleButton) e.getSource()).isSelected(),
-                    TOGGLE_DIRECTION.LEFT_RIGHT);
+                subversionPalette.togglePalette(((JToggleButton) e.getSource()).isSelected(), TOGGLE_DIRECTION.LEFT_RIGHT);
             } catch (Exception e1) {
                 AceLog.getAppLog().alertAndLogException(e1);
             }
@@ -1050,8 +1049,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 getRootPane().getLayeredPane().moveToFront(queuePalette);
                 deselectOthers(showQueuesButton);
             }
-            queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), conceptTabs
-                .getHeight() + 4);
+            queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(),
+                conceptTabs.getHeight() + 4);
             queuePalette.togglePalette(((JToggleButton) e.getSource()).isSelected(), TOGGLE_DIRECTION.LEFT_RIGHT);
             SwingUtilities.invokeLater(new Runnable() {
 
@@ -1085,8 +1084,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 getRootPane().getLayeredPane().moveToFront(processPalette);
                 deselectOthers(showProcessBuilder);
             }
-            processPalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), conceptTabs
-                .getHeight() + 4);
+            processPalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(),
+                conceptTabs.getHeight() + 4);
             processPalette.togglePalette(((JToggleButton) e.getSource()).isSelected(), TOGGLE_DIRECTION.LEFT_RIGHT);
         }
 
@@ -1251,6 +1250,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private JToggleButton showProcessBuilder;
 
+    private JButton newInboxButton;
+
+    private JButton addExistingInboxButton;
+
+    private JButton moveListenerButton;
+
+    private JToggleButton showAllQueuesButton;
+
     private TogglePanelsActionListener resizeListener = new TogglePanelsActionListener();
 
     private ManageBottomPaneActionListener bottomPanelActionListener = new ManageBottomPaneActionListener();
@@ -1340,8 +1347,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 Point p = new Point(topPanel.getLocation().x, getMenuSpacer());
                 if (offset == null) {
                     if (System.getProperty("exe4j.isInstall4j") != null
-                        && System.getProperty("exe4j.isInstall4j").equals("true")
-                        && System.getProperty("os.name") != null
+                        && System.getProperty("exe4j.isInstall4j").equals("true") && System.getProperty("os.name") != null
                         && System.getProperty("os.name").toLowerCase().startsWith("window")) {
                         System.out.println("Setting offset to 20");
                         offset = 20;
@@ -1561,22 +1567,19 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         menuItem = new JMenuItem("Cut");
         menuItem.setActionCommand((String) TransferHandler.getCutAction().getValue(Action.NAME));
         menuItem.addActionListener(actionListener);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit()
-            .getMenuShortcutKeyMask()));
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menuItem.setMnemonic(KeyEvent.VK_T);
         editMenu.add(menuItem);
         menuItem = new JMenuItem("Copy");
         menuItem.setActionCommand((String) TransferHandler.getCopyAction().getValue(Action.NAME));
         menuItem.addActionListener(actionListener);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit()
-            .getMenuShortcutKeyMask()));
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menuItem.setMnemonic(KeyEvent.VK_C);
         editMenu.add(menuItem);
         menuItem = new JMenuItem("Paste");
         menuItem.setActionCommand((String) TransferHandler.getPasteAction().getValue(Action.NAME));
         menuItem.addActionListener(actionListener);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit()
-            .getMenuShortcutKeyMask()));
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menuItem.setMnemonic(KeyEvent.VK_P);
         editMenu.add(menuItem);
 
@@ -1584,16 +1587,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         menuItem = new JMenuItem("Copy XML");
         menuItem.setActionCommand("Copy XML");
         menuItem.addActionListener(actionListener);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit()
-            .getMenuShortcutKeyMask()
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
             + java.awt.event.InputEvent.SHIFT_MASK));
         editMenu.add(menuItem);
 
         menuItem = new JMenuItem("Copy Tab Delimited Text");
         menuItem.setActionCommand("Copy TDT");
         menuItem.addActionListener(actionListener);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit()
-            .getMenuShortcutKeyMask()
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
             + java.awt.event.InputEvent.ALT_MASK));
         editMenu.add(menuItem);
 
@@ -1610,11 +1611,13 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
              * menuItem.addActionListener(new WriteJar(aceConfig));
              * fileMenu.add(menuItem); fileMenu.addSeparator();
              * menuItem = new JMenuItem("Import Java Changeset...");
-             * menuItem.addActionListener(new ImportJavaChangeset(config, aceFrame, aceConfig));
+             * menuItem.addActionListener(new ImportJavaChangeset(config,
+             * aceFrame, aceConfig));
              * fileMenu.add(menuItem);
              * fileMenu.addSeparator();
              * menuItem = new JMenuItem("Test Tuple Calculator...");
-             * menuItem.addActionListener(new TestTupleCalculator(config, aceFrame, aceConfig));
+             * menuItem.addActionListener(new TestTupleCalculator(config,
+             * aceFrame, aceConfig));
              * fileMenu.add(menuItem);
              * fileMenu.addSeparator();
              */
@@ -1639,16 +1642,17 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     }
 
-    private static void addActionButton(ActionListener actionListener, String resource, String tooltipText,
+    private static JButton addActionButton(ActionListener actionListener, String resource, String tooltipText,
             JPanel topPanel, GridBagConstraints c) {
         JButton newProcess = new JButton(new ImageIcon(ACE.class.getResource(resource)));
         newProcess.setToolTipText(tooltipText);
         newProcess.addActionListener(actionListener);
         topPanel.add(newProcess, c);
         c.gridx++;
+        return newProcess;
     }
 
-    private static void addActionToggleButton(ActionListener actionListener, String resource, String tooltipText,
+    private static JToggleButton addActionToggleButton(ActionListener actionListener, String resource, String tooltipText,
             JPanel topPanel, GridBagConstraints c, int size) {
         JToggleButton newProcess;
         switch (size) {
@@ -1669,6 +1673,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         newProcess.addActionListener(actionListener);
         topPanel.add(newProcess, c);
         c.gridx++;
+        return newProcess;
     }
 
     private JComponent getContentPanel() throws Exception {
@@ -1875,8 +1880,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         MasterWorker worker = new MasterWorker(config);
         worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), aceFrameConfig);
-        queuePalette.add(makeQueueViewerPanel(config, worker, aceFrameConfig.getInboxQueueFilter()),
-            BorderLayout.CENTER);
+        queuePalette.add(makeQueueViewerPanel(config, worker, aceFrameConfig.getInboxQueueFilter()), BorderLayout.CENTER);
         queuePalette.setBorder(BorderFactory.createRaisedBevelBorder());
         int width = getWidth() - termTreeConceptSplit.getDividerLocation();
         int height = getHeight() - topPanel.getHeight();
@@ -1925,14 +1929,18 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         listEditorTopPanel.add(new JLabel(" "), c); // filler
         c.gridx++;
         c.weightx = 0.0;
-        addActionButton(new NewQueueListener(this), "/24x24/plain/inbox_new.png",
-            "Create new inbox and add to profile", listEditorTopPanel, c);
-        addActionButton(new AddQueueListener(this), "/24x24/plain/inbox_add.png", "Add existing inbox to profile",
-            listEditorTopPanel, c);
-        addActionButton(new MoveListener(), "/24x24/plain/outbox_out.png",
-            "Take Selected Processes and Save To Disk (no transaction)", listEditorTopPanel, c);
-        addActionToggleButton(new ShowAllQueuesListener(), "/24x24/plain/funnel_delete.png", "Show all queues",
-            listEditorTopPanel, c, 24);
+        newInboxButton =
+                addActionButton(new NewQueueListener(this), "/24x24/plain/inbox_new.png",
+                    "Create new inbox and add to profile", listEditorTopPanel, c);
+        addExistingInboxButton =
+                addActionButton(new AddQueueListener(this), "/24x24/plain/inbox_add.png", "Add existing inbox to profile",
+                    listEditorTopPanel, c);
+        moveListenerButton =
+                addActionButton(new MoveListener(), "/24x24/plain/outbox_out.png",
+                    "Take Selected Processes and Save To Disk (no transaction)", listEditorTopPanel, c);
+        showAllQueuesButton =
+                addActionToggleButton(new ShowAllQueuesListener(), "/24x24/plain/funnel_delete.png", "Show all queues",
+                    listEditorTopPanel, c, 24);
         return listEditorTopPanel;
 
     }
@@ -2062,8 +2070,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         JPanel controlPanel = new JPanel(new GridLayout(3, 1));
         controlPanel.add(getCheckboxEditor("show contradictions in taxonomy view", "highlightConflictsInTaxonomyView",
             aceFrameConfig.getHighlightConflictsInTaxonomyView(), true));
-        controlPanel.add(getCheckboxEditor("show contradictions in component panel",
-            "highlightConflictsInComponentPanel", aceFrameConfig.getHighlightConflictsInComponentPanel(), true));
+        controlPanel.add(getCheckboxEditor("show contradictions in component panel", "highlightConflictsInComponentPanel",
+            aceFrameConfig.getHighlightConflictsInComponentPanel(), true));
 
         final JTextPane descriptionPanel = new JTextPane();
         descriptionPanel.setEditable(false);
@@ -2266,15 +2274,15 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridheight = 1;
-        checkPanel.add(getCheckboxEditor("show viewer images in taxonomy view", "showViewerImagesInTaxonomy",
-            aceFrameConfig.getShowViewerImagesInTaxonomy(), true), gbc);
+        checkPanel.add(getCheckboxEditor("show viewer images in taxonomy view", "showViewerImagesInTaxonomy", aceFrameConfig
+            .getShowViewerImagesInTaxonomy(), true), gbc);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridy++;
         checkPanel.add(getCheckboxEditor("show path info in taxonomy view", "showPathInfoInTaxonomy", aceFrameConfig
             .getShowPathInfoInTaxonomy(), true), gbc);
         gbc.gridy++;
-        checkPanel.add(getCheckboxEditor("show refset info in taxonomy view", "showRefsetInfoInTaxonomy",
-            aceFrameConfig.getShowRefsetInfoInTaxonomy(), true), gbc);
+        checkPanel.add(getCheckboxEditor("show refset info in taxonomy view", "showRefsetInfoInTaxonomy", aceFrameConfig
+            .getShowRefsetInfoInTaxonomy(), true), gbc);
         gbc.weighty = 1;
         gbc.gridheight = 3;
         gbc.gridy++;
@@ -2312,8 +2320,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         checkBoxEditor.setPropertyDisplayName(label);
         aceFrameConfig.addPropertyChangeListener("show" + propertyName.toUpperCase().substring(0, 1)
             + propertyName.substring(1), new PropertyListenerGlue("setValue", Object.class, checkBoxEditor));
-        checkBoxEditor.addPropertyChangeListener(new PropertyListenerGlue("set"
-            + propertyName.toUpperCase().substring(0, 1) + propertyName.substring(1), Boolean.class, aceFrameConfig));
+        checkBoxEditor.addPropertyChangeListener(new PropertyListenerGlue("set" + propertyName.toUpperCase().substring(0, 1)
+            + propertyName.substring(1), Boolean.class, aceFrameConfig));
 
         return checkBoxEditor.getCustomEditor();
     }
@@ -2539,8 +2547,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         classifierRootLabel.setTermComponent(aceFrameConfig.getClassificationRoot());
         aceFrameConfig.addPropertyChangeListener("classificationRoot", new PropertyListenerGlue("setTermComponent",
             I_AmTermComponent.class, classifierRootLabel));
-        classifierRootLabel.addTermChangeListener(new PropertyListenerGlue("setClassificationRoot",
-            I_GetConceptData.class, aceFrameConfig));
+        classifierRootLabel.addTermChangeListener(new PropertyListenerGlue("setClassificationRoot", I_GetConceptData.class,
+            aceFrameConfig));
 
         wrapAndAdd(classifierPrefPanel, classifierRootLabel, "Classification root: ");
 
@@ -2585,8 +2593,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         tabs.addTab("defaults", new JScrollPane(madeDefaultsPanel()));
         tabs.addTab("rel type", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditRelTypePopup(),
             "Relationship types for popup:")));
-        tabs.addTab("rel refinabilty", new JScrollPane(makePopupConfigPanel(
-            aceFrameConfig.getEditRelRefinabiltyPopup(), "Relationship refinability for popup:")));
+        tabs.addTab("rel refinabilty", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditRelRefinabiltyPopup(),
+            "Relationship refinability for popup:")));
         tabs.addTab("rel characteristic", new JScrollPane(makePopupConfigPanel(aceFrameConfig
             .getEditRelCharacteristicPopup(), "Relationship characteristics for popup:")));
         tabs.addTab("desc type", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditDescTypePopup(),
@@ -2622,24 +2630,24 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         defaultDescType.setTermComponent(aceFrameConfig.getDefaultDescriptionType());
         aceFrameConfig.addPropertyChangeListener("defaultDescriptionType", new PropertyListenerGlue("setTermComponent",
             I_AmTermComponent.class, defaultDescType));
-        defaultDescType.addTermChangeListener(new PropertyListenerGlue("setDefaultDescriptionType",
-            I_GetConceptData.class, aceFrameConfig));
+        defaultDescType.addTermChangeListener(new PropertyListenerGlue("setDefaultDescriptionType", I_GetConceptData.class,
+            aceFrameConfig));
         wrapAndAdd(defaultsPanel, defaultDescType, "Default description type: ");
 
         TermComponentLabel defaultRelType = new TermComponentLabel(aceFrameConfig);
         defaultRelType.setTermComponent(aceFrameConfig.getDefaultRelationshipType());
-        aceFrameConfig.addPropertyChangeListener("defaultRelationshipType", new PropertyListenerGlue(
-            "setTermComponent", I_AmTermComponent.class, defaultRelType));
-        defaultRelType.addTermChangeListener(new PropertyListenerGlue("setDefaultRelationshipType",
-            I_GetConceptData.class, aceFrameConfig));
+        aceFrameConfig.addPropertyChangeListener("defaultRelationshipType", new PropertyListenerGlue("setTermComponent",
+            I_AmTermComponent.class, defaultRelType));
+        defaultRelType.addTermChangeListener(new PropertyListenerGlue("setDefaultRelationshipType", I_GetConceptData.class,
+            aceFrameConfig));
         wrapAndAdd(defaultsPanel, defaultRelType, "Default relationship type: ");
 
         TermComponentLabel defaultRelCharacteristicType = new TermComponentLabel(aceFrameConfig);
         defaultRelCharacteristicType.setTermComponent(aceFrameConfig.getDefaultRelationshipCharacteristic());
         aceFrameConfig.addPropertyChangeListener("defaultRelationshipCharacteristic", new PropertyListenerGlue(
             "setTermComponent", I_AmTermComponent.class, defaultRelCharacteristicType));
-        defaultRelCharacteristicType.addTermChangeListener(new PropertyListenerGlue(
-            "setDefaultRelationshipCharacteristic", I_GetConceptData.class, aceFrameConfig));
+        defaultRelCharacteristicType.addTermChangeListener(new PropertyListenerGlue("setDefaultRelationshipCharacteristic",
+            I_GetConceptData.class, aceFrameConfig));
         wrapAndAdd(defaultsPanel, defaultRelCharacteristicType, "Default relationship characteristic: ");
 
         TermComponentLabel defaultRelRefinability = new TermComponentLabel(aceFrameConfig);
@@ -2942,8 +2950,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                             public void run() {
                                 aceFrameConfig.setStatusMessage("<html><font color='#006400'>execute");
                                 if (exceptionMessage.equals("")) {
-                                    aceFrameConfig.setStatusMessage("<html>Execution of <font color='blue'>"
-                                        + bp.getName() + "</font> complete.");
+                                    aceFrameConfig.setStatusMessage("<html>Execution of <font color='blue'>" + bp.getName()
+                                        + "</font> complete.");
                                 } else {
                                     aceFrameConfig
                                         .setStatusMessage("<html><font color='blue'>Process complete: <font color='red'>"
@@ -3244,6 +3252,26 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
     }
 
+    public void setEnabledNewInboxButton(boolean enable) {
+        AceLog.getAppLog().info("set enable new inbox button: " + enable);
+        newInboxButton.setEnabled(enable);
+    }
+
+    public void setEnabledExistingInboxButton(boolean enable) {
+        AceLog.getAppLog().info("set enable add-existing-inbox button: " + enable);
+        addExistingInboxButton.setEnabled(enable);
+    }
+
+    public void setEnabledMoveListenerButton(boolean enable) {
+        AceLog.getAppLog().info("set enable move-listener button: " + enable);
+        moveListenerButton.setEnabled(enable);
+    }
+
+    public void setEnabledAllQueuesButton(boolean enable) {
+        AceLog.getAppLog().info("set enable all queues button: " + enable);
+        showAllQueuesButton.setEnabled(enable);
+    }
+
     public void setShowProcessBuilder(boolean show) {
         AceLog.getAppLog().info("set show process builder: " + show);
         if (show != showProcessBuilder.isSelected()) {
@@ -3334,8 +3362,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                         aceFrameConfig.getWorker().execute(process);
                         AceLog.getAppLog().info("Finished shutdown business process: " + startupFiles[i]);
                     } catch (Throwable e1) {
-                        AceLog.getAppLog().alertAndLog(Level.SEVERE, e1.getMessage() + " thrown by " + startupFiles[i],
-                            e1);
+                        AceLog.getAppLog().alertAndLog(Level.SEVERE, e1.getMessage() + " thrown by " + startupFiles[i], e1);
                     }
                 }
             } else {

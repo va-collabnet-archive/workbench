@@ -1287,4 +1287,24 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
     public void setShowPromotionTab(Boolean show) {
         baseFrame.setShowPromotionTab(show);
     }
+
+    @Override
+    public void setEnabledAllQueuesButton(boolean enable) {
+        baseFrame.setEnabledAllQueuesButton(enable);
+    }
+
+    @Override
+    public void setEnabledExistingInboxButton(boolean enable) {
+        baseFrame.setEnabledExistingInboxButton(enable);
+    }
+
+    @Override
+    public void setEnabledMoveListenerButton(boolean enable) {
+        baseFrame.setEnabledMoveListenerButton(enable);
+    }
+
+    @Override
+    public void setEnabledNewInboxButton(boolean enable) {
+        baseFrame.setEnabledNewInboxButton(enable);
+    }
 }

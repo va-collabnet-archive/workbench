@@ -1151,4 +1151,24 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
     public void setShowPromotionTab(Boolean show) {
         config.setShowPromotionTab(show);
     }
+
+    @Override
+    public void setEnabledAllQueuesButton(boolean enable) {
+        config.setEnabledAllQueuesButton(enable);
+    }
+
+    @Override
+    public void setEnabledExistingInboxButton(boolean enable) {
+        config.setEnabledExistingInboxButton(enable);
+    }
+
+    @Override
+    public void setEnabledMoveListenerButton(boolean enable) {
+        config.setEnabledMoveListenerButton(enable);
+    }
+
+    @Override
+    public void setEnabledNewInboxButton(boolean enable) {
+        config.setEnabledNewInboxButton(enable);
+    }
 }

@@ -56,8 +56,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     };
 
     public enum LANGUAGE_SORT_PREF {
-        LANG_B4_TYPE("language before type"),
-        TYPE_B4_LANG("type before language");
+        LANG_B4_TYPE("language before type"), TYPE_B4_LANG("type before language");
 
         private String desc;
 
@@ -317,6 +316,14 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void setShowSearch(boolean shown);
 
+    public void setEnabledNewInboxButton(boolean enable);
+
+    public void setEnabledExistingInboxButton(boolean enable);
+
+    public void setEnabledMoveListenerButton(boolean enable);
+
+    public void setEnabledAllQueuesButton(boolean enable);
+
     public void performLuceneSearch(String query, I_GetConceptData root);
 
     public void performLuceneSearch(String query, List<I_TestSearchResults> extraCriterion);
@@ -387,8 +394,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public boolean isToggleVisible(TOGGLES toggle);
 
-    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException,
-            IOException;
+    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException, IOException;
 
     public void setRefsetInToggleVisible(REFSET_TYPES refsetType, TOGGLES toggle, boolean visible);
 
@@ -530,6 +536,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public I_ManageContradiction[] getAllConflictResolutionStrategies();
 
     public void setTopActivity(I_ShowActivity activity);
+
     public I_ShowActivity getTopActivity();
 
     /**
@@ -623,14 +630,13 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void fireUpdateHierarchyView();
 
     public void refreshRefsetTab();
-    
+
     public void setPrecedence(Precedence precedence);
-    
+
     public Precedence getPrecedence();
-    
+
     public Coordinate getCoordinate();
-    
+
     public void quit();
-    
-    
+
 }

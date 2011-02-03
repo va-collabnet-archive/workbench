@@ -1157,4 +1157,24 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         frameConfig.setShowPromotionTab(show);
     }
 
+    @Override
+    public void setEnabledAllQueuesButton(boolean enable) {
+        frameConfig.setEnabledAllQueuesButton(enable);
+    }
+
+    @Override
+    public void setEnabledExistingInboxButton(boolean enable) {
+        frameConfig.setEnabledExistingInboxButton(enable);
+    }
+
+    @Override
+    public void setEnabledMoveListenerButton(boolean enable) {
+        frameConfig.setEnabledMoveListenerButton(enable);
+    }
+
+    @Override
+    public void setEnabledNewInboxButton(boolean enable) {
+        frameConfig.setEnabledNewInboxButton(enable);
+    }
+
 }
