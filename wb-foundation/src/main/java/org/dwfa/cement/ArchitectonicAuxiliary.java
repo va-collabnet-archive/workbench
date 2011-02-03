@@ -171,6 +171,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                		  new I_ConceptualizeUniversally[] { IHTSDO }),
               CHRISTINE_SPISLA(new String[] {"Christine Spisla", "cspisla"}, null,
                		  new I_ConceptualizeUniversally[] { IHTSDO }),
+              DORIS_MCGINNESS(new String[] {"Doris Mcginness", "dmcginn"}, null,
+	        		  new I_ConceptualizeUniversally[] { IHTSDO }),
               GENERIC_USER(new String[] {"Generic User", "generic-user"}, null,
                       new I_ConceptualizeUniversally[] { IHTSDO }),
 
