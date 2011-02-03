@@ -189,9 +189,6 @@ public class WorkflowHelper {
    	   		if (id.contains("-"))
 				WorkflowHelper.setDefaultModeler(con);
 
-   	   		if (id.equalsIgnoreCase("alopez"))
-   	   			id = "alejandro";
-
    	   		return id;
 	}
 
@@ -222,9 +219,6 @@ public class WorkflowHelper {
 	{
 		if (modelers == null)
 			updateModelers();
-
-   		if (name.equalsIgnoreCase("alopez"))
-   			name = "alejandro";
 
 		if (!modelers.containsKey(name))
 		{
