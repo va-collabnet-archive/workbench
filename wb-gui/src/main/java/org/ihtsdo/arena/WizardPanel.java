@@ -5,7 +5,8 @@
 
 package org.ihtsdo.arena;
 
-import org.ihtsdo.swing.wizard.WizardBI;
+//import org.ihtsdo.swing.wizard.WizardBI;
+import org.ihtsdo.tk.api.WizardBI;
 import java.awt.LayoutManager;
 import javax.swing.JPanel;
 import org.ihtsdo.arena.conceptview.ConceptViewRenderer;
