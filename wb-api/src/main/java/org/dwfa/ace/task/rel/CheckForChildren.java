@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,13 +20,17 @@ import java.awt.Component;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -57,16 +61,16 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 public class CheckForChildren extends AbstractTask {
 
     /**
-	 * 
+	 *
 	 */
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
-    
+
     private WizardBI wizard;
-    
+
     private transient Condition returnCondition;
-     
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
     }
@@ -92,45 +96,60 @@ public class CheckForChildren extends AbstractTask {
             I_TermFactory tf = Terms.get();
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             wizard = (WizardBI) worker.readAttachement(WorkerAttachmentKeys.WIZARD_PANEL.name());
-     
+
             I_HostConceptPlugins host = (I_HostConceptPlugins) worker.readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name());
 
             I_GetConceptData concept = (I_GetConceptData) host.getTermComponent();
-            
+
             if (concept == null) {
                 throw new TaskFailedException("There is no concept in the arena...");
             }
-            
+
             //ComponentBI component = (ComponentBI) concept;
-            
+
             //ConceptVersionBI conceptVer = (ConceptVersionBI) component;
-            
+
             if(concept.getRelsIncoming().size() != 0){
             	JPanel wizardPanel = wizard.getWizardPanel();
-            	
-            	wizard.setWizardPanelVisible(true);
-            	
+            	if (SwingUtilities.isEventDispatchThread()) {
+                  wizard.setWizardPanelVisible(true);
+               } else {
+               try {
+                  SwingUtilities.invokeAndWait(new Runnable() {
+
+                  @Override
+                  public void run() {
+                     wizard.setWizardPanelVisible(true);
+                  }
+               });
+               } catch (InterruptedException ex) {
+                  throw new TaskFailedException(ex);
+               } catch (InvocationTargetException ex) {
+                  throw new TaskFailedException(ex);
+               }
+               }
+
             	Component[] components = wizardPanel.getComponents();
                 for (int i = 0; i < components.length; i++) {
                     wizardPanel.remove(components[i]);
                 }
-                
+
             	wizardPanel.add(new JLabel("Please remove the children of the concept before retiring the concept"));
-            	
-            	returnCondition = Condition.ITEM_CANCELED; 
+
+            	returnCondition = Condition.ITEM_CANCELED;
             } else{
             	returnCondition = Condition.CONTINUE;
             }
-            
+
             host.unlink();
             return returnCondition;
-            
+
         } catch (IOException e) {
         	throw new TaskFailedException(e);
         }
     }
 
-   
+
 
     public Collection<Condition> getConditions() {
     	return AbstractTask.CONTINUE_CANCEL;
