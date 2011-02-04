@@ -32,11 +32,13 @@ public class ReplaceAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;
 
 	ComponentVersionBI component;
-	int conceptNid; 
+	int conceptNid;
 	SpecFact<?> spec;
 	ConceptVersionBI concept;
-	
-	public ReplaceAction(String actionName, RelFact fact, ConceptVersionBI concept, SpecFact<?> spec){
+
+	public ReplaceAction(String actionName, RelFact fact,
+           ConceptVersionBI concept,
+           SpecFact<?> spec){
 		super(actionName);
 		this.component = fact.getComponent();
 		this.spec = spec;
@@ -57,26 +59,26 @@ public class ReplaceAction extends AbstractAction {
 			AceLog.getAppLog().alertAndLogException(ex);
 		}
 		}
-	
+
 	private void addRel() {
 		RelSpec relSpec = ((RelSpecFact) spec).getRelSpec();
 		try {
 			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-			
+
 			Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
 			I_GetConceptData originConcept = Terms.get().getConcept(concept.getNid());
-			I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), 
-					originConcept, 
-					relSpec.getRelTypeSpec().get(concept.getViewCoordinate()).getNid(), 
+			I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(),
+					originConcept,
+					relSpec.getRelTypeSpec().get(concept.getViewCoordinate()).getNid(),
 					relSpec.getDestinationSpec().get(concept.getViewCoordinate()).getNid(),
-					ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid(), 
-					ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.localize().getNid(), 
-					0, 
+					ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid(),
+					ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.localize().getNid(),
+					0,
 					ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),  //TODO should be retired?
 					config.getDbConfig().getUserConcept().getNid(),
-					pathItr.next().getConceptNid(), 
+					pathItr.next().getConceptNid(),
 		            Long.MAX_VALUE);
-			
+
 			while (pathItr.hasNext()) {
 				newRel.makeAnalog(newRel.getStatusNid(), newRel.getAuthorNid(), pathItr.next().getConceptNid(), Long.MAX_VALUE);
 			}
@@ -88,16 +90,16 @@ public class ReplaceAction extends AbstractAction {
 			AceLog.getAppLog().alertAndLogException(e1);
 		}
 	}
-	
+
 	private void retireRel(){
 		try {
 			I_AmPart componentVersion = (I_AmPart) component;
 			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 			for (PathBI ep: config.getEditingPathSet()) {
 				componentVersion.makeAnalog(
-						ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), 
+						ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
 						config.getDbConfig().getUserConcept().getNid(),
-						ep.getConceptNid(), 
+						ep.getConceptNid(),
 						Long.MAX_VALUE);
 				}
 			I_GetConceptData concept = Terms.get().getConceptForNid(componentVersion.getNid());

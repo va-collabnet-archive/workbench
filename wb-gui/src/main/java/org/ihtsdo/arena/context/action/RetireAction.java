@@ -13,7 +13,6 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.drools.facts.ComponentFact;
 
@@ -26,7 +25,7 @@ public class RetireAction extends AbstractAction {
 		super(actionName);
 		this.component = fact.getComponent();
 		/*
-		putValue(LARGE_ICON_KEY, 
+		putValue(LARGE_ICON_KEY,
 				new ImageIcon(BatchMonitor.class.getResource("/24x24/plain/delete2.png")));
 				*/
 	}
@@ -39,9 +38,9 @@ public class RetireAction extends AbstractAction {
 				I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 				for (PathBI ep: config.getEditingPathSet()) {
 					componentVersion.makeAnalog(
-							ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), 
+							ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
 							config.getDbConfig().getUserConcept().getNid(),
-							ep.getConceptNid(), 
+							ep.getConceptNid(),
 							Long.MAX_VALUE);
 				}
 				I_GetConceptData concept = Terms.get().getConceptForNid(componentVersion.getNid());
