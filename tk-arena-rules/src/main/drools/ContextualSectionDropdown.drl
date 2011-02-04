@@ -74,13 +74,13 @@ rule "rule 4" #concept onto same concept
 
    then
       # These are not meant to work. Just put up menu items as a starting example.
-      conceptActions.add(new RetireAction("retire", $focus));
-      conceptActions.add(new CloneAction("clone", $focus));
-      conceptActions.add(new CloneAndRetireAction("clone & retire", $focus));
-      descriptionActions.add(new RetireAction("retire", $focus));
-      descriptionActions.add(new CloneAction("clone", $focus));
-      descriptionActions.add(new CloneAndRetireAction("clone & retire", $focus));
-      relActions.add(new RetireAction("retire", $focus));
-      relActions.add(new CloneAction("clone", $focus));
-      relActions.add(new CloneAndRetireAction("clone & retire", $focus));
+      conceptActions.add(new RetireAction("retire", (ComponentFact) $focus));
+      conceptActions.add(new CloneAction("clone", (ComponentFact) $focus));
+      conceptActions.add(new CloneAndRetireAction("clone & retire", (ComponentFact) $focus));
+      descriptionActions.add(new RetireAction("retire", (ComponentFact) $focus));
+      descriptionActions.add(new CloneAction("clone", (ComponentFact) $focus));
+      descriptionActions.add(new CloneAndRetireAction("clone & retire", (ComponentFact) $focus));
+      relActions.add(new RetireAction("retire", (ComponentFact) $focus));
+      relActions.add(new CloneAction("clone", (ComponentFact) $focus));
+      relActions.add(new CloneAndRetireAction("clone & retire", (ComponentFact) $focus));
    end
