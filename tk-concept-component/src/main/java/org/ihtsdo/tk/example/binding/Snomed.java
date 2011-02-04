@@ -24,5 +24,10 @@ public class Snomed {
 	public static ConceptSpec FULLY_SPECIFIED_DESCRIPTION_TYPE = 
 		new ConceptSpec("fully specified name (description type)", 
 						UUID.fromString("5e1fe940-8faf-11db-b606-0800200c9a66"));
+	
+	public static ConceptSpec INACTIVE_STATUS = 
+		new ConceptSpec("inactive (inactive status type)", 
+						UUID.fromString("1464ec56-7118-3051-9d21-0f95c1a39080"));
+
 
 }
