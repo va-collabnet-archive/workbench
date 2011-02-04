@@ -24,8 +24,6 @@ import org.ihtsdo.tk.example.binding.Taxonomies;
 import org.ihtsdo.tk.example.binding.WbDescType;
 import org.ihtsdo.arena.spec.Refsets; 
 
-import org.ihtsdo.tk.example.binding.HistoricalRelSpec; //this is new 
-
 #declare any global variables here
 
 global Collection actions;
