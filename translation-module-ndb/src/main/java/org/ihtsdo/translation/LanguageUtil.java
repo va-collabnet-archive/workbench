@@ -428,7 +428,7 @@ public class LanguageUtil {
 			int fsn = tf.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
 
 			// 200 similarity matches cut off - previously results.topDocs.scoreDocs.length
-			for (int i = 0 ; i<500 || matches.size()<100  ; i++) {
+			for (int i = 0 ; i<500 && matches.size()<100 && i < results.topDocs.scoreDocs.length  ; i++) {
 				Document doc = results.searcher.doc(results.topDocs.scoreDocs[i].doc);
 				String sourceText = "";
 				String targetText = "";
