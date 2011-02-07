@@ -164,6 +164,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 	private boolean readOnlyMode;
 	private boolean saveDesc;
 	private JButton button5;
+	private Thread updateUIThread;
 
 	/**
 	 * Instantiates a new translation concept editor.
@@ -454,6 +455,9 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 	}
 
 	public void unloadData(){
+		if (updateUIThread != null && updateUIThread.isAlive()) {
+			updateUIThread.interrupt();
+		}
 		verifySavePending();
 		clearForm(true);
 	}
@@ -2092,14 +2096,15 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 									bSourceFSN=true;
 									sourceFSN=description.getText().substring(0, semtagLocation);
 									
-									SimilarityPanel similPanel = getSimilarityPanel();
-									similPanel.updateTabs(sourceFSN,concept,sourceIds,targetId,translationProject,worklistMember);
-//									Runnable simil = new Runnable() {
-//										public void run() {
-//											updateSimilarityTable(sourceFSN);
-//										}
-//									};
-//									simil.run();
+									final SimilarityPanel similPanel = getSimilarityPanel();
+//									similPanel.updateTabs(sourceFSN,concept,sourceIds,targetId,translationProject,worklistMember);
+									Runnable simil = new Runnable() {
+										public void run() {
+											similPanel.updateTabs(sourceFSN,concept,sourceIds,targetId,translationProject,worklistMember);
+										}
+									};
+									updateUIThread = new Thread(simil);
+									updateUIThread.start();
 //									Runnable tMemo = new Runnable() {
 //										public void run() {
 //											updateTransMemoryTable(sourceFSN);
