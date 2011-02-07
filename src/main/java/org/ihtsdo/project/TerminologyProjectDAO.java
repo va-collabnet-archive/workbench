@@ -16,6 +16,8 @@
  */
 package org.ihtsdo.project;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -51,7 +53,7 @@ import net.jini.lookup.entry.Name;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
-import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -62,6 +64,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.RefsetPropertyMap;
@@ -72,7 +75,9 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery.StopActionListener;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_QueueProcesses;
@@ -95,6 +100,7 @@ import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.model.WorkSetMember;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionRefset;
+import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -202,10 +208,10 @@ public class TerminologyProjectDAO {
 			termFactory.addUncommittedNoChecks(newConcept);
 			termFactory.commit();
 
-//			promote(newConcept, config);
-//
-//			termFactory.addUncommittedNoChecks(newConcept);
-//			termFactory.commit();
+			//			promote(newConcept, config);
+			//
+			//			termFactory.addUncommittedNoChecks(newConcept);
+			//			termFactory.commit();
 
 			project = getTranslationProject(newConcept, config);
 
@@ -302,8 +308,8 @@ public class TerminologyProjectDAO {
 					//					termFactory.commit();
 				}
 			}
-//			promote(concept, config);
-//			termFactory.addUncommittedNoChecks(concept);
+			//			promote(concept, config);
+			//			termFactory.addUncommittedNoChecks(concept);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
@@ -400,9 +406,9 @@ public class TerminologyProjectDAO {
 						termFactory.addUncommittedNoChecks(projectsRefset);
 						termFactory.addUncommittedNoChecks(extension);
 						//						termFactory.commit();
-//						promote(extension, config);
-//						termFactory.addUncommittedNoChecks(projectsRefset);
-//						termFactory.addUncommittedNoChecks(extension);
+						//						promote(extension, config);
+						//						termFactory.addUncommittedNoChecks(projectsRefset);
+						//						termFactory.addUncommittedNoChecks(extension);
 						//						termFactory.commit();
 					}
 				}
@@ -520,12 +526,12 @@ public class TerminologyProjectDAO {
 			termFactory.addUncommittedNoChecks(newCommentsConcept);
 			termFactory.addUncommittedNoChecks(newPromotionConcept);
 			termFactory.commit();
-//			promote(newConcept, config);
-//			promote(newCommentsConcept, config);
-//			promote(newPromotionConcept, config);
-//			termFactory.addUncommittedNoChecks(newConcept);
-//			termFactory.addUncommittedNoChecks(newCommentsConcept);
-//			termFactory.addUncommittedNoChecks(newPromotionConcept);
+			//			promote(newConcept, config);
+			//			promote(newCommentsConcept, config);
+			//			promote(newPromotionConcept, config);
+			//			termFactory.addUncommittedNoChecks(newConcept);
+			//			termFactory.addUncommittedNoChecks(newCommentsConcept);
+			//			termFactory.addUncommittedNoChecks(newPromotionConcept);
 			termFactory.commit();
 
 
@@ -742,13 +748,13 @@ public class TerminologyProjectDAO {
 					}
 					termFactory.addUncommittedNoChecks(refset);
 					termFactory.commit();
-//					//promote(relVersioned, config);
-//					termFactory.addUncommittedNoChecks(refset);
-//					termFactory.commit();
+					//					//promote(relVersioned, config);
+					//					termFactory.addUncommittedNoChecks(refset);
+					//					termFactory.commit();
 				}
 			}
-//			promote(refset, config);
-//			termFactory.addUncommittedNoChecks(refset);
+			//			promote(refset, config);
+			//			termFactory.addUncommittedNoChecks(refset);
 			termFactory.commit();
 		} catch (TerminologyException e) {
 			e.printStackTrace();
@@ -790,9 +796,9 @@ public class TerminologyProjectDAO {
 					//					termFactory.commit();
 				}
 			}
-//			promote(project.getConcept(), config);
-//			termFactory.addUncommittedNoChecks(project.getConcept());
-//			termFactory.commit();
+			//			promote(project.getConcept(), config);
+			//			termFactory.addUncommittedNoChecks(project.getConcept());
+			//			termFactory.commit();
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -833,9 +839,9 @@ public class TerminologyProjectDAO {
 					//					termFactory.commit();
 				}
 			}
-//			promote(project.getConcept(),config);
-//			termFactory.addUncommittedNoChecks(project.getConcept());
-//			termFactory.commit();
+			//			promote(project.getConcept(),config);
+			//			termFactory.addUncommittedNoChecks(project.getConcept());
+			//			termFactory.commit();
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -870,9 +876,9 @@ public class TerminologyProjectDAO {
 
 				termFactory.addUncommittedNoChecks(refset);
 				termFactory.commit();
-//				promote(refset, config);
-//				termFactory.addUncommittedNoChecks(refset);
-//				termFactory.commit();
+				//				promote(refset, config);
+				//				termFactory.addUncommittedNoChecks(refset);
+				//				termFactory.commit();
 			} catch (TerminologyException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -918,9 +924,9 @@ public class TerminologyProjectDAO {
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
 				termFactory.commit();
-//				promote(project.getConcept(), config);
-//				termFactory.addUncommittedNoChecks(project.getConcept());
-//				termFactory.commit();
+				//				promote(project.getConcept(), config);
+				//				termFactory.addUncommittedNoChecks(project.getConcept());
+				//				termFactory.commit();
 			} catch (TerminologyException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -956,9 +962,9 @@ public class TerminologyProjectDAO {
 				termFactory.addUncommittedNoChecks(project.getConcept());
 				termFactory.commit();
 				Thread.sleep(100);
-//				promote(project.getConcept(), config);
-//				termFactory.addUncommittedNoChecks(project.getConcept());
-//				termFactory.commit();
+				//				promote(project.getConcept(), config);
+				//				termFactory.addUncommittedNoChecks(project.getConcept());
+				//				termFactory.commit();
 			} catch (TerminologyException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -999,8 +1005,8 @@ public class TerminologyProjectDAO {
 					//					termFactory.addUncommittedNoChecks(workSet.getConcept());
 					//					termFactory.commit();
 				}
-//				termFactory.addUncommittedNoChecks(workSet.getConcept());
-//				termFactory.commit();
+				//				termFactory.addUncommittedNoChecks(workSet.getConcept());
+				//				termFactory.commit();
 				//promote(workSet.getConcept(), config);
 			}
 			I_RelVersioned relVersioned = termFactory.newRelationship(UUID.randomUUID(), workSet.getConcept(), 
@@ -1013,9 +1019,9 @@ public class TerminologyProjectDAO {
 
 			termFactory.addUncommittedNoChecks(workSet.getConcept());
 			termFactory.commit();
-//			promote(workSet.getConcept(), config);
-//			termFactory.addUncommittedNoChecks(workSet.getConcept());
-//			termFactory.commit();
+			//			promote(workSet.getConcept(), config);
+			//			termFactory.addUncommittedNoChecks(workSet.getConcept());
+			//			termFactory.commit();
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -1052,14 +1058,14 @@ public class TerminologyProjectDAO {
 						}
 						termFactory.addUncommittedNoChecks(project.getConcept());
 						termFactory.commit();
-//						Thread.sleep(100);
-//						//						promote(project.getConcept(), config);
-//						//						termFactory.addUncommittedNoChecks(project.getConcept());
-//						//						termFactory.commit();
+						//						Thread.sleep(100);
+						//						//						promote(project.getConcept(), config);
+						//						//						termFactory.addUncommittedNoChecks(project.getConcept());
+						//						//						termFactory.commit();
 					}
-//					promote(project.getConcept(), config);
-//					termFactory.addUncommittedNoChecks(project.getConcept());
-//					termFactory.commit();
+					//					promote(project.getConcept(), config);
+					//					termFactory.addUncommittedNoChecks(project.getConcept());
+					//					termFactory.commit();
 				}
 				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), 
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_LANGUAGE_TARGET_REFSET_ATTRIBUTE.getUids()), 
@@ -1071,10 +1077,10 @@ public class TerminologyProjectDAO {
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
 				termFactory.commit();
-//				Thread.sleep(100);
-//				promote(project.getConcept(), config);
-//				termFactory.addUncommittedNoChecks(project.getConcept());
-//				termFactory.commit();
+				//				Thread.sleep(100);
+				//				promote(project.getConcept(), config);
+				//				termFactory.addUncommittedNoChecks(project.getConcept());
+				//				termFactory.commit();
 			}
 
 		} catch (TerminologyException e) {
@@ -1151,9 +1157,9 @@ public class TerminologyProjectDAO {
 						//						termFactory.addUncommittedNoChecks(project.getConcept());
 						//						termFactory.commit();
 					}
-//					promote(project.getConcept(), config);
-//					termFactory.addUncommittedNoChecks(project.getConcept());
-//					termFactory.commit();
+					//					promote(project.getConcept(), config);
+					//					termFactory.addUncommittedNoChecks(project.getConcept());
+					//					termFactory.commit();
 				}
 				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), 
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_SOURCE_DEFECTS_ISSUE_REPO.getUids()), 
@@ -1165,9 +1171,9 @@ public class TerminologyProjectDAO {
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
 				termFactory.commit();
-//				promote(project.getConcept(), config);
-//				termFactory.addUncommittedNoChecks(project.getConcept());
-//				termFactory.commit();
+				//				promote(project.getConcept(), config);
+				//				termFactory.addUncommittedNoChecks(project.getConcept());
+				//				termFactory.commit();
 			}
 
 		} catch (TerminologyException e) {
@@ -1244,9 +1250,9 @@ public class TerminologyProjectDAO {
 						//						termFactory.addUncommittedNoChecks(project.getConcept());
 						//						termFactory.commit();
 					}
-//					promote(project.getConcept(), config);
-//					termFactory.addUncommittedNoChecks(project.getConcept());
-//					termFactory.commit();
+					//					promote(project.getConcept(), config);
+					//					termFactory.addUncommittedNoChecks(project.getConcept());
+					//					termFactory.commit();
 				}
 				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), 
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_PROJECT_ISSUE_REPO.getUids()), 
@@ -1258,9 +1264,9 @@ public class TerminologyProjectDAO {
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
 				termFactory.commit();
-//				promote(project.getConcept(), config);
-//				termFactory.addUncommittedNoChecks(project.getConcept());
-//				termFactory.commit();
+				//				promote(project.getConcept(), config);
+				//				termFactory.addUncommittedNoChecks(project.getConcept());
+				//				termFactory.commit();
 			}
 
 		} catch (TerminologyException e) {
@@ -1655,8 +1661,8 @@ public class TerminologyProjectDAO {
 						}
 						termFactory.addUncommittedNoChecks(workSetConcept);
 						//						termFactory.commit();
-//						promote(extension, config);
-//						termFactory.addUncommittedNoChecks(workSetConcept);
+						//						promote(extension, config);
+						//						termFactory.addUncommittedNoChecks(workSetConcept);
 						//						termFactory.commit();
 					}
 				}
@@ -1674,8 +1680,8 @@ public class TerminologyProjectDAO {
 							extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
 						termFactory.addUncommittedNoChecks(workSetConcept);
 						//						termFactory.commit();
-//						promote(extension, config);
-//						termFactory.addUncommittedNoChecks(workSetConcept);
+						//						promote(extension, config);
+						//						termFactory.addUncommittedNoChecks(workSetConcept);
 						//						termFactory.commit();
 					}
 				}
@@ -1725,9 +1731,9 @@ public class TerminologyProjectDAO {
 					termFactory.addUncommittedNoChecks(workListExtensionRefset);
 					termFactory.addUncommittedNoChecks(extension);
 					//					termFactory.commit();
-//					promote(extension, config);
-//					termFactory.addUncommittedNoChecks(workListExtensionRefset);
-//					termFactory.addUncommittedNoChecks(extension);
+					//					promote(extension, config);
+					//					termFactory.addUncommittedNoChecks(workListExtensionRefset);
+					//					termFactory.addUncommittedNoChecks(extension);
 					//					termFactory.commit();
 				}
 			}
@@ -1775,9 +1781,9 @@ public class TerminologyProjectDAO {
 					termFactory.addUncommittedNoChecks(workSetExtensionRefset);
 					termFactory.addUncommittedNoChecks(extension);
 					termFactory.commit();
-//					promote(extension, config);
-//					termFactory.addUncommittedNoChecks(workSetExtensionRefset);
-//					termFactory.addUncommittedNoChecks(extension);
+					//					promote(extension, config);
+					//					termFactory.addUncommittedNoChecks(workSetExtensionRefset);
+					//					termFactory.addUncommittedNoChecks(extension);
 					termFactory.commit();
 				}
 			}
@@ -1821,9 +1827,9 @@ public class TerminologyProjectDAO {
 					termFactory.addUncommittedNoChecks(worksetConcept);
 					termFactory.addUncommittedNoChecks(extension);
 					//					termFactory.commit();
-//					promote(extension, config);
-//					termFactory.addUncommittedNoChecks(worksetConcept);
-//					termFactory.addUncommittedNoChecks(extension);
+					//					promote(extension, config);
+					//					termFactory.addUncommittedNoChecks(worksetConcept);
+					//					termFactory.addUncommittedNoChecks(extension);
 					//					termFactory.commit();
 				}
 			}
@@ -1866,9 +1872,9 @@ public class TerminologyProjectDAO {
 					termFactory.addUncommittedNoChecks(workListConcept);
 					termFactory.addUncommittedNoChecks(extension);
 					//					termFactory.commit();
-//					promote(extension, config);
-//					termFactory.addUncommittedNoChecks(workListConcept);
-//					termFactory.addUncommittedNoChecks(extension);
+					//					promote(extension, config);
+					//					termFactory.addUncommittedNoChecks(workListConcept);
+					//					termFactory.addUncommittedNoChecks(extension);
 					//					termFactory.commit();
 				}
 			}
@@ -1914,9 +1920,9 @@ public class TerminologyProjectDAO {
 					termFactory.addUncommittedNoChecks(workSetConcept);
 					termFactory.addUncommittedNoChecks(extension);
 					//					termFactory.commit();
-//					promote(extension, config);
-//					termFactory.addUncommittedNoChecks(workSetConcept);
-//					termFactory.addUncommittedNoChecks(extension);
+					//					promote(extension, config);
+					//					termFactory.addUncommittedNoChecks(workSetConcept);
+					//					termFactory.addUncommittedNoChecks(extension);
 					//					termFactory.commit();
 				}
 			}
@@ -2418,13 +2424,13 @@ public class TerminologyProjectDAO {
 			termFactory.addUncommittedNoChecks(newCommentsConcept);
 			termFactory.addUncommittedNoChecks(newPromotionConcept);
 			termFactory.commit();
-//			promote(newConcept, config);
-//			promote(newCommentsConcept, config);
-//			promote(newPromotionConcept, config);
-//			termFactory.addUncommittedNoChecks(newConcept);
-//			termFactory.addUncommittedNoChecks(newCommentsConcept);
-//			termFactory.addUncommittedNoChecks(newPromotionConcept);
-//			termFactory.commit();
+			//			promote(newConcept, config);
+			//			promote(newCommentsConcept, config);
+			//			promote(newPromotionConcept, config);
+			//			termFactory.addUncommittedNoChecks(newConcept);
+			//			termFactory.addUncommittedNoChecks(newCommentsConcept);
+			//			termFactory.addUncommittedNoChecks(newPromotionConcept);
+			//			termFactory.commit();
 
 			termFactory.getRefsetHelper(config).newRefsetExtension(workListRefset.getConceptNid(), 
 					newConcept.getConceptNid(), EConcept.REFSET_TYPES.STR, 
@@ -2436,10 +2442,10 @@ public class TerminologyProjectDAO {
 					termFactory.addUncommittedNoChecks(workListRefset);
 					termFactory.addUncommittedNoChecks(extension);
 					termFactory.commit();
-//					promote(extension, config);
-//					termFactory.addUncommittedNoChecks(workListRefset);
-//					termFactory.addUncommittedNoChecks(extension);
-//					termFactory.commit();
+					//					promote(extension, config);
+					//					termFactory.addUncommittedNoChecks(workListRefset);
+					//					termFactory.addUncommittedNoChecks(extension);
+					//					termFactory.commit();
 				}
 			}
 
@@ -2613,9 +2619,9 @@ public class TerminologyProjectDAO {
 
 			termFactory.addUncommittedNoChecks(newConcept);
 			termFactory.commit();
-//			promote(newConcept, config);
-//			termFactory.addUncommittedNoChecks(newConcept);
-//			termFactory.commit();
+			//			promote(newConcept, config);
+			//			termFactory.addUncommittedNoChecks(newConcept);
+			//			termFactory.commit();
 
 		} catch (TerminologyException e) {
 			e.printStackTrace();
@@ -2691,9 +2697,9 @@ public class TerminologyProjectDAO {
 
 			termFactory.addUncommittedNoChecks(newConcept);
 			termFactory.commit();
-//			promote(newConcept, config);
-//			termFactory.addUncommittedNoChecks(newConcept);
-//			termFactory.commit();
+			//			promote(newConcept, config);
+			//			termFactory.addUncommittedNoChecks(newConcept);
+			//			termFactory.commit();
 
 		} catch (TerminologyException e) {
 			e.printStackTrace();
@@ -2744,9 +2750,9 @@ public class TerminologyProjectDAO {
 						termFactory.addUncommittedNoChecks(workListConcept);
 						termFactory.addUncommittedNoChecks(extension);
 						//						termFactory.commit();
-//						promote(extension, config);
-//						termFactory.addUncommittedNoChecks(workListConcept);
-//						termFactory.addUncommittedNoChecks(extension);
+						//						promote(extension, config);
+						//						termFactory.addUncommittedNoChecks(workListConcept);
+						//						termFactory.addUncommittedNoChecks(extension);
 						//						termFactory.commit();
 					}
 				}
@@ -2767,9 +2773,9 @@ public class TerminologyProjectDAO {
 						termFactory.addUncommittedNoChecks(workListConcept);
 						termFactory.addUncommittedNoChecks(extension);
 						//						termFactory.commit();
-//						promote(extension, config);
-//						termFactory.addUncommittedNoChecks(workListConcept);
-//						termFactory.addUncommittedNoChecks(extension);
+						//						promote(extension, config);
+						//						termFactory.addUncommittedNoChecks(workListConcept);
+						//						termFactory.addUncommittedNoChecks(extension);
 						//						termFactory.commit();
 					}
 				}
@@ -2834,9 +2840,9 @@ public class TerminologyProjectDAO {
 						termFactory.addUncommittedNoChecks(partitionConcept);
 						termFactory.addUncommittedNoChecks(extension);
 						//						termFactory.commit();
-//						promote(extension, config);
-//						termFactory.addUncommittedNoChecks(partitionConcept);
-//						termFactory.addUncommittedNoChecks(extension);
+						//						promote(extension, config);
+						//						termFactory.addUncommittedNoChecks(partitionConcept);
+						//						termFactory.addUncommittedNoChecks(extension);
 						//						termFactory.commit();
 					}
 				}
@@ -2855,9 +2861,9 @@ public class TerminologyProjectDAO {
 						termFactory.addUncommittedNoChecks(partitionConcept);
 						termFactory.addUncommittedNoChecks(extension);
 						//						termFactory.commit();
-//						promote(extension, config);
-//						termFactory.addUncommittedNoChecks(partitionConcept);
-//						termFactory.addUncommittedNoChecks(extension);
+						//						promote(extension, config);
+						//						termFactory.addUncommittedNoChecks(partitionConcept);
+						//						termFactory.addUncommittedNoChecks(extension);
 						//						termFactory.commit();
 					}
 				}
@@ -2962,7 +2968,7 @@ public class TerminologyProjectDAO {
 					.info("Moved process " + process.getProcessID() + " to queue: " + q.getNodeInboxAddress());
 					updateWorkListMemberMetadata(workListMember, config);
 					//TODO: move to a more generic promotion, not language specific
-//					promoteLanguageContent(workListMember, config);
+					//					promoteLanguageContent(workListMember, config);
 				} catch (Exception e) {
 					throw new TaskFailedException(e);
 				}
@@ -3356,9 +3362,9 @@ public class TerminologyProjectDAO {
 					termFactory.addUncommittedNoChecks(componentsRefset);
 					termFactory.addUncommittedNoChecks(extension);
 					//					termFactory.commit();
-//					promote(extension, config);
-//					termFactory.addUncommittedNoChecks(componentsRefset);
-//					termFactory.addUncommittedNoChecks(extension);
+					//					promote(extension, config);
+					//					termFactory.addUncommittedNoChecks(componentsRefset);
+					//					termFactory.addUncommittedNoChecks(extension);
 					//					termFactory.commit();
 				}
 			}
@@ -3541,9 +3547,9 @@ public class TerminologyProjectDAO {
 					termFactory.addUncommittedNoChecks(partitionConcept);
 					termFactory.addUncommittedNoChecks(extension);
 					//					termFactory.commit();
-//					promote(extension, config);
-//					termFactory.addUncommittedNoChecks(partitionConcept);
-//					termFactory.addUncommittedNoChecks(extension);
+					//					promote(extension, config);
+					//					termFactory.addUncommittedNoChecks(partitionConcept);
+					//					termFactory.addUncommittedNoChecks(extension);
 					//					termFactory.commit();
 				}
 			}
@@ -3575,9 +3581,9 @@ public class TerminologyProjectDAO {
 			termFactory.addUncommittedNoChecks(conceptToRetireUpdatedFromDB);
 			termFactory.commit();
 			//promote(conceptToRetireUpdatedFromDB.getConceptAttributes(), config);
-//			promote(conceptToRetire, config);
-//			termFactory.addUncommittedNoChecks(conceptToRetireUpdatedFromDB);
-//			termFactory.commit();
+			//			promote(conceptToRetire, config);
+			//			termFactory.addUncommittedNoChecks(conceptToRetireUpdatedFromDB);
+			//			termFactory.commit();
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -3674,6 +3680,16 @@ public class TerminologyProjectDAO {
 	}
 
 	public static void syncWorksetWithRefsetSpec(WorkSet workSet, I_ConfigAceFrame config) throws Exception {
+		I_ShowActivity activity =
+			Terms.get().newActivityPanel(true, config, "<html>Synchronizing workset from source refset: <br>", true);
+		activity.setIndeterminate(true);
+		long startTime = System.currentTimeMillis();
+		try {
+			ActivityViewer.addActivity(activity);
+		} catch (Exception e1) {
+			AceLog.getAppLog().alertAndLogException(e1);
+		}
+
 		if (!workSet.getPartitionSchemes(config).isEmpty()) {
 			JOptionPane.showMessageDialog(new JDialog(), "Not empty!, can't sync a workset once it has partition schemes...", 
 					"Warning", JOptionPane.WARNING_MESSAGE);
@@ -3704,19 +3720,38 @@ public class TerminologyProjectDAO {
 
 		Collection<? extends I_ExtendByRef> refsetMembers  = termFactory.getRefsetExtensionMembers(
 				refsetConc.getConceptNid());
-
+		int countIncluded = 0;
+		int countExcluded = 0;
+		int countRetired = 0;
+		int countNotUnique = 0;
 		for (I_ExtendByRef refsetMember : refsetMembers) {
 			I_ExtendByRefPart lastPart = getLastExtensionPart(refsetMember);
 			if (isActive(lastPart.getStatusNid())) {
-				includedConcepts.add(refsetMember.getComponentNid());
-				if (!excludedConcepts.contains(refsetMember.getComponentNid())) {
-					I_GetConceptData concept = termFactory.getConcept(refsetMember.getComponentNid());
-					WorkSetMember newWorkSetMember;
-					newWorkSetMember = new WorkSetMember(concept.getInitialText(),
-							concept.getConceptNid(),
-							concept.getUids(),
-							workSet.getUids().iterator().next());
-					addConceptAsWorkSetMember(newWorkSetMember, config);
+				I_GetConceptData memberConcept = termFactory.getConcept(refsetMember.getComponentNid());
+				// TODO: Unique in project clause
+				boolean uniqueInProject = true;
+				for (WorkSet loopWorkSet : workSet.getProject(config).getWorkSets(config)) {
+					if (loopWorkSet.getId() != workSet.getId() &&
+							loopWorkSet.hasMember(memberConcept)) {
+						uniqueInProject = false;
+					}
+				}
+
+				if (uniqueInProject) {
+					if (!excludedConcepts.contains(refsetMember.getComponentNid())) {
+						includedConcepts.add(refsetMember.getComponentNid());
+						WorkSetMember newWorkSetMember;
+						newWorkSetMember = new WorkSetMember(memberConcept.getInitialText(),
+								memberConcept.getConceptNid(),
+								memberConcept.getUids(),
+								workSet.getUids().iterator().next());
+						addConceptAsWorkSetMember(newWorkSetMember, config);
+						countIncluded++;
+					} else {
+						countExcluded++;
+					} 
+				} else {
+					countNotUnique++;
 				}
 			}
 		}
@@ -3726,8 +3761,10 @@ public class TerminologyProjectDAO {
 		for (WorkSetMember loopMember : workSetMembers) {
 			if (excludedConcepts.contains(loopMember.getId())) {
 				retireWorkSetMember(loopMember);
+				countRetired++;
 			} else if (!includedConcepts.contains(loopMember.getId())) {
 				retireWorkSetMember(loopMember);
+				countRetired++;
 			}
 		}
 
@@ -3751,6 +3788,14 @@ public class TerminologyProjectDAO {
 		//		}
 
 		termFactory.commit();
+
+		long endTime = System.currentTimeMillis();
+		long elapsed = endTime - startTime;
+		String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; incl = " + countIncluded + " , excl = " + countExcluded +
+				" , ret = " + countRetired + " , not unique = " + countNotUnique);
+		activity.complete();
+
 
 	}
 
@@ -3910,7 +3955,7 @@ public class TerminologyProjectDAO {
 				for (WorkListMember workListMember: workListMembers) {
 					workListMember.setWorkListUUID(workList.getUids().iterator().next());
 					addConceptAsWorkListMember(workListMember, config);
-//					promoteLanguageContent(workListMember, config);
+					//					promoteLanguageContent(workListMember, config);
 				}
 			}
 		}
@@ -3976,102 +4021,102 @@ public class TerminologyProjectDAO {
 	}
 
 	public static void promote(I_GetConceptData termComponent, I_ConfigAceFrame config) {
-//		PositionBI viewPosition = config.getViewPositionSetReadOnly().iterator().next();
-//		I_IntSet allowedStatusWithRetired = Terms.get().newIntSet();
-//		allowedStatusWithRetired.addAll(config.getAllowedStatus().getSetValues());
-//		try {
-//			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
-//			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
-//			//			if (I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
-//			//				Terms.get().addUncommittedNoChecks((I_GetConceptData)termComponent);
-//			//			}
-//			//			if (I_ExtendByRef.class.isAssignableFrom(termComponent.getClass())) {
-//			//				Terms.get().addUncommittedNoChecks((I_ExtendByRef)termComponent);
-//			//			}
-//			//			
-//			//			Terms.get().commit();
+		//		PositionBI viewPosition = config.getViewPositionSetReadOnly().iterator().next();
+		//		I_IntSet allowedStatusWithRetired = Terms.get().newIntSet();
+		//		allowedStatusWithRetired.addAll(config.getAllowedStatus().getSetValues());
+		//		try {
+		//			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
+		//			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
+		//			//			if (I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
+		//			//				Terms.get().addUncommittedNoChecks((I_GetConceptData)termComponent);
+		//			//			}
+		//			//			if (I_ExtendByRef.class.isAssignableFrom(termComponent.getClass())) {
+		//			//				Terms.get().addUncommittedNoChecks((I_ExtendByRef)termComponent);
+		//			//			}
+		//			//			
+		//			//			Terms.get().commit();
 
-//			termComponent.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
-//					allowedStatusWithRetired, Precedence.TIME);
-//			Terms.get().addUncommittedNoChecks(termComponent);
-//
-//			//			if (I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
-//			//				Terms.get().addUncommittedNoChecks((I_GetConceptData)termComponent);
-//			//			}
-//			//			if (I_ExtendByRef.class.isAssignableFrom(termComponent.getClass())) {
-//			//				Terms.get().addUncommittedNoChecks((I_ExtendByRef)termComponent);
-//			//			}
-//			//
-//			//			Terms.get().commit();
-//
-//			for (I_ExtendByRef loopExtension : Terms.get().getAllExtensionsForComponent(termComponent.getConceptNid())) {
-//				loopExtension.promote(config.getViewPositionSet().iterator().next(), 
-//						config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
-//				Terms.get().addUncommittedNoChecks(loopExtension);
-//			}
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//
-//
-//		//		for (PathBI path : config.getEditingPathSetReadOnly()) {
-//		//			try {
-//		//				PositionBI viewPosition = Terms.get().newPosition(path, Integer.MAX_VALUE);
-//		//				termComponent.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
-//		//						config.getAllowedStatus(), Precedence.TIME);
-//		//			} catch (TerminologyException e) {
-//		//				e.printStackTrace();
-//		//			} catch (IOException e) {
-//		//				e.printStackTrace();
-//		//			}
-//		//		}
+		//			termComponent.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
+		//					allowedStatusWithRetired, Precedence.TIME);
+		//			Terms.get().addUncommittedNoChecks(termComponent);
+		//
+		//			//			if (I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
+		//			//				Terms.get().addUncommittedNoChecks((I_GetConceptData)termComponent);
+		//			//			}
+		//			//			if (I_ExtendByRef.class.isAssignableFrom(termComponent.getClass())) {
+		//			//				Terms.get().addUncommittedNoChecks((I_ExtendByRef)termComponent);
+		//			//			}
+		//			//
+		//			//			Terms.get().commit();
+		//
+		//			for (I_ExtendByRef loopExtension : Terms.get().getAllExtensionsForComponent(termComponent.getConceptNid())) {
+		//				loopExtension.promote(config.getViewPositionSet().iterator().next(), 
+		//						config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+		//				Terms.get().addUncommittedNoChecks(loopExtension);
+		//			}
+		//
+		//		} catch (Exception e) {
+		//			e.printStackTrace();
+		//		}
+		//
+		//
+		//		//		for (PathBI path : config.getEditingPathSetReadOnly()) {
+		//		//			try {
+		//		//				PositionBI viewPosition = Terms.get().newPosition(path, Integer.MAX_VALUE);
+		//		//				termComponent.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
+		//		//						config.getAllowedStatus(), Precedence.TIME);
+		//		//			} catch (TerminologyException e) {
+		//		//				e.printStackTrace();
+		//		//			} catch (IOException e) {
+		//		//				e.printStackTrace();
+		//		//			}
+		//		//		}
 
 	}
 	public static void promote(I_ExtendByRef termComponent, I_ConfigAceFrame config) {
-//		PositionBI viewPosition = config.getViewPositionSetReadOnly().iterator().next();
-//		I_IntSet allowedStatusWithRetired = Terms.get().newIntSet();
-//		allowedStatusWithRetired.addAll(config.getAllowedStatus().getSetValues());
-//		try {
-//			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
-//			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
-//			//			if (I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
-//			//				Terms.get().addUncommittedNoChecks((I_GetConceptData)termComponent);
-//			//			}
-//			//			if (I_ExtendByRef.class.isAssignableFrom(termComponent.getClass())) {
-//			//				Terms.get().addUncommittedNoChecks((I_ExtendByRef)termComponent);
-//			//			}
-//			//			
-//			//			Terms.get().commit();
-//
-//			termComponent.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
-//					allowedStatusWithRetired, Precedence.TIME);
-//			Terms.get().addUncommittedNoChecks(termComponent);
-//
-//			//			if (I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
-//			//				Terms.get().addUncommittedNoChecks((I_GetConceptData)termComponent);
-//			//			}
-//			//			if (I_ExtendByRef.class.isAssignableFrom(termComponent.getClass())) {
-//			//				Terms.get().addUncommittedNoChecks((I_ExtendByRef)termComponent);
-//			//			}
-//			//
-//			//			Terms.get().commit();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//
-//
-//		//		for (PathBI path : config.getEditingPathSetReadOnly()) {
-//		//			try {
-//		//				PositionBI viewPosition = Terms.get().newPosition(path, Integer.MAX_VALUE);
-//		//				termComponent.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
-//		//						config.getAllowedStatus(), Precedence.TIME);
-//		//			} catch (TerminologyException e) {
-//		//				e.printStackTrace();
-//		//			} catch (IOException e) {
-//		//				e.printStackTrace();
-//		//			}
-//		//		}
+		//		PositionBI viewPosition = config.getViewPositionSetReadOnly().iterator().next();
+		//		I_IntSet allowedStatusWithRetired = Terms.get().newIntSet();
+		//		allowedStatusWithRetired.addAll(config.getAllowedStatus().getSetValues());
+		//		try {
+		//			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
+		//			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
+		//			//			if (I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
+		//			//				Terms.get().addUncommittedNoChecks((I_GetConceptData)termComponent);
+		//			//			}
+		//			//			if (I_ExtendByRef.class.isAssignableFrom(termComponent.getClass())) {
+		//			//				Terms.get().addUncommittedNoChecks((I_ExtendByRef)termComponent);
+		//			//			}
+		//			//			
+		//			//			Terms.get().commit();
+		//
+		//			termComponent.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
+		//					allowedStatusWithRetired, Precedence.TIME);
+		//			Terms.get().addUncommittedNoChecks(termComponent);
+		//
+		//			//			if (I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
+		//			//				Terms.get().addUncommittedNoChecks((I_GetConceptData)termComponent);
+		//			//			}
+		//			//			if (I_ExtendByRef.class.isAssignableFrom(termComponent.getClass())) {
+		//			//				Terms.get().addUncommittedNoChecks((I_ExtendByRef)termComponent);
+		//			//			}
+		//			//
+		//			//			Terms.get().commit();
+		//		} catch (Exception e) {
+		//			e.printStackTrace();
+		//		}
+		//
+		//
+		//		//		for (PathBI path : config.getEditingPathSetReadOnly()) {
+		//		//			try {
+		//		//				PositionBI viewPosition = Terms.get().newPosition(path, Integer.MAX_VALUE);
+		//		//				termComponent.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
+		//		//						config.getAllowedStatus(), Precedence.TIME);
+		//		//			} catch (TerminologyException e) {
+		//		//				e.printStackTrace();
+		//		//			} catch (IOException e) {
+		//		//				e.printStackTrace();
+		//		//			}
+		//		//		}
 
 	}
 
@@ -4138,158 +4183,158 @@ public class TerminologyProjectDAO {
 
 	public static void promoteLanguageContent(WorkListMember member, I_ConfigAceFrame config) throws Exception {
 		// PROMOTION REMOVED, No promotion path will be used
-//		I_TermFactory tf = Terms.get();
-//		I_GetConceptData concept = member.getConcept();
-//
-//		// Policy: Only one viewposition set, only one promotion path, only one edit path
-//		//TODO: promote only language content
-//
-//		concept.promote(config.getViewPositionSetReadOnly().iterator().next(), 
-//				config.getPromotionPathSetReadOnly(),
-//				config.getAllowedStatus(), config.getPrecedence());
-//		tf.addUncommittedNoChecks(concept);
-//
-//		for (I_ExtendByRef loopExtension : tf.getAllExtensionsForComponent(concept.getConceptNid())) {
-//			loopExtension.promote(config.getViewPositionSetReadOnly().iterator().next(), 
-//					config.getPromotionPathSetReadOnly(),
-//					config.getAllowedStatus(), config.getPrecedence());
-//			tf.addUncommittedNoChecks(loopExtension);
-//		}
-//
-//		// END OF NEW PROMOTION ALGORITHM
-//
-//		//		WorkList workList = TerminologyProjectDAO.getWorkList(
-//		//				tf.getConcept(member.getWorkListUUID()), config);
-//		//		CommentsRefset commentsRefset = workList.getCommentsRefset(config);
-//		//		PromotionRefset promotionRefset = workList.getPromotionRefset(config);
-//		//		TranslationProject project = (TranslationProject) TerminologyProjectDAO.getProjectForWorklist(workList, config);
-//		//		if (project.getTargetLanguageRefset() == null) {
-//		//			JOptionPane.showMessageDialog(new JDialog(), "Target language refset cannot be retrieved\nCheck project details", 
-//		//					"Error", JOptionPane.ERROR_MESSAGE);
-//		//			throw new Exception("Target language refset cannot be retrieved.");
-//		//		}
-//		//		int targetLanguageRefsetId = project.getTargetLanguageRefset().getConceptNid();
-//		//		LanguageMembershipRefset langRefset = new LanguageMembershipRefset(project.getTargetLanguageRefset(), config);
-//		//		int commentsLanguageRefsetId = langRefset.getCommentsRefset(config).getRefsetId();
-//		//
-//		//		I_IntSet allowedStatusWithRetired = Terms.get().newIntSet();
-//		//		for (int id : config.getAllowedStatus().getSetValues()) {
-//		//			allowedStatusWithRetired.add(id);
-//		//		}
-//		//		allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
-//		//		//TODO: validate only one viewposition, editPath and promotePath
-//		//		int editPathId = config.getEditingPathSet().iterator().next().getConceptNid();
-//		//		int promotePathId = config.getPromotionPathSet().iterator().next().getConceptNid();
-//		//		PositionBI viewPosition = config.getViewPositionSetReadOnly().iterator().next();
-//		//		Set<PositionBI> viewPositions= new HashSet<PositionBI>();
-//		//		viewPositions.add(viewPosition);
-//		//		PositionSetReadOnly originPositionsReadOnly = new PositionSetReadOnly(viewPositions);
-//		//
-//		//		Set<PositionBI> targetPositions= new HashSet<PositionBI>();
-//		//		for (PathBI loopPath : config.getPromotionPathSet()) {
-//		//			targetPositions.add(tf.newPosition(loopPath, Integer.MAX_VALUE));
-//		//		}
-//		//		PositionSetReadOnly targetPositionsReadOnly = new PositionSetReadOnly(targetPositions);
-//		//		
-//		//		// Check for changes in descriptions
-//		//		List<? extends I_DescriptionTuple> originDescriptions = concept.getDescriptionTuples(allowedStatusWithRetired, config.getDescTypes(), 
-//		//				originPositionsReadOnly, Precedence.TIME, config.getConflictResolutionStrategy());
-//		//
-//		//		List<? extends I_DescriptionTuple> targetDescriptions = concept.getDescriptionTuples(allowedStatusWithRetired, config.getDescTypes(), 
-//		//				targetPositionsReadOnly, Precedence.TIME, config.getConflictResolutionStrategy());
-//		//
-//		//		Set<Integer> originDescIds = new HashSet<Integer>();
-//		//		for (I_DescriptionTuple loopTuple : originDescriptions) {
-//		//			originDescIds.add(loopTuple.getDescId());
-//		//		}
-//		//		Set<Integer> targetDescIds = new HashSet<Integer>();
-//		//		for (I_DescriptionTuple loopTuple : targetDescriptions) {
-//		//			targetDescIds.add(loopTuple.getDescId());
-//		//		}
-//		//		// new Descriptions
-//		//		for (Integer loopDescId : originDescIds) {
-//		//			if (!targetDescIds.contains(loopDescId)) {
-//		//				tf.getDescription(loopDescId).promote(viewPosition, config.getPromotionPathSetReadOnly(), 
-//		//						allowedStatusWithRetired, Precedence.TIME);
-//		//			}
-//		//		}
-//		//		// retired Descriptions
-//		//		for (Integer loopDescId : targetDescIds) {
-//		//			if (!originDescIds.contains(loopDescId)) {
-//		//				tf.getDescription(loopDescId).promote(viewPosition, config.getPromotionPathSetReadOnly(), 
-//		//						allowedStatusWithRetired, Precedence.TIME);
-//		//			}
-//		//		}
-//		//		// Check for new versions of descriptions
-//		//		for (I_DescriptionTuple originLoopTuple : originDescriptions) {
-//		//			for (I_DescriptionTuple targetLoopTuple : targetDescriptions) {
-//		//				if (originLoopTuple.getDescId() == targetLoopTuple.getDescId()) {
-//		//					if (!originLoopTuple.getText().equals(targetLoopTuple.getText()) ||
-//		//							originLoopTuple.getTypeNid() != targetLoopTuple.getTypeNid() ||
-//		//							originLoopTuple.isInitialCaseSignificant() != targetLoopTuple.isInitialCaseSignificant() ||
-//		//							originLoopTuple.getStatusNid() != targetLoopTuple.getStatusNid()) {
-//		//						originLoopTuple.getDescVersioned().promote(viewPosition, config.getPromotionPathSetReadOnly(), 
-//		//								allowedStatusWithRetired, Precedence.TIME);
-//		//					}
-//		//				}
-//		//			}
-//		//		}
-//		//		
-//		//		Collection<? extends I_ExtendByRef> langExtensions = project.getTargetLanguageRefset().getExtensions();
-//		//		for (I_ExtendByRef iExtendByRef : langExtensions) {
-//		//			iExtendByRef.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
-//		//									allowedStatusWithRetired, Precedence.TIME);
-//		//		}
-//		//		
-//		////		Collection<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(concept.getConceptNid());
-//		////		for (I_ExtendByRef loopExtension : extensions) {
-//		////			if (loopExtension.getRefsetId() == commentsRefset.getRefsetId() ||
-//		////					loopExtension.getRefsetId() == promotionRefset.getRefsetId() ||
-//		////					loopExtension.getRefsetId() == commentsLanguageRefsetId ||
-//		////					loopExtension.getRefsetId() == targetLanguageRefsetId) {
-//		////				List<? extends I_ExtendByRefVersion> tuples = loopExtension.getTuples(config.getAllowedStatus(), 
-//		////						config.getViewPositionSetReadOnly(), Precedence.TIME, 
-//		////						config.getConflictResolutionStrategy());
-//		////				if (tuples != null && !tuples.isEmpty()) {
-//		////					I_ExtendByRefPart lastPart = tuples.iterator().next().getMutablePart();
-//		////					
-//		////					if (lastPart.getPathNid() == editPathId) {
-//		////						boolean promoted = false;
-//		////						for (I_ExtendByRefPart loop2Part : loopExtension.getMutableParts()) {
-//		////							if (loop2Part.getPathNid() == promotePathId && lastPart.compareTo(loop2Part) == 0) {
-//		////								promoted = true;
-//		////							}
-//		////						}
-//		////						if (!promoted) {
-//		////							loopExtension.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
-//		////									allowedStatusWithRetired, Precedence.TIME);
-//		////						}
-//		////					}
-//		////					
-//		////				}
-//		////			}
-//		////		}
-//		//		//TODO: extension.getTuples is always size =1 or 0??
-//		//		//			I_ExtendByRefVersion originVersion = loopExtension.getTuples(allowedStatusWithRetired, 
-//		//		//					originPositionsReadOnly, 
-//		//		//					Precedence.TIME, config.getConflictResolutionStrategy()).iterator().next();
-//		//		//			I_ExtendByRefVersion targetVersion = loopExtension.getTuples(allowedStatusWithRetired, 
-//		//		//					targetPositionsReadOnly, 
-//		//		//					Precedence.TIME, config.getConflictResolutionStrategy()).iterator().next();
-//		//		//			
-//		//		//			if ((originVersion != null && targetVersion == null) || 
-//		//		//					(originVersion == null && targetVersion != null)) {
-//		//		//				loopExtension.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
-//		//		//						allowedStatusWithRetired, Precedence.TIME);
-//		//		//				tf.addUncommitted(tf.getConcept(loopExtension.getRefsetId()));
-//		//		//			} else if ((originVersion != null && targetVersion != null)) {
-//		//		//				if (originVersion.getVersion() != targetVersion.getVersion()) {
-//		//		//					tf.addUncommitted(tf.getConcept(loopExtension.getRefsetId()));
-//		//		//					loopExtension.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
-//		//		//							allowedStatusWithRetired, Precedence.TIME);
-//		//		//				}
-//		//		//			}
-//		//		tf.commit();
+		//		I_TermFactory tf = Terms.get();
+		//		I_GetConceptData concept = member.getConcept();
+		//
+		//		// Policy: Only one viewposition set, only one promotion path, only one edit path
+		//		//TODO: promote only language content
+		//
+		//		concept.promote(config.getViewPositionSetReadOnly().iterator().next(), 
+		//				config.getPromotionPathSetReadOnly(),
+		//				config.getAllowedStatus(), config.getPrecedence());
+		//		tf.addUncommittedNoChecks(concept);
+		//
+		//		for (I_ExtendByRef loopExtension : tf.getAllExtensionsForComponent(concept.getConceptNid())) {
+		//			loopExtension.promote(config.getViewPositionSetReadOnly().iterator().next(), 
+		//					config.getPromotionPathSetReadOnly(),
+		//					config.getAllowedStatus(), config.getPrecedence());
+		//			tf.addUncommittedNoChecks(loopExtension);
+		//		}
+		//
+		//		// END OF NEW PROMOTION ALGORITHM
+		//
+		//		//		WorkList workList = TerminologyProjectDAO.getWorkList(
+		//		//				tf.getConcept(member.getWorkListUUID()), config);
+		//		//		CommentsRefset commentsRefset = workList.getCommentsRefset(config);
+		//		//		PromotionRefset promotionRefset = workList.getPromotionRefset(config);
+		//		//		TranslationProject project = (TranslationProject) TerminologyProjectDAO.getProjectForWorklist(workList, config);
+		//		//		if (project.getTargetLanguageRefset() == null) {
+		//		//			JOptionPane.showMessageDialog(new JDialog(), "Target language refset cannot be retrieved\nCheck project details", 
+		//		//					"Error", JOptionPane.ERROR_MESSAGE);
+		//		//			throw new Exception("Target language refset cannot be retrieved.");
+		//		//		}
+		//		//		int targetLanguageRefsetId = project.getTargetLanguageRefset().getConceptNid();
+		//		//		LanguageMembershipRefset langRefset = new LanguageMembershipRefset(project.getTargetLanguageRefset(), config);
+		//		//		int commentsLanguageRefsetId = langRefset.getCommentsRefset(config).getRefsetId();
+		//		//
+		//		//		I_IntSet allowedStatusWithRetired = Terms.get().newIntSet();
+		//		//		for (int id : config.getAllowedStatus().getSetValues()) {
+		//		//			allowedStatusWithRetired.add(id);
+		//		//		}
+		//		//		allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
+		//		//		//TODO: validate only one viewposition, editPath and promotePath
+		//		//		int editPathId = config.getEditingPathSet().iterator().next().getConceptNid();
+		//		//		int promotePathId = config.getPromotionPathSet().iterator().next().getConceptNid();
+		//		//		PositionBI viewPosition = config.getViewPositionSetReadOnly().iterator().next();
+		//		//		Set<PositionBI> viewPositions= new HashSet<PositionBI>();
+		//		//		viewPositions.add(viewPosition);
+		//		//		PositionSetReadOnly originPositionsReadOnly = new PositionSetReadOnly(viewPositions);
+		//		//
+		//		//		Set<PositionBI> targetPositions= new HashSet<PositionBI>();
+		//		//		for (PathBI loopPath : config.getPromotionPathSet()) {
+		//		//			targetPositions.add(tf.newPosition(loopPath, Integer.MAX_VALUE));
+		//		//		}
+		//		//		PositionSetReadOnly targetPositionsReadOnly = new PositionSetReadOnly(targetPositions);
+		//		//		
+		//		//		// Check for changes in descriptions
+		//		//		List<? extends I_DescriptionTuple> originDescriptions = concept.getDescriptionTuples(allowedStatusWithRetired, config.getDescTypes(), 
+		//		//				originPositionsReadOnly, Precedence.TIME, config.getConflictResolutionStrategy());
+		//		//
+		//		//		List<? extends I_DescriptionTuple> targetDescriptions = concept.getDescriptionTuples(allowedStatusWithRetired, config.getDescTypes(), 
+		//		//				targetPositionsReadOnly, Precedence.TIME, config.getConflictResolutionStrategy());
+		//		//
+		//		//		Set<Integer> originDescIds = new HashSet<Integer>();
+		//		//		for (I_DescriptionTuple loopTuple : originDescriptions) {
+		//		//			originDescIds.add(loopTuple.getDescId());
+		//		//		}
+		//		//		Set<Integer> targetDescIds = new HashSet<Integer>();
+		//		//		for (I_DescriptionTuple loopTuple : targetDescriptions) {
+		//		//			targetDescIds.add(loopTuple.getDescId());
+		//		//		}
+		//		//		// new Descriptions
+		//		//		for (Integer loopDescId : originDescIds) {
+		//		//			if (!targetDescIds.contains(loopDescId)) {
+		//		//				tf.getDescription(loopDescId).promote(viewPosition, config.getPromotionPathSetReadOnly(), 
+		//		//						allowedStatusWithRetired, Precedence.TIME);
+		//		//			}
+		//		//		}
+		//		//		// retired Descriptions
+		//		//		for (Integer loopDescId : targetDescIds) {
+		//		//			if (!originDescIds.contains(loopDescId)) {
+		//		//				tf.getDescription(loopDescId).promote(viewPosition, config.getPromotionPathSetReadOnly(), 
+		//		//						allowedStatusWithRetired, Precedence.TIME);
+		//		//			}
+		//		//		}
+		//		//		// Check for new versions of descriptions
+		//		//		for (I_DescriptionTuple originLoopTuple : originDescriptions) {
+		//		//			for (I_DescriptionTuple targetLoopTuple : targetDescriptions) {
+		//		//				if (originLoopTuple.getDescId() == targetLoopTuple.getDescId()) {
+		//		//					if (!originLoopTuple.getText().equals(targetLoopTuple.getText()) ||
+		//		//							originLoopTuple.getTypeNid() != targetLoopTuple.getTypeNid() ||
+		//		//							originLoopTuple.isInitialCaseSignificant() != targetLoopTuple.isInitialCaseSignificant() ||
+		//		//							originLoopTuple.getStatusNid() != targetLoopTuple.getStatusNid()) {
+		//		//						originLoopTuple.getDescVersioned().promote(viewPosition, config.getPromotionPathSetReadOnly(), 
+		//		//								allowedStatusWithRetired, Precedence.TIME);
+		//		//					}
+		//		//				}
+		//		//			}
+		//		//		}
+		//		//		
+		//		//		Collection<? extends I_ExtendByRef> langExtensions = project.getTargetLanguageRefset().getExtensions();
+		//		//		for (I_ExtendByRef iExtendByRef : langExtensions) {
+		//		//			iExtendByRef.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
+		//		//									allowedStatusWithRetired, Precedence.TIME);
+		//		//		}
+		//		//		
+		//		////		Collection<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(concept.getConceptNid());
+		//		////		for (I_ExtendByRef loopExtension : extensions) {
+		//		////			if (loopExtension.getRefsetId() == commentsRefset.getRefsetId() ||
+		//		////					loopExtension.getRefsetId() == promotionRefset.getRefsetId() ||
+		//		////					loopExtension.getRefsetId() == commentsLanguageRefsetId ||
+		//		////					loopExtension.getRefsetId() == targetLanguageRefsetId) {
+		//		////				List<? extends I_ExtendByRefVersion> tuples = loopExtension.getTuples(config.getAllowedStatus(), 
+		//		////						config.getViewPositionSetReadOnly(), Precedence.TIME, 
+		//		////						config.getConflictResolutionStrategy());
+		//		////				if (tuples != null && !tuples.isEmpty()) {
+		//		////					I_ExtendByRefPart lastPart = tuples.iterator().next().getMutablePart();
+		//		////					
+		//		////					if (lastPart.getPathNid() == editPathId) {
+		//		////						boolean promoted = false;
+		//		////						for (I_ExtendByRefPart loop2Part : loopExtension.getMutableParts()) {
+		//		////							if (loop2Part.getPathNid() == promotePathId && lastPart.compareTo(loop2Part) == 0) {
+		//		////								promoted = true;
+		//		////							}
+		//		////						}
+		//		////						if (!promoted) {
+		//		////							loopExtension.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
+		//		////									allowedStatusWithRetired, Precedence.TIME);
+		//		////						}
+		//		////					}
+		//		////					
+		//		////				}
+		//		////			}
+		//		////		}
+		//		//		//TODO: extension.getTuples is always size =1 or 0??
+		//		//		//			I_ExtendByRefVersion originVersion = loopExtension.getTuples(allowedStatusWithRetired, 
+		//		//		//					originPositionsReadOnly, 
+		//		//		//					Precedence.TIME, config.getConflictResolutionStrategy()).iterator().next();
+		//		//		//			I_ExtendByRefVersion targetVersion = loopExtension.getTuples(allowedStatusWithRetired, 
+		//		//		//					targetPositionsReadOnly, 
+		//		//		//					Precedence.TIME, config.getConflictResolutionStrategy()).iterator().next();
+		//		//		//			
+		//		//		//			if ((originVersion != null && targetVersion == null) || 
+		//		//		//					(originVersion == null && targetVersion != null)) {
+		//		//		//				loopExtension.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
+		//		//		//						allowedStatusWithRetired, Precedence.TIME);
+		//		//		//				tf.addUncommitted(tf.getConcept(loopExtension.getRefsetId()));
+		//		//		//			} else if ((originVersion != null && targetVersion != null)) {
+		//		//		//				if (originVersion.getVersion() != targetVersion.getVersion()) {
+		//		//		//					tf.addUncommitted(tf.getConcept(loopExtension.getRefsetId()));
+		//		//		//					loopExtension.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
+		//		//		//							allowedStatusWithRetired, Precedence.TIME);
+		//		//		//				}
+		//		//		//			}
+		//		//		tf.commit();
 	}
 
 }
