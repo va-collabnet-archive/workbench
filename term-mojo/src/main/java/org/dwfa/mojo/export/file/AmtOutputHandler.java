@@ -5,9 +5,9 @@
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- * 
+ *
  *       http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -157,7 +157,7 @@ public class AmtOutputHandler extends SnomedFileFormatOutputHandler {
 
         conceptRow.setConceptUuid(conceptDto.getConceptId().keySet().iterator().next().toString());
         conceptRow.setConceptStatusUuid(conceptDto.getStatusId().toString());
-        conceptRow.setEffectiveTime(getReleaseDate(conceptDto));
+        conceptRow.setEffectiveTime(getReleaseDate(conceptDto, conceptDto.getDateTime()));
         conceptRow.setIsPrimitve(getPrimitiveFlag(conceptDto));
         conceptRow.setPathUuid(getModuleUuid(conceptDto).toString());
 
@@ -178,7 +178,7 @@ public class AmtOutputHandler extends SnomedFileFormatOutputHandler {
         rf2DescriptionRow.setConceptUuid(descriptionDto.getConceptId().keySet().iterator().next().toString());
         rf2DescriptionRow.setInitialCapitalStatusCode(descriptionDto.getInitialCapitalStatusCode().toString());
         rf2DescriptionRow.setDescriptionstatusUuid(descriptionDto.getStatusId().toString());
-        rf2DescriptionRow.setEffectiveTime(getReleaseDate(descriptionDto));
+        rf2DescriptionRow.setEffectiveTime(getReleaseDate(descriptionDto, descriptionDto.getDateTime()));
         rf2DescriptionRow.setLanguageCode(descriptionDto.getLanguageCode());
         rf2DescriptionRow.setPathUuid(getModuleUuid(descriptionDto).toString());
         rf2DescriptionRow.setTerm(descriptionDto.getDescription());
@@ -201,7 +201,7 @@ public class AmtOutputHandler extends SnomedFileFormatOutputHandler {
         relationshipRow.setConceptUuid1(relationshipDto.getSourceId().toString());
         relationshipRow.setConceptUuid2(relationshipDto.getDestinationId().keySet().iterator().next().toString());
         relationshipRow.setCharacteristicTypeUuid(relationshipDto.getCharacteristicTypeId().toString());
-        relationshipRow.setEffectiveTime(getReleaseDate(relationshipDto));
+        relationshipRow.setEffectiveTime(getReleaseDate(relationshipDto, relationshipDto.getDateTime()));
         relationshipRow.setPathUuid(getModuleUuid(relationshipDto).toString());
         relationshipRow.setRefinabilityUuid(relationshipDto.getRefinabilityId().toString());
         relationshipRow.setRelationshipGroup(relationshipDto.getRelationshipGroup().toString());
@@ -224,7 +224,7 @@ public class AmtOutputHandler extends SnomedFileFormatOutputHandler {
             for (final IdentifierDto identifierDto : conceptDto.getIdentifierDtos()) {
                 UUID uuid = identifierDto.getConceptId().keySet().iterator().next();
                 AceIdentifierRow aceIdentifierRow = new AceIdentifierRow();
-                aceIdentifierRow.setEffectiveDate(getReleaseDate(identifierDto));
+                aceIdentifierRow.setEffectiveDate(getReleaseDate(identifierDto, identifierDto.getDateTime()));
                 aceIdentifierRow.setPathUuid(getModuleUuid(identifierDto).toString());
                 aceIdentifierRow.setPrimaryUuid(uuid.toString());
                 aceIdentifierRow.setSourceId(identifierDto.getReferencedSctId().toString());

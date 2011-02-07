@@ -19,6 +19,7 @@ package org.dwfa.mojo.export;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -129,6 +130,9 @@ public final class SnomedComponentDtoUpdater extends AbstractComponentDtoUpdater
 
         getBaseConceptDto(conceptDto, tuple, conceptData.getId().getVersions(), latest);
 
+        conceptDto.setRf2DateTime(new Date(
+                getRf2ConceptEffectiveDateMap(tuple.getConVersioned().getTuples()).get(tuple.getTime())));
+
         if (latest) {
             I_IdPart ctv3IdPart = getLatesIdtVersion(conceptData.getId().getVersions(), ctv3Id.getConceptId(), tuple);
             if (ctv3IdPart != null) {
@@ -222,6 +226,8 @@ public final class SnomedComponentDtoUpdater extends AbstractComponentDtoUpdater
         List<I_IdPart> idParts = termFactory.getId(tuple.getRelId()).getVersions();
 
         getBaseConceptDto(relationshipDto, tuple, idParts, latest);
+        relationshipDto.setRf2DateTime(new Date(
+                getRf2RelationshipEffectiveDateMap(tuple.getFixedPart().getTuples()).get(tuple.getTime())));
 
         if (latest) {
             //TODO not implementing the concept history refsets yet

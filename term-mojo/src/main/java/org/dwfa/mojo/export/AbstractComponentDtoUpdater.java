@@ -51,6 +51,7 @@ import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 import org.dwfa.mojo.ConceptConstants;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ThinIdPart;
 
 /**
@@ -446,6 +447,10 @@ public abstract class AbstractComponentDtoUpdater {
         List<I_IdPart> idParts = termFactory.getId(tuple.getDescId()).getVersions();
 
         getBaseConceptDto(descriptionDto, tuple, idParts, latest);
+
+        descriptionDto.setRf2DateTime(new Date(
+                getRf2DescriptionEffectiveDateMap(tuple.getDescVersioned().getTuples()).get(tuple.getTime())));
+
         descriptionDto.setActive(check.isDescriptionActive(tuple.getStatusId()));
         descriptionDto.setStatusCode(ArchitectonicAuxiliary.getSnomedDescriptionStatusId(
                 termFactory.getConcept(tuple.getStatusId()).getUids()) + "");
@@ -542,5 +547,111 @@ public abstract class AbstractComponentDtoUpdater {
         }
 
         return rf2DescriptionType;
+    }
+
+
+    /**
+     * Map the Ace versions to RF2 versions to account for the differences in RF1 and RF2 status
+     *
+     * @param conceptTuples List of I_ConceptAttributeTuple
+     * @param check StatusChecker
+     * @return Map of Ace version dates to RF2 version dates
+     * @throws Exception DB errors
+     */
+    public final Map<Long,Long> getRf2ConceptEffectiveDateMap(final List<I_ConceptAttributeTuple> conceptTuples) throws Exception {
+        Map<Long,Long> effectiveDateMap = new HashMap<Long,Long>();
+        Collections.sort(conceptTuples, new TupleVersionComparator());
+        Collections.reverse(conceptTuples);
+        I_ConceptAttributeTuple firstChange = null;
+
+        for (I_ConceptAttributeTuple conceptAttributeTuple : conceptTuples) {
+            if(firstChange == null
+                    || check.isActive(firstChange.getPart().getStatusId()) != check.isActive(conceptAttributeTuple.getPart().getStatusId())
+                    || firstChange.getPart().getPathId() != conceptAttributeTuple.getPart().getPathId()
+                    || firstChange.getPart().isDefined() != conceptAttributeTuple.getPart().isDefined()){
+                firstChange = conceptAttributeTuple;
+            }
+
+            effectiveDateMap.put(ThinVersionHelper.convert(conceptAttributeTuple.getVersion()),
+                    ThinVersionHelper.convert(firstChange.getVersion()));
+        }
+
+        return effectiveDateMap;
+
+    }
+
+    /**
+     * Map the Ace versions to RF2 versions to account for the differences in RF1 and RF2 status
+    String descriptionSctId;
+    String effectiveTime;
+    String active;
+    String moduleSctId;
+    String conceptSctId;
+    String lanaguageCode;
+    String typeSctId;
+    String term;
+    String caseSignificaceSctId;
+
+     *
+     * @param conceptTuples List of I_ConceptAttributeTuple
+     * @param check StatusChecker
+     * @return Map of Ace version dates to RF2 version dates
+     * @throws Exception DB errors
+     */
+    public final Map<Long,Long> getRf2DescriptionEffectiveDateMap(final List<I_DescriptionTuple> descriptionTuples) throws Exception {
+        Map<Long,Long> effectiveDateMap = new HashMap<Long,Long>();
+        Collections.sort(descriptionTuples, new TupleVersionComparator());
+        Collections.reverse(descriptionTuples);
+        I_DescriptionTuple firstChange = null;
+
+        for (I_DescriptionTuple conceptAttributeTuple : descriptionTuples) {
+            if(firstChange == null
+                    || check.isDescriptionActive(firstChange.getPart().getStatusId()) != check.isDescriptionActive(conceptAttributeTuple.getPart().getStatusId())
+                    || firstChange.getPart().getPathId() != conceptAttributeTuple.getPart().getPathId()
+                    || ! getRf2DescriptionType(firstChange.getPart().getTypeId()).equals(getRf2DescriptionType(conceptAttributeTuple.getPart().getTypeId()))
+                    || ! firstChange.getPart().getText().equals(conceptAttributeTuple.getPart().getText())
+                    || firstChange.getPart().getInitialCaseSignificant() != conceptAttributeTuple.getPart().getInitialCaseSignificant()){
+                firstChange = conceptAttributeTuple;
+            }
+
+            effectiveDateMap.put(ThinVersionHelper.convert(conceptAttributeTuple.getVersion()),
+                    ThinVersionHelper.convert(firstChange.getVersion()));
+        }
+
+        return effectiveDateMap;
+
+    }
+
+    /**
+     * Map the Ace versions to RF2 versions to account for the differences in RF1 and RF2 status
+     *
+     * @param relationshipTuples List of I_RelTuple
+     * @param check StatusChecker
+     * @return Map of Ace version dates to RF2 version dates
+     * @throws Exception DB errors
+     */
+    public final Map<Long,Long> getRf2RelationshipEffectiveDateMap(final List<I_RelTuple> relationshipTuples) throws Exception {
+        Map<Long,Long> effectiveDateMap = new HashMap<Long,Long>();
+        Collections.sort(relationshipTuples, new TupleVersionComparator());
+        Collections.reverse(relationshipTuples);
+        I_RelTuple firstChange = null;
+
+        for (I_RelTuple replationshipTuple : relationshipTuples) {
+            if(firstChange == null
+                    || check.isActive(firstChange.getPart().getStatusId()) != check.isActive(replationshipTuple.getPart().getStatusId())
+                    || firstChange.getPart().getPathId() != replationshipTuple.getPart().getPathId()
+                    || firstChange.getPart().getGroup() != replationshipTuple.getPart().getGroup()
+                    || firstChange.getPart().getTypeId() != replationshipTuple.getPart().getTypeId()
+                    || firstChange.getPart().getCharacteristicId() != replationshipTuple.getPart().getCharacteristicId()
+                    ){
+                firstChange = replationshipTuple;
+            }
+
+            effectiveDateMap.put(ThinVersionHelper.convert(replationshipTuple.getVersion()),
+                    ThinVersionHelper.convert(firstChange.getVersion()));
+        }
+
+        return effectiveDateMap;
+
     }
 }

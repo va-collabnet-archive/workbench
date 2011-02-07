@@ -1,12 +1,12 @@
 /*
  *  Copyright 2010 International Health Terminology Standards Development  *  Organisation..
- * 
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- * 
+ *
  *       http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,40 +16,40 @@
  */
 package org.dwfa.mojo.export.file;
 
-import org.dwfa.maven.sctid.UuidSctidMapDb;
-import java.util.GregorianCalendar;
-import java.util.Calendar;
-import java.util.TimeZone;
-import java.util.Iterator;
-import org.dwfa.mojo.file.ace.AceIdentifierReader;
-import org.dwfa.mojo.file.ace.AceConceptReader;
-import org.dwfa.mojo.file.ace.AceDescriptionReader;
-import org.dwfa.mojo.file.ace.AceRelationshipReader;
-import org.dwfa.mojo.file.ace.AceRelationshipRow;
-import org.dwfa.mojo.file.ace.AceDescriptionRow;
-import org.dwfa.mojo.file.ace.AceConceptRow;
-import org.dwfa.mojo.file.ace.AceIdentifierRow;
+import java.io.File;
 import java.util.ArrayList;
-import org.junit.Assert;
-import org.dwfa.dto.IdentifierDto;
-import org.dwfa.maven.transform.SctIdGenerator.TYPE;
-import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
-import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.UUID;
+
+import org.dwfa.dto.ComponentDto;
 import org.dwfa.dto.ConceptDto;
 import org.dwfa.dto.DescriptionDto;
+import org.dwfa.dto.IdentifierDto;
 import org.dwfa.dto.RelationshipDto;
-import java.util.UUID;
-import java.util.Map;
-import java.util.HashMap;
-import java.io.File;
-import java.util.Date;
-import org.dwfa.dto.ComponentDto;
+import org.dwfa.maven.sctid.UuidSctidMapDb;
+import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
+import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
+import org.dwfa.maven.transform.SctIdGenerator.TYPE;
+import org.dwfa.mojo.file.ace.AceConceptReader;
+import org.dwfa.mojo.file.ace.AceConceptRow;
+import org.dwfa.mojo.file.ace.AceDescriptionReader;
+import org.dwfa.mojo.file.ace.AceDescriptionRow;
+import org.dwfa.mojo.file.ace.AceIdentifierReader;
+import org.dwfa.mojo.file.ace.AceIdentifierRow;
+import org.dwfa.mojo.file.ace.AceRelationshipReader;
+import org.dwfa.mojo.file.ace.AceRelationshipRow;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -163,7 +163,7 @@ public class AmtOutputHandlerTest {
         Assert.assertEquals(descriptionDto.getDescription(), descriptionRow.getTerm());
         Assert.assertEquals(descriptionDto.getStatusId().toString(), descriptionRow.getDescriptionstatusUuid());
         Assert.assertEquals(descriptionDto.getTypeId().toString(), descriptionRow.getDescriptiontypeUuid());
-        Assert.assertEquals(aceOutputHandler.getReleaseDate(descriptionDto), descriptionRow.getEffectiveTime());
+        Assert.assertEquals(aceOutputHandler.getReleaseDate(descriptionDto, descriptionDto.getDateTime()), descriptionRow.getEffectiveTime());
         Assert.assertEquals(descriptionDto.getLanguageCode(), descriptionRow.getLanguageCode());
         Assert.assertEquals(descriptionDto.getPathId().toString(), descriptionRow.getPathUuid());
     }
@@ -174,7 +174,7 @@ public class AmtOutputHandlerTest {
         Assert.assertEquals(conceptDto.getConceptId().keySet().iterator().next().toString(), aceConceptRow.
                 getConceptUuid());
         Assert.assertEquals(conceptDto.getStatusId().toString(), aceConceptRow.getConceptStatusUuid());
-        Assert.assertEquals(aceOutputHandler.getReleaseDate(conceptDto), aceConceptRow.getEffectiveTime());
+        Assert.assertEquals(aceOutputHandler.getReleaseDate(conceptDto, conceptDto.getDateTime()), aceConceptRow.getEffectiveTime());
         Assert.assertEquals(conceptDto.getPathId().toString(), aceConceptRow.getPathUuid());
         Assert.assertEquals((conceptDto.isPrimative()) ? "1" : "0", aceConceptRow.getIsPrimitve());
     }
@@ -182,7 +182,7 @@ public class AmtOutputHandlerTest {
     private void assertIdentifierRow(IdentifierDto identifierDto, AceIdentifierRow aceIdentifierRow) throws Exception {
         Assert.assertEquals(identifierDto.getConceptId().keySet().iterator().next().toString(), aceIdentifierRow.
                 getPrimaryUuid());
-        Assert.assertEquals(aceOutputHandler.getReleaseDate(identifierDto), aceIdentifierRow.getEffectiveDate());
+        Assert.assertEquals(aceOutputHandler.getReleaseDate(identifierDto, identifierDto.getDateTime()), aceIdentifierRow.getEffectiveDate());
         Assert.assertEquals(identifierDto.getPathId().toString(), aceIdentifierRow.getPathUuid());
         Assert.assertEquals(identifierDto.getReferencedSctId().toString(), aceIdentifierRow.getSourceId());
         Assert.assertEquals(identifierDto.getIdentifierSchemeUuid().toString(), aceIdentifierRow.getSourceSystemUuid());

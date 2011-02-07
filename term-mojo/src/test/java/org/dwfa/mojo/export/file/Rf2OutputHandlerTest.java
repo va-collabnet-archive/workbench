@@ -387,7 +387,7 @@ public class Rf2OutputHandlerTest {
         Assert.assertEquals(getSctId(extensionDto.getConcept1Id(), extensionDto), referenceSetRow.getComponentId1());
         Assert.assertEquals(getSctId(extensionDto.getConceptId(), extensionDto), referenceSetRow.getRefsetId());
         Assert.assertEquals((extensionDto.isActive()) ? "1" : "0", referenceSetRow.getActive());
-        Assert.assertEquals(rf2OutputHandler.getReleaseDate(extensionDto), referenceSetRow.getEffectiveTime());
+        Assert.assertEquals(rf2OutputHandler.getReleaseDate(extensionDto, extensionDto.getRf2DateTime()), referenceSetRow.getEffectiveTime());
         Assert.assertEquals(getSctId(extensionDto.getPathId(), extensionDto), referenceSetRow.getModuleId());
     }
 
@@ -400,7 +400,7 @@ public class Rf2OutputHandlerTest {
             relationshipRow.getCharacteristicSctId());
         Assert.assertEquals(getSctId(relationshipDto.getDestinationId(), relationshipDto),
             relationshipRow.getDestinationSctId());
-        Assert.assertEquals(rf2OutputHandler.getReleaseDate(relationshipDto),
+        Assert.assertEquals(rf2OutputHandler.getReleaseDate(relationshipDto, relationshipDto.getRf2DateTime()),
             relationshipRow.getEffectiveTime());
         Assert.assertEquals(getSctId(relationshipDto.getModifierId(), relationshipDto),
             relationshipRow.getModifierSctId());
@@ -418,7 +418,7 @@ public class Rf2OutputHandlerTest {
         Assert.assertEquals(getSctId(descriptionDto.getDescriptionId(), descriptionDto),
             descriptionRow.getDescriptionSctId());
         Assert.assertEquals((descriptionDto.isActive()) ? "1" : "0", descriptionRow.getActive());
-        Assert.assertEquals(rf2OutputHandler.getReleaseDate(descriptionDto),
+        Assert.assertEquals(rf2OutputHandler.getReleaseDate(descriptionDto, descriptionDto.getRf2DateTime()),
             descriptionRow.getEffectiveTime());
         Assert.assertEquals(getSctId(descriptionDto.getCaseSignificanceId(), descriptionDto),
             descriptionRow.getCaseSignificaceSctId());
@@ -433,7 +433,7 @@ public class Rf2OutputHandlerTest {
 
     private void assertIdentifierRow(IdentifierDto identifierDto, Rf2IdentifierRow rf2IdentifierRow) throws Exception {
         Assert.assertEquals(identifierDto.getConceptId().keySet().iterator().next().toString(), rf2IdentifierRow.getAlternateIdentifier().toString());
-        Assert.assertEquals(rf2OutputHandler.getReleaseDate(identifierDto), rf2IdentifierRow.getEffectiveTime());
+        Assert.assertEquals(rf2OutputHandler.getReleaseDate(identifierDto, identifierDto.getRf2DateTime()), rf2IdentifierRow.getEffectiveTime());
         Assert.assertEquals((identifierDto.isActive())?"1":"0", rf2IdentifierRow.getActive());
         Assert.assertEquals(getSctId(identifierDto.getPathId(), identifierDto), rf2IdentifierRow.getModuleSctId());
         Assert.assertEquals(identifierDto.getReferencedSctId().toString(), rf2IdentifierRow.getReferencedComponentSctId());
@@ -445,7 +445,7 @@ public class Rf2OutputHandlerTest {
 
         Assert.assertEquals(getSctId(conceptDto.getConceptId(), conceptDto),
             rf2ConceptRow.getConceptSctId());
-        Assert.assertEquals(rf2OutputHandler.getReleaseDate(conceptDto), rf2ConceptRow.getEffectiveTime());
+        Assert.assertEquals(rf2OutputHandler.getReleaseDate(conceptDto, conceptDto.getRf2DateTime()), rf2ConceptRow.getEffectiveTime());
         Assert.assertEquals((conceptDto.isActive())?"1":"0", rf2ConceptRow.getActive());
         Assert.assertEquals(getSctId(conceptDto.getPathId(), conceptDto), rf2ConceptRow.getModuleSctId());
     }
@@ -483,10 +483,10 @@ public class Rf2OutputHandlerTest {
         }
 
         setConceptDtoData(conceptDto);
-        conceptDto.setDateTime(null);
+        conceptDto.setRf2DateTime(null);
         try{
             rf2OutputHandler.export(componentDto);
-            Assert.fail("Must have a date");
+            Assert.fail("Must have a RF2 date");
         } catch (Exception e) {
 
         }
@@ -757,6 +757,7 @@ public class Rf2OutputHandlerTest {
         identifierDto.setReferencedSctId(sctid);
         identifierDto.setConceptId(getIdMap(UUID.randomUUID(), null));
         identifierDto.setDateTime(new Date());
+        identifierDto.setRf2DateTime(new Date());
         identifierDto.setIdentifierSchemeUuid(UUID.randomUUID());
         identifierDto.setPathId(UUID.randomUUID());
         identifierDto.setNamespace(NAMESPACE.NEHTA);
@@ -771,6 +772,7 @@ public class Rf2OutputHandlerTest {
         conceptDto.setActive(true);
         conceptDto.setConceptId(getIdMap(UUID.randomUUID(), null));
         conceptDto.setDateTime(new Date());
+        conceptDto.setRf2DateTime(new Date());
         conceptDto.setFullySpecifiedName("Flamingducks");
         conceptDto.setNamespace(NAMESPACE.NEHTA);
         conceptDto.setProject(PROJECT.AU);

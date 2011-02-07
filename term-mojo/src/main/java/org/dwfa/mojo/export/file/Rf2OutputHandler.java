@@ -419,7 +419,7 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
                         Rf2IdentifierRow rf2IdentifierRow = new Rf2IdentifierRow();
                         rf2IdentifierRow.setActive(identifierDto.isActive() ? "1" : "0");
                         rf2IdentifierRow.setAlternateIdentifier(uuid.toString());
-                        rf2IdentifierRow.setEffectiveTime(getReleaseDate(identifierDto));
+                        rf2IdentifierRow.setEffectiveTime(getReleaseDate(identifierDto, identifierDto.getDateTime()));
                         rf2IdentifierRow.setIdentifierSchemeSctId(getSctId(identifierDto,
                             identifierDto.getIdentifierSchemeUuid(), TYPE.CONCEPT).toString());
                         rf2IdentifierRow.setModuleSctId(getModuleId(identifierDto).toString());
@@ -451,7 +451,7 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         Rf2IdentifierRow rf2IdentifierRow = new Rf2IdentifierRow();
         rf2IdentifierRow.setActive(extensionDto.isActive() ? "1" : "0");
         rf2IdentifierRow.setAlternateIdentifier(extensionDto.getMemberId().toString());
-        rf2IdentifierRow.setEffectiveTime(getReleaseDate(extensionDto));
+        rf2IdentifierRow.setEffectiveTime(getReleaseDate(extensionDto, extensionDto.getRf2DateTime()));
         rf2IdentifierRow.setModuleSctId(getModuleId(extensionDto).toString());
 
         rf2IdentifierRow.setIdentifierSchemeSctId(
@@ -478,7 +478,7 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         Rf2ConceptRow conceptRow = new Rf2ConceptRow();
 
         conceptRow.setConceptSctId(getSctId(conceptDto).toString());
-        conceptRow.setEffectiveTime(getReleaseDate(conceptDto));
+        conceptRow.setEffectiveTime(getReleaseDate(conceptDto, conceptDto.getRf2DateTime()));
         conceptRow.setModuleSctId(getModuleId(conceptDto).toString());
         conceptRow.setDefinitionStatusSctId(getSctId(conceptDto, conceptDto.getDefinitionStatusUuid()).toString());
         conceptRow.setActive(getActiveFlag(conceptDto));
@@ -504,7 +504,7 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         rf2DescriptionRow.setDescriptionSctId(getSctId(descriptionDto, descriptionDto.getDescriptionId(), descriptionDto.getIdentifierDtos(), descriptionDto.getType()).toString());
         rf2DescriptionRow.setConceptSctId(getSctId(descriptionDto, descriptionDto.getConceptId(), TYPE.CONCEPT).toString());
         rf2DescriptionRow.setModuleSctId(getModuleId(descriptionDto).toString());
-        rf2DescriptionRow.setEffectiveTime(getReleaseDate(descriptionDto));
+        rf2DescriptionRow.setEffectiveTime(getReleaseDate(descriptionDto, descriptionDto.getRf2DateTime()));
         rf2DescriptionRow.setActive(getActiveFlag(descriptionDto));
         rf2DescriptionRow.setCaseSignificaceSctId(getSctId(descriptionDto, descriptionDto.getCaseSignificanceId(), TYPE.CONCEPT).toString());
         rf2DescriptionRow.setLanaguageCode(lanuageCode);
@@ -528,7 +528,7 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         relationshipRow.setSourceSctId(getSctId(relationshipDto, relationshipDto.getSourceId(), TYPE.CONCEPT).toString());
         relationshipRow.setDestinationSctId(getSctId(relationshipDto, relationshipDto.getDestinationId(), TYPE.CONCEPT).toString());
         relationshipRow.setModuleSctId(getModuleId(relationshipDto).toString());
-        relationshipRow.setEffectiveTime(getReleaseDate(relationshipDto));
+        relationshipRow.setEffectiveTime(getReleaseDate(relationshipDto, relationshipDto.getRf2DateTime()));
         relationshipRow.setActive(getActiveFlag(relationshipDto));
         relationshipRow.setCharacteristicSctId(getSctId(relationshipDto, relationshipDto.getCharacteristicTypeId(), TYPE.CONCEPT).toString());
         relationshipRow.setModifierSctId(getSctId(relationshipDto, relationshipDto.getModifierId(), TYPE.CONCEPT).toString());
@@ -552,7 +552,7 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         referenceSetRow.setRefsetId(getSctId(extensionDto, extensionDto.getConceptId(), TYPE.CONCEPT).toString());
         referenceSetRow.setReferencedComponentId(getSctId(extensionDto, extensionDto.getReferencedConceptId(), extensionDto.getType()).toString());
         referenceSetRow.setModuleId(getModuleId(extensionDto).toString());
-        referenceSetRow.setEffectiveTime(getReleaseDate(extensionDto));
+        referenceSetRow.setEffectiveTime(getReleaseDate(extensionDto, extensionDto.getRf2DateTime()));
         referenceSetRow.setActive(getActiveFlag(extensionDto));
 
         TYPE valueComponentType = getValueComponentExtensionType(extensionDto);
@@ -588,6 +588,22 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         }
 
         return type;
+    }
+
+    /**
+     * Validate the concept details (concept, description, relationship or
+     * extension)
+     *
+     * @param validationErrorList List of String
+     * @param concept ConceptDto
+     */
+    protected void validateConceptDto(List<String> validationErrorList, Concept concept) {
+        super.validateConceptDto(validationErrorList, concept);
+        if (concept != null) {
+            if (concept.getRf2DateTime() == null) {
+                validationErrorList.add(concept.getConceptId() + " No RF2 concept date");
+            }
+        }
     }
 
     /**

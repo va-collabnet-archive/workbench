@@ -32,6 +32,11 @@ public interface Concept {
     public Date getDateTime();
 
     /**
+     * @return the RF2 dateTime
+     */
+    public Date getRf2DateTime();
+
+    /**
      * @return the isActive
      */
     public boolean isActive();

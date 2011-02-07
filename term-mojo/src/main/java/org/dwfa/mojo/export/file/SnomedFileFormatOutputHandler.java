@@ -254,13 +254,10 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
      * @param validationErrorList List of String
      * @param concept ConceptDto
      */
-    private void validateConceptDto(List<String> validationErrorList, Concept concept) {
+    protected void validateConceptDto(List<String> validationErrorList, Concept concept) {
         if (concept != null) {
             if (concept.getConceptId() == null) {
                 validationErrorList.add(concept.getConceptId() + " No concept id");
-            }
-            if (concept.getDateTime() == null) {
-                validationErrorList.add(concept.getConceptId() + " No concept date");
             }
             if (concept.getPathId() == null) {
                 validationErrorList.add(concept.getConceptId() + " No concept path");
@@ -476,14 +473,14 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
      * @param concept Concept
      * @return String
      */
-    protected String getReleaseDate(Concept concept) {
+    protected String getReleaseDate(Concept concept, Date currentReleaseDate) {
         Date releaseDate;
 
         Map<UUID, Date> moduleDateMap = releasePathDateMap.get(concept.getPathId());
         if (moduleDateMap != null) {
             releaseDate = moduleDateMap.values().iterator().next();
         } else {
-            releaseDate = concept.getDateTime();
+            releaseDate = currentReleaseDate;
         }
 
         return getReleaseDateString(releaseDate);

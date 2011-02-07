@@ -32,6 +32,7 @@ public class BaseConceptDto {
     private UUID status;
     private String statusCode;
     private Date dateTime;
+    private Date rf2DateTime;
     private boolean isActive = false;;
     private boolean islive = false;
     private NAMESPACE namespace;
@@ -113,6 +114,20 @@ public class BaseConceptDto {
      */
     public void setDateTime(Date dateTime) {
         this.dateTime = dateTime;
+    }
+
+    /**
+     * @return the rf2DateTime
+     */
+    public final Date getRf2DateTime() {
+        return rf2DateTime;
+    }
+
+    /**
+     * @param rf2DateTime the rf2DateTime to set
+     */
+    public final void setRf2DateTime(Date rf2DateTime) {
+        this.rf2DateTime = rf2DateTime;
     }
 
     /**

@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -433,6 +434,8 @@ public abstract class AbstractExportSpecification implements ExportSpecification
             }
 
             updater.getBaseConceptDto(extensionDto, tuple, idParts, latest);
+
+            extensionDto.setRf2DateTime(new Date(tuple.getTime()));
 
             updater.addUuidSctIdIndentifierToConceptDto(extensionDto, tuple, idParts, TYPE.REFSET, thinExtByRefVersioned.
                     getMemberId(), latest);
