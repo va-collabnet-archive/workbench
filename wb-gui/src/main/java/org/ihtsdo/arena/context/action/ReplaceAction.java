@@ -3,6 +3,7 @@ package org.ihtsdo.arena.context.action;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 import javax.swing.AbstractAction;
@@ -15,9 +16,12 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.TypedComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.drools.facts.ComponentFact;
@@ -32,17 +36,30 @@ public class ReplaceAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;
 
 	ComponentVersionBI component;
-	int conceptNid;
 	SpecFact<?> spec;
 	ConceptVersionBI concept;
 
 	public ReplaceAction(String actionName, RelFact fact,
-           ConceptVersionBI concept,
            SpecFact<?> spec){
 		super(actionName);
 		this.component = fact.getComponent();
 		this.spec = spec;
-		this.concept = concept;
+		
+		
+		try {
+			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+			UUID uuid = Terms.get().nidToUuid(component.getConceptNid());
+			ConceptVersionBI cv = Ts.get().getConceptVersion(
+					config.getViewCoordinate(), 
+					uuid);
+			this.concept = cv;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -50,8 +67,9 @@ public class ReplaceAction extends AbstractAction {
 		try{
 		if (RelSpecFact.class.isAssignableFrom(spec.getClass())) {
 			addRel();
-		} else if (I_AmPart.class.isAssignableFrom(component.getClass())) {
-			retireRel();
+			if (I_AmPart.class.isAssignableFrom(component.getClass())) {
+				retireRel();
+			}
 		} else {
 			throw new Exception("Can't handle type: " + spec);
 			}
@@ -66,7 +84,7 @@ public class ReplaceAction extends AbstractAction {
 			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
 			Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
-			I_GetConceptData originConcept = Terms.get().getConcept(concept.getNid());
+			I_GetConceptData originConcept = Terms.get().getConcept(concept.getNid()); 
 			I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(),
 					originConcept,
 					relSpec.getRelTypeSpec().get(concept.getViewCoordinate()).getNid(),
