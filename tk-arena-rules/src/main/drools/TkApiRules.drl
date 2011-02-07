@@ -133,20 +133,12 @@ end
 
 rule "isKindOf inactive status"
 	when
-		$c : ConceptVersionBI(this isKindOf Snomed.INACTIVE_STATUS, hasHistoricalRels == false);
+		$c : ConceptVersionBI(this isKindOf Snomed.INACTIVE_STATUS);
 	then
-			JOptionPane.showMessageDialog(null, "Please select the appropriate historical relationships.");
 			ArrayList<RelSpec> relSpecs = new RelSpecFromConcept($c).getRelSpecs();
 			for (RelSpec relSpec: relSpecs){
 			templates.put(relSpec, $c.getNid());
 			}
-end
-
-rule "retiring current Rels"
-	when
-		$c : ConceptVersionBI( this isKindOf Snomed.INACTIVE_STATUS, hasHistoricalRels == true);
-	then
-		System.out.println("***!!! retiring concept !!!***");
 end
 
 
