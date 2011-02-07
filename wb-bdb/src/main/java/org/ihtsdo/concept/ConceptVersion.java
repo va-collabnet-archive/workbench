@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -607,7 +608,7 @@ public class ConceptVersion implements ConceptVersionBI {
         }
 
     }
-    
+
     @Override
     public boolean hasHistoricalRels () throws IOException, ContraditionException {
     	boolean history = false;
@@ -622,7 +623,7 @@ public class ConceptVersion implements ConceptVersionBI {
 					int typeNid = vOutRel.getTypeNid();
 					UUID[] compUuids = historicalType.getUuids();
 					for (UUID compUuid: compUuids){
-						if (tf.nidToUuid(typeNid).compareTo(compUuid) == 0){ 
+						if (tf.nidToUuid(typeNid).compareTo(compUuid) == 0){
 							history = true;
 							}
 						}
@@ -630,15 +631,15 @@ public class ConceptVersion implements ConceptVersionBI {
     			}
     		}
     	return history;
-    	} 
-    			
-    @Override 
+    	}
+
+    @Override
     public boolean hasChildren() throws IOException, ContraditionException{
     	Collection<? extends RelationshipVersionBI> children = this.getRelsIncomingActive();
     	if(children.size() == 0){
     		return false;
     	}
-    	
+
     	return true;
     }
 
@@ -704,6 +705,11 @@ public class ConceptVersion implements ConceptVersionBI {
    @Override
    public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc) throws IOException {
       return concept.getCurrentRefsetMembers(vc);
+   }
+
+   @Override
+   public Set<Integer> getAllSapNids() throws IOException {
+      return concept.getAllSapNids();
    }
  }
 

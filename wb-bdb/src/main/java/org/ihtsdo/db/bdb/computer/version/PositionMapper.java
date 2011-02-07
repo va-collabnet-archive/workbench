@@ -17,7 +17,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
@@ -355,7 +354,7 @@ public class PositionMapper {
                 conflictMatrix = new BitSet[positionCount];
                 for (int p1index = 0; p1index < positionCount; p1index++) {
                     try {
-                        I_Position p1 = Bdb.getSapDb().getPosition(p1index);
+                        PositionBI p1 = Bdb.getSapDb().getPosition(p1index);
                         Integer p1pathId = p1.getPath().getConceptNid();
                         Set<Integer> precedingPathIdSet = precedingPathIdMap.get(p1pathId);
                         // see if position may be in route to the destination
@@ -379,7 +378,7 @@ public class PositionMapper {
 
                                 // iterate to compute conflicts...
                                 for (int p2index = 0; p2index < positionCount; p2index++) {
-                                    I_Position p2 = Bdb.getSapDb().getPosition(p2index);
+                                    PositionBI p2 = Bdb.getSapDb().getPosition(p2index);
                                     Integer p2pathId = p2.getPath().getConceptNid();
                                     if (originMap.containsKey(p2pathId)
                                             && p2.getTime() <= originMap.get(p2pathId).getTime()) {

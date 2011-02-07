@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.util.id.Type5UuidFactory;
@@ -19,16 +21,16 @@ import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 
 public class RelGroupChronicle implements RelGroupChronicleBI {
-	
-	
+
+
 	private int nid;
 	private UUID uuid;
 	private int relGroup;
 	private int conceptNid;
 
 	private Collection<RelationshipChronicleBI> rels;
-	
-	
+
+
 
 	public RelGroupChronicle(Concept c, int relGroup, Collection<RelationshipChronicleBI> rels) throws IOException {
 		super();
@@ -91,7 +93,7 @@ public class RelGroupChronicle implements RelGroupChronicleBI {
 
 	@Override
 	public String toUserString() {
-	    StringBuffer buff = new StringBuffer();
+	    StringBuilder buff = new StringBuilder();
     	buff.append("Group: ");
 	    for (RelationshipChronicleBI rc: rels) {
 	    	buff.append(rc.toUserString());
@@ -133,5 +135,13 @@ public class RelGroupChronicle implements RelGroupChronicleBI {
         throw new UnsupportedOperationException("Not supported.");
 	}
 
+   @Override
+   public Set<Integer> getAllSapNids() throws IOException {
+      HashSet<Integer> sapNids = new HashSet<Integer>();
+      for (RelationshipChronicleBI r: rels) {
+         sapNids.addAll(r.getAllSapNids());
+      }
+      return sapNids;
+   }
 
 }

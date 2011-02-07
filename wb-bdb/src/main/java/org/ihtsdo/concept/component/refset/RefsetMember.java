@@ -43,10 +43,10 @@ import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public abstract class RefsetMember<R extends RefsetRevision<R, C>, 
+public abstract class RefsetMember<R extends RefsetRevision<R, C>,
         C extends RefsetMember<R, C>>
         extends ConceptComponent<R, C>
-        implements I_ExtendByRef, 
+        implements I_ExtendByRef,
                    RefexChronicleBI<R>,
                    RefexAnalogBI<R>
                     {
@@ -159,7 +159,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
         public List<? extends I_ExtendByRefPart<R>> getVersions() {
             return RefsetMember.this.getVersions();
         }
-        
+
         public void setCollectionNid(int collectionNid) throws PropertyVetoException {
         	RefsetMember.this.setCollectionNid(collectionNid);
         }
@@ -230,7 +230,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
         @Override
 		public int getPartsHashCode() {
 			return getMutablePart().getPartsHashCode();
-		}		
+		}
 
         @Override
         public int getReferencedComponentNid() {
@@ -267,7 +267,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
     }
 
     @SuppressWarnings("unchecked")
-    public RefsetMember<R, C> merge(RefsetMember<R,C> component) {
+    public RefsetMember<R, C> merge(RefsetMember<R,C> component) throws IOException {
         return (RefsetMember<R, C>) super.merge((C) component);
     }
 
@@ -308,11 +308,11 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
     }
 
     /**
-     * Test method to check to see if two objects are equal in all respects. 
+     * Test method to check to see if two objects are equal in all respects.
      * @param another
      * @return either a zero length String, or a String containing a description of the
-     * validation failures. 
-     * @throws IOException 
+     * validation failures.
+     * @throws IOException
      */
     public String validate(RefsetMember<?, ?> another) throws IOException {
         assert another != null;
@@ -323,7 +323,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
                     + "\t\tthis.referencedComponentNid = " + this.referencedComponentNid + "\n"
                     + "\t\tanother.referencedComponentNid = " + another.referencedComponentNid + "\n");
         }
-        // Compare the parents 
+        // Compare the parents
         buf.append(super.validate(another));
         return buf.toString();
     }
@@ -610,7 +610,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
     public String toUserString() {
         return toString();
     }
-    
+
     @Override
 	public int getCollectionNid() {
 		return refsetNid;
@@ -618,7 +618,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 
     @Override
 	public void setCollectionNid(int collectionNid) throws PropertyVetoException {
-        if (this.refsetNid == Integer.MAX_VALUE || 
+        if (this.refsetNid == Integer.MAX_VALUE ||
                 this.refsetNid == collectionNid ||
                 getTime() == Long.MAX_VALUE) {
             if (this.refsetNid != collectionNid) {
@@ -628,10 +628,10 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
             throw new PropertyVetoException("Cannot change refset unless member is uncommitted...", null);
         }
     }
-    
+
    @Override
     public RefexAmendmentSpec getRefexEditSpec() throws IOException {
-    	RefexAmendmentSpec rcs = new RefexAmendmentSpec(getTkRefsetType(), 
+    	RefexAmendmentSpec rcs = new RefexAmendmentSpec(getTkRefsetType(),
         		getReferencedComponentNid(), getRefsetId(), getPrimUuid());
     	addSpecProperties(rcs);
     	return rcs;

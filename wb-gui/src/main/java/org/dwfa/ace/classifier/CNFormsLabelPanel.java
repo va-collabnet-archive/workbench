@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -79,10 +79,10 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 /**
  * Classifier Normal Form (Label Format) Panel
- * 
- * 
+ *
+ *
  * @author kazoo
- * 
+ *
  */
 
 /*
@@ -94,7 +94,7 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 public class CNFormsLabelPanel extends JPanel implements ActionListener {
     private static final long serialVersionUID = 1L;
-    
+
     public static class ConceptAttrVersion implements I_ConceptAttributeTuple {
         I_ConceptAttributeVersioned<?> core;
 
@@ -174,7 +174,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#getConId()
          */
         public int getConId() {
@@ -183,7 +183,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#getConceptStatus()
          */
         @Deprecated
@@ -193,7 +193,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.ace.api.I_AmPart#setStatusId(int)
          */
         @Deprecated
@@ -203,7 +203,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#getPathId()
          */
         @Deprecated
@@ -213,7 +213,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#getVersion()
          */
         @Deprecated
@@ -223,7 +223,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#isDefined()
          */
         public boolean isDefined() {
@@ -232,7 +232,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see
          * org.dwfa.vodb.types.I_ConceptAttributeTuple#setStatusId(java.lang.Integer
          * )
@@ -245,7 +245,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#setDefined(boolean)
          */
         public void setDefined(boolean defined) {
@@ -255,7 +255,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#getConVersioned()
          */
         public I_ConceptAttributeVersioned getConVersioned() {
@@ -370,9 +370,14 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             throw new UnsupportedOperationException("Not supported yet.");
 		}
 
+      @Override
+      public Set getAllSapNids() throws IOException {
+         throw new UnsupportedOperationException("Not supported yet.");
+      }
+
     }
 
-    
+
     private static class RelVersion implements I_RelTuple {
 
         I_RelVersioned<?> fixedPart;
@@ -487,7 +492,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_RelTuple#getC1Id()
          */
         public int getC1Id() {
@@ -496,7 +501,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_RelTuple#getC2Id()
          */
         public int getC2Id() {
@@ -505,7 +510,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_RelTuple#getRelId()
          */
         public int getRelId() {
@@ -514,7 +519,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_RelTuple#getPathId()
          */
         @Deprecated
@@ -524,7 +529,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_RelTuple#getCharacteristicId()
          */
         public int getCharacteristicId() {
@@ -533,7 +538,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_RelTuple#getGroup()
          */
         public int getGroup() {
@@ -542,7 +547,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_RelTuple#getRefinabilityId()
          */
         public int getRefinabilityId() {
@@ -551,7 +556,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_RelTuple#getTypeId()
          */
         @Deprecated
@@ -564,7 +569,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_RelTuple#getStatusId()
          */
         @Deprecated
@@ -574,7 +579,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_RelTuple#getVersion()
          */
         @Deprecated
@@ -584,7 +589,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_RelTuple#setTypeId(java.lang.Integer)
          */
         @Deprecated
@@ -600,7 +605,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_RelTuple#setStatusId(java.lang.Integer)
          */
         @Deprecated
@@ -611,7 +616,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see
          * org.dwfa.vodb.types.I_RelTuple#setCharacteristicId(java.lang.Integer)
          */
@@ -622,7 +627,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_RelTuple#setRefinabilityId(java.lang.Integer)
          */
         public void setRefinabilityId(int refinabilityId) {
@@ -632,7 +637,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_RelTuple#setGroup(java.lang.Integer)
          */
         public void setGroup(int group) {
@@ -642,7 +647,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_RelTuple#duplicate()
          */
         @Deprecated
@@ -652,7 +657,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_RelTuple#getRelVersioned()
          */
         public I_RelVersioned getRelVersioned() {
@@ -675,7 +680,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.dwfa.vodb.types.I_RelTuple#getFixedPart()
          */
         public I_RelVersioned getFixedPart() {
@@ -770,6 +775,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 				ViewCoordinate xyz) throws IOException {
             throw new UnsupportedOperationException("Not supported yet.");
 		}
+
+      @Override
+      public Set getAllSapNids() throws IOException {
+         throw new UnsupportedOperationException("Not supported yet.");
+      }
 
     }
 
@@ -1150,7 +1160,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
             // concept attributes
             List<? extends I_ConceptAttributeTuple> conTuplesForPosition = this.theCBean.getConceptAttributeTuples(
-                config.getAllowedStatus(), posSet, 
+                config.getAllowedStatus(), posSet,
                 config.getPrecedence(), config.getConflictResolutionStrategy()); // ####
             // ALL
             // COMMON
@@ -1159,7 +1169,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
             // relationships
             List<? extends I_RelTuple> relTuplesForPosition = this.theCBean.getSourceRelTuples(config.getAllowedStatus(), null,
-                posSet, 
+                posSet,
                 config.getPrecedence(), config.getConflictResolutionStrategy()); // ####
             // ALL
             // REL
@@ -1414,7 +1424,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
     /**
      * <b>Long Canonical Form</b><li>Most Proximate PRIMITIVE Supertypes (IS-A)</li>
-     * 
+     *
      */
     public JPanel newFormLongJPanel(String label, I_ConfigAceFrame config,
             Map<I_ConceptAttributeTuple, Color> conAttrColorMap, Map<I_DescriptionTuple, Color> desColorMap,

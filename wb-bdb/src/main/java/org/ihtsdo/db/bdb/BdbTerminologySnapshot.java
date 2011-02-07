@@ -4,12 +4,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.ihtsdo.concept.ConceptVersion;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.amend.TerminologyAmendmentBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
@@ -20,11 +23,12 @@ import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public class BdbTerminologySnapshot implements TerminologySnapshotDI {
-	
-	private BdbTerminologyStore store;
-	private ViewCoordinate vc;
 
-	
+	private BdbTerminologyStore store;
+
+   private ViewCoordinate vc;
+
+
 	public BdbTerminologySnapshot(BdbTerminologyStore store,
 			ViewCoordinate coordinate) {
 		super();
@@ -32,7 +36,26 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
 		this.vc = coordinate;
 	}
 
-	@Override
+
+   @Override
+   public Set<PositionBI> getPositionSet(Set<Integer> sapNids)
+           throws IOException {
+      return store.getPositionSet(sapNids);
+   }
+
+   @Override
+   public Set<PathBI> getPathSetFromSapSet(Set<Integer> sapNids)
+           throws IOException {
+      return store.getPathSetFromSapSet(sapNids);
+   }
+
+   @Override
+   public Set<PathBI> getPathSetFromPositionSet(Set<PositionBI> positions)
+           throws IOException {
+      return store.getPathSetFromPositionSet(positions);
+   }
+
+   @Override
 	public ComponentVersionBI getComponentVersion(int nid) throws IOException, ContraditionException {
 		return store.getComponentVersion(vc, nid);
 	}
@@ -125,5 +148,5 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
 	public void removeChangeSetGenerator(String key) {
 		store.removeChangeSetGenerator(key);
 	}
-	
+
 }

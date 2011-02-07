@@ -23,13 +23,13 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public abstract class Revision<V extends Revision<V, C>, 
+public abstract class Revision<V extends Revision<V, C>,
         C extends ConceptComponent<V, C>>
         implements I_AmPart<V>,
             I_HandleFutureStatusAtPositionSetup,
             AnalogBI {
 
-    public static SimpleDateFormat fileDateFormat = 
+    public static SimpleDateFormat fileDateFormat =
             new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
     public int sapNid = Integer.MAX_VALUE;
 
@@ -64,9 +64,9 @@ public abstract class Revision<V extends Revision<V, C>,
         assert statusAtPositionNid != Integer.MAX_VALUE;
     }
 
-    public Revision(int statusNid, int authorNid, int pathNid, 
+    public Revision(int statusNid, int authorNid, int pathNid,
             long time, C primordialComponent) {
-        this.sapNid = Bdb.getSapDb().getSapNid(statusNid, authorNid, 
+        this.sapNid = Bdb.getSapDb().getSapNid(statusNid, authorNid,
                 pathNid, time);
         this.primordialComponent = primordialComponent;
         primordialComponent.clearVersions();
@@ -169,7 +169,7 @@ public abstract class Revision<V extends Revision<V, C>,
     }
 
     /**
-     * 1. Analog, an object, concept or situation which in some way 
+     * 1. Analog, an object, concept or situation which in some way
      *    resembles a different situation
      * 2. Analogy, in language, a comparison between concepts
      * @param statusNid
@@ -181,12 +181,12 @@ public abstract class Revision<V extends Revision<V, C>,
     public abstract V makeAnalog(int statusNid, int pathNid, long time);
 
     @Override
-    public abstract V makeAnalog(int statusNid, int authorNid, 
+    public abstract V makeAnalog(int statusNid, int authorNid,
                                  int pathNid, long time);
 
-    public void setStatusAtPosition(int statusNid, int authorNid, 
+    public void setStatusAtPosition(int statusNid, int authorNid,
             int pathNid, long time) {
-        this.sapNid = Bdb.getSapDb().getSapNid(statusNid, authorNid, 
+        this.sapNid = Bdb.getSapDb().getSapNid(statusNid, authorNid,
                 pathNid, time);
         modified();
     }
@@ -271,11 +271,11 @@ public abstract class Revision<V extends Revision<V, C>,
     }
 
     /**
-     * Test method to check to see if two objects are equal in all respects. 
+     * Test method to check to see if two objects are equal in all respects.
      * @param another
-     * @return either a zero length String, or a String containing a 
-     * description of the validation failures. 
-     * @throws IOException 
+     * @return either a zero length String, or a String containing a
+     * description of the validation failures.
+     * @throws IOException
      */
     public String validate(Revision<?, ?> another) throws IOException {
         assert another != null;
@@ -328,7 +328,7 @@ public abstract class Revision<V extends Revision<V, C>,
                     + "Use makeAnalog instead.");
         }
         if (authorNid != getPathNid()) {
-            this.sapNid = Bdb.getSapNid(getStatusNid(), authorNid, 
+            this.sapNid = Bdb.getSapNid(getStatusNid(), authorNid,
                     getPathNid(), Long.MAX_VALUE);
             modified();
         }
@@ -345,11 +345,11 @@ public abstract class Revision<V extends Revision<V, C>,
     public boolean isUncommitted() {
         return getTime() == Long.MAX_VALUE;
     }
-    
+
 	public Collection<? extends RefexChronicleBI<?>> getAnnotations() {
         return primordialComponent.getAnnotations();
     }
-    
+
     public boolean addAnnotation(@SuppressWarnings("rawtypes") RefexChronicleBI annotation) {
         return primordialComponent.addAnnotation(annotation);
     }
@@ -376,6 +376,9 @@ public abstract class Revision<V extends Revision<V, C>,
 			ViewCoordinate xyz) throws IOException {
 		return primordialComponent.getCurrentAnnotations(xyz);
 	}
-    
-    
+
+   public Set<Integer> getAllSapNids() throws IOException {
+      return primordialComponent.getAllSapNids();
+   }
+
 }

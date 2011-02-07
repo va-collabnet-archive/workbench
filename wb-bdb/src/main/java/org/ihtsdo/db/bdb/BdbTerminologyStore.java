@@ -6,14 +6,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.dwfa.ace.api.PositionSetReadOnly;
 
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.PathNotExistsException;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
@@ -83,7 +87,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
          int languageNid = getNidForUuids(
                  ArchitectonicAuxiliary.Concept.EN_US.getUids());
          int classifierNid = getNidForUuids(
-                 ArchitectonicAuxiliary.Concept.SNOROCKET.getUids());;
+                 ArchitectonicAuxiliary.Concept.SNOROCKET.getUids());
 
          metadataVC = new ViewCoordinate(Precedence.TIME,
                  positionSet,
@@ -240,6 +244,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
       ChangeSetWriterHandler.removeWriter(key);
    }
 
+   @Override
    public ChangeSetGeneratorBI createDtoChangeSetGenerator(File changeSetFileName,
            File changeSetTempFileName,
            ChangeSetGenerationPolicy policy) {
@@ -267,6 +272,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
       return latestDependencies;
    }
 
+   @Override
    public boolean satisfiesDependencies(Collection<DbDependency> dependencies) {
       if (dependencies != null) {
          try {
@@ -420,5 +426,46 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
       return Bdb.getConceptDb().getReadOnlyConceptIdSet();
    }
 
+   @Override
+   public Set<PositionBI> getPositionSet(Set<Integer> sapNids)
+           throws IOException {
+      HashSet<PositionBI> positions = new HashSet<PositionBI>(sapNids.size());
+      for (int sap: sapNids) {
+         try {
+            positions.add(Bdb.getSapDb().getPosition(sap));
+         } catch (PathNotExistsException ex) {
+            throw new IOException(ex);
+         } catch (TerminologyException ex) {
+            throw new IOException(ex);
+         }
+      }
+      return positions;
+   }
+
+   @Override
+   public Set<PathBI> getPathSetFromSapSet(Set<Integer> sapNids)
+      throws IOException {
+      HashSet<PathBI> paths = new HashSet<PathBI>(sapNids.size());
+      for (int sap: sapNids) {
+         try {
+            paths.add(Bdb.getSapDb().getPosition(sap).getPath());
+         } catch (PathNotExistsException ex) {
+            throw new IOException(ex);
+         } catch (TerminologyException ex) {
+            throw new IOException(ex);
+         }
+      }
+      return paths;
+  }
+
+   @Override
+   public Set<PathBI> getPathSetFromPositionSet(Set<PositionBI> positions)
+           throws IOException  {
+      HashSet<PathBI> paths = new HashSet<PathBI>(positions.size());
+      for (PositionBI position: positions) {
+         paths.add(position.getPath());
+      }
+      return paths;
+   }
 
 }

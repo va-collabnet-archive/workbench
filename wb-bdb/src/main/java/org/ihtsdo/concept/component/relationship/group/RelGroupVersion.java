@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.ihtsdo.tk.api.ContraditionException;
@@ -182,4 +183,11 @@ public class RelGroupVersion
 	public int getSapNid() {
 		throw new UnsupportedOperationException();
 	}
+
+      @Override
+   public Set<Integer> getAllSapNids() throws IOException {
+      return rg.getAllSapNids();
+   }
+
 }
+

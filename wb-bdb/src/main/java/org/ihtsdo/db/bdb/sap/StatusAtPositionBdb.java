@@ -37,7 +37,7 @@ import com.sleepycat.je.OperationStatus;
 
 /**
  * @author kec
- * 
+ *
  */
 public class StatusAtPositionBdb extends ComponentBdb {
 	private static PositionArrays readOnlyArray;
@@ -210,7 +210,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 				sapToIntMap.put(
 						readWriteArray.statusNids[i],
 						readWriteArray.authorNids[i],
-						readWriteArray.pathNids[i], 
+						readWriteArray.pathNids[i],
 						readWriteArray.commitTimes[i], readWriteIndex);
 			}
 		} catch (DatabaseException e) {
@@ -218,16 +218,16 @@ public class StatusAtPositionBdb extends ComponentBdb {
 		}
 	}
 
-	public I_Position getPosition(int index) throws IOException,
+	public PositionBI getPosition(int sapNid) throws IOException,
 			PathNotExistsException, TerminologyException {
 		int pathNid = -1;
 		long time = -1;
-		if (index < readOnlyArray.getSize()) {
-			pathNid = readOnlyArray.pathNids[index];
-			time = readOnlyArray.commitTimes[index];
+		if (sapNid < readOnlyArray.getSize()) {
+			pathNid = readOnlyArray.pathNids[sapNid];
+			time = readOnlyArray.commitTimes[sapNid];
 		} else {
-			pathNid = readWriteArray.pathNids[getReadWriteIndex(index)];
-			time = readWriteArray.commitTimes[getReadWriteIndex(index)];
+			pathNid = readWriteArray.pathNids[getReadWriteIndex(sapNid)];
+			time = readWriteArray.commitTimes[getReadWriteIndex(sapNid)];
 		}
 		PathBI path = Bdb.getPathManager().get(pathNid);
 		return new Position(ThinVersionHelper.convert(time), path);

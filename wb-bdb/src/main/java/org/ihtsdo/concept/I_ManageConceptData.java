@@ -23,34 +23,34 @@ import org.ihtsdo.tk.api.NidSetBI;
 
 public interface I_ManageConceptData {
 
-    public int getNid();
+    int getNid();
 
-    public void resetNidData();
+    void resetNidData();
 
-    public int getReadWriteDataVersion() throws InterruptedException,
+    int getReadWriteDataVersion() throws InterruptedException,
             ExecutionException, IOException;
 
-    public AddSrcRelSet getSourceRels() throws IOException;
+    AddSrcRelSet getSourceRels() throws IOException;
 
-    public Collection<Relationship> getSourceRelsIfChanged() throws IOException;
+    Collection<Relationship> getSourceRelsIfChanged() throws IOException;
 
-    public AddDescriptionSet getDescriptions() throws IOException;
+    AddDescriptionSet getDescriptions() throws IOException;
 
-    public Collection<Description> getDescriptionsIfChanged() throws IOException;
+    Collection<Description> getDescriptionsIfChanged() throws IOException;
 
-    public ConceptAttributes getConceptAttributes() throws IOException;
+    ConceptAttributes getConceptAttributes() throws IOException;
 
-    public ConceptAttributes getConceptAttributesIfChanged() throws IOException;
+    ConceptAttributes getConceptAttributesIfChanged() throws IOException;
 
-    public RefsetMember<?, ?> getRefsetMemberForComponent(int componentNid) throws IOException;
+    RefsetMember<?, ?> getRefsetMemberForComponent(int componentNid) throws IOException;
 
-    public AddMemberSet getRefsetMembers() throws IOException;
+    AddMemberSet getRefsetMembers() throws IOException;
 
-    public Collection<RefsetMember<?, ?>> getRefsetMembersIfChanged() throws IOException;
+    Collection<RefsetMember<?, ?>> getRefsetMembersIfChanged() throws IOException;
 
-    public AddImageSet getImages() throws IOException;
+    AddImageSet getImages() throws IOException;
 
-    public Collection<Image> getImagesIfChanged() throws IOException;
+    Collection<Image> getImagesIfChanged() throws IOException;
 
     /**
      * Destination rels are stored as a relid and a type id in
@@ -59,79 +59,76 @@ public interface I_ManageConceptData {
      * @return
      * @throws IOException
      */
-    public List<Relationship> getDestRels() throws IOException;
+    List<Relationship> getDestRels() throws IOException;
 
-    public List<Relationship> getDestRels(NidSetBI allowedTypes) throws IOException;
+    List<Relationship> getDestRels(NidSetBI allowedTypes) throws IOException;
 
-    public void set(ConceptAttributes attr) throws IOException;
+    void set(ConceptAttributes attr) throws IOException;
 
-    public void add(Description desc) throws IOException;
+    void add(Description desc) throws IOException;
 
-    public void add(Relationship rel) throws IOException;
+    void add(Relationship rel) throws IOException;
 
-    public void add(Image img) throws IOException;
+    void add(Image img) throws IOException;
 
-    public void add(RefsetMember<?, ?> refsetMember) throws IOException;
+    void add(RefsetMember<?, ?> refsetMember) throws IOException;
 
-    public Collection<Integer> getAllNids() throws IOException;
+    Collection<Integer> getAllNids() throws IOException;
 
-    public byte[] getReadOnlyBytes() throws IOException;
+    byte[] getReadOnlyBytes() throws IOException;
 
-    public byte[] getReadWriteBytes() throws IOException;
+    byte[] getReadWriteBytes() throws IOException;
 
-    public TupleInput getReadWriteTupleInput() throws IOException;
+    TupleInput getReadWriteTupleInput() throws IOException;
 
-    public ComponentChroncileBI<?> getComponent(int nid) throws IOException;
+    ComponentChroncileBI<?> getComponent(int nid) throws IOException;
 
-    public Set<Integer> getDescNidsReadOnly() throws IOException;
+    Set<Integer> getDescNidsReadOnly() throws IOException;
 
-    public Set<Integer> getDescNids() throws IOException;
+    Set<Integer> getDescNids() throws IOException;
 
-    public Set<Integer> getSrcRelNidsReadOnly() throws IOException;
+    Set<Integer> getSrcRelNidsReadOnly() throws IOException;
 
-    public Set<Integer> getSrcRelNids() throws IOException;
+    Set<Integer> getSrcRelNids() throws IOException;
 
-    public Set<Integer> getImageNidsReadOnly() throws IOException;
+    Set<Integer> getImageNidsReadOnly() throws IOException;
 
-    public Set<Integer> getImageNids() throws IOException;
+    Set<Integer> getImageNids() throws IOException;
 
-    public Set<Integer> getMemberNidsReadOnly() throws IOException;
+    Set<Integer> getMemberNidsReadOnly() throws IOException;
 
-    public Set<Integer> getMemberNids() throws IOException;
+    Set<Integer> getMemberNids() throws IOException;
 
-    public RefsetMember<?, ?> getRefsetMember(int memberNid) throws IOException;
+    RefsetMember<?, ?> getRefsetMember(int memberNid) throws IOException;
 
-    public boolean isUncommitted();
+    boolean isUncommitted();
 
-    public void modified();
+    void modified();
 
-    public long getLastChange();
+    long getLastChange();
 
-    public long getLastWrite();
+    long getLastWrite();
 
-    public void setLastWrite(long version);
+    void setLastWrite(long version);
 
-    public boolean isUnwritten();
+    boolean isUnwritten();
 
-    public boolean isPrimordial() throws IOException;
+    boolean isPrimordial() throws IOException;
 
-    public boolean isLeafByDestRels(I_ConfigAceFrame aceConfig) throws IOException;
+    boolean isLeafByDestRels(I_ConfigAceFrame aceConfig) throws IOException;
 
-    public boolean isAnnotationStyleRefset() throws IOException;
+    boolean isAnnotationStyleRefset() throws IOException;
 
-    public void setAnnotationStyleRefset(boolean annotationStyleRefset);
+    void setAnnotationStyleRefset(boolean annotationStyleRefset);
 
-    /*
+    /**
      * For single-concept commit.
      * @param time
      */
+   NidSetBI setCommitTime(long time);
 
     /**
-     *
-     * @param time
-     * @return sapNids from
+     * For single-concept cancel.
      */
-   public NidSetBI setCommitTime(long time);
-
-   public void cancel() throws IOException;
+  void cancel() throws IOException;
 }

@@ -25,13 +25,13 @@ import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
 
 public class UuidBdb extends ComponentBdb {
-	
+
 	private static final int UUID_MAP_SIZE = 100000;
 	private List<UuidArrayList> uuidMaps;
 	private int readOnlyRecords;
 	private Lock writeLock = new ReentrantLock();
-	
-	
+
+
 	public UuidBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv) throws IOException {
 		super(readOnlyBdbEnv, mutableBdbEnv);
 	}
@@ -41,10 +41,10 @@ public class UuidBdb extends ComponentBdb {
 		readOnlyRecords = (int) readOnly.count();
 		int mutableRecords = (int) mutable.count();
         uuidMaps = new ArrayList<UuidArrayList>(Math.max(1, readOnlyRecords + mutableRecords));
-        		
+
 		readUuids(readOnly);
 		readUuids(mutable);
-		if (uuidMaps.size() == 0) {
+		if (uuidMaps.isEmpty()) {
         	uuidMaps.add(new UuidArrayList(UUID_MAP_SIZE));
 		}
 	}
@@ -65,7 +65,7 @@ public class UuidBdb extends ComponentBdb {
 				} else if (index < uuidMaps.size()) {
 					uuidMaps.set(index, newList);
 				} else {
-					throw new RuntimeException("Data out of order. Encountered index: " + 
+					throw new RuntimeException("Data out of order. Encountered index: " +
 							index + " list size: " + uuidMaps.size());
 				}
 
@@ -76,7 +76,7 @@ public class UuidBdb extends ComponentBdb {
 					uuidArray[0] = ti.readLong();
 					uuidArray[1] = ti.readLong();
 					if (j < newList.size()) {
-						assert newList.get(j)[0] == uuidArray[0] && 
+						assert newList.get(j)[0] == uuidArray[0] &&
 						newList.get(j)[1] == uuidArray[1];
 					} else {
 						newList.add(uuidArray);
@@ -125,15 +125,15 @@ public class UuidBdb extends ComponentBdb {
 
 	private void writeLastList() throws IOException {
 		DatabaseEntry keyEntry = new DatabaseEntry();
-		
+
 		int key = uuidMaps.size() - 1;
-		
+
 		UuidArrayList listToWrite = uuidMaps.get(key);
-		
+
 		IntegerBinding.intToEntry(key, keyEntry);
 		if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-			AceLog.getAppLog().fine("Writing uuid list mutable index " + key + " globalIndex: " + 
-					(uuidMaps.size() - 1) + " size: " + ((uuidMaps.size() - 2) * UUID_MAP_SIZE + 
+			AceLog.getAppLog().fine("Writing uuid list mutable index " + key + " globalIndex: " +
+					(uuidMaps.size() - 1) + " size: " + ((uuidMaps.size() - 2) * UUID_MAP_SIZE +
 					uuidMaps.get(uuidMaps.size() - 1).size()));
 		}
 		TupleOutput output = new TupleOutput(new byte[(UUID_MAP_SIZE + 1) * 16]);
@@ -153,7 +153,7 @@ public class UuidBdb extends ComponentBdb {
 			throw new IOException("Unsuccessful operation: " + status);
 		}
 	}
-	
+
 	public int addUuid(UUID uuid) throws IOException{
 		int mapIndex = uuidMaps.size() - 1;
 		int uNid = UUID_MAP_SIZE * (mapIndex) + (uuidMaps.get(mapIndex).size());
@@ -192,7 +192,7 @@ public class UuidBdb extends ComponentBdb {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 }

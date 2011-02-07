@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TooManyListenersException;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,6 +65,8 @@ import org.ihtsdo.arena.drools.EditPanelKb;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
@@ -90,6 +93,16 @@ public class ConceptView extends JPanel {
    }
 
    public class LayoutConceptWorker extends SwingWorker<Map<SpecBI, Integer>, Boolean> {
+      private Set<Integer> saps;
+      private Set<PositionBI> positions;
+      private Set<PathBI> paths;
+      private List<? extends I_RelTuple> rels;
+      private ConceptVersionBI cv;
+      private Collection<? extends RefexVersionBI<?>> memberRefsets;
+      private ViewCoordinate coordinate;
+      private Collection<? extends RelGroupVersionBI> relGroups;
+      private List<? extends I_DescriptionTuple> descriptions;
+      private I_GetConceptData layoutConcept;
 
       public LayoutConceptWorker() {
          super();
@@ -97,7 +110,25 @@ public class ConceptView extends JPanel {
 
       @Override
       protected Map<SpecBI, Integer> doInBackground() throws Exception {
-         return kb.setConcept(concept);
+         layoutConcept = concept;
+         if (layoutConcept != null) {
+            coordinate = config.getViewCoordinate();
+            saps = layoutConcept.getAllSapNids();
+            positions = Ts.get().getPositionSet(saps);
+            paths = Ts.get().getPathSetFromPositionSet(positions);
+            rels = layoutConcept.getSourceRelTuples(config.getAllowedStatus(),
+                    null, config.getViewPositionSetReadOnly(),
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
+            cv = Ts.get().getConceptVersion(
+                    config.getViewCoordinate(), layoutConcept.getNid());
+            //get refsets
+            memberRefsets = cv.getCurrentRefsetMembers();
+            relGroups = Ts.get().getConceptVersion(coordinate, layoutConcept.getNid()).getRelGroups();
+            descriptions = layoutConcept.getDescriptionTuples(config.getAllowedStatus(),
+                    null, config.getViewPositionSetReadOnly(),
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
+         }
+         return kb.setConcept(layoutConcept);
       }
 
       @Override
@@ -106,11 +137,8 @@ public class ConceptView extends JPanel {
             Map<SpecBI, Integer> templates = get();
             removeAll();
             setLayout(new GridBagLayout());
-            if (concept != null) {
+            if (layoutConcept != null) {
                try {
-                  List<? extends I_RelTuple> rels = concept.getSourceRelTuples(config.getAllowedStatus(),
-                          null, config.getViewPositionSetReadOnly(),
-                          config.getPrecedence(), config.getConflictResolutionStrategy());
                   GridBagConstraints gbc = new GridBagConstraints();
                   gbc.weightx = 1;
                   gbc.weighty = 0;
@@ -132,17 +160,13 @@ public class ConceptView extends JPanel {
                   gbc.gridy++;
                   I_TermFactory tf = Terms.get();
 
-                  ConceptVersionBI cv = Ts.get().getConceptVersion(
-                          config.getViewCoordinate(), concept.getNid());
-                  //get refsets
-                  Collection<? extends RefexVersionBI<?>> memberRefsets = cv.getCurrentRefsetMembers();
 
                   if (memberRefsets != null) {
                      for (RefexVersionBI<?> extn : memberRefsets) {
                         int refsetNid = extn.getCollectionNid();
                         List<? extends I_ExtendByRefPart> currentRefsets =
                                 tf.getRefsetHelper(config).
-                                getAllCurrentRefsetExtensions(refsetNid, concept.getConceptNid());
+                                getAllCurrentRefsetExtensions(refsetNid, layoutConcept.getConceptNid());
                         for (I_ExtendByRefPart cr : currentRefsets) {
                            DragPanelExtension ce =
                                    new DragPanelExtension(settings, cpe, extn);
@@ -166,10 +190,7 @@ public class ConceptView extends JPanel {
                   cpd.setTemplateCount(0);
                   add(cpd, gbc);
                   gbc.gridy++;
-                  for (I_DescriptionTuple desc :
-                          concept.getDescriptionTuples(config.getAllowedStatus(),
-                          null, config.getViewPositionSetReadOnly(),
-                          config.getPrecedence(), config.getConflictResolutionStrategy())) {
+                  for (I_DescriptionTuple desc: descriptions) {
                      DragPanelDescription dc = getDescComponent(desc, cpd);
                      cpd.addToggleComponent(dc);
                      add(dc, gbc);
@@ -180,7 +201,6 @@ public class ConceptView extends JPanel {
                      cpd.setTemplateCount(cpd.templateCount += dc.getTemplateSubpanelCount());
                   }
 
-                  ViewCoordinate coordinate = config.getViewCoordinate();
 
                   CollapsePanel cpr = new CollapsePanel("relationships:", settings,
                           prefMap.get(PanelSection.REL), PanelSection.REL);
@@ -208,9 +228,7 @@ public class ConceptView extends JPanel {
                   }
 
                   try {
-                     Collection<? extends RelGroupVersionBI> group =
-                             Ts.get().getConceptVersion(coordinate, concept.getNid()).getRelGroups();
-                     for (RelGroupVersionBI r : group) {
+                     for (RelGroupVersionBI r : relGroups) {
                         Collection<? extends RelationshipVersionBI> currentRels =
                                 r.getCurrentRels(); //TODO getCurrentRels
                         if (!currentRels.isEmpty()) {

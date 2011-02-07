@@ -230,6 +230,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       protected int index = -1;
       private boolean dup = false;
 
+      public Set<Integer> getAllSapNids() throws IOException {
+         return ConceptComponent.this.getAllSapNids();
+      }
+
       public boolean isUncommitted() {
          return getTime() == Long.MAX_VALUE;
       }
@@ -893,23 +897,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       return sapNids;
    }
 
-   public Set<Integer> getComponentSapNids() {
-      int size = 1;
-      if (revisions != null) {
-         size = size + revisions.size();
-      }
-      HashSet<Integer> sapNids = new HashSet<Integer>(size);
-      sapNids.add(primordialSapNid);
-      if (revisions != null) {
-         for (R r : revisions) {
-            sapNids.add(r.sapNid);
-         }
-      }
-      sapNids.addAll(getIdSapNids());
-      sapNids.addAll(getAnnotationSapNids());
-      return sapNids;
-   }
-
    public HashMap<Integer, ConceptComponent<R, C>.Version> getVersionSapMap() {
       int size = 1;
       if (revisions != null) {
@@ -954,20 +941,21 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       Bdb.gVersion.incrementAndGet();
    }
 
-   public ConceptComponent<R, C> merge(C another) {
+   public ConceptComponent<R, C> merge(C another) throws IOException {
       Set<Integer> currentSapNids = getComponentSapNids();
 
       // merge versions
       for (ConceptComponent<R, C>.Version v : another.getVersions()) {
          if (!currentSapNids.contains(v.getSapNid())) {
-        	 // TODO Added to avoid failure if v.getRefision() returns null
-        	 // Therefore, must find proper solution
-        	 // Happens with EConcept import with EConcept = workflow history refset only
-        	 R rev = v.getRevision();
-        	 if (rev == null)
-        		 return this;
+            // TODO Added to avoid failure if v.getRefision() returns null
+            // Therefore, must find proper solution
+            // Happens with EConcept import with EConcept = workflow history refset only
+            R rev = v.getRevision();
+            if (rev == null) {
+               return this;
+            }
 
-        	 addRevision((R) rev);
+            addRevision((R) rev);
          }
       }
 
@@ -1819,7 +1807,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             if (rm.getTime() == Long.MAX_VALUE) {
                toRemove.add(a);
             } else if (rm.revisions != null) {
-               for (RefsetRevision rv: rm.revisions) {
+               for (RefsetRevision rv : rm.revisions) {
                   List<RefsetRevision> revToRemove = new ArrayList<RefsetRevision>();
                   if (rv.getTime() == Long.MAX_VALUE) {
                      revToRemove.add(rv);
@@ -1855,6 +1843,73 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
    @Override
    public int getSapNid() {
       return primordialSapNid;
+   }
+
+   public Set<Integer> getAllSapNids() throws IOException {
+      return getComponentSapNids();
+   }
+
+   public Set<Integer> getComponentSapNids() throws IOException {
+      int size = 1;
+      if (revisions != null) {
+         size = size + revisions.size();
+      }
+      if (additionalIdVersions != null) {
+         size = size + additionalIdVersions.size();
+      }
+      if (annotations != null) {
+         size = size + annotations.size();
+      }
+      HashSet<Integer> sapNids = new HashSet<Integer>(size);
+      sapNids.add(primordialSapNid);
+      if (revisions != null) {
+         for (R r : revisions) {
+            sapNids.add(r.sapNid);
+         }
+      }
+      sapNids.addAll(getIdSapNids());
+      sapNids.addAll(getAnnotationSapNids());
+      sapNids.addAll(getRefsetMemberSapNids());
+      return sapNids;
+   }
+
+   public Set<Integer> getRefsetMemberSapNids()
+           throws IOException {
+      List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
+      if (pairs == null || pairs.isEmpty()) {
+         return new HashSet<Integer>(0);
+      }
+      HashSet<Integer> returnValues = new HashSet<Integer>(pairs.size());
+      for (NidPairForRefset pair : pairs) {
+         RefexChronicleBI<?> ext =
+                 (RefexChronicleBI<?>) Bdb.getComponent(pair.getMemberNid());
+         if (ext != null) {
+            for (RefexVersionBI<?> refexV : ext.getVersions()) {
+               returnValues.add(refexV.getSapNid());
+            }
+            returnValues.addAll(
+                    ((ConceptComponent) ext).getRefsetMemberSapNids());
+         }
+      }
+      return returnValues;
+   }
+
+   public Collection<? extends RefexChronicleBI<?>> getRefsetMembers()
+           throws IOException {
+      List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
+      if (pairs == null || pairs.isEmpty()) {
+         return new ArrayList<RefexChronicleBI<?>>(0);
+      }
+      List<RefexChronicleBI<?>> returnValues = new ArrayList<RefexChronicleBI<?>>(pairs.size());
+      HashSet<Integer> addedMembers = new HashSet<Integer>();
+      for (NidPairForRefset pair : pairs) {
+         RefexChronicleBI<?> ext = (RefexChronicleBI<?>) Bdb.getComponent(pair.getMemberNid());
+         if (ext != null && !addedMembers.contains(ext.getNid())) {
+            addedMembers.add(ext.getNid());
+            returnValues.add(ext);
+         }
+      }
+      return Collections.unmodifiableCollection(returnValues);
    }
 
    @Override
