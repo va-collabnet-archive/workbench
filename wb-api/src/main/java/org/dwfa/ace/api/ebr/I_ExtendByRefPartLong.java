@@ -1,6 +1,9 @@
 package org.dwfa.ace.api.ebr;
 
-public interface I_ExtendByRefPartLong extends I_ExtendByRefPart {
+import org.ihtsdo.tk.api.refex.type_long.RefexLongAnalogBI;
+
+public interface I_ExtendByRefPartLong<A extends RefexLongAnalogBI<A>> 
+	extends I_ExtendByRefPart<A> {
 
     public long getLongValue();
 

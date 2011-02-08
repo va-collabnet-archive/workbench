@@ -16,7 +16,9 @@
  */
 package org.dwfa.ace.api;
 
-public interface I_DescriptionPart extends I_AmTypedPart {
+import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
+
+public interface I_DescriptionPart<A extends DescriptionAnalogBI> extends I_AmTypedPart<A> {
 
     public boolean isInitialCaseSignificant();
 

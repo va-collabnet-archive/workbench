@@ -104,7 +104,8 @@ public class RelationshipValidator extends SimpleValidator {
         return relationshipMismatches == beanRelationships.size() - databaseRelationships.size();
     }
 
-    public boolean relationshipsEqual(UniversalAceRelationship beanRelationship, I_RelVersioned databaseRelationship,
+    public boolean relationshipsEqual(UniversalAceRelationship beanRelationship,
+            I_RelVersioned<?> databaseRelationship,
             int beanRelId, int beanC1Id, int beanC2Id) throws IOException, TerminologyException {
 
         if (beanRelId != databaseRelationship.getRelId()) {
@@ -159,7 +160,7 @@ public class RelationshipValidator extends SimpleValidator {
         return failureReport.toString();
     }
 
-    private boolean containsPart(I_RelVersioned databaseRelationship, I_RelPart newPart) {
+    private boolean containsPart(I_RelVersioned<?> databaseRelationship, I_RelPart newPart) {
         if (!timeLenient) {
             return databaseRelationship.getMutableParts().contains(newPart);
         } else {

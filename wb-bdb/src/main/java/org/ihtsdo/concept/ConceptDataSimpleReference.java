@@ -3,7 +3,6 @@ package org.ihtsdo.concept;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,15 +36,13 @@ import org.ihtsdo.db.bdb.NidDataFromBdb;
 import org.ihtsdo.db.bdb.NidDataInMemory;
 import org.ihtsdo.db.util.NidPairForRel;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 
 import com.sleepycat.bind.tuple.TupleInput;
-import org.ihtsdo.concept.component.ConceptComponent.Version;
-import org.ihtsdo.tk.api.refset.RefsetMemberChronicleBI;
 
 public class ConceptDataSimpleReference extends ConceptDataManager {
 
-    private static HashMap<I_ConfigAceFrame, IsLeafBinder> isLeafBinders = new HashMap<I_ConfigAceFrame, IsLeafBinder>();
     private Boolean annotationStyleRefset;
     private AtomicReference<ConceptAttributes> attributes = new AtomicReference<ConceptAttributes>();
     private AtomicReference<AddSrcRelSet> srcRels = new AtomicReference<AddSrcRelSet>();
@@ -117,7 +114,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
         private boolean hasUncommittedAnnotation(ConceptComponent<?, ?> cc) {
         if (cc != null && cc.annotations != null) {
-            for (RefsetMemberChronicleBI rmc : cc.annotations) {
+            for (RefexChronicleBI<?> rmc : cc.annotations) {
                 if (rmc.isUncommitted()) {
                     return true;
                 }
@@ -312,14 +309,14 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                         Concept.componentsCRHM.remove(cc.getNid());
                     } else {
                         if (cc.revisions != null) {
-                        List<Revision> revisionToRemove = new ArrayList<Revision>();
-                        for (Revision r: cc.revisions) {
+                        List<Revision<?,?>> revisionToRemove = new ArrayList<Revision<?,?>>();
+                        for (Revision<?,?> r: cc.revisions) {
                             if (r.getTime() == Long.MIN_VALUE) {
                                 cc.clearVersions();
                                 revisionToRemove.add(r);
                             }
                         }
-                        for (Revision r: revisionToRemove) {
+                        for (Revision<?,?> r: revisionToRemove) {
                             cc.revisions.remove(r);
                         }
                         }
@@ -443,6 +440,21 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     @Override
     public Set<Integer> getMemberNidsReadOnly() throws IOException {
         return getReadOnlyIntSet(OFFSETS.MEMBER_NIDS);
+    }
+
+        /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ihtsdo.db.bdb.concept.I_ManageConceptData#add(org.ihtsdo.db.bdb.concept
+     * .component.refset.RefsetMember)
+     */
+    @Override
+    public void add(RefsetMember<?, ?> refsetMember) throws IOException {
+        getRefsetMembers().addDirect(refsetMember);
+        getMemberNids().add(refsetMember.nid);
+        addToMemberMap(refsetMember);
+        modified();
     }
 
     @Override

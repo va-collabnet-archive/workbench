@@ -35,9 +35,9 @@ import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.time.TimeUtil;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public class RefsetComputer implements I_ProcessUnfetchedConceptData {
 	
@@ -151,7 +151,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             I_HelpMemberRefset refsetHelper, int refsetId, int memberTypeId) throws Exception {
 
         I_RepresentIdSet newList = Terms.get().getEmptyIdSet();
-        Coordinate coord = frameConfig.getCoordinate();
+        ViewCoordinate coord = frameConfig.getViewCoordinate();
         for (RefsetMember<?, ?> e : allRefsetMembers) {
             if (e.getVersions(coord).size() > 0) {
                 newList.setMember(e.getComponentNid());

@@ -16,7 +16,10 @@
  */
 package org.dwfa.ace.api;
 
-public interface I_RelPart extends I_AmTypedPart {
+import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
+
+public interface I_RelPart<A extends RelationshipAnalogBI>
+        extends I_AmTypedPart<A> {
 
     public int getCharacteristicId();
 

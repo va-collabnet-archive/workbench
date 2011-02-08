@@ -17,9 +17,12 @@
 package org.dwfa.ace.api;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.ihtsdo.tk.api.AnalogBI;
+import org.ihtsdo.tk.api.AnalogGeneratorBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 
-public interface I_AmPart extends ComponentVersionBI {
+public interface I_AmPart<T extends AnalogBI> extends ComponentVersionBI,
+        AnalogGeneratorBI<T> {
 	
 	public int getStatusNid();
 	public void setStatusNid(int statusNid);
@@ -45,7 +48,7 @@ public interface I_AmPart extends ComponentVersionBI {
 	 */
 	public Object makeAnalog(int statusNid, int pathNid, long time);
 
-	public Object makeAnalog(int statusNid, int authorNid, int pathNid, long time);
+	public T makeAnalog(int statusNid, int authorNid, int pathNid, long time);
 	
 	@Deprecated
 	public int getPathId();

@@ -117,7 +117,6 @@ public class CidCidStrMemberTest {
          
         obj.nid = 1;
         obj.primordialSapNid = 1; 
-        obj.primordialUNid = 1;
         obj.revisions = new CopyOnWriteArrayList<CidCidStrRevision>();
 
         CidCidStrRevision rev = new CidCidStrRevision(); 
@@ -138,7 +137,6 @@ public class CidCidStrMemberTest {
          
         obj.nid = 2;
         obj.primordialSapNid = 2; 
-        obj.primordialUNid = 2;
         obj.revisions = new CopyOnWriteArrayList<CidCidStrRevision>();
 
         CidCidStrRevision rev = new CidCidStrRevision(); 

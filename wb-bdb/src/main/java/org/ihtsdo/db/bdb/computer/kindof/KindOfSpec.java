@@ -9,11 +9,11 @@ import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public class KindOfSpec {
 	
@@ -68,8 +68,8 @@ public class KindOfSpec {
 
         private RelAssertionType relAssertionType;
 	
-	public Coordinate getCoordinate() {
-		return new Coordinate(precedence, viewPositionSet, 
+	public ViewCoordinate getCoordinate() {
+		return new ViewCoordinate(precedence, viewPositionSet, 
                         allowedStatusNids, relTypeNids,
                         contradictionMgr, Integer.MIN_VALUE,
                         classifierNid, relAssertionType);

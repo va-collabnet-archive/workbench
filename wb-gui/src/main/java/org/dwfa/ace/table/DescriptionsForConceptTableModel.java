@@ -21,12 +21,11 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JTable;
@@ -58,14 +57,14 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
     public class ReferencedConceptsSwingWorker extends SwingWorker<Boolean> {
 
         private boolean stopWork = false;
-        private HashMap<Integer, I_GetConceptData> concepts;
+        private Map<Integer, I_GetConceptData> concepts;
 
         @Override
         protected Boolean construct() throws Exception {
             getProgress().setActive(true);
-            concepts = new HashMap<Integer, I_GetConceptData>();
+            concepts = new ConcurrentHashMap<Integer, I_GetConceptData>();
             Set<Integer> fetchSet = null;
-            fetchSet = new HashSet<Integer>(conceptsToFetch.size());
+            fetchSet = new ConcurrentSkipListSet<Integer>();
             for (Integer i : conceptsToFetch.keySet()) {
                 fetchSet.add(i);
             }
@@ -94,7 +93,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
                     }
                     if (getProgress() != null) {
                         getProgress().getProgressBar().setIndeterminate(false);
-                        if (conceptsToFetch.size() == 0) {
+                        if (conceptsToFetch.isEmpty()) {
                             getProgress().getProgressBar().setValue(1);
                         } else {
                             getProgress().getProgressBar().setValue(conceptsToFetch.size());
@@ -173,7 +172,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
         }
 
         private void addToConceptsToFetch(Collection<? extends I_DescriptionVersioned> descs) {
-            for (I_DescriptionVersioned d : descs) {
+            for (I_DescriptionVersioned<?> d : descs) {
                 if (stopWork) {
                     return;
                 }
@@ -200,7 +199,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
     private TableChangedSwingWorker tableChangeWorker;
     private ReferencedConceptsSwingWorker refConWorker;
     private ConcurrentHashMap<Integer, Integer> conceptsToFetch = new ConcurrentHashMap<Integer, Integer>();
-    Map<Integer, I_GetConceptData> referencedConcepts = new HashMap<Integer, I_GetConceptData>();
+    Map<Integer, I_GetConceptData> referencedConcepts = new ConcurrentHashMap<Integer, I_GetConceptData>();
     I_HostConceptPlugins host;
 
     public DescriptionsForConceptTableModel(DESC_FIELD[] columns, I_HostConceptPlugins host) {

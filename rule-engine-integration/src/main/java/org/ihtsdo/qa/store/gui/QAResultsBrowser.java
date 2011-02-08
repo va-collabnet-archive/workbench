@@ -14,7 +14,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -58,6 +57,7 @@ public class QAResultsBrowser extends JPanel {
 	private int startLine = 0;
 	private int finalLine = 0;
 	private int totalLines = 0;
+	LinkedHashMap<RulesReportColumn, Boolean> sortBy = null;
 
 	public QAResultsBrowser(QAStoreBI store) {
 		this.store = store;
@@ -89,6 +89,7 @@ public class QAResultsBrowser extends JPanel {
 			}
 		};
 		table1.setModel(tableModel);
+		sortBy = new LinkedHashMap<RulesReportColumn, Boolean>();
 		setupDatabasesCombo();
 		setupPathsCombo();
 		setupTimeCombo();
@@ -100,14 +101,15 @@ public class QAResultsBrowser extends JPanel {
 		updatePageCounters();
 		setupSortByCombo();
 	}
-	
+
 	private void setupSortByCombo() {
-		comboBox9.removeAllItems();
-		comboBox9.addItem("Rule name");
-		comboBox9.addItem("Open");
-		comboBox9.addItem("Cleared");
-		comboBox9.addItem("Escalated");
-		comboBox9.addItem("Deferred");
+		sortByComboBox.removeAllItems();
+		sortByComboBox.addItem(RulesReportColumn.RULE_NAME);
+		sortByComboBox.addItem(RulesReportColumn.OPEN);
+		sortByComboBox.addItem(RulesReportColumn.CLEARED);
+		sortByComboBox.addItem(RulesReportColumn.ESCALATED);
+		sortByComboBox.addItem(RulesReportColumn.DEFERRED);
+		sortBy.put(RulesReportColumn.RULE_NAME, true);
 	}
 
 	private void updatePageCounters() {
@@ -136,35 +138,35 @@ public class QAResultsBrowser extends JPanel {
 	}
 
 	private void setupCategoryCombo() {
-		comboBox8.removeAllItems();
-		comboBox8.addItem("Any");
-		comboBox8.addItem("Concept model");
-		comboBox8.addItem("Descriptions model");
+		categoryComboBox.removeAllItems();
+		categoryComboBox.addItem("Any");
+		categoryComboBox.addItem("Concept model");
+		categoryComboBox.addItem("Descriptions model");
 	}
 
 	private void setupSeverityCombo() {
-		comboBox7.removeAllItems();
-		comboBox7.addItem("Any");
+		severityComboBox.removeAllItems();
+		severityComboBox.addItem("Any");
 		for (Severity loopSeverity : severities) {
-			comboBox7.addItem(loopSeverity);
+			severityComboBox.addItem(loopSeverity);
 		}
 	}
 
 	private void setupDispositionCombo() {
-		comboBox6.removeAllItems();
-		comboBox6.addItem("Any");
+		dispositionComboBox.removeAllItems();
+		dispositionComboBox.addItem("Any");
 		for (DispositionStatus loopStatus : dispositionStatuses) {
-			comboBox6.addItem(loopStatus);
+			dispositionComboBox.addItem(loopStatus);
 		}
 	}
 
 	private void setupStatusCombo() {
-		comboBox5.removeAllItems();
-		comboBox5.addItem("Any");
-		comboBox5.addItem("Open cases");
-		comboBox5.addItem("No open cases");
-		comboBox5.addItem("Closed cases");
-		comboBox5.addItem("No closed cases");
+		statusComboBox.removeAllItems();
+		statusComboBox.addItem("Any");
+		statusComboBox.addItem("Open cases");
+		statusComboBox.addItem("No open cases");
+		statusComboBox.addItem("Closed cases");
+		statusComboBox.addItem("No closed cases");
 	}
 
 	private void setupDatabasesCombo() {
@@ -186,7 +188,7 @@ public class QAResultsBrowser extends JPanel {
 	private void setupTimeCombo() {
 		comboBox3.removeAllItems();
 		if (comboBox1.getSelectedItem() != null && comboBox2.getSelectedItem() != null) {
-			for (String loopDate : store.getAllTimesForPath(((QADatabase) comboBox1.getSelectedItem()).getDatabaseUuid(), 
+			for (String loopDate : store.getAllTimesForPath(((QADatabase) comboBox1.getSelectedItem()).getDatabaseUuid(),
 					((TerminologyComponent) comboBox2.getSelectedItem()).getComponentUuid())) {
 				comboBox3.addItem(loopDate);
 			}
@@ -194,14 +196,12 @@ public class QAResultsBrowser extends JPanel {
 	}
 
 	private void searchActionPerformed(ActionEvent e) {
-		if (comboBox1.getSelectedItem() != null && 
-				comboBox2.getSelectedItem() != null &&
-				comboBox3.getSelectedItem() != null) {
+		if (comboBox1.getSelectedItem() != null && comboBox2.getSelectedItem() != null && comboBox3.getSelectedItem() != null) {
 			QADatabase database = (QADatabase) comboBox1.getSelectedItem();
 			TerminologyComponent path = (TerminologyComponent) comboBox2.getSelectedItem();
 			String time = (String) comboBox3.getSelectedItem();
 			coordinate = new QACoordinate(database.getDatabaseUuid(), path.getComponentUuid(), time);
-			if(startLine < 1){
+			if (startLine < 1) {
 				startLine = 1;
 			}
 			updateTable1(coordinate);
@@ -209,99 +209,94 @@ public class QAResultsBrowser extends JPanel {
 	}
 
 	private void clearTable1() {
-		while (tableModel.getRowCount()>0){
+		while (tableModel.getRowCount() > 0) {
 			tableModel.removeRow(0);
 		}
 		table1.revalidate();
+		table1.repaint();
 	}
 
 	private void updateTable1(QACoordinate coordinate) {
-		clearTable1();
-		//List<RulesReportLine> lines = store.getRulesReportLines(coordinate);
-		LinkedHashMap<RulesReportColumn, Boolean> sortBy = new LinkedHashMap<RulesReportColumn,Boolean>();
-		sortBy.put(RulesReportColumn.RULE_NAME,true);
+		try {
+			clearTable1();
+			// List<RulesReportLine> lines =
+			// store.getRulesReportLines(coordinate);
 
-		HashMap<RulesReportColumn, Object> filter = new HashMap<RulesReportColumn, Object>();
-		Integer selectedPageLengh = Integer.parseInt((String) comboBox4.getSelectedItem());
-		RulesReportPage page = store.getRulesReportLinesByPage(coordinate, sortBy, filter, startLine, selectedPageLengh);
-		List<RulesReportLine> lines = page.getLines();
-		totalLines = page.getTotalLines();
-		startLine = page.getInitialLine();
-		finalLine =  page.getFinalLine();
-		updatePageCounters();
-		for (RulesReportLine line : lines) {
-			boolean lineApproved = true;
-			//			if (showFilters) {
-			//				if (comboBox5.getSelectedIndex() != 0){
-			//					String selectedStatus = (String) comboBox5.getSelectedItem();
-			//					if (selectedStatus.equals("Open cases")) {
-			//						if (line.getStatusCount().get(true) ==  0) {
-			//							lineApproved = false;
-			//						}
-			//					} else if (selectedStatus.equals("No open cases")) {
-			//						if (line.getStatusCount().get(true) >  0) {
-			//							lineApproved = false;
-			//						}
-			//					} else if (selectedStatus.equals("Closed cases")) {
-			//						if (line.getStatusCount().get(false) ==  0) {
-			//							lineApproved = false;
-			//						}
-			//					} else if (selectedStatus.equals("No closed cases")) {
-			//						if (line.getStatusCount().get(false) >  0) {
-			//							lineApproved = false;
-			//						}
-			//					}
-			//				}
-			//				if (comboBox6.getSelectedIndex() != 0){
-			//					DispositionStatus selectedDisposition = (DispositionStatus) comboBox6.getSelectedItem();
-			//					if (line.getDispositionStatusCount().get(selectedDisposition.getDispositionStatusUuid()) == 0) {
-			//						lineApproved = false;
-			//					}
-			//				}
-			//				if (comboBox7.getSelectedIndex() != 0){
-			//					Integer selectedSeverity = Integer.valueOf((String) comboBox7.getSelectedItem());
-			//					if (line.getRule().getSeverity() != selectedSeverity) {
-			//						lineApproved = false;
-			//					}
-			//				}
-			//				if (comboBox8.getSelectedIndex() != 0){
-			//					String selectedCategory = (String) comboBox8.getSelectedItem();
-			//					if (!line.getRule().getCategory().equals(selectedCategory)) {
-			//						lineApproved = false;
-			//					}
-			//				}
-			//				String filterText = textField1.getText().trim().toLowerCase();
-			//				if (!filterText.isEmpty()) {
-			//					if (!line.getRule().getName().toLowerCase().contains(filterText)) {
-			//						lineApproved = false;
-			//					}
-			//				}
-			//				String filterCode = textField2.getText().trim().toLowerCase();
-			//				if (!filterCode.isEmpty()) {
-			//					if (!line.getRule().getRuleCode().toLowerCase().equals(filterCode)) {
-			//						lineApproved = false;
-			//					}
-			//				}
-			//			}
-
-			if (lineApproved) {
-				LinkedList<Object> row = new LinkedList<Object>();
-				row.add(String.valueOf(line.getRule().getRuleCode()));
-				row.add(line.getRule());
-				row.add(line.getRule().getCategory());
-				row.add(line.getRule().getSeverity());
-				row.add(line.getStatusCount().get(true));
-				for (DispositionStatus loopStatus : dispositionStatuses) {
-					row.add(line.getDispositionStatusCount().get(loopStatus.getDispositionStatusUuid()));
+			HashMap<RulesReportColumn, Object> filter = new HashMap<RulesReportColumn, Object>();
+			getFilterData(filter);
+			Integer selectedPageLengh = Integer.parseInt((String) comboBox4.getSelectedItem());
+			RulesReportPage page = store.getRulesReportLinesByPage(coordinate, sortBy, filter, startLine, selectedPageLengh);
+			List<RulesReportLine> lines = page.getLines();
+			totalLines = page.getTotalLines();
+			startLine = page.getInitialLine();
+			finalLine = page.getFinalLine();
+			updatePageCounters();
+			for (RulesReportLine line : lines) {
+				boolean lineApproved = true;
+				if (lineApproved) {
+					LinkedList<Object> row = new LinkedList<Object>();
+					row.add(String.valueOf(line.getRule().getRuleCode()));
+					row.add(line.getRule());
+					row.add(line.getRule().getCategory());
+					row.add(line.getRule().getSeverity());
+					row.add(line.getStatusCount().get(true));
+					for (DispositionStatus loopStatus : dispositionStatuses) {
+						row.add(line.getDispositionStatusCount().get(loopStatus.getDispositionStatusUuid()));
+					}
+					row.add(line.getStatusCount().get(false));
+					if (line.getLastExecutionTime() != null) {
+						row.add(line.getLastExecutionTime().toString());
+					}
+					tableModel.addRow(row.toArray());
 				}
-				row.add(line.getStatusCount().get(false));
-				if(line.getLastExecutionTime() != null){
-					row.add(line.getLastExecutionTime().toString());
-				}
-				tableModel.addRow(row.toArray());
 			}
+			table1.revalidate();
+			table1.repaint();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		table1.revalidate();
+	}
+
+	private void getFilterData(HashMap<RulesReportColumn, Object> filter) {
+		filter.clear();
+		if (showFilters) {
+			String ruleCodeFilter = ruleCodeTextField.getText();
+			if (ruleCodeFilter != null && !ruleCodeFilter.trim().equals("")) {
+				filter.put(RulesReportColumn.RULE_CODE, ruleCodeFilter);
+			}
+			String ruleNameFilter = ruleNameTextField.getText();
+			if (ruleNameFilter != null && !ruleNameFilter.trim().equals("")) {
+				filter.put(RulesReportColumn.RULE_NAME, ruleNameFilter);
+			}
+			String categoryFilter = (String) categoryComboBox.getSelectedItem();
+			if (categoryFilter != null && !categoryFilter.equals("Any")) {
+				filter.put(RulesReportColumn.CATEGORY, categoryFilter);
+			}
+			Object severityObj = severityComboBox.getSelectedItem();
+			if (severityObj != null && severityObj instanceof Severity) {
+				Severity severityFilter = (Severity) severityObj;
+				filter.put(RulesReportColumn.SEVERITY, severityFilter);
+			}
+			String statusFilter = (String) statusComboBox.getSelectedItem();
+			if (!statusFilter.equals("Any")) {
+				if (statusFilter.equals("Open cases")) {
+					filter.put(RulesReportColumn.STATUS, "Open cases");
+				} else if (statusFilter.equals("No open cases")) {
+					filter.put(RulesReportColumn.STATUS, "No open cases");
+				} else if (statusFilter.equals("Closed cases")) {
+					filter.put(RulesReportColumn.STATUS, "Closed cases");
+				} else if (statusFilter.equals("No closed cases")) {
+					filter.put(RulesReportColumn.STATUS, "No closed cases");
+				}
+			}
+			Object dispoObj = dispositionComboBox.getSelectedItem();
+			if (dispoObj != null && dispoObj instanceof DispositionStatus) {
+				DispositionStatus dispStatus = (DispositionStatus) dispoObj;
+				filter.put(RulesReportColumn.DISPOSITION_STATUS_FILTER, dispStatus.getDispositionStatusUuid().toString());
+			}
+
+		}
+
 	}
 
 	private void comboBox1ItemStateChanged(ItemEvent e) {
@@ -352,8 +347,20 @@ public class QAResultsBrowser extends JPanel {
 		updateTable1(coordinate);
 	}
 
+	private void sortByComboBoxItemStateChanged(ItemEvent e) {
+		if (e.getStateChange() == ItemEvent.SELECTED) {
+			Object selectedItem = e.getItem();
+			if (selectedItem instanceof RulesReportColumn) {
+				RulesReportColumn column = (RulesReportColumn) selectedItem;
+				sortBy.clear();
+				sortBy.put(column, true);
+			}
+		}
+	}
+
 	private void initComponents() {
-		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+		// JFormDesigner - Component initialization - DO NOT MODIFY
+		// //GEN-BEGIN:initComponents
 		panel1 = new JPanel();
 		label1 = new JLabel();
 		label2 = new JLabel();
@@ -364,7 +371,7 @@ public class QAResultsBrowser extends JPanel {
 		comboBox3 = new JComboBox();
 		button1 = new JButton();
 		button2 = new JButton();
-		comboBox9 = new JComboBox();
+		sortByComboBox = new JComboBox();
 		panel4 = new JPanel();
 		label11 = new JLabel();
 		label8 = new JLabel();
@@ -372,12 +379,12 @@ public class QAResultsBrowser extends JPanel {
 		label9 = new JLabel();
 		label4 = new JLabel();
 		label5 = new JLabel();
-		textField2 = new JTextField();
-		textField1 = new JTextField();
-		comboBox8 = new JComboBox();
-		comboBox7 = new JComboBox();
-		comboBox5 = new JComboBox();
-		comboBox6 = new JComboBox();
+		ruleCodeTextField = new JTextField();
+		ruleNameTextField = new JTextField();
+		categoryComboBox = new JComboBox();
+		severityComboBox = new JComboBox();
+		statusComboBox = new JComboBox();
+		dispositionComboBox = new JComboBox();
 		panel2 = new JPanel();
 		scrollPane1 = new JScrollPane();
 		table1 = new JTable();
@@ -491,7 +498,15 @@ public class QAResultsBrowser extends JPanel {
 			panel1.add(button2, new GridBagConstraints(8, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
-			panel1.add(comboBox9, new GridBagConstraints(11, 1, 1, 1, 0.0, 0.0,
+
+			//---- sortByComboBox ----
+			sortByComboBox.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					sortByComboBoxItemStateChanged(e);
+				}
+			});
+			panel1.add(sortByComboBox, new GridBagConstraints(11, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
 		}
@@ -502,65 +517,65 @@ public class QAResultsBrowser extends JPanel {
 		//======== panel4 ========
 		{
 			panel4.setLayout(new GridBagLayout());
-			((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {0, 0, 209, 0, 0, 0, 0};
+			((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {85, 255, 159, 115, 0, 0, 0};
 			((GridBagLayout)panel4.getLayout()).rowHeights = new int[] {0, 0, 0};
-			((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0E-4};
 			((GridBagLayout)panel4.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
 
 			//---- label11 ----
 			label11.setText("Rule code");
 			panel4.add(label11, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+				new Insets(0, 0, 5, 15), 0, 0));
 
 			//---- label8 ----
-			label8.setText("Rule name filter");
+			label8.setText("Rule name");
 			panel4.add(label8, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+				new Insets(0, 0, 5, 15), 0, 0));
 
 			//---- label10 ----
 			label10.setText("Category");
 			panel4.add(label10, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+				new Insets(0, 0, 5, 15), 0, 0));
 
 			//---- label9 ----
 			label9.setText("Severity");
 			panel4.add(label9, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+				new Insets(0, 0, 5, 15), 0, 0));
 
 			//---- label4 ----
 			label4.setText("Status");
 			panel4.add(label4, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+				new Insets(0, 0, 5, 15), 0, 0));
 
 			//---- label5 ----
 			label5.setText("Disposition");
 			panel4.add(label5, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 0), 0, 0));
-			panel4.add(textField2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+			panel4.add(ruleCodeTextField, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+				new Insets(0, 0, 0, 15), 0, 0));
 
-			//---- textField1 ----
-			textField1.setColumns(50);
-			panel4.add(textField1, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+			//---- ruleNameTextField ----
+			ruleNameTextField.setColumns(50);
+			panel4.add(ruleNameTextField, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
-			panel4.add(comboBox8, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
+				new Insets(0, 0, 0, 15), 0, 0));
+			panel4.add(categoryComboBox, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
-			panel4.add(comboBox7, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
+				new Insets(0, 0, 0, 15), 0, 0));
+			panel4.add(severityComboBox, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
-			panel4.add(comboBox5, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0,
+				new Insets(0, 0, 0, 15), 0, 0));
+			panel4.add(statusComboBox, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
-			panel4.add(comboBox6, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0,
+				new Insets(0, 0, 0, 15), 0, 0));
+			panel4.add(dispositionComboBox, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 0), 0, 0));
 		}
@@ -691,10 +706,11 @@ public class QAResultsBrowser extends JPanel {
 		add(panel3, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 0, 0), 0, 0));
-		// JFormDesigner - End of component initialization  //GEN-END:initComponents
+		// //GEN-END:initComponents
 	}
 
-	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	// JFormDesigner - Variables declaration - DO NOT MODIFY
+	// //GEN-BEGIN:variables
 	private JPanel panel1;
 	private JLabel label1;
 	private JLabel label2;
@@ -705,7 +721,7 @@ public class QAResultsBrowser extends JPanel {
 	private JComboBox comboBox3;
 	private JButton button1;
 	private JButton button2;
-	private JComboBox comboBox9;
+	private JComboBox sortByComboBox;
 	private JPanel panel4;
 	private JLabel label11;
 	private JLabel label8;
@@ -713,12 +729,12 @@ public class QAResultsBrowser extends JPanel {
 	private JLabel label9;
 	private JLabel label4;
 	private JLabel label5;
-	private JTextField textField2;
-	private JTextField textField1;
-	private JComboBox comboBox8;
-	private JComboBox comboBox7;
-	private JComboBox comboBox5;
-	private JComboBox comboBox6;
+	private JTextField ruleCodeTextField;
+	private JTextField ruleNameTextField;
+	private JComboBox categoryComboBox;
+	private JComboBox severityComboBox;
+	private JComboBox statusComboBox;
+	private JComboBox dispositionComboBox;
 	private JPanel panel2;
 	private JScrollPane scrollPane1;
 	private JTable table1;
@@ -734,5 +750,5 @@ public class QAResultsBrowser extends JPanel {
 	private JLabel label14;
 	private JLabel totalLinesLabel;
 	private JButton nextButton;
-	// JFormDesigner - End of variables declaration  //GEN-END:variables
+	// JFormDesigner - End of variables declaration //GEN-END:variables
 }

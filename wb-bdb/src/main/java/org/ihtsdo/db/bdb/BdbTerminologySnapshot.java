@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
@@ -8,53 +9,57 @@ import java.util.UUID;
 import org.ihtsdo.concept.ConceptVersion;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
+import org.ihtsdo.tk.api.amend.TerminologyAmendmentBI;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public class BdbTerminologySnapshot implements TerminologySnapshotDI {
 	
 	private BdbTerminologyStore store;
-	private Coordinate c;
+	private ViewCoordinate vc;
 
 	
 	public BdbTerminologySnapshot(BdbTerminologyStore store,
-			Coordinate coordinate) {
+			ViewCoordinate coordinate) {
 		super();
 		this.store = store;
-		this.c = coordinate;
+		this.vc = coordinate;
 	}
 
 	@Override
 	public ComponentVersionBI getComponentVersion(int nid) throws IOException, ContraditionException {
-		return store.getComponentVersion(c, nid);
+		return store.getComponentVersion(vc, nid);
 	}
 
 	@Override
 	public ComponentVersionBI getComponentVersion(UUID... uuids) throws IOException, ContraditionException {
-		return store.getComponentVersion(c, uuids);
+		return store.getComponentVersion(vc, uuids);
 	}
 
 	@Override
 	public ComponentVersionBI getComponentVersion(Collection<UUID> uuids) throws IOException, ContraditionException {
-		return store.getComponentVersion(c, uuids);
+		return store.getComponentVersion(vc, uuids);
 	}
 
 	@Override
 	public ConceptVersionBI getConceptVersion(int cNid) throws IOException {
-		return new ConceptVersion(Bdb.getConcept(cNid), c);
+		return new ConceptVersion(Bdb.getConcept(cNid), vc);
 	}
 
 	@Override
 	public ConceptVersionBI getConceptVersion(UUID... uuids) throws IOException {
-		return new ConceptVersion(Bdb.getConcept(Bdb.uuidToNid(uuids)), c);
+		return new ConceptVersion(Bdb.getConcept(Bdb.uuidToNid(uuids)), vc);
 	}
 
 	@Override
 	public ConceptVersionBI getConceptVersion(Collection<UUID> uuids) throws IOException {
-		return new ConceptVersion(Bdb.getConcept(Bdb.uuidsToNid(uuids)), c);
+		return new ConceptVersion(Bdb.getConcept(Bdb.uuidsToNid(uuids)), vc);
 	}
 
 	@Override
@@ -99,7 +104,26 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
 
 	@Override
 	public Map<Integer, ConceptVersionBI> getConceptVersions(NidBitSetBI cNids) throws IOException {
-		return store.getConceptVersions(c, cNids);
+		return store.getConceptVersions(vc, cNids);
 	}
 
+	public TerminologyAmendmentBI getAmender(EditCoordinate ec) {
+		return store.getAmender(ec, vc);
+	}
+
+	public void addChangeSetGenerator(String key, ChangeSetGeneratorBI writer) {
+		store.addChangeSetGenerator(key, writer);
+	}
+
+	public ChangeSetGeneratorBI createDtoChangeSetGenerator(
+			File changeSetFileName, File changeSetTempFileName,
+			ChangeSetGenerationPolicy policy) {
+		return store.createDtoChangeSetGenerator(changeSetFileName,
+				changeSetTempFileName, policy);
+	}
+
+	public void removeChangeSetGenerator(String key) {
+		store.removeChangeSetGenerator(key);
+	}
+	
 }

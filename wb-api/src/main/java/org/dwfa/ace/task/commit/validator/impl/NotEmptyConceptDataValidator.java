@@ -104,7 +104,7 @@ public class NotEmptyConceptDataValidator implements GetConceptDataValidationStr
      * @see NotEmptyConceptDataValidator
      */
     public void validate() throws ValidationException {
-        for (I_DescriptionVersioned description : descriptions) {
+        for (I_DescriptionVersioned<?> description : descriptions) {
             for (I_DescriptionPart part : description.getMutableParts()) {
                 if (comparer.isPartRequiredConceptType(requiredConcept, part) && !hasValue(part)) {
                     throw new ValidationException(String.format("Concept %1$s has empty %2$s",

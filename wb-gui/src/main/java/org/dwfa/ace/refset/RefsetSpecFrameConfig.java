@@ -74,11 +74,11 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.etypes.EConcept;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
@@ -108,8 +108,8 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 		frameConfig.quit();
 	}
 
-	public Coordinate getCoordinate() {
-		return frameConfig.getCoordinate();
+	public ViewCoordinate getViewCoordinate() {
+		return frameConfig.getViewCoordinate();
 	}
 
 	public Set<PathBI> getPromotionPathSet() {

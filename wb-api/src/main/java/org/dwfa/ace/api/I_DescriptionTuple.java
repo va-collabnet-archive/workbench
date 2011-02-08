@@ -19,22 +19,30 @@ package org.dwfa.ace.api;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 
 
-public interface I_DescriptionTuple extends I_AmTypedTuple, DescriptionAnalogBI {
+public interface I_DescriptionTuple<A extends DescriptionAnalogBI>
+        extends I_AmTypedTuple<A>, DescriptionAnalogBI<A> {
 
+    @Override
     public boolean isInitialCaseSignificant();
 
+    @Override
     public String getLang();
 
+    @Override
     public String getText();
 
+    @Override
     public int getConceptNid();
 
     public int getDescId();
 
+    @Override
     public void setInitialCaseSignificant(boolean capStatus);
 
+    @Override
     public void setLang(String lang);
 
+    @Override
     public void setText(String text);
 
     /**
@@ -42,6 +50,7 @@ public interface I_DescriptionTuple extends I_AmTypedTuple, DescriptionAnalogBI 
      */
     public I_DescriptionPart duplicate();
 
+    @Override
     public I_DescriptionPart getMutablePart();
 
     public I_DescriptionVersioned getDescVersioned();

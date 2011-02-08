@@ -5,8 +5,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 public class RelConstraint implements ConstraintBI {
@@ -57,28 +57,28 @@ public class RelConstraint implements ConstraintBI {
 		return destinationSpec;
 	}
 
-	public ConceptVersionBI getOrigin(Coordinate c) throws IOException {
+	public ConceptVersionBI getOrigin(ViewCoordinate c) throws IOException {
 		return originSpec.get(c);
 	}
 
-	public ConceptVersionBI getRelType(Coordinate c) throws IOException {
+	public ConceptVersionBI getRelType(ViewCoordinate c) throws IOException {
 		return relTypeSpec.get(c);
 	}
 
-	public ConceptVersionBI getDestination(Coordinate c) throws IOException {
+	public ConceptVersionBI getDestination(ViewCoordinate c) throws IOException {
 		return destinationSpec.get(c);
 	}
 
 	public int getOriginNid() throws IOException {
-		return Ts.get().uuidsToNid(originSpec.getUuids());
+		return Ts.get().getNidForUuids(originSpec.getUuids());
 	}
 
 	public int getRelTypeNid() throws IOException {
-		return Ts.get().uuidsToNid(relTypeSpec.getUuids());
+		return Ts.get().getNidForUuids(relTypeSpec.getUuids());
 	}
 
 	public int getDestinationNid() throws IOException {
-		return Ts.get().uuidsToNid(destinationSpec.getUuids());
+		return Ts.get().getNidForUuids(destinationSpec.getUuids());
 	}
 
 }

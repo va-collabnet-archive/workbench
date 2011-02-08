@@ -28,7 +28,8 @@ import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 
-public interface I_RelVersioned extends I_AmTermComponent, RelationshipAnalogBI {
+public interface I_RelVersioned<A extends RelationshipAnalogBI>
+        extends I_AmTermComponent, RelationshipAnalogBI<A> {
 
     public boolean addVersion(I_RelPart rel);
 

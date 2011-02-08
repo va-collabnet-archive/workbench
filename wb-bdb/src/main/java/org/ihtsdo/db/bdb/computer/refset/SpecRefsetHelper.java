@@ -72,7 +72,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         Concept refsetConcept = Bdb.getConcept(refsetId);
         RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
         if (extension != null) {
-            for (RefsetMember.Version v : extension.getVersions(config.getCoordinate())) {
+            for (RefsetMember.Version v : extension.getVersions(config.getViewCoordinate())) {
                 if (config.getAllowedStatus().contains(v.getStatusNid())
                     && v.getTypeNid() == REFSET_TYPES.CID.getTypeNid()) {
                     return (I_ExtendByRefPartCid) v;
@@ -93,7 +93,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         Concept refsetConcept = Bdb.getConcept(refsetId);
         RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
         if (extension != null) {
-            for (RefsetMember.Version v : extension.getVersions(config.getCoordinate())) {
+            for (RefsetMember.Version v : extension.getVersions(config.getViewCoordinate())) {
                 if (config.getAllowedStatus().contains(v.getStatusNid())
                     && v.getTypeNid() == REFSET_TYPES.CID.getTypeNid()) {
                     if (((I_ExtendByRefPartCid) v).getC1id() == c1Nid) {
@@ -219,7 +219,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         Concept refsetConcept = Bdb.getConcept(refsetId);
         RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
         if (extension != null) {
-            for (RefsetMember.Version v : extension.getVersions(config.getCoordinate())) {
+            for (RefsetMember.Version v : extension.getVersions(config.getViewCoordinate())) {
                 if (statusId == v.getStatusNid() && v.getTypeNid() == REFSET_TYPES.CID_CID.getTypeNid()) {
                     if (((I_ExtendByRefPartCidCid) v).getC1id() == c1Nid
                         && ((I_ExtendByRefPartCidCid) v).getC2id() == c2Nid) {
@@ -243,7 +243,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         Concept refsetConcept = Bdb.getConcept(refsetId);
         RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
         if (extension != null) {
-            for (RefsetMember.Version v : extension.getVersions(config.getCoordinate())) {
+            for (RefsetMember.Version v : extension.getVersions(config.getViewCoordinate())) {
                 if (v.getStatusNid() == statusNid) {
                     if (v.getTypeNid() == REFSET_TYPES.CID.getTypeNid()) {
                         if (((I_ExtendByRefPartCid) v).getC1id() == c1Nid) {
@@ -261,7 +261,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         Concept refsetConcept = Bdb.getConcept(refsetId);
         RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
         if (extension != null) {
-            for (RefsetMember.Version v : extension.getVersions(config.getCoordinate())) {
+            for (RefsetMember.Version v : extension.getVersions(config.getViewCoordinate())) {
                 if (v.getStatusNid() == statusNid) {
                     if (v.getTypeNid() == REFSET_TYPES.CID_STR.getTypeNid()) {
                         if (((I_ExtendByRefPartCidString) v).getC1id() == c1Nid
@@ -280,7 +280,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         Concept refsetConcept = Bdb.getConcept(refsetId);
         RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
         if (extension != null) {
-            for (RefsetMember.Version v : extension.getVersions(config.getCoordinate())) {
+            for (RefsetMember.Version v : extension.getVersions(config.getViewCoordinate())) {
                 if (v.getStatusNid() == statusNid) {
                     if (v.getTypeNid() == REFSET_TYPES.STR.getTypeNid()) {
                         if (((I_ExtendByRefPartStr) v).getStringValue().equals(extString)) {
@@ -298,7 +298,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         Concept refsetConcept = Bdb.getConcept(refsetId);
         RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
         if (extension != null) {
-            for (RefsetMember.Version v : extension.getVersions(config.getCoordinate())) {
+            for (RefsetMember.Version v : extension.getVersions(config.getViewCoordinate())) {
                 if (v.getStatusNid() == statusNid) {
                     if (v.getTypeNid() == REFSET_TYPES.LONG.getTypeNid()) {
                         if (extLong.equals(((I_ExtendByRefPartLong) v).getLongValue())) {
@@ -322,7 +322,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         Concept refsetConcept = Bdb.getConcept(refsetId);
         RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
         if (extension != null) {
-            for (RefsetMember.Version v : extension.getVersions(config.getCoordinate())) {
+            for (RefsetMember.Version v : extension.getVersions(config.getViewCoordinate())) {
                 if (v.getStatusNid() == statusNid) {
                     if (v.getTypeNid() == REFSET_TYPES.INT.getTypeNid()) {
                         if (intValue == ((I_ExtendByRefPartInt) v).getIntValue()) {
@@ -346,7 +346,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         Concept refsetConcept = Bdb.getConcept(refsetId);
         RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
         if (extension != null) {
-            for (RefsetMember.Version v : extension.getVersions(config.getCoordinate())) {
+            for (RefsetMember.Version v : extension.getVersions(config.getViewCoordinate())) {
                 if (statusId == v.getStatusNid() && v.getTypeNid() == REFSET_TYPES.CID_CID_CID.getTypeNid()) {
                     if (((I_ExtendByRefPartCidCidCid) v).getC1id() == c1Nid
                         && ((I_ExtendByRefPartCidCidCid) v).getC2id() == c2Nid
@@ -370,7 +370,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         Concept refsetConcept = Bdb.getConcept(refsetId);
         RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
         if (extension != null) {
-            for (RefsetMember.Version v : extension.getVersions(config.getCoordinate())) {
+            for (RefsetMember.Version v : extension.getVersions(config.getViewCoordinate())) {
                 if (statusId == v.getStatusNid() && v.getTypeNid() == REFSET_TYPES.CID_CID_STR.getTypeNid()) {
                     if (((I_ExtendByRefPartCidCidString) v).getC1id() == c1Nid
                         && ((I_ExtendByRefPartCidCidString) v).getC2id() == c2Nid
@@ -387,7 +387,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         Concept refsetConcept = Bdb.getConcept(refsetId);
         RefsetMember<?, ?> extension = refsetConcept.getExtension(componentId);
         if (extension != null) {
-            for (RefsetMember.Version v : extension.getVersions(config.getCoordinate())) {
+            for (RefsetMember.Version v : extension.getVersions(config.getViewCoordinate())) {
                 if (config.getAllowedStatus().contains(v.getStatusNid())) {
                     if (v.getTypeNid() == REFSET_TYPES.LONG.getTypeNid()) {
                         return true;
@@ -897,7 +897,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         Concept refsetConcept = Bdb.getConcept(refsetId);
         RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
         if (extension != null) {
-            for (RefsetMember.Version v : extension.getVersions(config.getCoordinate())) {
+            for (RefsetMember.Version v : extension.getVersions(config.getViewCoordinate())) {
                 if (config.getAllowedStatus().contains(v.getStatusNid())
                     && v.getTypeNid() == REFSET_TYPES.CID.getTypeNid()) {
 
@@ -1123,7 +1123,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         Concept refsetConcept = Bdb.getConcept(refsetId);
         RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
         if (extension != null) {
-            for (RefsetMember.Version v : extension.getVersions(config.getCoordinate())) {
+            for (RefsetMember.Version v : extension.getVersions(config.getViewCoordinate())) {
                 if (config.getAllowedStatus().contains(v.getStatusNid())
                     && v.getTypeNid() == REFSET_TYPES.CID.getTypeNid()) {
                     for (PathBI editPath : getEditPaths()) {
@@ -1151,7 +1151,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         Concept refsetConcept = Bdb.getConcept(refsetId);
         RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
         if (extension != null) {
-            for (RefsetMember.Version v : extension.getVersions(config.getCoordinate())) {
+            for (RefsetMember.Version v : extension.getVersions(config.getViewCoordinate())) {
                 if (config.getAllowedStatus().contains(v.getStatusNid())
                     && v.getTypeNid() == REFSET_TYPES.CID.getTypeNid()) {
                     // found a member to retire
@@ -1406,7 +1406,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         Concept refsetConcept = Bdb.getConcept(refsetId);
         RefsetMember<?, ?> extension = refsetConcept.getExtension(componentNid);
         if (extension != null) {
-            for (RefsetMember.Version v : extension.getVersions(config.getCoordinate())) {
+            for (RefsetMember.Version v : extension.getVersions(config.getViewCoordinate())) {
                 if (config.getAllowedStatus().contains(v.getStatusNid())) {
                     if (v.getTypeNid() == REFSET_TYPES.CID.getTypeNid()) {
                         return true;

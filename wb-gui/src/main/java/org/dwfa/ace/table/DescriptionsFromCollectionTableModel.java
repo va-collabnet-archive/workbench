@@ -53,7 +53,7 @@ public class DescriptionsFromCollectionTableModel extends DescriptionTableModel 
         return descriptionList.size();
     }
 
-    public void setDescriptions(Collection<I_DescriptionVersioned> descriptions) {
+    public void setDescriptions(Collection<I_DescriptionVersioned<?>> descriptions) {
         descriptionList = new ArrayList<I_DescriptionVersioned>(descriptions);
         scoreList = null;
         SwingUtilities.invokeLater(new Runnable() {

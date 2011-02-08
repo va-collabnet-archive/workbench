@@ -413,7 +413,7 @@
          <class>java.awt.GridBagLayout</class> 
          <void method="setProperty"> 
           <string>$columnSpecs</string> 
-          <string>0, 0, 0</string> 
+          <string>380, 0, 0</string> 
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
@@ -421,7 +421,7 @@
          </void> 
          <void method="setProperty"> 
           <string>$hGap</string> 
-          <int>5</int> 
+          <int>15</int> 
          </void> 
          <void method="setProperty"> 
           <string>$vGap</string> 
@@ -496,7 +496,7 @@
          <object class="com.jformdesigner.model.FormComponent"> 
           <string>javax.swing.JTextField</string> 
           <void property="name"> 
-           <string>textField1</string> 
+           <string>conceptNameTextField</string> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -511,7 +511,7 @@
          <object class="com.jformdesigner.model.FormComponent"> 
           <string>javax.swing.JComboBox</string> 
           <void property="name"> 
-           <string>comboBox4</string> 
+           <string>statusComboBox</string> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -530,7 +530,7 @@
          <object class="com.jformdesigner.model.FormComponent"> 
           <string>javax.swing.JComboBox</string> 
           <void property="name"> 
-           <string>comboBox5</string> 
+           <string>dispoStatusComboBox</string> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 

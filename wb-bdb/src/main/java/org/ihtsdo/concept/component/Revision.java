@@ -1,7 +1,9 @@
 package org.ihtsdo.concept.component;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -13,19 +15,25 @@ import org.dwfa.ace.api.TimePathId;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.AnalogBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
-import java.util.Collection;
-import org.ihtsdo.tk.api.Coordinate;
-import org.ihtsdo.tk.api.refset.RefsetMemberChronicleBI;
 
-public abstract class Revision<V extends Revision<V, C>, C extends ConceptComponent<V, C>>
-        implements I_AmPart, I_HandleFutureStatusAtPositionSetup {
+public abstract class Revision<V extends Revision<V, C>, 
+        C extends ConceptComponent<V, C>>
+        implements I_AmPart<V>,
+            I_HandleFutureStatusAtPositionSetup,
+            AnalogBI {
 
-    public static SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
+    public static SimpleDateFormat fileDateFormat = 
+            new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
     public int sapNid = Integer.MAX_VALUE;
 
+    @Override
     public int getSapNid() {
         return sapNid;
     }
@@ -56,8 +64,10 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
         assert statusAtPositionNid != Integer.MAX_VALUE;
     }
 
-    public Revision(int statusNid, int authorNid, int pathNid, long time, C primordialComponent) {
-        this.sapNid = Bdb.getSapDb().getSapNid(statusNid, authorNid, pathNid, time);
+    public Revision(int statusNid, int authorNid, int pathNid, 
+            long time, C primordialComponent) {
+        this.sapNid = Bdb.getSapDb().getSapNid(statusNid, authorNid, 
+                pathNid, time);
         this.primordialComponent = primordialComponent;
         primordialComponent.clearVersions();
         assert primordialComponent != null;
@@ -84,16 +94,12 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
         writeFieldsToBdb(output);
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.db.bdb.concept.component.I_HandleDeferredStatusAtPositionSetup#isSetup()
-     */
+    @Override
     public boolean isSetup() {
         return sapNid != Integer.MAX_VALUE;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.db.bdb.concept.component.I_HandleDeferredStatusAtPositionSetup#setStatusAtPositionNid(int)
-     */
+    @Override
     public void setStatusAtPositionNid(int sapNid) {
         this.sapNid = sapNid;
         modified();
@@ -119,6 +125,7 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
         return sapNid;
     }
 
+    @Override
     public final ArrayIntList getPartComponentNids() {
         ArrayIntList resultList = getVariableVersionNids();
         resultList.add(getPathNid());
@@ -134,6 +141,7 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
         return Bdb.getSapDb().getPathNid(sapNid);
     }
 
+    @Override
     public int getPathNid() {
         return Bdb.getSapDb().getPathNid(sapNid);
     }
@@ -161,19 +169,25 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     }
 
     /**
-     * 1. Analog, an object, concept or situation which in some way resembles a different situation
+     * 1. Analog, an object, concept or situation which in some way 
+     *    resembles a different situation
      * 2. Analogy, in language, a comparison between concepts
      * @param statusNid
      * @param pathNid
      * @param time
      * @return
      */
+    @Override
     public abstract V makeAnalog(int statusNid, int pathNid, long time);
 
-    public abstract V makeAnalog(int statusNid, int authorNid, int pathNid, long time);
+    @Override
+    public abstract V makeAnalog(int statusNid, int authorNid, 
+                                 int pathNid, long time);
 
-    public void setStatusAtPosition(int statusNid, int authorNid, int pathNid, long time) {
-        this.sapNid = Bdb.getSapDb().getSapNid(statusNid, authorNid, pathNid, time);
+    public void setStatusAtPosition(int statusNid, int authorNid, 
+            int pathNid, long time) {
+        this.sapNid = Bdb.getSapDb().getSapNid(statusNid, authorNid, 
+                pathNid, time);
         modified();
     }
 
@@ -187,7 +201,8 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     public final void setPathNid(int pathId) {
         if (getTime() != Long.MAX_VALUE) {
             throw new UnsupportedOperationException(
-                    "Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
+                    "Cannot change status if time != Long.MAX_VALUE; "
+                    + "Use makeAnalog instead.");
         }
         this.sapNid = Bdb.getSapNid(getStatusNid(),
                 Terms.get().getAuthorNid(),
@@ -205,7 +220,8 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     public final void setStatusNid(int statusNid) {
         if (getTime() != Long.MAX_VALUE) {
             throw new UnsupportedOperationException(
-                    "Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
+                    "Cannot change status if time != Long.MAX_VALUE; "
+                    + "Use makeAnalog instead.");
         }
         try {
             this.sapNid = Bdb.getSapNid(statusNid,
@@ -257,8 +273,8 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     /**
      * Test method to check to see if two objects are equal in all respects. 
      * @param another
-     * @return either a zero length String, or a String containing a description of the
-     * validation failures. 
+     * @return either a zero length String, or a String containing a 
+     * description of the validation failures. 
      * @throws IOException 
      */
     public String validate(Revision<?, ?> another) throws IOException {
@@ -271,9 +287,11 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
                     append(another.sapNid).append("\n");
         }
         if (!this.primordialComponent.equals(another.primordialComponent)) {
-             buf.append("\t\tRevision.primordialComponent not equal: \n\t\t\tthis.primordialComponent = ").
-                                           append(this.primordialComponent).append("\n\t\t\tanother.primordialComponent = ").
-                                           append(another.primordialComponent).append("\n");
+             buf.append("\t\tRevision.primordialComponent not equal: "
+                     + "\n\t\t\tthis.primordialComponent = ").
+                    append(this.primordialComponent).append(
+                     "\n\t\t\tanother.primordialComponent = ").
+                    append(another.primordialComponent).append("\n");
         }
         return buf.toString();
     }
@@ -282,7 +300,8 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     public final void setTime(long time) {
         if (getTime() != Long.MAX_VALUE) {
             throw new UnsupportedOperationException(
-                    "Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
+                    "Cannot change status if time != Long.MAX_VALUE; "
+                    + "Use makeAnalog instead.");
         }
         if (time != getTime()) {
             try {
@@ -305,10 +324,12 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     public void setAuthorNid(int authorNid) {
         if (getTime() != Long.MAX_VALUE) {
             throw new UnsupportedOperationException(
-                    "Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
+                    "Cannot change status if time != Long.MAX_VALUE; "
+                    + "Use makeAnalog instead.");
         }
         if (authorNid != getPathNid()) {
-            this.sapNid = Bdb.getSapNid(getStatusNid(), authorNid, getPathNid(), Long.MAX_VALUE);
+            this.sapNid = Bdb.getSapNid(getStatusNid(), authorNid, 
+                    getPathNid(), Long.MAX_VALUE);
             modified();
         }
     }
@@ -325,13 +346,36 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
         return getTime() == Long.MAX_VALUE;
     }
     
-    public Collection<? extends RefsetMemberChronicleBI> getAnnotations() {
+	public Collection<? extends RefexChronicleBI<?>> getAnnotations() {
         return primordialComponent.getAnnotations();
     }
     
-    public boolean addAnnotation(RefsetMemberChronicleBI annotation) {
+    public boolean addAnnotation(@SuppressWarnings("rawtypes") RefexChronicleBI annotation) {
         return primordialComponent.addAnnotation(annotation);
     }
 
 
+    public final void setNid(int nid) throws PropertyVetoException {
+        throw new PropertyVetoException("nid", null);
+     }
+
+	@Override
+	public Collection<? extends RefexChronicleBI<?>> getRefexes()
+			throws IOException {
+		return primordialComponent.getRefexes();
+	}
+
+	@Override
+	public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
+			ViewCoordinate xyz) throws IOException {
+		return primordialComponent.getCurrentRefexes(xyz);
+	}
+
+	@Override
+	public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
+			ViewCoordinate xyz) throws IOException {
+		return primordialComponent.getCurrentAnnotations(xyz);
+	}
+    
+    
 }

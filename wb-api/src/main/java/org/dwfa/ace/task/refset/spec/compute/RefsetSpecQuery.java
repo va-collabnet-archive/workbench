@@ -49,6 +49,7 @@ import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.PositionBI;
 
 /**
@@ -67,6 +68,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
     private static Executor refsetExecutorPool =
             Executors.newCachedThreadPool(new NamedThreadFactory(new ThreadGroup("RefsetSpecQuery "), "pool "));
+    
+    public static KindOfCacheBI myStaticIsACache;
 
     private ArrayList<RefsetSpecQuery> subqueries;
     private ArrayList<RefsetSpecStatement> statements;

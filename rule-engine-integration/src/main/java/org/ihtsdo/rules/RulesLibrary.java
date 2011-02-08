@@ -60,8 +60,8 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure.ALERT_TYPE;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
@@ -82,14 +82,15 @@ import org.ihtsdo.testmodel.DrConcept;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.KindOfCacheBI;
+import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.helper.ResultsItem;
 import org.ihtsdo.tk.helper.ResultsItem.Severity;
 import org.ihtsdo.tk.helper.templates.AbstractTemplate;
+import org.ihtsdo.tk.helper.templates.AbstractTemplate.TemplateType;
 import org.ihtsdo.tk.helper.templates.DescriptionTemplate;
 import org.ihtsdo.tk.helper.templates.RelationshipTemplate;
-import org.ihtsdo.tk.helper.templates.AbstractTemplate.TemplateType;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.DescriptionSpec;
 import org.ihtsdo.tk.spec.RelSpec;
@@ -108,9 +109,10 @@ public class RulesLibrary {
 	public static int LINGUISTIC_GUIDELINES_PKG = 1;
 
 	public static KindOfCacheBI myStaticIsACache;
+	public static KindOfCacheBI myStaticIsACacheRefsetSpec;
 	public static TerminologyHelperDroolsWorkbench terminologyHelperCache;
 
-	public enum INFERRED_VIEW_ORIGIN {CLASSIFIER, CONSTRAINT_NORMAL_FORM};
+	public enum INFERRED_VIEW_ORIGIN {CLASSIFIER, CONSTRAINT_NORMAL_FORM, FULL};
 
 	public static I_IntSet allRels;
 	public static I_IntSet histRels;
@@ -127,7 +129,10 @@ public class RulesLibrary {
 	}
 
 	public static KindOfCacheBI setupIsACache() throws TerminologyException, Exception {
-		return myStaticIsACache = Ts.get().getCache(Terms.get().getActiveAceFrameConfig().getCoordinate());
+		myStaticIsACache = Ts.get().getCache(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+		RefsetSpecQuery.myStaticIsACache = myStaticIsACache;
+		myStaticIsACacheRefsetSpec = RefsetSpecQuery.myStaticIsACache;
+		return myStaticIsACache;
 	}
 
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
@@ -170,7 +175,7 @@ public class RulesLibrary {
 				ksession.setGlobal("resultsCollector", results);
 				ksession.setGlobal("terminologyHelper", getTerminologyHelper());
 
-				ConceptVersionBI conceptBi = Ts.get().getConceptVersion(config.getCoordinate(), concept.getNid());
+				ConceptVersionBI conceptBi = Ts.get().getConceptVersion(config.getViewCoordinate(), concept.getNid());
 
 				DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version", inferredOrigin);
 
@@ -205,7 +210,7 @@ public class RulesLibrary {
 						DescriptionTemplate dtemplate = (DescriptionTemplate) template;
 						if (!textList.contains(dtemplate.getText())) {
 							textList.add(dtemplate.getText());
-							DescriptionVersionBI description = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getCoordinate(),
+							DescriptionVersionBI description = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getViewCoordinate(),
 									UUID.fromString(dtemplate.getComponentUuid()));
 							DescriptionSpec dSpec = SpecFactory.get(description);
 							if (dtemplate.getText() != null) {
@@ -793,7 +798,7 @@ public class RulesLibrary {
 
 	public static void updateGuvnorEnumerations(I_GetConceptData refset, RulesDeploymentPackageReference kPack, I_ConfigAceFrame config) {
 		try {
-			ConceptVersionBI refsetBI = Ts.get().getConceptVersion(config.getCoordinate(), refset.getUids());
+			ConceptVersionBI refsetBI = Ts.get().getConceptVersion(config.getViewCoordinate(), refset.getUids());
 			String propertyName = "";
 			int guvnorDescriptionsSize = refsetBI.getDescsActive(ArchitectonicAuxiliary.Concept.GUVNOR_ENUM_PROPERTY_DESC_TYPE.localize().getNid()).size();
 			if (guvnorDescriptionsSize < 1 || guvnorDescriptionsSize > 1) {
@@ -806,7 +811,7 @@ public class RulesLibrary {
 
 //				I_ExtendByRefPartCid lastPart = (I_ExtendByRefPartCid) loopMember.getTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), 
 //						config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getMutablePart();
-				ConceptVersionBI loopConcept = Ts.get().getConceptVersion(config.getCoordinate(),loopMember.getComponentNid());
+				ConceptVersionBI loopConcept = Ts.get().getConceptVersion(config.getViewCoordinate(),loopMember.getComponentNid());
 
 				String name = "no description found";
 				
@@ -858,7 +863,7 @@ public class RulesLibrary {
 			RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, config);
 			I_GetConceptData refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
 //			AceLog.getAppLog().info("Refset: " + refset.getInitialText() + " " + refset.getUids().get(0));
-//			AceLog.getAppLog().info("Refset spec: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
+//			AceLog.getAppLog().info("Checking Refset spec: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
 			RefsetComputeType computeType = RefsetComputeType.CONCEPT; // default
 			if (refsetSpecHelper.isDescriptionComputeType()) {
 				computeType = RefsetComputeType.DESCRIPTION;
@@ -905,6 +910,20 @@ public class RulesLibrary {
 
 			List<I_ShowActivity> activities = new ArrayList<I_ShowActivity>();
 			result = query.execute(selectedConcept, activities);
+			
+//			ArrayList<RefsetSpecComponent> components = query.getAllComponents();
+//			
+//			boolean resultByComponents = false;
+//			for (RefsetSpecComponent loopComponent : components) {
+//				try {
+//					ConceptStatement loopConceptStatement = (ConceptStatement) loopComponent;
+//					//loopConceptStatement..getTokenEnum().equals(loopConceptStatement.getTokenEnum().CONCEPT_IS);
+//				} catch (Exception e) {
+//					// skip, unknown component
+//				}
+//				
+//			}
+			
 
 //			System.out.println("++++++++++++++ Result = " + result);
 //			System.out.println("************ Finished test computation in " + (System.currentTimeMillis() - start) + " ms. *****************");
@@ -1007,5 +1026,69 @@ public class RulesLibrary {
 			e.printStackTrace();
 		}
 		return descendants;
+	}
+	
+	/**
+	 * Calculates a set of valid users - a user is valid is they are a child of the User concept in the top hierarchy,
+	 * and have a description of type "user inbox".
+	 * 
+	 * @return The set of valid users.
+	 */
+	public static Set<I_GetConceptData> getUsers() {
+		HashSet<I_GetConceptData> validUsers = new HashSet<I_GetConceptData>();
+		I_ConfigAceFrame config = null;
+		try {
+			config = Terms.get().getActiveAceFrameConfig();
+		} catch (TerminologyException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			I_GetConceptData userParent =
+				Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
+
+			I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
+			I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+			Set<Integer> currentStatuses = helper.getCurrentStatusIds();
+
+			Set<? extends I_GetConceptData> allUsers = userParent.getDestRelOrigins(config.getAllowedStatus(),
+					allowedTypes, config.getViewPositionSetReadOnly(), Precedence.TIME,
+					config.getConflictResolutionStrategy());
+			I_GetConceptData descriptionType =
+				Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
+			I_IntSet descAllowedTypes = Terms.get().newIntSet();
+			descAllowedTypes.add(descriptionType.getConceptNid());
+
+			for (I_GetConceptData user : allUsers) {
+
+				I_DescriptionTuple latestTuple = null;
+				long latestVersion = Long.MIN_VALUE;
+
+				List<? extends I_DescriptionTuple> descriptionResults =
+					user.getDescriptionTuples(null, descAllowedTypes, Terms.get()
+							.getActiveAceFrameConfig().getViewPositionSetReadOnly(),
+							Precedence.TIME, config.getConflictResolutionStrategy());
+				for (I_DescriptionTuple descriptionTuple : descriptionResults) {
+					if (descriptionTuple.getTime() > latestVersion) {
+						latestVersion = descriptionTuple.getTime();
+						latestTuple = descriptionTuple;
+					}
+				}
+				if (latestTuple != null) {
+					for (int currentStatusId : currentStatuses) {
+						if (latestTuple.getStatusNid() == currentStatusId) {
+							validUsers.add(user);
+						}
+					}
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return validUsers;
 	}
 }

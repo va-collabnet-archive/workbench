@@ -54,7 +54,7 @@ public class ConceptAttributeValidator extends SimpleValidator {
         }
 
         int startParts = 0;
-        I_ConceptAttributeVersioned thinConAttr = tf.getConcept(bean.getConceptAttributes().getConId())
+        I_ConceptAttributeVersioned<?> thinConAttr = tf.getConcept(bean.getConceptAttributes().getConId())
             .getConceptAttributes();
         for (UniversalAceConceptAttributesPart part : conceptAttributes.getVersions()) {
 

@@ -124,7 +124,7 @@ public class UpdateDescFromSpecAction extends AbstractAction {
 			}
 			
 			else{ //other: make analog and update
-				I_DescriptionVersioned description = Terms.get().getDescription(Terms.get().uuidToNative(descSpec.getUuids()));
+				I_DescriptionVersioned<?> description = Terms.get().getDescription(Terms.get().uuidToNative(descSpec.getUuids()));
 				I_DescriptionPart descPart = description.getTuples(config.getConflictResolutionStrategy()).iterator().next().getMutablePart();
 				I_DescriptionPart newPart = (I_DescriptionPart) descPart.makeAnalog(
 						ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), 

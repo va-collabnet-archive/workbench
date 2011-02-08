@@ -16,6 +16,9 @@
  */
 package org.dwfa.ace.api;
 
-public interface I_AmTypedTuple extends I_AmTypedPart, I_AmTuple {
+import org.ihtsdo.tk.api.AnalogBI;
+
+public interface I_AmTypedTuple<T extends AnalogBI>
+        extends I_AmTypedPart<T>, I_AmTuple<T> {
 
 }

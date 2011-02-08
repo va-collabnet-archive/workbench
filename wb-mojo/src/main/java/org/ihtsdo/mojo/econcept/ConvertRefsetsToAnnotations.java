@@ -160,7 +160,7 @@ public class ConvertRefsetsToAnnotations extends AbstractMojo {
                                         + eConcept + "\n\nConcept descriptor: \n"
                                         + cd);
                             }
-                            eConcept.setAnnotationStyleRefset(true);
+                            eConcept.setAnnotationStyleRefex(true);
                         }
                         eConcept.writeExternal(codos);
                         if (foundWatchConcept) {

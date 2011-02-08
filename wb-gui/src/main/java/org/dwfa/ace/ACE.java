@@ -361,7 +361,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                                 "Data Checks Linked");
 
                         } else {
-                            leftTabs.setSelectedIndex(taxonomyIndex);
+                            //leftTabs.setSelectedIndex(taxonomyIndex);
                             if (dataCheckIndex != -1) {
                                 leftTabs.removeTabAt(dataCheckIndex);
                             }
@@ -1219,11 +1219,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private JLabel statusLabel = new JLabel();
 
-    private JTabbedPane leftTabs = new JTabbedPane();
+    private JTabbedPane leftTabs = new MemoriousJTabbedPane();
 
     private JPanel topPanel;
 
-    public JTabbedPane conceptTabs = new JTabbedPane();
+    public JTabbedPane conceptTabs = new MemoriousJTabbedPane();
 
     private ConceptPanel c1Panel;
 

@@ -16,7 +16,10 @@
  */
 package org.dwfa.ace.api;
 
-public interface I_ConceptAttributePart extends I_AmPart {
+import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
+
+public interface I_ConceptAttributePart<A extends ConAttrAnalogBI>
+        extends I_AmPart<A> {
 
     public boolean isDefined();
 

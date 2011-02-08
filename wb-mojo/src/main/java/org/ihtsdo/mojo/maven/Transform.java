@@ -446,8 +446,8 @@ public class Transform extends AbstractMojo {
         nativeToUuidMap = new HashMap<Integer, UUID>();
         for (PrimordialId pid : PrimordialId.values()) {
             for (UUID uid : pid.getUids()) {
-                uuidToNativeMap.put(uid, pid.getNativeId(Integer.MIN_VALUE));
-                nativeToUuidMap.put(pid.getNativeId(Integer.MIN_VALUE), uid);
+                uuidToNativeMap.put(uid, pid.getNativeId());
+                nativeToUuidMap.put(pid.getNativeId(), uid);
             }
         }
     }

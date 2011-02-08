@@ -15,11 +15,11 @@
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
-		<version>2.6.0-trek-10-uktc-SNAPSHOT</version>
+		<version>2.6.0-trek-11-uktc-nid-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>tk-concept-component</artifactId>
-	<name>Toolkit Concepts &amp; Concept Components</name>
+	<name>${branch}: Toolkit Concepts &amp; Concept Components</name>
 	<dependencies>
 		<dependency>
 			<groupId>org.drools</groupId>

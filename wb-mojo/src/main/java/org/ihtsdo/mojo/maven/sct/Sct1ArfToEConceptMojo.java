@@ -70,7 +70,7 @@ import org.ihtsdo.etypes.ERefsetStrMember;
 import org.ihtsdo.etypes.ERefsetStrRevision;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipRevision;
-import org.ihtsdo.mojo.econcept.ConceptDescriptor;
+// import org.ihtsdo.mojo.econcept.ConceptDescriptor;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
@@ -319,12 +319,14 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
      */
     private UUID uuidUser;
     
-    /**
-     * Watch concepts
-     * 
-     * @parameter
-     */
-    private List<ConceptDescriptor> conceptsToWatch;
+//    /**
+//     * Watch concepts
+//     * 
+//     * @parameter
+//     */
+//    private List<ConceptDescriptor> conceptsToWatch;
+//    HashMap<UUID, ConceptDescriptor> conceptsToWatchMap;
+
 
     /**
      * Watch concepts
@@ -784,19 +786,16 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             i++;
         }
     }
-
-    HashMap<UUID, ConceptDescriptor> conceptsToWatchMap;
     
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-           conceptsToWatchMap =
-                    new HashMap<UUID, ConceptDescriptor>();
-
-            if (conceptsToWatch != null) {
-                for (ConceptDescriptor cd : conceptsToWatch) {
-                    conceptsToWatchMap.put(UUID.fromString(cd.getUuid()), cd);
-                }
-            }
+//           conceptsToWatchMap =
+//                    new HashMap<UUID, ConceptDescriptor>();
+//            if (conceptsToWatch != null) {
+//                for (ConceptDescriptor cd : conceptsToWatch) {
+//                    conceptsToWatchMap.put(UUID.fromString(cd.getUuid()), cd);
+//                }
+//            }
 
         
         getLog().info("::: BEGIN Sct1ArfToEConcept");
@@ -1888,7 +1887,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             Collections.sort(aRel);
 
             // MATCH & ADD ID TO RELATIONSHIP
-            // PLACE IDs ON FIRST UUID INSTANCE OF DESCRIPTIONS
+            // PLACE IDs ON FIRST UUID INSTANCE OF RELATIONSHIP
             oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(
                     fNameStep4Rel)));
 
@@ -2047,20 +2046,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         final int BEFORE = -1;
         final int MATCH = 0;
         final int AFTER = 1;
-
-
-        if (debug) {
-            if (rel.relSnoId == 2455349029L || id.denotationLong == 2455349029L) {
-                getLog().info(":!!!:DEBUG @@ rel.relSnoId      == " + rel.relSnoId);
-                getLog().info(":!!!:DEBUG @@ id.denotationLong == " + id.denotationLong);
-                getLog().info(":!!!:DEBUG @@ id.userIdx        == " + id.userIdx);
-            }
-            if (rel.relSnoId == 2671123026L || id.denotationLong == 2671123026L) {
-                getLog().info(":!!!:DEBUG @@ rel.relSnoId      == " + rel.relSnoId);
-                getLog().info(":!!!:DEBUG @@ id.denotationLong == " + id.denotationLong);
-                getLog().info(":!!!:DEBUG @@ id.userIdx        == " + id.userIdx);
-            }
-        }
 
         if (id.primaryUuidMsb > rel.relUuidMsb)
             return AFTER;
@@ -2982,18 +2967,18 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 // UNCONNECTED CONCEPT theCon ==theDes !=theRel !=theRelDest
                 createEConcept(conList, desList, null, null, addRsByCon, addRsByRs, dos);
             } else {
-                if (debug) {
-                    getLog().info(
-                            "!!! Case what case is this??? -- Step 4" + " theCon=\t" + theCon
-                                    + "\ttheDes=\t" + theDes + "\ttheRel=\t" + theRel
-                                    + "\ttheRelDest\t" + theRelDest);
-                    getLog().info("!!! --- concept UUID id   =" + theCon);
-                    getLog().info("!!! --- concept SNOMED id =" + conList.get(0).conSnoId);
-                    
-                    getLog().info("!!! --- concept counter   #" + countCon);
-                    getLog().info("!!! --- description       \"" + desList.get(0).termText + "\"");
-                    getLog().info("!!! \r\n");
-                }
+//                if (debug) {
+//                    getLog().info(
+//                            "!!! Case what case is this??? -- Step 4" + " theCon=\t" + theCon
+//                                    + "\ttheDes=\t" + theDes + "\ttheRel=\t" + theRel
+//                                    + "\ttheRelDest\t" + theRelDest);
+//                    getLog().info("!!! --- concept UUID id   =" + theCon);
+//                    getLog().info("!!! --- concept SNOMED id =" + conList.get(0).conSnoId);
+//                    
+//                    getLog().info("!!! --- concept counter   #" + countCon);
+//                    getLog().info("!!! --- description       \"" + desList.get(0).termText + "\"");
+//                    getLog().info("!!! \r\n");
+//                }
                 throw new MojoFailureException("Case not implemented -- executeMojoStep7()");
             }
 
@@ -3037,6 +3022,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         getLog().info("*** Sct1ArfToEConcept STEP #7 COMPLETED -- CREATE eCONCEPTS ***\r\n");
     }
         
+    private static final UUID debugUuid01 = UUID.fromString("132c4951-0632-55b9-81ee-d24480732ae5");
+    private static final UUID debugUuid02 = UUID.fromString("22949563-e40b-5121-81d9-ac7e38fcc956");
+    private static final UUID debugUuid03 = UUID.fromString("3ca0d065-06b8-596c-8ca0-e4d2a605701c");
+    
     private void createEConcept(ArrayList<Sct1_ConRecord> conList,
             ArrayList<Sct1_DesRecord> desList, ArrayList<Sct1_RelRecord> relList,
             ArrayList<Sct1_RelDestRecord> relDestList, ArrayList<Sct1_RefSetRecord> rsByConList,
@@ -3226,7 +3215,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
                     // CREATE NEW RELATIONSHIP
                     rel = new ERelationship();
-
+                    
                     ArrayList<TkIdentifier> tmpRelAdditionalIds = new ArrayList<TkIdentifier>(1);
                     if (rRec.addedIds != null) {
                         for (Sct1_IdRecord eId : rRec.addedIds)
@@ -3580,10 +3569,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             countRefsetMaster++;
 
             ec.setRefsetMembers(listErm);
-            if (conceptsToWatchMap.containsKey(ec.primordialUuid)) {
-                getLog().info("Found watch concept after adding refset members: "
-                        + ec);
-            }
+//            if (conceptsToWatchMap.containsKey(ec.primordialUuid)) {
+//                getLog().info("Found watch concept after adding refset members: "
+//                        + ec);
+//            }
         }
 
         try {
@@ -4500,19 +4489,19 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 while ((r1 < count1) && (r2 < count2)) {
 
                     // :!!!:DEBUG:
-                    if (debug)
-                        if ((a1[r1].relSnoId == 2455349029L || a2[r2].relSnoId == 2455349029L)
-                                || (a1[r1].relSnoId == 2671123026L || a2[r2].relSnoId == 2671123026L)) {
-                            int tmpCompare = compareRelationship(a1[r1], a2[r2]);
-                            getLog().info("!!! ");
-                            getLog().info("!!! CASE == " + tmpCompare);
-                            getLog().info("!!! a1[r1] @ " + revTime + " = "
-                                    + a1[r1].toString());
-                            getLog().info("!!! ");
-                            getLog().info("!!! a2[r2] @ " + revTime + " = "
-                                    + a2[r2].toString());
-                            getLog().info("!!! ");
-                        }
+//                    if (debug)
+//                        if ((a1[r1].relSnoId == 2455349029L || a2[r2].relSnoId == 2455349029L)
+//                                || (a1[r1].relSnoId == 2671123026L || a2[r2].relSnoId == 2671123026L)) {
+//                            int tmpCompare = compareRelationship(a1[r1], a2[r2]);
+//                            getLog().info("!!! ");
+//                            getLog().info("!!! CASE == " + tmpCompare);
+//                            getLog().info("!!! a1[r1] @ " + revTime + " = "
+//                                    + a1[r1].toString());
+//                            getLog().info("!!! ");
+//                            getLog().info("!!! a2[r2] @ " + revTime + " = "
+//                                    + a2[r2].toString());
+//                            getLog().info("!!! ");
+//                        }
 
                     switch (compareRelationship(a1[r1], a2[r2])) {
                     case 1: // SAME RELATIONSHIP, SAME SNOMED_ID skip to next

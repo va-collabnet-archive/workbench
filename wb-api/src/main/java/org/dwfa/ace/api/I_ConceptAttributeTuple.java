@@ -16,17 +16,21 @@
  */
 package org.dwfa.ace.api;
 
+import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 
-public interface I_ConceptAttributeTuple extends I_AmTuple, ConAttrVersionBI {
+public interface I_ConceptAttributeTuple<A extends ConAttrAnalogBI>
+        extends I_AmTuple<A>, ConAttrVersionBI<A> {
 
 
+    @Override
     public boolean isDefined();
 
     public void setDefined(boolean defined);
 
     public I_ConceptAttributePart duplicate();
 
+    @Override
     public I_ConceptAttributePart getMutablePart();
     
     /**

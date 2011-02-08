@@ -18,18 +18,23 @@ package org.dwfa.ace.api;
 
 import org.ihtsdo.tk.api.media.MediaAnalogBI;
 
-public interface I_ImageTuple extends I_AmTypedTuple, MediaAnalogBI {
+public interface I_ImageTuple<A extends MediaAnalogBI>
+        extends I_AmTypedTuple<A>, MediaAnalogBI<A> {
 
     public byte[] getImage();
 
+    @Override
     public String getTextDescription();
 
+    @Override
     public String getFormat();
 
+    @Override
     public int getConceptNid();
 
     public I_ImageVersioned getVersioned();
 
+    @Override
     public I_ImagePart getMutablePart();
 
     /**
@@ -42,7 +47,7 @@ public interface I_ImageTuple extends I_AmTypedTuple, MediaAnalogBI {
     /**
      * 
      * @return
-     * @deprecated use getNid;
+     * @deprecated use makeAnalog
      */
     public I_ImagePart duplicate();
 

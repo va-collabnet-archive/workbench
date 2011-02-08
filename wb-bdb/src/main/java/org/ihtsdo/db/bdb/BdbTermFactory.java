@@ -64,9 +64,9 @@ import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.I_WriteDirectToDb;
 import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.RefsetPropertyMap;
+import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
-import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
@@ -105,6 +105,7 @@ import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_FetchConceptFromCursor;
 import org.ihtsdo.concept.I_ProcessConceptData;
+import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.concept.component.description.Description;
@@ -153,11 +154,10 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 import com.sleepycat.je.DatabaseException;
-import org.ihtsdo.concept.component.ConceptComponent;
-import org.ihtsdo.tk.api.refset.RefsetMemberChronicleBI;
 
 public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_Search {
 
@@ -337,7 +337,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             component = ((Concept) component).getConceptAttributes();
         }
         ComponentChroncileBI<?> cc = (ComponentChroncileBI<?>) component;
-        for (RefsetMemberChronicleBI annotation: cc.getAnnotations()) {
+        for (RefexChronicleBI annotation: cc.getAnnotations()) {
             returnValues.add((I_ExtendByRef) annotation);
         }
         return returnValues;
@@ -862,7 +862,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         a.enclosingConceptNid = cNid;
         newC.setConceptAttributes(a);
         a.setDefined(isDefined);
-        a.primordialUNid = Bdb.getUuidsToNidMap().getUNid(newConceptUuid);
+        a.setPrimUuid(newConceptUuid);
         a.primordialSapNid = Integer.MIN_VALUE;
 
         for (final PathBI p : aceFrameConfig.getEditingPathSet()) {
@@ -926,7 +926,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         d.enclosingConceptNid = c.getNid();
         d.nid = Bdb.uuidToNid(descUuid);
         Bdb.getNidCNidMap().setCNidForNid(c.getNid(), d.nid);
-        d.primordialUNid = Bdb.getUuidsToNidMap().getUNid(descUuid);
+        d.setPrimUuid(descUuid);
         d.setLang(lang);
         d.setText(text);
         d.setInitialCaseSignificant(false);
@@ -1096,7 +1096,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         member.refsetNid = refsetConcept.getNid();
         Bdb.getNidCNidMap().setCNidForNid(refsetConcept.getNid(), member.nid);
         member.referencedComponentNid = referencedComponentNid;
-        member.primordialUNid = Bdb.getUuidsToNidMap().getUNid(primordialUuid);
+        member.setPrimUuid(primordialUuid);
         member.primordialSapNid = Integer.MIN_VALUE;
         int statusNid = ReferenceConcepts.CURRENT.getNid();
         long time = Long.MAX_VALUE;
@@ -1118,7 +1118,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                 member.addVersion(revision);
             }
         }
-        if (refsetConcept.isAnnotationStyleRefset()) {
+        if (refsetConcept.isAnnotationStyleRefex()) {
             ConceptComponent<?,?> referencedComponent = (ConceptComponent<?, ?>) Bdb.getComponent(referencedComponentNid);
             referencedComponent.addAnnotation(member);
             member.enclosingConceptNid = Bdb.getConceptNid(referencedComponentNid);
@@ -1219,7 +1219,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         r.enclosingConceptNid = c.getNid();
         r.nid = Bdb.uuidToNid(newRelUid);
         Bdb.getNidCNidMap().setCNidForNid(c.getNid(), r.nid);
-        r.primordialUNid = Bdb.getUuidsToNidMap().getUNid(newRelUid);
+        r.setPrimUuid(newRelUid);
         final int parentId = relDestination.getNid();
         r.setC2Id(parentId);
         r.setTypeId(relType.getNid());
@@ -1263,7 +1263,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         r.enclosingConceptNid = c.getNid();
         r.nid = Bdb.uuidToNid(newRelUid);
         Bdb.getNidCNidMap().setCNidForNid(c.getNid(), r.nid);
-        r.primordialUNid = Bdb.getUuidsToNidMap().getUNid(newRelUid);
+        r.setPrimUuid(newRelUid);
         r.setC2Id(c2Nid);
         r.setTypeId(relTypeNid);
         r.setRefinabilityId(relRefinabilityNid);
@@ -1287,7 +1287,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         r.enclosingConceptNid = c.getNid();
         r.nid = Bdb.uuidToNid(newRelUid);
         Bdb.getNidCNidMap().setCNidForNid(c.getNid(), r.nid);
-        r.primordialUNid = Bdb.getUuidsToNidMap().getUNid(newRelUid);
+        r.setPrimUuid(newRelUid);
         r.setC2Id(c2Nid);
         r.setTypeId(relTypeNid);
         r.setRefinabilityId(relRefinabilityNid);
@@ -1587,7 +1587,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         private final List<I_TestSearchResults> checkList;
         private final I_ConfigAceFrame config;
         private final Pattern p;
-        Collection<I_DescriptionVersioned> matches;
+        Collection<I_DescriptionVersioned<?>> matches;
     	private NidBitSetBI nidSet;
     	
     	public NidBitSetBI getNidSet() {
@@ -1596,7 +1596,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
         public RegexSearcher(final CountDownLatch conceptLatch, final I_TrackContinuation tracker, final Semaphore checkSemaphore,
                 final List<I_TestSearchResults> checkList, final I_ConfigAceFrame config, final Pattern p,
-                final Collection<I_DescriptionVersioned> matches) throws IOException {
+                final Collection<I_DescriptionVersioned<?>> matches) throws IOException {
             super();
             this.conceptLatch = conceptLatch;
             this.tracker = tracker;
@@ -1643,7 +1643,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public void searchRegex(final I_TrackContinuation tracker, final Pattern p, final Collection<I_DescriptionVersioned> matches,
+    public void searchRegex(final I_TrackContinuation tracker, final Pattern p, final Collection<I_DescriptionVersioned<?>> matches,
             final CountDownLatch conceptLatch, final List<I_TestSearchResults> checkList, final I_ConfigAceFrame config)
     throws DatabaseException, IOException {
         Stopwatch timer = null;
@@ -1753,7 +1753,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         int cidTypeNid = REFSET_TYPES.CID.getTypeNid();
         int normalMemberNid = ReferenceConcepts.NORMAL_MEMBER.getNid();
         for (final RefsetMember<?, ?> m : members) {
-            for (RefsetMember.Version v : m.getVersions(frameConfig.getCoordinate())) {
+            for (RefsetMember.Version v : m.getVersions(frameConfig.getViewCoordinate())) {
                 if (allowedStatus.contains(v.getStatusNid()) && v.getTypeNid() == cidTypeNid) {
                     if (((I_ExtendByRefPartCid) v).getC1id() == normalMemberNid) {
                         if (Terms.get().hasConcept(m.getComponentId())) {
@@ -1897,7 +1897,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         final Concept c = Concept.get(conceptNid);
         final Image img = new Image();
         img.nid = this.uuidToNative(imageUuid);
-        img.primordialUNid = Bdb.getUuidsToNidMap().getUNid(imageUuid);
+        img.setPrimUuid(imageUuid);
         img.enclosingConceptNid = c.getNid();
         Bdb.getNidCNidMap().setCNidForNid(conceptNid, img.nid);
         img.setImage(image);

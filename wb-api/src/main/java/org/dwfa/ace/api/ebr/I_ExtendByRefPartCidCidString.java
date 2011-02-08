@@ -16,8 +16,11 @@
  */
 package org.dwfa.ace.api.ebr;
 
-public interface I_ExtendByRefPartCidCidString extends I_ExtendByRefPartCidCid,
-		I_ExtendByRefPartStr {
+import org.ihtsdo.tk.api.refex.type_cnid_cnid_str.RefexCnidCnidStrAnalogBI;
+
+public interface I_ExtendByRefPartCidCidString<A extends RefexCnidCnidStrAnalogBI<A>>
+	extends I_ExtendByRefPartCidCid<A>,
+		I_ExtendByRefPartStr<A> {
 
 	public int getC1id();
 

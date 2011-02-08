@@ -16,7 +16,10 @@
  */
 package org.dwfa.ace.api.ebr;
 
-public interface I_ExtendByRefPartInt extends I_ExtendByRefPart {
+import org.ihtsdo.tk.api.refex.type_int.RefexIntAnalogBI;
+
+public interface I_ExtendByRefPartInt<A extends RefexIntAnalogBI<A>> 
+	extends I_ExtendByRefPart<A> {
 
     public int getIntValue();
 

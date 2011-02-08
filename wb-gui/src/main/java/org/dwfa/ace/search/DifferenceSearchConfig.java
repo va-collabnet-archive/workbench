@@ -64,11 +64,11 @@ import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class DifferenceSearchConfig implements I_ConfigAceFrame {
@@ -102,8 +102,8 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 
 
     @Override
-	public Coordinate getCoordinate() {
-		return frameConfig.getCoordinate();
+	public ViewCoordinate getViewCoordinate() {
+		return frameConfig.getViewCoordinate();
 	}
 
 

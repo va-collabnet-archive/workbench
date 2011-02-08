@@ -31,7 +31,8 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
         this.enclosingConcept = concept;
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public Collection<RefsetMember<?, ?>> entryToObject(TupleInput input) {
         assert enclosingConcept != null;
         int listSize = input.readInt();

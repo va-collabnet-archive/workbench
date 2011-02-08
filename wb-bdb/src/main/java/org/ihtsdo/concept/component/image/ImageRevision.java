@@ -10,7 +10,7 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.media.MediaAnalogBI;
 import org.ihtsdo.tk.api.media.MediaVersionBI;
 import org.ihtsdo.tk.dto.concept.component.media.TkMediaRevision;
@@ -19,7 +19,7 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class ImageRevision extends Revision<ImageRevision, Image>
-        implements I_ImagePart, MediaAnalogBI {
+        implements I_ImagePart<ImageRevision>, MediaAnalogBI<ImageRevision> {
 
     private String textDescription;
     private int typeNid;
@@ -215,14 +215,14 @@ public class ImageRevision extends Revision<ImageRevision, Image>
     }
 
     @Override
-    public Image.Version getVersion(Coordinate c)
+    public Image.Version getVersion(ViewCoordinate c)
             throws ContraditionException {
         return primordialComponent.getVersion(c);
     }
 
     @Override
     public Collection<Image.Version> getVersions(
-            Coordinate c) {
+            ViewCoordinate c) {
         return primordialComponent.getVersions(c);
     }
 

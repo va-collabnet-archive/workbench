@@ -8,7 +8,6 @@ import java.util.UUID;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersion;
-import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -62,6 +61,7 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
      * (non-Javadoc)
      * @see org.ihtsdo.db.bdb.concept.component.I_HandleDeferredStatusAtPositionSetup#isSetup()
      */
+    @Override
     public boolean isSetup() {
         return statusAtPositionNid != Integer.MAX_VALUE;
     }
@@ -70,6 +70,7 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
      * (non-Javadoc)
      * @see org.ihtsdo.db.bdb.concept.component.I_HandleDeferredStatusAtPositionSetup#setStatusAtPositionNid(int)
      */
+    @Override
     public void setStatusAtPositionNid(int sapNid) {
         this.statusAtPositionNid = sapNid;
     }
@@ -133,6 +134,7 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
     	return sapBdb.getAuthorNid(statusAtPositionNid);
     }
 
+    @Override
     public int getAuthorNid() {
     	return sapBdb.getAuthorNid(statusAtPositionNid);
     }
@@ -189,10 +191,11 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
      * (non-Javadoc)
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
 
-        buf.append("sap:" + statusAtPositionNid);
+        buf.append("sap:").append(statusAtPositionNid);
         buf.append(" authority:");
         ConceptComponent.addNidToBuffer(buf, authorityNid);
         buf.append(" path:");

@@ -22,11 +22,11 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.EventObject;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JTable;
@@ -99,7 +99,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
 
     private ReferencedConceptsSwingWorker refConWorker;
 
-    private Set<Integer> conceptsToFetch = new HashSet<Integer>();
+    private Set<Integer> conceptsToFetch = new ConcurrentSkipListSet<Integer>();
 
     Map<Integer, I_GetConceptData> referencedConcepts = new HashMap<Integer, I_GetConceptData>();
 
@@ -113,7 +113,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
             concepts = new HashMap<Integer, I_GetConceptData>();
             Set<Integer> fetchSet = null;
             synchronized (conceptsToFetch) {
-                fetchSet = new HashSet<Integer>(conceptsToFetch);
+                fetchSet = new ConcurrentSkipListSet<Integer>(conceptsToFetch);
             }
             for (Integer id : fetchSet) {
                 if (stopWork) {

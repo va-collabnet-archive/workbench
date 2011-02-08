@@ -367,19 +367,6 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
         modified();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.ihtsdo.db.bdb.concept.I_ManageConceptData#add(org.ihtsdo.db.bdb.concept
-     * .component.refset.RefsetMember)
-     */
-    @Override
-    public void add(RefsetMember<?, ?> refsetMember) throws IOException {
-        getRefsetMembers().addDirect(refsetMember);
-        getMemberNids().add(refsetMember.nid);
-        modified();
-    }
 
     public abstract boolean hasComponent(int nid) throws IOException;
 

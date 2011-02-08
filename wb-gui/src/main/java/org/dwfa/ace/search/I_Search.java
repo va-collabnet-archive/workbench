@@ -27,7 +27,7 @@ public interface I_Search {
 	 * @throws IOException
 	 */
 	public void searchRegex(I_TrackContinuation tracker, Pattern p,
-			Collection<I_DescriptionVersioned> matches, CountDownLatch latch,
+			Collection<I_DescriptionVersioned<?>> matches, CountDownLatch latch,
 			List<I_TestSearchResults> checkList, I_ConfigAceFrame config)
 			throws IOException;
 

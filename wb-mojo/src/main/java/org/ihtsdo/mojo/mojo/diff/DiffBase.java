@@ -829,14 +829,14 @@ public class DiffBase extends AbstractMojo {
 		I_TermFactory tf = Terms.get();
 		I_GetConceptData c = tf.getConcept(SNOMED.Concept.ROOT.getUids());
 		getLog().info(c.getInitialText());
-		I_ConceptAttributeVersioned cv = c.getConceptAttributes();
+		I_ConceptAttributeVersioned<?> cv = c.getConceptAttributes();
 		for (I_ConceptAttributePart cvp : cv.getMutableParts()) {
 			getLog().info("Attr: " + cvp.getTime());
 		}
 		I_GetConceptData syn_type = tf
 				.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE
 						.getUids());
-		for (I_DescriptionVersioned cd : c.getDescriptions()) {
+		for (I_DescriptionVersioned<?> cd : c.getDescriptions()) {
 			for (I_DescriptionPart cvp : cd.getMutableParts()) {
 				if (cvp.getTypeNid() == syn_type.getConceptNid()
 				// && cvp.getText().contains("time")
@@ -1074,17 +1074,17 @@ public class DiffBase extends AbstractMojo {
 		List<? extends I_ConceptAttributeTuple> a2s = c
 				.getConceptAttributeTuples(null, allowed_position2, precedence,
 						contradiction_mgr);
-		I_ConceptAttributeTuple a1 = (a1s != null && a1s.size() > 0 ? a1s
+		I_ConceptAttributeTuple<?> a1 = (a1s != null && a1s.size() > 0 ? a1s
 				.get(0) : null);
-		I_ConceptAttributeTuple a2 = (a2s != null && a2s.size() > 0 ? a2s
+		I_ConceptAttributeTuple<?> a2 = (a2s != null && a2s.size() > 0 ? a2s
 				.get(0) : null);
 		if (debug_p) {
 			System.out.println("P1: " + allowed_position1);
 			System.out.println("P2: " + allowed_position2);
 			System.out.println("A1: " + a1);
 			System.out.println("A2: " + a2);
-			for (I_ConceptAttributePart a : c.getConceptAttributes()
-					.getMutableParts()) {
+                        I_ConceptAttributeVersioned<?> attr = c.getConceptAttributes();
+			for (I_ConceptAttributePart a : attr.getMutableParts()) {
 				System.out.println("A:  " + a);
 			}
 		}

@@ -292,7 +292,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
             }
             List<I_ImageVersioned> images = new ArrayList<I_ImageVersioned>();
             images.addAll(cb.getImages());
-            for (I_ImageVersioned i : images) {
+            for (I_ImageVersioned<?> i : images) {
                 if (stopWork) {
                     return -1;
                 }

@@ -116,7 +116,6 @@ public class CidLongMemberTest {
          
         obj.nid = 1;
         obj.primordialSapNid = 1; 
-        obj.primordialUNid = 1;
         obj.revisions = new CopyOnWriteArrayList<CidLongRevision>();
 
         CidLongRevision rev = new CidLongRevision(); 
@@ -136,7 +135,6 @@ public class CidLongMemberTest {
          
         obj.nid = 2;
         obj.primordialSapNid = 2; 
-        obj.primordialUNid = 2;
         obj.revisions = new CopyOnWriteArrayList<CidLongRevision>();
 
         CidLongRevision rev = new CidLongRevision(); 

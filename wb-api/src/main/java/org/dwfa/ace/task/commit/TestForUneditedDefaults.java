@@ -64,7 +64,7 @@ public class TestForUneditedDefaults extends AbstractConceptTest {
         return alerts;
     }
 
-    private List<AlertToDataConstraintFailure> testDescription(I_GetConceptData concept, I_DescriptionVersioned desc,
+    private List<AlertToDataConstraintFailure> testDescription(I_GetConceptData concept, I_DescriptionVersioned<?> desc,
             boolean forCommit) {
         for (I_DescriptionPart part : desc.getMutableParts()) {
             if (part.getVersion() == Integer.MAX_VALUE) {

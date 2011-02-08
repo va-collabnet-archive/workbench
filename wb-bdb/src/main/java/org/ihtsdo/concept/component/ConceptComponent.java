@@ -1,15 +1,18 @@
 package org.ihtsdo.concept.component;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
@@ -36,12 +39,20 @@ import org.ihtsdo.concept.component.identifier.IdentifierVersion;
 import org.ihtsdo.concept.component.identifier.IdentifierVersionLong;
 import org.ihtsdo.concept.component.identifier.IdentifierVersionString;
 import org.ihtsdo.concept.component.identifier.IdentifierVersionUuid;
+import org.ihtsdo.concept.component.refset.AnnotationWriter;
+import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
+import org.ihtsdo.db.util.NidPairForRefset;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.ComponentBI;
+import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierLong;
@@ -50,16 +61,9 @@ import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierUuid;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
-import java.util.Comparator;
-import java.util.concurrent.ConcurrentSkipListSet;
-import org.ihtsdo.concept.component.refset.AnnotationWriter;
-import org.ihtsdo.concept.component.refset.RefsetMember;
-import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.refset.RefsetMemberChronicleBI;
-import org.ihtsdo.tk.api.refset.RefsetMemberVersionBI;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>> implements
-        I_AmTermComponent, I_AmPart, I_AmTuple, I_Identify, I_IdPart, I_IdVersion, I_HandleFutureStatusAtPositionSetup {
+        I_AmTermComponent, I_AmPart<R>, I_AmTuple<R>, I_Identify, I_IdPart, I_IdVersion, I_HandleFutureStatusAtPositionSetup {
 
     public static void addTextToBuffer(StringBuffer buf, int nidToConvert) {
         try {
@@ -220,7 +224,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
     };
 
-    public abstract class Version implements I_AmTuple, I_Identify {
+    public abstract class Version 
+            implements I_AmTuple<R>,  I_Identify {
 
         protected int index = -1;
         private boolean dup = false;
@@ -229,11 +234,43 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             return getTime() == Long.MAX_VALUE;
         }
 
-        public Collection<? extends RefsetMemberChronicleBI> getAnnotations() {
+    
+    public final void setNid(int nid) throws PropertyVetoException {
+             if (index == -1) {
+                ConceptComponent.this.setNid(nid);
+            }
+         throw new PropertyVetoException(null, null);
+    }
+
+    @Override
+	public Collection<? extends RefexChronicleBI<?>> getRefexes()
+			throws IOException {
+		return ConceptComponent.this.getRefexes();
+	}
+
+
+	@Override
+	public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
+			ViewCoordinate xyz) throws IOException {
+		return ConceptComponent.this.getCurrentRefexes(xyz);
+	}
+
+
+	@Override
+	public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
+			ViewCoordinate xyz) throws IOException {
+		return ConceptComponent.this.getCurrentAnnotations(xyz);
+	}
+
+
+        @Override
+	public Collection<? extends RefexChronicleBI<?>> getAnnotations() {
             return ConceptComponent.this.getAnnotations();
         }
 
-        public boolean addAnnotation(RefsetMemberChronicleBI annotation) {
+        @SuppressWarnings("rawtypes")
+        @Override
+        public boolean addAnnotation(RefexChronicleBI annotation) {
             return ConceptComponent.this.addAnnotation(annotation);
         }
 
@@ -312,7 +349,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         @Override
         public boolean equals(Object obj) {
             if (Version.class.isAssignableFrom(obj.getClass())) {
-                Version another = (Version) obj;
+                @SuppressWarnings("unchecked")
+				Version another = (Version) obj;
                 if (this.getNid() == another.getNid() && this.index == another.index) {
                     return true;
                 }
@@ -354,6 +392,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             return this;
         }
 
+        @Override
         public int getSapNid() {
             if (index >= 0) {
                 return revisions.get(index).sapNid;
@@ -361,6 +400,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             return primordialSapNid;
         }
 
+        @Override
         public String toString() {
             if (index >= 0) {
                 return "Version: " + revisions.get(index).toString();
@@ -368,6 +408,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             return "Version: " + ConceptComponent.this.toString();
         }
 
+        @Override
         public String toUserString() {
             if (index >= 0) {
                 return revisions.get(index).toUserString();
@@ -514,7 +555,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public UUID getPrimUuid() {
-            return Bdb.getUuidDb().getUuid(primordialUNid);
+            return new UUID(primordialMSB, primordialLSB);
         }
 
         public Version removeDuplicates(Version dup1, Version dup2) {
@@ -709,8 +750,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             throw new UnsupportedOperationException("Use makeAnalog instead");
         }
     }
-    public int nid;
-    public int enclosingConceptNid;
+    public int nid = Integer.MAX_VALUE;
+    public int enclosingConceptNid = Integer.MAX_VALUE;
     /**
      * primordial: first created or developed Sap = Status At Position
      */
@@ -719,19 +760,22 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
      * primordial: first created or developed
      * 
      */
-    public int primordialUNid = Integer.MIN_VALUE;
+    public long primordialMSB = Long.MIN_VALUE;
+    public long primordialLSB = Long.MIN_VALUE;
     public CopyOnWriteArrayList<R> revisions;
     protected ArrayList<IdentifierVersion> additionalIdVersions;
     private ArrayList<IdVersion> idVersions;
-    public ConcurrentSkipListSet<RefsetMemberChronicleBI> annotations;
+    public ConcurrentSkipListSet<RefexChronicleBI<?>> annotations;
 
-    public boolean addAnnotation(RefsetMemberChronicleBI annotation) {
+    @SuppressWarnings("rawtypes")
+    @Override
+    public boolean addAnnotation(RefexChronicleBI annotation) {
         if (annotations == null) {
-            annotations = new ConcurrentSkipListSet<RefsetMemberChronicleBI>(
-                    new Comparator<RefsetMemberChronicleBI>() {
+            annotations = new ConcurrentSkipListSet<RefexChronicleBI<?>>(
+                    new Comparator<RefexChronicleBI>() {
 
                         @Override
-                        public int compare(RefsetMemberChronicleBI t, RefsetMemberChronicleBI t1) {
+                        public int compare(RefexChronicleBI t, RefexChronicleBI t1) {
                             return t.getNid() - t1.getNid();
                         }
                     });
@@ -740,10 +784,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         return annotations.add(annotation);
     }
 
-    public Collection<RefsetMemberChronicleBI> getAnnotations() {
+    @Override
+    public Collection<? extends RefexChronicleBI<?>> getAnnotations() {
         if (annotations == null) {
             return Collections.unmodifiableCollection(
-                    new ArrayList<RefsetMemberChronicleBI>());
+                    new ArrayList<RefexChronicleBI<?>>());
         }
         return Collections.unmodifiableCollection(annotations);
     }
@@ -788,7 +833,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         buf.append("nid:");
         buf.append(nid);
         buf.append(" pUuid:");
-        buf.append(Bdb.getUuidDb().getUuid(primordialUNid));
+        buf.append(getPrimUuid());
         buf.append(" sap: ");
         if (primordialSapNid == Integer.MIN_VALUE) {
             buf.append("Integer.MIN_VALUE");
@@ -828,8 +873,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
         HashSet<Integer> sapNids = new HashSet<Integer>(size);
         if (annotations != null) {
-            for (RefsetMemberChronicleBI annotation : annotations) {
-                for (RefsetMemberVersionBI av : annotation.getVersions()) {
+            for (RefexChronicleBI<?> annotation : annotations) {
+                for (RefexVersionBI<?> av : annotation.getVersions()) {
                     sapNids.add(av.getSapNid());
                 }
             }
@@ -870,13 +915,13 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         return sapNids;
     }
 
-    public HashMap<Integer, ConceptComponent<?, ?>.Version> getVersionSapMap() {
+    public HashMap<Integer, ConceptComponent<R, C>.Version> getVersionSapMap() {
         int size = 1;
         if (revisions != null) {
             size = size + revisions.size();
         }
-        HashMap<Integer, ConceptComponent<?, ?>.Version> sapMap =
-                new HashMap<Integer, ConceptComponent<?, ?>.Version>(size);
+        HashMap<Integer, ConceptComponent<R, C>.Version> sapMap =
+                new HashMap<Integer, ConceptComponent<R, C>.Version>(size);
         for (Version v : getVersions()) {
             sapMap.put(v.getSapNid(), v);
         }
@@ -888,7 +933,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         this.enclosingConceptNid = enclosingConceptNid;
         readComponentFromBdb(input);
         Bdb.getNidCNidMap().setCNidForNid(this.enclosingConceptNid, this.nid);
-        assert this.primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
+        assert this.primordialLSB != Long.MIN_VALUE &&
+                this.primordialMSB != Long.MIN_VALUE :
+                    "Processing nid: " + enclosingConceptNid;
         assert nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
         assert nid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
     }
@@ -903,9 +950,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         this.enclosingConceptNid = enclosingConceptNid;
         Bdb.getNidCNidMap().setCNidForNid(this.enclosingConceptNid, this.nid);
         this.primordialSapNid = Bdb.getSapNid(eComponent);
-        this.primordialUNid = Bdb.getUuidsToNidMap().getUNid(eComponent.getPrimordialComponentUuid());
+        this.setPrimUuid(eComponent.getPrimordialComponentUuid());
         convertId(eComponent.additionalIds);
-        assert this.primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
+       assert this.primordialLSB != Long.MIN_VALUE &&
+                this.primordialMSB != Long.MIN_VALUE :
+                    "Processing nid: " + enclosingConceptNid;
         assert nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
         assert nid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
     }
@@ -914,11 +963,16 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         Bdb.gVersion.incrementAndGet();
     }
 
+    public void setPrimUuid(UUID prim) {
+        this.primordialMSB = prim.getMostSignificantBits();
+        this.primordialLSB = prim.getLeastSignificantBits();
+    }
+
     public ConceptComponent<R, C> merge(C another) {
         Set<Integer> currentSapNids = getComponentSapNids();
 
         // merge versions
-        for (ConceptComponent<?, ?>.Version v : another.getVersions()) {
+        for (ConceptComponent<R, C>.Version v : another.getVersions()) {
             if (!currentSapNids.contains(v.getSapNid())) {
                 addRevision((R) v.getRevision());
             }
@@ -946,16 +1000,16 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             } else {
                 HashMap<Integer, RefsetMember<?, ?>> anotherAnnotationMap =
                         new HashMap<Integer, RefsetMember<?, ?>>();
-                for (RefsetMemberChronicleBI annotation : another.annotations) {
+                for (@SuppressWarnings("rawtypes") RefexChronicleBI annotation : another.annotations) {
                     anotherAnnotationMap.put(annotation.getNid(),
                             (RefsetMember<?, ?>) annotation);
                 }
 
-                for (RefsetMemberChronicleBI annotation : this.annotations) {
+                for (@SuppressWarnings("rawtypes") RefexChronicleBI annotation : this.annotations) {
                     RefsetMember<?, ?> anotherAnnotation =
                             anotherAnnotationMap.remove(annotation.getNid());
                     if (anotherAnnotation != null) {
-                        for (RefsetMember.Version annotationVersion :
+                        for (@SuppressWarnings("rawtypes") RefsetMember.Version annotationVersion :
                                 anotherAnnotation.getVersions()) {
                             if (!currentSapNids.contains(
                                     annotationVersion.getSapNid())) {
@@ -999,7 +1053,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                         revisions.remove(indexToRemove);
                     }
                 }
-                if (revisions.size() == 0) {
+                if (revisions.isEmpty()) {
                     revisions = null;
                 }
                 Concept c = getEnclosingConcept();
@@ -1023,7 +1077,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     public final void convertId(List<TkIdentifier> list) {
-        if (list == null || list.size() == 0) {
+        if (list == null || list.isEmpty()) {
             return;
         }
         additionalIdVersions = new ArrayList<IdentifierVersion>(list.size());
@@ -1055,7 +1109,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
      */
     @Override
     public boolean isSetup() {
-        assert primordialUNid != Integer.MIN_VALUE;
+       assert this.primordialLSB != Long.MIN_VALUE &&
+                this.primordialMSB != Long.MIN_VALUE :
+                    "Processing nid: " + enclosingConceptNid;
         return primordialSapNid != Integer.MAX_VALUE;
     }
 
@@ -1073,7 +1129,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     private void readIdentifierFromBdb(TupleInput input) {
         // nid, list size, and conceptNid are read already by the binder...
-        primordialUNid = input.readInt();
+        primordialMSB = input.readLong();
+        primordialLSB = input.readLong();
         int listSize = input.readShort();
         if (listSize != 0) {
             additionalIdVersions = new ArrayList<IdentifierVersion>(listSize);
@@ -1116,8 +1173,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     private void writeIdentifierToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
         assert primordialSapNid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
-        assert primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
-        output.writeInt(primordialUNid);
+       assert this.primordialLSB != Long.MIN_VALUE &&
+                this.primordialMSB != Long.MIN_VALUE :
+                    "Processing nid: " + enclosingConceptNid;
+        output.writeLong(primordialMSB);
+        output.writeLong(primordialLSB);
         List<IdentifierVersion> partsToWrite = new ArrayList<IdentifierVersion>();
         if (additionalIdVersions != null) {
             for (IdentifierVersion p : additionalIdVersions) {
@@ -1174,7 +1234,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     @Override
     public final Object getDenotation() {
-        return Bdb.getUuidDb().getUuid(primordialUNid);
+        return getPrimUuid();
     }
 
     @Override
@@ -1190,7 +1250,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     @Override
     public final List<UUID> getUUIDs() {
         List<UUID> returnValues = new ArrayList<UUID>();
-        returnValues.add(Bdb.getUuidDb().getUuid(primordialUNid));
+        returnValues.add(getPrimUuid());
         if (additionalIdVersions != null) {
             for (IdentifierVersion idv : additionalIdVersions) {
                 if (IdentifierVersionUuid.class.isAssignableFrom(idv.getClass())) {
@@ -1339,6 +1399,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     @Deprecated
+    @Override
     public final Set<TimePathId> getTimePathSet() {
         Set<TimePathId> set = new TreeSet<TimePathId>();
         set.add(new TimePathId(getVersion(), getPathNid()));
@@ -1357,7 +1418,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     public Object getDenotation(int authorityNid) throws IOException, TerminologyException {
         if (getAuthorityNid() == authorityNid) {
-            return Bdb.getUuidDb().getUuid(primordialUNid);
+            return getPrimUuid();
         }
         for (I_IdPart id : getMutableIdParts()) {
             if (id.getAuthorityNid() == authorityNid) {
@@ -1416,6 +1477,16 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public final int getVersion() {
         return ThinVersionHelper.convert(getTime());
     }
+    
+    public final void setNid(int nid) throws PropertyVetoException {
+        if (this.getSapNid() != Integer.MAX_VALUE && 
+                this.getTime() != Long.MAX_VALUE && 
+                this.nid != nid &&
+                this.nid != Integer.MAX_VALUE) {
+            throw new PropertyVetoException("nid", null);
+        }
+        this.nid = nid;
+    }
 
     @Override
     @Deprecated
@@ -1460,6 +1531,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     @Deprecated
+    @Override
     public final void setStatusId(int statusId) {
         if (getTime() != Long.MAX_VALUE) {
             throw new UnsupportedOperationException(
@@ -1472,6 +1544,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
     }
 
+    @Override
     public final void setStatusNid(int statusId) {
         if (getTime() != Long.MAX_VALUE) {
             throw new UnsupportedOperationException(
@@ -1489,6 +1562,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         throw new UnsupportedOperationException("Use makeAnalog instead.");
     }
 
+    @Override
     public final ArrayIntList getPartComponentNids() {
         ArrayIntList resultList = getVariableVersionNids();
         resultList.add(getPathNid());
@@ -1526,7 +1600,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         if (this.primordialSapNid != another.primordialSapNid) {
             return false;
         }
-        if (this.primordialUNid != another.primordialUNid) {
+        if (this.primordialLSB != another.primordialLSB) {
+            return false;
+        }
+        if (this.primordialMSB != another.primordialMSB) {
             return false;
         }
         if (this.additionalIdVersions != null && another.additionalIdVersions == null) {
@@ -1566,28 +1643,41 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     @SuppressWarnings("unchecked")
     public String validate(ConceptComponent<?, ?> another) throws IOException {
         assert another != null;
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         String validationResults = null;
 
         if (this.nid != another.nid) {
-            buf.append("\tConceptComponent.nid not equal: \n" + "\t\tthis.nid = " + this.nid + "\n"
-                    + "\t\tanother.nid = " + another.nid + "\n");
+            buf.append("\tConceptComponent.nid not equal: \n\t\t"
+                    + "this.nid = ").append(this.nid).
+                    append("\n" + "\t\tanother.nid = ").
+                    append(another.nid).append("\n");
         }
         if (this.primordialSapNid != another.primordialSapNid) {
-            buf.append("\tConceptComponent.primordialSapNid not equal: \n" + "\t\tthis.primordialSapNid = "
-                    + this.primordialSapNid + "\n" + "\t\tanother.primordialSapNid = " + another.primordialSapNid + "\n");
+            buf.append("\tConceptComponent.primordialSapNid not equal: \n" +
+                    "\t\tthis.primordialSapNid = ").append(
+                    this.primordialSapNid).append(
+                    "\n" + "\t\tanother.primordialSapNid = ").append(
+                    another.primordialSapNid).append(
+                    "\n");
         }
 
-        if (this.primordialUNid != another.primordialUNid) {
-            buf.append("\tConceptComponent.primordialUNid not equal: \n" + "\t\tthis.primordialUNid = "
-                    + this.primordialUNid + "\n" + "\t\tanother.primordialUNid = " + another.primordialUNid + "\n");
+        if (this.primordialLSB != another.primordialLSB &&
+                this.primordialMSB != another.primordialMSB) {
+            buf.append("\tConceptComponent.primordialUNid not equal: \n" +
+                    "\t\tthis.primordialUNid = ").append(
+                    this.getPrimUuid()).append("\n" +
+                    "\t\tanother.primordialUNid = ").append(
+                    another.getPrimUuid()).append("\n");
         }
 
         if (this.additionalIdVersions != null) {
             if (this.additionalIdVersions.equals(another.additionalIdVersions) == false) {
-                buf.append("\tConceptComponent.additionalIdentifierParts not equal: \n"
-                        + "\t\tthis.additionalIdentifierParts = " + this.additionalIdVersions + "\n"
-                        + "\t\tanother.additionalIdentifierParts = " + another.additionalIdVersions + "\n");
+                buf.append("\tConceptComponent.additionalIdentifierParts "
+                        + "not equal: \n" +
+                        "\t\tthis.additionalIdentifierParts = ").append(
+                        this.additionalIdVersions).append("\n" +
+                        "\t\tanother.additionalIdentifierParts = ").append(
+                        another.additionalIdVersions).append("\n");
             }
         }
 
@@ -1664,7 +1754,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             }
         }
         if (annotations != null) {
-            for (RefsetMemberChronicleBI r : annotations) {
+            for (RefexChronicleBI<?> r : annotations) {
                 if (r.isUncommitted()) {
                     return true;
                 }
@@ -1675,7 +1765,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     @Override
     public UUID getPrimUuid() {
-        return Bdb.getUuidDb().getUuid(primordialUNid);
+        return new UUID(this.primordialMSB, this.primordialLSB);
     }
 
     public ArrayList<IdentifierVersion> getAdditionalIdentifierParts() {
@@ -1776,4 +1866,64 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public int getSapNid() {
         return primordialSapNid;
     }
+
+	@Override
+	public Collection<? extends RefexChronicleBI<?>> getRefexes()
+			throws IOException {
+        List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
+        if (pairs == null || pairs.isEmpty()) {
+            return new ArrayList<RefexChronicleBI<?>>(0);
+        }
+        List<RefexChronicleBI<?>> returnValues = new ArrayList<RefexChronicleBI<?>>(pairs.size());
+        HashSet<Integer> addedMembers = new HashSet<Integer>();
+        for (NidPairForRefset pair : pairs) {
+        	RefexChronicleBI<?> ext = (RefexChronicleBI<?>) Bdb.getComponent(pair.getMemberNid());
+            if (ext != null && !addedMembers.contains(ext.getNid())) {
+            	addedMembers.add(ext.getNid());
+                returnValues.add(ext);
+            }
+        }
+        
+        ComponentBI component = 
+                Bdb.getComponent(nid);
+        if (component instanceof Concept) {
+            component = ((Concept) component).getConceptAttributes();
+        }
+        ComponentChroncileBI<?> cc = (ComponentChroncileBI<?>) component;
+        for (RefexChronicleBI<?> annotation: cc.getAnnotations()) {
+            returnValues.add(annotation);
+        }
+        return Collections.unmodifiableCollection(returnValues);
+	}
+
+	@Override
+	public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
+			ViewCoordinate xyz) throws IOException {
+		Collection<? extends RefexChronicleBI<?>> refexes = getRefexes();
+        List<RefexVersionBI<?>> returnValues = new ArrayList<RefexVersionBI<?>>(refexes.size());
+        for (RefexChronicleBI<?> refex: refexes) {
+        	for (RefexVersionBI<?> version: refex.getVersions(xyz)) {
+        		returnValues.add(version);
+        	}
+        }
+        return Collections.unmodifiableCollection(returnValues);
+	}
+
+	@Override
+	public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
+			ViewCoordinate xyz) throws IOException {
+        if (annotations == null) {
+            return Collections.unmodifiableCollection(
+                    new ArrayList<RefexVersionBI<?>>());
+        }
+        Collection<RefexVersionBI<?>> returnValues = new ArrayList<RefexVersionBI<?>>();
+        for (RefexChronicleBI<?> refex: annotations) {
+        	for (RefexVersionBI<?> version: refex.getVersions(xyz)) {
+        		returnValues.add(version);
+        	}
+        }
+        return Collections.unmodifiableCollection(returnValues);
+	}
+
+    
 }

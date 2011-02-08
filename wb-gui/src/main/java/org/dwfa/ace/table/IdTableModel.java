@@ -16,24 +16,17 @@
  */
 package org.dwfa.ace.table;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
 
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.SmallProgressPanel;
@@ -51,11 +44,9 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
-import org.ihtsdo.tk.api.PathBI;
 
 public class IdTableModel extends AbstractTableModel implements PropertyChangeListener {
     /**
@@ -82,9 +73,9 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
 
     private TableChangedSwingWorker tableChangeWorker;
 
-    private Set<Integer> conceptsToFetch = new HashSet<Integer>();
+    private Set<Integer> conceptsToFetch = new ConcurrentSkipListSet<Integer>();
 
-    private Map<Integer, I_GetConceptData> referencedConcepts = new HashMap<Integer, I_GetConceptData>();
+    private Map<Integer, I_GetConceptData> referencedConcepts = new ConcurrentHashMap<Integer, I_GetConceptData>();
 
     public class ReferencedConceptsSwingWorker extends SwingWorker<Boolean> {
         private boolean stopWork = false;
@@ -95,9 +86,9 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
         protected Boolean construct() throws Exception {
             getProgress().setActive(true);
             concepts = new HashMap<Integer, I_GetConceptData>();
-            HashSet<Integer> idSetToFetch = null;
+            Set<Integer> idSetToFetch = null;
             synchronized (conceptsToFetch) {
-                idSetToFetch = new HashSet<Integer>(conceptsToFetch);
+                idSetToFetch = new ConcurrentSkipListSet<Integer>(conceptsToFetch);
             }
             for (Integer id : idSetToFetch) {
                 if (stopWork) {
@@ -121,7 +112,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
                     }
                     if (getProgress() != null) {
                         getProgress().getProgressBar().setIndeterminate(false);
-                        if (conceptsToFetch.size() == 0) {
+                        if (conceptsToFetch.isEmpty()) {
                             getProgress().getProgressBar().setValue(1);
                         } else {
                             getProgress().getProgressBar().setValue(conceptsToFetch.size());
@@ -303,7 +294,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
         if (tableChangeWorker != null) {
             tableChangeWorker.stop();
         }
-        conceptsToFetch = new HashSet<Integer>();
+        conceptsToFetch = new ConcurrentSkipListSet<Integer>();
         referencedConcepts = new HashMap<Integer, I_GetConceptData>();
         if (getProgress() != null) {
             getProgress().setVisible(true);

@@ -37,7 +37,7 @@ public class TkConcept {
     public List<TkMedia> media;
     public List<TkRefsetAbstractMember<?>> refsetMembers;
     public UUID primordialUuid;
-    public boolean annotationStyleRefset = false;
+    public boolean annotationStyleRefex = false;
 
     public TkConcept(DataInput in) throws IOException, ClassNotFoundException {
         super();
@@ -139,9 +139,9 @@ public class TkConcept {
             in.readInt(); //refsetUuidMemberUuidForRefsetMembersCount
         }
         if (readDataVersion >= 5) {
-            annotationStyleRefset = in.readBoolean();
+            annotationStyleRefex = in.readBoolean();
         } else {
-            annotationStyleRefset = false;
+            annotationStyleRefex = false;
         }
     }
 
@@ -191,7 +191,7 @@ public class TkConcept {
                 r.writeExternal(out);
             }
         }
-        out.writeBoolean(annotationStyleRefset);
+        out.writeBoolean(annotationStyleRefex);
     }
     public TkConcept() {
         super();
@@ -354,12 +354,12 @@ public class TkConcept {
         this.primordialUuid = primordialUuid;
     }
     
-    public boolean isAnnotationStyleRefset() {
-        return annotationStyleRefset;
+    public boolean isAnnotationStyleRefex() {
+        return annotationStyleRefex;
     }
 
-    public void setAnnotationStyleRefset(boolean annotationStyleRefset) {
-        this.annotationStyleRefset = annotationStyleRefset;
+    public void setAnnotationStyleRefex(boolean annotationStyleRefex) {
+        this.annotationStyleRefex = annotationStyleRefex;
     }
 
 }

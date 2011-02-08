@@ -5,21 +5,21 @@ import java.util.Collection;
 
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 import org.ihtsdo.tk.api.constraint.ConstraintBI;
 import org.ihtsdo.tk.api.constraint.ConstraintCheckType;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.media.MediaVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
-import org.ihtsdo.tk.example.binding.Snomed;
-import org.ihtsdo.tk.spec.ConceptSpec;
 
 public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI {
 	
-	public Coordinate getCoordinate();
+	public ViewCoordinate getCoordinate();
+        
+        public ConceptChronicleBI getChronicle();
 	
 	public ConAttrVersionBI getConAttrsActive() throws IOException, ContraditionException;
 	
@@ -68,7 +68,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
 			ConstraintCheckType valueCheck) throws IOException, ContraditionException;
 	//TODO
 	
-	public boolean isMember(int conceptNid, int evalRefsetNid) throws IOException; 
+	public boolean isMember(int evalRefsetNid) throws IOException; 
 	
 	//TODO to here
 

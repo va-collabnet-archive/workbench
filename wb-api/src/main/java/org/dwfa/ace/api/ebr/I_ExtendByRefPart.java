@@ -22,27 +22,28 @@ import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.refset.RefsetMemberVersionBI;
+import org.ihtsdo.tk.api.refex.RefexAnalogBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
-public interface I_ExtendByRefPart extends Comparable<I_ExtendByRefPart>, 
-        I_AmPart, RefsetMemberVersionBI {
+public interface I_ExtendByRefPart<T extends RefexAnalogBI<T>> 
+        extends Comparable<I_ExtendByRefPart<T>>, I_AmPart<T>, RefexVersionBI<T> {
 
     /**
-     * @deprecated Use {@link #getStatusId()}
+     * @deprecated Use {@link #getStatusNid()}
      */
     @Deprecated
     public int getStatus();
 
     /**
-     * @deprecated Use {@link #setStatusId(int)}
+     * @deprecated Use {@link #setStatusNid(int)}
      */
     @Deprecated
     public void setStatus(int idStatus);
 
     public UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException;
 
-    public I_ExtendByRefPart duplicate();
+    public I_ExtendByRefPart<T> duplicate();
 
-    public I_ExtendByRefPart makePromotionPart(PathBI promotionPath);
+    public I_ExtendByRefPart<T> makePromotionPart(PathBI promotionPath);
 
 }
