@@ -78,7 +78,7 @@ public class TestCPath_New extends AbstractTask {
 
         try {
             setupRoleNids();
-            SnoPathProcessConcepts pcClass = new SnoPathProcessConcepts(logger, null,
+            SnoPathProcessStated pcClass = new SnoPathProcessStated(logger, null,
                     cClassSnoRels, allowedRoleTypes, statusSet, cClassPosSet, null, config
                             .getPrecedence(), config.getConflictResolutionStrategy());
             tf.iterateConcepts(pcClass);

@@ -378,7 +378,7 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 
 			cEditSnoCons = new ArrayList<SnoCon>();
 			cEditSnoRels = new ArrayList<SnoRel>();
-			SnoPathProcessConcepts pcEdit = new SnoPathProcessConcepts(logger,
+			SnoPathProcessStated pcEdit = new SnoPathProcessStated(logger,
 					cEditSnoCons, cEditSnoRels, allowedRoleTypes, statusSet,
 					cEditPosSet, gui, precedence, contradictionMgr);
 			tf.iterateConcepts(pcEdit);

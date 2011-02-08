@@ -48,6 +48,8 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
     private static int isCh_STATED_AND_SUBSUMED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int isCh_INFERRED_RELATIONSHIP = Integer.MIN_VALUE;
 
+    private static int snorocketAuthorNid = Integer.MIN_VALUE;
+
     private I_IntSet roleTypeSet;
     private I_IntSet statusSet;
     private PositionSetReadOnly fromPathPos;
@@ -59,9 +61,10 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
     private Precedence precedence;
     private I_ManageContradiction contradictionMgr;
 
-    public SnoPathProcessInferred(Logger logger, List<SnoRel> snorels,
-            I_IntSet roleSet, I_IntSet statSet, PositionSetReadOnly pathPosEditSide, PositionSetReadOnly pathPos, I_ShowActivity gui,
-            Precedence precedence, I_ManageContradiction contradictionMgr) throws TerminologyException, IOException {
+    public SnoPathProcessInferred(Logger logger, List<SnoRel> snorels, I_IntSet roleSet,
+            I_IntSet statSet, PositionSetReadOnly pathPosEditSide, PositionSetReadOnly pathPos,
+            I_ShowActivity gui, Precedence precedence, I_ManageContradiction contradictionMgr)
+            throws TerminologyException, IOException {
         this.logger = logger;
         this.snorels = snorels;
         this.fromPathPos = pathPos;
@@ -108,12 +111,15 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
                         .getUids());
         isCh_INFERRED_RELATIONSHIP = tf
                 .uuidToNative(ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids());
+
+        snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET
+                .getUids());
     }
 
     // :TODO: have concept attributes for user created concepts go on the common path.
-    
+
     // :TODO: then, simple this routine to not look at both the stated and inferred.
-    
+
     @Override
     public void processConcept(I_GetConceptData concept) throws Exception {
         // processUnfetchedConceptData(int cNid, I_FetchConceptFromCursor fcfc)
@@ -132,60 +138,61 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
 
         boolean passToCompare = false;
         List<? extends I_ConceptAttributeTuple> attribs = concept.getConceptAttributeTuples(
-                statusSet, fromPathPos, 
-                precedence, contradictionMgr);
+                statusSet, fromPathPos, precedence, contradictionMgr);
 
         if (attribs.size() == 1)
-        	passToCompare = true;
+            passToCompare = true;
         else if (attribs.size() == 0) {
-        	// check to see if attribute is only on edit path
-            attribs = concept.getConceptAttributeTuples(
-                    statusSet, fromPathPosEditSide, 
-                    precedence, contradictionMgr);
+            // check to see if attribute is only on edit path
+            attribs = concept.getConceptAttributeTuples(statusSet, fromPathPosEditSide, precedence,
+                    contradictionMgr);
             if (attribs.size() == 1)
-            	passToCompare = true;
+                passToCompare = true;
         }
-        
+
         if (passToCompare) {
-             List<? extends I_RelTuple> relTupList = concept.getSourceRelTuples(statusSet,
-                    roleTypeSet, fromPathPos, 
-                    precedence, contradictionMgr);
+            List<? extends I_RelTuple> relTupList = concept.getSourceRelTuples(statusSet,
+                    roleTypeSet, fromPathPos, precedence, contradictionMgr);
 
-                countConAdded++;
+            countConAdded++;
 
-                for (I_RelTuple rt : relTupList) {
-                    int charId = rt.getCharacteristicId();
-                    boolean keep = false;
-                    if (charId == isCh_DEFINING_CHARACTERISTIC) {
-                        keep = true;
-                        countRelCharDefining++;
-                    } else if (charId == isCh_STATED_RELATIONSHIP) {
-                        keep = true;
-                        countRelCharStated++;
-                    } else if (charId == isCh_STATED_AND_INFERRED_RELATIONSHIP) {
-                        keep = true;
-                        countRelCharStatedInferred++;
-                    } else if (charId == isCh_STATED_AND_SUBSUMED_RELATIONSHIP) {
-                        keep = true;
-                        countRelCharStatedSubsumed++;
-                    } else if (charId == isCh_INFERRED_RELATIONSHIP) {
-                        keep = true;
-                        countRelCharInferred++;
-                    }
+            for (I_RelTuple rt : relTupList) {
+                int authorNid = rt.getAuthorNid();
+                if (authorNid != snorocketAuthorNid) 
+                    continue; // SKIP IF NOT INFERRED
+                
+                int charId = rt.getCharacteristicId();
+                boolean keep = false;
+                if (charId == isCh_DEFINING_CHARACTERISTIC) {
+                    keep = true;
+                    countRelCharDefining++;
+                } else if (charId == isCh_STATED_RELATIONSHIP) {
+                    keep = true;
+                    countRelCharStated++;
+                } else if (charId == isCh_STATED_AND_INFERRED_RELATIONSHIP) {
+                    keep = true;
+                    countRelCharStatedInferred++;
+                } else if (charId == isCh_STATED_AND_SUBSUMED_RELATIONSHIP) {
+                    keep = true;
+                    countRelCharStatedSubsumed++;
+                } else if (charId == isCh_INFERRED_RELATIONSHIP) {
+                    keep = true;
+                    countRelCharInferred++;
+                }
 
-                    if (keep == true) {
-                        if (snorels != null)
-                            snorels.add(new SnoRel(rt.getC1Id(), rt.getC2Id(), rt.getTypeId(), rt
-                                    .getGroup(), rt.getNid()));
-                        countRelAdded++;
+                if (keep == true) {
+                    if (snorels != null)
+                        snorels.add(new SnoRel(rt.getC1Id(), rt.getC2Id(), rt.getTypeNid(), rt
+                                .getGroup(), rt.getNid()));
+                    countRelAdded++;
 
-                        if (gui != null && countRelAdded % 25000 == 0) {
-                            // ** GUI: ProcessPath
-                            gui.setValue(countRelAdded);
-                            gui.setProgressInfoLower("rels processed " + countRelAdded);
-                        }
+                    if (gui != null && countRelAdded % 25000 == 0) {
+                        // ** GUI: ProcessPath
+                        gui.setValue(countRelAdded);
+                        gui.setProgressInfoLower("rels processed " + countRelAdded);
                     }
                 }
+            }
         } else if (attribs.size() > 1) {
             countConDuplVersion++;
         }

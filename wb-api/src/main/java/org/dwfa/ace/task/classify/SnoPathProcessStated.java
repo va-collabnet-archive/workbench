@@ -19,7 +19,7 @@ import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.Precedence;
 
-public class SnoPathProcessConcepts implements I_ProcessConcepts {
+public class SnoPathProcessStated implements I_ProcessConcepts {
     private List<SnoRel> snorels;
     private List<SnoCon> snocons;
 
@@ -45,6 +45,8 @@ public class SnoPathProcessConcepts implements I_ProcessConcepts {
     private static int isCh_STATED_AND_INFERRED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int isCh_STATED_AND_SUBSUMED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int isCh_INFERRED_RELATIONSHIP = Integer.MIN_VALUE;
+    
+    private static int snorocketAuthorNid = Integer.MIN_VALUE;
 
     private I_IntSet roleTypeSet;
     private I_IntSet statusSet;
@@ -56,7 +58,7 @@ public class SnoPathProcessConcepts implements I_ProcessConcepts {
     private Precedence precedence;
     private I_ManageContradiction contradictionMgr;
 
-    public SnoPathProcessConcepts(Logger logger, List<SnoCon> snocons, List<SnoRel> snorels,
+    public SnoPathProcessStated(Logger logger, List<SnoCon> snocons, List<SnoRel> snorels,
             I_IntSet roleSet, I_IntSet statSet, PositionSetReadOnly pathPos, I_ShowActivity gui,
             Precedence precedence, I_ManageContradiction contradictionMgr) throws TerminologyException, IOException {
         this.logger = logger;
@@ -106,6 +108,9 @@ public class SnoPathProcessConcepts implements I_ProcessConcepts {
                         .getUids());
         isCh_INFERRED_RELATIONSHIP = tf
                 .uuidToNative(ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids());
+        
+        snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET
+                .getUids());
     }
 
     @Override
@@ -135,7 +140,7 @@ public class SnoPathProcessConcepts implements I_ProcessConcepts {
 
 			boolean isaFound = false;
 			for (I_RelTuple rt : relTupList)
-				if (rt.getTypeId() == isaNid)
+				if (rt.getTypeNid() == isaNid && rt.getAuthorNid() != snorocketAuthorNid)
 					isaFound = true;
 
             if (isaFound) {
@@ -144,6 +149,10 @@ public class SnoPathProcessConcepts implements I_ProcessConcepts {
                 countConAdded++;
 
                 for (I_RelTuple rt : relTupList) {
+                    int authorNid = rt.getAuthorNid();
+                    if (authorNid == snorocketAuthorNid) 
+                        continue;
+                    
                     int charId = rt.getCharacteristicId();
                     boolean keep = false;
                     if (charId == isCh_DEFINING_CHARACTERISTIC) {
@@ -165,7 +174,7 @@ public class SnoPathProcessConcepts implements I_ProcessConcepts {
 
                     if (keep == true) {
                         if (snorels != null)
-                            snorels.add(new SnoRel(rt.getC1Id(), rt.getC2Id(), rt.getTypeId(), rt
+                            snorels.add(new SnoRel(rt.getC1Id(), rt.getC2Id(), rt.getTypeNid(), rt
                                     .getGroup(), rt.getNid()));
                         countRelAdded++;
 

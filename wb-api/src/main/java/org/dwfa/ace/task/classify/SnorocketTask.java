@@ -137,6 +137,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 	private static int sourceUnspecifiedNid;
 	private static int workbenchAuxPath = Integer.MIN_VALUE;
 
+    private static int snorocketAuthorNid = Integer.MIN_VALUE;
+
 	// NID SETS
 	I_IntSet statusSet = null;
 	PositionSetReadOnly cClassPosSet = null;
@@ -357,7 +359,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 			// GET EDIT_PATH CONCEPTS AND RELATIONSHIPS
 			cEditSnoCons = new ArrayList<SnoCon>();
 			cEditSnoRels = new ArrayList<SnoRel>();
-			SnoPathProcessConcepts pcEdit = new SnoPathProcessConcepts(logger,
+			SnoPathProcessStated pcEdit = new SnoPathProcessStated(logger,
 					cEditSnoCons, cEditSnoRels, allowedRoleTypes, statusSet,
 					cEditPosSet, gui, precedence, contradictionMgr);
 			tf.iterateConcepts(pcEdit); // :!!!:
@@ -1187,7 +1189,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 		// CREATE RELATIONSHIP PART W/ TermFactory-->VobdEnv
 		tf.newRelationshipNoCheck(UUID.randomUUID(), thisC1, rel_B.typeId,
 				rel_B.c2Id, isCh_DEFINING_CHARACTERISTIC,
-				isOPTIONAL_REFINABILITY, isCURRENT, rel_B.group, writeToNid,
+				isOPTIONAL_REFINABILITY, rel_B.group, isCURRENT, snorocketAuthorNid, writeToNid,
 				versionTime);
 
 		// :TODO: move addUncommittedNoChecks() to more efficient location.
@@ -1296,6 +1298,10 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 			sourceUnspecifiedNid = tf
 					.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
 							.getUids());
+			
+            snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET
+                    .getUids());
+
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 			return Condition.STOP;
@@ -2029,10 +2035,10 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 				for (SnoRel sr : srl) {
 					// RELATIONSHIPID + CONCEPTID1 + RELATIONSHIPTYPE +
 					// CONCEPTID2
-					bw.write("#" + index + "\t" + sr.c1Id + "\t" + sr.typeId
+					bw.write("\t" + sr.c1Id + "\t" + sr.typeId
 							+ "\t" + sr.c2Id + "\t");
 					// CHARACTERISTICTYPE + REFINABILITY + RELATIONSHIPGROUP
-					bw.write("NA\t" + "NA\t" + sr.group + "\r\n");
+					bw.write("0\t" + "0\t" + sr.group + "\r\n");
 					index += 1;
 				}
 			}
