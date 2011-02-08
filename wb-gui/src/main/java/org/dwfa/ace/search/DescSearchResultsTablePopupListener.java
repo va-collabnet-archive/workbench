@@ -129,8 +129,8 @@ public class DescSearchResultsTablePopupListener extends MouseAdapter implements
                         case CID_CID:
                             popup.addSeparator();
                             Collection<? extends I_ExtendByRef> extensions =
-                                    Terms.get().getAllExtensionsForComponent(
-                                        config.getRefsetSpecInSpecEditor().getConceptNid(), true);
+                                    Terms.get()
+                                        .getRefsetExtensionMembers(config.getRefsetSpecInSpecEditor().getConceptNid());
                             HashMap<Integer, I_ExtendByRef> memberIdBasedExtensionMap =
                                     new HashMap<Integer, I_ExtendByRef>();
                             memberIdBasedExtensionMap = populateMemberIdBasedExtensionMap(extensions);
@@ -233,12 +233,12 @@ public class DescSearchResultsTablePopupListener extends MouseAdapter implements
     private boolean clauseIsChildOfConceptContainsDesc(I_ExtendByRef specPart,
             HashMap<Integer, I_ExtendByRef> componentIdBasedExtensionMap) throws IOException, TerminologyException {
 
-        int conceptContainsRelNid = RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING.localize().getNid();
+        int conceptContainsDescNid = RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING.localize().getNid();
         I_ExtendByRefPartCidCid cidCidPart = (I_ExtendByRefPartCidCid) specPart;
-        if (cidCidPart.getC2id() == conceptContainsRelNid) {
+        if (cidCidPart.getC2id() == conceptContainsDescNid) {
             return true;
         } else {
-            I_ExtendByRef parentSpecPart = componentIdBasedExtensionMap.get(specPart.getComponentId());
+            I_ExtendByRef parentSpecPart = componentIdBasedExtensionMap.get(specPart.getComponentNid());
             if (parentSpecPart == null) {
                 return false;
             } else {

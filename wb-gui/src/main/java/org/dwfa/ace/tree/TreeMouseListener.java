@@ -158,8 +158,8 @@ public class TreeMouseListener extends MouseAdapter {
                         case CID_CID:
                             popup.addSeparator();
                             Collection<? extends I_ExtendByRef> extensions =
-                                    Terms.get().getAllExtensionsForComponent(
-                                        ace.getAceFrameConfig().getRefsetSpecInSpecEditor().getConceptNid(), true);
+                                    Terms.get().getRefsetExtensionMembers(
+                                        ace.getAceFrameConfig().getRefsetSpecInSpecEditor().getConceptNid());
                             HashMap<Integer, I_ExtendByRef> memberIdBasedExtensionMap =
                                     new HashMap<Integer, I_ExtendByRef>();
                             memberIdBasedExtensionMap = populateMemberIdBasedExtensionMap(extensions);
@@ -251,12 +251,12 @@ public class TreeMouseListener extends MouseAdapter {
     private boolean clauseIsChildOfConceptContainsDesc(I_ExtendByRef specPart,
             HashMap<Integer, I_ExtendByRef> componentIdBasedExtensionMap) throws IOException, TerminologyException {
 
-        int conceptContainsRelNid = RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING.localize().getNid();
+        int conceptContainsDescNid = RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING.localize().getNid();
         I_ExtendByRefPartCidCid cidCidPart = (I_ExtendByRefPartCidCid) specPart;
-        if (cidCidPart.getC2id() == conceptContainsRelNid) {
+        if (cidCidPart.getC2id() == conceptContainsDescNid) {
             return true;
         } else {
-            I_ExtendByRef parentSpecPart = componentIdBasedExtensionMap.get(specPart.getComponentId());
+            I_ExtendByRef parentSpecPart = componentIdBasedExtensionMap.get(specPart.getComponentNid());
             if (parentSpecPart == null) {
                 return false;
             } else {
