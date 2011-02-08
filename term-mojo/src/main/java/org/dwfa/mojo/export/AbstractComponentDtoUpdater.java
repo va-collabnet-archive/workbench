@@ -561,7 +561,7 @@ public abstract class AbstractComponentDtoUpdater {
     public final Map<Long,Long> getRf2ConceptEffectiveDateMap(final List<I_ConceptAttributeTuple> conceptTuples) throws Exception {
         Map<Long,Long> effectiveDateMap = new HashMap<Long,Long>();
         Collections.sort(conceptTuples, new TupleVersionComparator());
-        Collections.reverse(conceptTuples);
+
         I_ConceptAttributeTuple firstChange = null;
 
         for (I_ConceptAttributeTuple conceptAttributeTuple : conceptTuples) {
@@ -601,7 +601,7 @@ public abstract class AbstractComponentDtoUpdater {
     public final Map<Long,Long> getRf2DescriptionEffectiveDateMap(final List<I_DescriptionTuple> descriptionTuples) throws Exception {
         Map<Long,Long> effectiveDateMap = new HashMap<Long,Long>();
         Collections.sort(descriptionTuples, new TupleVersionComparator());
-        Collections.reverse(descriptionTuples);
+
         I_DescriptionTuple firstChange = null;
 
         for (I_DescriptionTuple conceptAttributeTuple : descriptionTuples) {
@@ -633,7 +633,7 @@ public abstract class AbstractComponentDtoUpdater {
     public final Map<Long,Long> getRf2RelationshipEffectiveDateMap(final List<I_RelTuple> relationshipTuples) throws Exception {
         Map<Long,Long> effectiveDateMap = new HashMap<Long,Long>();
         Collections.sort(relationshipTuples, new TupleVersionComparator());
-        Collections.reverse(relationshipTuples);
+
         I_RelTuple firstChange = null;
 
         for (I_RelTuple replationshipTuple : relationshipTuples) {
