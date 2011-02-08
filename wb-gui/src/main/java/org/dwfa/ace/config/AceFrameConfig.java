@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -337,7 +337,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     // 45
     private I_GetConceptData classificationRoleRoot;
-    
+
     // 46, 47
     private Precedence precedence;
 
@@ -360,9 +360,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private transient BundleType bundleType;
 
     private boolean autoApprovedOn = false;
-    
+
     private boolean overrideOn = false;
-    
+
     private TreeSet<? extends I_GetConceptData> workflowRoles = null;
 
     private TreeSet<? extends I_GetConceptData> workflowStates = null;
@@ -556,7 +556,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
         // 45
         writeConceptAsId(classificationRoleRoot, out);
-        
+
         // 46; 47 changed implementation class
         out.writeObject(precedence);
 
@@ -1017,7 +1017,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             } else {
                 classificationRoleRoot = null;
             }
-            
+
             if (objDataVersion == 46) {
             	PRECEDENCE p = (PRECEDENCE) in.readObject();
             	precedence = p.getTkPrecedence();
@@ -1053,7 +1053,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                     throw new IOException(ex);
                }
             }
-              
+
 
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -1063,9 +1063,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
    @Override
    public EditCoordinate getEditCoordinate() {
-      
+
       NidSet editPaths = new NidSet(editingPathSet);
-      return new EditCoordinate(getDbConfig().getUserConcept().getNid(), 
+      return new EditCoordinate(getDbConfig().getUserConcept().getNid(),
               editPaths);
    }
 
@@ -2699,7 +2699,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /**
      * Sets the conflict resolution strategy for this profile
-     * 
+     *
      * @param conflictResolutionStrategy
      */
     public void setConflictResolutionStrategy(I_ManageContradiction conflictResolutionStrategy) {
@@ -2713,7 +2713,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /**
      * Sets the conflict resolution strategy for this profile
-     * 
+     *
      * @param contradictionStrategy
      */
     public <T extends I_ManageContradiction> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
@@ -2772,25 +2772,25 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public I_GetConceptData getRefsetInSpecEditor() {
-        if (aceFrame != null && aceFrame.getCdePanel() != null) 
+        if (aceFrame != null && aceFrame.getCdePanel() != null)
             return aceFrame.getCdePanel().getRefsetInSpecEditor();
         return null;
     }
 
     public I_ExtendByRef getSelectedRefsetClauseInSpecEditor() {
-        if (aceFrame != null && aceFrame.getCdePanel() != null) 
+        if (aceFrame != null && aceFrame.getCdePanel() != null)
             return aceFrame.getCdePanel().getSelectedRefsetClauseInSpecEditor();
         return null;
     }
 
     public JTree getTreeInSpecEditor() {
-        if (aceFrame != null && aceFrame.getCdePanel() != null) 
+        if (aceFrame != null && aceFrame.getCdePanel() != null)
             return aceFrame.getCdePanel().getTreeInSpecEditor();
         return null;
     }
 
     public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {
-        if (aceFrame != null && aceFrame.getCdePanel() != null) 
+        if (aceFrame != null && aceFrame.getCdePanel() != null)
             return aceFrame.getCdePanel().getRefsetSpecInSpecEditor();
         return null;
     }
@@ -2860,7 +2860,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public I_IntList getLanguagePreferenceList() {
         if (languagePreferenceList == null) {
             languagePreferenceList = new IntList();
-        } 
+        }
         if (languagePreferenceList.size() == 0) {
         	try {
 				languagePreferenceList.add(ArchitectonicAuxiliary.Concept.EN_US.localize().getNid());
@@ -3084,7 +3084,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         this.searchWithDescTypeFilter = searchWithDescTypeFilter;
         this.changeSupport.firePropertyChange("searchWithDescTypeFilter", old, searchWithDescTypeFilter);
     }
-    
+
     public Precedence getPrecedence() {
         return precedence;
     }
@@ -3093,7 +3093,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         Precedence old = this.precedence;
         this.precedence = precedence;
         this.changeSupport.firePropertyChange("precedence", old, precedence);
-        this.changeSupport.firePropertyChange("viewPositions", null, this.viewPositions);        
+        this.changeSupport.firePropertyChange("viewPositions", null, this.viewPositions);
     }
 
     public void setSelectedPreferencesTab(String tabName) {
@@ -3153,19 +3153,21 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	@Override
 	public ViewCoordinate getViewCoordinate() {
 		if (languagePreferenceList != null && languagePreferenceList.size()>1) {
-			return  new ViewCoordinate(getPrecedence(), getViewPositionSetReadOnly(), 
+			return  new ViewCoordinate(getPrecedence(), getViewPositionSetReadOnly(),
 					getAllowedStatus(), getDestRelTypes(),
                                         getConflictResolutionStrategy(),
                                         languagePreferenceList.get(0),
                                         classifierConcept.getConceptNid(),
-                                        relAssertionType);
+                                        relAssertionType,
+                 getLanguagePreferenceList());
 		} else {
-			return  new ViewCoordinate(getPrecedence(), getViewPositionSetReadOnly(), 
+			return  new ViewCoordinate(getPrecedence(), getViewPositionSetReadOnly(),
 					getAllowedStatus(), getDestRelTypes(),
                                         getConflictResolutionStrategy(),
                                         Integer.MAX_VALUE,
                                         classifierConcept.getConceptNid(),
-                                        relAssertionType);
+                                        relAssertionType,
+                 getLanguagePreferenceList());
 		}
 	}
 
@@ -3190,7 +3192,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
 	@Override
 	public boolean isAutoApproveOn() {
-		
+
 		return autoApprovedOn;
 	}
 
@@ -3199,11 +3201,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
 			this.autoApprovedOn = b;
 	}
-	
-	
+
+
 	@Override
 	public boolean isOverrideOn() {
-		
+
 		return overrideOn;
 	}
 
@@ -3217,7 +3219,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	public TreeSet<? extends I_GetConceptData> getWorkflowRoles() {
 		if (workflowRoles == null)
 			WorkflowHelper.updateWorkflowUserRoles();
-		
+
 		return workflowRoles;
 	}
 
@@ -3230,7 +3232,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	public TreeSet<? extends I_GetConceptData> getWorkflowStates() {
 		if (workflowStates == null)
 			WorkflowHelper.updateWorkflowStates();
-		
+
 		return workflowStates;
 	}
 
@@ -3238,12 +3240,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	public void setWorkflowStates(TreeSet<? extends I_GetConceptData> states) {
 		workflowStates = states;
 	}
-	
+
 	@Override
 	public TreeSet<? extends I_GetConceptData> getWorkflowActions() {
 		if (workflowActions == null)
 			WorkflowHelper.updateWorkflowActions();
-		
+
 		return workflowActions;
 	}
 
@@ -3256,7 +3258,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	public TreeSet<UUID> getAllAvailableWorkflowActionUids() {
 		if (availableWorkflowActions == null)
 			WorkflowHelper.updateWorkflowActions();
-		
+
 		return availableWorkflowActions;
 	}
 

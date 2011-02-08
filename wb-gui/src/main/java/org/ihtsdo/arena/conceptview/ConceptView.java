@@ -110,6 +110,7 @@ public class ConceptView extends JPanel {
 
       @Override
       protected Map<SpecBI, Integer> doInBackground() throws Exception {
+         //TODO move all layout to background thread, and return a complte panel...
          layoutConcept = concept;
          if (layoutConcept != null) {
             coordinate = config.getViewCoordinate();
@@ -149,6 +150,13 @@ public class ConceptView extends JPanel {
                   gbc.gridx = 1;
                   gbc.gridy = 0;
 
+                  for (PathBI path: paths) {
+                     ConceptVersionBI pathVersion =
+                             Ts.get().getConceptVersion(coordinate, path.getConceptNid());
+                     add(new JLabel(pathVersion.toString()), gbc);
+                    //TODO add(new JLabel(pathVersion.getPreferredDescription().getText()), gbc);
+                     gbc.gridy++;
+                  }
 
                   CollapsePanel cpe = new CollapsePanel("concept:", settings,
                           prefMap.get(PanelSection.CONCEPT), PanelSection.CONCEPT);

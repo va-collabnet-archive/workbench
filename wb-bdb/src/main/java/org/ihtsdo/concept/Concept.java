@@ -611,7 +611,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
               allowedStatus, null,
               new IdentifyAllConflictStrategy(), Integer.MIN_VALUE,
               Integer.MIN_VALUE,
-              RelAssertionType.STATED);
+              RelAssertionType.STATED, typePrefOrder);
       if (descriptions.size() > 0) {
          if (descriptions.size() > 1) {
             for (int typePrefNid : typePrefOrder.getListArray()) {
@@ -1111,7 +1111,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
            throws IOException, TerminologyException {
 
       ViewCoordinate coordinate = new ViewCoordinate(precedencePolicy,
-              positions, allowedStatus, allowedTypes, contradictionManager, Integer.MIN_VALUE, classifierNid, relAssertionType);
+              positions, allowedStatus, allowedTypes, contradictionManager,
+              Integer.MIN_VALUE, classifierNid, relAssertionType, null);
       List<Relationship.Version> actualValues = new ArrayList<Relationship.Version>();
       for (Relationship rel : getSourceRels()) {
          for (Relationship.Version rv : rel.getVersions(coordinate)) {
@@ -1185,6 +1186,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
       return data.getAllNids();
    }
 
+   @Override
    public Set<Integer> getAllSapNids() throws IOException {
       Set<Integer> sapNids = new HashSet<Integer>();
       sapNids.addAll(getConceptAttributes().getComponentSapNids());
@@ -1485,7 +1487,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
            throws IOException {
 
       ViewCoordinate coordinate = new ViewCoordinate(precedencePolicy,
-              positions, allowedStatus, allowedTypes, contradictionManager, Integer.MIN_VALUE, classifierNid, relAssertionType);
+              positions, allowedStatus, allowedTypes, contradictionManager,
+              Integer.MIN_VALUE, classifierNid, relAssertionType, null);
       List<Relationship.Version> actualValues = new ArrayList<Relationship.Version>();
       for (Relationship rel : getDestRels(coordinate.getIsaTypeNids())) {
          for (Relationship.Version relv : rel.getVersions(coordinate)) {

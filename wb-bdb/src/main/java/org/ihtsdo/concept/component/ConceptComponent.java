@@ -1869,7 +1869,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       }
       sapNids.addAll(getIdSapNids());
       sapNids.addAll(getAnnotationSapNids());
-      sapNids.addAll(getRefsetMemberSapNids());
       return sapNids;
    }
 

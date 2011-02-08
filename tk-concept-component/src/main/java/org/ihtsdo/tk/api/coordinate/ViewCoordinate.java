@@ -1,6 +1,7 @@
 package org.ihtsdo.tk.api.coordinate;
 
 import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -16,13 +17,14 @@ public class ViewCoordinate {
     private int languageNid;
     private int classifierNid;
     private RelAssertionType relAssertionType;
+    private NidListBI langPrefList;
 
     public ViewCoordinate(Precedence precedence, PositionSetBI positionSet,
             NidSetBI allowedStatusNids, NidSetBI isaTypeNids,
             ContradictionManagerBI contradictionManager,
             int languageNid,
             int classifierNid,
-            RelAssertionType relAssertionType) {
+            RelAssertionType relAssertionType, NidListBI langPrefList) {
         super();
         assert precedence != null;
         assert contradictionManager != null;
@@ -34,9 +36,14 @@ public class ViewCoordinate {
         this.languageNid = languageNid;
         this.classifierNid = classifierNid;
         this.relAssertionType = relAssertionType;
+        this.langPrefList = langPrefList;
     }
 
-    public PositionSetBI getPositionSet() {
+   public NidListBI getLangPrefList() {
+      return langPrefList;
+   }
+
+   public PositionSetBI getPositionSet() {
         return positionSet;
     }
 

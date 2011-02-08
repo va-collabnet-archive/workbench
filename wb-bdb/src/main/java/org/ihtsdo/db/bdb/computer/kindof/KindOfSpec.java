@@ -16,8 +16,8 @@ import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public class KindOfSpec {
-	
-	
+
+
 	/**
 	 * The view position for which this cache is valid.
 	 */
@@ -46,36 +46,36 @@ public class KindOfSpec {
 	 */
 	public NidSetBI allowedStatusNids;
 	/**
-	 * The set of destination rels nids for which this cache is valid. 
+	 * The set of destination rels nids for which this cache is valid.
 	 */
 	public NidSetBI relTypeNids;
 	/**
 	 * The cNid of the kind this cache represents.
 	 */
 	public int kindNid;
-	
+
 	public Precedence precedence;
-	
+
 	public ContradictionManagerBI contradictionMgr;
-	
+
 	/**
 	 * cached value so that viewPositionSet does not have to be recreated
-	 * each time a query is perfomed. 
+	 * each time a query is perfomed.
 	 */
 	private PositionSetReadOnly viewPositionSet;
 
         private int classifierNid;
 
         private RelAssertionType relAssertionType;
-	
+
 	public ViewCoordinate getCoordinate() {
-		return new ViewCoordinate(precedence, viewPositionSet, 
+		return new ViewCoordinate(precedence, viewPositionSet,
                         allowedStatusNids, relTypeNids,
                         contradictionMgr, Integer.MIN_VALUE,
-                        classifierNid, relAssertionType);
+                        classifierNid, relAssertionType, null);
 	}
 	public KindOfSpec(PositionBI viewPosition, NidSetBI allowedStatus,
-			NidSetBI relTypeNids, int kindNid, Precedence precedence, 
+			NidSetBI relTypeNids, int kindNid, Precedence precedence,
 			ContradictionManagerBI contradictionMgr, int classifierNid,
                         RelAssertionType relAssertionType) {
 		super();
@@ -83,7 +83,7 @@ public class KindOfSpec {
 		this.allowedStatusNids = new IntSet(allowedStatus.getSetValues());
 		assert allowedStatus != null: "Cannot use null wildcard for allowed status.";
 		assert allowedStatus.size() != 0: "Cannot use an empty set for allowed status.";
-		assert allowedStatus.contains(ReferenceConcepts.RETIRED.getNid()) == false: 
+		assert allowedStatus.contains(ReferenceConcepts.RETIRED.getNid()) == false:
 			"Cannot include a retired status. May surface cycles: " + allowedStatus;
 		this.relTypeNids = new IntSet(relTypeNids.getSetValues());
 		this.kindNid = kindNid;
@@ -117,11 +117,11 @@ public class KindOfSpec {
 	public int hashCode() {
 		return HashFunction.hashCode(new int[] {kindNid, viewPosition.getPath().getConceptNid()});
 	}
-	
+
 	public PositionSetReadOnly getViewPositionSet() {
 		return viewPositionSet;
 	}
-	
+
 	public String toString() {
 		StringBuffer buff = new StringBuffer();
 		buff.append("KindOfSpec: viewPosition: ");
@@ -140,10 +140,10 @@ public class KindOfSpec {
 		}
 		buff.append("\n viewPositions: ");
 		buff.append(viewPositionSet);
-		
+
 		return buff.toString();
 	}
-	
-	
+
+
 
 }

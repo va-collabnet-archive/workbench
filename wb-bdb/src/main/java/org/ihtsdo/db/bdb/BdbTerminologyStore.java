@@ -96,7 +96,8 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
                  contradictionManager,
                  languageNid,
                  classifierNid,
-                 RelAssertionType.STATED);
+                 RelAssertionType.STATED,
+                 null);
       }
       return metadataVC;
    }
@@ -448,7 +449,9 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
       HashSet<PathBI> paths = new HashSet<PathBI>(sapNids.size());
       for (int sap: sapNids) {
          try {
-            paths.add(Bdb.getSapDb().getPosition(sap).getPath());
+            PathBI path = Bdb.getSapDb().getPosition(sap).getPath();
+            paths.add(path);
+            addOrigins(paths, path.getOrigins());
          } catch (PathNotExistsException ex) {
             throw new IOException(ex);
          } catch (TerminologyException ex) {
@@ -458,12 +461,23 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
       return paths;
   }
 
+   private void addOrigins(Set<PathBI> paths, Collection<? extends PositionBI> origins) {
+      if (origins == null) {
+         return;
+      }
+      for (PositionBI o: origins) {
+         paths.add(o.getPath());
+         addOrigins(paths, o.getPath().getOrigins());
+       }
+   }
+
    @Override
    public Set<PathBI> getPathSetFromPositionSet(Set<PositionBI> positions)
            throws IOException  {
       HashSet<PathBI> paths = new HashSet<PathBI>(positions.size());
       for (PositionBI position: positions) {
          paths.add(position.getPath());
+         addOrigins(paths, position.getPath().getInheritedOrigins());
       }
       return paths;
    }

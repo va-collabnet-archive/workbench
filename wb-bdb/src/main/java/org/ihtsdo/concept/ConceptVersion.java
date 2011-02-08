@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
@@ -22,7 +23,10 @@ import org.ihtsdo.concept.component.relationship.group.RelGroupVersion;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidList;
+import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
@@ -573,8 +577,26 @@ public class ConceptVersion implements ConceptVersionBI {
     @Override
     public DescriptionVersionBI getPreferredDescription() throws IOException,
             ContraditionException {
-        throw new UnsupportedOperationException();
-    }
+       /*
+       I_IntList typePrefOrder,
+           I_IntList langPrefOrder, NidSetBI allowedStatus,
+           PositionSetBI positionSet, LANGUAGE_SORT_PREF sortPref,
+           Precedence precedencePolicy, ContradictionManagerBI contradictionManager
+        *
+        */
+       /*
+        NidListBI typePrefOrder = new NidList(values);
+        return concept.getDescTuple(typePrefOrder,
+                vc.getLangPrefList(),
+                vc.getAllowedStatusNids(),
+                vc.getPositionSet(),
+                LANGUAGE_SORT_PREF.LANG_REFEX,
+                vc.getPrecedence(),
+                vc.getContradictionManager());
+        *
+        */
+          throw new UnsupportedOperationException();
+  }
 
     @Override
     public Collection<? extends DescriptionVersionBI> getSynonyms()
