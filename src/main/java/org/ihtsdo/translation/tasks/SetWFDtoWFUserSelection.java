@@ -150,6 +150,21 @@ public class SetWFDtoWFUserSelection extends AbstractTask {
 			FileLink link1 = new FileLink(new File("sampleProcesses/TranslationWorkflow.bp"), 
 					tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
 			flApi.putLinkInConfig(link1);
+			FileLink link2 = new FileLink(new File("sampleProcesses/MaintenanceWorkflow.bp"), 
+					tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
+			flApi.putLinkInConfig(link2);
+			FileLink link3 = new FileLink(new File("sampleProcesses/IsolatedEdit.bp"), 
+					tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
+			flApi.putLinkInConfig(link3);
+			FileLink link4 = new FileLink(new File("sampleProcesses/TranslationWorkflowCa.bp"), 
+					tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
+			flApi.putLinkInConfig(link4);
+			FileLink link5 = new FileLink(new File("sampleProcesses/TranslationWorkflowCaFastTrack.bp"), 
+					tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
+			flApi.putLinkInConfig(link5);
+			FileLink link6 = new FileLink(new File("sampleProcesses/TranslationWorkflowDk.bp"), 
+					tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
+			flApi.putLinkInConfig(link6);
 			//			// end testing fixture
 
 
