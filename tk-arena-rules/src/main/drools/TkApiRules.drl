@@ -29,7 +29,7 @@ import org.ihtsdo.tk.example.binding.HistoricalRelType;
 import java.util.ArrayList;
 import org.ihtsdo.tk.spec.RelSpecFromConcept;
 import javax.swing.JOptionPane;
-import org.ihtsdo.arena.context.action.RetireIsaRels;
+
 
 
 #declare any global variables here
