@@ -23,6 +23,8 @@ import java.awt.GridBagLayout;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
@@ -33,9 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.InstructAndWait;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -44,9 +44,6 @@ import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.jini.TermEntry;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
@@ -54,15 +51,14 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 import org.ihtsdo.tk.api.WizardBI;
-import javax.swing.JPanel;
+import org.ihtsdo.tk.example.binding.Snomed;
 
 
 
 //import org.ihtsdo.arena;
 
-@BeanList(specs = { @Spec(directory = "tasks/ide/instruct", type = BeanType.TASK_BEAN),
-        @Spec(directory = "tasks/ide/wfpanel", type = BeanType.TASK_BEAN) })
-public class SelectInactiveParent extends PreviousNextOrCancel {
+@BeanList(specs = { @Spec(directory = "tasks/arena", type = BeanType.TASK_BEAN)})
+public class SelectExtension extends PreviousNextOrCancel {
 
     /*
      * -----------------------
@@ -74,7 +70,7 @@ public class SelectInactiveParent extends PreviousNextOrCancel {
     private static final int dataVersion = 1;
 
     // Task Attribute Properties
-    private String instruction = "<html>Select Parent for Concept Being Retired:";
+    private String instruction = "<html>Select extension for concept being moved:";
     private String relParentPropName = ProcessAttachmentKeys.REL_PARENT.getAttachmentKey();
 
     // Other Properties
@@ -225,19 +221,18 @@ public class SelectInactiveParent extends PreviousNextOrCancel {
             // Add the Refset Purpose List ComboBox
             c.gridx++;
             c.gridy = 0;
-            I_GetConceptData parentList[] = new I_GetConceptData[11];
+            I_GetConceptData parentList[] = new I_GetConceptData[3];
             try {
-            	parentList[0] = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CONFLICTING.getUids());
-            	parentList[1] = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.NOT_YET_CREATED.getUids());
-            	parentList[2] = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
-            	parentList[3] = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.RETIRED_MISSPELLED.getUids());
-            	parentList[4] = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.DUPLICATE.getUids());
-            	parentList[5] = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.OUTDATED.getUids());
-            	parentList[6] = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.AMBIGUOUS.getUids());
-            	parentList[7] = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.ERRONEOUS.getUids());
-            	parentList[8] = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.INAPPROPRIATE.getUids());
-            	parentList[9] = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IMPLIED_RELATIONSHIP.getUids());
-            	parentList[10] = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.EXTINCT.getUids());
+            	UUID[] uuidsArray = Snomed.CORE.getUuids();
+            	List<UUID> uuidsCore = Arrays.asList(uuidsArray);
+            	uuidsArray = Snomed.EXTENSION_0.getUuids();
+            	List<UUID> uuidsExtn1 = Arrays.asList(uuidsArray);
+            	uuidsArray = Snomed.EXTENSION_13.getUuids();
+            	List<UUID> uuidsExtn2 = Arrays.asList(uuidsArray);
+            	
+            	parentList[0] = Terms.get().getConcept(uuidsCore);
+            	parentList[1] = Terms.get().getConcept(uuidsExtn1);
+            	parentList[2] = Terms.get().getConcept(uuidsExtn2);
             } catch (TerminologyException e) {
                 e.printStackTrace();
             } catch (IOException e) {
