@@ -18,7 +18,6 @@ package org.dwfa.ace.search;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.SortedSet;
 import java.util.logging.Level;
 
@@ -31,7 +30,6 @@ import org.dwfa.ace.api.I_TrackContinuation;
 import org.dwfa.ace.config.FrameConfigSnapshot;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.swing.SwingWorker;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetSearcher;
@@ -39,7 +37,7 @@ import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetSearcher;
 public class SearchWfHistoryStringWorker extends SwingWorker<I_UpdateProgress> implements I_TrackContinuation {
     boolean continueWork = true;
 
-    MySearchPanel wfSearchPanel;
+    WorkflowHistorySearchPanel wfSearchPanel;
 
     private WorkflowHistoryRefsetSearcher searcher = null;
     
@@ -96,7 +94,7 @@ public class SearchWfHistoryStringWorker extends SwingWorker<I_UpdateProgress> i
     }
     
     
-    public SearchWfHistoryStringWorker(MySearchPanel wfSearchPanel, WorkflowHistoryTableModel model,
+    public SearchWfHistoryStringWorker(WorkflowHistorySearchPanel wfSearchPanel, WorkflowHistoryTableModel model,
             I_ConfigAceFrame config, boolean wfIP, boolean wfCompleted, boolean wfSearchPreviousReleases) {
         super();
         this.config = new FrameConfigSnapshot(config);
@@ -124,7 +122,7 @@ public class SearchWfHistoryStringWorker extends SwingWorker<I_UpdateProgress> i
     	I_UpdateProgress updater = new WfHxProgressUpdator();
     	searcher = new WorkflowHistoryRefsetSearcher();
 
-    	int totalWfCount = searcher.getTotalCount();
+    	int totalWfCount = searcher.getTotalMemberCount();
 
 //        completeLatch = new CountDownLatch(totalWfCount);
         
@@ -204,7 +202,7 @@ public class SearchWfHistoryStringWorker extends SwingWorker<I_UpdateProgress> i
         public void actionPerformed(ActionEvent e) {
             if (continueWork) {
                 if (firstUpdate) {
-                	int searchSize = searcher.getTotalCount();
+                	int searchSize = searcher.getTotalMemberCount();
 
                 	wfSearchPanel.setProgressInfo("   Starting Workflow History search   ");
                     if (searchSize > 0) {

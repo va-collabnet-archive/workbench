@@ -39,10 +39,10 @@ public class RemoveCriterion implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-    	if (MySearchPanel.class.isInstance(this.searchPanel))
+    	if (WorkflowHistorySearchPanel.class.isInstance(this.searchPanel))
     	{
-    		if (((MySearchPanel)this.searchPanel).getWorkflowHistoryCriterionPanels().size() > 1)
-    			((MySearchPanel)this.searchPanel).getWorkflowHistoryCriterionPanels().remove(criterionPanel);
+    		if (((WorkflowHistorySearchPanel)this.searchPanel).getWorkflowHistoryCriterionPanels().size() > 1)
+    			((WorkflowHistorySearchPanel)this.searchPanel).getWorkflowHistoryCriterionPanels().remove(criterionPanel);
     	} else
         this.searchPanel.getCriterionPanels().remove(criterionPanel);
         this.searchPanel.layoutCriterion();

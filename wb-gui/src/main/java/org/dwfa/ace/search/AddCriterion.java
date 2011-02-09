@@ -44,8 +44,8 @@ public class AddCriterion implements ActionListener {
             searchPanel.getCriterionPanels().add(searchPanel.makeCriterionPanel());
         	else
         	{
-        		WorkflowHistoryCriterionPanel panel = ((MySearchPanel)searchPanel).makeCriterionPanel();
-        		((MySearchPanel)searchPanel).getWorkflowHistoryCriterionPanels().add(panel);
+        		WorkflowHistoryCriterionPanel panel = ((WorkflowHistorySearchPanel)searchPanel).makeCriterionPanel();
+        		((WorkflowHistorySearchPanel)searchPanel).getWorkflowHistoryCriterionPanels().add(panel);
         	}
         } catch (ClassNotFoundException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
