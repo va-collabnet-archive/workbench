@@ -72,6 +72,7 @@ import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkSet;
+import org.ihtsdo.project.panel.ExportDescrAndLangSubsetPanel;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.project.panel.dnd.GetAndSetIssueRepo;
 import org.ihtsdo.project.panel.dnd.I_UpdateRepository;
@@ -109,6 +110,9 @@ public class ProjectDetailsPanel extends JPanel {
 		this.config = config;
 		I_TermFactory tf = Terms.get();
 		try {
+			ExportDescrAndLangSubsetPanel expPanel=new ExportDescrAndLangSubsetPanel(project);
+			expPanel.revalidate();
+			tabbedPane1.addTab("Export Target Language", expPanel);
 			//TODO: hardcoded test fixture, for demo purposes
 			FileLinkAPI flApi = new FileLinkAPI(config);
 			FileLink link1 = new FileLink(new File("sampleProcesses/TranslationWorkflow.bp"), 
