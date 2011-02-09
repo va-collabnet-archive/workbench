@@ -1018,13 +1018,13 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             ContradictionManagerBI contradictionManager,
             int classifierNid, RelAssertionType relAssertionType)
             throws IOException, TerminologyException {
-    	
-        Coordinate coordinate = new Coordinate(precedencePolicy, 
+
+        Coordinate coordinate = new Coordinate(precedencePolicy,
         		positions, allowedStatus, allowedTypes, contradictionManager, Integer.MIN_VALUE, classifierNid, relAssertionType);
         List<Relationship.Version> actualValues = new ArrayList<Relationship.Version>();
         for (Relationship rel : getSourceRels()) {
         	actualValues.addAll(rel.getVersions(coordinate));
-        }        
+        }
         return actualValues;
     }
 
@@ -1122,7 +1122,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     /**
      * Returns a longer - more complete - string representation of the object.
-     * 
+     *
      * @return
      */
     @Override
@@ -1204,7 +1204,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     @Override
     public boolean isUncommitted() {
-        return data.isUncommitted();
+        return data.isUnwritten() || data.isUncommitted();
     }
 
     public boolean isUnwritten() {
@@ -1368,13 +1368,13 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             ContradictionManagerBI contradictionManager,
             int classifierNid, RelAssertionType relAssertionType)
             throws IOException {
-    	
-        Coordinate coordinate = new Coordinate(precedencePolicy, 
+
+        Coordinate coordinate = new Coordinate(precedencePolicy,
         		positions, allowedStatus, allowedTypes, contradictionManager, Integer.MIN_VALUE, classifierNid, relAssertionType);
         List<Relationship.Version> actualValues = new ArrayList<Relationship.Version>();
         for (Relationship rel : getDestRels()) {
         	actualValues.addAll(rel.getVersions(coordinate));
-        }        
+        }
         return actualValues;
     }
 
