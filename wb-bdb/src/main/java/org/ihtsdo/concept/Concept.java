@@ -1164,7 +1164,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     @Override
     public boolean isUncommitted() {
-        return data.isUncommitted();
+        return  data.isUnwritten() || data.isUncommitted();
     }
 
     public boolean isUnwritten() {
