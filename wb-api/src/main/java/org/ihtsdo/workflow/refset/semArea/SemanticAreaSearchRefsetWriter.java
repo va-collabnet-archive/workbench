@@ -1,10 +1,10 @@
 package org.ihtsdo.workflow.refset.semArea;
 
 import java.io.IOException;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
@@ -27,22 +27,40 @@ public class SemanticAreaSearchRefsetWriter extends WorkflowRefsetWriter
 		setRefsetId(refset.getRefsetId());
 	}
 	
+	public void setReferencedComponentId(UUID uid) {
+		((SemanticAreaSearchRSFields)fields).setReferencedComponentUid(uid);
+	}
+	
+	public void setHierarchy(I_GetConceptData hierarchy) {
+		setReferencedComponentId(hierarchy.getPrimUuid());
+	}
+	
 	public void setSearchTerm(String term) {
 		((SemanticAreaSearchRSFields)fields).setSearchTerm(term);
 	}
 	
-	public void setHierarchy(I_GetConceptData hierarchy) {
-		((SemanticAreaSearchRSFields)fields).setHierarchy(hierarchy);
+	
+	public UUID getReferencedComponentUid() {
+		return ((SemanticAreaSearchRSFields)fields).getReferencedComponentId();
+	}
+
+	public I_GetConceptData getHierarchy() {
+		try {
+			return Terms.get().getConcept(getReferencedComponentUid());
+		} catch (Exception e) {
+	    	AceLog.getAppLog().log(Level.SEVERE, "Unable to get the Category (refCompId) from the SemanticAreaSearch Refset", e);
+		}
+		
+		return null;
 	}
 
 	public String getSearchTerm() {
 		return ((SemanticAreaSearchRSFields)fields).getSearchTerm();
 	}
 
-	public I_GetConceptData getHierarchy() {
-		return ((SemanticAreaSearchRSFields)fields).getHierarchy();
-	}
-
+	
+	
+	
 	private class SemanticAreaSearchRSFields extends WorkflowRefsetFields {
 		private String searchTerm = null;
 		 		
@@ -50,18 +68,40 @@ public class SemanticAreaSearchRefsetWriter extends WorkflowRefsetWriter
 
 		}
 		
-		private void setHierarchy(I_GetConceptData hierarchy) {
-			setReferencedComponentId(hierarchy);
+		public void setReferencedComponentUid(UUID uid) {
+			try {
+				setReferencedComponentId(uid);
+			} catch (Exception e) {
+		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: ", e);
+			}
 		}
-
-		private I_GetConceptData getHierarchy() {
-			return getReferencedComponentId();
+		
+		private void setHierarchy(I_GetConceptData hierarchy) {
+			setReferencedComponentUid(hierarchy.getPrimUuid());
 		}
 		
 		private void setSearchTerm(String term) {
 			searchTerm = term;
 		}
 
+		public I_GetConceptData getReferencedComponent() {
+			try {
+				return Terms.get().getConcept(getReferencedComponentId());
+			} catch (Exception e) {
+		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: ", e);
+			}
+			
+			return null;
+		}
+		
+		public UUID getReferencedComponentUid() {
+			return getReferencedComponentId();
+		}
+		
+		public I_GetConceptData getHierarchy() {
+			return getReferencedComponent();
+		}
+		
 		private String getSearchTerm() {
 			return searchTerm;
 		}
@@ -91,10 +131,13 @@ public class SemanticAreaSearchRefsetWriter extends WorkflowRefsetWriter
 			if (!retVal)
 			{
 				StringBuffer str = new StringBuffer();
-				str.append("\nError in adding to Semantic Area Search Refset");
-				str.append("\nReferencedComponentId:" + getReferencedComponentId());
-				str.append("\nsearchTerm:" + searchTerm);
-				AceLog.getAppLog().log(Level.WARNING, str.toString(), new Exception("Failure in updating Semantic Area Search Refset"));
+				try {
+					str.append("\nError in adding to Semantic Area Search Refset");
+					str.append("\nReferencedComponentId:" + getReferencedComponent().getInitialText());
+					str.append("\nsearchTerm:" + searchTerm);
+				} catch (Exception e) {
+					AceLog.getAppLog().log(Level.WARNING, str.toString(), new Exception("Failure in updating Semantic Area Search Refset", e));
+				}
 			}
 			
 			return retVal;

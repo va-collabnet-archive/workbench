@@ -112,7 +112,7 @@ public class SemanticHierarchyDropDown extends AbstractWorkflowHistorySearchTest
             	return false;
             }
             I_GetConceptData parentHierarchy = translateStringToHierarchy(testHierarchy);    		
-            I_GetConceptData testConcept = Terms.get().getConcept(bean.getConceptId());
+            I_GetConceptData testConcept = Terms.get().getConcept(bean.getConcept());
             
     		if (parentHierarchy.isParentOfOrEqualTo(testConcept, getFrameConfig().getAllowedStatus(), getFrameConfig().getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(), getFrameConfig().getConflictResolutionStrategy())) 
     			return true;

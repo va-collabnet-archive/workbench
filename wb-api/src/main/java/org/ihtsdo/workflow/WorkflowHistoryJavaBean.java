@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.logging.Level;
 
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.workflow.WorkflowHistoryJavaBeanBI;
 
 
@@ -18,19 +16,28 @@ import org.ihtsdo.tk.api.workflow.WorkflowHistoryJavaBeanBI;
 * 
 */
 public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
+	private UUID releaseDescription = null;
 	private UUID workflowId = null;
-	private UUID conceptId = null;
-	private UUID useCase = null;
+	private UUID concept = null;
 	private UUID path = null;
 	private UUID modeler = null;
 	private UUID action = null;
 	private UUID state = null;
 	private String fsn = null;
-	private Long timeStamp = null;
+	private Long workflowTime = null;
+	private Long effectiveTime = null;
 	private boolean autoApproved;
 	private boolean overridden;
-	
-	private Long refsetColumnTimeStamp = null;
+
+	@Override
+	public void setReleaseDescription(UUID id ) {
+		releaseDescription = id;
+	}
+
+	@Override
+	public UUID getReleaseDescription() {
+		return releaseDescription;
+	}
 
 	@Override
 	public void setWorkflowId(UUID id ) {
@@ -43,23 +50,13 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 	}
 
 	@Override
-	public void setConceptId(UUID id ) {
-		conceptId = id;
+	public void setConcept(UUID id ) {
+		concept = id;
 	}
 
 	@Override
-	public UUID getConceptId() {
-		return conceptId;
-	}
-
-	@Override
-	public void setUseCase(UUID id ) {
-		useCase = id;
-	}
-
-	@Override
-	public UUID getUseCase() {
-		return useCase;
+	public UUID getConcept() {
+		return concept;
 	}
 
 	@Override
@@ -113,15 +110,25 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 	}
 
 	@Override
-	public void setTimeStamp(Long t ) {
-		timeStamp = t;
+	public void setEffectiveTime(Long t ) {
+		effectiveTime = t;
 	}
 
 	@Override
-	public Long getTimeStamp() {
-		return timeStamp;
+	public Long getEffectiveTime() {
+		return effectiveTime;
 	}
 
+	@Override
+	public void setWorkflowTime(Long t ) {
+		workflowTime = t;
+	}
+
+	@Override
+	public Long getWorkflowTime() {
+		return workflowTime;
+	}
+	
 	public boolean getAutoApproved() {
 		return autoApproved;
 	}
@@ -138,41 +145,22 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 		overridden = b;
 	}
 
-	
-	
-	@Override
-	public void setRefsetColumnTimeStamp(Long t) {
-		refsetColumnTimeStamp = t;
-		
-	}
-
-	@Override
-	public Long getRefsetColumnTimeStamp() {
-		return refsetColumnTimeStamp;
-	}
-
-	public I_GetConceptData getReferencedComponent() throws TerminologyException, IOException {
-		return Terms.get().getConcept(getConceptId());
-	}
-
 	public String toString() {
 		try {
 			I_TermFactory tf = Terms.get();
 			
-			return "\nReferenced Component Id(Concept) = " + getReferencedComponent().getInitialText() + 
-				   "\nConcept Id = " + conceptId.toString() +
+			return "\nRelease Description (Referenced Component Id) = " + tf.getConcept(getReleaseDescription()).getInitialText() + 
+				   "\nConcept = " + tf.getConcept(concept.toString()) +
 				   "\nWorkflow Id = " + workflowId.toString() +
-				   "\nUse Case = " + tf.getConcept(useCase).getInitialText() + 
 				   "\nPath = " + tf.getConcept(path).getInitialText() +
 				   "\nModeler = " + tf.getConcept(modeler).getInitialText() + 
 				   "\nAction = " + tf.getConcept(action).getInitialText() +
 				   "\nState = " + tf.getConcept(state).getInitialText() +
 				   "\nFSN = " + fsn +
-				   "\nTimestamp = " + timeStamp + 
+				   "\nEffectiveTimestamp = " + effectiveTime +
+				   "\nWorkflow Time = " + workflowTime + 
 				   "\nAutoApproved = " + autoApproved + 
-				   "\nOverridden = " + overridden + 
-				   "\nrefsetColumnTimeStamp = " + refsetColumnTimeStamp +
-				   "\nTimestamp = " + timeStamp;
+				   "\nOverridden = " + overridden;
 		} catch (IOException io) {
 			return "Failed to identify referencedComponentId or WorkflowHistory" + 
 				   "\nError msg: " + io.getMessage();
@@ -187,14 +175,14 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 		WorkflowHistoryJavaBean o2 = (WorkflowHistoryJavaBean)o1;
 		
 		if (this.getAction().equals(o2.getAction()) &&
-			this.getConceptId().equals(o2.getConceptId()) &&
+			this.getConcept().equals(o2.getConcept()) &&
 			this.getFSN().equals(o2.getFSN()) &&
 			this.getModeler().equals(o2.getModeler()) &&
 			this.getPath().equals(o2.getPath()) &&
 			this.getState().equals(o2.getState()) &&
-			this.getTimeStamp().equals(o2.getTimeStamp()) &&
-			this.getRefsetColumnTimeStamp().equals(o2.getRefsetColumnTimeStamp()) &&
-			this.getUseCase().equals(o2.getUseCase()) &&
+			this.getEffectiveTime().equals(o2.getEffectiveTime()) &&
+			this.getWorkflowTime().equals(o2.getWorkflowTime()) &&
+			this.getReleaseDescription().equals(o2.getReleaseDescription()) &&
 			this.getWorkflowId().equals(o2.getWorkflowId()) &&
 			this.getAutoApproved() == o2.getAutoApproved() && 
 			this.getOverridden() == o2.getOverridden()

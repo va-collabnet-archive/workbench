@@ -1,9 +1,11 @@
 package org.ihtsdo.workflow.refset.stateTrans;
 
 import java.io.IOException;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.refset.WorkflowRefsetFields;
@@ -25,12 +27,12 @@ public class StateTransitionRefsetWriter extends WorkflowRefsetWriter
 		setRefsetId(refset.getRefsetId());
 	}
 	
-	public I_GetConceptData getReferencedComponentId() {
-		return getCategory();
+	public void setReferencedComponentId(UUID uid) {
+		((StateTransitionRSFields)fields).setReferencedComponentUid(uid);
 	}
 	
 	public void setCategory(I_GetConceptData category) {
-		((StateTransitionRSFields)fields).setCategory(category);
+		setReferencedComponentId(category.getPrimUuid());
 	}
 	
 	public void setWorkflowType(I_GetConceptData type) {
@@ -48,9 +50,19 @@ public class StateTransitionRefsetWriter extends WorkflowRefsetWriter
 	public void setFinalState(I_GetConceptData state) {
 		((StateTransitionRSFields)fields).setFinalState(state);
 	}
+	
+	public UUID getReferencedComponentUid() {
+		return ((StateTransitionRSFields)fields).getReferencedComponentId();
+	}
 
 	public I_GetConceptData getCategory() {
-		return ((StateTransitionRSFields)fields).getCategory();
+		try {
+			return Terms.get().getConcept(getReferencedComponentUid());
+		} catch (Exception e) {
+	    	AceLog.getAppLog().log(Level.SEVERE, "Unable to get the Category (refCompId) from the StateTransitionRefset", e);
+		}
+		
+		return null;
 	}
 
 	public I_GetConceptData getWorkflowType() {
@@ -75,9 +87,18 @@ public class StateTransitionRefsetWriter extends WorkflowRefsetWriter
 		private I_GetConceptData action = null;
 		private I_GetConceptData finalState = null;
 		 		
-		private void setCategory(I_GetConceptData category) {
-			setReferencedComponentId(category);
+		public void setReferencedComponentUid(UUID uid) {
+			try {
+				setReferencedComponentId(uid);
+			} catch (Exception e) {
+		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: ", e);
+			}
 		}
+		
+		public void setCategoryUid(UUID uid) {
+			setReferencedComponentUid(uid);
+		}
+		
 
 		private void setWorkflowType(I_GetConceptData type) {
 			workflowType = type;
@@ -95,8 +116,22 @@ public class StateTransitionRefsetWriter extends WorkflowRefsetWriter
 			finalState = state;
 		}
 		
-		private I_GetConceptData getCategory() {
+		public I_GetConceptData getReferencedComponent() {
+			try {
+				return Terms.get().getConcept(getReferencedComponentId());
+			} catch (Exception e) {
+		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: ", e);
+			}
+			
+			return null;
+		}
+		
+		public UUID getReferencedComponentUid() {
 			return getReferencedComponentId();
+		}
+		
+		public I_GetConceptData getCategory() {
+			return getReferencedComponent();
 		}
 		
 		private I_GetConceptData getAction() {
@@ -118,15 +153,16 @@ public class StateTransitionRefsetWriter extends WorkflowRefsetWriter
 
 		public String toString() {
 			try {
-				return "\nReferenced Component Id (Editor Category) = " + getReferencedComponentId().getInitialText() + 
-					   "(" + getReferencedComponentId().getConceptNid() + ")" +
+				I_GetConceptData con = Terms.get().getConcept(getReferencedComponentId());
+				return "\nReferenced Component Id (Editor Category) = " + con.getInitialText() + 
+					   "(" + con.getConceptNid() + ")" +
 					   "\nWorkflow Type = " + workflowType.getInitialText() +
 					   "\nInitial State = " + initialState.getInitialText() +
 					   "\nAction = " + action.getInitialText() +
 					   "\nFinal State= " + finalState.getInitialText();
-			} catch (IOException io) {
-				return "Failed to identify referencedComponentId" + 
-					   "\nError msg: " + io.getMessage();
+			} catch (Exception e) {
+		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to identify the relCompId of the row", e);
+				return ""; 
 			}
 		}
 

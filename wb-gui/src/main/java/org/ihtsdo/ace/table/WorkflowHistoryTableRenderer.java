@@ -16,20 +16,14 @@
  */
 package org.ihtsdo.ace.table;
 
-import java.awt.Color;
 import java.awt.Component;
-import java.io.IOException;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.UIManager;
-import javax.swing.plaf.basic.BasicHTML;
-import javax.swing.table.TableColumn;
-import javax.swing.text.View;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.table.AceTableRenderer;
-import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowTextFieldEditor;
 
 public class WorkflowHistoryTableRenderer extends AceTableRenderer {

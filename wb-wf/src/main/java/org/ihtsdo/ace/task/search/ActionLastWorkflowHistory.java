@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Set;
 import java.util.UUID;
-import javax.swing.text.html.HTMLDocument.Iterator;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -78,7 +77,7 @@ public class ActionLastWorkflowHistory extends AbstractWorkflowHistorySearchTest
         WorkflowHistoryJavaBean current = null;
 
         for (WorkflowHistoryJavaBean wfHistoryItem : wfHistory) {
-            if (current == null || wfHistoryItem.getTimeStamp() > current.getTimeStamp()) {
+            if (current == null || wfHistoryItem.getEffectiveTime() > current.getEffectiveTime()) {
                 current = wfHistoryItem;
             }
         }

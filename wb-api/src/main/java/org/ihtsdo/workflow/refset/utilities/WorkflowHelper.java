@@ -139,20 +139,20 @@ public class WorkflowHelper {
 		try {
 			writer = new WorkflowHistoryRefsetWriter();
 
+			writer.setReleaseDescriptionUid(wfhjb.getReleaseDescription());
 			writer.setPathUid(wfhjb.getPath());
 			writer.setModelerUid(wfhjb.getModeler());
-			writer.setConceptUid(wfhjb.getConceptId());
+			writer.setConceptUid(wfhjb.getConcept());
 			writer.setFSN(wfhjb.getFSN());
-			writer.setUseCaseUid(wfhjb.getUseCase());
 			writer.setActionUid(wfhjb.getAction());
 			writer.setStateUid(wfhjb.getState());
 
 			writer.setWorkflowUid(wfhjb.getWorkflowId());
 
 			java.util.Date today = new java.util.Date();
-			writer.setTimeStamp(today.getTime());
+			writer.setEffectiveTime(today.getTime());
 			// Must use previous Refset Timestamp to revert proper Str
-			writer.setRefsetColumnTimeStamp(wfhjb.getRefsetColumnTimeStamp());
+			writer.setWorkflowTime(wfhjb.getWorkflowTime());
 
 			WorkflowHistoryRefsetWriter.lockMutex();
 			writer.retireMember();
@@ -176,6 +176,11 @@ public class WorkflowHelper {
 	
 			for (I_GetConceptData editor : editors)
 			{
+				if (defaultModeler == null && isDefaultModeler(editor))
+				{
+					setDefaultModeler(editor);
+				}
+				
 		    	modelers.put(getLoginId(editor), editor);
 			}
 		} catch (Exception e) {
@@ -185,11 +190,8 @@ public class WorkflowHelper {
 
 	private static String getLoginId(I_GetConceptData con) throws TerminologyException, IOException {
     	String id = identifyPrefTerm(con);
-   	   		// TODO Remove this as fix to deal with gen-user & two Alos
-   	   		if (id.contains("-"))
-				WorkflowHelper.setDefaultModeler(con);
 
-   	   		return id;
+   		return id;
 	}
 
 	public static boolean isActiveModeler(String name) throws Exception
@@ -287,21 +289,21 @@ public class WorkflowHelper {
     	WorkflowHistoryJavaBean bean = new WorkflowHistoryJavaBean();
     	WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
 
-    	bean.setConceptId(refComponentId);
+    	bean.setReleaseDescription(refComponentId);
     	bean.setWorkflowId(refset.getWorkflowId(fieldValues));
-
+    	bean.setConcept(refset.getConceptUid(fieldValues));
     	bean.setAction(refset.getActionUid(fieldValues));
     	bean.setState(refset.getStateUid(fieldValues));
     	bean.setPath(refset.getPathUid(fieldValues));
     	bean.setModeler(refset.getModelerUid(fieldValues));
     	bean.setAction(refset.getActionUid(fieldValues));
-    	bean.setUseCase(refset.getUseCaseUid(fieldValues));
     	bean.setState(refset.getStateUid(fieldValues));
     	bean.setFSN(refset.getFSN(fieldValues));
-    	bean.setRefsetColumnTimeStamp(refset.getRefsetColumnTimeStamp(fieldValues));
-    	bean.setTimeStamp(timeStamp);
+    	bean.setWorkflowTime(refset.getWorkflowTime(fieldValues));
     	bean.setAutoApproved(refset.getAutoApproved(fieldValues));
     	bean.setOverridden(refset.getOverridden(fieldValues));
+    	
+    	bean.setEffectiveTime(timeStamp);
 
     	return bean;
     }
@@ -481,20 +483,15 @@ public class WorkflowHelper {
 				I_RelTuple tuple = rel.getLastTuple();
 				int relId = tuple.getTypeNid();
 				int statusId = tuple.getStatusNid();
+				
 				if ((relId == searchRelId) && (statusId == currentNid)) 
 					rels.add(rel);
 			}
-			/*
-			rels =  concept.getSourceRelTuples(allowedStatuses, relType, viewPositions, precedencePolicy, contractionResolutionStrategy);
-	
-			if (!rels.isEmpty())
-			*/
-				return rels;
 		} catch (Exception e) {
         	AceLog.getAppLog().log(Level.WARNING, "Error in getting workflow-based attribute", e);
 		}
 		
-		return new LinkedList<I_RelVersioned>();
+		return rels;
 	}
 
     public static boolean isBeginEndAction(UUID action) {
@@ -533,12 +530,10 @@ public class WorkflowHelper {
         int categoryNid = category.getConceptNid();
 
 		// Get Current WF Status for Concept
-        SortedSet<WorkflowHistoryJavaBean> beanList = historySearcher.getWfHxByConcept(concept);
+        WorkflowHistoryJavaBean latestBean= historySearcher.getLatestWfHxJavaBeanForConcept(concept);
 
-        if (beanList.size() > 0)
+        if (latestBean != null)
         {
-            WorkflowHistoryJavaBean latestBean = beanList.first();
-
             List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(Terms.get().getConcept(latestBean.getAction()), ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
 
 			for (I_RelVersioned rel : relList)
@@ -562,14 +557,13 @@ public class WorkflowHelper {
 		        	// Such as done via Commit
 		    		WorkflowHistoryJavaBean templateBean = new WorkflowHistoryJavaBean();
 
-		            templateBean.setConceptId(latestBean.getConceptId());
+		            templateBean.setConcept(latestBean.getConcept());
 		            templateBean.setWorkflowId(latestBean.getWorkflowId());
 		            templateBean.setFSN(latestBean.getFSN());
 		            templateBean.setModeler(latestBean.getModeler());
 		            templateBean.setPath(latestBean.getPath());
-		            templateBean.setTimeStamp(latestBean.getTimeStamp());
-		            templateBean.setRefsetColumnTimeStamp(latestBean.getTimeStamp());
-		            templateBean.setUseCase(latestBean.getUseCase());
+		            templateBean.setEffectiveTime(latestBean.getEffectiveTime());
+		            templateBean.setWorkflowTime(latestBean.getWorkflowTime());
 
 		            templateBean.setAction(key.getUids().get(0));
 		            templateBean.setState(actionMap.get(key).getUids().get(0));
@@ -588,6 +582,19 @@ public class WorkflowHelper {
 		{
 			if (rel != null &&
     			rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getPrimoridalUid()).getConceptNid())
+				return true;
+		}
+
+		return false;
+	}
+
+	public static boolean isDefaultModeler(I_GetConceptData modeler) throws TerminologyException, IOException {
+		List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_MODELER_VALUE);
+
+		for (I_RelVersioned rel : relList)
+		{
+			if (rel != null &&
+    			rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_DEFAULT_MODELER.getPrimoridalUid()).getConceptNid())
 				return true;
 		}
 

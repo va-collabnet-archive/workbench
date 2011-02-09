@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
@@ -35,22 +36,21 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 	
 	public WorkflowHistoryRefset() throws IOException, TerminologyException {
 		super (RefsetAuxiliary.Concept.WORKFLOW_HISTORY);
-		}
+	}
 
 	public Collection<UUID> getRefsetUids() throws TerminologyException, IOException {
-		// TODO Auto-generated method stub
 		return RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids();
 	}
 
+	
 	// Workflow ID Only a UUID (No Concept)
 	public UUID getWorkflowId(String props) {
 		return getUUID("workflowId", props);
 	}
 
-
 	// I_GetConceptData values where appropriate
-	public I_GetConceptData getUseCase(String props) throws NumberFormatException, TerminologyException, IOException {
-		return getConcept("useCase", props);
+	public I_GetConceptData getConcept(String props) throws NumberFormatException, TerminologyException, IOException {
+		return getConcept("concept", props);
 	}
 	public I_GetConceptData getState(String props) throws NumberFormatException, TerminologyException, IOException {
 		return getConcept("state", props);
@@ -67,16 +67,14 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 	public String getFSN(String props) throws NumberFormatException, TerminologyException, IOException {
 		return getProp("fsn", props);
 	}
-	public Long getRefsetColumnTimeStamp(String props) throws NumberFormatException, TerminologyException, IOException {
-		return Long.parseLong(getProp("refsetColumnTimeStamp", props));
+	public Long getWorkflowTime(String props) throws NumberFormatException, TerminologyException, IOException {
+		return Long.parseLong(getProp("workflowTime", props));
 	}
-	public Long getTimeStamp(String props) throws NumberFormatException, TerminologyException, IOException {
-		return Long.parseLong(getProp("timeStamp", props));
+	public Long getEffectiveTime(String props) throws NumberFormatException, TerminologyException, IOException {
+		return Long.parseLong(getProp("effectiveTime", props));
 	}
-	
-	// UUID values where appropriate
-	public UUID getUseCaseUid(String props) throws NumberFormatException, TerminologyException, IOException {
-		return getUUID("useCase", props);
+	public UUID getConceptUid(String props) throws NumberFormatException, TerminologyException, IOException {
+		return getUUID("conceptId", props);
 	}
 	public UUID getStateUid(String props) throws NumberFormatException, TerminologyException, IOException {
 		return getUUID("state", props);
@@ -147,9 +145,22 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 	public static Comparator<I_GetConceptData> createPreferredTermComparer() {
 		return new PreferredTermComparator();
 	}
-	
+
+	public static Comparator<I_DescriptionVersioned> createDescriptionTimestampComparer() {
+		return new DescriptionTimestampComparator();
+	}
+
 	public static Comparator<WorkflowHistoryJavaBean> createWfIdTimeStampComparer() {
 		return new WfHxWfIdTimeStampComparer();
+	}
+
+	public static class DescriptionTimestampComparator implements Comparator<I_DescriptionVersioned> { 
+		public int compare(I_DescriptionVersioned a, I_DescriptionVersioned b) {
+			if (a.getTime() < b.getTime())
+				return 1;
+			else
+				return -1;
+		}
 	}
 
 	public static class WorkflowFsnComparator implements Comparator<I_GetConceptData> { 
@@ -175,10 +186,10 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 	private static class WfHxJavaBeanComparer implements Comparator<WorkflowHistoryJavaBean> {
 		@Override
 		public int compare(WorkflowHistoryJavaBean o1, WorkflowHistoryJavaBean o2) {
-			if (o2.getConceptId().compareTo(o1.getConceptId()) != 0)
-				return o2.getConceptId().compareTo(o1.getConceptId());
-			else if (o2.getRefsetColumnTimeStamp().compareTo(o1.getRefsetColumnTimeStamp()) != 0)
-				return o2.getRefsetColumnTimeStamp().compareTo(o1.getRefsetColumnTimeStamp());
+			if (o2.getConcept().compareTo(o1.getConcept()) != 0)
+				return o2.getConcept().compareTo(o1.getConcept());
+			else if (o2.getWorkflowTime().compareTo(o1.getWorkflowTime()) != 0)
+				return o2.getWorkflowTime().compareTo(o1.getWorkflowTime());
 			else 
 				return -1;
 		}
@@ -214,7 +225,7 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 			if (o1.getWorkflowId().compareTo(o2.getWorkflowId()) != 0)
 				return (o1.getWorkflowId().compareTo(o2.getWorkflowId()));
 			else
-				return (o1.getRefsetColumnTimeStamp().compareTo(o2.getRefsetColumnTimeStamp()));
+				return (o1.getWorkflowTime().compareTo(o2.getWorkflowTime()));
 		}
 	}
 

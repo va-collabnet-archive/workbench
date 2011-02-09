@@ -1,6 +1,7 @@
 package org.ihtsdo.workflow.refset;
 
-import org.dwfa.ace.api.I_GetConceptData;
+import java.util.UUID;
+
 
 
 
@@ -9,7 +10,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 * 
 */
 public abstract class WorkflowRefsetFields {
-	private I_GetConceptData referencedComponentId = null;
+	private UUID referencedComponentId = null;
 	
 	public abstract String toString();
 	public abstract boolean valuesExist();
@@ -19,11 +20,11 @@ public abstract class WorkflowRefsetFields {
 		
 	}
 
-	public void setReferencedComponentId(I_GetConceptData referencedComponentId) {
-		this.referencedComponentId = referencedComponentId;
+	public void setReferencedComponentId(UUID refCompId) {
+		referencedComponentId = refCompId;
 	}
 
-	public I_GetConceptData getReferencedComponentId() {
+	public UUID getReferencedComponentId() {
 		return referencedComponentId;
 	}
 	

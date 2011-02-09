@@ -352,20 +352,19 @@ public class TerminologyTransferHandler extends TransferHandler {
 				            		}
 				            	}
 				            	return new DescriptionTransferable(Terms.get().getDescription(descId));
-/*				            case ACTION:
-				                return new StringSelection(field.getCellText());
+//				            case ACTION:
+//				                return new StringSelection(field.getCellText());
 				            case STATE:
 				                return new StringSelection(field.getCellText());
 				            case EDITOR:
 				                return new StringSelection(field.getCellText());
-		                    case PATH:
-				                return new StringSelection(field.getCellText());
+//		                    case PATH:
+//				                return new StringSelection(field.getCellText());
 				            case TIMESTAMP:
 //				            	conField = (StringWithConceptTuple)value;
 //				                return new ConceptTransferable(Terms.get().getConcept(conField.getTuple().getConceptNid()));
 				                return new StringSelection(field.getCellText());
-*/
-				                default:
+			                default:
 				                throw new UnsupportedOperationException("Can't convert " + columnDesc + " to a concept bean");
 			            }
 			        } else {

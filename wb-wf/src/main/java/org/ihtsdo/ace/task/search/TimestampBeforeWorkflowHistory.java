@@ -60,7 +60,7 @@ public class TimestampBeforeWorkflowHistory extends AbstractWorkflowHistorySearc
         	DateFormat dfm = new SimpleDateFormat(DEFAULT_TIME_STAMP);
     		long testTimestampBeforeThisDate = dfm.parse(testTimestampBefore).getTime();
 
-       		if (bean.getTimeStamp() < testTimestampBeforeThisDate)
+       		if (bean.getEffectiveTime() < testTimestampBeforeThisDate)
             	return true;
 		} catch (Exception e) {
 			AceLog.getAppLog().log(Level.WARNING, "Couldn't read search Timestamp Before Than", e);
@@ -89,7 +89,7 @@ public class TimestampBeforeWorkflowHistory extends AbstractWorkflowHistorySearc
 	
 	    	//If any item in the list passes the filter, return true.
 	    	for (WorkflowHistoryJavaBean wfHistoryItem : wfHistory) {
-	            if (wfHistoryItem.getTimeStamp() < testTimestampBeforeThisDate) {
+	            if (wfHistoryItem.getEffectiveTime() < testTimestampBeforeThisDate) {
 	            	return true;
 				}
 			}

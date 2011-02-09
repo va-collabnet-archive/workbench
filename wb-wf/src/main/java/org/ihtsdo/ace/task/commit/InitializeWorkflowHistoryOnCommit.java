@@ -71,7 +71,6 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
 
     private static final long serialVersionUID = 1;
     private static final int DATA_VERSION = 1;
-    private static final String ALERT_MESSAGE = "<html>Empty value found:<br><font color='blue'>%1$s</font><br>Please enter a value before commit...";
 
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -112,9 +111,6 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
 		            writer.setConceptUid(concept.getUids().iterator().next());
 		            writer.setFSN(WorkflowHelper.identifyFSN(concept));
 
-		            // Use Case (Deprecated)
-	            	writer.setUseCaseUid(ArchitectonicAuxiliary.Concept.WORKFLOW_CONCEPTS.getPrimoridalUid());
-
 	            	// Action
 	            	UUID actionUid = identifyAction();
 	                writer.setActionUid(actionUid);
@@ -149,8 +145,8 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
 
 		            // TimeStamps
 			        java.util.Date today = new java.util.Date();
-			        writer.setTimeStamp(today.getTime());
-			        writer.setRefsetColumnTimeStamp(today.getTime());
+			        writer.setEffectiveTime(today.getTime());
+			        writer.setWorkflowTime(today.getTime());
 
 			        // Write Member
 					WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
@@ -235,29 +231,29 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
 
 		try {
         	WorkflowHistoryRefsetSearcher wfSearcher = new WorkflowHistoryRefsetSearcher();
-
-			if (wfSearcher.getTotalCountByConcept(concept) > 0)
-				initialState = Terms.get().getConcept(wfSearcher.getLatestWfHxJavaBeanForConcept(concept).getState());
+        	WorkflowHistoryJavaBean bean = wfSearcher.getLatestWfHxJavaBeanForConcept(concept);
+			if (bean != null)
+				initialState = Terms.get().getConcept(bean.getState());
 			else
-    	{
+			{
 				for (I_GetConceptData state : Terms.get().getActiveAceFrameConfig().getWorkflowStates())
-    		{
+				{
 					List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE);
 
 		    		for (I_RelVersioned rel : relList)
-    	{
+		    		{
 		    			if (rel != null &&
 							((existsInDb && (rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EXISTING_CONCEPT.getPrimoridalUid()).getConceptNid())) ||
 							 (!existsInDb && (rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_NEW_CONCEPT.getPrimoridalUid()).getConceptNid()))))
-    		{
+		    			{
 							initialState = state;
-    		}
-    	}
+		    			}
+		    		}
 
 		    		if (initialState != null)
 		    			break;
-    		}
-    	}
+				}
+			}
 
 			EditorCategoryRefsetSearcher categorySearcher = new EditorCategoryRefsetSearcher();
 			I_GetConceptData modeler = Terms.get().getConcept(modelerUid);
@@ -267,16 +263,18 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
 			Map<I_GetConceptData, I_GetConceptData> possibleActions = nextStateSearcher.searchForPossibleActionsAndFinalStates(category.getConceptNid(), initialState.getConceptNid());
 
 			for (I_GetConceptData transitionAction : possibleActions.keySet())
-    	{
+			{
 				if (transitionAction.getPrimUuid().equals(commitActionUid))
+				{
 					return possibleActions.get(transitionAction).getPrimUuid();
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return null;
-    	}
+   	}
 
 	private boolean isConceptInDatabase(I_GetConceptData concept) {
 		boolean hasBeenReleased = false;
@@ -291,7 +289,7 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
 	            	hasBeenReleased = true;
 	        }
 
-			if (!hasBeenReleased && (searcher.getTotalCountByConcept(concept) == 0))
+			if (!hasBeenReleased && (searcher.getLatestWfHxJavaBeanForConcept(concept) == null))
 				return false;
 		} catch (Exception e) {
 			e.printStackTrace();

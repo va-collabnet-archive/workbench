@@ -330,18 +330,16 @@ public class JTableWithDragImage extends JTable {
             switch (field) {
             case FSN:
                 return new ConceptTransferable(Terms.get().getConcept(wfct.getTuple().getConceptNid()));
-/*                
-            case ACTION:
-                return new StringSelection(wfct.getCellText());
+//            case ACTION:
+//                return new StringSelection(wfct.getCellText());
             case STATE:
                 return new StringSelection(wfct.getCellText());
             case EDITOR:
                 return new StringSelection(wfct.getCellText());
-            case PATH:
-                return new ConceptTransferable(Terms.get().getConcept(wfct.getTuple().getConceptNid()));
+//            case PATH:
+//                return new ConceptTransferable(Terms.get().getConcept(wfct.getTuple().getConceptNid()));
             case TIMESTAMP:
                 return new StringSelection(wfct.getCellText());
-*/                
             default:
                 throw new UnsupportedOperationException("Cana't handle field: " + field);
             }

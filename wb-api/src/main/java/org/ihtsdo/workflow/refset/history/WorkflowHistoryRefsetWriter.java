@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.WorkflowRefsetFields;
@@ -20,8 +20,9 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetWriter;
 * 
 */
 public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
+
 	private static boolean inUse = false;
-	
+
 	public WorkflowHistoryRefsetWriter() throws IOException, TerminologyException {
 		refset = new WorkflowHistoryRefset();
 		fields = new WorkflowHistoryRSFields();
@@ -30,22 +31,36 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 		setRefsetId(refset.getRefsetId());
 	}
 	
+	// Statics
+	public static void lockMutex() {
+		inUse = true; 
+	}
 	
+	public static boolean isInUse() {
+		return inUse;
+	}
 	
+	public static void unLockMutex() {
+		inUse = false;
+	}
+
+	// Setters
+	public void setReferencedComponentId(UUID uid) {
+		((WorkflowHistoryRSFields)fields).setReferencedComponentUid(uid);
+}
+
+	public void setReleaseDescriptionUid(UUID uid) {
+		setReferencedComponentId(uid);
+}
+
 	public void setWorkflowUid(UUID uid) {
 			((WorkflowHistoryRSFields)fields).setWorkflowUid(uid);
 	}
 
- 	
-	public void setConceptUid(UUID uid) {
+ 	public void setConceptUid(UUID uid) {
 			((WorkflowHistoryRSFields)fields).setConceptUid(uid);
 	}
 	
-	
-	public void setUseCaseUid(UUID useCase) {
-		((WorkflowHistoryRSFields)fields).setUseCaseUid(useCase);
-	}
-
 	public void setPathUid(UUID path) {
 		((WorkflowHistoryRSFields)fields).setPathUid(path);
 	}
@@ -66,12 +81,12 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 		((WorkflowHistoryRSFields)fields).setFSN(fsn);
 	}
 
-	public void setRefsetColumnTimeStamp(Long timeStamp) {
-		((WorkflowHistoryRSFields)fields).setRefsetColumnTimeStamp(timeStamp);
+	public void setWorkflowTime(Long timeStamp) {
+		((WorkflowHistoryRSFields)fields).setWorkflowTime(timeStamp);
 	}
 
-	public void setTimeStamp(Long timeStamp) {
-		((WorkflowHistoryRSFields)fields).setTimeStamp(timeStamp);
+	public void setEffectiveTime(Long timeStamp) {
+		((WorkflowHistoryRSFields)fields).setEffectiveTime(timeStamp);
 	}
 
 	public void setAutoApproved(boolean b) {
@@ -82,16 +97,22 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 		((WorkflowHistoryRSFields)fields).setOverride(b);
 	}	
 	
-	public UUID getWorkflowUid() {
-		return ((WorkflowHistoryRSFields)fields).getWorkflowUid();
+	
+	// Getters
+	public UUID getReferencedComponentUid() {
+		return ((WorkflowHistoryRSFields)fields).getReferencedComponentId();
 	}
-		
+	
+	public UUID getReleaseDescriptionUid() {
+		return getReferencedComponentUid();
+	}
+	
 	public UUID getConceptUid() {
 		return ((WorkflowHistoryRSFields)fields).getConceptUid();
 	}
 	
-	public UUID getUseCaseUid() {
-		return ((WorkflowHistoryRSFields)fields).getUseCaseUid();
+	public UUID getWorkflowUid() {
+		return ((WorkflowHistoryRSFields)fields).getWorkflowUid();
 	}
 	
 	public UUID getPathUid() {
@@ -114,18 +135,17 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 		return ((WorkflowHistoryRSFields)fields).getFSN();
 	}
 	
-	public Long getRefsetColumnTimeStamp() {
-		return ((WorkflowHistoryRSFields)fields).getRefsetColumnTimeStamp();
+	public Long getWorkflowTime() {
+		return ((WorkflowHistoryRSFields)fields).getWorkflowTime();
 	}
 
-	public Long getTimeStamp() {
-		return ((WorkflowHistoryRSFields)fields).getTimeStamp();
+	public Long getEffectiveTime() {
+		return ((WorkflowHistoryRSFields)fields).getEffectiveTime();
 	}
 	
 	public boolean getAutoApproved() {
 		return ((WorkflowHistoryRSFields)fields).getAutoApproved();
 	}
-
 	
 	public boolean getOverride() {
 		return ((WorkflowHistoryRSFields)fields).getOverride();
@@ -133,62 +153,43 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 
 	
 	
-	public static void lockMutex() {
-		inUse = true; 
-	}
 	
-	public static boolean isInUse() {
-		return inUse;
-	}
-	
-	public static void unLockMutex() {
-		inUse = false;
-	}
-	
-	
-	
+	// Actual Fields
 	public class WorkflowHistoryRSFields extends WorkflowRefsetFields {
 	
-		
+		public UUID concept = null;
 		public UUID workflowId = null;
-		public UUID conceptId = null;
-		public UUID useCase = null;
 		public UUID path = null;
 		public UUID modeler = null;
 		public UUID action = null;
 		public UUID state = null;
 		public String fsn = null;
-		public Long refsetColumnTimeStamp = null;
-		public Long timeStamp = null;
+		public Long workflowTime = null;
+		public Long effectiveTime = null;
 		public boolean autoApproved;
 		public boolean override;
 		
-		public WorkflowHistoryRSFields() {
+
+		
+		
+		public void setReferencedComponentUid(UUID uid) {
 			try {
-				setReferencedComponentId(Terms.get().getConcept(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids()));
+				setReferencedComponentId(uid);
 			} catch (Exception e) {
-				
+		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: ", e);
 			}
 		}
 		
-		public void setWorkflowUid(UUID uid) {
-			workflowId = uid;
+		public void setReleaseDescriptionUid(UUID uid) {
+			setReferencedComponentUid(uid);
 		}
 		
 		public void setConceptUid(UUID uid) {
-			try {
-				setReferencedComponentId(Terms.get().getConcept(uid));
-			} catch (Exception e) {
-	        	AceLog.getAppLog().log(Level.WARNING, "Error getting concept from database: " + uid, e);
-			}
+			concept = uid;
 		}
 
-		public void setUseCaseUid(UUID uc) {
-			useCase = uc;
-		}
-
-		public void setPathUid(UUID p) {
-			path = p;
+		public void setWorkflowUid(UUID uid) {
+			workflowId = uid;
 		}
 		
 		public void setModelerUid(UUID mod) {
@@ -199,6 +200,10 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 			action = act;
 		}
 
+		public void setPathUid(UUID uid) {
+			path = uid;
+		}
+		
 		public void setStateUid(UUID s) {
 			state = s;
 		}
@@ -207,12 +212,12 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 			fsn = desc;
 		}
 
-		public void setRefsetColumnTimeStamp(Long ts) {
-			refsetColumnTimeStamp = ts;
+		public void setWorkflowTime(Long ts) {
+			workflowTime = ts;
 		}
 
-		public void setTimeStamp(Long ts) {
-			timeStamp = ts;
+		public void setEffectiveTime(Long ts) {
+			effectiveTime = ts;
 		}
 		
 		public void setAutoApproved(boolean b) {
@@ -224,16 +229,32 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 		}
 
 
-		public UUID getWorkflowUid() {
-			return workflowId;
+		
+		
+		public I_GetConceptData getReferencedComponent() {
+			try {
+				return Terms.get().getConcept(getReferencedComponentId());
+			} catch (Exception e) {
+		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: ", e);
+			}
+			
+			return null;
+		}
+		
+		public UUID getReferencedComponentUid() {
+			return getReferencedComponentId();
+		}
+		
+		public UUID getReleaseDescriptionUid() {
+			return getReferencedComponentUid();
 		}
 		
 		public UUID getConceptUid() {
-			return getReferencedComponentId().getPrimUuid();
+			return concept;
 		}
-
-		public UUID getUseCaseUid() {
-			return useCase;
+		
+		public UUID getWorkflowUid() {
+			return workflowId;
 		}
 
 		public UUID getPathUid() {
@@ -256,12 +277,12 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 			return fsn;
 		}
 
-		public Long getRefsetColumnTimeStamp() {
-			return refsetColumnTimeStamp;
+		public Long getWorkflowTime() {
+			return workflowTime;
 		}
 
-		public Long getTimeStamp() {
-			return timeStamp;
+		public Long getEffectiveTime() {
+			return effectiveTime;
 		}
 		public boolean getAutoApproved() {
 			return autoApproved;
@@ -275,15 +296,15 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 			try { 
 				I_TermFactory tf = Terms.get();
 
-				return "\nReferenced Component Id(Concept) = " + getReferencedComponentId().getInitialText() + 
+				return "\nReferenced Component Id(Concept) = " + getReferencedComponent().getInitialText() + 
+				   "\nConcept = " + tf.getConcept(concept).getInitialText() +
 				   "\nWorkflow Uid = " + workflowId.toString() +
-				   "\nUseCase = " + tf.getConcept(useCase).getInitialText() +
 				   "\nPath = " + tf.getConcept(path).getInitialText() +
 				   "\nModeler = " + tf.getConcept(modeler).getInitialText() +
 				   "\nAction = " + tf.getConcept(action).getInitialText() +
 				   "\nState = " + tf.getConcept(state).getInitialText() +
-				   "\ngetRefsetColumnTimeStamp = " + refsetColumnTimeStamp +
-				   "\ntimestamp = " + timeStamp +
+				   "\nWorkflow Timestamp = " + workflowTime +
+				   "\nEffectiveTime = " + effectiveTime +
 				   "\nFSN = " + fsn;
 			} catch (Exception io) {
 				return "Failed to identify referencedComponentId for StressTest" + 
@@ -293,23 +314,30 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 
 		@Override
 		public void cleanValues() {
+			setReferencedComponentUid(null);
+			concept = null;
 			workflowId = null;
-			useCase = null;
 			path = null;
 			modeler = null;
 			action = null;
 			state = null;
 			fsn = null;
-			refsetColumnTimeStamp = null;
+			workflowTime = null;
+			effectiveTime = null;
 		}
 
 
 		@Override
 		public boolean valuesExist() {
-			boolean retVal =  workflowId != null &&
-							  useCase != null && path != null &&
-							  modeler != null && action != null &&
-							  state != null && refsetColumnTimeStamp != null & 
+			boolean retVal =  getReferencedComponentUid() != null &&
+							  concept != null &&
+							  workflowId != null && 
+							  path != null &&
+							  modeler != null && 
+							  action != null &&
+							  state != null && 
+							  workflowTime != null & 
+							  effectiveTime != null & 
 							  fsn != null && fsn.length() > 0;
 								
 			if (!retVal)
@@ -317,13 +345,14 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 				StringBuffer str = new StringBuffer();
 				str.append("\nError in adding to Workflow History Refset");
 				str.append("\nReferencedComponentId:" + getReferencedComponentId());
+				str.append("\nconceptId:" + concept);
 				str.append("\nworkflowId:" + workflowId);
-				str.append("\nuseCase:" + useCase);
 				str.append("\npath:" + path);
 				str.append("\nmodeler:" + modeler);
-				str.append("\naction:" + useCase);
+				str.append("\naction:" + action);
 				str.append("\nstate:" + state);
-				str.append("\nrefsetColumnTimeStamp:" + refsetColumnTimeStamp);
+				str.append("\nworkflowTime:" + workflowTime);
+				str.append("\neffectiveTime:" + effectiveTime);
 				str.append("\nfsn:" + fsn);
 	        	AceLog.getAppLog().log(Level.WARNING, str.toString(), new Exception("Failure in updating Workflow History Refset"));
 			}
@@ -336,13 +365,13 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 	public String fieldsToRefsetString() throws IOException {
 		return "<properties>\n" +
 				   	"<property>" +
+				   		"<key>concept</key>" +
+				   		"<value>" + getConceptUid() + "</value>" +
+				   	"</property>" + 
+				   	"<property>" +
 				   		"<key>workflowId</key>" +
 				   		"<value>" + getWorkflowUid() + "</value>" +
 				   	"</property>" + 
-				   	"<property>" +
-			   			"<key>useCase</key>" +
-			   			"<value>" + getUseCaseUid() + "</value>" +
-			   		"</property>" + 
 			   		"<property>" +
 			   			"<key>path</key>" +
 			   			"<value>" + getPathUid() + "</value>" +
@@ -360,9 +389,13 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 						"<value>" + getActionUid() + "</value>" +
 			   		"</property>" + 
 			   		"<property>" +
-			   			"<key>refsetColumnTimeStamp</key>" +
-			   			"<value>" + getRefsetColumnTimeStamp() + "</value>" +
+			   			"<key>workflowTime</key>" +
+			   			"<value>" + getWorkflowTime() + "</value>" +
 			   		"</property>" + 
+			   		"<property>" +
+		   				"<key>effectiveTime</key>" +
+		   				"<value>" + getEffectiveTime() + "</value>" +
+		   			"</property>" + 
 			   		"<property>" +
 			   			"<key>fsn</key>" +
 			   			"<value>" + getFSN() + "</value>" +
@@ -380,20 +413,20 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 	
 	public void updateWorkflowHistory(WorkflowHistoryJavaBean update) throws Exception
 	{
-		setConceptUid(update.getConceptId());
+		setReleaseDescriptionUid(update.getReleaseDescription());
+		setConceptUid(update.getConcept());
     	setWorkflowUid(update.getWorkflowId());
     	setActionUid(update.getAction());
     	setFSN(update.getFSN());
     	setModelerUid(update.getModeler());
     	setPathUid(update.getPath());
     	setStateUid(update.getState());
-    	setUseCaseUid(update.getUseCase());
     	setAutoApproved(update.getAutoApproved());
     	
     	java.util.Date today = new java.util.Date();
-        setTimeStamp(Long.MAX_VALUE);
+        setEffectiveTime(Long.MAX_VALUE);
         // Add new timestamp for new version (in case this row is retired for WFid)
-		setRefsetColumnTimeStamp(today.getTime());
+		setWorkflowTime(today.getTime());
         
         WorkflowHistoryRefsetWriter.lockMutex();
         addMember();

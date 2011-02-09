@@ -17,12 +17,10 @@
 package org.ihtsdo.ace.table;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.UUID;
@@ -49,7 +47,8 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
     private static final long serialVersionUID = 1L;
 
  	    public enum WORKFLOW_FIELD { 
- 	    	FSN("FSN", 5, 400, 600);
+ 	    	FSN("FSN", 5, 400, 600), EDITOR("Editor", 5, 150, 180), 
+ 	    	STATE("State", 5, 115, 150), TIMESTAMP("TimeStamp", 5, 75, 200);
 
  /*
   *  FSN("FSN", 5, 400, 600), 	  	STATE("State", 5, 115, 150), 	ACTION("Action", 5, 115, 150), 	  
@@ -148,25 +147,27 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
 
             switch (columns[columnIndex]) {
             case FSN:
-            	I_GetConceptData con = Terms.get().getConcept(bean.getConceptId());
+            	I_GetConceptData con = Terms.get().getConcept(bean.getConcept());
             	I_ConceptAttributeTuple tuple = (I_ConceptAttributeTuple) con.getConceptAttributes().getTuples().get(0);
                 return new WorkflowFSNWithConceptTuple(bean.getFSN(), tuple, false);
 /*
  *          case ACTION:
-                return new WorkflowTextFieldEditor(getPrefText(bean.getAction()), false);
+ *               return new WorkflowTextFieldEditor(getPrefText(bean.getAction()), false);
+ */
             case STATE:
                 return new WorkflowTextFieldEditor(getPrefText(bean.getState()), false);
             case EDITOR:
                 return new WorkflowTextFieldEditor(getPrefText(bean.getModeler()), false);
-             case PATH:
-            	I_GetConceptData path = Terms.get().getConcept(bean.getPath());
-            	I_ConceptAttributeTuple pTuple = path.getConceptAttributes().getTuples().get(0);
-                return new WorkflowFSNWithConceptTuple(getPrefText(bean.getPath()), pTuple, false);
+/*
+ *              case PATH:
+ *           	I_GetConceptData path = Terms.get().getConcept(bean.getPath());
+ *           	I_ConceptAttributeTuple pTuple = path.getConceptAttributes().getTuples().get(0);
+ *               return new WorkflowFSNWithConceptTuple(getPrefText(bean.getPath()), pTuple, false);
+ */
             case TIMESTAMP:
-            	Date d = new Date(bean.getTimeStamp());
+            	Date d = new Date(bean.getWorkflowTime());
             	String timeStamp = formatter.format(d);
             	return new WorkflowTextFieldEditor(timeStamp, false);
- */
             }
                
         } catch (Exception e) {
@@ -223,13 +224,11 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
 
             switch (columns[col]) {
                 case FSN:
-/*                	
-                case ACTION:
+//                case ACTION:
                 case STATE:
                 case EDITOR:
-                case PATH:
+//                case PATH:
                 case TIMESTAMP:
-*/
                 	break;
                 }
                 fireTableDataChanged();
@@ -248,18 +247,17 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
         switch (columns[c]) {
         case FSN:
             return WorkflowFSNWithConceptTuple.class;
-/*            
-        case ACTION:
-            return WorkflowTextFieldEditor.class;
+           
+//        case ACTION:
+//            return WorkflowTextFieldEditor.class;
         case STATE:
             return WorkflowTextFieldEditor.class;
         case EDITOR:
             return WorkflowTextFieldEditor.class;
-        case PATH:
-            return WorkflowFSNWithConceptTuple.class;
+//        case PATH:
+//            return WorkflowFSNWithConceptTuple.class;
         case TIMESTAMP:
             return WorkflowTextFieldEditor.class;
-*/
         }
         return String.class;
     }
@@ -295,7 +293,7 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
  				final String workflowId =  bean.getWorkflowId().toString();
          	 	final String fsn =  bean.getFSN();
          	 	final String action = Terms.get().getConcept(bean.getAction()).getInitialText();
-         	 	final String conceptId = Terms.get().getConcept(bean.getConceptId()).getInitialText();
+         	 	final String conceptId = Terms.get().getConcept(bean.getConcept()).getInitialText();
          	 	
          	 	if (conceptId == null)
          	 		a = 12 / 0;
@@ -303,11 +301,10 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
          	 	final String modeler = Terms.get().getConcept(bean.getModeler()).getInitialText();
          	 	final String path = Terms.get().getConcept(bean.getPath()).getInitialText();
          	 	final String state = Terms.get().getConcept(bean.getState()).getInitialText();
-         	 	final Long timeStamp =  bean.getTimeStamp();
-         	 	final Long refsetColumnTimeStamp = bean.getRefsetColumnTimeStamp();
-         	 	final String useCase = bean.getUseCase().toString();
+         	 	final Long timeStamp =  bean.getEffectiveTime();
+         	 	final Long refsetColumnTimeStamp = bean.getWorkflowTime();
 
-         	 	String d[] = new String[] {workflowId, fsn, action, conceptId, modeler, path, state, timeStamp.toString(), refsetColumnTimeStamp.toString(), useCase}; 
+         	 	String d[] = new String[] {workflowId, fsn, action, conceptId, modeler, path, state, timeStamp.toString(), refsetColumnTimeStamp.toString()}; 
          	 	data[i] = d;         			}
  			catch (Exception e) {
  				errorConceptCount++;

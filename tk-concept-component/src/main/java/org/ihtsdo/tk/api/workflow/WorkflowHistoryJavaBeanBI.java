@@ -4,29 +4,29 @@ import java.util.UUID;
 
 
 public interface WorkflowHistoryJavaBeanBI {
+	public void setReleaseDescription(UUID id);
+	public void setConcept(UUID id);
 	public void setWorkflowId(UUID id);
-	public void setConceptId(UUID id);
-	public void setUseCase(UUID id);
 	public void setPath(UUID id);
 	public void setModeler(UUID id);
 	public void setState(UUID id);
 	public void setAction(UUID id);
 	public void setFSN(String desc);
-	public void setTimeStamp(Long t);
-	public void setRefsetColumnTimeStamp(Long t);
+	public void setEffectiveTime(Long t);
+	public void setWorkflowTime(Long t);
 	
+	public UUID getReleaseDescription();
+	public UUID getConcept();
 	public UUID getWorkflowId();
-	public UUID getConceptId();
-	public UUID getUseCase();
 	public UUID getPath();
-	public	UUID getModeler();
+	public UUID getModeler();
 	public UUID getState();
 	public UUID getAction();
 	public String getFSN();
-	public Long getTimeStamp();
-	public Long getRefsetColumnTimeStamp();
-	
-	public String toString();
+	public Long getEffectiveTime();
+	public Long getWorkflowTime();
 	public boolean getAutoApproved();
 	public boolean getOverridden();
+	
+	public String toString();
 }

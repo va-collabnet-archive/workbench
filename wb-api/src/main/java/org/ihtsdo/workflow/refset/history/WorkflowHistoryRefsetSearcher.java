@@ -2,14 +2,20 @@ package org.ihtsdo.workflow.refset.history;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
@@ -20,6 +26,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.ace.task.search.I_TestWorkflowHistorySearchResults;
+import org.ihtsdo.tk.example.binding.Taxonomies;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
@@ -30,28 +37,29 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
 * 
 */
 public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
-	
-	private int activeStatusNid = 0;
+
 	private int currentStatusNid = 0;
-
-
 	private int totalConcepts = 0;
-		
-	public WorkflowHistoryRefsetSearcher()
+	private SortedSet<I_DescriptionVersioned> releases = null;
+	private String releaseSearchString = "version: ";
+
+	// First release with Workflow History
+	private final String earliestWorkflowHistoryRelease = "2008-01-31"; 
+	
+		public WorkflowHistoryRefsetSearcher()
 	{
 		try {
 			refset = new WorkflowHistoryRefset();
 			setRefsetName(refset.getRefsetName());
 			setRefsetId(refset.getRefsetId());
 		
-			activeStatusNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.ACTIVE.getPrimoridalUid());
 			currentStatusNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid());
 		} catch (Exception e) {
         	AceLog.getAppLog().log(Level.WARNING, "Error creating Workflow History Refset Searcher", e);
 		}
 	}
 
-	public int getTotalCount() {
+	public int getTotalMemberCount() {
 		try {
 			return Terms.get().getRefsetExtensionMembers(refsetId).size();
 		} catch (Exception e) {
@@ -61,14 +69,11 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		return 0;
 	}
 
-	public int getTotalCountByConcept(I_GetConceptData con) {
-		String term = null;
-
+	public int getTotalCountByRelease(int relNid) {
 		try {
-			term = con.getInitialText();
-		return Terms.get().getRefsetExtensionsForComponent(refsetId, con.getConceptNid()).size();
+			return Terms.get().getRefsetExtensionsForComponent(refsetId, relNid).size();
 		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.WARNING, "Cant access workflow history refset for concept: " + term, e);
+        	AceLog.getAppLog().log(Level.WARNING, "Cant access workflow history refset for release", e);
 		}
 
 		return 0;
@@ -79,101 +84,6 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		return totalConcepts;
 	}
 
-	
-	
-	public SortedSet<WorkflowHistoryJavaBean> getWfHxByConcept(I_GetConceptData con) throws TerminologyException, IOException, Exception {
-		SortedSet <WorkflowHistoryJavaBean> retMap = new TreeSet<WorkflowHistoryJavaBean>(WorkflowHistoryRefset.createWfHxJavaBeanComparer());
-
-		for (I_ExtendByRef historyRow : Terms.get().getRefsetExtensionsForComponent(refsetId, con.getConceptNid())) 
-		{
-			I_ExtendByRefPartStr latestVersion = (I_ExtendByRefPartStr)historyRow.getMutableParts().get(historyRow.getMutableParts().size() - 1);
-			
-			int currentState = latestVersion.getStatusNid();
-		
-			// TODO: Must make ExportWorkflowHistory use proper active/current status
-			if ((currentState == activeStatusNid) ||
-			    (currentState == currentStatusNid))
-			{
-				WorkflowHistoryJavaBean b = WorkflowHelper.fillOutWorkflowHistoryJavaBean(Terms.get().nidToUuid(historyRow.getComponentNid()), latestVersion.getStringValue(), new Long(latestVersion.getTime()));
-
-				retMap.add(b);
-			}
-		}
-
-		return retMap;
-	} 
-	
-	public UUID getLatestWfIdForConcept(I_GetConceptData con) 
-	{
-		UUID currentWorkflowId = UUID.randomUUID();
-		long currentTimeStamp = 0;
-		String conceptTerm = "unknown concept";
-
-		try {
-			conceptTerm = con.getInitialText();
-
-			for (I_ExtendByRef historyRow : Terms.get().getRefsetExtensionsForComponent(refsetId, con.getConceptNid())) 
-			{
-				I_ExtendByRefPartStr latestVersion = (I_ExtendByRefPartStr)historyRow.getMutableParts().get(historyRow.getMutableParts().size() - 1);
-				
-				int currentState = latestVersion.getStatusNid();
-			
-				// TODO: Must make ExportWorkflowHistory use proper active/current status
-				if ((currentState == activeStatusNid) ||
-				    (currentState == currentStatusNid))
-				{
-		
-					WorkflowHistoryJavaBean b = WorkflowHelper.fillOutWorkflowHistoryJavaBean(Terms.get().nidToUuid(historyRow.getComponentNid()), latestVersion.getStringValue(), new Long(latestVersion.getTime()));
-				
-					if (!b.getWorkflowId().equals(currentWorkflowId) &&
-						b.getTimeStamp() >= currentTimeStamp)
-					{
-						currentWorkflowId = b.getWorkflowId();
-						currentTimeStamp = b.getTimeStamp();
-					}
-				}
-			}
-		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.WARNING, "Error getting workflow history on Concept: " + conceptTerm, e);
-		}
-		
-		return currentWorkflowId;
-	}
-	
-	public WorkflowHistoryJavaBean getLatestWfHxJavaBeanForConcept(I_GetConceptData con) 
-	{
-		WorkflowHistoryJavaBean mostCurrent = null;
-		String conceptTerm = "unknown concept";
-		
-		try {
-			conceptTerm = con.getInitialText();
-			for (I_ExtendByRef extension : Terms.get().getRefsetExtensionsForComponent(refsetId, con.getConceptNid()))
-			{
-				I_ExtendByRefPartStr props = (I_ExtendByRefPartStr)extension.getMutableParts().get(extension.getMutableParts().size() - 1);
-
-				int currentState = props.getStatusNid();
-
-				if ((currentState == activeStatusNid) ||
-					(currentState == currentStatusNid))
-				{
-
-					WorkflowHistoryJavaBean b = WorkflowHelper.fillOutWorkflowHistoryJavaBean(Terms.get().nidToUuid(extension.getComponentNid()), props.getStringValue(), new Long(extension.getMutableParts().get(0).getTime()));
-					
-					if (mostCurrent == null || b.getTimeStamp() >= mostCurrent.getTimeStamp())
-					{
-						mostCurrent = b;
-					}
-				}
-			}
-		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.WARNING, "Error getting workflow history on Concept: " + conceptTerm, e);
-		}
-		
-		return mostCurrent;
-	}
-
-	
-	
 	public void listWorkflowHistory() throws NumberFormatException, IOException, TerminologyException 
 	{
 	//	Writer outputFile = new OutputStreamWriter(new FileOutputStream("C:\\Users\\jefron\\Desktop\\wb-bundle\\Output.txt"));
@@ -223,11 +133,8 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 			
 			int currentState = latestVersion.getStatusNid();
 		
-			// TODO: Must make ExportWorkflowHistory use proper active/current status
-			if ((currentState == activeStatusNid) ||
-			    (currentState == currentStatusNid))
+			if (currentState == currentStatusNid)
 			{
-	
 				WorkflowHistoryJavaBean history = WorkflowHelper.fillOutWorkflowHistoryJavaBean(Terms.get().nidToUuid(historyRow.getComponentNid()), latestVersion.getStringValue(), new Long(latestVersion.getTime()));
 				sortedInputList.add(history);
 			}
@@ -264,78 +171,285 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		return returnList;
 	}
 
+	 private boolean testSingleConcept (Set<WorkflowHistoryJavaBean> singleWorkflowBucket, List<I_TestWorkflowHistorySearchResults> checkList) throws TaskFailedException {
 
-
-
-
- private boolean testSingleConcept (Set<WorkflowHistoryJavaBean> singleWorkflowBucket, List<I_TestWorkflowHistorySearchResults> checkList) throws TaskFailedException {
-
-	 totalConcepts++;
-	 
-	for (I_TestWorkflowHistorySearchResults results : checkList) {
-	
-		if (!results.test(singleWorkflowBucket)) {
-	   		return false;
-		}
-	}
-	
-	return true;
- }
- 
- private boolean testConceptAgainstCheckboxes (Set<WorkflowHistoryJavaBean> singleWorkflowBucket, boolean WorkflowInProgress, boolean CompletedWorkflowInProgress, boolean PastReleasesIncluded) throws IOException, TerminologyException, Exception {
-	 
-		boolean approvedFound = false;
-
-		///// PAST RELEASE INCLUDED
+		 totalConcepts++;
+		 
+		for (I_TestWorkflowHistorySearchResults results : checkList) {
 		
-		boolean currentItemFound = false;
-		
-		if (!PastReleasesIncluded) {
-			for (WorkflowHistoryJavaBean wfHistoryItem : singleWorkflowBucket) {
-				if (new Date(wfHistoryItem.getTimeStamp()).after(new Date("01/01/2010"))) {
-					currentItemFound = true;
-				}
+			if (!results.test(singleWorkflowBucket)) {
+		   		return false;
 			}
-		
-			if (!currentItemFound)
-				return false;
-		}
-
-		///// END PAST RELEASE INCLUDED
-		
-		if (!WorkflowInProgress && !CompletedWorkflowInProgress) { 
-				throw new Exception("Error: User must choose either Workflow In Progress or Completed.");
-		} else if (!(WorkflowInProgress && CompletedWorkflowInProgress)) {
-			
-	    	for (WorkflowHistoryJavaBean wfHistoryItem : singleWorkflowBucket) {
-	    		I_GetConceptData state = Terms.get().getConcept(wfHistoryItem.getState());
-	    		
-	    		List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
-	    		
-	    		for (I_RelVersioned rel : relList)
-	    		{
-	    			if (rel != null && 
-	    				rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACCEPT_ACTION.getPrimoridalUid()).getConceptNid())
-	    				approvedFound = true;
-	    		}
-	    		
-	    		if (approvedFound)
-	    			break;
-			}
-	    	
-	    	if (approvedFound) {
-	    		if (WorkflowInProgress)
-	    			return false;
-	    	} else {
-	    		if (CompletedWorkflowInProgress) 
-	    			return false;
-	    	}
-	    	
 		}
 		
 		return true;
- }
+	 }
+	 
+	 private boolean testConceptAgainstCheckboxes (Set<WorkflowHistoryJavaBean> singleWorkflowBucket, boolean WorkflowInProgress, boolean CompletedWorkflowInProgress, boolean PastReleasesIncluded) throws IOException, TerminologyException, Exception {
+		 
+			boolean approvedFound = false;
+
+			///// PAST RELEASE INCLUDED
+			
+			boolean currentItemFound = false;
+			
+			if (!PastReleasesIncluded) {
+				for (WorkflowHistoryJavaBean wfHistoryItem : singleWorkflowBucket) {
+					if (new Date(wfHistoryItem.getEffectiveTime()).after(new Date("01/01/2010"))) {
+						currentItemFound = true;
+					}
+				}
+			
+				if (!currentItemFound)
+					return false;
+			}
+
+			///// END PAST RELEASE INCLUDED
+			
+			if (!WorkflowInProgress && !CompletedWorkflowInProgress) { 
+					throw new Exception("Error: User must choose either Workflow In Progress or Completed.");
+			} else if (!(WorkflowInProgress && CompletedWorkflowInProgress)) {
+				
+		    	for (WorkflowHistoryJavaBean wfHistoryItem : singleWorkflowBucket) {
+		    		I_GetConceptData state = Terms.get().getConcept(wfHistoryItem.getState());
+		    		
+		    		List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
+		    		
+		    		for (I_RelVersioned rel : relList)
+		    		{
+		    			if (rel != null && 
+		    				rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACCEPT_ACTION.getPrimoridalUid()).getConceptNid())
+		    				approvedFound = true;
+		    		}
+		    		
+		    		if (approvedFound)
+		    			break;
+				}
+		    	
+		    	if (approvedFound) {
+		    		if (WorkflowInProgress)
+		    			return false;
+		    	} else {
+		    		if (CompletedWorkflowInProgress) 
+		    			return false;
+		    	}
+		    	
+			}
+			
+			return true;
+	 	}
+	 
+		
+
+	
+	
+	
+	
+	public SortedMap<UUID, Map<UUID, SortedSet<WorkflowHistoryJavaBean>>> getAllWorkflowHistory() 
+	{
+		SortedMap<UUID, Map<UUID, SortedSet<WorkflowHistoryJavaBean>>> returnHistory = new TreeMap<UUID, Map<UUID, SortedSet<WorkflowHistoryJavaBean>>>();
+
+		SortedSet<I_DescriptionVersioned> allReleases = getWorkflowAllReleases();
+		
+		for (I_DescriptionVersioned release : allReleases)
+		{
+			SortedMap<UUID, Map<UUID, SortedSet<WorkflowHistoryJavaBean>>> releaseHistory = getWorkflowHistoryForRelease(release.getNid());
+			returnHistory.putAll(releaseHistory);
+		}
+		
+		return returnHistory;
+	}
+
+	public SortedMap<UUID, Map<UUID, SortedSet<WorkflowHistoryJavaBean>>> getWorkflowHistoryForRelease(int relNid) 
+	{
+		SortedMap<UUID, Map<UUID, SortedSet<WorkflowHistoryJavaBean>>> returnCollection = new TreeMap<UUID, Map<UUID, SortedSet<WorkflowHistoryJavaBean>>>();
+		
+		try
+		{
+			// Create sorted by Concept/WfId/Timestamp list of current WfHxJavaBeans
+			for (I_ExtendByRef historyRow : Terms.get().getRefsetExtensionsForComponent(refsetId, relNid)) 
+			{
+				I_ExtendByRefPartStr latestVersion = (I_ExtendByRefPartStr)historyRow.getMutableParts().get(historyRow.getMutableParts().size() - 1);
+				
+				int currentState = latestVersion.getStatusNid();
+			
+				if (currentState == currentStatusNid)
+				{
+					WorkflowHistoryJavaBean history = WorkflowHelper.fillOutWorkflowHistoryJavaBean(Terms.get().nidToUuid(historyRow.getComponentNid()), latestVersion.getStringValue(), new Long(latestVersion.getTime()));
+	
+					if (!returnCollection.containsKey(history.getConcept()))
+					{
+						HashMap<UUID, SortedSet<WorkflowHistoryJavaBean>> newConceptSet = new HashMap<UUID, SortedSet<WorkflowHistoryJavaBean>>();
+						SortedSet<WorkflowHistoryJavaBean> newWorkflowSet = new TreeSet<WorkflowHistoryJavaBean>(WorkflowHistoryRefset.createWfHxJavaBeanComparer());
+						
+						newConceptSet.put(history.getConcept(), newWorkflowSet);
+					}
+					
+					Map<UUID, SortedSet<WorkflowHistoryJavaBean>> conceptHistory = returnCollection.get(history.getConcept());
+					populateWorkflowCollection(conceptHistory, history);
+				}
+			}
+		} catch (Exception e) {
+			AceLog.getAppLog().log(Level.SEVERE, "Failure in Getting workflow history", e);
+		}
+		
+		return returnCollection;
+	} 
+	
+	private void populateWorkflowCollection(Map<UUID, SortedSet<WorkflowHistoryJavaBean>> conceptHistory, WorkflowHistoryJavaBean history) 
+	{
+		if (!conceptHistory.containsKey(history.getWorkflowId()))
+		{
+			SortedSet<WorkflowHistoryJavaBean> newWorkflowSet = new TreeSet<WorkflowHistoryJavaBean>(WorkflowHistoryRefset.createWfHxJavaBeanComparer());			
+
+			conceptHistory.put(history.getWorkflowId(), newWorkflowSet);
+		}
+
+		Set<WorkflowHistoryJavaBean> workflowHistory = conceptHistory.get(history.getWorkflowId());
+		workflowHistory.add(history);
+	}
+	
+	public Map<UUID, SortedSet<WorkflowHistoryJavaBean>> getAllWorkflowHistoryForConcept(I_GetConceptData con)
+	{
+		SortedMap<UUID, Map<UUID, SortedSet<WorkflowHistoryJavaBean>>> history = getAllWorkflowHistory();
+
+		if (!history.containsKey(con.getPrimUuid()))
+		{
+			return new TreeMap<UUID, SortedSet<WorkflowHistoryJavaBean>>();
+		}
+		else
+		{
+			return history.get(con.getPrimUuid());
+		}
+
+	}
+	
+	public SortedSet<WorkflowHistoryJavaBean> getLatestWorkflowHistoryForConcept(I_GetConceptData con)
+	{
+		SortedSet<WorkflowHistoryJavaBean> retSet = new TreeSet<WorkflowHistoryJavaBean>();
+		Map<UUID, SortedSet<WorkflowHistoryJavaBean>> conHx = getAllWorkflowHistoryForConcept(con);
+		
+		for (UUID key : conHx.keySet())
+		{
+			SortedSet<WorkflowHistoryJavaBean> workflowSet = conHx.get(key);
+			
+			if ((retSet.size() == 0) || 
+				(retSet.last().getWorkflowTime() < workflowSet.last().getWorkflowTime()))
+			{
+				retSet = workflowSet;
+			}
+				
+		}
+		
+		return retSet;
+	}
+	public WorkflowHistoryJavaBean getLatestWfHxJavaBeanForConcept(I_GetConceptData con)
+	{
+		SortedSet<WorkflowHistoryJavaBean> list = getLatestWorkflowHistoryForConcept(con);
+		
+		if (list.size() > 0)
+			return list.last();
+		else
+			return null;
+	}
+
+	public Map<UUID, SortedSet<WorkflowHistoryJavaBean>> getAllWorkflowHistoryForConceptForRelease(I_GetConceptData con, int relNid)
+	{
+		SortedMap<UUID, Map<UUID, SortedSet<WorkflowHistoryJavaBean>>> history = getWorkflowHistoryForRelease(relNid);
+		
+		if (!history.containsKey(con.getPrimUuid()))
+		{
+			return new TreeMap<UUID, SortedSet<WorkflowHistoryJavaBean>>();
+		}
+		else
+		{
+			return history.get(con.getPrimUuid());
+		}
+	}
  
+	public SortedSet<WorkflowHistoryJavaBean> getLatestWorkflowHistoryForConceptForRelease(I_GetConceptData con, int relNid)
+	{
+		SortedSet<WorkflowHistoryJavaBean> retSet = new TreeSet<WorkflowHistoryJavaBean>();
+		Map<UUID, SortedSet<WorkflowHistoryJavaBean>> conHx = getAllWorkflowHistoryForConceptForRelease(con, relNid);
+		
+		for (UUID key : conHx.keySet())
+		{
+			SortedSet<WorkflowHistoryJavaBean> workflowSet = conHx.get(key);
+			
+			if ((retSet.size() == 0) || 
+				(retSet.last().getWorkflowTime() < workflowSet.last().getWorkflowTime()))
+			{
+				retSet = workflowSet;
+			}
+				
+		}
+		
+		return retSet;
+	}
+
+	public WorkflowHistoryJavaBean getLatestWfHxJavaBeanForConceptForRelease(I_GetConceptData con, int relNid)
+	{
+		SortedSet<WorkflowHistoryJavaBean> list = getLatestWorkflowHistoryForConceptForRelease(con, relNid);
+		
+		if (list.size() > 0)
+			return list.last();
+		else
+			return null;
+	}
+	
+	private SortedSet<I_DescriptionVersioned> getWorkflowAllReleases() {
+		if (releases == null)
+		{
+			releases = new TreeSet<I_DescriptionVersioned>(WorkflowHistoryRefset.createDescriptionTimestampComparer());
+
+			try {
+				
+				I_GetConceptData snomedConcept = Terms.get().getConcept(Taxonomies.SNOMED.getUuids());
+				for ( I_DescriptionVersioned desc : snomedConcept.getDescriptions())
+				{
+					I_DescriptionTuple tuple = desc.getLastTuple();
+					int currentState = tuple.getStatusNid();
+					
+					if ((currentState == currentStatusNid) &&
+						(tuple.getText().contains(releaseSearchString)))
+					{
+						int releaseStringLocation = tuple.getText().indexOf(releaseSearchString);
+						int releaseStringLength = tuple.getText().length();
+						String dateString = tuple.getText().substring(releaseStringLocation, releaseStringLength);
+						String normalizedDateString = dateString.substring(0, 3) + "-" + 
+													  dateString.substring(4, 2) + "-" +
+													  dateString.substring(6,2);
+						
+						if (earliestWorkflowHistoryRelease.compareTo(normalizedDateString) >= 0)
+						{
+							releases.add(desc);
+						}
+					}
+				}
+			} catch (Exception e) {
+				AceLog.getAppLog().log(Level.SEVERE, "Failure in identifying the workflow history releases", e);
+			}
+		}
+		
+		return releases;
+	}
+
+
+	// @ TODO
+	/*
+	
+	
+	search backwards pre release till found
+
+
+	
+	getLatestWfForConcept
+		search backwards pre release till WF FOund, then till begin Action
+		
+	getLatestWfRowForConcept
+	*/
 
 }
 
+// @TODO 
+//Add if (currentState == currentStatusNid)

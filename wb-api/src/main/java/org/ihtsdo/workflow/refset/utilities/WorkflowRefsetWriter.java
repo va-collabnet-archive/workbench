@@ -5,17 +5,13 @@ import java.util.Collection;
 import java.util.UUID;
 import java.util.logging.Level;
 
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
-import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.WorkflowRefset;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
 
 
 
@@ -34,7 +30,6 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 	}
 
 	public boolean addMember() {
-		String refCompStr = null;
 		boolean retVal = false;
 		
 		try {
@@ -42,9 +37,8 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 			
 			if (fields.valuesExist())
 			{
-		        refCompStr = fields.getReferencedComponentId().getInitialText();
 				propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
-				helper.newRefsetExtension(refsetId, fields.getReferencedComponentId().getConceptNid(), REFSET_TYPES.STR, propMap, Terms.get().getActiveAceFrameConfig());
+				helper.newRefsetExtension(refsetId, Terms.get().getConcept(fields.getReferencedComponentId()).getConceptNid(), REFSET_TYPES.STR, propMap, Terms.get().getActiveAceFrameConfig());
 				retVal = true;
 			} else
 				return false;
@@ -58,17 +52,14 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 
 	//public boolean retireMember(int refsetId, int memberId)  {
 	public boolean retireMember()  {
-		String refCompStr = null;
 		
 		try {
 			RefsetPropertyMap propMap = new RefsetPropertyMap();
 
 			if (fields.valuesExist())
 			{
-				refCompStr = fields.getReferencedComponentId().getInitialText();
-
 				propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
-				helper.retireRefsetStrExtension(refsetId, fields.getReferencedComponentId().getConceptNid(), propMap);
+				helper.retireRefsetStrExtension(refsetId, Terms.get().getConcept(fields.getReferencedComponentId()).getConceptNid(), propMap);
 	
 				return true;
 			}
