@@ -27,7 +27,7 @@ import org.ihtsdo.tk.example.binding.TermAux;
 import org.ihtsdo.tk.spec.RelSpec;
 import org.ihtsdo.tk.example.binding.HistoricalRelType;
 import java.util.ArrayList;
-import org.ihtsdo.tk.example.binding.RelSpecFromConcept;
+import org.ihtsdo.tk.spec.RelSpecFromConcept;
 import javax.swing.JOptionPane;
 import org.ihtsdo.arena.context.action.RetireIsaRels;
 
