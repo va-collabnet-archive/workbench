@@ -37,11 +37,13 @@ import org.ihtsdo.project.refset.CommentsRefset;
  * @author Guillermo Reynoso
  */
 @SuppressWarnings("serial")
-public class RejectionReasonPopUpDialog extends JDialog {
+public class CommentPopUpDialog extends JDialog {
 	
 	private HashMap<I_GetConceptData, String>response = null;
+	private I_GetConceptData commentType;
 	
-	public RejectionReasonPopUpDialog(String title) {
+	public CommentPopUpDialog(String title, I_GetConceptData commentType) {
+		this.commentType = commentType;
 		response = new HashMap<I_GetConceptData, String>();
 		initComponents();
 		initCustomComponents();
@@ -51,18 +53,11 @@ public class RejectionReasonPopUpDialog extends JDialog {
 	}
 	
 	private void initCustomComponents() {
-		try {
-			I_GetConceptData c = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_REJECTION.getPrimoridalUid());
-			List<I_GetConceptData> s = new ArrayList<I_GetConceptData>();
-			CommentsRefset.getCommentSubTypes(s, c);
-			rejectionReasonCombo.addItem("");
-			for (I_GetConceptData iGetConceptData : s) {
-				rejectionReasonCombo.addItem(iGetConceptData);
-			}
-		} catch (TerminologyException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		List<I_GetConceptData> s = new ArrayList<I_GetConceptData>();
+		CommentsRefset.getCommentSubTypes(s, commentType);
+		rejectionReasonCombo.addItem("");
+		for (I_GetConceptData iGetConceptData : s) {
+			rejectionReasonCombo.addItem(iGetConceptData);
 		}
 		
 	}
@@ -124,7 +119,7 @@ public class RejectionReasonPopUpDialog extends JDialog {
 					((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 					//---- label2 ----
-					label2.setText("Rejection reason:");
+					label2.setText("Sub Type:");
 					panel1.add(label2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 0, 5), 0, 0));

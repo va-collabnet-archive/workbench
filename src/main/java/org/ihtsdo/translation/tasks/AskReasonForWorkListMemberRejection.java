@@ -41,7 +41,7 @@ import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.refset.CommentsRefset;
-import org.ihtsdo.translation.RejectionReasonPopUpDialog;
+import org.ihtsdo.translation.CommentPopUpDialog;
 
 /**
  * The Class
@@ -114,12 +114,11 @@ public class AskReasonForWorkListMemberRejection extends AbstractTask {
 			WorkList workList = TerminologyProjectDAO.getWorkList(tf.getConcept(workListMember.getWorkListUUID()), config);
 			
 			CommentsRefset commentsRefset = workList.getCommentsRefset(config);
-			
-			HashMap<I_GetConceptData,String> reason = new RejectionReasonPopUpDialog("Enter reason for rejection").showDialog();
+			I_GetConceptData commentType = tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_REJECTION.getPrimoridalUid());
+			HashMap<I_GetConceptData,String> reason = new CommentPopUpDialog("Enter reason for rejection", commentType).showDialog();
 			if(reason!= null && !reason.isEmpty()){
 				Set<I_GetConceptData> a = reason.keySet();
 				I_GetConceptData rejReason = a.iterator().next();
-				I_GetConceptData commentType = tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_REJECTION.getPrimoridalUid());
 				String fullName= config.getDbConfig().getFullName();
 				I_GetConceptData role=Terms.get().getConcept(stepRole.ids);
 				String comment = role + HEADER_SEPARATOR + fullName + COMMENT_HEADER_SEP + reason.get(rejReason);
