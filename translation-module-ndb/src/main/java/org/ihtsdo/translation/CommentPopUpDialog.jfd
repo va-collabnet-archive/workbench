@@ -111,7 +111,7 @@
               <string>javax.swing.JLabel</string> 
               <void method="setProperty"> 
                <string>text</string> 
-               <string>Rejection reason:</string> 
+               <string>Sub Type:</string> 
               </void> 
               <void property="name"> 
                <string>label2</string> 
