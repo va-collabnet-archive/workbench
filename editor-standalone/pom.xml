@@ -1,7 +1,7 @@
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
    http://maven.apache.org/maven-v4_0_0.xsd">
    <parent>
       <groupId>org.ihtsdo.sample</groupId>
@@ -51,7 +51,7 @@
          <groupId>org.ihtsdo</groupId>
          <artifactId>wb-icons</artifactId>
       </dependency>
-      <dependency>
+      <!--<dependency>
          <groupId>org.ihtsdo</groupId>
          <artifactId>tk-arena-rules</artifactId>
          <type>zip</type>
@@ -59,7 +59,7 @@
       <dependency>
          <groupId>org.ihtsdo</groupId>
          <artifactId>tk-arena-spec</artifactId>
-      </dependency>
+      </dependency> -->
       <dependency>
          <groupId>jgraphx</groupId>
          <artifactId>jgraphx-examples</artifactId>
@@ -333,17 +333,17 @@
                            <artifactId>wb-ide-user-bp</artifactId>
                            <type>zip</type>
                         </artifactItem>
-                        <artifactItem>
+                        <!-- <artifactItem>
                            <groupId>org.ihtsdo</groupId>
                            <artifactId>tk-arena-rules</artifactId>
                            <type>zip</type>
-                        </artifactItem>
+                        </artifactItem> -->
                      </artifactItems>
                      <outputDirectory>${project.build.directory}/generated-resources</outputDirectory>
                   </configuration>
                </execution>
             </executions>
-         </plugin>            
+         </plugin>
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-deploy-plugin</artifactId>
@@ -537,7 +537,7 @@
                         </configuration>
                      </execution>
                      <execution>
- 
+
                         <id>extract-tk-dependencies</id>
                         <phase>initialize</phase>
                         <goals>
@@ -559,52 +559,52 @@
                                  <groupId>org.ihtsdo</groupId>
                                  <artifactId>rule-engine-integration</artifactId>
                                  <version>${wb-toolkit.version}</version>
-                              </artifactItem>  
+                              </artifactItem>
                               <artifactItem>
                                  <groupId>org.ihtsdo</groupId>
                                  <artifactId>tk-arena-spec</artifactId>
                                  <version>${wb-toolkit.version}</version>
-                              </artifactItem>  
+                              </artifactItem>
                               <artifactItem>
                                  <groupId>org.ihtsdo</groupId>
                                  <artifactId>tk-concept-component</artifactId>
                                  <version>${wb-toolkit.version}</version>
-                              </artifactItem>  
+                              </artifactItem>
                               <artifactItem>
                                  <groupId>org.ihtsdo</groupId>
                                  <artifactId>tk-drools</artifactId>
                                  <version>${wb-toolkit.version}</version>
-                              </artifactItem>  
+                              </artifactItem>
                               <artifactItem>
                                  <groupId>org.ihtsdo</groupId>
                                  <artifactId>tk-helpers</artifactId>
                                  <version>${wb-toolkit.version}</version>
-                              </artifactItem>  
+                              </artifactItem>
                               <artifactItem>
                                  <groupId>org.ihtsdo</groupId>
                                  <artifactId>wb-api</artifactId>
                                  <version>${wb-toolkit.version}</version>
-                              </artifactItem>  
+                              </artifactItem>
                               <artifactItem>
                                  <groupId>org.ihtsdo</groupId>
                                  <artifactId>wb-core</artifactId>
                                  <version>${wb-toolkit.version}</version>
-                              </artifactItem>  
+                              </artifactItem>
                               <artifactItem>
                                  <groupId>org.ihtsdo</groupId>
                                  <artifactId>wb-foundation</artifactId>
                                  <version>${wb-toolkit.version}</version>
-                              </artifactItem>  
+                              </artifactItem>
                               <artifactItem>
                                  <groupId>org.ihtsdo</groupId>
                                  <artifactId>wb-gui</artifactId>
                                  <version>${wb-toolkit.version}</version>
-                              </artifactItem>  
+                              </artifactItem>
                               <artifactItem>
                                  <groupId>org.ihtsdo</groupId>
                                  <artifactId>wb-wf</artifactId>
                                  <version>${wb-toolkit.version}</version>
-                              </artifactItem>  
+                              </artifactItem>
                            </artifactItems>
                            <outputDirectory>${project.build.directory}/wb-bundle/lib</outputDirectory>
                         </configuration>

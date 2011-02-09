@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>queues</artifactId>
   <packaging>pom</packaging>
-  <name>SCT Mini Queues</name>
+  <name>Workbench Queues</name>
   <description>Workbench Queues</description>
   <build>
     <plugins>
