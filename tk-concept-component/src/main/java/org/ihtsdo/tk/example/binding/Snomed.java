@@ -25,9 +25,16 @@ public class Snomed {
 		new ConceptSpec("fully specified name (description type)", 
 						UUID.fromString("5e1fe940-8faf-11db-b606-0800200c9a66"));
 	
-	public static ConceptSpec INACTIVE_STATUS = 
-		new ConceptSpec("inactive (inactive status type)", 
-						UUID.fromString("1464ec56-7118-3051-9d21-0f95c1a39080"));
-
+	public static ConceptSpec CORE = 
+		new ConceptSpec("Core Namespace",
+						UUID.fromString("d6bbe207-7b5c-3e32-a2a1-f9259a7260c1"));
+		
+	public static ConceptSpec EXTENSION_0= 
+		new ConceptSpec("Extension Namespace 1000000",
+						UUID.fromString("18388bfd-9fab-3581-9e22-cbae53725ef2"));
+	
+	public static ConceptSpec EXTENSION_13 = 
+		new ConceptSpec("Extension Namespace 1000013",
+						UUID.fromString("bb57db0f-def7-3fb7-b7f2-89fa7710bffa"));
 
 }
