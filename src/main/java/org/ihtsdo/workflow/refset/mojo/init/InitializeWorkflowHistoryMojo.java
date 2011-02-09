@@ -132,6 +132,7 @@ public class InitializeWorkflowHistoryMojo extends AbstractMojo {
 					}
 				}
 				
+				// TODO Fix this with new solution &&&& InitWfHxOnCommit as will be using this RefCompId
 				// If here, means that the first time for which a member is being added for the 
 				// current release which for current testing is 2011-01-31
 				releases.put(timestamp, snomedConcept.getPrimUuid());
