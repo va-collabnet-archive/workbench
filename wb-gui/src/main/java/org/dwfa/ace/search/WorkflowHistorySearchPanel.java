@@ -79,7 +79,7 @@ import org.ihtsdo.ace.table.WorkflowHistoryTableRenderer;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WORKFLOW_FIELD;
 import org.ihtsdo.ace.task.search.I_TestWorkflowHistorySearchResults;
 
-public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
+public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterionPanel {
 
     public class EraseListener implements ActionListener {
 
@@ -133,7 +133,7 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
             try {
                 // Create a file dialog box to prompt for a new file to display
                 updateExtraCriterion();
-                FileDialog f = new FileDialog((Frame) MySearchPanel.this.getTopLevelAncestor(), "Save query (.query)",
+                FileDialog f = new FileDialog((Frame) WorkflowHistorySearchPanel.this.getTopLevelAncestor(), "Save query (.query)",
                     FileDialog.SAVE);
                 File searchFolder = new File("search");
                 f.setDirectory(searchFolder.getAbsolutePath());
@@ -177,9 +177,6 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
                     QueryBean qb = (QueryBean) ois.readObject();
                     ois.close();
                     setQuery(qb);
-                    // TODO
-                    // model.setDescriptions(new ArrayList<I_DescriptionVersioned>());
-                    // startSearch();
                 }
 
             } catch (Exception ex) {
@@ -364,7 +361,7 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
 
     private int lastSelectedRow = -1;
 
-    public MySearchPanel(I_ConfigAceFrame config, ACE ace) {
+    public WorkflowHistorySearchPanel(I_ConfigAceFrame config, ACE ace) {
         super(new GridBagLayout());
         this.config = config;
         this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "search");
@@ -552,7 +549,11 @@ public class MySearchPanel extends JPanel implements I_MakeCriterionPanel {
         gbc.gridy++;
         gbc.gridheight = 1;
 
-		model = new WorkflowHistoryTableModel(new WORKFLOW_FIELD[] { WORKFLOW_FIELD.FSN }, config);
+		model = new WorkflowHistoryTableModel(new WORKFLOW_FIELD[] { WORKFLOW_FIELD.FSN, 
+																	 WORKFLOW_FIELD.EDITOR, 
+																	 WORKFLOW_FIELD.STATE, 
+																	 WORKFLOW_FIELD.TIMESTAMP}, 
+																	 config);
 		/*
 		 *         model = new WorkflowHistoryTableModel(new WORKFLOW_FIELD[] {
 		 *       		WORKFLOW_FIELD.FSN, 	WORKFLOW_FIELD.ACTION, 	WORKFLOW_FIELD.STATE,

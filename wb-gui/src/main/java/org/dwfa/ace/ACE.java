@@ -150,8 +150,8 @@ import org.dwfa.ace.queue.AddQueueListener;
 import org.dwfa.ace.queue.NewQueueListener;
 import org.dwfa.ace.refset.RefsetSpecEditor;
 import org.dwfa.ace.refset.RefsetSpecPanel;
+import org.dwfa.ace.search.WorkflowHistorySearchPanel;
 import org.dwfa.ace.search.SearchPanel;
-import org.dwfa.ace.search.MySearchPanel;
 import org.dwfa.ace.table.refset.RefsetDefaults;
 import org.dwfa.ace.table.refset.RefsetDefaultsConcept;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -1031,7 +1031,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public SearchPanel searchPanel;
 
-    private MySearchPanel wfSearchPanel;
+    private WorkflowHistorySearchPanel wfSearchPanel;
 
     public JSplitPane upperLowerSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
@@ -1278,7 +1278,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         searchPanel.addComponentListener(new ResizePalettesListener());
 
         try {
-              wfSearchPanel = new MySearchPanel(aceFrameConfig, this);
+              wfSearchPanel = new WorkflowHistorySearchPanel(aceFrameConfig, this);
               wfSearchPanel.addComponentListener(new ResizePalettesListener());
 	          wfSearchPanel.setMinimumSize(new Dimension(0, 0));
         } catch (Exception e) {
@@ -3445,7 +3445,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         return searchPanel;
     }
 
-    public MySearchPanel getWfSearchPanel() {
+    public WorkflowHistorySearchPanel getWfSearchPanel() {
         return wfSearchPanel;
     }
     int refsetTabIndex = -2;
