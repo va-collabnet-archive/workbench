@@ -54,57 +54,8 @@ public class SetWFDtoWFUserSelectionBeanInfo extends SimpleBeanInfo {
 			projectPropName.setDisplayName("<html><font color='green'>projectPropName:");
 			projectPropName.setShortDescription("projectPropName");
 
-			PropertyDescriptor worklistName = new PropertyDescriptor("worklistName", 
-					getBeanDescriptor().getBeanClass());
-			worklistName.setBound(true);
-			worklistName.setPropertyEditorClass(CheckboxEditor.class);
-			worklistName.setDisplayName("Worklist name");
-			worklistName.setShortDescription("Worklist name");
-			
-			PropertyDescriptor businessProcess = new PropertyDescriptor("businessProcess", 
-					getBeanDescriptor().getBeanClass());
-			businessProcess.setBound(true);
-			businessProcess.setPropertyEditorClass(CheckboxEditor.class);
-			businessProcess.setDisplayName("Business process");
-			businessProcess.setShortDescription("Business process");
-			
-			PropertyDescriptor translator = new PropertyDescriptor("translator", 
-					getBeanDescriptor().getBeanClass());
-			translator.setBound(true);
-			translator.setPropertyEditorClass(CheckboxEditor.class);
-			translator.setDisplayName("Translator role");
-			translator.setShortDescription("Translator role");
-
-			PropertyDescriptor reviewer1 = new PropertyDescriptor("reviewer1", 
-					getBeanDescriptor().getBeanClass());
-			reviewer1.setBound(true);
-			reviewer1.setPropertyEditorClass(CheckboxEditor.class);
-			reviewer1.setDisplayName("Reviewer one");
-			reviewer1.setShortDescription("Reviewer one");
-
-			PropertyDescriptor reviewer2 = new PropertyDescriptor("reviewer2", 
-					getBeanDescriptor().getBeanClass());
-			reviewer2.setBound(true);
-			reviewer2.setPropertyEditorClass(CheckboxEditor.class);
-			reviewer2.setDisplayName("Reviewer two");
-			reviewer2.setShortDescription("Reviewer two");
-
-			PropertyDescriptor sme = new PropertyDescriptor("sme", 
-					getBeanDescriptor().getBeanClass());
-			sme.setBound(true);
-			sme.setPropertyEditorClass(CheckboxEditor.class);
-			sme.setDisplayName("Subject matter expert");
-			sme.setShortDescription("Subject matter expert");
-
-			PropertyDescriptor editorialBoard = new PropertyDescriptor("editorialBoard", 
-					getBeanDescriptor().getBeanClass());
-			editorialBoard.setBound(true);
-			editorialBoard.setPropertyEditorClass(CheckboxEditor.class);
-			editorialBoard.setDisplayName("Editorial board");
-			editorialBoard.setShortDescription("Editorial board");
-
 			PropertyDescriptor rv[] =
-			{profilePropName, projectPropName, worklistName, businessProcess, translator, reviewer1, reviewer2, sme, editorialBoard};
+			{profilePropName, projectPropName};
 			return rv;
 		} catch (IntrospectionException e) {
 			throw new Error(e.toString());

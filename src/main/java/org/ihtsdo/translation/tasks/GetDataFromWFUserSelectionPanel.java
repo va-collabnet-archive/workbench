@@ -68,9 +68,11 @@ public class GetDataFromWFUserSelectionPanel extends AbstractTask {
     private String processPropName = ProcessAttachmentKeys.PROCESS_TO_LAUNCH.getAttachmentKey();
     private String worklistNamePropName = ProcessAttachmentKeys.PROCESS_NAME.getAttachmentKey();
     private String translatorInboxPropName = ProcessAttachmentKeys.TRANSLATOR_ROLE_INBOX.getAttachmentKey();
+    private String fastTrackTranslatorInboxPropName = ProcessAttachmentKeys.FAST_TRACK_TRANSLATOR_ROLE_INBOX.getAttachmentKey();
     private String reviewer1InboxPropName = ProcessAttachmentKeys.REVIEWER_1_ROLE_INBOX.getAttachmentKey();
     private String reviewer2InboxPropName = ProcessAttachmentKeys.REVIEWER_2_ROLE_INBOX.getAttachmentKey();
     private String smeInboxPropName = ProcessAttachmentKeys.SME_ROLE_INBOX.getAttachmentKey();
+    private String superSmeInboxPropName = ProcessAttachmentKeys.SUPER_SME_ROLE_INBOX.getAttachmentKey();
     private String editorialBoardInboxPropName = ProcessAttachmentKeys.EDITORIAL_BOARD_ROLE_INBOX.getAttachmentKey();
 
     // Other Properties
@@ -87,9 +89,11 @@ public class GetDataFromWFUserSelectionPanel extends AbstractTask {
         out.writeObject(processPropName);
         out.writeObject(worklistNamePropName);
         out.writeObject(translatorInboxPropName);
+        out.writeObject(fastTrackTranslatorInboxPropName);
         out.writeObject(reviewer1InboxPropName);
         out.writeObject(reviewer2InboxPropName);
         out.writeObject(smeInboxPropName);
+        out.writeObject(superSmeInboxPropName);
         out.writeObject(editorialBoardInboxPropName);
     }
 
@@ -103,9 +107,11 @@ public class GetDataFromWFUserSelectionPanel extends AbstractTask {
                 processPropName = (String) in.readObject();
                 worklistNamePropName = (String) in.readObject();
                 translatorInboxPropName = (String) in.readObject();
+                fastTrackTranslatorInboxPropName = (String) in.readObject();
                 reviewer1InboxPropName = (String) in.readObject();
                 reviewer2InboxPropName = (String) in.readObject();
                 smeInboxPropName = (String) in.readObject();
+                superSmeInboxPropName = (String) in.readObject();
                 editorialBoardInboxPropName = (String) in.readObject();
             }
             // Initialize transient properties
@@ -168,6 +174,10 @@ public class GetDataFromWFUserSelectionPanel extends AbstractTask {
 					String translatorInbox = null;
 					if (panel.getTranslator()) {
 						translatorInbox = (String) panel.getTranslatorCombo().getSelectedItem();
+					}
+					String fastTrackTranslatorInbox = null;
+					if (panel.getTranslator()) {
+						fastTrackTranslatorInbox = (String) panel.getTranslatorCombo().getSelectedItem();
 					}
 					String reviewer1Inbox = null;
 					if (panel.getReviewer1()) {
@@ -387,6 +397,23 @@ public class GetDataFromWFUserSelectionPanel extends AbstractTask {
 
 	public void setEditorialBoardInboxPropName(String editorialBoardInboxPropName) {
 		this.editorialBoardInboxPropName = editorialBoardInboxPropName;
+	}
+
+	public String getFastTrackTranslatorInboxPropName() {
+		return fastTrackTranslatorInboxPropName;
+	}
+
+	public void setFastTrackTranslatorInboxPropName(
+			String fastTrackTranslatorInboxPropName) {
+		this.fastTrackTranslatorInboxPropName = fastTrackTranslatorInboxPropName;
+	}
+
+	public String getSuperSmeInboxPropName() {
+		return superSmeInboxPropName;
+	}
+
+	public void setSuperSmeInboxPropName(String superSmeInboxPropName) {
+		this.superSmeInboxPropName = superSmeInboxPropName;
 	}
 
 
