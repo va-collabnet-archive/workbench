@@ -86,7 +86,8 @@ rule "retire if no children"
 	when
 		$c: ConceptVersionBI (); 
 	then
-		actions.addAll(actionFactory.fromDir("plugins/retire"));
+		actions.add(actionFactory.make(new File("plugins/retire/retire-concept.bp")));
+		actions.add(actionFactory.make(new File("plugins/retire/move-concept.bp")));
 end
 
 

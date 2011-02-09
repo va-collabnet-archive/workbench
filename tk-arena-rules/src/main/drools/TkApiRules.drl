@@ -4,6 +4,7 @@ package org.ihtsdo.arena.drools
 #list any import classes here.
 import java.util.Map;
 
+
 import org.ihtsdo.helper.dialect.DialectHelper;
 
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -21,12 +22,14 @@ import org.ihtsdo.tk.example.binding.SnomedRelType;
 import org.ihtsdo.tk.example.binding.SnomedRelSpec;
 import org.ihtsdo.tk.example.binding.Taxonomies;
 import org.ihtsdo.tk.example.binding.WbDescType;
+import org.ihtsdo.tk.example.binding.TermAux;
 
 import org.ihtsdo.tk.spec.RelSpec;
 import org.ihtsdo.tk.example.binding.HistoricalRelType;
 import java.util.ArrayList;
 import org.ihtsdo.tk.example.binding.RelSpecFromConcept;
 import javax.swing.JOptionPane;
+import org.ihtsdo.arena.context.action.RetireIsaRels;
 
 
 #declare any global variables here
@@ -133,7 +136,7 @@ end
 
 rule "isKindOf inactive status"
 	when
-		$c : ConceptVersionBI(this isKindOf Snomed.INACTIVE_STATUS);
+		$c : ConceptVersionBI(this isKindOf TermAux.INACTIVE_STATUS, this not isKindOf TermAux.MOVED_TO);
 	then
 			ArrayList<RelSpec> relSpecs = new RelSpecFromConcept($c).getRelSpecs();
 			for (RelSpec relSpec: relSpecs){

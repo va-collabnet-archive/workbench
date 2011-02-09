@@ -269,10 +269,7 @@ rule "rule 14" #historical rel template onto rel"
 	when
 		$dropObject : RelFact(context == Context.DROP_OBJECT);
 		$dropTarget : RelSpecFact(context == Context.DROP_TARGET);
-		$concept : ConceptVersionBI();
 
 	then
-		actions.add(new ReplaceAction("Replace with", $dropObject,
-                                    $concept, $dropTarget));
-		#String actionName, RelFact fact, ConceptFact concept, SpecFact<?> spec
+		actions.add(new ReplaceAction("Replace with", $dropObject, $dropTarget));
 end
