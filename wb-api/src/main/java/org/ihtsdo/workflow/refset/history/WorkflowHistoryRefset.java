@@ -8,7 +8,6 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
@@ -19,6 +18,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.WorkflowRefset;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
@@ -74,7 +74,7 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 		return Long.parseLong(getProp("effectiveTime", props));
 	}
 	public UUID getConceptUid(String props) throws NumberFormatException, TerminologyException, IOException {
-		return getUUID("conceptId", props);
+		return getUUID("concept", props);
 	}
 	public UUID getStateUid(String props) throws NumberFormatException, TerminologyException, IOException {
 		return getUUID("state", props);
@@ -146,17 +146,17 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 		return new PreferredTermComparator();
 	}
 
-	public static Comparator<I_DescriptionVersioned> createDescriptionTimestampComparer() {
-		return new DescriptionTimestampComparator();
+	public static Comparator<ComponentVersionBI> createComponentTimestampComparer() {
+		return new ComponentTimestampComparator();
 	}
 
 	public static Comparator<WorkflowHistoryJavaBean> createWfIdTimeStampComparer() {
 		return new WfHxWfIdTimeStampComparer();
 	}
 
-	public static class DescriptionTimestampComparator implements Comparator<I_DescriptionVersioned> { 
-		public int compare(I_DescriptionVersioned a, I_DescriptionVersioned b) {
-			if (a.getTime() < b.getTime())
+	public static class ComponentTimestampComparator implements Comparator<ComponentVersionBI> { 
+		public int compare(ComponentVersionBI a, ComponentVersionBI b) {
+			if (a.getTime() > b.getTime())
 				return 1;
 			else
 				return -1;
@@ -186,10 +186,10 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 	private static class WfHxJavaBeanComparer implements Comparator<WorkflowHistoryJavaBean> {
 		@Override
 		public int compare(WorkflowHistoryJavaBean o1, WorkflowHistoryJavaBean o2) {
-			if (o2.getConcept().compareTo(o1.getConcept()) != 0)
-				return o2.getConcept().compareTo(o1.getConcept());
-			else if (o2.getWorkflowTime().compareTo(o1.getWorkflowTime()) != 0)
-				return o2.getWorkflowTime().compareTo(o1.getWorkflowTime());
+			if (o1.getConcept().compareTo(o2.getConcept()) != 0)
+				return o1.getConcept().compareTo(o2.getConcept());
+			else if (o1.getWorkflowTime().compareTo(o2.getWorkflowTime()) != 0)
+				return o1.getWorkflowTime().compareTo(o2.getWorkflowTime());
 			else 
 				return -1;
 		}

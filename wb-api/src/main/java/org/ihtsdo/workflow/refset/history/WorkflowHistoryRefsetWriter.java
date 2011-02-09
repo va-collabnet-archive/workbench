@@ -393,10 +393,6 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 			   			"<value>" + getWorkflowTime() + "</value>" +
 			   		"</property>" + 
 			   		"<property>" +
-		   				"<key>effectiveTime</key>" +
-		   				"<value>" + getEffectiveTime() + "</value>" +
-		   			"</property>" + 
-			   		"<property>" +
 			   			"<key>fsn</key>" +
 			   			"<value>" + getFSN() + "</value>" +
 			   		"</property>" + 

@@ -26,6 +26,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.ace.task.search.I_TestWorkflowHistorySearchResults;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.example.binding.Taxonomies;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
@@ -40,7 +41,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 
 	private int currentStatusNid = 0;
 	private int totalConcepts = 0;
-	private SortedSet<I_DescriptionVersioned> releases = null;
+	private static SortedSet<ComponentVersionBI> releases = null;
 	private String releaseSearchString = "version: ";
 
 	// First release with Workflow History
@@ -247,21 +248,33 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 	
 	public SortedMap<UUID, Map<UUID, SortedSet<WorkflowHistoryJavaBean>>> getAllWorkflowHistory() 
 	{
+		// TODO: Add Sort Comparer
 		SortedMap<UUID, Map<UUID, SortedSet<WorkflowHistoryJavaBean>>> returnHistory = new TreeMap<UUID, Map<UUID, SortedSet<WorkflowHistoryJavaBean>>>();
 
-		SortedSet<I_DescriptionVersioned> allReleases = getWorkflowAllReleases();
+		SortedSet<ComponentVersionBI> allReleases = getWorkflowAllReleases();
 		
-		for (I_DescriptionVersioned release : allReleases)
+		for (ComponentVersionBI release : allReleases)
 		{
 			SortedMap<UUID, Map<UUID, SortedSet<WorkflowHistoryJavaBean>>> releaseHistory = getWorkflowHistoryForRelease(release.getNid());
+			
 			returnHistory.putAll(releaseHistory);
 		}
-		
+
+		try {
+			// Current Release
+			I_GetConceptData snomedConcept = Terms.get().getConcept(Taxonomies.SNOMED.getUuids());
+			SortedMap<UUID, Map<UUID, SortedSet<WorkflowHistoryJavaBean>>> releaseHistory = getWorkflowHistoryForRelease(snomedConcept.getNid());
+			returnHistory.putAll(releaseHistory);
+		} catch (Exception e)  {
+			AceLog.getAppLog().log(Level.SEVERE, "Failure in getting current release's workflow", e);
+		}
+
 		return returnHistory;
 	}
 
 	public SortedMap<UUID, Map<UUID, SortedSet<WorkflowHistoryJavaBean>>> getWorkflowHistoryForRelease(int relNid) 
 	{
+		// TODO: Add Comparer
 		SortedMap<UUID, Map<UUID, SortedSet<WorkflowHistoryJavaBean>>> returnCollection = new TreeMap<UUID, Map<UUID, SortedSet<WorkflowHistoryJavaBean>>>();
 		
 		try
@@ -275,18 +288,20 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 			
 				if (currentState == currentStatusNid)
 				{
-					WorkflowHistoryJavaBean history = WorkflowHelper.fillOutWorkflowHistoryJavaBean(Terms.get().nidToUuid(historyRow.getComponentNid()), latestVersion.getStringValue(), new Long(latestVersion.getTime()));
+					WorkflowHistoryJavaBean bean = WorkflowHelper.fillOutWorkflowHistoryJavaBean(Terms.get().nidToUuid(historyRow.getComponentNid()), latestVersion.getStringValue(), new Long(latestVersion.getTime()));
 	
-					if (!returnCollection.containsKey(history.getConcept()))
+					if (!returnCollection.containsKey(bean.getConcept()))
 					{
-						HashMap<UUID, SortedSet<WorkflowHistoryJavaBean>> newConceptSet = new HashMap<UUID, SortedSet<WorkflowHistoryJavaBean>>();
-						SortedSet<WorkflowHistoryJavaBean> newWorkflowSet = new TreeSet<WorkflowHistoryJavaBean>(WorkflowHistoryRefset.createWfHxJavaBeanComparer());
+						// TODO: Add Comparer
+						HashMap<UUID, SortedSet<WorkflowHistoryJavaBean>> newWorkflowMap = new HashMap<UUID, SortedSet<WorkflowHistoryJavaBean>>();
 						
-						newConceptSet.put(history.getConcept(), newWorkflowSet);
+						SortedSet<WorkflowHistoryJavaBean> newWorkflow = new TreeSet<WorkflowHistoryJavaBean>(WorkflowHistoryRefset.createWfHxJavaBeanComparer());
+						newWorkflowMap.put(bean.getWorkflowId(), newWorkflow);
+						returnCollection.put(bean.getConcept(), newWorkflowMap);
 					}
 					
-					Map<UUID, SortedSet<WorkflowHistoryJavaBean>> conceptHistory = returnCollection.get(history.getConcept());
-					populateWorkflowCollection(conceptHistory, history);
+					Map<UUID, SortedSet<WorkflowHistoryJavaBean>> conceptHistory = returnCollection.get(bean.getConcept());
+					populateWorkflowCollection(conceptHistory, bean);
 				}
 			}
 		} catch (Exception e) {
@@ -315,6 +330,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 
 		if (!history.containsKey(con.getPrimUuid()))
 		{
+			// TODO: Add Comparer
 			return new TreeMap<UUID, SortedSet<WorkflowHistoryJavaBean>>();
 		}
 		else
@@ -326,7 +342,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 	
 	public SortedSet<WorkflowHistoryJavaBean> getLatestWorkflowHistoryForConcept(I_GetConceptData con)
 	{
-		SortedSet<WorkflowHistoryJavaBean> retSet = new TreeSet<WorkflowHistoryJavaBean>();
+		SortedSet<WorkflowHistoryJavaBean> retSet = new TreeSet<WorkflowHistoryJavaBean>(WorkflowHistoryRefset.createWfHxJavaBeanComparer());
 		Map<UUID, SortedSet<WorkflowHistoryJavaBean>> conHx = getAllWorkflowHistoryForConcept(con);
 		
 		for (UUID key : conHx.keySet())
@@ -359,6 +375,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		
 		if (!history.containsKey(con.getPrimUuid()))
 		{
+			// TODO: Add Comparer
 			return new TreeMap<UUID, SortedSet<WorkflowHistoryJavaBean>>();
 		}
 		else
@@ -369,6 +386,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
  
 	public SortedSet<WorkflowHistoryJavaBean> getLatestWorkflowHistoryForConceptForRelease(I_GetConceptData con, int relNid)
 	{
+		// TODO: Add Comparer
 		SortedSet<WorkflowHistoryJavaBean> retSet = new TreeSet<WorkflowHistoryJavaBean>();
 		Map<UUID, SortedSet<WorkflowHistoryJavaBean>> conHx = getAllWorkflowHistoryForConceptForRelease(con, relNid);
 		
@@ -397,10 +415,10 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 			return null;
 	}
 	
-	private SortedSet<I_DescriptionVersioned> getWorkflowAllReleases() {
+	private SortedSet<ComponentVersionBI> getWorkflowAllReleases() {
 		if (releases == null)
 		{
-			releases = new TreeSet<I_DescriptionVersioned>(WorkflowHistoryRefset.createDescriptionTimestampComparer());
+			releases = new TreeSet<ComponentVersionBI>(WorkflowHistoryRefset.createComponentTimestampComparer());
 
 			try {
 				
@@ -410,15 +428,14 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 					I_DescriptionTuple tuple = desc.getLastTuple();
 					int currentState = tuple.getStatusNid();
 					
-					if ((currentState == currentStatusNid) &&
-						(tuple.getText().contains(releaseSearchString)))
+					if (tuple.getText().contains(releaseSearchString))
 					{
 						int releaseStringLocation = tuple.getText().indexOf(releaseSearchString);
-						int releaseStringLength = tuple.getText().length();
-						String dateString = tuple.getText().substring(releaseStringLocation, releaseStringLength);
-						String normalizedDateString = dateString.substring(0, 3) + "-" + 
-													  dateString.substring(4, 2) + "-" +
-													  dateString.substring(6,2);
+						int releaseStringLength = releaseSearchString.length();
+						String dateString = tuple.getText().substring(releaseStringLocation + releaseStringLength);
+						String normalizedDateString = dateString.substring(0, 4) + "-" + 
+													  dateString.substring(4, 6) + "-" +
+													  dateString.substring(6,8);
 						
 						if (earliestWorkflowHistoryRelease.compareTo(normalizedDateString) >= 0)
 						{
@@ -426,6 +443,8 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 						}
 					}
 				}
+				
+//				releases.add(Taxonomies.SNOMED.get(Terms.get().getActiveAceFrameConfig().getViewCoordinate()));
 			} catch (Exception e) {
 				AceLog.getAppLog().log(Level.SEVERE, "Failure in identifying the workflow history releases", e);
 			}

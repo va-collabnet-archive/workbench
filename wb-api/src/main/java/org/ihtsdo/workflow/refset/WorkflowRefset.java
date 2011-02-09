@@ -80,6 +80,9 @@ public abstract class WorkflowRefset
 		String fullKey = "<key>" + key + "</key>";
 		
 		int idx = props.indexOf(fullKey);
+		if (idx < 0)
+			return "";
+		
 		String s = props.substring(idx);
 		
 		int startIndex = s.indexOf("<value>");
@@ -99,10 +102,14 @@ public abstract class WorkflowRefset
 
 	protected I_GetConceptData getConcept(String key, String props) {
 		String UidString = getProp(key, props);
-		try {
-			return Terms.get().getConcept(UUID.fromString(UidString));
-		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.WARNING, "Error retrieving Concept: " + UidString, e);
+		
+		if (UidString.length() > 0)
+		{
+			try {
+				return Terms.get().getConcept(UUID.fromString(UidString));
+			} catch (Exception e) {
+	        	AceLog.getAppLog().log(Level.WARNING, "Error retrieving Concept: " + UidString, e);
+			}
 		}
 		
 		return null;
@@ -110,6 +117,15 @@ public abstract class WorkflowRefset
 
 	protected UUID getUUID(String key, String props) {
 		String UidString = getProp(key, props);
-		return UUID.fromString(UidString);
+		
+		if (UidString.length() < 0)
+			return null;
+		
+		try {
+			return UUID.fromString(UidString);
+		} catch (Exception e) {
+		}
+		
+		return null;
 	}
 }

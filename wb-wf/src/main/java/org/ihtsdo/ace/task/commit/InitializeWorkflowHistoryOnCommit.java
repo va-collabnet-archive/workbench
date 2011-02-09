@@ -52,6 +52,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.example.binding.Taxonomies;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
@@ -71,6 +72,7 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
 
     private static final long serialVersionUID = 1;
     private static final int DATA_VERSION = 1;
+	private static I_GetConceptData snomedConcept = null;
 
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -88,6 +90,9 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
     public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit)
             throws TaskFailedException {
         try {
+        	if (snomedConcept == null)
+        		snomedConcept = Terms.get().getConcept(Taxonomies.SNOMED.getUuids());
+        	
             if (!WorkflowHistoryRefsetWriter.isInUse()) // Not in the middle of an existing commit
         	{
             	WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
@@ -148,6 +153,9 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
 			        writer.setEffectiveTime(today.getTime());
 			        writer.setWorkflowTime(today.getTime());
 
+			        // RefCompId
+			        writer.setReleaseDescriptionUid(snomedConcept.getPrimUuid());
+			        // 
 			        // Write Member
 					WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
 					writer.addMember();

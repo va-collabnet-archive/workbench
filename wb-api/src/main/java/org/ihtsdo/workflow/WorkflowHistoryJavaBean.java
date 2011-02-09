@@ -150,7 +150,7 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 			I_TermFactory tf = Terms.get();
 			
 			return "\nRelease Description (Referenced Component Id) = " + tf.getConcept(getReleaseDescription()).getInitialText() + 
-				   "\nConcept = " + tf.getConcept(concept.toString()) +
+				   "\nConcept = " + tf.getConcept(concept).getInitialText() +
 				   "\nWorkflow Id = " + workflowId.toString() +
 				   "\nPath = " + tf.getConcept(path).getInitialText() +
 				   "\nModeler = " + tf.getConcept(modeler).getInitialText() + 

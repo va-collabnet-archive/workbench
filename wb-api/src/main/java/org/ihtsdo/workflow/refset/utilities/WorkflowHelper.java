@@ -564,6 +564,7 @@ public class WorkflowHelper {
 		            templateBean.setPath(latestBean.getPath());
 		            templateBean.setEffectiveTime(latestBean.getEffectiveTime());
 		            templateBean.setWorkflowTime(latestBean.getWorkflowTime());
+		            templateBean.setReleaseDescription(latestBean.getReleaseDescription());
 
 		            templateBean.setAction(key.getUids().get(0));
 		            templateBean.setState(actionMap.get(key).getUids().get(0));
