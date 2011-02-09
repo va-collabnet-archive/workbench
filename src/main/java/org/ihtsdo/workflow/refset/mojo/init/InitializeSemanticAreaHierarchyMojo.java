@@ -41,10 +41,13 @@ public class InitializeSemanticAreaHierarchyMojo extends AbstractMojo {
             	String line = scanner.nextLine();
             	String[] columns = line.split("\t");
             
-            	writer.setChildSemanticArea(columns[0]);
-            	writer.setParentSemanticArea(columns[1]);
-
-            	writer.addMember();
+            	if (columns.length == 2)
+            	{
+	            	writer.setChildSemanticArea(columns[0]);
+	            	writer.setParentSemanticArea(columns[1]);
+	
+	            	writer.addMember();
+            	}
             }
 
             // Single RefCompId, so commit at end
