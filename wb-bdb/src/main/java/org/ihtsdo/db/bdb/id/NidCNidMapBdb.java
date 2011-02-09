@@ -198,11 +198,16 @@ public class NidCNidMapBdb extends ComponentBdb {
         int indexInMap = (nid  - Integer.MIN_VALUE) % NID_CNID_MAP_SIZE;
         assert indexInMap < NID_CNID_MAP_SIZE: "cNid: " + cNid + " nid: " + nid + " mapIndex: " + mapIndex
             + " indexInMap: " + indexInMap;
-        
 		ensureCapacity(nid);
-		assert nidCNidMaps.get()[mapIndex][indexInMap] == Integer.MAX_VALUE ||
-			nidCNidMaps.get()[mapIndex][indexInMap] == cNid: "processing cNid: " + cNid + 
-					" nid: " + nid + " found: " + nidCNidMaps.get()[mapIndex][indexInMap];
+		
+		if (nidCNidMaps.get()[mapIndex][indexInMap] != Integer.MAX_VALUE &&
+			nidCNidMaps.get()[mapIndex][indexInMap] != cNid) {
+			AceLog.getAppLog().warning("processing cNid: " + cNid + 
+							" nid: " + nid + " found existing cNid: " + nidCNidMaps.get()[mapIndex][indexInMap] +
+							"\n    " + cNid + " maps to: " + getCNid(cNid) +
+							"\n    " + nidCNidMaps.get()[mapIndex][indexInMap] + " maps to: " + getCNid(nidCNidMaps.get()[mapIndex][indexInMap]));
+		}
+		
 		if (nidCNidMaps.get() != null && nidCNidMaps.get()[mapIndex] != null) {
 	        if (nidCNidMaps.get()[mapIndex][indexInMap] != cNid) {
 	            nidCNidMaps.get()[mapIndex][indexInMap] = cNid;
