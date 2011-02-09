@@ -45,6 +45,7 @@ public class GenerateWorklistFromAttachments extends AbstractTask {
 	private String processPropName = ProcessAttachmentKeys.PROCESS_TO_LAUNCH.getAttachmentKey();
 	private String worklistNamePropName = ProcessAttachmentKeys.PROCESS_NAME.getAttachmentKey();
 	private String translatorInboxPropName = ProcessAttachmentKeys.TRANSLATOR_ROLE_INBOX.getAttachmentKey();
+	private String fastTrackTranslatorInboxPropName = ProcessAttachmentKeys.FAST_TRACK_TRANSLATOR_ROLE_INBOX.getAttachmentKey();
 	private String partitionPropName = ProcessAttachmentKeys.PARTITION.getAttachmentKey();
 
 	/** The Constant serialVersionUID. */
@@ -66,6 +67,7 @@ public class GenerateWorklistFromAttachments extends AbstractTask {
 		out.writeObject(processPropName);
 		out.writeObject(worklistNamePropName);
 		out.writeObject(translatorInboxPropName);
+		out.writeObject(fastTrackTranslatorInboxPropName);
 		out.writeObject(partitionPropName);
 	}
 
@@ -85,6 +87,7 @@ public class GenerateWorklistFromAttachments extends AbstractTask {
 			processPropName = (String) in.readObject();
 			worklistNamePropName = (String) in.readObject();
 			translatorInboxPropName = (String) in.readObject();
+			fastTrackTranslatorInboxPropName = (String) in.readObject();
 			partitionPropName = (String) in.readObject();
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);   
@@ -104,7 +107,19 @@ public class GenerateWorklistFromAttachments extends AbstractTask {
 
 			Partition partition = (Partition) process.getProperty(getPartitionPropName());
 
-			String destination = (String) selectedWorkFlow.getProperty(getTranslatorInboxPropName());
+			String trans = (String) selectedWorkFlow.getProperty(getTranslatorInboxPropName());
+			String fastTrans = (String) selectedWorkFlow.getProperty(getFastTrackTranslatorInboxPropName());
+			String destination = "";
+			if (!fastTrans.isEmpty()) {
+				destination =  fastTrans;
+			} else if (!trans.isEmpty()){
+				destination = trans;
+			}
+			
+			if (destination.isEmpty()) {
+				throw new TaskFailedException("No destination");
+			}
+			
 
 			String name = (String) process.getProperty(getWorklistNamePropName());
 
@@ -176,6 +191,15 @@ public class GenerateWorklistFromAttachments extends AbstractTask {
 
 	public void setPartitionPropName(String partitionPropName) {
 		this.partitionPropName = partitionPropName;
+	}
+
+	public String getFastTrackTranslatorInboxPropName() {
+		return fastTrackTranslatorInboxPropName;
+	}
+
+	public void setFastTrackTranslatorInboxPropName(
+			String fastTrackTranslatorInboxPropName) {
+		this.fastTrackTranslatorInboxPropName = fastTrackTranslatorInboxPropName;
 	}
 
 }

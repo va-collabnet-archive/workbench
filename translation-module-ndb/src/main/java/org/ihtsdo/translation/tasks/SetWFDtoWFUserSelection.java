@@ -58,20 +58,6 @@ public class SetWFDtoWFUserSelection extends AbstractTask {
 	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 	private String projectPropName = ProcessAttachmentKeys.TERMINOLOGY_PROJECT.getAttachmentKey();
 
-	public Boolean worklistName = true;
-	
-	public Boolean businessProcess = true;
-	
-	public Boolean translator = true;
-
-	public Boolean reviewer1 = true;
-
-	public Boolean reviewer2 = true;
-
-	public Boolean sme = true;
-
-	public Boolean editorialBoard = true;
-
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1;
 
@@ -89,13 +75,6 @@ public class SetWFDtoWFUserSelection extends AbstractTask {
 	 */
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
-		out.writeObject(worklistName);
-		out.writeObject(businessProcess);
-		out.writeObject(translator);
-		out.writeObject(reviewer1);
-		out.writeObject(reviewer2);
-		out.writeObject(sme);
-		out.writeObject(editorialBoard);
 		out.writeObject(profilePropName);
 		out.writeObject(projectPropName);
 	}
@@ -112,13 +91,6 @@ public class SetWFDtoWFUserSelection extends AbstractTask {
 	ClassNotFoundException {
 		int objDataVersion = in.readInt();
 		if (objDataVersion == 1) {
-			worklistName=(Boolean)in.readObject();
-			businessProcess=(Boolean)in.readObject();
-			translator=(Boolean)in.readObject();
-			reviewer1=(Boolean)in.readObject();
-			reviewer2=(Boolean)in.readObject();
-			sme=(Boolean)in.readObject();
-			editorialBoard=(Boolean)in.readObject();
 			profilePropName = (String) in.readObject();
 			projectPropName = (String) in.readObject();
 		} else {
@@ -182,8 +154,7 @@ public class SetWFDtoWFUserSelection extends AbstractTask {
 			workflowDetailsSheet.setSize(width, height);
 			workflowDetailsSheet.setLayout(new GridLayout(1, 1));
 			
-			UsersSelectionForWorkflowPanel newPanel = new UsersSelectionForWorkflowPanel(worklistName, businessProcess, translator, reviewer1, reviewer2,
-					sme, editorialBoard, project, config);
+			UsersSelectionForWorkflowPanel newPanel = new UsersSelectionForWorkflowPanel(project, config);
 
 			workflowDetailsSheet.add(newPanel);
 		} catch (TerminologyException e) {
@@ -235,45 +206,6 @@ public class SetWFDtoWFUserSelection extends AbstractTask {
 		this.profilePropName = profilePropName;
 	}
 
-	public Boolean getTranslator() {
-		return translator;
-	}
-
-	public void setTranslator(Boolean translator) {
-		this.translator = translator;
-	}
-
-	public Boolean getReviewer1() {
-		return reviewer1;
-	}
-
-	public void setReviewer1(Boolean reviewer1) {
-		this.reviewer1 = reviewer1;
-	}
-
-	public Boolean getReviewer2() {
-		return reviewer2;
-	}
-
-	public void setReviewer2(Boolean reviewer2) {
-		this.reviewer2 = reviewer2;
-	}
-
-	public Boolean getSme() {
-		return sme;
-	}
-
-	public void setSme(Boolean sme) {
-		this.sme = sme;
-	}
-
-	public Boolean getEditorialBoard() {
-		return editorialBoard;
-	}
-
-	public void setEditorialBoard(Boolean editorialBoard) {
-		this.editorialBoard = editorialBoard;
-	}
 
 	public String getProjectPropName() {
 		return projectPropName;
@@ -281,22 +213,6 @@ public class SetWFDtoWFUserSelection extends AbstractTask {
 
 	public void setProjectPropName(String projectPropName) {
 		this.projectPropName = projectPropName;
-	}
-
-	public Boolean getBusinessProcess() {
-		return businessProcess;
-	}
-
-	public void setBusinessProcess(Boolean businessProcess) {
-		this.businessProcess = businessProcess;
-	}
-
-	public Boolean getWorklistName() {
-		return worklistName;
-	}
-
-	public void setWorklistName(Boolean worklistName) {
-		this.worklistName = worklistName;
 	}
 
 }
