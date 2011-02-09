@@ -391,7 +391,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
             // Create the new origin/position
             refsetHelper.newRefsetExtension(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(), path.getConceptNid(),
                 EConcept.REFSET_TYPES.CID_INT, propMap, config);
-            Concept pathOriginRefConcept = getPathRefsetConcept();
+            Concept pathOriginRefConcept = getRefsetPathOriginsConcept();
             BdbCommitManager.addUncommittedNoChecks(pathOriginRefConcept);
             AceLog.getAppLog().info("Path origin refset: " +
                     pathOriginRefConcept.toLongString());
