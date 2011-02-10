@@ -67,6 +67,13 @@ public class GenerateWorklistFromAttachmentsBeanInfo extends SimpleBeanInfo {
 			translatorInboxPropName.setDisplayName("<html><font color='green'>translatorInboxPropName:");
 			translatorInboxPropName.setShortDescription("translatorInboxPropName.");
 			
+			PropertyDescriptor fastTrackTranslatorInboxPropName = new PropertyDescriptor("fastTrackTranslatorInboxPropName",
+					getBeanDescriptor().getBeanClass());
+			fastTrackTranslatorInboxPropName.setBound(true);
+			fastTrackTranslatorInboxPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+			fastTrackTranslatorInboxPropName.setDisplayName("<html><font color='green'>fastTrackTranslatorInboxPropName:");
+			fastTrackTranslatorInboxPropName.setShortDescription("fastTrackTranslatorInboxPropName.");
+			
 			PropertyDescriptor partitionPropName = new PropertyDescriptor("partitionPropName",
 					getBeanDescriptor().getBeanClass());
 			partitionPropName.setBound(true);
@@ -75,7 +82,8 @@ public class GenerateWorklistFromAttachmentsBeanInfo extends SimpleBeanInfo {
 			partitionPropName.setShortDescription("partitionPropName.");
 
 			PropertyDescriptor rv[] =
-			{profilePropName, processPropName, worklistNamePropName, translatorInboxPropName, partitionPropName};
+			{profilePropName, processPropName, worklistNamePropName, translatorInboxPropName, 
+					fastTrackTranslatorInboxPropName, partitionPropName};
 			return rv;
 		} catch (IntrospectionException e) {
 			throw new Error(e.toString());
