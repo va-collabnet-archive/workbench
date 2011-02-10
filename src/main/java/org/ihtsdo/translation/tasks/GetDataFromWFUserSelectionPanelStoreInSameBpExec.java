@@ -67,9 +67,11 @@ public class GetDataFromWFUserSelectionPanelStoreInSameBpExec extends AbstractTa
 	// Task Attribute Properties
 	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 	private String translatorInboxPropName = ProcessAttachmentKeys.TRANSLATOR_ROLE_INBOX.getAttachmentKey();
+	private String fastTrackTranslatorInboxPropName = ProcessAttachmentKeys.FAST_TRACK_TRANSLATOR_ROLE_INBOX.getAttachmentKey();
 	private String reviewer1InboxPropName = ProcessAttachmentKeys.REVIEWER_1_ROLE_INBOX.getAttachmentKey();
 	private String reviewer2InboxPropName = ProcessAttachmentKeys.REVIEWER_2_ROLE_INBOX.getAttachmentKey();
 	private String smeInboxPropName = ProcessAttachmentKeys.SME_ROLE_INBOX.getAttachmentKey();
+	private String superSmeInboxPropName = ProcessAttachmentKeys.SUPER_SME_ROLE_INBOX.getAttachmentKey();
 	private String editorialBoardInboxPropName = ProcessAttachmentKeys.EDITORIAL_BOARD_ROLE_INBOX.getAttachmentKey();
 
 	// Other Properties
@@ -84,9 +86,11 @@ public class GetDataFromWFUserSelectionPanelStoreInSameBpExec extends AbstractTa
 		out.writeInt(dataVersion);
 		out.writeObject(profilePropName);
 		out.writeObject(translatorInboxPropName);
+		out.writeObject(fastTrackTranslatorInboxPropName);
 		out.writeObject(reviewer1InboxPropName);
 		out.writeObject(reviewer2InboxPropName);
 		out.writeObject(smeInboxPropName);
+		out.writeObject(superSmeInboxPropName);
 		out.writeObject(editorialBoardInboxPropName);
 	}
 
@@ -98,9 +102,11 @@ public class GetDataFromWFUserSelectionPanelStoreInSameBpExec extends AbstractTa
 				// Read version 1 data fields...
 				profilePropName = (String) in.readObject();
 				translatorInboxPropName = (String) in.readObject();
+				fastTrackTranslatorInboxPropName = (String) in.readObject();
 				reviewer1InboxPropName = (String) in.readObject();
 				reviewer2InboxPropName = (String) in.readObject();
 				smeInboxPropName = (String) in.readObject();
+				superSmeInboxPropName = (String) in.readObject();
 				editorialBoardInboxPropName = (String) in.readObject();
 			}
 			// Initialize transient properties
@@ -145,18 +151,26 @@ public class GetDataFromWFUserSelectionPanelStoreInSameBpExec extends AbstractTa
 			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
 			String roleTrans = termFactory.getConcept(
 					ArchitectonicAuxiliary.Concept.TRANSLATOR_ONE_TSP_ROLE.getUids()).toString();
+			String roleftTrans = termFactory.getConcept(
+					ArchitectonicAuxiliary.Concept.TRANSLATOR_FAST_TRACK_ROLE.getUids()).toString();
+			
 			String roleRev1 = termFactory.getConcept(
 					ArchitectonicAuxiliary.Concept.TRANSLATION_TSP_REVIEWER_ROLE.getUids()).toString();
 			String roleRev2 = termFactory.getConcept(
 					ArchitectonicAuxiliary.Concept.TRANSLATION_TPO_REVIEWER_ROLE.getUids()).toString();
 			String roleSme = termFactory.getConcept(
 					ArchitectonicAuxiliary.Concept.TRANSLATION_SME_ROLE.getUids()).toString();
+			String roleSupSme = termFactory.getConcept(
+					ArchitectonicAuxiliary.Concept.TRANSLATION_SUPER_SME_ROLE.getUids()).toString();
+		
 			String roleEdB = termFactory.getConcept(
 					ArchitectonicAuxiliary.Concept.TRANSLATION_EDITORIAL_BOARD_ROLE.getUids()).toString();
 			String translatorInbox = null;
+			String ftTranslatorInbox = null;
 			String reviewer1Inbox = null;
 			String reviewer2Inbox = null;
 			String smeInbox = null;
+			String supSmeInbox = null;
 			String editorialBoardInbox = null;
 			
 			for (Component c : workflowDetailsSheet.getComponents()) {
@@ -171,14 +185,16 @@ public class GetDataFromWFUserSelectionPanelStoreInSameBpExec extends AbstractTa
 					for (I_GetConceptData con:hash.keySet()){
 						if (con.toString().equals(roleTrans)){
 							translatorInbox=(String) hash.get(con).getSelectedItem();
+						}else if (con.toString().equals(roleftTrans)){
+							ftTranslatorInbox = (String)  hash.get(con).getSelectedItem();
 						}else if (con.toString().equals(roleRev1)){
 							reviewer1Inbox = (String)  hash.get(con).getSelectedItem();
 						}else if (con.toString().equals(roleRev2)){
 							reviewer2Inbox = (String)  hash.get(con).getSelectedItem();
 						}else if (con.toString().equals(roleSme)){
 							smeInbox = (String)  hash.get(con).getSelectedItem();
-						}else if (con.toString().equals(roleSme)){
-							smeInbox = (String)  hash.get(con).getSelectedItem();
+						}else if (con.toString().equals(roleSupSme)){
+							supSmeInbox = (String)  hash.get(con).getSelectedItem();
 						}else if (con.toString().equals(roleEdB)){
 							editorialBoardInbox = (String)  hash.get(con).getSelectedItem();
 						}
@@ -194,6 +210,13 @@ public class GetDataFromWFUserSelectionPanelStoreInSameBpExec extends AbstractTa
 					// -----------------------------------------
 					if (!(translatorInbox == null || translatorInbox.isEmpty())) {
 						process.setProperty(translatorInboxPropName, translatorInbox);
+					}
+
+					// -----------------------------------------
+					// fast track Translator
+					// -----------------------------------------
+					if (!(ftTranslatorInbox == null || ftTranslatorInbox.isEmpty())) {
+						process.setProperty(fastTrackTranslatorInboxPropName, ftTranslatorInbox);
 					}
 
 					// -----------------------------------------
@@ -216,6 +239,13 @@ public class GetDataFromWFUserSelectionPanelStoreInSameBpExec extends AbstractTa
 						if (!(smeInbox == null || smeInbox.isEmpty())) {
 							process.setProperty(smeInboxPropName, smeInbox);
 						}
+
+						// -----------------------------------------
+						// Super SME
+						// -----------------------------------------
+							if (!(supSmeInbox == null || supSmeInbox.isEmpty())) {
+								process.setProperty(superSmeInboxPropName, supSmeInbox);
+							}
 
 					// -----------------------------------------
 					// Editorial Board
@@ -308,6 +338,23 @@ public class GetDataFromWFUserSelectionPanelStoreInSameBpExec extends AbstractTa
 
 	public void setEditorialBoardInboxPropName(String editorialBoardInboxPropName) {
 		this.editorialBoardInboxPropName = editorialBoardInboxPropName;
+	}
+
+	public String getFastTrackTranslatorInboxPropName() {
+		return fastTrackTranslatorInboxPropName;
+	}
+
+	public void setFastTrackTranslatorInboxPropName(
+			String fastTrackTranslatorInboxPropName) {
+		this.fastTrackTranslatorInboxPropName = fastTrackTranslatorInboxPropName;
+	}
+
+	public String getSuperSmeInboxPropName() {
+		return superSmeInboxPropName;
+	}
+
+	public void setSuperSmeInboxPropName(String superSmeInboxPropName) {
+		this.superSmeInboxPropName = superSmeInboxPropName;
 	}
 
 
