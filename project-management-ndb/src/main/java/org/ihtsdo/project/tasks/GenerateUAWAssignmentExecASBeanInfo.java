@@ -71,7 +71,14 @@ public class GenerateUAWAssignmentExecASBeanInfo extends SimpleBeanInfo {
             translatorInboxPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             translatorInboxPropName.setDisplayName("<html><font color='green'>translatorInboxPropName:");
             translatorInboxPropName.setShortDescription("translatorInboxPropName");
-            
+           
+            PropertyDescriptor fastTrackTranslatorInboxPropName =
+            	new PropertyDescriptor("fastTrackTranslatorInboxPropName", getBeanDescriptor().getBeanClass());
+            fastTrackTranslatorInboxPropName.setBound(true);
+            fastTrackTranslatorInboxPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            fastTrackTranslatorInboxPropName.setDisplayName("<html><font color='green'>fastTrackTranslatorInboxPropName:");
+            fastTrackTranslatorInboxPropName.setShortDescription("fastTrackTranslatorInboxPropName");
+           
             PropertyDescriptor reviewer1InboxPropName =
             	new PropertyDescriptor("reviewer1InboxPropName", getBeanDescriptor().getBeanClass());
             reviewer1InboxPropName.setBound(true);
@@ -92,6 +99,13 @@ public class GenerateUAWAssignmentExecASBeanInfo extends SimpleBeanInfo {
             smeInboxPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             smeInboxPropName.setDisplayName("<html><font color='green'>smeInboxPropName:");
             smeInboxPropName.setShortDescription("smeInboxPropName");
+
+            PropertyDescriptor superSmeInboxPropName =
+            	new PropertyDescriptor("superSmeInboxPropName", getBeanDescriptor().getBeanClass());
+            superSmeInboxPropName.setBound(true);
+            superSmeInboxPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            superSmeInboxPropName.setDisplayName("<html><font color='green'>superSmeInboxPropName:");
+            superSmeInboxPropName.setShortDescription("superSmeInboxPropName");
             
             PropertyDescriptor editorialBoardInboxPropName =
             	new PropertyDescriptor("editorialBoardInboxPropName", getBeanDescriptor().getBeanClass());
@@ -101,8 +115,8 @@ public class GenerateUAWAssignmentExecASBeanInfo extends SimpleBeanInfo {
             editorialBoardInboxPropName.setShortDescription("editorialBoardInboxPropName");
             
             PropertyDescriptor rv[] =
-                    { profilePropName, memberPropName, processPropName, translatorInboxPropName, 
-            		reviewer1InboxPropName, reviewer2InboxPropName, smeInboxPropName, editorialBoardInboxPropName };
+                    { profilePropName, memberPropName, processPropName, translatorInboxPropName,fastTrackTranslatorInboxPropName, 
+            		reviewer1InboxPropName, reviewer2InboxPropName, smeInboxPropName, superSmeInboxPropName, editorialBoardInboxPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
