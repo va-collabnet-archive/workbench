@@ -40,6 +40,21 @@ public class InitializeEditorCategoryMojo extends AbstractMojo {
      * @required
      */
     private String filePath;
+	
+    /**
+     * Whether to alert user of a bad row that can't be imported into the database
+     * 
+     * @parameter
+     * default-value=true
+     * @required
+     */
+    private boolean reportErrors;
+
+    private static final int editorPosition = 0;							// 0
+    private static final int semanticAreaPosition = editorPosition + 1;		// 1
+    private static final int categoryPosition = semanticAreaPosition + 1;	// 2
+
+    private static final int numberOfColumns = categoryPosition + 1;		// 3
 
    @Override
     public void execute() throws MojoExecutionException, MojoFailureException
@@ -57,11 +72,16 @@ public class InitializeEditorCategoryMojo extends AbstractMojo {
             	line = scanner.nextLine();
             	String[] columns = line.split("\t");
 
-            	writer.setEditor(getEditor(columns[0]));
-            	writer.setSemanticArea(columns[1]);
-            	writer.setCategory(WorkflowHelper.lookupEditorCategory(columns[2]));
+        		if (columns.length == numberOfColumns)
+        		{
+        			writer.setEditor(getEditor(columns[editorPosition]));
+	            	writer.setSemanticArea(columns[semanticAreaPosition]);
+	            	writer.setCategory(WorkflowHelper.lookupEditorCategory(columns[categoryPosition]));
 
-            	writer.addMember();
+	            	writer.addMember();
+        		} else if (reportErrors) {
+        			AceLog.getAppLog().log(Level.WARNING, line, new Exception("Unable to import this row into editor category refset"));
+    			}
             }
 
             Terms.get().addUncommitted(writer.getRefsetConcept());

@@ -35,6 +35,22 @@ public class InitializeStateTransitionMojo extends AbstractMojo {
      */
     private String filePath;
 
+    /**
+     * Whether to alert user of a bad row that can't be imported into the database
+     * 
+     * @parameter
+     * default-value=true
+     * @required
+     */
+    private boolean reportErrors;
+
+    private static final int categoryPosition = 0;								// 0
+    private static final int initialStatePosition = categoryPosition + 1;		// 1
+    private static final int actionPosition = initialStatePosition + 1;			// 2
+    private static final int finalStatePosition = actionPosition + 1;			// 3
+
+    private static final int numberOfColumns = finalStatePosition + 1;			// 4
+
     private StateTransitionRefsetWriter writer = null;
     
     public void execute() throws MojoExecutionException, MojoFailureException 
@@ -67,21 +83,27 @@ public class InitializeStateTransitionMojo extends AbstractMojo {
         	
         	
         	String[] columns = line.split("\t");
-        
-        	try 
-        	{
-	        	I_GetConceptData category = WorkflowHelper.lookupEditorCategory(columns[0]);
-    			
-	        	writer.setCategory(category);
-    			writer.setInitialState(WorkflowHelper.lookupState(columns[1]));
-	        	writer.setAction(WorkflowHelper.lookupAction(columns[2]));
-	        	writer.setFinalState(WorkflowHelper.lookupState(columns[3]));
 
-        	writer.addMember();
-        	} catch (Exception e) {
-        		AceLog.getAppLog().log(Level.WARNING, line, e);
+        	if (columns.length == numberOfColumns)
+        	{
+	        	try 
+	        	{
+		        	I_GetConceptData category = WorkflowHelper.lookupEditorCategory(columns[categoryPosition]);
+	    			
+		        	writer.setCategory(category);
+	    			writer.setInitialState(WorkflowHelper.lookupState(columns[initialStatePosition]));
+		        	writer.setAction(WorkflowHelper.lookupAction(columns[actionPosition]));
+		        	writer.setFinalState(WorkflowHelper.lookupState(columns[finalStatePosition]));
+	
+		        	writer.addMember();
+	        	} catch (Exception e) {
+	        		AceLog.getAppLog().log(Level.WARNING, line, e);
+	        	}
         	}
-        };
+    		else if (reportErrors) {
+            	AceLog.getAppLog().log(Level.WARNING, line, new Exception("Unable to import this row into state transition refset"));        
+        	}
+        }
         
         Terms.get().addUncommitted(writer.getRefsetConcept());
     }

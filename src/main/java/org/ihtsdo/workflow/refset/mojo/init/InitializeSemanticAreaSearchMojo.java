@@ -34,6 +34,20 @@ public class InitializeSemanticAreaSearchMojo extends AbstractMojo {
      * @required
      */
     private String filePath;
+    
+    /**
+     * Whether to alert user of a bad row that can't be imported into the database
+     * 
+     * @parameter
+     * default-value=true
+     * @required
+     */
+    private boolean reportErrors;
+	
+    private static final int serachTermPosition = 0;							// 0
+    private static final int hierarchyPosition = serachTermPosition + 1;		// 1
+
+    private static final int numberOfColumns = hierarchyPosition + 1;			// 2
 
     private SemanticAreaSearchRefsetWriter writer = null;
     
@@ -68,11 +82,17 @@ public class InitializeSemanticAreaSearchMojo extends AbstractMojo {
         		continue;
         	
         	String[] columns = line.split("\t");
-        	try {
-        		writer.setHierarchy(Terms.get().getConcept(UUID.fromString(columns[1])));
-        		writer.setSearchTerm(columns[0]);
 
-        		writer.addMember();
+        	try {
+        		if (columns.length == numberOfColumns)
+        		{
+        			writer.setSearchTerm(columns[serachTermPosition]);
+        			writer.setHierarchy(Terms.get().getConcept(UUID.fromString(columns[hierarchyPosition])));
+
+            		writer.addMember();
+        		} else if (reportErrors) {
+    				AceLog.getAppLog().log(Level.WARNING, line, new Exception("Unable to import this row into semantic area search refset"));
+    			}
         	} catch (Exception e) {
         		AceLog.getAppLog().log(Level.WARNING, line, e);
         	}

@@ -45,17 +45,30 @@ public class InitializeWorkflowHistoryMojo extends AbstractMojo {
      * @required
      */
     private String filePath;
-    private static final int workflowIdPosition = 0;
-    private static final int conceptIdPosition = 1;
-    private static final int useCaseIgnorePosition = 2;
-    private static final int pathPosition = 3;
-    private static final int modelerPosition = 4;
-    private static final int actionPosition = 5;
-    private static final int statePosition = 6;
-    private static final int fsnPosition = 7;
-    private static final int refsetColumnTimeStampPosition = 8;
-    private static final int timeStampPosition = 9;
-	private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    
+    /**
+     * Whether to alert user of a bad row that can't be imported into the database
+     * 
+     * @parameter
+     * default-value=true
+     * @required
+     */
+    private boolean reportErrors;
+
+    private static final int workflowIdPosition = 0;								// 0
+    private static final int conceptIdPosition = workflowIdPosition + 1;			// 1
+    private static final int useCaseIgnorePosition = conceptIdPosition + 1;			// 2
+    private static final int pathPosition = useCaseIgnorePosition + 1;				// 3
+    private static final int modelerPosition = pathPosition + 1;					// 4
+    private static final int actionPosition = modelerPosition + 1;					// 5
+    private static final int statePosition = actionPosition + 1;					// 6
+    private static final int fsnPosition = statePosition + 1;						// 7
+    private static final int refsetColumnTimeStampPosition = fsnPosition + 1;		// 8
+    private static final int timeStampPosition = refsetColumnTimeStampPosition + 1;	// 9
+    
+    private static final int numberOfColumns = timeStampPosition + 1;				// 10
+
+    private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	private Map<String, UUID> releases = new HashMap<String, UUID>();
 
@@ -77,29 +90,33 @@ public class InitializeWorkflowHistoryMojo extends AbstractMojo {
             	String[] columns = line.split("\t");
             	if (lineCounter++ % 2500 == 0) System.out.println("At: " + (lineCounter - 1));
 
-
-            	UUID refConUid = UUID.fromString(columns[conceptIdPosition]);
-
-            	if (Terms.get().hasId(refConUid))
+            	if (columns.length == numberOfColumns)
             	{
-            		UUID releaseDescription = identifyReleaseDescription(columns[timeStampPosition]);
-            		writer.setReleaseDescriptionUid(releaseDescription);
-            		writer.setWorkflowUid(UUID.fromString(columns[workflowIdPosition]));
-	            	writer.setConceptUid(UUID.fromString(columns[conceptIdPosition]));
-	            	writer.setPathUid(UUID.fromString(columns[pathPosition]));
-	            	writer.setModelerUid(WorkflowHelper.lookupModeler(columns[modelerPosition]).getPrimUuid());
-	            	writer.setActionUid(WorkflowHelper.lookupAction(columns[actionPosition]).getPrimUuid());
-	            	writer.setStateUid(WorkflowHelper.lookupState(columns[statePosition]).getPrimUuid());
-	            	writer.setFSN(columns[fsnPosition]);
-	            	
-        			long timestamp = format.parse(columns[timeStampPosition]).getTime();
-	            	writer.setEffectiveTime(timestamp);
+	            	UUID refConUid = UUID.fromString(columns[conceptIdPosition]);
 	
-        			timestamp = format.parse(columns[refsetColumnTimeStampPosition]).getTime();
-	            	writer.setWorkflowTime(timestamp);
-	
-	            	writer.addMember();
-            	} 
+	            	if (Terms.get().hasId(refConUid))
+	            	{
+	            		UUID releaseDescription = identifyReleaseDescription(columns[timeStampPosition]);
+	            		writer.setReleaseDescriptionUid(releaseDescription);
+	            		writer.setWorkflowUid(UUID.fromString(columns[workflowIdPosition]));
+		            	writer.setConceptUid(UUID.fromString(columns[conceptIdPosition]));
+		            	writer.setPathUid(UUID.fromString(columns[pathPosition]));
+		            	writer.setModelerUid(WorkflowHelper.lookupModeler(columns[modelerPosition]).getPrimUuid());
+		            	writer.setActionUid(WorkflowHelper.lookupAction(columns[actionPosition]).getPrimUuid());
+		            	writer.setStateUid(WorkflowHelper.lookupState(columns[statePosition]).getPrimUuid());
+		            	writer.setFSN(columns[fsnPosition]);
+		            	
+	        			long timestamp = format.parse(columns[timeStampPosition]).getTime();
+		            	writer.setEffectiveTime(timestamp);
+		
+	        			timestamp = format.parse(columns[refsetColumnTimeStampPosition]).getTime();
+		            	writer.setWorkflowTime(timestamp);
+		
+		            	writer.addMember();
+	            	} 
+            	} else if (reportErrors) {
+                	AceLog.getAppLog().log(Level.WARNING, line, new Exception("Unable to import this row into workflow history refset"));
+            	}
             }	
 
             Terms.get().addUncommitted(writer.getRefsetConcept());
