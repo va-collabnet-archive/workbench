@@ -62,6 +62,13 @@ public class GetDataFromWFUserSelectionPanelStoreInSameBpExecBeanInfo extends Si
             translatorInboxPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             translatorInboxPropName.setDisplayName("<html><font color='green'>translatorInboxPropName:");
             translatorInboxPropName.setShortDescription("translatorInboxPropName");
+
+            PropertyDescriptor fastTrackTranslatorInboxPropName =
+            	new PropertyDescriptor("fastTrackTranslatorInboxPropName", getBeanDescriptor().getBeanClass());
+            fastTrackTranslatorInboxPropName.setBound(true);
+            fastTrackTranslatorInboxPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            fastTrackTranslatorInboxPropName.setDisplayName("<html><font color='green'>fastTrackTranslatorInboxPropName:");
+            fastTrackTranslatorInboxPropName.setShortDescription("fastTrackTranslatorInboxPropName");
             
             PropertyDescriptor reviewer1InboxPropName =
             	new PropertyDescriptor("reviewer1InboxPropName", getBeanDescriptor().getBeanClass());
@@ -84,6 +91,13 @@ public class GetDataFromWFUserSelectionPanelStoreInSameBpExecBeanInfo extends Si
             smeInboxPropName.setDisplayName("<html><font color='green'>smeInboxPropName:");
             smeInboxPropName.setShortDescription("smeInboxPropName");
             
+            PropertyDescriptor superSmeInboxPropName =
+            	new PropertyDescriptor("superSmeInboxPropName", getBeanDescriptor().getBeanClass());
+            superSmeInboxPropName.setBound(true);
+            superSmeInboxPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            superSmeInboxPropName.setDisplayName("<html><font color='green'>superSmeInboxPropName:");
+            superSmeInboxPropName.setShortDescription("superSmeInboxPropName");
+            
             PropertyDescriptor editorialBoardInboxPropName =
             	new PropertyDescriptor("editorialBoardInboxPropName", getBeanDescriptor().getBeanClass());
             editorialBoardInboxPropName.setBound(true);
@@ -93,9 +107,9 @@ public class GetDataFromWFUserSelectionPanelStoreInSameBpExecBeanInfo extends Si
             
 
             PropertyDescriptor rv[] =
-                    { profilePropName, translatorInboxPropName, 
+                    { profilePropName, translatorInboxPropName, fastTrackTranslatorInboxPropName,
             		reviewer1InboxPropName, reviewer2InboxPropName, 
-            		smeInboxPropName, editorialBoardInboxPropName};
+            		smeInboxPropName,superSmeInboxPropName, editorialBoardInboxPropName};
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
