@@ -34,7 +34,7 @@ public class ModelerWorkflowHistory extends AbstractWorkflowHistorySearchTest {
    /**
     * Property name for the Modeler being searched.
     */
-   private String testModeler = null;
+   private I_GetConceptData testModeler = null;
 
    private void writeObject(ObjectOutputStream out) throws IOException {
       out.writeInt(dataVersion);
@@ -44,25 +44,23 @@ public class ModelerWorkflowHistory extends AbstractWorkflowHistorySearchTest {
    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
       int objDataVersion = in.readInt();
       if (objDataVersion == 1) {
-         this.testModeler = (String) in.readObject();
-         if (testModeler == null) {
+         this.testModeler = (I_GetConceptData) in.readObject();
+			if (this.testModeler == null) {
             try {
                I_GetConceptData leadModeler = WorkflowHelper.getLeadModeler();
 
                if (leadModeler != null) {
-                  this.testModeler = WorkflowHelper.getLeadModeler().getInitialText();
+                  this.testModeler = WorkflowHelper.getLeadModeler();
                } else {
                   Iterator<String> itr = WorkflowHelper.getModelerKeySet().iterator();
                   if (itr.hasNext()) {
-                     this.testModeler = WorkflowHelper.lookupModeler(itr.next()).getInitialText();
+                     this.testModeler = WorkflowHelper.lookupModeler(itr.next());
                   }
                }
             } catch (Exception e) {
             	AceLog.getAppLog().log(Level.WARNING, "Error in initializing drop-down value", e);
             }
          }
-      } else {
-         throw new IOException("Can't handle dataversion: " + objDataVersion);
       }
 
    }
@@ -123,15 +121,15 @@ public class ModelerWorkflowHistory extends AbstractWorkflowHistorySearchTest {
       }
    }
 
-   public String getTestModeler() {
+   public I_GetConceptData getTestModeler() {
       return testModeler;
    }
 
-   public void setTestModeler(String testModeler) {
+   public void setTestModeler(I_GetConceptData testModeler) {
       this.testModeler = testModeler;
    }
 
-   private UUID validateModeler(String mod) throws IOException, TerminologyException {
+   private UUID validateModeler(I_GetConceptData mod) throws IOException, TerminologyException {
       I_GetConceptData cap = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IHTSDO.getPrimoridalUid());
 
       final long pathNid = cap.getConceptAttributes().getPathNid();
@@ -144,7 +142,7 @@ public class ModelerWorkflowHistory extends AbstractWorkflowHistorySearchTest {
             if ((relAttrPart.getPathNid() == pathNid)
                     && (relAttrPart.getTypeNid() == relTypeNid)
                     && (relAttrPart.getStatusNid() == currentNid)) {
-               if (Terms.get().getConcept(version.getC1Id()).getInitialText().equalsIgnoreCase(mod)) {
+               if (Terms.get().getConcept(version.getC1Id()).getInitialText().equalsIgnoreCase(mod.getInitialText())) {
                   return Terms.get().nidToUuid(version.getC1Id());
                }
             }
