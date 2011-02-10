@@ -100,12 +100,12 @@ public class UsersSelectionForWorkflowPanel extends JPanel {
 			row = 0;
 			c.fill = GridBagConstraints.HORIZONTAL;
 			c.gridx = 0;
-			c.gridy = 0;
+			c.gridy = row;
 			c.weightx = 0.5;
 			add(new JLabel("Worklist name: "), c);
 			c.fill = GridBagConstraints.HORIZONTAL;
 			c.gridx = 1;
-			c.gridy = 0;
+			c.gridy = row;
 			c.weightx = 1;
 			worklistName = new JTextField(30);
 			add(worklistName, c);
@@ -113,7 +113,7 @@ public class UsersSelectionForWorkflowPanel extends JPanel {
 			row = 1;
 			c.fill = GridBagConstraints.HORIZONTAL;
 			c.gridx = 0;
-			c.gridy = 1;
+			c.gridy = row;
 			c.weightx = 0.5;
 			add(new JLabel("Business Process (Workflow): "),c);
 			FileLinkAPI fileLinkApi = new FileLinkAPI(config);
@@ -122,44 +122,26 @@ public class UsersSelectionForWorkflowPanel extends JPanel {
 							ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids())).toArray());
 			c.fill = GridBagConstraints.HORIZONTAL;
 			c.gridx = 1;
-			c.gridy = 1;
+			c.gridy = row;
 			c.weightx = 1;
 			add(bpCombo,c);
 
 			rolesPanel = new JPanel();
 			row = 2;
-			c.fill = GridBagConstraints.HORIZONTAL;
+			c.fill = GridBagConstraints.BOTH;
 			c.gridx = 0;
-			c.gridy = 1;
-			c.weightx = 0.5;
+			c.gridy = row;
+			c.gridwidth = 2;
+			c.weightx = 1;
 			add(rolesPanel,c);
 
 			bpCombo.addActionListener(new ActionListener () {
 				public void actionPerformed(ActionEvent e) {
-					FileLink fileLink = (FileLink)bpCombo.getSelectedItem();
-					if (fileLink != null) {
-						File file = fileLink.getFile();
-						BusinessProcess bp = 
-							TerminologyProjectDAO.getBusinessProcess(file);
-						try {
-							updateRolesList(bp);
-						} catch (IllegalArgumentException e1) {
-							e1.printStackTrace();
-						} catch (TerminologyException e1) {
-							e1.printStackTrace();
-						} catch (IOException e1) {
-							e1.printStackTrace();
-						} catch (IntrospectionException e1) {
-							e1.printStackTrace();
-						} catch (IllegalAccessException e1) {
-							e1.printStackTrace();
-						} catch (InvocationTargetException e1) {
-							e1.printStackTrace();
-						}
-					}
+					callUpdate();
 				}
 			});
-
+			
+			callUpdate();
 
 		} catch (TerminologyException e) {
 			e.printStackTrace();
@@ -171,7 +153,31 @@ public class UsersSelectionForWorkflowPanel extends JPanel {
 			e.printStackTrace();
 		}
 	}
-
+	
+	private void callUpdate() {
+		FileLink fileLink = (FileLink)bpCombo.getSelectedItem();
+		if (fileLink != null) {
+			File file = fileLink.getFile();
+			BusinessProcess bp = 
+				TerminologyProjectDAO.getBusinessProcess(file);
+			try {
+				updateRolesList(bp);
+			} catch (IllegalArgumentException e1) {
+				e1.printStackTrace();
+			} catch (TerminologyException e1) {
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			} catch (IntrospectionException e1) {
+				e1.printStackTrace();
+			} catch (IllegalAccessException e1) {
+				e1.printStackTrace();
+			} catch (InvocationTargetException e1) {
+				e1.printStackTrace();
+			}
+		}
+	}
+ 
 	private void updateRolesList(BusinessProcess bp) throws TerminologyException, IOException, IntrospectionException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 		translator = false;
 		fastTrackTranslator = false;
@@ -228,6 +234,7 @@ public class UsersSelectionForWorkflowPanel extends JPanel {
 
 		}
 
+		remove(rolesPanel);
 		rolesPanel = new JPanel();
 		rolesPanel.setLayout(new GridBagLayout());
 		GridBagConstraints c2 = new GridBagConstraints();
@@ -357,6 +364,9 @@ public class UsersSelectionForWorkflowPanel extends JPanel {
 			rolesPanel.add(ebCombo,c2);
 		}
 		rolesPanel.revalidate();
+		add(rolesPanel, c);
+		setSize(getWidth()+1, getHeight()+1);
+		setSize(getWidth()-1, getHeight()-1);
 		this.revalidate();
 	}
 
@@ -486,6 +496,38 @@ public class UsersSelectionForWorkflowPanel extends JPanel {
 
 	public void setNameForWorkList(Boolean nameForWorkList) {
 		this.nameForWorkList = nameForWorkList;
+	}
+
+	public Boolean getFastTrackTranslator() {
+		return fastTrackTranslator;
+	}
+
+	public void setFastTrackTranslator(Boolean fastTrackTranslator) {
+		this.fastTrackTranslator = fastTrackTranslator;
+	}
+
+	public Boolean getSuperSme() {
+		return superSme;
+	}
+
+	public void setSuperSme(Boolean superSme) {
+		this.superSme = superSme;
+	}
+
+	public JComboBox getFastTrackTranslatorCombo() {
+		return fastTrackTranslatorCombo;
+	}
+
+	public void setFastTrackTranslatorCombo(JComboBox fastTrackTranslatorCombo) {
+		this.fastTrackTranslatorCombo = fastTrackTranslatorCombo;
+	}
+
+	public JComboBox getSuperSmeCombo() {
+		return superSmeCombo;
+	}
+
+	public void setSuperSmeCombo(JComboBox superSmeCombo) {
+		this.superSmeCombo = superSmeCombo;
 	}
 
 

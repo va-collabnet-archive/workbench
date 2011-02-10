@@ -176,8 +176,8 @@ public class GetDataFromWFUserSelectionPanel extends AbstractTask {
 						translatorInbox = (String) panel.getTranslatorCombo().getSelectedItem();
 					}
 					String fastTrackTranslatorInbox = null;
-					if (panel.getTranslator()) {
-						fastTrackTranslatorInbox = (String) panel.getTranslatorCombo().getSelectedItem();
+					if (panel.getFastTrackTranslator()) {
+						fastTrackTranslatorInbox = (String) panel.getFastTrackTranslatorCombo().getSelectedItem();
 					}
 					String reviewer1Inbox = null;
 					if (panel.getReviewer1()) {
@@ -190,6 +190,10 @@ public class GetDataFromWFUserSelectionPanel extends AbstractTask {
 					String smeInbox = null;
 					if (panel.getSme()) {
 						smeInbox = (String) panel.getSmeCombo().getSelectedItem();
+					}
+					String superSmeInbox = null;
+					if (panel.getSme()) {
+						superSmeInbox = (String) panel.getSuperSmeCombo().getSelectedItem();
 					}
 					String editorialBoardInbox = null;
 					if (panel.getEditorialBoard()) {
@@ -240,6 +244,20 @@ public class GetDataFromWFUserSelectionPanel extends AbstractTask {
                     }
                     
                     // -----------------------------------------
+                    // Fast Track Translator
+                    // -----------------------------------------
+                    if (panel.getFastTrackTranslator()) {
+                    	if (fastTrackTranslatorInbox == null || fastTrackTranslatorInbox.isEmpty()) {
+                    		// Warn the user that translatorInbox is required.
+                    		JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                    				"You must select a Fast Track Translator Inbox. ", "", JOptionPane.ERROR_MESSAGE);
+                    		return Condition.ITEM_CANCELED;
+                    	} else {
+                    		selectedWorkFlow.setProperty(fastTrackTranslatorInboxPropName, fastTrackTranslatorInbox);
+                    	}
+                    }
+                    
+                    // -----------------------------------------
                     // Reviewer 1
                     // -----------------------------------------
                     if (panel.getReviewer1()) {
@@ -278,6 +296,20 @@ public class GetDataFromWFUserSelectionPanel extends AbstractTask {
                     		return Condition.ITEM_CANCELED;
                     	} else {
                     		selectedWorkFlow.setProperty(smeInboxPropName, smeInbox);
+                    	}
+                    }
+                    
+                    // -----------------------------------------
+                    // Super SME
+                    // -----------------------------------------
+                    if (panel.getSuperSme()) {
+                    	if (superSmeInbox == null || superSmeInbox.isEmpty()) {
+                    		// Warn the user that translatorInbox is required.
+                    		JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                    				"You must select a Super SME Inbox. ", "", JOptionPane.ERROR_MESSAGE);
+                    		return Condition.ITEM_CANCELED;
+                    	} else {
+                    		selectedWorkFlow.setProperty(superSmeInboxPropName, superSmeInbox);
                     	}
                     }
                     
