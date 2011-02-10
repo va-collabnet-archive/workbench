@@ -192,7 +192,7 @@ public class GetDataFromWFUserSelectionPanel extends AbstractTask {
 						smeInbox = (String) panel.getSmeCombo().getSelectedItem();
 					}
 					String superSmeInbox = null;
-					if (panel.getSme()) {
+					if (panel.getSuperSme()) {
 						superSmeInbox = (String) panel.getSuperSmeCombo().getSelectedItem();
 					}
 					String editorialBoardInbox = null;

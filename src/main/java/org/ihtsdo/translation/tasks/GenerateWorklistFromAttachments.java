@@ -110,9 +110,9 @@ public class GenerateWorklistFromAttachments extends AbstractTask {
 			String trans = (String) selectedWorkFlow.getProperty(getTranslatorInboxPropName());
 			String fastTrans = (String) selectedWorkFlow.getProperty(getFastTrackTranslatorInboxPropName());
 			String destination = "";
-			if (!fastTrans.isEmpty()) {
+			if (fastTrans != null && !fastTrans.isEmpty()) {
 				destination =  fastTrans;
-			} else if (!trans.isEmpty()){
+			} else if (trans != null && !trans.isEmpty()){
 				destination = trans;
 			}
 			
