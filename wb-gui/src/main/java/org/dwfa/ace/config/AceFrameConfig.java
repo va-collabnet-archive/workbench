@@ -3159,7 +3159,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                                         languagePreferenceList.get(0),
                                         classifierConcept.getConceptNid(),
                                         relAssertionType,
-                 getLanguagePreferenceList());
+                                        getLanguagePreferenceList(),
+                                        getLanguageSortPref().getLangSort());
 		} else {
 			return  new ViewCoordinate(getPrecedence(), getViewPositionSetReadOnly(),
 					getAllowedStatus(), getDestRelTypes(),
@@ -3167,7 +3168,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                                         Integer.MAX_VALUE,
                                         classifierConcept.getConceptNid(),
                                         relAssertionType,
-                 getLanguagePreferenceList());
+                                        getLanguagePreferenceList(),
+                                        getLanguageSortPref().getLangSort());
 		}
 	}
 

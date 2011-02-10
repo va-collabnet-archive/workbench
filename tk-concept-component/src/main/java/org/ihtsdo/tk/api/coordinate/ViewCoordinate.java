@@ -9,6 +9,22 @@ import org.ihtsdo.tk.api.RelAssertionType;
 
 public class ViewCoordinate {
 
+    public enum LANGUAGE_SORT {
+
+        LANG_BEFORE_TYPE("language before type"),
+        TYPE_BEFORE_LANG("type before language"),
+        LANG_REFEX("use language refex");
+        private String desc;
+
+        private LANGUAGE_SORT(String desc) {
+            this.desc = desc;
+        }
+
+        @Override
+        public String toString() {
+            return desc;
+        }
+    }
     private Precedence precedence;
     private PositionSetBI positionSet;
     private NidSetBI allowedStatusNids;
@@ -18,13 +34,16 @@ public class ViewCoordinate {
     private int classifierNid;
     private RelAssertionType relAssertionType;
     private NidListBI langPrefList;
+    private LANGUAGE_SORT langSort;
 
     public ViewCoordinate(Precedence precedence, PositionSetBI positionSet,
             NidSetBI allowedStatusNids, NidSetBI isaTypeNids,
             ContradictionManagerBI contradictionManager,
             int languageNid,
             int classifierNid,
-            RelAssertionType relAssertionType, NidListBI langPrefList) {
+            RelAssertionType relAssertionType,
+            NidListBI langPrefList,
+            LANGUAGE_SORT langSort) {
         super();
         assert precedence != null;
         assert contradictionManager != null;
@@ -37,13 +56,18 @@ public class ViewCoordinate {
         this.classifierNid = classifierNid;
         this.relAssertionType = relAssertionType;
         this.langPrefList = langPrefList;
+        this.langSort = langSort;
     }
 
-   public NidListBI getLangPrefList() {
-      return langPrefList;
-   }
+    public LANGUAGE_SORT getLangSort() {
+        return langSort;
+    }
 
-   public PositionSetBI getPositionSet() {
+    public NidListBI getLangPrefList() {
+        return langPrefList;
+    }
+
+    public PositionSetBI getPositionSet() {
         return positionSet;
     }
 
@@ -83,20 +107,18 @@ public class ViewCoordinate {
         this.relAssertionType = relAssertionType;
     }
 
-   @Override
-   public String toString() {
-      StringBuilder sb = new StringBuilder();
-      sb.append("precedence: ").append(precedence);
-      sb.append(" \npositions: ").append(positionSet);
-      sb.append(" \nallowedStatus: ").append(allowedStatusNids);
-      sb.append(" \nisaTypes: ").append(isaTypeNids);
-      sb.append(" \ncontradiction: ").append(contradictionManager);
-      sb.append(" \nlanguage: ").append(languageNid);
-      sb.append(" \nclassifier: ").append(classifierNid);
-      sb.append(" \nrelAssertionType: ").append(relAssertionType);
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("precedence: ").append(precedence);
+        sb.append(" \npositions: ").append(positionSet);
+        sb.append(" \nallowedStatus: ").append(allowedStatusNids);
+        sb.append(" \nisaTypes: ").append(isaTypeNids);
+        sb.append(" \ncontradiction: ").append(contradictionManager);
+        sb.append(" \nlanguage: ").append(languageNid);
+        sb.append(" \nclassifier: ").append(classifierNid);
+        sb.append(" \nrelAssertionType: ").append(relAssertionType);
 
-      return sb.toString();
-   }
-
-
+        return sb.toString();
+    }
 }

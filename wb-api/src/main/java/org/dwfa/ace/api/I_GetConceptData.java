@@ -27,6 +27,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -340,11 +341,11 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
 
     public I_Identify getIdentifier() throws IOException;
 
-    public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder, I_IntList langPrefOrder, NidSetBI allowedStatus,
+    public I_DescriptionTuple getDescTuple(NidListBI typePrefOrder, NidListBI langPrefOrder, NidSetBI allowedStatus,
             PositionSetBI positionSet, LANGUAGE_SORT_PREF sortPref,
             Precedence precedencePolicy, ContradictionManagerBI contradictionManager) throws IOException;
 
-    public I_DescriptionTuple getDescTuple(I_IntList descTypePreferenceList, I_ConfigAceFrame config)
+    public I_DescriptionTuple getDescTuple(NidListBI descTypePreferenceList, I_ConfigAceFrame config)
             throws IOException;
 
     public NidSetBI getUncommittedIds();

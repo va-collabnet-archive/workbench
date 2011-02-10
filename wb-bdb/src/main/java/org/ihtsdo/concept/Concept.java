@@ -26,7 +26,6 @@ import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
-import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -73,6 +72,7 @@ import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -85,6 +85,7 @@ import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate.LANGUAGE_SORT;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.media.MediaChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
@@ -576,8 +577,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
    }
 
    @Override
-   public I_DescriptionTuple<DescriptionRevision> getDescTuple(I_IntList typePrefOrder,
-           I_IntList langPrefOrder, NidSetBI allowedStatus,
+   public I_DescriptionTuple<DescriptionRevision> getDescTuple(NidListBI typePrefOrder,
+           NidListBI langPrefOrder, NidSetBI allowedStatus,
            PositionSetBI positionSet, LANGUAGE_SORT_PREF sortPref,
            Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
            throws IOException {
@@ -604,14 +605,16 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
    private I_DescriptionTuple getRefexSpecifiedDesc(
            Collection<I_DescriptionTuple<DescriptionRevision>> descriptions,
-           I_IntList typePrefOrder, I_IntList langRefexOrder,
+           NidListBI typePrefOrder, NidListBI langRefexOrder,
            NidSetBI allowedStatus, PositionSetBI positionSet) throws IOException, ToIoException {
       ViewCoordinate vc = new ViewCoordinate(Precedence.PATH,
               positionSet,
               allowedStatus, null,
               new IdentifyAllConflictStrategy(), Integer.MIN_VALUE,
               Integer.MIN_VALUE,
-              RelAssertionType.STATED, typePrefOrder);
+              RelAssertionType.STATED,
+              langRefexOrder,
+              LANGUAGE_SORT.LANG_REFEX);
       if (descriptions.size() > 0) {
          if (descriptions.size() > 1) {
             for (int typePrefNid : typePrefOrder.getListArray()) {
@@ -666,7 +669,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
    private I_DescriptionTuple getLangPreferredDesc(
            Collection<I_DescriptionTuple<DescriptionRevision>> descriptions,
-           I_IntList typePrefOrder, I_IntList langPrefOrder,
+           NidListBI typePrefOrder, NidListBI langPrefOrder,
            NidSetBI allowedStatus, PositionSetBI positionSet,
            boolean tryType) throws IOException, ToIoException {
       if (descriptions.size() > 0) {
@@ -714,7 +717,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
    private I_DescriptionTuple getTypePreferredDesc(
            Collection<I_DescriptionTuple<DescriptionRevision>> descriptions,
-           I_IntList typePrefOrder, I_IntList langPrefOrder,
+           NidListBI typePrefOrder, NidListBI langPrefOrder,
            NidSetBI allowedStatus, PositionSetBI positionSet,
            boolean tryLang) throws IOException, ToIoException {
       if (descriptions.size() > 0) {
@@ -752,7 +755,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
    }
 
    @Override
-   public Description.Version getDescTuple(I_IntList descTypePreferenceList,
+   public Description.Version getDescTuple(NidListBI descTypePreferenceList,
            I_ConfigAceFrame config) throws IOException {
       return (Version) getDescTuple(descTypePreferenceList, config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSetReadOnly(), config.getLanguageSortPref(),
               config.getPrecedence(), config.getConflictResolutionStrategy());
@@ -1112,7 +1115,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
       ViewCoordinate coordinate = new ViewCoordinate(precedencePolicy,
               positions, allowedStatus, allowedTypes, contradictionManager,
-              Integer.MIN_VALUE, classifierNid, relAssertionType, null);
+              Integer.MIN_VALUE, classifierNid, relAssertionType, null, null);
       List<Relationship.Version> actualValues = new ArrayList<Relationship.Version>();
       for (Relationship rel : getSourceRels()) {
          for (Relationship.Version rv : rel.getVersions(coordinate)) {
@@ -1488,7 +1491,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
       ViewCoordinate coordinate = new ViewCoordinate(precedencePolicy,
               positions, allowedStatus, allowedTypes, contradictionManager,
-              Integer.MIN_VALUE, classifierNid, relAssertionType, null);
+              Integer.MIN_VALUE, classifierNid, relAssertionType, null, null);
       List<Relationship.Version> actualValues = new ArrayList<Relationship.Version>();
       for (Relationship rel : getDestRels(coordinate.getIsaTypeNids())) {
          for (Relationship.Version relv : rel.getVersions(coordinate)) {

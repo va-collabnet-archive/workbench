@@ -72,7 +72,7 @@ public class KindOfSpec {
 		return new ViewCoordinate(precedence, viewPositionSet,
                         allowedStatusNids, relTypeNids,
                         contradictionMgr, Integer.MIN_VALUE,
-                        classifierNid, relAssertionType, null);
+                        classifierNid, relAssertionType, null, null);
 	}
 	public KindOfSpec(PositionBI viewPosition, NidSetBI allowedStatus,
 			NidSetBI relTypeNids, int kindNid, Precedence precedence,

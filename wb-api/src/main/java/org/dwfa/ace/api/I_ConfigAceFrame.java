@@ -51,6 +51,7 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate.LANGUAGE_SORT;
 
 public interface I_ConfigAceFrame extends I_HandleSubversion {
 
@@ -69,8 +70,32 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
             this.desc = desc;
         }
 
+        @Override
         public String toString() {
             return desc;
+        }
+
+        public LANGUAGE_SORT getLangSort() {
+            switch (this) {
+                case LANG_B4_TYPE:
+                    return LANGUAGE_SORT.LANG_BEFORE_TYPE;
+                case LANG_REFEX:
+                    return LANGUAGE_SORT.LANG_REFEX;
+                case TYPE_B4_LANG:
+                    return LANGUAGE_SORT.TYPE_BEFORE_LANG;
+            }
+            throw new UnsupportedOperationException("Can't handle: " + this);
+        }
+        public static LANGUAGE_SORT_PREF  getPref(LANGUAGE_SORT sort) {
+            switch (sort) {
+                case LANG_BEFORE_TYPE:
+                    return LANG_B4_TYPE;
+                case LANG_REFEX:
+                    return LANG_REFEX;
+                case TYPE_BEFORE_LANG:
+                    return TYPE_B4_LANG;
+            }
+            throw new UnsupportedOperationException("Can't handle: " + sort);
         }
     }
 

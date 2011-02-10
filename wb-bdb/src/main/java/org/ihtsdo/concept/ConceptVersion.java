@@ -17,10 +17,12 @@ import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.cern.colt.map.OpenIntIntHashMap;
 import org.ihtsdo.concept.component.relationship.group.RelGroupVersion;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidList;
@@ -55,48 +57,6 @@ import org.ihtsdo.tk.spec.ConceptSpec;
 public class ConceptVersion implements ConceptVersionBI {
 
     private Concept concept;
-
-   public void cancel() throws IOException {
-      concept.cancel();
-   }
-
-   public void commit(ChangeSetGenerationPolicy changeSetPolicy, ChangeSetGenerationThreadingPolicy changeSetWriterThreading) throws IOException {
-      concept.commit(changeSetPolicy, changeSetWriterThreading);
-   }
-
-   public void commit(ChangeSetPolicy changeSetPolicy, ChangeSetWriterThreading changeSetWriterThreading) throws IOException {
-      concept.commit(changeSetPolicy, changeSetWriterThreading);
-   }
-
-    @Override
-    public void setAnnotationStyleRefex(boolean annotationStyleRefset) {
-        concept.setAnnotationStyleRefex(annotationStyleRefset);
-    }
-
-    @Override
-    public boolean isAnnotationStyleRefex() throws IOException {
-        return concept.isAnnotationStyleRefex();
-    }
-
-    @Override
-    public boolean isUncommitted() {
-        return concept.isUncommitted();
-    }
-
-    @Override
-    public UUID getPrimUuid() {
-        return concept.getPrimUuid();
-    }
-
-    @Override
-    public int getConceptNid() {
-        return concept.getConceptNid();
-    }
-
-    @Override
-    public List<UUID> getUUIDs() {
-        return concept.getUUIDs();
-    }
     private ViewCoordinate vc;
 
     public ConceptVersion(Concept concept, ViewCoordinate coordinate) {
@@ -571,37 +531,52 @@ public class ConceptVersion implements ConceptVersionBI {
     @Override
     public DescriptionVersionBI getFullySpecifiedDescription()
             throws IOException, ContraditionException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public DescriptionVersionBI getPreferredDescription() throws IOException,
-            ContraditionException {
-       /*
-       I_IntList typePrefOrder,
-           I_IntList langPrefOrder, NidSetBI allowedStatus,
-           PositionSetBI positionSet, LANGUAGE_SORT_PREF sortPref,
-           Precedence precedencePolicy, ContradictionManagerBI contradictionManager
-        *
-        */
-       /*
-        NidListBI typePrefOrder = new NidList(values);
-        return concept.getDescTuple(typePrefOrder,
+      if (fsnOrder == null) {
+            fsnOrder = new IntList();
+            fsnOrder.add(ReferenceConcepts.FULLY_SPECIFIED_RF1.getNid());
+            fsnOrder.add(ReferenceConcepts.PREFERRED_ACCEPTABILITY.getNid());
+            fsnOrder.add(ReferenceConcepts.PREFERRED_RF1.getNid());
+        }
+       return concept.getDescTuple(fsnOrder,
                 vc.getLangPrefList(),
                 vc.getAllowedStatusNids(),
                 vc.getPositionSet(),
-                LANGUAGE_SORT_PREF.LANG_REFEX,
+                LANGUAGE_SORT_PREF.getPref(vc.getLangSort()),
                 vc.getPrecedence(),
                 vc.getContradictionManager());
-        *
-        */
-          throw new UnsupportedOperationException();
+   }
+
+    NidListBI preferredOrder;
+    NidListBI fsnOrder;
+    NidListBI synonymOrder;
+    
+    @Override
+    public DescriptionVersionBI getPreferredDescription() throws IOException,
+            ContraditionException {
+        if (preferredOrder == null) {
+            preferredOrder = new IntList();
+            preferredOrder.add(ReferenceConcepts.PREFERRED_ACCEPTABILITY.getNid());
+            preferredOrder.add(ReferenceConcepts.PREFERRED_RF1.getNid());
+            preferredOrder.add(ReferenceConcepts.FULLY_SPECIFIED_RF1.getNid());
+        }
+        return concept.getDescTuple(preferredOrder,
+                vc.getLangPrefList(),
+                vc.getAllowedStatusNids(),
+                vc.getPositionSet(),
+                LANGUAGE_SORT_PREF.getPref(vc.getLangSort()),
+                vc.getPrecedence(),
+                vc.getContradictionManager());
   }
 
     @Override
     public Collection<? extends DescriptionVersionBI> getSynonyms()
             throws IOException {
-        throw new UnsupportedOperationException();
+        if (synonymOrder == null) {
+            synonymOrder = new IntList();
+            synonymOrder.add(ReferenceConcepts.ACCEPTABLE_ACCEPTABILITY.getNid());
+            synonymOrder.add(ReferenceConcepts.SYNONYM.getNid());
+        }
+       throw new UnsupportedOperationException();
     }
 
     @Override
@@ -733,5 +708,51 @@ public class ConceptVersion implements ConceptVersionBI {
    public Set<Integer> getAllSapNids() throws IOException {
       return concept.getAllSapNids();
    }
+
+
+   @Override
+   public void cancel() throws IOException {
+      concept.cancel();
+   }
+
+   @Override
+   public void commit(ChangeSetGenerationPolicy changeSetPolicy, ChangeSetGenerationThreadingPolicy changeSetWriterThreading) throws IOException {
+      concept.commit(changeSetPolicy, changeSetWriterThreading);
+   }
+
+   public void commit(ChangeSetPolicy changeSetPolicy, ChangeSetWriterThreading changeSetWriterThreading) throws IOException {
+      concept.commit(changeSetPolicy, changeSetWriterThreading);
+   }
+
+    @Override
+    public void setAnnotationStyleRefex(boolean annotationStyleRefset) {
+        concept.setAnnotationStyleRefex(annotationStyleRefset);
+    }
+
+    @Override
+    public boolean isAnnotationStyleRefex() throws IOException {
+        return concept.isAnnotationStyleRefex();
+    }
+
+    @Override
+    public boolean isUncommitted() {
+        return concept.isUncommitted();
+    }
+
+    @Override
+    public UUID getPrimUuid() {
+        return concept.getPrimUuid();
+    }
+
+    @Override
+    public int getConceptNid() {
+        return concept.getConceptNid();
+    }
+
+    @Override
+    public List<UUID> getUUIDs() {
+        return concept.getUUIDs();
+    }
+
  }
 

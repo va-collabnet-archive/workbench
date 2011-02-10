@@ -97,7 +97,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
                  languageNid,
                  classifierNid,
                  RelAssertionType.STATED,
-                 null);
+                 null, ViewCoordinate.LANGUAGE_SORT.TYPE_BEFORE_LANG);
       }
       return metadataVC;
    }

@@ -34,7 +34,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
-import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_Position;
@@ -52,6 +51,7 @@ import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
@@ -215,8 +215,8 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 				positionSet, precedencePolicy, contradictionManager);
 	}
 
-	public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder,
-			I_IntList langPrefOrder, NidSetBI allowedStatus,
+	public I_DescriptionTuple getDescTuple(NidListBI typePrefOrder,
+			NidListBI langPrefOrder, NidSetBI allowedStatus,
 			PositionSetBI positionSet, LANGUAGE_SORT_PREF sortPref,
 			Precedence precedencePolicy,
 			ContradictionManagerBI contradictionManager) throws IOException {
@@ -316,8 +316,8 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 				positionSet, precedencePolicy, contradictionManager);
 	}
 
-	public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder,
-			I_IntList langPrefOrder, NidSetBI allowedStatus,
+	public I_DescriptionTuple getDescTuple(NidListBI typePrefOrder,
+			NidListBI langPrefOrder, NidSetBI allowedStatus,
 			PositionSetBI positionSet, LANGUAGE_SORT_PREF sortPref,
 			Precedence precedencePolicy,
 			I_ManageContradiction contradictionManager) throws IOException {
@@ -530,7 +530,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
             contradictionManager);
     }
 
-    public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder, I_IntList langPrefOrder, I_IntSet allowedStatus,
+    public I_DescriptionTuple getDescTuple(NidListBI typePrefOrder, NidListBI langPrefOrder, I_IntSet allowedStatus,
             PositionSetReadOnly positionSet, LANGUAGE_SORT_PREF sortPref, Precedence precedencePolicy,
             I_ManageContradiction contradictionManager) throws IOException {
         return bean.getDescTuple(typePrefOrder, langPrefOrder, allowedStatus, positionSet, sortPref, precedencePolicy,
@@ -700,7 +700,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.getDescTuple(config.getTreeDescPreferenceList(), config);
     }
 
-    public I_DescriptionTuple getDescTuple(I_IntList prefOrder, I_ConfigAceFrame config) throws IOException {
+    public I_DescriptionTuple getDescTuple(NidListBI prefOrder, I_ConfigAceFrame config) throws IOException {
         return bean.getDescTuple(prefOrder, config);
     }
 

@@ -153,8 +153,7 @@ public class ConceptView extends JPanel {
                   for (PathBI path: paths) {
                      ConceptVersionBI pathVersion =
                              Ts.get().getConceptVersion(coordinate, path.getConceptNid());
-                     add(new JLabel(pathVersion.toString()), gbc);
-                    //TODO add(new JLabel(pathVersion.getPreferredDescription().getText()), gbc);
+                     add(new JLabel(pathVersion.getPreferredDescription().getText()), gbc);
                      gbc.gridy++;
                   }
 

@@ -60,7 +60,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
-import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
@@ -90,6 +89,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.PathBI;
 
 public class RefsetSpecPanel extends JPanel {
@@ -403,7 +403,7 @@ public class RefsetSpecPanel extends JPanel {
         column1.setMax(1000);
         column1.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.CONCEPT_COMPONENT);
         column1
-            .setReadMethod(I_GetConceptData.class.getMethod("getDescTuple", I_IntList.class, I_ConfigAceFrame.class));
+            .setReadMethod(I_GetConceptData.class.getMethod("getDescTuple", NidListBI.class, I_ConfigAceFrame.class));
         List<Object> parameters = new ArrayList<Object>();
         parameters.add(aceFrameConfig.getTableDescPreferenceList());
         parameters.add(aceFrameConfig);
