@@ -91,7 +91,7 @@ public class RoleBasedWFDestinationSelector extends AbstractTask {
      *      org.dwfa.bpa.process.I_Work)
      */
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-        return Condition.STOP;
+        return Condition.CONTINUE;
     }
 
     /**
@@ -167,7 +167,7 @@ public class RoleBasedWFDestinationSelector extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
      */
     public Collection<Condition> getConditions() {
-        return AbstractTask.STOP_CONDITION;
+        return CONTINUE_CONDITION;
     }
 
     /**
