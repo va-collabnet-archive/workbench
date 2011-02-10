@@ -563,6 +563,22 @@
 							<rstaFileNames>
 								<String>sctSiEConcepts.jbin.rsta</String>
 							</rstaFileNames>
+							<initialPaths>
+								<path>
+									<pathConcept>
+										<description>SNOMED Core</description>
+										<uuidStrs>
+											<String>8c230474-9f11-30ce-9cad-185a96fd03a2</String>
+										</uuidStrs>
+									</pathConcept>
+									<originConcept>
+										<description>Workbench Auxiliary</description>
+										<uuidStrs>
+											<String>2faa9260-8fb2-11db-b606-0800200c9a66</String>
+										</uuidStrs>
+									</originConcept>
+								</path>
+							</initialPaths>
 						</configuration>
 					</execution>
 				</executions>
