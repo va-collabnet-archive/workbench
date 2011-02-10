@@ -87,9 +87,11 @@ public class GenerateUAWAssignmentExec extends AbstractTask {
 	private String projectPropName = ProcessAttachmentKeys.TERMINOLOGY_PROJECT.getAttachmentKey();
 	private String processPropName = ProcessAttachmentKeys.PROCESS_TO_LAUNCH.getAttachmentKey();
 	private String translatorInboxPropName = ProcessAttachmentKeys.TRANSLATOR_ROLE_INBOX.getAttachmentKey();
+	private String fastTrackTranslatorInboxPropName = ProcessAttachmentKeys.FAST_TRACK_TRANSLATOR_ROLE_INBOX.getAttachmentKey();
 	private String reviewer1InboxPropName = ProcessAttachmentKeys.REVIEWER_1_ROLE_INBOX.getAttachmentKey();
 	private String reviewer2InboxPropName = ProcessAttachmentKeys.REVIEWER_2_ROLE_INBOX.getAttachmentKey();
 	private String smeInboxPropName = ProcessAttachmentKeys.SME_ROLE_INBOX.getAttachmentKey();
+	private String superSmeInboxPropName = ProcessAttachmentKeys.SUPER_SME_ROLE_INBOX.getAttachmentKey();
 	private String editorialBoardInboxPropName = ProcessAttachmentKeys.EDITORIAL_BOARD_ROLE_INBOX.getAttachmentKey();
 
 	// Other Properties
@@ -108,9 +110,11 @@ public class GenerateUAWAssignmentExec extends AbstractTask {
 		out.writeObject(projectPropName);
 		out.writeObject(processPropName);
 		out.writeObject(translatorInboxPropName);
+		out.writeObject(fastTrackTranslatorInboxPropName);
 		out.writeObject(reviewer1InboxPropName);
 		out.writeObject(reviewer2InboxPropName);
 		out.writeObject(smeInboxPropName);
+		out.writeObject(superSmeInboxPropName);
 		out.writeObject(editorialBoardInboxPropName);
 	}
 
@@ -125,9 +129,11 @@ public class GenerateUAWAssignmentExec extends AbstractTask {
 				projectPropName=(String) in.readObject();
 				processPropName = (String) in.readObject();
 				translatorInboxPropName = (String) in.readObject();
+				fastTrackTranslatorInboxPropName = (String) in.readObject();
 				reviewer1InboxPropName = (String) in.readObject();
 				reviewer2InboxPropName = (String) in.readObject();
 				smeInboxPropName = (String) in.readObject();
+				superSmeInboxPropName = (String) in.readObject();
 				editorialBoardInboxPropName = (String) in.readObject();
 			}
 			// Initialize transient properties
@@ -227,9 +233,11 @@ public class GenerateUAWAssignmentExec extends AbstractTask {
 						I_EncodeBusinessProcess wfProcess=(I_EncodeBusinessProcess)worklist.getBusinessProcess();
 						wfProcess.setDestination(destination);
 						wfProcess.setProperty(translatorInboxPropName, process.getProperty(translatorInboxPropName));
+						wfProcess.setProperty(fastTrackTranslatorInboxPropName, process.getProperty(fastTrackTranslatorInboxPropName));
 						wfProcess.setProperty(reviewer1InboxPropName, process.getProperty(reviewer1InboxPropName));
 						wfProcess.setProperty(reviewer2InboxPropName, process.getProperty(reviewer2InboxPropName));
 						wfProcess.setProperty(smeInboxPropName, process.getProperty(smeInboxPropName));
+						wfProcess.setProperty(superSmeInboxPropName, process.getProperty(superSmeInboxPropName));
 						wfProcess.setProperty(editorialBoardInboxPropName, process.getProperty(editorialBoardInboxPropName));
 
 						workListMember.setActivityStatus(
@@ -278,7 +286,10 @@ public class GenerateUAWAssignmentExec extends AbstractTask {
 							}
 							I_QueueProcesses q = (I_QueueProcesses) service.service;
 
-							destination = (String) process.getProperty(translatorInboxPropName);
+							destination = (String) process.getProperty(fastTrackTranslatorInboxPropName);
+							if (destination==null || destination.trim().equals(""))
+								destination = (String) process.getProperty(translatorInboxPropName);
+							
 							wfProcess.setDestination(destination);
 							worker.getLogger().info(
 									"Moving process " + wfProcess.getProcessID() + " to Queue named: " + queueName);
@@ -417,5 +428,22 @@ public class GenerateUAWAssignmentExec extends AbstractTask {
 
 	public void setProjectPropName(String projectPropName) {
 		this.projectPropName = projectPropName;
+	}
+
+	public String getFastTrackTranslatorInboxPropName() {
+		return fastTrackTranslatorInboxPropName;
+	}
+
+	public void setFastTrackTranslatorInboxPropName(
+			String fastTrackTranslatorInboxPropName) {
+		this.fastTrackTranslatorInboxPropName = fastTrackTranslatorInboxPropName;
+	}
+
+	public String getSuperSmeInboxPropName() {
+		return superSmeInboxPropName;
+	}
+
+	public void setSuperSmeInboxPropName(String superSmeInboxPropName) {
+		this.superSmeInboxPropName = superSmeInboxPropName;
 	}
 }
