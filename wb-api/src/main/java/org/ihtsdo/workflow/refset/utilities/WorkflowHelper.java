@@ -187,6 +187,27 @@ public class WorkflowHelper {
         	AceLog.getAppLog().log(Level.WARNING, "Error in updating modelers", e);
 		}
     }
+	
+
+    public static TreeSet<I_GetConceptData> returnWorkflowStates() {
+		TreeSet <I_GetConceptData> sortedStates = new TreeSet<I_GetConceptData>(new WfHxConceptComparer());
+
+		try {
+			I_GetConceptData statesParentConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_STATES.getPrimoridalUid());
+
+    		Set<? extends I_GetConceptData> workflowStates = getChildren(statesParentConcept);
+    		workflowStates.remove(statesParentConcept);
+
+    		sortedStates.addAll(workflowStates);
+
+    		Terms.get().getActiveAceFrameConfig().setWorkflowStates(sortedStates);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	
+    	return (TreeSet<I_GetConceptData>)sortedStates.clone();
+    }
+    
 
 	private static String getLoginId(I_GetConceptData con) throws TerminologyException, IOException {
     	String id = identifyPrefTerm(con);
@@ -450,6 +471,8 @@ public class WorkflowHelper {
 
 		return retVal;
 	}
+	
+
 
 	public static I_GetConceptData lookupRoles(String role) throws TerminologyException, IOException {
 		Set<? extends I_GetConceptData> allActions = Terms.get().getActiveAceFrameConfig().getWorkflowRoles();
