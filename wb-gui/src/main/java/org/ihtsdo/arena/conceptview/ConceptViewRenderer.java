@@ -189,12 +189,7 @@ public class ConceptViewRenderer extends JLayeredPane {
     */
    public ConceptViewRenderer(Object cellObj,
            final mxGraphComponent graphContainer, ACE ace) {
-	   
-	   
-	    
-	   
-	   
-
+	
       wizardPanel =
            		new WizardPanel(new FlowLayout(FlowLayout.LEADING, 10, 10), this);
       wizardScrollPane = new JScrollPane(wizardPanel,
@@ -423,12 +418,10 @@ public class ConceptViewRenderer extends JLayeredPane {
                         	
         		            bean.setPath(Terms.get().nidToUuid(selectedConcept.getConceptAttributes().getPathNid()));
         		            bean.setModeler(WorkflowHelper.getCurrentModeler().getPrimUuid());
-        		            bean.setConceptId(selectedConcept.getUids().iterator().next());
+        		            bean.setConcept(selectedConcept.getUids().iterator().next());
         		            bean.setFSN(WorkflowHelper.identifyFSN(selectedConcept));
-        	            	bean.setUseCase(ArchitectonicAuxiliary.Concept.WORKFLOW_CONCEPTS.getPrimoridalUid());
         	            	java.util.Date today = new java.util.Date();
-        			        bean.setTimeStamp(today.getTime());
-        			        bean.setRefsetColumnTimeStamp(today.getTime());
+        			        bean.setWorkflowTime(today.getTime());
         			        
         			        WorkflowHistoryJavaBean latestBean = searcher.getLatestWfHxJavaBeanForConcept(selectedConcept);
         		            
