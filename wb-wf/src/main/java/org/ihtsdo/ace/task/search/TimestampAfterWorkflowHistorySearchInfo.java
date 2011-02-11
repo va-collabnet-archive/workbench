@@ -23,8 +23,6 @@ import java.beans.PropertyDescriptor;
 import org.dwfa.bpa.tasks.editor.JTextFieldEditorOneLine;
 
 
-import net.sourceforge.jdatepicker.*;
-
 public class TimestampAfterWorkflowHistorySearchInfo extends AbstractWorkflowHistorySearchTestSearchInfo {
 
     @Override
