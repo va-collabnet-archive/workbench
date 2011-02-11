@@ -29,7 +29,7 @@ public class SemanticHierarchyDropDownSearchInfo extends AbstractWorkflowHistory
 	        PropertyDescriptor testHierarchy = new PropertyDescriptor("testHierarchy", getBeanDescriptor().getBeanClass());
 	        testHierarchy.setBound(true);
 	        testHierarchy.setPropertyEditorClass(SemanticHierarchyEditor.class);
-	        testHierarchy.setDisplayName("<html><font color='green'>Hierarchy Id:");
+	        testHierarchy.setDisplayName("<html><font color='green'>Semantic Tag:");
 	        testHierarchy.setShortDescription("The concept to test has the proper hierarchy.");
 	
 	        PropertyDescriptor rv[] = { testHierarchy };
@@ -44,7 +44,7 @@ public class SemanticHierarchyDropDownSearchInfo extends AbstractWorkflowHistory
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SemanticHierarchyDropDown.class);
-        bd.setDisplayName("Hierarchy");
+        bd.setDisplayName("Semantic Tag");
         return bd;
     }
 
