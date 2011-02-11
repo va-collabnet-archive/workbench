@@ -418,6 +418,7 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
     	setPathUid(update.getPath());
     	setStateUid(update.getState());
     	setAutoApproved(update.getAutoApproved());
+    	setOverride(update.getOverridden());
     	
     	java.util.Date today = new java.util.Date();
         setEffectiveTime(Long.MAX_VALUE);
