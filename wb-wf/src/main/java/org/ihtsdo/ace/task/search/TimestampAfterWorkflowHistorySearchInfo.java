@@ -22,6 +22,9 @@ import java.beans.PropertyDescriptor;
 
 import org.dwfa.bpa.tasks.editor.JTextFieldEditorOneLine;
 
+
+import net.sourceforge.jdatepicker.*;
+
 public class TimestampAfterWorkflowHistorySearchInfo extends AbstractWorkflowHistorySearchTestSearchInfo {
 
     @Override
@@ -30,7 +33,7 @@ public class TimestampAfterWorkflowHistorySearchInfo extends AbstractWorkflowHis
 	        PropertyDescriptor testTimestampAfter = new PropertyDescriptor("testTimestampAfter", getBeanDescriptor().getBeanClass());
 	        testTimestampAfter.setBound(true);
 	        testTimestampAfter.setPropertyEditorClass(JTextFieldEditorOneLine.class);
-	        testTimestampAfter.setDisplayName("<html><font color='green'>WfHx Record inserted After Following Date:");
+	        testTimestampAfter.setDisplayName("<html><font color='green'>Date (mm/dd/yyy):");
 	        testTimestampAfter.setShortDescription("The concept to test has the proper timestamp After Than.");
 	
 	        PropertyDescriptor rv[] = { testTimestampAfter };
@@ -45,7 +48,7 @@ public class TimestampAfterWorkflowHistorySearchInfo extends AbstractWorkflowHis
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(TimestampAfterWorkflowHistory.class);
-        bd.setDisplayName("After Timestamp");
+        bd.setDisplayName("Timestamp on or after");
         return bd;
     }
 
