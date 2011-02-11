@@ -1152,13 +1152,17 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 
 	            // Workflow Actions
 	            WORKFLOW_ACTIONS("Workflow actions", new I_ConceptualizeUniversally[] { WORKFLOW_CONCEPTS }), 
-	            WORKFLOW_ACCEPT_ACTION("Accept workflow action", new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
-	            WORKFLOW_CHIEF_TERMINOLOGIST_REVIEW_ACTION("Chief Terminologist review workflow action", new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
-	            WORKFLOW_COMMIT_ACTION("Commit workflow action", new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
-	            WORKFLOW_COMMIT_IN_BATCH_ACTION("Commit in batch workflow action", new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
-	            WORKFLOW_DISCUSS_ACTION("Discuss workflow action", new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
-	            WORKFLOW_ESCALATE_ACTION("Escalate workflow action", new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
-	            WORKFLOW_REVIEW_ACTION("Review workflow action", new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
+	            WORKFLOW_ACCEPT_ACTION(new String[] {"Accept workflow action", "Accept"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
+	            WORKFLOW_CHIEF_TERMINOLOGIST_REVIEW_ACTION(new String[] {"Chief Terminologist review workflow action", "Chief Terminologist review"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
+	            WORKFLOW_COMMIT_ACTION(new String[] {"Commit workflow action", "Commit"}, null,  new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
+	            WORKFLOW_COMMIT_IN_BATCH_ACTION(new String[] {"Commit in batch workflow action", "Commit in batch"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
+	            WORKFLOW_DISCUSS_ACTION(new String[] {"Discuss workflow action", "Discuss"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
+	            WORKFLOW_ESCALATE_ACTION(new String[] {"Escalate workflow action", "Escalate"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
+	            WORKFLOW_REVIEW_ACTION(new String[] {"Review workflow action", "Review"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
+	            WORKFLOW_OVERRIDE_ACTION(new String[] {"Override workflow action", "Override"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
+	            
+	            
+	            
 
 	            // WOrkflow Roles Driving WOrkflow
 	            WORKFLOW_ROLES("Workflow role", "admin role", new I_ConceptualizeUniversally[] { USER_ROLE }),
