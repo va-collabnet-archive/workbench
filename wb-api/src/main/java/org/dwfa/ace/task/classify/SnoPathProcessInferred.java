@@ -140,6 +140,9 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
         List<? extends I_ConceptAttributeTuple> attribs = concept.getConceptAttributeTuples(
                 statusSet, fromPathPos, precedence, contradictionMgr);
 
+        if (attribs.size() != 1)
+            System.out.println("!!!:DEBUG:!!!");
+        
         if (attribs.size() == 1)
             passToCompare = true;
         else if (attribs.size() == 0) {

@@ -54,7 +54,25 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate.LANGUAGE_SORT;
 
 public interface I_ConfigAceFrame extends I_HandleSubversion {
-
+    
+    public enum CLASSIFIER_INPUT_MODE_PREF {
+        EDIT_PATH("edit path"),
+        VIEW_PATH("view path only"),
+        VIEW_PATH_WITH_EDIT_PRIORITY("view path with edit path priority");
+        
+        private String desc;
+        
+        private CLASSIFIER_INPUT_MODE_PREF(String desc){
+            this.desc = desc;
+        }
+        
+        @Override
+        public String toString() {
+            return desc;
+        }
+        
+    };
+    
     public enum SPECIAL_SVN_ENTRIES {
         PROFILE_CSU();
     };
@@ -549,6 +567,10 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public I_GetConceptData getClassifierIsaType();
 
     public void setClassifierIsaType(I_GetConceptData classifierIsaType);
+
+    public CLASSIFIER_INPUT_MODE_PREF getClassifierInputMode();
+
+    public void setClassifierInputMode(CLASSIFIER_INPUT_MODE_PREF classifierInputMode);
 
     public I_GetConceptData getClassifierInputPath();
 

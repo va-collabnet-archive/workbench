@@ -125,6 +125,7 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.I_ConfigAceFrame.CLASSIFIER_INPUT_MODE_PREF;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
@@ -2381,7 +2382,41 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private JPanel makeClassifierPrefPane() {
         JPanel classifierPrefPanel = new JPanel(new GridLayout(0, 1));
+        
+        // INPUT SELECTION
+        JPanel classifierPrefInputSubpanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.weightx = 0;
+        gbc.weighty = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
 
+        JLabel inputSelectLabel = new JLabel(" Classifier Input Mode:");
+        inputSelectLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 0));
+        classifierPrefInputSubpanel.add(inputSelectLabel, gbc);
+        gbc.gridx++;
+        gbc.weightx = 1;
+
+        JComboBox pathSelectCombo = new JComboBox(CLASSIFIER_INPUT_MODE_PREF.values());
+        pathSelectCombo.setSelectedItem(aceFrameConfig.getClassifierInputMode());
+        classifierPrefInputSubpanel.add(pathSelectCombo, gbc);
+        pathSelectCombo.addActionListener(new ActionListener() {
+         @Override
+            public void actionPerformed(ActionEvent e) {
+                JComboBox cb = (JComboBox) e.getSource();
+                CLASSIFIER_INPUT_MODE_PREF modePref = (CLASSIFIER_INPUT_MODE_PREF) cb.getSelectedItem();
+                aceFrameConfig.setClassifierInputMode(modePref);
+            }
+        });
+        // classifierPrefInputSubpanel.setBorder(BorderFactory.createTitledBorder(""));
+        // classifierPrefInputSubpanel.add(someLabel);
+        classifierPrefPanel.add(classifierPrefInputSubpanel);
+
+        // 
         TermComponentLabel classifierRootLabel = new TermComponentLabel(aceFrameConfig);
         classifierRootLabel.setTermComponent(aceFrameConfig.getClassificationRoot());
         aceFrameConfig.addPropertyChangeListener("classificationRoot", new PropertyListenerGlue("setTermComponent",

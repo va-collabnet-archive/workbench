@@ -140,7 +140,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 48; // keep current with
+    private static final int dataVersion = 49; // keep current with
     // objDataVersion logic
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
@@ -345,6 +345,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      private I_GetConceptData classifierConcept;
      private RelAssertionType relAssertionType = RelAssertionType.INFERRED_THEN_STATED;
 
+     // 49
+     private CLASSIFIER_INPUT_MODE_PREF classifierInputMode;
 
     // transient
     private transient MasterWorker worker;
@@ -563,6 +565,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         // 48
         writeConceptAsId(classifierConcept, out);
         out.writeObject(relAssertionType);
+        
+        // 49
+        out.writeObject(classifierInputMode);
 
     }
 
@@ -1054,6 +1059,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                }
             }
 
+            if (objDataVersion >= 49) {
+                classifierInputMode = (CLASSIFIER_INPUT_MODE_PREF) in.readObject();
+            } else {
+                classifierInputMode = CLASSIFIER_INPUT_MODE_PREF.EDIT_PATH;
+            }
 
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -2803,6 +2813,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return classificationRoot;
     }
 
+    public CLASSIFIER_INPUT_MODE_PREF getClassifierInputMode() {
+        return classifierInputMode;
+    }
+
     public I_GetConceptData getClassifierInputPath() {
         return classifierInputPathConcept;
     }
@@ -2827,7 +2841,13 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         changeSupport.firePropertyChange("classificationRoot", old, classificationRoot);
     }
 
-    public void setClassifierInputPath(I_GetConceptData inputPath) {
+    public void setClassifierInputMode(CLASSIFIER_INPUT_MODE_PREF classifierInputMode) {
+       Object old = this.classifierInputMode;
+       this.classifierInputMode = classifierInputMode;
+       changeSupport.firePropertyChange("classifierInputMode", old, classifierInputMode);
+    }
+
+   public void setClassifierInputPath(I_GetConceptData inputPath) {
         Object old = inputPath;
         classifierInputPathConcept = inputPath;
         changeSupport.firePropertyChange("classifierInputPath", old, inputPath);

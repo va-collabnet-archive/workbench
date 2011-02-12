@@ -17,11 +17,13 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.I_ConfigAceFrame.CLASSIFIER_INPUT_MODE_PREF;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -36,6 +38,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.Precedence;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN) })
 public class TestSnoPathProcessInferred extends AbstractTask {
@@ -45,6 +48,8 @@ public class TestSnoPathProcessInferred extends AbstractTask {
     private Logger logger;
     private I_TermFactory tf;
     private I_ConfigAceFrame config = null;
+    private Precedence precedence;
+    private I_ManageContradiction contradictionMgr;
 
     // CORE CONSTANTS
     private static int isaNid = Integer.MIN_VALUE;
@@ -70,19 +75,19 @@ public class TestSnoPathProcessInferred extends AbstractTask {
 
     // NID SETS
     I_IntSet statusSet = null;
-    PositionSetReadOnly cClassPosSet = null;
+    PositionSetReadOnly cViewPosSet = null;
     PositionSetReadOnly cEditPosSet = null;
     I_IntSet allowedRoleTypes = null;
 
     // INPUT PATHS
     int cEditPathNid = Integer.MIN_VALUE; // :TODO: move to logging
-    PathBI cEditIPath = null;
-    List<PositionBI> cEditPathPos = null; // Edit (Stated) Path I_Positions
+    PathBI cEditPathBI = null;
+    List<PositionBI> cEditPathListPositionBI = null; // Edit (Stated) Path I_Positions
 
     // OUTPUT PATHS
-    int cClassPathNid; // :TODO: move to logging
-    PathBI cClassIPath; // Used for write back value
-    List<PositionBI> cClassPathPos; // Classifier (Inferred) Path I_Positions
+    int cViewPathNid; // :TODO: move to logging
+    PathBI cViewPathBI; // Used for write back value
+    List<PositionBI> cViewPathListPositionBI; // Classifier (Inferred) Path I_Positions
 
     // MASTER DATA SETS
     List<SnoRel> cEditSnoRels; // "Edit Path" Concepts
@@ -105,22 +110,40 @@ public class TestSnoPathProcessInferred extends AbstractTask {
             long startTime = System.currentTimeMillis();
             tf = Terms.get();
             config = tf.getActiveAceFrameConfig();
+            precedence = config.getPrecedence();
+            contradictionMgr = config.getConflictResolutionStrategy();
+            
             cClassSnoRels = new ArrayList<SnoRel>();
 
             setupCoreNids();
             setupPaths();
-            logger.info(toStringPathPos(cClassPathPos, "Classifier Path"));
+            logger.info(toStringPathPos(cViewPathListPositionBI, "Classifier Path"));
             setupRoleNids();
 
-            SnoPathProcessInferred pcClass = new SnoPathProcessInferred(logger,
-                    cClassSnoRels, allowedRoleTypes, statusSet, cEditPosSet,
-                    cClassPosSet, null, config
-                            .getPrecedence(), config.getConflictResolutionStrategy());
-            tf.iterateConcepts(pcClass);
-            logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED PATH DATA : "
-                    + pcClass.getStats(startTime));
+            SnoPathProcessInferred pcClass = null;
+            if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.EDIT_PATH) {
+                pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
+                        statusSet, cEditPosSet, cEditPosSet, null, precedence, contradictionMgr);
+                tf.iterateConcepts(pcClass);
+                logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED (Edit) PATH DATA : "
+                        + pcClass.getStats(startTime));
+            } else if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH) {
+                pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
+                        statusSet, cViewPosSet, cViewPosSet, null, precedence, contradictionMgr);
+                tf.iterateConcepts(pcClass);
+                logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED (View) PATH DATA : "
+                        + pcClass.getStats(startTime));
+            } else if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH_WITH_EDIT_PRIORITY) {
+                pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
+                        statusSet, cEditPosSet, cViewPosSet, null, precedence, contradictionMgr);
+                tf.iterateConcepts(pcClass);
+                logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED (View w/ edit priority) PATH DATA : "
+                        + pcClass.getStats(startTime));
+            } else {
+                throw new TaskFailedException("(Classifier) Inferred Path case not implemented.");
+            }
 
-            dumpSnoRel(cEditSnoRels, "TestSnoPathInferred_sctIds_t" + startTime + ".txt", 6);
+            dumpSnoRel(cClassSnoRels, "TestSnoPathInferred_sctIds_t" + startTime + ".txt", 6);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -141,53 +164,52 @@ public class TestSnoPathProcessInferred extends AbstractTask {
     private Condition setupPaths() {
         // GET INPUT & OUTPUT PATHS FROM CLASSIFIER PREFERRENCES
         try {
-            if (config.getEditingPathSet().size() != 1) {
-                String errStr = "Profile must have only one edit path. Found: "
-                        + config.getEditingPathSet();
-                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
-                        new TaskFailedException(errStr));
-                return Condition.STOP;
-            }
-
-            // GET ALL EDIT_PATH ORIGINS
-            I_GetConceptData cEditPathObj = config.getClassifierInputPath();
-            if (cEditPathObj == null) {
-                String errStr = "Classifier Input (Edit) Path -- not set in Classifier preferences tab!";
-                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
-                return Condition.STOP;
-            }
-
             // Setup to exclude Workbench Auxiliary on path
             UUID wAuxUuid = UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66");
             I_GetConceptData wAuxCb = tf.getConcept(wAuxUuid);
             workbenchAuxPath = wAuxCb.getConceptNid();
 
-            cEditPathNid = cEditPathObj.getConceptNid();
-            cEditIPath = tf.getPath(cEditPathObj.getUids());
-            cEditPosSet = new PositionSetReadOnly(tf.newPosition(cEditIPath, Integer.MAX_VALUE));
-            // cEditPosSet = new
-            // PositionSetReadOnly(cEditIPath.getOrigins().get(0));
-
-            cEditPathPos = new ArrayList<PositionBI>();
-            cEditPathPos.add(tf.newPosition(cEditIPath, Integer.MAX_VALUE));
-            getPathOrigins(cEditPathPos, cEditIPath);
-
-            // GET ALL CLASSIFER_PATH ORIGINS
-            I_GetConceptData cClassPathObj = config.getClassifierOutputPath();
-            if (cClassPathObj == null) {
-                String errStr = "Classifier Output (Inferred) Path -- not set in Classifier preferences tab!";
-                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
+            // GET ALL EDIT_PATH ORIGINS
+            if (config.getEditingPathSet() == null) {
+                String errStr = "(Classification error) Edit path is not set.";
+                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
+                        new TaskFailedException(errStr));
+                return Condition.STOP;
+            } else if (config.getEditingPathSet().size() != 1) {
+                String errStr = "(Classification error) Profile must have exactly one edit path. Found: "
+                        + config.getEditingPathSet();
+                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
+                        new TaskFailedException(errStr));
                 return Condition.STOP;
             }
-            cClassPathNid = cClassPathObj.getConceptNid();
-            cClassIPath = tf.getPath(cClassPathObj.getUids());
-            cClassPosSet = new PositionSetReadOnly(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
-            // cClassPosSet = new
-            // PositionSetReadOnly(cClassIPath.getOrigins().get(0));
+            cEditPathBI = config.getEditingPathSet().iterator().next();
+            cEditPathNid = cEditPathBI.getConceptNid();
+            cEditPosSet = new PositionSetReadOnly(tf.newPosition(cEditPathBI, Integer.MAX_VALUE));
 
-            cClassPathPos = new ArrayList<PositionBI>();
-            cClassPathPos.add(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
-            getPathOrigins(cClassPathPos, cClassIPath);
+            cEditPathListPositionBI = new ArrayList<PositionBI>();
+            cEditPathListPositionBI.add(tf.newPosition(cEditPathBI, Integer.MAX_VALUE));
+            getPathOrigins(cEditPathListPositionBI, cEditPathBI);
+
+            // GET ALL CLASSIFER_PATH ORIGINS
+            if (config.getViewPositionSet() == null) {
+                String errStr = "(Classification error) View path is not set.";
+                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
+                        new TaskFailedException(errStr));
+                return Condition.STOP;
+            } else if (config.getViewPositionSet().size() != 1) {
+                String errStr = "(Classification error) Profile must have exactly one view path. Found: "
+                        + config.getViewPositionSet();
+                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
+                        new TaskFailedException(errStr));
+                return Condition.STOP;
+            }
+            cViewPathBI = config.getViewPositionSet().iterator().next().getPath();
+            cViewPathNid = cViewPathBI.getConceptNid();
+            cViewPosSet = new PositionSetReadOnly(tf.newPosition(cViewPathBI, Integer.MAX_VALUE));
+
+            cViewPathListPositionBI = new ArrayList<PositionBI>();
+            cViewPathListPositionBI.add(tf.newPosition(cViewPathBI, Integer.MAX_VALUE));
+            getPathOrigins(cViewPathListPositionBI, cViewPathBI);
 
         } catch (TerminologyException e) {
             // TODO Auto-generated catch block
@@ -324,7 +346,7 @@ public class TestSnoPathProcessInferred extends AbstractTask {
             ArrayList<I_RelVersioned> nextLevel = new ArrayList<I_RelVersioned>();
             for (I_RelVersioned<?> rv : thisLevel) {
                 I_RelPart rPart1 = null;
-                for (PositionBI pos : cEditPathPos) { // PATHS_IN_PRIORITY_ORDER
+                for (PositionBI pos : cEditPathListPositionBI) { // PATHS_IN_PRIORITY_ORDER
                     for (I_RelPart rPart : rv.getMutableParts()) {
                         if (pos.getPath().getConceptNid() == rPart.getPathId()) {
                             if (rPart1 == null) {

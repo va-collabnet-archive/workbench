@@ -242,6 +242,10 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         return baseFrame.getClassificationRoot();
     }
 
+    public CLASSIFIER_INPUT_MODE_PREF getClassifierInputMode() {
+        return baseFrame.getClassifierInputMode();
+    }
+
     public I_GetConceptData getClassifierInputPath() {
         return baseFrame.getClassifierInputPath();
     }
@@ -261,6 +265,10 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
     public void setClassificationRoot(I_GetConceptData classificationRoot) {
         baseFrame.setClassificationRoot(classificationRoot);
     }
+    
+    public void setClassifierInputMode(CLASSIFIER_INPUT_MODE_PREF classifierInputMode) {
+        baseFrame.setClassifierInputMode(classifierInputMode);
+     }
 
     public void setClassifierInputPath(I_GetConceptData inputPath) {
         baseFrame.setClassifierInputPath(inputPath);

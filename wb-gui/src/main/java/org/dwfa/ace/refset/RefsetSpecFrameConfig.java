@@ -320,6 +320,10 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         return frameConfig.getClassificationRoot();
     }
 
+    public CLASSIFIER_INPUT_MODE_PREF getClassifierInputMode() {
+        return frameConfig.getClassifierInputMode();
+    }
+
     public I_GetConceptData getClassifierInputPath() {
         return frameConfig.getClassifierInputPath();
     }
@@ -813,6 +817,10 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     public void setClassificationRoot(I_GetConceptData classificationRoot) {
         frameConfig.setClassificationRoot(classificationRoot);
     }
+
+    public void setClassifierInputMode(CLASSIFIER_INPUT_MODE_PREF classifierInputMode) {
+        frameConfig.setClassifierInputMode(classifierInputMode);
+     }
 
     public void setClassifierInputPath(I_GetConceptData inputPath) {
         frameConfig.setClassifierInputPath(inputPath);

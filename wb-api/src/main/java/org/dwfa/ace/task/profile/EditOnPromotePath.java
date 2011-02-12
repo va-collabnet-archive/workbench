@@ -252,6 +252,10 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         return config.getClassificationRoot();
     }
 
+    public CLASSIFIER_INPUT_MODE_PREF getClassifierInputMode() {
+        return config.getClassifierInputMode();
+    }
+
     public I_GetConceptData getClassifierInputPath() {
         return config.getClassifierInputPath();
     }
@@ -728,6 +732,10 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
     public void setClassificationRoot(I_GetConceptData classificationRoot) {
         config.setClassificationRoot(classificationRoot);
     }
+
+    public void setClassifierInputMode(CLASSIFIER_INPUT_MODE_PREF classifierInputMode) {
+        config.setClassifierInputMode(classifierInputMode);
+     }
 
     public void setClassifierInputPath(I_GetConceptData inputPath) {
         config.setClassifierInputPath(inputPath);
