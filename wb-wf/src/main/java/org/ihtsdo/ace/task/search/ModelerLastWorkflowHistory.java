@@ -44,11 +44,16 @@ public class ModelerLastWorkflowHistory extends AbstractWorkflowHistorySearchTes
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
-            this.testModeler = (I_GetConceptData) in.readObject();
+         Object obj = in.readObject();
+         if (obj instanceof I_GetConceptData) {
+          this.testModeler = (I_GetConceptData) obj;
+         } else {
+            this.testModeler = null;
+         }
 			if (this.testModeler == null)
 			{
 				I_GetConceptData leadModeler = WorkflowHelper.getLeadModeler();
-					
+
 				if (leadModeler != null)
 					this.testModeler = WorkflowHelper.getLeadModeler();
 				else
@@ -59,18 +64,18 @@ public class ModelerLastWorkflowHistory extends AbstractWorkflowHistorySearchTes
         }
 
     }
-     
+
     @Override
     public boolean test(WorkflowHistoryJavaBean bean, I_ConfigAceFrame frameConfig) throws TaskFailedException {
     	return false;
     }
-    
 
-    
+
+
     @Override
 	public boolean test(Set<WorkflowHistoryJavaBean> wfHistory)
 			throws TaskFailedException {
-		
+
     	 try {
              UUID modUUID =  validateModeler(testModeler);
 
@@ -78,7 +83,7 @@ public class ModelerLastWorkflowHistory extends AbstractWorkflowHistorySearchTes
 				return true;
 			else
 				return false;
-	
+
         } catch (Exception e) {
 
 			throw new TaskFailedException("Couldn't read search Modeler!");
@@ -87,22 +92,22 @@ public class ModelerLastWorkflowHistory extends AbstractWorkflowHistorySearchTes
     }
 
 
-    
+
 	public WorkflowHistoryJavaBean getCurrent (Set<WorkflowHistoryJavaBean> wfHistory) {
 
 		WorkflowHistoryJavaBean current = null;
-		
+
 		for (WorkflowHistoryJavaBean wfHistoryItem : wfHistory) {
-			if (current == null || wfHistoryItem.getEffectiveTime() > current.getEffectiveTime()) 
+			if (current == null || wfHistoryItem.getEffectiveTime() > current.getEffectiveTime())
 				current = wfHistoryItem;
 		}
-		
-		
+
+
 		return current;
 	}
-	
-    
-    
+
+
+
     public I_GetConceptData getTestModeler() {
         return testModeler;
     }
@@ -117,8 +122,8 @@ public class ModelerLastWorkflowHistory extends AbstractWorkflowHistorySearchTes
     	final long pathNid = cap.getConceptAttributes().getPathNid();
     	final long relTypeNid = Terms.get().getConcept(PrimordialId.IS_A_REL_ID.getUids()).getConceptNid();
     	final long currentNid = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptNid();
-		
-		for (I_RelVersioned version : cap.getDestRels()) 
+
+		for (I_RelVersioned version : cap.getDestRels())
 		{
 			List<? extends I_RelPart> parts = version.getMutableParts();
 			for (I_RelPart relAttrPart : parts)
@@ -134,7 +139,7 @@ public class ModelerLastWorkflowHistory extends AbstractWorkflowHistorySearchTes
 				}
 			}
 		}
-		
+
 		return null;
     }
 
