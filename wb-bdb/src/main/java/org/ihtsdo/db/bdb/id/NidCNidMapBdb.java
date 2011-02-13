@@ -24,19 +24,19 @@ import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
 
 /**
- * 
+ *
  * @author kec
  *
  */
 public class NidCNidMapBdb extends ComponentBdb {
-	
+
 	private static final int NID_CNID_MAP_SIZE = 50000;
 	private AtomicReference<int[][]> nidCNidMaps;
 	private boolean[] mapChanged;
 	private int readOnlyRecords;
 	private ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
 
-	
+
 	public NidCNidMapBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv) throws IOException {
 		super(readOnlyBdbEnv, mutableBdbEnv);
 	}
@@ -56,8 +56,8 @@ public class NidCNidMapBdb extends ComponentBdb {
         	nidCNidMaps.get()[index] = new int[NID_CNID_MAP_SIZE];
         	Arrays.fill(nidCNidMaps.get()[index], Integer.MAX_VALUE);
         }
-        maxId = (nidCNidMaps.get().length *  NID_CNID_MAP_SIZE) - Integer.MIN_VALUE; 
-		
+        maxId = (nidCNidMaps.get().length *  NID_CNID_MAP_SIZE) - Integer.MIN_VALUE;
+
 		readMaps(readOnly, true);
 		readMaps(mutable, false);
 		if (AceLog.getAppLog().isLoggable(Level.FINE)) {
@@ -124,9 +124,9 @@ public class NidCNidMapBdb extends ComponentBdb {
 		} finally {
 			cursor.close();
 		}
-		
+
 	}
-	
+
 
 	@Override
 	public void sync() throws IOException {
@@ -162,12 +162,12 @@ public class NidCNidMapBdb extends ComponentBdb {
 						if (nidCNidMaps.get()[key][i] == Integer.MAX_VALUE) {
 							if (i > 0) {
 								if (nidCNidMaps.get()[key][i-1] != Integer.MAX_VALUE) {
-									maxValueEntries.add("\n[" + key + "][" + (i-1) + "]: " + 
+									maxValueEntries.add("\n[" + key + "][" + (i-1) + "]: " +
 											nidCNidMaps.get()[key][i-1] + "\n");
 								}
 								maxValueEntries.add("[" + key + "][" + i + "]");
 								if (i + 1 < NID_CNID_MAP_SIZE && nidCNidMaps.get()[key][i+1] != Integer.MAX_VALUE) {
-									maxValueEntries.add("\n[" + key + "][" + (i+1) + "]: " + 
+									maxValueEntries.add("\n[" + key + "][" + (i+1) + "]: " +
 											nidCNidMaps.get()[key][i+1]  + "\n");
 								}
 							} else {
@@ -197,14 +197,14 @@ public class NidCNidMapBdb extends ComponentBdb {
         assert nid != Integer.MAX_VALUE;
 		int mapIndex = (nid  - Integer.MIN_VALUE) / NID_CNID_MAP_SIZE;
 		int indexInMap = (nid  - Integer.MIN_VALUE) % NID_CNID_MAP_SIZE;
-		assert mapIndex >= 0 && indexInMap >= 0: "mapIndex: " + mapIndex + " indexInMap: " + 
+		assert mapIndex >= 0 && indexInMap >= 0: "mapIndex: " + mapIndex + " indexInMap: " +
 				indexInMap + " nid: " + nid;
 		if (mapIndex >= nidCNidMaps.get().length) {
 		    return Integer.MAX_VALUE;
 		}
 		return nidCNidMaps.get()[mapIndex][indexInMap];
 	}
-	
+
 	public void setCNidForNid(int cNid, int nid) throws IOException {
         assert cNid != Integer.MAX_VALUE;
         int mapIndex = (nid  - Integer.MIN_VALUE) / NID_CNID_MAP_SIZE;
@@ -212,11 +212,14 @@ public class NidCNidMapBdb extends ComponentBdb {
         int indexInMap = (nid  - Integer.MIN_VALUE) % NID_CNID_MAP_SIZE;
         assert indexInMap < NID_CNID_MAP_SIZE: "cNid: " + cNid + " nid: " + nid + " mapIndex: " + mapIndex
             + " indexInMap: " + indexInMap;
-        
+
 		ensureCapacity(nid);
 		assert nidCNidMaps.get()[mapIndex][indexInMap] == Integer.MAX_VALUE ||
-			nidCNidMaps.get()[mapIndex][indexInMap] == cNid: "processing cNid: " + cNid + 
-					" nid: " + nid + " found: " + nidCNidMaps.get()[mapIndex][indexInMap];
+			nidCNidMaps.get()[mapIndex][indexInMap] == cNid: "processing cNid: " + cNid +
+							" nid: " + nid + " found existing cNid: " + nidCNidMaps.get()[mapIndex][indexInMap] +
+							"\n    " + cNid + " maps to: " + getCNid(cNid) +
+							"\n    " + nidCNidMaps.get()[mapIndex][indexInMap] +
+              " maps to: " + getCNid(nidCNidMaps.get()[mapIndex][indexInMap]);
 		if (nidCNidMaps.get() != null && nidCNidMaps.get()[mapIndex] != null) {
 	        if (nidCNidMaps.get()[mapIndex][indexInMap] != cNid) {
 	            nidCNidMaps.get()[mapIndex][indexInMap] = cNid;
@@ -226,7 +229,7 @@ public class NidCNidMapBdb extends ComponentBdb {
 		    if (nidCNidMaps.get() == null) {
 	            throw new IOException("Null nidCidMap: ");
 		    }
-            throw new IOException("nidCidMap[" + mapIndex + "] " + 
+            throw new IOException("nidCidMap[" + mapIndex + "] " +
                 "is null. cNid: " + cNid + " nid: " + nid);
 		}
 	}
@@ -238,7 +241,7 @@ public class NidCNidMapBdb extends ComponentBdb {
         int indexInMap = (nid  - Integer.MIN_VALUE) % NID_CNID_MAP_SIZE;
         assert indexInMap < NID_CNID_MAP_SIZE: "cNid: " + cNid + " nid: " + nid + " mapIndex: " + mapIndex
             + " indexInMap: " + indexInMap;
-        
+
 		ensureCapacity(nid);
 		if (nidCNidMaps.get() != null && nidCNidMaps.get()[mapIndex] != null) {
 	        if (nidCNidMaps.get()[mapIndex][indexInMap] != cNid) {
@@ -249,11 +252,11 @@ public class NidCNidMapBdb extends ComponentBdb {
 		    if (nidCNidMaps.get() == null) {
 	            throw new IOException("Null nidCidMap: ");
 		    }
-            throw new IOException("nidCidMap[" + mapIndex + "] " + 
+            throw new IOException("nidCidMap[" + mapIndex + "] " +
                 "is null. cNid: " + cNid + " nid: " + nid);
 		}
 	}
-   
+
 	private void ensureCapacity(int nextId) throws IOException {
 		int nidCidMapCount = ((nextId - Integer.MIN_VALUE) / NID_CNID_MAP_SIZE) + 1;
 		rwl.readLock().lock();
@@ -308,8 +311,8 @@ public class NidCNidMapBdb extends ComponentBdb {
 	    assert cNid <= Bdb.getUuidsToNidMap().getCurrentMaxNid(): "Invalid cNid: " + cNid + " currentMax: " + Bdb.getUuidsToNidMap().getCurrentMaxNid();
 		int mapIndex = (cNid  - Integer.MIN_VALUE) / NID_CNID_MAP_SIZE;
 		int indexInMap = (cNid  - Integer.MIN_VALUE) % NID_CNID_MAP_SIZE;
-        assert mapIndex >= 0 && mapIndex < nidCNidMaps.get().length 
-            && indexInMap >= 0 && indexInMap < NID_CNID_MAP_SIZE: "mapIndex: " + mapIndex + " indexInMap: " + 
+        assert mapIndex >= 0 && mapIndex < nidCNidMaps.get().length
+            && indexInMap >= 0 && indexInMap < NID_CNID_MAP_SIZE: "mapIndex: " + mapIndex + " indexInMap: " +
                 indexInMap + " nid: " + cNid + " number of maps: " + nidCNidMaps.get().length + " mapSize: " + NID_CNID_MAP_SIZE;
 		if (nidCNidMaps.get()[mapIndex][indexInMap] == cNid) {
 			return true;
