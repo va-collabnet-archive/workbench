@@ -97,16 +97,16 @@ import com.mxgraph.view.mxGraph;
  */
 public class ConceptViewRenderer extends JLayeredPane {
 
-	
+
 	final String CHANGED_WORKFLOW_STATE = "Changed workflow state";
 	final String CHANGED_IN_BATCH_WORKFLOW_STATE = "Changed in batch workflow state";
 	final String CONCEPT_HAVING_NO_PRIOR_WORKFLOW_STATE = "Concept having no prior workflow state";
 	final String CONCEPT_NOT_PREVIOUSLY_EXISTING_WORKFLOW_STATE = "Concept not previously existing workflow state";
 	final String NEW_WORKFLOW_STATE = "New workflow state";
 	final String WORKFLOW_STATE_SUFFIX = " workflow state";
-	
-	
-	
+
+
+
    private class RendererComponentAdaptor extends ComponentAdapter implements AncestorListener {
 
       @Override
@@ -167,9 +167,9 @@ public class ConceptViewRenderer extends JLayeredPane {
    private ConceptViewTitle title;
    private JSplitPane workflowPanel =
 	   	   new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-   private JPanel applicationWorkflowPanel = 
+   private JPanel applicationWorkflowPanel =
 	   	   new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-   private JPanel conceptWorkflowPanel = 
+   private JPanel conceptWorkflowPanel =
 	   	   new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
 
    private JScrollPane workflowScrollPane = new JScrollPane(workflowPanel,
@@ -189,7 +189,7 @@ public class ConceptViewRenderer extends JLayeredPane {
     */
    public ConceptViewRenderer(Object cellObj,
            final mxGraphComponent graphContainer, ACE ace) {
-	
+
       wizardPanel =
            		new WizardPanel(new FlowLayout(FlowLayout.LEADING, 10, 10), this);
       wizardScrollPane = new JScrollPane(wizardPanel,
@@ -207,7 +207,6 @@ public class ConceptViewRenderer extends JLayeredPane {
       this.graph = graphContainer.getGraph();
       this.settings = (ConceptViewSettings) this.cell.getValue();
       this.settings.setup(ace, cell, graphContainer, graph, this);
-      this.settings.addHostListener(new HostListener());
       wizardPanel.add(new JLabel("Wizard Panel"));
       setLayout(new BorderLayout());
 
@@ -290,7 +289,7 @@ public class ConceptViewRenderer extends JLayeredPane {
             for (Action a : actions) {
             	applicationWorkflowPanel.add(new JButton(a));
             }
-            
+
        		workflowPanel.setTopComponent(applicationWorkflowPanel);
 
             WorkflowHandlerBI wfHandler = new WorkflowHandler();
@@ -353,10 +352,10 @@ public class ConceptViewRenderer extends JLayeredPane {
                    	  int j = 0;
 
                    	String[] possibilities = new String[wfStates.size()];
-                 	  
+
                    	  while (i.hasNext()) {
                    		String currCon = i.next().toString();
-                   		  if (currCon.equals(CHANGED_WORKFLOW_STATE) || 
+                   		  if (currCon.equals(CHANGED_WORKFLOW_STATE) ||
                    				currCon.equals(CHANGED_IN_BATCH_WORKFLOW_STATE) ||
                    				currCon.equals(CONCEPT_HAVING_NO_PRIOR_WORKFLOW_STATE) ||
                    				currCon.equals(CONCEPT_NOT_PREVIOUSLY_EXISTING_WORKFLOW_STATE) ||
@@ -368,33 +367,33 @@ public class ConceptViewRenderer extends JLayeredPane {
                    	  }
 
                    	  possibilities = Arrays.copyOf(possibilities, wfStates.size());
-                   	  
-                   	  
+
+
                    	  String s = (String)JOptionPane.showInputDialog(override.getParent(), "Select a workflow state:",
            				"Override",
            				JOptionPane.PLAIN_MESSAGE,
            				new ImageIcon(BatchMonitor.class.getResource("/24x24/plain/flag_green.png")),
            				possibilities,
            				possibilities[0]);
-              	  
+
                    	  if ((s != null) && (s.length() > 0)) {
 
                    		I_GetConceptData currConcept = null;
-                   		
+
                    		  for (Object c: wfStates) {
                    			  if (c.toString().equals(s + WORKFLOW_STATE_SUFFIX)) {
                    				  currConcept = (I_GetConceptData)c;
                    			  }
                    		  }
-                   		
+
                    		try {
-								
+
 							I_ConfigAceFrame config;
 
 							config = Terms.get().getActiveAceFrameConfig();
 
 							I_Work worker;
-	                        
+
 	                        if (config.getWorker().isExecuting()) {
 	                           worker = config.getWorker().getTransactionIndependentClone();
 	                        } else {
@@ -406,43 +405,43 @@ public class ConceptViewRenderer extends JLayeredPane {
 	                        worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), WorkflowHelper.lookupAction(action).getPrimUuid());
 
 	                        I_GetConceptData selectedConcept = settings.getConcept();
-	                        
+
                         	workflowToggleButton.doClick();
                         	updateOopsButton(selectedConcept);
 
                         	UUID selectedActionUid = (UUID) worker.readAttachement(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name());
                         	WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter();
-                        	
+
                             WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
                             WorkflowHistoryJavaBean bean = new WorkflowHistoryJavaBean();
-                        	
+
         		            bean.setPath(Terms.get().nidToUuid(selectedConcept.getConceptAttributes().getPathNid()));
         		            bean.setModeler(WorkflowHelper.getCurrentModeler().getPrimUuid());
         		            bean.setConcept(selectedConcept.getUids().iterator().next());
         		            bean.setFSN(WorkflowHelper.identifyFSN(selectedConcept));
         	            	java.util.Date today = new java.util.Date();
         			        bean.setWorkflowTime(today.getTime());
-        			        
+
         			        WorkflowHistoryJavaBean latestBean = searcher.getLatestWfHxJavaBeanForConcept(selectedConcept);
-        		            
+
         			        if (!isConceptInCurrentWorkflow(latestBean))
             			        bean.setWorkflowId(UUID.randomUUID());
         		            else
         		            	bean.setWorkflowId(latestBean.getWorkflowId());
-   
+
               				bean.setOverridden(true);
               				bean.setAction(selectedActionUid);
               				bean.setState(currConcept.getPrimUuid());
               				writer.updateWorkflowHistory(bean);
-								
-                          	} catch (IOException e2) {
-								e2.printStackTrace();
-							} catch (TerminologyException e2) {
-								e2.printStackTrace();
-							} catch (Exception e1) {
-							    e1.printStackTrace();
-							}
-                   	  }
+
+                        } catch (IOException e2) {
+                           AceLog.getAppLog().alertAndLogException(e2);
+                        } catch (TerminologyException e2) {
+                           AceLog.getAppLog().alertAndLogException(e2);
+                        } catch (Exception e1) {
+                           AceLog.getAppLog().alertAndLogException(e1);
+                        }
+                     }
                   }
                });
 
@@ -450,7 +449,7 @@ public class ConceptViewRenderer extends JLayeredPane {
             }
          }
 
-         
+
          private boolean isConceptInCurrentWorkflow(WorkflowHistoryJavaBean latestBean) throws Exception
          {
          	if (latestBean == null)
@@ -471,7 +470,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 
          		return true;
          }
-         
+
 		private void capWorkflowSetup(boolean capWorkflow,
                  Collection<UUID> availableActions, File wfBpFile,
                  WorkflowHandlerBI wfHandler,
@@ -497,7 +496,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 
                            @Override
                            public void actionPerformed(ActionEvent e) {
-                        	   
+
                               try {
                                  final I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
@@ -508,7 +507,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                                  } else {
                                     worker = config.getWorker();
                                  }
-                                 
+
                                  worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), WorkflowHelper.lookupAction(e.getActionCommand()).getPrimUuid());
                                  workflowToggleButton.doClick();
                                  updateOopsButton(settings.getConcept());
@@ -516,7 +515,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                               } catch (Exception e1) {
                                  AceLog.getAppLog().alertAndLogException(e1);
                               }
-                              
+
                            }
                         });
 
@@ -629,10 +628,10 @@ public class ConceptViewRenderer extends JLayeredPane {
       RendererComponentAdaptor rca = new RendererComponentAdaptor();
       addAncestorListener(rca);
       addComponentListener(rca);
+      this.settings.addHostListener(new HostListener());
    }
 
    private void updateLabel() {
-	   showConceptPanel();
 	   title.updateTitle();
    }
 
@@ -675,9 +674,9 @@ public class ConceptViewRenderer extends JLayeredPane {
       }
       return actions;
    }
-   
+
    private String getActionFromState(String state) {
-	   
+
 	  if (state.equals("Approved"))
 		  return "Accept";
 	  if (state.equals("Escalated"))
@@ -690,10 +689,10 @@ public class ConceptViewRenderer extends JLayeredPane {
 		  return "Review";
 
 	  return "";
-	  
+
 	}
-   
-   
+
+
 
    /**
     *
@@ -753,7 +752,7 @@ public class ConceptViewRenderer extends JLayeredPane {
       GuiUtil.tickle(ConceptViewRenderer.this);
    }
 
-   private void setDividerLocation() 
+   private void setDividerLocation()
    {
 	   int dividerLocation = workflowPanel.getHeight() / 2;
 	   workflowPanel.setDividerLocation(dividerLocation);
