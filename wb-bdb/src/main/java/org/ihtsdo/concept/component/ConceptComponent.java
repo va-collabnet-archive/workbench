@@ -1339,6 +1339,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       assert r != null;
       boolean returnValue = false;
       Concept c = getEnclosingConcept();
+      assert c != null;
       if (revisions == null) {
          revisions = new CopyOnWriteArrayList<R>();
          returnValue = revisions.add(r);
@@ -1347,9 +1348,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       } else if (revisions.get(revisions.size() - 1) != r && getVersionSapMap().containsKey(r.sapNid) == false) {
          assert revisions.get(revisions.size() - 1).equals(r) == false :
                  "last revision: " + revisions.get(revisions.size() - 1) + " new revision: " + r;
-         returnValue = revisions.add(r);
+         returnValue = revisions.add(r); //maybe here...
       }
-      r.primordialComponent = (C) this;
+      r.primordialComponent = (C) this; // maybe here
       c.modified();
       clearVersions();
       return returnValue;
