@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
@@ -498,7 +499,8 @@ public class ConceptView extends JPanel {
         }
     }
 
-    private class UpdateTextTemplateDocumentListener implements DocumentListener, ActionListener {
+    private class UpdateTextTemplateDocumentListener
+    implements DocumentListener, ActionListener {
 
         FixedWidthJEditorPane editorPane;
         DescriptionSpec desc;
@@ -506,7 +508,8 @@ public class ConceptView extends JPanel {
         I_GetConceptData c;
         boolean update = false;
 
-        public UpdateTextTemplateDocumentListener(FixedWidthJEditorPane editorPane, DescriptionSpec desc) throws TerminologyException, IOException {
+        public UpdateTextTemplateDocumentListener(FixedWidthJEditorPane editorPane,
+                DescriptionSpec desc) throws TerminologyException, IOException {
             super();
             this.editorPane = editorPane;
             this.desc = desc;
@@ -716,7 +719,9 @@ public class ConceptView extends JPanel {
                     @Override
                     public void propertyChange(PropertyChangeEvent evt) {
                         try {
-                            desc.setDescTypeSpec(SpecFactory.get((I_GetConceptData) evt.getNewValue(), config.getViewCoordinate()));
+                            desc.setDescTypeSpec(SpecFactory.get(
+                                    (I_GetConceptData) evt.getNewValue(),
+                                    config.getViewCoordinate()));
                         } catch (IOException ex) {
                             Logger.getLogger(ConceptView.class.getName()).log(Level.SEVERE,
                                     null, ex);
@@ -782,14 +787,17 @@ public class ConceptView extends JPanel {
         relPanel.add(new JSeparator(SwingConstants.VERTICAL), gbc);
         gbc.weightx = 1;
         gbc.gridx++;
-        TermComponentLabel destLabel = getLabel(spec.getDestinationSpec().get(coordinate).getNid(), true);
+        TermComponentLabel destLabel = getLabel(
+                spec.getDestinationSpec().get(coordinate).getNid(), true);
         relPanel.add(destLabel, gbc);
-        destLabel.addPropertyChangeListener("termComponent", new PropertyChangeListener() {
+        destLabel.addPropertyChangeListener("termComponent",
+                new PropertyChangeListener() {
 
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 try {
-                    spec.setDestinationSpec(SpecFactory.get((I_GetConceptData) evt.getNewValue(),
+                    spec.setDestinationSpec(SpecFactory.get(
+                            (I_GetConceptData) evt.getNewValue(),
                             config.getViewCoordinate()));
                 } catch (IOException ex) {
                     Logger.getLogger(ConceptView.class.getName()).log(Level.SEVERE, null, ex);
@@ -800,7 +808,8 @@ public class ConceptView extends JPanel {
     }
 
     public DragPanelRel getRelComponent(RelationshipVersionBI r,
-            CollapsePanel parentCollapsePanel) throws TerminologyException, IOException {
+            CollapsePanel parentCollapsePanel)
+            throws TerminologyException, IOException {
         DragPanelRel relPanel = new DragPanelRel(new GridBagLayout(), settings,
                 parentCollapsePanel, r);
         boolean canDrop = false;
@@ -827,14 +836,16 @@ public class ConceptView extends JPanel {
         relPanel.add(relLabel, gbc);
         gbc.gridx++;
         TermComponentLabel typeLabel = getLabel(r.getTypeNid(), canDrop);
-        typeLabel.addPropertyChangeListener("termComponent", new PropertyChangeManager<RelationshipAnalogBI>((RelationshipAnalogBI) r) {
+        typeLabel.addPropertyChangeListener("termComponent",
+                new PropertyChangeManager<RelationshipAnalogBI>((RelationshipAnalogBI) r) {
 
             @Override
             protected void changeProperty(I_GetConceptData newValue) {
                 try {
                     getComponent().setTypeNid(newValue.getNid());
                     if (getComponent().isUncommitted()) {
-                        Terms.get().addUncommitted(Terms.get().getConcept(getComponent().getOriginNid()));
+                        Terms.get().addUncommitted(Terms.get().getConcept(
+                                getComponent().getOriginNid()));
                     }
                 } catch (PropertyVetoException e) {
                     AceLog.getAppLog().alertAndLogException(e);
@@ -851,14 +862,16 @@ public class ConceptView extends JPanel {
         gbc.weightx = 1;
         gbc.gridx++;
         TermComponentLabel destLabel = getLabel(r.getDestinationNid(), canDrop);
-        typeLabel.addPropertyChangeListener("termComponent", new PropertyChangeManager<RelationshipAnalogBI>((RelationshipAnalogBI) r) {
+        typeLabel.addPropertyChangeListener("termComponent",
+                new PropertyChangeManager<RelationshipAnalogBI>((RelationshipAnalogBI) r) {
 
             @Override
             protected void changeProperty(I_GetConceptData newValue) {
                 try {
                     getComponent().setDestinationNid(newValue.getNid());
                     if (getComponent().isUncommitted()) {
-                        Terms.get().addUncommitted(Terms.get().getConcept(getComponent().getOriginNid()));
+                        Terms.get().addUncommitted(Terms.get().getConcept(
+                                getComponent().getOriginNid()));
                     }
                 } catch (PropertyVetoException e) {
                     AceLog.getAppLog().alertAndLogException(e);
@@ -880,6 +893,15 @@ public class ConceptView extends JPanel {
         return l;
     }
 
+
+   JComponent getJCheckBox() {
+      JCheckBox check = new JCheckBox();
+        check.setFont(check.getFont().deriveFont(settings.getFontSize()));
+        check.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
+        return check;
+   }
+
+
     private TermComponentLabel getLabel(int nid, boolean canDrop)
             throws TerminologyException, IOException {
         TermComponentLabel termLabel = new TermComponentLabel();
@@ -895,7 +917,8 @@ public class ConceptView extends JPanel {
     private void getKbActions(Object thingToDrop) {
         if (kbase == null) {
             try {
-                kbase = EditPanelKb.setupKb(new File("drools-rules/ContextualDropActions.drl"));
+                kbase = EditPanelKb.setupKb(
+                        new File("drools-rules/ContextualDropActions.drl"));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -904,7 +927,8 @@ public class ConceptView extends JPanel {
             actionList.clear();
             if (I_GetConceptData.class.isAssignableFrom(thingToDrop.getClass())) {
                 I_GetConceptData conceptToDrop = (I_GetConceptData) thingToDrop;
-                thingToDrop = Ts.get().getConceptVersion(config.getViewCoordinate(), conceptToDrop.getConceptNid());
+                thingToDrop = Ts.get().getConceptVersion(config.getViewCoordinate(),
+                        conceptToDrop.getConceptNid());
             }
 
             if (ComponentVersionBI.class.isAssignableFrom(thingToDrop.getClass())
@@ -923,9 +947,11 @@ public class ConceptView extends JPanel {
                         AceLog.getAppLog().fine("dropTarget: " + concept);
                         AceLog.getAppLog().fine("thingToDrop: " + thingToDrop);
                     }
-                    ksession.insert(FactFactory.get(Context.DROP_OBJECT, thingToDrop));
+                    ksession.insert(FactFactory.get(
+                            Context.DROP_OBJECT, thingToDrop));
                     ksession.insert(FactFactory.get(Context.DROP_TARGET,
-                            Ts.get().getConceptVersion(config.getViewCoordinate(), concept.getNid())));
+                            Ts.get().getConceptVersion(
+                            config.getViewCoordinate(), concept.getNid())));
                     ksession.fireAllRules();
                 } finally {
                     if (logger != null) {
