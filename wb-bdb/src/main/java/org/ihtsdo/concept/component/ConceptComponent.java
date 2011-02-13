@@ -381,7 +381,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
          if (index >= 0) {
             return revisions.get(index);
          }
-         return null;
+         return makeAnalog(getStatusNid(),
+                 getPathNid(),
+                 getAuthorNid(),
+                 getTime());
       }
 
       @Override
@@ -1339,7 +1342,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       assert r != null;
       boolean returnValue = false;
       Concept c = getEnclosingConcept();
-      assert c != null;
+      assert c != null: "Can't find concept for: " + r;
       if (revisions == null) {
          revisions = new CopyOnWriteArrayList<R>();
          returnValue = revisions.add(r);
