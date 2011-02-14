@@ -73,6 +73,7 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
     private static final long serialVersionUID = 1;
     private static final int DATA_VERSION = 1;
 	private static I_GetConceptData snomedConcept = null;
+	private static UUID endWorkflowAction = null;
 
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -126,7 +127,7 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
 
 	                // Worfklow Id
 	                WorkflowHistoryJavaBean latestBean = searcher.getLatestWfHxJavaBeanForConcept(concept);
-		            if (!isConceptInCurrentWorkflow(latestBean))
+		            if (!WorkflowHelper.isEndWorkflowAction(Terms.get().getConcept(latestBean.getAction())))
 		            	writer.setWorkflowUid(UUID.randomUUID());
 		            else
 		            	writer.setWorkflowUid(latestBean.getWorkflowId());
@@ -176,27 +177,21 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
     	{
 	    	for (I_GetConceptData action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
 	    	{
-	    		List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
-
-	    		for (I_RelVersioned rel : relList)
+	    		if (WorkflowHelper.isBeginWorkflowAction(action))
 	    		{
-	    			if (rel != null &&
-	        			rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_BEGIN_WF_CONCEPT.getPrimoridalUid()).getConceptNid())
-    {
-	    				List<I_RelVersioned> commitRelList = WorkflowHelper.getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE);
+	    			List<I_RelVersioned> commitRelList = WorkflowHelper.getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE);
 
-	    	    		for (I_RelVersioned commitRel : commitRelList)
-	    	    		{
-							if (commitRel != null &&
-								commitRel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_SINGLE_COMMIT.getPrimoridalUid()).getConceptNid())
-    {
+    	    		for (I_RelVersioned commitRel : commitRelList)
+    	    		{
+						if (commitRel != null &&
+							commitRel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_SINGLE_COMMIT.getPrimoridalUid()).getConceptNid())
+						{
 								commitActionUid = action.getPrimUuid();
-							}
-	    	    		}
+						}
+    	    		}
 
-	    	    		if (commitActionUid != null)
-	    	    			break;
-	    			}
+    	    		if (commitActionUid != null)
+    	    			break;
 				}
 	    	}
     	} catch (Exception e) {
@@ -209,28 +204,6 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
 	private I_TermFactory getTermFactory() {
         return Terms.get();
     }
-
-    private boolean isConceptInCurrentWorkflow(WorkflowHistoryJavaBean latestBean) throws Exception
-    {
-    	if (latestBean == null)
-    		return false;
-    	else
-    	{
-    		I_GetConceptData action = Terms.get().getConcept(latestBean.getAction());
-
-    		List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
-
-    		for (I_RelVersioned rel : relList)
-    {
-    			if (rel != null &&
-    				rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACCEPT_ACTION.getPrimoridalUid()).getConceptNid())
-    				return false;
-    		}
-    	}
-
-    		return true;
-    }
-
 
 	private UUID identifyNextState(UUID modelerUid, I_GetConceptData concept, UUID commitActionUid)
     		{
@@ -308,23 +281,24 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
 
 	private UUID identifyAcceptAction() {
 
-		try
+		if (endWorkflowAction  == null)
 		{
-			for (I_GetConceptData action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
+			try
 			{
-				List<I_RelVersioned> useCaseRel = WorkflowHelper.getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
-
-				for (I_RelVersioned rel : useCaseRel)
+				for (I_GetConceptData action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
 				{
-					if (rel != null &&
-						rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACCEPT_ACTION.getPrimoridalUid()).getConceptNid())
-						return action.getPrimUuid();
+					if (WorkflowHelper.isEndWorkflowAction(action))
+					{
+						endWorkflowAction = action.getPrimUuid();
+						break;
+					}
 				}
+			} catch (Exception e ) {
+				e.printStackTrace();
 			}
-		} catch (Exception e ) {
-			e.printStackTrace();
 		}
-		return null;
+		
+		return endWorkflowAction;
     }
 
 }

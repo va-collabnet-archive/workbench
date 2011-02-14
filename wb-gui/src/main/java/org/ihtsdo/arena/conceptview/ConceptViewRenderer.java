@@ -716,7 +716,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                  searcher.getLatestWfHxJavaBeanForConcept(concept);
 
          if (latestWfHxJavaBean == null ||
-                 WorkflowHelper.isBeginEndAction(latestWfHxJavaBean.getAction())) {
+                 WorkflowHelper.isBeginAction(Terms.get().getConcept(latestWfHxJavaBean.getAction()))) {
             oopsButton.setEnabled(false);
          } else {
             oopsButton.setEnabled(true);
