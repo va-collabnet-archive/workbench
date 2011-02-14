@@ -146,20 +146,22 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 		return new PreferredTermComparator();
 	}
 
-	public static Comparator<ComponentVersionBI> createComponentTimestampComparer() {
-		return new ComponentTimestampComparator();
+	public static Comparator<String> createComponentStringTimestampComparer() {
+		return new ComponentStringTimestampComparator();
 	}
 
-	public static Comparator<WorkflowHistoryJavaBean> createWfIdTimeStampComparer() {
-		return new WfHxWfIdTimeStampComparer();
+	public static Comparator<WorkflowHistoryJavaBean> ConceptWorkflowTimestampComparer() {
+		return new ConceptWorkflowTimestampComparer();
 	}
 
-	public static class ComponentTimestampComparator implements Comparator<ComponentVersionBI> { 
-		public int compare(ComponentVersionBI a, ComponentVersionBI b) {
-			if (a.getTime() > b.getTime())
-				return 1;
-			else
-				return -1;
+	public static Comparator<WorkflowHistoryJavaBean> createTimestampComparer() {
+		return new TimestampComparer();
+	}
+
+	public static class ComponentStringTimestampComparator implements Comparator<String> { 
+		public int compare(String a, String b) {
+			// Reverse List
+			return b.compareTo(a);
 		}
 	}
 
@@ -219,13 +221,25 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 		}
 	}
 
-	private static class WfHxWfIdTimeStampComparer implements Comparator<WorkflowHistoryJavaBean> {
+	private static class ConceptWorkflowTimestampComparer implements Comparator<WorkflowHistoryJavaBean> {
 		@Override
 		public int compare(WorkflowHistoryJavaBean o1, WorkflowHistoryJavaBean o2) {
-			if (o1.getWorkflowId().compareTo(o2.getWorkflowId()) != 0)
-				return (o1.getWorkflowId().compareTo(o2.getWorkflowId()));
+			if (o1.getConcept().compareTo(o2.getConcept()) != 0)
+				return o1.getConcept().compareTo(o2.getConcept());
 			else
-				return (o1.getWorkflowTime().compareTo(o2.getWorkflowTime()));
+			{
+				if (o1.getWorkflowId().compareTo(o2.getWorkflowId()) != 0)
+					return (o1.getWorkflowId().compareTo(o2.getWorkflowId()));
+				else
+					return (o1.getWorkflowTime().compareTo(o2.getWorkflowTime()));
+			}
+		}
+	}
+
+	private static class TimestampComparer implements Comparator<WorkflowHistoryJavaBean> {
+		@Override
+		public int compare(WorkflowHistoryJavaBean o1, WorkflowHistoryJavaBean o2) {
+			return (o2.getWorkflowTime().compareTo(o1.getWorkflowTime()));
 		}
 	}
 
