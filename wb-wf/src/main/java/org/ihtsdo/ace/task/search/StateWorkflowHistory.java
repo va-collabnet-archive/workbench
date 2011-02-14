@@ -98,4 +98,14 @@ public class StateWorkflowHistory extends AbstractWorkflowHistorySearchTest {
    public void setTestState(I_GetConceptData testState) {
       this.testState = testState;
    }
+   
+   @Override
+	public int getTestType() {
+		return hasState;
+	}
+
+	@Override
+	public Object getTestValue() {
+		return getTestState();
+	}
 }

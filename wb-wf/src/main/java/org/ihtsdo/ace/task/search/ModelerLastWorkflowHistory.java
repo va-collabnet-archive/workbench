@@ -143,4 +143,13 @@ public class ModelerLastWorkflowHistory extends AbstractWorkflowHistorySearchTes
 		return null;
     }
 
+    @Override
+	public int getTestType() {
+		return currentModeler;
+	}
+
+	@Override
+	public Object getTestValue() {
+		return getTestModeler();
+	}
 }

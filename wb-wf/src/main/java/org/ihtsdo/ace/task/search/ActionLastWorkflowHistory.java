@@ -64,8 +64,8 @@ public class ActionLastWorkflowHistory extends AbstractWorkflowHistorySearchTest
         if (testUUID == null) {
             throw new TaskFailedException("Failed to complete test.  UUID null.");
         }
-
-        if (getCurrent(wfHistory).getAction().equals(testUUID)) {
+        WorkflowHistoryJavaBean bean = getCurrent(wfHistory);
+        if (bean.getAction().equals(testUUID)) {
             return true;
         }
 
@@ -96,4 +96,14 @@ public class ActionLastWorkflowHistory extends AbstractWorkflowHistorySearchTest
     public void setTestAction(I_GetConceptData testAction) {
         this.testAction = testAction;
     }
+
+	@Override
+	public int getTestType() {
+		return currentAction;
+	}
+
+	@Override
+	public Object getTestValue() {
+		return getTestAction();
+	}
 }

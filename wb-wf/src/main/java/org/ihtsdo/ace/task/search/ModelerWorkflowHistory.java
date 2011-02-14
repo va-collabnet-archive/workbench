@@ -91,22 +91,6 @@ public class ModelerWorkflowHistory extends AbstractWorkflowHistorySearchTest {
             return false;
          }
 
-
-
-         //TODO: TAKE THIS OUT. IS ACTUALLY LAST MODELER
-	    	/*
-         Iterator<WorkflowHistoryJavaBean> i = wfHistory.iterator();
-         
-         while (i.hasNext()) {
-         if (i.next().getModeler().equals(testUUID) && !i.hasNext()) {
-         return true;
-         }
-         }
-          */
-
-
-         //TODO: 
-         //If any item in the list passes the filter, return true.
          for (WorkflowHistoryJavaBean wfHistoryItem : wfHistory) {
             if (wfHistoryItem.getModeler().equals(testUUID)) {
                return true;
@@ -151,4 +135,14 @@ public class ModelerWorkflowHistory extends AbstractWorkflowHistorySearchTest {
 
       return null;
    }
+   
+   @Override
+	public int getTestType() {
+		return hasModeler;
+	}
+
+	@Override
+	public Object getTestValue() {
+		return getTestModeler();
+	}
 }

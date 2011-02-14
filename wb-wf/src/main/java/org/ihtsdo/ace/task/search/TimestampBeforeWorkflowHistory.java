@@ -99,8 +99,15 @@ public class TimestampBeforeWorkflowHistory extends AbstractWorkflowHistorySearc
 		} catch (Exception e) {
 			throw new TaskFailedException("Couldn't read search Timestamp!");
 		}
-		
-
 	}
-
+	
+	@Override
+	public int getTestType() {
+		return timestampBefore;
+	}
+	
+	@Override
+	public Object getTestValue() {
+		return getTestTimestampBefore();
+	}
 }

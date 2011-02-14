@@ -93,4 +93,14 @@ public class PathWorkflowHistory extends AbstractWorkflowHistorySearchTest {
 		}
 	}
 
+   @Override
+	public int getTestType() {
+	   return path;
+	}
+
+	@Override
+	public Object getTestValue() {
+		return getTestPath();
+	}
+
 }

@@ -91,4 +91,14 @@ public class ActionWorkflowHistory extends AbstractWorkflowHistorySearchTest {
     public void setTestAction(I_GetConceptData testAction) {
         this.testAction = testAction;
     }
+
+	@Override
+	public int getTestType() {
+		return hasAction;
+	}
+
+	@Override
+	public Object getTestValue() {
+		return getTestAction();
+	}
 }

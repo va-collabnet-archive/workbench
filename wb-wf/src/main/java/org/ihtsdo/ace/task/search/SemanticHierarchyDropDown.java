@@ -126,4 +126,13 @@ public class SemanticHierarchyDropDown extends AbstractWorkflowHistorySearchTest
 
 	}
 
+    @Override
+	public int getTestType() {
+		return hierarchy;
+	}
+
+	@Override
+	public Object getTestValue() {
+		return getTestHierarchy();
+	}
 }
