@@ -54,6 +54,9 @@ public class WorkflowHelper {
 	private static final String unrecognizedLoginMessage = "Login is unrecognlized.  You will be defaulted to generic-user workflow permissions";
 	private static I_GetConceptData defaultModeler = null;
 	private static int currentNid = 0;
+	private static int isARelNid = 0;
+	private static UUID beginWorkflowAction = null;
+	private static UUID endWorkflowAction = null;
 
 	private static class WfHxConceptComparer implements Comparator<I_GetConceptData> {
 		@Override
@@ -86,12 +89,13 @@ public class WorkflowHelper {
 		allowedTypes = Terms.get().newIntSet();
 
 		try {
-			allowedTypes.add(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid()).getConceptNid());
 			allowedStatuses = Terms.get().getActiveAceFrameConfig().getAllowedStatus();
 			viewPositions = Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly();
 			precedencePolicy = Terms.get().getActiveAceFrameConfig().getPrecedence();
 			contractionResolutionStrategy = Terms.get().getActiveAceFrameConfig().getConflictResolutionStrategy();
-			currentNid = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid()).getConceptNid();
+			currentNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid());
+			isARelNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid());
+			allowedTypes.add(isARelNid);
 		} catch (Exception e) {
         	AceLog.getAppLog().log(Level.SEVERE, "Error in creating WF Class WorkflowHelper", e);
 		}
@@ -408,17 +412,27 @@ public class WorkflowHelper {
     	I_GetConceptData child = null;
 		Set<I_GetConceptData> resultSet = new HashSet<I_GetConceptData>();
 
-		resultSet.add(concept);
-		Set childSet = concept.getDestRelOrigins(allowedStatuses, allowedTypes, viewPositions, precedencePolicy, contractionResolutionStrategy);
+		if (currentNid == 0)
+			initialize();
 
-    	if (childSet == null || childSet.size() == 0)
+		resultSet.add(concept);
+		Collection<? extends I_RelVersioned> relationships = concept.getDestRels();
+
+
+    	if (relationships == null || relationships.size() == 0)
     		return resultSet;
 
-    	Iterator itr = childSet.iterator();
+    	Iterator itr = relationships.iterator();
     	while (itr.hasNext())
     	{
-    		child = (I_GetConceptData)itr.next();
-    		resultSet.addAll(getChildren(child));
+    		I_RelVersioned rel = (I_RelVersioned)itr.next();
+    		 
+    		if (rel.getStatusNid() == currentNid &&
+    			rel.getTypeNid() == isARelNid)
+    		{
+    			child = Terms.get().getConcept(rel.getC1Id());
+    			resultSet.addAll(getChildren(child));
+    		}
     	}
 
     	return resultSet;
@@ -517,24 +531,59 @@ public class WorkflowHelper {
 		return rels;
 	}
 
-    public static boolean isBeginEndAction(UUID action) {
-		try
-    	{
-	        I_GetConceptData actionConcept = Terms.get().getConcept(action);
+    public static boolean isBeginWorkflowAction(I_GetConceptData actionConcept) {
+    	if (beginWorkflowAction  == null)
+		{
+    		try
+	    	{
+				List<I_RelVersioned> relList = getWorkflowRelationship(actionConcept, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
+	
+				for (I_RelVersioned rel : relList)
+				{
+					if (rel != null &&
+		    			 rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_BEGIN_WF_CONCEPT.getPrimoridalUid()).getConceptNid())
+					{
+						beginWorkflowAction = actionConcept.getPrimUuid();
+						break;
+					}
+				}
+	    	} catch (Exception e) {
+	        	AceLog.getAppLog().log(Level.SEVERE, "Error in identifying if current action is a BEGIN-WORKFLOW action", e);
+	    	}
+		}
 
-			List<I_RelVersioned> relList = getWorkflowRelationship(actionConcept, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
+    	if (beginWorkflowAction != null)
+    		return (beginWorkflowAction.equals(actionConcept.getPrimUuid()));
+    	else
+    		return false;
+	}
 
-			for (I_RelVersioned rel : relList)
-			{
-				if (rel != null &&
-	    			 rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_BEGIN_WF_CONCEPT.getPrimoridalUid()).getConceptNid())
-					return true;
-			}
-    	} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.SEVERE, "Error in identifying if current action is a BEGIN-WORKFLOW action", e);
-    	}
+    public static boolean isEndWorkflowAction(I_GetConceptData actionConcept) {
+		
+    	if (endWorkflowAction  == null)
+		{
+			try
+	    	{
+				List<I_RelVersioned> relList = getWorkflowRelationship(actionConcept, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
+	
+				for (I_RelVersioned rel : relList)
+				{
+					if (rel != null &&
+		    			 rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_END_WF_CONCEPT.getPrimoridalUid()).getConceptNid())
+					{
+						endWorkflowAction = actionConcept.getPrimUuid();
+						break;
+					}
+				}
+	    	} catch (Exception e) {
+	        	AceLog.getAppLog().log(Level.SEVERE, "Error in identifying if current action is a END-WORKFLOW action", e);
+	    	}
+		}
 
-    	return false;
+    	if (endWorkflowAction != null)
+    		return (endWorkflowAction.equals(actionConcept.getPrimUuid()));
+    	else
+    		return false;
     }
 
 	public static List<WorkflowHistoryJavaBean> searchForPossibleActions(I_GetConceptData modeler, I_GetConceptData concept) throws Exception
@@ -555,44 +604,32 @@ public class WorkflowHelper {
 		// Get Current WF Status for Concept
         WorkflowHistoryJavaBean latestBean= historySearcher.getLatestWfHxJavaBeanForConcept(concept);
 
-        if (latestBean != null)
-        {
-            List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(Terms.get().getConcept(latestBean.getAction()), ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
+        if ((latestBean != null) && (!WorkflowHelper.isEndWorkflowAction(Terms.get().getConcept(latestBean.getAction()))))
+	    {
+	        // Get Possible Next Actions to Next State Map from Editor Category and Current WF's useCase and state (which now will mean INITIAL-State)
+	        int initialStateNid = Terms.get().uuidToNative(latestBean.getState());
+	        StateTransitionRefsetSearcher stateTransitionSearcher = new StateTransitionRefsetSearcher();
+	        Map<I_GetConceptData, I_GetConceptData> actionMap = stateTransitionSearcher.searchForPossibleActionsAndFinalStates(categoryNid, initialStateNid);
 
-			for (I_RelVersioned rel : relList)
-			{
-				if (rel != null &&
-	    			rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_END_WF_CONCEPT.getPrimoridalUid()).getConceptNid())
-					isAcceptAction  = true;
-			}
 
-			if (!isAcceptAction)
+	        // Create Beans for future update.  Only differences in Beans will be action & state (which now will mean NEXT-State)
+	        for (I_GetConceptData key : actionMap.keySet())
 	        {
-		        // Get Possible Next Actions to Next State Map from Editor Category and Current WF's useCase and state (which now will mean INITIAL-State)
-		        int initialStateNid = Terms.get().uuidToNative(latestBean.getState());
-		        StateTransitionRefsetSearcher stateTransitionSearcher = new StateTransitionRefsetSearcher();
-		        Map<I_GetConceptData, I_GetConceptData> actionMap = stateTransitionSearcher.searchForPossibleActionsAndFinalStates(categoryNid, initialStateNid);
+	        	// Such as done via Commit
+	    		WorkflowHistoryJavaBean templateBean = new WorkflowHistoryJavaBean();
 
+	            templateBean.setConcept(latestBean.getConcept());
+	            templateBean.setWorkflowId(latestBean.getWorkflowId());
+	            templateBean.setFSN(latestBean.getFSN());
+	            templateBean.setModeler(latestBean.getModeler());
+	            templateBean.setPath(latestBean.getPath());
+	            templateBean.setEffectiveTime(latestBean.getEffectiveTime());
+	            templateBean.setWorkflowTime(latestBean.getWorkflowTime());
+	            templateBean.setReleaseDescription(latestBean.getReleaseDescription());
 
-		        // Create Beans for future update.  Only differences in Beans will be action & state (which now will mean NEXT-State)
-		        for (I_GetConceptData key : actionMap.keySet())
-		        {
-		        	// Such as done via Commit
-		    		WorkflowHistoryJavaBean templateBean = new WorkflowHistoryJavaBean();
-
-		            templateBean.setConcept(latestBean.getConcept());
-		            templateBean.setWorkflowId(latestBean.getWorkflowId());
-		            templateBean.setFSN(latestBean.getFSN());
-		            templateBean.setModeler(latestBean.getModeler());
-		            templateBean.setPath(latestBean.getPath());
-		            templateBean.setEffectiveTime(latestBean.getEffectiveTime());
-		            templateBean.setWorkflowTime(latestBean.getWorkflowTime());
-		            templateBean.setReleaseDescription(latestBean.getReleaseDescription());
-
-		            templateBean.setAction(key.getUids().get(0));
-		            templateBean.setState(actionMap.get(key).getUids().get(0));
-		            retList.add(templateBean);
-		    	}
+	            templateBean.setAction(key.getUids().get(0));
+	            templateBean.setState(actionMap.get(key).getUids().get(0));
+	            retList.add(templateBean);
 	        }
         }
 
