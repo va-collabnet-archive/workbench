@@ -55,6 +55,8 @@ public class InitializeWorkflowHistoryMojo extends AbstractMojo {
      */
     private boolean reportErrors;
 
+    private I_GetConceptData snomedConcept = null;
+
     private static final int workflowIdPosition = 0;								// 0
     private static final int conceptIdPosition = workflowIdPosition + 1;			// 1
     private static final int useCaseIgnorePosition = conceptIdPosition + 1;			// 2
@@ -80,6 +82,8 @@ public class InitializeWorkflowHistoryMojo extends AbstractMojo {
         WorkflowHistoryRefsetWriter writer = null;
         
         try {
+        	snomedConcept = Terms.get().getConcept(Taxonomies.SNOMED.getUuids());
+        	
             writer = new WorkflowHistoryRefsetWriter();
             Scanner scanner = new Scanner(new File(filePath));
             int lineCounter = 1;
@@ -88,38 +92,42 @@ public class InitializeWorkflowHistoryMojo extends AbstractMojo {
             {
             	line = scanner.nextLine();
             	String[] columns = line.split("\t");
-            	if (lineCounter++ % 2500 == 0) System.out.println("At: " + (lineCounter - 1));
+            	
+            	if (lineCounter++ % 2500 == 0)
+            	{
+                    System.out.println("At: " + (lineCounter - 1));
+            	}
 
             	if (columns.length == numberOfColumns)
             	{
-	            	UUID refConUid = UUID.fromString(columns[conceptIdPosition]);
+            		UUID releaseDescription = identifyReleaseDescription(columns[timeStampPosition]);
+            		writer.setReleaseDescriptionUid(releaseDescription);
+            		writer.setWorkflowUid(UUID.fromString(columns[workflowIdPosition]));
+	            	writer.setConceptUid(UUID.fromString(columns[conceptIdPosition]));
+	            	writer.setPathUid(UUID.fromString(columns[pathPosition]));
+	            	writer.setModelerUid(WorkflowHelper.lookupModeler(columns[modelerPosition]).getPrimUuid());
+	            	writer.setActionUid(WorkflowHelper.lookupAction(columns[actionPosition]).getPrimUuid());
+	            	writer.setStateUid(WorkflowHelper.lookupState(columns[statePosition]).getPrimUuid());
+	            	writer.setFSN(columns[fsnPosition]);
+	            	
+        			long timestamp = format.parse(columns[timeStampPosition]).getTime();
+	            	writer.setEffectiveTime(timestamp);
 	
-	            	if (Terms.get().hasId(refConUid))
-	            	{
-	            		UUID releaseDescription = identifyReleaseDescription(columns[timeStampPosition]);
-	            		writer.setReleaseDescriptionUid(releaseDescription);
-	            		writer.setWorkflowUid(UUID.fromString(columns[workflowIdPosition]));
-		            	writer.setConceptUid(UUID.fromString(columns[conceptIdPosition]));
-		            	writer.setPathUid(UUID.fromString(columns[pathPosition]));
-		            	writer.setModelerUid(WorkflowHelper.lookupModeler(columns[modelerPosition]).getPrimUuid());
-		            	writer.setActionUid(WorkflowHelper.lookupAction(columns[actionPosition]).getPrimUuid());
-		            	writer.setStateUid(WorkflowHelper.lookupState(columns[statePosition]).getPrimUuid());
-		            	writer.setFSN(columns[fsnPosition]);
-		            	
-	        			long timestamp = format.parse(columns[timeStampPosition]).getTime();
-		            	writer.setEffectiveTime(timestamp);
-		
-	        			timestamp = format.parse(columns[refsetColumnTimeStampPosition]).getTime();
-		            	writer.setWorkflowTime(timestamp);
-		
-		            	writer.addMember();
-	            	} 
+        			timestamp = format.parse(columns[refsetColumnTimeStampPosition]).getTime();
+	            	writer.setWorkflowTime(timestamp);
+	
+	            	writer.addMember();
             	} else if (reportErrors) {
                 	AceLog.getAppLog().log(Level.WARNING, line, new Exception("Unable to import this row into workflow history refset"));
             	}
-            }	
+            	
+            	if (lineCounter % 100 == 0)
+            	{
+            		Terms.get().addUncommitted(writer.getRefsetConcept());
+            		Terms.get().commit();
+            	}
 
-            Terms.get().addUncommitted(writer.getRefsetConcept());
+            }	
         } catch (Exception e) {
         	AceLog.getAppLog().log(Level.WARNING, line, e);
 		}
@@ -135,8 +143,6 @@ public class InitializeWorkflowHistoryMojo extends AbstractMojo {
 			String searchDate = timestamp.substring(0, 4) + timestamp.substring(5,7) + timestamp.substring(8, 10);
 			
 			try {
-				I_GetConceptData snomedConcept = Terms.get().getConcept(Taxonomies.SNOMED.getUuids());
-				
 				for ( I_DescriptionVersioned desc : snomedConcept.getDescriptions())
 				{
 					I_DescriptionTuple tuple = desc.getLastTuple();
