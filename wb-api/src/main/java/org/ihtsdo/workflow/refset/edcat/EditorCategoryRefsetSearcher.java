@@ -68,7 +68,7 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 		{
 			SemanticAreaHierarchyRefsetSearcher searcher = new SemanticAreaHierarchyRefsetSearcher();
 
-			// Create map of tags-to-categories
+			// Transform editor category list into a map of tags-to-categories
 			Map<String, I_GetConceptData> hierarchyToCategoryMap = getHierarchyToCategoryMap(currentModelerPropertySet);
 
 			// Find Tag
