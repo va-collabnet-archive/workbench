@@ -57,18 +57,9 @@ public class TimestampAfterWorkflowHistory extends AbstractWorkflowHistorySearch
     }
 
     @Override
-    public boolean test(WorkflowHistoryJavaBean bean, I_ConfigAceFrame frameConfig)  {
-    	try {
-        	DateFormat dfm = new SimpleDateFormat(DEFAULT_TIME_STAMP);
-        	long testTimestampAfterThisDate = dfm.parse(testTimestampAfter).getTime();
-
-            if (bean.getEffectiveTime() > testTimestampAfterThisDate)
-            	return true;
-		} catch (Exception e) {
-			AceLog.getAppLog().log(Level.WARNING, "Couldn't read search Timestamp After Than", e);
-		}
-
-		return false;
+    public boolean test(WorkflowHistoryJavaBean bean, I_ConfigAceFrame frameConfig)  
+    {
+    	return false;
     }
 
     public String getTestTimestampAfter() {
@@ -81,24 +72,25 @@ public class TimestampAfterWorkflowHistory extends AbstractWorkflowHistorySearch
 
 	@Override
 	public boolean test(Set<WorkflowHistoryJavaBean> wfHistory)
-			throws TaskFailedException {
-
+			throws TaskFailedException 
+	{
 		try {
 			DateFormat dfm = new SimpleDateFormat(DEFAULT_TIME_STAMP);
-	    	long testTimestampAfterThisDate = testTimestampAfterThisDate = dfm.parse(testTimestampAfter).getTime();
+	    	long testTimestampAfterThisDate = dfm.parse(testTimestampAfter).getTime();
 	
 	    	//If any item in the list passes the filter, return true.
-	    	for (WorkflowHistoryJavaBean wfHistoryItem : wfHistory) {
-	            if (wfHistoryItem.getEffectiveTime() > testTimestampAfterThisDate) {
+	    	for (WorkflowHistoryJavaBean wfHistoryItem : wfHistory) 
+	    	{
+	            if (wfHistoryItem.getWorkflowTime().longValue() < testTimestampAfterThisDate) 
+	            {
 	            	return true;
 				}
 			}
-	
-	    	return false;
-
 		} catch (Exception e) {
 			throw new TaskFailedException("Couldn't read search Timestamp!");
 		}
+		
+		return false;
 	}
 	
 	@Override
