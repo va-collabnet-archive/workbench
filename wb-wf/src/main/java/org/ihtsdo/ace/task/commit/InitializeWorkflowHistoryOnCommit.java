@@ -127,7 +127,7 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
 
 	                // Worfklow Id
 	                WorkflowHistoryJavaBean latestBean = searcher.getLatestWfHxJavaBeanForConcept(concept);
-		            if (!WorkflowHelper.isEndWorkflowAction(Terms.get().getConcept(latestBean.getAction())))
+		            if (latestBean == null || !WorkflowHelper.isEndWorkflowAction(Terms.get().getConcept(latestBean.getAction())))
 		            	writer.setWorkflowUid(UUID.randomUUID());
 		            else
 		            	writer.setWorkflowUid(latestBean.getWorkflowId());

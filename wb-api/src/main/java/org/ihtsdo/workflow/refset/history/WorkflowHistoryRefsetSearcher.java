@@ -272,30 +272,33 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		}
 
 		// Handle Last row
-		WorkflowHistoryJavaBean latestWfBean = currentWorkflowBucket.last();
-		boolean isCompletedWorkflow = isFinalState(currentWorkflowBucket);
-
-		if (wfInProgress && !completedWorkflow)
-		{
-			// Only add/process if incomplete workflow
-			// Also, don't search for this concept any more
-			if (!isCompletedWorkflow)
+		if (currentWorkflowBucket.size() > 0)
+		{	
+			WorkflowHistoryJavaBean latestWfBean = currentWorkflowBucket.last();
+			boolean isCompletedWorkflow = isFinalState(currentWorkflowBucket);
+	
+			if (wfInProgress && !completedWorkflow)
 			{
-				retSet.put(currentWorkflow, currentWorkflowBucket);
-				processedConcepts.add(latestWfBean.getConcept());
+				// Only add/process if incomplete workflow
+				// Also, don't search for this concept any more
+				if (!isCompletedWorkflow)
+				{
+					retSet.put(currentWorkflow, currentWorkflowBucket);
+					processedConcepts.add(latestWfBean.getConcept());
+				}
 			}
+			else if (!wfInProgress && completedWorkflow)
+			{
+				if (isCompletedWorkflow)
+				{
+					// Only add/process if completed workflow
+					retSet.put(currentWorkflow, currentWorkflowBucket);
+				}
+			} else {
+				// Must be search for all
+				retSet.put(currentWorkflow, currentWorkflowBucket);
+			} 
 		}
-		else if (!wfInProgress && completedWorkflow)
-		{
-			if (isCompletedWorkflow)
-			{
-				// Only add/process if completed workflow
-				retSet.put(currentWorkflow, currentWorkflowBucket);
-			}
-		} else {
-			// Must be search for all
-			retSet.put(currentWorkflow, currentWorkflowBucket);
-		} 
 
 		return retSet;
 	}
