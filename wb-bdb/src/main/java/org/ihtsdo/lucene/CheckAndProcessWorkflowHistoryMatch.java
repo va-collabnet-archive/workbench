@@ -48,16 +48,17 @@ public class CheckAndProcessWorkflowHistoryMatch implements Runnable {
 	    	 {
 	             boolean failed = false;
 	             for (I_TestWorkflowHistorySearchResults test : checkList) {
-	                 if (test.test(bean, config) == false) {
-	                     failed = true;
-	                     break;
-	                 }
+//	                 if (test.t(bean, config) == false) {
+//	                     failed = true;
+//	                     break;
+//	                 }
+	            	 failed = true;
 	             }
 	
 	             if (failed == false) {
 	                 matches.add(bean);
 	             }
-	         } catch (TaskFailedException e) {
+	         } catch (Exception e) {
 	             if (ACE.editMode) {
 	                 AceLog.getAppLog().alertAndLogException(e);
 	             } else {
