@@ -80,7 +80,7 @@ public class StateLastWorkflowHistory extends AbstractWorkflowHistorySearchTest 
 		WorkflowHistoryJavaBean current = null;
 		
 		for (WorkflowHistoryJavaBean wfHistoryItem : wfHistory) {
-			if (current == null || wfHistoryItem.getEffectiveTime() > current.getEffectiveTime()) 
+			if (current == null || wfHistoryItem.getEffectiveTime().longValue() > current.getEffectiveTime().longValue()) 
 				current = wfHistoryItem;
 		}
 		
