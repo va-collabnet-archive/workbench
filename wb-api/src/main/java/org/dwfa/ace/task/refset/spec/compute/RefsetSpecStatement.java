@@ -47,6 +47,7 @@ import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PositionSetBI;
 
 /**
  * Represents partial information contained in a refset spec. An example of a
@@ -223,8 +224,8 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
     }
 
 	public boolean execute(I_AmTermComponent component,
-			 GROUPING_TYPE version, I_Position v1_is,
-			I_Position v2_is, Collection<I_ShowActivity> activities) throws IOException, TerminologyException {
+			 GROUPING_TYPE version, PositionSetBI v1_is,
+			PositionSetBI v2_is, Collection<I_ShowActivity> activities) throws IOException, TerminologyException {
 
 		boolean statementResult = getStatementResult(component, 
 				version, v1_is, v2_is);
@@ -239,8 +240,8 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
     }
 
  public abstract boolean getStatementResult(I_AmTermComponent component,
-		 GROUPING_TYPE version, I_Position v1Is,
-			I_Position v2Is) throws IOException, TerminologyException;
+		 GROUPING_TYPE version, PositionSetBI v1Is,
+			PositionSetBI v2Is) throws IOException, TerminologyException;
 
     protected boolean isComponentStatus(I_GetConceptData requiredStatus, List<I_AmTuple> tuples) {
 
@@ -366,51 +367,51 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         return buff.toString();
     }
 
-	private Set<? extends I_GetConceptData> getChildren2(I_GetConceptData c,
-			I_Position pos) throws TerminologyException, IOException {
-		System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-		System.out.println("\t" + c.getInitialText());
-		HashSet<I_GetConceptData> ret = new HashSet<I_GetConceptData>();
-		I_TermFactory tf = Terms.get();
-		for (I_RelVersioned<?> d : c.getDestRels()) {
-			I_RelPart dm = null;
-			for (I_RelPart dd : d.getMutableParts()) {
-				System.out.println("\tpos:" + dd.getPathId() + " "
-						+ pos.getPath().getConceptNid());
-				if (dd.getPathId() != pos.getPath().getConceptNid())
-					continue;
-				// if (!getIsAIds().contains(dd.getTypeId()))
-				// continue;
-				System.out.println("\ttyp:"
-						+ dd.getTypeId()
-						+ " "
-						+ tf.getConcept(SNOMED.Concept.IS_A.getUids())
-								.getConceptNid());
-				if (dd.getTypeId() != tf.getConcept(
-						SNOMED.Concept.IS_A.getUids()).getConceptNid())
-					continue;
-				// Find the greatest version <= the one of interest
-				System.out.println("\tver:" + dd.getVersion() + " "
-						+ pos.getVersion());
-				if (dd.getVersion() <= pos.getVersion()
-						&& (dm == null || dm.getVersion() < dd.getVersion()))
-					dm = dd;
-			}
-			if (dm != null)
-				System.out.println("\tsta:"
-						+ dm.getStatusId()
-						+ " "
-						+ tf.getConcept(
-								ArchitectonicAuxiliary.Concept.CURRENT
-										.getUids()).getConceptNid());
-			if (dm != null
-					&& dm.getStatusId() == tf.getConcept(
-							ArchitectonicAuxiliary.Concept.CURRENT.getUids())
-							.getConceptNid())
-				ret.add(tf.getConcept(d.getC1Id()));
-		}
-		return ret;
-	}
+//	private Set<? extends I_GetConceptData> getChildren2(I_GetConceptData c,
+//			PositionSetBI pos) throws TerminologyException, IOException {
+//		System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+//		System.out.println("\t" + c.getInitialText());
+//		HashSet<I_GetConceptData> ret = new HashSet<I_GetConceptData>();
+//		I_TermFactory tf = Terms.get();
+//		for (I_RelVersioned<?> d : c.getDestRels()) {
+//			I_RelPart dm = null;
+//			for (I_RelPart dd : d.getMutableParts()) {
+//				System.out.println("\tpos:" + dd.getPathId() + " "
+//						+ pos.getPath().getConceptNid());
+//				if (dd.getPathId() != pos.getPath().getConceptNid())
+//					continue;
+//				// if (!getIsAIds().contains(dd.getTypeId()))
+//				// continue;
+//				System.out.println("\ttyp:"
+//						+ dd.getTypeId()
+//						+ " "
+//						+ tf.getConcept(SNOMED.Concept.IS_A.getUids())
+//								.getConceptNid());
+//				if (dd.getTypeId() != tf.getConcept(
+//						SNOMED.Concept.IS_A.getUids()).getConceptNid())
+//					continue;
+//				// Find the greatest version <= the one of interest
+//				System.out.println("\tver:" + dd.getVersion() + " "
+//						+ pos.getVersion());
+//				if (dd.getVersion() <= pos.getVersion()
+//						&& (dm == null || dm.getVersion() < dd.getVersion()))
+//					dm = dd;
+//			}
+//			if (dm != null)
+//				System.out.println("\tsta:"
+//						+ dm.getStatusId()
+//						+ " "
+//						+ tf.getConcept(
+//								ArchitectonicAuxiliary.Concept.CURRENT
+//										.getUids()).getConceptNid());
+//			if (dm != null
+//					&& dm.getStatusId() == tf.getConcept(
+//							ArchitectonicAuxiliary.Concept.CURRENT.getUids())
+//							.getConceptNid())
+//				ret.add(tf.getConcept(d.getC1Id()));
+//		}
+//		return ret;
+//	}
 
 	private I_IntSet getCurrentStatuses() throws TerminologyException {
 		if (currentStatuses == null) {
@@ -427,7 +428,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
 	}
 
 	protected Set<? extends I_GetConceptData> getChildren(
-			I_GetConceptData concept, I_Position pos)
+			I_GetConceptData concept, PositionSetBI pos)
 			throws TerminologyException, IOException {
 		return concept.getDestRelOrigins(getCurrentStatuses(), getIsAIds(),
 				new PositionSetReadOnly(pos), config.getPrecedence(),
@@ -435,7 +436,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
 	}
 
 	protected boolean conceptIsChildOf(I_GetConceptData c1,
-			I_GetConceptData c2, I_Position pos) throws TerminologyException,
+			I_GetConceptData c2, PositionSetBI pos) throws TerminologyException,
 			IOException {
 		for (I_GetConceptData child : getChildren(c2, pos)) {
 			if (c1.getConceptNid() == child.getConceptNid())
@@ -446,7 +447,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
 
 	private HashSet<Integer> descendants = null;
 
-	private void getDescendants(I_GetConceptData c2, I_Position pos)
+	private void getDescendants(I_GetConceptData c2, PositionSetBI pos)
 			throws TerminologyException, IOException {
 		if (descendants.contains(new Integer(c2.getConceptNid())))
 			return;
@@ -457,7 +458,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
 	}
 
 	protected boolean conceptIsDescendantOf(I_GetConceptData c1,
-			I_GetConceptData c2, I_Position pos) throws TerminologyException,
+			I_GetConceptData c2, PositionSetBI pos) throws TerminologyException,
 			IOException {
 		if (descendants == null) {
 			descendants = new HashSet<Integer>();
@@ -466,8 +467,8 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
 		return descendants.contains(new Integer(c1.getConceptNid()));
 	}
 
-	protected I_Position getVersion(GROUPING_TYPE version, I_Position v1_is,
-			I_Position v2_is) throws TerminologyException {
+	protected PositionSetBI getVersion(GROUPING_TYPE version, PositionSetBI v1_is,
+			PositionSetBI v2_is) throws TerminologyException {
 		if (version == GROUPING_TYPE.V1)
 			return v1_is;
 		if (version == GROUPING_TYPE.V2)
@@ -475,45 +476,45 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
 		throw new TerminologyException("Version error:" + version);
 	}
 
-	protected I_AmPart getVersion(List<I_AmPart> parts, I_Position vn_is,
-			boolean trace_p) throws TerminologyException {
-		try {
-			I_AmPart an = null;
-			Set<? extends PositionBI> origins = vn_is.getPath().getInheritedOrigins();
-			for (I_AmPart a : parts) {
-				if (trace_p) {
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-					System.out.println("\t" + a.getPathId() + " "
-							+ a.getVersion() + " "
-							+ vn_is.getPath().getConceptNid() + " "
-							+ vn_is.getVersion());
-				}
-				// Must be on the path
-				// Find the greatest version <= the one of interest
-				for (PositionBI origin : origins) {
-					if (trace_p) {
-						System.out.println("\t" + a.getPathId() + " "
-								+ origin.getPath().getConceptNid());
-						System.out.println("\t" + a.getVersion() + " "
-								+ origin.getVersion());
-					}
-					if ((a.getPathId() == vn_is.getPath().getConceptNid() || (a
-							.getPathId() == origin.getPath().getConceptNid()
-					// &&
-					// a.getVersion()
-					// >=
-					// origin.getVersion()
-					))
-							&& a.getVersion() <= vn_is.getVersion()
-							&& (an == null || an.getVersion() < a.getVersion()))
-						an = a;
-				}
-			}
-			return an;
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new TerminologyException(e.getMessage());
-		}
-	}
+//	protected I_AmPart getVersion(List<I_AmPart> parts, PositionSetBI vn_is,
+//			boolean trace_p) throws TerminologyException {
+//		try {
+//			I_AmPart an = null;
+//			Set<? extends PositionBI> origins = vn_is.getPath().getInheritedOrigins();
+//			for (I_AmPart a : parts) {
+//				if (trace_p) {
+//					System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+//					System.out.println("\t" + a.getPathId() + " "
+//							+ a.getVersion() + " "
+//							+ vn_is.getPath().getConceptNid() + " "
+//							+ vn_is.getVersion());
+//				}
+//				// Must be on the path
+//				// Find the greatest version <= the one of interest
+//				for (PositionBI origin : origins) {
+//					if (trace_p) {
+//						System.out.println("\t" + a.getPathId() + " "
+//								+ origin.getPath().getConceptNid());
+//						System.out.println("\t" + a.getVersion() + " "
+//								+ origin.getVersion());
+//					}
+//					if ((a.getPathId() == vn_is.getPath().getConceptNid() || (a
+//							.getPathId() == origin.getPath().getConceptNid()
+//					// &&
+//					// a.getVersion()
+//					// >=
+//					// origin.getVersion()
+//					))
+//							&& a.getVersion() <= vn_is.getVersion()
+//							&& (an == null || an.getVersion() < a.getVersion()))
+//						an = a;
+//				}
+//			}
+//			return an;
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			throw new TerminologyException(e.getMessage());
+//		}
+//	}
 
 }

@@ -20,12 +20,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
@@ -41,6 +43,8 @@ import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery.GROUPING_TYPE;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.PositionSetBI;
+import org.ihtsdo.tk.api.Precedence;
 
 /**
  * Represents partial information contained in a refset spec.
@@ -75,8 +79,8 @@ public class RelationshipStatement extends RefsetSpecStatement {
         }
     }
 
-    public boolean getStatementResult(I_AmTermComponent component, GROUPING_TYPE version, I_Position v1_is,
-			I_Position v2_is) throws IOException, TerminologyException {
+    public boolean getStatementResult(I_AmTermComponent component, GROUPING_TYPE version, PositionSetBI v1_is,
+			PositionSetBI v2_is) throws IOException, TerminologyException {
 
         I_RelVersioned relVersioned = (I_RelVersioned) component;
         I_RelTuple relTuple = relVersioned.getLastTuple();
@@ -705,20 +709,31 @@ public class RelationshipStatement extends RefsetSpecStatement {
         }
     }
 
-	private I_RelPart getVersion(I_RelVersioned descriptionBeingTested,
-			I_Position vn_is) throws TerminologyException {
-		ArrayList<I_AmPart> parts = new ArrayList<I_AmPart>(
-				descriptionBeingTested.getMutableParts());
-		I_AmPart part = getVersion(parts, vn_is, false);
-		return (I_RelPart) part;
+	private I_RelTuple getVersion(I_RelVersioned descriptionBeingTested,
+			PositionSetBI vn_is) throws TerminologyException {
+		try {
+			// ArrayList<I_AmPart> parts = new ArrayList<I_AmPart>(
+			// descriptionBeingTested.getMutableParts());
+			// I_AmPart part = getVersion(parts, vn_is, false);
+			// return (I_RelPart) part;
+			List<I_RelTuple> d1s = new ArrayList<I_RelTuple>();
+			descriptionBeingTested.addTuples(null, null, vn_is, d1s,
+					Precedence.PATH, config.getConflictResolutionStrategy());
+			if (d1s.size() > 0)
+				return d1s.get(0);
+			return null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new TerminologyException(e.getMessage());
+		}
 	}
 
 	private boolean addedRelationship(I_RelVersioned relBeingTested,
-			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
+			GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is)
 			throws TerminologyException, IOException {
 		try {
-			I_RelPart a1 = getVersion(relBeingTested, v1_is);
-			I_RelPart a2 = getVersion(relBeingTested, v2_is);
+			I_RelTuple a1 = getVersion(relBeingTested, v1_is);
+			I_RelTuple a2 = getVersion(relBeingTested, v2_is);
 			return (a1 == null && a2 != null);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -728,14 +743,16 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
 	private boolean changedRelationshipCharacteristic(
 			I_RelVersioned relBeingTested, GROUPING_TYPE version,
-			I_Position v1_is, I_Position v2_is) throws TerminologyException,
-			IOException {
+			PositionSetBI v1_is, PositionSetBI v2_is)
+			throws TerminologyException, IOException {
 		try {
-			I_RelPart a1 = getVersion(relBeingTested, v1_is);
-			I_RelPart a2 = getVersion(relBeingTested, v2_is);
-			return (a1 != null && a2 != null
-					&& a1.getVersion() != a2.getVersion() && a1
-					.getCharacteristicId() != a2.getCharacteristicId());
+			I_RelTuple a1 = getVersion(relBeingTested, v1_is);
+			I_RelTuple a2 = getVersion(relBeingTested, v2_is);
+			return (a1 != null
+					&& a2 != null
+					&& !(a1.getPathNid() == a2.getPathNid() && a1.getTime() == a2
+							.getTime()) && a1.getCharacteristicId() != a2
+					.getCharacteristicId());
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new TerminologyException(e.getMessage());
@@ -743,14 +760,15 @@ public class RelationshipStatement extends RefsetSpecStatement {
 	}
 
 	private boolean changedRelationshipGroup(I_RelVersioned relBeingTested,
-			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
+			GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is)
 			throws TerminologyException, IOException {
 		try {
-			I_RelPart a1 = getVersion(relBeingTested, v1_is);
-			I_RelPart a2 = getVersion(relBeingTested, v2_is);
-			return (a1 != null && a2 != null
-					&& a1.getVersion() != a2.getVersion() && a1.getGroup() != a2
-					.getGroup());
+			I_RelTuple a1 = getVersion(relBeingTested, v1_is);
+			I_RelTuple a2 = getVersion(relBeingTested, v2_is);
+			return (a1 != null
+					&& a2 != null
+					&& !(a1.getPathNid() == a2.getPathNid() && a1.getTime() == a2
+							.getTime()) && a1.getGroup() != a2.getGroup());
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new TerminologyException(e.getMessage());
@@ -759,14 +777,16 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
 	private boolean changedRelationshipRefinability(
 			I_RelVersioned relBeingTested, GROUPING_TYPE version,
-			I_Position v1_is, I_Position v2_is) throws TerminologyException,
-			IOException {
+			PositionSetBI v1_is, PositionSetBI v2_is)
+			throws TerminologyException, IOException {
 		try {
-			I_RelPart a1 = getVersion(relBeingTested, v1_is);
-			I_RelPart a2 = getVersion(relBeingTested, v2_is);
-			return (a1 != null && a2 != null
-					&& a1.getVersion() != a2.getVersion() && a1
-					.getRefinabilityId() != a2.getRefinabilityId());
+			I_RelTuple a1 = getVersion(relBeingTested, v1_is);
+			I_RelTuple a2 = getVersion(relBeingTested, v2_is);
+			return (a1 != null
+					&& a2 != null
+					&& !(a1.getPathNid() == a2.getPathNid() && a1.getTime() == a2
+							.getTime()) && a1.getRefinabilityId() != a2
+					.getRefinabilityId());
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new TerminologyException(e.getMessage());
@@ -774,14 +794,16 @@ public class RelationshipStatement extends RefsetSpecStatement {
 	}
 
 	private boolean changedRelationshipStatus(I_RelVersioned relBeingTested,
-			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
+			GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is)
 			throws TerminologyException, IOException {
 		try {
-			I_RelPart a1 = getVersion(relBeingTested, v1_is);
-			I_RelPart a2 = getVersion(relBeingTested, v2_is);
-			return (a1 != null && a2 != null
-					&& a1.getVersion() != a2.getVersion() && a1.getStatusId() != a2
-					.getStatusId());
+			I_RelTuple a1 = getVersion(relBeingTested, v1_is);
+			I_RelTuple a2 = getVersion(relBeingTested, v2_is);
+			return (a1 != null
+					&& a2 != null
+					&& !(a1.getPathNid() == a2.getPathNid() && a1.getTime() == a2
+							.getTime()) && a1.getStatusNid() != a2
+					.getStatusNid());
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new TerminologyException(e.getMessage());
@@ -789,14 +811,15 @@ public class RelationshipStatement extends RefsetSpecStatement {
 	}
 
 	private boolean changedRelationshipType(I_RelVersioned relBeingTested,
-			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
+			GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is)
 			throws TerminologyException, IOException {
 		try {
-			I_RelPart a1 = getVersion(relBeingTested, v1_is);
-			I_RelPart a2 = getVersion(relBeingTested, v2_is);
-			return (a1 != null && a2 != null
-					&& a1.getVersion() != a2.getVersion() && a1.getTypeId() != a2
-					.getTypeId());
+			I_RelTuple a1 = getVersion(relBeingTested, v1_is);
+			I_RelTuple a2 = getVersion(relBeingTested, v2_is);
+			return (a1 != null
+					&& a2 != null
+					&& !(a1.getPathNid() == a2.getPathNid() && a1.getTime() == a2
+							.getTime()) && a1.getTypeNid() != a2.getTypeNid());
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new TerminologyException(e.getMessage());

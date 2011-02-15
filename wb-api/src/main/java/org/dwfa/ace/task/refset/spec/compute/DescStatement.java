@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -49,6 +50,8 @@ import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery.GROUPING_TYPE;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.PositionSetBI;
+import org.ihtsdo.tk.api.Precedence;
 
 /**
  * Represents partial information contained in a refset spec. An example of a
@@ -127,8 +130,8 @@ public class DescStatement extends RefsetSpecStatement {
         }
     }
 
-    public boolean getStatementResult(I_AmTermComponent component, GROUPING_TYPE version, I_Position v1_is,
-			I_Position v2_is) throws IOException, TerminologyException {
+    public boolean getStatementResult(I_AmTermComponent component, GROUPING_TYPE version, PositionSetBI v1_is,
+			PositionSetBI v2_is) throws IOException, TerminologyException {
         if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
             I_DescriptionVersioned descriptionVersioned = (I_DescriptionVersioned) component;
 			I_DescriptionTuple descriptionTuple = descriptionVersioned
@@ -616,11 +619,11 @@ public class DescStatement extends RefsetSpecStatement {
 
 	private boolean addedDescription(
 			I_DescriptionVersioned descriptionBeingTested,
-			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
+			GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is)
 			throws TerminologyException, IOException {
 		try {
-			I_DescriptionPart a1 = getVersion(descriptionBeingTested, v1_is);
-			I_DescriptionPart a2 = getVersion(descriptionBeingTested, v2_is);
+			I_DescriptionTuple a1 = getVersion(descriptionBeingTested, v1_is);
+			I_DescriptionTuple a2 = getVersion(descriptionBeingTested, v2_is);
 			return (a1 == null && a2 != null);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -630,14 +633,15 @@ public class DescStatement extends RefsetSpecStatement {
 
 	private boolean changedDescriptionCase(
 			I_DescriptionVersioned descriptionBeingTested,
-			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
+			GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is)
 			throws TerminologyException, IOException {
 		try {
-			I_DescriptionPart a1 = getVersion(descriptionBeingTested, v1_is);
-			I_DescriptionPart a2 = getVersion(descriptionBeingTested, v2_is);
-			return (a1 != null && a2 != null
-					&& a1.getVersion() != a2.getVersion() && a1
-					.isInitialCaseSignificant() != a2
+			I_DescriptionTuple a1 = getVersion(descriptionBeingTested, v1_is);
+			I_DescriptionTuple a2 = getVersion(descriptionBeingTested, v2_is);
+			return (a1 != null
+					&& a2 != null
+					&& !(a1.getPathNid() == a2.getPathNid() && a1.getTime() == a2
+							.getTime()) && a1.isInitialCaseSignificant() != a2
 					.isInitialCaseSignificant());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -647,14 +651,15 @@ public class DescStatement extends RefsetSpecStatement {
 
 	private boolean changedDescriptionLanguage(
 			I_DescriptionVersioned descriptionBeingTested,
-			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
+			GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is)
 			throws TerminologyException, IOException {
 		try {
-			I_DescriptionPart a1 = getVersion(descriptionBeingTested, v1_is);
-			I_DescriptionPart a2 = getVersion(descriptionBeingTested, v2_is);
-			return (a1 != null && a2 != null
-					&& a1.getVersion() != a2.getVersion() && !a1.getLang()
-					.equals(a2.getLang()));
+			I_DescriptionTuple a1 = getVersion(descriptionBeingTested, v1_is);
+			I_DescriptionTuple a2 = getVersion(descriptionBeingTested, v2_is);
+			return (a1 != null
+					&& a2 != null
+					&& !(a1.getPathNid() == a2.getPathNid() && a1.getTime() == a2
+							.getTime()) && !a1.getLang().equals(a2.getLang()));
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new TerminologyException(e.getMessage());
@@ -663,14 +668,15 @@ public class DescStatement extends RefsetSpecStatement {
 
 	private boolean changedDescriptionStatus(
 			I_DescriptionVersioned descriptionBeingTested,
-			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
+			GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is)
 			throws TerminologyException, IOException {
 		try {
-			I_DescriptionPart a1 = getVersion(descriptionBeingTested, v1_is);
-			I_DescriptionPart a2 = getVersion(descriptionBeingTested, v2_is);
+			I_DescriptionTuple a1 = getVersion(descriptionBeingTested, v1_is);
+			I_DescriptionTuple a2 = getVersion(descriptionBeingTested, v2_is);
 			return (a1 != null && a2 != null
-					&& a1.getVersion() != a2.getVersion() && a1.getStatusId() != a2
-					.getStatusId());
+					&& !(a1.getPathNid() == a2.getPathNid() && a1.getTime() == a2
+							.getTime()) && a1.getStatusNid() != a2
+					.getStatusNid());
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new TerminologyException(e.getMessage());
@@ -679,14 +685,15 @@ public class DescStatement extends RefsetSpecStatement {
 
 	private boolean changedDescriptionTerm(
 			I_DescriptionVersioned descriptionBeingTested,
-			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
+			GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is)
 			throws TerminologyException, IOException {
 		try {
-			I_DescriptionPart a1 = getVersion(descriptionBeingTested, v1_is);
-			I_DescriptionPart a2 = getVersion(descriptionBeingTested, v2_is);
-			return (a1 != null && a2 != null
-					&& a1.getVersion() != a2.getVersion() && !a1.getText()
-					.equals(a2.getText()));
+			I_DescriptionTuple a1 = getVersion(descriptionBeingTested, v1_is);
+			I_DescriptionTuple a2 = getVersion(descriptionBeingTested, v2_is);
+			return (a1 != null
+					&& a2 != null
+					&& !(a1.getPathNid() == a2.getPathNid() && a1.getTime() == a2
+							.getTime()) && !a1.getText().equals(a2.getText()));
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new TerminologyException(e.getMessage());
@@ -695,28 +702,29 @@ public class DescStatement extends RefsetSpecStatement {
 
 	private boolean changedDescriptionType(
 			I_DescriptionVersioned descriptionBeingTested,
-			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
+			GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is)
 			throws TerminologyException, IOException {
 		try {
-			I_DescriptionPart a1 = getVersion(descriptionBeingTested, v1_is);
-			I_DescriptionPart a2 = getVersion(descriptionBeingTested, v2_is);
-			return (a1 != null && a2 != null
-					&& a1.getVersion() != a2.getVersion() && a1.getTypeId() != a2
-					.getTypeId());
+			I_DescriptionTuple a1 = getVersion(descriptionBeingTested, v1_is);
+			I_DescriptionTuple a2 = getVersion(descriptionBeingTested, v2_is);
+			return (a1 != null
+					&& a2 != null
+					&& !(a1.getPathNid() == a2.getPathNid() && a1.getTime() == a2
+							.getTime()) && a1.getTypeNid() != a2.getTypeNid());
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new TerminologyException(e.getMessage());
 		}
 	}
 
-	private I_DescriptionPart getVersion(
-			I_DescriptionVersioned descriptionBeingTested, I_Position vn_is)
+	private I_DescriptionTuple getVersion(
+			I_DescriptionVersioned descriptionBeingTested, PositionSetBI vn_is)
 			throws TerminologyException {
 		try {
-			ArrayList<I_AmPart> parts = new ArrayList<I_AmPart>(
-					descriptionBeingTested.getMutableParts());
-			I_AmPart part = getVersion(parts, vn_is, false);
-			return (I_DescriptionPart) part;
+			// ArrayList<I_AmPart> parts = new ArrayList<I_AmPart>(
+			// descriptionBeingTested.getMutableParts());
+			// I_AmPart part = getVersion(parts, vn_is, false);
+			// return (I_DescriptionPart) part;
 			// I_DescriptionPart an = null;
 			// for (I_DescriptionPart a :
 			// descriptionBeingTested.getMutableParts()) {
@@ -728,6 +736,12 @@ public class DescStatement extends RefsetSpecStatement {
 			// an = a;
 			// }
 			// return an;
+			List<I_DescriptionTuple> d1s = new ArrayList<I_DescriptionTuple>();
+			descriptionBeingTested.addTuples(null, null, vn_is, d1s,
+					Precedence.PATH, config.getConflictResolutionStrategy());
+			if (d1s.size() > 0)
+				return d1s.get(0);
+			return null;
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new TerminologyException(e.getMessage());
@@ -735,86 +749,86 @@ public class DescStatement extends RefsetSpecStatement {
 	}
 
 	private boolean descriptionIs(
-			I_DescriptionVersioned descriptionBeingTested, I_Position pos)
+			I_DescriptionVersioned descriptionBeingTested, PositionSetBI pos)
 			throws TerminologyException {
 		I_DescriptionVersioned queryConstraintDesc = (I_DescriptionVersioned) queryConstraint;
-		I_DescriptionPart a = getVersion(descriptionBeingTested, pos);
+		I_DescriptionTuple a = getVersion(descriptionBeingTested, pos);
 		return (a != null && descriptionBeingTested.getDescId() == queryConstraintDesc
 				.getDescId());
 	}
 
 	private boolean descriptionStatusIs(
-			I_DescriptionVersioned descriptionBeingTested, I_Position pos)
+			I_DescriptionVersioned descriptionBeingTested, PositionSetBI pos)
 			throws TerminologyException {
-		I_DescriptionPart a = getVersion(descriptionBeingTested, pos);
-		return (a != null && a.getStatusId() == ((I_GetConceptData) queryConstraint)
+		I_DescriptionTuple a = getVersion(descriptionBeingTested, pos);
+		return (a != null && a.getStatusNid() == ((I_GetConceptData) queryConstraint)
 				.getConceptNid());
 	}
 
 	private boolean descriptionStatusIsChildOf(
-			I_DescriptionVersioned descriptionBeingTested, I_Position pos)
+			I_DescriptionVersioned descriptionBeingTested, PositionSetBI pos)
 			throws TerminologyException, IOException {
-		I_DescriptionPart a = getVersion(descriptionBeingTested, pos);
+		I_DescriptionTuple a = getVersion(descriptionBeingTested, pos);
 		if (a == null)
 			return false;
-		return conceptIsChildOf(Terms.get().getConcept(a.getStatusId()),
+		return conceptIsChildOf(Terms.get().getConcept(a.getStatusNid()),
 				(I_GetConceptData) queryConstraint, pos);
 	}
 
 	private boolean descriptionStatusIsDescendentOf(
-			I_DescriptionVersioned descriptionBeingTested, I_Position pos)
+			I_DescriptionVersioned descriptionBeingTested, PositionSetBI pos)
 			throws TerminologyException, IOException {
-		I_DescriptionPart a = getVersion(descriptionBeingTested, pos);
+		I_DescriptionTuple a = getVersion(descriptionBeingTested, pos);
 		if (a == null)
 			return false;
-		return conceptIsDescendantOf(Terms.get().getConcept(a.getStatusId()),
+		return conceptIsDescendantOf(Terms.get().getConcept(a.getStatusNid()),
 				(I_GetConceptData) queryConstraint, pos);
 	}
 
 	private boolean descriptionStatusIsKindOf(
-			I_DescriptionVersioned descriptionBeingTested, I_Position pos)
+			I_DescriptionVersioned descriptionBeingTested, PositionSetBI pos)
 			throws TerminologyException, IOException {
 		return descriptionStatusIs(descriptionBeingTested, pos)
 				|| descriptionStatusIsDescendentOf(descriptionBeingTested, pos);
 	}
 
 	private boolean descriptionTypeIs(
-			I_DescriptionVersioned descriptionBeingTested, I_Position pos)
+			I_DescriptionVersioned descriptionBeingTested, PositionSetBI pos)
 			throws TerminologyException {
-		I_DescriptionPart a = getVersion(descriptionBeingTested, pos);
-		return (a != null && a.getTypeId() == ((I_GetConceptData) queryConstraint)
+		I_DescriptionTuple a = getVersion(descriptionBeingTested, pos);
+		return (a != null && a.getTypeNid() == ((I_GetConceptData) queryConstraint)
 				.getConceptNid());
 	}
 
 	private boolean descriptionTypeIsChildOf(
-			I_DescriptionVersioned descriptionBeingTested, I_Position pos)
+			I_DescriptionVersioned descriptionBeingTested, PositionSetBI pos)
 			throws TerminologyException, IOException {
-		I_DescriptionPart a = getVersion(descriptionBeingTested, pos);
+		I_DescriptionTuple a = getVersion(descriptionBeingTested, pos);
 		if (a == null)
 			return false;
-		return conceptIsChildOf(Terms.get().getConcept(a.getTypeId()),
+		return conceptIsChildOf(Terms.get().getConcept(a.getTypeNid()),
 				(I_GetConceptData) queryConstraint, pos);
 	}
 
 	private boolean descriptionTypeIsDescendentOf(
-			I_DescriptionVersioned descriptionBeingTested, I_Position pos)
+			I_DescriptionVersioned descriptionBeingTested, PositionSetBI pos)
 			throws TerminologyException, IOException {
-		I_DescriptionPart a = getVersion(descriptionBeingTested, pos);
+		I_DescriptionTuple a = getVersion(descriptionBeingTested, pos);
 		if (a == null)
 			return false;
-		return conceptIsDescendantOf(Terms.get().getConcept(a.getTypeId()),
+		return conceptIsDescendantOf(Terms.get().getConcept(a.getTypeNid()),
 				(I_GetConceptData) queryConstraint, pos);
 	}
 
 	private boolean descriptionTypeIsKindOf(
-			I_DescriptionVersioned descriptionBeingTested, I_Position pos)
+			I_DescriptionVersioned descriptionBeingTested, PositionSetBI pos)
 			throws TerminologyException, IOException {
 		return descriptionTypeIs(descriptionBeingTested, pos)
 				|| descriptionTypeIsDescendentOf(descriptionBeingTested, pos);
 	}
 
 	private boolean descriptionRegexMatch(
-			I_DescriptionVersioned descriptionBeingTested, I_Position pos)
+			I_DescriptionVersioned descriptionBeingTested, PositionSetBI pos)
 			throws TerminologyException {
 		if (regexPattern == null) {
 			String queryConstraintString = (String) queryConstraint;
@@ -823,7 +837,7 @@ public class DescStatement extends RefsetSpecStatement {
 					"Compiling regex: " + regexPattern + " into: "
 							+ regexPattern);
 		}
-		I_DescriptionPart a = getVersion(descriptionBeingTested, pos);
+		I_DescriptionTuple a = getVersion(descriptionBeingTested, pos);
 		if (a == null)
 			return false;
 		return regexPattern.matcher(a.getText()).find();

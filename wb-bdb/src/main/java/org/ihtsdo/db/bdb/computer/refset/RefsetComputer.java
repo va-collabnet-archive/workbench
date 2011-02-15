@@ -197,8 +197,8 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             I_ConfigAceFrame config, Collection<I_ShowActivity> activities) throws Exception {
         if (possibleCNids.isMember(conceptNid)) {
             boolean containsCurrentMember = currentRefsetMemberComponentNids.isMember(componentNid);
-			if (query.execute(component, null, (I_Position) query.getV1Is(),
-					(I_Position) query.getV2Is(), activities)) {
+			if (query.execute(component, null, query.getV1Is(),
+					 query.getV2Is(), activities)) {
             	newMemberNids.setMember(componentNid);
                 members.incrementAndGet();
                 if (!containsCurrentMember) {

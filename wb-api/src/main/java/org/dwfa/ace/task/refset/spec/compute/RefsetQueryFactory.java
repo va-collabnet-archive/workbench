@@ -32,6 +32,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
@@ -251,11 +252,11 @@ public class RefsetQueryFactory {
 									UUID.fromString(p_str));
 							if (part.getC2id() == RefsetAuxiliary.Concept.DIFFERENCE_V1_IS
 									.localize().getNid()) {
-								query.setV1Is(Terms.get().newPosition(path,
-										Integer.parseInt(v_str)));
+								query.setV1Is(new PositionSetReadOnly(Terms.get().newPosition(path,
+										Integer.parseInt(v_str))));
 							} else {
-								query.setV2Is(Terms.get().newPosition(path,
-										Integer.parseInt(v_str)));
+								query.setV2Is(new PositionSetReadOnly(Terms.get().newPosition(path,
+										Integer.parseInt(v_str))));
 							}
 						} else {
                         throw new TerminologyException(

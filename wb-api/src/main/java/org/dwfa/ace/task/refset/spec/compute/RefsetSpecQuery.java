@@ -41,6 +41,7 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -51,6 +52,7 @@ import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PositionSetBI;
 
 /**
  * Represents the data provided by a refset spec. It can hold 0 or more
@@ -75,23 +77,23 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     private ArrayList<RefsetSpecStatement> statements;
     private ArrayList<RefsetSpecComponent> allComponents;
 
-    private PositionBI v1_is = null;
-    private PositionBI v2_is = null;
+    private PositionSetReadOnly v1_is = null;
+    private PositionSetReadOnly v2_is = null;
     
-    public PositionBI getV1Is() {
+    public PositionSetReadOnly getV1Is() {
 		return v1_is;
 	}
 
-	public void setV1Is(PositionBI position) {
-		v1_is = position;
+	public void setV1Is(PositionSetReadOnly position_set_read_only) {
+		v1_is = position_set_read_only;
 	}
 
-	public PositionBI getV2Is() {
+	public PositionSetReadOnly getV2Is() {
 		return v2_is;
 	}
 
-	public void setV2Is(PositionBI position) {
-		v2_is = position;
+	public void setV2Is(PositionSetReadOnly position_set_read_only) {
+		v2_is = position_set_read_only;
 	}
 
     public ArrayList<RefsetSpecComponent> getAllComponents() {
@@ -500,7 +502,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
      * @throws TerminologyException
      * @throws IOException
      */
-    public boolean execute(I_AmTermComponent component, GROUPING_TYPE version, I_Position v1_is, I_Position v2_is, Collection<I_ShowActivity> activities) throws IOException,
+    public boolean execute(I_AmTermComponent component, GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is, Collection<I_ShowActivity> activities) throws IOException,
             TerminologyException, ComputationCanceled {
 
         if (!continueComputation) {
@@ -593,7 +595,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
     }
 
-    private boolean executeConceptContainsDesc(I_AmTermComponent component, GROUPING_TYPE version, I_Position v1_is, I_Position v2_is, Collection<I_ShowActivity> activities)
+    private boolean executeConceptContainsDesc(I_AmTermComponent component, GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is, Collection<I_ShowActivity> activities)
             throws TerminologyException, IOException, ComputationCanceled {
         if (!continueComputation) {
             throw new ComputationCanceled("Compute cancelled");
@@ -647,7 +649,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         return false; // no descriptions met criteria
     }
 
-    private boolean executeConceptContainsRel(I_AmTermComponent component, GROUPING_TYPE version, I_Position v1_is, I_Position v2_is, Collection<I_ShowActivity> activities)
+    private boolean executeConceptContainsRel(I_AmTermComponent component, GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is, Collection<I_ShowActivity> activities)
             throws TerminologyException, IOException, ComputationCanceled {
         if (!continueComputation) {
             throw new ComputationCanceled("Compute cancelled");
