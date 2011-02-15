@@ -358,6 +358,8 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
     private JCheckBox workflowInProgress;
     private JCheckBox workflowCompleted;
     private JCheckBox pastReleases;
+    private String 	  timestampBefore = null;
+    private String    timestampAfter = null;
 
     private int lastSelectedRow = -1;
 
@@ -672,13 +674,22 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
         updateExtraCriterion();
 
 	    setShowProgress(true);
-	    ACE.threadPool.execute(new SearchWfHistoryStringWorker(this, model, config, this.workflowInProgress.isSelected(), this.workflowCompleted.isSelected(), this.pastReleases.isSelected()));
+	    ACE.threadPool.execute(new SearchWfHistoryStringWorker(this, model, config, this.workflowInProgress.isSelected(), this.workflowCompleted.isSelected(), this.pastReleases.isSelected(), timestampBefore, timestampAfter));
     }
 
     private void updateExtraCriterion() {
         extraCriterion = new ArrayList<I_TestWorkflowHistorySearchResults>();
         for (WorkflowHistoryCriterionPanel criterionPanel : criterionPanels) {
             I_TestWorkflowHistorySearchResults test = criterionPanel.getBean();
+            if (test.getTestType() == I_TestWorkflowHistorySearchResults.timestampBefore) 
+            {
+            	timestampBefore = (String)test.getTestValue();
+            }
+            else if (test.getTestType() == I_TestWorkflowHistorySearchResults.timestampAfter)
+            {
+            	timestampAfter = (String)test.getTestValue();
+            }
+            	
             if (test != null) {
                 extraCriterion.add(test);
             }

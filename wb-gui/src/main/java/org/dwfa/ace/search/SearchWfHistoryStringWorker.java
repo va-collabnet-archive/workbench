@@ -52,6 +52,8 @@ public class SearchWfHistoryStringWorker extends SwingWorker<I_UpdateProgress> i
     private boolean wfInProgress = true;
     private boolean completedWF = false;
     private boolean searchPreviousReleases = false;
+    private String timestampBefore = null;
+    private String timestampAfter = null;
 
     private WorkflowHistoryTableModel model;
 
@@ -95,7 +97,7 @@ public class SearchWfHistoryStringWorker extends SwingWorker<I_UpdateProgress> i
     
     
     public SearchWfHistoryStringWorker(WorkflowHistorySearchPanel wfSearchPanel, WorkflowHistoryTableModel model,
-            I_ConfigAceFrame config, boolean wfIP, boolean wfCompleted, boolean wfSearchPreviousReleases) {
+            I_ConfigAceFrame config, boolean wfIP, boolean wfCompleted, boolean wfSearchPreviousReleases, String timestampBefore, String timestampAfter) {
         super();
         this.config = new FrameConfigSnapshot(config);
         this.model = model;
@@ -103,11 +105,10 @@ public class SearchWfHistoryStringWorker extends SwingWorker<I_UpdateProgress> i
         this.wfInProgress= wfIP;
         this.completedWF = wfCompleted;
         this.searchPreviousReleases = wfSearchPreviousReleases;
-//        this.wfSearchPanel.addStopActionListener(stopListener);
-//        this.wfSearchPanel.setProgressInfo("   Searching lucene for " + patternString + "   ");
-//        this.wfSearchPanel.setProgressIndeterminate(true);
+        this.timestampBefore = timestampBefore;
+        this.timestampAfter = timestampAfter;
 
-			searcher = new WorkflowHistoryRefsetSearcher();
+		searcher = new WorkflowHistoryRefsetSearcher();
     }
 
   
@@ -129,7 +130,7 @@ public class SearchWfHistoryStringWorker extends SwingWorker<I_UpdateProgress> i
         new MatchUpdator();
         
         
-        wfHistorySearchResults = searcher.searchForWFHistory(wfSearchPanel.getExtraCriterion(), this.wfInProgress, this.completedWF, this.searchPreviousReleases);
+        wfHistorySearchResults = searcher.searchForWFHistory(wfSearchPanel.getExtraCriterion(), wfInProgress, completedWF, searchPreviousReleases, timestampBefore, timestampAfter);
 //        while (completeLatch.getCount() > 0)
 //        	completeLatch.countDown();
         
