@@ -33,6 +33,11 @@
     </licenses>
     <dependencies>
     	<dependency>
+    		<groupId>${project.groupId}</groupId>
+    		<artifactId>tk-arena-spec</artifactId>
+    		<version>${project.version}</version>
+    	</dependency>
+    	<dependency>
     		<groupId>org.drools</groupId>
     		<artifactId>drools-core</artifactId>
     		<type>jar</type>
