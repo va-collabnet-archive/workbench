@@ -237,22 +237,22 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
 
     /**
      * Returns a hash code for this <code>EComponent</code>.
-     * 
+     *
      * @return a hash code value for this <tt>EComponent</tt>.
      */
     public int hashCode() {
-        return Arrays.hashCode(new int[] { getPrimordialComponentUuid().hashCode(), 
+        return Arrays.hashCode(new int[] { getPrimordialComponentUuid().hashCode(),
         		statusUuid.hashCode(), pathUuid.hashCode(), (int) time, (int) (time >>> 32) });
     }
 
     /**
      * Compares this object to the specified object. The result is <tt>true</tt>
      * if and only if the argument is not <tt>null</tt>, is a
-     * <tt>EComponent</tt> object, and contains the same values, field by field, 
+     * <tt>EComponent</tt> object, and contains the same values, field by field,
      * as this <tt>EComponent</tt>.
-     * 
+     *
      * @param obj the object to compare with.
-     * @return <code>true</code> if the objects are the same; 
+     * @return <code>true</code> if the objects are the same;
      *         <code>false</code> otherwise.
      */
     public boolean equals(Object obj) {
@@ -293,5 +293,15 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
         }
         return false;
     }
+
+
+   public List<TkRefsetAbstractMember<?>> getAnnotations() {
+      return annotations;
+   }
+
+   public void setAnnotations(List<TkRefsetAbstractMember<?>> annotations) {
+      this.annotations = annotations;
+   }
+
 
 }
