@@ -70,6 +70,7 @@ import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.id.Type3UuidFactory;
@@ -79,6 +80,7 @@ import org.ihtsdo.rules.testmodel.DrComponentHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.rules.testmodel.TerminologyHelperDroolsWorkbench;
 import org.ihtsdo.testmodel.DrConcept;
+import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.KindOfCacheBI;
@@ -159,6 +161,16 @@ public class RulesLibrary {
 			boolean onlyUncommittedContent, I_ConfigAceFrame config, RulesContextHelper contextHelper, 
 			INFERRED_VIEW_ORIGIN inferredOrigin) 
 	throws Exception {
+		HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
+		I_ShowActivity activity =
+			Terms.get().newActivityPanel(true, config, 
+					"<html>Performing QA check on concept...", true);
+		activities.add(activity);
+		activity.setValue(0);
+		activity.setIndeterminate(true);
+		activity.setProgressInfoLower("Getting KnowledgeBase...");
+		Terms.get().getActiveAceFrameConfig().setStatusMessage("Getting KnowledgeBase...");
+		long startTime = System.currentTimeMillis();
 		KnowledgeBase kbase = contextHelper.getKnowledgeBaseForContext(context, config);
 		ResultsCollectorWorkBench results = new ResultsCollectorWorkBench();
 		if (kbase != null) {
@@ -167,6 +179,8 @@ public class RulesLibrary {
 			if (!(kbase.getKnowledgePackages().size() == 0) && 
 					!(kbase.getKnowledgePackages().size() == 1 &&
 							kbase.getKnowledgePackages().iterator().next().getRules().size() == 0)) { 
+				activity.setProgressInfoLower("Creating session...");
+				config.setStatusMessage("Creating session...");
 
 				StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 
@@ -176,8 +190,14 @@ public class RulesLibrary {
 				ksession.setGlobal("terminologyHelper", getTerminologyHelper());
 
 				ConceptVersionBI conceptBi = Ts.get().getConceptVersion(config.getViewCoordinate(), concept.getNid());
+				
+				activity.setProgressInfoLower("Converting concept...");
+				config.setStatusMessage("Converting concept...");
 
 				DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version", inferredOrigin);
+				
+				activity.setProgressInfoLower("Testing concept...");
+				config.setStatusMessage("Testing concept...");
 
 				ksession.insert(testConcept);
 
@@ -242,6 +262,17 @@ public class RulesLibrary {
 				ksession.dispose();
 			}
 		}
+		long endTime = System.currentTimeMillis();
+		long elapsed = endTime - startTime;
+		String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+		String result = "Done";
+		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
+		try {
+			activity.complete();
+		} catch (ComputationCanceled e) {
+			e.printStackTrace();
+		}
+		config.setStatusMessage("");
 
 		return results;
 	}
@@ -509,6 +540,22 @@ public class RulesLibrary {
 	}
 
 	private static KnowledgeBase getKnowledgeBaseFromFileCache(UUID referenceUuid) {
+		HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
+		I_ConfigAceFrame config = null;
+		try {
+			config = Terms.get().getActiveAceFrameConfig();
+		} catch (TerminologyException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		I_ShowActivity activity =
+			Terms.get().newActivityPanel(true, config, 
+					"<html>Retrieving rules data from cache", true);
+		activities.add(activity);
+		activity.setValue(0);
+		activity.setIndeterminate(true);
+		long startTime = System.currentTimeMillis();
 		KnowledgeBase kbase= null;
 		File rulesDirectory = new File("rules");
 		if (!rulesDirectory.exists())
@@ -532,10 +579,41 @@ public class RulesLibrary {
 				e.printStackTrace();
 			}
 		}
-
+		
+		long endTime = System.currentTimeMillis();
+		long elapsed = endTime - startTime;
+		String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+		String result = "";
+		if (kbase != null) {
+			result = "Sucess...";
+		} else {
+			result = "Cache not available...";
+		}
+		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
+		try {
+			activity.complete();
+		} catch (ComputationCanceled e) {
+			e.printStackTrace();
+		}
 		return kbase;
 	}
 	private static KnowledgeBase getKnowledgeBaseWithAgent(UUID referenceUuid, byte[] bytes) {
+		HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
+		I_ConfigAceFrame config = null;
+		try {
+			config = Terms.get().getActiveAceFrameConfig();
+		} catch (TerminologyException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		I_ShowActivity activity =
+			Terms.get().newActivityPanel(true, config, 
+					"<html>Retrieving rules data from repository", true);
+		activities.add(activity);
+		activity.setValue(0);
+		activity.setIndeterminate(true);
+		long startTime = System.currentTimeMillis();
 		KnowledgeBase kbase= null;
 		File rulesDirectory = new File("rules");
 		if (!rulesDirectory.exists())
@@ -553,6 +631,21 @@ public class RulesLibrary {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		long endTime = System.currentTimeMillis();
+		long elapsed = endTime - startTime;
+		String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+		String result = "";
+		if (kbase != null) {
+			result = "Sucess...";
+		} else {
+			result = "Repository not available...";
+		}
+		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
+		try {
+			activity.complete();
+		} catch (ComputationCanceled e) {
 			e.printStackTrace();
 		}
 		return kbase;
@@ -809,12 +902,12 @@ public class RulesLibrary {
 			String guvnorEnumerationText = "'" + propertyName + "' : [";
 			for (I_ExtendByRef loopMember : Terms.get().getRefsetExtensionMembers(refset.getConceptNid())) {
 
-//				I_ExtendByRefPartCid lastPart = (I_ExtendByRefPartCid) loopMember.getTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), 
-//						config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getMutablePart();
+				//				I_ExtendByRefPartCid lastPart = (I_ExtendByRefPartCid) loopMember.getTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), 
+				//						config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getMutablePart();
 				ConceptVersionBI loopConcept = Ts.get().getConceptVersion(config.getViewCoordinate(),loopMember.getComponentNid());
 
 				String name = "no description found";
-				
+
 				for (DescriptionVersionBI loopDescription : loopConcept.getDescsActive()) {
 					if (loopDescription.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()
 							&& loopDescription.getLang().toLowerCase().startsWith("en")) {
@@ -822,13 +915,13 @@ public class RulesLibrary {
 					}
 				}
 
-//				if (loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).size() > 0) {
-//					name = loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).iterator().next().getText();
-//				} else if (loopConcept.getDescsActive().size() > 0){
-//					name = loopConcept.getDescsActive().iterator().next().getText();
-//				} else {
-//					name = "no description found";
-//				}
+				//				if (loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).size() > 0) {
+				//					name = loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).iterator().next().getText();
+				//				} else if (loopConcept.getDescsActive().size() > 0){
+				//					name = loopConcept.getDescsActive().iterator().next().getText();
+				//				} else {
+				//					name = "no description found";
+				//				}
 
 				guvnorEnumerationText = guvnorEnumerationText + "'" + loopConcept.getPrimUuid();
 				guvnorEnumerationText = guvnorEnumerationText + "=" + name;
@@ -857,13 +950,13 @@ public class RulesLibrary {
 
 	public static boolean isIncludedInRefsetSpec(I_GetConceptData refset, I_GetConceptData candidateConcept, I_ConfigAceFrame config) {
 		boolean result = false;
-//		System.out.println("************ Starting test computation *****************");
+		//		System.out.println("************ Starting test computation *****************");
 		Long start = System.currentTimeMillis();
 		try {
 			RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, config);
 			I_GetConceptData refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
-//			AceLog.getAppLog().info("Refset: " + refset.getInitialText() + " " + refset.getUids().get(0));
-//			AceLog.getAppLog().info("Checking Refset spec: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
+			//			AceLog.getAppLog().info("Refset: " + refset.getInitialText() + " " + refset.getUids().get(0));
+			//			AceLog.getAppLog().info("Checking Refset spec: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
 			RefsetComputeType computeType = RefsetComputeType.CONCEPT; // default
 			if (refsetSpecHelper.isDescriptionComputeType()) {
 				computeType = RefsetComputeType.DESCRIPTION;
@@ -904,29 +997,29 @@ public class RulesLibrary {
 
 			I_GetConceptData selectedConcept = candidateConcept;
 
-//			System.out.println("Refset spec = " + refsetSpec.toString());
-//			System.out.println("Refset = " + refset.toString());
-//			System.out.println("Concept to test = " + selectedConcept.toString());
+			//			System.out.println("Refset spec = " + refsetSpec.toString());
+			//			System.out.println("Refset = " + refset.toString());
+			//			System.out.println("Concept to test = " + selectedConcept.toString());
 
 			List<I_ShowActivity> activities = new ArrayList<I_ShowActivity>();
 			result = query.execute(selectedConcept, activities);
-			
-//			ArrayList<RefsetSpecComponent> components = query.getAllComponents();
-//			
-//			boolean resultByComponents = false;
-//			for (RefsetSpecComponent loopComponent : components) {
-//				try {
-//					ConceptStatement loopConceptStatement = (ConceptStatement) loopComponent;
-//					//loopConceptStatement..getTokenEnum().equals(loopConceptStatement.getTokenEnum().CONCEPT_IS);
-//				} catch (Exception e) {
-//					// skip, unknown component
-//				}
-//				
-//			}
-			
 
-//			System.out.println("++++++++++++++ Result = " + result);
-//			System.out.println("************ Finished test computation in " + (System.currentTimeMillis() - start) + " ms. *****************");
+			//			ArrayList<RefsetSpecComponent> components = query.getAllComponents();
+			//			
+			//			boolean resultByComponents = false;
+			//			for (RefsetSpecComponent loopComponent : components) {
+			//				try {
+			//					ConceptStatement loopConceptStatement = (ConceptStatement) loopComponent;
+			//					//loopConceptStatement..getTokenEnum().equals(loopConceptStatement.getTokenEnum().CONCEPT_IS);
+			//				} catch (Exception e) {
+			//					// skip, unknown component
+			//				}
+			//				
+			//			}
+
+
+			//			System.out.println("++++++++++++++ Result = " + result);
+			//			System.out.println("************ Finished test computation in " + (System.currentTimeMillis() - start) + " ms. *****************");
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 			try {
@@ -1027,7 +1120,7 @@ public class RulesLibrary {
 		}
 		return descendants;
 	}
-	
+
 	/**
 	 * Calculates a set of valid users - a user is valid is they are a child of the User concept in the top hierarchy,
 	 * and have a description of type "user inbox".
