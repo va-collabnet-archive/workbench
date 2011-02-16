@@ -18,15 +18,15 @@ import com.mxgraph.view.mxGraphView;
 
 public class ArenaGraphComponent extends mxGraphComponent
 {
-	
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -1152655782652932774L;
 	private ACE ace;
 
     /**
-     * 
+     *
      * @param graph
      */
     public ArenaGraphComponent(mxGraph graph, ACE ace) {
@@ -38,7 +38,7 @@ public class ArenaGraphComponent extends mxGraphComponent
     }
 
     /**
-     * 
+     *
      * @param edge
      * @param isSource
      * @return the column number the edge is attached to
@@ -57,8 +57,9 @@ public class ArenaGraphComponent extends mxGraphComponent
 
 
     /**
-     * 
+     *
      */
+   @Override
     public Component[] createComponents(mxCellState state) {
         if (getGraph().getModel().isVertex(state.getCell())) {
         	mxCell cell = (mxCell) state.getCell();

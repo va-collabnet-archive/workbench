@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -253,7 +254,7 @@ public class WorkflowHistoryCriterionPanel extends CriterionPanel {
                     }
                 }
             } else {
-                AceLog.getAppLog().alertAndLogException(this,
+                AceLog.getAppLog().log(Level.WARNING, "No search plugins in folder: " + searchPluginFolder.getAbsolutePath(),
                     new Exception("No search plugins in folder: " + searchPluginFolder.getAbsolutePath()));
             }
         }

@@ -100,7 +100,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
     @Override
     public ConceptView makeComponent(I_ConfigAceFrame config) {
         if (view == null) {
-            view = new ConceptView(config, this);
+            view = new ConceptView(config, this, (ConceptViewRenderer) this.renderer);
             addHostListener(new ConceptChangedListener());
             view.layoutConcept((I_GetConceptData) getHost().getTermComponent());
         }

@@ -174,6 +174,13 @@ public class ConceptViewRenderer extends JLayeredPane {
    private JToggleButton oopsButton;
    private final static String advanceWorkflowActionPath = "migration-wf";
    private final String advanceWorkflowActionFile = "AdvanceWorkflow.bp";
+   private JPanel historyPanel = new JPanel(new BorderLayout());
+
+   public JPanel getHistoryPanel() {
+      return historyPanel;
+   }
+
+   private JPanel conceptViewPanel = new JPanel(new BorderLayout());
 
    /**
     *
@@ -187,7 +194,8 @@ public class ConceptViewRenderer extends JLayeredPane {
     		  		ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
     		  		ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
       try {
-        	   contextualConceptActionsKBase = EditPanelKb.setupKb(new File("drools-rules/ContextualConceptActionsPanel.drl"));
+        	   contextualConceptActionsKBase = EditPanelKb.setupKb(
+                    new File("drools-rules/ContextualConceptActionsPanel.drl"));
       } catch (IOException e1) {
          throw new RuntimeException(e1);
       }
@@ -217,7 +225,9 @@ public class ConceptViewRenderer extends JLayeredPane {
       }
 
       if (scrollPane != null) {
-         add(scrollPane, BorderLayout.CENTER);
+         conceptViewPanel.add(historyPanel, BorderLayout.NORTH);
+         conceptViewPanel.add(scrollPane, BorderLayout.CENTER);
+         add(conceptViewPanel, BorderLayout.CENTER);
          scrollPane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
          scrollPane.getViewport().setBackground(Color.WHITE);
          scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);

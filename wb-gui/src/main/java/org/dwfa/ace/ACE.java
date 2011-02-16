@@ -225,7 +225,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public void addDataCheckListener(TermComponentDataCheckSelectionListener l) {
         dataCheckListeners.add(l);
     }
- 
+
     public class ProcessMenuActionListener implements ActionListener {
         private class MenuProcessThread implements Runnable {
 
@@ -739,12 +739,12 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     	upperLowerSplit.setBottomComponent(signpostPanel);
                         shownContainer = signpostPanel;
                     }
-                    
+
                     upperLowerSplit.setDividerLocation(splitLoc);
-                    
-                    
+
+
                 }
-                
+
                 if (hidden) {
                     // AceLog.getAppLog().info("showing bottom panel");
                     if (lastLocation == 0) {
@@ -1279,11 +1279,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         searchPanel.addComponentListener(new ResizePalettesListener());
 
         try {
-              wfSearchPanel = new WorkflowHistorySearchPanel(aceFrameConfig, this);
-              wfSearchPanel.addComponentListener(new ResizePalettesListener());
+             wfSearchPanel = new WorkflowHistorySearchPanel(aceFrameConfig, this);
+             wfSearchPanel.addComponentListener(new ResizePalettesListener());
 	          wfSearchPanel.setMinimumSize(new Dimension(0, 0));
         } catch (Exception e) {
-            AceLog.getAppLog().alertAndLogException(e);
+            AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
         }
 
         GridBagConstraints c = new GridBagConstraints();
@@ -2382,7 +2382,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private JPanel makeClassifierPrefPane() {
         JPanel classifierPrefPanel = new JPanel(new GridLayout(0, 1));
-        
+
         // INPUT SELECTION
         JPanel classifierPrefInputSubpanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -2416,7 +2416,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         // classifierPrefInputSubpanel.add(someLabel);
         classifierPrefPanel.add(classifierPrefInputSubpanel);
 
-        // 
+        //
         TermComponentLabel classifierRootLabel = new TermComponentLabel(aceFrameConfig);
         classifierRootLabel.setTermComponent(aceFrameConfig.getClassificationRoot());
         aceFrameConfig.addPropertyChangeListener("classificationRoot", new PropertyListenerGlue("setTermComponent",
@@ -3237,7 +3237,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         if (show != showSignpostPanelToggle.isSelected()) {
             showSignpostPanelToggle.setSelected(show);
             bottomPanelActionListener.actionPerformed(new ActionEvent(showSignpostPanelToggle, 0, "toggle"));
-            
+
             if (show) {
     			setShowWorkflowSignpostPanel(false);
             }

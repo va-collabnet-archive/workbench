@@ -87,6 +87,7 @@ import org.ihtsdo.tk.spec.SpecFactory;
 import org.ihtsdo.util.swing.GuiUtil;
 
 public class ConceptView extends JPanel {
+   private final ConceptViewRenderer cvRenderer;
 
     private void setupPrefMap() {
         prefMap.put(PanelSection.CONCEPT, new CollapsePanelPrefs());
@@ -122,19 +123,7 @@ public class ConceptView extends JPanel {
                 saps = layoutConcept.getAllSapNids();
                 positions = Ts.get().getPositionSet(saps);
                 paths = Ts.get().getPathSetFromPositionSet(positions);
-                positionOrderedSet = new TreeSet(new Comparator<PositionBI>() {
-
-                    @Override
-                    public int compare(PositionBI t, PositionBI t1) {
-                        if (t.getTime() != t1.getTime()) {
-                            if (t.getTime() > t1.getTime()) {
-                                return 1;
-                            }
-                            return -1;
-                        }
-                        return t.getPath().getConceptNid() - t1.getPath().getConceptNid();
-                    }
-                });
+                positionOrderedSet = new TreeSet(new PositionComparator());
                 positionOrderedSet.addAll(positions);
                 rels = layoutConcept.getSourceRelTuples(config.getAllowedStatus(),
                         null, config.getViewPositionSetReadOnly(),
@@ -168,19 +157,8 @@ public class ConceptView extends JPanel {
                         gbc.gridwidth = 1;
                         gbc.gridx = 1;
                         gbc.gridy = 0;
-                        pathRowMap = new HashMap<PathBI, Integer>();
-                        int row = 0;
-                        for (PathBI path : paths) {
-                            pathRowMap.put(path, row);
-                            row++;
-                            ConceptVersionBI pathVersion =
-                                    Ts.get().getConceptVersion(coordinate, path.getConceptNid());
-                            JLabel pathPanel = getJLabel("_ " + pathVersion.getPreferredDescription().getText());
-                            historyComponents.add(pathPanel);
-                            pathPanel.setVisible(ConceptView.this.historyShown);
-                            add(pathPanel, gbc);
-                            gbc.gridy++;
-                        }
+                        setupHistoryPane();
+                        gbc.anchor = GridBagConstraints.NORTHWEST;
 
                         CollapsePanel cpe = new CollapsePanel("concept:", settings,
                                 prefMap.get(PanelSection.CONCEPT), PanelSection.CONCEPT);
@@ -330,8 +308,49 @@ public class ConceptView extends JPanel {
                settings.getNavigator().updateHistoryPanel();
             }
         }
-    }
-    private Object lastThingBeingDropped;
+
+      private void setupHistoryPane() throws IOException, ContraditionException {
+         int row = 0;
+         cvRenderer.getHistoryPanel().removeAll();
+         cvRenderer.getHistoryPanel().setLayout(new GridBagLayout());
+         GridBagConstraints gbc = new GridBagConstraints();
+         gbc.weightx = 1;
+         gbc.weighty = 0;
+         gbc.anchor = GridBagConstraints.NORTHWEST;
+         gbc.fill = GridBagConstraints.BOTH;
+         gbc.gridheight = 1;
+         gbc.gridwidth = 1;
+         gbc.gridx = 1;
+         gbc.gridy = 0;
+         pathRowMap = new HashMap<PathBI, Integer>();
+         for (PathBI path : paths) {
+            pathRowMap.put(path, row);
+            row++;
+            ConceptVersionBI pathVersion =
+                    Ts.get().getConceptVersion(coordinate, path.getConceptNid());
+            JCheckBox pathCheck = getJCheckBox();
+
+
+            if (settings.getNavigator().getDropSide()
+                    == ConceptViewSettings.SIDE.LEFT) {
+               gbc.anchor = GridBagConstraints.NORTHWEST;
+               pathCheck.setHorizontalTextPosition(SwingConstants.RIGHT);
+               pathCheck.setHorizontalAlignment(SwingConstants.LEFT);
+            } else {
+               gbc.anchor = GridBagConstraints.NORTHEAST;
+               pathCheck.setHorizontalTextPosition(SwingConstants.LEFT);
+               pathCheck.setHorizontalAlignment(SwingConstants.RIGHT);
+            }
+
+            pathCheck.setText(pathVersion.getPreferredDescription().getText());
+            historyComponents.add(pathCheck);
+            pathCheck.setVisible(ConceptView.this.historyShown);
+            cvRenderer.getHistoryPanel().add(pathCheck, gbc);
+            gbc.gridy++;
+         }
+      }
+   }
+       private Object lastThingBeingDropped;
 
     public void setupDrop(Object thingBeingDropped) {
 
@@ -577,17 +596,12 @@ public class ConceptView extends JPanel {
             Collections.synchronizedList(new ArrayList<JComponent>());
     private boolean historyShown = false;
 
-    public ConceptView() throws TerminologyException, IOException {
-        this.config = Terms.get().getActiveAceFrameConfig();
-        kb = new EditPanelKb(config);
-        addCommitListener(settings);
-        setupPrefMap();
-    }
-
-    public ConceptView(I_ConfigAceFrame config, ConceptViewSettings settings) {
+    public ConceptView(I_ConfigAceFrame config,
+            ConceptViewSettings settings, ConceptViewRenderer cvRenderer) {
         super();
         this.config = config;
         this.settings = settings;
+        this.cvRenderer = cvRenderer;
         kb = new EditPanelKb(config);
         addCommitListener(settings);
         setupPrefMap();
@@ -894,7 +908,7 @@ public class ConceptView extends JPanel {
     }
 
 
-   JComponent getJCheckBox() {
+   JCheckBox getJCheckBox() {
       JCheckBox check = new JCheckBox();
         check.setFont(check.getFont().deriveFont(settings.getFontSize()));
         check.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
@@ -968,7 +982,29 @@ public class ConceptView extends JPanel {
         return pathRowMap;
     }
 
-    public TreeSet<PositionBI> getPositionOrderedSet() {
-        return positionOrderedSet;
-    }
+   public TreeSet<PositionBI> getPositionOrderedSet() {
+
+      TreeSet positionSet = new TreeSet(new PositionComparator());
+      positionSet.addAll(positionOrderedSet);
+
+      return positionSet;
+   }
+
+   static class PositionComparator implements Comparator<PositionBI> {
+
+      public PositionComparator() {
+      }
+
+      @Override
+      public int compare(PositionBI t, PositionBI t1) {
+         if (t.getTime() != t1.getTime()) {
+            if (t.getTime() > t1.getTime()) {
+               return 1;
+            }
+            return -1;
+         }
+         return t.getPath().getConceptNid() - t1.getPath().getConceptNid();
+      }
+   }
+
 }

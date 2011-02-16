@@ -1,6 +1,7 @@
 package org.ihtsdo.arena.conceptview;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -15,6 +16,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -117,33 +119,42 @@ public class ConceptNavigator extends JPanel {
             gbc.weightx = 0;
             gbc.weighty = 0;
 
-            for (int i = 0; i < pathRowMap.size(); i++) {
-                gbc.gridy = i;
-                historyPanel.add(view.getJLabel(" _ "), gbc);
-            }
-            gbc.gridx++;
+                JComponent startCheck = view.getJCheckBox();
+               historyPanel.add(startCheck, gbc);
+                gbc.gridx++;
 
-            for (PositionBI p : positionOrderedSet) {
+               historyPanel.setBorder(new HistoryBorder(
+                        BorderFactory.createEmptyBorder(),
+                        positionOrderedSet.iterator().next().toString(),
+                        new Font("monospaced", Font.PLAIN, 9),
+                        Color.BLACK));
+
+             for (PositionBI p : positionOrderedSet) {
                 gbc.gridy = pathRowMap.get(p.getPath());
-                JLabel positionLabel = view.getJLabel(" * ");
+                JComponent positionLabel = view.getJCheckBox();
                 positionLabel.setToolTipText(p.toString());
+                positionLabel.setBorder(new HistoryBorder(
+                        BorderFactory.createEmptyBorder(),
+                        p.toString(),
+                        new Font("monospaced", Font.PLAIN, 9),
+                        Color.BLACK));
                 historyPanel.add(positionLabel, gbc);
                 gbc.gridx++;
             }
+            gbc.gridheight = 1;
             gbc.weightx = 1;
             historyPanel.add(new JLabel(""), gbc);
             gbc.weightx = 0;
+            gbc.gridx = 0;
             gbc.gridy = pathRowMap.size();
 
             // add some random button groups...
-            historyPanel.add(new JLabel(" _ "), gbc);
-            gbc.gridy++;
-            historyPanel.add(new JLabel(" _ "), gbc);
             Random randomGenerator = new Random();
             gbc.gridy++;
             gbc.gridx = 0;
             ButtonGroup group0 = new ButtonGroup();
-             for (PositionBI p : positionOrderedSet) {
+
+            for (PositionBI p : positionOrderedSet) {
                 if (randomGenerator.nextInt(100) > 60) {
                     JRadioButton button = new JRadioButton();
                     button.setToolTipText(p.toString());
@@ -154,10 +165,10 @@ public class ConceptNavigator extends JPanel {
                 gbc.gridx++;
             }
 
-           gbc.gridy++;
+            gbc.gridy++;
             gbc.gridx = 0;
             ButtonGroup group1 = new ButtonGroup();
-             for (PositionBI p : positionOrderedSet) {
+            for (PositionBI p : positionOrderedSet) {
                 if (randomGenerator.nextInt(100) > 60) {
                     JRadioButton button = new JRadioButton();
                     button.setToolTipText(p.toString());
@@ -168,10 +179,10 @@ public class ConceptNavigator extends JPanel {
                 gbc.gridx++;
             }
 
-           gbc.gridy++;
+            gbc.gridy++;
             gbc.gridx = 0;
             ButtonGroup group = new ButtonGroup();
-             for (PositionBI p : positionOrderedSet) {
+            for (PositionBI p : positionOrderedSet) {
                 if (randomGenerator.nextInt(100) > 60) {
                     JRadioButton button = new JRadioButton();
                     button.setToolTipText(p.toString());
@@ -196,6 +207,10 @@ public class ConceptNavigator extends JPanel {
             this.side = side;
             layoutNavigator();
         }
+    }
+
+    public SIDE getDropSide() {
+        return this.side;
     }
 
     private void layoutNavigator() {
