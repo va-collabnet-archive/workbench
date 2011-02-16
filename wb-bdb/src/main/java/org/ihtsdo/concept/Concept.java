@@ -273,7 +273,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
       if (eConcept.getImages() != null) {
          setImagesFromEConcept(eConcept, c);
       }
-
+      
       if (eConcept.getRefsetMembers() != null) {
          setRefsetMembersFromEConcept(eConcept, c);
       }

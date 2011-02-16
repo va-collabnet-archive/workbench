@@ -60,8 +60,10 @@ import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierUuid;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import org.ihtsdo.concept.component.refset.RefsetMemberFactory;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>> implements
         I_AmTermComponent, I_AmPart<R>, I_AmTuple<R>, I_Identify, I_IdPart, I_IdVersion, I_HandleFutureStatusAtPositionSetup {
@@ -938,6 +940,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       assert this.primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
       assert nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
       assert nid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
+      if (eComponent.getAnnotations() != null) {
+         this.annotations = new ConcurrentSkipListSet<RefexChronicleBI<?>>();
+         for (TkRefsetAbstractMember<?> eAnnot: eComponent.getAnnotations()) {
+            RefsetMember<?, ?> annot = RefsetMemberFactory.create(
+                 eAnnot, this.nid);
+            this.annotations.add(annot);
+         }
+      }
    }
 
    public ConceptComponent() {
