@@ -208,7 +208,7 @@ public interface I_TermFactory {
      *
      * @return An unmodifiable set of uncommitted items.
      */
-    Set<I_Transact> getUncommitted();
+    List<I_Transact> getUncommitted();
 
     /**
      * Method to call prior to commit that will list all commit failures that
@@ -309,21 +309,21 @@ public interface I_TermFactory {
     public I_RepresentIdSet getConceptIdSet() throws IOException;
 
     /**
-     * 
+     *
      * @return a mutable bit set, with all description identifiers set to true.
      * @throws IOException
      */
     public I_RepresentIdSet getDescriptionIdSet() throws IOException;
 
     /**
-     * 
+     *
      * @return a mutable bit set, with all relationship identifiers set to true.
      * @throws IOException
      */
     public I_RepresentIdSet getRelationshipIdSet() throws IOException;
 
     /**
-     * 
+     *
      * @return a bit set, sized to hold all current identifiers, all set to
      *         false.
      * @throws IOException

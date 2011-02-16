@@ -1486,7 +1486,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     public I_ThinExtByRefPartConceptString newConceptStringExtensionPart() {
         return new ThinExtByRefPartConceptString();
     }
-    public Set<I_Transact> getUncommitted() {
+    public List<I_Transact> getUncommitted() {
         return ACE.getUncommitted();
     }
 

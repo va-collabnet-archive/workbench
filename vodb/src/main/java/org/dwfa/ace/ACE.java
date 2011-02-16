@@ -503,8 +503,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
     }
 
-    private static Set<I_Transact> uncommitted = Collections.synchronizedSet(new HashSet<I_Transact>());
-    private static Set<I_Transact> uncommittedNoChecks = Collections.synchronizedSet(new HashSet<I_Transact>());
+    private static List<I_Transact> uncommitted = Collections.synchronizedList(new ArrayList<I_Transact>());
+    private static List<I_Transact> uncommittedNoChecks = Collections.synchronizedList(new ArrayList<I_Transact>());
 
     private static Map<I_GetConceptData, Collection<AlertToDataConstraintFailure>> dataCheckMap = new HashMap<I_GetConceptData, Collection<AlertToDataConstraintFailure>>();
 
@@ -1718,7 +1718,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         setWorkflowDetailsSheet(wizardPanel.getWfDetailsPanel());
         conceptTabs.addTab(
             "wizard", new ImageIcon(ACE.class.getResource("/images/Wizard.gif")), wizardPanel);
-        
+
         conceptTabs.setMinimumSize(new Dimension(0, 0));
         c2Panel.setMinimumSize(new Dimension(0, 0));
 
@@ -3027,7 +3027,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         });
         topPanel.add(showProgressButton, c);
         c.gridx++;
-        
+
         JPanel topActivityPanel = new JPanel(new GridLayout(1, 1));
         topActivityListener = new ActivityPanel(false, null, aceFrameConfig);
         topActivityListener.setEraseWhenFinishedEnabled(true);
@@ -3058,7 +3058,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             topPanel.add(headerLabel, c);
             c.gridx++;
         }
-        
+
         File componentPluginDir = new File(getPluginRoot() + File.separator + "viewer");
         File[] plugins = componentPluginDir.listFiles(new FilenameFilter() {
             public boolean accept(File arg0, String fileName) {
@@ -3754,8 +3754,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         });
     }
 
-    public static Set<I_Transact> getUncommitted() {
-        return Collections.unmodifiableSet(uncommitted);
+    public static List<I_Transact> getUncommitted() {
+        return Collections.unmodifiableList(uncommitted);
     }
 
     public UncommittedListModel getUncommittedListModel() {
@@ -3825,7 +3825,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     /**
-     * Switch view to the Wizard tab. 
+     * Switch view to the Wizard tab.
      * This contains the workflow panel and the workflow detail sheet.
      */
     public void showWizardPanel() {
@@ -3833,7 +3833,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         conceptTabs.setSelectedComponent(wizardPanel);
         wizardPanel.setVisible(true);
     }
-    
+
     public void setShowActivityViewer(boolean show) {
         if (show) {
             ActivityViewer.toFront();
@@ -3867,7 +3867,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                         cont.validate();
                         cont = cont.getParent();
                     }
-                    workflowDetailsSheet.repaint();                    
+                    workflowDetailsSheet.repaint();
                 }
             }
         });
