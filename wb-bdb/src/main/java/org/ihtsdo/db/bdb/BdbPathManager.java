@@ -344,7 +344,6 @@ public class BdbPathManager implements I_Manage<PathBI> {
 
             Concept pathRefConcept = getPathRefsetConcept();
             BdbCommitManager.addUncommittedNoChecks(pathRefConcept);
-            AceLog.getAppLog().info("Path refset: " + pathRefConcept.toLongString());
             // write position
 
             for (PositionBI origin : path.getOrigins()) {
@@ -393,11 +392,8 @@ public class BdbPathManager implements I_Manage<PathBI> {
                 EConcept.REFSET_TYPES.CID_INT, propMap, config);
             Concept pathOriginRefConcept = getRefsetPathOriginsConcept();
             BdbCommitManager.addUncommittedNoChecks(pathOriginRefConcept);
-            AceLog.getAppLog().info("Path origin refset: " +
-                    pathOriginRefConcept.toLongString());
 
             pathMap.put(path.getConceptNid(), (Path) path);
-            logger.log(Level.INFO, "Wrote origin path : {0} to path {1}", new Object[]{origin, path});
         } catch (Exception e) {
             throw new TerminologyException("Unable to write path origin: " + origin + " to path " + path, e);
         }
