@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,6 +32,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
@@ -41,8 +43,10 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
 
@@ -92,6 +96,15 @@ public class RulesContextHelper {
 		return getKnowledgeBaseForContext(context, config, false);
 	}
 	public KnowledgeBase getKnowledgeBaseForContext(I_GetConceptData context, I_ConfigAceFrame config, boolean recreate) throws Exception {
+		HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
+		I_ShowActivity activity =
+			Terms.get().newActivityPanel(true, config, 
+					"<html>Performing QA check on concept...", true);
+		activities.add(activity);
+		activity.setValue(0);
+		activity.setIndeterminate(true);
+		activity.setProgressInfoLower("Generating KnowledgeBase for context...");
+		long startTime = System.currentTimeMillis();
 		File serializedKbFile = new File("rules/" + context.getConceptNid() + ".bkb");
 		if (kbCache.containsKey(context.getConceptNid()) && !recreate) {
 			return kbCache.get(context.getConceptNid());
@@ -141,7 +154,16 @@ public class RulesContextHelper {
 				kbCache.put(context.getConceptNid(), kbase);
 				lastCacheUpdateTime = Calendar.getInstance().getTimeInMillis();
 			}
-
+			long endTime = System.currentTimeMillis();
+			long elapsed = endTime - startTime;
+			String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+			String result = "Done";
+			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
+			try {
+				activity.complete();
+			} catch (ComputationCanceled e) {
+				e.printStackTrace();
+			}
 			return kbase;
 		}
 	}
