@@ -223,13 +223,16 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
     /**
      * Returns a string representation of the object.
      */
+   @Override
     public String toString() {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append(" primordialComponentUuid:");
         buff.append(this.primordialUuid);
         buff.append(" additionalIdComponents:");
         buff.append(this.additionalIds);
         buff.append(super.toString());
+        buff.append(" annotations:");
+        buff.append(this.annotations);
         buff.append(" Revisions:");
         buff.append(this.revisions);
         return buff.toString();
@@ -240,6 +243,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
      *
      * @return a hash code value for this <tt>EComponent</tt>.
      */
+   @Override
     public int hashCode() {
         return Arrays.hashCode(new int[] { getPrimordialComponentUuid().hashCode(),
         		statusUuid.hashCode(), pathUuid.hashCode(), (int) time, (int) (time >>> 32) });
@@ -271,7 +275,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
             // Compare additionalIdComponents
             if (this.additionalIds == null) {
                 if (another.additionalIds == null) { // Equal!
-                } else if (another.additionalIds.size() == 0) { // Equal!
+                } else if (another.additionalIds.isEmpty()) { // Equal!
                 } else {
                     return false;
                 }
@@ -281,7 +285,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
             // Compare extraVersions
             if (this.revisions == null) {
                 if (another.revisions == null) { // Equal!
-                } else if (another.revisions.size() == 0) { // Equal!
+                } else if (another.revisions.isEmpty()) { // Equal!
                 } else {
                     return false;
                 }
