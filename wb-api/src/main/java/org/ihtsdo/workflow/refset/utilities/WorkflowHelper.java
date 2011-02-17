@@ -482,7 +482,7 @@ public class WorkflowHelper {
 		
 			for (I_GetConceptData actionConcept : allActions)
 			{
-				actions.put(identifyFSN(actionConcept), actionConcept);
+				actions.put(identifyPrefTerm(actionConcept), actionConcept);
 			}
 		}
 
