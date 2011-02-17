@@ -166,8 +166,8 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 		public String fsn = null;
 		public Long workflowTime = null;
 		public Long effectiveTime = null;
-		public boolean autoApproved;
-		public boolean override;
+		public boolean autoApproved = false;
+		public boolean override = false;
 		
 
 		
@@ -351,9 +351,11 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 				str.append("\nmodeler:" + modeler);
 				str.append("\naction:" + action);
 				str.append("\nstate:" + state);
+				str.append("\nfsn:" + fsn);
+				str.append("\noverride:" + override);
+				str.append("\nautoApproved:" + autoApproved);
 				str.append("\nworkflowTime:" + workflowTime);
 				str.append("\neffectiveTime:" + effectiveTime);
-				str.append("\nfsn:" + fsn);
 	        	AceLog.getAppLog().log(Level.WARNING, str.toString(), new Exception("Failure in updating Workflow History Refset"));
 			}
 			
