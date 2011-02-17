@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -44,7 +45,7 @@ import org.ihtsdo.tk.api.PositionBI;
 
 public class Path implements PathBI, I_Path {
     /**
-	 * 
+	 *
 	 */
     private static final long serialVersionUID = 1L;
 
@@ -56,12 +57,12 @@ public class Path implements PathBI, I_Path {
         super();
         this.conceptNid = conceptId;
         if (origins != null) {
-            this.origins = new HashSet<PositionBI>(origins);
+            this.origins = new CopyOnWriteArraySet<PositionBI>(origins);
         } else {
-            this.origins = new HashSet<PositionBI>(0);
+            this.origins = new CopyOnWriteArraySet<PositionBI>();
         }
     }
-    
+
     public boolean equals(PathBI another) {
         return (conceptNid == another.getConceptNid());
     }
@@ -84,7 +85,7 @@ public class Path implements PathBI, I_Path {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.PathBI#getConceptNid()
      */
     public int getConceptNid() {
@@ -93,7 +94,7 @@ public class Path implements PathBI, I_Path {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.PathBI#getOrigins()
      */
     public Collection<? extends PositionBI> getOrigins() {
@@ -112,7 +113,7 @@ public class Path implements PathBI, I_Path {
     public Set<PositionBI> getNormalisedOrigins() {
         return getNormalisedOrigins(null);
     }
-    
+
     public Set<PositionBI> getNormalisedOrigins(Collection<PathBI> paths) {
         final Set<PositionBI> inheritedOrigins = getInheritedOrigins();
         if (paths != null) {
@@ -135,7 +136,7 @@ public class Path implements PathBI, I_Path {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.PathBI#getMatchingPath(int)
      */
     public PathBI getMatchingPath(int pathId) {
@@ -172,13 +173,13 @@ public class Path implements PathBI, I_Path {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
-     * 
-     * 
-     * 
-     * 
-     * 
+     *
+     *
+     *
+     *
+     *
      * org.dwfa.vodb.types.PathBI#convertIds(org.dwfa.ace.api.I_MapNativeToNative
      * )
      */
@@ -283,7 +284,7 @@ public class Path implements PathBI, I_Path {
         this.origins.add(position);
         Terms.get().writePathOrigin(this, position, config);
     }
-    
+
     public void remmoveOrigin(I_Position position, I_ConfigAceFrame config) throws TerminologyException {
         assert this.origins.contains(position) == false: "Attempt to remove origin that is not in path: " +
             this.toString() + " erroneous origin: " + position;
