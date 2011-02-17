@@ -99,7 +99,7 @@ public class RulesContextHelper {
 		HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
 		I_ShowActivity activity =
 			Terms.get().newActivityPanel(true, config, 
-					"<html>Performing QA check on concept...", true);
+					"<html>Generating KnowledgeBase for context...", true);
 		activities.add(activity);
 		activity.setValue(0);
 		activity.setIndeterminate(true);
@@ -120,6 +120,16 @@ public class RulesContextHelper {
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			long endTime = System.currentTimeMillis();
+			long elapsed = endTime - startTime;
+			String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+			String result = "Done";
+			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
+			try {
+				activity.complete();
+			} catch (ComputationCanceled e) {
 				e.printStackTrace();
 			}
 			return kbase;
