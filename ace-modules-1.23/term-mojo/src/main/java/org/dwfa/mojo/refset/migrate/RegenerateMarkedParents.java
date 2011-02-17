@@ -1,0 +1,137 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.dwfa.mojo.refset.migrate;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.refset.ConceptConstants;
+import org.dwfa.ace.refset.MarkedParentRefsetHelper;
+import org.dwfa.ace.refset.MemberRefsetHelper;
+import org.dwfa.ace.task.profile.NewDefaultProfile;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.mojo.ConceptDescriptor;
+
+/**
+ *
+ * @goal regenerate-marked-parents
+ */
+public class RegenerateMarkedParents extends AbstractMojo {
+
+    /**
+     * @parameter
+     * @required
+     */
+    public ConceptDescriptor editPath;
+
+    public final String PARENT_MEMBER_HIERARCHY_NAME = "parent members";
+
+    public final String PARENT_MEMBER_REFSET_PURPOSE_NAME = "marked parent membership";
+
+    public final String PARENT_MEMBER_REFSET_RELATIONSHIP_NAME = ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getDescription();
+
+    protected I_TermFactory termFactory;
+
+    private I_IntSet activeIntSet;
+
+    protected HashMap<String, I_GetConceptData> concepts = new HashMap<String, I_GetConceptData>();
+
+    public RegenerateMarkedParents() throws Exception {
+        termFactory = LocalVersionedTerminology.get();
+        if (termFactory == null) {
+            throw new RuntimeException("The LocalVersionedTerminology is not available. Please check the database.");
+        }
+    }
+
+    public void init() throws Exception {
+        concepts.put("CURRENT", termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()));
+        concepts.put("ACTIVE", termFactory.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid()));
+        concepts.put("RETIRED", termFactory.getConcept(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()));
+        concepts.put("PARENT_MARKER", termFactory.getConcept(ConceptConstants.PARENT_MARKER.localize().getNid()));
+        concepts.put("NORMAL_MEMBER",
+            new ConceptDescriptor("cc624429-b17d-4ac5-a69e-0b32448aaf3c", "normal member").getVerifiedConcept());
+
+        I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+        if (config == null) {
+            config = NewDefaultProfile.newProfile(null, null, null, null, null);
+            termFactory.setActiveAceFrameConfig(config);
+        }
+        config.getEditingPathSet().clear();
+        config.addEditingPath(termFactory.getPath(editPath.getVerifiedConcept().getUids()));
+
+        config.setViewPositions(null);
+
+        activeIntSet = termFactory.newIntSet();
+        activeIntSet.add(concepts.get("ACTIVE").getNid());
+        activeIntSet.add(concepts.get("CURRENT").getNid());
+    }
+
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        try {
+            init();
+            Set<Integer> memberRefsets = MemberRefsetHelper.getMemberRefsets();
+
+            for (Integer memberRefsetId : memberRefsets) {
+                I_GetConceptData memberRefsetConcept = termFactory.getConcept(memberRefsetId);
+                regenerateMarkedParentMembers(memberRefsetConcept);
+            }
+        } catch (Exception ex) {
+            throw new MojoExecutionException("Unable to migrate specification refsets", ex);
+        }
+
+    }
+
+    private void regenerateMarkedParentMembers(I_GetConceptData memberRefsetConcept) throws Exception {
+
+        int refsetId = memberRefsetConcept.getConceptId();
+
+        Set<Integer> normalMemberIds = new HashSet<Integer>();
+        List<I_ThinExtByRefVersioned> extVersions = termFactory.getRefsetExtensionMembers(refsetId);
+
+        for (I_ThinExtByRefVersioned thinExtByRefVersioned : extVersions) {
+
+            List<I_ThinExtByRefTuple> extensions = thinExtByRefVersioned.getTuples(activeIntSet, null, true, true);
+
+            for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
+                if (thinExtByRefTuple.getRefsetId() == refsetId) {
+
+                    I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getPart();
+                    if (part.getConceptId() == concepts.get("NORMAL_MEMBER").getConceptId()) {
+                        normalMemberIds.add(thinExtByRefTuple.getComponentId());
+                    }
+                }
+            }
+        }
+
+        new MarkedParentRefsetHelper(refsetId, concepts.get("NORMAL_MEMBER").getConceptId()).addParentMembers(normalMemberIds.toArray(new Integer[] {}));
+    }
+
+}
