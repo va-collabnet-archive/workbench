@@ -38,7 +38,7 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 			if (fields.valuesExist())
 			{
 				propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
-				helper.newRefsetExtension(refsetId, Terms.get().getConcept(fields.getReferencedComponentId()).getConceptNid(), REFSET_TYPES.STR, propMap, Terms.get().getActiveAceFrameConfig());
+				helper.newRefsetExtension(refsetId, fields.getReferencedComponent().getConceptNid(), REFSET_TYPES.STR, propMap, Terms.get().getActiveAceFrameConfig());
 				retVal = true;
 			} else
 				return false;
@@ -59,7 +59,7 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 			if (fields.valuesExist())
 			{
 				propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
-				helper.retireRefsetStrExtension(refsetId, Terms.get().getConcept(fields.getReferencedComponentId()).getConceptNid(), propMap);
+				helper.retireRefsetStrExtension(refsetId, fields.getReferencedComponent().getConceptNid(), propMap);
 	
 				return true;
 			}
