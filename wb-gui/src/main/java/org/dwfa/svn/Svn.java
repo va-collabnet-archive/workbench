@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -383,7 +383,7 @@ public class Svn implements I_HandleSubversion {
                         if (s.getRepositoryTextStatus() == StatusKind.modified) {
                             // Conflict exists.
                             AceLog.getAppLog().warning("File has been modified locally and on server: " + s.getPath());
-                            StringBuffer msg = new StringBuffer();
+                            StringBuilder msg = new StringBuilder();
                             msg
                                 .append("<html>File has been modified locally and on server: <br><br>&nbsp;>&nbsp;>&nbsp;>&nbsp;");
                             msg.append(s.getPath());
@@ -407,10 +407,16 @@ public class Svn implements I_HandleSubversion {
                     boolean force = false;
                     boolean noIgnores = false;
                     boolean addParents = true;
-                    Svn.getSvnClient().add(s.getPath(), depth, force, noIgnores, addParents);
-                    SvnLog.info("Adding: " + s.getPath());
-                    newFiles++;
-                } else if (s.isDeleted() && s.getRepositoryTextStatus() == StatusKind.deleted) {
+                   try {
+                      Svn.getSvnClient().add(s.getPath(), depth, force, noIgnores, addParents);
+                      SvnLog.info("Adding: " + s.getPath());
+                      newFiles++;
+                   } catch (Exception e) {
+                     SvnLog.warning("Not adding: " + s.getPath() + " becuase: " +
+                             e.getLocalizedMessage());
+
+                   }
+                 } else if (s.isDeleted() && s.getRepositoryTextStatus() == StatusKind.deleted) {
                     // prevent tree conflict.
                     SvnLog.info("Preventing dual deletion tree conflict by reverting local copy: " + s.getPath());
                     revert(s);
