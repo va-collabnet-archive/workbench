@@ -25,7 +25,6 @@ import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.I_AmChangeSetObject;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.util.io.FileIO;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbProperty;
@@ -37,7 +36,7 @@ import com.sleepycat.je.DatabaseException;
 public class EConceptChangeSetReader implements I_ReadChangeSet {
 
     /**
-	 * 
+	 *
 	 */
     private static final long serialVersionUID = 1L;
 
@@ -69,6 +68,7 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
         super();
     }
 
+   @Override
     public long nextCommitTime() throws IOException, ClassNotFoundException {
         lazyInit();
         if (nextCommit == null) {
@@ -85,11 +85,12 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
         return nextCommit;
     }
 
+   @Override
     public void readUntil(long endTime) throws IOException, ClassNotFoundException {
         HashSet<TimePathId> values = new HashSet<TimePathId>();
         if (AceLog.getEditLog().isLoggable(Level.INFO)) {
             AceLog.getEditLog().info(
-                "Reading from log " + changeSetFile.getName() + " until " + 
+                "Reading from log " + changeSetFile.getName() + " until " +
                 TimeUtil.getFileDateFormat().format(new Date(endTime)));
         }
         while ((nextCommitTime() <= endTime) && (nextCommitTime() != Long.MAX_VALUE)) {
@@ -168,6 +169,7 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
 
     }
 
+   @Override
     public void read() throws IOException, ClassNotFoundException {
         readUntil(Long.MAX_VALUE);
     }
@@ -229,7 +231,7 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
                 FileInputStream fis = new FileInputStream(changeSetFile);
                 BufferedInputStream bis = new BufferedInputStream(fis);
                 dataStream = new DataInputStream(bis);
-                
+
                 if (EConceptChangeSetWriter.writeDebugFiles) {
                     csreFile = new File(changeSetFile.getParentFile(), changeSetFile.getName() + ".csre");;
                     csreOut = new FileWriter(csreFile, true);
@@ -244,23 +246,28 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
         }
     }
 
+   @Override
     public File getChangeSetFile() {
         return changeSetFile;
     }
 
+   @Override
     public void setChangeSetFile(File changeSetFile) {
         this.changeSetFile = changeSetFile;
     }
 
+   @Override
     public void setCounter(I_Count counter) {
         this.counter = counter;
     }
 
 
+   @Override
     public List<I_ValidateChangeSetChanges> getValidators() {
         return validators;
     }
 
+   @Override
     public int availableBytes() throws FileNotFoundException, IOException, ClassNotFoundException {
         lazyInit();
         if (dataStream != null) {
