@@ -592,6 +592,7 @@ public class RulesLibrary {
 		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
 		try {
 			activity.complete();
+			activity.removeActivityFromViewer();
 		} catch (ComputationCanceled e) {
 			e.printStackTrace();
 		}
@@ -645,6 +646,7 @@ public class RulesLibrary {
 		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
 		try {
 			activity.complete();
+			activity.removeActivityFromViewer();
 		} catch (ComputationCanceled e) {
 			e.printStackTrace();
 		}
