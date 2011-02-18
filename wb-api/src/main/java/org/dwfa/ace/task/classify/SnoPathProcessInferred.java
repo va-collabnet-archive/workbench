@@ -140,9 +140,6 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
         List<? extends I_ConceptAttributeTuple> attribs = concept.getConceptAttributeTuples(
                 statusSet, fromPathPos, precedence, contradictionMgr);
 
-        if (attribs.size() != 1)
-            System.out.println("!!!:DEBUG:!!!");
-        
         if (attribs.size() == 1)
             passToCompare = true;
         else if (attribs.size() == 0) {
@@ -200,7 +197,7 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
             countConDuplVersion++;
         }
     }
-
+    
     // STATS FROM PROCESS CONCEPTS (CLASSIFIER INPUT)
     public String getStats(long startTime) {
         StringBuffer s = new StringBuffer(1500);

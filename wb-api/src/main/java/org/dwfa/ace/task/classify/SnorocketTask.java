@@ -358,14 +358,33 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             // GET EDIT_PATH CONCEPTS AND RELATIONSHIPS
             cEditSnoCons = new ArrayList<SnoCon>();
             cEditSnoRels = new ArrayList<SnoRel>();
-            SnoPathProcessStated pcEdit = new SnoPathProcessStated(logger, cEditSnoCons,
-                    cEditSnoRels, allowedRoleTypes, statusSet, cEditPosSet, gui, precedence,
-                    contradictionMgr);
-            tf.iterateConcepts(pcEdit); // :!!!:
-            // Bdb.getConceptDb().iterateConceptDataInSequence(pcEdit);
-            logger
-                    .info("\r\n::: [SnorocketTask] GET STATED PATH DATA"
-                            + pcEdit.getStats(startTime));
+            
+            SnoPathProcessStated pcEdit = null;
+            if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.EDIT_PATH) {
+                pcEdit = new SnoPathProcessStated(logger, cEditSnoCons, cEditSnoRels,
+                        allowedRoleTypes, statusSet, cEditPosSet, null, config.getPrecedence(),
+                        config.getConflictResolutionStrategy());
+                tf.iterateConcepts(pcEdit);
+                logger.info("\r\n::: [TestSnoPathConcepts] GET STATED (Edit) PATH DATA : "
+                        + pcEdit.getStats(startTime));
+            } else if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH) {
+                pcEdit = new SnoPathProcessStated(logger, cEditSnoCons, cEditSnoRels,
+                        allowedRoleTypes, statusSet, cViewPosSet, null, config.getPrecedence(),
+                        config.getConflictResolutionStrategy());
+                tf.iterateConcepts(pcEdit);
+                logger.info("\r\n::: [TestSnoPathConcepts] GET STATED (View) PATH DATA : "
+                        + pcEdit.getStats(startTime));
+            } else if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH_WITH_EDIT_PRIORITY) {
+                pcEdit = new SnoPathProcessStated(logger, cEditSnoCons, cEditSnoRels,
+                        allowedRoleTypes, statusSet, cViewPosSet, cEditPosSet, null, config
+                                .getPrecedence(), config.getConflictResolutionStrategy());
+                tf.iterateConcepts(pcEdit);
+                logger
+                        .info("\r\n::: [TestSnoPathConcepts] GET STATED (View w/ edit priority) PATH DATA : "
+                                + pcEdit.getStats(startTime));
+            } else {
+                throw new TaskFailedException("(Classifier) Inferred Path case not implemented.");
+            }
 
             // SETUP CONCEPT NID ARRAY
             final int reserved = 2;
@@ -663,29 +682,34 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             // GET CLASSIFIER_PATH RELS
             startTime = System.currentTimeMillis();
             cClassSnoRels = new ArrayList<SnoRel>();
-            
             SnoPathProcessInferred pcClass = null;
-            if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.EDIT_PATH) {
-                pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
-                        statusSet, cEditPosSet, cEditPosSet, gui, precedence, contradictionMgr);
-                tf.iterateConcepts(pcClass);
-                logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED (Edit) PATH DATA : "
-                        + pcClass.getStats(startTime));
-            } else if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH) {
-                pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
-                        statusSet, cEditPosSet, cViewPosSet, gui, precedence, contradictionMgr);
-                tf.iterateConcepts(pcClass);
-                logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED (View) PATH DATA : "
-                        + pcClass.getStats(startTime));
-            } else if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH_WITH_EDIT_PRIORITY) {
-                pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
-                        statusSet, cEditPosSet, cViewPosSet, gui, precedence, contradictionMgr);
-                tf.iterateConcepts(pcClass);
-                logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED (View w/ edit priority) PATH DATA : "
-                        + pcClass.getStats(startTime));
-            } else {
-                throw new TaskFailedException("(Classifier) Inferred Path case not implemented.");
-            }
+            pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
+                    statusSet, cEditPosSet, cViewPosSet, gui, precedence, contradictionMgr);
+            tf.iterateConcepts(pcClass);
+            logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED (View) PATH DATA : "
+                    + pcClass.getStats(startTime));
+            
+//            if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.EDIT_PATH) {
+//                pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
+//                        statusSet, cEditPosSet, cEditPosSet, gui, precedence, contradictionMgr);
+//                tf.iterateConcepts(pcClass);
+//                logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED (Edit) PATH DATA : "
+//                        + pcClass.getStats(startTime));
+//            } else if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH) {
+//                pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
+//                        statusSet, cEditPosSet, cViewPosSet, gui, precedence, contradictionMgr);
+//                tf.iterateConcepts(pcClass);
+//                logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED (View) PATH DATA : "
+//                        + pcClass.getStats(startTime));
+//            } else if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH_WITH_EDIT_PRIORITY) {
+//                pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
+//                        statusSet, cEditPosSet, cViewPosSet, gui, precedence, contradictionMgr);
+//                tf.iterateConcepts(pcClass);
+//                logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED (View w/ edit priority) PATH DATA : "
+//                        + pcClass.getStats(startTime));
+//            } else {
+//                throw new TaskFailedException("(Classifier) Inferred Path case not implemented.");
+//            }
 
             // FILTER RELATIONSHIPS
             int last = cClassSnoRels.size();

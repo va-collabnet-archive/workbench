@@ -22,6 +22,7 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.I_ConfigAceFrame.CLASSIFIER_INPUT_MODE_PREF;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -105,21 +106,41 @@ public class TestSnoPathProcessStated extends AbstractTask {
             long startTime = System.currentTimeMillis();
             tf = Terms.get();
             config = tf.getActiveAceFrameConfig();
-            cEditSnoCons = null; // ignore concepts for now
+            cEditSnoCons = new ArrayList<SnoCon>();
             cEditSnoRels = new ArrayList<SnoRel>();
 
             setupCoreNids();
             setupPaths();
-            logger.info(toStringPathPos(cEditPathListPositionBI, "Edit Path"));
+            logger.info(toStringPathPos(cEditPathListPositionBI, "Primary Input Path"));
             setupRoleNids();
 
-            SnoPathProcessStated pcEdit = new SnoPathProcessStated(logger, cEditSnoCons,
-                    cEditSnoRels, allowedRoleTypes, statusSet, cEditPosSet, null, config
-                            .getPrecedence(), config.getConflictResolutionStrategy());
-            tf.iterateConcepts(pcEdit);
-            logger.info("\r\n::: [TestSnoPathConcepts] GET STATED PATH DATA : "
-                    + pcEdit.getStats(startTime));
-
+            SnoPathProcessStated pcEdit = null;
+            if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.EDIT_PATH) {
+                pcEdit = new SnoPathProcessStated(logger, cEditSnoCons, cEditSnoRels,
+                        allowedRoleTypes, statusSet, cEditPosSet, null, config.getPrecedence(),
+                        config.getConflictResolutionStrategy());
+                tf.iterateConcepts(pcEdit);
+                logger.info("\r\n::: [TestSnoPathConcepts] GET STATED (Edit) PATH DATA : "
+                        + pcEdit.getStats(startTime));
+            } else if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH) {
+                pcEdit = new SnoPathProcessStated(logger, cEditSnoCons, cEditSnoRels,
+                        allowedRoleTypes, statusSet, cViewPosSet, null, config.getPrecedence(),
+                        config.getConflictResolutionStrategy());
+                tf.iterateConcepts(pcEdit);
+                logger.info("\r\n::: [TestSnoPathConcepts] GET STATED (View) PATH DATA : "
+                        + pcEdit.getStats(startTime));
+            } else if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH_WITH_EDIT_PRIORITY) {
+                pcEdit = new SnoPathProcessStated(logger, cEditSnoCons, cEditSnoRels,
+                        allowedRoleTypes, statusSet, cViewPosSet, cEditPosSet, null, config
+                                .getPrecedence(), config.getConflictResolutionStrategy());
+                tf.iterateConcepts(pcEdit);
+                logger
+                        .info("\r\n::: [TestSnoPathConcepts] GET STATED (View w/ edit priority) PATH DATA : "
+                                + pcEdit.getStats(startTime));
+            } else {
+                throw new TaskFailedException("(Classifier) Inferred Path case not implemented.");
+            }
+            
             dumpSnoRel(cEditSnoRels, "TestSnoPathConcepts_sctIds_t" + startTime + ".txt", 6);
 
         } catch (Exception e) {

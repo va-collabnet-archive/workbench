@@ -23,7 +23,7 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.I_ConfigAceFrame.CLASSIFIER_INPUT_MODE_PREF;
+// import org.dwfa.ace.api.I_ConfigAceFrame.CLASSIFIER_INPUT_MODE_PREF;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -121,27 +121,32 @@ public class TestSnoPathProcessInferred extends AbstractTask {
             setupRoleNids();
 
             SnoPathProcessInferred pcClass = null;
-            if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.EDIT_PATH) {
-                pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
-                        statusSet, cEditPosSet, cEditPosSet, null, precedence, contradictionMgr);
-                tf.iterateConcepts(pcClass);
-                logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED (Edit) PATH DATA : "
-                        + pcClass.getStats(startTime));
-            } else if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH) {
-                pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
-                        statusSet, cViewPosSet, cViewPosSet, null, precedence, contradictionMgr);
-                tf.iterateConcepts(pcClass);
-                logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED (View) PATH DATA : "
-                        + pcClass.getStats(startTime));
-            } else if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH_WITH_EDIT_PRIORITY) {
-                pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
-                        statusSet, cEditPosSet, cViewPosSet, null, precedence, contradictionMgr);
-                tf.iterateConcepts(pcClass);
-                logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED (View w/ edit priority) PATH DATA : "
-                        + pcClass.getStats(startTime));
-            } else {
-                throw new TaskFailedException("(Classifier) Inferred Path case not implemented.");
-            }
+            pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
+                    statusSet, cEditPosSet, cViewPosSet, null, precedence, contradictionMgr);
+            tf.iterateConcepts(pcClass);
+            logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED (View) PATH DATA : "
+                    + pcClass.getStats(startTime));
+//            if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.EDIT_PATH) {
+//                pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
+//                        statusSet, cEditPosSet, cEditPosSet, null, precedence, contradictionMgr);
+//                tf.iterateConcepts(pcClass);
+//                logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED (Edit) PATH DATA : "
+//                        + pcClass.getStats(startTime));
+//            } else if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH) {
+//                pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
+//                        statusSet, cViewPosSet, cViewPosSet, null, precedence, contradictionMgr);
+//                tf.iterateConcepts(pcClass);
+//                logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED (View) PATH DATA : "
+//                        + pcClass.getStats(startTime));
+//            } else if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH_WITH_EDIT_PRIORITY) {
+//                pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
+//                        statusSet, cEditPosSet, cViewPosSet, null, precedence, contradictionMgr);
+//                tf.iterateConcepts(pcClass);
+//                logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED (View w/ edit priority) PATH DATA : "
+//                        + pcClass.getStats(startTime));
+//            } else {
+//                throw new TaskFailedException("(Classifier) Inferred Path case not implemented.");
+//            }
 
             dumpSnoRel(cClassSnoRels, "TestSnoPathInferred_sctIds_t" + startTime + ".txt", 6);
 
