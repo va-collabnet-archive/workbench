@@ -16,11 +16,10 @@ public class CheckConceptTask extends SwingWorker<ResultsCollectorWorkBench, Res
 	private I_ConfigAceFrame config;
 	private RulesContextHelper contextHelper; 
 	private INFERRED_VIEW_ORIGIN inferredOrigin;
+	private ResultsCollectorWorkBench results;
 
 	@Override
 	protected ResultsCollectorWorkBench doInBackground() throws Exception {
-		ResultsCollectorWorkBench results = null;
-		
 		if (concept != null && context != null && config != null && contextHelper != null && inferredOrigin != null) {
 			results = RulesLibrary.checkConcept(concept, context, onlyUncommittedContent, 
 					config, contextHelper, inferredOrigin);
@@ -35,6 +34,10 @@ public class CheckConceptTask extends SwingWorker<ResultsCollectorWorkBench, Res
 		}
 		
 		return results;
+	}
+	
+	@Override
+	protected void done() {
 	}
 
 	public I_GetConceptData getConcept() {
@@ -85,4 +88,11 @@ public class CheckConceptTask extends SwingWorker<ResultsCollectorWorkBench, Res
 		this.inferredOrigin = inferredOrigin;
 	}
 
+	public ResultsCollectorWorkBench getResults() {
+		return results;
+	}
+
+	public void setResults(ResultsCollectorWorkBench results) {
+		this.results = results;
+	}
 }

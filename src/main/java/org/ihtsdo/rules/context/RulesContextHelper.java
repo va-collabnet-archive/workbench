@@ -96,6 +96,7 @@ public class RulesContextHelper {
 		return getKnowledgeBaseForContext(context, config, false);
 	}
 	public KnowledgeBase getKnowledgeBaseForContext(I_GetConceptData context, I_ConfigAceFrame config, boolean recreate) throws Exception {
+		KnowledgeBase returnBase = null;
 		HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
 		I_ShowActivity activity =
 			Terms.get().newActivityPanel(true, config, 
@@ -107,7 +108,7 @@ public class RulesContextHelper {
 		long startTime = System.currentTimeMillis();
 		File serializedKbFile = new File("rules/" + context.getConceptNid() + ".bkb");
 		if (kbCache.containsKey(context.getConceptNid()) && !recreate) {
-			return kbCache.get(context.getConceptNid());
+			returnBase = kbCache.get(context.getConceptNid());
 		} else if (serializedKbFile.exists() && !recreate){
 			KnowledgeBase kbase = null;
 			try {
@@ -122,17 +123,7 @@ public class RulesContextHelper {
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
-			long endTime = System.currentTimeMillis();
-			long elapsed = endTime - startTime;
-			String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
-			String result = "Done";
-			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
-			try {
-				activity.complete();
-			} catch (ComputationCanceled e) {
-				e.printStackTrace();
-			}
-			return kbase;
+			returnBase = kbase;
 		} else {
 			//RulesDeploymentPackageReferenceHelper rulesPackageHelper = new RulesDeploymentPackageReferenceHelper(config);
 
@@ -164,18 +155,20 @@ public class RulesContextHelper {
 				kbCache.put(context.getConceptNid(), kbase);
 				lastCacheUpdateTime = Calendar.getInstance().getTimeInMillis();
 			}
-			long endTime = System.currentTimeMillis();
-			long elapsed = endTime - startTime;
-			String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
-			String result = "Done";
-			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
-			try {
-				activity.complete();
-			} catch (ComputationCanceled e) {
-				e.printStackTrace();
-			}
-			return kbase;
+			returnBase = kbase;
 		}
+		long endTime = System.currentTimeMillis();
+		long elapsed = endTime - startTime;
+		String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+		String result = "Done";
+		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
+		try {
+			activity.complete();
+			activity.removeActivityFromViewer();
+		} catch (ComputationCanceled e) {
+			e.printStackTrace();
+		}
+		return returnBase;
 	}
 
 	public KnowledgeBase filterForContext(KnowledgeBase kbase, I_GetConceptData context, I_ConfigAceFrame config) throws TerminologyException, IOException {
@@ -503,7 +496,7 @@ public class RulesContextHelper {
 	public void clearCache() {
 		File dir = new File("rules");
 		for (File loopFile : dir.listFiles()) {
-			if (loopFile.getName().endsWith(".bkb")) {
+			if (loopFile.getName().endsWith(".bkb") || loopFile.getName().endsWith(".pkg")) {
 				loopFile.delete();
 			}
 		}
