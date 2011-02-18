@@ -1,7 +1,9 @@
 package org.ihtsdo.workflow.refset.history; 
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,11 +45,12 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 	private static SortedMap<String, ComponentVersionBI> releasesMap = null;
 	private String releaseSearchString = "version: ";
 	private I_GetConceptData snomedConcept = null;
-	private final SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+	private long earliestWorkflowHistoryReleaseTimestamp = 0;
 
 	// First release with Workflow History
 	private final String earliestWorkflowHistoryRelease = "01/31/2008"; 
-	private long earliestWorkflowHistoryReleaseTimestamp = 0;
+	private final SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+	private final int dateStringLength = 8;
 
 	public WorkflowHistoryRefsetSearcher()
 	{
@@ -575,7 +578,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		if (releasesMap == null)
 		{
 			releasesMap = new TreeMap<String, ComponentVersionBI>(WorkflowHistoryRefset.createComponentStringTimestampComparer());
-
+			String dateString = new String();
 			try {
 				
 				I_GetConceptData snomedConcept = Terms.get().getConcept(Taxonomies.SNOMED.getUuids());
@@ -588,14 +591,27 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 					{
 						int releaseStringLocation = tuple.getText().indexOf(releaseSearchString);
 						int releaseStringLength = releaseSearchString.length();
-						String dateString = tuple.getText().substring(releaseStringLocation + releaseStringLength, releaseStringLocation + releaseStringLength + 8);
-						String normalizedDateString = dateString.substring(4, 6) + "/" +
-													  dateString.substring(6,8) + "/" + 
-						  							  dateString.substring(0, 4);
+						int dateStartingPos = releaseStringLocation + releaseStringLength;
+						int totalTagAndDateStringLength = dateStartingPos + dateStringLength;
 						
-						if (earliestWorkflowHistoryReleaseTimestamp <= format.parse(normalizedDateString).getTime())
-						{
-							releasesMap.put(normalizedDateString, desc);
+						try {
+							if (tuple.getText().length() < totalTagAndDateStringLength)
+								 throw new IllegalArgumentException();
+
+							dateString = tuple.getText().substring(dateStartingPos, totalTagAndDateStringLength);
+						
+							String normalizedDateString = dateString.substring(4, 6) + "/" +
+														  dateString.substring(6,8) + "/" + 
+							  							  dateString.substring(0, 4);
+							Date d = format.parse(normalizedDateString);
+							if (earliestWorkflowHistoryReleaseTimestamp <= d.getTime())
+							{
+								releasesMap.put(normalizedDateString, desc);
+							}
+						} catch (IllegalArgumentException iae) {
+							AceLog.getAppLog().log(Level.WARNING, "dateString should be 8 characters long: " + dateString);
+						} catch (ParseException pe) {
+							AceLog.getAppLog().log(Level.WARNING, "String with <version: > tag not followed by valid date: " + dateString);
 						}
 					}
 				}
