@@ -619,17 +619,18 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public static List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings() {
         List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
-        for (I_Transact to : uncommitted) {
-            for (I_TestDataConstraints test : commitTests) {
-                try {
-                    for (AlertToDataConstraintFailure failure : test.test(to, true)) {
-                        warningsAndErrors.add(failure);
-                    }
-                } catch (Exception e) {
-                    AceLog.getEditLog().alertAndLogException(e);
-                }
-            }
-        }
+        // Commented in the process of moving all checks into BdbCommitManager - ALO
+//        for (I_Transact to : uncommitted) {
+//            for (I_TestDataConstraints test : commitTests) {
+//                try {
+//                    for (AlertToDataConstraintFailure failure : test.test(to, true)) {
+//                        warningsAndErrors.add(failure);
+//                    }
+//                } catch (Exception e) {
+//                    AceLog.getEditLog().alertAndLogException(e);
+//                }
+//            }
+//        }
         return warningsAndErrors;
     }
     /*
