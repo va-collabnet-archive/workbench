@@ -334,8 +334,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
              return revisions.get(index);
           }
           return (R) makeAnalog(getStatusNid(),
-                  getPathNid(),
                   getAuthorNid(),
+                  getPathNid(),
                   getTime());
        }
 
