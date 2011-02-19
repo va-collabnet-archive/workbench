@@ -327,7 +327,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             if (index >= 0) {
                 return revisions.get(index);
             }
-            return null;
+            return (R) makeAnalog(getStatusNid(), 
+                    getAuthorNid(), 
+                    getPathNid(), 
+                    getTime());
         }
 
         @Override
