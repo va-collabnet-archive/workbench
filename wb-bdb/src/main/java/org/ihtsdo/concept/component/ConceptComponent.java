@@ -384,8 +384,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             return revisions.get(index);
          }
          return makeAnalog(getStatusNid(),
-                 getPathNid(),
                  getAuthorNid(),
+                 getPathNid(),
                  getTime());
       }
 
@@ -946,7 +946,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             RefsetMember<?, ?> annot = RefsetMemberFactory.create(
                  eAnnot, this.nid);
             this.annotations.add(annot);
-         }
+   }
       }
    }
 
@@ -960,15 +960,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       // merge versions
       for (ConceptComponent<R, C>.Version v : another.getVersions()) {
          if (!currentSapNids.contains(v.getSapNid())) {
-            // TODO Added to avoid failure if v.getRefision() returns null
-            // Therefore, must find proper solution
-            // Happens with EConcept import with EConcept = workflow history refset only
-            R rev = v.getRevision();
-            if (rev == null) {
-               return this;
-            }
-
-            addRevision((R) rev);
+            addRevision((R) v.getRevision());
          }
       }
 
