@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -105,7 +105,7 @@ public class SetWFDSheetToNewCollabnetQueuePanelTask extends AbstractTask {
     /**
      * Handles actions required by the task after normal task completion (such
      * as moving a process to another user's input queue).
-     * 
+     *
      * @return void
      * @param process The currently executing Workflow process
      * @param worker The worker currently executing this task
@@ -122,7 +122,7 @@ public class SetWFDSheetToNewCollabnetQueuePanelTask extends AbstractTask {
      * and validate data that has been entered by the user on the Workflow
      * Details
      * Sheet.
-     * 
+     *
      * @return The exit condition of the task
      * @param process The currently executing Workflow process
      * @param worker The worker currently executing this task
@@ -212,16 +212,7 @@ public class SetWFDSheetToNewCollabnetQueuePanelTask extends AbstractTask {
     }
 
     private TreeSet<I_GetConceptData> getWorkbenchUsers() throws Exception {
-        TreeSet<I_GetConceptData> workbenchUsers = new TreeSet<I_GetConceptData>(new Comparator<Object>() {
-
-            @Override
-            public int compare(Object o1, Object o2) {
-                return o1.toString().compareTo(o2.toString());
-            }
-        });
-
         I_GetConceptData userConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.USER.localize().getNid());
-
         return getChildren(userConcept);
     }
 
@@ -239,11 +230,25 @@ public class SetWFDSheetToNewCollabnetQueuePanelTask extends AbstractTask {
                 parent.getDestRelOrigins(activeSet, termFactory.getActiveAceFrameConfig().getDestRelTypes(), config
                     .getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
         for (I_GetConceptData child : children) {
-            childrenTreeSet.add(child);
+            if (isValidProfile(child)) {
+                childrenTreeSet.add(child);
+            }
             childrenTreeSet.addAll(getChildren(child));
         }
 
         return childrenTreeSet;
+    }
+
+    private boolean isValidProfile(I_GetConceptData child) throws IOException {
+        String userDirStr = "profiles" + File.separator + child.getInitialText();
+        File userDir = new File(userDirStr);
+
+        File profileFile = new File(userDir, child.getInitialText() + ".ace");
+        if (profileFile.exists()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public int[] getDataContainerIds() {
