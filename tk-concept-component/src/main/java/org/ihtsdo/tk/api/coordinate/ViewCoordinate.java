@@ -1,11 +1,14 @@
 package org.ihtsdo.tk.api.coordinate;
 
+import java.util.Arrays;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.hash.Hashcode;
 
 public class ViewCoordinate {
 
@@ -121,4 +124,74 @@ public class ViewCoordinate {
 
         return sb.toString();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+           return true;
+        }
+        if (o instanceof ViewCoordinate) {
+            ViewCoordinate another = (ViewCoordinate) o;
+            if (!testEquals(precedence, another.precedence)) return false;
+            if (!testEquals(positionSet, another.positionSet)) return false;
+            if (!testEquals(allowedStatusNids, another.allowedStatusNids)) return false;
+            if (!testEquals(isaTypeNids, another.isaTypeNids)) return false;
+            if (!testEquals(contradictionManager, another.contradictionManager)) return false;
+            if (!testEquals(languageNid, another.languageNid)) return false;
+            if (!testEquals(classifierNid, another.classifierNid)) return false;
+            if (!testEquals(relAssertionType, another.relAssertionType)) return false;
+            if (!testEquals(langPrefList, another.langPrefList)) return false;
+            if (!testEquals(langSort, another.langSort)) return false;
+            return true;
+        }
+        return false;
+    }
+    
+    private static boolean testEquals(Object o1, Object o2) {
+        if (o1 == null && o2 == null) {
+            return true;
+        }
+        if (o1 == o2) {
+            return true;
+        }
+        if (o1 instanceof NidSetBI) {
+            NidSetBI ns1 = (NidSetBI) o1;
+            NidSetBI ns2 = (NidSetBI) o2;
+            return Arrays.equals(ns1.getSetValues(), ns2.getSetValues());
+                    
+        }
+        if (o1 instanceof NidListBI) {
+            NidListBI ns1 = (NidListBI) o1;
+            NidListBI ns2 = (NidListBI) o2;
+            return Arrays.equals(ns1.getListArray(), ns2.getListArray());
+                    
+        }
+        if (o1 instanceof PositionSetBI) {
+            PositionSetBI ns1 = (PositionSetBI) o1;
+            PositionSetBI ns2 = (PositionSetBI) o2;
+            if (ns1.size() == 1) {
+                if (ns2.size() == 1) {
+                    return ns1.getPositionArray()[0].equals(ns2.getPositionArray()[0]);
+                }
+            }
+            return Arrays.equals(ns1.getPositionArray(), ns2.getPositionArray());                    
+        }
+        if (o1.equals(o2)) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hashCode = 0;
+        for (PositionBI pos: positionSet.getPositionArray()) {
+            hashCode = Hashcode.compute(new int[] {hashCode, 
+                pos.getPath().getConceptNid(), 
+                pos.getVersion()});
+        }
+        return hashCode;
+    }
+    
+    
 }
