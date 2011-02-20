@@ -39,7 +39,7 @@ public class LogManagerAdaptor implements I_ManageLogs {
     Map<String, RemoteHandlerAdaptor> remoteHandlerAdaptors = new HashMap<String, RemoteHandlerAdaptor>();
 
     /**
-     * 
+     *
      */
     public LogManagerAdaptor(LogManager logManager) {
         super();
@@ -62,6 +62,9 @@ public class LogManagerAdaptor implements I_ManageLogs {
      * @see org.dwfa.log.I_ManageLogs#getLevel(java.lang.String)
      */
     public Object getLevel(String loggerName) {
+        if (this.logManager == null || this.logManager.getLogger(loggerName) == null) {
+            return null;
+        }
         return this.logManager.getLogger(loggerName).getLevel();
     }
 
@@ -70,6 +73,9 @@ public class LogManagerAdaptor implements I_ManageLogs {
      *      java.util.logging.Level)
      */
     public boolean isLoggable(String loggerName, Level level) {
+        if (this.logManager.getLogger(loggerName) == null) {
+            return false;
+        }
         return this.logManager.getLogger(loggerName).isLoggable(level);
     }
 

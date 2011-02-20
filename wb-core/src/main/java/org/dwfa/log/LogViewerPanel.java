@@ -104,13 +104,13 @@ public class LogViewerPanel extends JPanel implements TableModelListener {
         splitPane.setBottomComponent(new JScrollPane(logOut));
         this.add(splitPane);
         this.init();
-        LoggerTableModel model = this.addLoggerTab(new LogManagerAdaptor(logManager), "Local logs",
-            "Configure and view log output for the local JVM. ");
+        LoggerTableModel model =
+                this.addLoggerTab(new LogManagerAdaptor(logManager), "Local logs",
+                    "Configure and view log output for the local JVM. ");
         this.setHandler(model, "", new Boolean(true));
     }
 
-    public LoggerTableModel addLoggerTab(I_ManageLogs logManager, String tabDesc, String toolTipText)
-            throws RemoteException {
+    public LoggerTableModel addLoggerTab(I_ManageLogs logManager, String tabDesc, String toolTipText) throws RemoteException {
         LoggerTableModel model = new LoggerTableModel(logManager);
         JTable table = new JTable(model);
         setPreferredWidth(table);
@@ -184,8 +184,8 @@ public class LogViewerPanel extends JPanel implements TableModelListener {
      */
     @SuppressWarnings("unchecked")
     protected void init() throws Exception {
-        LoginContext loginContext = (LoginContext) config.getEntry(this.getClass().getName(), "loginContext",
-            LoginContext.class, null);
+        LoginContext loginContext =
+                (LoginContext) config.getEntry(this.getClass().getName(), "loginContext", LoginContext.class, null);
         if (loginContext == null) {
             initAsSubject();
         } else {
