@@ -479,6 +479,7 @@ public class BdbCommitManager {
                     int warningCount = 0;
                     if (performCreationTests) {
                         NidBitSetItrBI uncommittedCNidItr = uncommittedCNids.iterator();
+                        DataCheckRunner.cancelAll();
                         dataCheckMap.clear();
                         while (uncommittedCNidItr.next()) {
                             List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
@@ -676,6 +677,7 @@ public class BdbCommitManager {
                     uncommittedCNidsNoChecks.clear();
                     uncommittedCNids.clear();
                     Bdb.getSapDb().commit(Long.MIN_VALUE);
+                    DataCheckRunner.cancelAll();
                     dataCheckMap.clear();
                 } catch (IOException e1) {
                     AceLog.getAppLog().alertAndLogException(e1);
@@ -1077,6 +1079,13 @@ public class BdbCommitManager {
             return runner;
         }
 
+        public static void cancelAll() {
+            for (DataCheckRunner runner: runners.values()) {
+                runner.cancel();
+            };
+            runners.clear();
+        }
+                
         @Override
         protected void done() {
             super.done();
