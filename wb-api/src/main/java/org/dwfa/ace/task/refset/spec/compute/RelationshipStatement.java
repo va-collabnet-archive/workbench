@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,9 +40,9 @@ import org.ihtsdo.time.TimeUtil;
 /**
  * Represents partial information contained in a refset spec.
  * An example of a statement is : "NOT: Concept is : Paracetamol"
- * 
+ *
  * @author Chrissy Hill
- * 
+ *
  */
 public class RelationshipStatement extends RefsetSpecStatement {
 
@@ -50,7 +50,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
     /**
      * Constructor for refset spec statement.
-     * 
+     *
      * @param useNotQualifier Whether to use the NOT qualifier.
      * @param queryToken The query type to use (e.g. "concept is")
      * @param queryConstraint The destination concept (e.g. "paracetamol")
@@ -223,7 +223,6 @@ public class RelationshipStatement extends RefsetSpecStatement {
         if (parentPossibleConcepts == null) {
             parentPossibleConcepts = termFactory.getConceptNidSet();
         }
-        activity.setProgressInfoLower("Incoming count: " + parentPossibleConcepts.cardinality());
 
         switch (tokenEnum) {
         case REL_IS_MEMBER_OF:
@@ -282,12 +281,14 @@ public class RelationshipStatement extends RefsetSpecStatement {
         }
         setPossibleConceptsCount(possibleConcepts.cardinality());
 
-        long endTime = System.currentTimeMillis();
-        long elapsed = endTime - startTime;
-        String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
-        activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Incoming count: "
-            + parentPossibleConcepts.cardinality() + "; Outgoing count: " + possibleConcepts.cardinality());
-        activity.complete();
+        if (activity != null) {
+            long endTime = System.currentTimeMillis();
+            long elapsed = endTime - startTime;
+            String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+            activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Incoming count: "
+                + parentPossibleConcepts.cardinality() + "; Outgoing count: " + possibleConcepts.cardinality());
+            activity.complete();
+        }
         return possibleConcepts;
     }
 
