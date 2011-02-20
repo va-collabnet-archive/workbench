@@ -22,8 +22,9 @@ public class KindOfComputer {
     private static ConcurrentHashMap<KindOfSpec, KindOfCache> caches =
             new ConcurrentHashMap<KindOfSpec, KindOfCache>(10);
     private static IsaCache isaCache = null;
-    protected static ExecutorService kindOfComputerService = Executors.newFixedThreadPool(1,
-            new NamedThreadFactory(Bdb.dbdThreadGroup, "kind-of computor service"));
+    protected static ExecutorService kindOfComputerService = 
+            Executors.newFixedThreadPool(1, new NamedThreadFactory(
+                Bdb.dbdThreadGroup, "kind-of computer service"));
 
     public static void reset() {
         caches.clear();
@@ -68,7 +69,8 @@ public class KindOfComputer {
     }
     static ReentrantLock lock = new ReentrantLock();
 
-    public static boolean isKindOf(Concept c, KindOfSpec spec) throws IOException, TerminologyException {
+    public static boolean isKindOf(Concept c, KindOfSpec spec) 
+            throws IOException, TerminologyException {
         if (isaCache != null && isaCache.isReady()) {
             return cachedIsKindOfWithDepth(c, spec, 0);
         }
@@ -80,8 +82,10 @@ public class KindOfComputer {
             lock.lock();
             try {
                 if (isaCache == null) {
-                    IsaCache tempIsaCache = new IsaCache(Bdb.getConceptDb().getConceptNidSet());
-                    tempIsaCache.setup(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+                    IsaCache tempIsaCache = 
+                            new IsaCache(Bdb.getConceptDb().getConceptNidSet());
+                    tempIsaCache.setup(
+                            Terms.get().getActiveAceFrameConfig().getViewCoordinate());
                     isaCache = tempIsaCache;
                 }
             } catch (Exception e) {
@@ -93,13 +97,16 @@ public class KindOfComputer {
         return isaCache;
     }
 
-    public static IsaCache setupIsaCacheAndWait() throws IOException, InterruptedException {
+    public static IsaCache setupIsaCacheAndWait() 
+            throws IOException, InterruptedException {
         setupIsaCache();
         isaCache.getLatch().await();
         return isaCache;
     }
 
-    private static boolean cachedIsKindOfWithDepth(Concept c, KindOfSpec spec, int depth) throws IOException {
+    private static boolean cachedIsKindOfWithDepth(
+            Concept c, KindOfSpec spec, int depth) 
+          throws IOException {
         if (depth > 15) {
             AceLog.getAppLog().info("depth of: " + depth + " testing: " + c);
             if (depth > 100) {
@@ -118,7 +125,8 @@ public class KindOfComputer {
         }
         if (cache == null) {
             Concept kindOf = Bdb.getConcept(spec.kindNid);
-            cache = new KindOfCache(kindOf.getPossibleKindOfConcepts(spec.getRelTypeNids(), null));
+            cache = new KindOfCache(
+                    kindOf.getPossibleKindOfConcepts(spec.getRelTypeNids(), null));
             KindOfCache prevCache = caches.putIfAbsent(spec, cache);
             if (prevCache != null) {
                 cache = prevCache;
@@ -137,7 +145,8 @@ public class KindOfComputer {
         }
     }
 
-    private static boolean isKindOfWithDepth(Concept c, KindOfSpec spec, int depth) throws IOException, TerminologyException {
+    private static boolean isKindOfWithDepth(Concept c, KindOfSpec spec, int depth) 
+            throws IOException, TerminologyException {
         if (depth > 15) {
             AceLog.getAppLog().info("depth of: " + depth + " testing: " + c);
             if (depth > 100) {
@@ -156,7 +165,8 @@ public class KindOfComputer {
         }
         if (cache == null) {
             Concept kindOf = Bdb.getConcept(spec.kindNid);
-            cache = new KindOfCache(kindOf.getPossibleKindOfConcepts(spec.getRelTypeNids(), null));
+            cache = new KindOfCache(
+                    kindOf.getPossibleKindOfConcepts(spec.getRelTypeNids(), null));
             KindOfCache prevCache = caches.putIfAbsent(spec, cache);
             if (prevCache != null) {
                 cache = prevCache;
@@ -167,7 +177,8 @@ public class KindOfComputer {
             }
         }
         Set<I_GetConceptData> parents = c.getSourceRelTargets(spec.allowedStatusNids,
-                spec.relTypeNids, spec.getViewPositionSet(), spec.precedence, spec.contradictionMgr);
+                spec.relTypeNids, spec.getViewPositionSet(), 
+                spec.precedence, spec.contradictionMgr);
         if (parents.isEmpty()) {
             cache.setKindOf(c.getNid(), false);
             return false;

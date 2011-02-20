@@ -1073,7 +1073,8 @@ public class BdbCommitManager {
            }
         }
 
-        public static DataCheckRunner runDataChecks(Concept c, List<I_TestDataConstraints> tests) {
+        public static DataCheckRunner runDataChecks(Concept c, 
+                List<I_TestDataConstraints> tests) {
             DataCheckRunner runner = new DataCheckRunner(c, tests);
             runner.execute();
             return runner;
@@ -1082,7 +1083,7 @@ public class BdbCommitManager {
         public static void cancelAll() {
             for (DataCheckRunner runner: runners.values()) {
                 runner.cancel();
-            };
+            }
             runners.clear();
         }
                 
@@ -1096,14 +1097,17 @@ public class BdbCommitManager {
 
         
         @Override
-        protected Collection<AlertToDataConstraintFailure> doInBackground() throws Exception {
-            List<AlertToDataConstraintFailure> runnerAlerts = new ArrayList<AlertToDataConstraintFailure>();
+        protected Collection<AlertToDataConstraintFailure> doInBackground() 
+                throws Exception {
+            List<AlertToDataConstraintFailure> runnerAlerts = 
+                    new ArrayList<AlertToDataConstraintFailure>();
             if (canceled) return runnerAlerts;
             if (c != null && tests != null) {
                 for (I_TestDataConstraints test : tests) {
                     if (canceled) return runnerAlerts;
                     try {
-                        Collection<AlertToDataConstraintFailure> result = test.test(c, true);
+                        Collection<AlertToDataConstraintFailure> result = 
+                                test.test(c, true);
                         runnerAlerts.addAll(result);
                         if (canceled) return runnerAlerts;
                         publish(result);
