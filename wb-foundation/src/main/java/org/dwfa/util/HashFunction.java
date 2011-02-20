@@ -16,6 +16,8 @@
  */
 package org.dwfa.util;
 
+@Deprecated
+// Moved to DTOs & API
 public class HashFunction {
     public static int hashCode(int[] parts) {
         int hash = 0;
@@ -29,5 +31,4 @@ public class HashFunction {
         }
         return hash;
     }
-
 }
