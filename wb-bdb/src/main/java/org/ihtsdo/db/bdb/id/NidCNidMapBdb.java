@@ -195,14 +195,15 @@ public class NidCNidMapBdb extends ComponentBdb {
         int indexInMap = (nid - Integer.MIN_VALUE) % NID_CNID_MAP_SIZE;
         assert indexInMap < NID_CNID_MAP_SIZE : "cNid: " + cNid + " nid: " + nid + " mapIndex: " + mapIndex
                 + " indexInMap: " + indexInMap;
-        assert nidCNidMaps.get()[mapIndex][indexInMap] == Integer.MAX_VALUE
+       ensureCapacity(nid);
+       
+       assert nidCNidMaps.get()[mapIndex][indexInMap] == Integer.MAX_VALUE
                 || nidCNidMaps.get()[mapIndex][indexInMap] == cNid : "processing cNid: " + cNid
                 + " nid: " + nid + " found existing cNid: " + nidCNidMaps.get()[mapIndex][indexInMap]
                 + "\n    " + cNid + " maps to: " + getCNid(cNid)
                 + "\n    " + nidCNidMaps.get()[mapIndex][indexInMap] + " maps to: " + getCNid(nidCNidMaps.get()[mapIndex][indexInMap]);
 
-        ensureCapacity(nid);
-
+ 
         /*
         if (nidCNidMaps.get()[mapIndex][indexInMap] != Integer.MAX_VALUE
                 && nidCNidMaps.get()[mapIndex][indexInMap] != cNid) {
