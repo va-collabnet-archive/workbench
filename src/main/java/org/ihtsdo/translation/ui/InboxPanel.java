@@ -36,6 +36,7 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 import java.security.PrivilegedActionException;
 import java.text.SimpleDateFormat;
@@ -113,6 +114,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.I_ContextualizeDescription;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
@@ -176,6 +178,9 @@ public class InboxPanel extends JPanel {
 
 
 		initComponents();
+		
+		label4.setIcon(IconUtilities.helpIcon);
+		label4.setText("");
 		
 		this.queueName=queueName;
 		if (selector==null)
@@ -2808,6 +2813,16 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	private void label4MouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("TRANSLATION_INBOX");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
+
 
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -2816,6 +2831,7 @@ public class InboxPanel extends JPanel {
 		label1 = new JLabel();
 		label2 = new JLabel();
 		button1 = new JButton();
+		label4 = new JLabel();
 		inboxItemCheckbox = new JCheckBox();
 		bSendItems = new JButton();
 		scrollPane1 = new JScrollPane();
@@ -2847,9 +2863,9 @@ public class InboxPanel extends JPanel {
 			{
 				panel1.setBackground(new Color(238, 238, 238));
 				panel1.setLayout(new GridBagLayout());
-				((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
+				((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0};
 				((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0};
-				((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0, 0.0, 1.0E-4};
 				((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
 
 				//---- label1 ----
@@ -2875,6 +2891,18 @@ public class InboxPanel extends JPanel {
 					}
 				});
 				panel1.add(button1, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
+
+				//---- label4 ----
+				label4.setText("text");
+				label4.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						label4MouseClicked(e);
+					}
+				});
+				panel1.add(label4, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 0), 0, 0));
 
@@ -2902,7 +2930,7 @@ public class InboxPanel extends JPanel {
 				});
 				panel1.add(bSendItems, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 0), 0, 0));
+					new Insets(0, 0, 0, 5), 0, 0));
 			}
 			panel2.add(panel1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -2983,6 +3011,7 @@ public class InboxPanel extends JPanel {
 	private JLabel label1;
 	private JLabel label2;
 	private JButton button1;
+	private JLabel label4;
 	private JCheckBox inboxItemCheckbox;
 	private JButton bSendItems;
 	private JScrollPane scrollPane1;

@@ -22,6 +22,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,9 +52,11 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.document.DocumentManager;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
+import org.ihtsdo.project.util.IconUtilities;
 import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.SimilarityMatchedItem;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.DefaultSimilaritySearchOption;
@@ -86,6 +89,8 @@ public class SimilarityPanel extends JPanel {
 			e.printStackTrace();
 		}
 		
+		label4.setIcon(IconUtilities.helpIcon);
+		label4.setText("");
 
 		refineCheckBox.addItemListener(new ItemListener() {
 			
@@ -413,11 +418,23 @@ public class SimilarityPanel extends JPanel {
 		    clipboard.setContents( strSel,strSel );
 		}
 	}
+
+	private void label4MouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("TRANSLATION_INFO");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
 	
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		similarityPanel = new JPanel();
+		panel2 = new JPanel();
 		label1 = new JLabel();
+		label4 = new JLabel();
 		refinePanel = new JPanel();
 		searchTextField = new JTextField();
 		searchButton = new JButton();
@@ -458,10 +475,34 @@ public class SimilarityPanel extends JPanel {
 			((GridBagLayout)similarityPanel.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
 			((GridBagLayout)similarityPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0, 0.0, 1.0E-4};
 
-			//---- label1 ----
-			label1.setText("Similarity");
-			label1.setHorizontalAlignment(SwingConstants.LEFT);
-			similarityPanel.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+			//======== panel2 ========
+			{
+				panel2.setLayout(new GridBagLayout());
+				((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0, 0};
+				((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0};
+				((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+
+				//---- label1 ----
+				label1.setText("Similarity");
+				label1.setHorizontalAlignment(SwingConstants.LEFT);
+				panel2.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
+
+				//---- label4 ----
+				label4.setText("text");
+				label4.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						label4MouseClicked(e);
+					}
+				});
+				panel2.add(label4, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
+			}
+			similarityPanel.add(panel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 0), 0, 0));
 
@@ -661,7 +702,9 @@ public class SimilarityPanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
 	private JPanel similarityPanel;
+	private JPanel panel2;
 	private JLabel label1;
+	private JLabel label4;
 	private JPanel refinePanel;
 	private JTextField searchTextField;
 	private JButton searchButton;
