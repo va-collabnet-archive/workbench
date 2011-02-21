@@ -28,6 +28,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -69,6 +70,7 @@ import org.ihtsdo.project.FileLink;
 import org.ihtsdo.project.FileLinkAPI;
 import org.ihtsdo.project.ProjectPermissionsAPI;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkSet;
@@ -79,6 +81,7 @@ import org.ihtsdo.project.panel.dnd.I_UpdateRepository;
 import org.ihtsdo.project.panel.dnd.ListDragGestureListenerWithImage;
 import org.ihtsdo.project.panel.dnd.ObjectTransferHandler;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
+import org.ihtsdo.project.util.IconUtilities;
 /**
  * @author Guillermo Reynoso
  */
@@ -110,6 +113,8 @@ public class ProjectDetailsPanel extends JPanel {
 		this.config = config;
 		I_TermFactory tf = Terms.get();
 		try {
+			label18.setIcon(IconUtilities.helpIcon);
+			label18.setText("");
 			ExportDescrAndLangSubsetPanel expPanel=new ExportDescrAndLangSubsetPanel(project);
 			expPanel.revalidate();
 			tabbedPane1.addTab("Export Target Language", expPanel);
@@ -1095,6 +1100,16 @@ public class ProjectDetailsPanel extends JPanel {
 		frame.setVisible(true);
 	}
 
+	private void label18MouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("PROJECT_DETAILS");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
+
 
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -1112,6 +1127,7 @@ public class ProjectDetailsPanel extends JPanel {
 		label7 = new JLabel();
 		panel12 = new JPanel();
 		button3 = new JButton();
+		label18 = new JLabel();
 		panel5 = new JPanel();
 		label3 = new JLabel();
 		scrollPane4 = new JScrollPane();
@@ -1328,9 +1344,9 @@ public class ProjectDetailsPanel extends JPanel {
 					//======== panel12 ========
 					{
 						panel12.setLayout(new GridBagLayout());
-						((GridBagLayout)panel12.getLayout()).columnWidths = new int[] {0, 0};
+						((GridBagLayout)panel12.getLayout()).columnWidths = new int[] {0, 0, 0};
 						((GridBagLayout)panel12.getLayout()).rowHeights = new int[] {0, 0};
-						((GridBagLayout)panel12.getLayout()).columnWeights = new double[] {0.0, 1.0E-4};
+						((GridBagLayout)panel12.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0E-4};
 						((GridBagLayout)panel12.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 						//---- button3 ----
@@ -1343,6 +1359,18 @@ public class ProjectDetailsPanel extends JPanel {
 							}
 						});
 						panel12.add(button3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 0, 5), 0, 0));
+
+						//---- label18 ----
+						label18.setText("text");
+						label18.addMouseListener(new MouseAdapter() {
+							@Override
+							public void mouseClicked(MouseEvent e) {
+								label18MouseClicked(e);
+							}
+						});
+						panel12.add(label18, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 0, 0), 0, 0));
 					}
@@ -2179,6 +2207,7 @@ public class ProjectDetailsPanel extends JPanel {
 	private JLabel label7;
 	private JPanel panel12;
 	private JButton button3;
+	private JLabel label18;
 	private JPanel panel5;
 	private JLabel label3;
 	private JScrollPane scrollPane4;
