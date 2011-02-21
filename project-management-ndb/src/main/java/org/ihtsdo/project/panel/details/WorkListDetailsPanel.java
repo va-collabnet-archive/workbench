@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -51,10 +52,12 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.ProjectPermissionsAPI;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
+import org.ihtsdo.project.util.IconUtilities;
 
 /**
  * @author Guillermo Reynoso
@@ -77,6 +80,8 @@ public class WorkListDetailsPanel extends JPanel {
 		this.config = config;
 		this.worker = worker;
 
+		label13.setIcon(IconUtilities.helpIcon);
+		label13.setText("");
 		pBarW.setVisible(false);
 		pBarBP.setVisible(false);
 		pBarD.setVisible(false);
@@ -476,6 +481,16 @@ public class WorkListDetailsPanel extends JPanel {
 		updateMembersTable();
 	}
 
+	private void label13MouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("WORKLIST_DETAILS");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -496,6 +511,7 @@ public class WorkListDetailsPanel extends JPanel {
 		button3 = new JButton();
 		pBarW = new JProgressBar();
 		button4 = new JButton();
+		label13 = new JLabel();
 		panel8 = new JPanel();
 		label7 = new JLabel();
 		panel10 = new JPanel();
@@ -690,7 +706,19 @@ public class WorkListDetailsPanel extends JPanel {
 							button4ActionPerformed(e);
 						}
 					});
-					panel7.add(button4, new GridBagConstraints(8, 0, 1, 1, 0.0, 0.0,
+					panel7.add(button4, new GridBagConstraints(7, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 5), 0, 0));
+
+					//---- label13 ----
+					label13.setText("text");
+					label13.addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							label13MouseClicked(e);
+						}
+					});
+					panel7.add(label13, new GridBagConstraints(8, 0, 1, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 0, 0), 0, 0));
 				}
@@ -1047,6 +1075,7 @@ public class WorkListDetailsPanel extends JPanel {
 	private JButton button3;
 	private JProgressBar pBarW;
 	private JButton button4;
+	private JLabel label13;
 	private JPanel panel8;
 	private JLabel label7;
 	private JPanel panel10;

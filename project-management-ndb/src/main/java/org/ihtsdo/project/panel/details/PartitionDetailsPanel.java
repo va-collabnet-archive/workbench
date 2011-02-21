@@ -9,16 +9,14 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -47,10 +45,12 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.model.Partition;
 import org.ihtsdo.project.model.PartitionMember;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
+import org.ihtsdo.project.util.IconUtilities;
 
 /**
  * @author Guillermo Reynoso
@@ -71,6 +71,8 @@ public class PartitionDetailsPanel extends JPanel {
 
 	public PartitionDetailsPanel(Partition partition, I_ConfigAceFrame config) {
 		initComponents();
+		label11.setIcon(IconUtilities.helpIcon);
+		label11.setText("");
 		pBarW.setVisible(false);
 		pBarW2.setVisible(false);
 		this.partition = partition;
@@ -464,6 +466,16 @@ public class PartitionDetailsPanel extends JPanel {
 		}
 	}
 
+	private void label11MouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("PARTITION_DETAILS");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		tabbedPane1 = new JTabbedPane();
@@ -484,6 +496,7 @@ public class PartitionDetailsPanel extends JPanel {
 		button4 = new JButton();
 		button5 = new JButton();
 		pBarW = new JProgressBar();
+		label11 = new JLabel();
 		panel9 = new JPanel();
 		label4 = new JLabel();
 		scrollPane2 = new JScrollPane();
@@ -616,9 +629,9 @@ public class PartitionDetailsPanel extends JPanel {
 				//======== panel7 ========
 				{
 					panel7.setLayout(new GridBagLayout());
-					((GridBagLayout)panel7.getLayout()).columnWidths = new int[] {130, 112, 0, 0, 0, 0, 0};
+					((GridBagLayout)panel7.getLayout()).columnWidths = new int[] {130, 112, 0, 0, 0, 0, 0, 0};
 					((GridBagLayout)panel7.getLayout()).rowHeights = new int[] {0, 0};
-					((GridBagLayout)panel7.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
+					((GridBagLayout)panel7.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4};
 					((GridBagLayout)panel7.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 					//---- button2 ----
@@ -673,6 +686,18 @@ public class PartitionDetailsPanel extends JPanel {
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 0, 5), 0, 0));
 					panel7.add(pBarW, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 5), 0, 0));
+
+					//---- label11 ----
+					label11.setText("text");
+					label11.addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							label11MouseClicked(e);
+						}
+					});
+					panel7.add(label11, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 0, 0), 0, 0));
 				}
@@ -867,6 +892,7 @@ public class PartitionDetailsPanel extends JPanel {
 	private JButton button4;
 	private JButton button5;
 	private JProgressBar pBarW;
+	private JLabel label11;
 	private JPanel panel9;
 	private JLabel label4;
 	private JScrollPane scrollPane2;
