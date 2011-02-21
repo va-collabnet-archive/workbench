@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_20" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_22" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void method="setProperty"> 
    <string>i18n.bundlePackage</string> 
@@ -501,10 +501,6 @@
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
               <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-              <void method="setProperty"> 
-               <string>gridx</string> 
-               <int>1</int> 
-              </void> 
              </object> 
             </void> 
             <void method="add"> 
@@ -538,7 +534,7 @@
               <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
               <void method="setProperty"> 
                <string>gridx</string> 
-               <int>2</int> 
+               <int>1</int> 
               </void> 
              </object> 
             </void> 
@@ -573,7 +569,7 @@
               <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
               <void method="setProperty"> 
                <string>gridx</string> 
-               <int>3</int> 
+               <int>2</int> 
               </void> 
              </object> 
             </void> 
@@ -608,7 +604,7 @@
               <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
               <void method="setProperty"> 
                <string>gridx</string> 
-               <int>4</int> 
+               <int>3</int> 
               </void> 
              </object> 
             </void> 
@@ -621,6 +617,33 @@
               </void> 
               <void property="name"> 
                <string>pBarW</string> 
+              </void> 
+             </object> 
+             <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+              <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+              <void method="setProperty"> 
+               <string>gridx</string> 
+               <int>4</int> 
+              </void> 
+             </object> 
+            </void> 
+            <void method="add"> 
+             <object class="com.jformdesigner.model.FormComponent"> 
+              <string>javax.swing.JLabel</string> 
+              <void method="setProperty"> 
+               <string>text</string> 
+               <string>text</string> 
+              </void> 
+              <void property="name"> 
+               <string>label15</string> 
+              </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.MouseListener</string> 
+                <string>mouseClicked</string> 
+                <string>label15MouseClicked</string> 
+                <boolean>true</boolean> 
+               </object> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
