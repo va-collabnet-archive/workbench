@@ -113,6 +113,7 @@ import org.ihtsdo.issue.manager.IssueRepositoryDAO;
 import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.I_ContextualizeDescription;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.issue.manager.IssuesListPanel2;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.TranslationProject;
@@ -215,6 +216,13 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		initComponents();
 		cmbTarComm.addItem(REFSET_COMMENT_NAME);
 		cmbTarComm.addItem(WORKLIST_COMMENT_NAME);
+		
+		label10.setIcon(IconUtilities.helpIcon);
+		label10.setText("");
+		label12.setIcon(IconUtilities.helpIcon);
+		label12.setText("");
+		label13.setIcon(IconUtilities.helpIcon);
+		label13.setText("");
 		
 		tblComm.setSelectionBackground(Color.YELLOW);
 		formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
@@ -1205,6 +1213,36 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		return false;
 		
 	}
+
+	private void label10MouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("TRANSLATION_UI");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	private void label12MouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("WORKFLOW_BUTTONS");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	private void label13MouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("TRANSLATION_EDIT");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
 	
 	class SelectionListener implements ListSelectionListener {
 
@@ -1256,6 +1294,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+		panel1 = new JPanel();
 		menuBar1 = new JMenuBar();
 		menu1 = new JMenu();
 		bAddFSN = new JMenuItem();
@@ -1266,6 +1305,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		menu2 = new JMenu();
 		mHist = new JMenuItem();
 		mLog = new JMenuItem();
+		label10 = new JLabel();
 		panel10 = new JPanel();
 		splitPane2 = new JSplitPane();
 		splitPane4 = new JSplitPane();
@@ -1310,12 +1350,15 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		rbAct = new JRadioButton();
 		rbInact = new JRadioButton();
 		panel3 = new JPanel();
+		label13 = new JLabel();
 		panel6 = new JPanel();
 		buttonPanel = new JPanel();
 		label8 = new JLabel();
 		bKeep = new JButton();
 		bReview = new JButton();
 		bEscalate = new JButton();
+		panel12 = new JPanel();
+		label12 = new JLabel();
 		tabbedPane3 = new JTabbedPane();
 		scrollPane7 = new JScrollPane();
 		tree3 = new JTree();
@@ -1329,111 +1372,135 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
 		((GridBagLayout)getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
 
-		//======== menuBar1 ========
+		//======== panel1 ========
 		{
+			panel1.setLayout(new GridBagLayout());
+			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0, 0};
+			((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {30, 0};
+			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-			//======== menu1 ========
+			//======== menuBar1 ========
 			{
-				menu1.setText("E[d]it");
-				menu1.setFont(new Font("Verdana", Font.PLAIN, 14));
-				menu1.setMnemonic('D');
 
-				//---- bAddFSN ----
-				bAddFSN.setText("Add Concept FSN");
-				bAddFSN.setFont(new Font("Verdana", Font.PLAIN, 14));
-				bAddFSN.setMnemonic('F');
-				bAddFSN.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
-				bAddFSN.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						bAddFSNActionPerformed();
-					}
-				});
-				menu1.add(bAddFSN);
+				//======== menu1 ========
+				{
+					menu1.setText("E[d]it");
+					menu1.setFont(new Font("Verdana", Font.PLAIN, 14));
+					menu1.setMnemonic('D');
 
-				//---- mAddPref ----
-				mAddPref.setText("Add Concept Preferred");
-				mAddPref.setFont(new Font("Verdana", Font.PLAIN, 14));
-				mAddPref.setMnemonic('P');
-				mAddPref.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
-				mAddPref.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						mAddPrefActionPerformed();
-					}
-				});
-				menu1.add(mAddPref);
+					//---- bAddFSN ----
+					bAddFSN.setText("Add Concept FSN");
+					bAddFSN.setFont(new Font("Verdana", Font.PLAIN, 14));
+					bAddFSN.setMnemonic('F');
+					bAddFSN.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					bAddFSN.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							bAddFSNActionPerformed();
+						}
+					});
+					menu1.add(bAddFSN);
 
-				//---- mAddDesc ----
-				mAddDesc.setText("Add Concept Description");
-				mAddDesc.setFont(new Font("Verdana", Font.PLAIN, 14));
-				mAddDesc.setMnemonic('D');
-				mAddDesc.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
-				mAddDesc.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						mAddDescActionPerformed();
-					}
-				});
-				menu1.add(mAddDesc);
+					//---- mAddPref ----
+					mAddPref.setText("Add Concept Preferred");
+					mAddPref.setFont(new Font("Verdana", Font.PLAIN, 14));
+					mAddPref.setMnemonic('P');
+					mAddPref.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					mAddPref.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							mAddPrefActionPerformed();
+						}
+					});
+					menu1.add(mAddPref);
+
+					//---- mAddDesc ----
+					mAddDesc.setText("Add Concept Description");
+					mAddDesc.setFont(new Font("Verdana", Font.PLAIN, 14));
+					mAddDesc.setMnemonic('D');
+					mAddDesc.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					mAddDesc.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							mAddDescActionPerformed();
+						}
+					});
+					menu1.add(mAddDesc);
+				}
+				menuBar1.add(menu1);
+
+				//======== menu3 ========
+				{
+					menu3.setText("[T]ools");
+					menu3.setSelectedIcon(null);
+					menu3.setFont(new Font("Verdana", Font.PLAIN, 14));
+					menu3.setMnemonic('T');
+
+					//---- mSpellChk ----
+					mSpellChk.setText("Spellcheck");
+					mSpellChk.setFont(new Font("Verdana", Font.PLAIN, 14));
+					mSpellChk.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					mSpellChk.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							mSpellChkActionPerformed();
+						}
+					});
+					menu3.add(mSpellChk);
+				}
+				menuBar1.add(menu3);
+
+				//======== menu2 ========
+				{
+					menu2.setText("[V]iew");
+					menu2.setFont(new Font("Verdana", Font.PLAIN, 14));
+					menu2.setMnemonic('V');
+
+					//---- mHist ----
+					mHist.setText("History");
+					mHist.setMnemonic('Y');
+					mHist.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					mHist.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							mHistActionPerformed();
+						}
+					});
+					menu2.add(mHist);
+
+					//---- mLog ----
+					mLog.setText("Log");
+					mLog.setMnemonic('G');
+					mLog.setIcon(null);
+					mLog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					mLog.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							mLogActionPerformed();
+						}
+					});
+					menu2.add(mLog);
+				}
+				menuBar1.add(menu2);
 			}
-			menuBar1.add(menu1);
+			panel1.add(menuBar1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
 
-			//======== menu3 ========
-			{
-				menu3.setText("[T]ools");
-				menu3.setSelectedIcon(null);
-				menu3.setFont(new Font("Verdana", Font.PLAIN, 14));
-				menu3.setMnemonic('T');
-
-				//---- mSpellChk ----
-				mSpellChk.setText("Spellcheck");
-				mSpellChk.setFont(new Font("Verdana", Font.PLAIN, 14));
-				mSpellChk.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
-				mSpellChk.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						mSpellChkActionPerformed();
-					}
-				});
-				menu3.add(mSpellChk);
-			}
-			menuBar1.add(menu3);
-
-			//======== menu2 ========
-			{
-				menu2.setText("[V]iew");
-				menu2.setFont(new Font("Verdana", Font.PLAIN, 14));
-				menu2.setMnemonic('V');
-
-				//---- mHist ----
-				mHist.setText("History");
-				mHist.setMnemonic('Y');
-				mHist.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
-				mHist.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						mHistActionPerformed();
-					}
-				});
-				menu2.add(mHist);
-
-				//---- mLog ----
-				mLog.setText("Log");
-				mLog.setMnemonic('G');
-				mLog.setIcon(null);
-				mLog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
-				mLog.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						mLogActionPerformed();
-					}
-				});
-				menu2.add(mLog);
-			}
-			menuBar1.add(menu2);
+			//---- label10 ----
+			label10.setText("text");
+			label10.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					label10MouseClicked(e);
+				}
+			});
+			panel1.add(label10, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(menuBar1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+		add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 5, 0), 0, 0));
 
@@ -1770,6 +1837,18 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 								((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {0, 0};
 								((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
 								((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+
+								//---- label13 ----
+								label13.setText("text");
+								label13.addMouseListener(new MouseAdapter() {
+									@Override
+									public void mouseClicked(MouseEvent e) {
+										label13MouseClicked(e);
+									}
+								});
+								panel3.add(label13, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+									new Insets(0, 0, 0, 0), 0, 0));
 							}
 							panel2.add(panel3, new GridBagConstraints(3, 6, 1, 1, 0.0, 0.0,
 								GridBagConstraints.EAST, GridBagConstraints.NONE,
@@ -1790,12 +1869,12 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 								buttonPanel.setLayout(new GridBagLayout());
 								((GridBagLayout)buttonPanel.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0, 0, 0};
 								((GridBagLayout)buttonPanel.getLayout()).rowHeights = new int[] {0, 0};
-								((GridBagLayout)buttonPanel.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+								((GridBagLayout)buttonPanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
 								((GridBagLayout)buttonPanel.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 								//---- label8 ----
 								label8.setText("Workflow actions:      ");
-								buttonPanel.add(label8, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+								buttonPanel.add(label8, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
 									new Insets(0, 0, 0, 5), 0, 0));
 
@@ -1808,7 +1887,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 										bKeepActionPerformed();
 									}
 								});
-								buttonPanel.add(bKeep, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+								buttonPanel.add(bKeep, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
 									new Insets(0, 0, 0, 5), 0, 0));
 
@@ -1821,7 +1900,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 										bReviewActionPerformed();
 									}
 								});
-								buttonPanel.add(bReview, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+								buttonPanel.add(bReview, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
 									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
 									new Insets(0, 0, 0, 5), 0, 0));
 
@@ -1834,7 +1913,31 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 										bEscalateActionPerformed();
 									}
 								});
-								buttonPanel.add(bEscalate, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
+								buttonPanel.add(bEscalate, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+									new Insets(0, 0, 0, 5), 0, 0));
+
+								//======== panel12 ========
+								{
+									panel12.setLayout(new GridBagLayout());
+									((GridBagLayout)panel12.getLayout()).columnWidths = new int[] {0, 0, 0};
+									((GridBagLayout)panel12.getLayout()).rowHeights = new int[] {0, 0};
+									((GridBagLayout)panel12.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0E-4};
+									((GridBagLayout)panel12.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+
+									//---- label12 ----
+									label12.setText("text");
+									label12.addMouseListener(new MouseAdapter() {
+										@Override
+										public void mouseClicked(MouseEvent e) {
+											label12MouseClicked(e);
+										}
+									});
+									panel12.add(label12, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+										GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+										new Insets(0, 0, 0, 0), 0, 0));
+								}
+								buttonPanel.add(panel12, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
 									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
 									new Insets(0, 0, 0, 0), 0, 0));
 							}
@@ -1886,6 +1989,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	private JPanel panel1;
 	private JMenuBar menuBar1;
 	private JMenu menu1;
 	private JMenuItem bAddFSN;
@@ -1896,6 +2000,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 	private JMenu menu2;
 	private JMenuItem mHist;
 	private JMenuItem mLog;
+	private JLabel label10;
 	private JPanel panel10;
 	private JSplitPane splitPane2;
 	private JSplitPane splitPane4;
@@ -1940,12 +2045,15 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 	private JRadioButton rbAct;
 	private JRadioButton rbInact;
 	private JPanel panel3;
+	private JLabel label13;
 	private JPanel panel6;
 	private JPanel buttonPanel;
 	private JLabel label8;
 	private JButton bKeep;
 	private JButton bReview;
 	private JButton bEscalate;
+	private JPanel panel12;
+	private JLabel label12;
 	private JTabbedPane tabbedPane3;
 	private JScrollPane scrollPane7;
 	private JTree tree3;
