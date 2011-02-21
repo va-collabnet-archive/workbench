@@ -67,10 +67,12 @@ public class EnableQueueButtons extends AbstractTask {
         }
     }
 
+    @Override
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
+    @Override
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             I_ConfigAceFrame configFrame =
@@ -85,10 +87,12 @@ public class EnableQueueButtons extends AbstractTask {
         }
     }
 
+    @Override
     public int[] getDataContainerIds() {
         return new int[] {};
     }
 
+    @Override
     public Collection<Condition> getConditions() {
         return AbstractTask.CONTINUE_CONDITION;
     }

@@ -1932,15 +1932,23 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         newInboxButton =
                 addActionButton(new NewQueueListener(this), "/24x24/plain/inbox_new.png",
                     "Create new inbox and add to profile", listEditorTopPanel, c);
+        newInboxButton.setEnabled(false);
+        newInboxButton.setVisible(false);
         addExistingInboxButton =
                 addActionButton(new AddQueueListener(this), "/24x24/plain/inbox_add.png", "Add existing inbox to profile",
                     listEditorTopPanel, c);
+        addExistingInboxButton.setEnabled(false);
+        addExistingInboxButton.setVisible(false);
         moveListenerButton =
                 addActionButton(new MoveListener(), "/24x24/plain/outbox_out.png",
                     "Take Selected Processes and Save To Disk (no transaction)", listEditorTopPanel, c);
+        moveListenerButton.setEnabled(false);
+        moveListenerButton.setVisible(false);
         showAllQueuesButton =
                 addActionToggleButton(new ShowAllQueuesListener(), "/24x24/plain/funnel_delete.png", "Show all queues",
                     listEditorTopPanel, c, 24);
+        showAllQueuesButton.setEnabled(false);
+        showAllQueuesButton.setVisible(false);
         return listEditorTopPanel;
 
     }
@@ -3256,6 +3264,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         AceLog.getAppLog().info("set enable new inbox button: " + enable);
         if (newInboxButton != null) {
             newInboxButton.setEnabled(enable);
+            newInboxButton.setVisible(true);
         }
     }
 
@@ -3263,6 +3272,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         AceLog.getAppLog().info("set enable add-existing-inbox button: " + enable);
         if (addExistingInboxButton != null) {
             addExistingInboxButton.setEnabled(enable);
+            addExistingInboxButton.setVisible(true);
         }
     }
 
@@ -3270,6 +3280,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         AceLog.getAppLog().info("set enable move-listener button: " + enable);
         if (moveListenerButton != null) {
             moveListenerButton.setEnabled(enable);
+            moveListenerButton.setVisible(true);
         }
     }
 
@@ -3277,6 +3288,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         AceLog.getAppLog().info("set enable all queues button: " + enable);
         if (showAllQueuesButton != null) {
             showAllQueuesButton.setEnabled(enable);
+            showAllQueuesButton.setVisible(true);
         }
     }
 
