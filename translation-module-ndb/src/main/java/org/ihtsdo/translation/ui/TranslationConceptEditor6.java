@@ -1353,12 +1353,11 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		label13 = new JLabel();
 		panel6 = new JPanel();
 		buttonPanel = new JPanel();
+		label12 = new JLabel();
 		label8 = new JLabel();
 		bKeep = new JButton();
 		bReview = new JButton();
 		bEscalate = new JButton();
-		panel12 = new JPanel();
-		label12 = new JLabel();
 		tabbedPane3 = new JTabbedPane();
 		scrollPane7 = new JScrollPane();
 		tree3 = new JTree();
@@ -1867,14 +1866,26 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 							{
 								buttonPanel.setBackground(new Color(238, 238, 238));
 								buttonPanel.setLayout(new GridBagLayout());
-								((GridBagLayout)buttonPanel.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0, 0, 0};
+								((GridBagLayout)buttonPanel.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0};
 								((GridBagLayout)buttonPanel.getLayout()).rowHeights = new int[] {0, 0};
-								((GridBagLayout)buttonPanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
+								((GridBagLayout)buttonPanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
 								((GridBagLayout)buttonPanel.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+
+								//---- label12 ----
+								label12.setText("text");
+								label12.addMouseListener(new MouseAdapter() {
+									@Override
+									public void mouseClicked(MouseEvent e) {
+										label12MouseClicked(e);
+									}
+								});
+								buttonPanel.add(label12, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+									new Insets(0, 0, 0, 5), 0, 0));
 
 								//---- label8 ----
 								label8.setText("Workflow actions:      ");
-								buttonPanel.add(label8, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+								buttonPanel.add(label8, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
 									new Insets(0, 0, 0, 5), 0, 0));
 
@@ -1887,7 +1898,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 										bKeepActionPerformed();
 									}
 								});
-								buttonPanel.add(bKeep, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+								buttonPanel.add(bKeep, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
 									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
 									new Insets(0, 0, 0, 5), 0, 0));
 
@@ -1900,7 +1911,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 										bReviewActionPerformed();
 									}
 								});
-								buttonPanel.add(bReview, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+								buttonPanel.add(bReview, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
 									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
 									new Insets(0, 0, 0, 5), 0, 0));
 
@@ -1913,33 +1924,9 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 										bEscalateActionPerformed();
 									}
 								});
-								buttonPanel.add(bEscalate, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
+								buttonPanel.add(bEscalate, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
 									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
 									new Insets(0, 0, 0, 5), 0, 0));
-
-								//======== panel12 ========
-								{
-									panel12.setLayout(new GridBagLayout());
-									((GridBagLayout)panel12.getLayout()).columnWidths = new int[] {0, 0, 0};
-									((GridBagLayout)panel12.getLayout()).rowHeights = new int[] {0, 0};
-									((GridBagLayout)panel12.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0E-4};
-									((GridBagLayout)panel12.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
-
-									//---- label12 ----
-									label12.setText("text");
-									label12.addMouseListener(new MouseAdapter() {
-										@Override
-										public void mouseClicked(MouseEvent e) {
-											label12MouseClicked(e);
-										}
-									});
-									panel12.add(label12, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-										GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-										new Insets(0, 0, 0, 0), 0, 0));
-								}
-								buttonPanel.add(panel12, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-									new Insets(0, 0, 0, 0), 0, 0));
 							}
 							panel6.add(buttonPanel);
 						}
@@ -2048,12 +2035,11 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 	private JLabel label13;
 	private JPanel panel6;
 	private JPanel buttonPanel;
+	private JLabel label12;
 	private JLabel label8;
 	private JButton bKeep;
 	private JButton bReview;
 	private JButton bEscalate;
-	private JPanel panel12;
-	private JLabel label12;
 	private JTabbedPane tabbedPane3;
 	private JScrollPane scrollPane7;
 	private JTree tree3;
