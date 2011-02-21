@@ -18,6 +18,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.*;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -50,11 +52,13 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.model.PartitionScheme;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.model.WorkSetMember;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.project.panel.dnd.ObjectTransferHandler;
+import org.ihtsdo.project.util.IconUtilities;
 
 /**
  * @author Guillermo Reynoso
@@ -82,6 +86,8 @@ public class WorkSetDetailsPanel extends JPanel {
 		this.config = config;
 		I_TermFactory tf = Terms.get();
 		try {
+			label15.setIcon(IconUtilities.helpIcon);
+			label15.setText("");
 			pBarW.setVisible(false);
 			pBarS.setVisible(false);
 			pBarE.setVisible(false);
@@ -647,6 +653,16 @@ public class WorkSetDetailsPanel extends JPanel {
 		pBarS.setVisible(false);
 	}
 
+	private void label15MouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("WORKSET_DETAILS");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		jTabbedPane1 = new JTabbedPane();
@@ -668,6 +684,7 @@ public class WorkSetDetailsPanel extends JPanel {
 		button4 = new JButton();
 		button7 = new JButton();
 		pBarW = new JProgressBar();
+		label15 = new JLabel();
 		panel4 = new JPanel();
 		panel8 = new JPanel();
 		panel13 = new JPanel();
@@ -851,7 +868,7 @@ public class WorkSetDetailsPanel extends JPanel {
 							button2ActionPerformed(e);
 						}
 					});
-					panel7.add(button2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					panel7.add(button2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 0, 5), 0, 0));
 
@@ -864,7 +881,7 @@ public class WorkSetDetailsPanel extends JPanel {
 							button3ActionPerformed(e);
 						}
 					});
-					panel7.add(button3, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+					panel7.add(button3, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 0, 5), 0, 0));
 
@@ -877,7 +894,7 @@ public class WorkSetDetailsPanel extends JPanel {
 							button4ActionPerformed(e);
 						}
 					});
-					panel7.add(button4, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+					panel7.add(button4, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 0, 5), 0, 0));
 
@@ -890,13 +907,25 @@ public class WorkSetDetailsPanel extends JPanel {
 							button7ActionPerformed(e);
 						}
 					});
-					panel7.add(button7, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+					panel7.add(button7, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 0, 5), 0, 0));
 
 					//---- pBarW ----
 					pBarW.setIndeterminate(true);
-					panel7.add(pBarW, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
+					panel7.add(pBarW, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 5), 0, 0));
+
+					//---- label15 ----
+					label15.setText("text");
+					label15.addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							label15MouseClicked(e);
+						}
+					});
+					panel7.add(label15, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 0, 0), 0, 0));
 				}
@@ -1300,6 +1329,7 @@ public class WorkSetDetailsPanel extends JPanel {
 	private JButton button4;
 	private JButton button7;
 	private JProgressBar pBarW;
+	private JLabel label15;
 	private JPanel panel4;
 	private JPanel panel8;
 	private JPanel panel13;

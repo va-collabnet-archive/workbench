@@ -12,10 +12,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragSource;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.*;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -48,11 +47,13 @@ import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.model.Partition;
 import org.ihtsdo.project.model.PartitionScheme;
 import org.ihtsdo.project.panel.dnd.ListConceptDragSourceListener;
 import org.ihtsdo.project.panel.dnd.ListDragGestureListenerWithImage;
 import org.ihtsdo.project.panel.dnd.ObjectTransferHandler;
+import org.ihtsdo.project.util.IconUtilities;
 
 /**
  * @author Guillermo Reynoso
@@ -72,6 +73,8 @@ public class RefsetPartitionerPanel extends JPanel {
 		this.config = config;
 
 		try {
+			label11.setIcon(IconUtilities.helpIcon);
+			label11.setText("");
 			label8.setText(partitionScheme.getName());
 			I_GetConceptData refset = partitionScheme.getSourceRefset(config);
 			label9.setText(refset.toString());
@@ -281,6 +284,16 @@ public class RefsetPartitionerPanel extends JPanel {
 		button3.setEnabled(false);
 	}
 
+	private void label11MouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("REFSET_PARTITIONER");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		panel1 = new JPanel();
@@ -312,6 +325,7 @@ public class RefsetPartitionerPanel extends JPanel {
 		button2 = new JButton();
 		button1 = new JButton();
 		button3 = new JButton();
+		label11 = new JLabel();
 
 		//======== this ========
 		setBackground(new Color(238, 238, 238));
@@ -555,9 +569,9 @@ public class RefsetPartitionerPanel extends JPanel {
 		{
 			panel8.setBackground(new Color(238, 238, 238));
 			panel8.setLayout(new GridBagLayout());
-			((GridBagLayout)panel8.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
+			((GridBagLayout)panel8.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0};
 			((GridBagLayout)panel8.getLayout()).rowHeights = new int[] {0, 0};
-			((GridBagLayout)panel8.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel8.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4};
 			((GridBagLayout)panel8.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 			//---- button2 ----
@@ -596,6 +610,18 @@ public class RefsetPartitionerPanel extends JPanel {
 				}
 			});
 			panel8.add(button3, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- label11 ----
+			label11.setText("text");
+			label11.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					label11MouseClicked(e);
+				}
+			});
+			panel8.add(label11, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 0), 0, 0));
 		}
@@ -640,5 +666,6 @@ public class RefsetPartitionerPanel extends JPanel {
 	private JButton button2;
 	private JButton button1;
 	private JButton button3;
+	private JLabel label11;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }
