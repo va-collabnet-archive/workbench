@@ -400,7 +400,7 @@ Click ‘Retire worklist’ to retire a list. However, it will not be retired un
              <class>java.awt.GridBagLayout</class> 
              <void method="setProperty"> 
               <string>$columnSpecs</string> 
-              <string>0, 0, 0, 0, 103, 0, 35, 0, 0</string> 
+              <string>0, 0, 0, 0, 103:1.0, 0, 35, 0, 0</string> 
              </void> 
              <void method="setProperty"> 
               <string>$rowSpecs</string> 

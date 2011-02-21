@@ -662,7 +662,7 @@ public class WorkListDetailsPanel extends JPanel {
 					panel7.setLayout(new GridBagLayout());
 					((GridBagLayout)panel7.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 108, 0, 40, 0, 0, 0};
 					((GridBagLayout)panel7.getLayout()).rowHeights = new int[] {0, 0};
-					((GridBagLayout)panel7.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+					((GridBagLayout)panel7.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 					((GridBagLayout)panel7.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 					//---- button2 ----
