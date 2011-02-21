@@ -4893,10 +4893,11 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
         } else {
             s = f.getParent().substring(baseDir.length() + subDir.length());
         }
-
+        getLog().info("createNewSctFile S = "+s);
         // :NYI: (Maybe) Additional checks if last directory branch is a date
         // @@@ (Maybe just use the directory branch for UUID)
         if (f.getAbsolutePath().contains(SNOMED_FILE_PATH)) {
+        	getLog().info("f.getAbsolutePath().contains(SNOMED_FILE_PATH) f.getAbsolutePath()= " + f.getAbsolutePath());
             if (f.getAbsolutePath().contains("sct_relationships_stated")) {
                 puuid = uuidPathSnomedStatedStr;
                 getLog().info("  PATH UUID: " + "SNOMED Core Stated " + puuid);
@@ -4913,6 +4914,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             }
         } else if (s.startsWith(NHS_UK_EXTENSION_FILE_PATH)) {
             // "UK Extensions" Path UUID
+        	getLog().info("s.startsWith(NHS_UK_EXTENSION_FILE_PATH) s = " + s);
             try {
                 if (f.getAbsolutePath().contains("sct_relationships_stated"))
                     u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
@@ -4936,6 +4938,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             getLog().info("  PATH UUID (uke): " + s + " " + puuid);
         } else if (s.startsWith(NHS_UK_DRUG_EXTENSION_FILE_PATH)) {
             // "UK Drug Extensions" Path UUID
+        	getLog().info("s.startsWith(NHS_UK_DRUG_EXTENSION_FILE_PATH) s = " + s);
             try {
                 if (f.getAbsolutePath().contains("sct_relationships_stated"))
                     u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
@@ -4962,6 +4965,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
 
         } else {
             // OTHER PATH UUID: based on directory path
+        	getLog().info("OTHER PATH UUID: based on directory path s = " + s);
             try {
                 if (f.getAbsolutePath().contains("sct_relationships_stated"))
                     u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, s + " Stated");
