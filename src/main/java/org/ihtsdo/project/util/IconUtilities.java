@@ -24,6 +24,8 @@ public class IconUtilities {
 	public static Icon associationIcon=new ImageIcon("icons/Association.gif");
 	public static Icon notAcceptIcon=new ImageIcon("icons/NotAccept.gif");
 	
+	public static Icon helpIcon=new ImageIcon("icons/help16.png");
+	
 	public static Icon checkIcon=new ImageIcon("icons/check.png");
 	public static Icon addIcon=new ImageIcon("icons/add.png");
 	public static Icon deleteIcon=new ImageIcon("icons/delete.png");

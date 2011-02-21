@@ -30,6 +30,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.FilteredImageSource;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 import java.security.PrivilegedActionException;
 import java.util.ArrayList;
@@ -76,6 +77,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.model.Partition;
 import org.ihtsdo.project.model.PartitionScheme;
 import org.ihtsdo.project.model.TranslationProject;
@@ -155,6 +157,8 @@ public class ProjectsPanel extends JPanel {
 
 
 		initComponents();
+		label2.setIcon(IconUtilities.helpIcon);
+		label2.setText("");
 		this.worker=worker;
 		try {
 			loadProjects();
@@ -911,6 +915,16 @@ public class ProjectsPanel extends JPanel {
 		}
 	}
 
+	private void label2MouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("PROJECT_LEFT");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
+
 	class MenuItemActionListener implements ActionListener{
 
 		private String nodeType;
@@ -1016,6 +1030,7 @@ public class ProjectsPanel extends JPanel {
 		label1 = new JLabel();
 		button2 = new JButton();
 		button1 = new JButton();
+		label2 = new JLabel();
 		panel11 = new JPanel();
 		scrollPane1 = new JScrollPane();
 		jTree1 = new JTree();
@@ -1040,9 +1055,9 @@ public class ProjectsPanel extends JPanel {
 			{
 				panel1.setBackground(new Color(238, 238, 238));
 				panel1.setLayout(new GridBagLayout());
-				((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 61, 0, 0, 0};
+				((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 61, 0, 0, 0, 0};
 				((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0};
-				((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0, 0.0, 0.0, 1.0E-4};
 				((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 				//---- label1 ----
@@ -1073,6 +1088,18 @@ public class ProjectsPanel extends JPanel {
 					}
 				});
 				panel1.add(button1, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
+
+				//---- label2 ----
+				label2.setText("text");
+				label2.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						label2MouseClicked(e);
+					}
+				});
+				panel1.add(label2, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 0, 0), 0, 0));
 			}
@@ -1134,6 +1161,7 @@ public class ProjectsPanel extends JPanel {
 	private JLabel label1;
 	private JButton button2;
 	private JButton button1;
+	private JLabel label2;
 	private JPanel panel11;
 	private JScrollPane scrollPane1;
 	private JTree jTree1;
