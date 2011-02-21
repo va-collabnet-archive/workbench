@@ -26,6 +26,7 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.BundleType;
 import org.dwfa.ace.api.I_ConfigAceDb;
@@ -154,20 +155,23 @@ public class SaveNewProfile extends AbstractTask {
                 String repositoryUrlStr = profileDirRepoUrl + profileToSave.getUsername();
                 String workingCopyStrForNewUser = "profiles" + File.separator + profileToSave.getUsername();
 
-                SubversionData svd = new SubversionData(repositoryUrlStr, workingCopyStrForNewUser);
-                currentProfile.svnImport(svd);
-                worker.getLogger().info("Recursive delete for: " + newDbProfile.getProfileFile().getParent());
-                FileIO.recursiveDelete(newDbProfile.getProfileFile().getParentFile());
+                File newUserSvnDir = new File(newDbProfile.getProfileFile().getParent(), ".svn");
+                if (!newUserSvnDir.exists()) {
+                    SubversionData svd = new SubversionData(repositoryUrlStr, workingCopyStrForNewUser);
+                    currentProfile.svnImport(svd);
+                    worker.getLogger().log(Level.INFO, "Recursive delete for: {0}", newDbProfile.getProfileFile().getParent());
+                    FileIO.recursiveDelete(newDbProfile.getProfileFile().getParentFile());
+                }
 
-                worker.getLogger().info("Starting commits for: " + currentProfile.getSubversionMap().keySet());
+                worker.getLogger().log(Level.INFO, "Starting commits for: {0}", currentProfile.getSubversionMap().keySet());
 
                 for (Entry<String, SubversionData> entry : currentProfile.getSubversionMap().entrySet()) {
 
                     if (!entry.getKey().replace('\\', '/').equalsIgnoreCase(I_ConfigAceDb.MUTABLE_DB_LOC)) {
-                        worker.getLogger().info("commit: " + entry);
+                        worker.getLogger().log(Level.INFO, "commit: {0}", entry);
                         CommitAllSvnEntries.commit(currentProfile, entry.getValue(), entry.getKey());
                     } else {
-                        worker.getLogger().info("suppressed commit for: " + entry);
+                        worker.getLogger().log(Level.INFO, "suppressed commit for: {0}", entry);
                     }
                 }
             }
