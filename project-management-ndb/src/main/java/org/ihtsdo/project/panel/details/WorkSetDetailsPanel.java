@@ -51,6 +51,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.ihtsdo.project.ProjectPermissionsAPI;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.model.PartitionScheme;
@@ -139,12 +140,12 @@ public class WorkSetDetailsPanel extends JPanel {
 
 			updateList4Content();
 			updateList5Content();
-
-			boolean isWorkSetManager = TerminologyProjectDAO.checkPermissionForProject(
+			
+			ProjectPermissionsAPI permissionsApi = new ProjectPermissionsAPI(config);
+			boolean isWorkSetManager = permissionsApi.checkPermissionForProject(
 					config.getDbConfig().getUserConcept(), 
 					tf.getConcept(ArchitectonicAuxiliary.Concept.PROJECTS_ROOT_HIERARCHY.localize().getNid()),
-					tf.getConcept(ArchitectonicAuxiliary.Concept.WORKSET_MANAGER_ROLE.localize().getNid()), 
-					config);
+					tf.getConcept(ArchitectonicAuxiliary.Concept.WORKSET_MANAGER_ROLE.localize().getNid()));
 			
 			if (workSet.getName().startsWith("Maintenance -")) {
 				isWorkSetManager = false;
@@ -856,7 +857,7 @@ public class WorkSetDetailsPanel extends JPanel {
 					panel7.setLayout(new GridBagLayout());
 					((GridBagLayout)panel7.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0, 0};
 					((GridBagLayout)panel7.getLayout()).rowHeights = new int[] {0, 0};
-					((GridBagLayout)panel7.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+					((GridBagLayout)panel7.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4};
 					((GridBagLayout)panel7.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 					//---- button2 ----

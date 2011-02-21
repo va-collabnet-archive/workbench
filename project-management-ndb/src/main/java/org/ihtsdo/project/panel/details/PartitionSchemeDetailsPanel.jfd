@@ -433,7 +433,7 @@ Click ‘Retire partition scheme’  to retire a partition scheme. Partitions mu
              <class>java.awt.GridBagLayout</class> 
              <void method="setProperty"> 
               <string>$columnSpecs</string> 
-              <string>0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0</string> 
+              <string>0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0:1.0, 0, 0, 0, 0</string> 
              </void> 
              <void method="setProperty"> 
               <string>$rowSpecs</string> 
