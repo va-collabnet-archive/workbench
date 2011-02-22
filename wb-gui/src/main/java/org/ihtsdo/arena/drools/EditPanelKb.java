@@ -154,7 +154,7 @@ public class EditPanelKb implements Runnable {
 			}
 			
 			try {
-				I_GetConceptData context = Terms.get().getConcept(RefsetAuxiliary.Concept.REALTIME_QA_CONTEXT.getUids());
+				I_GetConceptData context = Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_CONTEXT.getUids());
 				ResultsCollectorWorkBench results = RulesLibrary.checkConcept(c, context, false, config);
 				Map<SpecBI, Integer> guvnorTemplates = results.getWbTemplates();
 				templates.putAll(guvnorTemplates);
