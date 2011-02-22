@@ -699,6 +699,28 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                                 new I_ConceptualizeUniversally[] { SNOMED_CORE }),
                         SNOMED_20050131("SNOMED 2005-01-31",
                                 new I_ConceptualizeUniversally[] { SNOMED_CORE }),
+
+                        SNOMED_CORE_INFERRED("SNOMED Core Inferred",
+                                new I_ConceptualizeUniversally[] { SNOMED_CORE }),
+                        SNOMED_CORE_STATED("SNOMED Core Stated",
+                                new I_ConceptualizeUniversally[] { SNOMED_CORE }),
+                                                
+                        SNOMED_NHS_UK_EXT("NHS UK Extension Path",
+                                new I_ConceptualizeUniversally[] { SNOMED_CORE }),
+                        SNOMED_NHS_UK_EXT_STATED("NHS UK Extension Path Stated",
+                                new I_ConceptualizeUniversally[] { SNOMED_NHS_UK_EXT }),
+                        SNOMED_NHS_UK_EXT_INFERRED("NHS UK Extension Path Inferred",
+                                new I_ConceptualizeUniversally[] { SNOMED_NHS_UK_EXT }),
+                        SNOMED_NHS_UK_EXT_DRUG("NHS UK Drug Extension Path",
+                                new I_ConceptualizeUniversally[] { SNOMED_NHS_UK_EXT }),
+                        SNOMED_NHS_UK_EXT_DRUG_STATED("NHS UK Drug Extension Path Stated",
+                                new I_ConceptualizeUniversally[] { SNOMED_NHS_UK_EXT_DRUG }),
+                        SNOMED_NHS_UK_EXT_DRUG_INFERRED("NHS UK Drug Extension Path Inferred",
+                                new I_ConceptualizeUniversally[] { SNOMED_NHS_UK_EXT_DRUG }),
+                                
+                                
+                                
+                                
                 ARCHITECTONIC_BRANCH(PrimordialId.ACE_AUXILIARY_ID, new String[] {"Workbench Auxiliary"}, null,
                         new I_ConceptualizeUniversally[] { PATH }),
         TEST("test",
