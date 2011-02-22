@@ -164,7 +164,8 @@ public class RulesLibrary {
 		HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
 		I_ShowActivity activity =
 			Terms.get().newActivityPanel(true, config, 
-					"<html>Performing QA check on concept...", true);
+					"<html>Performing QA check on concept: " + concept.toString() + 
+					" for " + context.toString(), true);
 		activities.add(activity);
 		activity.setValue(0);
 		activity.setIndeterminate(true);
@@ -266,6 +267,8 @@ public class RulesLibrary {
 		long elapsed = endTime - startTime;
 		String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
 		String result = "Done";
+		activity.setProgressInfoUpper("<html>Performed QA check on concept: " + concept.toString() + 
+					" for " + context.toString());
 		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
 		try {
 			activity.complete();
