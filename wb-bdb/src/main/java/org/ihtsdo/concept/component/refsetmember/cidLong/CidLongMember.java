@@ -26,7 +26,7 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class CidLongMember
         extends RefsetMember<CidLongRevision, CidLongMember>
-		implements RefexCnidLongAnalogBI<CidLongRevision> {
+        implements RefexCnidLongAnalogBI<CidLongRevision> {
 
     private static VersionComputer<RefsetMember<CidLongRevision, CidLongMember>.Version> computer =
             new VersionComputer<RefsetMember<CidLongRevision, CidLongMember>.Version>();
@@ -112,9 +112,6 @@ public class CidLongMember
 
     @Override
     public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-        if (getTime() == time && getPathNid() == pathNid) {
-            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
-        }
         CidLongRevision newR = new CidLongRevision(statusNid, pathNid, time, this);
         addRevision(newR);
         return newR;
@@ -122,9 +119,6 @@ public class CidLongMember
 
     @Override
     public CidLongRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-        if (getTime() == time && getPathNid() == pathNid) {
-            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
-        }
         CidLongRevision newR = new CidLongRevision(statusNid, authorNid, pathNid, time, this);
         addRevision(newR);
         return newR;
@@ -197,36 +191,34 @@ public class CidLongMember
         return (List<Version>) versions;
     }
 
-	@Override
-	public long getLong1() {
-		return this.longValue;
-	}
+    @Override
+    public long getLong1() {
+        return this.longValue;
+    }
 
-	@Override
-	public void setLong1(long l) throws PropertyVetoException {
-		this.longValue = l;
-		modified();
-	}
+    @Override
+    public void setLong1(long l) throws PropertyVetoException {
+        this.longValue = l;
+        modified();
+    }
 
-	@Override
-	public void setCnid1(int cnid1) throws PropertyVetoException {
-		this.c1Nid = cnid1;
-		modified();
-	}
+    @Override
+    public void setCnid1(int cnid1) throws PropertyVetoException {
+        this.c1Nid = cnid1;
+        modified();
+    }
 
-	@Override
-	public int getCnid1() {
-		return c1Nid;
-	}
-    
-	protected TK_REFSET_TYPE getTkRefsetType() {
-		return TK_REFSET_TYPE.CID_LONG;
-	}
+    @Override
+    public int getCnid1() {
+        return c1Nid;
+    }
 
-	protected void addSpecProperties(RefexAmendmentSpec rcs) {
-		rcs.with(RefexProperty.CNID1, getCnid1());
-		rcs.with(RefexProperty.LONG1, getLong1());
-	}
+    protected TK_REFSET_TYPE getTkRefsetType() {
+        return TK_REFSET_TYPE.CID_LONG;
+    }
 
-    
+    protected void addSpecProperties(RefexAmendmentSpec rcs) {
+        rcs.with(RefexProperty.CNID1, getCnid1());
+        rcs.with(RefexProperty.LONG1, getLong1());
+    }
 }

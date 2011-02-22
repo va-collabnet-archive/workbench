@@ -44,14 +44,14 @@ import org.ihtsdo.tk.api.RelAssertionType;
 
 public class Relationship extends ConceptComponent<RelationshipRevision, Relationship>
         implements I_RelVersioned<RelationshipRevision>,
-                   I_RelPart<RelationshipRevision>,
-                   RelationshipAnalogBI<RelationshipRevision> {
+        I_RelPart<RelationshipRevision>,
+        RelationshipAnalogBI<RelationshipRevision> {
 
     public class Version
             extends ConceptComponent<RelationshipRevision, Relationship>.Version
             implements I_RelTuple<RelationshipRevision>,
-                       I_RelPart<RelationshipRevision>,
-                       RelationshipAnalogBI<RelationshipRevision> {
+            I_RelPart<RelationshipRevision>,
+            RelationshipAnalogBI<RelationshipRevision> {
 
         public Version() {
             super();
@@ -757,9 +757,6 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
     @Override
     public RelationshipRevision makeAnalog(int statusNid, int pathNid, long time) {
-        if (getTime() == time && getPathNid() == pathNid) {
-            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
-        }
         RelationshipRevision newR = new RelationshipRevision(this, statusNid, Terms.get().getAuthorNid(), pathNid, time, this);
         addRevision(newR);
         return newR;
@@ -767,9 +764,6 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
     @Override
     public RelationshipRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-        if (getTime() == time && getPathNid() == pathNid) {
-            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
-        }
         RelationshipRevision newR = new RelationshipRevision(this, statusNid, authorNid, pathNid, time, this);
         addRevision(newR);
         return newR;
@@ -780,7 +774,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         throw new UnsupportedOperationException("Use makeAnalog instead");
     }
 
-   @Override
+    @Override
     public Relationship getFixedPart() {
         return this;
     }
@@ -800,32 +794,32 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         versions = null;
     }
 
-   @Override
+    @Override
     public void setCharacteristicNid(int characteristicNid) {
         this.characteristicNid = characteristicNid;
     }
 
-   @Override
+    @Override
     public int getCharacteristicNid() {
         return characteristicNid;
     }
 
-   @Override
+    @Override
     public void setRefinabilityNid(int refinabilityNid) {
         this.refinabilityNid = refinabilityNid;
     }
 
-   @Override
+    @Override
     public int getRefinabilityNid() {
         return refinabilityNid;
     }
 
-   @Override
+    @Override
     public void setTypeNid(int typeNid) {
         this.typeNid = typeNid;
     }
 
-   @Override
+    @Override
     public int getTypeNid() {
         return typeNid;
     }
@@ -880,10 +874,10 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     @Override
     public List<Relationship.Version> getVersions(ViewCoordinate c) {
         List<Version> returnValues = new ArrayList<Version>(2);
-         computer.addSpecifiedRelVersions(returnValues,
+        computer.addSpecifiedRelVersions(returnValues,
                 getVersions(),
                 c);
-         return returnValues;
+        return returnValues;
     }
 
     @Override

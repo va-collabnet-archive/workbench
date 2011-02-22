@@ -44,14 +44,14 @@ import com.sleepycat.bind.tuple.TupleOutput;
 public class Image
         extends ConceptComponent<ImageRevision, Image>
         implements I_ImageVersioned<ImageRevision>,
-                I_ImagePart<ImageRevision>,
-                MediaAnalogBI<ImageRevision> {
+        I_ImagePart<ImageRevision>,
+        MediaAnalogBI<ImageRevision> {
 
     public class Version
             extends ConceptComponent<ImageRevision, Image>.Version
             implements I_ImageTuple<ImageRevision>,
-                    I_ImagePart<ImageRevision>,
-                    MediaAnalogBI<ImageRevision> {
+            I_ImagePart<ImageRevision>,
+            MediaAnalogBI<ImageRevision> {
 
         public Version() {
             super();
@@ -572,9 +572,6 @@ public class Image
 
     @Override
     public ImageRevision makeAnalog(int statusNid, int pathNid, long time) {
-        if (getTime() == time && getPathNid() == pathNid) {
-            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
-        }
         ImageRevision newR;
         newR = new ImageRevision(this, statusNid,
                 Terms.get().getAuthorNid(),
@@ -585,9 +582,6 @@ public class Image
 
     @Override
     public ImageRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-        if (getTime() == time && getPathNid() == pathNid) {
-            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
-        }
         ImageRevision newR;
         newR = new ImageRevision(this, statusNid,
                 authorNid,

@@ -70,11 +70,10 @@ public class ConceptAttributes
         super();
     }
 
-
-       public class Version
+    public class Version
             extends ConceptComponent<ConceptAttributesRevision, ConceptAttributes>.Version
             implements I_ConceptAttributeTuple<ConceptAttributesRevision>,
-                       I_ConceptAttributePart<ConceptAttributesRevision> {
+            I_ConceptAttributePart<ConceptAttributesRevision> {
 
         public Version() {
             super();
@@ -84,7 +83,6 @@ public class ConceptAttributes
             super(index);
         }
 
-            
         @Override
         public boolean isDefined() {
             if (index >= 0) {
@@ -468,9 +466,6 @@ public class ConceptAttributes
 
     @Override
     public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-        if (getTime() == time && getPathNid() == pathNid) {
-            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
-        }
         ConceptAttributesRevision newR;
         newR = new ConceptAttributesRevision(this, statusNid,
                 Terms.get().getAuthorNid(),
@@ -481,9 +476,6 @@ public class ConceptAttributes
 
     @Override
     public ConceptAttributesRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-        if (getTime() == time && getPathNid() == pathNid) {
-            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
-        }
         ConceptAttributesRevision newR;
         newR = new ConceptAttributesRevision(this, statusNid,
                 Terms.get().getAuthorNid(),

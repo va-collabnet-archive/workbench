@@ -54,8 +54,8 @@ public class Description
     public class Version
             extends ConceptComponent<DescriptionRevision, Description>.Version
             implements I_DescriptionTuple<DescriptionRevision>,
-                       I_DescriptionPart<DescriptionRevision>,
-                       DescriptionAnalogBI<DescriptionRevision> {
+            I_DescriptionPart<DescriptionRevision>,
+            DescriptionAnalogBI<DescriptionRevision> {
 
         public Version() {
             super();
@@ -599,9 +599,6 @@ public class Description
 
     @Override
     public DescriptionRevision makeAnalog(int statusNid, int pathNid, long time) {
-        if (getTime() == time && getPathNid() == pathNid) {
-            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
-        }
         DescriptionRevision newR;
         newR = new DescriptionRevision(this, statusNid,
                 Terms.get().getAuthorNid(),
@@ -612,9 +609,6 @@ public class Description
 
     @Override
     public DescriptionRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-        if (getTime() == time && getPathNid() == pathNid) {
-            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
-        }
         DescriptionRevision newR;
         newR = new DescriptionRevision(this, statusNid,
                 authorNid,

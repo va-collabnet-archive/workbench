@@ -42,7 +42,7 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
     public class Version
             extends RefsetMember<StrRevision, StrMember>.Version
             implements I_ExtendByRefVersion<StrRevision>, I_ExtendByRefPartStr<StrRevision>,
-            	RefexStrAnalogBI<StrRevision> {
+            RefexStrAnalogBI<StrRevision> {
 
         private Version() {
             super();
@@ -54,8 +54,8 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
 
         public int compareTo(I_ExtendByRefPart<StrRevision> o) {
             if (I_ExtendByRefPartStr.class.isAssignableFrom(o.getClass())) {
-                I_ExtendByRefPartStr<StrRevision> another = 
-                	(I_ExtendByRefPartStr<StrRevision>) o;
+                I_ExtendByRefPartStr<StrRevision> another =
+                        (I_ExtendByRefPartStr<StrRevision>) o;
                 if (!this.getStringValue().equals(another.getStringValue())) {
                     return this.getStringValue().compareTo(another.getStringValue());
                 }
@@ -77,22 +77,22 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
         }
 
         @Override
-		public String getStr1() {
+        public String getStr1() {
             if (index >= 0) {
                 return revisions.get(index).getStr1();
             }
             return StrMember.this.getStr1();
-		}
+        }
 
-		@Override
-		public void setStr1(String str) throws PropertyVetoException {
+        @Override
+        public void setStr1(String str) throws PropertyVetoException {
             if (index >= 0) {
                 revisions.get(index).setStr1(str);
             }
             StrMember.this.setStr1(str);
-		}
+        }
 
-		@Override
+        @Override
         public void setStringValue(String stringValue) {
             if (index >= 0) {
                 revisions.get(index).setStringValue(stringValue);
@@ -180,9 +180,6 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
 
     @Override
     public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-        if (getTime() == time && getPathNid() == pathNid) {
-            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
-        }
         StrRevision newR = new StrRevision(statusNid, pathNid, time, this);
         addRevision(newR);
         return newR;
@@ -190,9 +187,6 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
 
     @Override
     public StrRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-        if (getTime() == time && getPathNid() == pathNid) {
-            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
-        }
         StrRevision newR = new StrRevision(statusNid, authorNid, pathNid, time, this);
         addRevision(newR);
         return newR;
@@ -260,28 +254,27 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
         return (List<Version>) versions;
     }
 
-	@Override
-	public int getPartsHashCode() {
-		return HashFunction.hashCode(new int[]{ getStringValue().hashCode()});
-	}
-	
-	@Override
-	public void setStr1(String str) throws PropertyVetoException {
-		this.stringValue = str;
-		modified();
-	}
+    @Override
+    public int getPartsHashCode() {
+        return HashFunction.hashCode(new int[]{getStringValue().hashCode()});
+    }
 
-	@Override
-	public String getStr1() {
-		return stringValue;
-	}
-	
-	protected TK_REFSET_TYPE getTkRefsetType() {
-		return TK_REFSET_TYPE.STR;
-	}
+    @Override
+    public void setStr1(String str) throws PropertyVetoException {
+        this.stringValue = str;
+        modified();
+    }
 
-	protected void addSpecProperties(RefexAmendmentSpec rcs) {
-		rcs.with(RefexProperty.STRING1, getStr1());
-	}
+    @Override
+    public String getStr1() {
+        return stringValue;
+    }
 
+    protected TK_REFSET_TYPE getTkRefsetType() {
+        return TK_REFSET_TYPE.STR;
+    }
+
+    protected void addSpecProperties(RefexAmendmentSpec rcs) {
+        rcs.with(RefexProperty.STRING1, getStr1());
+    }
 }

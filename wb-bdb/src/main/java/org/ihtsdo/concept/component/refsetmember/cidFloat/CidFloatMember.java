@@ -24,7 +24,7 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMember>
-	implements RefexCnidFloatAnalogBI<CidFloatRevision> {
+        implements RefexCnidFloatAnalogBI<CidFloatRevision> {
 
     private static VersionComputer<RefsetMember<CidFloatRevision, CidFloatMember>.Version> computer =
             new VersionComputer<RefsetMember<CidFloatRevision, CidFloatMember>.Version>();
@@ -91,9 +91,6 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
 
     @Override
     public CidFloatRevision makeAnalog(int statusNid, int pathNid, long time) {
-        if (getTime() == time && getPathNid() == pathNid) {
-            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
-        }
         CidFloatRevision newR = new CidFloatRevision(statusNid, pathNid, time, this);
         addRevision(newR);
         return newR;
@@ -101,9 +98,6 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
 
     @Override
     public CidFloatRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-        if (getTime() == time && getPathNid() == pathNid) {
-            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
-        }
         CidFloatRevision newR = new CidFloatRevision(statusNid, authorNid, pathNid, time, this);
         addRevision(newR);
         return newR;
@@ -192,35 +186,34 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
         return (List<Version>) versions;
     }
 
-	@Override
-	public void setCnid1(int cnid) throws PropertyVetoException {
-		this.c1Nid = cnid;
-		modified();
-	}
+    @Override
+    public void setCnid1(int cnid) throws PropertyVetoException {
+        this.c1Nid = cnid;
+        modified();
+    }
 
-	@Override
-	public int getCnid1() {
-		return c1Nid;
-	}
+    @Override
+    public int getCnid1() {
+        return c1Nid;
+    }
 
-	@Override
-	public void setFloat1(float f) throws PropertyVetoException {
-		this.floatValue = f;
-		modified();
-	}
+    @Override
+    public void setFloat1(float f) throws PropertyVetoException {
+        this.floatValue = f;
+        modified();
+    }
 
-	@Override
-	public float getFloat1() {
-		return this.floatValue;
-	}
-	
-	protected TK_REFSET_TYPE getTkRefsetType() {
-		return TK_REFSET_TYPE.CID_FLOAT;
-	}
+    @Override
+    public float getFloat1() {
+        return this.floatValue;
+    }
 
-	protected void addSpecProperties(RefexAmendmentSpec rcs) {
-		rcs.with(RefexProperty.CNID1, getCnid1());
-		rcs.with(RefexProperty.FLOAT1, getFloat1());
-	}
+    protected TK_REFSET_TYPE getTkRefsetType() {
+        return TK_REFSET_TYPE.CID_FLOAT;
+    }
 
+    protected void addSpecProperties(RefexAmendmentSpec rcs) {
+        rcs.with(RefexProperty.CNID1, getCnid1());
+        rcs.with(RefexProperty.FLOAT1, getFloat1());
+    }
 }

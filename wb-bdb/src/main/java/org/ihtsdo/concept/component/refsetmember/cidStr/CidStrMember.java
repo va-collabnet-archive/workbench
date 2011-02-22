@@ -30,8 +30,8 @@ import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrRevision;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember> implements 
-	I_ExtendByRefPartCidString<CidStrRevision>, RefexCnidStrAnalogBI<CidStrRevision> {
+public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember> implements
+        I_ExtendByRefPartCidString<CidStrRevision>, RefexCnidStrAnalogBI<CidStrRevision> {
 
     private static VersionComputer<RefsetMember<CidStrRevision, CidStrMember>.Version> computer =
             new VersionComputer<RefsetMember<CidStrRevision, CidStrMember>.Version>();
@@ -42,7 +42,7 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember> imp
 
     public class Version
             extends RefsetMember<CidStrRevision, CidStrMember>.Version
-            implements I_ExtendByRefVersion<CidStrRevision>, 
+            implements I_ExtendByRefVersion<CidStrRevision>,
             I_ExtendByRefPartCidString<CidStrRevision>,
             RefexCnidStrAnalogBI<CidStrRevision> {
 
@@ -56,8 +56,8 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember> imp
 
         public int compareTo(I_ExtendByRefPart<CidStrRevision> o) {
             if (I_ExtendByRefPartCidString.class.isAssignableFrom(o.getClass())) {
-                I_ExtendByRefPartCidString<CidStrRevision> another = 
-                	(I_ExtendByRefPartCidString<CidStrRevision>) o;
+                I_ExtendByRefPartCidString<CidStrRevision> another =
+                        (I_ExtendByRefPartCidString<CidStrRevision>) o;
                 if (this.getC1id() != another.getC1id()) {
                     return this.getC1id() - another.getC1id();
                 }
@@ -75,6 +75,7 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember> imp
             }
             return CidStrMember.this.getC1Nid();
         }
+
         @Override
         public int getCnid1() {
             if (index >= 0) {
@@ -90,6 +91,7 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember> imp
             }
             CidStrMember.this.setC1Nid(c1id);
         }
+
         @Override
         public void setCnid1(int c1id) throws PropertyVetoException {
             if (index >= 0) {
@@ -118,6 +120,7 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember> imp
             }
             CidStrMember.this.setStringValue(value);
         }
+
         @Override
         public String getStr1() {
             if (index >= 0) {
@@ -220,9 +223,6 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember> imp
 
     @Override
     public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-        if (getTime() == time && getPathNid() == pathNid) {
-            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
-        }
         CidStrRevision newR = new CidStrRevision(statusNid, pathNid, time, this);
         addRevision(newR);
         return newR;
@@ -230,9 +230,6 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember> imp
 
     @Override
     public CidStrRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-        if (getTime() == time && getPathNid() == pathNid) {
-            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
-        }
         CidStrRevision newR = new CidStrRevision(statusNid, authorNid, pathNid, time, this);
         addRevision(newR);
         return newR;
@@ -322,36 +319,35 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember> imp
         }
         return (List<Version>) versions;
     }
-    
 
-	@Override
-	public void setCnid1(int cnid) throws PropertyVetoException {
-		this.c1Nid = cnid;
-		modified();
-	}
+    @Override
+    public void setCnid1(int cnid) throws PropertyVetoException {
+        this.c1Nid = cnid;
+        modified();
+    }
 
-	@Override
-	public void setStr1(String str) throws PropertyVetoException {
-		this.strValue = str;
-		modified();
-	}
-		@Override
-	public int getPartsHashCode() {
-		return HashFunction.hashCode(new int[]{ getC1id(), getStringValue().hashCode()});
-	}
+    @Override
+    public void setStr1(String str) throws PropertyVetoException {
+        this.strValue = str;
+        modified();
+    }
 
-	@Override
-	public int getCnid1() {
-		return c1Nid;
-	}
-    
-	protected TK_REFSET_TYPE getTkRefsetType() {
-		return TK_REFSET_TYPE.CID_STR;
-	}
+    @Override
+    public int getPartsHashCode() {
+        return HashFunction.hashCode(new int[]{getC1id(), getStringValue().hashCode()});
+    }
 
-	protected void addSpecProperties(RefexAmendmentSpec rcs) {
-		rcs.with(RefexProperty.CNID1, getCnid1());
-		rcs.with(RefexProperty.STRING1, getStr1());
-	}
+    @Override
+    public int getCnid1() {
+        return c1Nid;
+    }
 
+    protected TK_REFSET_TYPE getTkRefsetType() {
+        return TK_REFSET_TYPE.CID_STR;
+    }
+
+    protected void addSpecProperties(RefexAmendmentSpec rcs) {
+        rcs.with(RefexProperty.CNID1, getCnid1());
+        rcs.with(RefexProperty.STRING1, getStr1());
+    }
 }
