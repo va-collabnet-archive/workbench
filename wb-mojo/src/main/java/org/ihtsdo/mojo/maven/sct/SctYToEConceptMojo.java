@@ -297,28 +297,28 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
 
     // UUIDs
     private static UUID uuidPathWbAux;
-    private static String uuidPathWbAuxStr;
+    //private static String uuidPathWbAuxStr;
     private static UUID uuidDescPrefTerm;
     private static UUID uuidDescFullSpec;
     private static UUID uuidRelCharStated;
     private static UUID uuidRelNotRefinable;
     private static UUID uuidWbAuxIsa;
 
-    UUID uuidStatedDescFs;
-    UUID uuidStatedDescPt;
-    UUID uuidStatedRel;
-    UUID uuidInferredDescFs;
-    UUID uuidInferredDescPt;
-    UUID uuidInferredRel;
+    /*private UUID uuidStatedDescFs;
+    private UUID uuidStatedDescPt;
+    private UUID uuidStatedRel;
+    private UUID uuidInferredDescFs;
+    private UUID uuidInferredDescPt;
+    private UUID uuidInferredRel;*/
 
     private static UUID uuidPathSnomedCore;
-    private static String uuidPathSnomedCoreStr;
-    private static UUID uuidRootSnomed;
-    private static String uuidRootSnomedStr;
+    //private static String uuidPathSnomedCoreStr;
+    //private static UUID uuidRootSnomed;
+    //private static String uuidRootSnomedStr;
     private static UUID uuidPathSnomedInferred;
-    private static String uuidPathSnomedInferredStr;
+    //private static String uuidPathSnomedInferredStr;
     private static UUID uuidPathSnomedStated;
-    private static String uuidPathSnomedStatedStr;
+    //private static String uuidPathSnomedStatedStr;
 
     private static UUID uuidCurrent = ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator()
             .next();
@@ -3604,33 +3604,41 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
     }
 
     private void setupUuids() throws MojoFailureException {
-        try {
-            uuidPathWbAuxStr = "2faa9260-8fb2-11db-b606-0800200c9a66";
-            uuidPathWbAux = UUID.fromString(uuidPathWbAuxStr);
-            uuidDescPrefTerm = UUID.fromString("d8e3b37d-7c11-33ef-b1d0-8769e2264d44");
-            uuidDescFullSpec = UUID.fromString("5e1fe940-8faf-11db-b606-0800200c9a66");
-            uuidRelCharStated = UUID.fromString("3fde38f6-e079-3cdc-a819-eda3ec74732d");
-            uuidRelNotRefinable = UUID.fromString("e4cde443-8fb6-11db-b606-0800200c9a66");
-            uuidWbAuxIsa = UUID.fromString("46bccdc4-8fb6-11db-b606-0800200c9a66");
+        //try {
+            //uuidPathWbAuxStr = "2faa9260-8fb2-11db-b606-0800200c9a66";
+            //uuidPathWbAux = UUID.fromString(uuidPathWbAuxStr);
+            //uuidDescPrefTerm = UUID.fromString("d8e3b37d-7c11-33ef-b1d0-8769e2264d44");
+            //uuidDescFullSpec = UUID.fromString("5e1fe940-8faf-11db-b606-0800200c9a66");
+            //uuidRelCharStated = UUID.fromString("3fde38f6-e079-3cdc-a819-eda3ec74732d");
+            //uuidRelNotRefinable = UUID.fromString("e4cde443-8fb6-11db-b606-0800200c9a66");
+            //uuidWbAuxIsa = UUID.fromString("46bccdc4-8fb6-11db-b606-0800200c9a66");
 
-            uuidRootSnomedStr = "ee9ac5d2-a07c-3981-a57a-f7f26baf38d8";
-            uuidRootSnomed = UUID.fromString(uuidRootSnomedStr);
+            uuidPathWbAux  = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids().iterator().next();
+            uuidDescPrefTerm  = ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids().iterator().next();
+            uuidDescFullSpec = ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids().iterator().next();
+            uuidRelCharStated = ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids().iterator().next();
+            uuidRelNotRefinable = ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids().iterator().next();
+            uuidWbAuxIsa = ArchitectonicAuxiliary.Concept.IS_A_REL.getUids().iterator().next();
+            
+            
+           // uuidRootSnomedStr = "ee9ac5d2-a07c-3981-a57a-f7f26baf38d8";
+           // uuidRootSnomed = UUID.fromString(uuidRootSnomedStr);
 
-            uuidPathSnomedCore = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids().iterator()
-                    .next();
-            uuidPathSnomedCoreStr = uuidPathSnomedCore.toString();
-
-            uuidPathSnomedInferred = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                    "SNOMED Core Inferred");
+            uuidPathSnomedCore = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids().iterator().next();
+            uuidPathSnomedInferred = ArchitectonicAuxiliary.Concept.SNOMED_CORE_INFERRED.getUids().iterator().next();
+            uuidPathSnomedStated = ArchitectonicAuxiliary.Concept.SNOMED_CORE_STATED.getUids().iterator().next();
+            //uuidPathSnomedInferred = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,"SNOMED Core Inferred");
+            //uuidPathSnomedStated = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,"SNOMED Core Stated");
+            /*uuidPathSnomedCoreStr = uuidPathSnomedCore.toString();
             uuidPathSnomedInferredStr = uuidPathSnomedInferred.toString();
-            getLog().info("SNOMED Core Inferred = " + uuidPathSnomedInferredStr);
+            uuidPathSnomedStatedStr = uuidPathSnomedStated.toString();*/
+            //getLog().info("SNOMED Core Inferred = " + uuidPathSnomedInferredStr);
 
-            uuidPathSnomedStated = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                    "SNOMED Core Stated");
-            uuidPathSnomedStatedStr = uuidPathSnomedStated.toString();
+            
+            
 
-            uuidStatedDescFs = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                    uuidPathWbAux + uuidDescFullSpec.toString() + "SNOMED Core Stated");
+           /* uuidStatedDescFs = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+uuidPathWbAux + uuidDescFullSpec.toString() + "SNOMED Core Stated");
 
             uuidStatedDescPt = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
                     uuidWbAuxIsa + uuidDescPrefTerm.toString() + "SNOMED Core Stated");
@@ -3645,7 +3653,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     uuidWbAuxIsa + uuidDescPrefTerm.toString() + "SNOMED Core Inferred");
 
             uuidInferredRel = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                    uuidWbAuxIsa + uuidInferredDescFs.toString() + uuidInferredDescPt.toString());
+                    uuidWbAuxIsa + uuidInferredDescFs.toString() + uuidInferredDescPt.toString());*/
 
             uuidCurrent = ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next();
 
@@ -3655,25 +3663,23 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             uuidSourceSnomedInteger = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids()
                     .iterator().next();
 
-            getLog().info("SNOMED CT Root       = " + uuidRootSnomedStr);
-            getLog().info("SNOMED Core          = " + uuidPathSnomedCore);
+            //getLog().info("SNOMED CT Root       = " + uuidRootSnomedStr);
+          //getLog().info("  ... Stated rel     = " + uuidStatedRel.toString());
+            //getLog().info("  ... Inferred rel   = " + uuidInferredRel.toString());
+            /*getLog().info("SNOMED Core          = " + uuidPathSnomedCore);
             getLog().info("SNOMED Core Stated   = " + uuidPathSnomedStatedStr);
-            getLog().info("  ... Stated rel     = " + uuidStatedRel.toString());
-
             getLog().info("SNOMED Core Inferred = " + uuidPathSnomedInferredStr);
-            getLog().info("  ... Inferred rel   = " + uuidInferredRel.toString());
-
             getLog().info("SNOMED integer id UUID = " + uuidSourceSnomedInteger);
             getLog().info("SNOMED CTV3 id UUID    = " + uuidSourceCtv3);
-            getLog().info("SNOMED RT id UUID      = " + uuidSourceSnomedRt);
+            getLog().info("SNOMED RT id UUID      = " + uuidSourceSnomedRt);*/
 
-        } catch (NoSuchAlgorithmException e2) {
+        /*} catch (NoSuchAlgorithmException e2) {
             e2.printStackTrace();
             throw new MojoFailureException("FAILED: SNOMED Core Stated/Inferred Path", e2);
         } catch (UnsupportedEncodingException e2) {
             e2.printStackTrace();
             throw new MojoFailureException("FAILED: SNOMED Core Stated/Inferred Path", e2);
-        }
+        }*/
     }
 
     private List<List<ARFFile>> getArfFiles(String wDir, String subDir, String[] arfDirs,
@@ -4899,34 +4905,37 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
         if (f.getAbsolutePath().contains(SNOMED_FILE_PATH)) {
         	getLog().info("f.getAbsolutePath().contains(SNOMED_FILE_PATH) f.getAbsolutePath()= " + f.getAbsolutePath());
             if (f.getAbsolutePath().contains("sct_relationships_stated")) {
-                puuid = uuidPathSnomedStatedStr;
+                puuid = uuidPathSnomedStated.toString();
                 getLog().info("  PATH UUID: " + "SNOMED Core Stated " + puuid);
                 hasSnomedId = false;
                 doCrossMap = true;
             } else if (f.getAbsolutePath().contains("sct_relationships_inferred")) {
-                puuid = uuidPathSnomedInferredStr;
+                puuid = uuidPathSnomedInferred.toString();
                 getLog().info("  PATH UUID: " + "SNOMED Core Inferred " + puuid);
                 doCrossMap = true;
             } else {
                 // SNOMED_CORE Path UUID
-                puuid = uuidPathSnomedCoreStr;
+                puuid = uuidPathSnomedCore.toString();
                 getLog().info("  PATH UUID: " + "SNOMED Core " + puuid);
             }
         } else if (s.startsWith(NHS_UK_EXTENSION_FILE_PATH)) {
             // "UK Extensions" Path UUID
         	getLog().info("s.startsWith(NHS_UK_EXTENSION_FILE_PATH) s = " + s);
-            try {
+           // try {
                 if (f.getAbsolutePath().contains("sct_relationships_stated"))
-                    u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                            "NHS UK Extension Path Stated");
+                	u = ArchitectonicAuxiliary.Concept.SNOMED_NHS_UK_EXT_STATED.getUids().iterator().next();
+                    /*u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                            "NHS UK Extension Path Stated");*/
                 else if (f.getAbsolutePath().contains("sct_relationships_inferred"))
-                    u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                            "NHS UK Extension Path Inferred");
+                	u = ArchitectonicAuxiliary.Concept.SNOMED_NHS_UK_EXT_INFERRED.getUids().iterator().next();
+                    /*u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                            "NHS UK Extension Path Inferred");*/
                 else
-                    u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                            "NHS UK Extension Path");
+                	u = ArchitectonicAuxiliary.Concept.SNOMED_NHS_UK_EXT.getUids().iterator().next();
+                    /*u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                            "NHS UK Extension Path");*/
                 puuid = u.toString();
-            } catch (NoSuchAlgorithmException e) {
+            /*} catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
                 throw new MojoFailureException("FAILED: NHS UK Extension Path.."
                         + "getFilePathID() NoSuchAlgorithmException", e);
@@ -4934,23 +4943,26 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                 e.printStackTrace();
                 throw new MojoFailureException("FAILED: NHS UK Extension Path.."
                         + "getFilePathID() UnsupportedEncodingException", e);
-            }
+            }*/
             getLog().info("  PATH UUID (uke): " + s + " " + puuid);
         } else if (s.startsWith(NHS_UK_DRUG_EXTENSION_FILE_PATH)) {
             // "UK Drug Extensions" Path UUID
         	getLog().info("s.startsWith(NHS_UK_DRUG_EXTENSION_FILE_PATH) s = " + s);
-            try {
+            //try {
                 if (f.getAbsolutePath().contains("sct_relationships_stated"))
-                    u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                            "NHS UK Drug Extension Path Stated");
+                	u = ArchitectonicAuxiliary.Concept.SNOMED_NHS_UK_EXT_DRUG_STATED.getUids().iterator().next();
+                    /*u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                            "NHS UK Drug Extension Path Stated");*/
                 else if (f.getAbsolutePath().contains("sct_relationships_inferred"))
-                    u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                            "NHS UK Drug Extension Path Inferred");
+                	u = ArchitectonicAuxiliary.Concept.SNOMED_NHS_UK_EXT_DRUG_INFERRED.getUids().iterator().next();
+                    /*u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                            "NHS UK Drug Extension Path Inferred");*/
                 else
-                    u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                            "NHS UK Drug Extension Path");
+                	u = ArchitectonicAuxiliary.Concept.SNOMED_NHS_UK_EXT_DRUG.getUids().iterator().next();
+                    /*u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                            "NHS UK Drug Extension Path");*/
                 puuid = u.toString();
-            } catch (NoSuchAlgorithmException e) {
+            /*} catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
                 throw new MojoFailureException(
                         "FAILED: NHS UK Drug Extension Path.. getFilePathID()"
@@ -4960,7 +4972,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                 throw new MojoFailureException(
                         "FAILED: NHS UK Drug Extension Path.. getFilePathID()"
                                 + " UnsupportedEncodingException", e);
-            }
+            }*/
             getLog().info("  PATH UUID (ukde): " + s + " " + puuid);
 
         } else {
