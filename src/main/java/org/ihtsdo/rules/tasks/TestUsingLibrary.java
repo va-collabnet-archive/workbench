@@ -18,6 +18,7 @@ package org.ihtsdo.rules.tasks;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -28,6 +29,7 @@ import org.dwfa.ace.task.commit.AbstractConceptTest;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.cement.SNOMED;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -86,12 +88,23 @@ public class TestUsingLibrary extends AbstractConceptTest {
 	@Override
 	public List<AlertToDataConstraintFailure> test(I_GetConceptData concept,
 			boolean forCommit) throws TaskFailedException {
+		List<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
 		try {
 			I_TermFactory tf = Terms.get();
-			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-			return RulesLibrary.checkConcept(concept, 
+			I_GetConceptData snomedRoot = getConceptSafe(Terms.get(), SNOMED.Concept.ROOT.getUids());
+			if (snomedRoot == null)
+				return alertList;
+			if (!snomedRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
+					.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
+					getFrameConfig().getConflictResolutionStrategy())) {
+				return alertList;
+			} else {
+			alertList =  RulesLibrary.checkConcept(concept, 
 					tf.getConcept(RefsetAuxiliary.Concept.REALTIME_QA_CONTEXT.getUids()), false, 
-					config, INFERRED_VIEW_ORIGIN.FULL).getAlertList();
+					getFrameConfig(), INFERRED_VIEW_ORIGIN.FULL).getAlertList();
+			}
+			
+			return alertList;
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
 		}
