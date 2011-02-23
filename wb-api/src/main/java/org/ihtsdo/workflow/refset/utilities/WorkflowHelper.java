@@ -466,11 +466,11 @@ public class WorkflowHelper {
 	
 			for (I_GetConceptData stateConcept : allStates)
 			{
-				states.put(identifyFSN(stateConcept), stateConcept);
+				states.put(identifyFSN(stateConcept).toLowerCase(), stateConcept);
 			}
 		}
 		
-		return states.get(state);
+		return states.get(state.toLowerCase());
 	}
 
 	public static I_GetConceptData lookupAction(String action) throws TerminologyException, IOException {
@@ -482,11 +482,11 @@ public class WorkflowHelper {
 		
 			for (I_GetConceptData actionConcept : allActions)
 			{
-				actions.put(identifyPrefTerm(actionConcept), actionConcept);
+				actions.put(identifyFSN(actionConcept).toLowerCase(), actionConcept);
 			}
 		}
 
-		return actions.get(action);
+		return actions.get(action.toLowerCase());
 	}
 	
 

@@ -397,7 +397,8 @@ public class ConceptViewRenderer extends JLayeredPane {
                                     }
 
                                     String action = getActionFromState(s);
-
+                                    
+                                    // TODO: Override Action Handler. . . Not sure how used
                                     worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), WorkflowHelper.lookupAction(action).getPrimUuid());
 
                                     I_GetConceptData selectedConcept = settings.getConcept();
@@ -501,8 +502,9 @@ public class ConceptViewRenderer extends JLayeredPane {
                                             } else {
                                                 worker = config.getWorker();
                                             }
-
-                                            worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), WorkflowHelper.lookupAction(e.getActionCommand()).getPrimUuid());
+                                            
+                                            // TODO: Remove Hardcoding and find better fix to issue of Pref-Term vs FSN
+                                            worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), WorkflowHelper.lookupAction(e.getActionCommand() + " workflow action").getPrimUuid());
                                             workflowToggleButton.doClick();
                                             updateOopsButton(settings.getConcept());
 
@@ -672,19 +674,19 @@ public class ConceptViewRenderer extends JLayeredPane {
     private String getActionFromState(String state) {
 
         if (state.equals("Approved")) {
-            return "Accept";
+            return "Accept Workflow Action";
         }
         if (state.equals("Escalated")) {
-            return "Escalate";
+            return "Escalate Workflow Action";
         }
         if (state.equals("For Chief Terminologist review")) {
-            return "Chief Terminologist review";
+            return "Chief Terminologist review Workflow Action";
         }
         if (state.equals("For discussion")) {
-            return "Discuss";
+            return "Discuss Workflow Action";
         }
         if (state.equals("For review")) {
-            return "Review";
+            return "Review Workflow Action";
         }
 
         return "";
