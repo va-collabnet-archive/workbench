@@ -337,7 +337,7 @@ public class TerminologyTransferHandler extends TransferHandler {
 
 			            switch (columnDesc) {
 				            case FSN:
-				            	int descId = 01;
+				            	int descId = 0;
 				            	conField = (WorkflowFSNWithConceptTuple)value;
 				                //return new ConceptTransferable(Terms.get().getConcept(conField.getTuple().getConceptNid()));
 				            	
