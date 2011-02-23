@@ -575,7 +575,7 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
         WfHistoryTable.setDefaultRenderer(Boolean.class, renderer);
         // TODO
          /* */
-         WfHistoryTable.addMouseListener(new DescSearchResultsTablePopupListener(config, ace));
+         WfHistoryTable.addMouseListener(new DescSearchResultsTablePopupListener(config, ace, workflowHistorySearchPanelId));
          /* */
 
          WORKFLOW_FIELD[] columnEnums = model.getColumnEnums();

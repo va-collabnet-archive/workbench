@@ -30,6 +30,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTree;
+import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
@@ -48,21 +49,24 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowFSNWithConceptTuple;
 import org.ihtsdo.etypes.EConcept;
 
 public class DescSearchResultsTablePopupListener extends MouseAdapter implements ActionListener {
 
     private I_DescriptionTuple descTuple;
-    private I_GetConceptData descConcept;
+    private I_GetConceptData rowConcept;
     private int selectedRow;
     private I_ConfigAceFrame config;
     private JTable descTable;
     private ACE ace;
+	private int panelId;
 
-    DescSearchResultsTablePopupListener(I_ConfigAceFrame config, ACE ace) {
+    DescSearchResultsTablePopupListener(I_ConfigAceFrame config, ACE ace, int panelId) {
         super();
         this.config = config;
         this.ace = ace;
+        this.panelId = panelId;
     }
 
     public void mousePressed(MouseEvent e) {
@@ -104,10 +108,29 @@ public class DescSearchResultsTablePopupListener extends MouseAdapter implements
         if (descTable.getCellRect(descTable.getSelectedRow(), descTable.getSelectedColumn(), true).contains(
             e.getPoint())) {
             selectedRow = descTable.getSelectedRow();
-            StringWithDescTuple swdt = (StringWithDescTuple) descTable.getValueAt(selectedRow, 0);
-            descTuple = swdt.getTuple();
-            UUID descUuid = Terms.get().getId(descTuple.getDescId()).getUUIDs().iterator().next();
-            descConcept = Terms.get().getConcept(descTuple.getConceptNid());
+            
+            Object obj = descTable.getValueAt(selectedRow, 0);
+            UUID rowUuid = null;
+            
+            if (panelId == I_MakeCriterionPanel.searchPanelId)
+            {
+            	StringWithDescTuple swdt = (StringWithDescTuple)obj;
+            	descTuple = swdt.getTuple();
+                rowUuid = Terms.get().getId(descTuple.getDescId()).getUUIDs().iterator().next();
+                rowConcept = Terms.get().getConcept(descTuple.getConceptNid());
+            } else if (panelId == I_MakeCriterionPanel.workflowHistorySearchPanelId)
+            {
+		        TableModel wftm = descTable.getModel();
+		        if (descTable.getSelectedRow() >= 0) 
+		        {
+	            	WorkflowFSNWithConceptTuple conField = null;
+
+		        	Object value = wftm.getValueAt(descTable.getSelectedRow(), 0);
+	            	conField = (WorkflowFSNWithConceptTuple)value;
+	            	
+	            	rowConcept = Terms.get().getConcept(conField.getTuple().getConceptNid());
+		        }
+            }
 
             JPopupMenu popup = new JPopupMenu();
             JMenuItem menuItem = new JMenuItem(" ");
@@ -120,11 +143,11 @@ public class DescSearchResultsTablePopupListener extends MouseAdapter implements
                     if (selPath != null) {
                         DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
                         I_ExtendByRef specPart = (I_ExtendByRef) node.getUserObject();
-                        switch (EConcept.REFSET_TYPES.nidToType(specPart.getTypeId())) {
+                        switch (EConcept.REFSET_TYPES.nidToType(specPart.getTypeNid())) {
                         case CID_CID:
                             popup.addSeparator();
                             addRefsetItems(popup, new File(AceFrame.pluginRoot, "refsetspec/branch-popup"), specPart,
-                                descUuid);
+                                rowUuid);
                             break;
                         default:
                         }
@@ -174,8 +197,8 @@ public class DescSearchResultsTablePopupListener extends MouseAdapter implements
             try {
                 AceFrameConfig frameConfig = (AceFrameConfig) config;
                 new ExpandPathToNodeStateListener(frameConfig.getAceFrame().getCdePanel().getTree(), config,
-                    descConcept);
-                config.setHierarchySelection(descConcept);
+                    rowConcept);
+                config.setHierarchySelection(rowConcept);
             } catch (IOException e1) {
                 AceLog.getAppLog().alertAndLogException(e1);
             } catch (TerminologyException e1) {
@@ -183,23 +206,23 @@ public class DescSearchResultsTablePopupListener extends MouseAdapter implements
 			}
         } else if (e.getActionCommand().equals("Put in Concept Tab L-1")) {
             I_HostConceptPlugins viewer = config.getConceptViewer(5);
-            viewer.setTermComponent(descConcept);
+            viewer.setTermComponent(rowConcept);
         } else if (e.getActionCommand().equals("Put in Concept Tab R-1")) {
             I_HostConceptPlugins viewer = config.getConceptViewer(1);
-            viewer.setTermComponent(descConcept);
+            viewer.setTermComponent(rowConcept);
         } else if (e.getActionCommand().equals("Put in Concept Tab R-2")) {
             I_HostConceptPlugins viewer = config.getConceptViewer(2);
-            viewer.setTermComponent(descConcept);
+            viewer.setTermComponent(rowConcept);
         } else if (e.getActionCommand().equals("Put in Concept Tab R-3")) {
             I_HostConceptPlugins viewer = config.getConceptViewer(3);
-            viewer.setTermComponent(descConcept);
+            viewer.setTermComponent(rowConcept);
         } else if (e.getActionCommand().equals("Put in Concept Tab R-4")) {
             I_HostConceptPlugins viewer = config.getConceptViewer(4);
-            viewer.setTermComponent(descConcept);
+            viewer.setTermComponent(rowConcept);
         } else if (e.getActionCommand().equals("Add to list")) {
             JList conceptList = config.getBatchConceptList();
             I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
-            model.addElement(descConcept);
+            model.addElement(rowConcept);
         }
     }
 

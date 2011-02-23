@@ -667,7 +667,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         descTable.setDefaultRenderer(StringWithDescTuple.class, renderer);
         descTable.setDefaultRenderer(String.class, renderer);
         descTable.setDefaultRenderer(Boolean.class, renderer);
-        descTable.addMouseListener(new DescSearchResultsTablePopupListener(config, ace));
+        descTable.addMouseListener(new DescSearchResultsTablePopupListener(config, ace, searchPanelId));
 
         DESC_FIELD[] columnEnums = model.getColumnEnums();
 
