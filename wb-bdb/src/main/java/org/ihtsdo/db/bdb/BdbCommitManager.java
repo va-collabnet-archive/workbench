@@ -176,6 +176,7 @@ public class BdbCommitManager {
     private static AtomicReference<Concept> lastUncommitted = new AtomicReference<Concept>();
 
     public static void addUncommittedNoChecks(I_GetConceptData concept) {
+        ((Concept) concept).modified();
         if (Bdb.watchList.containsKey(concept.getNid())) {
             AceLog.getAppLog().info(
                     "---@@@ Adding uncommitted NO checks: "
@@ -257,6 +258,7 @@ public class BdbCommitManager {
             }
             return;
         }
+        concept.modified();
         if (Bdb.watchList.containsKey(concept.getNid())) {
             AceLog.getAppLog().info(
                     "---@@@ Adding uncommitted concept: " + concept.getNid()
