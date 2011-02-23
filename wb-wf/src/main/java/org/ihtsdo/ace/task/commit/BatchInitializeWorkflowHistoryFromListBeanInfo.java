@@ -41,7 +41,7 @@ import org.dwfa.ace.task.commit.TestForUneditedDefaultsBeanInfo;
 * @author Jesse Efron
 * 
 */
-public class InitializeWorkflowHistoryOnCommitBeanInfo extends TestForUneditedDefaultsBeanInfo {
+public class BatchInitializeWorkflowHistoryFromListBeanInfo extends TestForUneditedDefaultsBeanInfo {
 
     /**
      * @see java.beans.BeanInfo#getBeanDescriptor()
@@ -49,7 +49,7 @@ public class InitializeWorkflowHistoryOnCommitBeanInfo extends TestForUneditedDe
     @Override
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(TestForIsa.class);
-        bd.setDisplayName("<html><font color='green'><center>Initialize Workflow History<br>On Commit");
+        bd.setDisplayName("<html><font color='green'><center>Batch Initialization of <br>Workflow History From List Panel");
         return bd;
     }
 }

@@ -677,11 +677,11 @@ public class WorkflowHelper {
 		return defaultModeler;
 	}
 
-	public void initializeWorkflowForConcept(I_GetConceptData concept) throws TerminologyException, IOException {
+	public void initializeWorkflowForConcept(I_GetConceptData concept, boolean inBatch) throws TerminologyException, IOException {
     	if (snomedConcept  == null)
     		snomedConcept = Terms.get().getConcept(Taxonomies.SNOMED.getUuids());
     	
-    	if (!WorkflowHistoryRefsetWriter.isInUse()) // Not in the middle of an existing commit
+    	if (inBatch || !WorkflowHistoryRefsetWriter.isInUse()) // Not in the middle of an existing commit
     	{
         	WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
 

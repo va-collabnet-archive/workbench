@@ -36,31 +36,15 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_Identify;
-import org.dwfa.ace.api.I_RelVersioned;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.commit.AbstractConceptTest;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.tk.example.binding.Taxonomies;
-import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
-import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetSearcher;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
-import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefsetSearcher;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
-
 
 /*
 * @author Jesse Efron
@@ -68,13 +52,12 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 */
 @BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
                    @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
-public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
+                   
+public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest 
+{
 
     private static final long serialVersionUID = 1;
     private static final int DATA_VERSION = 1;
-	private static I_GetConceptData snomedConcept = null;
-	private static UUID endWorkflowAction = null;
-
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(DATA_VERSION);
@@ -88,217 +71,18 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
     }
 
     @Override
-    public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit)
-            throws TaskFailedException {
-        try {
-        	if (snomedConcept == null)
-        		snomedConcept = Terms.get().getConcept(Taxonomies.SNOMED.getUuids());
-        	
-            if (!WorkflowHistoryRefsetWriter.isInUse()) // Not in the middle of an existing commit
-        	{
-            	WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
-
-            	I_GetConceptData modeler = WorkflowHelper.getCurrentModeler();
-
-            	if (modeler != null && WorkflowHelper.isActiveModeler(modeler))
-            	{
-            		I_TermFactory tf = getTermFactory();
-            		WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter();
-
-					WorkflowHistoryRefsetWriter.lockMutex();
-
-					// Path
-		            writer.setPathUid(Terms.get().nidToUuid(concept.getConceptAttributes().getPathNid()));
-
-		            // Modeler
-		            writer.setModelerUid(WorkflowHelper.getCurrentModeler().getPrimUuid());
-
-		            // Concept & FSN
-		            writer.setConceptUid(concept.getUids().iterator().next());
-		            writer.setFSN(WorkflowHelper.identifyFSN(concept));
-
-	            	// Action
-	            	UUID actionUid = identifyAction();
-	                writer.setActionUid(actionUid);
-
-	                // State
-	                UUID initialState = identifyNextState(writer.getModelerUid(), concept, actionUid);
-	                writer.setStateUid(initialState);
-
-	                // Worfklow Id
-	                WorkflowHistoryJavaBean latestBean = searcher.getLatestWfHxJavaBeanForConcept(concept);
-		            if (latestBean == null || !WorkflowHelper.isEndWorkflowAction(Terms.get().getConcept(latestBean.getAction())))
-		            	writer.setWorkflowUid(UUID.randomUUID());
-		            else
-		            	writer.setWorkflowUid(latestBean.getWorkflowId());
-
-		            // Set auto approved based on AceFrameConfig setting
-		            if (tf.getActiveAceFrameConfig().isAutoApproveOn()) {
-		            	writer.setAutoApproved(true);
-
-		            	// Identify and overwrite Accept Action
-		            	UUID acceptActionUid = identifyAcceptAction();
-		            	writer.setActionUid(acceptActionUid);
-
-		            	// Identify and overwrite Next State
-		            	UUID nextState = identifyNextState(writer.getModelerUid(), concept, acceptActionUid);
-						writer.setStateUid(nextState);
-		            } else
-		            	writer.setAutoApproved(false);
-
-		            // Override
-		            writer.setOverride(tf.getActiveAceFrameConfig().isOverrideOn());
-
-		            // TimeStamps
-			        java.util.Date today = new java.util.Date();
-			        writer.setEffectiveTime(today.getTime());
-			        writer.setWorkflowTime(today.getTime());
-
-			        // RefCompId
-			        writer.setReleaseDescriptionUid(snomedConcept.getPrimUuid());
-			        // 
-			        // Write Member
-					WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
-					writer.addMember();
-			        Terms.get().addUncommitted(refset.getRefsetConcept());
-				}
-            }
-
-            // return alerts;
-            return new ArrayList<AlertToDataConstraintFailure>();
+    public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit) throws TaskFailedException 
+    {
+    	WorkflowHelper wfHelper = new WorkflowHelper();
+        
+    	try 
+        {
+        	wfHelper.initializeWorkflowForConcept(concept, false);
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }
+
+        // return empty alerts;
+        return new ArrayList<AlertToDataConstraintFailure>();
     }
-
-	private UUID identifyAction() {
-    	UUID commitActionUid = null;
-    	try
-    	{
-	    	for (I_GetConceptData action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
-	    	{
-	    		if (WorkflowHelper.isBeginWorkflowAction(action))
-	    		{
-	    			List<I_RelVersioned> commitRelList = WorkflowHelper.getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE);
-
-    	    		for (I_RelVersioned commitRel : commitRelList)
-    	    		{
-						if (commitRel != null &&
-							commitRel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_SINGLE_COMMIT.getPrimoridalUid()).getConceptNid())
-						{
-								commitActionUid = action.getPrimUuid();
-						}
-    	    		}
-
-    	    		if (commitActionUid != null)
-    	    			break;
-				}
-	    	}
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    	}
-
-    	return commitActionUid;
-	}
-
-	private I_TermFactory getTermFactory() {
-        return Terms.get();
-    }
-
-	private UUID identifyNextState(UUID modelerUid, I_GetConceptData concept, UUID commitActionUid)
-    		{
-		I_GetConceptData initialState = null;
-        boolean existsInDb = isConceptInDatabase(concept);
-
-		try {
-        	WorkflowHistoryRefsetSearcher wfSearcher = new WorkflowHistoryRefsetSearcher();
-        	WorkflowHistoryJavaBean bean = wfSearcher.getLatestWfHxJavaBeanForConcept(concept);
-			if (bean != null)
-				initialState = Terms.get().getConcept(bean.getState());
-			else
-			{
-				for (I_GetConceptData state : Terms.get().getActiveAceFrameConfig().getWorkflowStates())
-				{
-					List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE);
-
-		    		for (I_RelVersioned rel : relList)
-		    		{
-		    			if (rel != null &&
-							((existsInDb && (rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EXISTING_CONCEPT.getPrimoridalUid()).getConceptNid())) ||
-							 (!existsInDb && (rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_NEW_CONCEPT.getPrimoridalUid()).getConceptNid()))))
-		    			{
-							initialState = state;
-		    			}
-		    		}
-
-		    		if (initialState != null)
-		    			break;
-				}
-			}
-
-			EditorCategoryRefsetSearcher categorySearcher = new EditorCategoryRefsetSearcher();
-			I_GetConceptData modeler = Terms.get().getConcept(modelerUid);
-			I_GetConceptData category = categorySearcher.searchForCategoryForConceptByModeler(modeler, concept);
-
-			StateTransitionRefsetSearcher nextStateSearcher = new StateTransitionRefsetSearcher();
-			Map<I_GetConceptData, I_GetConceptData> possibleActions = nextStateSearcher.searchForPossibleActionsAndFinalStates(category.getConceptNid(), initialState.getConceptNid());
-
-			for (I_GetConceptData transitionAction : possibleActions.keySet())
-			{
-				if (transitionAction.getPrimUuid().equals(commitActionUid))
-				{
-					return possibleActions.get(transitionAction).getPrimUuid();
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return null;
-   	}
-
-	private boolean isConceptInDatabase(I_GetConceptData concept) {
-		boolean hasBeenReleased = false;
-
-		try {
-			WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
-			int SnomedId = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids());
-
-			I_Identify idVersioned = Terms.get().getId(concept.getConceptNid());
-	        for (I_IdPart idPart : idVersioned.getMutableIdParts()) {
-	            if (idPart.getAuthorityNid() == SnomedId)
-	            	hasBeenReleased = true;
-	        }
-
-			if (!hasBeenReleased && (searcher.getLatestWfHxJavaBeanForConcept(concept) == null))
-				return false;
-		} catch (Exception e) {
-			e.printStackTrace();
-    }
-
-    		return true;
-    }
-
-	private UUID identifyAcceptAction() {
-
-		if (endWorkflowAction  == null)
-		{
-			try
-			{
-				for (I_GetConceptData action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
-				{
-					if (WorkflowHelper.isEndWorkflowAction(action))
-					{
-						endWorkflowAction = action.getPrimUuid();
-						break;
-					}
-				}
-			} catch (Exception e ) {
-				e.printStackTrace();
-			}
-		}
-		
-		return endWorkflowAction;
-    }
-
 }
