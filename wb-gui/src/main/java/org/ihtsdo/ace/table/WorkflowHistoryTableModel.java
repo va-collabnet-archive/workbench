@@ -34,11 +34,13 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.StringWithTuple;
 import org.dwfa.ace.table.ConceptAttributeTableModel.StringWithConceptTuple;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 
@@ -147,9 +149,11 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
 
             switch (columns[columnIndex]) {
             case FSN:
-            	I_GetConceptData con = Terms.get().getConcept(bean.getConcept());
-            	I_ConceptAttributeTuple tuple = (I_ConceptAttributeTuple) con.getConceptAttributes().getTuples().get(0);
-                return new WorkflowFSNWithConceptTuple(bean.getFSN(), tuple, false);
+            	I_GetConceptData concept = Terms.get().getConcept(bean.getConcept());
+         	 	// Get Latest Version of the FSN
+         	 	final String fsn =  getLatestFSNVersion(concept);
+            	I_ConceptAttributeTuple tuple = (I_ConceptAttributeTuple) concept.getConceptAttributes().getTuples().get(0);
+                return new WorkflowFSNWithConceptTuple(fsn, tuple, false);
 /*
  *          case ACTION:
  *               return new WorkflowTextFieldEditor(getPrefText(bean.getAction()), false);
@@ -175,11 +179,21 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
         }
         return null;
     }
-
     
-    /**
-	 * 
-	 */
+    private String getLatestFSNVersion(I_GetConceptData concept) {
+		try {
+			for (I_DescriptionVersioned<?> descv: concept.getDescriptions()) {
+				for (I_DescriptionTuple p: descv.getTuples()) {
+					if (p.getTypeNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()).getNid())
+						return descv.getLastTuple().getText();
+		   		}
+	   		}
+		} catch (Exception e) {
+        	AceLog.getAppLog().log(Level.SEVERE, "Error in identifying current concept's FSN", e);
+		}
+
+		return "";
+    }
 
     private ArrayList<WorkflowHistoryJavaBean> wfHistoryList = new ArrayList<WorkflowHistoryJavaBean>();
     
@@ -289,20 +303,17 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
  			try {
  				
  				bean = (WorkflowHistoryJavaBean)itr.next();
+		 	 	I_GetConceptData concept = Terms.get().getConcept(bean.getConcept());
 		 	 	
  				final String workflowId =  bean.getWorkflowId().toString();
-         	 	final String fsn =  bean.getFSN();
          	 	final String action = Terms.get().getConcept(bean.getAction()).getInitialText();
-         	 	final String conceptId = Terms.get().getConcept(bean.getConcept()).getInitialText();
-         	 	
-         	 	if (conceptId == null)
-         	 		a = 12 / 0;
-         	 	
+         	 	final String conceptId = String.valueOf(concept.getConceptNid());
          	 	final String modeler = Terms.get().getConcept(bean.getModeler()).getInitialText();
          	 	final String path = Terms.get().getConcept(bean.getPath()).getInitialText();
          	 	final String state = Terms.get().getConcept(bean.getState()).getInitialText();
          	 	final Long timeStamp =  bean.getEffectiveTime();
          	 	final Long refsetColumnTimeStamp = bean.getWorkflowTime();
+         	 	final String fsn = bean.getFSN();
 
          	 	String d[] = new String[] {workflowId, fsn, action, conceptId, modeler, path, state, timeStamp.toString(), refsetColumnTimeStamp.toString()}; 
          	 	data[i] = d;         			}
