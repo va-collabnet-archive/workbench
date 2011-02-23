@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.dwfa.ace.activity.ActivityViewer;
@@ -15,7 +16,6 @@ import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
@@ -37,6 +37,7 @@ import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
+import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public class RefsetComputer implements I_ProcessUnfetchedConceptData {
@@ -87,7 +88,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
     private I_ConfigAceFrame frameConfig;
     private RefsetSpec specHelper;
     private ComputeType computeType;
-	 private IsaCache isaCache;
+	private Map<IsaCoordinate, IsaCache> isaCache;
     private StopActionListener stopListener;
 
     public RefsetComputer(int refsetNid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig,
@@ -131,7 +132,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
 
         activity.setProgressInfoLower("Setting up is-a cache...");
         if (possibleIds.cardinality() > SETUP_ISA_CACHE_THRESHOLD) {
-            isaCache = KindOfComputer.setupIsaCacheAndWait();
+            isaCache = KindOfComputer.setupIsaCacheAndWait(frameConfig.getViewCoordinate().getIsaCoordinate());
         }
 
         activity.setProgressInfoLower("Starting computation...");
@@ -265,7 +266,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             I_RepresentIdSet newParents = Bdb.getConceptDb().getEmptyIdSet();
             NidBitSetItrBI newMemberItr = newMemberNids.iterator();
             while (newMemberItr.next()) {
-            	isaCache.addParents(newMemberItr.nid(), newParents);
+            	isaCache.get(frameConfig.getViewCoordinate().getIsaCoordinate()).addParents(newMemberItr.nid(), newParents);
             }
             NidBitSetItrBI newParentItr = newParents.iterator();
             while (newParentItr.next()) {
@@ -286,12 +287,12 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             I_RepresentIdSet parentsToRetire = Bdb.getConceptDb().getEmptyIdSet();
             NidBitSetItrBI retiredMemberItr = retiredMemberNids.iterator();
             while (retiredMemberItr.next()) {
-            	isaCache.addParents(retiredMemberItr.nid(), parentsToRetire);
+            	isaCache.get(frameConfig.getViewCoordinate().getIsaCoordinate()).addParents(retiredMemberItr.nid(), parentsToRetire);
             }
             I_RepresentIdSet currentParents = Bdb.getConceptDb().getEmptyIdSet();
             NidBitSetItrBI currentMemberItr = currentRefsetMemberComponentNids.iterator();
             while (currentMemberItr.next()) {
-            	isaCache.addParents(currentMemberItr.nid(), currentParents);
+            	isaCache.get(frameConfig.getViewCoordinate().getIsaCoordinate()).addParents(currentMemberItr.nid(), currentParents);
             }
             parentsToRetire.andNot(currentParents);
             NidBitSetItrBI parentToRetireItr = parentsToRetire.iterator();

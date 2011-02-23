@@ -48,9 +48,11 @@ import org.dwfa.tapi.SuppressDataChecks;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.ihtsdo.lucene.SearchResult;
+import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
+import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 
 public interface I_TermFactory {
 
@@ -655,6 +657,14 @@ public interface I_TermFactory {
     public I_GetConceptData getConceptForNid(int componentNid) throws IOException;
 
 	public int getAuthorNid();
+	
+	public Map<IsaCoordinate,? extends KindOfCacheBI> setupIsaCache(IsaCoordinate isaCoordinate) throws IOException;
+	
+	public Map<IsaCoordinate,? extends KindOfCacheBI> setupIsaCacheAndWait(IsaCoordinate isaCoordinate) throws IOException, InterruptedException;
+	
+	public void updateIsaCache(IsaCoordinate isaCoordinate, int cNid) throws Exception;
+	
+	public void persistIsaCache() throws Exception;
 
-
+	public void loadIsaCacheFromFile() throws Exception;
 }

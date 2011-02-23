@@ -64,9 +64,9 @@ import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.I_WriteDirectToDb;
 import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.RefsetPropertyMap;
+import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
-import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
@@ -134,6 +134,7 @@ import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetReader;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
+import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.refset.MarkedParentRefsetHelper;
 import org.ihtsdo.db.bdb.computer.refset.MemberRefsetConflictCalculator;
 import org.ihtsdo.db.bdb.computer.refset.MemberRefsetHelper;
@@ -149,6 +150,7 @@ import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.NidSetBI;
@@ -156,6 +158,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
+import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
@@ -166,6 +169,7 @@ import com.sleepycat.je.DatabaseException;
 public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_Search {
 
     private BdbPathManager pathManager;
+    private Map<IsaCoordinate,? extends KindOfCacheBI> isaCache;
 
     private File envHome;
 
@@ -2053,5 +2057,33 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             ChangeSetGenerationPolicy policy) {
         return new EConceptChangeSetWriter(changeSetFileName, changeSetTempFileName, policy, true);
     }
+
+	@Override
+	public Map<IsaCoordinate,? extends KindOfCacheBI> setupIsaCache(IsaCoordinate isaCoordinate) throws IOException {
+		isaCache = KindOfComputer.setupIsaCache(isaCoordinate);
+		return isaCache;
+	}
+
+	@Override
+	public Map<IsaCoordinate,? extends KindOfCacheBI> setupIsaCacheAndWait(IsaCoordinate isaCoordinate) throws IOException,
+			InterruptedException {
+		isaCache = KindOfComputer.setupIsaCacheAndWait(isaCoordinate);
+		return isaCache;
+	}
+
+	@Override
+	public void updateIsaCache(IsaCoordinate isaCoordinate, int cNid) throws Exception {
+		KindOfComputer.updateIsaCache(isaCoordinate, cNid);
+	}
+
+	@Override
+	public void persistIsaCache() throws Exception {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void loadIsaCacheFromFile() throws Exception {
+		throw new UnsupportedOperationException();
+	}
 
 }

@@ -1,21 +1,19 @@
-package org.ihtsdo.db.bdb.computer.kindof;
+package org.ihtsdo.tk.api.coordinate;
 
 import java.io.IOException;
 
-import org.dwfa.ace.api.PositionSetReadOnly;
-import org.dwfa.ace.api.Terms;
-import org.dwfa.tapi.TerminologyException;
-import org.dwfa.util.HashFunction;
-import org.dwfa.vodb.types.IntSet;
-import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
-import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.example.binding.TermAux;
+import org.ihtsdo.tk.hash.Hashcode;
 
-public class KindOfSpec {
+public class IsaCoordinate {
 
 
 	/**
@@ -30,9 +28,6 @@ public class KindOfSpec {
 	}
 	public NidSetBI getRelTypeNids() {
 		return relTypeNids;
-	}
-	public int getKindNid() {
-		return kindNid;
 	}
 	public Precedence getPrecedence() {
 		return precedence;
@@ -49,10 +44,6 @@ public class KindOfSpec {
 	 * The set of destination rels nids for which this cache is valid.
 	 */
 	public NidSetBI relTypeNids;
-	/**
-	 * The cNid of the kind this cache represents.
-	 */
-	public int kindNid;
 
 	public Precedence precedence;
 
@@ -62,11 +53,11 @@ public class KindOfSpec {
 	 * cached value so that viewPositionSet does not have to be recreated
 	 * each time a query is perfomed.
 	 */
-	private PositionSetReadOnly viewPositionSet;
+	protected PositionSetBI viewPositionSet;
 
-        private int classifierNid;
+        protected int classifierNid;
 
-        private RelAssertionType relAssertionType;
+        protected RelAssertionType relAssertionType;
 
 	public ViewCoordinate getCoordinate() {
 		return new ViewCoordinate(precedence, viewPositionSet,
@@ -74,38 +65,42 @@ public class KindOfSpec {
                         contradictionMgr, Integer.MIN_VALUE,
                         classifierNid, relAssertionType, null, null);
 	}
-	public KindOfSpec(PositionBI viewPosition, NidSetBI allowedStatus,
-			NidSetBI relTypeNids, int kindNid, Precedence precedence,
+	
+	public IsaCoordinate(PositionBI viewPosition, NidSetBI allowedStatus,
+			NidSetBI relTypeNids, Precedence precedence,
 			ContradictionManagerBI contradictionMgr, int classifierNid,
                         RelAssertionType relAssertionType) {
 		super();
 		this.viewPosition = viewPosition;
-		this.allowedStatusNids = new IntSet(allowedStatus.getSetValues());
+		this.allowedStatusNids = new NidSet(allowedStatus.getSetValues());
 		assert allowedStatus != null: "Cannot use null wildcard for allowed status.";
 		assert allowedStatus.size() != 0: "Cannot use an empty set for allowed status.";
-		assert allowedStatus.contains(ReferenceConcepts.RETIRED.getNid()) == false:
-			"Cannot include a retired status. May surface cycles: " + allowedStatus;
-		this.relTypeNids = new IntSet(relTypeNids.getSetValues());
-		this.kindNid = kindNid;
-		this.viewPositionSet = new PositionSetReadOnly(viewPosition);
+		try {
+			assert allowedStatus.contains(TermAux.RETIRED.get(Ts.get().getMetadataVC()).getNid()) == false:
+				"Cannot include a retired status. May surface cycles: " + allowedStatus;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		this.relTypeNids = new NidSet(relTypeNids.getSetValues());
+		this.viewPositionSet = new PositionSet(viewPosition);
 		this.precedence = precedence;
 		this.contradictionMgr = contradictionMgr;
                 this.classifierNid = classifierNid;
                 this.relAssertionType = relAssertionType;
 	}
+	
+	
 	@Override
 	public boolean equals(Object obj) {
-		if (KindOfSpec.class.isAssignableFrom(obj.getClass())) {
-			KindOfSpec another = (KindOfSpec) obj;
-			if (kindNid != another.kindNid) {
-				return false;
-			}
+		if (IsaCoordinate.class.isAssignableFrom(obj.getClass())) {
+			IsaCoordinate another = (IsaCoordinate) obj;
 			if (!viewPosition.equals(another.viewPosition)) {
 				return false;
 			}
-			if (!allowedStatusNids.equals(another.allowedStatusNids)) {
-				return false;
-			}
+			//TODO: research status list... gets contaminated with all active subtypes of active (like develpmental, experimental, etc)
+//			if (!allowedStatusNids.equals(another.allowedStatusNids)) {
+//				return false;
+//			}
 			if (!relTypeNids.equals(another.relTypeNids)) {
 				return false;
 			}
@@ -115,10 +110,10 @@ public class KindOfSpec {
 	}
 	@Override
 	public int hashCode() {
-		return HashFunction.hashCode(new int[] {kindNid, viewPosition.getPath().getConceptNid()});
+		return Hashcode.compute(new int[] {viewPosition.getPath().getConceptNid()});
 	}
 
-	public PositionSetReadOnly getViewPositionSet() {
+	public PositionSetBI getViewPositionSet() {
 		return viewPositionSet;
 	}
 
@@ -130,14 +125,6 @@ public class KindOfSpec {
 		buff.append(allowedStatusNids);
 		buff.append("\n relTypes: ");
 		buff.append(relTypeNids);
-		buff.append("\n kind: ");
-		try {
-			buff.append(Terms.get().getConcept(kindNid).toString());
-		} catch (TerminologyException e) {
-			buff.append(e.getLocalizedMessage());
-		} catch (IOException e) {
-			buff.append(e.getLocalizedMessage());
-		}
 		buff.append("\n viewPositions: ");
 		buff.append(viewPositionSet);
 

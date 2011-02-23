@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb.computer.kindof;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -16,7 +17,7 @@ import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
-public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnable, KindOfCacheBI {
+public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnable, KindOfCacheBI, Serializable {
 	protected ConcurrentHashMap<Integer, int[]> typeMap;
     private List<ParallelConceptIterator> pcis;
     protected ViewCoordinate coordinate;

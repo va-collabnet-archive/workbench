@@ -193,5 +193,11 @@ public class ViewCoordinate {
         return hashCode;
     }
     
+    public IsaCoordinate getIsaCoordinate() {
+    	IsaCoordinate isaCoordinate = new IsaCoordinate(positionSet.iterator().next(), allowedStatusNids, isaTypeNids, 
+    			precedence, contradictionManager, classifierNid, relAssertionType);
+    	return isaCoordinate;
+    }
+    
     
 }

@@ -407,6 +407,7 @@ public class BdbCommitManager {
 
             if (performCommit) {
                 KindOfComputer.reset();
+                KindOfComputer.updateIsaCache(getActiveFrame().getViewCoordinate().getIsaCoordinate(), c.getNid());
                 long commitTime = System.currentTimeMillis();
                 NidSetBI sapNidsFromCommit = c.setCommitTime(commitTime);
                 Bdb.getConceptDb().writeConcept(c);
@@ -545,6 +546,10 @@ public class BdbCommitManager {
 
                     if (performCommit) {
                         KindOfComputer.reset();
+                        NidBitSetItrBI uncommittedCNidItr = uncommittedCNids.iterator();
+                        while (uncommittedCNidItr.next()) {
+                            KindOfComputer.updateIsaCache(getActiveFrame().getViewCoordinate().getIsaCoordinate(), uncommittedCNidItr.nid());
+                        }
                         long commitTime = System.currentTimeMillis();
                         IntSet sapNidsFromCommit = Bdb.getSapDb().commit(
                                 commitTime);
@@ -603,7 +608,9 @@ public class BdbCommitManager {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
-        } finally {
+        } catch (Exception e1) {
+        	AceLog.getAppLog().alertAndLogException(e1);
+		} finally {
             if (!passedRelease) {
                 Svn.rwl.release();
             }
