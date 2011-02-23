@@ -234,7 +234,7 @@ public class SearchWfHistoryStringWorker extends SwingWorker<I_UpdateProgress> i
             }
             
             if (wfHistorySearchResults != null)
-            	wfSearchPanel.setProgressInfo("   " + wfHistorySearchResults.size() + " concepts matched out of " + searcher.getTotalConceptCount() + " filtered concepts   ");
+                wfSearchPanel.setProgressInfo(" " + wfHistorySearchResults.size() + " matches. Search complete. ");
         }
 
         public void normalCompletion() {
@@ -245,8 +245,8 @@ public class SearchWfHistoryStringWorker extends SwingWorker<I_UpdateProgress> i
                 firstUpdate = false;
             }
             wfSearchPanel.setProgressValue(0);
+            wfSearchPanel.setProgressInfo(" " + wfHistorySearchResults.size() + " matches. Search complete. ");
         }
-
     }
 
 
