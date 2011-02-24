@@ -165,7 +165,7 @@ public class ConceptViewRenderer extends JLayeredPane {
     private WizardPanel wizardPanel;
     private JScrollPane wizardScrollPane;
     private KnowledgeBase contextualConceptActionsKBase;
-    private JScrollPane scrollPane;
+    private JScrollPane conceptScrollPane;
     private JToggleButton workflowToggleButton;
     private JToggleButton oopsButton;
     private final static String advanceWorkflowActionPath = "migration-wf";
@@ -208,27 +208,27 @@ public class ConceptViewRenderer extends JLayeredPane {
 
         add(title, BorderLayout.NORTH);
 
-        scrollPane = null;
+        conceptScrollPane = null;
 
         if (graph.getModel().getChildCount(cell) == 0) {
             renderedComponent = settings.getComponent(ace.getAceFrameConfig());
             if (JScrollPane.class.isAssignableFrom(renderedComponent.getClass())) {
-                scrollPane = (JScrollPane) renderedComponent;
+                conceptScrollPane = (JScrollPane) renderedComponent;
             } else {
-                scrollPane = new JScrollPane(renderedComponent);
+                conceptScrollPane = new JScrollPane(renderedComponent);
             }
         }
 
-        if (scrollPane != null) {
+        if (conceptScrollPane != null) {
             conceptViewPanel.add(historyPanel, BorderLayout.NORTH);
-            conceptViewPanel.add(scrollPane, BorderLayout.CENTER);
+            conceptViewPanel.add(conceptScrollPane, BorderLayout.CENTER);
             add(conceptViewPanel, BorderLayout.CENTER);
-            scrollPane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            scrollPane.getViewport().setBackground(Color.WHITE);
-            scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+            conceptScrollPane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            conceptScrollPane.getViewport().setBackground(Color.WHITE);
+            conceptScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            conceptScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
             setOpaque(true);
-            scrollPane.getVerticalScrollBar().addAdjustmentListener(
+            conceptScrollPane.getVerticalScrollBar().addAdjustmentListener(
                     new AdjustmentListener() {
 
                         @Override
@@ -236,7 +236,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                             graphContainer.refresh();
                         }
                     });
-            scrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 0, 1, Color.GRAY));
+            conceptScrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 0, 1, Color.GRAY));
         }
 
 
@@ -268,7 +268,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                             || ((e.getModifiers() & ActionEvent.ALT_MASK) > 0)) {
                         showWizardPanel();
                     } else {
-                        scrollPane.setVisible(false);
+                        conceptScrollPane.setVisible(false);
                         remove(conceptViewPanel);
                         applicationWorkflowPanel.removeAll();
                         conceptWorkflowPanel.removeAll();
@@ -326,7 +326,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 
                 add(workflowScrollPane, BorderLayout.CENTER);
                 // Populate here...
-                scrollPane.setVisible(false);
+                conceptScrollPane.setVisible(false);
                 GuiUtil.tickle(ConceptViewRenderer.this);
 
                 if (capWorkflow) {
@@ -739,9 +739,10 @@ public class ConceptViewRenderer extends JLayeredPane {
         remove(wizardScrollPane);
         workflowPanel.setVisible(false);
         remove(workflowScrollPane);
-        
         add(conceptViewPanel, BorderLayout.CENTER);
-        scrollPane.setVisible(true);
+        conceptViewPanel.setVisible(true);
+        conceptScrollPane.setVisible(true);
+        GuiUtil.tickle(ConceptViewRenderer.this);
     }
 
     public void showWizardPanel() {
