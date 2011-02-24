@@ -748,6 +748,8 @@ public class ConceptViewRenderer extends JLayeredPane {
         conceptViewPanel.setVisible(false);
         remove(conceptViewPanel);
         wizardPanel.setVisible(true);
+        workflowPanel.setVisible(false);
+        remove(workflowScrollPane);
         add(wizardScrollPane, BorderLayout.CENTER);
         GuiUtil.tickle(ConceptViewRenderer.this);
     }
