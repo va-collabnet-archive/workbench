@@ -40,6 +40,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.commitlog.CommitLog;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrame;
@@ -65,6 +66,7 @@ import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.custom.statics.CustomStatics;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.objectCache.ObjectCacheClassHandler;
 import org.ihtsdo.tk.api.PositionBI;
@@ -444,7 +446,13 @@ public class WorkbenchRunner {
 			}
 
 			// Startup queues in profile sub-directories here...
-
+			
+			// Isa Cache Setup start
+			List<CountDownLatch> latches = new ArrayList<CountDownLatch>();
+			for (final I_ConfigAceFrame ace : AceConfig.config.aceFrames) {
+				latches.add(Terms.get().setupIsaCache(ace.getViewCoordinate().getIsaCoordinate()).getLatch());
+			}
+			
 			File directory = AceConfig.config.getProfileFile().getParentFile();
 
 			if (directory.listFiles() != null) {
@@ -493,6 +501,11 @@ public class WorkbenchRunner {
 						new Exception(
 								"Removing queues that are not accessable: "
 										+ queuesToRemove));
+			}
+			
+			// Await isa cache finalization
+			for (CountDownLatch latch : latches) {
+				latch.await();
 			}
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);

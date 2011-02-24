@@ -17,6 +17,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.thread.NamedThreadFactory;
+import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.api.coordinate.KindOfSpec;
 
@@ -84,16 +85,18 @@ public class KindOfComputer {
 		return isKindOfWithDepth(c, spec, 0);
 	}
 
-	public static IsaCache setupIsaCacheGeneric(IsaCoordinate isaCoordinate) throws IOException {
+	public static IsaCache setupIsaCache(IsaCoordinate isaCoordinate) throws IOException {
 		IsaCache tempIsaCache = 
 			new IsaCache(Bdb.getConceptDb().getConceptNidSet());
 		try {
-			tempIsaCache.setup(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+			tempIsaCache.setup(isaCoordinate.getCoordinate());
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		AceLog.getAppLog().info("Saving cache reference...");
+		isaCache.put(isaCoordinate, tempIsaCache);
 		return tempIsaCache;
 		//		if (isaCache == null) {
 		//			lock.lock();
@@ -113,20 +116,14 @@ public class KindOfComputer {
 		//		return isaCache;
 	}
 
-	public static Map<IsaCoordinate,IsaCache> setupIsaCache(IsaCoordinate isaCoordinate) throws IOException {
-		IsaCache tempIsaCache = setupIsaCacheGeneric(isaCoordinate);
-		isaCache.put(isaCoordinate, tempIsaCache);
-		return isaCache;
-	}
-
-	public static Map<IsaCoordinate,IsaCache> setupIsaCacheAndWait(IsaCoordinate isaCoordinate) 
+	public static IsaCache setupIsaCacheAndWait(IsaCoordinate isaCoordinate) 
 	throws IOException, InterruptedException {
-		IsaCache tempIsaCache = setupIsaCacheGeneric(isaCoordinate);
+		IsaCache tempIsaCache = setupIsaCache(isaCoordinate);
 		tempIsaCache.getLatch().await();
 		isaCache.put(isaCoordinate, tempIsaCache);
-		return isaCache;
+		return tempIsaCache;
 	}
-
+	
 	public static void updateIsaCache(IsaCoordinate isaCoordinate, int cNid) throws Exception {
 		if (isaCache.get(isaCoordinate) != null && isaCache.get(isaCoordinate).isReady()) {
 			isaCache.get(isaCoordinate).updateConcept(cNid);
@@ -252,7 +249,7 @@ public class KindOfComputer {
 		return false;
 	}
 
-	public static Map<IsaCoordinate,IsaCache> getIsaCache() {
+	public static Map<IsaCoordinate,IsaCache> getIsaCacheMap() {
 		return isaCache;
 	}
 }

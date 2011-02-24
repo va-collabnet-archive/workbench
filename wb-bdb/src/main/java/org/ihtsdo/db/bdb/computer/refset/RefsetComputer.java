@@ -88,7 +88,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
     private I_ConfigAceFrame frameConfig;
     private RefsetSpec specHelper;
     private ComputeType computeType;
-	private Map<IsaCoordinate, IsaCache> isaCache;
+	private IsaCache isaCache;
     private StopActionListener stopListener;
 
     public RefsetComputer(int refsetNid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig,
@@ -266,7 +266,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             I_RepresentIdSet newParents = Bdb.getConceptDb().getEmptyIdSet();
             NidBitSetItrBI newMemberItr = newMemberNids.iterator();
             while (newMemberItr.next()) {
-            	isaCache.get(frameConfig.getViewCoordinate().getIsaCoordinate()).addParents(newMemberItr.nid(), newParents);
+            	isaCache.addParents(newMemberItr.nid(), newParents);
             }
             NidBitSetItrBI newParentItr = newParents.iterator();
             while (newParentItr.next()) {
@@ -287,12 +287,12 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             I_RepresentIdSet parentsToRetire = Bdb.getConceptDb().getEmptyIdSet();
             NidBitSetItrBI retiredMemberItr = retiredMemberNids.iterator();
             while (retiredMemberItr.next()) {
-            	isaCache.get(frameConfig.getViewCoordinate().getIsaCoordinate()).addParents(retiredMemberItr.nid(), parentsToRetire);
+            	isaCache.addParents(retiredMemberItr.nid(), parentsToRetire);
             }
             I_RepresentIdSet currentParents = Bdb.getConceptDb().getEmptyIdSet();
             NidBitSetItrBI currentMemberItr = currentRefsetMemberComponentNids.iterator();
             while (currentMemberItr.next()) {
-            	isaCache.get(frameConfig.getViewCoordinate().getIsaCoordinate()).addParents(currentMemberItr.nid(), currentParents);
+            	isaCache.addParents(currentMemberItr.nid(), currentParents);
             }
             parentsToRetire.andNot(currentParents);
             NidBitSetItrBI parentToRetireItr = parentsToRetire.iterator();

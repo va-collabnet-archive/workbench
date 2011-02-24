@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
+import org.drools.KnowledgeBase;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
@@ -170,6 +172,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     private BdbPathManager pathManager;
     private Map<IsaCoordinate,? extends KindOfCacheBI> isaCache;
+    private HashMap<Integer, KnowledgeBase> knowledgeBaseCache;
 
     private File envHome;
 
@@ -2059,16 +2062,18 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
 	@Override
-	public Map<IsaCoordinate,? extends KindOfCacheBI> setupIsaCache(IsaCoordinate isaCoordinate) throws IOException {
-		isaCache = KindOfComputer.setupIsaCache(isaCoordinate);
-		return isaCache;
+	public KindOfCacheBI setupIsaCache(IsaCoordinate isaCoordinate) throws IOException {
+		KindOfCacheBI tmpIsaCache = KindOfComputer.setupIsaCache(isaCoordinate);
+		isaCache = KindOfComputer.getIsaCacheMap();
+		return tmpIsaCache;
 	}
 
 	@Override
-	public Map<IsaCoordinate,? extends KindOfCacheBI> setupIsaCacheAndWait(IsaCoordinate isaCoordinate) throws IOException,
+	public KindOfCacheBI setupIsaCacheAndWait(IsaCoordinate isaCoordinate) throws IOException,
 			InterruptedException {
-		isaCache = KindOfComputer.setupIsaCacheAndWait(isaCoordinate);
-		return isaCache;
+		KindOfCacheBI tmpIsaCache = KindOfComputer.setupIsaCacheAndWait(isaCoordinate);
+		isaCache = KindOfComputer.getIsaCacheMap();
+		return tmpIsaCache;
 	}
 
 	@Override
@@ -2084,6 +2089,16 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 	@Override
 	public void loadIsaCacheFromFile() throws Exception {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public HashMap<Integer, KnowledgeBase> getKnowledgeBaseCache() {
+		return knowledgeBaseCache;
+	}
+
+	@Override
+	public void setKnowledgeBaseCache(HashMap<Integer, KnowledgeBase> kbCache) {
+		knowledgeBaseCache = kbCache;
 	}
 
 }

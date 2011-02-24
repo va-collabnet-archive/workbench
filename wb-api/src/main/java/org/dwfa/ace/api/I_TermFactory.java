@@ -19,6 +19,7 @@ package org.dwfa.ace.api;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import javax.swing.JComponent;
 import javax.swing.TransferHandler;
 
 import org.apache.lucene.queryParser.ParseException;
+import org.drools.KnowledgeBase;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
@@ -658,13 +660,17 @@ public interface I_TermFactory {
 
 	public int getAuthorNid();
 	
-	public Map<IsaCoordinate,? extends KindOfCacheBI> setupIsaCache(IsaCoordinate isaCoordinate) throws IOException;
+	public KindOfCacheBI setupIsaCache(IsaCoordinate isaCoordinate) throws IOException;
 	
-	public Map<IsaCoordinate,? extends KindOfCacheBI> setupIsaCacheAndWait(IsaCoordinate isaCoordinate) throws IOException, InterruptedException;
+	public KindOfCacheBI setupIsaCacheAndWait(IsaCoordinate isaCoordinate) throws IOException, InterruptedException;
 	
 	public void updateIsaCache(IsaCoordinate isaCoordinate, int cNid) throws Exception;
 	
 	public void persistIsaCache() throws Exception;
 
 	public void loadIsaCacheFromFile() throws Exception;
+	
+	public HashMap<Integer, KnowledgeBase> getKnowledgeBaseCache();
+	
+	public void setKnowledgeBaseCache(HashMap<Integer, KnowledgeBase> kbCache);
 }

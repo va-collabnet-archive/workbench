@@ -58,7 +58,11 @@ public class RulesContextHelper {
 
 	public RulesContextHelper(I_ConfigAceFrame config) {
 		this.config = config;
-		this.kbCache = new HashMap<Integer, KnowledgeBase>();
+		if (Terms.get().getKnowledgeBaseCache() != null) {
+			this.kbCache = Terms.get().getKnowledgeBaseCache();
+		} else {
+			this.kbCache = new HashMap<Integer, KnowledgeBase>();
+		}
 	}
 
 	//	public void updateKbCacheFromFiles() {
@@ -116,6 +120,7 @@ public class RulesContextHelper {
 				kbase = (KnowledgeBase) in.readObject();
 				in.close();
 				kbCache.put(context.getConceptNid(), kbase);
+				Terms.get().setKnowledgeBaseCache(kbCache);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -153,6 +158,7 @@ public class RulesContextHelper {
 					e.printStackTrace();
 				}
 				kbCache.put(context.getConceptNid(), kbase);
+				Terms.get().setKnowledgeBaseCache(kbCache);
 				lastCacheUpdateTime = Calendar.getInstance().getTimeInMillis();
 			}
 			returnBase = kbase;
@@ -491,6 +497,7 @@ public class RulesContextHelper {
 
 	public void setKbCache(HashMap<Integer, KnowledgeBase> kbCache) {
 		this.kbCache = kbCache;
+		Terms.get().setKnowledgeBaseCache(kbCache);
 	}
 
 	public void clearCache() {
@@ -501,6 +508,7 @@ public class RulesContextHelper {
 			}
 		}
 		kbCache = new HashMap<Integer, KnowledgeBase>();
+		Terms.get().setKnowledgeBaseCache(kbCache);
 		//updateKbCacheFromFiles();
 	}
 
