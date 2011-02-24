@@ -56,6 +56,8 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.WizardBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/arena", type = BeanType.TASK_BEAN) })
 public class CheckForChildren extends AbstractTask {
@@ -95,6 +97,8 @@ public class CheckForChildren extends AbstractTask {
         try {
             I_TermFactory tf = Terms.get();
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            ViewCoordinate vc = config.getViewCoordinate();
+            
             wizard = (WizardBI) worker.readAttachement(WorkerAttachmentKeys.WIZARD_PANEL.name());
 
             I_HostConceptPlugins host = (I_HostConceptPlugins) worker.readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name());
@@ -105,11 +109,16 @@ public class CheckForChildren extends AbstractTask {
                 throw new TaskFailedException("There is no concept in the arena...");
             }
 
-            //ComponentBI component = (ComponentBI) concept;
+            Collection<? extends RelationshipChronicleBI> relsIncoming = concept.getRelsIncoming();
+            int size = 0;
+            
+            for(RelationshipChronicleBI rel : relsIncoming){
+            	if (vc.getIsaTypeNids().contains(rel.getNid())){
+            		size = size++;
+            	}
+            }
 
-            //ConceptVersionBI conceptVer = (ConceptVersionBI) component;
-
-            if(concept.getRelsIncoming().size() != 0){
+            if( size != 0){
             	JPanel wizardPanel = wizard.getWizardPanel();
             	if (SwingUtilities.isEventDispatchThread()) {
                   wizard.setWizardPanelVisible(true);
