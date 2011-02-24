@@ -115,11 +115,6 @@ public class KindOfComputer {
 
 	public static Map<IsaCoordinate,IsaCache> setupIsaCache(IsaCoordinate isaCoordinate) throws IOException {
 		IsaCache tempIsaCache = setupIsaCacheGeneric(isaCoordinate);
-		try {
-			tempIsaCache.getLatch().await();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 		isaCache.put(isaCoordinate, tempIsaCache);
 		return isaCache;
 	}
