@@ -25,6 +25,7 @@ import java.util.TreeMap;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
+import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -33,6 +34,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
@@ -104,6 +106,9 @@ public class RefsetPartitionerPanel extends JPanel {
 
 			updatePanel7Content();
 			ConceptDnDHandler=new ObjectTransferHandler(config,null);
+			list1.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+	        list1.setDropMode(DropMode.INSERT);
+			list1.setDragEnabled(true);
 			list1.setTransferHandler(ConceptDnDHandler);
 
 	        DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(list1, DnDConstants.ACTION_MOVE,
