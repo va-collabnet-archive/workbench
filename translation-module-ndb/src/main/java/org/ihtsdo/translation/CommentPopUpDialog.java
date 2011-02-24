@@ -55,7 +55,6 @@ public class CommentPopUpDialog extends JDialog {
 	private void initCustomComponents() {
 		List<I_GetConceptData> s = new ArrayList<I_GetConceptData>();
 		CommentsRefset.getCommentSubTypes(s, commentType);
-		rejectionReasonCombo.addItem("");
 		for (I_GetConceptData iGetConceptData : s) {
 			rejectionReasonCombo.addItem(iGetConceptData);
 		}
