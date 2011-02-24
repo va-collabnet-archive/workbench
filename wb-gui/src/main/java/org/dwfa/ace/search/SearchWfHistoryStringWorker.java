@@ -64,7 +64,8 @@ public class SearchWfHistoryStringWorker extends SwingWorker<I_UpdateProgress> i
 
         public MatchUpdator() {
             super();
-            updateTimer = new Timer(1000, this);
+            // TODO: Once have full history, increase the timer from 100 milliseconds
+            updateTimer = new Timer(100, this);
             updateTimer.start();
         }
 
@@ -116,44 +117,22 @@ public class SearchWfHistoryStringWorker extends SwingWorker<I_UpdateProgress> i
  		this.model.setWfHxBeans(wfHistorySearchResults);
     }
 
+    private boolean hasMatches() {
+    	return this.model.hasMatches();
+    }
     @Override
     protected I_UpdateProgress construct() throws Exception 
     {
-
     	I_UpdateProgress updater = new WfHxProgressUpdator();
     	searcher = new WorkflowHistoryRefsetSearcher();
 
-    	int totalWfCount = searcher.getTotalMemberCount();
-
-//        completeLatch = new CountDownLatch(totalWfCount);
-        
         new MatchUpdator();
         
-        
         wfHistorySearchResults = searcher.searchForWFHistory(wfSearchPanel.getExtraCriterion(), wfInProgress, completedWF, searchPreviousReleases, timestampBefore, timestampAfter);
-//        while (completeLatch.getCount() > 0)
-//        	completeLatch.countDown();
-        
-//        completeLatch.await();
+
         updater.actionPerformed(null);
             
         return updater;
-        
-    
-/*	  
-    	I_UpdateProgress updater = new WfHxProgressUpdator();
-		wfHistorySearchResults = new TreeSet<WorkflowHistoryJavaBean>(WorkflowHistoryRefset.createWfHxJavaBeanComparer());
-	
-	    //completeLatch = new CountDownLatch(1);
-	
-	    new MatchUpdator();
-	
-	    //completeLatch = 
-	        ((I_Search) Terms.get()).searchWfHx(this, wfHistorySearchResults, //completeLatch,
-	                wfSearchPanel.getExtraCriterion(), config, (WfHxProgressUpdator) updater);
-		
-	    return updater;
-*/
     }
 
     protected void finished() {
@@ -177,11 +156,6 @@ public class SearchWfHistoryStringWorker extends SwingWorker<I_UpdateProgress> i
         wfSearchPanel.setProgressValue(0);
     }
 
-
-
-
-
-
     public class WfHxProgressUpdator implements I_UpdateProgress {
         Timer updateTimer;
 
@@ -189,156 +163,66 @@ public class SearchWfHistoryStringWorker extends SwingWorker<I_UpdateProgress> i
 
         public WfHxProgressUpdator() {
             super();
+            // TODO: Once have full history, increase the timer from 100 milliseconds
             updateTimer = new Timer(100, this);
             updateTimer.start();
         }
 
-         /*
-         * (non-Javadoc)
-         * 
-         * @see
-         * org.dwfa.ace.search.I_UpdateProgress#actionPerformed(java.awt.event
-         * .ActionEvent)
-         */
-        public void actionPerformed(ActionEvent e) {
-            if (continueWork) {
-                if (firstUpdate) {
-                	int searchSize = searcher.getTotalMemberCount();
-
-                	wfSearchPanel.setProgressInfo("   Starting Workflow History search   ");
-                    if (searchSize > 0) {
-                    	wfSearchPanel.setProgressIndeterminate(false);
-                        wfSearchPanel.setProgressMaximum(searchSize);
-                        firstUpdate = false;
-                    }
-                }
-//                if (completeLatch != null) {
-//                	wfSearchPanel.setProgressValue((int) (wfSearchPanel.getProgressMaximum() - completeLatch.getCount()));
-//                }
-                if (firstUpdate != true) {
-                    updateProgress();
-                    if (wfSearchPanel.getProgressValue() == wfSearchPanel.getProgressMaximum()) {
-                        normalCompletion();
-                    }
-                }
-            } else {
-                updateProgress();
-                updateTimer.stop();
-            }
-        }
-
-        private void updateProgress() {
-            String max = "" + wfSearchPanel.getProgressMaximum();
-            if (wfSearchPanel.getProgressMaximum() == Integer.MAX_VALUE) {
-                max = "unknown";
-            }
-            
-            if (wfHistorySearchResults != null)
-                wfSearchPanel.setProgressInfo(" " + wfHistorySearchResults.size() + " matches. Search complete. ");
-        }
-
-        public void normalCompletion() {
-            updateTimer.stop();
-            if (firstUpdate) {
-                wfSearchPanel.setProgressIndeterminate(false);
-                wfSearchPanel.setProgressMaximum(searchSize);
-                firstUpdate = false;
-            }
-            wfSearchPanel.setProgressValue(0);
-            wfSearchPanel.setProgressInfo(" " + wfHistorySearchResults.size() + " matches. Search complete. ");
-        }
-    }
-
-
-	@Override
-	public boolean continueWork() {
-        return continueWork;
-    }
-    
-       /*
-
-    public class WfHxProgressUpdator implements I_UpdateProgress {
-        Timer updateTimer;
-
-        boolean firstUpdate = true;
-
-        private Integer hits = null;
-
-        public WfHxProgressUpdator() {
-            super();
-            updateTimer = new Timer(100, this);
-            updateTimer.start();
-        }
-
-        *
-         * (non-Javadoc)
-         * 
-         * @see
-         * org.dwfa.ace.search.I_UpdateProgress#actionPerformed(java.awt.event
-         * .ActionEvent)
-         *
+       
         public void actionPerformed(ActionEvent e) {
             if (continueWork) 
             {
                 if (firstUpdate) 
                 {
-                    if (hits == null) 
+                	int searchSize = searcher.getRefsetMembersCount();
+                	wfSearchPanel.setProgressInfo("   Starting Workflow History search   ");
+
+                	if (searchSize > 0) {
                     	wfSearchPanel.setProgressIndeterminate(true);
-                    
-                    wfSearchPanel.setProgressMaximum(searchSize);
-                    firstUpdate = false;
+                        wfSearchPanel.setProgressMaximum(searchSize);
+                        firstUpdate = false;
+                    }
                 }
-                *
-                if (completeLatch != null) {
-                    if (hits != null)
-                    	wfSearchPanel.setProgressIndeterminate(false);
-                 
-                    wfSearchPanel.setProgressMaximum(searchSize);
-                    wfSearchPanel.setProgressValue((int) (wfSearchPanel.getProgressMaximum() - completeLatch.getCount()));
-                } else 
-                    AceLog.getAppLog().info("completeLatch is null");                
-                *
-                wfSearchPanel.setProgressInfo(" " + wfHistorySearchResults.size() + " matches. ");
-                
-                if (hits != null )//&& completeLatch.getCount() == 0) 
-                    normalCompletion();
+
+                if (firstUpdate != true) {
+                    updateProgress();
+                }
             } else {
+                updateProgress();
                 updateTimer.stop();
+
+                if (hasMatches())
+                {
+                	wfSearchPanel.setProgressIndeterminate(false);
+                	model.clearResults();
+                    normalCompletion();
+                }
             }
         }
 
-        public void setIndeterminate(boolean value) {
-        	wfSearchPanel.setProgressIndeterminate(value);
-        }
-
-               
-        public void setProgressInfo(String info) {
-        	wfSearchPanel.setProgressInfo(info);
-        }
-
-        public void setHits(int hits) {
-            this.hits = hits;
-            searchSize = hits;
-            wfSearchPanel.setProgressMaximum(hits);
-        }
-
-        public boolean continueWork() {
-            return continueWork;
+        private void updateProgress() {
+            if (wfHistorySearchResults != null)
+                wfSearchPanel.setProgressInfo(" Searching " + searcher.getRefsetMembersCount()+ " records.");
         }
 
         public void normalCompletion() {
             updateTimer.stop();
-            if (firstUpdate) {
+    
+            if (firstUpdate) 
+            {
                 wfSearchPanel.setProgressIndeterminate(false);
                 wfSearchPanel.setProgressMaximum(searchSize);
                 firstUpdate = false;
             }
+            
             wfSearchPanel.setProgressValue(0);
             wfSearchPanel.setProgressInfo(" " + wfHistorySearchResults.size() + " matches. Search complete. ");
         }
-
     }
-*/
 
+	@Override
+	public boolean continueWork() {
+        return continueWork;
+    }
 }
 

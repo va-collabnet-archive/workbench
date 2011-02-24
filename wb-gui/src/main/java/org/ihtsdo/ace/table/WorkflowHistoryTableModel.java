@@ -47,77 +47,77 @@ import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 public class WorkflowHistoryTableModel extends DefaultTableModel {
 	
     private static final long serialVersionUID = 1L;
+ 
+    private ArrayList<WorkflowHistoryJavaBean> wfHistoryList = new ArrayList<WorkflowHistoryJavaBean>();
+	private Integer searchResults = null;
 
- 	    public enum WORKFLOW_FIELD { 
- 	    	FSN("FSN", 5, 400, 600), EDITOR("Editor", 5, 150, 180), 
- 	    	STATE("State", 5, 115, 150), TIMESTAMP("TimeStamp", 5, 75, 200);
+    public enum WORKFLOW_FIELD { 
+    	FSN("FSN", 5, 400, 600), EDITOR("Editor", 5, 150, 180), 
+    	STATE("State", 5, 115, 150), TIMESTAMP("TimeStamp", 5, 75, 200);
 
  /*
   *  FSN("FSN", 5, 400, 600), 	  	STATE("State", 5, 115, 150), 	ACTION("Action", 5, 115, 150), 	  
   *	 EDITOR("Editor", 5, 150, 180), 	PATH("Path", 5, 115, 150), 		TIMESTAMP("TimeStamp", 5, 75, 200);
   */
  
-  	        private int min;
- 	        private int pref;
- 	        private int max;
- 	        private String columnName;
+    	private int min;
+        private int pref;
+        private int max;
+        private String columnName;
 
- 	        private WORKFLOW_FIELD(String columnName, int min, int pref, int max) {
- 	            this.columnName = columnName;
- 	            this.min = min;
- 	            this.pref = pref;
- 	            this.max = max;
- 	        }
+        private WORKFLOW_FIELD(String columnName, int min, int pref, int max) {
+            this.columnName = columnName;
+            this.min = min;
+            this.pref = pref;
+            this.max = max;
+        }
 
- 	        public String getColumnName() {
- 	            return columnName;
- 	        }
+        public String getColumnName() {
+            return columnName;
+        }
 
- 	        public int getMax() {
- 	            return max;
- 	        }
+        public int getMax() {
+            return max;
+        }
 
- 	        public int getMin() {
- 	            return min;
- 	        }
+        public int getMin() {
+            return min;
+        }
 
- 	        public int getPref() {
- 	            return pref;
- 	        }
- 	    }
+        public int getPref() {
+            return pref;
+        }
+    }
 
- 	    private WORKFLOW_FIELD[] columns;
+    private WORKFLOW_FIELD[] columns;
 
+    private I_ConfigAceFrame config;
+    private DateFormat formatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
 
-// 	    private SmallProgressPanel progress = new SmallProgressPanel();
+    public WorkflowHistoryTableModel(WORKFLOW_FIELD[] columns, I_ConfigAceFrame config) {
+        super();
+        this.columns = columns;
+        this.config = config;
+    }
 
- 	    private I_ConfigAceFrame config;
- 	    private DateFormat formatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
+    public final void setColumns(WORKFLOW_FIELD[] columns) {
+        if (this.columns.length != columns.length) {
+            this.columns = columns;
+            fireTableStructureChanged();
+            return;
+        }
+        for (int i = 0; i < columns.length; i++) {
+            if (columns[i].equals(this.columns[i]) == false) {
+                this.columns = columns;
+                fireTableStructureChanged();
+                return;
+            }
+        }
+    }
 
- 	    public WorkflowHistoryTableModel(WORKFLOW_FIELD[] columns, I_ConfigAceFrame config) {
- 	        super();
- 	        this.columns = columns;
- 	        this.config = config;
- 	    }
-
- 	    public final void setColumns(WORKFLOW_FIELD[] columns) {
- 	        if (this.columns.length != columns.length) {
- 	            this.columns = columns;
- 	            fireTableStructureChanged();
- 	            return;
- 	        }
- 	        for (int i = 0; i < columns.length; i++) {
- 	            if (columns[i].equals(this.columns[i]) == false) {
- 	                this.columns = columns;
- 	                fireTableStructureChanged();
- 	                return;
- 	            }
- 	        }
- 	    }
-
- 	    public int getColumnCount() {
- 	        return columns.length;
- 	    }
+    public int getColumnCount() {
+        return columns.length;
+    }
 
     public WorkflowHistoryTableModel(String[][] data, String[] columns) {
         super(data, columns);
@@ -139,9 +139,6 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
                 return null;
             }
             WorkflowHistoryJavaBean bean = wfHistoryList.get(rowIndex);
-
-//            boolean inConflict = config.getHighlightConflictsInComponentPanel()
-//                && config.getConflictResolutionStrategy().isInConflict((I_DescriptionVersioned) desc.getFixedPart());
 
             if (bean == null) {
                 return null;
@@ -194,8 +191,6 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
 
 		return "";
     }
-
-    private ArrayList<WorkflowHistoryJavaBean> wfHistoryList = new ArrayList<WorkflowHistoryJavaBean>();
     
     public WorkflowHistoryJavaBean getBean(int rowIndex) {
         if (rowIndex < 0 || wfHistoryList == null || rowIndex == wfHistoryList.size()) {
@@ -233,7 +228,6 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
 
     public void setValueAt(Object value, int row, int col) {
         try {
-            WorkflowHistoryJavaBean bean = getBean(row);
             boolean changed = false;
 
             switch (columns[col]) {
@@ -249,8 +243,6 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
 
                 if (changed) {
                     AceLog.getAppLog().info("Description table changed");
-                    //updateDataAlerts(row);
-                    //Terms.get().addUncommitted(Terms.get().getConcept(desc.getConceptNid()));
                }
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
@@ -276,20 +268,6 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
         return String.class;
     }
 
-//    public SmallProgressPanel getProgress() {
-//        return progress;
-//    }
-//
-//    public void setProgress(SmallProgressPanel progress) {
-//        this.progress = progress;
-//    }
-    
-
-    
-    
-    
-    
-    
     public void setWfHxBeans(SortedSet<WorkflowHistoryJavaBean> beans) {
     	wfHistoryList = new ArrayList<WorkflowHistoryJavaBean>(beans);
  		String data[][] = new String[wfHistoryList.size()][]; 
@@ -297,7 +275,9 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
  		Iterator<WorkflowHistoryJavaBean> itr = wfHistoryList.iterator();
  		int i = 0;
  		int errorConceptCount = 0;
- 		int a = 0;
+ 		
+ 		searchResults = beans.size();
+ 		
  		while (itr.hasNext())
  		{ 
  			try {
@@ -361,59 +341,6 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
         return columns;
     }
 
-
-/*
- *     private class UpdateDataAlertsTimerTask extends TimerTask {
-        boolean active = true;
-        final int row;
-
-        public UpdateDataAlertsTimerTask(int row) {
-            super();
-            this.row = row;
-        }
-
-        @Override
-        public void run() {
-            if (active) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        if (active) {
-                            try {
-                                I_DescriptionTuple desc = getDescription(row);
-                                if (desc != null) {
-                                    Terms.get().addUncommitted(Terms.get().getConcept(desc.getConceptNid()));
-                                }
-                            } catch (IOException e) {
-                                AceLog.getAppLog().alertAndLogException(e);
-                            } catch (TerminologyException e) {
-                                AceLog.getAppLog().alertAndLogException(e);
-							}
-                        }
-                    }
-                });
-            }
-        }
-
-        public void setActive(boolean active) {
-            this.active = active;
-        }
-
-    }
-
-    UpdateDataAlertsTimerTask alertUpdater;
-
-    private void updateDataAlerts(int row) {
-        if (alertUpdater != null) {
-            alertUpdater.setActive(false);
-        }
-        alertUpdater = new UpdateDataAlertsTimerTask(row);
-        UpdateAlertsTimer.schedule(alertUpdater, 2000);
-
-    }
-
-
- */
-
     public static class WorkflowFSNWithConceptTuple extends StringWithTuple<StringWithConceptTuple> {
         String cellText;
 
@@ -424,13 +351,16 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
             this.tuple = tuple;
         }
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.dwfa.ace.table.I_CellTextWithTuple#getTuple()
-         */
         public I_ConceptAttributeTuple getTuple() {
             return tuple;
         }
     }
+
+	public void clearResults() {
+		searchResults = null;
+	}
+
+	public boolean hasMatches() {
+		return searchResults != null;
+	}
 }
