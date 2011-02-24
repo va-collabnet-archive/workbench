@@ -66,7 +66,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		}
 	}
 
-	public int getTotalMemberCount() {
+	public int getRefsetMembersCount() {
 		try {
 			return Terms.get().getRefsetExtensionMembers(refsetId).size();
 		} catch (Exception e) {
@@ -76,7 +76,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		return 0;
 	}
 
-	public int getTotalCountByRelease(int relNid) {
+	public int getRefsetMembersCountByRelease(int relNid) {
 		try {
 			return Terms.get().getRefsetExtensionsForComponent(refsetId, relNid).size();
 		} catch (Exception e) {
@@ -87,7 +87,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 	}
 
 
-	public int getTotalConceptCount() {
+	public int getConceptsInRefsetCount() {
 		return totalConcepts;
 	}
 
