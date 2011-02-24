@@ -1097,11 +1097,17 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
 				REFERRED_TO_SME_STATUS("referred to SME status",
 						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
+				REFERRED_TO_SUPER_SME_STATUS("referred to Super SME status",
+						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
 				SME_FEEDBACK_COMPLETE_STATUS("SME feedback complete status",
+						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
+				SUPER_SME_FEEDBACK_COMPLETE_STATUS("Super SME feedback complete status",
 						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
 				APPROVED_FOR_PUBLICATION_STATUS("approved for publication status",
 						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
 				ESCALATED_TO_EDITORIAL_BOARD_STATUS("escalated to editorial board status",
+						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
+				FAST_TRACK_TRANSLATED_STATUS("fast track translated status",
 						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
 
                 
