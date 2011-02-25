@@ -21,7 +21,7 @@ public class AlertToWfHxSearchFailure {
         this.alertType = alertType;
         this.alertMessage = alertMessage;
         this.stringCausingAlert = stringCausingAlert;
-    }
+    } 
 
     public ALERT_TYPE getAlertType() {
         return alertType;

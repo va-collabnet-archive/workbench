@@ -32,7 +32,10 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -80,6 +83,8 @@ import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WORKFLOW_FIELD;
 import org.ihtsdo.ace.task.search.I_TestWorkflowHistorySearchResults;
 
 public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterionPanel {
+
+	protected static final String DEFAULT_TIME_STAMP = "MM/dd/yyyy";
 
     public class EraseListener implements ActionListener {
 
@@ -312,6 +317,14 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
      *
      */
     private static final long serialVersionUID = 1L;
+
+	private static final int EXPECTED_YEAR_MONTH = 0;
+	private static final int EXPECTED_YEAR_DATE = 1;
+	private static final int EXPECTED_YEAR_LOCATION = 2;
+	private static final int REQUIRED_DATE_LENGTH = 2;
+	private static final int REQUIRED_YEAR_LENGTH = 4;
+	private static final int REQUIRED_MONTH_LENGTH = 2;
+	private static final int EXPECTED_DATE_PARTS = 3;
 
     private WorkflowHistoryTableModel model;
 
@@ -570,35 +583,21 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
         WfHistoryTable.setTransferHandler(new TerminologyTransferHandler(this));
         WorkflowHistoryTableRenderer renderer = new WorkflowHistoryTableRenderer(config, true);
         WfHistoryTable.setDefaultRenderer(Number.class, renderer);
-        //WfHistoryTable.setDefaultRenderer(StringWithDescTuple.class, renderer);
         WfHistoryTable.setDefaultRenderer(String.class, renderer);
         WfHistoryTable.setDefaultRenderer(Boolean.class, renderer);
-        // TODO
-         /* */
-         WfHistoryTable.addMouseListener(new DescSearchResultsTablePopupListener(config, ace, workflowHistorySearchPanelId));
-         /* */
+        WfHistoryTable.addMouseListener(new DescSearchResultsTablePopupListener(config, ace, workflowHistorySearchPanelId));
+        
+        WORKFLOW_FIELD[] columnEnums = model.getColumnEnums();
 
-         WORKFLOW_FIELD[] columnEnums = model.getColumnEnums();
-
-         for (int i = 0; i < WfHistoryTable.getColumnCount(); i++) {
-             TableColumn column = WfHistoryTable.getColumnModel().getColumn(i);
-             WORKFLOW_FIELD columnDesc = columnEnums[i];
-             column.setIdentifier(columnDesc);
-             column.setPreferredWidth(columnDesc.getPref());
-             column.setMaxWidth(columnDesc.getMax());
-             column.setMinWidth(columnDesc.getMin());
-         }
-
-/*
         for (int i = 0; i < WfHistoryTable.getColumnCount(); i++) {
             TableColumn column = WfHistoryTable.getColumnModel().getColumn(i);
-            String columnDesc = model.getColumnName(i);
-            column.setIdentifier(columnDesc + "asdf");
-            column.setPreferredWidth(160);
-            column.setMaxWidth(200);
-            column.setMinWidth(5);
+            WORKFLOW_FIELD columnDesc = columnEnums[i];
+            column.setIdentifier(columnDesc);
+            column.setPreferredWidth(columnDesc.getPref());
+            column.setMaxWidth(columnDesc.getMax());
+            column.setMinWidth(columnDesc.getMin());
         }
-*/
+
         // Set up tool tips for column headers.
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
@@ -671,32 +670,95 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
 
     private void startSearch() {
         lastSelectedRow = -1;
-        updateExtraCriterion();
-
-	    setShowProgress(true);
-	    ACE.threadPool.execute(new SearchWfHistoryStringWorker(this, model, config, this.workflowInProgress.isSelected(), this.workflowCompleted.isSelected(), this.pastReleases.isSelected(), timestampBefore, timestampAfter));
-    }
-
-    private void updateExtraCriterion() {
-        extraCriterion = new ArrayList<I_TestWorkflowHistorySearchResults>();
-        for (WorkflowHistoryCriterionPanel criterionPanel : criterionPanels) {
-            I_TestWorkflowHistorySearchResults test = criterionPanel.getBean();
-            if (test.getTestType() == I_TestWorkflowHistorySearchResults.timestampBefore) 
-            {
-            	timestampBefore = (String)test.getTestValue();
-            }
-            else if (test.getTestType() == I_TestWorkflowHistorySearchResults.timestampAfter)
-            {
-            	timestampAfter = (String)test.getTestValue();
-            }
-            	
-            if (test != null) {
-                extraCriterion.add(test);
-            }
+        if (updateExtraCriterion()) {
+		    setShowProgress(true);
+		    ACE.threadPool.execute(new SearchWfHistoryStringWorker(this, model, config, this.workflowInProgress.isSelected(), this.workflowCompleted.isSelected(), this.pastReleases.isSelected(), timestampBefore, timestampAfter));
         }
     }
 
-    public void setProgressInfo(String string) {
+    private boolean updateExtraCriterion() {
+        extraCriterion = new ArrayList<I_TestWorkflowHistorySearchResults>();
+        boolean timestampPassed = false;
+        
+        for (WorkflowHistoryCriterionPanel criterionPanel : criterionPanels) 
+        {
+            I_TestWorkflowHistorySearchResults test = criterionPanel.getBean();
+            
+            if (test != null) 
+            {
+	    		// Test to see if time is properly formatted
+	        	if (test.getTestType() == I_TestWorkflowHistorySearchResults.timestampBefore) 
+	            {
+	            	timestampBefore = (String)test.getTestValue();
+	            	timestampPassed = testDateFormat(timestampBefore);
+	            }
+	            else if (test.getTestType() == I_TestWorkflowHistorySearchResults.timestampAfter)
+	            {
+	            	timestampAfter = (String)test.getTestValue();
+	            	timestampPassed = testDateFormat(timestampAfter);
+	            }
+            	
+                extraCriterion.add(test);
+            }
+        }
+        
+       	return timestampPassed;
+
+    }
+
+    private boolean testDateFormat(String s) {
+
+    	try {
+    		// Simple two day, two month, four year date format
+	    	SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_TIME_STAMP);
+	    	sdf.setLenient(false);
+	    	Date d = sdf.parse(s);
+	    	
+	    	String[] dateParts = s.split("/");
+	    	if (dateParts.length != EXPECTED_DATE_PARTS)
+	    		throw new ParseException("Error: Month, Date, and Year must be specified and seperated by '/'", 0);
+	    	if (hasNonNumericValue(dateParts))
+	    		throw new ParseException("Error: Only digits seperated by '/' are allowed", 0);
+	    	if (dateParts[EXPECTED_YEAR_LOCATION].length() != REQUIRED_YEAR_LENGTH)
+	    		throw new ParseException("Error: Year must be four digits", 0);
+	    	if (dateParts[EXPECTED_YEAR_DATE].length() != REQUIRED_DATE_LENGTH)
+	    		throw new ParseException("Error: Day must be two digits", 0);
+			if (dateParts[EXPECTED_YEAR_MONTH].length() != REQUIRED_MONTH_LENGTH)
+	    		throw new ParseException("Error: Month must be two digits", 0);
+
+	    	return true;
+
+    	} catch (ParseException e) {
+            // TODO: Request to make the informing mechanism non-Module.   
+    		AlertToWfHxSearchFailure alerter = new AlertToWfHxSearchFailure(AlertToWfHxSearchFailure.ALERT_TYPE.INFORMATIONAL, "Error parsing date criterion", e.getMessage());
+
+            WorkflowAlerter alert = new WorkflowAlerter(alerter);
+            alert.alert();
+            
+            //AceLog.getAppLog().alertAndLogException(e);
+		}
+    	
+		return false;
+    }
+    
+    
+    
+    private boolean hasNonNumericValue(String[] dateParts) {
+    	for (int i = 0; i < dateParts.length; i++)
+    	{
+    		String part = dateParts[i];
+    		
+    		for (int j = 0; j < part.length(); j++)
+    		{
+    			if (!Character.isDigit(part.charAt(j)))
+    				return true;
+    		}
+    	}
+
+    	return false;
+	}
+
+	public void setProgressInfo(String string) {
         progressBar.setStringPainted(true);
         progressBar.setString(string);
     }
