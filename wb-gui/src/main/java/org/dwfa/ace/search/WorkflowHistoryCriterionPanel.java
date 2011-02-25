@@ -254,8 +254,7 @@ public class WorkflowHistoryCriterionPanel extends CriterionPanel {
                     }
                 }
             } else {
-                AceLog.getAppLog().log(Level.WARNING, "No search plugins in folder: " + searchPluginFolder.getAbsolutePath(),
-                    new Exception("No search plugins in folder: " + searchPluginFolder.getAbsolutePath()));
+                AceLog.getAppLog().log(Level.WARNING, "No search plugins found in folder: " + searchPluginFolder.getAbsolutePath());
             }
         }
         for (I_TestWorkflowHistorySearchResults bean : criterionOptions) {
