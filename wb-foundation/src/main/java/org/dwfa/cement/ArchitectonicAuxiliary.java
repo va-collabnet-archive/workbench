@@ -1145,16 +1145,16 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 
 	            // Workflow States
 	            WORKFLOW_STATES("Workflow states", new I_ConceptualizeUniversally[] { WORKFLOW_CONCEPTS }), 
-	            WORKFLOW_APPROVED_STATE("Approved workflow state", new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
-	            WORKFLOW_CHANGED_STATE("Changed workflow state", new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
-	            WORKFLOW_CHANGED_IN_BATCH_STATE("Changed in batch workflow state", new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
-	            WORKFLOW_CHIEF_TERMINOLOGIST_REVIEW_STATE("For Chief Terminologist review workflow state", new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
-	            WORKFLOW_EMPTY_NO_WFHX_STATE("Concept having no prior workflow state", new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
-	            WORKFLOW_EMPTY_NOT_EXISTING_STATE("Concept not previously existing workflow state", new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
-	            WORKFLOW_ESCALATED_STATE("Escalated workflow state", new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
-	            WORKFLOW_NEW_STATE("New workflow state", new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
-	            WORKFLOW_REVIEW_STATE("For review workflow state", new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
-	            WORKFLOW_DISCUSSION_STATE("For discussion workflow state", new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
+	            WORKFLOW_APPROVED_STATE(new String[] {"Approved workflow state", "Approved"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
+	            WORKFLOW_CHANGED_STATE(new String[] {"Changed workflow state", "Changed"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
+	            WORKFLOW_CHANGED_IN_BATCH_STATE(new String[] {"Changed in batch workflow state", "Changed in batch"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
+	            WORKFLOW_CHIEF_TERMINOLOGIST_REVIEW_STATE(new String[] {"For Chief Terminologist review workflow state", "For Chief Terminologist review"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
+	            WORKFLOW_EMPTY_NO_WFHX_STATE(new String[] {"Concept having no prior workflow state", "Concept having no prior"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
+	            WORKFLOW_EMPTY_NOT_EXISTING_STATE(new String[] {"Concept not previously existing workflow state", "Concept not previously existing"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
+	            WORKFLOW_ESCALATED_STATE(new String[] {"Escalated workflow state", "Escalated"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
+	            WORKFLOW_NEW_STATE(new String[] {"New workflow state", "New"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
+	            WORKFLOW_REVIEW_STATE(new String[] {"For review workflow state", "For review"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
+	            WORKFLOW_DISCUSSION_STATE(new String[] {"For discussion workflow state", "For discussion"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
 
 	            // Workflow Actions
 	            WORKFLOW_ACTIONS("Workflow actions", new I_ConceptualizeUniversally[] { WORKFLOW_CONCEPTS }), 
