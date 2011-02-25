@@ -30,7 +30,7 @@ public class TimestampBeforeWorkflowHistorySearchInfo extends AbstractWorkflowHi
 	        PropertyDescriptor testTimestampBefore = new PropertyDescriptor("testTimestampBefore", getBeanDescriptor().getBeanClass());
 	        testTimestampBefore.setBound(true);
 	        testTimestampBefore.setPropertyEditorClass(JTextFieldEditorOneLine.class);
-	        testTimestampBefore.setDisplayName("<html><font color='green'>Date (mm/dd/yyy):");
+	        testTimestampBefore.setDisplayName("<html><font color='green'>Date (mm/dd/yyyy):");
 	        testTimestampBefore.setShortDescription("The concept to test has the proper timestamp Before Than.");
 	
 	        PropertyDescriptor rv[] = { testTimestampBefore };
