@@ -2331,7 +2331,7 @@ public class InboxPanel extends JPanel {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 
-			if (e.getButton()==e.BUTTON3){
+			if (e.getButton()==MouseEvent.BUTTON3){
 
 				xPoint = e.getX();
 				yPoint = e.getY();

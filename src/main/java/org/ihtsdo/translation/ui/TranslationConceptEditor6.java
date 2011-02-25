@@ -445,8 +445,9 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 	
 	private ConfigTranslationModule getTranslationProjectConfig(){
 		ConfigTranslationModule translProjConfig=null;
-		if (this.translationProject!=null)
+		if (this.translationProject!=null){
 			translProjConfig=LanguageUtil.getDefaultTranslationConfig(this.translationProject);
+		}
 
 		if (translProjConfig==null){
 			return translConfig;

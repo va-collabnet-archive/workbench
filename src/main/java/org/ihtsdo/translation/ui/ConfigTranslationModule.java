@@ -1,12 +1,17 @@
 package org.ihtsdo.translation.ui;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.translation.ui.config.TranslatorDefaultEditorModePanel;
 
 public class ConfigTranslationModule  implements Serializable{
 
@@ -36,13 +41,17 @@ public class ConfigTranslationModule  implements Serializable{
 		columns.add(InboxColumn.STATUS);
 		this.ColumnsDisplayedInInbox = columns;
 		this.translatorRoles = new HashMap<UUID, EditorMode>();
-			translatorRoles.put(ArchitectonicAuxiliary.Concept.TRANSLATOR_ONE_TSP_ROLE.getUids().iterator().next(), EditorMode.READ_ONLY);
-			translatorRoles.put(ArchitectonicAuxiliary.Concept.TRANSLATOR_TWO_TSP_ROLE.getUids().iterator().next(), EditorMode.READ_ONLY);
-			translatorRoles.put(ArchitectonicAuxiliary.Concept.TRANSLATION_TSP_REVIEWER_ROLE.getUids().iterator().next(), EditorMode.READ_ONLY);
-			translatorRoles.put(ArchitectonicAuxiliary.Concept.TRANSLATION_TPO_REVIEWER_ROLE.getUids().iterator().next(), EditorMode.READ_ONLY);
-			translatorRoles.put(ArchitectonicAuxiliary.Concept.TRANSLATION_SME_ROLE.getUids().iterator().next(), EditorMode.READ_ONLY);
-			translatorRoles.put(ArchitectonicAuxiliary.Concept.TRANSLATION_EDITORIAL_BOARD_ROLE.getUids().iterator().next(), EditorMode.READ_ONLY);
-			translatorRoles.put(ArchitectonicAuxiliary.Concept.RELEASE_AUTHORITY_ROLE.getUids().iterator().next(), EditorMode.READ_ONLY);		
+		try {
+			Set<I_GetConceptData> roles = TranslatorDefaultEditorModePanel.getTranslationRoles();
+			for (I_GetConceptData role : roles) {
+				translatorRoles.put(role.getUids().iterator().next(), EditorMode.READ_ONLY);
+			}
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 	public enum FsnGenerationStrategy implements Serializable{
