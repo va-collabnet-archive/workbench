@@ -628,6 +628,7 @@ public class ConceptViewRenderer extends JLayeredPane {
     }
 
     private void updateLabel() {
+		showConceptPanel();
         title.updateTitle();
     }
 
@@ -739,8 +740,11 @@ public class ConceptViewRenderer extends JLayeredPane {
         remove(wizardScrollPane);
         workflowPanel.setVisible(false);
         remove(workflowScrollPane);
-        add(conceptViewPanel, BorderLayout.CENTER);
-        conceptViewPanel.setVisible(true);
+      	conceptViewPanel.setVisible(true);
+
+        if (this.getIndexOf(conceptViewPanel) < 0)
+            add(conceptViewPanel, BorderLayout.CENTER);
+
         conceptScrollPane.setVisible(true);
         GuiUtil.tickle(ConceptViewRenderer.this);
     }
