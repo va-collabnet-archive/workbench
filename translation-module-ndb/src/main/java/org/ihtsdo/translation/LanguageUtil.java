@@ -458,7 +458,7 @@ public class LanguageUtil {
 							if (isActive(languageExtensionPart.getStatusNid())) {
 								// is active member 
 								sourceDesc=new ContextualizedDescription(dnid, cnid, extensionUsed.getRefsetId());
-								
+
 								if (sourceDesc.getLanguageExtension()!=null ){
 									if (descTypes.contains(fsn) && sourceDesc.getTypeId()==fsn && (sourceDesc.getAcceptabilityId()==preferred || sourceDesc.getAcceptabilityId()==fsn) ){
 										sourceText=sourceDesc.getText();
@@ -495,7 +495,7 @@ public class LanguageUtil {
 							matches.add(new SimilarityMatchedItem(cnid, dnid, sourceText, targetDescriptionId, targetText, score, query));
 						}
 					}
-					
+
 				}
 			}
 		} catch (IOException e) {
@@ -1393,16 +1393,21 @@ public class LanguageUtil {
 	 * @return The project file
 	 */
 	private static File getTranslationProjectDefaultConfigFile(TranslationProject project){
-		List<UUID> uids = project.getUids();
 		File configFile = null;
-		for (UUID uuid : uids) {
-			File tmpFile = new File("config/" + uuid + "-translation-config.cfg");
-			if(tmpFile.exists()){
-				configFile = tmpFile;
+		File sharedFolder = new File("profiles/shared");
+		if (!sharedFolder.exists()) {
+			sharedFolder.mkdirs();
+		} else {
+			List<UUID> uids = project.getUids();
+			for (UUID uuid : uids) {
+				File tmpFile = new File("profiles/shared/" + uuid + "-translation-config.cfg");
+				if(tmpFile.exists()){
+					configFile = tmpFile;
+				}
 			}
 		}
 		if(configFile == null){
-			configFile = new File("config/" + project.getUids().get(0) + "-translation-config.cfg");
+			configFile = new File("profiles/shared/" + project.getUids().get(0) + "-translation-config.cfg");
 		}
 		return configFile;
 	}
