@@ -195,26 +195,6 @@ public class WorkflowHelper {
     }
 	
 
-    public static TreeSet<I_GetConceptData> returnWorkflowStates() {
-		TreeSet <I_GetConceptData> sortedStates = new TreeSet<I_GetConceptData>(new WfHxConceptComparer());
-
-		try {
-			I_GetConceptData statesParentConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_STATES.getPrimoridalUid());
-
-    		Set<? extends I_GetConceptData> workflowStates = getChildren(statesParentConcept);
-    		workflowStates.remove(statesParentConcept);
-
-    		sortedStates.addAll(workflowStates);
-
-    		Terms.get().getActiveAceFrameConfig().setWorkflowStates(sortedStates);
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    	}
-    	
-    	return (TreeSet<I_GetConceptData>)sortedStates.clone();
-    }
-    
-
 	private static String getLoginId(I_GetConceptData con) throws TerminologyException, IOException {
     	String id = identifyPrefTerm(con);
 
