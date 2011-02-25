@@ -87,13 +87,14 @@ import com.mxgraph.view.mxGraph;
  *
  */
 public class ConceptViewRenderer extends JLayeredPane {
-
+    // TODO: Remove Hardcoding and find better fix to issue of Pref-Term vs FSN (THROUGHOUT FILE ie Override)
     final String CHANGED_WORKFLOW_STATE = "Changed workflow state";
     final String CHANGED_IN_BATCH_WORKFLOW_STATE = "Changed in batch workflow state";
     final String CONCEPT_HAVING_NO_PRIOR_WORKFLOW_STATE = "Concept having no prior workflow state";
     final String CONCEPT_NOT_PREVIOUSLY_EXISTING_WORKFLOW_STATE = "Concept not previously existing workflow state";
     final String NEW_WORKFLOW_STATE = "New workflow state";
     final String WORKFLOW_STATE_SUFFIX = " workflow state";
+    final String WORKFLOW_ACTION_SUFFIX = " workflow action";
 
     private class RendererComponentAdaptor extends ComponentAdapter implements AncestorListener {
 
@@ -476,55 +477,62 @@ public class ConceptViewRenderer extends JLayeredPane {
                             BpActionFactory actionFactory =
                                     new BpActionFactory(settings.getConfig(),
                                     settings.getHost(), wizardPanel);
-                            for (UUID action : availableActions) {
+                            for (UUID action : availableActions) 
+                            {
+                            	I_GetConceptData actionConcept = Terms.get().getConcept(action);
+                                List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(actionConcept, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
 
-                                JButton actionButton = new JButton();
+                                for (I_RelVersioned rel : relList) {
+                                    if (rel != null && 
+                                    	rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_USER_ACTION.getPrimoridalUid()).getConceptNid()) 
+                                    {
+                                    	JButton actionButton = new JButton();
 
-                                Action a = actionFactory.make(wfBpFile);
-                                actionButton.setAction(a);
-
-                                actionButton.setHorizontalTextPosition(SwingConstants.CENTER);
-                                actionButton.setVerticalTextPosition(SwingConstants.BOTTOM);
-                                actionButton.setText(Terms.get().getConcept(action).getInitialText());
-
-                                actionButton.addActionListener(new ActionListener() {
-
-                                    @Override
-                                    public void actionPerformed(ActionEvent e) {
-
-                                        try {
-                                            final I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-
-                                            // Get Worker
-                                            I_Work worker;
-                                            if (config.getWorker().isExecuting()) {
-                                                worker = config.getWorker().getTransactionIndependentClone();
-                                            } else {
-                                                worker = config.getWorker();
-                                            }
-                                            
-                                            // TODO: Remove Hardcoding and find better fix to issue of Pref-Term vs FSN
-                                            worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), WorkflowHelper.lookupAction(e.getActionCommand() + " workflow action").getPrimUuid());
-                                            workflowToggleButton.doClick();
-                                            updateOopsButton(settings.getConcept());
-
-                                        } catch (Exception e1) {
-                                            AceLog.getAppLog().alertAndLogException(e1);
-                                        }
-
-                                    }
-                                });
-
-                                if (wfHandler.isActiveAction(possibleActions, action)) {
-                                    actionButton.setEnabled(true);
-                                } else {
-                                    actionButton.setEnabled(false);
-                                }
-
-                                conceptWorkflowPanel.add(actionButton);
+		                                Action a = actionFactory.make(wfBpFile);
+		                                actionButton.setAction(a);
+		
+		                                actionButton.setHorizontalTextPosition(SwingConstants.CENTER);
+		                                actionButton.setVerticalTextPosition(SwingConstants.BOTTOM);
+		                                actionButton.setText(actionConcept.getInitialText());
+		
+		                                actionButton.addActionListener(new ActionListener() {
+		
+		                                    @Override
+		                                    public void actionPerformed(ActionEvent e) {
+		
+		                                        try {
+		                                            final I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+		
+		                                            // Get Worker
+		                                            I_Work worker;
+		                                            if (config.getWorker().isExecuting()) {
+		                                                worker = config.getWorker().getTransactionIndependentClone();
+		                                            } else {
+		                                                worker = config.getWorker();
+		                                            }
+		                                            
+		                                            // TODO: Remove Hardcoding and find better fix to issue of Pref-Term vs FSN
+		                                            worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), WorkflowHelper.lookupAction(e.getActionCommand() + WORKFLOW_ACTION_SUFFIX).getPrimUuid());
+		                                            updateOopsButton(settings.getConcept());
+		                                            workflowToggleButton.doClick();
+		                                        } catch (Exception e1) {
+		                                            AceLog.getAppLog().alertAndLogException(e1);
+		                                        }
+		
+		                                    }
+		                                });
+		
+		                                if (wfHandler.isActiveAction(possibleActions, action)) {
+		                                    actionButton.setEnabled(true);
+		                                } else {
+		                                    actionButton.setEnabled(false);
+		                                }
+		
+		                                conceptWorkflowPanel.add(actionButton);
+		                            }
+		                        }
                             }
                         }
-
                     } catch (TerminologyException e2) {
                         AceLog.getAppLog().alertAndLogException(e2);
                     } catch (IOException e2) {

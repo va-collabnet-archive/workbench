@@ -1127,6 +1127,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 	            WORKFLOW_AUTOMOTAIC_APPROVAL("Workflow automatic approval", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
 	            WORKFLOW_LEAD_MODELER("Workflow lead editor", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
 	            WORKFLOW_DEFAULT_MODELER("Workflow default editor", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
+	            WORKFLOW_USER_ACTION("Workflow user action", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
 	            
 	            // Workflow Attribute Types
 	            WORKFLOW_ATTRIBUTES("Workflow attributes", new I_ConceptualizeUniversally[] { WORKFLOW_CONCEPTS }), 
