@@ -678,7 +678,7 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
 
     private boolean updateExtraCriterion() {
         extraCriterion = new ArrayList<I_TestWorkflowHistorySearchResults>();
-        boolean timestampPassed = false;
+        boolean timestampPassed = true;
         
         for (WorkflowHistoryCriterionPanel criterionPanel : criterionPanels) 
         {
