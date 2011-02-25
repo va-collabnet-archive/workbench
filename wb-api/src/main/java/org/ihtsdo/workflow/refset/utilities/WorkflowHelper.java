@@ -2,6 +2,7 @@ package org.ihtsdo.workflow.refset.utilities;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -11,7 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -22,17 +22,14 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.example.binding.Taxonomies;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
@@ -51,20 +48,36 @@ public class WorkflowHelper {
 	private static HashMap<String, I_GetConceptData> modelers = null;
 	private static HashMap<String, I_GetConceptData> actions = null;
 	private static HashMap<String, I_GetConceptData> states = null;
-	private static I_IntSet allowedTypes = null;
-	private static I_IntSet allowedStatuses = null;
-	private static PositionSetReadOnly viewPositions = null;
-	private static Precedence precedencePolicy = null;
-	private static I_ManageContradiction contractionResolutionStrategy = null;
+	
 	private static I_GetConceptData leadModeler = null;
-	private static final String unrecognizedLoginMessage = "Login is unrecognlized.  You will be defaulted to generic-user workflow permissions";
 	private static I_GetConceptData defaultModeler = null;
-	private static int currentNid = 0;
-	private static int isARelNid = 0;
-	private static UUID beginWorkflowAction = null;
-	private static UUID endWorkflowAction = null;
 	private static I_GetConceptData snomedConcept = null;
 
+	private static int currentNid = 0;
+	private static int isARelNid = 0;
+	private static UUID beginWorkflowActionUid = null;
+	private static UUID endWorkflowActionUid = null;
+
+	public static final int EARLIEST_WORKFLOW_HISTORY_YEAR = 2007;
+	public static final int EARLIEST_WORKFLOW_HISTORY_MONTH = Calendar.OCTOBER; 
+	public static final int EARLIEST_WORKFLOW_HISTORY_DATE = 19;
+	private static final String unrecognizedLoginMessage = "Login is unrecognlized.  You will be defaulted to generic-user workflow permissions";
+
+	public WorkflowHelper() {
+		initialize();
+	}
+	
+	public static void initialize() {
+
+		try {
+			currentNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid());
+			isARelNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid());
+		} catch (Exception e) {
+        	AceLog.getAppLog().log(Level.SEVERE, "Error in creating WF Class WorkflowHelper", e);
+		}
+	}
+
+	
 	private static class WfHxConceptComparer implements Comparator<I_GetConceptData> {
 		@Override
 		public int compare(I_GetConceptData o1, I_GetConceptData o2) {
@@ -88,29 +101,11 @@ public class WorkflowHelper {
 			return -1;
 		}
 	}
-	public WorkflowHelper() {
-		initialize();
-	}
-	
-	public static void initialize() {
-		allowedTypes = Terms.get().newIntSet();
-
-		try {
-			allowedStatuses = Terms.get().getActiveAceFrameConfig().getAllowedStatus();
-			viewPositions = Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly();
-			precedencePolicy = Terms.get().getActiveAceFrameConfig().getPrecedence();
-			contractionResolutionStrategy = Terms.get().getActiveAceFrameConfig().getConflictResolutionStrategy();
-			currentNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid());
-			isARelNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid());
-			allowedTypes.add(isARelNid);
-		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.SEVERE, "Error in creating WF Class WorkflowHelper", e);
-		}
-	}
 
 	public static I_GetConceptData getCurrentModeler() throws TerminologyException, IOException {
 		return modelers.get(Terms.get().getActiveAceFrameConfig().getUsername());
 	}
+	
 	@SuppressWarnings("unchecked")
 	public static String identifyPrefTerm(I_GetConceptData con)  {
         try {
@@ -535,7 +530,7 @@ public class WorkflowHelper {
 	}
 
     public static boolean isBeginWorkflowAction(I_GetConceptData actionConcept) {
-    	if (beginWorkflowAction  == null)
+    	if (beginWorkflowActionUid  == null)
 		{
     		try
 	    	{
@@ -546,7 +541,7 @@ public class WorkflowHelper {
 					if (rel != null &&
 		    			 rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_BEGIN_WF_CONCEPT.getPrimoridalUid()).getConceptNid())
 					{
-						beginWorkflowAction = actionConcept.getPrimUuid();
+						beginWorkflowActionUid = actionConcept.getPrimUuid();
 						break;
 					}
 				}
@@ -555,15 +550,15 @@ public class WorkflowHelper {
 	    	}
 		}
 
-    	if (beginWorkflowAction != null)
-    		return (beginWorkflowAction.equals(actionConcept.getPrimUuid()));
+    	if (beginWorkflowActionUid != null)
+    		return (beginWorkflowActionUid.equals(actionConcept.getPrimUuid()));
     	else
     		return false;
 	}
 
     public static boolean isEndWorkflowAction(I_GetConceptData actionConcept) {
 		
-    	if (endWorkflowAction  == null)
+    	if (endWorkflowActionUid  == null)
 		{
 			try
 	    	{
@@ -574,7 +569,7 @@ public class WorkflowHelper {
 					if (rel != null &&
 		    			 rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_END_WF_CONCEPT.getPrimoridalUid()).getConceptNid())
 					{
-						endWorkflowAction = actionConcept.getPrimUuid();
+						endWorkflowActionUid = actionConcept.getPrimUuid();
 						break;
 					}
 				}
@@ -583,15 +578,14 @@ public class WorkflowHelper {
 	    	}
 		}
 
-    	if (endWorkflowAction != null)
-    		return (endWorkflowAction.equals(actionConcept.getPrimUuid()));
+    	if (endWorkflowActionUid != null)
+    		return (endWorkflowActionUid.equals(actionConcept.getPrimUuid()));
     	else
     		return false;
     }
 
 	public static List<WorkflowHistoryJavaBean> searchForPossibleActions(I_GetConceptData modeler, I_GetConceptData concept) throws Exception
 	{
-		boolean isAcceptAction = false;
 		EditorCategoryRefsetSearcher categegorySearcher = new EditorCategoryRefsetSearcher();
         WorkflowHistoryRefsetSearcher historySearcher = new WorkflowHistoryRefsetSearcher();
         ArrayList<WorkflowHistoryJavaBean> retList = new ArrayList<WorkflowHistoryJavaBean>();
@@ -859,7 +853,7 @@ public class WorkflowHelper {
 
 	private UUID identifyAcceptAction() 
 	{
-		if (endWorkflowAction  == null)
+		if (endWorkflowActionUid  == null)
 		{
 			try
 			{
@@ -867,7 +861,7 @@ public class WorkflowHelper {
 				{
 					if (WorkflowHelper.isEndWorkflowAction(action))
 					{
-						endWorkflowAction = action.getPrimUuid();
+						endWorkflowActionUid = action.getPrimUuid();
 						break;
 					}
 				}
@@ -876,6 +870,6 @@ public class WorkflowHelper {
 			}
 		}
 		
-		return endWorkflowAction;
+		return endWorkflowActionUid;
     }
 }

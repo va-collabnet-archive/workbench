@@ -46,12 +46,13 @@ public class TimestampBeforeWorkflowHistory extends AbstractWorkflowHistorySearc
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == 1) {
-            this.testTimestampBefore = getCurrentTime();
+
+        if (objDataVersion == 1) 
+        {
+            this.testTimestampBefore = (String) getCurrentTime();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
-
     }
 
     @Override

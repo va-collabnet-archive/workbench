@@ -3,20 +3,17 @@ package org.ihtsdo.ace.task.search;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.Set;
-import java.util.UUID;
-import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/search", type = BeanType.TASK_BEAN),
                    @Spec(directory = "search/workflow", type = BeanType.TASK_BEAN) })
@@ -30,15 +27,27 @@ public class TimestampAfterWorkflowHistory extends AbstractWorkflowHistorySearch
     /**
      * Property name for the Timestamp After being searched.
      */
-     private String testTimestampAfter = getCurrentTime();        
+     private String testTimestampAfter = getEarliestWorkflowReleaseStartDate();        
 
-     protected String getCurrentTime() {
+     protected String getEarliestWorkflowReleaseStartDate() {
      	DateFormat dfm = new SimpleDateFormat(DEFAULT_TIME_STAMP);
 
-     	Date d = new Date();
-         return dfm.format(d);
+     	Calendar date = Calendar.getInstance();
 
-     }
+        if (date != null) {
+            date.set(Calendar.HOUR_OF_DAY, 12);	// Noon to ensure mid-day at first release date
+            date.set(Calendar.MINUTE, 0);
+            date.set(Calendar.SECOND, 0);
+            date.set(Calendar.MILLISECOND, 0);
+             
+            date.set(Calendar.DAY_OF_MONTH, WorkflowHelper.EARLIEST_WORKFLOW_HISTORY_DATE);
+            date.set(Calendar.MONTH, WorkflowHelper.EARLIEST_WORKFLOW_HISTORY_MONTH);
+            date.set(Calendar.YEAR, WorkflowHelper.EARLIEST_WORKFLOW_HISTORY_YEAR);
+            return dfm.format(date.getTime());
+        }
+
+        return "";
+    }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -48,8 +57,10 @@ public class TimestampAfterWorkflowHistory extends AbstractWorkflowHistorySearch
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == 1) {
-            this.testTimestampAfter = (String) getCurrentTime();
+
+        if (objDataVersion == 1) 
+        {
+            this.testTimestampAfter = (String) getEarliestWorkflowReleaseStartDate();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
