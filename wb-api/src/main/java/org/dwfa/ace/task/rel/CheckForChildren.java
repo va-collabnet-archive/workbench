@@ -17,6 +17,8 @@
 package org.dwfa.ace.task.rel;
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -28,6 +30,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -52,15 +55,17 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.WizardBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/arena", type = BeanType.TASK_BEAN) })
-public class CheckForChildren extends AbstractTask {
+public class CheckForChildren extends AbstractTask implements ActionListener{
 
     /**
 	 *
@@ -113,15 +118,18 @@ public class CheckForChildren extends AbstractTask {
             int size = 0;
             
             for(RelationshipChronicleBI rel : relsIncoming){
-            	if (vc.getIsaTypeNids().contains(rel.getNid())){
-            		size = size++;
+            	for (RelationshipVersionBI relv : rel.getVersions()) {
+                 if (vc.getIsaTypeNids().contains(relv.getTypeNid())){
+            		size++;
+                 }
             	}
             }
 
-            if( size != 0){
+            if( size > 0){
             	JPanel wizardPanel = wizard.getWizardPanel();
+            	makeWizardPanel(wizardPanel);
             	if (SwingUtilities.isEventDispatchThread()) {
-                  wizard.setWizardPanelVisible(true);
+            		wizard.setWizardPanelVisible(true);
                } else {
                try {
                   SwingUtilities.invokeAndWait(new Runnable() {
@@ -138,13 +146,6 @@ public class CheckForChildren extends AbstractTask {
                }
                }
 
-            	Component[] components = wizardPanel.getComponents();
-                for (int i = 0; i < components.length; i++) {
-                    wizardPanel.remove(components[i]);
-                }
-
-            	wizardPanel.add(new JLabel("Please remove the children of the concept before retiring the concept"));
-
             	returnCondition = Condition.ITEM_CANCELED;
             } else{
             	returnCondition = Condition.CONTINUE;
@@ -158,7 +159,23 @@ public class CheckForChildren extends AbstractTask {
         }
     }
 
+    private void makeWizardPanel(JPanel wizardPanel){
+    	Component[] components = wizardPanel.getComponents();
+        for (int i = 0; i < components.length; i++) {
+            wizardPanel.remove(components[i]);
+        }
 
+    	wizardPanel.add(new JLabel("Please remove the children of the concept before retiring the concept"));
+    	
+    	JButton continueButton = new JButton("OK");
+    	wizardPanel.add(continueButton);
+    	continueButton.addActionListener(this);
+    }
+    
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		wizard.setWizardPanelVisible(false);
+	}
 
     public Collection<Condition> getConditions() {
     	return AbstractTask.CONTINUE_CANCEL;
@@ -167,5 +184,6 @@ public class CheckForChildren extends AbstractTask {
     public int[] getDataContainerIds() {
         return new int[] {};
     }
+
 
 }
