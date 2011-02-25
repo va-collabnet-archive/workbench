@@ -136,7 +136,9 @@ end
 
 rule "isKindOf inactive status"
 	when
-		$c : ConceptVersionBI(this isKindOf TermAux.INACTIVE_STATUS, this not isKindOf TermAux.MOVED_TO);
+		$c : ConceptVersionBI(this isKindOf TermAux.INACTIVE_STATUS,
+				this not isKindOf TermAux.MOVED_TO,
+				hasHistoricalRels == false);
 	then
 			ArrayList<RelSpec> relSpecs = new RelSpecFromConcept($c).getRelSpecs();
 			for (RelSpec relSpec: relSpecs){
