@@ -34,7 +34,7 @@ public class SemanticHierarchyDropDown extends AbstractWorkflowHistorySearchTest
     /**
      * Property name for the Hierarchy being searched.
      */
-     private String testHierarchy = null;
+    private String testHierarchy = null;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -44,17 +44,18 @@ public class SemanticHierarchyDropDown extends AbstractWorkflowHistorySearchTest
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == 1) {
-            this.testHierarchy = (String) in.readObject();
-            try 
+        if (objDataVersion == 1) 
+        {
+            Object obj = in.readObject();
+            if (obj instanceof String) {
+            	this.testHierarchy = (String) obj;
+            } else {
+            	this.testHierarchy = null;
+            }
+            
+            if (this.testHierarchy == null || this.testHierarchy.length() == 0)
             {
-	            if (this.testHierarchy == null || this.testHierarchy.length() == 0)
-	            {
-	            	throw new Exception("Must fix this bug in setting up Hierarchy DropDown--Using Default Observable Entity");
-	            }
-            } catch (Exception e) {
-            	//e.printStackTrace();
-            	testHierarchy = "observable_entity";
+	            	testHierarchy = "observable_entity";
             }
         }
     }

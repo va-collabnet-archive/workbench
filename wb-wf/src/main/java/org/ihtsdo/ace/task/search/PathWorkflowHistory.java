@@ -33,17 +33,22 @@ public class PathWorkflowHistory extends AbstractWorkflowHistorySearchTest {
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(this.testPath);
-
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == 1) {
-            this.testPath = (TermEntry) in.readObject();
+        if (objDataVersion == 1) 
+        {
+            Object obj = in.readObject();
+           
+			if (obj instanceof TermEntry) {
+            	this.testPath = (TermEntry) obj;
+            } else {
+            	this.testPath = null;
+            }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
-
     }
 
     @Override

@@ -43,10 +43,20 @@ public class ModelerWorkflowHistory extends AbstractWorkflowHistorySearchTest {
 
    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
       int objDataVersion = in.readInt();
-      if (objDataVersion == 1) {
-         this.testModeler = (I_GetConceptData) in.readObject();
-			if (this.testModeler == null) {
-            try {
+      if (objDataVersion == 1) 
+      {
+    	  Object obj = in.readObject();
+    	  
+          if (obj instanceof I_GetConceptData) {
+        	  this.testModeler = (I_GetConceptData) obj;
+          } else {
+        	  this.testModeler = null;
+          }
+         
+          if (this.testModeler == null) 
+          {
+            try 
+            {
                I_GetConceptData leadModeler = WorkflowHelper.getLeadModeler();
 
                if (leadModeler != null) {

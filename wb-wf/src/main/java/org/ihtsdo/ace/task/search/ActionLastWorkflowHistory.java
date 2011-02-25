@@ -2,6 +2,7 @@ package org.ihtsdo.ace.task.search;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
@@ -35,11 +36,23 @@ public class ActionLastWorkflowHistory extends AbstractWorkflowHistorySearchTest
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == 1) {
-            this.testAction = (I_GetConceptData) in.readObject();
-            if (this.testAction == null) {
-                try {
-                    java.util.Iterator<? extends I_GetConceptData> wfitr = Terms.get().getActiveAceFrameConfig().getWorkflowActions().iterator();
+        
+        if (objDataVersion == 1) 
+        {
+        	Object obj = in.readObject();
+        	
+            if (obj instanceof I_GetConceptData) {
+            	this.testAction = (I_GetConceptData) obj;
+            } else {
+            	this.testAction = null;
+            }
+        	
+        	if (this.testAction == null) 
+        	{
+                try 
+                {
+                    Iterator<? extends I_GetConceptData> wfitr = Terms.get().getActiveAceFrameConfig().getWorkflowActions().iterator();
+                    
                     if (wfitr.hasNext()) {
                         this.testAction = Terms.get().getActiveAceFrameConfig().getWorkflowActions().iterator().next();
                     }

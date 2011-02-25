@@ -37,8 +37,16 @@ public class StateWorkflowHistory extends AbstractWorkflowHistorySearchTest {
 
    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
       int objDataVersion = in.readInt();
-      if (objDataVersion == 1) {
-         this.testState = (I_GetConceptData) in.readObject();
+      if (objDataVersion == 1) 
+      {
+         Object obj = in.readObject();
+
+         if (obj instanceof I_GetConceptData) {
+        	 this.testState = (I_GetConceptData) obj;
+         } else {
+        	 this.testState = null;
+         }
+         
          if (this.testState == null) {
             try {
                Iterator<? extends I_GetConceptData> itr = Terms.get().getActiveAceFrameConfig().getWorkflowStates().iterator();
