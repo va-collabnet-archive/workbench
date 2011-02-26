@@ -64,7 +64,7 @@ public class Bdb {
     private static Bdb mutable;
     private static UuidBdb uuidDb;
     private static UuidsToNidMapBdb uuidsToNidMapDb;
-    private static NidCNidMapBdb nidCidMapDb;
+    public static NidCNidMapBdb nidCidMapDb;
     private static StatusAtPositionBdb statusAtPositionDb;
     private static ConceptBdb conceptDb;
     private static PropertiesBdb propDb;
