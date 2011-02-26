@@ -40,30 +40,35 @@ import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
 
 public class RefsetComputer implements I_ProcessUnfetchedConceptData {
-	
-	private static final int SETUP_ISA_CACHE_THRESHOLD = 5000;
 
-	private enum ComputeType { CONCEPT, DESCRIPTION };
+    private static final int SETUP_ISA_CACHE_THRESHOLD = 5000;
+
+    private enum ComputeType {
+
+        CONCEPT, DESCRIPTION
+    };
+
     public class StopActionListener implements ActionListener {
 
         public StopActionListener() {
         }
 
-      @Override
+        @Override
         public void actionPerformed(ActionEvent e) {
-            canceled = true;
-            List<ParallelConceptIterator> pcis = getParallelConceptIterators();
-            for (ParallelConceptIterator pci : pcis) {
-                pci.stop();
+            if (!canceled) {
+                canceled = true;
+                List<ParallelConceptIterator> pcis = getParallelConceptIterators();
+                for (ParallelConceptIterator pci : pcis) {
+                    pci.stop();
+                }
+                for (I_ShowActivity a : activities) {
+                    a.cancel();
+                    a.setProgressInfoLower("Cancelled.");
+                }
+                activity.removeStopActionListener(this);
             }
-            for (I_ShowActivity a : activities) {
-                a.cancel();
-                a.setProgressInfoLower("Cancelled.");
-            }
-            activity.removeStopActionListener(this);
         }
     }
-
     private int refsetNid;
     private RefsetSpecQuery query;
     private Collection<? extends I_ExtendByRef> allRefsetMembers;
@@ -87,7 +92,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
     private I_ConfigAceFrame frameConfig;
     private RefsetSpec specHelper;
     private ComputeType computeType;
-	 private IsaCache isaCache;
+    private IsaCache isaCache;
     private StopActionListener stopListener;
 
     public RefsetComputer(int refsetNid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig,
@@ -100,7 +105,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         this.refsetConcept = Bdb.getConcept(refsetNid);
         this.newMemberNids = Bdb.getConceptDb().getEmptyIdSet();
         this.retiredMemberNids = Bdb.getConceptDb().getEmptyIdSet();
-        
+
         conceptCount = possibleIds.cardinality();
 
         activity =
@@ -118,16 +123,15 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
 
         memberRefsetHelper =
                 Terms.get().getSpecRefsetHelper(frameConfig).getMemberHelper(refsetNid,
-                    ReferenceConcepts.NORMAL_MEMBER.getNid());
+                ReferenceConcepts.NORMAL_MEMBER.getNid());
         memberRefsetHelper.setAutocommitActive(false);
         currentRefsetMemberComponentNids =
                 filterNonCurrentRefsetMembers((Collection<RefsetMember<?, ?>>) allRefsetMembers, memberRefsetHelper, refsetNid,
-                    ReferenceConcepts.NORMAL_MEMBER.getNid());
+                ReferenceConcepts.NORMAL_MEMBER.getNid());
 
         markedParentRefsetConcept =
-                (Concept) memberRefsetHelper.getMarkedParentRefsetForRefset(refsetConcept, frameConfig).iterator()
-                    .next();
-        
+                (Concept) memberRefsetHelper.getMarkedParentRefsetForRefset(refsetConcept, frameConfig).iterator().next();
+
         activity.setProgressInfoLower("Setting up is-a cache...");
         if (possibleIds.cardinality() > SETUP_ISA_CACHE_THRESHOLD) {
             isaCache = KindOfComputer.setupIsaCacheAndWait();
@@ -139,11 +143,11 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         activity.setIndeterminate(false);
         specHelper = new RefsetSpec(refsetConcept, true, frameConfig);
         if (specHelper.isDescriptionComputeType()) {
-        	computeType = ComputeType.DESCRIPTION;
+            computeType = ComputeType.DESCRIPTION;
         } else if (specHelper.isConceptComputeType()) {
-        	computeType = ComputeType.CONCEPT;
+            computeType = ComputeType.CONCEPT;
         } else {
-        	throw new UnsupportedOperationException("Unknown compute type.");
+            throw new UnsupportedOperationException("Unknown compute type.");
         }
 
     }
@@ -173,22 +177,21 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         if (possibleCNids.isMember(cNid)) {
             Concept concept = fcfc.fetch();
             switch (computeType) {
-			case CONCEPT:
-                executeComponent(concept, cNid, cNid, frameConfig, activities);
-				break;
-			case DESCRIPTION:
-                List<? extends I_DescriptionTuple> descriptionTuples =
-                    concept.getDescriptionTuples(null, null, frameConfig.getViewPositionSetReadOnly(), frameConfig
-                        .getPrecedence(), frameConfig.getConflictResolutionStrategy());
-                for (I_DescriptionTuple tuple : descriptionTuples) {
-                	I_DescriptionVersioned descVersioned = tuple.getDescVersioned();
-                	executeComponent(descVersioned, cNid, descVersioned.getDescId(), frameConfig, activities);
-                }
-				break;
+                case CONCEPT:
+                    executeComponent(concept, cNid, cNid, frameConfig, activities);
+                    break;
+                case DESCRIPTION:
+                    List<? extends I_DescriptionTuple> descriptionTuples =
+                            concept.getDescriptionTuples(null, null, frameConfig.getViewPositionSetReadOnly(), frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
+                    for (I_DescriptionTuple tuple : descriptionTuples) {
+                        I_DescriptionVersioned descVersioned = tuple.getDescVersioned();
+                        executeComponent(descVersioned, cNid, descVersioned.getDescId(), frameConfig, activities);
+                    }
+                    break;
 
-			default:
-				throw new UnsupportedOperationException("Unknown compute type");
-			}           
+                default:
+                    throw new UnsupportedOperationException("Unknown compute type");
+            }
         }
     }
 
@@ -196,28 +199,26 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             I_ConfigAceFrame config, Collection<I_ShowActivity> activities) throws Exception {
         if (possibleCNids.isMember(conceptNid)) {
             boolean containsCurrentMember = currentRefsetMemberComponentNids.isMember(componentNid);
-			if (query.execute(component, null, (I_Position) query.getV1Is(),
-					(I_Position) query.getV2Is(), activities)) {
-            	newMemberNids.setMember(componentNid);
+            if (query.execute(component, null, (I_Position) query.getV1Is(),
+                    (I_Position) query.getV2Is(), activities)) {
+                newMemberNids.setMember(componentNid);
                 members.incrementAndGet();
                 if (!containsCurrentMember) {
-                	currentRefsetMemberComponentNids.setMember(componentNid);
+                    currentRefsetMemberComponentNids.setMember(componentNid);
                     newMembers.incrementAndGet();
-                    memberRefsetHelper.newRefsetExtension(refsetNid, componentNid, ReferenceConcepts.NORMAL_MEMBER
-                        .getNid(), false);
+                    memberRefsetHelper.newRefsetExtension(refsetNid, componentNid, ReferenceConcepts.NORMAL_MEMBER.getNid(), false);
                     if (isaCache == null) {
-                        memberRefsetHelper.addMarkedParents(new Integer[] { conceptNid });
+                        memberRefsetHelper.addMarkedParents(new Integer[]{conceptNid});
                     }
                 }
             } else {
                 if (containsCurrentMember) {
-                	currentRefsetMemberComponentNids.setNotMember(componentNid);
-                	retiredMemberNids.setMember(componentNid);
+                    currentRefsetMemberComponentNids.setNotMember(componentNid);
+                    retiredMemberNids.setMember(componentNid);
                     retiredMembers.incrementAndGet();
-                    memberRefsetHelper.retireRefsetExtension(refsetNid, componentNid, ReferenceConcepts.NORMAL_MEMBER
-                        .getNid());
+                    memberRefsetHelper.retireRefsetExtension(refsetNid, componentNid, ReferenceConcepts.NORMAL_MEMBER.getNid());
                     if (isaCache == null) {
-                    	memberRefsetHelper.removeMarkedParents(new Integer[] { conceptNid });
+                        memberRefsetHelper.removeMarkedParents(new Integer[]{conceptNid});
                     }
                 }
             }
@@ -233,8 +234,8 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
                     String remainingStr = TimeUtil.getRemainingTimeString(completed, conceptCount, elapsed);
 
                     activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Remaining: " + remainingStr
-                        + ";  Members: " + members.get() + " New: " + newMembers.get() + " Ret: "
-                        + retiredMembers.get());
+                            + ";  Members: " + members.get() + " New: " + newMembers.get() + " Ret: "
+                            + retiredMembers.get());
                 } else {
                     for (I_ShowActivity a : activities) {
                         if (!a.isComplete()) {
@@ -251,62 +252,62 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
 
     public void addUncommitted() throws Exception {
         int parentMemberTypeNid =
-            Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT.getUids()).getConceptNid();
-   	if (!canceled && isaCache != null) {
+                Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT.getUids()).getConceptNid();
+        if (!canceled && isaCache != null) {
             long endTime = System.currentTimeMillis();
             long elapsed = endTime - startTime;
             String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
             activity.setIndeterminate(true);
-            activity.setProgressInfoLower("Adding marked parents. Elapsed: " + elapsedStr 
+            activity.setProgressInfoLower("Adding marked parents. Elapsed: " + elapsedStr
                     + ";  Members: " + members.get() + " New: " + newMembers.get() + " Ret: "
                     + retiredMembers.get());
-            
+
             I_RepresentIdSet newParents = Bdb.getConceptDb().getEmptyIdSet();
             NidBitSetItrBI newMemberItr = newMemberNids.iterator();
             while (newMemberItr.next()) {
-            	isaCache.addParents(newMemberItr.nid(), newParents);
+                isaCache.addParents(newMemberItr.nid(), newParents);
             }
             NidBitSetItrBI newParentItr = newParents.iterator();
             while (newParentItr.next()) {
-            	memberRefsetHelper.newRefsetExtension(markedParentRefsetConcept.getNid(), newParentItr.nid(), parentMemberTypeNid);
+                memberRefsetHelper.newRefsetExtension(markedParentRefsetConcept.getNid(), newParentItr.nid(), parentMemberTypeNid);
             }
-     	}
-    	if (!canceled && isaCache != null) {
+        }
+        if (!canceled && isaCache != null) {
             long endTime = System.currentTimeMillis();
             long elapsed = endTime - startTime;
             String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
             activity.setIndeterminate(true);
-            activity.setProgressInfoLower("Removing old marked parents. Elapsed: " + elapsedStr 
+            activity.setProgressInfoLower("Removing old marked parents. Elapsed: " + elapsedStr
                     + ";  Members: " + members.get() + " New: " + newMembers.get() + " Ret: "
                     + retiredMembers.get());
-            
+
             retiredMemberNids.andNot(newMemberNids);
 
             I_RepresentIdSet parentsToRetire = Bdb.getConceptDb().getEmptyIdSet();
             NidBitSetItrBI retiredMemberItr = retiredMemberNids.iterator();
             while (retiredMemberItr.next()) {
-            	isaCache.addParents(retiredMemberItr.nid(), parentsToRetire);
+                isaCache.addParents(retiredMemberItr.nid(), parentsToRetire);
             }
             I_RepresentIdSet currentParents = Bdb.getConceptDb().getEmptyIdSet();
             NidBitSetItrBI currentMemberItr = currentRefsetMemberComponentNids.iterator();
             while (currentMemberItr.next()) {
-            	isaCache.addParents(currentMemberItr.nid(), currentParents);
+                isaCache.addParents(currentMemberItr.nid(), currentParents);
             }
             parentsToRetire.andNot(currentParents);
             NidBitSetItrBI parentToRetireItr = parentsToRetire.iterator();
             while (parentToRetireItr.next()) {
-            	memberRefsetHelper.retireRefsetExtension(markedParentRefsetConcept.getNid(), parentToRetireItr.nid(), parentMemberTypeNid);
+                memberRefsetHelper.retireRefsetExtension(markedParentRefsetConcept.getNid(), parentToRetireItr.nid(), parentMemberTypeNid);
             }
-    	}
-    	if (!canceled) {
-    		BdbCommitManager.addUncommittedNoChecks(refsetConcept);
-    		BdbCommitManager.addUncommittedNoChecks(markedParentRefsetConcept);
-    	}
+        }
+        if (!canceled) {
+            BdbCommitManager.addUncommittedNoChecks(refsetConcept);
+            BdbCommitManager.addUncommittedNoChecks(markedParentRefsetConcept);
+        }
         long elapsed = System.currentTimeMillis() - startTime;
         String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
         if (!canceled) {
             activity.setProgressInfoLower("Complete. Time: " + elapsedStr + "; Members: " + members.get() + " New: "
-                + newMembers.get() + " Ret: " + retiredMembers.get());
+                    + newMembers.get() + " Ret: " + retiredMembers.get());
         } else {
             activity.setProgressInfoLower("Cancelled.");
             for (I_ShowActivity a : activities) {
@@ -329,7 +330,6 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
     public boolean continueWork() {
         return !canceled;
     }
-
     List<ParallelConceptIterator> pcis;
 
     @Override
@@ -341,8 +341,8 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         return pcis;
     }
 
-	@Override
-	public NidBitSetBI getNidSet() {
-		return possibleCNids;
-	}
+    @Override
+    public NidBitSetBI getNidSet() {
+        return possibleCNids;
+    }
 }
