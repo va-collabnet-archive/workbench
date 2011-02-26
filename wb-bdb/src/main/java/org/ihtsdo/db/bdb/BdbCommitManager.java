@@ -548,7 +548,9 @@ public class BdbCommitManager {
                         KindOfComputer.reset();
                         NidBitSetItrBI uncommittedCNidItr = uncommittedCNids.iterator();
                         while (uncommittedCNidItr.next()) {
-                            KindOfComputer.updateIsaCache(getActiveFrame().getViewCoordinate().getIsaCoordinate(), uncommittedCNidItr.nid());
+							if (getActiveFrame() != null) {
+                           		 KindOfComputer.updateIsaCache(getActiveFrame().getViewCoordinate().getIsaCoordinate(), uncommittedCNidItr.nid());
+							}
                         }
                         long commitTime = System.currentTimeMillis();
                         IntSet sapNidsFromCommit = Bdb.getSapDb().commit(
