@@ -42,64 +42,57 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.tapi.ComputationCanceled;
 
 public class ActivityPanel implements I_ShowActivity, AncestorListener {
-    
-	private ConcurrentHashMap<ActivityPanelImpl, ActivityPanelImpl> panels = 
-    			new ConcurrentHashMap<ActivityPanelImpl, ActivityPanelImpl>();
-    private ConcurrentHashMap<ActionListener, ActionListener> listeners = 
-    			new ConcurrentHashMap<ActionListener, ActionListener>();
-    private ConcurrentHashMap<ActionListener, ActionListener> stopActionListeners = 
-    			new ConcurrentHashMap<ActionListener, ActionListener>();
-    private ConcurrentSkipListSet<I_ShowActivity> showActivityListeners = 
-    			new ConcurrentSkipListSet<I_ShowActivity>(new Comparator<I_ShowActivity>() {
 
-					@Override
-					public int compare(I_ShowActivity o1, I_ShowActivity o2) {
-						return o1.hashCode() - o2.hashCode();
-					}
-				});
+    private ConcurrentHashMap<ActivityPanelImpl, ActivityPanelImpl> panels =
+            new ConcurrentHashMap<ActivityPanelImpl, ActivityPanelImpl>();
+    private ConcurrentHashMap<ActionListener, ActionListener> listeners =
+            new ConcurrentHashMap<ActionListener, ActionListener>();
+    private ConcurrentHashMap<ActionListener, ActionListener> stopActionListeners =
+            new ConcurrentHashMap<ActionListener, ActionListener>();
+    private ConcurrentSkipListSet<I_ShowActivity> showActivityListeners =
+            new ConcurrentSkipListSet<I_ShowActivity>(new Comparator<I_ShowActivity>() {
 
-    
-    
+        @Override
+        public int compare(I_ShowActivity o1, I_ShowActivity o2) {
+            return o1.hashCode() - o2.hashCode();
+        }
+    });
+
     private class StopActionListenerPropigator implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-           canceled = true;
-           complete = true;
-           stopButtonVisible = false;
-           progressInfoLowerStr = "canceled by user...";
-           for (I_ShowActivity shower : showActivityListeners) {
-               try {
-                shower.complete();
-               } catch (ComputationCanceled e1) {
-                   // nothing to report. ;
-               }
-           }
-           showActivityListeners.clear();
-           for (ActionListener sal: stopActionListeners.keySet()) {
-               sal.actionPerformed(e);
-           }
-           stopActionListeners.clear();
+            canceled = true;
+            complete = true;
+            stopButtonVisible = false;
+            progressInfoLowerStr = "canceled by user...";
+            for (I_ShowActivity shower : showActivityListeners) {
+                try {
+                    shower.complete();
+                } catch (ComputationCanceled e1) {
+                    // nothing to report. ;
+                }
+            }
+            showActivityListeners.clear();
+            for (ActionListener sal : stopActionListeners.keySet()) {
+                sal.actionPerformed(e);
+            }
+            stopActionListeners.clear();
         }
-        
     }
+
     private class ActivityPanelImpl extends JPanel {
+
         /**
          * 
          */
         private static final long serialVersionUID = 1L;
-
         JProgressBar progressBar = new ActivityProgress(100);
-
         JButton stopButton = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/stop.png")));
-
         JLabel progressInfoUpper = new JLabel();
-
         JLabel progressInfoLower = new JLabel();
-                
         boolean stopped = false;
 
-        
         public ActivityPanelImpl(boolean showBorder) {
             super(new GridBagLayout());
             progressInfoUpper.setFont(new Font("Dialog", java.awt.Font.BOLD, 10));
@@ -151,7 +144,7 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
             infoGridPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
             return infoGridPanel;
         }
-        
+
         private class ShowStopAndProgress implements ActionListener {
 
             private ShowStopAndProgress() {
@@ -180,7 +173,6 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
                 }
                 ActivityViewer.removeFromUpdateTimer(this);
             }
-
         }
 
         public void update() {
@@ -195,7 +187,7 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
                     progressBar.setVisible(true);
                 }
             }
-            
+
             if (max != progressBar.getMaximum()) {
                 if (progressBar.isVisible() == false) {
                     progressBar.setVisible(true);
@@ -211,11 +203,11 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
             if (indeterminate != progressBar.isIndeterminate()) {
                 progressBar.setIndeterminate(indeterminate);
             }
-            
+
             if (stringPainted != progressBar.isStringPainted()) {
                 progressBar.setStringPainted(stringPainted);
             }
-            
+
             if (stopButtonVisible != stopButton.isVisible()) {
                 stopButton.setVisible(stopButtonVisible);
             }
@@ -224,7 +216,6 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
             }
         }
     }
-
     private long startTime = System.currentTimeMillis();
     private I_ConfigAceFrame aceFrameConfig;
     private boolean eraseWhenFinishedEnabled = false;
@@ -237,28 +228,28 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
     private boolean stringPainted = false;
     private boolean stopButtonVisible = true;
     private boolean canceled = false;
-
     private StopActionListenerPropigator sal = new StopActionListenerPropigator();
-    
+
+    @Override
     public void update() {
-        for (ActivityPanelImpl panel: panels.keySet()) {
+        for (ActivityPanelImpl panel : panels.keySet()) {
             panel.update();
         }
         if (complete) {
             ActivityViewer.removeFromUpdateTimer(this);
         }
     }
-    
-    
+
+    @Override
     public long getStartTime() {
         return startTime;
     }
 
+    @Override
     public void setStartTime(long startTime) {
         this.startTime = startTime;
     }
-
-    char[] spinners = new char[] { '|', '\\', '-', '/' };
+    char[] spinners = new char[]{'|', '\\', '-', '/'};
     int spinnerIndex = 0;
 
     public char nextSpinner() {
@@ -268,11 +259,11 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         return spinners[spinnerIndex++];
     }
 
-
     private class ActivityProgress extends JProgressBar {
+
         /**
-		 *
-		 */
+         *
+         */
         private static final long serialVersionUID = 1L;
         int width;
 
@@ -302,26 +293,24 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
             return d;
         }
     }
-
     /**
-	 *
-	 */
+     *
+     */
     private static final long serialVersionUID = 1L;
-
     private boolean complete = false;
-    
+
+    @Override
     public boolean isStopButtonVisible() {
         return stopButtonVisible;
     }
 
-
+    @Override
     public void setStopButtonVisible(boolean stopButtonVisible) {
         this.stopButtonVisible = stopButtonVisible;
         for (I_ShowActivity shower : showActivityListeners) {
             shower.setStopButtonVisible(stopButtonVisible);
         }
     }
-
 
     public ActivityPanel(I_ConfigAceFrame aceFrameConfig, boolean showStop) {
         this.aceFrameConfig = aceFrameConfig;
@@ -336,6 +325,7 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         }
     }
 
+    @Override
     public JPanel getViewPanel(boolean showBorder) {
         ActivityPanelImpl viewPanel = new ActivityPanelImpl(showBorder);
         panels.put(viewPanel, viewPanel);
@@ -344,22 +334,25 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         return viewPanel;
     }
 
+    @Override
     public void setProgressInfoUpper(String text) {
-    	assert text != null;
-    	progressInfoUpperStr = text;
+        assert text != null;
+        progressInfoUpperStr = text;
         for (I_ShowActivity shower : showActivityListeners) {
             shower.setProgressInfoUpper(text);
         }
     }
 
+    @Override
     public void setProgressInfoLower(String text) {
-    	assert text != null;
-    	progressInfoLowerStr = text;
+        assert text != null;
+        progressInfoLowerStr = text;
         for (I_ShowActivity shower : showActivityListeners) {
             shower.setProgressInfoLower(text);
         }
     }
 
+    @Override
     public void setIndeterminate(boolean newValue) {
         this.indeterminate = newValue;
         for (I_ShowActivity shower : showActivityListeners) {
@@ -367,10 +360,12 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         }
     }
 
+    @Override
     public void setMaximum(int n) {
         this.max = n;
     }
 
+    @Override
     public void setValue(int n) {
         this.value = n;
         for (I_ShowActivity shower : showActivityListeners) {
@@ -379,6 +374,7 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         }
     }
 
+    @Override
     public void complete() throws ComputationCanceled {
         this.complete = true;
         this.stopButtonVisible = false;
@@ -390,6 +386,7 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         }
     }
 
+    @Override
     public void addRefreshActionListener(final ActionListener l) {
         listeners.put(l, l);
         for (I_ShowActivity shower : showActivityListeners) {
@@ -397,6 +394,7 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         }
     }
 
+    @Override
     public void removeRefreshActionListener(final ActionListener l) {
         listeners.remove(l);
         for (I_ShowActivity shower : showActivityListeners) {
@@ -404,22 +402,27 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         }
     }
 
+    @Override
     public void addShowActivityListener(I_ShowActivity listener) {
         showActivityListeners.add(listener);
     }
 
+    @Override
     public void removeShowActivityListener(I_ShowActivity listener) {
         showActivityListeners.remove(listener);
     }
 
+    @Override
     public int getMaximum() {
         return max;
     }
 
+    @Override
     public int getValue() {
         return value;
     }
 
+    @Override
     public boolean isComplete() throws ComputationCanceled {
         if (canceled) {
             throw new ComputationCanceled();
@@ -427,18 +430,22 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         return this.complete;
     }
 
+    @Override
     public boolean isCompleteForComparison() {
         return this.complete;
     }
 
+    @Override
     public boolean isIndeterminate() {
         return indeterminate;
     }
 
+    @Override
     public boolean isStringPainted() {
         return this.stringPainted;
     }
 
+    @Override
     public void setStringPainted(final boolean stringPainted) {
         this.stringPainted = stringPainted;
         for (I_ShowActivity shower : showActivityListeners) {
@@ -446,14 +453,17 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         }
     }
 
+    @Override
     public I_ConfigAceFrame getAceFrameConfig() {
         return aceFrameConfig;
     }
 
+    @Override
     public String getProgressInfoLower() {
         return progressInfoLowerStr;
     }
 
+    @Override
     public String getProgressInfoUpper() {
         return progressInfoUpperStr;
     }
@@ -466,24 +476,20 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         this.eraseWhenFinishedEnabled = eraseWhenFinishedEnabled;
     }
 
-
     @Override
     public void actionPerformed(ActionEvent e) {
         update();
     }
-
 
     @Override
     public void ancestorAdded(AncestorEvent event) {
         // Nothing to do...
     }
 
-
     @Override
     public void ancestorMoved(AncestorEvent event) {
         // Nothing to do...
     }
-
 
     @Override
     public void ancestorRemoved(AncestorEvent event) {
@@ -496,19 +502,17 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         aPanel.setVisible(false);
     }
 
-
     @Override
     public void addStopActionListener(ActionListener l) {
         stopActionListeners.put(l, l);
     }
 
-
     @Override
     public void removeStopActionListener(ActionListener l) {
         stopActionListeners.remove(l);
     }
-    
-    
+
+    @Override
     public boolean isCanceled() {
         return canceled;
     }
@@ -517,21 +521,26 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         this.canceled = canceled;
     }
 
+    @Override
     public void cancel() {
-    	this.canceled = true;
-        this.complete = true;
-        this.stopButtonVisible = false;
-        for (I_ShowActivity shower : showActivityListeners) {
-            try {
-				shower.complete();
-			} catch (ComputationCanceled e) {
-				// Nothing to do...
-			}
+        if (this.canceled == false) {
+            this.canceled = true;
+            this.complete = true;
+            this.stopButtonVisible = false;
+            for (I_ShowActivity shower : showActivityListeners) {
+                try {
+                    if (!shower.isComplete()) {
+                        shower.complete();
+                    }
+                } catch (ComputationCanceled e) {
+                    // Nothing to do...
+                }
+            }
+            showActivityListeners.clear();
+            for (ActionListener sal2 : stopActionListeners.keySet()) {
+                sal2.actionPerformed(null);
+            }
+            stopActionListeners.clear();
         }
-        showActivityListeners.clear();
-        for (ActionListener sal2: stopActionListeners.keySet()) {
-           sal2.actionPerformed(null);
-        }
-        stopActionListeners.clear();
     }
 }
