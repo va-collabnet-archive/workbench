@@ -449,7 +449,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
       return nidData;
    }
 
-   protected Set<Integer> getReadOnlyIntSet(OFFSETS offset) throws IOException {
+   protected ConcurrentSkipListSet<Integer> getReadOnlyIntSet(OFFSETS offset) throws IOException {
       TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
       if (readOnlyInput.available() < OFFSETS.getHeaderSize()) {
          return new ConcurrentSkipListSet<Integer>();
@@ -463,7 +463,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
       return binder.entryToObject(readOnlyInput);
    }
 
-   protected Set<Integer> getMutableIntSet(OFFSETS offset) throws IOException {
+   protected ConcurrentSkipListSet<Integer> getMutableIntSet(OFFSETS offset) throws IOException {
       TupleInput mutableInput = nidData.getMutableTupleInput();
       if (mutableInput.available() < OFFSETS.getHeaderSize()) {
          return new ConcurrentSkipListSet<Integer>();
@@ -728,14 +728,12 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
    @Override
    public boolean isLeafByDestRels(I_ConfigAceFrame aceConfig) throws IOException {
       boolean isLeaf = true;
-      List<NidPairForRel> relPairs = Bdb.getDestRelPairs(enclosingConcept.getNid());
-      if (relPairs != null) {
-         I_IntSet destRelTypes = aceConfig.getDestRelTypes();
+       I_IntSet destRelTypes = aceConfig.getDestRelTypes();
+        List<NidPairForRel> relPairs = Bdb.xref.getDestRelPairs(enclosingConcept.getNid(), destRelTypes);
+        if (relPairs != null) {
          for (NidPairForRel pair : relPairs) {
             int relNid = pair.getRelNid();
-            int typeId = pair.getTypeNid();
-            if (destRelTypes.contains(typeId)) {
-               try {
+                try {
                   Concept c = Bdb.getConceptForComponent(relNid);
                   if (c != null) {
                      Relationship r = c.getSourceRel(relNid);
@@ -752,7 +750,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                } catch (IOException e) {
                   AceLog.getAppLog().alertAndLogException(e);
                }
-            }
+            
          }
       }
       return isLeaf;
