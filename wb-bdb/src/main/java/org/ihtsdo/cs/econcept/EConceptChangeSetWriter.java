@@ -172,6 +172,7 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
 	                eC.writeExternal(tempOut);
 	                long writeTime = System.currentTimeMillis() - start - permitTime - computeTime;
 	                long totalTime = System.currentTimeMillis() - start;
+                        /*
 	                if (totalTime > 100000) {
 	                    AceLog.getAppLog().info("\n##################################################################\n" +
 	                        "Exceptional change set write time for concept: \n" + 
@@ -187,6 +188,8 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
 	                        "\n##################################################################\n"
 	                        );
 	                }
+                         * 
+                         */
 	            }
             } catch (Throwable e) {
                 AceLog.getAppLog().severe("\n##################################################################\n" +
