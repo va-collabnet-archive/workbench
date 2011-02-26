@@ -40,39 +40,37 @@ import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class ConceptDataSimpleReference extends ConceptDataManager {
 
     private static HashMap<I_ConfigAceFrame, IsLeafBinder> isLeafBinders = new HashMap<I_ConfigAceFrame, IsLeafBinder>();
-
     private AtomicReference<ConceptAttributes> attributes = new AtomicReference<ConceptAttributes>();
     private AtomicReference<AddSrcRelList> srcRels = new AtomicReference<AddSrcRelList>();
     private AtomicReference<AddDescriptionList> descriptions = new AtomicReference<AddDescriptionList>();
     private AtomicReference<AddImageList> images = new AtomicReference<AddImageList>();
     private AtomicReference<AddMemberList> refsetMembers = new AtomicReference<AddMemberList>();
-    
-    
     private AtomicReference<CopyOnWriteArraySet<Integer>> descNids =
             new AtomicReference<CopyOnWriteArraySet<Integer>>();
     private AtomicReference<CopyOnWriteArraySet<Integer>> srcRelNids =
             new AtomicReference<CopyOnWriteArraySet<Integer>>();
     private AtomicReference<CopyOnWriteArraySet<Integer>> imageNids =
             new AtomicReference<CopyOnWriteArraySet<Integer>>();
-    private AtomicReference<CopyOnWriteArraySet<Integer>> memberNids =
-            new AtomicReference<CopyOnWriteArraySet<Integer>>();
+    private AtomicReference<ConcurrentSkipListSet<Integer>> memberNids =
+            new AtomicReference<ConcurrentSkipListSet<Integer>>();
     private AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>> refsetMembersMap =
-        new AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>>();
+            new AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>>();
     private AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>> refsetComponentMap =
-        new AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>>();
-    
+            new AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>>();
+
     @Override
     public void diet() {
         if (!isUnwritten()) {
             refsetMembersMap.set(null);
             refsetComponentMap.set(null);
             refsetMembers.set(null);
-       }
-      }
+        }
+    }
 
     public ConceptDataSimpleReference(Concept enclosingConcept) throws IOException {
         super(new NidDataFromBdb(enclosingConcept.getNid()));
@@ -85,10 +83,10 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         assert enclosingConcept != null : "enclosing concept cannot be null.";
         this.enclosingConcept = enclosingConcept;
     }
-    
+
     public boolean hasUncommittedComponents() {
-        if (hasUncommittedVersion(attributes.get()) ||
-        		hasUncommittedId(attributes.get())) {
+        if (hasUncommittedVersion(attributes.get())
+                || hasUncommittedId(attributes.get())) {
             return true;
         }
         if (hasUncommittedVersion(srcRels.get())) {
@@ -106,10 +104,9 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         return false;
     }
 
-
     private boolean hasUncommittedVersion(ComponentList<? extends ConceptComponent<?, ?>> componentList) {
         if (componentList != null) {
-            for (ConceptComponent<?, ?> cc: componentList) {
+            for (ConceptComponent<?, ?> cc : componentList) {
                 if (hasUncommittedVersion(cc)) {
                     return true;
                 }
@@ -123,15 +120,14 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
     private boolean hasUncommittedId(ConceptComponent<?, ?> cc) {
         if (cc != null && cc.getAdditionalIdentifierParts() != null) {
-        	for (IdentifierVersion idv: cc.getAdditionalIdentifierParts()) {
-        		if (idv.getTime() == Long.MAX_VALUE) {
+            for (IdentifierVersion idv : cc.getAdditionalIdentifierParts()) {
+                if (idv.getTime() == Long.MAX_VALUE) {
                     return true;
-        		}
-        	}
+                }
+            }
         }
         return false;
     }
-
 
     private boolean hasUncommittedVersion(ConceptComponent<?, ?> cc) {
         if (cc != null) {
@@ -139,7 +135,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                 return true;
             }
             if (cc.revisions != null) {
-                for (Revision<?, ?> r: cc.revisions) {
+                for (Revision<?, ?> r : cc.revisions) {
                     if (r.getTime() == Long.MAX_VALUE) {
                         return true;
                     }
@@ -152,7 +148,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     public AddSrcRelList getSourceRels() throws IOException {
         if (srcRels.get() == null) {
             srcRels.compareAndSet(null, new AddSrcRelList(getList(new RelationshipBinder(), OFFSETS.SOURCE_RELS,
-                enclosingConcept)));
+                    enclosingConcept)));
         }
         handleCanceledComponents();
         return srcRels.get();
@@ -161,7 +157,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     public AddDescriptionList getDescriptions() throws IOException {
         if (descriptions.get() == null) {
             descriptions.compareAndSet(null, new AddDescriptionList(getList(new DescriptionBinder(),
-                OFFSETS.DESCRIPTIONS, enclosingConcept)));
+                    OFFSETS.DESCRIPTIONS, enclosingConcept)));
         }
         handleCanceledComponents();
         return descriptions.get();
@@ -245,54 +241,54 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     public AddMemberList getRefsetMembers() throws IOException {
         if (refsetMembers.get() == null) {
             refsetMembers.compareAndSet(null, new AddMemberList(getList(new RefsetMemberBinder(enclosingConcept),
-                OFFSETS.REFSET_MEMBERS, enclosingConcept)));
+                    OFFSETS.REFSET_MEMBERS, enclosingConcept)));
         }
         handleCanceledComponents();
         return refsetMembers.get();
     }
 
-	private void handleCanceledComponents() {
-		if (lastExtinctRemoval < BdbCommitManager.getLastCancel()) {
-			if (refsetMembers != null && 
-					refsetMembers.get() != null && 
-					refsetMembers.get().size() > 0) {
-	        	removeCanceledFromList(refsetMembers.get());
-			}
-			if (descriptions != null && 
-					descriptions.get() != null && 
-					descriptions.get().size() > 0) {
-	        	removeCanceledFromList(descriptions.get());
-			}
-			if (images != null && 
-					images.get() != null && 
-					images.get().size() > 0) {
-	        	removeCanceledFromList(images.get());
-			}
-			if (srcRels != null && 
-					srcRels.get() != null && 
-					srcRels.get().size() > 0) {
-	        	removeCanceledFromList(srcRels.get());
-			}
-			lastExtinctRemoval = Bdb.gVersion.incrementAndGet();
+    private void handleCanceledComponents() {
+        if (lastExtinctRemoval < BdbCommitManager.getLastCancel()) {
+            if (refsetMembers != null
+                    && refsetMembers.get() != null
+                    && refsetMembers.get().size() > 0) {
+                removeCanceledFromList(refsetMembers.get());
+            }
+            if (descriptions != null
+                    && descriptions.get() != null
+                    && descriptions.get().size() > 0) {
+                removeCanceledFromList(descriptions.get());
+            }
+            if (images != null
+                    && images.get() != null
+                    && images.get().size() > 0) {
+                removeCanceledFromList(images.get());
+            }
+            if (srcRels != null
+                    && srcRels.get() != null
+                    && srcRels.get().size() > 0) {
+                removeCanceledFromList(srcRels.get());
+            }
+            lastExtinctRemoval = Bdb.gVersion.incrementAndGet();
         }
-	}
+    }
 
-	private void removeCanceledFromList(List<? extends ConceptComponent<?,?>> ccList) {
-		if (ccList != null) {
-			synchronized (ccList) {
-				List<Integer> toRemove = new ArrayList<Integer>();
-				for (int i = ccList.size() -1; i > -1; i--) {
-					if (ccList.get(i).getTime() == Long.MIN_VALUE) {
-							toRemove.add(i);
-							ccList.get(i).clearVersions();
-					}
-				}
-				for (int i: toRemove) {
-					ccList.remove(i);
-				}
-			}
-		}
-	}
+    private void removeCanceledFromList(List<? extends ConceptComponent<?, ?>> ccList) {
+        if (ccList != null) {
+            synchronized (ccList) {
+                List<Integer> toRemove = new ArrayList<Integer>();
+                for (int i = ccList.size() - 1; i > -1; i--) {
+                    if (ccList.get(i).getTime() == Long.MIN_VALUE) {
+                        toRemove.add(i);
+                        ccList.get(i).clearVersions();
+                    }
+                }
+                for (int i : toRemove) {
+                    ccList.remove(i);
+                }
+            }
+        }
+    }
 
     public AddImageList getImages() throws IOException {
         if (images.get() == null) {
@@ -306,10 +302,10 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         return nidData;
     }
 
-    protected CopyOnWriteArraySet<Integer> getReadOnlyIntSet(OFFSETS offset) throws IOException {
+    protected ConcurrentSkipListSet<Integer> getReadOnlyIntSet(OFFSETS offset) throws IOException {
         TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
         if (readOnlyInput.available() < OFFSETS.getHeaderSize()) {
-            return new CopyOnWriteArraySet<Integer>();
+            return new ConcurrentSkipListSet<Integer>();
         }
         readOnlyInput.mark(OFFSETS.getHeaderSize());
         readOnlyInput.skipFast(offset.offset);
@@ -320,10 +316,10 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         return binder.entryToObject(readOnlyInput);
     }
 
-    protected CopyOnWriteArraySet<Integer> getMutableIntSet(OFFSETS offset) throws IOException {
+    protected ConcurrentSkipListSet<Integer> getMutableIntSet(OFFSETS offset) throws IOException {
         TupleInput mutableInput = nidData.getMutableTupleInput();
         if (mutableInput.available() < OFFSETS.getHeaderSize()) {
-            return new CopyOnWriteArraySet<Integer>();
+            return new ConcurrentSkipListSet<Integer>();
         }
         mutableInput.mark(OFFSETS.getHeaderSize());
         mutableInput.skipFast(offset.offset);
@@ -386,14 +382,14 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
 
     @Override
-    public CopyOnWriteArraySet<Integer> getSrcRelNidsReadOnly() throws IOException {
+    public ConcurrentSkipListSet<Integer> getSrcRelNidsReadOnly() throws IOException {
         return getReadOnlyIntSet(OFFSETS.SRC_REL_NIDS);
     }
 
     @Override
-    public CopyOnWriteArraySet<Integer> getMemberNids() throws IOException {
+    public ConcurrentSkipListSet<Integer> getMemberNids() throws IOException {
         if (memberNids.get() == null) {
-            CopyOnWriteArraySet<Integer> temp = new CopyOnWriteArraySet<Integer>(getMemberNidsReadOnly());
+            ConcurrentSkipListSet<Integer> temp = new ConcurrentSkipListSet<Integer>(getMemberNidsReadOnly());
             temp.addAll(getMutableIntSet(OFFSETS.MEMBER_NIDS));
             memberNids.compareAndSet(null, temp);
         }
@@ -401,26 +397,25 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
 
     @Override
-    public CopyOnWriteArraySet<Integer> getMemberNidsReadOnly() throws IOException {
+    public ConcurrentSkipListSet<Integer> getMemberNidsReadOnly() throws IOException {
         return getReadOnlyIntSet(OFFSETS.MEMBER_NIDS);
     }
 
-    
     @Override
     public RefsetMember<?, ?> getRefsetMember(int memberNid) throws IOException {
         Collection<RefsetMember<?, ?>> refsetMemberList = getRefsetMembers();
-			if (refsetMemberList.size() < useMemberMapThreshold) {
-				for (RefsetMember<?, ?> member : refsetMemberList) {
-					if (member.nid == memberNid) {
-						return member;
-					}
-				}
-				return null;
-			}
-        if (refsetMembersMap.get() == null) {
-			setupMemberMap(refsetMemberList);
+        if (refsetMemberList.size() < useMemberMapThreshold) {
+            for (RefsetMember<?, ?> member : refsetMemberList) {
+                if (member.nid == memberNid) {
+                    return member;
+                }
+            }
+            return null;
         }
-	    return refsetMembersMap.get().get(memberNid);
+        if (refsetMembersMap.get() == null) {
+            setupMemberMap(refsetMemberList);
+        }
+        return refsetMembersMap.get().get(memberNid);
     }
 
     @Override
@@ -435,47 +430,46 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             return null;
         }
         if (refsetComponentMap.get() == null) {
-        	setupMemberMap(refsetMemberList);
+            setupMemberMap(refsetMemberList);
         }
         return refsetComponentMap.get().get(componentNid);
     }
- 
     private ReentrantLock memberMapLock = new ReentrantLock();
-    private void setupMemberMap(Collection<RefsetMember<?, ?>> refsetMemberList) {
-    	memberMapLock.lock();
-        try {
-			if (refsetMembersMap.get() == null
-					|| refsetComponentMap.get() == null) {
-			    ConcurrentHashMap<Integer, RefsetMember<?, ?>> memberMap =
-			        new ConcurrentHashMap<Integer, RefsetMember<?, ?>>(refsetMemberList.size(), 0.75f, 2);
-			    ConcurrentHashMap<Integer, RefsetMember<?, ?>> componentMap =
-			        new ConcurrentHashMap<Integer, RefsetMember<?, ?>>(refsetMemberList.size(), 0.75f, 2);
-			    for (RefsetMember<?, ?> m : refsetMemberList) {
-			        memberMap.put(m.nid, m);
-			        componentMap.put(m.getComponentNid(), m);
-			    }
-			    refsetMembersMap.set(memberMap);
-			    refsetComponentMap.set(componentMap);
-			}
-		} finally {
-			memberMapLock.unlock();
-		}
-    }
 
+    private void setupMemberMap(Collection<RefsetMember<?, ?>> refsetMemberList) {
+        memberMapLock.lock();
+        try {
+            if (refsetMembersMap.get() == null
+                    || refsetComponentMap.get() == null) {
+                ConcurrentHashMap<Integer, RefsetMember<?, ?>> memberMap =
+                        new ConcurrentHashMap<Integer, RefsetMember<?, ?>>(refsetMemberList.size(), 0.75f, 2);
+                ConcurrentHashMap<Integer, RefsetMember<?, ?>> componentMap =
+                        new ConcurrentHashMap<Integer, RefsetMember<?, ?>>(refsetMemberList.size(), 0.75f, 2);
+                for (RefsetMember<?, ?> m : refsetMemberList) {
+                    memberMap.put(m.nid, m);
+                    componentMap.put(m.getComponentNid(), m);
+                }
+                refsetMembersMap.set(memberMap);
+                refsetComponentMap.set(componentMap);
+            }
+        } finally {
+            memberMapLock.unlock();
+        }
+    }
 
     @Override
     protected void addToMemberMap(RefsetMember<?, ?> refsetMember) {
-    	memberMapLock.lock();
+        memberMapLock.lock();
         try {
-        	if (refsetMembersMap.get() != null) {
-        		refsetMembersMap.get().put(refsetMember.nid, refsetMember);
-        	}
-        	if (refsetComponentMap.get() != null) {
-        		refsetComponentMap.get().put(refsetMember.getComponentNid(), refsetMember);
-        	}
-		} finally {
-			memberMapLock.unlock();
-		}
+            if (refsetMembersMap.get() != null) {
+                refsetMembersMap.get().put(refsetMember.nid, refsetMember);
+            }
+            if (refsetComponentMap.get() != null) {
+                refsetComponentMap.get().put(refsetMember.getComponentNid(), refsetMember);
+            }
+        } finally {
+            memberMapLock.unlock();
+        }
     }
 
     @Override
@@ -531,13 +525,13 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             }
         }
         if (getMemberNids().contains(nid)) {
-        	return getRefsetMember(nid);
+            return getRefsetMember(nid);
         }
-        
-        for (RelGroupChronicleBI group: enclosingConcept.getRelGroups()) {
-        	if (group.getNid() == nid) {
-        		return group;
-        	}
+
+        for (RelGroupChronicleBI group : enclosingConcept.getRelGroups()) {
+            if (group.getNid() == nid) {
+                return group;
+            }
         }
         return null;
     }
@@ -564,31 +558,30 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     @Override
     public boolean isLeafByDestRels(I_ConfigAceFrame aceConfig) throws IOException {
         boolean isLeaf = true;
-        List<NidPairForRel> relPairs = Bdb.getDestRelPairs(enclosingConcept.getNid());
+        I_IntSet destRelTypes = aceConfig.getDestRelTypes();
+        List<NidPairForRel> relPairs = Bdb.xref.getDestRelPairs(enclosingConcept.getNid(), destRelTypes);
         if (relPairs != null) {
-            I_IntSet destRelTypes = aceConfig.getDestRelTypes();
-            for (NidPairForRel pair: relPairs) {
+            for (NidPairForRel pair : relPairs) {
                 int relNid = pair.getRelNid();
-                int typeId = pair.getTypeNid();
-                if (destRelTypes.contains(typeId)) {
-                    try {
-                        Concept c = Bdb.getConceptForComponent(relNid);
-                        if (c != null) {
-                            Relationship r = c.getSourceRel(relNid);
-                            if (r != null) {
-                                List<I_RelTuple> currentVersions = new ArrayList<I_RelTuple>();
-                                r.addTuples(aceConfig.getAllowedStatus(), destRelTypes, aceConfig
-                                        .getViewPositionSetReadOnly(), currentVersions, 
-                                        aceConfig.getPrecedence(),
-                                        aceConfig.getConflictResolutionStrategy());
-                                if (currentVersions.size() > 0) {
-                                    return false;
-                                }
+                try {
+                    Concept c = Bdb.getConceptForComponent(relNid);
+                    if (c != null) {
+                        Relationship r = c.getSourceRel(relNid);
+                        if (r != null) {
+                            List<I_RelTuple> currentVersions = new ArrayList<I_RelTuple>();
+                            r.addTuples(aceConfig.getAllowedStatus(), 
+                                    destRelTypes, 
+                                    aceConfig.getViewPositionSetReadOnly(), 
+                                    currentVersions,
+                                    aceConfig.getPrecedence(),
+                                    aceConfig.getConflictResolutionStrategy());
+                            if (currentVersions.size() > 0) {
+                                return false;
                             }
                         }
-                    } catch (IOException e) {
-                        AceLog.getAppLog().alertAndLogException(e);
                     }
+                } catch (IOException e) {
+                    AceLog.getAppLog().alertAndLogException(e);
                 }
             }
         } else {
@@ -600,7 +593,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                 }
                 isLeafBinders.put(aceConfig, leafBinder);
             }
-            
+
             TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
             if (readOnlyInput.available() > OFFSETS.getHeaderSize()) {
                 readOnlyInput.mark(OFFSETS.getHeaderSize());
@@ -610,7 +603,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                 readOnlyInput.skipFast(dataOffset);
                 isLeaf = leafBinder.entryToObject(readOnlyInput);
             }
-            
+
             if (isLeaf) {
                 TupleInput mutableInput = nidData.getMutableTupleInput();
                 if (mutableInput.available() > OFFSETS.getHeaderSize()) {
@@ -625,5 +618,4 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         }
         return isLeaf;
     }
-
 }
