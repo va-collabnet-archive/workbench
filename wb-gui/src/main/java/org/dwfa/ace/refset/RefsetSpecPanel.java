@@ -1186,10 +1186,15 @@ public class RefsetSpecPanel extends JPanel {
                         comp.setSize(currentRowWidth, currentRowHeight);
 
                         double dPreferredHeight = comp.getPreferredSize().getHeight();
-                        if (dPreferredHeight > rowPreferredHeight) {
+                        if (dPreferredHeight > rowPreferredHeight && rowIndex >= 0 &&
+                                rowIndex < table.getRowCount()) {
                             rowPreferredHeight = dPreferredHeight;
                             // set the new row height based on the preferred height of the cell component
-                            table.setRowHeight(rowIndex, (int) dPreferredHeight);
+                            try {
+                                table.setRowHeight(rowIndex, (int) dPreferredHeight);
+                            } catch (IndexOutOfBoundsException e) {
+                                AceLog.getAppLog().warning("columnMarginChanged ex: " + e.toString());
+                            }
                         }
                     }
                 }
