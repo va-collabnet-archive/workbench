@@ -69,6 +69,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.objectCache.ObjectCacheClassHandler;
+import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 
@@ -448,6 +449,12 @@ public class WorkbenchRunner {
 			// Startup queues in profile sub-directories here...
 			
 			// Isa Cache Setup start
+			long isaStartTime = System.currentTimeMillis();
+			ActivityPanel activityIsa = new ActivityPanel(null, true);
+			activityIsa.setIndeterminate(true);
+			activityIsa.setProgressInfoUpper("Isa Cache pre-computation");
+			activityIsa.setProgressInfoLower("Setting up isa cache...");
+			ActivityViewer.addActivity(activityIsa);
 			List<CountDownLatch> latches = new ArrayList<CountDownLatch>();
 			for (final I_ConfigAceFrame ace : AceConfig.config.aceFrames) {
 				latches.add(Terms.get().setupIsaCache(ace.getViewCoordinate().getIsaCoordinate()).getLatch());
@@ -507,6 +514,10 @@ public class WorkbenchRunner {
 			for (CountDownLatch latch : latches) {
 				latch.await();
 			}
+			long isaLoadTime = System.currentTimeMillis() - startTime;
+			String elapsedStr = TimeUtil.getElapsedTimeString(isaLoadTime);
+			activityIsa.setProgressInfoLower("Elapsed: " + elapsedStr);
+			activityIsa.complete();
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 			System.exit(0);
