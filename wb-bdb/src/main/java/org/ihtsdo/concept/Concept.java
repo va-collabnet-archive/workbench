@@ -58,6 +58,7 @@ import org.ihtsdo.concept.component.relationship.group.RelGroupChronicle;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.BdbMemoryMonitor.LowMemoryListener;
+import org.ihtsdo.db.bdb.computer.kindof.KindOfCache;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfSpec;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
@@ -69,6 +70,7 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
@@ -103,7 +105,6 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         Bdb.addMemoryMonitorListener(new ConceptLowMemoryListener());
     }
 
-
     public static class ConceptLowMemoryListener implements LowMemoryListener {
 
         @Override
@@ -127,18 +128,40 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
         @Override
         public void run() {
-            for (int cNid : conceptsCRHM.keySet()) {
-                Concept c = conceptsCRHM.get(cNid);
-                if (c != null) {
-                    c.diet();
-                }
-            }
             System.gc();
             double usedMemory = maxMemory - Runtime.getRuntime().freeMemory();
             double percentageUsed = ((double) usedMemory) / maxMemory;
-            AceLog.getAppLog().
-                    info("Diet finished recover memory. "
-                    + "Percent used: " + percentageUsed);
+
+
+            if (percentageUsed > 0.85) {
+                for (int cNid : conceptsCRHM.keySet()) {
+                    Concept c = conceptsCRHM.get(cNid);
+                    if (c != null) {
+                        c.diet();
+                    }
+                }
+                usedMemory = maxMemory - Runtime.getRuntime().freeMemory();
+                percentageUsed = ((double) usedMemory) / maxMemory;
+
+                if (percentageUsed > 0.85) {
+                    KindOfComputer.trimCache();
+                    usedMemory = maxMemory - Runtime.getRuntime().freeMemory();
+                    percentageUsed = ((double) usedMemory) / maxMemory;
+                    AceLog.getAppLog().
+                            info("Concept Diet + KindOfComputer.trimCache() finished recover memory. "
+                            + "Percent used: " + percentageUsed);
+                } else {
+                    AceLog.getAppLog().
+                            info("Concept Diet finished recover memory. "
+                            + "Percent used: " + percentageUsed);
+                }
+            } else {
+                usedMemory = maxMemory - Runtime.getRuntime().freeMemory();
+                percentageUsed = ((double) usedMemory) / maxMemory;
+                AceLog.getAppLog().
+                        info("GC ONLY Diet finished recover memory. "
+                        + "Percent used: " + percentageUsed);
+            }
         }
     }
 
@@ -585,84 +608,102 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         switch (sortPref) {
             case LANG_B4_TYPE:
                 return getLangPreferredDesc(getDescriptionTuples(allowedStatus, typeSet, positionSet, precedencePolicy,
-                        contradictionManager), typePrefOrder, langPrefOrder, allowedStatus, positionSet, typeSet);
+                        contradictionManager), typePrefOrder, langPrefOrder, allowedStatus, positionSet, true);
             case TYPE_B4_LANG:
                 return getTypePreferredDesc(getDescriptionTuples(allowedStatus, typeSet, positionSet, precedencePolicy,
-                        contradictionManager), typePrefOrder, langPrefOrder, allowedStatus, positionSet, typeSet);
+                        contradictionManager), typePrefOrder, langPrefOrder, allowedStatus, positionSet, true);
             default:
                 throw new IOException("Can't handle sort type: " + sortPref);
         }
     }
 
-    private I_DescriptionTuple getLangPreferredDesc(Collection<I_DescriptionTuple> descriptions,
-            I_IntList typePrefOrder, I_IntList langPrefOrder, NidSetBI allowedStatus, PositionSetBI positionSet,
-            NidSetBI typeSet) throws IOException, ToIoException {
-        if (descriptions.size() > 0) {
-            if (descriptions.size() > 1) {
-                List<I_DescriptionTuple> matchedList = new ArrayList<I_DescriptionTuple>();
-                if (langPrefOrder != null && langPrefOrder.getListValues() != null) {
-                    for (int langId : langPrefOrder.getListValues()) {
-                        for (I_DescriptionTuple d : descriptions) {
-                            try {
-                                int tupleLangId =
-                                        ArchitectonicAuxiliary.getLanguageConcept(d.getLang()).localize().getNid();
-                                if (tupleLangId == langId) {
-                                    matchedList.add(d);
-                                    if (matchedList.size() == 2) {
-                                        break;
-                                    }
-                                }
-                            } catch (TerminologyException e) {
-                                throw new ToIoException(e);
-                            }
-                        }
-                        if (matchedList.size() > 0) {
-                            if (matchedList.size() == 1) {
-                                return matchedList.get(0);
-                            }
-                            return getTypePreferredDesc(matchedList, typePrefOrder, langPrefOrder, allowedStatus,
-                                    positionSet, typeSet);
-                        }
-                    }
-                }
-                return descriptions.iterator().next();
-            } else {
-                return descriptions.iterator().next();
-            }
-        }
-        return null;
-    }
 
-    private I_DescriptionTuple getTypePreferredDesc(Collection<I_DescriptionTuple> descriptions,
-            I_IntList typePrefOrder, I_IntList langPrefOrder, NidSetBI allowedStatus, PositionSetBI positionSet,
-            NidSetBI typeSet) throws IOException, ToIoException {
-        if (descriptions.size() > 0) {
-            if (descriptions.size() > 1) {
-                List<I_DescriptionTuple> matchedList = new ArrayList<I_DescriptionTuple>();
-                for (int typeId : typePrefOrder.getListValues()) {
-                    for (I_DescriptionTuple d : descriptions) {
-                        if (d.getTypeNid() == typeId) {
-                            matchedList.add(d);
-                            if (matchedList.size() == 2) {
-                                break;
-                            }
+   private I_DescriptionTuple getLangPreferredDesc(
+           Collection<I_DescriptionTuple> descriptions,
+           NidListBI typePrefOrder, NidListBI langPrefOrder,
+           NidSetBI allowedStatus, PositionSetBI positionSet,
+           boolean tryType) throws IOException, ToIoException {
+      if (descriptions.size() > 0) {
+         if (descriptions.size() > 1) {
+            List<I_DescriptionTuple> matchedList =
+                    new ArrayList<I_DescriptionTuple>();
+            if (langPrefOrder != null
+                    && langPrefOrder.getListValues() != null) {
+               for (int langId : langPrefOrder.getListValues()) {
+                  for (I_DescriptionTuple d : descriptions) {
+                     try {
+                        int tupleLangId =
+                                ArchitectonicAuxiliary.getLanguageConcept(d.getLang()).localize().getNid();
+                        if (tupleLangId == langId) {
+                           matchedList.add(d);
+                           if (matchedList.size() == 2) {
+                              break;
+                           }
                         }
-                    }
-                    if (matchedList.size() > 0) {
-                        if (matchedList.size() == 1) {
-                            return matchedList.get(0);
-                        }
-                        return getLangPreferredDesc(matchedList, typePrefOrder, langPrefOrder, allowedStatus,
-                                positionSet, typeSet);
-                    }
-                }
-                return descriptions.iterator().next();
-            } else {
-                return descriptions.iterator().next();
+                     } catch (TerminologyException e) {
+                        throw new ToIoException(e);
+                     }
+                  }
+                  if (matchedList.size() > 0) {
+                     if (matchedList.size() == 1) {
+                        return matchedList.get(0);
+                     }
+                     if (tryType) {
+                        return getTypePreferredDesc(matchedList,
+                                typePrefOrder, langPrefOrder,
+                                allowedStatus, positionSet, false);
+                     } else {
+                        return matchedList.get(0);
+                     }
+                  }
+               }
             }
-        }
-        return null;
-    }
+            return descriptions.iterator().next();
+         } else {
+            return descriptions.iterator().next();
+         }
+      }
+      return null;
+   }
+
+   private I_DescriptionTuple getTypePreferredDesc(
+           Collection<I_DescriptionTuple> descriptions,
+           NidListBI typePrefOrder, NidListBI langPrefOrder,
+           NidSetBI allowedStatus, PositionSetBI positionSet,
+           boolean tryLang) throws IOException, ToIoException {
+      if (descriptions.size() > 0) {
+         if (descriptions.size() > 1) {
+            List<I_DescriptionTuple> matchedList =
+                    new ArrayList<I_DescriptionTuple>();
+            for (int typeId : typePrefOrder.getListValues()) {
+               for (I_DescriptionTuple d : descriptions) {
+                  if (d.getTypeNid() == typeId) {
+                     matchedList.add(d);
+                     if (matchedList.size() == 2) {
+                        break;
+                     }
+                  }
+               }
+               if (matchedList.size() > 0) {
+                  if (matchedList.size() == 1) {
+                     return matchedList.get(0);
+                  }
+                  if (tryLang) {
+                     return getLangPreferredDesc(matchedList, typePrefOrder,
+                             langPrefOrder, allowedStatus, positionSet,
+                             false);
+                  } else {
+                     return matchedList.get(0);
+                  }
+               }
+            }
+            return descriptions.iterator().next();
+         } else {
+            return descriptions.iterator().next();
+         }
+      }
+      return null;
+   }
 
     @Override
     public Description.Version getDescTuple(I_IntList descTypePreferenceList, I_ConfigAceFrame config)
@@ -1164,7 +1205,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     @Override
     public boolean isUncommitted() {
-        return  data.isUnwritten() || data.isUncommitted();
+        return data.isUnwritten() || data.isUncommitted();
     }
 
     public boolean isUnwritten() {
@@ -1277,20 +1318,16 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     public I_RepresentIdSet getPossibleChildOfConcepts(I_ConfigAceFrame config) throws IOException {
         NidSetBI isATypes = config.getDestRelTypes();
         I_RepresentIdSet possibleChildOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
-        for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
-            if (isATypes.contains(pair.getTypeNid())) {
-                possibleChildOfConcepts.setMember(Bdb.getNidCNidMap().getCNid(pair.getRelNid()));
-            }
+        for (int cNid : Bdb.xref.getDestRelOrigins(nid, isATypes)) {
+            possibleChildOfConcepts.setMember(cNid);
         }
         return possibleChildOfConcepts;
     }
 
     public Set<Integer> getPossibleDestRelsOfTypes(NidSetBI relTypes) throws IOException {
         Set<Integer> possibleRelNids = new HashSet<Integer>();
-        for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
-            if (relTypes.contains(pair.getTypeNid())) {
-                possibleRelNids.add(pair.getRelNid());
-            }
+        for (NidPairForRel pair : Bdb.xref.getDestRelPairs(nid, relTypes)) {
+            possibleRelNids.add(pair.getRelNid());
         }
         return possibleRelNids;
     }
@@ -1320,22 +1357,26 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             Precedence precedencePolicy, ContradictionManagerBI contradictionManager) throws IOException {
         List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
         List<NidPairForRel> invalidPairs = new ArrayList<NidPairForRel>();
-        for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
+        List<NidPairForRel> pairs;
+        if (allowedTypes != null && allowedTypes.size() > 0) {
+            pairs = Bdb.xref.getDestRelPairs(nid, allowedTypes);
+        } else {
+            pairs = Bdb.xref.getDestRelPairs(nid);
+        }
+
+        for (NidPairForRel pair : pairs) {
             int relNid = pair.getRelNid();
-            int typeNid = pair.getTypeNid();
-            if (allowedTypes == null || allowedTypes.contains(typeNid)) {
-                Concept relSource = Bdb.getConceptForComponent(relNid);
-                if (relSource != null) {
-                    Relationship r = relSource.getRelationship(relNid);
-                    if (r != null) {
-                        r.addTuples(allowedStatus, allowedTypes, positions, returnRels, precedencePolicy,
-                                contradictionManager);
-                    } else {
-                        invalidPairs.add(pair);
-                    }
+            Concept relSource = Bdb.getConceptForComponent(relNid);
+            if (relSource != null) {
+                Relationship r = relSource.getRelationship(relNid);
+                if (r != null) {
+                    r.addTuples(allowedStatus, allowedTypes, positions, returnRels, precedencePolicy,
+                            contradictionManager);
                 } else {
                     invalidPairs.add(pair);
                 }
+            } else {
+                invalidPairs.add(pair);
             }
         }
 
@@ -1358,23 +1399,22 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         I_RepresentIdSet possibleKindOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
         possibleKindOfConcepts.setMember(getNid());
 
-        collectKindOf(activity, isATypes, possibleKindOfConcepts, nid);
+        collectPossibleKindOf(activity, isATypes, possibleKindOfConcepts, nid);
 
         return possibleKindOfConcepts;
     }
 
-    private void collectKindOf(I_ShowActivity activity, NidSetBI isATypes, I_RepresentIdSet possibleKindOfConcepts,
+    private void collectPossibleKindOf(I_ShowActivity activity,
+            NidSetBI isATypes,
+            I_RepresentIdSet possibleKindOfConcepts,
             int cNid) throws IOException {
-        for (NidPairForRel pair : Bdb.getDestRelPairs(cNid)) {
+        for (int cNidForOrigin : Bdb.xref.getDestRelOrigins(cNid, isATypes)) {
             if (activity != null && activity.isCanceled()) {
                 return;
             }
-            if (isATypes.contains(pair.getTypeNid())) {
-                int cNidForOrigin = Bdb.getNidCNidMap().getCNid(pair.getRelNid());
-                if (possibleKindOfConcepts.isMember(cNidForOrigin) == false) {
-                    possibleKindOfConcepts.setMember(cNidForOrigin);
-                    collectKindOf(activity, isATypes, possibleKindOfConcepts, cNidForOrigin);
-                }
+            if (possibleKindOfConcepts.isMember(cNidForOrigin) == false) {
+                possibleKindOfConcepts.setMember(cNidForOrigin);
+                collectPossibleKindOf(activity, isATypes, possibleKindOfConcepts, cNidForOrigin);
             }
         }
     }
@@ -1454,11 +1494,10 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         }
         return results;
     }
-    
+
     private void diet() {
         data.diet();
     }
-
 
     @Override
     public int compareTo(Concept concept) {
