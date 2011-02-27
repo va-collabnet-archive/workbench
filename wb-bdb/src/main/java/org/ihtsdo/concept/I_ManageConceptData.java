@@ -125,10 +125,12 @@ public interface I_ManageConceptData {
      * For single-concept commit.
      * @param time
      */
-   NidSetBI setCommitTime(long time);
+    NidSetBI setCommitTime(long time);
 
     /**
      * For single-concept cancel.
      */
-  void cancel() throws IOException;
+    void cancel() throws IOException;
+
+    void diet();
 }

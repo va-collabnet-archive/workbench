@@ -53,7 +53,7 @@ public class EditPanelKb implements Runnable {
 		this.config = config;
 		ACE.threadPool.execute(this);
 	}
-	
+	 
 	@Override
 	public void run() {
 		try {

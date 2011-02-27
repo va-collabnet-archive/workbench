@@ -77,6 +77,17 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
       this.enclosingConcept = enclosingConcept;
    }
 
+   
+    @Override
+    public void diet() {
+        if (!isUnwritten()) {
+            refsetMembersMap.set(null);
+            refsetComponentMap.set(null);
+            refsetMembers.set(null);
+        }
+    }
+
+
    @Override
    public boolean hasUncommittedComponents() {
       if (hasUncommittedVersion(attributes.get())) {

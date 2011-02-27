@@ -201,19 +201,19 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
         }
     }
 
-    private class AuthorAntiFilter extends AuthorFilter {
+    private static class AuthorAntiFilter extends AuthorFilter {
 
         private AuthorAntiFilter(int... nids) {
             super(nids);
         }
 
       @Override
-        public boolean pass(V part) {
+        public boolean pass(ConceptComponent<?, ?>.Version part) {
             return !super.pass(part);
         }
     }
 
-    private class AuthorFilter {
+    private static class AuthorFilter {
 
         NidSetBI authorNids = new NidSet();
 
@@ -223,7 +223,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
             }
         }
 
-        public boolean pass(V part) {
+        public boolean pass(ConceptComponent<?, ?>.Version part) {
             return authorNids.contains(part.getAuthorNid());
         }
     }

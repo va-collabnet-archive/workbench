@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.dwfa.ace.activity.ActivityViewer;
@@ -37,7 +36,6 @@ import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
-import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public class RefsetComputer implements I_ProcessUnfetchedConceptData {
@@ -50,8 +48,9 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         public StopActionListener() {
         }
 
-      @Override
+        @Override
         public void actionPerformed(ActionEvent e) {
+          if (!canceled) {
             canceled = true;
             List<ParallelConceptIterator> pcis = getParallelConceptIterators();
             for (ParallelConceptIterator pci : pcis) {
@@ -62,6 +61,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
                 a.setProgressInfoLower("Cancelled.");
             }
             activity.removeStopActionListener(this);
+          }
         }
     }
 

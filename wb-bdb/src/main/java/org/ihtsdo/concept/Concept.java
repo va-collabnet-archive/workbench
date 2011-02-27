@@ -59,6 +59,7 @@ import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.concept.component.relationship.group.RelGroupChronicle;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
+import org.ihtsdo.db.bdb.BdbMemoryMonitor.LowMemoryListener;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
@@ -112,6 +113,72 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
            new ConcurrentReferenceHashMap<Integer, Object>(
            ConcurrentReferenceHashMap.ReferenceType.STRONG,
            ConcurrentReferenceHashMap.ReferenceType.WEAK);
+
+   
+    static {
+        Bdb.addMemoryMonitorListener(new ConceptLowMemoryListener());
+    }
+
+    public static class ConceptLowMemoryListener implements LowMemoryListener {
+
+        @Override
+        public void memoryUsageLow(long usedMemory, long maxMemory) {
+            double percentageUsed = ((double) usedMemory) / maxMemory;
+            AceLog.getAppLog().
+                    warning("Memory low. Percent used: " + percentageUsed
+                    + " Concept trying to recover memory by dieting concepts. ");
+            new Thread(new Diet(maxMemory)).start();
+
+        }
+    }
+
+    public static class Diet implements Runnable {
+
+        long maxMemory;
+
+        public Diet(long maxMemory) {
+            this.maxMemory = maxMemory;
+        }
+
+        @Override
+        public void run() {
+            System.gc();
+            double usedMemory = maxMemory - Runtime.getRuntime().freeMemory();
+            double percentageUsed = ((double) usedMemory) / maxMemory;
+
+
+            if (percentageUsed > 0.85) {
+                for (int cNid : conceptsCRHM.keySet()) {
+                    Concept c = conceptsCRHM.get(cNid);
+                    if (c != null) {
+                        c.diet();
+                    }
+                }
+                usedMemory = maxMemory - Runtime.getRuntime().freeMemory();
+                percentageUsed = ((double) usedMemory) / maxMemory;
+
+                if (percentageUsed > 0.85) {
+                    KindOfComputer.trimCache();
+                    usedMemory = maxMemory - Runtime.getRuntime().freeMemory();
+                    percentageUsed = ((double) usedMemory) / maxMemory;
+                    AceLog.getAppLog().
+                            info("Concept Diet + KindOfComputer.trimCache() finished recover memory. "
+                            + "Percent used: " + percentageUsed);
+                } else {
+                    AceLog.getAppLog().
+                            info("Concept Diet finished recover memory. "
+                            + "Percent used: " + percentageUsed);
+                }
+            } else {
+                usedMemory = maxMemory - Runtime.getRuntime().freeMemory();
+                percentageUsed = ((double) usedMemory) / maxMemory;
+                AceLog.getAppLog().
+                        info("GC ONLY Diet finished recover memory. "
+                        + "Percent used: " + percentageUsed);
+            }
+        }
+    }
+
 
    public static Concept mergeAndWrite(EConcept eConcept) throws IOException {
       int conceptNid = Bdb.uuidToNid(eConcept.getPrimordialUuid());
@@ -1439,25 +1506,20 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
    @Override
    public I_RepresentIdSet getPossibleChildOfConcepts(I_ConfigAceFrame config) throws IOException {
-      NidSetBI isATypes = config.getDestRelTypes();
-      I_RepresentIdSet possibleChildOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
-      for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
-         if (isATypes.contains(pair.getTypeNid())) {
-            possibleChildOfConcepts.setMember(
-                    Bdb.getNidCNidMap().getCNid(pair.getRelNid()));
-         }
-      }
-      return possibleChildOfConcepts;
-   }
+       NidSetBI isATypes = config.getDestRelTypes();
+        I_RepresentIdSet possibleChildOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
+        for (int cNid : Bdb.xref.getDestRelOrigins(nid, isATypes)) {
+            possibleChildOfConcepts.setMember(cNid);
+        }
+        return possibleChildOfConcepts;
+    }
 
    public Set<Integer> getPossibleDestRelsOfTypes(NidSetBI relTypes) throws IOException {
-      Set<Integer> possibleRelNids = new HashSet<Integer>();
-      for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
-         if (relTypes.contains(pair.getTypeNid())) {
+       Set<Integer> possibleRelNids = new HashSet<Integer>();
+        for (NidPairForRel pair : Bdb.xref.getDestRelPairs(nid, relTypes)) {
             possibleRelNids.add(pair.getRelNid());
-         }
-      }
-      return possibleRelNids;
+        }
+        return possibleRelNids;
    }
 
    @Deprecated
@@ -1509,10 +1571,15 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
            throws IOException {
       List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
       List<NidPairForRel> invalidPairs = new ArrayList<NidPairForRel>();
-      for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
-         int relNid = pair.getRelNid();
-         int typeNid = pair.getTypeNid();
-         if (allowedTypes == null || allowedTypes.contains(typeNid)) {
+        List<NidPairForRel> pairs;
+        if (allowedTypes != null && allowedTypes.size() > 0) {
+            pairs = Bdb.xref.getDestRelPairs(nid, allowedTypes);
+        } else {
+            pairs = Bdb.xref.getDestRelPairs(nid);
+        }
+
+        for (NidPairForRel pair : pairs) {
+            int relNid = pair.getRelNid();
             Concept relSource = Bdb.getConceptForComponent(relNid);
             if (relSource != null) {
                Relationship r = relSource.getRelationship(relNid);
@@ -1525,7 +1592,6 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             } else {
                invalidPairs.add(pair);
             }
-         }
       }
 
       if (removeInvalidXrefs && invalidPairs.size() > 0) {
@@ -1548,25 +1614,22 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
       I_RepresentIdSet possibleKindOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
       possibleKindOfConcepts.setMember(getNid());
 
-      collectKindOf(activity, isATypes, possibleKindOfConcepts, nid);
+      collectPossibleKindOf(activity, isATypes, possibleKindOfConcepts, nid);
 
       return possibleKindOfConcepts;
    }
 
-   private void collectKindOf(I_ShowActivity activity, NidSetBI isATypes,
+   private void collectPossibleKindOf(I_ShowActivity activity, NidSetBI isATypes,
            I_RepresentIdSet possibleKindOfConcepts, int cNid) throws IOException {
-      for (NidPairForRel pair : Bdb.getDestRelPairs(cNid)) {
-         if (activity != null && activity.isCanceled()) {
-            return;
-         }
-         if (isATypes.contains(pair.getTypeNid())) {
-            int cNidForOrigin = Bdb.getNidCNidMap().getCNid(pair.getRelNid());
-            if (possibleKindOfConcepts.isMember(cNidForOrigin) == false) {
-               possibleKindOfConcepts.setMember(cNidForOrigin);
-               collectKindOf(activity, isATypes, possibleKindOfConcepts, cNidForOrigin);
+        for (int cNidForOrigin : Bdb.xref.getDestRelOrigins(cNid, isATypes)) {
+            if (activity != null && activity.isCanceled()) {
+                return;
             }
-         }
-      }
+            if (possibleKindOfConcepts.isMember(cNidForOrigin) == false) {
+                possibleKindOfConcepts.setMember(cNidForOrigin);
+                collectPossibleKindOf(activity, isATypes, possibleKindOfConcepts, cNidForOrigin);
+            }
+        }
    }
 
    @Override
@@ -1726,6 +1789,10 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
       BdbCommitManager.commit(this, ChangeSetPolicy.get(changeSetPolicy),
               ChangeSetWriterThreading.get(changeSetWriterThreading));
    }
+   
+    private void diet() {
+        data.diet();
+    }
 
    @Override
    public void cancel() throws IOException {

@@ -54,6 +54,7 @@ import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.je.EnvironmentLockedException;
 import com.sleepycat.je.EnvironmentMutableConfig;
+import org.ihtsdo.db.bdb.BdbMemoryMonitor.LowMemoryListener;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 public class Bdb {
@@ -82,6 +83,20 @@ public class Bdb {
 	
 	private static boolean closed = true;
 	
+    private static BdbMemoryMonitor memoryMonitor = new BdbMemoryMonitor();
+
+    public static boolean removeMemoryMonitorListener(LowMemoryListener listener) {
+        return memoryMonitor.removeListener(listener);
+    }
+
+    public static boolean addMemoryMonitorListener(LowMemoryListener listener) {
+        return memoryMonitor.addListener(listener);
+    }
+
+    static {
+        memoryMonitor.setPercentageUsageThreshold(0.9);
+    }
+
 	public static boolean isClosed() {
 		return closed;
 	}

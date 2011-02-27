@@ -32,11 +32,11 @@ public class HistoryBorder extends AbstractBorder {
     protected Color titleColor;
     private Point textLoc = new Point();
     // Space between the border and the component's edge
-    static protected final int EDGE_SPACING = 2;
+    static protected final int EDGE_SPACING = 0;
     // Space between the border and text
-    static protected final int TEXT_SPACING = 2;
+    static protected final int TEXT_SPACING = 0;
     // Horizontal inset of text that is left or right justified
-    static protected final int TEXT_INSET_H = 5;
+    static protected final int TEXT_INSET_H = 25;
 
     /**
      * Creates a TitledBorder instance with the specified border,
@@ -187,7 +187,7 @@ public class HistoryBorder extends AbstractBorder {
             height = fm.getHeight();
         }
 
-        insets.right += ascent + descent + TEXT_SPACING + 5;
+        insets.right += ascent + descent + TEXT_SPACING;
         return insets;
     }
 

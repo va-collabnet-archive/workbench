@@ -100,8 +100,9 @@ public class IntSet implements ListDataListener, I_IntSet, NidSetBI {
         Arrays.sort(setValues);
     }
 
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[");
         int count = 0;
         for (int i : setValues) {

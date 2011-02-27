@@ -121,6 +121,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
      * getAllCurrentRefsetExtensions(int, int)
      */
     @SuppressWarnings("unchecked")
+    @Override
     public <T extends I_ExtendByRefPart> List<T> getAllCurrentRefsetExtensions(int refsetId, int conceptId)
             throws Exception {
 
@@ -155,6 +156,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
      * org.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#hasRefsetExtension
      * (int, int, org.dwfa.ace.api.RefsetPropertyMap)
      */
+    @Override
     public boolean hasRefsetExtension(int refsetId, int componentNid, final RefsetPropertyMap extProps)
             throws Exception {
         access();
@@ -187,6 +189,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
      * org.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#getRefsetExtension
      * (int, int, org.dwfa.ace.api.RefsetPropertyMap)
      */
+    @Override
     public I_ExtendByRef getRefsetExtension(int refsetId, int componentId, final RefsetPropertyMap extProps)
             throws Exception {
         access();
@@ -205,6 +208,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
      * org.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#hasCurrentRefsetExtension
      * (int, int, org.dwfa.ace.api.RefsetPropertyMap)
      */
+    @Override
     public boolean hasCurrentRefsetExtension(int refsetId, int conceptId, final RefsetPropertyMap extProps)
             throws Exception {
         access();
@@ -220,6 +224,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
      * getOrCreateRefsetExtension(int, int, java.lang.Class,
      * org.dwfa.ace.api.RefsetPropertyMap)
      */
+    @Override
     public <T extends I_ExtendByRefPart> I_ExtendByRef getOrCreateRefsetExtension(int refsetId, int componentId,
             REFSET_TYPES type, final RefsetPropertyMap propMap, UUID memberUuid) throws Exception {
 
@@ -242,6 +247,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
             getConfig(), propMap);
     }
 
+    @Override
     public boolean newRefsetExtension(int refsetId, int componentId, REFSET_TYPES type, RefsetPropertyMap propMap,
             I_ConfigAceFrame config) throws Exception {
         access();
@@ -258,6 +264,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
      * org.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#retireRefsetExtension
      * (int, int, org.dwfa.ace.api.RefsetPropertyMap)
      */
+    @Override
     public boolean retireRefsetExtension(int refsetId, int conceptId, final RefsetPropertyMap extProps)
             throws Exception {
 
@@ -303,6 +310,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
      * org.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#retireStrRefsetExtension
      * (int, int, org.dwfa.ace.api.RefsetPropertyMap)
      */
+    @Override
     public boolean retireRefsetStrExtension(int refsetId, int conceptId, final RefsetPropertyMap extProps)
             throws Exception {
 
@@ -357,6 +365,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
      * org.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#setEditPaths(org.
      * dwfa.ace.api.PathBI)
      */
+    @Override
     public void setEditPaths(PathBI... editPaths) {
         access();
         HashSet<PathBI> editPathSet = new HashSet<PathBI>();
@@ -373,6 +382,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
      * @see org.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#hasPurpose(int,
      * int)
      */
+    @Override
     public boolean hasPurpose(int refsetId, int purposeId) throws Exception {
         access();
         if (refsetPurposeCache.containsKey(purposeId)) {
@@ -400,6 +410,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
      * @see org.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#hasPurpose(int,
      * org.dwfa.tapi.I_ConceptualizeUniversally)
      */
+    @Override
     public boolean hasPurpose(int refsetId, I_ConceptualizeUniversally purposeConcept) throws Exception {
         access();
         return hasPurpose(refsetId, purposeConcept.localize().getNid());
@@ -414,6 +425,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
             this.memberTypeId = memberTypeId;
         }
 
+        @Override
         public boolean evaluate(I_GetConceptData concept) throws Exception {
             return hasCurrentRefsetExtension(this.refsetId, concept.getConceptNid(), new RefsetPropertyMap().with(
                 RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, this.memberTypeId));
@@ -426,6 +438,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
      * getCommentsRefsetForRefset(org.dwfa.ace.api.I_GetConceptData,
      * org.dwfa.ace.api.I_ConfigAceFrame)
      */
+    @Override
     public Set<? extends I_GetConceptData> getCommentsRefsetForRefset(I_GetConceptData refsetIdentityConcept,
             I_ConfigAceFrame config) throws IOException, TerminologyException {
         access();
@@ -439,6 +452,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
      * getCommentsRefsetForRefset(org.dwfa.ace.api.I_GetConceptData,
      * org.dwfa.ace.api.I_ConfigAceFrame)
      */
+    @Override
     public Set<? extends I_GetConceptData> getEditTimeRefsetForRefset(I_GetConceptData refsetIdentityConcept,
             I_ConfigAceFrame config) throws IOException, TerminologyException {
         access();
@@ -452,6 +466,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
      * getCommentsRefsetForRefset(org.dwfa.ace.api.I_GetConceptData,
      * org.dwfa.ace.api.I_ConfigAceFrame)
      */
+    @Override
     public Set<? extends I_GetConceptData> getComputeTimeRefsetForRefset(I_GetConceptData refsetIdentityConcept,
             I_ConfigAceFrame config) throws IOException, TerminologyException {
         access();
@@ -465,6 +480,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
      * getMarkedParentRefsetForRefset(org.dwfa.ace.api.I_GetConceptData,
      * org.dwfa.ace.api.I_ConfigAceFrame)
      */
+    @Override
     public Set<? extends I_GetConceptData> getMarkedParentRefsetForRefset(I_GetConceptData refsetIdentityConcept,
             I_ConfigAceFrame config) throws IOException, TerminologyException {
         access();
@@ -478,6 +494,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
      * getPromotionRefsetForRefset(org.dwfa.ace.api.I_GetConceptData,
      * org.dwfa.ace.api.I_ConfigAceFrame)
      */
+    @Override
     public Set<? extends I_GetConceptData> getPromotionRefsetForRefset(I_GetConceptData refsetIdentityConcept,
             I_ConfigAceFrame config) throws IOException, TerminologyException {
         access();
@@ -503,6 +520,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
      * getSpecificationRefsetForRefset(org.dwfa.ace.api.I_GetConceptData,
      * org.dwfa.ace.api.I_ConfigAceFrame)
      */
+    @Override
     public Set<? extends I_GetConceptData> getSpecificationRefsetForRefset(I_GetConceptData refsetIdentityConcept,
             I_ConfigAceFrame config) throws IOException, TerminologyException {
         access();
@@ -527,6 +545,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
      * @see
      * org.ihtsdo.db.bdb.computer.refset.I_HelpMemberRefsets#getMemberRefsets()
      */
+    @Override
     public Set<Integer> getMemberRefsets() throws Exception {
         access();
 
@@ -563,19 +582,23 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
         return memberRefsets;
     }
 
+    @Override
     public List<Integer> getSpecificationRefsets() throws Exception {
         access();
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public I_GetConceptData getMemberSetConcept(int refsetId) throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public int getExcludeMembersRefset(int specRefsetConceptId) {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public List<Integer> getChildrenOfConcept(int conceptId) throws IOException, Exception {
         Concept c = Concept.get(conceptId);
         Collection<Concept> children =

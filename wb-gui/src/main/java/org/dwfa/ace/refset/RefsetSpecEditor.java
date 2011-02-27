@@ -117,12 +117,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         pcs.addPropertyChangeListener(listener);
     }
 
+    @Override
     public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         pcs.addPropertyChangeListener(propertyName, listener);
-    }
-
-    public boolean equals(Object obj) {
-        return pcs.equals(obj);
     }
 
     public void fireIndexedPropertyChange(String propertyName, int index, boolean oldValue, boolean newValue) {
@@ -161,10 +158,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         return pcs.getPropertyChangeListeners(propertyName);
     }
 
-    public int hashCode() {
-        return pcs.hashCode();
-    }
-
     public boolean hasListeners(String propertyName) {
         return pcs.hasListeners(propertyName);
     }
@@ -175,10 +168,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
     public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         pcs.removePropertyChangeListener(propertyName, listener);
-    }
-
-    public String toString() {
-        return pcs.toString();
     }
 
     public class RefsetSpecSelectionListener implements TreeSelectionListener {

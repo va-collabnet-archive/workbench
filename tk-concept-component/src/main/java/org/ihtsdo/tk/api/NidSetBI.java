@@ -1,28 +1,26 @@
 package org.ihtsdo.tk.api;
 
-
 public interface NidSetBI {
 
-    public boolean contains(int nid);
+    boolean contains(int nid);
 
-    public int[] getSetValues();
+    int[] getSetValues();
 
-    public void add(int nid);
+    void add(int nid);
 
-    public void remove(int nid);
+    void remove(int nid);
 
-    public NidSetBI addAll(int[] nids);
+    NidSetBI addAll(int[] nids);
 
-    public void removeAll(int[] nids);
+    void removeAll(int[] nids);
 
-    public void clear();
+    void clear();
 
-	public int size();
+    int size();
 
-	int getMax();
+    int getMax();
 
-	int getMin();
+    int getMin();
 
-	boolean contiguous();
-
+    boolean contiguous();
 }

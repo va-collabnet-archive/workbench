@@ -16,6 +16,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -105,6 +106,37 @@ public class ConceptNavigator extends JPanel {
         layoutNavigator();
     }
 
+    private static class UpdateHistoryBorder implements ActionListener {
+
+        String hxString; 
+        JLabel historyLabel;
+
+        public UpdateHistoryBorder(String hxString, JLabel historyLabel) {
+            this.hxString = hxString;
+            this.historyLabel = historyLabel;
+        }
+        
+        
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            JCheckBox check = (JCheckBox) ae.getSource();
+            if (check.isSelected()) {
+               historyLabel.setBorder(
+                        BorderFactory.createCompoundBorder(
+                        BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY),
+                        new HistoryBorder(
+                        BorderFactory.createEmptyBorder(),
+                        hxString,
+                        new Font("monospaced", Font.PLAIN, 12),
+                        Color.BLACK)));
+                
+            } else {
+               historyLabel.setBorder(
+                        BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
+            }
+        }
+        
+    }
     protected void updateHistoryPanel() {
         JPanel historyPanel = new JPanel(new GridBagLayout());
         Map<PathBI, Integer> pathRowMap = view.getPathRowMap();
@@ -119,27 +151,26 @@ public class ConceptNavigator extends JPanel {
             gbc.weightx = 0;
             gbc.weighty = 0;
 
-                JComponent startCheck = view.getJCheckBox();
-               historyPanel.add(startCheck, gbc);
-                gbc.gridx++;
+            JCheckBox startCheck = view.getJCheckBox();
+            historyPanel.add(startCheck, gbc);
+            gbc.gridx++;
 
-               historyPanel.setBorder(new HistoryBorder(
-                        BorderFactory.createEmptyBorder(),
-                        positionOrderedSet.iterator().next().toString(),
-                        new Font("monospaced", Font.PLAIN, 9),
-                        Color.BLACK));
-
-             for (PositionBI p : positionOrderedSet) {
+            for (PositionBI p : positionOrderedSet) {
+                gbc.gridheight = 1;
                 gbc.gridy = pathRowMap.get(p.getPath());
-                JComponent positionLabel = view.getJCheckBox();
-                positionLabel.setToolTipText(p.toString());
-                positionLabel.setBorder(new HistoryBorder(
-                        BorderFactory.createEmptyBorder(),
-                        p.toString(),
-                        new Font("monospaced", Font.PLAIN, 9),
-                        Color.BLACK));
-                historyPanel.add(positionLabel, gbc);
+                JCheckBox positionCheck = view.getJCheckBox();
+                positionCheck.setToolTipText(p.toString());
+                historyPanel.add(positionCheck, gbc);
                 gbc.gridx++;
+                gbc.gridheight = 10;
+                gbc.gridy = 0;
+                JLabel historyLabel = new JLabel("");
+                historyLabel.setBorder(
+                         BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
+                historyPanel.add(historyLabel, gbc);
+                gbc.gridx++;
+                positionCheck.addActionListener(
+                        new UpdateHistoryBorder(p.toString(), historyLabel));
             }
             gbc.gridheight = 1;
             gbc.weightx = 1;
@@ -151,7 +182,7 @@ public class ConceptNavigator extends JPanel {
             // add some random button groups...
             Random randomGenerator = new Random();
             gbc.gridy++;
-            gbc.gridx = 0;
+            gbc.gridx = 1;
             ButtonGroup group0 = new ButtonGroup();
 
             for (PositionBI p : positionOrderedSet) {
@@ -162,11 +193,11 @@ public class ConceptNavigator extends JPanel {
                     button.setSelected(true);
                     historyPanel.add(button, gbc);
                 }
-                gbc.gridx++;
+                gbc.gridx+= 2;
             }
 
             gbc.gridy++;
-            gbc.gridx = 0;
+            gbc.gridx = 1;
             ButtonGroup group1 = new ButtonGroup();
             for (PositionBI p : positionOrderedSet) {
                 if (randomGenerator.nextInt(100) > 60) {
@@ -176,11 +207,11 @@ public class ConceptNavigator extends JPanel {
                     button.setSelected(true);
                     historyPanel.add(button, gbc);
                 }
-                gbc.gridx++;
+                gbc.gridx+= 2;
             }
 
             gbc.gridy++;
-            gbc.gridx = 0;
+            gbc.gridx = 1;
             ButtonGroup group = new ButtonGroup();
             for (PositionBI p : positionOrderedSet) {
                 if (randomGenerator.nextInt(100) > 60) {
@@ -190,7 +221,7 @@ public class ConceptNavigator extends JPanel {
                     button.setSelected(true);
                     historyPanel.add(button, gbc);
                 }
-                gbc.gridx++;
+                gbc.gridx+= 2;
             }
 
             gbc.gridx++;
