@@ -452,6 +452,7 @@ public class WorkbenchRunner {
 			long isaStartTime = System.currentTimeMillis();
 			ActivityPanel activityIsa = new ActivityPanel(null, true);
 			activityIsa.setIndeterminate(true);
+			activityIsa.setStopButtonVisible(false);
 			activityIsa.setProgressInfoUpper("Isa Cache pre-computation");
 			activityIsa.setProgressInfoLower("Setting up isa cache...");
 			ActivityViewer.addActivity(activityIsa);
