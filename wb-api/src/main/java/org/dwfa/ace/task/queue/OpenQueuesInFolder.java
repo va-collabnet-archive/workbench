@@ -34,17 +34,18 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 import com.sun.jini.start.LifeCycle;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 
-@BeanList(specs = { @Spec(directory = "tasks/ide/queue", type = BeanType.TASK_BEAN) })
+@BeanList(specs = {
+    @Spec(directory = "tasks/ide/queue", type = BeanType.TASK_BEAN)})
 public class OpenQueuesInFolder extends AbstractTask {
 
     /**
      *
      */
     private static final long serialVersionUID = 1L;
-
     private static final int dataVersion = 1;
-
     private String queueDir = "profiles/queues";
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -61,17 +62,19 @@ public class OpenQueuesInFolder extends AbstractTask {
         }
     }
 
+    @Override
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
+    @Override
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             File directory = new File(queueDir);
 
             if (directory.listFiles() != null) {
                 for (File dir : directory.listFiles()) {
-                    processFile(dir, null);
+                    processFile(dir, null, worker);
                 }
             }
 
@@ -83,27 +86,44 @@ public class OpenQueuesInFolder extends AbstractTask {
         }
     }
 
-    private void processFile(File file, LifeCycle lc) throws Exception {
+    private void processFile(File file, LifeCycle lc, I_Work worker) throws Exception {
         if (file.isDirectory() == false) {
             if (file.getName().equalsIgnoreCase("queue.config")) {
-                AceLog.getAppLog().info("Found queue: " + file.toURI().toURL().toExternalForm());
-                if (QueueServer.started(file)) {
-                    AceLog.getAppLog().info("Queue already started: " + file.toURI().toURL().toExternalForm());
+                if (file.getParentFile().getName().toLowerCase().contains("collabnet")) {
+                    I_ConfigAceFrame frameConfig = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+                    if (file.getParentFile().getName().toLowerCase().contains(frameConfig.getUsername().toLowerCase())) {
+                        AceLog.getAppLog().info("Found queue2: " + file.toURI().toURL().toExternalForm());
+                        if (QueueServer.started(file)) {
+                            AceLog.getAppLog().info("Queue already started: " + file.toURI().toURL().toExternalForm());
+                        } else {
+                            new QueueServer(new String[]{file.getCanonicalPath()}, lc);
+                        }
+                    } else {
+                        AceLog.getAppLog().info("Queue not for this user: " + file.toURI().toURL().toExternalForm());
+                    }
+
                 } else {
-                    new QueueServer(new String[] { file.getCanonicalPath() }, lc);
+                    AceLog.getAppLog().info("Found queue: " + file.toURI().toURL().toExternalForm());
+                    if (QueueServer.started(file)) {
+                        AceLog.getAppLog().info("Queue already started: " + file.toURI().toURL().toExternalForm());
+                    } else {
+                        new QueueServer(new String[]{file.getCanonicalPath()}, lc);
+                    }
                 }
             }
         } else {
             for (File f : file.listFiles()) {
-                processFile(f, lc);
+                processFile(f, lc, worker);
             }
         }
     }
 
+    @Override
     public int[] getDataContainerIds() {
-        return new int[] {};
+        return new int[]{};
     }
 
+    @Override
     public Collection<Condition> getConditions() {
         return AbstractTask.CONTINUE_CONDITION;
     }
@@ -115,5 +135,4 @@ public class OpenQueuesInFolder extends AbstractTask {
     public void setQueueDir(String queueDir) {
         this.queueDir = queueDir;
     }
-
 }

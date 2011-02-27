@@ -3365,24 +3365,24 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private void executeShutdownProcesses(File shutdownFolder) {
         if (shutdownFolder.exists()) {
             AceLog.getAppLog().info("Shutdown folder exists: " + shutdownFolder.getAbsolutePath());
-            File[] startupFiles = shutdownFolder.listFiles(new FilenameFilter() {
+            File[] processFiles = shutdownFolder.listFiles(new FilenameFilter() {
 
                 public boolean accept(File dir, String name) {
                     return name.endsWith(".bp");
                 }
             });
-            if (startupFiles != null) {
-                for (int i = 0; i < startupFiles.length; i++) {
+            if (processFiles != null) {
+                for (int i = 0; i < processFiles.length; i++) {
                     try {
-                        AceLog.getAppLog().info("Executing shutdown business process: " + startupFiles[i]);
-                        FileInputStream fis = new FileInputStream(startupFiles[i]);
+                        AceLog.getAppLog().info("Executing shutdown business process: " + processFiles[i]);
+                        FileInputStream fis = new FileInputStream(processFiles[i]);
                         BufferedInputStream bis = new BufferedInputStream(fis);
                         ObjectInputStream ois = new ObjectInputStream(bis);
                         I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
                         aceFrameConfig.getWorker().execute(process);
-                        AceLog.getAppLog().info("Finished shutdown business process: " + startupFiles[i]);
+                        AceLog.getAppLog().info("Finished shutdown business process: " + processFiles[i]);
                     } catch (Throwable e1) {
-                        AceLog.getAppLog().alertAndLog(Level.SEVERE, e1.getMessage() + " thrown by " + startupFiles[i], e1);
+                        AceLog.getAppLog().alertAndLog(Level.SEVERE, e1.getMessage() + " thrown by " + processFiles[i], e1);
                     }
                 }
             } else {
