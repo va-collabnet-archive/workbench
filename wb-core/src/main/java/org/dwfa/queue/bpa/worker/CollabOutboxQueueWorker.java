@@ -68,7 +68,7 @@ import com.collabnet.ce.soap50.webservices.tracker.ArtifactSoapDO;
  * @author Marc Campbell
  * 
  */
-public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueue, Runnable {
+public final class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueue, Runnable {
 
     public static final String PROCESS_ATTACHMENT_TYPE = "application/x-java-serialized-object-base64";
 
@@ -153,6 +153,7 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
     /**
      * @see org.dwfa.bpa.worker.task.I_GetWorkFromQueue#queueContentsChanged()
      */
+    @Override
     public void queueContentsChanged() {
         if (this.sleeping) {
             this.workerThread.interrupt();
@@ -162,6 +163,7 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
     /**
      * @see org.dwfa.bpa.worker.task.I_GetWorkFromQueue#start(org.dwfa.bpa.process.I_QueueProcesses)
      */
+    @Override
     public void start(I_QueueProcesses queue) {
         this.queue = queue;
         this.workerThread = new Thread(this, "Worker " + this.getWorkerDesc());
@@ -181,6 +183,7 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
     /**
      * @see java.lang.Runnable#run()
      */
+    @Override
     public void run() {
         if (!disabled) {
             // check of any *.bp in the outbox directory
@@ -191,17 +194,16 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
                 try {
                     BusinessProcess.validateAddress(this.queue.getNodeInboxAddress(), null);
                     while (true) {
-                        logger.info("RUN: CollabOutboxQueueWorker.run() ... " + this.getWorkerDesc());
+                        logger.log(Level.INFO, "RUN: CollabOutboxQueueWorker.run() ... {0}", this.getWorkerDesc());
                         t = this.getActiveTransaction();
 
                         I_EncodeBusinessProcess process = this.queue.take(selector, t);
-                        logger.info(this.getWorkerDesc() + " found process: " + process);
+                        logger.log(Level.INFO, "{0} found process: {1}", new Object[]{this.getWorkerDesc(), process});
 
                         try {
                             BusinessProcess.validateAddress(process.getOriginator(), process.getProcessID());
                         } catch (TaskFailedException ex) {
-                            logger.info(this.getWorkerDesc() + " found missing or malformed origin for process: " + process
-                                + " setting origin to queue's node inbox address");
+                            logger.log(Level.INFO, "{0} found missing or malformed origin for process: {1} setting origin to queue''s node inbox address", new Object[]{this.getWorkerDesc(), process});
                             process.setOriginator(this.queue.getNodeInboxAddress());
 
                         }
@@ -210,8 +212,7 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
                             this.commitTransactionIfActive();
                         } else {
                             this.discardActiveTransaction();
-                            logger.info("Worker: " + this.getWorkerDesc() + " (" + this.getId()
-                                + ") cannot deliver process to: " + process.getDestination());
+                            logger.log(Level.INFO, "Worker: {0} ({1}) cannot deliver process to: {2}", new Object[]{this.getWorkerDesc(), this.getId(), process.getDestination()});
                         }
 
                     }
@@ -226,16 +227,15 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
                     }
 
                     if (logger.isLoggable(Level.FINE)) {
-                        logger.fine(this.getWorkerDesc() + " (" + this.getId() + ") started sleep.");
+                        logger.log(Level.FINE, "{0} ({1}) started sleep.", new Object[]{this.getWorkerDesc(), this.getId()});
                     }
                     this.sleep();
                     if (logger.isLoggable(Level.FINE)) {
-                        logger.fine(this.getWorkerDesc() + " (" + this.getId() + ") awake.");
+                        logger.log(Level.FINE, "{0} ({1}) awake.", new Object[]{this.getWorkerDesc(), this.getId()});
                     }
 
                 } catch (Throwable ex) {
                     this.discardActiveTransaction();
-                    ex.printStackTrace();
                     logger.log(Level.SEVERE, this.getWorkerDesc(), ex);
                 }
             }
@@ -338,22 +338,22 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
     public boolean doCollabNetDelivery(I_EncodeBusinessProcess process, Transaction t) throws IllegalArgumentException,
             IntrospectionException, IllegalAccessException, InvocationTargetException {
 
-        logger.info(this.getWorkerDesc() + " trying CollabNet delivery. ");
+        logger.log(Level.INFO, "{0} trying CollabNet delivery. ", this.getWorkerDesc());
         try {
             // process.validateAddresses();
 
             // CONNECTION (URL_STR)
             CollabNetSoapConnection sfc = new CollabNetSoapConnection(repoUrlStr);
-            logger.info("[INFO] connection object: " + sfc.toString());
+            logger.log(Level.INFO, "[INFO] connection object: {0}", sfc.toString());
 
             // SESSION (USER_STR, PWD_STR)
             String sessionId = sfc.login(userNameStr, userPwdStr);
-            logger.info("[INFO]         sessionId: " + sessionId);
+            logger.log(Level.INFO, "[INFO]         sessionId: {0}", sessionId);
 
             // TRACKER (URL_STR, sessionId)
             TrackerAppSoapUtil tracker = new TrackerAppSoapUtil(repoUrlStr, sessionId);
-            logger.info("[INFO]         trackerId: " + repoTrackerIdStr);
-            logger.info("[INFO]           tracker: " + tracker);
+            logger.log(Level.INFO, "[INFO]         trackerId: {0}", repoTrackerIdStr);
+            logger.log(Level.INFO, "[INFO]           tracker: {0}", tracker);
 
             String artfId = (String) process.getProperty("A: ID_ARTF");
             if (artfId.equalsIgnoreCase("NA"))
@@ -363,7 +363,7 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
 
             // LOGOFF
             sfc.logoff(sessionId);
-            logger.info("[INFO] logoff successful for \"" + sessionId + "\"");
+            logger.log(Level.INFO, "[INFO] logoff successful for \"{0}\"", sessionId);
 
             return true;
             // } catch (TaskFailedException e) {
@@ -371,10 +371,8 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
             // logger.log(Level.WARNING, this.getWorkerDesc()
             // + " cannot deliver message (addresses not valid)", e);
         } catch (RemoteException e) {
-            e.printStackTrace();
             logger.log(Level.WARNING, this.getWorkerDesc() + " cannot deliver message (possible login issue)", e);
         } catch (IOException e) {
-            e.printStackTrace();
             logger.log(Level.WARNING, this.getWorkerDesc() + " cannot deliver message (possible upload issue)", e);
         }
 
@@ -384,7 +382,7 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
     private void writeUsersToFile(CollabNetSoapConnection sfc, String sessionId, String projectId) throws RemoteException {
         try {
 
-            String fileName = "config" + File.separator + "collabnet-users.txt";
+            String fileName = "queues" + File.separator + "collabnet-users.txt";
             File file = new File(fileName);
             FileWriter fileWriter = new FileWriter(file);
             BufferedWriter bufferedFileWriter = new BufferedWriter(fileWriter);
@@ -404,57 +402,70 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
         }
     }
 
+    @Override
     public synchronized Condition execute(I_EncodeBusinessProcess process) throws TaskFailedException {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean isWorkspaceActive(UUID workspaceId) {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public I_Workspace createWorkspace(UUID workspaceId, String name, File menuDir) throws WorkspaceActiveException,
             Exception {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public I_Workspace getWorkspace(UUID workspaceId) throws NoSuchWorkspaceException {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public I_Workspace getCurrentWorkspace() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public void setCurrentWorkspace(I_Workspace workspace) {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public Collection<I_Workspace> getWorkspaces() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public Object selectFromList(Object[] list, String title, String instructions) {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public I_Workspace createHeadlessWorkspace(UUID workspace_id) throws WorkspaceActiveException, HeadlessException {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public I_Workspace createWorkspace(UUID arg0, String arg1, I_ManageUserTransactions arg2, File menuDir)
             throws WorkspaceActiveException, Exception {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public Object getObjFromFilesystem(Frame arg0, String arg1, String arg2, FilenameFilter arg3) throws IOException,
             ClassNotFoundException {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public void writeObjToFilesystem(Frame arg0, String arg1, String arg2, String arg3, Object arg4) throws IOException {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public I_Work getTransactionIndependentClone() throws LoginException, ConfigurationException, IOException,
             PrivilegedActionException {
         throw new UnsupportedOperationException();

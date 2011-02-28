@@ -130,6 +130,7 @@ public class SetWFDSheetToSMEDetailsPanelTask extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
+    @Override
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
@@ -147,6 +148,7 @@ public class SetWFDSheetToSMEDetailsPanelTask extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
+    @Override
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
 
         try {
@@ -155,6 +157,7 @@ public class SetWFDSheetToSMEDetailsPanelTask extends AbstractTask {
                 doRun(process, worker);
             } else {
                 SwingUtilities.invokeAndWait(new Runnable() {
+                    @Override
                     public void run() {
                         doRun(process, worker);
                     }
@@ -209,7 +212,7 @@ public class SetWFDSheetToSMEDetailsPanelTask extends AbstractTask {
     private TreeMap<String, String> getCollabnetUsers() {
         try {
             TreeMap<String, String> users = new TreeMap<String, String>();
-            String fileName = "config" + File.separator + "collabnet-users.txt";
+            String fileName = "queues" + File.separator + "collabnet-users.txt";
             File file = new File(fileName);
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedFileReader = new BufferedReader(fileReader);
@@ -278,10 +281,12 @@ public class SetWFDSheetToSMEDetailsPanelTask extends AbstractTask {
         }
     }
 
+    @Override
     public int[] getDataContainerIds() {
         return new int[] {};
     }
 
+    @Override
     public Collection<Condition> getConditions() {
         return AbstractTask.CONTINUE_CONDITION;
     }
