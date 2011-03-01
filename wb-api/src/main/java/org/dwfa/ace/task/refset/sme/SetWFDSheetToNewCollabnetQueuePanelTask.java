@@ -189,7 +189,8 @@ public class SetWFDSheetToNewCollabnetQueuePanelTask extends AbstractTask {
     private TreeMap<String, String> getCollabnetUsers() {
         try {
             TreeMap<String, String> users = new TreeMap<String, String>();
-            String fileName = "config" + File.separator + "collabnet-users.txt";
+			// changed from config to queues
+            String fileName = "queues" + File.separator + "collabnet-users.txt";
             File file = new File(fileName);
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedFileReader = new BufferedReader(fileReader);
