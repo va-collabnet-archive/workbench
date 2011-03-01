@@ -101,6 +101,7 @@ public class OpenQueuesInFolder extends AbstractTask {
                         AceLog.getAppLog().info("Found queue2: " + file.toURI().toURL().toExternalForm());
                         if (QueueServer.started(file)) {
                             AceLog.getAppLog().info("Queue already started: " + file.toURI().toURL().toExternalForm());
+                            addToVisibleQueues(file, frameConfig);
                         } else {
                             setupQueue(file, lc, frameConfig);
                         }
@@ -127,19 +128,7 @@ public class OpenQueuesInFolder extends AbstractTask {
     
     private void setupQueue(File file, LifeCycle lc, I_ConfigAceFrame frameConfig) throws Exception, ConfigurationException, IOException {
         new QueueServer(new String[]{file.getCanonicalPath()}, lc);
-        if (file.getParentFile().getName().toLowerCase().endsWith(".inbox") && 
-                file.getParentFile().getName().toLowerCase().contains(frameConfig.getUsername())) {
-            Configuration queueConfig = ConfigurationProvider.getInstance(new String[]{file.getAbsolutePath()});
-            Entry[] entries = (Entry[]) queueConfig.getEntry("org.dwfa.queue.QueueServer", "entries",
-                    Entry[].class, new Entry[]{});
-            for (Entry entry : entries) {
-                if (ElectronicAddress.class.isAssignableFrom(entry.getClass())) {
-                    ElectronicAddress ea = (ElectronicAddress) entry;
-                    frameConfig.getQueueAddressesToShow().add(ea.address);
-                    break;
-                }
-            }
-        }
+        addToVisibleQueues(file, frameConfig);
     }
 
     @Override
@@ -159,4 +148,22 @@ public class OpenQueuesInFolder extends AbstractTask {
     public void setQueueDir(String queueDir) {
         this.queueDir = queueDir;
     }
+
+
+    private void addToVisibleQueues(File file, I_ConfigAceFrame frameConfig) throws ConfigurationException {
+        if (file.getParentFile().getName().toLowerCase().endsWith(".inbox") &&
+                file.getParentFile().getName().toLowerCase().contains(frameConfig.getUsername())) {
+            Configuration queueConfig = ConfigurationProvider.getInstance(new String[]{file.getAbsolutePath()});
+            Entry[] entries = (Entry[]) queueConfig.getEntry("org.dwfa.queue.QueueServer", "entries",
+                    Entry[].class, new Entry[]{});
+            for (Entry entry : entries) {
+                if (ElectronicAddress.class.isAssignableFrom(entry.getClass())) {
+                    ElectronicAddress ea = (ElectronicAddress) entry;
+                    frameConfig.getQueueAddressesToShow().add(ea.address);
+                    break;
+                }
+            }
+        }
+    }
+
 }
