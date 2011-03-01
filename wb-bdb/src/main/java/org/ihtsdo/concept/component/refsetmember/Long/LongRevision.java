@@ -35,9 +35,9 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
      */
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(this.getClass().getSimpleName() + ":{");
-        buf.append(" longValue:" + this.longValue);
+        StringBuilder buf = new StringBuilder();
+        buf.append(this.getClass().getSimpleName()).append(":{");
+        buf.append(" longValue:").append(this.longValue);
         buf.append(super.toString());
         return buf.toString();
     }
@@ -171,28 +171,29 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
         return ((LongMember) primordialComponent).getVersions(c);
     }
 
-	@Override
-	public void setLong1(long l) throws PropertyVetoException {
-		this.longValue = l;
-		modified();
-	}
-	
     @Override
-	public long getLong1() {
-		return longValue;
-	}
-    
-	protected TK_REFSET_TYPE getTkRefsetType() {
-		return TK_REFSET_TYPE.LONG;
-	}
+    public void setLong1(long l) throws PropertyVetoException {
+        this.longValue = l;
+        modified();
+    }
 
+    @Override
+    public long getLong1() {
+        return longValue;
+    }
 
-	protected void addSpecProperties(RefexAmendmentSpec rcs) {
-		rcs.with(RefexProperty.LONG1, getLong1());
-	}
+    @Override
+    protected TK_REFSET_TYPE getTkRefsetType() {
+        return TK_REFSET_TYPE.LONG;
+    }
 
-	@Override
-	public int getPartsHashCode() {
-		return HashFunction.hashCode(new int[]{ new Long(getLongValue()).hashCode()});
-	}
+    @Override
+    protected void addSpecProperties(RefexAmendmentSpec rcs) {
+        rcs.with(RefexProperty.LONG1, getLong1());
+    }
+
+    @Override
+    public int getPartsHashCode() {
+        return HashFunction.hashCode(new int[]{new Long(getLongValue()).hashCode()});
+    }
 }

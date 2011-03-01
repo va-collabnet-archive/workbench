@@ -58,13 +58,13 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
             this.setStatusNid(statusNid);
             return this;
         }
-        try {
-            return new ConceptAttributesRevision(this, statusNid,
-                    Terms.get().getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptNid(),
-                    pathNid, time, this.primordialComponent);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+
+        ConceptAttributesRevision newR;
+        newR = new ConceptAttributesRevision(this.primordialComponent, statusNid,
+                Terms.get().getAuthorNid(),
+                pathNid, time, this.primordialComponent);
+        this.primordialComponent.addRevision(newR);
+        return newR;
     }
 
     @Override
@@ -74,13 +74,12 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
             this.setAuthorNid(authorNid);
             return this;
         }
-        try {
-            return new ConceptAttributesRevision(this, statusNid,
-                    authorNid,
-                    pathNid, time, this.primordialComponent);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        ConceptAttributesRevision newR;
+        newR = new ConceptAttributesRevision(this.primordialComponent, statusNid,
+                authorNid,
+                pathNid, time, this.primordialComponent);
+        this.primordialComponent.addRevision(newR);
+        return newR;
     }
 
     @Override
@@ -167,6 +166,4 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
         }
         return buf.toString();
     }
-    
-    
 }

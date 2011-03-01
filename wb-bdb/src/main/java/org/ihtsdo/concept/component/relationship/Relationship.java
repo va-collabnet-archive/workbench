@@ -266,7 +266,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
         @Override
         public RelationshipRevision makeAnalog(int statusNid, int pathNid, long time) {
-            if (index >= 0) {
+             if (index >= 0) {
                 RelationshipRevision rev = revisions.get(index);
                 if (rev.getTime() == Long.MAX_VALUE && rev.getPathNid() == pathNid) {
                     rev.setStatusNid(statusNid);
@@ -280,17 +280,20 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
         @Override
         public RelationshipRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+            RelationshipRevision newR;
             if (index >= 0) {
                 RelationshipRevision rev = revisions.get(index);
                 if (rev.getTime() == Long.MAX_VALUE && rev.getPathNid() == pathNid) {
                     rev.setStatusNid(statusNid);
                     rev.setAuthorNid(authorNid);
-                    return rev;
+                    newR = rev;
+                } else {
+                    newR = rev.makeAnalog(statusNid, authorNid, pathNid, time);
                 }
-                return rev.makeAnalog(statusNid, authorNid, pathNid, time);
             } else {
-                return Relationship.this.makeAnalog(statusNid, authorNid, pathNid, time);
+                newR = Relationship.this.makeAnalog(statusNid, authorNid, pathNid, time);
             }
+            return newR;
         }
 
         public RelationshipRevision makeAnalog() {

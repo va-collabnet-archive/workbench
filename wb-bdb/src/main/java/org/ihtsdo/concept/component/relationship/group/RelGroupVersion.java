@@ -22,31 +22,36 @@ public class RelGroupVersion
 
     private RelGroupChronicleBI rg;
 
-	public Collection<? extends RefexChronicleBI<?>> getRefexes()
-			throws IOException {
-		return rg.getRefexes();
-	}
+    @Override
+    public Collection<? extends RefexChronicleBI<?>> getRefexes()
+            throws IOException {
+        return rg.getRefexes();
+    }
 
-	public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
-			ViewCoordinate xyz) throws IOException {
-		return rg.getCurrentRefexes(xyz);
-	}
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
+            ViewCoordinate xyz) throws IOException {
+        return rg.getCurrentRefexes(xyz);
+    }
 
-	public boolean addAnnotation(RefexChronicleBI<?> annotation)
-			throws IOException {
-		return rg.addAnnotation(annotation);
-	}
+    @Override
+    public boolean addAnnotation(RefexChronicleBI<?> annotation)
+            throws IOException {
+        return rg.addAnnotation(annotation);
+    }
 
-	public Collection<? extends RefexChronicleBI<?>> getAnnotations()
-			throws IOException {
-		return rg.getAnnotations();
-	}
+    @Override
+    public Collection<? extends RefexChronicleBI<?>> getAnnotations()
+            throws IOException {
+        return rg.getAnnotations();
+    }
 
-	public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
-			ViewCoordinate xyz) throws IOException {
-		return rg.getCurrentAnnotations(xyz);
-	}
-	private int authorNid;
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
+            ViewCoordinate xyz) throws IOException {
+        return rg.getCurrentAnnotations(xyz);
+    }
+    private int authorNid;
     private int statusNid;
     private int pathNid;
     private long time = Long.MIN_VALUE;
@@ -179,15 +184,13 @@ public class RelGroupVersion
         return false;
     }
 
-	@Override
-	public int getSapNid() {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public int getSapNid() {
+        throw new UnsupportedOperationException();
+    }
 
-      @Override
-   public Set<Integer> getAllSapNids() throws IOException {
-      return rg.getAllSapNids();
-   }
-
+    @Override
+    public Set<Integer> getAllSapNids() throws IOException {
+        return rg.getAllSapNids();
+    }
 }
-

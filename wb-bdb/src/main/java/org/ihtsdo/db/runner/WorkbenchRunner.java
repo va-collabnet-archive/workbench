@@ -66,7 +66,6 @@ import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.custom.statics.CustomStatics;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.objectCache.ObjectCacheClassHandler;
 import org.ihtsdo.time.TimeUtil;

@@ -34,7 +34,7 @@ public class RelationshipRevision
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
-        buf.append(this.getClass().getSimpleName() + ":{");
+        buf.append(this.getClass().getSimpleName()).append(":{");
         buf.append("src:");
         ConceptComponent.addNidToBuffer(buf, this.primordialComponent.enclosingConceptNid);
         buf.append(" t:");
@@ -43,7 +43,7 @@ public class RelationshipRevision
         ConceptComponent.addNidToBuffer(buf, this.primordialComponent.getC2Id());
         buf.append(" c:");
         ConceptComponent.addNidToBuffer(buf, this.characteristicNid);
-        buf.append(" g:" + this.group);
+        buf.append(" g:").append(this.group);
         buf.append(" r:");
         ConceptComponent.addNidToBuffer(buf, this.refinabilityNid);
         buf.append(super.toString());
@@ -128,48 +128,58 @@ public class RelationshipRevision
         output.writeInt(typeNid);
     }
 
+    @Override
     public int getCharacteristicId() {
         return characteristicNid;
     }
 
+    @Override
     public void setCharacteristicId(int characteristicNid) {
         this.characteristicNid = characteristicNid;
         modified();
     }
 
+    @Override
     public int getGroup() {
         return group;
     }
 
+    @Override
     public void setGroup(int group) {
         this.group = group;
         modified();
     }
 
+    @Override
     public int getRefinabilityId() {
         return refinabilityNid;
     }
 
+    @Override
     public void setRefinabilityId(int refinabilityNid) {
         this.refinabilityNid = refinabilityNid;
         modified();
     }
 
     @Deprecated
+    @Override
     public int getTypeId() {
         return typeNid;
     }
 
     @Deprecated
+    @Override
     public void setTypeId(int typeNid) {
         this.typeNid = typeNid;
         modified();
     }
 
+    @Override
     public int getTypeNid() {
         return typeNid;
     }
 
+    @Override
     public void setTypeNid(int typeNid) {
         this.typeNid = typeNid;
         modified();
@@ -191,8 +201,11 @@ public class RelationshipRevision
             this.setStatusNid(statusNid);
             return this;
         }
-        return new RelationshipRevision(this, statusNid, Terms.get().getAuthorNid(), pathNid, time,
-                primordialComponent);
+         RelationshipRevision newR = new RelationshipRevision(this.primordialComponent, statusNid,
+                Terms.get().getAuthorNid(),
+                pathNid, time, this.primordialComponent);
+        this.primordialComponent.addRevision(newR);
+        return newR;
     }
 
     @Override
@@ -202,8 +215,11 @@ public class RelationshipRevision
             this.setAuthorNid(authorNid);
             return this;
         }
-        return new RelationshipRevision(this, statusNid, authorNid, pathNid, time,
-                primordialComponent);
+          RelationshipRevision newR = new RelationshipRevision(this.primordialComponent, statusNid,
+                authorNid,
+                pathNid, time, this.primordialComponent);
+        this.primordialComponent.addRevision(newR);
+        return newR;
     }
 
     @Override
@@ -215,18 +231,22 @@ public class RelationshipRevision
         return nids;
     }
 
+    @Override
     public int getRefinabilityNid() {
         return refinabilityNid;
     }
 
+    @Override
     public int getCharacteristicNid() {
         return characteristicNid;
     }
 
+    @Override
     public void setCharacteristicNid(int characteristicNid) {
         this.characteristicNid = characteristicNid;
     }
 
+    @Override
     public void setRefinabilityNid(int refinabilityNid) {
         this.refinabilityNid = refinabilityNid;
     }

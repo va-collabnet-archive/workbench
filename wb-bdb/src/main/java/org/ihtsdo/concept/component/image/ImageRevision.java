@@ -29,10 +29,12 @@ public class ImageRevision extends Revision<ImageRevision, Image>
      */
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(this.getClass().getSimpleName() + ":{");
-        buf.append(" textDescription:" + "'" + this.textDescription + "'");
-        buf.append(" typeNid:" + this.typeNid);
+        StringBuilder buf = new StringBuilder();
+        buf.append(this.getClass().getSimpleName()).append(":{");
+        buf.append(" textDescription:" + "'").
+                append(this.textDescription).
+                append("'");
+        buf.append(" typeNid:").append(this.typeNid);
         buf.append(super.toString());
         return buf.toString();
     }
@@ -51,6 +53,7 @@ public class ImageRevision extends Revision<ImageRevision, Image>
         return false;
     }
 
+    @Override
     public ArrayIntList getVariableVersionNids() {
         ArrayIntList partComponentNids = new ArrayIntList(3);
         partComponentNids.add(typeNid);
@@ -100,9 +103,12 @@ public class ImageRevision extends Revision<ImageRevision, Image>
             this.setStatusNid(statusNid);
             return this;
         }
-        return new ImageRevision(this, statusNid,
+        ImageRevision newR;
+        newR = new ImageRevision(this.primordialComponent, statusNid,
                 Terms.get().getAuthorNid(),
                 pathNid, time, this.primordialComponent);
+        this.primordialComponent.addRevision(newR);
+        return newR;
     }
 
     @Override
@@ -112,10 +118,12 @@ public class ImageRevision extends Revision<ImageRevision, Image>
             this.setAuthorNid(authorNid);
             return this;
         }
-        return new ImageRevision(this, statusNid,
+        ImageRevision newR;
+        newR = new ImageRevision(this.primordialComponent, statusNid,
                 authorNid,
-                pathNid, time,
-                this.primordialComponent);
+                pathNid, time, this.primordialComponent);
+        this.primordialComponent.addRevision(newR);
+        return newR;
     }
 
     @Override
@@ -137,6 +145,7 @@ public class ImageRevision extends Revision<ImageRevision, Image>
     /* (non-Javadoc)
      * @see org.dwfa.vodb.types.I_ImagePart#getTextDescription()
      */
+    @Override
     public String getTextDescription() {
         return textDescription;
     }
@@ -144,6 +153,7 @@ public class ImageRevision extends Revision<ImageRevision, Image>
      * @see org.dwfa.vodb.types.I_ImagePart#setTextDescription(java.lang.String)
      */
 
+    @Override
     public void setTextDescription(String name) {
         this.textDescription = name;
         modified();
@@ -153,6 +163,7 @@ public class ImageRevision extends Revision<ImageRevision, Image>
      */
 
     @Deprecated
+    @Override
     public int getTypeId() {
         return typeNid;
     }
@@ -161,11 +172,13 @@ public class ImageRevision extends Revision<ImageRevision, Image>
      */
 
     @Deprecated
+    @Override
     public void setTypeId(int type) {
         this.typeNid = type;
         modified();
     }
 
+    @Override
     public int getTypeNid() {
         return typeNid;
     }
@@ -173,6 +186,7 @@ public class ImageRevision extends Revision<ImageRevision, Image>
      * @see org.dwfa.vodb.types.I_ImagePart#setTypeId(int)
      */
 
+    @Override
     public void setTypeNid(int type) {
         this.typeNid = type;
         modified();
@@ -191,10 +205,12 @@ public class ImageRevision extends Revision<ImageRevision, Image>
      * @see org.dwfa.vodb.types.I_ImagePart#convertIds(org.dwfa.vodb.jar.I_MapNativeToNative)
      */
 
+    @Override
     public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public ImageRevision duplicate() {
         throw new UnsupportedOperationException();
     }

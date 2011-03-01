@@ -264,13 +264,12 @@ public class DescriptionRevision
             this.setStatusNid(statusNid);
             return this;
         }
-        try {
-            return new DescriptionRevision(this, statusNid,
-                    Terms.get().getAuthorNid(),
-                    pathNid, time, this.primordialComponent);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        DescriptionRevision newR;
+        newR = new DescriptionRevision(this.primordialComponent, statusNid,
+                Terms.get().getAuthorNid(),
+                pathNid, time, this.primordialComponent);
+        this.primordialComponent.addRevision(newR);
+        return newR;
     }
 
     @Override
@@ -281,13 +280,12 @@ public class DescriptionRevision
             this.setAuthorNid(authorNid);
             return this;
         }
-        try {
-            return new DescriptionRevision(this, statusNid,
-                    authorNid,
-                    pathNid, time, this.primordialComponent);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        DescriptionRevision newR;
+        newR = new DescriptionRevision(this.primordialComponent, statusNid,
+                authorNid,
+                pathNid, time, this.primordialComponent);
+        this.primordialComponent.addRevision(newR);
+        return newR;
     }
 
     @Override

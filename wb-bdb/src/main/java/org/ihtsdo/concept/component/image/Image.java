@@ -155,6 +155,7 @@ public class Image
             Image.this.setTypeNid(type);
         }
 
+        @Override
         public ArrayIntList getVariableVersionNids() {
             if (index >= 0) {
                 ArrayIntList resultList = new ArrayIntList(3);
@@ -254,10 +255,10 @@ public class Image
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
-        buf.append(this.getClass().getSimpleName() + ":{");
-        buf.append("format:" + "'" + this.format + "'");
-        buf.append(" image:" + this.image);
-        buf.append(" textDescription:" + "'" + this.textDescription + "'");
+        buf.append(this.getClass().getSimpleName()).append(":{");
+        buf.append("format:'").append(this.format).append("'");
+        buf.append(" image:").append(this.image);
+        buf.append(" textDescription:'").append(this.textDescription).append("'");
         buf.append(" typeNid:");
         ConceptComponent.addNidToBuffer(buf, typeNid);
         buf.append(" ");
@@ -312,22 +313,28 @@ public class Image
      */
     public String validate(Image another) throws IOException {
         assert another != null;
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         if (!this.format.equals(another.format)) {
-            buf.append("\tImage.format not equal: \n"
-                    + "\t\tthis.format = " + this.format + "\n"
-                    + "\t\tanother.format = " + another.format + "\n");
+            buf.append("\tImage.format not equal: \n\t\tthis.format = ").
+                    append(this.format).
+                    append("\n\t\tanother.format = ").
+                    append(another.format).
+                    append("\n");
         }
         if (!Arrays.equals(this.image, another.image)) {
-            buf.append("\tImage.image not equal: \n"
-                    + "\t\tthis.image = " + this.image + "\n"
-                    + "\t\tanother.image = " + another.image + "\n");
+            buf.append("\tImage.image not equal: \n" + "\t\tthis.image = ").
+                    append(this.image).
+                    append("\n\t\tanother.image = ").
+                    append(another.image).
+                    append("\n");
         }
         if (this.typeNid != another.typeNid) {
-            buf.append("\tImage.typeNid not equal: \n"
-                    + "\t\tthis.typeNid = " + this.typeNid + "\n"
-                    + "\t\tanother.typeNid = " + another.typeNid + "\n");
+            buf.append("\tImage.typeNid not equal: \n\t\tthis.typeNid = ").
+                    append(this.typeNid).
+                    append("\n\t\tanother.typeNid = ").
+                    append(another.typeNid).
+                    append("\n");
         }
 
         // Compare the parents 
@@ -470,10 +477,12 @@ public class Image
      * @seeorg.dwfa.vodb.types.I_ImageVersioned#convertIds(org.dwfa.vodb.jar.
      * I_MapNativeToNative)
      */
+    @Override
     public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public void addTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
             PositionSetBI positions, List<I_ImageTuple> matchingTuples,
             Precedence precedencePolicy, ContradictionManagerBI contradictionManager) {
@@ -497,6 +506,7 @@ public class Image
         return LocalFixedTerminology.getStore().getUids(id);
     }
 
+    @Override
     public UniversalAceImage getUniversal() throws IOException,
             TerminologyException {
         UniversalAceImage universal = new UniversalAceImage(getUids(nid),
@@ -514,6 +524,7 @@ public class Image
         return universal;
     }
 
+    @Override
     public boolean promote(PositionBI viewPosition,
             PathSetReadOnly pomotionPaths, NidSetBI allowedStatus, Precedence precedence) {
         int viewPathId = viewPosition.getPath().getConceptNid();
@@ -610,10 +621,12 @@ public class Image
         versions = null;
     }
 
+    @Override
     public int getTypeNid() {
         return typeNid;
     }
 
+    @Override
     public void setTypeNid(int typeNid) {
         this.typeNid = typeNid;
         modified();
@@ -641,7 +654,7 @@ public class Image
     public Image.Version getVersion(ViewCoordinate c)
             throws ContraditionException {
         List<Image.Version> vForC = getVersions(c);
-        if (vForC.size() == 0) {
+        if (vForC.isEmpty()) {
             return null;
         }
         if (vForC.size() > 1) {
