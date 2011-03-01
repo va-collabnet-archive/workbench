@@ -3097,7 +3097,8 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 				if(translConfig.getEditingPanelOpenMode().equals(EditingPanelOpenMode.PREFFERD_TERM_MODE)){
 					if (targetPreferred.equals("") ){
 						mAddPrefActionPerformed();
-
+						String pref=LanguageUtil.getDefaultPreferredTermText(concept, sourceLangRefsets.iterator().next(), targetLangRefset, config);
+						textField1.setText(pref);
 					}
 					else{
 						if (targetPreferredRow!=null){
