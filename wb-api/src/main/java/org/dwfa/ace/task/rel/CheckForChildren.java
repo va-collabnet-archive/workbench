@@ -49,10 +49,12 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidSetBI;
@@ -113,19 +115,12 @@ public class CheckForChildren extends AbstractTask implements ActionListener{
             if (concept == null) {
                 throw new TaskFailedException("There is no concept in the arena...");
             }
-
-            Collection<? extends RelationshipChronicleBI> relsIncoming = concept.getRelsIncoming();
-            int size = 0;
             
-            for(RelationshipChronicleBI rel : relsIncoming){
-            	for (RelationshipVersionBI relv : rel.getVersions()) {
-                 if (vc.getIsaTypeNids().contains(relv.getTypeNid())){
-            		size++;
-                 }
-            	}
-            }
+           ConceptVersionBI cv= Ts.get().getConceptVersion(vc, concept.getNid());
 
-            if( size > 0){
+           Collection<? extends ConceptVersionBI> relsIncoming = cv.getRelsIncomingOriginsActiveIsa();
+           
+            if( relsIncoming.size() > 0){
             	JPanel wizardPanel = wizard.getWizardPanel();
             	makeWizardPanel(wizardPanel);
             	if (SwingUtilities.isEventDispatchThread()) {
@@ -156,7 +151,9 @@ public class CheckForChildren extends AbstractTask implements ActionListener{
 
         } catch (IOException e) {
         	throw new TaskFailedException(e);
-        }
+        } catch (ContraditionException e) {
+        	throw new TaskFailedException(e);
+		}
     }
 
     private void makeWizardPanel(JPanel wizardPanel){
