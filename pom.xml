@@ -8,16 +8,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ihtsdo</groupId>
     <artifactId>wb-mmb</artifactId>
-    <version>2.6.2-trek-rsrb-6</version>
+    <version>2.6.2-trek-rsrb-7-SNAPSHOT</version>
     <name>${branch}: (MMP) Workbench Toolkit</name>
     <packaging>pom</packaging>
     <description>multi-module build for the Workbench modules (dwfa-pom, foundation, 
                  dwfa-mojo, core, ace-api, vodb and term-mojo)
     </description>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-2.6.2-trek-rsrb-6</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-2.6.2-trek-rsrb-6</developerConnection>
-        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/tags/?root=workbench;&amp;system=exsy1002/wb-mmb-2.6.2-trek-rsrb-6</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit_trek-rsrb</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit_trek-rsrb</developerConnection>
+        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/branches/wb-toolkit_trek-rsrb/?root=workbench;&amp;system=exsy1002</url>
     </scm>
     <properties>
         <branch>rsrb</branch>
