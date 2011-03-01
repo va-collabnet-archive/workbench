@@ -127,8 +127,8 @@ public class OpenQueuesInFolder extends AbstractTask {
     
     private void setupQueue(File file, LifeCycle lc, I_ConfigAceFrame frameConfig) throws Exception, ConfigurationException, IOException {
         new QueueServer(new String[]{file.getCanonicalPath()}, lc);
-        if (file.getName().toLowerCase().endsWith(".inbox") && 
-                file.getName().toLowerCase().contains(frameConfig.getUsername())) {
+        if (file.getParentFile().getName().toLowerCase().endsWith(".inbox") && 
+                file.getParentFile().getName().toLowerCase().contains(frameConfig.getUsername())) {
             Configuration queueConfig = ConfigurationProvider.getInstance(new String[]{file.getAbsolutePath()});
             Entry[] entries = (Entry[]) queueConfig.getEntry("org.dwfa.queue.QueueServer", "entries",
                     Entry[].class, new Entry[]{});
