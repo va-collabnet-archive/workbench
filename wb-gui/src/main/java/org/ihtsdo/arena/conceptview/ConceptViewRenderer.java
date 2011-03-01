@@ -748,6 +748,7 @@ public class ConceptViewRenderer extends JLayeredPane {
         workflowPanel.setVisible(false);
         remove(workflowScrollPane);
       	conceptViewPanel.setVisible(true);
+        workflowToggleButton.setSelected(false);
 
         if (this.getIndexOf(conceptViewPanel) < 0)
             add(conceptViewPanel, BorderLayout.CENTER);
