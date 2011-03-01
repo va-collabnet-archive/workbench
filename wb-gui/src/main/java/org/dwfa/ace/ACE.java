@@ -1948,21 +1948,27 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         newInboxButton =
                 addActionButton(new NewQueueListener(this), "/24x24/plain/inbox_new.png",
                     "Create new inbox and add to profile", listEditorTopPanel, c);
+
         newInboxButton.setEnabled(showQueueButtons);
         newInboxButton.setVisible(showQueueButtons);
+
         addExistingInboxButton =
                 addActionButton(new AddQueueListener(this), "/24x24/plain/inbox_add.png", "Add existing inbox to profile",
                     listEditorTopPanel, c);
         addExistingInboxButton.setEnabled(showQueueButtons);
         addExistingInboxButton.setVisible(showQueueButtons);
+
         moveListenerButton =
                 addActionButton(new MoveListener(), "/24x24/plain/outbox_out.png",
                     "Take Selected Processes and Save To Disk (no transaction)", listEditorTopPanel, c);
+
         moveListenerButton.setEnabled(showQueueButtons);
         moveListenerButton.setVisible(showQueueButtons);
+
         showAllQueuesButton =
                 addActionToggleButton(new ShowAllQueuesListener(), "/24x24/plain/funnel_delete.png", "Show all queues",
                     listEditorTopPanel, c, 24);
+
         showAllQueuesButton.setEnabled(showQueueButtons);
         showAllQueuesButton.setVisible(showQueueButtons);
         return listEditorTopPanel;
