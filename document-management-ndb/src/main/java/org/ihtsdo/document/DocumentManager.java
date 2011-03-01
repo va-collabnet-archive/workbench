@@ -16,12 +16,17 @@
  */
 package org.ihtsdo.document;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -106,29 +111,29 @@ public class DocumentManager {
 						FileInputStream fi = new FileInputStream(f);
 						Metadata metadata = new Metadata();
 						ParseContext context = new ParseContext();
-						org.apache.tika.parser.pdf.PDFParser parser = new  org.apache.tika.parser.pdf.PDFParser();
+						org.apache.tika.parser.pdf.PDFParser parser = new org.apache.tika.parser.pdf.PDFParser();
 						parser.parse(fi, textHandler, metadata, context);
 						fi.close();
 					} else if (f.getName().endsWith(".doc") || f.getName().endsWith(".xls")) {
 						FileInputStream fi = new FileInputStream(f);
 						Metadata metadata = new Metadata();
 						ParseContext context = new ParseContext();
-						org.apache.tika.parser.microsoft.OfficeParser parser = new  org.apache.tika.parser.microsoft.OfficeParser();
+						org.apache.tika.parser.microsoft.OfficeParser parser = new org.apache.tika.parser.microsoft.OfficeParser();
 						parser.parse(fi, textHandler, metadata, context);
 						fi.close();
 					} else if (f.getName().endsWith(".docx") || f.getName().endsWith(".xlsx")) {
 						FileInputStream fi = new FileInputStream(f);
 						Metadata metadata = new Metadata();
 						ParseContext context = new ParseContext();
-						org.apache.tika.parser.microsoft.ooxml.OOXMLParser parser = new  org.apache.tika.parser.microsoft.ooxml.OOXMLParser();
+						org.apache.tika.parser.microsoft.ooxml.OOXMLParser parser = new org.apache.tika.parser.microsoft.ooxml.OOXMLParser();
 						parser.parse(fi, textHandler, metadata, context);
 						fi.close();
 					} else {
 						throw new IOException();
 					}
 					Document doc = new Document();
-					doc.add(new Field("path", f.getPath(),Field.Store.YES, Field.Index.ANALYZED));
-					doc.add(new Field("text",textHandler.toString(),Field.Store.YES, Field.Index.ANALYZED));
+					doc.add(new Field("path", f.getPath(), Field.Store.YES, Field.Index.ANALYZED));
+					doc.add(new Field("text", textHandler.toString(), Field.Store.YES, Field.Index.ANALYZED));
 					writer.addDocument(doc);
 					output = output + counter + ") Indexing:" + doc.get("path") + " Size:" + doc.get("text").length() + "<br>";
 				} catch (IOException e) {
@@ -154,7 +159,8 @@ public class DocumentManager {
 	/**
 	 * Search documents.
 	 * 
-	 * @param q the q
+	 * @param q
+	 *            the q
 	 * 
 	 * @return the string
 	 */
@@ -164,13 +170,10 @@ public class DocumentManager {
 			Directory fsDir = FSDirectory.open(new File("documentsIndex"));
 			IndexSearcher is = new IndexSearcher(fsDir);
 
-			QueryParser qp = new QueryParser(Version.LUCENE_30, "text", 
-					new StandardAnalyzer(Version.LUCENE_30));
+			QueryParser qp = new QueryParser(Version.LUCENE_30, "text", new StandardAnalyzer(Version.LUCENE_30));
 			Query query = qp.parse(q);
 
-			SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter(
-					"<font style='BACKGROUND-COLOR: yellow'>", 
-					"</font>");
+			SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter("<font style='BACKGROUND-COLOR: yellow'>", "</font>");
 			Highlighter highlighter = new Highlighter(htmlFormatter, new QueryScorer(query));
 
 			long start = new Date().getTime();
@@ -178,15 +181,13 @@ public class DocumentManager {
 			is.search(query, collector);
 			ScoreDoc[] hits = collector.topDocs().scoreDocs;
 			long end = new Date().getTime();
-			output = output + "Found " + hits.length + " document(s) (in " + (end - start) +
-			" milliseconds) that matched query '" + q + "':<br><br>";
+			output = output + "Found " + hits.length + " document(s) (in " + (end - start) + " milliseconds) that matched query '" + q + "':<br><br>";
 
 			for (int i = 0; i < hits.length; i++) {
 				int docId = hits[i].doc;
 				Document doc = is.doc(docId);
-				output = output + (i+1) + ") <a href=\"file://" + doc.get("path").trim() + "\">"+ doc.get("path") + "</a><br>";
-				TokenStream tokenStream = TokenSources.getAnyTokenStream(is.getIndexReader(), docId, "text", 
-						new StandardAnalyzer(Version.LUCENE_30));
+				output = output + (i + 1) + ") <a href=\"file://" + doc.get("path").trim() + "\">" + doc.get("path") + "</a><br>";
+				TokenStream tokenStream = TokenSources.getAnyTokenStream(is.getIndexReader(), docId, "text", new StandardAnalyzer(Version.LUCENE_30));
 				String frags = highlighter.getBestFragments(tokenStream, doc.get("text"), 3, "<br>");
 				output = output + frags + "<br><br><br>";
 			}
@@ -194,9 +195,9 @@ public class DocumentManager {
 			e.printStackTrace();
 		} catch (ParseException e) {
 			e.printStackTrace();
-		} 
+		}
 		output = output + "</font></body></html>";
-		//System.out.println(output);
+		// System.out.println(output);
 		return output;
 	}
 
@@ -204,7 +205,7 @@ public class DocumentManager {
 	 * Index memory from xls.
 	 * 
 	 * @return the string
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static String indexMemoryFromXls() throws OfficeXmlFileException, IOException {
 		String output = "<html><body><font style='font-family:arial,sans-serif'>";
@@ -218,49 +219,51 @@ public class DocumentManager {
 
 		if (excelFile != null) {
 			InputStream inp = new FileInputStream(excelFile);
-			
-			Workbook wb =  null;
-			
-			if (excelFile.getName().endsWith(".xls")){
+
+			Workbook wb = null;
+
+			if (excelFile.getName().endsWith(".xls")) {
 				wb = new HSSFWorkbook(inp);
-			} else if (excelFile.getName().endsWith(".xlsx")){
+			} else if (excelFile.getName().endsWith(".xlsx")) {
 				wb = new XSSFWorkbook(inp);
-			} else throw new IOException("Excel format not recognized");
-			
+			} else
+				throw new IOException("Excel format not recognized");
+
 			Sheet sheet = wb.getSheetAt(0);
 			Row row = sheet.getRow(0);
 			int sourceColumn = 0;
 			int translationColumn = 1;
 			int firstDataRow = 0;
 			if (row != null) {
-				for (Iterator<Cell> cells = row.cellIterator(); cells.hasNext();) { 
+				for (Iterator<Cell> cells = row.cellIterator(); cells.hasNext();) {
 					Cell loopCell = cells.next();
 					if (loopCell.getStringCellValue().equals("Source text")) {
 						sourceColumn = loopCell.getColumnIndex();
 						firstDataRow = 1;
 					}
-					if (loopCell.getStringCellValue().equals("Translation"))  {
+					if (loopCell.getStringCellValue().equals("Translation")) {
 						translationColumn = loopCell.getColumnIndex();
 						firstDataRow = 1;
 					}
-					//System.out.println("Celda: " + loopCell.getColumnIndex() + " Valor: " + loopCell.getStringCellValue());
+					// System.out.println("Celda: " + loopCell.getColumnIndex()
+					// + " Valor: " + loopCell.getStringCellValue());
 				}
 			}
 
 			File indexDir = new File("translationMemory");
-			IndexWriter writer = new IndexWriter(FSDirectory.open(indexDir), 
-					new StandardAnalyzer(Version.LUCENE_30), true, IndexWriter.MaxFieldLength.UNLIMITED);
+			IndexWriter writer = new IndexWriter(FSDirectory.open(indexDir), new StandardAnalyzer(Version.LUCENE_30), true, IndexWriter.MaxFieldLength.UNLIMITED);
 
-			for (int i = firstDataRow ; i <= sheet.getLastRowNum() ; i++) {
+			for (int i = firstDataRow; i <= sheet.getLastRowNum(); i++) {
 				Row loopRow = sheet.getRow(i);
-				//System.out.println("Row: " + i + " Values: " + loopRow.getCell(sourceColumn).getStringCellValue() + " | " +
-				//		loopRow.getCell(translationColumn).getStringCellValue());
+				// System.out.println("Row: " + i + " Values: " +
+				// loopRow.getCell(sourceColumn).getStringCellValue() + " | " +
+				// loopRow.getCell(translationColumn).getStringCellValue());
 
 				if (loopRow.getCell(sourceColumn) != null & loopRow.getCell(translationColumn) != null) {
 					String sourceText = loopRow.getCell(sourceColumn).getStringCellValue();
 					String targetText = loopRow.getCell(translationColumn).getStringCellValue();
 					Document doc = new Document();
-					output = output + "Row: " + i + " Source text: " + sourceText + " Translation Text: " +	targetText + "<br>";
+					output = output + "Row: " + i + " Source text: " + sourceText + " Translation Text: " + targetText + "<br>";
 					doc.add(new Field("source", sourceText.toLowerCase().trim(), Field.Store.YES, Field.Index.ANALYZED));
 					doc.add(new Field("translation", targetText.toLowerCase().trim(), Field.Store.YES, Field.Index.ANALYZED));
 					writer.addDocument(doc);
@@ -279,45 +282,47 @@ public class DocumentManager {
 	/**
 	 * Match translation memory.
 	 * 
-	 * @param term the term
+	 * @param term
+	 *            the term
 	 * 
 	 * @return the hash map< string, string>
 	 */
-	public static HashMap<String,String> matchTranslationMemory(String term) {
+	public static HashMap<String, String> matchTranslationMemory(String term) {
 		term = term.toLowerCase().trim();
 		if (term.contains("(")) {
-			term = term.substring(0, term.indexOf("(")-1).trim();
+			term = term.substring(0, term.indexOf("(") - 1).trim();
 		}
-		HashMap<String,String> results = new HashMap<String,String>();
+		HashMap<String, String> results = new HashMap<String, String>();
 
 		try {
 			Directory fsDir = FSDirectory.open(new File("translationMemory"));
 			IndexSearcher is = new IndexSearcher(fsDir);
 
 			if (term.equals("*")) {
-				for (int i = 0 ; i<is.maxDoc() ; i++ ) {
+				for (int i = 0; i < is.maxDoc(); i++) {
 					results.put(is.doc(i).get("source"), is.doc(i).get("translation"));
 				}
 
 			} else {
 
-				QueryParser qp = new QueryParser(Version.LUCENE_30, "source", 
-						new StandardAnalyzer(Version.LUCENE_30));
+				QueryParser qp = new QueryParser(Version.LUCENE_30, "source", new StandardAnalyzer(Version.LUCENE_30));
 				Query query = qp.parse(term);
 
-				//long start = new Date().getTime();
+				// long start = new Date().getTime();
 				TopScoreDocCollector collector = TopScoreDocCollector.create(10, true);
 				is.search(query, collector);
 				ScoreDoc[] hits = collector.topDocs().scoreDocs;
-				//long end = new Date().getTime();
-				//System.out.println("Found " + hits.length + " document(s) (in " + (end - start) +
-				//		" milliseconds) that matched query '" + term + "'");
+				// long end = new Date().getTime();
+				// System.out.println("Found " + hits.length +
+				// " document(s) (in " + (end - start) +
+				// " milliseconds) that matched query '" + term + "'");
 
 				for (int i = 0; i < hits.length; i++) {
 					int docId = hits[i].doc;
 					Document doc = is.doc(docId);
 					results.put(doc.get("source"), doc.get("translation"));
-					//System.out.println(doc.get("source") +" | " + doc.get("translation"));
+					// System.out.println(doc.get("source") +" | " +
+					// doc.get("translation"));
 				}
 			}
 
@@ -332,7 +337,8 @@ public class DocumentManager {
 	/**
 	 * Index dictionary from workbench database.
 	 * 
-	 * @param overwrite the overwrite
+	 * @param overwrite
+	 *            the overwrite
 	 * 
 	 * @return the string
 	 */
@@ -364,7 +370,8 @@ public class DocumentManager {
 	/**
 	 * Index dictionary from text file.
 	 * 
-	 * @param overwrite the overwrite
+	 * @param overwrite
+	 *            the overwrite
 	 * 
 	 * @return the string
 	 */
@@ -388,7 +395,7 @@ public class DocumentManager {
 			Directory spellDir = FSDirectory.open(new File(dictionaryFolder.getPath()));
 			SpellChecker spellchecker = new SpellChecker(spellDir);
 			// To index a file containing words:
-			spellchecker.indexDictionary(new PlainTextDictionary( new InputStreamReader(new FileInputStream(dictionaryTextFile), "UTF-8")));
+			spellchecker.indexDictionary(new PlainTextDictionary(new InputStreamReader(new FileInputStream(dictionaryTextFile), "UTF-8")));
 			spellDir.close();
 			output = output + "<br><br>Done!<br>";
 		} catch (IOException e) {
@@ -401,7 +408,8 @@ public class DocumentManager {
 	/**
 	 * Adds the to dictionary.
 	 * 
-	 * @param word the word
+	 * @param word
+	 *            the word
 	 * 
 	 * @return the string
 	 */
@@ -414,6 +422,7 @@ public class DocumentManager {
 			spellchecker.indexDictionary(new PlainTextDictionary(new StringReader(word)));
 			spellDir.close();
 			output = output + "<br><br>Done!<br>";
+			addToNewWordsfile(word);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -421,18 +430,49 @@ public class DocumentManager {
 		return output;
 	}
 
-	public static void addToNewWordsfile(String word, String langCode){
-		File file=new File("dictionaries/NewWords_" + langCode + ".txt");
-		
+	/**
+	 * Saves the new words to a file.
+	 * @param word 
+	 * 				the word.
+	 * @param langCode
+	 * 				the language code the code belongs to.
+	 * @throws IOException
+	 */
+	public static void addToNewWordsfile(String word) throws IOException {
+		BufferedWriter bw = null;
+		try {
+			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+			File dir = new File("profiles/shared/dictionaries");
+			dir.mkdirs();
+			File file = new File(dir,"userDic-" + config.getUsername() + ".txt");
+			FileOutputStream fos = new FileOutputStream(file, true);
+			OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+			bw = new BufferedWriter(osw);
+			bw.append(word);
+			bw.newLine();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} finally {
+			if(bw != null){
+				bw.flush();
+				bw.close();
+			}
+		}
 	}
+
 	/**
 	 * Exists in dictionary.
 	 * 
-	 * @param word the word
+	 * @param word
+	 *            the word
 	 * 
 	 * @return true, if successful
 	 */
-	public static boolean existsInDictionary(String word,String langCode) {
+	public static boolean existsInDictionary(String word, String langCode) {
 		try {
 			Directory spellDir = FSDirectory.open(new File("spellIndexDirectory/" + langCode));
 			SpellChecker spellchecker = new SpellChecker(spellDir);
@@ -448,7 +488,8 @@ public class DocumentManager {
 	/**
 	 * Gets the sugestions from dictionary.
 	 * 
-	 * @param word the word
+	 * @param word
+	 *            the word
 	 * 
 	 * @return the sugestions from dictionary
 	 */
@@ -468,18 +509,20 @@ public class DocumentManager {
 	/**
 	 * Spellcheck phrase.
 	 * 
-	 * @param phrase the phrase
-	 * @param frame the frame
+	 * @param phrase
+	 *            the phrase
+	 * @param frame
+	 *            the frame
 	 * 
 	 * @return the string
-	 * @throws TerminologyException 
-	 * @throws IOException 
-	 * @throws NoSuchElementException 
+	 * @throws TerminologyException
+	 * @throws IOException
+	 * @throws NoSuchElementException
 	 */
-	static public String spellcheckPhrase(String phrase, JFrame frame, String langCode)  {
+	static public String spellcheckPhrase(String phrase, JFrame frame, String langCode) {
 		String[] words = phrase.split("[\\s+\\p{Punct}]");
 		String modifiedPhrase = phrase;
-		String parsedLangCode=null;
+		String parsedLangCode = null;
 		try {
 			parsedLangCode = ArchitectonicAuxiliary.getLanguageCode(ArchitectonicAuxiliary.getLanguageConcept(langCode).getUids());
 		} catch (NoSuchElementException e) {
@@ -492,20 +535,20 @@ public class DocumentManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if (parsedLangCode!=null){
+		if (parsedLangCode != null) {
 			DictionaryResultsDialog spellCheckDialog = new DictionaryResultsDialog(frame, null, parsedLangCode);
 			spellCheckDialog.pack();
 			for (int i = 0; i < words.length; i++) {
-				//&&!words[i].matches("[0-9\\.]*") // detect numeric
+				// &&!words[i].matches("[0-9\\.]*") // detect numeric
 				String wordToCheck = words[i];
-				if (wordToCheck.length() > 2 && !DocumentManager.existsInDictionary(wordToCheck,parsedLangCode) &&!words[i].matches("[0-9\\.]*")) {
+				if (wordToCheck.length() > 2 && !DocumentManager.existsInDictionary(wordToCheck, parsedLangCode) && !words[i].matches("[0-9\\.]*")) {
 					spellCheckDialog.setLocationRelativeTo(frame);
 					spellCheckDialog.queryField.setText(wordToCheck);
 					spellCheckDialog.update(wordToCheck);
 					spellCheckDialog.setVisible(true);
 					String s = spellCheckDialog.getValidatedWord();
-					//if (s!=null) words[i] = s;
-					if (s!=null) {
+					// if (s!=null) words[i] = s;
+					if (s != null) {
 						modifiedPhrase = modifiedPhrase.replace(wordToCheck, s);
 					}
 				}
@@ -513,12 +556,12 @@ public class DocumentManager {
 			spellCheckDialog.dispose();
 		}
 
-		/*String modifiedPhrase = "";
-
-		for (int i = 0; i < words.length; i++) {
-			modifiedPhrase = modifiedPhrase + " " + words[i];
-		}*/
-
+		/*
+		 * String modifiedPhrase = "";
+		 * 
+		 * for (int i = 0; i < words.length; i++) { modifiedPhrase =
+		 * modifiedPhrase + " " + words[i]; }
+		 */
 
 		return modifiedPhrase.trim();
 	}
@@ -526,43 +569,45 @@ public class DocumentManager {
 	/**
 	 * Delete directory.
 	 * 
-	 * @param path the path
+	 * @param path
+	 *            the path
 	 * 
 	 * @return true, if successful
 	 */
 	static public boolean deleteDirectory(File path) {
-		if( path.exists() ) {
+		if (path.exists()) {
 			File[] files = path.listFiles();
-			for(int i=0; i<files.length; i++) {
-				if(files[i].isDirectory()) {
+			for (int i = 0; i < files.length; i++) {
+				if (files[i].isDirectory()) {
 					deleteDirectory(files[i]);
-				}
-				else {
+				} else {
 					files[i].delete();
 				}
 			}
 		}
-		return( path.delete() );
+		return (path.delete());
 	}
 
 	/**
 	 * Gets the descendants.
 	 * 
-	 * @param descendants the descendants
-	 * @param concept the concept
+	 * @param descendants
+	 *            the descendants
+	 * @param concept
+	 *            the concept
 	 * 
 	 * @return the descendants
 	 */
 	public static Set<I_GetConceptData> getDescendants(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
 		try {
 			I_TermFactory termFactory = LocalVersionedTerminology.get();
-			//TODO: get config as parameter
+			// TODO: get config as parameter
 			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
-			I_IntSet allowedDestRelTypes =  termFactory.newIntSet();
+			I_IntSet allowedDestRelTypes = termFactory.newIntSet();
 			allowedDestRelTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
 			Set<I_GetConceptData> childrenSet = new HashSet<I_GetConceptData>();
-			childrenSet.addAll(concept.getDestRelOrigins(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly()
-					, config.getPrecedence(), config.getConflictResolutionStrategy()));
+			childrenSet.addAll(concept.getDestRelOrigins(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(),
+					config.getConflictResolutionStrategy()));
 			descendants.addAll(childrenSet);
 			for (I_GetConceptData loopConcept : childrenSet) {
 				descendants = getDescendants(descendants, loopConcept);
@@ -577,67 +622,55 @@ public class DocumentManager {
 		return descendants;
 	}
 
-	public static void addNewLinguisticGuideline(String name, String pattern, String recommendation, 
-			I_GetConceptData infoRoot, I_ConfigAceFrame config) throws TerminologyException, IOException {
+	public static void addNewLinguisticGuideline(String name, String pattern, String recommendation, I_GetConceptData infoRoot, I_ConfigAceFrame config) throws TerminologyException,
+			IOException {
 		I_TermFactory termFactory = Terms.get();
 		termFactory.setActiveAceFrameConfig(config);
 
 		I_GetConceptData newConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
 
 		termFactory.newDescription(UUID.randomUUID(), newConcept, "en", name + " (linguistic guideline)",
-				termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()),
-				config);
+				termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), config);
 
-		termFactory.newDescription(UUID.randomUUID(), newConcept, "en", pattern,
-				termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), 
-				config);
+		termFactory.newDescription(UUID.randomUUID(), newConcept, "en", pattern, termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), config);
 
-		termFactory.newDescription(UUID.randomUUID(), newConcept, "en", recommendation,
-				termFactory.getConcept(ArchitectonicAuxiliary.Concept.XHTML_PREFERRED_DESC_TYPE.getUids()), 
-				config);
+		termFactory.newDescription(UUID.randomUUID(), newConcept, "en", recommendation, termFactory.getConcept(ArchitectonicAuxiliary.Concept.XHTML_PREFERRED_DESC_TYPE.getUids()), config);
 
-		termFactory.newRelationship(UUID.randomUUID(), newConcept, 
-				termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), 
-				infoRoot, 
-				termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), 
-				termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
-				termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 
-				0, config);
+		termFactory.newRelationship(UUID.randomUUID(), newConcept, termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), infoRoot,
+				termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+				termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 	}
-
 
 	/**
 	 * Gets the info for term.
 	 * 
-	 * @param term the term
-	 * @param config the config
+	 * @param term
+	 *            the term
+	 * @param config
+	 *            the config
 	 * 
 	 * @return the info for term
 	 */
-	public static String getInfoForTerm(String term, I_ConfigAceFrame config){
+	public static String getInfoForTerm(String term, I_ConfigAceFrame config) {
 		I_TermFactory tf = Terms.get();
 		String selectedInfo = "";
 		if (term != null) {
 			try {
 				config.getDescTypes().add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());
 				config.getDescTypes().add(ArchitectonicAuxiliary.Concept.XHTML_PREFERRED_DESC_TYPE.localize().getNid());
-				I_GetConceptData semtagsRoot = tf.getConcept(new UUID[] {UUID.fromString("9d3036a8-2c4b-3576-bbb4-a531370552c1")});
+				I_GetConceptData semtagsRoot = tf.getConcept(new UUID[] { UUID.fromString("9d3036a8-2c4b-3576-bbb4-a531370552c1") });
 				Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
 				descendants = getDescendants(descendants, semtagsRoot);
 				HashMap<String, String> infoMap = new HashMap<String, String>();
 				for (I_GetConceptData infoConcept : descendants) {
 					String key = "";
 					String info = "";
-					for (I_DescriptionTuple tuple : infoConcept.getDescriptionTuples(config.getAllowedStatus(), 
-							config.getDescTypes(), 
-							config.getViewPositionSetReadOnly(), config.getPrecedence(),
-							config.getConflictResolutionStrategy())) {
-						if (tuple.getTypeId() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid() &&
-								tuple.getLang().equals("en")) {
+					for (I_DescriptionTuple tuple : infoConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(),
+							config.getPrecedence(), config.getConflictResolutionStrategy())) {
+						if (tuple.getTypeId() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid() && tuple.getLang().equals("en")) {
 							key = tuple.getText();
 						}
-						if (tuple.getTypeId() == ArchitectonicAuxiliary.Concept.XHTML_PREFERRED_DESC_TYPE.localize().getNid() &&
-								tuple.getLang().equals("en")) {
+						if (tuple.getTypeId() == ArchitectonicAuxiliary.Concept.XHTML_PREFERRED_DESC_TYPE.localize().getNid() && tuple.getLang().equals("en")) {
 							info = tuple.getText();
 						}
 					}
@@ -662,7 +695,7 @@ public class DocumentManager {
 		return selectedInfo;
 	}
 
-	public static String getInfoForTerm(String term, I_GetConceptData infoRoot, I_ConfigAceFrame config){
+	public static String getInfoForTerm(String term, I_GetConceptData infoRoot, I_ConfigAceFrame config) {
 		String selectedInfo = "";
 		if (term != null) {
 			try {
@@ -674,16 +707,12 @@ public class DocumentManager {
 				for (I_GetConceptData infoConcept : descendants) {
 					String key = "";
 					String info = "";
-					for (I_DescriptionTuple tuple : infoConcept.getDescriptionTuples(config.getAllowedStatus(), 
-							config.getDescTypes(), 
-							config.getViewPositionSetReadOnly(), config.getPrecedence(),
-							config.getConflictResolutionStrategy())) {
-						if (tuple.getTypeId() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid() &&
-								tuple.getLang().equals("en")) {
+					for (I_DescriptionTuple tuple : infoConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(),
+							config.getPrecedence(), config.getConflictResolutionStrategy())) {
+						if (tuple.getTypeId() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid() && tuple.getLang().equals("en")) {
 							key = tuple.getText();
 						}
-						if (tuple.getTypeId() == ArchitectonicAuxiliary.Concept.XHTML_PREFERRED_DESC_TYPE.localize().getNid() &&
-								tuple.getLang().equals("en")) {
+						if (tuple.getTypeId() == ArchitectonicAuxiliary.Concept.XHTML_PREFERRED_DESC_TYPE.localize().getNid() && tuple.getLang().equals("en")) {
 							info = tuple.getText();
 						}
 					}
@@ -705,32 +734,40 @@ public class DocumentManager {
 		return selectedInfo;
 	}
 
-	public static String wildcardToRegex(String wildcard){
+	public static String wildcardToRegex(String wildcard) {
 		StringBuffer s = new StringBuffer(wildcard.length());
 		s.append('^');
 		for (int i = 0, is = wildcard.length(); i < is; i++) {
 			char c = wildcard.charAt(i);
-			switch(c) {
+			switch (c) {
 			case '*':
 				s.append(".*");
 				break;
 			case '?':
 				s.append(".");
 				break;
-				// escape special regexp-characters
-			case '(': case ')': case '[': case ']': case '$':
-			case '^': case '.': case '{': case '}': case '|':
+			// escape special regexp-characters
+			case '(':
+			case ')':
+			case '[':
+			case ']':
+			case '$':
+			case '^':
+			case '.':
+			case '{':
+			case '}':
+			case '|':
 			case '\\':
 				s.append("\\");
 				s.append(c);
 				break;
 			default:
 				s.append(c);
-			break;
+				break;
 			}
 		}
 		s.append('$');
-		return(s.toString());
+		return (s.toString());
 	}
 
 }
