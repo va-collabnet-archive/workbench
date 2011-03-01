@@ -67,6 +67,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.security.auth.login.LoginException;
 import javax.swing.Action;
@@ -1398,22 +1399,21 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         super(new GridBagLayout());
 
         this.pluginRoot = pluginRoot;
-        try {
+        this.config = config;
+       try {
             menuWorker = new MasterWorker(config);
 
             // only initialize these once as they are static lists...
-            if (commitTests.size() == 0) {
+            if (commitTests.isEmpty()) {
                 loadTests("commit", commitTests);
             }
-            if (creationTests.size() == 0) {
+            if (creationTests.isEmpty()) {
                 loadTests("precommit", creationTests);
             }
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        this.config = config;
-
         this.addComponentListener(new ResizeComponentAdaptor());
     }
 
@@ -1929,26 +1929,42 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         listEditorTopPanel.add(new JLabel(" "), c); // filler
         c.gridx++;
         c.weightx = 0.0;
+        /*
+         * 
+         org.dwfa.ace.ACE {
+            showQueueButtons = Boolean.TRUE;
+         }
+
+         */
+        boolean showQueueButtons = false;
+        try {
+            showQueueButtons =
+                           (Boolean) config.getEntry(this.getClass().getName(), "showQueueButtons", Boolean.class,
+                               Boolean.FALSE);
+        } catch (ConfigurationException ex) {
+            Logger.getLogger(ACE.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         newInboxButton =
                 addActionButton(new NewQueueListener(this), "/24x24/plain/inbox_new.png",
                     "Create new inbox and add to profile", listEditorTopPanel, c);
-        newInboxButton.setEnabled(false);
-        newInboxButton.setVisible(false);
+        newInboxButton.setEnabled(showQueueButtons);
+        newInboxButton.setVisible(showQueueButtons);
         addExistingInboxButton =
                 addActionButton(new AddQueueListener(this), "/24x24/plain/inbox_add.png", "Add existing inbox to profile",
                     listEditorTopPanel, c);
-        addExistingInboxButton.setEnabled(false);
-        addExistingInboxButton.setVisible(false);
+        addExistingInboxButton.setEnabled(showQueueButtons);
+        addExistingInboxButton.setVisible(showQueueButtons);
         moveListenerButton =
                 addActionButton(new MoveListener(), "/24x24/plain/outbox_out.png",
                     "Take Selected Processes and Save To Disk (no transaction)", listEditorTopPanel, c);
-        moveListenerButton.setEnabled(false);
-        moveListenerButton.setVisible(false);
+        moveListenerButton.setEnabled(showQueueButtons);
+        moveListenerButton.setVisible(showQueueButtons);
         showAllQueuesButton =
                 addActionToggleButton(new ShowAllQueuesListener(), "/24x24/plain/funnel_delete.png", "Show all queues",
                     listEditorTopPanel, c, 24);
-        showAllQueuesButton.setEnabled(false);
-        showAllQueuesButton.setVisible(false);
+        showAllQueuesButton.setEnabled(showQueueButtons);
+        showAllQueuesButton.setVisible(showQueueButtons);
         return listEditorTopPanel;
 
     }
