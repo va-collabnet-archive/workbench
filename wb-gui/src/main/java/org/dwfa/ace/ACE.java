@@ -48,6 +48,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.rmi.RemoteException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedActionException;
 import java.util.ArrayList;
@@ -1055,7 +1056,19 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             queuePalette.togglePalette(((JToggleButton) e.getSource()).isSelected(), TOGGLE_DIRECTION.LEFT_RIGHT);
             SwingUtilities.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
+                    try {
+                        queueViewer.refreshQueues();
+                    } catch (RemoteException ex) {
+                        Logger.getLogger(ACE.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(ACE.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (PrivilegedActionException ex) {
+                        Logger.getLogger(ACE.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (ConfigurationException ex) {
+                        Logger.getLogger(ACE.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                     queueViewer.requestFocusOnEntry();
                 }
 
