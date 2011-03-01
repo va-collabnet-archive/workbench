@@ -157,7 +157,7 @@ public class RelTupleFileUtil {
             I_GetConceptData concept = termFactory.getConcept(new UUID[] { c1Uuid });
             int rNid = termFactory.uuidToNative(relUuid);
             assert rNid != Integer.MAX_VALUE;
-            I_RelVersioned irv = termFactory.getRelationship(rNid);
+            I_RelVersioned<?> irv = termFactory.getRelationship(rNid);
 
             if (!termFactory.hasId(c1Uuid)) {
                 ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,

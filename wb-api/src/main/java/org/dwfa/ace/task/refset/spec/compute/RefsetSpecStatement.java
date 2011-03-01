@@ -372,7 +372,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
 		System.out.println("\t" + c.getInitialText());
 		HashSet<I_GetConceptData> ret = new HashSet<I_GetConceptData>();
 		I_TermFactory tf = Terms.get();
-		for (I_RelVersioned d : c.getDestRels()) {
+		for (I_RelVersioned<?> d : c.getDestRels()) {
 			I_RelPart dm = null;
 			for (I_RelPart dd : d.getMutableParts()) {
 				System.out.println("\tpos:" + dd.getPathId() + " "

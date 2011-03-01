@@ -4,11 +4,11 @@
 	<parent>
 		<artifactId>wb-mmb</artifactId>
 		<groupId>org.ihtsdo</groupId>
-		<version>2.6.0-trek-10-uktc-SNAPSHOT</version>
+		<version>2.6.0-trek-11-uktc-nid-SNAPSHOT</version>
 	</parent>
 	<artifactId>wb-dita-maven-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
-	<name>Workbench Maven DITA documentation mojo</name>
+  <name>${branch}: Workbench Maven DITA documentation mojo</name>
 	<description>This Maven plugin (or mojo - Maven plain Old Java Object) builds a set of DITA topic
     files that can, in turn, be used to build documentation for the IHTSDO workbench. In this case,
     the DITA topic files describe each of the Workbench Business Process Automation tasks.

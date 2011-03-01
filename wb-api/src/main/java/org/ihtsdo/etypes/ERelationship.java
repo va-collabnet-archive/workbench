@@ -20,7 +20,7 @@ public class ERelationship extends TkRelationship {
         super(in, dataVersion);
     }
 
-    public ERelationship(I_RelVersioned rel) throws TerminologyException, IOException {
+    public ERelationship(I_RelVersioned<?> rel) throws TerminologyException, IOException {
         if (I_Identify.class.isAssignableFrom(rel.getClass())) {
             EConcept.convertId((I_Identify) rel, this);
         } else {

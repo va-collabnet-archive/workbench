@@ -49,12 +49,8 @@ public enum PrimordialId {
         this.uids = uids;
     }
 
-    public int getNativeId(int sequenceStart) {
-        return sequenceStart + sequenceRelativeId;
-    }
-
-    public long getNativeId(long sequenceStart) {
-        return sequenceStart + sequenceRelativeId;
+    public int getNativeId() {
+        return Integer.MIN_VALUE + sequenceRelativeId;
     }
 
     public Collection<UUID> getUids() {

@@ -1,6 +1,8 @@
 package org.ihtsdo.concept.component.refsetmember.Long;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
+import java.util.Collection;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
@@ -8,19 +10,22 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
+import org.ihtsdo.concept.component.refsetmember.Long.LongMember.Version;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_long.RefexLongAnalogBI;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
-import java.util.Collection;
-import org.ihtsdo.concept.component.refsetmember.Long.LongMember.Version;
-import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
-import org.ihtsdo.tk.api.refset.RefsetMemberVersionBI;
 
 public class LongRevision extends RefsetRevision<LongRevision, LongMember>
-        implements I_ExtendByRefPartLong {
+        implements I_ExtendByRefPartLong<LongRevision>, RefexLongAnalogBI<LongRevision> {
 
     private long longValue;
 
@@ -124,7 +129,7 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
     }
 
     @Override
-    public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
+    public I_ExtendByRefPart<LongRevision> makePromotionPart(PathBI promotionPath) {
         // TODO
         throw new UnsupportedOperationException();
     }
@@ -149,7 +154,7 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
     }
 
     @Override
-    public LongMember.Version getVersion(Coordinate c)
+    public LongMember.Version getVersion(ViewCoordinate c)
             throws ContraditionException {
         return (Version) ((LongMember) primordialComponent).getVersion(c);
     }
@@ -160,8 +165,29 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
     }
 
     @Override
-    public Collection<? extends RefsetMemberVersionBI> getVersions(
-            Coordinate c) {
+    public Collection<? extends RefexVersionBI<LongRevision>> getVersions(
+            ViewCoordinate c) {
         return ((LongMember) primordialComponent).getVersions(c);
     }
+
+	@Override
+	public void setLong1(long l) throws PropertyVetoException {
+		this.longValue = l;
+		modified();
+	}
+	
+    @Override
+	public long getLong1() {
+		return longValue;
+	}
+    
+	protected TK_REFSET_TYPE getTkRefsetType() {
+		return TK_REFSET_TYPE.LONG;
+	}
+
+
+	protected void addSpecProperties(RefexAmendmentSpec rcs) {
+		rcs.with(RefexProperty.LONG1, getLong1());
+	}
+
 }

@@ -30,7 +30,6 @@ import org.drools.rule.VariableRestriction.VariableContextEntry;
 import org.drools.spi.Evaluator;
 import org.drools.spi.FieldValue;
 import org.drools.spi.InternalReadAccessor;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.spec.ConceptSpec;
@@ -96,13 +95,10 @@ public class IsMemberOfEvaluatorDefinition implements EvaluatorDefinition {
 				//value2 (refset): this will be put in Refset.java (tk-arena-rules) as a ConceptSpec
 				
 				ConceptVersionBI possibleMember = null;
-				int conceptNid = 0;
 				if (ConceptVersionBI.class.isAssignableFrom(value1.getClass())) {
 					possibleMember = (ConceptVersionBI) value1;
-					conceptNid = possibleMember.getNid();
 				} else if (ConceptFact.class.isAssignableFrom(value1.getClass())) {
 					possibleMember = ((ConceptFact) value1).getConcept();
-					conceptNid = possibleMember.getNid();
 				} else {
 					throw new UnsupportedOperationException("Can't convert: " + value1);
 				}
@@ -123,8 +119,7 @@ public class IsMemberOfEvaluatorDefinition implements EvaluatorDefinition {
 					possibleRefsetCV = (ConceptVersionBI) fact.getConcept();
 					evalRefsetNid = possibleRefsetCV.getNid();
 				}
-				return this.getOperator().isNegated() ^ (possibleMember.isMember(conceptNid, evalRefsetNid)); //TODO not sure about this either
-				//return possibleMember.isMember(conceptNid, evalRefsetNid);
+				return this.getOperator().isNegated() ^ (possibleMember.isMember(evalRefsetNid)); 
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}

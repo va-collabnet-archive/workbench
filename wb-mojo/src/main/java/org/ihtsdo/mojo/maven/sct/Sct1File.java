@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.maven.plugin.MojoFailureException;
+
 public class Sct1File implements Comparable<Object> {
     private static final String TAB_CHARACTER = "\t";
 
@@ -62,7 +64,19 @@ public class Sct1File implements Comparable<Object> {
         return lineCount - 1;
     }
     
-    private static Date getFileRevDate(File f) throws ParseException {
+    private static boolean inDateRange(Date revDate, Date dateStart, Date dateStop)
+            throws MojoFailureException {
+
+        if (dateStart != null && revDate.compareTo(dateStart) < 0)
+            return false; // precedes start date
+
+        if (dateStop != null && revDate.compareTo(dateStop) > 0)
+            return false; // after end date
+
+        return true;
+    }
+
+   private static Date getFileRevDate(File f) throws ParseException {
         int pos;
         Date d1 = null;
         Date d2 = null;
@@ -132,6 +146,35 @@ public class Sct1File implements Comparable<Object> {
 
         return listOfFiles;
     }
+    
+    public static List<Sct1File> getSctFiles(String wDir, String subDir, String rootDir,
+            String prefix, String postfix, Date dateStart, Date dateStop) throws ParseException,
+            MojoFailureException {
+
+        ArrayList<Sct1File> listOfFiles = new ArrayList<Sct1File>();
+
+        File f1 = new File(new File(wDir, subDir), rootDir);
+        ArrayList<File> fv = new ArrayList<File>();
+        listFilesRecursive(fv, f1, "sct1_" + prefix, postfix);
+
+        File[] files = new File[0];
+        files = fv.toArray(files);
+        Arrays.sort(files);
+
+        for (File f2 : files) {
+            // ADD Sct1File Entry
+            Date revDate = Sct1File.getFileRevDate(f2);
+            if (inDateRange(revDate, dateStart, dateStop)) {
+                Sct1File fo = new Sct1File(f2, revDate);
+                listOfFiles.add(fo);
+            }
+        }
+
+        Collections.sort(listOfFiles);
+
+        return listOfFiles;
+    }
+
 
     private static void listFilesRecursive(ArrayList<File> list, File root, String prefix,
             String postfix) {

@@ -399,7 +399,9 @@ public class QAStoreBIImpl implements QAStoreBI {
 			request.setSortedBy(wsSorteBy);
 
 			IntStrKeyValue[] wsFilter = null;
-			wsFilter = WsClientDataConverter.filterToWsFilter(filter, wsFilter);
+			if(filter != null && !filter.isEmpty()){
+				wsFilter = WsClientDataConverter.filterToWsFilter(filter);
+			}
 			request.setFilter(wsFilter);
 
 			request.setStartLine(startLine);
@@ -469,7 +471,9 @@ public class QAStoreBIImpl implements QAStoreBI {
 			
 			QACasesReportLinesByPageRequest request = new QACasesReportLinesByPageRequest();
 			IntStrKeyValue[] wsFilter = null;
-			WsClientDataConverter.qaCaseFilterToWsQaCaseFilter(filter, wsFilter);
+			if(filter != null && !filter.isEmpty()){
+				wsFilter = WsClientDataConverter.qaCaseFilterToWsQaCaseFilter(filter);
+			}
 			IntBoolKeyValue[] wsSorteBy = null;
 			
 			wsSorteBy = WsClientDataConverter.qaCaseSortToWsQaCaseSort(sortBy);
@@ -500,7 +504,6 @@ public class QAStoreBIImpl implements QAStoreBI {
 					DispositionStatus disposition = WsClientDataConverter.wsDipsStatusToDispStatus(wsQACasesReportLine.getDispositionStatus());
 					QACasesReportLine line = new QACasesReportLine(qaCase, component, disposition);
 					lines.add(line);
-					
 				}
 			}
 			reportPage.setLines(lines);

@@ -1,20 +1,22 @@
 package org.ihtsdo.concept.component.refsetmember.membership;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
-import java.util.Collection;
-import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
-import org.ihtsdo.tk.api.refset.RefsetMemberVersionBI;
 
 public class MembershipRevision extends RefsetRevision<MembershipRevision, MembershipMember> {
 
@@ -133,7 +135,7 @@ public class MembershipRevision extends RefsetRevision<MembershipRevision, Membe
     
     
     @Override
-    public MembershipMember.Version getVersion(Coordinate c)
+    public MembershipMember.Version getVersion(ViewCoordinate c)
             throws ContraditionException {
         return (MembershipMember.Version) ((MembershipMember) primordialComponent).getVersion(c);
     }
@@ -144,9 +146,16 @@ public class MembershipRevision extends RefsetRevision<MembershipRevision, Membe
     }
 
     @Override
-    public Collection<? extends RefsetMemberVersionBI> getVersions(
-            Coordinate c) {
+    public Collection<? extends RefexVersionBI<MembershipRevision>> getVersions(
+            ViewCoordinate c) {
         return ((MembershipMember) primordialComponent).getVersions(c);
     }
 
+	protected TK_REFSET_TYPE getTkRefsetType() {
+		return TK_REFSET_TYPE.MEMBER;
+	}
+
+	protected void addSpecProperties(RefexAmendmentSpec rcs) {
+		// no fields to add...
+	}
 }

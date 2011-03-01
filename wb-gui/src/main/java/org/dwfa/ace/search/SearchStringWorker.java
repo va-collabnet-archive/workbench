@@ -52,7 +52,7 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 
     private int conceptCount;
 
-    private Collection<I_DescriptionVersioned> regexMatches;
+    private Collection<I_DescriptionVersioned<?>> regexMatches;
     private Collection<LuceneMatch> luceneMatches;
 
     private DescriptionsFromCollectionTableModel model;
@@ -277,7 +277,7 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
             completeLatch = ((I_Search) Terms.get()).searchLucene(this, patternString, luceneMatches, completeLatch,
                 searchPanel.getExtraCriterion(), config, (LuceneProgressUpdator) updater);
         } else {
-            regexMatches = new ConcurrentSkipListSet<I_DescriptionVersioned>(
+            regexMatches = new ConcurrentSkipListSet<I_DescriptionVersioned<?>>(
                 new DescriptionComparator());
             updater = new RegexProgressUpdator();
             try {

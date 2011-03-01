@@ -50,7 +50,7 @@ import org.dwfa.util.id.Type5UuidFactory;
 
 
 /**
-  * <b>DESCRIPTION: </b><br>
+ * <b>DESCRIPTION: </b><br>
  * 
  * Rf1ToArfLanguage is a maven mojo which creates intermediate ARF files for ingestion by Sct1ArfToEConceptsMojo.<br>
  * <br>

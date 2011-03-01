@@ -4,15 +4,14 @@
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
-		<version>2.6.0-trek-10-uktc-SNAPSHOT</version>
+		<version>2.6.0-trek-11-uktc-nid-SNAPSHOT</version>
 	</parent>
 	<artifactId>wb-bdb</artifactId>
-	<name>Workbench Berkeley Database</name>
+    <name>${branch}: Workbench Berkeley Database</name>
 	<dependencies>
 		<dependency>
 			<groupId>com.sleepycat</groupId>
 			<artifactId>je</artifactId>
-			<version>4.1.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>

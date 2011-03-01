@@ -47,7 +47,7 @@ import org.ihtsdo.arena.ScrollablePanel;
 import org.ihtsdo.arena.context.action.BpActionFactory;
 import org.ihtsdo.arena.drools.EditPanelKb;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.util.swing.GuiUtil;
 
 import com.mxgraph.model.mxCell;
@@ -309,7 +309,7 @@ public class ConceptViewRenderer extends JLayeredPane
 			}
 			try {
 				
-				Coordinate coordinate = settings.getConfig().getCoordinate();
+				ViewCoordinate coordinate = settings.getConfig().getViewCoordinate();
 				ksession.setGlobal("actions", actions);
 				ksession.setGlobal("actionFactory", new BpActionFactory(settings.getConfig(), 
 						settings.getHost()));

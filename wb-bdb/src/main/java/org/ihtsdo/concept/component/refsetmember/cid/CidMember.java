@@ -16,17 +16,22 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetCidMember;
 import org.ihtsdo.etypes.ERefsetCidRevision;
-import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
+import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class CidMember extends RefsetMember<CidRevision, CidMember> implements I_ExtendByRefPartCid {
+public class CidMember extends RefsetMember<CidRevision, CidMember> 
+	implements I_ExtendByRefPartCid<CidRevision>, RefexCnidAnalogBI<CidRevision> {
 	
 	private static VersionComputer<RefsetMember<CidRevision, CidMember>.Version> computer = 
 		new VersionComputer<RefsetMember<CidRevision, CidMember>.Version>();
@@ -37,7 +42,8 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 
 	public class Version 
 	extends RefsetMember<CidRevision, CidMember>.Version 
-	implements I_ExtendByRefVersion, I_ExtendByRefPartCid {
+	implements I_ExtendByRefVersion<CidRevision>, I_ExtendByRefPartCid<CidRevision>,
+		RefexCnidAnalogBI<CidRevision> {
 
 		private Version() {
 			super();
@@ -47,9 +53,9 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 			super(index);
 		}
 		@Override
-		public int compareTo(I_ExtendByRefPart o) {
+		public int compareTo(I_ExtendByRefPart<CidRevision> o) {
 			if (I_ExtendByRefPartCid.class.isAssignableFrom(o.getClass())) {
-				I_ExtendByRefPartCid another = (I_ExtendByRefPartCid) o;
+				I_ExtendByRefPartCid<CidRevision> another = (I_ExtendByRefPartCid<CidRevision>) o;
 				if (this.getC1id() != another.getC1id()) {
 					return this.getC1id() - another.getC1id();
 				}
@@ -81,6 +87,21 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 			CidMember.this.setC1Nid(c1id);
 		}
 		
+		@Override
+		public int getCnid1() {
+			if (index >= 0) {
+				return revisions.get(index).getCnid1();
+			}
+			return CidMember.this.getCnid1();
+		}
+
+		@Override
+		public void setCnid1(int c1id) {
+			if (index >= 0) {
+				revisions.get(index).setCnid1(c1id);
+			}
+			CidMember.this.setCnid1(c1id);
+		}
 		@Override
 		public ERefsetCidMember getERefsetMember() throws TerminologyException, IOException {
 			return new ERefsetCidMember(this, CidMember.this);
@@ -177,7 +198,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 	}
 
 	@Override
-	public I_AmPart makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+	public CidRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
         if (getTime() == time && getPathNid() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
@@ -197,6 +218,15 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 	}
 
 	public void setC1Nid(int c1Nid) {
+		this.c1Nid = c1Nid;
+        modified();
+	}
+	
+	public int getCnid1() {
+		return c1Nid;
+	}
+
+	public void setCnid1(int c1Nid) {
 		this.c1Nid = c1Nid;
         modified();
 	}
@@ -222,11 +252,11 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 	}
 
 	@Override
-	public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
+	public I_ExtendByRefPart<CidRevision> makePromotionPart(PathBI promotionPath) {
 		throw new UnsupportedOperationException();
 	}
 	
-	public I_ExtendByRefPart duplicate() {
+	public I_ExtendByRefPart<CidRevision> duplicate() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -264,6 +294,14 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 			versions = list;
 		}
 		return (List<Version>) versions;
+	}
+
+	protected TK_REFSET_TYPE getTkRefsetType() {
+		return TK_REFSET_TYPE.CID;
+	}
+
+	protected void addSpecProperties(RefexAmendmentSpec rcs) {
+		rcs.with(RefexProperty.CNID1, getCnid1());
 	}
 
 }

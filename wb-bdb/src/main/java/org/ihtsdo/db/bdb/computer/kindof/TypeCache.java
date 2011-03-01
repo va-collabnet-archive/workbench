@@ -12,14 +12,14 @@ import org.ihtsdo.concept.I_FetchConceptFromCursor;
 import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
 import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnable, KindOfCacheBI {
 	protected ConcurrentHashMap<Integer, int[]> typeMap;
     private List<ParallelConceptIterator> pcis;
-    protected Coordinate coordinate;
+    protected ViewCoordinate coordinate;
     private boolean ready = false;
     private boolean cancelled = false;
     private CountDownLatch latch = new CountDownLatch(1);
@@ -50,7 +50,7 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 	 * @see org.ihtsdo.db.bdb.computer.kindof.I_CacheKindOfRels#setup(org.ihtsdo.tk.api.Coordinate)
 	 */
 	@Override
-	public void setup(Coordinate coordinate) throws Exception {
+	public void setup(ViewCoordinate coordinate) throws Exception {
 		this.coordinate = coordinate;
 		this.types = coordinate.getIsaTypeNids();
 		typeMap = new ConcurrentHashMap<Integer, int[]>(Terms.get().getConceptCount());

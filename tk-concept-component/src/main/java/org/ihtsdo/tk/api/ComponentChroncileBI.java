@@ -1,19 +1,17 @@
 package org.ihtsdo.tk.api;
 
 import java.util.Collection;
-import org.ihtsdo.tk.api.refset.RefsetMemberChronicleBI;
 
-public interface ComponentChroncileBI<T extends ComponentVersionBI> extends ComponentBI {
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
-    T getVersion(Coordinate c) throws ContraditionException;
+public interface ComponentChroncileBI<T extends ComponentVersionBI>
+        extends ComponentBI {
 
-    Collection<? extends T> getVersions(Coordinate c);
+    T getVersion(ViewCoordinate c) throws ContraditionException;
+
+    Collection<? extends T> getVersions(ViewCoordinate c);
 
     Collection<? extends T> getVersions();
     
     boolean isUncommitted();
-
-    boolean addAnnotation(RefsetMemberChronicleBI annotation);
-
-    Collection<? extends RefsetMemberChronicleBI> getAnnotations();
 }

@@ -74,7 +74,7 @@ public  class SemanticAreaHierarchyRefsetSearcher extends RefsetSearcherUtility
    		while (itr.hasNext())
    		{
    	   		I_TermFactory tf = Terms.get();
-   	   		I_DescriptionVersioned v = (I_DescriptionVersioned)itr.next();
+   	   		I_DescriptionVersioned<?> v = (I_DescriptionVersioned)itr.next();
 
    	   		for (I_DescriptionTuple tuple : v.getTuples())
 	   		{

@@ -124,11 +124,11 @@ import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
@@ -3122,16 +3122,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
 	@Override
-	public Coordinate getCoordinate() {
+	public ViewCoordinate getViewCoordinate() {
 		if (languagePreferenceList != null && languagePreferenceList.size()>1) {
-			return  new Coordinate(getPrecedence(), getViewPositionSetReadOnly(), 
+			return  new ViewCoordinate(getPrecedence(), getViewPositionSetReadOnly(), 
 					getAllowedStatus(), getDestRelTypes(),
                                         getConflictResolutionStrategy(),
                                         languagePreferenceList.get(0),
                                         classifierConcept.getConceptNid(),
                                         relAssertionType);
 		} else {
-			return  new Coordinate(getPrecedence(), getViewPositionSetReadOnly(), 
+			return  new ViewCoordinate(getPrecedence(), getViewPositionSetReadOnly(), 
 					getAllowedStatus(), getDestRelTypes(),
                                         getConflictResolutionStrategy(),
                                         Integer.MAX_VALUE,

@@ -3,8 +3,9 @@ package org.ihtsdo.tk.api.media;
 import org.ihtsdo.tk.api.AnalogGeneratorBI;
 import org.ihtsdo.tk.api.TypedComponentVersionBI;
 
-public interface MediaVersionBI extends TypedComponentVersionBI,
-		MediaChronicleBI, AnalogGeneratorBI<MediaAnalogBI> {
+public interface MediaVersionBI<A extends MediaAnalogBI>
+        extends TypedComponentVersionBI,
+		MediaChronicleBI, AnalogGeneratorBI<A> {
 
     public byte[] getMedia();
 

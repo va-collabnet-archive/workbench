@@ -125,7 +125,6 @@ public class CidStrRevisionTest {
          
         member.nid = 1;
         member.primordialSapNid = 1; 
-        member.primordialUNid = 1;
         member.setC1Nid(1);
         member.setStringValue("Test Object 1 - Rev 1");
         member.setStatusAtPositionNid(1);
@@ -148,7 +147,6 @@ public class CidStrRevisionTest {
          
         member.nid = 2;
         member.primordialSapNid = 2; 
-        member.primordialUNid = 2;
         member.setC1Nid(2);
         member.setStringValue("Test Object 2 - Rev 1");
         member.setStatusAtPositionNid(2);

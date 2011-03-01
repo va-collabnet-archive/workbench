@@ -11,14 +11,17 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
-import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetCidCidCidMember;
 import org.ihtsdo.etypes.ERefsetCidCidCidRevision;
-import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
+import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidVersionBI;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.cidcidcid.TkRefsetCidCidCidMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidcidcid.TkRefsetCidCidCidRevision;
 
@@ -26,7 +29,8 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMember>
-	implements I_ExtendByRefPartCidCidCid {
+	implements I_ExtendByRefPartCidCidCid<CidCidCidRevision>, 
+			   RefexCnidCnidCnidVersionBI<CidCidCidRevision> {
 
 	private static VersionComputer<RefsetMember<CidCidCidRevision, CidCidCidMember>.Version> computer = 
 		new VersionComputer<RefsetMember<CidCidCidRevision, CidCidCidMember>.Version>();
@@ -39,7 +43,8 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 	
 	public class Version 
 	extends RefsetMember<CidCidCidRevision, CidCidCidMember>.Version 
-	implements I_ExtendByRefVersion, I_ExtendByRefPartCidCidCid {
+	implements I_ExtendByRefVersion<CidCidCidRevision>, 
+		I_ExtendByRefPartCidCidCid<CidCidCidRevision> {
 
 		private Version() {
 			super();
@@ -48,9 +53,10 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 		private Version(int index) {
 			super(index);
 		}
-		public int compareTo(I_ExtendByRefPart o) {
+		public int compareTo(I_ExtendByRefPart<CidCidCidRevision> o) {
 			if (I_ExtendByRefPartCidCidCid.class.isAssignableFrom(o.getClass())) {
-				I_ExtendByRefPartCidCidCid another = (I_ExtendByRefPartCidCidCid) o;
+				I_ExtendByRefPartCidCidCid<CidCidCidRevision> another = 
+					(I_ExtendByRefPartCidCidCid<CidCidCidRevision>) o;
 				if (this.getC1id() != another.getC1id()) {
 					return this.getC1id() - another.getC1id();
 				}
@@ -334,4 +340,27 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 		return (List<Version>) versions;
 	}
 
+	@Override
+	public int getCnid2() {
+		return c2Nid;
+	}
+
+	@Override
+	public int getCnid1() {
+		return c1Nid;
+	}
+
+	@Override
+	public int getCnid3() {
+		return c3Nid;
+	}
+	protected TK_REFSET_TYPE getTkRefsetType() {
+		return TK_REFSET_TYPE.CID_CID_CID;
+	}
+
+	protected void addSpecProperties(RefexAmendmentSpec rcs) {
+		rcs.with(RefexProperty.CNID1, getCnid1());
+		rcs.with(RefexProperty.CNID2, getCnid2());
+		rcs.with(RefexProperty.CNID3, getCnid3());
+	}
 }

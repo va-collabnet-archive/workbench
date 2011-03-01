@@ -29,5 +29,23 @@ public class HashFunction {
         }
         return hash;
     }
+    public static short hashCode(short[] parts) {
+        short hash = 0;
+        for (int i = 0; i < parts.length; i++) {
+            hash <<= 1;
+            if (hash < 0) {
+                hash |= 1;
+            }
+            hash ^= parts[i];
+        }
+        return hash;
+    }
+
+    public static short intHashToShortHash(int hash) {
+        short[] parts = new short[2];
+        parts[0] = (short) hash; // low order short
+        parts[1] = (short) (hash >> 16); // high order short
+        return HashFunction.hashCode(parts);
+    }
 
 }

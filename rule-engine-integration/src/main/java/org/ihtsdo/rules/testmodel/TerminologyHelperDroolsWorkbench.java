@@ -100,8 +100,8 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		int parentConceptNid = Terms.get().uuidToNative(UUID.fromString(parent));
 		int subtypeConceptNid = Terms.get().uuidToNative(UUID.fromString(subtype));
 		if (RulesLibrary.myStaticIsACache == null) { 
-			ConceptVersionBI parentConcept = Ts.get().getConceptVersion(config.getCoordinate(), parentConceptNid);
-			ConceptVersionBI subtypeConcept = Ts.get().getConceptVersion(config.getCoordinate(), subtypeConceptNid);
+			ConceptVersionBI parentConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), parentConceptNid);
+			ConceptVersionBI subtypeConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), subtypeConceptNid);
 			result = subtypeConcept.isKindOf(parentConcept);
 		} else {
 			//System.out.println("Using rules library isa cache!");
@@ -135,7 +135,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 					if (potential_fsn != null) {
 
 						DescriptionVersionBI description = (DescriptionVersionBI) 
-						Ts.get().getComponentVersion(Terms.get().getActiveAceFrameConfig().getCoordinate(), dnid);
+						Ts.get().getComponentVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), dnid);
 
 						if (description.getTypeNid() == fsnTypeNid
 								&& description.getText().equals(fsn)
@@ -162,8 +162,8 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		boolean result = false;
 
 		try {
-			ConceptVersionBI concept = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getCoordinate(), UUID.fromString(conceptUUID));
-			int status = concept.getConAttrs().getVersion(Terms.get().getActiveAceFrameConfig().getCoordinate()).getStatusNid();
+			ConceptVersionBI concept = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), UUID.fromString(conceptUUID));
+			int status = concept.getConAttrs().getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate()).getStatusNid();
 			if (status == ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid() ||
 					status == ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()) {
 				result = true;

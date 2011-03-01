@@ -442,7 +442,7 @@ public abstract class  DragPanel<T extends Object> extends JPanel implements Tra
 			actionList.clear();
 			if (I_GetConceptData.class.isAssignableFrom(thingToDrop.getClass())) {
 				I_GetConceptData conceptToDrop = (I_GetConceptData) thingToDrop;
-				thingToDrop = Ts.get().getConceptVersion(settings.getConfig().getCoordinate(), conceptToDrop.getConceptNid());
+				thingToDrop = Ts.get().getConceptVersion(settings.getConfig().getViewCoordinate(), conceptToDrop.getConceptNid());
 			} else if (ComponentVersionBI.class.isAssignableFrom(thingToDrop.getClass()) ||
 					SpecBI.class.isAssignableFrom(thingToDrop.getClass())) {
 				StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();

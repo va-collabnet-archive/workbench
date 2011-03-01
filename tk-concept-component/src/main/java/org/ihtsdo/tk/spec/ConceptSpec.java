@@ -20,15 +20,16 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 public class ConceptSpec implements SpecBI {
@@ -94,7 +95,7 @@ public class ConceptSpec implements SpecBI {
         this.relSpecs = relSpecs;
     }
 
-    public ConceptVersionBI get(Coordinate c) throws IOException  {
+    public ConceptVersionBI get(ViewCoordinate c) throws IOException  {
             try {
 				ConceptVersionBI local = Ts.get().getConceptVersion(c, uuids);
 				validateDescription(local, c);
@@ -105,7 +106,7 @@ public class ConceptSpec implements SpecBI {
 			}
     }
 
-    private boolean validateRelationships(ConceptVersionBI local, Coordinate c) throws IOException {
+    private boolean validateRelationships(ConceptVersionBI local, ViewCoordinate c) throws IOException {
         if (relSpecs == null || relSpecs.length == 0) {
             return true;
         }
@@ -127,7 +128,7 @@ public class ConceptSpec implements SpecBI {
         return false;
     }
 
-    private void validateDescription(ConceptVersionBI local, Coordinate c) throws IOException, ContraditionException {
+    private void validateDescription(ConceptVersionBI local, ViewCoordinate c) throws IOException, ContraditionException {
         boolean found = false;
         for (DescriptionVersionBI desc : local.getDescsActive()) {
             if (desc.getText().equals(description)) {
@@ -180,6 +181,21 @@ public class ConceptSpec implements SpecBI {
     public void setUuids(UUID[] uuids) {
         this.uuids = uuids;
     }
+    
+    public void setUuidStrs(String[] uuidStrs) {
+        this.uuids = new UUID[uuidStrs.length];
+        for (int i = 0; i < uuidStrs.length; i++) {
+            this.uuids[i] = UUID.fromString(uuidStrs[i]);
+        }
+    }
+
+    public String[] getUuidStrs() {
+        String[] results = new String[uuids.length];
+        for (int i = 0; i < uuids.length; i++) {
+            results[i] = uuids[i].toString();
+        }
+        return results;
+    }
 
     public String getDescription() {
         return description;
@@ -198,6 +214,14 @@ public class ConceptSpec implements SpecBI {
     }
 
     public int getNid() throws IOException {
-    	return Ts.get().uuidsToNid(uuids);
+    	return Ts.get().getNidForUuids(uuids);
     }
+
+    @Override
+    public String toString() {
+        return "ConceptSpec{" + description + "; " + Arrays.asList(uuids) +
+                "}";
+    }
+    
+    
 }

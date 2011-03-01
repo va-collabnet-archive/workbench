@@ -4,11 +4,11 @@
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
-		<version>2.6.0-trek-10-uktc-SNAPSHOT</version>
+		<version>2.6.0-trek-11-uktc-nid-SNAPSHOT</version>
 	</parent>
 	<artifactId>tk-qa-ws-client</artifactId>
 	<packaging>jar</packaging>
-	<name>QA Database Web Service Client</name>
+	<name>${branch}: QA Database Web Service Client</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

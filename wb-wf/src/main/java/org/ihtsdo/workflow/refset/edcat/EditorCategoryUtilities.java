@@ -67,7 +67,7 @@ public class EditorCategoryUtilities {
     	
     	while (itr.hasNext())
    		{
-   	   		I_DescriptionVersioned v = (I_DescriptionVersioned)itr.next();
+   	   		I_DescriptionVersioned<?> v = (I_DescriptionVersioned)itr.next();
 
 	   		for (I_DescriptionTuple tuple : v.getTuples())
 	   		{

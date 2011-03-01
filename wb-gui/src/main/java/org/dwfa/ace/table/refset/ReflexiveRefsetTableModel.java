@@ -102,11 +102,15 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
             }
             Collection<? extends I_ExtendByRef> refsetMembers = Terms.get().getRefsetExtensionMembers(refsetId);
 
-            if (stopWork || refsetMembers.size() == 0) {
+            if (stopWork || refsetMembers.isEmpty()) {
                 return false;
             }
             for (I_ExtendByRef extension : refsetMembers) {
-
+                if (extension.getComponentNid() == Integer.MAX_VALUE) {
+                    AceLog.getAppLog().warning("Extension has unset component nid: " +
+                            extension);
+                    break;
+                }
                 I_IntSet statusSet = host.getConfig().getAllowedStatus();
                 PositionSetReadOnly positionSet = host.getConfig().getViewPositionSetReadOnly();
                 if (host instanceof RefsetSpecEditor) {
@@ -157,14 +161,14 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                                 if (col.readParamaters != null) {
                                     Object readValue =
                                             col.getReadMethod().invoke(
-                                                Terms.get().getConcept(extension.getComponentId()), col.readParamaters);
+                                                Terms.get().getConcept(extension.getComponentNid()), col.readParamaters);
                                     if (readValue != null && Integer.class.isAssignableFrom(readValue.getClass())) {
                                         conceptsToFetch.add((Integer) readValue);
                                     }
                                 } else {
                                     Object readValue =
                                             col.getReadMethod().invoke(
-                                                Terms.get().getConcept(extension.getComponentId()));
+                                                Terms.get().getConcept(extension.getComponentNid()));
                                     if (readValue != null && Integer.class.isAssignableFrom(readValue.getClass())) {
                                         conceptsToFetch.add((Integer) readValue);
                                     }

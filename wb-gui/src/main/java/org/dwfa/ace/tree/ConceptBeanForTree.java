@@ -57,23 +57,70 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.amend.InvalidAmendmentSpec;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
 import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.media.MediaChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 
 public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<ConceptBeanForTree> {
     I_GetConceptData bean;
 
+    public boolean isUncommitted() {
+        return bean.isUncommitted();
+    }
+
+    public Collection<? extends ConceptVersionBI> getVersions() {
+        return bean.getVersions();
+    }
+
+    public Collection<? extends ConceptVersionBI> getVersions(ViewCoordinate c) {
+        return bean.getVersions(c);
+    }
+
+    public ConceptVersionBI getVersion(ViewCoordinate c) throws ContraditionException {
+        return bean.getVersion(c);
+    }
+
+    public Collection<? extends RefexChronicleBI<?>> getRefexes()
+			throws IOException {
+		return bean.getRefexes();
+	}
+
+	public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
+			ViewCoordinate xyz) throws IOException {
+		return bean.getCurrentRefexes(xyz);
+	}
+
+	public boolean addAnnotation(RefexChronicleBI<?> annotation)
+			throws IOException {
+		return bean.addAnnotation(annotation);
+	}
+
+	public Collection<? extends RefexChronicleBI<?>> getAnnotations()
+			throws IOException {
+		return bean.getAnnotations();
+	}
+
+	public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
+			ViewCoordinate xyz) throws IOException {
+		return bean.getCurrentAnnotations(xyz);
+	}
+
     @Override
-    public void setAnnotationStyleRefset(boolean annotationSyleRefset) {
-        bean.setAnnotationStyleRefset(annotationSyleRefset);
+    public void setAnnotationStyleRefex(boolean annotationSyleRefex) {
+        bean.setAnnotationStyleRefex(annotationSyleRefex);
     }
 
     @Override
-    public boolean isAnnotationStyleRefset() throws IOException {
-        return bean.isAnnotationStyleRefset();
+    public boolean isAnnotationStyleRefex() throws IOException {
+        return bean.isAnnotationStyleRefex();
     }
 
     @Override
@@ -105,9 +152,6 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
                 classifierNid,
                 relAssertionType);
     }
-    public boolean isUncommitted() {
-		return bean.isUncommitted();
-	}
 
 	public String toUserString() {
 		return bean.toUserString();

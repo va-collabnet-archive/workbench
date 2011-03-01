@@ -35,7 +35,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.drools.IsKindOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsMemberOfEvaluatorDefinition; //TODO this
 import org.ihtsdo.tk.drools.SatisfiesConstraintEvaluatorDefinition;
@@ -136,7 +136,7 @@ public class EditPanelKb implements Runnable {
 				logger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 			}
 			try {
-				Coordinate coordinate = config.getCoordinate();
+				ViewCoordinate coordinate = config.getViewCoordinate();
 				ksession.setGlobal("templates", templates);
 				ksession.insert(Ts.get().getConceptVersion(coordinate, c.getNid()));
 				ksession.fireAllRules();

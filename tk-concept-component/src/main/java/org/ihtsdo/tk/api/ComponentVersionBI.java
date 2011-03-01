@@ -3,9 +3,9 @@ package org.ihtsdo.tk.api;
 
 public interface ComponentVersionBI extends ComponentBI {
 
-    public int getStatusNid();
-    public int getAuthorNid();
-    public int getPathNid();
-    public long getTime();
-    public int getSapNid();
+    int getStatusNid();
+    int getAuthorNid();
+    int getPathNid();
+    long getTime();
+    int getSapNid();
 }

@@ -28,12 +28,12 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.media.MediaAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
 import org.ihtsdo.tk.dto.concept.component.media.TkMediaRevision;
@@ -43,11 +43,15 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class Image
         extends ConceptComponent<ImageRevision, Image>
-        implements I_ImageVersioned, I_ImagePart, MediaAnalogBI {
+        implements I_ImageVersioned<ImageRevision>,
+                I_ImagePart<ImageRevision>,
+                MediaAnalogBI<ImageRevision> {
 
     public class Version
             extends ConceptComponent<ImageRevision, Image>.Version
-            implements I_ImageTuple, I_ImagePart, MediaAnalogBI {
+            implements I_ImageTuple<ImageRevision>,
+                    I_ImagePart<ImageRevision>,
+                    MediaAnalogBI<ImageRevision> {
 
         public Version() {
             super();
@@ -96,14 +100,14 @@ public class Image
         }
 
         @Override
-        public Image.Version getVersion(Coordinate c)
+        public Image.Version getVersion(ViewCoordinate c)
                 throws ContraditionException {
             return Image.this.getVersion(c);
         }
 
         @Override
         public Collection<Image.Version> getVersions(
-                Coordinate c) {
+                ViewCoordinate c) {
             return Image.this.getVersions(c);
         }
 
@@ -496,7 +500,7 @@ public class Image
     public UniversalAceImage getUniversal() throws IOException,
             TerminologyException {
         UniversalAceImage universal = new UniversalAceImage(getUids(nid),
-                getImage(), new ArrayList<UniversalAceImagePart>(revisions.size()), getFormat(), getEnclosingConcept().getUids());
+                getImage(), new ArrayList<UniversalAceImagePart>(revisions.size()), getFormat(), getEnclosingConcept().getUUIDs());
 
         for (org.ihtsdo.concept.component.image.Image.Version part : getVersions()) {
             UniversalAceImagePart universalPart = new UniversalAceImagePart();
@@ -640,7 +644,7 @@ public class Image
     }
 
     @Override
-    public Image.Version getVersion(Coordinate c)
+    public Image.Version getVersion(ViewCoordinate c)
             throws ContraditionException {
         List<Image.Version> vForC = getVersions(c);
         if (vForC.size() == 0) {
@@ -653,7 +657,7 @@ public class Image
     }
 
     @Override
-    public List<Image.Version> getVersions(Coordinate c) {
+    public List<Image.Version> getVersions(ViewCoordinate c) {
         List<Version> returnTuples = new ArrayList<Version>(2);
         computer.addSpecifiedVersions(c.getAllowedStatusNids(), (NidSetBI) null, c.getPositionSet(),
                 returnTuples, getVersions(), c.getPrecedence(), c.getContradictionManager());

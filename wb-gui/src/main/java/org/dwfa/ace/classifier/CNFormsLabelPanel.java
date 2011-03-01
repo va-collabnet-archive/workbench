@@ -67,13 +67,13 @@ import org.dwfa.ace.task.classify.SnoRel;
 import org.dwfa.ace.task.classify.SnoTable;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
-import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
-import org.ihtsdo.tk.api.refset.RefsetMemberChronicleBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
@@ -96,9 +96,19 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
     private static final long serialVersionUID = 1L;
     
     public static class ConceptAttrVersion implements I_ConceptAttributeTuple {
-        I_ConceptAttributeVersioned core;
+        I_ConceptAttributeVersioned<?> core;
 
-        public boolean isUncommitted() {
+        public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
+				ViewCoordinate xyz) throws IOException {
+			return core.getCurrentRefexes(xyz);
+		}
+
+		public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
+				ViewCoordinate xyz) throws IOException {
+			return core.getCurrentAnnotations(xyz);
+		}
+
+		public boolean isUncommitted() {
 			return core.isUncommitted();
 		}
 
@@ -110,7 +120,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 			return core.getUUIDs();
 		}
 
-		public ConAttrVersionBI getVersion(Coordinate c)
+		public ConAttrVersionBI getVersion(ViewCoordinate c)
 				throws ContraditionException {
 			return core.getVersion(c);
 		}
@@ -119,7 +129,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 			return core.getVersions();
 		}
 
-		public Collection<? extends ConAttrVersionBI> getVersions(Coordinate c) {
+		public Collection<? extends ConAttrVersionBI> getVersions(ViewCoordinate c) {
 			return core.getVersions(c);
 		}
 
@@ -340,12 +350,12 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 		}
 
         @Override
-        public boolean addAnnotation(RefsetMemberChronicleBI annotation) {
+        public boolean addAnnotation(RefexChronicleBI<?> annotation) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
-        public Collection<? extends RefsetMemberChronicleBI> getAnnotations() {
+        public Collection<? extends RefexChronicleBI<?>> getAnnotations() {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
@@ -353,12 +363,19 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         public int getSapNid() {
             throw new UnsupportedOperationException("Not supported yet.");
         }
+
+		@Override
+		public Collection<? extends RefexChronicleBI<?>> getRefexes()
+				throws IOException {
+            throw new UnsupportedOperationException("Not supported yet.");
+		}
+
     }
 
     
     private static class RelVersion implements I_RelTuple {
 
-        I_RelVersioned fixedPart;
+        I_RelVersioned<?> fixedPart;
         public boolean isUncommitted() {
 			return fixedPart.isUncommitted();
 		}
@@ -371,7 +388,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 			return fixedPart.getUUIDs();
 		}
 
-		public RelationshipVersionBI getVersion(Coordinate c)
+		public RelationshipVersionBI<?> getVersion(ViewCoordinate c)
 				throws ContraditionException {
 			return fixedPart.getVersion(c);
 		}
@@ -381,7 +398,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 		}
 
 		public Collection<? extends RelationshipVersionBI> getVersions(
-				Coordinate c) {
+				ViewCoordinate c) {
 			return fixedPart.getVersions(c);
 		}
 
@@ -714,13 +731,9 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             return false;
         }
 
-        @Override
-        public boolean addAnnotation(RefsetMemberChronicleBI annotation) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
 
         @Override
-        public Collection<? extends RefsetMemberChronicleBI> getAnnotations() {
+        public Collection<? extends RefexChronicleBI<?>> getAnnotations() {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
@@ -728,6 +741,35 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         public int getSapNid() {
             throw new UnsupportedOperationException("Not supported yet.");
         }
+
+        @Override
+        public void setNid(int nid) throws PropertyVetoException {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+		@Override
+		public Collection<? extends RefexChronicleBI<?>> getRefexes()
+				throws IOException {
+            throw new UnsupportedOperationException("Not supported yet.");
+		}
+
+		@Override
+		public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
+				ViewCoordinate xyz) throws IOException {
+            throw new UnsupportedOperationException("Not supported yet.");
+		}
+
+		@Override
+		public boolean addAnnotation(RefexChronicleBI<?> annotation)
+				throws IOException {
+            throw new UnsupportedOperationException("Not supported yet.");
+		}
+
+		@Override
+		public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
+				ViewCoordinate xyz) throws IOException {
+            throw new UnsupportedOperationException("Not supported yet.");
+		}
 
     }
 

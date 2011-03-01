@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.Concept;
-import org.ihtsdo.tk.api.refset.RefsetMemberChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 
 /**
  *
@@ -41,18 +41,19 @@ public class AnnotationWriter {
     public AnnotationWriter() {
     }
 
-    public ConcurrentSkipListSet<RefsetMemberChronicleBI> entryToObject(TupleInput input, 
+	@SuppressWarnings("unchecked")
+	public ConcurrentSkipListSet<RefexChronicleBI<?>> entryToObject(TupleInput input, 
             int enclosingConceptNid) {
         int listSize = input.readShort();
         if (listSize == 0) {
             return null;
         }
-        ConcurrentSkipListSet<RefsetMemberChronicleBI> newRefsetMemberList = 
-                new ConcurrentSkipListSet<RefsetMemberChronicleBI>(
-                    new Comparator<RefsetMemberChronicleBI>() {
+        ConcurrentSkipListSet<RefexChronicleBI<?>> newRefsetMemberList = 
+                new ConcurrentSkipListSet<RefexChronicleBI<?>>(
+                    new Comparator<RefexChronicleBI<?>>() {
 
                 @Override
-                public int compare(RefsetMemberChronicleBI t, RefsetMemberChronicleBI t1) {
+                public int compare(RefexChronicleBI<?> t, RefexChronicleBI<?> t1) {
                     return t.getNid() - t1.getNid();
                 }
                 
@@ -94,14 +95,14 @@ public class AnnotationWriter {
         return newRefsetMemberList;
     }
 
-    public void objectToEntry(Collection<RefsetMemberChronicleBI> list,
+    public void objectToEntry(Collection<RefexChronicleBI<?>> list,
             TupleOutput output, int maxReadOnlyStatusAtPositionId) {
         if (list == null) {
             output.writeShort(0); // List size
             return;
         }
         List<RefsetMember<?,?>> refsetMembersToWrite = new ArrayList<RefsetMember<?,?>>(list.size());
-        for (RefsetMemberChronicleBI refsetChronicle : list) {
+        for (RefexChronicleBI<?> refsetChronicle : list) {
             RefsetMember<?,?> refsetMember = (RefsetMember<?, ?>) refsetChronicle;
             encountered.incrementAndGet();
             assert refsetMember.getSapNid() != Integer.MAX_VALUE;

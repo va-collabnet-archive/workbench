@@ -4,11 +4,11 @@
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
-		<version>2.6.0-trek-10-uktc-SNAPSHOT</version>
+		<version>2.6.0-trek-11-uktc-nid-SNAPSHOT</version>
 	</parent>
 	<artifactId>wb-bdb-mojo</artifactId>
 	<packaging>maven-plugin</packaging>
-	<name>Workbench Berkeley Database Mojo</name>
+  <name>${branch}: Workbench Berkeley Database Mojo</name>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.maven</groupId>

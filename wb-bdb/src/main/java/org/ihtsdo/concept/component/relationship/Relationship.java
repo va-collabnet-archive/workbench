@@ -28,12 +28,12 @@ import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRel;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
@@ -42,11 +42,15 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class Relationship extends ConceptComponent<RelationshipRevision, Relationship>
-        implements I_RelVersioned, I_RelPart, RelationshipAnalogBI {
+        implements I_RelVersioned<RelationshipRevision>,
+                   I_RelPart<RelationshipRevision>,
+                   RelationshipAnalogBI<RelationshipRevision> {
 
     public class Version
             extends ConceptComponent<RelationshipRevision, Relationship>.Version
-            implements I_RelTuple, I_RelPart, RelationshipAnalogBI {
+            implements I_RelTuple<RelationshipRevision>,
+                       I_RelPart<RelationshipRevision>,
+                       RelationshipAnalogBI<RelationshipRevision> {
 
         public Version() {
             super();
@@ -218,14 +222,14 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         }
 
         @Override
-        public Relationship.Version getVersion(Coordinate c)
+        public Relationship.Version getVersion(ViewCoordinate c)
                 throws ContraditionException {
             return Relationship.this.getVersion(c);
         }
 
         @Override
         public Collection<Relationship.Version> getVersions(
-                Coordinate c) {
+                ViewCoordinate c) {
             return Relationship.this.getVersions(c);
         }
 
@@ -853,7 +857,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     }
 
     @Override
-    public Relationship.Version getVersion(Coordinate c)
+    public Relationship.Version getVersion(ViewCoordinate c)
             throws ContraditionException {
         List<Relationship.Version> vForC = getVersions(c);
         if (vForC.size() == 0) {
@@ -866,7 +870,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     }
 
     @Override
-    public List<Relationship.Version> getVersions(Coordinate c) {
+    public List<Relationship.Version> getVersions(ViewCoordinate c) {
         List<Version> possibleValues = new ArrayList<Version>(2);
         computer.addSpecifiedRelVersions(possibleValues,
                 getVersions(),

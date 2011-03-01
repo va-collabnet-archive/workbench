@@ -9,23 +9,17 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.JComponent;
-
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
-import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.cern.colt.map.OpenIntIntHashMap;
 import org.ihtsdo.concept.component.relationship.group.RelGroupVersion;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.amend.InvalidAmendmentSpec;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.constraint.ConstraintBI;
 import org.ihtsdo.tk.api.constraint.ConstraintCheckType;
@@ -33,31 +27,31 @@ import org.ihtsdo.tk.api.constraint.DescriptionConstraint;
 import org.ihtsdo.tk.api.constraint.RelConstraint;
 import org.ihtsdo.tk.api.constraint.RelConstraintIncoming;
 import org.ihtsdo.tk.api.constraint.RelConstraintOutgoing;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.media.MediaChronicleBI;
 import org.ihtsdo.tk.api.media.MediaVersionBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
-import org.ihtsdo.tk.example.binding.Snomed;
 import org.ihtsdo.tk.spec.ConceptSpec;
-
-import org.dwfa.tapi.TerminologyException; //TODO this 
 
 public class ConceptVersion implements ConceptVersionBI {
 
     private Concept concept;
 
     @Override
-    public void setAnnotationStyleRefset(boolean annotationStyleRefset) {
-        concept.setAnnotationStyleRefset(annotationStyleRefset);
+    public void setAnnotationStyleRefex(boolean annotationStyleRefset) {
+        concept.setAnnotationStyleRefex(annotationStyleRefset);
     }
 
     @Override
-    public boolean isAnnotationStyleRefset() throws IOException {
-        return concept.isAnnotationStyleRefset();
+    public boolean isAnnotationStyleRefex() throws IOException {
+        return concept.isAnnotationStyleRefex();
     }
 
     @Override
@@ -79,12 +73,12 @@ public class ConceptVersion implements ConceptVersionBI {
     public List<UUID> getUUIDs() {
         return concept.getUUIDs();
     }
-    private Coordinate coordinate;
+    private ViewCoordinate xyz;
 
-    public ConceptVersion(Concept concept, Coordinate coordinate) {
+    public ConceptVersion(Concept concept, ViewCoordinate coordinate) {
         super();
         this.concept = concept;
-        this.coordinate = coordinate;
+        this.xyz = coordinate;
     }
 
     @Override
@@ -94,12 +88,12 @@ public class ConceptVersion implements ConceptVersionBI {
 
     @Override
     public ConAttrVersionBI getConAttrsActive() throws IOException, ContraditionException {
-        return concept.getConceptAttributes().getVersion(coordinate);
+        return concept.getConceptAttributes().getVersion(xyz);
     }
 
     @Override
-    public Coordinate getCoordinate() {
-        return coordinate;
+    public ViewCoordinate getCoordinate() {
+        return xyz;
     }
 
     @Override
@@ -113,7 +107,7 @@ public class ConceptVersion implements ConceptVersionBI {
             throws IOException, ContraditionException {
         Collection<DescriptionVersionBI> returnValues = new ArrayList<DescriptionVersionBI>();
         for (DescriptionChronicleBI desc : getDescs()) {
-            returnValues.addAll(desc.getVersions(coordinate));
+            returnValues.addAll(desc.getVersions(xyz));
         }
         return returnValues;
     }
@@ -128,7 +122,7 @@ public class ConceptVersion implements ConceptVersionBI {
             throws IOException, ContraditionException {
         Collection<MediaVersionBI> returnValues = new ArrayList<MediaVersionBI>();
         for (MediaChronicleBI media : getMedia()) {
-            returnValues.addAll(media.getVersions(coordinate));
+            returnValues.addAll(media.getVersions(xyz));
         }
         return returnValues;
     }
@@ -144,7 +138,7 @@ public class ConceptVersion implements ConceptVersionBI {
             throws IOException, ContraditionException {
         Collection<RelationshipVersionBI> returnValues = new ArrayList<RelationshipVersionBI>();
         for (RelationshipChronicleBI rel : getRelsIncoming()) {
-            returnValues.addAll(rel.getVersions(coordinate));
+            returnValues.addAll(rel.getVersions(xyz));
         }
         return returnValues;
     }
@@ -155,7 +149,7 @@ public class ConceptVersion implements ConceptVersionBI {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
         for (RelationshipChronicleBI rel : getRelsIncoming()) {
             for (RelationshipVersionBI relv : rel.getVersions()) {
-                ConceptVersionBI cv = Ts.get().getConceptVersion(coordinate, relv.getDestinationNid());
+                ConceptVersionBI cv = Ts.get().getConceptVersion(xyz, relv.getDestinationNid());
                 conceptSet.add(cv);
             }
         }
@@ -169,7 +163,7 @@ public class ConceptVersion implements ConceptVersionBI {
         for (RelationshipChronicleBI rel : getRelsIncoming()) {
             for (RelationshipVersionBI relv : rel.getVersions()) {
                 if (typeNids.contains(relv.getTypeNid())) {
-                    ConceptVersionBI cv = Ts.get().getConceptVersion(coordinate, relv.getDestinationNid());
+                    ConceptVersionBI cv = Ts.get().getConceptVersion(xyz, relv.getDestinationNid());
                     conceptSet.add(cv);
                 }
             }
@@ -182,8 +176,8 @@ public class ConceptVersion implements ConceptVersionBI {
             throws IOException, ContraditionException {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
         for (RelationshipChronicleBI rel : getRelsIncoming()) {
-            for (RelationshipVersionBI relv : rel.getVersions(coordinate)) {
-                ConceptVersionBI cv = Ts.get().getConceptVersion(coordinate, relv.getDestinationNid());
+            for (RelationshipVersionBI relv : rel.getVersions(xyz)) {
+                ConceptVersionBI cv = Ts.get().getConceptVersion(xyz, relv.getDestinationNid());
                 conceptSet.add(cv);
             }
         }
@@ -195,9 +189,9 @@ public class ConceptVersion implements ConceptVersionBI {
             NidSetBI typeNids) throws IOException, ContraditionException {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
         for (RelationshipChronicleBI rel : getRelsIncoming()) {
-            for (RelationshipVersionBI relv : rel.getVersions(coordinate)) {
+            for (RelationshipVersionBI relv : rel.getVersions(xyz)) {
                 if (typeNids.contains(relv.getTypeNid())) {
-                    ConceptVersionBI cv = Ts.get().getConceptVersion(coordinate, relv.getDestinationNid());
+                    ConceptVersionBI cv = Ts.get().getConceptVersion(xyz, relv.getDestinationNid());
                     conceptSet.add(cv);
                 }
             }
@@ -210,9 +204,9 @@ public class ConceptVersion implements ConceptVersionBI {
             throws IOException, ContraditionException {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
         for (RelationshipChronicleBI rel : getRelsIncoming()) {
-            for (RelationshipVersionBI relv : rel.getVersions(coordinate)) {
-                if (coordinate.getIsaTypeNids().contains(relv.getTypeNid())) {
-                    ConceptVersionBI cv = Ts.get().getConceptVersion(coordinate, relv.getDestinationNid());
+            for (RelationshipVersionBI relv : rel.getVersions(xyz)) {
+                if (xyz.getIsaTypeNids().contains(relv.getTypeNid())) {
+                    ConceptVersionBI cv = Ts.get().getConceptVersion(xyz, relv.getDestinationNid());
                     conceptSet.add(cv);
                 }
             }
@@ -226,8 +220,8 @@ public class ConceptVersion implements ConceptVersionBI {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
         for (RelationshipChronicleBI rel : getRelsIncoming()) {
             for (RelationshipVersionBI relv : rel.getVersions()) {
-                if (coordinate.getIsaTypeNids().contains(relv.getTypeNid())) {
-                    ConceptVersionBI cv = Ts.get().getConceptVersion(coordinate, relv.getDestinationNid());
+                if (xyz.getIsaTypeNids().contains(relv.getTypeNid())) {
+                    ConceptVersionBI cv = Ts.get().getConceptVersion(xyz, relv.getDestinationNid());
                     conceptSet.add(cv);
                 }
             }
@@ -246,7 +240,7 @@ public class ConceptVersion implements ConceptVersionBI {
             throws IOException, ContraditionException {
         Collection<RelationshipVersionBI> returnValues = new ArrayList<RelationshipVersionBI>();
         for (RelationshipChronicleBI rel : getRelsOutgoing()) {
-            returnValues.addAll(rel.getVersions(coordinate));
+            returnValues.addAll(rel.getVersions(xyz));
         }
         return returnValues;
     }
@@ -257,7 +251,7 @@ public class ConceptVersion implements ConceptVersionBI {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
         for (RelationshipChronicleBI rel : getRelsOutgoing()) {
             for (RelationshipVersionBI relv : rel.getVersions()) {
-                ConceptVersionBI cv = Ts.get().getConceptVersion(coordinate, relv.getDestinationNid());
+                ConceptVersionBI cv = Ts.get().getConceptVersion(xyz, relv.getDestinationNid());
                 conceptSet.add(cv);
             }
         }
@@ -271,7 +265,7 @@ public class ConceptVersion implements ConceptVersionBI {
         for (RelationshipChronicleBI rel : getRelsOutgoing()) {
             for (RelationshipVersionBI relv : rel.getVersions()) {
                 if (typeNids.contains(relv.getTypeNid())) {
-                    ConceptVersionBI cv = Ts.get().getConceptVersion(coordinate, relv.getDestinationNid());
+                    ConceptVersionBI cv = Ts.get().getConceptVersion(xyz, relv.getDestinationNid());
                     conceptSet.add(cv);
                 }
             }
@@ -284,8 +278,8 @@ public class ConceptVersion implements ConceptVersionBI {
             throws IOException, ContraditionException {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
         for (RelationshipChronicleBI rel : getRelsOutgoing()) {
-            for (RelationshipVersionBI relv : rel.getVersions(coordinate)) {
-                ConceptVersionBI cv = Ts.get().getConceptVersion(coordinate, relv.getDestinationNid());
+            for (RelationshipVersionBI relv : rel.getVersions(xyz)) {
+                ConceptVersionBI cv = Ts.get().getConceptVersion(xyz, relv.getDestinationNid());
                 conceptSet.add(cv);
             }
         }
@@ -297,9 +291,9 @@ public class ConceptVersion implements ConceptVersionBI {
             NidSetBI typeNids) throws IOException, ContraditionException {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
         for (RelationshipChronicleBI rel : getRelsOutgoing()) {
-            for (RelationshipVersionBI relv : rel.getVersions(coordinate)) {
+            for (RelationshipVersionBI relv : rel.getVersions(xyz)) {
                 if (typeNids.contains(relv.getTypeNid())) {
-                    ConceptVersionBI cv = Ts.get().getConceptVersion(coordinate, relv.getDestinationNid());
+                    ConceptVersionBI cv = Ts.get().getConceptVersion(xyz, relv.getDestinationNid());
                     conceptSet.add(cv);
                 }
             }
@@ -312,9 +306,9 @@ public class ConceptVersion implements ConceptVersionBI {
             throws IOException, ContraditionException {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
         for (RelationshipChronicleBI rel : getRelsOutgoing()) {
-            for (RelationshipVersionBI relv : rel.getVersions(coordinate)) {
-                if (coordinate.getIsaTypeNids().contains(relv.getTypeNid())) {
-                    ConceptVersionBI cv = Ts.get().getConceptVersion(coordinate, relv.getDestinationNid());
+            for (RelationshipVersionBI relv : rel.getVersions(xyz)) {
+                if (xyz.getIsaTypeNids().contains(relv.getTypeNid())) {
+                    ConceptVersionBI cv = Ts.get().getConceptVersion(xyz, relv.getDestinationNid());
                     conceptSet.add(cv);
                 }
             }
@@ -328,8 +322,8 @@ public class ConceptVersion implements ConceptVersionBI {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
         for (RelationshipChronicleBI rel : getRelsOutgoing()) {
             for (RelationshipVersionBI relv : rel.getVersions()) {
-                if (coordinate.getIsaTypeNids().contains(relv.getTypeNid())) {
-                    ConceptVersionBI cv = Ts.get().getConceptVersion(coordinate, relv.getDestinationNid());
+                if (xyz.getIsaTypeNids().contains(relv.getTypeNid())) {
+                    ConceptVersionBI cv = Ts.get().getConceptVersion(xyz, relv.getDestinationNid());
                     conceptSet.add(cv);
                 }
             }
@@ -341,8 +335,8 @@ public class ConceptVersion implements ConceptVersionBI {
     public int[] getRelsOutgoingDestinationsNidsActiveIsa() throws IOException {
         OpenIntIntHashMap nidList = new OpenIntIntHashMap(10);
         for (RelationshipChronicleBI rel : getRelsOutgoing()) {
-            for (RelationshipVersionBI relv : rel.getVersions(coordinate)) {
-                if (coordinate.getIsaTypeNids().contains(relv.getTypeNid())) {
+            for (RelationshipVersionBI relv : rel.getVersions(xyz)) {
+                if (xyz.getIsaTypeNids().contains(relv.getTypeNid())) {
                     nidList.put(relv.getDestinationNid(), relv.getDestinationNid());
                 }
             }
@@ -359,8 +353,8 @@ public class ConceptVersion implements ConceptVersionBI {
     public boolean isKindOf(ConceptVersionBI possibleKind) throws IOException {
         Concept possibleParent = ((ConceptVersion) possibleKind).concept;
         try {
-            return possibleParent.isParentOfOrEqualTo(concept, coordinate.getAllowedStatusNids(),
-                    coordinate.getIsaTypeNids(), coordinate.getPositionSet(), coordinate.getPrecedence(), coordinate.getContradictionManager());
+            return possibleParent.isParentOfOrEqualTo(concept, xyz.getAllowedStatusNids(),
+                    xyz.getIsaTypeNids(), xyz.getPositionSet(), xyz.getPrecedence(), xyz.getContradictionManager());
         } catch (TerminologyException e) {
             throw new IOException(e);
         }
@@ -368,7 +362,7 @@ public class ConceptVersion implements ConceptVersionBI {
 
     @Override
     public String toString() {
-        return "ConceptVersion coordinate: " + coordinate
+        return "ConceptVersion coordinate: " + xyz
                 + "\nConcept: " + concept.toString();
     }
 
@@ -431,11 +425,11 @@ public class ConceptVersion implements ConceptVersionBI {
 
         switch (checkType) {
             case EQUALS:
-                return Ts.get().getConceptVersion(coordinate, cNid).getNid() == constraint.get(coordinate).getNid();
+                return Ts.get().getConceptVersion(xyz, cNid).getNid() == constraint.get(xyz).getNid();
             case IGNORE:
                 return true;
             case KIND_OF:
-                return Ts.get().getConceptVersion(coordinate, cNid).isKindOf(constraint.get(coordinate));
+                return Ts.get().getConceptVersion(xyz, cNid).isKindOf(constraint.get(xyz));
             default:
                 throw new UnsupportedOperationException("Illegal ConstraintCheckType: " + checkType);
         }
@@ -507,7 +501,7 @@ public class ConceptVersion implements ConceptVersionBI {
             throws IOException, ContraditionException {
         ArrayList<RelGroupVersionBI> results = new ArrayList<RelGroupVersionBI>();
         for (RelGroupChronicleBI rgc : concept.getRelGroups()) {
-            RelGroupVersionBI rgv = new RelGroupVersion(rgc, coordinate);
+            RelGroupVersionBI rgv = new RelGroupVersion(rgc, xyz);
             if (rgv.getRels().size() > 0) {
                 results.add(rgv);
             }
@@ -571,42 +565,80 @@ public class ConceptVersion implements ConceptVersionBI {
 
     @Override
     public int getSapNid() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported.");
     }
 
     //TODO
     @Override
-    public boolean isMember(int conceptNid, int evalRefsetNid) throws IOException{ 
+    public boolean isMember(int collectionNid) throws IOException{ 
     	boolean isMember = false;
     	try{
-    	I_TermFactory tf = Terms.get();
-    	I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-    	List<? extends I_ExtendByRef> memberRefsets = tf.getAllExtensionsForComponent(conceptNid/*concept.getConceptNid()*/); 
-    	//ConceptSpec refset = Snomed.TEST_REFEST;
-    	//int evaluationRefset = refset.getNid();
+    	Collection<? extends RefexChronicleBI<?>> refexes = 
+    		concept.getConceptAttributes().getCurrentRefexes(xyz);
  
-    	if (memberRefsets != null){
-    	for (I_ExtendByRef extn : memberRefsets) {
-    		int refsetNidCurrent = extn.getRefsetId();
-    		List<? extends I_ExtendByRefPart> currentRefsets = tf.getRefsetHelper(config).getAllCurrentRefsetExtensions(refsetNidCurrent, conceptNid/*concept.getConceptNid()*/);
-    		
-    		for(I_ExtendByRefPart cr: currentRefsets){
-    			if (refsetNidCurrent == evalRefsetNid) {
-    				isMember = true;
-    			}
+    	if (refexes != null) {
+    	for (RefexChronicleBI<?> refex : refexes) {
+    		if (refex.getCollectionNid() == collectionNid) {
+    			return true;
     		}
     	}
     	}
     	return isMember;
-    	}catch (TerminologyException e) {
-    		throw new IOException(e); //TODO maybe this one? throw new IOException(e);
     	}catch (Exception e) {
     		throw new IOException(e); //AceLog.getAppLog().alertAndLogException(e);
         }
     	
     }
+
+	@Override
+	public Collection<? extends RefexChronicleBI<?>> getRefexes()
+			throws IOException {
+		return concept.getRefexes();
+	}
+
+	@Override
+	public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
+			ViewCoordinate xyz) throws IOException {
+		return concept.getCurrentRefexes(xyz);
+	}
+
+	@Override
+	public boolean addAnnotation(RefexChronicleBI<?> annotation) throws IOException {
+		return concept.addAnnotation(annotation);
+	}
+
+	@Override
+	public Collection<? extends RefexChronicleBI<?>> getAnnotations()
+			throws IOException {
+		return concept.getAnnotations();
+	}
+
+	@Override
+	public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
+			ViewCoordinate xyz) throws IOException {
+		return concept.getCurrentAnnotations(xyz);
+	}
+
+    @Override
+    public ConceptVersionBI getVersion(ViewCoordinate c) throws ContraditionException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Collection<? extends ConceptVersionBI> getVersions(ViewCoordinate c) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Collection<? extends ConceptVersionBI> getVersions() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public ConceptChronicleBI getChronicle() {
+        return concept;
+    }
     
-    //TODO to here
-}
+ }
     
 		

@@ -98,7 +98,7 @@ public class TestDescGt256Bytes extends AbstractConceptTest {
         typesToCheck.add(fsn_type.getConceptNid());
         typesToCheck.add(pt_type.getConceptNid());
         typesToCheck.add(syn_type.getConceptNid());
-        for (I_DescriptionVersioned desc : descriptions) {
+        for (I_DescriptionVersioned<?> desc : descriptions) {
             for (I_DescriptionPart part : desc.getMutableParts()) {
                 if (part.getVersion() == Integer.MAX_VALUE) {
                     if (typesToCheck.contains(part.getTypeId())) {

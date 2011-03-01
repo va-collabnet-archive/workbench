@@ -29,30 +29,33 @@ import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
-import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 public class Description
         extends ConceptComponent<DescriptionRevision, Description>
-        implements I_DescriptionVersioned, I_DescriptionPart, DescriptionAnalogBI {
+        implements I_DescriptionVersioned<DescriptionRevision>,
+        I_DescriptionPart<DescriptionRevision>,
+        DescriptionAnalogBI<DescriptionRevision> {
 
     private static VersionComputer<Description.Version> computer =
             new VersionComputer<Description.Version>();
 
     public class Version
             extends ConceptComponent<DescriptionRevision, Description>.Version
-            implements I_DescriptionTuple, I_DescriptionPart, DescriptionAnalogBI {
+            implements I_DescriptionTuple<DescriptionRevision>,
+                       I_DescriptionPart<DescriptionRevision>,
+                       DescriptionAnalogBI<DescriptionRevision> {
 
         public Version() {
             super();
@@ -227,14 +230,14 @@ public class Description
         }
 
         @Override
-        public Description.Version getVersion(Coordinate c)
+        public Description.Version getVersion(ViewCoordinate c)
                 throws ContraditionException {
             return Description.this.getVersion(c);
         }
 
         @Override
         public Collection<Description.Version> getVersions(
-                Coordinate c) {
+                ViewCoordinate c) {
             return Description.this.getVersions(c);
         }
     }
@@ -518,7 +521,8 @@ public class Description
 
     @Override
     public void addTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
-            PositionSetBI positions, List<I_DescriptionTuple> matchingTuples,
+            PositionSetBI positions,
+            List<I_DescriptionTuple<DescriptionRevision>> matchingTuples,
             Precedence precedence, ContradictionManagerBI contradictionManager) {
         List<Version> returnTuples = new ArrayList<Version>();
         computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions,
@@ -629,10 +633,9 @@ public class Description
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public List<? extends I_DescriptionPart> getMutableParts() {
-        return new EditableVersionList(getVersions());
+    public List<? extends I_DescriptionPart<DescriptionRevision>> getMutableParts() {
+        return getTuples();
     }
 
     @Override
@@ -688,7 +691,7 @@ public class Description
     }
 
     @Override
-    public Description.Version getVersion(Coordinate c)
+    public Description.Version getVersion(ViewCoordinate c)
             throws ContraditionException {
         List<Description.Version> vForC = getVersions(c);
         if (vForC.size() == 0) {
@@ -701,7 +704,7 @@ public class Description
     }
 
     @Override
-    public List<Description.Version> getVersions(Coordinate c) {
+    public List<Description.Version> getVersions(ViewCoordinate c) {
         List<Version> returnTuples = new ArrayList<Version>(2);
         computer.addSpecifiedVersions(c.getAllowedStatusNids(), (NidSetBI) null, c.getPositionSet(),
                 returnTuples, getVersions(), c.getPrecedence(), c.getContradictionManager());

@@ -22,7 +22,7 @@ public class EConceptAttributes extends TkConceptAttributes {
         super(in, dataVersion);
     }
 
-    public EConceptAttributes(I_ConceptAttributeVersioned conceptAttributes) throws TerminologyException, IOException {
+    public EConceptAttributes(I_ConceptAttributeVersioned<?> conceptAttributes) throws TerminologyException, IOException {
         super();
         EConcept.convertId(Terms.get().getId(conceptAttributes.getNid()), this);
         int partCount = conceptAttributes.getMutableParts().size();

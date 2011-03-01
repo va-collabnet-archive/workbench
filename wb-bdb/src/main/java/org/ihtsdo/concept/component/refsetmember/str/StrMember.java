@@ -1,5 +1,6 @@
 package org.ihtsdo.concept.component.refsetmember.str;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,14 +13,16 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
-import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
-import org.ihtsdo.concept.component.attributes.ConceptAttributes.Version;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetStrMember;
 import org.ihtsdo.etypes.ERefsetStrRevision;
-import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
+import org.ihtsdo.tk.api.refex.type_str.RefexStrAnalogBI;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrRevision;
 
@@ -27,7 +30,7 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class StrMember extends RefsetMember<StrRevision, StrMember>
-        implements I_ExtendByRefPartStr {
+        implements I_ExtendByRefPartStr<StrRevision>, RefexStrAnalogBI<StrRevision> {
 
     private static VersionComputer<RefsetMember<StrRevision, StrMember>.Version> computer =
             new VersionComputer<RefsetMember<StrRevision, StrMember>.Version>();
@@ -38,7 +41,8 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
 
     public class Version
             extends RefsetMember<StrRevision, StrMember>.Version
-            implements I_ExtendByRefVersion, I_ExtendByRefPartStr {
+            implements I_ExtendByRefVersion<StrRevision>, I_ExtendByRefPartStr<StrRevision>,
+            	RefexStrAnalogBI<StrRevision> {
 
         private Version() {
             super();
@@ -48,9 +52,10 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
             super(index);
         }
 
-        public int compareTo(I_ExtendByRefPart o) {
+        public int compareTo(I_ExtendByRefPart<StrRevision> o) {
             if (I_ExtendByRefPartStr.class.isAssignableFrom(o.getClass())) {
-                I_ExtendByRefPartStr another = (I_ExtendByRefPartStr) o;
+                I_ExtendByRefPartStr<StrRevision> another = 
+                	(I_ExtendByRefPartStr<StrRevision>) o;
                 if (!this.getStringValue().equals(another.getStringValue())) {
                     return this.getStringValue().compareTo(another.getStringValue());
                 }
@@ -59,8 +64,8 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
         }
 
         @Override
-        public I_ExtendByRefPartStr duplicate() {
-            return (I_ExtendByRefPartStr) super.duplicate();
+        public I_ExtendByRefPartStr<StrRevision> duplicate() {
+            return (I_ExtendByRefPartStr<StrRevision>) super.duplicate();
         }
 
         @Override
@@ -72,6 +77,22 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
         }
 
         @Override
+		public String getStr1() {
+            if (index >= 0) {
+                return revisions.get(index).getStr1();
+            }
+            return StrMember.this.getStr1();
+		}
+
+		@Override
+		public void setStr1(String str) throws PropertyVetoException {
+            if (index >= 0) {
+                revisions.get(index).setStr1(str);
+            }
+            StrMember.this.setStr1(str);
+		}
+
+		@Override
         public void setStringValue(String stringValue) {
             if (index >= 0) {
                 revisions.get(index).setStringValue(stringValue);
@@ -168,7 +189,7 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
     }
 
     @Override
-    public I_AmPart makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+    public StrRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
         if (getTime() == time && getPathNid() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
@@ -238,4 +259,24 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
         }
         return (List<Version>) versions;
     }
+
+	@Override
+	public void setStr1(String str) throws PropertyVetoException {
+		this.stringValue = str;
+		modified();
+	}
+
+	@Override
+	public String getStr1() {
+		return stringValue;
+	}
+	
+	protected TK_REFSET_TYPE getTkRefsetType() {
+		return TK_REFSET_TYPE.STR;
+	}
+
+	protected void addSpecProperties(RefexAmendmentSpec rcs) {
+		rcs.with(RefexProperty.STRING1, getStr1());
+	}
+
 }

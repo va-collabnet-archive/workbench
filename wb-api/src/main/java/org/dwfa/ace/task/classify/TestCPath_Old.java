@@ -227,7 +227,7 @@ public class TestCPath_Old extends AbstractTask {
         Collection<? extends I_RelVersioned> thisLevel = rootConcept.getDestRels();
         while (thisLevel.size() > 0) {
             ArrayList<I_RelVersioned> nextLevel = new ArrayList<I_RelVersioned>();
-            for (I_RelVersioned rv : thisLevel) {
+            for (I_RelVersioned<?> rv : thisLevel) {
                 I_RelPart rPart1 = null;
                 for (PositionBI pos : cClassPathPos) { // PATHS_IN_PRIORITY_ORDER
                     for (I_RelPart rPart : rv.getMutableParts()) {

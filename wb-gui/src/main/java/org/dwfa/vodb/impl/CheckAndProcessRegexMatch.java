@@ -35,7 +35,7 @@ import org.dwfa.ace.task.search.I_TestSearchResults;
 public class CheckAndProcessRegexMatch implements Runnable {
     Pattern p;
 
-    Collection<I_DescriptionVersioned> matches;
+    Collection<I_DescriptionVersioned<?>> matches;
 
     I_DescriptionVersioned descV;
 
@@ -48,7 +48,7 @@ public class CheckAndProcessRegexMatch implements Runnable {
     Semaphore checkSemaphore;
 
     public CheckAndProcessRegexMatch(CountDownLatch descLatch, Semaphore checkSemaphore, Pattern p,
-            Collection<I_DescriptionVersioned> matches, I_DescriptionVersioned descV,
+            Collection<I_DescriptionVersioned<?>> matches, I_DescriptionVersioned descV,
             List<I_TestSearchResults> checkList, I_ConfigAceFrame config) {
         super();
         this.p = p;

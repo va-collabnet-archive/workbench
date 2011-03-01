@@ -36,6 +36,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
@@ -1280,7 +1281,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
         Collection<? extends I_RelVersioned> thisLevel = rootConcept.getDestRels();
         while (thisLevel.size() > 0) {
             ArrayList<I_RelVersioned> nextLevel = new ArrayList<I_RelVersioned>();
-            for (I_RelVersioned rv : thisLevel) {
+            for (I_RelVersioned<?> rv : thisLevel) {
                 I_RelPart rPart1 = null;
                 for (PositionBI pos : cEditPathPos) { // PATHS_IN_PRIORITY_ORDER
                     for (I_RelPart rPart : rv.getMutableParts()) {
@@ -1586,7 +1587,8 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
                     + c2.getInitialText() + "\t" + g + "\r\n");
 
             sb.append("\tc2 status: ** ");
-            for (I_ConceptAttributePart mp : c2.getConceptAttributes().getMutableParts())
+            I_ConceptAttributeVersioned<?> ca = c2.getConceptAttributes();
+            for (I_ConceptAttributePart mp : ca.getMutableParts())
                 sb.append(toStringCNid(mp.getStatusId()) + " ** ");
 
             return sb.toString();

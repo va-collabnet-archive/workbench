@@ -8,7 +8,7 @@ import org.w3c.dom.Element;
 public class XML_I_DescriptionVersioned extends XML_basic_getCon implements
 		I_Handle_XML {
 
-	I_DescriptionVersioned desc;
+	I_DescriptionVersioned<?> desc;
 	int desc_id = -1;
 	int con_id = -1;
 	

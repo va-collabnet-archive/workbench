@@ -1,33 +1,38 @@
 package org.ihtsdo.concept.component.refsetmember.Boolean;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
-import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
-import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetBooleanMember;
 import org.ihtsdo.etypes.ERefsetBooleanRevision;
-import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
+import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanAnalogBI;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanMember;
 import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> implements I_ExtendByRefPartBoolean {
+public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
+	implements I_ExtendByRefPartBoolean<BooleanRevision>, RefexBooleanAnalogBI<BooleanRevision> {
 
     private static VersionComputer<RefsetMember<BooleanRevision, BooleanMember>.Version> computer =
             new VersionComputer<RefsetMember<BooleanRevision, BooleanMember>.Version>();
@@ -38,7 +43,10 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
 
     public class Version
             extends RefsetMember<BooleanRevision, BooleanMember>.Version
-            implements I_ExtendByRefVersion, I_ExtendByRefPartBoolean {
+            implements I_ExtendByRefVersion<BooleanRevision>, 
+            		I_ExtendByRefPartBoolean<BooleanRevision>,
+            		RefexBooleanAnalogBI<BooleanRevision>
+            	 {
 
         private Version() {
             super();
@@ -53,7 +61,8 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
             return new ArrayIntList();
         }
 
-        @Override
+        @SuppressWarnings({ "rawtypes", "unchecked" })
+		@Override
         public int compareTo(I_ExtendByRefPart o) {
             if (I_ExtendByRefPartBoolean.class.isAssignableFrom(o.getClass())) {
                 I_ExtendByRefPartBoolean another = (I_ExtendByRefPartBoolean) o;
@@ -69,8 +78,8 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
         }
 
         @Override
-        public I_ExtendByRefPartStr duplicate() {
-            return (I_ExtendByRefPartStr) super.duplicate();
+        public I_ExtendByRefPartBoolean<BooleanRevision> duplicate() {
+            return (I_ExtendByRefPartBoolean<BooleanRevision>) super.duplicate();
         }
 
         @Override
@@ -83,6 +92,21 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
 
         @Override
         public void setBooleanValue(boolean value) {
+            if (index >= 0) {
+                revisions.get(index).setBooleanValue(value);
+            }
+            BooleanMember.this.setBooleanValue(value);
+        }
+        @Override
+        public boolean getBoolean1() {
+            if (index >= 0) {
+                return revisions.get(index).getBoolean1();
+            }
+            return BooleanMember.this.getBoolean1();
+        }
+
+        @Override
+        public void setBoolean1(boolean value) {
             if (index >= 0) {
                 revisions.get(index).setBooleanValue(value);
             }
@@ -146,12 +170,12 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
     }
 
     @Override
-    public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
+    public I_ExtendByRefPart<BooleanRevision> makePromotionPart(PathBI promotionPath) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public I_ExtendByRefPart duplicate() {
+    public I_ExtendByRefPart<BooleanRevision> duplicate() {
         throw new UnsupportedOperationException();
     }
 
@@ -187,7 +211,7 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
     }
 
     @Override
-    public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+    public BooleanRevision makeAnalog(int statusNid, int pathNid, long time) {
         if (getTime() == time && getPathNid() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
@@ -197,7 +221,7 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
     }
 
     @Override
-    public I_AmPart makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+    public BooleanRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
         if (getTime() == time && getPathNid() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
@@ -260,4 +284,24 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
     public int hashCode() {
         return HashFunction.hashCode(new int[]{nid});
     }
+
+	@Override
+	public boolean getBoolean1() {
+		return this.booleanValue;
+	}
+
+	@Override
+	public void setBoolean1(boolean l) throws PropertyVetoException {
+		this.booleanValue = l;
+		modified();
+	}
+
+	protected TK_REFSET_TYPE getTkRefsetType() {
+		return TK_REFSET_TYPE.BOOLEAN;
+	}
+
+	protected void addSpecProperties(RefexAmendmentSpec rcs) {
+		rcs.with(RefexProperty.BOOLEAN1, getBoolean1());
+	}
+
 }

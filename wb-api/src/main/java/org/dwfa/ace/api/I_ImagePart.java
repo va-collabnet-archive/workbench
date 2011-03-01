@@ -16,7 +16,10 @@
  */
 package org.dwfa.ace.api;
 
-public interface I_ImagePart extends I_AmTypedPart {
+import org.ihtsdo.tk.api.media.MediaAnalogBI;
+
+public interface I_ImagePart<A extends MediaAnalogBI>
+        extends I_AmTypedPart<A> {
 
     public String getTextDescription();
 

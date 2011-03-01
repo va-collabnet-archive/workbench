@@ -48,13 +48,15 @@ public class Rf1TextDef implements Comparable<Object> {
     public int compareTo(Object o) {
         Rf1TextDef tmp = (Rf1TextDef) o;
 
-        if (this.conceptSid < tmp.conceptSid) {
+        if (this.conceptSid < tmp.conceptSid)
             return -1; // instance less than received
-        } else if (this.conceptSid > tmp.conceptSid) {
+        else if (this.conceptSid > tmp.conceptSid)
             return 1; // instance greater than received
-        } else {
-            return 0; // instance == received
-        }
+        else if (this.definition.compareTo(tmp.definition) < 0)
+            return -1; // instance less than received
+        else if (this.definition.compareTo(tmp.definition) > 0)
+            return 1; // instance greater than received
+        return 0; // instance == received
     }
 
     public static Rf1TextDef[] parseFile(RF1File rf1) throws IOException, MojoFailureException {
@@ -80,7 +82,7 @@ public class Rf1TextDef implements Comparable<Object> {
             String tmpSnomedId = line[SNOMED_ID];
             String tmpFsn = line[FSM];
             String tmpDefinition = line[DEFINITION];
-
+            
             a[members] = new Rf1TextDef(tmpConceptSid, tmpSnomedId, tmpFsn, tmpDefinition);
 
             members++;
@@ -90,6 +92,10 @@ public class Rf1TextDef implements Comparable<Object> {
         Arrays.sort(a);
         
         return a;
+    }
+    
+    public String toString() {
+        return ( this.conceptSid + " :: " + this.definition);
     }
 
 }

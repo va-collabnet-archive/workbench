@@ -72,6 +72,7 @@ import au.csiro.snorocket.snapi.I_Snorocket_123.I_EquivalentCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataConCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRelCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRoleCallback;
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 
 /**
  * 
@@ -1568,7 +1569,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 				.getDestRels();
 		while (thisLevel.size() > 0) {
 			ArrayList<I_RelVersioned> nextLevel = new ArrayList<I_RelVersioned>();
-			for (I_RelVersioned rv : thisLevel) {
+			for (I_RelVersioned<?> rv : thisLevel) {
 				I_RelPart rPart1 = null;
 				for (PositionBI pos : cEditPathPos) { // PATHS_IN_PRIORITY_ORDER
 					for (I_RelPart rPart : rv.getMutableParts()) {
@@ -1898,8 +1899,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 					+ "\t|" + c2.getInitialText() + "\t" + g + "\r\n");
 
 			sb.append("\tc2 status: ** ");
-			for (I_ConceptAttributePart mp : c2.getConceptAttributes()
-					.getMutableParts())
+            I_ConceptAttributeVersioned<?> ca = c2.getConceptAttributes();
+            for (I_ConceptAttributePart mp : ca.getMutableParts())
 				sb.append(toStringCNid(mp.getStatusId()) + " ** ");
 
 			return sb.toString();

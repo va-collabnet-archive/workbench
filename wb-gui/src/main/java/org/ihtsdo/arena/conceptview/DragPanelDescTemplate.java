@@ -2,12 +2,14 @@ package org.ihtsdo.arena.conceptview;
 
 import java.awt.LayoutManager;
 import java.awt.datatransfer.DataFlavor;
+import java.util.EnumSet;
 
 import javax.swing.TransferHandler;
+import org.ihtsdo.arena.conceptview.ComponentVersionDragPanel.SubPanels;
 
 import org.ihtsdo.tk.spec.DescriptionSpec;
 
-public class DragPanelDescTemplate extends DragPanel<DescriptionSpec> {
+public class DragPanelDescTemplate extends DragPanel<DescriptionSpec> implements I_ToggleSubPanels {
 
 	/**
 	 * 
@@ -56,6 +58,11 @@ public class DragPanelDescTemplate extends DragPanel<DescriptionSpec> {
 	public String getUserString(DescriptionSpec obj) {
 		return obj.getDescText();
 	}
+
+    @Override
+    public void showSubPanels(EnumSet<SubPanels> panels) {
+        // nothing to do...;
+    }
 	
 	
 }

@@ -1,17 +1,23 @@
 package org.ihtsdo.concept.component.refset;
 
+import java.beans.PropertyVetoException;
+
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
+import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
 import com.sleepycat.bind.tuple.TupleInput;
-import org.ihtsdo.tk.api.refset.RefsetMemberVersionBI;
 
-public abstract class RefsetRevision<V extends RefsetRevision<V, C>, C extends RefsetMember<V, C>>
+public abstract class RefsetRevision
+			<V extends RefsetRevision<V, C>, 
+			 C extends RefsetMember<V, C>>
         extends Revision<V, C>
-        implements I_ExtendByRefPart, RefsetMemberVersionBI {
+        implements I_ExtendByRefPart<V>, RefexAnalogBI<V> {
 
     public RefsetRevision(int statusNid, int pathNid, long time,
             C primordialComponent) {
@@ -48,7 +54,7 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>, C extends R
     }
 
     @Override
-    public final int compareTo(I_ExtendByRefPart o) {
+    public final int compareTo(I_ExtendByRefPart<V> o) {
         return this.toString().compareTo(o.toString());
     }
 
@@ -66,7 +72,7 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>, C extends R
 
     @Override
     @Deprecated
-    public I_ExtendByRefPart duplicate() {
+    public I_ExtendByRefPart<V> duplicate() {
         throw new UnsupportedOperationException();
     }
 
@@ -100,4 +106,39 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>, C extends R
     public String toUserString() {
         return toString();
     }
+    
+    @Override
+	public int getCollectionNid() {
+		return primordialComponent.refsetNid;
+	}
+
+	@Override
+	public void setCollectionNid(int collectionNid) throws PropertyVetoException {
+		primordialComponent.setCollectionNid(collectionNid);
+	}
+
+	@Override
+    public RefexAmendmentSpec getRefexEditSpec() {
+    	RefexAmendmentSpec rcs = new RefexAmendmentSpec(getTkRefsetType(), 
+    			primordialComponent.getReferencedComponentNid(), 
+    			primordialComponent.getRefsetId(),
+        		getPrimUuid());
+    	addSpecProperties(rcs);
+    	return rcs;
+    }
+
+	protected abstract TK_REFSET_TYPE getTkRefsetType();
+
+	protected abstract void addSpecProperties(RefexAmendmentSpec rcs);
+
+    @Override
+    public int getReferencedComponentNid() {
+       return primordialComponent.getReferencedComponentNid();
+    }
+
+    @Override
+    public void setReferencedComponentNid(int componentNid) throws PropertyVetoException {
+        primordialComponent.setReferencedComponentNid(componentNid);
+    }
+
 }

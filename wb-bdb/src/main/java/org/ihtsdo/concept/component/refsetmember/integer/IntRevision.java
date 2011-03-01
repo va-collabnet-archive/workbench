@@ -1,6 +1,8 @@
 package org.ihtsdo.concept.component.refsetmember.integer;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
+import java.util.Collection;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
@@ -8,18 +10,21 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
+import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_int.RefexIntAnalogBI;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
-import java.util.Collection;
-import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
-import org.ihtsdo.tk.api.refset.RefsetMemberVersionBI;
 
 public class IntRevision extends RefsetRevision<IntRevision, IntMember>
-        implements I_ExtendByRefPartInt {
+        implements I_ExtendByRefPartInt<IntRevision>, RefexIntAnalogBI<IntRevision> {
 
     private int intValue;
 
@@ -132,13 +137,18 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
     }
 
     @Override
-    public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
+    public I_ExtendByRefPart<IntRevision> makePromotionPart(PathBI promotionPath) {
         // TODO
         throw new UnsupportedOperationException();
     }
 
     @Override
     public int getIntValue() {
+        return intValue;
+    }
+
+    @Override
+    public int getInt1() {
         return intValue;
     }
 
@@ -159,7 +169,7 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
     }
 
     @Override
-    public IntMember.Version getVersion(Coordinate c)
+    public IntMember.Version getVersion(ViewCoordinate c)
             throws ContraditionException {
         return (IntMember.Version) ((IntMember) primordialComponent).getVersion(c);
     }
@@ -170,8 +180,24 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
     }
 
     @Override
-    public Collection<? extends RefsetMemberVersionBI> getVersions(
-            Coordinate c) {
+    public Collection<? extends RefexVersionBI<IntRevision>> getVersions(
+            ViewCoordinate c) {
         return ((IntMember) primordialComponent).getVersions(c);
     }
+
+	@Override
+	public void setInt1(int l) throws PropertyVetoException {
+		this.intValue = l;
+		modified();
+	}
+	
+    
+	protected TK_REFSET_TYPE getTkRefsetType() {
+		return TK_REFSET_TYPE.INT;
+	}
+
+	protected void addSpecProperties(RefexAmendmentSpec rcs) {
+		rcs.with(RefexProperty.INTEGER1, this.intValue);
+	}
+
 }
