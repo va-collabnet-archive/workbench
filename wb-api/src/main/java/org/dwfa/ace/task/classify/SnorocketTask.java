@@ -1655,7 +1655,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 results.add(sr);
                 if (countRolesVerbose) {
                     sb.append("::: "
-                            + SnoTable.toStringIsaAncestry(sr.typeId, cEditPathListPositionBI)
+                            + SnoTable.toStringIsaAncestry(sr.typeId, cEditPathListPositionBI, true)
                             + "\r\n");
                 }
             }
@@ -1715,7 +1715,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     countRoles += 1;
                     if (countRolesVerboseFlag) {
                         sb.append("::: "
-                                + SnoTable.toStringIsaAncestry(sr.typeId, cEditPathListPositionBI)
+                                + SnoTable.toStringIsaAncestry(sr.typeId, cEditPathListPositionBI, true)
                                 + "\r\n");
                     }
                 }

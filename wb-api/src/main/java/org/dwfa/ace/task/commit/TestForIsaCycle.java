@@ -74,7 +74,7 @@ public class TestForIsaCycle extends AbstractConceptTest {
                     List<? extends I_RelTuple> rvtl = rv.getTuples();
                     for (I_RelTuple rt : rvtl) {
                         try {
-                            boolean test = SnoTable.findIsaCycle(rt.getC1Id(), rt.getTypeNid(), rt.getC2Id());
+                            boolean test = SnoTable.findIsaCycle(rt.getC1Id(), rt.getTypeNid(), rt.getC2Id(), true);
                             if (test)
                                 foundCycle = true;
                         } catch (TerminologyException e) {

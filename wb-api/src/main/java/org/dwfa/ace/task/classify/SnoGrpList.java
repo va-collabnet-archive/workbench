@@ -75,7 +75,7 @@ public class SnoGrpList extends ArrayList<SnoGrp> {
      * 
      * @return SnoGrpList
      */
-    public SnoGrpList whichNonRedundant() {
+    public SnoGrpList whichNonRedundant(boolean isStatedUser) {
         int max = this.size();
         if (max <= 1)
             return this; // trivial case.
@@ -87,7 +87,7 @@ public class SnoGrpList extends ArrayList<SnoGrp> {
             boolean keep = true;
             for (int bi = ai - 1; bi >= 0; bi--) {
                 SnoGrp groupB = this.get(bi);
-                if (groupA.subsumes(groupB)) {
+                if (groupA.subsumes(groupB, isStatedUser)) {
                     keep = false;
                     break;
                 }
@@ -106,7 +106,7 @@ public class SnoGrpList extends ArrayList<SnoGrp> {
             boolean keep = true;
             for (int bi = ai - 1; bi >= 0; bi--) {
                 SnoGrp groupB = sgPass1.get(bi);
-                if (groupA.subsumes(groupB)) {
+                if (groupA.subsumes(groupB, isStatedUser)) {
                     keep = false;
                     break;
                 }
@@ -129,7 +129,7 @@ public class SnoGrpList extends ArrayList<SnoGrp> {
      * 
      * @return SnoGrpList
      */
-    public SnoGrpList whichDifferentiateFrom(SnoGrpList groupListB) {
+    public SnoGrpList whichDifferentiateFrom(SnoGrpList groupListB, boolean isStatedUser) {
         if (this.size() == 0)
             return this; // trivial case.
 
@@ -137,7 +137,7 @@ public class SnoGrpList extends ArrayList<SnoGrp> {
         for (SnoGrp groupA : this) {
             boolean keep = true;
             for (SnoGrp groupB : groupListB) {
-                if (groupA.subsumes(groupB)) {
+                if (groupA.subsumes(groupB, isStatedUser)) {
                     keep = false;
                     break;
                 }

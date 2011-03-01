@@ -156,6 +156,7 @@ import org.dwfa.ace.search.SearchPanel;
 import org.dwfa.ace.table.refset.RefsetDefaults;
 import org.dwfa.ace.table.refset.RefsetDefaultsConcept;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
+import org.dwfa.ace.task.classify.SnoAB;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.commit.I_Fixup;
 import org.dwfa.ace.task.commit.I_TestDataConstraints;
@@ -182,6 +183,7 @@ import org.ihtsdo.arena.Arena;
 import org.ihtsdo.custom.statics.CustomStatics;
 import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.thread.NamedThreadFactory;
+import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
@@ -2411,6 +2413,40 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 JComboBox cb = (JComboBox) e.getSource();
                 CLASSIFIER_INPUT_MODE_PREF modePref = (CLASSIFIER_INPUT_MODE_PREF) cb.getSelectedItem();
                 aceFrameConfig.setClassifierInputMode(modePref);
+                
+                try {
+
+                    PathBI editPath = null;
+                    I_GetConceptData editPathConcept = null;
+                    if (aceFrameConfig.getEditingPathSet() != null
+                            && aceFrameConfig.getEditingPathSet().size() > 0) {
+                        editPath = aceFrameConfig.getEditingPathSet().iterator().next();
+                        editPathConcept = Terms.get().getConcept(editPath.getConceptNid());
+                    }
+
+                    PathBI viewPath = null;
+                    I_GetConceptData viewPathConcept = null;
+                    if (aceFrameConfig.getViewPositionSet() != null
+                            && aceFrameConfig.getViewPositionSet().size() > 0) {
+                        viewPath = aceFrameConfig.getViewPositionSet().iterator().next().getPath();
+                        viewPathConcept = Terms.get().getConcept(viewPath.getConceptNid());
+                    }
+
+                    if (modePref == CLASSIFIER_INPUT_MODE_PREF.EDIT_PATH) {
+                        aceFrameConfig.setClassifierInputPath(editPathConcept);
+                        aceFrameConfig.setClassifierOutputPath(viewPathConcept);
+                    } else if (modePref == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH) {
+                        aceFrameConfig.setClassifierInputPath(viewPathConcept);
+                        aceFrameConfig.setClassifierOutputPath(viewPathConcept);
+                    } else if (modePref == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH_WITH_EDIT_PRIORITY) {
+                        aceFrameConfig.setClassifierInputPath(viewPathConcept);
+                        aceFrameConfig.setClassifierOutputPath(viewPathConcept);
+                    }
+                } catch (TerminologyException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
             }
         });
         // classifierPrefInputSubpanel.setBorder(BorderFactory.createTitledBorder(""));

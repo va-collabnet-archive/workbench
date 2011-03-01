@@ -46,6 +46,7 @@ public class SnoAB {
     public static int isCURRENT = Integer.MIN_VALUE;
     public static int isaNid = Integer.MIN_VALUE;
     public static List<PositionBI> posList = null; //
+    public static int snorocketAuthorNid;
     I_TermFactory tf;
 
     public SnoAB() {
@@ -54,6 +55,8 @@ public class SnoAB {
             I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
             isaNid = config.getClassifierIsaType().getConceptNid();
             isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+            snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET
+                    .getUids());
         } catch (TerminologyException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -67,11 +70,11 @@ public class SnoAB {
         SnoAB.posList = posList;
     }
 
-    public boolean aSubsumesB(int nid_A, int nid_B) {
+    public boolean aSubsumesB(int nid_A, int nid_B, boolean isStatedUser) {
         try {
             I_GetConceptData con_B = tf.getConcept(nid_B);
 
-            List<SnoRel> isaSnoRelProx = findIsaProximal(con_B);
+            List<SnoRel> isaSnoRelProx = findIsaProximal(con_B, isStatedUser);
             while (isaSnoRelProx.size() > 0) {
                 for (SnoRel isaRel : isaSnoRelProx) {
                     if (isaRel.c2Id == nid_A)
@@ -81,7 +84,7 @@ public class SnoAB {
                 List<SnoRel> isaSnoRelProxNext = new ArrayList<SnoRel>();
                 for (SnoRel isaRel : isaSnoRelProx) {
                     I_GetConceptData con_tmp = tf.getConcept(isaRel.c2Id);
-                    isaSnoRelProxNext.addAll(findIsaProximal(con_tmp));
+                    isaSnoRelProxNext.addAll(findIsaProximal(con_tmp, isStatedUser));
                 }
                 isaSnoRelProx = isaSnoRelProxNext;
             }
@@ -94,7 +97,7 @@ public class SnoAB {
         return false;
     }
 
-    private List<SnoRel> findIsaProximal(I_GetConceptData cBean) {
+    private List<SnoRel> findIsaProximal(I_GetConceptData cBean, boolean isStatedUser) {
         List<SnoRel> returnSnoRels = new ArrayList<SnoRel>();
         try {
             Collection<? extends I_RelVersioned> relList = cBean.getSourceRels();
@@ -106,6 +109,11 @@ public class SnoAB {
                     int tmpCountDupl = 0;
                     for (I_RelPart rp : rel.getMutableParts()) {
                         if (rp.getPathNid() == pos.getPath().getConceptNid()) {
+                            if (isStatedUser && rp.getAuthorNid() == snorocketAuthorNid )
+                                continue; // filter stated vs. inferred
+                            else if (!isStatedUser && rp.getAuthorNid() != snorocketAuthorNid)
+                                continue; // filter stated vs. inferred
+
                             if (rp1 == null) {
                                 rp1 = rp; // ... KEEP FIRST_INSTANCE PART
                             } else if (rp1.getTime() < rp.getTime()) {

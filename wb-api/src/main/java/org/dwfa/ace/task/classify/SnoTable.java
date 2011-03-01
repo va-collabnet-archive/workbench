@@ -31,7 +31,9 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.I_ConfigAceFrame.CLASSIFIER_INPUT_MODE_PREF;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
@@ -82,8 +84,11 @@ public class SnoTable {
     private static int roleRootNid = Integer.MIN_VALUE;
 
     // STATED & INFERRED PATHS
-    static List<PositionBI> cStatedPath = null; // Classifier Stated Path
-    static List<PositionBI> cInferredPath = null; // Classifier Inferred Path
+    static List<PositionBI> cEditPath = null; // Classifier Stated Path
+    static List<PositionBI> cViewPath = null; // Classifier Inferred Path
+    private static int snorocketAuthorNid;
+    private static final boolean USER_STATED = true;
+    private static final boolean USER_SNOROCKET = true;
 
     // ** STATISTICS **
     // :NYI: need reset statistics routine
@@ -141,7 +146,7 @@ public class SnoTable {
     private static boolean prefsNotSet() {
         if (isaNid == Integer.MIN_VALUE || isCURRENT == Integer.MIN_VALUE
                 || rootNid == Integer.MIN_VALUE || roleRootNid == Integer.MIN_VALUE
-                || cStatedPath == null || cInferredPath == null)
+                || cEditPath == null || cViewPath == null)
             return true;
         else return false;
     }
@@ -192,36 +197,44 @@ public class SnoTable {
         }
 
         // GET ALL EDIT_PATH ORIGINS
-        I_GetConceptData cEditPathObj = config.getClassifierInputPath();
-        if (cEditPathObj != null) {
-            PathBI cEditIPath = tf.getPath(cEditPathObj.getUids());
-            cStatedPath = new ArrayList<PositionBI>();
-            cStatedPath.add(tf.newPosition(cEditIPath, Integer.MAX_VALUE));
-            addPathOrigins(cStatedPath, cEditIPath);
-        } else {
-            String errStr = "Input (Stated) Path not set in Classifier Preferences!";
-            if (showDialogs)
-                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
-            else
-                AceLog.getAppLog().log(Level.SEVERE, errStr, new Exception(errStr));
+        if (config.getEditingPathSet() == null) {
+            String errStr = "(SnoTable error) Edit path is not set.";
+            AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
+                    new TaskFailedException(errStr));
+            return errStr;
+        } else if (config.getEditingPathSet().size() != 1) {
+            String errStr = "(SnoTable error) Profile must have exactly one edit path. Found: "
+                    + config.getEditingPathSet();
+            AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
+                    new TaskFailedException(errStr));
             return errStr;
         }
-
+        PathBI cEditPathBI = config.getEditingPathSet().iterator().next();
+        cEditPath = new ArrayList<PositionBI>();
+        cEditPath.add(tf.newPosition(cEditPathBI, Integer.MAX_VALUE));
+        addPathOrigins(cEditPath, cEditPathBI);
+                
         // GET ALL CLASSIFER_PATH ORIGINS
-        I_GetConceptData cClassPathObj = config.getClassifierOutputPath();
-        if (cClassPathObj != null) {
-            PathBI cClassIPath = tf.getPath(cClassPathObj.getUids());
-            cInferredPath = new ArrayList<PositionBI>();
-            cInferredPath.add(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
-            addPathOrigins(cInferredPath, cClassIPath);
-        } else {
-            String errStr = "Output (Inferred) Path not set in Classifier Preferences!";
-            if (showDialogs)
-                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
-            else
-                AceLog.getAppLog().log(Level.SEVERE, errStr, new Exception(errStr));
+        if (config.getViewPositionSet() == null) {
+            String errStr = "(SnoTable error) View path is not set.";
+            AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
+                    new TaskFailedException(errStr));
+            return errStr;
+        } else if (config.getViewPositionSet().size() != 1) {
+            String errStr = "(SnoTable error) Profile must have exactly one view path. Found: "
+                    + config.getViewPositionSet();
+            AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
+                    new TaskFailedException(errStr));
             return errStr;
         }
+         PositionBI cViewPositionBI = config.getViewPositionSet().iterator().next();
+        cViewPath = new ArrayList<PositionBI>();
+        cViewPath.add(cViewPositionBI);
+        addPathOrigins(cViewPath, cViewPositionBI.getPath());
+        
+        snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET
+                .getUids());
+
         return null;
     }
 
@@ -239,44 +252,62 @@ public class SnoTable {
         ArrayList<SnoRel> isaStatedList = null;
 
         try {
-            if (cStatedPath == null || cInferredPath == null)
+            if (cEditPath == null || cViewPath == null)
                 updatePrefs(false);
-            if (cStatedPath == null || cInferredPath == null)
+            if (cEditPath == null || cViewPath == null)
                 return false;
+            
+            if (tf == null)
+                Terms.get();
+            CLASSIFIER_INPUT_MODE_PREF inputMode = tf.getActiveAceFrameConfig().getClassifierInputMode();
 
+            List<PositionBI> statedPath = null;
+            List<PositionBI> inferredPath = null;
+            if (inputMode == CLASSIFIER_INPUT_MODE_PREF.EDIT_PATH) {
+                statedPath = cEditPath;
+                inferredPath = cViewPath;
+            } else if (inputMode == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH) {
+                statedPath = cViewPath;
+                inferredPath = cViewPath;
+            } else if (inputMode == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH_WITH_EDIT_PRIORITY) {
+                statedPath = cViewPath;
+                inferredPath = cViewPath;
+            }
+            
             cBeanStr = cBean.getInitialText(); // Remember concept name
-            cBeanDef = isCDefined(cBean, cStatedPath);
+            cBeanDef = isCDefined(cBean, statedPath);
 
             // GET STATED DATA
-            isaStatedList = findIsaProximal(cBean, cStatedPath);
+            isaStatedList = findIsaProximal(cBean, statedPath, USER_STATED);
             isaStatedSnoGrpList = new SnoGrpList();
             for (SnoRel sr : isaStatedList)
                 isaStatedSnoGrpList.add(new SnoGrp(sr));
 
-            roleStatedSnoGrpList = findRoleGrpProximal(cBean, cStatedPath);
+            roleStatedSnoGrpList = findRoleGrpProximal(cBean, statedPath, USER_STATED);
 
             // GET INFERRED DATA
             // USE: Distribution Normal, Authoring Normal
-            isaProxList = findIsaProximal(cBean, cInferredPath);
+            isaProxList = findIsaProximal(cBean, inferredPath, USER_SNOROCKET);
             isaProxSnoGrpList = new SnoGrpList();
             for (SnoRel sr : isaProxList)
                 isaProxSnoGrpList.add(new SnoGrp(sr));
 
             // USE: Short Canonical Form, Long Canonical Form
-            isaProxPrimList = findIsaProximalPrim(cBean, cInferredPath);
+            isaProxPrimList = findIsaProximalPrim(cBean, inferredPath, USER_SNOROCKET);
             isaProxPrimSnoGrpList = new SnoGrpList();
             for (SnoRel sr : isaProxPrimList)
                 isaProxPrimSnoGrpList.add(new SnoGrp(sr));
 
             // USE: Distribution Normal Form, Long Canonical Form
-            roleDiffFromRootList = findRoleGrpDiffFromRoot(cBean, cInferredPath);
+            roleDiffFromRootList = findRoleGrpDiffFromRoot(cBean, inferredPath, USER_SNOROCKET);
 
             // USE: Authoring Form
-            roleDiffFromProxList = findRoleGrpDiffFromProx(cBean, isaProxList, cInferredPath);
+            roleDiffFromProxList = findRoleGrpDiffFromProx(cBean, isaProxList, inferredPath,
+                    USER_SNOROCKET);
 
             // USE: Short Canonical Form
             roleDiffFromProxPrimList = findRoleGrpDiffFromProxPrim(cBean, isaProxPrimList,
-                    cInferredPath);
+                    inferredPath, USER_SNOROCKET);
 
         } catch (TerminologyException e) {
             e.printStackTrace();
@@ -451,7 +482,7 @@ public class SnoTable {
      */
 
     private static ArrayList<SnoRel> findIsaProximal(I_GetConceptData cBean,
-            List<PositionBI> posList) {
+            List<PositionBI> posList, boolean isStatedUser) {
         ArrayList<SnoRel> returnSnoRels = new ArrayList<SnoRel>();
         try {
             Collection<? extends I_RelVersioned> relList = cBean.getSourceRels();
@@ -462,6 +493,11 @@ public class SnoTable {
                     // FIND MOST CURRENT
                     int tmpCountDupl = 0;
                     for (I_RelPart rp : rel.getMutableParts()) {
+                        if (isStatedUser && rp.getAuthorNid() == snorocketAuthorNid)
+                            continue; // filter stated vs. inferred
+                        else if (!isStatedUser && rp.getAuthorNid() != snorocketAuthorNid)
+                            continue; // filter stated vs. inferred
+                        
                         if (rp.getPathId() == pos.getPath().getConceptNid()) {
                             if (rp1 == null) {
                                 rp1 = rp; // ... KEEP FIRST_INSTANCE PART
@@ -493,12 +529,12 @@ public class SnoTable {
      * Does starting at C2 ever end up at C1?<br>
      * If yes, then adding C1-ISA-C2 to C1 will create a cycle.<br>
      */
-    public static boolean findIsaCycle(int c1, int type, int c2) throws TerminologyException,
+    public static boolean findIsaCycle(int c1, int type, int c2, boolean isStatedUser) throws TerminologyException,
             IOException {
 
-        if (cStatedPath == null)
+        if (cEditPath == null)
             updatePrefs(true);
-        if (cStatedPath == null)
+        if (cEditPath == null)
             return false;
         if (type != isaNid)
             return false;
@@ -509,12 +545,12 @@ public class SnoTable {
         int testNid = c1;
 
         I_GetConceptData cBean = tf.getConcept(startNid);
-        List<PositionBI> posList = cStatedPath;
+        List<PositionBI> posList = cEditPath;
 
         //
         List<I_GetConceptData> isaCBNext = new ArrayList<I_GetConceptData>();
 
-        List<SnoRel> isaSnoRelProx = findIsaProximal(cBean, posList);
+        List<SnoRel> isaSnoRelProx = findIsaProximal(cBean, posList, isStatedUser);
         while (isaSnoRelProx.size() > 0) {
             // TEST LIST FOR PRIMITIVE OR NOT
             for (SnoRel isaSnoRel : isaSnoRelProx) {
@@ -533,7 +569,7 @@ public class SnoTable {
             // GET ALL NEXT LEVEL RELS FOR NON_PRIMITIVE CONCEPTS
             isaSnoRelProx = new ArrayList<SnoRel>();
             for (I_GetConceptData cbNext : isaCBNext) {
-                List<SnoRel> nextSnoRelList = findIsaProximal(cbNext, posList);
+                List<SnoRel> nextSnoRelList = findIsaProximal(cbNext, posList, isStatedUser);
                 if (nextSnoRelList.size() > 0)
                     isaSnoRelProx.addAll(nextSnoRelList);
             }
@@ -544,14 +580,14 @@ public class SnoTable {
         return false;
     }
 
-    public static int testIsRole(int cid) {        
+    public static int testIsRole(int cid, boolean isStatedUser) {        
         try {
             if (prefsNotSet())
                 updatePrefs(true); 
             if (prefsNotSet())
                 return -1; // can not confirm as role
             int[] parents = {isaNid, roleRootNid};
-            if (testIsaChildOf(parents, isaNid, cid))
+            if (testIsaChildOf(parents, isaNid, cid, isStatedUser))
                 return 1;
             else 
             return 0;
@@ -569,12 +605,12 @@ public class SnoTable {
      * Does starting at C2 ever end up at C1?<br>
      * If yes, then C2 is a child of at least one of the provided C1.<br>
      */    
-    public static boolean testIsaChildOf(int[] parents, int type, int c1)
+    public static boolean testIsaChildOf(int[] parents, int type, int c1, boolean isStatedUser)
             throws TerminologyException, IOException {
 
-        if (cStatedPath == null)
+        if (cEditPath == null)
             updatePrefs(true);
-        if (cStatedPath == null)
+        if (cEditPath == null)
             return false;
         if (type != isaNid)
             return false;
@@ -584,12 +620,12 @@ public class SnoTable {
         int[] testNids = parents;
 
         I_GetConceptData cBean = tf.getConcept(startNid);
-        List<PositionBI> posList = cStatedPath;
+        List<PositionBI> posList = cEditPath;
 
         //
         List<I_GetConceptData> isaCBNext = new ArrayList<I_GetConceptData>();
 
-        List<SnoRel> isaSnoRelProx = findIsaProximal(cBean, posList);
+        List<SnoRel> isaSnoRelProx = findIsaProximal(cBean, posList, isStatedUser);
         while (isaSnoRelProx.size() > 0) {
             // TEST LIST FOR PRIMITIVE OR NOT
             for (SnoRel isaSnoRel : isaSnoRelProx) {
@@ -611,7 +647,7 @@ public class SnoTable {
             // GET ALL NEXT LEVEL RELS FOR NON_PRIMITIVE CONCEPTS
             isaSnoRelProx = new ArrayList<SnoRel>();
             for (I_GetConceptData cbNext : isaCBNext) {
-                List<SnoRel> nextSnoRelList = findIsaProximal(cbNext, posList);
+                List<SnoRel> nextSnoRelList = findIsaProximal(cbNext, posList, isStatedUser);
                 if (nextSnoRelList.size() > 0)
                     isaSnoRelProx.addAll(nextSnoRelList);
             }
@@ -622,13 +658,13 @@ public class SnoTable {
         return false;
     }
 
-    private ArrayList<SnoRel> findIsaProximalPrim(I_GetConceptData cBean, List<PositionBI> posList)
-            throws TerminologyException, IOException {
+    private ArrayList<SnoRel> findIsaProximalPrim(I_GetConceptData cBean, List<PositionBI> posList,
+            boolean isStatedUser) throws TerminologyException, IOException {
 
         List<I_GetConceptData> isaCBNext = new ArrayList<I_GetConceptData>();
         ArrayList<SnoRel> isaSnoRelFinal = new ArrayList<SnoRel>();
 
-        List<SnoRel> isaSnoRelProx = findIsaProximal(cBean, posList);
+        List<SnoRel> isaSnoRelProx = findIsaProximal(cBean, posList, isStatedUser);
         while (isaSnoRelProx.size() > 0) {
             // TEST LIST FOR PRIMITIVE OR NOT
             for (SnoRel isaSnoRel : isaSnoRelProx) {
@@ -652,7 +688,7 @@ public class SnoTable {
             // GET ALL NEXT LEVEL RELS FOR NON_PRIMITIVE CONCEPTS
             isaSnoRelProx = new ArrayList<SnoRel>();
             for (I_GetConceptData cbNext : isaCBNext) {
-                List<SnoRel> nextSnoRelList = findIsaProximal(cbNext, posList);
+                List<SnoRel> nextSnoRelList = findIsaProximal(cbNext, posList, isStatedUser);
                 if (nextSnoRelList.size() > 0)
                     isaSnoRelProx.addAll(nextSnoRelList);
             }
@@ -704,17 +740,17 @@ public class SnoTable {
         }
     }
 
-    private SnoGrpList findRoleGrpProximal(I_GetConceptData cBean, List<PositionBI> posList) {
+    private SnoGrpList findRoleGrpProximal(I_GetConceptData cBean, List<PositionBI> posList, boolean isStatedUser) {
         SnoGrpList returnSnoGrpList;
 
         // Find individual proximal roles
-        List<SnoRel> roleSnoRelProx = findRoleProximal(cBean, posList);
+        List<SnoRel> roleSnoRelProx = findRoleProximal(cBean, posList, isStatedUser);
 
         // Get the role groups as groups
-        returnSnoGrpList = splitGrouped(roleSnoRelProx);
+        returnSnoGrpList = splitGrouped(roleSnoRelProx, isStatedUser);
 
         // Get group "0" roles as one group
-        SnoGrp tmpGroup0 = splitNonGrouped(roleSnoRelProx);
+        SnoGrp tmpGroup0 = splitNonGrouped(roleSnoRelProx, isStatedUser);
 
         // Convert each group "0" role into its own group of one role each.
         // Add each singleton group to beginning in sort order
@@ -725,7 +761,7 @@ public class SnoTable {
         return returnSnoGrpList;
     }
 
-    private List<SnoRel> findRoleProximal(I_GetConceptData cBean, List<PositionBI> posList) {
+    private List<SnoRel> findRoleProximal(I_GetConceptData cBean, List<PositionBI> posList, boolean isStatedUser) {
         ArrayList<SnoRel> returnSnoRels = new ArrayList<SnoRel>();
 
         try {
@@ -737,6 +773,11 @@ public class SnoTable {
                     // FIND MOST CURRENT
                     int tmpCountDupl = 0;
                     for (I_RelPart rp : rel.getMutableParts()) {
+                        if (isStatedUser && rp.getAuthorNid() == snorocketAuthorNid)
+                            continue; // filter stated vs. inferred
+                        else if (!isStatedUser && rp.getAuthorNid() != snorocketAuthorNid)
+                            continue; // filter stated vs. inferred
+                            
                         if (rp.getPathId() == pos.getPath().getConceptNid()) {
                             if (rp1 == null) {
                                 rp1 = rp; // ... KEEP FIRST_INSTANCE PART
@@ -771,7 +812,7 @@ public class SnoTable {
         return returnSnoRels;
     }
 
-    private SnoGrpList splitGrouped(List<SnoRel> relsIn) {
+    private SnoGrpList splitGrouped(List<SnoRel> relsIn, boolean isStatedUser) {
         SnoGrpList sg = new SnoGrpList();
 
         // Step 1: Segment
@@ -802,31 +843,31 @@ public class SnoTable {
             sg.add(groupList);
 
         // Step 2: Get non-Redundant set
-        sg = sg.whichNonRedundant();
+        sg = sg.whichNonRedundant(isStatedUser);
 
         return sg;
     }
 
-    private SnoGrp splitNonGrouped(List<SnoRel> relsIn) {
+    private SnoGrp splitNonGrouped(List<SnoRel> relsIn, boolean isStatedUser) {
         List<SnoRel> relsOut = new ArrayList<SnoRel>();
         for (SnoRel r : relsIn)
             if (r.group == 0)
                 relsOut.add(r);
         SnoGrp sgOut = new SnoGrp(relsOut, true);
-        sgOut = sgOut.whichRoleValAreNonRedundant();
+        sgOut = sgOut.whichRoleValAreNonRedundant(isStatedUser);
         return sgOut; // returns as sorted.
     }
 
-    private SnoGrpList findRoleGrpDiffFromRoot(I_GetConceptData cBean, List<PositionBI> posList)
+    private SnoGrpList findRoleGrpDiffFromRoot(I_GetConceptData cBean, List<PositionBI> posList, boolean isStatedUser)
             throws TerminologyException, IOException {
         SnoGrpList grpListA;
         SnoGrpList grpListB;
 
         // GET IMMEDIATE PROXIMAL ROLES OF *THIS*CONCEPT*
-        grpListA = findRoleGrpProximal(cBean, posList);
+        grpListA = findRoleGrpProximal(cBean, posList, isStatedUser);
 
         // GET PROXIMAL ISAs, one next level up at a time
-        List<SnoRel> isaSnoRelNext = findIsaProximal(cBean, posList);
+        List<SnoRel> isaSnoRelNext = findIsaProximal(cBean, posList, isStatedUser);
         List<SnoRel> isaSnoRelNextB = new ArrayList<SnoRel>();
         while (isaSnoRelNext.size() > 0) {
 
@@ -837,16 +878,16 @@ public class SnoTable {
                 I_GetConceptData isaCB = tf.getConcept(isaSnoRel.c2Id);
 
                 // ... EVALUATE PROXIMAL ROLES & SEPARATE GROUP
-                grpListB = findRoleGrpProximal(isaCB, posList);
+                grpListB = findRoleGrpProximal(isaCB, posList, isStatedUser);
 
                 // KEEP DIFFERENTIATED GROUPS
                 // keep what continues to differentiate
-                grpListA = grpListA.whichDifferentiateFrom(grpListB);
+                grpListA = grpListA.whichDifferentiateFrom(grpListB, isStatedUser);
                 // add anything new which also differentiates
-                grpListA.addAll(grpListB.whichDifferentiateFrom(grpListA));
+                grpListA.addAll(grpListB.whichDifferentiateFrom(grpListA, isStatedUser));
 
                 // ... GET PROXIMAL ISAs
-                isaSnoRelNextB.addAll(findIsaProximal(isaCB, posList));
+                isaSnoRelNextB.addAll(findIsaProximal(isaCB, posList, isStatedUser));
             }
 
             // SETUP NEXT LEVEL OF ISAs
@@ -855,16 +896,16 @@ public class SnoTable {
         }
 
         // last check for redundant -- check may not be needed
-        grpListA = grpListA.whichNonRedundant();
+        grpListA = grpListA.whichNonRedundant(isStatedUser);
 
         return grpListA;
     }
 
     private SnoGrpList findRoleGrpDiffFromProx(I_GetConceptData cBean, List<SnoRel> isaList,
-            List<PositionBI> posList) throws TerminologyException, IOException {
+            List<PositionBI> posList, boolean isStatedUser) throws TerminologyException, IOException {
 
         // FIND IMMEDIATE ROLES OF *THIS*CONCEPT*
-        SnoGrpList grpListA = findRoleGrpProximal(cBean, posList);
+        SnoGrpList grpListA = findRoleGrpProximal(cBean, posList, isStatedUser);
         if (grpListA.size() == 0) // NOTHING TO DIFFERENTIATE
             return grpListA;
 
@@ -872,29 +913,29 @@ public class SnoTable {
         SnoGrpList grpListB = new SnoGrpList();
         for (SnoRel isaSnoRel : isaList) {
             I_GetConceptData isaCB = tf.getConcept(isaSnoRel.c2Id);
-            SnoGrpList tmpGrpList = findRoleGrpDiffFromRoot(isaCB, posList);
+            SnoGrpList tmpGrpList = findRoleGrpDiffFromRoot(isaCB, posList, isStatedUser);
 
             // IF EMPTY LIST, SKIP TO NEXT
             if (tmpGrpList.size() == 0)
                 break;
 
             // keep role-groups which continue to differentiate
-            grpListB = grpListB.whichDifferentiateFrom(tmpGrpList);
+            grpListB = grpListB.whichDifferentiateFrom(tmpGrpList, isStatedUser);
             // add anything new which also differentiates
-            grpListB.addAll(tmpGrpList.whichDifferentiateFrom(grpListB));
+            grpListB.addAll(tmpGrpList.whichDifferentiateFrom(grpListB, isStatedUser));
         }
 
         // KEEP ONLY ROLES DIFFERENTIATED FROM MOST PROXIMATE
-        grpListA = grpListA.whichDifferentiateFrom(grpListB);
+        grpListA = grpListA.whichDifferentiateFrom(grpListB, isStatedUser);
 
         return grpListA;
     }
 
     private SnoGrpList findRoleGrpDiffFromProxPrim(I_GetConceptData cBean, List<SnoRel> isaList,
-            List<PositionBI> posList) throws TerminologyException, IOException {
+            List<PositionBI> posList, boolean isStatedUser) throws TerminologyException, IOException {
 
         // FIND ALL NON-REDUNDANT INHERITED ROLES OF *THIS*CONCEPT*
-        SnoGrpList grpListA = findRoleGrpDiffFromRoot(cBean, posList);
+        SnoGrpList grpListA = findRoleGrpDiffFromRoot(cBean, posList, isStatedUser);
         if (grpListA.size() == 0) // NOTHING TO DIFFERENTIATE
             return grpListA;
 
@@ -902,20 +943,20 @@ public class SnoTable {
         SnoGrpList grpListB = new SnoGrpList();
         for (SnoRel isaSnoRel : isaList) {
             I_GetConceptData isaCB = tf.getConcept(isaSnoRel.c2Id);
-            SnoGrpList tmpGrpList = findRoleGrpDiffFromRoot(isaCB, posList);
+            SnoGrpList tmpGrpList = findRoleGrpDiffFromRoot(isaCB, posList, isStatedUser);
 
             // IF EMPTY LIST, SKIP TO NEXT
             if (tmpGrpList.size() == 0)
                 break;
 
             // keep role-groups which continue to differentiate
-            grpListB = grpListB.whichDifferentiateFrom(tmpGrpList);
+            grpListB = grpListB.whichDifferentiateFrom(tmpGrpList, isStatedUser);
             // add anything new which also differentiates
-            grpListB.addAll(tmpGrpList.whichDifferentiateFrom(grpListB));
+            grpListB.addAll(tmpGrpList.whichDifferentiateFrom(grpListB, isStatedUser));
         }
 
         // KEEP ONLY ROLES DIFFERENTIATED FROM MOST PROXIMATE PRIMITIVE
-        grpListA = grpListA.whichDifferentiateFrom(grpListB);
+        grpListA = grpListA.whichDifferentiateFrom(grpListB, isStatedUser);
 
         return grpListA;
     }
@@ -948,7 +989,7 @@ public class SnoTable {
 
     // This routine is a simple version for check role roots.
     // Expansion would be needed to properly format more complex ancestry.
-    static public String toStringIsaAncestry(int conceptNid, List<PositionBI> posList) {
+    static public String toStringIsaAncestry(int conceptNid, List<PositionBI> posList, boolean isStatedUser) {
         String barStr = new String(" || ");
         String commaStr = new String(", ");
         String delimStr = commaStr;
@@ -971,7 +1012,7 @@ public class SnoTable {
             I_GetConceptData cBean = tf.getConcept(conceptNid);
             List<I_GetConceptData> isaCBNext = new ArrayList<I_GetConceptData>();
 
-            List<SnoRel> isaSnoRelProx = findIsaProximal(cBean, posList);
+            List<SnoRel> isaSnoRelProx = findIsaProximal(cBean, posList, isStatedUser);
             while (isaSnoRelProx.size() > 0) {
 
                 // ADD THIS LEVEL RELS TO STRING
@@ -990,7 +1031,7 @@ public class SnoTable {
                 // GET ALL NEXT LEVEL RELS FOR NON_PRIMITIVE CONCEPTS
                 isaSnoRelProx = new ArrayList<SnoRel>();
                 for (I_GetConceptData cbNext : isaCBNext) {
-                    List<SnoRel> nextSnoRelList = findIsaProximal(cbNext, posList);
+                    List<SnoRel> nextSnoRelList = findIsaProximal(cbNext, posList, isStatedUser);
                     if (nextSnoRelList.size() > 0)
                         isaSnoRelProx.addAll(nextSnoRelList);
                 }

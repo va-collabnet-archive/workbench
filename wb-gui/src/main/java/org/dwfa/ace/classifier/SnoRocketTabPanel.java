@@ -25,6 +25,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.classify.SnoAB;
 import org.dwfa.ace.task.classify.SnoQuery;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.tk.api.PathBI;
@@ -57,8 +58,8 @@ public class SnoRocketTabPanel extends JPanel implements ActionListener {
     private I_TermFactory tf;
     private I_ConfigAceFrame config;
 
-    private List<PositionBI> cEditPathPos;
-    private List<PositionBI> cClassPathPos;
+//    private List<PositionBI> cEditPathPos;
+    private List<PositionBI> cClassPositionBIList;
 
     // ** CONFIGURATION PARTICULARS **
     private static final boolean debug = false; // :DEBUG:
@@ -184,30 +185,43 @@ public class SnoRocketTabPanel extends JPanel implements ActionListener {
             }
 
             // CHECK & GET EDIT_PATH
-            I_GetConceptData cEditPathObj = config.getClassifierInputPath();
-            if (cEditPathObj != null) {
-                PathBI cEditIPath = tf.getPath(cEditPathObj.getNid());
-                cEditPathPos = new ArrayList<PositionBI>();
-                cEditPathPos.add(new Position(Integer.MAX_VALUE, cEditIPath));
-                addPathOrigins(cEditPathPos, cEditIPath);
-            }
+//            I_GetConceptData cEditPathObj = config.getClassifierInputPath();
+//            if (cEditPathObj != null) {
+//                PathBI cEditIPath = tf.getPath(cEditPathObj.getNid());
+//                cEditPathPos = new ArrayList<PositionBI>();
+//                cEditPathPos.add(new Position(Integer.MAX_VALUE, cEditIPath));
+//                addPathOrigins(cEditPathPos, cEditIPath);
+//            }
 
             // CHECK & GET CLASSIFER_PATH
             I_GetConceptData cClassPathObj = config.getClassifierOutputPath();
             if (cClassPathObj != null) {
                 PathBI cClassIPath = tf.getPath(cClassPathObj.getUids());
-                cClassPathPos = new ArrayList<PositionBI>();
-                cClassPathPos.add(new Position(Integer.MAX_VALUE, cClassIPath));
-                addPathOrigins(cClassPathPos, cClassIPath);
+                cClassPositionBIList = new ArrayList<PositionBI>();
+                cClassPositionBIList.add(new Position(Integer.MAX_VALUE, cClassIPath));
+                addPathOrigins(cClassPositionBIList, cClassIPath);
+            } else {
+                if (config.getViewPositionSet() == null) {
+                    String errStr = "(SnoRocketTabPanel error) View path is not set.";
+                    AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
+                } else if (config.getViewPositionSet().size() != 1) {
+                    String errStr = "(SnoRocketTabPanel error) Profile must have exactly one view path. Found: "
+                            + config.getViewPositionSet();
+                    AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
+                } else {
+                    cClassPositionBIList = new ArrayList<PositionBI>();
+                    cClassPositionBIList.add(config.getViewPositionSet().iterator().next());
+                }
             }
 
+            SnoAB.posList = cClassPositionBIList;
+            SnoAB.snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET
+                    .getUids());;
         } catch (TerminologyException e) {
             AceLog.getAppLog().alertAndLogException(e);
         } catch (IOException e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
-
-        SnoAB.posList = cClassPathPos;
     }
 
     private void addPathOrigins(List<PositionBI> origins, PathBI p) {

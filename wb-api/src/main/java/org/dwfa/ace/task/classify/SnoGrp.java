@@ -62,7 +62,7 @@ public class SnoGrp extends ArrayList<SnoRel> {
      * @param SnoGrp
      * @return
      */
-    public SnoGrp whichRoleValAreNonRedundant() {
+    public SnoGrp whichRoleValAreNonRedundant(boolean isStatedUser) {
         StringBuilder s = new StringBuilder("\r\n::: SnoGrp X.whichRoleValAreNonRedundant()");
         if (this.size() == 0) {
             if (debug) {
@@ -108,12 +108,12 @@ public class SnoGrp extends ArrayList<SnoRel> {
                 // Check differentiation
                 SnoRel relB = sgPass1.get(yB);
                 if (relA.typeId == relB.typeId)
-                    if (gSnoAB.aSubsumesB(relA.c2Id, relB.c2Id)) {
+                    if (gSnoAB.aSubsumesB(relA.c2Id, relB.c2Id, isStatedUser)) {
                         keep = false;
                         break;
                     }
                 if (relA.typeId != relB.typeId)
-                    if (gSnoAB.aSubsumesB(relA.typeId, relB.typeId)) {
+                    if (gSnoAB.aSubsumesB(relA.typeId, relB.typeId, isStatedUser)) {
                         keep = false;
                         break;
                     }
@@ -139,12 +139,12 @@ public class SnoGrp extends ArrayList<SnoRel> {
             for (int bi = max - 2; bi >= 0; bi--) {
                 SnoRel relB = sgPass2.get(bi);
                 if (relA.typeId == relB.typeId)
-                    if (gSnoAB.aSubsumesB(relA.c2Id, relB.c2Id)) {
+                    if (gSnoAB.aSubsumesB(relA.c2Id, relB.c2Id, isStatedUser)) {
                         keep = false;
                         break;
                     }
                 if (relA.typeId != relB.typeId)
-                    if (gSnoAB.aSubsumesB(relA.typeId, relB.typeId)) {
+                    if (gSnoAB.aSubsumesB(relA.typeId, relB.typeId, isStatedUser)) {
                         keep = false;
                         break;
                     }
@@ -184,7 +184,7 @@ public class SnoGrp extends ArrayList<SnoRel> {
      * @param SnoGrp
      * @return
      */
-    public SnoGrp whichRoleValDifferFrom(SnoGrp rg_B) {
+    public SnoGrp whichRoleValDifferFrom(SnoGrp rg_B, boolean isStatedUser) {
         StringBuilder s = new StringBuilder("\r\n::: SnoGrp X.whichRoleValDifferFrom(Y)");
 
         int maxA = this.size();
@@ -257,7 +257,7 @@ public class SnoGrp extends ArrayList<SnoRel> {
                             s.append("\t" + i + "\t" + j);
                             s.append("\tTYPE_A == TYPE_B, CHECK VALUE_A");
                         }
-                        if (rvA.c2Id == rvB.c2Id || gSnoAB.aSubsumesB(rvA.c2Id, rvB.c2Id)) {
+                        if (rvA.c2Id == rvB.c2Id || gSnoAB.aSubsumesB(rvA.c2Id, rvB.c2Id, isStatedUser)) {
                             subsumesAtLeastOneRV = true;
                             i = zA;
                             j = zB;
@@ -308,7 +308,7 @@ public class SnoGrp extends ArrayList<SnoRel> {
                 int j = 0;
                 while (j < maxB) {
                     rvB = rg_B.get(j);
-                    if (gSnoAB.aSubsumesB(rvA.typeId, rvB.typeId)) {
+                    if (gSnoAB.aSubsumesB(rvA.typeId, rvB.typeId, isStatedUser)) {
                         subsumesAtLeastOneType = true;
                         break;
                     }
@@ -352,7 +352,7 @@ public class SnoGrp extends ArrayList<SnoRel> {
             int j = 0;
             while (j < maxB) {
                 rvB = rg_B.get(j);
-                if (gSnoAB.aSubsumesB(rvA.typeId, rvB.typeId)) {
+                if (gSnoAB.aSubsumesB(rvA.typeId, rvB.typeId, isStatedUser)) {
                     subsumesAtLeastOneType = true;
                     break;
                 }
@@ -491,7 +491,7 @@ public class SnoGrp extends ArrayList<SnoRel> {
      * @param relListB
      * @return
      */
-    public boolean subsumes(List<SnoRel> rg_B) {
+    public boolean subsumes(List<SnoRel> rg_B, boolean isStatedUser) {
         int maxA = this.size();
         if (maxA == 0)
             return true; // empty set A, effectively "subsumes" everything
@@ -557,7 +557,7 @@ public class SnoGrp extends ArrayList<SnoRel> {
                             s.append("\t" + i + "\t" + j);
                             s.append("\tTYPE_A == TYPE_B, CHECK VALUE_A");
                         }
-                        if (rvA.c2Id == rvB.c2Id || gSnoAB.aSubsumesB(rvA.c2Id, rvB.c2Id)) {
+                        if (rvA.c2Id == rvB.c2Id || gSnoAB.aSubsumesB(rvA.c2Id, rvB.c2Id, isStatedUser)) {
                             subsumesAtLeastOneRV = true;
                             i = zA;
                             j = zB;
@@ -607,7 +607,7 @@ public class SnoGrp extends ArrayList<SnoRel> {
                 int j = 0;
                 while (j < maxB) {
                     rvB = rg_B.get(j);
-                    if (gSnoAB.aSubsumesB(rvA.typeId, rvB.typeId)) {
+                    if (gSnoAB.aSubsumesB(rvA.typeId, rvB.typeId, isStatedUser)) {
                         subsumesAtLeastOneType = true;
                         break;
                     }
@@ -643,7 +643,7 @@ public class SnoGrp extends ArrayList<SnoRel> {
             int j = 0;
             while (j < maxB) {
                 rvB = rg_B.get(j);
-                if (gSnoAB.aSubsumesB(rvA.typeId, rvB.typeId)) {
+                if (gSnoAB.aSubsumesB(rvA.typeId, rvB.typeId, isStatedUser)) {
                     subsumesAtLeastOneType = true;
                     break;
                 }

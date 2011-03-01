@@ -578,7 +578,7 @@ public class DLPanel extends JPanel {
             int cNid = Integer.MAX_VALUE;
             if (config.getHierarchySelection() != null) {
                 cNid = config.getHierarchySelection().getConceptNid();
-                int isRole = SnoTable.testIsRole(cNid);
+                int isRole = SnoTable.testIsRole(cNid, true);
                 if (isRole == 1) {
                     AceLog.getAppLog().log(Level.INFO,
                             "::: TAXONOMY NEW DL RHS: " + SnoTable.toString(cNid));
@@ -623,7 +623,7 @@ public class DLPanel extends JPanel {
             int cNid = Integer.MAX_VALUE;
             if (config.getHierarchySelection() != null) {
                 cNid = config.getHierarchySelection().getConceptNid();
-                int isRole = SnoTable.testIsRole(cNid);
+                int isRole = SnoTable.testIsRole(cNid, true);
                 if (isRole == 1) {
                     AceLog.getAppLog().log(Level.INFO,
                             "::: TAXONOMY NEW DL RHS: " + SnoTable.toString(cNid));
@@ -663,7 +663,7 @@ public class DLPanel extends JPanel {
                 int cNid = Integer.MAX_VALUE;
                 if (config.getHierarchySelection() != null) {
                     cNid = config.getHierarchySelection().getConceptNid();
-                    int isRole = SnoTable.testIsRole(cNid);
+                    int isRole = SnoTable.testIsRole(cNid, true);
                     if (isRole == 1) {
                         AceLog.getAppLog().log(Level.INFO,
                                 "::: TAXONOMY - NEVER GROUPED: " + SnoTable.toString(cNid));

@@ -71,6 +71,7 @@ import au.csiro.snorocket.snapi.I_Snorocket.I_EquivalentCallback;
 // import au.csiro.snorocket.snapi.I_Snorocket.I_InternalDataRoleCallback;
 
 /**
+ * :NYI: NOT UPDATED FOR SNOROCKET AS A 'USER'
  * 
  * SnorocketTask retrieves concepts and relationship from the stated edit path
  * and load the same to the IHTSDO (Snorocket) classifier.
@@ -1538,7 +1539,7 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 					if (countRolesVerbose) {
 						debugSB.append("::: "
 								+ SnoTable.toStringIsaAncestry(debugSR.typeId,
-										cEditPathPos) + "\r\n");
+										cEditPathPos, true) + "\r\n");
 					}
 				}
 				debugLastRole = debugSR.typeId;

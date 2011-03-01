@@ -51,6 +51,12 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 
+/**
+ * :NYI: NOT UPDATED FOR SNOROCKET AS A 'USER'
+ * 
+ * @author marc
+ *
+ */
 @BeanList(specs = { @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN) })
 public class SnoTaskComparePaths extends AbstractTask implements ActionListener {
     private static final long serialVersionUID = 1L;
