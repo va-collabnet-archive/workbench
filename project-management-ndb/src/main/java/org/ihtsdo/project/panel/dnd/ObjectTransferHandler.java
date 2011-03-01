@@ -34,6 +34,7 @@ public class ObjectTransferHandler extends TransferHandler {
 	private int addCount = 0; // Number of items added.
 	private I_ConfigAceFrame config;
 	private I_GetItemForModel getItem;
+	private JList source = null;
 
 	public ObjectTransferHandler(I_ConfigAceFrame config, I_GetItemForModel getItem) {
 		this.config = config;
@@ -112,8 +113,9 @@ public class ObjectTransferHandler extends TransferHandler {
 							}
 							for (Object concept : values) {
 
-								if (this.config == null)
+								if (this.config == null) {
 									this.config = Terms.get().getActiveAceFrameConfig();
+								}
 								Object obj = null;
 								if (getItem != null && concept != null) {
 									try {
@@ -121,12 +123,10 @@ public class ObjectTransferHandler extends TransferHandler {
 										for (int i = 0; i < listModel.getSize(); i++) {
 											String objString = listModel.get(i).toString();
 											if (objString.equals(concept.toString())) {
-												duplicated = true;
+												return false;
 											}
 										}
-										if(!duplicated){
-											obj = getItem.getItemFromConcept((I_GetConceptData)concept);
-										}
+										obj = getItem.getItemFromConcept((I_GetConceptData) concept);
 									} catch (Exception e) {
 										e.printStackTrace();
 									}
@@ -134,8 +134,8 @@ public class ObjectTransferHandler extends TransferHandler {
 									obj = concept;
 								}
 								addIndex = index;
-								addCount = 1;
-								
+								addCount = (target == source)?values.length : 0;
+
 								if (obj != null) {
 									if (c.getName() != null && c.getName().equals(ProjectDetailsPanel.TARGET_LIST_NAME)) {
 										listModel.removeAllElements();
@@ -148,7 +148,8 @@ public class ObjectTransferHandler extends TransferHandler {
 												duplicated = true;
 											}
 										}
-										if(!duplicated){
+										if (!duplicated) {
+											result = true;
 											listModel.add(index++, obj);
 										}
 									}
@@ -173,6 +174,7 @@ public class ObjectTransferHandler extends TransferHandler {
 
 	protected Transferable createTransferable(JComponent c) {
 		JList list = (JList) c;
+		source = list;
 		indices = list.getSelectedIndices();
 		Object[] values = list.getSelectedValues();
 		I_GetConceptData[] concepts = new I_GetConceptData[values.length];
