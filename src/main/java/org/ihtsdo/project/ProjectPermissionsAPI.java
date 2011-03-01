@@ -186,22 +186,21 @@ public class ProjectPermissionsAPI {
 	public Set<I_GetConceptData> getUsers() {
 		HashSet<I_GetConceptData> validUsers = new HashSet<I_GetConceptData>();
 		try {
-			I_GetConceptData userParent =
-				Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
+			I_GetConceptData roleParent =
+				Terms.get().getConcept(ArchitectonicAuxiliary.Concept.TRANSLATOR_ROLE.getUids());
 
 			I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
 			I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
 			Set<Integer> currentStatuses = helper.getCurrentStatusIds();
 
-			Set<? extends I_GetConceptData> allUsers = userParent.getDestRelOrigins(config.getAllowedStatus(),
+			Set<? extends I_GetConceptData> allRoles = roleParent.getDestRelOrigins(config.getAllowedStatus(),
 					allowedTypes, config.getViewPositionSetReadOnly(), Precedence.TIME,
 					config.getConflictResolutionStrategy());
-			I_GetConceptData descriptionType =
-				Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
+			I_GetConceptData descriptionType = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
 			I_IntSet descAllowedTypes = Terms.get().newIntSet();
 			descAllowedTypes.add(descriptionType.getConceptNid());
 
-			for (I_GetConceptData user : allUsers) {
+			for (I_GetConceptData user : allRoles) {
 
 				I_DescriptionTuple latestTuple = null;
 				long latestVersion = Long.MIN_VALUE;
