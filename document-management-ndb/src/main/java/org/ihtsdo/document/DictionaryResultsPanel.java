@@ -51,16 +51,16 @@ public class DictionaryResultsPanel extends JPanel implements ActionListener {
 
 	/** The query field. */
 	JTextField queryField;
-	
+
 	/** The result label. */
 	JLabel resultLabel;
-	
+
 	/** The table model. */
 	DefaultTableModel tableModel;
-	
+
 	/** The add button. */
 	JButton addButton;
-	
+
 	/** The search button. */
 	JButton searchButton;
 
@@ -113,7 +113,7 @@ public class DictionaryResultsPanel extends JPanel implements ActionListener {
 		searchButton.addActionListener(this);
 		searchButton.setAlignmentY(Component.CENTER_ALIGNMENT);
 		topContainer.add(searchButton);
-		
+
 		addButton = new JButton("Add to dictionary");
 		addButton.setActionCommand("add");
 		addButton.setEnabled(false);
@@ -191,15 +191,11 @@ public class DictionaryResultsPanel extends JPanel implements ActionListener {
 
 			String lCode=this.langCode;
 
-			if (lCode==null && cmbLangs!=null && cmbLangs.getSelectedIndex()>-1)
-				lCode=(String)cmbLangs.getSelectedItem();
-			if (lCode!=null){
-				DocumentManager.addToDictionary(queryField.getText(),lCode);
-				update(queryField.getText());
-			}
+			DocumentManager.addToDictionary(queryField.getText(),lCode);
+			update(queryField.getText());
 		}
 	}
-	
+
 	/**
 	 * Update.
 	 * 
@@ -210,23 +206,21 @@ public class DictionaryResultsPanel extends JPanel implements ActionListener {
 			tableModel.removeRow(0);
 		}
 		String lCode=this.langCode;
-		
+
 		if (lCode==null && cmbLangs!=null && cmbLangs.getSelectedIndex()>-1)
 			lCode=(String)cmbLangs.getSelectedItem();
-		if (lCode!=null){
-			if (DocumentManager.existsInDictionary(word,lCode)) {
-				resultLabel.setText("<html><font color='green'><b>OK");
-				addButton.setEnabled(false);
-			} else {
-				resultLabel.setText("<html><font color='red'><b>Not in dictionary");
-				addButton.setEnabled(true);
-			}
+		if (DocumentManager.existsInDictionary(word,lCode)) {
+			resultLabel.setText("<html><font color='green'><b>OK");
+			addButton.setEnabled(false);
+		} else {
+			resultLabel.setText("<html><font color='red'><b>Not in dictionary");
+			addButton.setEnabled(true);
+		}
 
-			String[] results = DocumentManager.getSugestionsFromDictionary(word,lCode);
+		String[] results = DocumentManager.getSugestionsFromDictionary(word,lCode);
 
-			for (String suggestion : results) {
-				tableModel.addRow(new String[] {suggestion});
-			}
+		for (String suggestion : results) {
+			tableModel.addRow(new String[] {suggestion});
 		}
 	}
 

@@ -372,7 +372,7 @@ public class DocumentManager {
 		return output;
 	}
 
-	
+
 	/**
 	 * 
 	 * 
@@ -403,7 +403,7 @@ public class DocumentManager {
 			activity.setIndeterminate(true);
 			activity.setProgressInfoLower("Indexing...");
 			long startTime = System.currentTimeMillis();
-			
+
 			File sharedDictionaryDir = new File(PROFILES_SHARED_DICTIONARIES);
 			if (!sharedDictionaryDir.exists()) {
 				sharedDictionaryDir.mkdirs();
@@ -412,7 +412,7 @@ public class DocumentManager {
 				File destFile = new File(sharedDictionaryDir, dictionaryTextFile.getName());
 				copyfile(dictionaryTextFile, destFile);
 			}
-			
+
 			File[] sharedFiles = sharedDictionaryDir.listFiles();
 			output = reindexDictionaries(overwrite, output, sharedFiles);
 
@@ -421,7 +421,7 @@ public class DocumentManager {
 			long elapsed = endTime - startTime;
 			String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
 			activity.setProgressInfoLower("Elapsed: " + elapsedStr);
-				activity.complete();
+			activity.complete();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (TerminologyException e) {
@@ -432,20 +432,21 @@ public class DocumentManager {
 	}
 
 	private static String reindexDictionaries(boolean overwrite, String output, File[] sharedFiles) throws IOException, UnsupportedEncodingException, FileNotFoundException {
-		for (File file : sharedFiles) {
-			File dictionaryFolder = new File("spellIndexDirectory/" + file.getName().split("\\.")[0]);
-			if (overwrite) {
-				output = output + "Deleting dictionary...<br>";
-				if (!deleteDirectory(dictionaryFolder) && dictionaryFolder.exists()) {
-					output = output + "Can't delete previous dictionary, adding new content...<br><br>";
-				}
+
+		File dictionaryFolder = new File("spellIndexDirectory/");
+		if (overwrite) {
+			output = output + "Deleting dictionary...<br>";
+			if (!deleteDirectory(dictionaryFolder) && dictionaryFolder.exists()) {
+				output = output + "Can't delete previous dictionary, adding new content...<br><br>";
 			}
-			Directory spellDir = FSDirectory.open(new File(dictionaryFolder.getPath()));
-			SpellChecker spellchecker = new SpellChecker(spellDir);
-			// To index a file containing words:
-			spellchecker.indexDictionary(new PlainTextDictionary(new InputStreamReader(new FileInputStream(file), "UTF-8")));
-			spellDir.close();
 		}
+		Directory spellDir = FSDirectory.open(new File(dictionaryFolder.getPath()));
+		SpellChecker spellchecker = new SpellChecker(spellDir);
+		// To index a file containing words:
+		for (File file : sharedFiles) {
+			spellchecker.indexDictionary(new PlainTextDictionary(new InputStreamReader(new FileInputStream(file), "UTF-8")));
+		}
+		spellDir.close();
 		return output;
 	}
 
@@ -478,7 +479,7 @@ public class DocumentManager {
 	public static String addToDictionary(String word, String langCode) {
 		String output = "<html><body><font style='font-family:arial,sans-serif'>";
 		try {
-			Directory spellDir = FSDirectory.open(new File("spellIndexDirectory/" + langCode));
+			Directory spellDir = FSDirectory.open(new File("spellIndexDirectory"));
 			SpellChecker spellchecker = new SpellChecker(spellDir);
 			// To index a file containing words:
 			spellchecker.indexDictionary(new PlainTextDictionary(new StringReader(word)));
@@ -537,7 +538,7 @@ public class DocumentManager {
 	 */
 	public static boolean existsInDictionary(String word, String langCode) {
 		try {
-			Directory spellDir = FSDirectory.open(new File("spellIndexDirectory/" + langCode));
+			Directory spellDir = FSDirectory.open(new File("spellIndexDirectory/"));
 			SpellChecker spellchecker = new SpellChecker(spellDir);
 			boolean result = spellchecker.exist(word);
 			spellDir.close();
@@ -558,7 +559,7 @@ public class DocumentManager {
 	 */
 	public static String[] getSugestionsFromDictionary(String word, String langCode) {
 		try {
-			Directory spellDir = FSDirectory.open(new File("spellIndexDirectory/" + langCode));
+			Directory spellDir = FSDirectory.open(new File("spellIndexDirectory/"));
 			SpellChecker spellchecker = new SpellChecker(spellDir);
 			String[] results = spellchecker.suggestSimilar(word, 5);
 			spellDir.close();
@@ -686,7 +687,7 @@ public class DocumentManager {
 	}
 
 	public static void addNewLinguisticGuideline(String name, String pattern, String recommendation, I_GetConceptData infoRoot, I_ConfigAceFrame config) throws TerminologyException,
-			IOException {
+	IOException {
 		I_TermFactory termFactory = Terms.get();
 		termFactory.setActiveAceFrameConfig(config);
 
@@ -809,7 +810,7 @@ public class DocumentManager {
 			case '?':
 				s.append(".");
 				break;
-			// escape special regexp-characters
+				// escape special regexp-characters
 			case '(':
 			case ')':
 			case '[':
