@@ -20,7 +20,7 @@
 	<name>translation-module-master-pom</name>
 	<url>http://maven.apache.org</url>
 	<properties>
-		<workbench.version>2.6.0-trek-13-SNAPSHOT</workbench.version>
+		<workbench.version>2.6.0-trek-13</workbench.version>
 	</properties>
 
 	<modules>
