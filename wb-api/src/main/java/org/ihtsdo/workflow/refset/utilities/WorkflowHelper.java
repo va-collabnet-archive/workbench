@@ -55,7 +55,7 @@ public class WorkflowHelper {
 
 	private static int currentNid = 0;
 	private static int isARelNid = 0;
-	private static UUID beginWorkflowActionUid = null;
+	private static Set<UUID> beginWorkflowActions = null;
 	private static UUID endWorkflowActionUid = null;
 
 	public static final int EARLIEST_WORKFLOW_HISTORY_YEAR = 2007;
@@ -513,28 +513,31 @@ public class WorkflowHelper {
 	}
 
     public static boolean isBeginWorkflowAction(I_GetConceptData actionConcept) {
-    	if (beginWorkflowActionUid  == null)
+    	if (beginWorkflowActions  == null)
 		{
+    		beginWorkflowActions = new HashSet<UUID>();
+    		
     		try
 	    	{
-				List<I_RelVersioned> relList = getWorkflowRelationship(actionConcept, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
-	
-				for (I_RelVersioned rel : relList)
-				{
-					if (rel != null &&
-		    			 rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_BEGIN_WF_CONCEPT.getPrimoridalUid()).getConceptNid())
+    	    	for (I_GetConceptData action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
+    	    	{
+					for (I_RelVersioned rel : getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE))
 					{
-						beginWorkflowActionUid = actionConcept.getPrimUuid();
-						break;
+						if (rel != null &&
+			    			rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_BEGIN_WF_CONCEPT.getPrimoridalUid()).getConceptNid())
+						{
+    						beginWorkflowActions.add(action.getPrimUuid());
+							break;
+						}
 					}
-				}
+    	    	}
 	    	} catch (Exception e) {
 	        	AceLog.getAppLog().log(Level.SEVERE, "Error in identifying if current action is a BEGIN-WORKFLOW action", e);
 	    	}
 		}
 
-    	if (beginWorkflowActionUid != null)
-    		return (beginWorkflowActionUid.equals(actionConcept.getPrimUuid()));
+    	if (beginWorkflowActions != null)
+    		return (beginWorkflowActions.contains(actionConcept.getPrimUuid()));
     	else
     		return false;
 	}
