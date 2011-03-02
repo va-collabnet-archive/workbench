@@ -9,13 +9,30 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.translation.ui.config.TranslatorDefaultEditorModePanel;
 
 public class ConfigTranslationModule  implements Serializable{
 
 	private static final long serialVersionUID = 1L;
+	private boolean autoOpenNextInboxItem;
+	private boolean enableSpellChecker;
+	private boolean isProjectDefaultConfiguration;
+
+	private HashMap<UUID, EditorMode> translatorRoles;
+
+	private LinkedHashSet<TreeComponent> sourceTreeComponents;
+	private LinkedHashSet<TreeComponent> targetTreeComponents;
+	private LinkedHashSet<InboxColumn> ColumnsDisplayedInInbox;
+	private EditorMode selectedEditorMode;
+	private EditingPanelOpenMode editingPanelOpenMode;
+	private DefaultSimilaritySearchOption defaultSimilaritySearchOption;
+	private PreferredTermDefault selectedPrefTermDefault;
+	private FsnGenerationStrategy selectedFsnGenStrategy;
+	private IcsGenerationStrategy selectedIcsGenerationStrategy;
+	private List<UUID> projectIssuesRepositoryIds;
+	private List<UUID> sourceIssuesRepositoryIds;
+	
 	
 	public ConfigTranslationModule() {
 		super();
@@ -199,25 +216,6 @@ public class ConfigTranslationModule  implements Serializable{
 		}
 
 	}
-
-
-	private boolean autoOpenNextInboxItem;
-	private boolean enableSpellChecker;
-	private boolean isProjectDefaultConfiguration;
-
-	private HashMap<UUID, EditorMode> translatorRoles;
-
-	private LinkedHashSet<TreeComponent> sourceTreeComponents;
-	private LinkedHashSet<TreeComponent> targetTreeComponents;
-	private LinkedHashSet<InboxColumn> ColumnsDisplayedInInbox;
-	private EditorMode selectedEditorMode;
-	private EditingPanelOpenMode editingPanelOpenMode;
-	private DefaultSimilaritySearchOption defaultSimilaritySearchOption;
-	private PreferredTermDefault selectedPrefTermDefault;
-	private FsnGenerationStrategy selectedFsnGenStrategy;
-	private IcsGenerationStrategy selectedIcsGenerationStrategy;
-	private List<UUID> projectIssuesRepositoryIds;
-	private List<UUID> sourceIssuesRepositoryIds;
 	
 	public boolean isEnableSpellChecker() {
 		return enableSpellChecker;

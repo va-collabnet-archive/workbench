@@ -2448,6 +2448,7 @@ public class InboxPanel extends JPanel {
 	List<I_Work> cloneList = new ArrayList<I_Work>();
 	private int processInExecution;
 	private boolean setByCode;
+	
 	protected void executeProcess(){
 		Runnable r = new Runnable() {
 

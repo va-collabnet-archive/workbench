@@ -55,7 +55,8 @@ public class ConfigDialog extends JDialog {
 	private FileLinkConfigurationPanel fileLinkConfigurationPanel;
 	private TranslatorDefaultEditorModePanel translatorDefaultEditorModePanel;
 	private SpellCheckerConfigPanel spellCheckConfigPanel;
-	
+	private PreferedTermDefaultPanel preferdTermDefaultPanel;
+
 	private boolean isProjectConfiguration;
 	private ConfigTranslationModule confTrans;
 	private I_ConfigAceFrame config;
@@ -65,36 +66,37 @@ public class ConfigDialog extends JDialog {
 		this.isProjectConfiguration = isProjectConfiguration;
 		this.config = config;
 		this.confTrans = confTrans;
-		
-		if(projectName != null){
+
+		if (projectName != null) {
 			setTitle("Translation preferences for " + projectName);
-		}else{
+		} else {
 			setTitle("Translation preferences");
 		}
-		setPreferredSize(new Dimension(640,480));
-		setLocation(150,150);
+		setPreferredSize(new Dimension(640, 480));
+		setLocation(150, 150);
 
-		//================Initialize Configuration Panels=============
+		// ================Initialize Configuration Panels=============
 		initComponents();
 		initCustomComponents();
-		
+
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				close(null);
 			}
 		});
-		
+
 	}
-	
-	public JPanel getPanel(){
+
+	public JPanel getPanel() {
 		return (JPanel) this.getContentPane();
 	}
-	
+
 	/**
 	 * Opens the configuration dialog<br>
+	 * 
 	 * @return The ConfigTranslationModule if configuration was accepted, <br>
-	 * else returns null
+	 *         else returns null
 	 */
 	public ConfigTranslationModule showModalDialog() {
 		setModal(true);
@@ -102,15 +104,16 @@ public class ConfigDialog extends JDialog {
 		setVisible(true);
 		return this.confTrans;
 	}
-	
+
 	private void close(ConfigTranslationModule canceled) {
 		this.confTrans = canceled;
 		dispose();
 	}
 
 	private void initCustomComponents() {
-	
-		//=================== CONFIG TREE RENDERER CONFIGURATION ===================
+
+		// =================== CONFIG TREE RENDERER CONFIGURATION
+		// ===================
 		DefaultTreeCellRenderer rend = new DefaultTreeCellRenderer();
 		rend.setOpenIcon(null);
 		rend.setClosedIcon(null);
@@ -123,21 +126,21 @@ public class ConfigDialog extends JDialog {
 		createNodes(top);
 		DefaultTreeModel model = new DefaultTreeModel(top);
 		configTree.setModel(model);
-		
-		//Selects the first node by default
+
+		// Selects the first node by default
 		configTree.setSelectionRow(0);
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) configTree.getLastSelectedPathComponent();
-		
-		title.setText(((ConfigTreeInfo)node.getUserObject()).getName());
+
+		title.setText(((ConfigTreeInfo) node.getUserObject()).getName());
 		title.setBorder(new EmptyBorder(new Insets(5, 20, 5, 0)));
-		
-		scrollPane1.setPreferredSize(new Dimension(230,300));
-		scrollPane1.setMinimumSize(new Dimension(230,300));
-		
-		splitPane1.getLeftComponent().setMinimumSize(new Dimension(230,300));
+
+		scrollPane1.setPreferredSize(new Dimension(230, 300));
+		scrollPane1.setMinimumSize(new Dimension(230, 300));
+
+		splitPane1.getLeftComponent().setMinimumSize(new Dimension(230, 300));
 		splitPane1.setDividerSize(1);
-		
-		contentPanel.setMinimumSize(new Dimension(300,300));
+
+		contentPanel.setMinimumSize(new Dimension(300, 300));
 
 		TreeSelectionListener sl = new TreeSelectionListener() {
 
@@ -148,46 +151,49 @@ public class ConfigDialog extends JDialog {
 					return;
 				}
 				Object nodeInfo = node.getUserObject();
-				ConfigTreeInfo conf = (ConfigTreeInfo)nodeInfo;
+				ConfigTreeInfo conf = (ConfigTreeInfo) nodeInfo;
 				title.setText(conf.getName());
 				try {
-					CardLayout cardLo = (CardLayout)contentPanel.getLayout();
-					if(conf.getItem().equals(ConfigurationConstants.EDITOR_MODE_PANEL)){
+					CardLayout cardLo = (CardLayout) contentPanel.getLayout();
+					if (conf.getItem().equals(ConfigurationConstants.EDITOR_MODE_PANEL)) {
 						editorModePanel.selectCurrentConfButton();
 						cardLo.show(contentPanel, ConfigurationConstants.EDITOR_MODE_PANEL);
-					}else if(conf.getItem().equals(ConfigurationConstants.SIMILARITY_DEFAULT_SETTING_PANEL)){
+					} else if (conf.getItem().equals(ConfigurationConstants.SIMILARITY_DEFAULT_SETTING_PANEL)) {
 						similarityDefaultSettingPanel.selectCurrentConfButton();
 						cardLo.show(contentPanel, ConfigurationConstants.SIMILARITY_DEFAULT_SETTING_PANEL);
-					}else if(conf.getItem().equals(ConfigurationConstants.FSN_GENERATION_STRATEGY_PANEL)){
+					} else if (conf.getItem().equals(ConfigurationConstants.FSN_GENERATION_STRATEGY_PANEL)) {
 						fsnGenStrategyPanel.selectCurrentConfButton();
 						cardLo.show(contentPanel, ConfigurationConstants.FSN_GENERATION_STRATEGY_PANEL);
-					}else if(conf.getItem().equals(ConfigurationConstants.SOURCE_TREE_COMPONENTS_PANEL)){
+					} else if (conf.getItem().equals(ConfigurationConstants.SOURCE_TREE_COMPONENTS_PANEL)) {
 						sourceTreeComponentsPanel.initializeLists();
 						cardLo.show(contentPanel, ConfigurationConstants.SOURCE_TREE_COMPONENTS_PANEL);
-					}else if(conf.getItem().equals(ConfigurationConstants.TARGET_TREE_COMPONENTS_PANEL)){
+					} else if (conf.getItem().equals(ConfigurationConstants.TARGET_TREE_COMPONENTS_PANEL)) {
 						sourceTreeComponentsPanel.initializeLists();
 						cardLo.show(contentPanel, ConfigurationConstants.TARGET_TREE_COMPONENTS_PANEL);
-					}else if(conf.getItem().equals(ConfigurationConstants.INBOX_COLUMN_COMPONENTS_PANEL)){
+					} else if (conf.getItem().equals(ConfigurationConstants.INBOX_COLUMN_COMPONENTS_PANEL)) {
 						inboxColumnComponentsPanel.initializeLists();
 						cardLo.show(contentPanel, ConfigurationConstants.INBOX_COLUMN_COMPONENTS_PANEL);
-					}else if(conf.getItem().equals(ConfigurationConstants.ICS_GENERATION_STRATEGY_PANEL)){
+					} else if (conf.getItem().equals(ConfigurationConstants.ICS_GENERATION_STRATEGY_PANEL)) {
 						icsConGenerationStrategyPanel.selectCurrentConfButton();
 						cardLo.show(contentPanel, ConfigurationConstants.ICS_GENERATION_STRATEGY_PANEL);
-					}else if(conf.getItem().equals(ConfigurationConstants.INBOX_ITEM_CONFIGURATION_PANEL)){
+					} else if (conf.getItem().equals(ConfigurationConstants.INBOX_ITEM_CONFIGURATION_PANEL)) {
 						inboxItemConfigurationPanel.selectCurrentConfButton();
 						cardLo.show(contentPanel, ConfigurationConstants.INBOX_ITEM_CONFIGURATION_PANEL);
-					}else if(conf.getItem().equals(ConfigurationConstants.TRANSLATION_ISSUE_REPOSITORIES)){
-						//inboxItemConfigurationPanel.selectCurrentConfButton();
+					} else if (conf.getItem().equals(ConfigurationConstants.TRANSLATION_ISSUE_REPOSITORIES)) {
+						// inboxItemConfigurationPanel.selectCurrentConfButton();
 						cardLo.show(contentPanel, ConfigurationConstants.TRANSLATION_ISSUE_REPOSITORIES);
-					}else if(conf.getItem().equals(ConfigurationConstants.FILE_LINK_CONFIGURATION_PANEL)){
-						//inboxItemConfigurationPanel.selectCurrentConfButton();
+					} else if (conf.getItem().equals(ConfigurationConstants.FILE_LINK_CONFIGURATION_PANEL)) {
+						// inboxItemConfigurationPanel.selectCurrentConfButton();
 						cardLo.show(contentPanel, ConfigurationConstants.FILE_LINK_CONFIGURATION_PANEL);
-					}else if(conf.getItem().equals(ConfigurationConstants.TRANSLATOR_DEFAULT_EDITOR_MODE)){
+					} else if (conf.getItem().equals(ConfigurationConstants.TRANSLATOR_DEFAULT_EDITOR_MODE)) {
 						translatorDefaultEditorModePanel.revertSelections();
 						cardLo.show(contentPanel, ConfigurationConstants.TRANSLATOR_DEFAULT_EDITOR_MODE);
-					}else if(conf.getItem().equals(ConfigurationConstants.SPELL_CHECK_CONFIGURATION_PANEL)){
+					} else if (conf.getItem().equals(ConfigurationConstants.SPELL_CHECK_CONFIGURATION_PANEL)) {
 						spellCheckConfigPanel.selectCurrentConfButton();
 						cardLo.show(contentPanel, ConfigurationConstants.SPELL_CHECK_CONFIGURATION_PANEL);
+					} else if (conf.getItem().equals(ConfigurationConstants.PREFERD_TERM_DEFAULT_PANEL)) {
+						preferdTermDefaultPanel.selectCurrentConfButton();
+						cardLo.show(contentPanel, ConfigurationConstants.PREFERD_TERM_DEFAULT_PANEL);
 					}
 
 				} catch (Exception ex) {
@@ -196,29 +202,32 @@ public class ConfigDialog extends JDialog {
 			}
 		};
 		configTree.addTreeSelectionListener(sl);
-		//=================== CONFIGURATIOIN PANELS INITIALIZATION ===================
-		
-		if(!isProjectConfiguration){
-			inboxColumnComponentsPanel = new InboxColumnComponentsPanel(this.config,this.confTrans);
+		// =================== CONFIGURATIOIN PANELS INITIALIZATION
+		// ===================
+
+		if (!isProjectConfiguration) {
+			inboxColumnComponentsPanel = new InboxColumnComponentsPanel(this.config, this.confTrans);
 			inboxColumnComponentsPanel.initializeLists();
-			inboxItemConfigurationPanel = new InboxItemConfigurationPanel(config,this.confTrans);
-			sourceTreeComponentsPanel = new SourceTreeComponentsPanel(config,this.confTrans);
-			targetTreeComponentsPanel = new TargetTreeComponentsPanel(config,this.confTrans);
+			inboxItemConfigurationPanel = new InboxItemConfigurationPanel(config, this.confTrans);
+			sourceTreeComponentsPanel = new SourceTreeComponentsPanel(config, this.confTrans);
+			targetTreeComponentsPanel = new TargetTreeComponentsPanel(config, this.confTrans);
 			spellCheckConfigPanel = new SpellCheckerConfigPanel(config, confTrans);
-			
+			preferdTermDefaultPanel = new PreferedTermDefaultPanel(config, confTrans);
+
 			contentPanel.add(inboxColumnComponentsPanel, ConfigurationConstants.INBOX_COLUMN_COMPONENTS_PANEL);
 			contentPanel.add(inboxItemConfigurationPanel, ConfigurationConstants.INBOX_ITEM_CONFIGURATION_PANEL);
+			contentPanel.add(preferdTermDefaultPanel, ConfigurationConstants.PREFERD_TERM_DEFAULT_PANEL);
 			contentPanel.add(sourceTreeComponentsPanel, ConfigurationConstants.SOURCE_TREE_COMPONENTS_PANEL);
 			contentPanel.add(spellCheckConfigPanel, ConfigurationConstants.SPELL_CHECK_CONFIGURATION_PANEL);
 			contentPanel.add(targetTreeComponentsPanel, ConfigurationConstants.TARGET_TREE_COMPONENTS_PANEL);
-		}else{
+		} else {
 			editorModePanel = new EditorModePanel(config, this.confTrans);
 			editorModePanel.selectCurrentConfButton();
 			similarityDefaultSettingPanel = new SimilarityDefaultSettingsPanel(config, this.confTrans);
-			fsnGenStrategyPanel = new FsnGenerationStrategyPanel(config, this.confTrans); 
-			icsConGenerationStrategyPanel = new IcsGenerationStrategyPanel(config,this.confTrans);
+			fsnGenStrategyPanel = new FsnGenerationStrategyPanel(config, this.confTrans);
+			icsConGenerationStrategyPanel = new IcsGenerationStrategyPanel(config, this.confTrans);
 			translationIssuesRepositoryIdsPanel = new TranslationIssuesRepositoryIdsPanel(config, this.confTrans);
-			fileLinkConfigurationPanel = new FileLinkConfigurationPanel(config,this.confTrans);
+			fileLinkConfigurationPanel = new FileLinkConfigurationPanel(config, this.confTrans);
 			translatorDefaultEditorModePanel = new TranslatorDefaultEditorModePanel(config, this.confTrans);
 
 			contentPanel.add(editorModePanel, ConfigurationConstants.EDITOR_MODE_PANEL);
@@ -229,26 +238,26 @@ public class ConfigDialog extends JDialog {
 			contentPanel.add(translationIssuesRepositoryIdsPanel, ConfigurationConstants.TRANSLATION_ISSUE_REPOSITORIES);
 			contentPanel.add(translatorDefaultEditorModePanel, ConfigurationConstants.TRANSLATOR_DEFAULT_EDITOR_MODE);
 		}
-		
-		//=================== CLOSE BUTTONS ====================
+
+		// =================== CLOSE BUTTONS ====================
 		configCancelButton.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				close(null);
 			}
 
 		});
-		
+
 		acceptButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				close(confTrans);
 			}
 		});
-		
+
 	}
-	
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -263,58 +272,56 @@ public class ConfigDialog extends JDialog {
 		title = new JLabel();
 		contentPanel = new JPanel();
 
-		//======== this ========
+		// ======== this ========
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
 
-		//======== panel2 ========
+		// ======== panel2 ========
 		{
 			panel2.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-			//---- acceptButton ----
+			// ---- acceptButton ----
 			acceptButton.setText("Accept");
 			panel2.add(acceptButton);
 
-			//---- configCancelButton ----
+			// ---- configCancelButton ----
 			configCancelButton.setText("Close");
 			panel2.add(configCancelButton);
 		}
 		contentPane.add(panel2, BorderLayout.SOUTH);
 
-		//======== splitPane1 ========
+		// ======== splitPane1 ========
 		{
 			splitPane1.setEnabled(false);
 
-			//======== scrollPane1 ========
+			// ======== scrollPane1 ========
 			{
 				scrollPane1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-				//---- configTree ----
+				// ---- configTree ----
 				configTree.setRootVisible(false);
 				configTree.setShowsRootHandles(true);
 				scrollPane1.setViewportView(configTree);
 			}
 			splitPane1.setLeftComponent(scrollPane1);
 
-			//======== panel1 ========
+			// ======== panel1 ========
 			{
 				panel1.setLayout(new BorderLayout());
 
-				//======== titlePanel ========
+				// ======== titlePanel ========
 				{
 					titlePanel.setBorder(new EtchedBorder());
 					titlePanel.setLayout(new GridBagLayout());
-					((GridBagLayout)titlePanel.getLayout()).columnWidths = new int[] {0, 0};
-					((GridBagLayout)titlePanel.getLayout()).rowHeights = new int[] {29, 0};
-					((GridBagLayout)titlePanel.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-					((GridBagLayout)titlePanel.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
-					titlePanel.add(title, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 0), 0, 0));
+					((GridBagLayout) titlePanel.getLayout()).columnWidths = new int[] { 0, 0 };
+					((GridBagLayout) titlePanel.getLayout()).rowHeights = new int[] { 29, 0 };
+					((GridBagLayout) titlePanel.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+					((GridBagLayout) titlePanel.getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
+					titlePanel.add(title, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 				}
 				panel1.add(titlePanel, BorderLayout.NORTH);
 
-				//======== contentPanel ========
+				// ======== contentPanel ========
 				{
 					contentPanel.setBorder(new EtchedBorder());
 					contentPanel.setLayout(new CardLayout());
@@ -341,48 +348,52 @@ public class ConfigDialog extends JDialog {
 	private JPanel titlePanel;
 	private JLabel title;
 	private JPanel contentPanel;
+
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
 	private void createNodes(DefaultMutableTreeNode top) {
 		DefaultMutableTreeNode category = null;
-		if(!isProjectConfiguration){
+		if (!isProjectConfiguration) {
 			category = new DefaultMutableTreeNode(new ConfigTreeInfo("Inbox columns display", ConfigurationConstants.INBOX_COLUMN_COMPONENTS_PANEL));
 			top.add(category);
-			
+
 			category = new DefaultMutableTreeNode(new ConfigTreeInfo("Inbox item configuration", ConfigurationConstants.INBOX_ITEM_CONFIGURATION_PANEL));
 			top.add(category);
+
+			category = new DefaultMutableTreeNode(new ConfigTreeInfo("Preferd term default mode", ConfigurationConstants.PREFERD_TERM_DEFAULT_PANEL));
+			top.add(category);
 			
-			category = new DefaultMutableTreeNode(new ConfigTreeInfo("Source descriptions display",ConfigurationConstants.SOURCE_TREE_COMPONENTS_PANEL));
+			category = new DefaultMutableTreeNode(new ConfigTreeInfo("Source descriptions display", ConfigurationConstants.SOURCE_TREE_COMPONENTS_PANEL));
 			top.add(category);
 
-			category = new DefaultMutableTreeNode(new ConfigTreeInfo("Spell check configuration",ConfigurationConstants.SPELL_CHECK_CONFIGURATION_PANEL));
+			category = new DefaultMutableTreeNode(new ConfigTreeInfo("Spell check configuration", ConfigurationConstants.SPELL_CHECK_CONFIGURATION_PANEL));
 			top.add(category);
-			
+
 			category = new DefaultMutableTreeNode(new ConfigTreeInfo("Target descriptions display", ConfigurationConstants.TARGET_TREE_COMPONENTS_PANEL));
 			top.add(category);
-		}else{
+		} else {
 			category = new DefaultMutableTreeNode(new ConfigTreeInfo("Editor mode", ConfigurationConstants.EDITOR_MODE_PANEL));
 			top.add(category);
-			
+
 			category = new DefaultMutableTreeNode(new ConfigTreeInfo("File link configuration", ConfigurationConstants.FILE_LINK_CONFIGURATION_PANEL));
 			top.add(category);
-			
-			category = new DefaultMutableTreeNode(new ConfigTreeInfo("FSN generation strategy",ConfigurationConstants.FSN_GENERATION_STRATEGY_PANEL));
+
+			category = new DefaultMutableTreeNode(new ConfigTreeInfo("FSN generation strategy", ConfigurationConstants.FSN_GENERATION_STRATEGY_PANEL));
 			top.add(category);
-			
+
 			category = new DefaultMutableTreeNode(new ConfigTreeInfo("Ics generation strategy", ConfigurationConstants.ICS_GENERATION_STRATEGY_PANEL));
 			top.add(category);
-			
+
 			category = new DefaultMutableTreeNode(new ConfigTreeInfo("Similarity default setting", ConfigurationConstants.SIMILARITY_DEFAULT_SETTING_PANEL));
 			top.add(category);
 
 			category = new DefaultMutableTreeNode(new ConfigTreeInfo("Translation issue repositories", ConfigurationConstants.TRANSLATION_ISSUE_REPOSITORIES));
 			top.add(category);
-			
+
 			category = new DefaultMutableTreeNode(new ConfigTreeInfo("Translator default editor mode", ConfigurationConstants.TRANSLATOR_DEFAULT_EDITOR_MODE));
 			top.add(category);
 		}
-		
+
 	}
 
 }
