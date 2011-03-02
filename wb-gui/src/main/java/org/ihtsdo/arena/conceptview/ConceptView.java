@@ -985,8 +985,9 @@ public class ConceptView extends JPanel {
    public TreeSet<PositionBI> getPositionOrderedSet() {
 
       TreeSet positionSet = new TreeSet(new PositionComparator());
-      positionSet.addAll(positionOrderedSet);
-
+      if (positionOrderedSet != null){
+    	  positionSet.addAll(positionOrderedSet);
+      }
       return positionSet;
    }
 
