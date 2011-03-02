@@ -14,5 +14,6 @@ public class ConfigurationConstants {
 	public static final String TRANSLATOR_DEFAULT_EDITOR_MODE = "Translator default editor mode panel";
 	public static final String SPELL_CHECK_CONFIGURATION_PANEL = "Spell check configuration panel";
 	public static final String SIMILARITY_DEFAULT_SETTING_PANEL = "Similarity default setting panel";
+	public static final String PREFERD_TERM_DEFAULT_PANEL = "Preferd term default panel";
 	
 }

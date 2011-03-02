@@ -49,6 +49,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -131,6 +132,7 @@ import org.ihtsdo.translation.FSNGenerationException;
 import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.TreeEditorObjectWrapper;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.EditingPanelOpenMode;
+import org.ihtsdo.translation.ui.ConfigTranslationModule.EditorMode;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 import org.ihtsdo.translation.ui.InboxPanel.MenuItemListener;
 import org.ihtsdo.translation.ui.InboxPanel.RefreshServer;
@@ -3038,6 +3040,21 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 			translConfig=LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
 //			if (translConfig.isProjectDefaultConfiguration())
 			translConfig=getTranslationProjectConfig();
+		
+			HashMap<UUID, EditorMode> currentRoleConfiguration = translConfig.getTranslatorRoles();
+			List<UUID> uidList = role.getUids();
+			for (UUID uuid : uidList) {
+				if (currentRoleConfiguration.containsKey(uuid)) {
+					EditorMode selectedEditorModeForCurrentRole = currentRoleConfiguration.get(uuid);
+					if(selectedEditorModeForCurrentRole.equals(EditorMode.READ_ONLY)){
+						textField1.setEnabled(false);
+						textField1.setEditable(false);
+					}else{
+						textField1.setEnabled(true);
+					}
+				}
+			}
+
 			this.concept=workListMember.getConcept();
 			this.worklistMember=workListMember;
 			sourceLangRefsets=new HashSet<LanguageMembershipRefset>();
