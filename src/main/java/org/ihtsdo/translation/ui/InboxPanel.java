@@ -912,7 +912,9 @@ public class InboxPanel extends JPanel {
 			
 //			foldTree.setSelectionPath(tp);
 		}
+		foldTree.validate();
 		foldTree.revalidate();
+		foldTree.repaint();
 	}
 	private void setSelectedFolder(String atrName) {
 		boolean testPath = false;
