@@ -320,6 +320,9 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                     	 		DA_DK(new String[] {"Danish-Denmark (language concept)","Danish-Denmark"}, null,
                     	 		 	    new I_ConceptualizeUniversally[] { DA }) ,
 
+        	 		 	    PL(new String[] {"Polish (language concept)","Polish"}, null,
+              	 		 	       new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
+                          	 		 	    
                 	 		SV(new String[] {"Swedish (language concept)","Swedish"}, null,
                 	 		 	    new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
                     	 		SV_FI(new String[] {"Swedish-Finland (language concept)","Swedish-Finland"}, null,
@@ -1898,7 +1901,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
     	EN_TT, EN_US, EN_ZA, LIT, ES, ES_AR, ES_BO, ES_CL, ES_CO, ES_CR,
     	ES_DO, ES_EC, ES_ES, ES_GT, ES_HN, EX_MX, ES_NI, ES_PA, ES_PE,
     	ES_ER, ES_PY, ES_SV, ES_UY, ES_VE, FR, FR_BE, FR_CA, FR_FR, FR_CH,
-    	FR_LU, FR_MC, DA, DA_DK, SV, SV_FI, SV_SE, LT, LT_LT, ZH,
+    	FR_LU, FR_MC, DA, DA_DK, PL, SV, SV_FI, SV_SE, LT, LT_LT, ZH,
         ZH_CN, ZH_HK, ZH_CHS, ZH_CHT, ZH_MO, ZH_SG, ZH_TW;
     }
 
@@ -1987,6 +1990,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             return ArchitectonicAuxiliary.Concept.LT;
     	case LT_LT:
             return ArchitectonicAuxiliary.Concept.LT_LT;
+    	case PL:
+    		return ArchitectonicAuxiliary.Concept.PL;    
     	case SV:
             return ArchitectonicAuxiliary.Concept.SV;
     	case SV_FI:
