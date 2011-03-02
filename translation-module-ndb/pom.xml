@@ -13,7 +13,7 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>project-management-ndb</artifactId>
-			<version>${workbench.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -49,7 +49,7 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>document-management-ndb</artifactId>
-			<version>${workbench.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>

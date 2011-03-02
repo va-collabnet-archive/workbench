@@ -32,7 +32,7 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>issue-management-ndb</artifactId>
-			<version>${workbench.version}</version>
+			<version>${project.version}</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>

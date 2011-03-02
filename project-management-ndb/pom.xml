@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>issue-management-ndb</artifactId>
-			<version>${workbench.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
