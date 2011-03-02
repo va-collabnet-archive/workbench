@@ -28,6 +28,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -171,7 +172,17 @@ public class DictionaryIndexPanel extends JPanel  implements ActionListener {
     					e1.printStackTrace();
     				}
     				if (lCode!=null){
-    					results = DocumentManager.indexDictionaryFromTextFile(true,lCode);
+    					JFileChooser fileopen = new JFileChooser();
+    					int ret = fileopen.showDialog(this, "Open file");
+    					File dictionaryTextFile = null;
+    					if (ret == JFileChooser.APPROVE_OPTION) {
+    						dictionaryTextFile = fileopen.getSelectedFile();
+    					}
+    					if(dictionaryTextFile != null){
+    						results = DocumentManager.indexDictionaryFromTextFile(true,dictionaryTextFile);
+    					}else{
+    						results = "No file was selected...";
+    					}
     					htmlPane.setText(results);
     					htmlPane.setCaretPosition(0);
     					htmlPane.revalidate();

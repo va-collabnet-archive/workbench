@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
@@ -77,11 +78,13 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.time.TimeUtil;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -89,6 +92,8 @@ import org.xml.sax.SAXException;
  * The Class DocumentManager.
  */
 public class DocumentManager {
+
+	private static final String PROFILES_SHARED_DICTIONARIES = "profiles/shared/dictionaries";
 
 	/**
 	 * Index documents.
@@ -367,25 +372,68 @@ public class DocumentManager {
 		return output;
 	}
 
+	
 	/**
-	 * Index dictionary from text file.
+	 * 
 	 * 
 	 * @param overwrite
 	 *            the overwrite
+	 * @param dictionaryTextFile
 	 * 
 	 * @return the string
+	 */	
+	/**
+	 * Index dictionary from text file.
+	 * @param overwrite
+	 * @param indexDir
+	 * 				Index dictionary folder.
+	 * @param dictionaryTextFile
+	 * 				If null, indexes all dictionary files of shared folder
+	 * @return
 	 */
-	public static String indexDictionaryFromTextFile(boolean overwrite, String langCode) {
+	public static String indexDictionaryFromTextFile(boolean overwrite, File dictionaryTextFile) {
 		String output = "<html><body><font style='font-family:arial,sans-serif'>";
 		try {
-			File dictionaryTextFile = null;
-			JFileChooser fileopen = new JFileChooser();
-			int ret = fileopen.showDialog(null, "Open file");
-
-			if (ret == JFileChooser.APPROVE_OPTION) {
-				dictionaryTextFile = fileopen.getSelectedFile();
+			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+			HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
+			I_ShowActivity activity =
+				Terms.get().newActivityPanel(true, config, "Dictionaries Build", false);
+			activities.add(activity);
+			activity.setValue(0);
+			activity.setIndeterminate(true);
+			activity.setProgressInfoLower("Indexing...");
+			long startTime = System.currentTimeMillis();
+			
+			File sharedDictionaryDir = new File(PROFILES_SHARED_DICTIONARIES);
+			if (!sharedDictionaryDir.exists()) {
+				sharedDictionaryDir.mkdirs();
 			}
-			File dictionaryFolder = new File("spellIndexDirectory/" + langCode);
+			if(dictionaryTextFile != null){
+				File destFile = new File(sharedDictionaryDir, dictionaryTextFile.getName());
+				copyfile(dictionaryTextFile, destFile);
+			}
+			
+			File[] sharedFiles = sharedDictionaryDir.listFiles();
+			output = reindexDictionaries(overwrite, output, sharedFiles);
+
+			output = output + "<br><br>Done!<br>";
+			long endTime = System.currentTimeMillis();
+			long elapsed = endTime - startTime;
+			String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+			activity.setProgressInfoLower("Elapsed: " + elapsedStr);
+				activity.complete();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		}
+		output = output + "</font></body></html>";
+		return output;
+	}
+
+	private static String reindexDictionaries(boolean overwrite, String output, File[] sharedFiles) throws IOException, UnsupportedEncodingException, FileNotFoundException {
+		for (File file : sharedFiles) {
+			File dictionaryFolder = new File("spellIndexDirectory/" + file.getName().split("\\.")[0]);
 			if (overwrite) {
 				output = output + "Deleting dictionary...<br>";
 				if (!deleteDirectory(dictionaryFolder) && dictionaryFolder.exists()) {
@@ -395,14 +443,28 @@ public class DocumentManager {
 			Directory spellDir = FSDirectory.open(new File(dictionaryFolder.getPath()));
 			SpellChecker spellchecker = new SpellChecker(spellDir);
 			// To index a file containing words:
-			spellchecker.indexDictionary(new PlainTextDictionary(new InputStreamReader(new FileInputStream(dictionaryTextFile), "UTF-8")));
+			spellchecker.indexDictionary(new PlainTextDictionary(new InputStreamReader(new FileInputStream(file), "UTF-8")));
 			spellDir.close();
-			output = output + "<br><br>Done!<br>";
+		}
+		return output;
+	}
+
+	private static void copyfile(File srFile, File dtFile) {
+		try {
+			InputStream in = new FileInputStream(srFile);
+			OutputStream out = new FileOutputStream(dtFile);
+			byte[] buf = new byte[1024];
+			int len;
+			while ((len = in.read(buf)) > 0) {
+				out.write(buf, 0, len);
+			}
+			in.close();
+			out.close();
+		} catch (FileNotFoundException ex) {
+			ex.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		output = output + "</font></body></html>";
-		return output;
 	}
 
 	/**
@@ -432,21 +494,22 @@ public class DocumentManager {
 
 	/**
 	 * Saves the new words to a file.
-	 * @param word 
-	 * 				the word.
+	 * 
+	 * @param word
+	 *            the word.
 	 * @param langCode
-	 * 				the language code the code belongs to.
+	 *            the language code the code belongs to.
 	 * @throws IOException
 	 */
 	public static void addToNewWordsfile(String word) throws IOException {
 		BufferedWriter bw = null;
 		try {
 			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-			File dir = new File("profiles/shared/dictionaries");
+			File dir = new File(PROFILES_SHARED_DICTIONARIES);
 			dir.mkdirs();
-			File file = new File(dir,"userDic-" + config.getUsername() + ".txt");
+			File file = new File(dir, "userDic-" + config.getUsername() + ".txt");
 			FileOutputStream fos = new FileOutputStream(file, true);
-			OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+			OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF8");
 			bw = new BufferedWriter(osw);
 			bw.append(word);
 			bw.newLine();
@@ -457,7 +520,7 @@ public class DocumentManager {
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} finally {
-			if(bw != null){
+			if (bw != null) {
 				bw.flush();
 				bw.close();
 			}
