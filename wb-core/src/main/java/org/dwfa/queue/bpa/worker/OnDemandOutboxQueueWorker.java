@@ -28,6 +28,7 @@ import java.rmi.RemoteException;
 import java.security.PrivilegedActionException;
 import java.util.Collection;
 import java.util.Properties;
+import java.util.HashSet;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -159,6 +160,7 @@ public class OnDemandOutboxQueueWorker extends Worker implements I_GetWorkFromQu
      */
     public void run() {
         Transaction t;
+        HashSet<I_EncodeBusinessProcess> processSet=new HashSet<I_EncodeBusinessProcess>();
             try {
                 BusinessProcess.validateAddress(this.queue.getNodeInboxAddress(), null);
                 while (true) {
@@ -181,19 +183,25 @@ public class OnDemandOutboxQueueWorker extends Worker implements I_GetWorkFromQu
                         } else if (smtpDelivery(process, t)) {
                             this.commitTransactionIfActive();
                         } else {
-                            this.discardActiveTransaction();
+                        	processSet.add(process);
+                            this.commitTransactionIfActive();
                             System.out.println("Worker: " + this.getWorkerDesc() + " (" + this.getId()
                                 + ") cannot deliver process to: " + process.getDestination());
                         }
                     } catch (TaskFailedException ex) {
                     	System.out.println(this.getWorkerDesc() + " cannot deliver process " + process.getId() + " to: "
                             + process.getDestination());
-                        this.discardActiveTransaction();
+                    	processSet.add(process);
+                    	this.commitTransactionIfActive();
                     }
                 }
             } catch (NoMatchingEntryException ex) {
                 try {
-                    this.abortActiveTransaction();
+                	for (I_EncodeBusinessProcess process: processSet){
+	    				this.queue.write(process,  this.getActiveTransaction());
+	    				this.commitTransactionIfActive();
+                	}
+//                    this.abortActiveTransaction();
                 } catch (Exception e) {
                 	logger.log (Level.SEVERE, "Worker: " + this.getWorkerDesc() + " (" + this.getId() + ") "
                         + e.getMessage(), e);
