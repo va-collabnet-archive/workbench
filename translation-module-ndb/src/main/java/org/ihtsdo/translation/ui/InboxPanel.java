@@ -108,6 +108,7 @@ import org.dwfa.bpa.util.SwingWorker;
 import org.dwfa.bpa.worker.Worker;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.queue.ObjectServerCore;
 import org.dwfa.queue.SelectAll;
 import org.dwfa.queue.bpa.worker.OnDemandOutboxQueueWorker;
 import org.dwfa.tapi.TerminologyException;
@@ -1121,23 +1122,23 @@ public class InboxPanel extends JPanel {
 				executeReviewProcess(((I_DescribeQueueEntry) descProcess).getEntryID());
 			}
 
-			synchronized (this){
-				if (!closing){
-					//	if (entId.toString().equals(getEntryID().toString())){
-
-					SwingUtilities.invokeLater(new Runnable() {
-						public void run() {
-							setupExecuteEnd();
-						}
-
-						private void setupExecuteEnd()  {
-							RefreshServer res = new RefreshServer();
-							res.start();
-
-						}
-					});
-				}
-			}
+//			synchronized (this){
+//				if (!closing){
+//					//	if (entId.toString().equals(getEntryID().toString())){
+//
+//					SwingUtilities.invokeLater(new Runnable() {
+//						public void run() {
+//							setupExecuteEnd();
+//						}
+//
+//						private void setupExecuteEnd()  {
+//							RefreshServer res = new RefreshServer();
+//							res.start();
+//
+//						}
+//					});
+//				}
+//			}
 		}
 
 		protected void executeReviewProcess(EntryID entId){
@@ -1217,14 +1218,20 @@ public class InboxPanel extends JPanel {
 		Collection<I_DescribeBusinessProcess> processes= this.queue.getProcessMetaData(revisionProcCancelSelector);
 
 		if (processes.size()>0){
-			SwingUtilities.invokeLater(new RunRevisionProcess(processes));
-
+			RunRevisionProcess revisionProc= new RunRevisionProcess(processes);
+			revisionProc.run();
+			ObjectServerCore.refreshServers();
+			loadQueueItems();
 		}
 		else{
 			processes= this.queue.getProcessMetaData(revisionProcSelector);
 
 			if (processes.size()>0){
-				SwingUtilities.invokeLater(new RunRevisionProcess(processes));
+//				SwingUtilities.invokeLater(new RunRevisionProcess(processes));
+				RunRevisionProcess revisionProc= new RunRevisionProcess(processes);
+				revisionProc.run();
+				ObjectServerCore.refreshServers();
+				loadQueueItems();
 
 			}
 			else{
