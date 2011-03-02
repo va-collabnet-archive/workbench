@@ -74,6 +74,7 @@ public class PreferedTermDefaultPanel extends JPanel{
 			PreferdTermDefaultRadioButton button = new PreferdTermDefaultRadioButton();
 			button.setText(loopMode.toString());
 			button.setPreferdTermDefault(loopMode);
+			button.addChangeListener(cl);
 			radioButtons.add(button);
 			if (confTrans != null && confTrans.getSelectedEditorMode() != null && confTrans.getSelectedPrefTermDefault() == loopMode) {
 				button.setSelected(true);
