@@ -1120,6 +1120,8 @@ public class InboxPanel extends JPanel {
 		public void run() {
 			for(I_DescribeBusinessProcess descProcess:processes){
 				executeReviewProcess(((I_DescribeQueueEntry) descProcess).getEntryID());
+				
+				ObjectServerCore.refreshServers();
 			}
 
 //			synchronized (this){
@@ -1220,7 +1222,7 @@ public class InboxPanel extends JPanel {
 		if (processes.size()>0){
 			RunRevisionProcess revisionProc= new RunRevisionProcess(processes);
 			revisionProc.run();
-			ObjectServerCore.refreshServers();
+//			ObjectServerCore.refreshServers();
 			loadQueueItems();
 		}
 		else{
@@ -1230,7 +1232,7 @@ public class InboxPanel extends JPanel {
 //				SwingUtilities.invokeLater(new RunRevisionProcess(processes));
 				RunRevisionProcess revisionProc= new RunRevisionProcess(processes);
 				revisionProc.run();
-				ObjectServerCore.refreshServers();
+//				ObjectServerCore.refreshServers();
 				loadQueueItems();
 
 			}
