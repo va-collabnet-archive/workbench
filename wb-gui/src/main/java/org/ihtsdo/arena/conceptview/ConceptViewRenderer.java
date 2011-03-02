@@ -71,6 +71,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.workflow.WorkflowHandlerBI;
 import org.ihtsdo.tk.api.workflow.WorkflowHistoryJavaBeanBI;
+import org.ihtsdo.tk.example.binding.Taxonomies;
 import org.ihtsdo.util.swing.GuiUtil;
 import org.ihtsdo.workflow.WorkflowHandler;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
@@ -88,11 +89,11 @@ import com.mxgraph.view.mxGraph;
  */
 public class ConceptViewRenderer extends JLayeredPane {
     // TODO: Remove Hardcoding and find better fix to issue of Pref-Term vs FSN (THROUGHOUT FILE ie Override)
-    final String CHANGED_WORKFLOW_STATE = "Changed workflow state";
-    final String CHANGED_IN_BATCH_WORKFLOW_STATE = "Changed in batch workflow state";
-    final String CONCEPT_HAVING_NO_PRIOR_WORKFLOW_STATE = "Concept having no prior workflow state";
-    final String CONCEPT_NOT_PREVIOUSLY_EXISTING_WORKFLOW_STATE = "Concept not previously existing workflow state";
-    final String NEW_WORKFLOW_STATE = "New workflow state";
+    final String CHANGED_WORKFLOW_STATE = "Changed";
+    final String CHANGED_IN_BATCH_WORKFLOW_STATE = "Changed in batch";
+    final String CONCEPT_HAVING_NO_PRIOR_WORKFLOW_STATE = "Concept having no prior";
+    final String CONCEPT_NOT_PREVIOUSLY_EXISTING_WORKFLOW_STATE = "Concept not previously existing";
+    final String NEW_WORKFLOW_STATE = "New";
     final String WORKFLOW_STATE_SUFFIX = " workflow state";
     final String WORKFLOW_ACTION_SUFFIX = " workflow action";
 
@@ -332,63 +333,62 @@ public class ConceptViewRenderer extends JLayeredPane {
 
                 if (capWorkflow) {
 
-                    final JButton override = new JButton();
-                    override.setText("Override mode");
-                    override.setAlignmentY(LEFT_ALIGNMENT);
+                    final JButton overrideButton = new JButton();
+                    overrideButton.setText("Override mode");
+                    overrideButton.setAlignmentY(LEFT_ALIGNMENT);
 
-                    override.addActionListener(new ActionListener() {
+                    overrideButton.addActionListener(new ActionListener() {
 
                         @Override
                         public void actionPerformed(ActionEvent e) {
 
-                            JButton override = ((JButton) e.getSource());
+                            JButton selectedOverrideButton = ((JButton) e.getSource());
 
                             try {
-	                            TreeSet wfStates = Terms.get().getActiveAceFrameConfig().getWorkflowStates();
-	                            Iterator i = wfStates.iterator();
+	                            TreeSet<? extends I_GetConceptData> wfStates = Terms.get().getActiveAceFrameConfig().getWorkflowStates();
+	                            Iterator<? extends I_GetConceptData> i = wfStates.iterator();
 	
-	                            int j = 0;
+	                            int totalStatesCount = 0;
 	
 	                            String[] possibilities = new String[wfStates.size()];
 	
 	                            while (i.hasNext()) {
 	                                String currCon = i.next().toString();
-	                                if (currCon.equals(CHANGED_WORKFLOW_STATE)
-	                                        || currCon.equals(CHANGED_IN_BATCH_WORKFLOW_STATE)
-	                                        || currCon.equals(CONCEPT_HAVING_NO_PRIOR_WORKFLOW_STATE)
-	                                        || currCon.equals(CONCEPT_NOT_PREVIOUSLY_EXISTING_WORKFLOW_STATE)
-	                                        || currCon.equals(NEW_WORKFLOW_STATE)) {
-	                                    i.remove();
-	                                } else {
-	                                    possibilities[j++] = currCon.replaceAll(WORKFLOW_STATE_SUFFIX, "");
+	                                if (!currCon.equalsIgnoreCase(CHANGED_WORKFLOW_STATE) &&
+	                                    !currCon.equalsIgnoreCase(CHANGED_IN_BATCH_WORKFLOW_STATE) && 
+	                                    !currCon.equalsIgnoreCase(CONCEPT_HAVING_NO_PRIOR_WORKFLOW_STATE) &&
+	                                    !currCon.equalsIgnoreCase(CONCEPT_NOT_PREVIOUSLY_EXISTING_WORKFLOW_STATE) &&
+	                                    !currCon.equalsIgnoreCase(NEW_WORKFLOW_STATE))
+	                                {
+	                                    possibilities[totalStatesCount++] = currCon;
 	                                }
 	                            }
 	
-	                            possibilities = Arrays.copyOf(possibilities, wfStates.size());
+	                            String[] actualPossibilities = new String[totalStatesCount];
+	                            int overrideStatesCount = 0; 
+	                            for (;overrideStatesCount < totalStatesCount; overrideStatesCount++)
+	                            {
+	                            	String s = possibilities[overrideStatesCount];
+	                            	
+	                            	if (s == null || s.length() == 0)
+	                            		break;
+	                            	
+	                            	actualPossibilities[overrideStatesCount] = s;
+	                            }
+	                            actualPossibilities = Arrays.copyOf(actualPossibilities, overrideStatesCount);
 	
 	
-	                            String s = (String) JOptionPane.showInputDialog(override.getParent(), "Select a workflow state:",
+	                            String s = (String) JOptionPane.showInputDialog(selectedOverrideButton.getParent(), "Select a workflow state:",
 	                                    "Override",
 	                                    JOptionPane.PLAIN_MESSAGE,
 	                                    new ImageIcon(BatchMonitor.class.getResource("/24x24/plain/flag_green.png")),
-	                                    possibilities,
-	                                    possibilities[0]);
+	                                    actualPossibilities,
+	                                    actualPossibilities[0]);
 	
-	                            if ((s != null) && (s.length() > 0)) {
-	
-	                                I_GetConceptData currConcept = null;
-	
-	                                for (Object c : wfStates) {
-	                                    if (c.toString().equals(s + WORKFLOW_STATE_SUFFIX)) {
-	                                        currConcept = (I_GetConceptData) c;
-	                                    }
-	                                }
-
-
-                                    I_ConfigAceFrame config;
-
-                                    config = Terms.get().getActiveAceFrameConfig();
-
+	                            if ((s != null) && (s.length() > 0)) 
+	 							{
+	                                I_GetConceptData currConcept = WorkflowHelper.lookupState(s + WORKFLOW_STATE_SUFFIX);
+                                    I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
                                     I_Work worker;
 
                                     if (config.getWorker().isExecuting()) {
@@ -397,6 +397,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                                         worker = config.getWorker();
                                     }
 
+                                    // TODO: REMOVE HARD CODING!!!
                                     String action = getActionFromState(s);
                                     
                                     // TODO: Override Action Handler. . . Not sure how used
@@ -420,13 +421,16 @@ public class ConceptViewRenderer extends JLayeredPane {
                                     java.util.Date today = new java.util.Date();
                                     bean.setWorkflowTime(today.getTime());
 
+                                    // TODO: For now, currnet release is denote by SNOMED-CT concept
+                			        I_GetConceptData snomedConcept = Terms.get().getConcept(Taxonomies.SNOMED.getUuids());
+                			        bean.setReleaseDescription(snomedConcept.getPrimUuid());
+
                                     WorkflowHistoryJavaBean latestBean = searcher.getLatestWfHxJavaBeanForConcept(selectedConcept);
 
-                                    if (!isConceptInCurrentWorkflow(latestBean)) {
+        				            if (latestBean == null || !WorkflowHelper.isEndWorkflowAction(Terms.get().getConcept(latestBean.getAction())))
                                         bean.setWorkflowId(UUID.randomUUID());
-                                    } else {
+        				            else
                                         bean.setWorkflowId(latestBean.getWorkflowId());
-                                    }
 
                                     bean.setOverridden(true);
                                     bean.setAction(selectedActionUid);
@@ -443,27 +447,8 @@ public class ConceptViewRenderer extends JLayeredPane {
                         }
                     });
 
-                    conceptWorkflowPanel.add(override);
+                    conceptWorkflowPanel.add(overrideButton);
                 }
-            }
-
-            private boolean isConceptInCurrentWorkflow(WorkflowHistoryJavaBean latestBean) throws Exception {
-                if (latestBean == null) {
-                    return false;
-                } else {
-                    I_GetConceptData action = Terms.get().getConcept(latestBean.getAction());
-
-                    List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
-
-                    for (I_RelVersioned rel : relList) {
-                        if (rel != null
-                                && rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACCEPT_ACTION.getPrimoridalUid()).getConceptNid()) {
-                            return false;
-                        }
-                    }
-                }
-
-                return true;
             }
 
             private void capWorkflowSetup(boolean capWorkflow,
@@ -682,19 +667,19 @@ public class ConceptViewRenderer extends JLayeredPane {
     private String getActionFromState(String state) {
 
         if (state.equals("Approved")) {
-            return "Accept Workflow Action";
+            return "Accept workflow action";
         }
         if (state.equals("Escalated")) {
-            return "Escalate Workflow Action";
+            return "Escalate workflow action";
         }
         if (state.equals("For Chief Terminologist review")) {
-            return "Chief Terminologist review Workflow Action";
+            return "Chief Terminologist review workflow action";
         }
         if (state.equals("For discussion")) {
-            return "Discuss Workflow Action";
+            return "Discuss workflow action";
         }
         if (state.equals("For review")) {
-            return "Review Workflow Action";
+            return "Review workflow action";
         }
 
         return "";
