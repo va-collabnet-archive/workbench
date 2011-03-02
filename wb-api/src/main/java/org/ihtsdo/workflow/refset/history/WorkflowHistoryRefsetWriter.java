@@ -305,6 +305,8 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 				   "\nState = " + tf.getConcept(state).getInitialText() +
 				   "\nWorkflow Timestamp = " + workflowTime +
 				   "\nEffectiveTime = " + effectiveTime +
+				   "\nAutoApproved = " + autoApproved + 
+				   "\nOverridden = " + override + 
 				   "\nFSN = " + fsn;
 			} catch (Exception io) {
 				return "Failed to identify referencedComponentId for StressTest" + 

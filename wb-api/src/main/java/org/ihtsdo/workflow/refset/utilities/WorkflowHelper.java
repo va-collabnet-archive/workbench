@@ -138,35 +138,38 @@ public class WorkflowHelper {
 		
     }
 
-	public static void retireWorkflowHistoryRow(WorkflowHistoryJavaBean wfhjb)
+	public static void retireWorkflowHistoryRow(WorkflowHistoryJavaBean bean)
  	{
 		WorkflowHistoryRefsetWriter writer;
 
 		try {
 			writer = new WorkflowHistoryRefsetWriter();
 
-			writer.setReleaseDescriptionUid(wfhjb.getReleaseDescription());
-			writer.setPathUid(wfhjb.getPath());
-			writer.setModelerUid(wfhjb.getModeler());
-			writer.setConceptUid(wfhjb.getConcept());
-			writer.setFSN(wfhjb.getFSN());
-			writer.setActionUid(wfhjb.getAction());
-			writer.setStateUid(wfhjb.getState());
+			writer.setReleaseDescriptionUid(bean.getReleaseDescription());
+			writer.setPathUid(bean.getPath());
+			writer.setModelerUid(bean.getModeler());
+			writer.setConceptUid(bean.getConcept());
+			writer.setFSN(bean.getFSN());
+			writer.setActionUid(bean.getAction());
+			writer.setStateUid(bean.getState());
 
-			writer.setWorkflowUid(wfhjb.getWorkflowId());
+			writer.setWorkflowUid(bean.getWorkflowId());
 
 			java.util.Date today = new java.util.Date();
-			writer.setEffectiveTime(today.getTime());
+			writer.setEffectiveTime(Long.MAX_VALUE);
 			// Must use previous Refset Timestamp to revert proper Str
-			writer.setWorkflowTime(wfhjb.getWorkflowTime());
+			writer.setWorkflowTime(bean.getWorkflowTime());
 
+			writer.setAutoApproved(bean.getAutoApproved());
+			writer.setOverride(bean.getOverridden());
+			
 			WorkflowHistoryRefsetWriter.lockMutex();
-			writer.retireMember();
+            writer.retireMember();
 			Terms.get().addUncommitted(writer.getRefsetConcept());
 			Terms.get().commit();
 
 		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.SEVERE, "Error in retiring workflow history row: " + wfhjb.toString(), e);
+        	AceLog.getAppLog().log(Level.SEVERE, "Error in retiring workflow history row: " + bean.toString(), e);
 		}
 		WorkflowHistoryRefsetWriter.unLockMutex();
 	}
