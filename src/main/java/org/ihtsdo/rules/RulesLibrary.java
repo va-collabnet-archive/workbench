@@ -1109,11 +1109,17 @@ public class RulesLibrary {
 			//TODO: get config as parameter
 			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 			Set<I_GetConceptData> childrenSet = new HashSet<I_GetConceptData>();
+			Set<I_GetConceptData> firstMetChildrenSet = new HashSet<I_GetConceptData>();
 			childrenSet.addAll(concept.getDestRelOrigins(config.getAllowedStatus(), 
 					config.getDestRelTypes(), config.getViewPositionSetReadOnly()
 					, config.getPrecedence(), config.getConflictResolutionStrategy()));
-			descendants.addAll(childrenSet);
 			for (I_GetConceptData loopConcept : childrenSet) {
+				if (!descendants.contains(loopConcept)) {
+					firstMetChildrenSet.add(loopConcept);
+				}
+			}
+			descendants.addAll(firstMetChildrenSet);
+			for (I_GetConceptData loopConcept : firstMetChildrenSet) {
 				descendants = getDescendants(descendants, loopConcept);
 			}
 		} catch (IOException e) {
