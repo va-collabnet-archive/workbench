@@ -86,19 +86,21 @@ public class PreferedTermDefaultPanel extends JPanel{
 
 		int buttonNum = 1;
 		for (PreferdTermDefaultRadioButton jRadioButton : radioButtons) {
-			GridBagConstraints constraint = new GridBagConstraints();
-			//constraint.
-			constraint.gridx = 1;
-			constraint.gridy = buttonNum;
-			constraint.gridheight = 1;
-			constraint.gridwidth = 0;
-			constraint.weightx = 0;
-			constraint.weighty = 0;
-			constraint.fill = GridBagConstraints.HORIZONTAL;
-			constraint.anchor = GridBagConstraints.LINE_START;
-			constraint.insets = new Insets(0, 0, 0, 0);
-			configContainer.add(jRadioButton, constraint);
-			buttonNum++;
+			if(!jRadioButton.getPreferdTermDefault().equals(PreferredTermDefault.BEST_SIMILARITY_MATCH)){
+				GridBagConstraints constraint = new GridBagConstraints();
+				//constraint.
+				constraint.gridx = 1;
+				constraint.gridy = buttonNum;
+				constraint.gridheight = 1;
+				constraint.gridwidth = 0;
+				constraint.weightx = 0;
+				constraint.weighty = 0;
+				constraint.fill = GridBagConstraints.HORIZONTAL;
+				constraint.anchor = GridBagConstraints.LINE_START;
+				constraint.insets = new Insets(0, 0, 0, 0);
+				configContainer.add(jRadioButton, constraint);
+				buttonNum++;
+			}
 		}
 		
 		setButtonsEnabled(false);
