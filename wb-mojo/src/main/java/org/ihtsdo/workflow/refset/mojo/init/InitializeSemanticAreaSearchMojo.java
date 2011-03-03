@@ -44,8 +44,8 @@ public class InitializeSemanticAreaSearchMojo extends AbstractMojo {
      */
     private boolean reportErrors;
 	
-    private static final int serachTermPosition = 0;							// 0
-    private static final int hierarchyPosition = serachTermPosition + 1;		// 1
+    private static final int searchTermPosition = 0;							// 0
+    private static final int hierarchyPosition = searchTermPosition + 1;		// 1
 
     private static final int numberOfColumns = hierarchyPosition + 1;			// 2
 
@@ -86,7 +86,7 @@ public class InitializeSemanticAreaSearchMojo extends AbstractMojo {
         	try {
         		if (columns.length == numberOfColumns)
         		{
-        			writer.setSearchTerm(columns[serachTermPosition]);
+        			writer.setSearchTerm(columns[searchTermPosition]);
         			writer.setHierarchy(Terms.get().getConcept(UUID.fromString(columns[hierarchyPosition])));
 
             		writer.addMember();
