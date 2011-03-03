@@ -79,7 +79,9 @@ public class PreferedTermDefaultPanel extends JPanel{
 			if (confTrans != null && confTrans.getSelectedEditorMode() != null && confTrans.getSelectedPrefTermDefault() == loopMode) {
 				button.setSelected(true);
 			}
-			group.add(button);
+			if(!button.getPreferdTermDefault().equals(PreferredTermDefault.BEST_SIMILARITY_MATCH)){
+				group.add(button);
+			}
 		}
 
 		int buttonNum = 1;

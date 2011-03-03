@@ -71,10 +71,9 @@ public class EditorModePanel extends JPanel{
 		EditingPanelOpenMode[] openMode = EditingPanelOpenMode.values();
 		List<EditingOpenModeRb> openModeRbs = new ArrayList<EditingOpenModeRb>();
 		
-
-		ChangeListener cl = new ChangeListener() {
+		ActionListener al = new ActionListener() {
 			@Override
-			public void stateChanged(ChangeEvent e) {
+			public void actionPerformed(ActionEvent e) {
 				Object o = e.getSource();
 				if(o instanceof EditorModeRadioButton){
 					EditorModeRadioButton button = (EditorModeRadioButton)o;
@@ -94,7 +93,7 @@ public class EditorModePanel extends JPanel{
 			openModeRb.setText(om.toString());
 			openModeRb.setOpenMode(om);
 			openModeRbs.add(openModeRb);
-			openModeRb.addChangeListener(cl);
+			openModeRb.addActionListener(al);
 			System.out.println("EDITING MODE: "+confTrans.getEditingPanelOpenMode());
 			if (confTrans != null && confTrans.getEditingPanelOpenMode() != null && confTrans.getEditingPanelOpenMode() == om) {
 				openModeRb.setSelected(true);
@@ -110,7 +109,7 @@ public class EditorModePanel extends JPanel{
 			button.setText(loopMode.toString());
 			button.setEditorMode(loopMode);
 			radioButtons.add(button);
-			button.addChangeListener(cl);
+			button.addActionListener(al);
 			if (confTrans != null && confTrans.getSelectedEditorMode() != null && confTrans.getSelectedEditorMode() == loopMode) {
 				button.setSelected(true);
 			}
