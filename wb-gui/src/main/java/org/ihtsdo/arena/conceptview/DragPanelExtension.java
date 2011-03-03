@@ -83,7 +83,7 @@ public class DragPanelExtension
       // handle drop...;
    }
 
-   public void layoutExtension() throws IOException {
+   public final void layoutExtension() throws IOException {
       setLayout(new GridBagLayout());
       boolean canDrop = false;
       TerminologyStoreDI ts = Ts.get();
@@ -112,23 +112,27 @@ public class DragPanelExtension
       gbc.weightx = 1;
       gbc.gridx++;
 
+      boolean classFound = false;
       if (RefexCnidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
          int cnid = ((RefexCnidVersionBI) getRefexV()).getCnid1();
          TermComponentLabel ext = getLabel(cnid, canDrop);
          add(ext, gbc);
          gbc.gridx++;
+         classFound = true;
       }
       if (RefexCnidCnidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
          int cnid = ((RefexCnidCnidVersionBI) getRefexV()).getCnid1();
          TermComponentLabel ext = getLabel(cnid, canDrop);
          add(ext, gbc);
          gbc.gridx++;
+         classFound = true;
       }
       if (RefexCnidCnidCnidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
          int cnid = ((RefexCnidCnidCnidVersionBI) getRefexV()).getCnid1();
          TermComponentLabel ext = getLabel(cnid, canDrop);
          add(ext, gbc);
          gbc.gridx++;
+         classFound = true;
       }
 
       if (RefexStrVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
@@ -137,9 +141,10 @@ public class DragPanelExtension
          textPane.setEditable(canDrop);
          textPane.setOpaque(false);
          textPane.setFont(textPane.getFont().deriveFont(getSettings().getFontSize()));
-         textPane.setText(getRefexV().toUserString());
+         textPane.setText(text);
          add(textPane, gbc);
          gbc.gridx++;
+         classFound = true;
       }
 
       if (RefexIntVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
@@ -147,9 +152,20 @@ public class DragPanelExtension
          JLabel valueLabel = new JLabel(Integer.toString(value));
          valueLabel.setOpaque(false);
          valueLabel.setFont(valueLabel.getFont().deriveFont(getSettings().getFontSize()));
-         valueLabel.setText(getRefexV().toUserString());
+         valueLabel.setText(Integer.toString(value));
          add(valueLabel, gbc);
          gbc.gridx++;
+         classFound = true;
+      }
+      if (!classFound) {
+         FixedWidthJEditorPane textPane = new FixedWidthJEditorPane();
+         textPane.setEditable(canDrop);
+         textPane.setOpaque(false);
+         textPane.setFont(textPane.getFont().deriveFont(getSettings().getFontSize()));
+         textPane.setText(getRefexV().toUserString());
+         add(textPane, gbc);
+         gbc.gridx++;
+         classFound = true;
       }
    }
 }

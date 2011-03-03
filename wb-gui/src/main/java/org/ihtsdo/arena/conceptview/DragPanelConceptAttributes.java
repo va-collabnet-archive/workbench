@@ -1,0 +1,136 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package org.ihtsdo.arena.conceptview;
+
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.LayoutManager;
+import java.awt.datatransfer.DataFlavor;
+import java.io.IOException;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
+import javax.swing.TransferHandler;
+import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+
+/**
+ *
+ * @author kec
+ */
+public class DragPanelConceptAttributes extends ComponentVersionDragPanel<ConAttrAnalogBI> {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    public DragPanelConceptAttributes(ConceptViewSettings settings,
+            CollapsePanel parentCollapsePanel, 
+            ConAttrAnalogBI attr)
+            throws TerminologyException, IOException {
+        super(settings, parentCollapsePanel, attr);
+        layoutConceptAttrs();
+    }
+
+    public DragPanelConceptAttributes(LayoutManager layout, ConceptViewSettings settings,
+            CollapsePanel parentCollapsePanel,
+            ConAttrAnalogBI attr)
+            throws TerminologyException, IOException {
+        super(layout, settings, parentCollapsePanel, attr);
+        layoutConceptAttrs();
+    }
+
+    private ConAttrAnalogBI getAttr() {
+       return getComponentVersion();
+    }
+    @Override
+    public DataFlavor[] getTransferDataFlavors() {
+        return new DataFlavor[]{DragPanelDataFlavors.descVersionFlavor};
+    }
+
+    @Override
+    public DataFlavor getNativeDataFlavor() {
+        return DragPanelDataFlavors.descVersionFlavor;
+    }
+
+    @Override
+    public boolean isDataFlavorSupported(DataFlavor flavor) {
+        return false;
+    }
+
+    @Override
+    protected int getTransferMode() {
+        return TransferHandler.COPY;
+    }
+
+    @Override
+    public ConAttrAnalogBI getThingToDrag() {
+        return thingToDrag;
+    }
+
+    public ConAttrAnalogBI getDraggedThing() {
+        return thingToDrag;
+    }
+
+    public void setDraggedThing(DescriptionVersionBI desc) {
+        // handle drop...;
+    }
+
+    private void layoutConceptAttrs() throws TerminologyException, IOException {
+        boolean canDrop = false;
+        if (getAttr().getTime() == Long.MAX_VALUE) {
+            setOpaque(true);
+            setBackground(Color.YELLOW);
+            canDrop = true;
+        }
+        setupDrag(getAttr());
+        setBorder(BorderFactory.createRaisedBevelBorder());
+
+        JLabel attrLabel = getJLabel(" ");
+        attrLabel.setBackground(Color.CYAN);
+        attrLabel.setOpaque(true);
+        setDropPopupInset(attrLabel.getPreferredSize().width);
+
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.weightx = 0;
+        gbc.weighty = 0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridheight = 1;
+        gbc.gridwidth = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        add(attrLabel, gbc);
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.gridx++;
+        gbc.weightx = 1;
+
+        
+        String statedDefinedStr = "primitive";
+        if (getAttr().isDefined()) {
+            statedDefinedStr = "defined";
+        }
+        JLabel statedDefinedLabel = getJLabel(statedDefinedStr);
+        statedDefinedLabel.setOpaque(true);
+        add(statedDefinedLabel, gbc);
+        gbc.gridx++;
+        gbc.weightx = 0;
+
+
+        JButton collapseExpandButton = getCollapseExpandButton();
+        add(collapseExpandButton, gbc);
+        
+        addSubPanels(gbc);
+     }
+    
+    
+}
+

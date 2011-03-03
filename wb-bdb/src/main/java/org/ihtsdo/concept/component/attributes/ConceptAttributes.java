@@ -73,7 +73,8 @@ public class ConceptAttributes
     public class Version
             extends ConceptComponent<ConceptAttributesRevision, ConceptAttributes>.Version
             implements I_ConceptAttributeTuple<ConceptAttributesRevision>,
-            I_ConceptAttributePart<ConceptAttributesRevision> {
+            I_ConceptAttributePart<ConceptAttributesRevision>, 
+            ConAttrAnalogBI<ConceptAttributesRevision>{
 
         public Version() {
             super();

@@ -71,6 +71,7 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
@@ -162,13 +163,20 @@ public class ConceptView extends JPanel {
 
                         CollapsePanel cpe = new CollapsePanel("concept:", settings,
                                 prefMap.get(PanelSection.CONCEPT), PanelSection.CONCEPT);
-                        cpe.setAlertCount(0);
-                        cpe.setRefexCount(0);
-                        cpe.setHistoryCount(0);
-                        cpe.setTemplateCount(0);
                         add(cpe, gbc);
                         gbc.gridy++;
                         I_TermFactory tf = Terms.get();
+                        ConAttrAnalogBI cav = 
+                                (ConAttrAnalogBI) cv.getConAttrsActive();
+                        DragPanelConceptAttributes cac = getConAttrComponent(
+                                (ConAttrAnalogBI) cav, cpe);
+                        cpe.addToggleComponent(cac);
+                        cpe.setAlertCount(0);
+                        cpe.setRefexCount(cav.getRefexes().size());
+                        cpe.setHistoryCount(0);
+                        cpe.setTemplateCount(0);
+                        add(cac, gbc);
+                        gbc.gridy++;
 
 
                         if (memberRefsets != null) {
@@ -692,6 +700,15 @@ public class ConceptView extends JPanel {
 
         return relGroupPanel;
 
+    }
+
+    public DragPanelConceptAttributes getConAttrComponent(ConAttrAnalogBI conAttr,
+            CollapsePanel parentCollapsePanel)
+            throws TerminologyException, IOException {
+        DragPanelConceptAttributes dragConAttrPanel =
+                new DragPanelConceptAttributes(new GridBagLayout(), settings,
+                parentCollapsePanel, conAttr);
+        return dragConAttrPanel;
     }
 
     public DragPanelDescription getDescComponent(DescriptionAnalogBI desc,
