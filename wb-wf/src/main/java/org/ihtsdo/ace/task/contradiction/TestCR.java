@@ -74,8 +74,8 @@ public class TestCR extends AbstractTask {
     		reporter.identifyInConceptListPanel(results.getConflictingNids());
     		
     		// Some Changes
-    		Set<I_GetConceptData> set = results.getUnreachableConcepts();
-			set = results.getSingleConcepts();
+//    		Set<I_GetConceptData> set = results.getUnreachableConcepts();
+//			set = results.getSingleConcepts();
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }
