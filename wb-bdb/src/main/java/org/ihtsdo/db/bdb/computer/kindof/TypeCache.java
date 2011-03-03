@@ -53,21 +53,12 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 	 */
 	@Override
 	public void setup(ViewCoordinate coordinate) throws Exception {
-		if (!ready) {
-			this.coordinate = coordinate;
-			this.types = coordinate.getIsaTypeNids();
-			typeMap = new ConcurrentHashMap<Integer, int[]>(Terms.get().getConceptCount());
-			KindOfComputer.kindOfComputerService.execute(this);
-		}
+		this.coordinate = coordinate;
+		this.types = coordinate.getIsaTypeNids();
+		typeMap = new ConcurrentHashMap<Integer, int[]>(Terms.get().getConceptCount());
+		KindOfComputer.kindOfComputerService.execute(this);
 	}
-	
-	//new method
-	public void forceSetup(ViewCoordinate coordinate) throws Exception {
-		ready = false;
-		setup(coordinate);
-	}
-	
-	
+
 	private static int cacheCount = 1;
 
 	@Override
