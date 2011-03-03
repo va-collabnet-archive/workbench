@@ -39,8 +39,8 @@ public class ContradictionConceptProcessor implements I_ProcessUnfetchedConceptD
 
 			if (position.equals(CONTRADICTION_RESULT.CONTRADICTION))
 				results.addConflict(c.getConceptNid());
-			else if (position.equals(CONTRADICTION_RESULT.UNREACHABLE))
-				results.addUnreachable(c.getConceptNid());
+//			else if (position.equals(CONTRADICTION_RESULT.UNREACHABLE))
+//				results.addUnreachable(c.getConceptNid());
 			else if (position.equals(CONTRADICTION_RESULT.SINGLE))
 				results.addSingle(c.getConceptNid());
 			else
