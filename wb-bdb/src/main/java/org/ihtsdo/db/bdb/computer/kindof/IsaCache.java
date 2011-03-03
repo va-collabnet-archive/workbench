@@ -52,4 +52,8 @@ public class IsaCache extends TypeCache {
     public NidBitSetBI getNidSet() throws IOException {
         return nidSet;
     }
+    
+    public void shutdown() {
+    	setCancelled(true);
+    }
 }

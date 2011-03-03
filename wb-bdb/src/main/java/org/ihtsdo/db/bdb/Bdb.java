@@ -29,6 +29,9 @@ import org.ihtsdo.concept.BdbLegacyFixedFactory;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.ConceptBdb;
 import org.ihtsdo.concept.OFFSETS;
+import org.ihtsdo.db.bdb.BdbMemoryMonitor.LowMemoryListener;
+import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
+import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.db.bdb.id.UuidBdb;
@@ -45,6 +48,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 import com.sleepycat.je.CheckpointConfig;
 import com.sleepycat.je.Database;
@@ -54,8 +58,6 @@ import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.je.EnvironmentLockedException;
 import com.sleepycat.je.EnvironmentMutableConfig;
-import org.ihtsdo.db.bdb.BdbMemoryMonitor.LowMemoryListener;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 public class Bdb {
 	
@@ -421,28 +423,34 @@ public class Bdb {
 			    I_ShowActivity activity = Terms.get().newActivityPanel(true,
 			        Terms.get().getActiveAceFrameConfig(), "Executing shutdown sequence", false);
 			    activity.setStopButtonVisible(false);
-                activity.setProgressInfoLower("1/10: Starting sync using service.");
+			    
+			    activity.setProgressInfoLower("1/11: Stopping Isa Cache generation.");
+			    for (IsaCache loopCache : KindOfComputer.getIsaCacheMap().values()) {
+			    	loopCache.shutdown();
+			    }
+			    
+                activity.setProgressInfoLower("2/11: Starting sync using service.");
                 assert conceptDb != null: "conceptDb is null...";
                 new Sync().run();
-                activity.setProgressInfoLower("2/10: Shutting down sync service.");
+                activity.setProgressInfoLower("3/11: Shutting down sync service.");
                 syncService.shutdown();
 			    
-                activity.setProgressInfoLower("3/10: Awaiting termination of sync service.");
+                activity.setProgressInfoLower("4/11: Awaiting termination of sync service.");
                 syncService.awaitTermination(90, TimeUnit.MINUTES);
 
 
-                activity.setProgressInfoLower("4/10: Starting PositionMapper close.");
+                activity.setProgressInfoLower("5/11: Starting PositionMapper close.");
 				PositionMapper.close();
-				activity.setProgressInfoLower("5/10: Canceling uncommitted changes.");
+				activity.setProgressInfoLower("6/11: Canceling uncommitted changes.");
 				Terms.get().cancel();
-				 activity.setProgressInfoLower("6/10: Starting BdbCommitManager shutdown.");
+				 activity.setProgressInfoLower("7/11: Starting BdbCommitManager shutdown.");
 				BdbCommitManager.shutdown();
-                activity.setProgressInfoLower("7/10: Starting LuceneManager close.");
+                activity.setProgressInfoLower("8/11: Starting LuceneManager close.");
 		        LuceneManager.close();
                 NidDataFromBdb.close();
-                activity.setProgressInfoLower("8/10: Starting mutable.bdbEnv.sync().");
+                activity.setProgressInfoLower("9/11: Starting mutable.bdbEnv.sync().");
 				mutable.bdbEnv.sync();
-				activity.setProgressInfoLower("9/10: mutable.bdbEnv.sync() finished.");
+				activity.setProgressInfoLower("10/11: mutable.bdbEnv.sync() finished.");
 				uuidDb.close();
 				uuidsToNidMapDb.close();
 				nidCidMapDb.close();
@@ -452,7 +460,7 @@ public class Bdb {
 				xref.close();
 				mutable.bdbEnv.sync();
 				mutable.bdbEnv.close();
-                activity.setProgressInfoLower("10/10: Shutdown complete");
+                activity.setProgressInfoLower("11/11: Shutdown complete");
 			} catch (DatabaseException e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			} catch (Exception e) {
