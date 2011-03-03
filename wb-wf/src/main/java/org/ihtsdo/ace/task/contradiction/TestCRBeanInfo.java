@@ -35,7 +35,7 @@ public class TestCRBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(TestCR.class);
-        bd.setDisplayName("<html><font color='green'><center>Test Conflict Resolution");
+        bd.setDisplayName("<html><font color='green'><center>Test Contradiction Resolution");
         return bd;
     }
 

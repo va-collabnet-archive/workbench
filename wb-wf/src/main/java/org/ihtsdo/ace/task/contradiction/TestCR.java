@@ -36,7 +36,7 @@ import org.ihtsdo.tk.api.PositionBI;
 
 
 
-@BeanList(specs = { @Spec(directory = "tasks/c/contradiction", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/contradiction", type = BeanType.TASK_BEAN) })
 public class TestCR extends AbstractTask {
     private static final long serialVersionUID = 1;
 
