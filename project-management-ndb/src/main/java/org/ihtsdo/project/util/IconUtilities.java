@@ -302,7 +302,7 @@ public class IconUtilities {
     	case FR_BE:
             return ESP;
     	case FR_CA:
-            return ESP;
+            return EN_CAN;
     	case FR_CH:
             return ESP;
     	case FR_FR:
