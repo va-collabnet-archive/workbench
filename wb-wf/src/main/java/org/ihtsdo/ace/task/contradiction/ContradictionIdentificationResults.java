@@ -11,16 +11,11 @@ import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
 
 public class ContradictionIdentificationResults {
 	private Set<Integer> conflictingConcepts = null;
-	private Set<Integer> unreachableConcepts = null;
 	private Set<Integer> singleConcepts = null;
 	private Set<Integer> nonConflictingConcepts = null;
 
 	public void addConflict(Integer nid) {
 		conflictingConcepts.add(nid);
-	}
-
-	public void addUnreachable(Integer nid) {
-		unreachableConcepts.add(nid);
 	}
 
 	public void addSingle(Integer nid) {
@@ -36,22 +31,6 @@ public class ContradictionIdentificationResults {
 
 		try {
 			for (Integer i : conflictingConcepts)
-			{
-				I_GetConceptData con = Terms.get().getConcept(i);
-				sortedConcepts.add(con);
-			}
-		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.WARNING, "Error in getting concept from detection results", e);
-		}
-
-		return sortedConcepts;
-	}
-
-	public TreeSet<I_GetConceptData> getUnreachableConcepts() {
-		TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createPreferredTermComparer());
-
-		try {
-			for (Integer i : unreachableConcepts)
 			{
 				I_GetConceptData con = Terms.get().getConcept(i);
 				sortedConcepts.add(con);
@@ -97,10 +76,6 @@ public class ContradictionIdentificationResults {
 	
 	public Set<Integer> getConflictingNids() {
 		return conflictingConcepts;
-	}
-
-	public Set<Integer> getUnreachableNids() {
-		return unreachableConcepts;
 	}
 
 	public Set<Integer> getSingleNids() {
