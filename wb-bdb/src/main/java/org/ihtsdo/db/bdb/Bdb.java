@@ -428,6 +428,9 @@ public class Bdb {
 			    for (IsaCache loopCache : KindOfComputer.getIsaCacheMap().values()) {
 			    	loopCache.shutdown();
 			    }
+			    for (IsaCache loopCache : KindOfComputer.getIsaCacheMap().values()) {
+			    	loopCache.getLatch().await();
+			    }
 			    
                 activity.setProgressInfoLower("2/11: Starting sync using service.");
                 assert conceptDb != null: "conceptDb is null...";
