@@ -19,116 +19,126 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnable, KindOfCacheBI, Serializable {
 
-    protected ConcurrentHashMap<Integer, int[]> typeMap;
-    private List<ParallelConceptIterator> pcis;
-    protected ViewCoordinate coordinate;
-    private boolean ready = false;
-    private boolean cancelled = false;
-    private CountDownLatch latch = new CountDownLatch(1);
-    protected NidSetBI types;
+	protected ConcurrentHashMap<Integer, int[]> typeMap;
+	private List<ParallelConceptIterator> pcis;
+	protected ViewCoordinate coordinate;
+	private boolean ready = false;
+	private boolean cancelled = false;
+	private CountDownLatch latch = new CountDownLatch(1);
+	protected NidSetBI types;
 
-    @Override
-    public CountDownLatch getLatch() {
-        return latch;
-    }
+	@Override
+	public CountDownLatch getLatch() {
+		return latch;
+	}
 
-    public boolean isCancelled() {
-        return cancelled;
-    }
+	public boolean isCancelled() {
+		return cancelled;
+	}
 
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
-    }
+	public void setCancelled(boolean cancelled) {
+		this.cancelled = cancelled;
+	}
 
-    public boolean isReady() {
-        return ready;
-    }
+	public boolean isReady() {
+		return ready;
+	}
 
-    public TypeCache() {
-        super();
-    }
+	public TypeCache() {
+		super();
+	}
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.db.bdb.computer.kindof.I_CacheKindOfRels#setup(org.ihtsdo.tk.api.Coordinate)
-     */
-    @Override
-    public void setup(ViewCoordinate coordinate) throws Exception {
-        this.coordinate = coordinate;
-        this.types = coordinate.getIsaTypeNids();
-        typeMap = new ConcurrentHashMap<Integer, int[]>(Terms.get().getConceptCount());
-        KindOfComputer.kindOfComputerService.execute(this);
-    }
-    private static int cacheCount = 1;
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.db.bdb.computer.kindof.I_CacheKindOfRels#setup(org.ihtsdo.tk.api.Coordinate)
+	 */
+	@Override
+	public void setup(ViewCoordinate coordinate) throws Exception {
+		if (!ready) {
+			this.coordinate = coordinate;
+			this.types = coordinate.getIsaTypeNids();
+			typeMap = new ConcurrentHashMap<Integer, int[]>(Terms.get().getConceptCount());
+			KindOfComputer.kindOfComputerService.execute(this);
+		}
+	}
+	
+	//new method
+	public void forceSetup(ViewCoordinate coordinate) throws Exception {
+		ready = false;
+		setup(coordinate);
+	}
+	
+	
+	private static int cacheCount = 1;
 
-    @Override
-    public void run() {
-       
-        int cacheNum = cacheCount++;
-        AceLog.getAppLog().info("Starting cache setup: " + cacheNum + " "
-                + this.getClass().getSimpleName());
-        long startTime = System.currentTimeMillis();
-        try {
+	@Override
+	public void run() {
 
-            Bdb.getConceptDb().iterateConceptDataInParallel(this);
-        } catch (Exception e) {
-            AceLog.getAppLog().log(Level.INFO, e.getLocalizedMessage(), e);
-            TypeCache.this.cancelled = true;
-        }
-        latch.countDown();
-        ready = !cancelled;
-        long elapsedTime = System.currentTimeMillis() - startTime;
-        AceLog.getAppLog().info("Finised cache setup: " + cacheNum
-                + " in: " + elapsedTime);
-     }
+		int cacheNum = cacheCount++;
+		AceLog.getAppLog().info("Starting cache setup: " + cacheNum + " "
+				+ this.getClass().getSimpleName());
+		long startTime = System.currentTimeMillis();
+		try {
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.db.bdb.computer.kindof.I_CacheKindOfRels#isKindOf(int, int)
-     */
-    @Override
-    public boolean isKindOf(int childNid, int parentNid) throws Exception {
-        return isKindOfNoLatch(childNid, parentNid);
-    }
+			Bdb.getConceptDb().iterateConceptDataInParallel(this);
+		} catch (Exception e) {
+			AceLog.getAppLog().log(Level.INFO, e.getLocalizedMessage(), e);
+			TypeCache.this.cancelled = true;
+		}
+		latch.countDown();
+		ready = !cancelled;
+		long elapsedTime = System.currentTimeMillis() - startTime;
+		AceLog.getAppLog().info("Finised cache setup: " + cacheNum
+				+ " in: " + elapsedTime);
+	}
 
-    public void addParents(int cNid, I_RepresentIdSet parentNidSet) {
-        int[] parents = typeMap.get(cNid);
-        if (parents != null) {
-            for (int parentNid : parents) {
-                if (!parentNidSet.isMember(parentNid)) {
-                    parentNidSet.setMember(parentNid);
-                    addParents(parentNid, parentNidSet);
-                }
-            }
-        }
-    }
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.db.bdb.computer.kindof.I_CacheKindOfRels#isKindOf(int, int)
+	 */
+	@Override
+	public boolean isKindOf(int childNid, int parentNid) throws Exception {
+		return isKindOfNoLatch(childNid, parentNid);
+	}
 
-    protected boolean isKindOfNoLatch(int childNid, int parentNid) {
-        if (!cancelled) {
-            if (childNid == parentNid) {
-                return true;
-            }
-            int[] parents = (int[]) typeMap.get(childNid);
-            if (parents != null) {
-                for (int pNid : parents) {
-                    if (isKindOfNoLatch(pNid, parentNid)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
+	public void addParents(int cNid, I_RepresentIdSet parentNidSet) {
+		int[] parents = typeMap.get(cNid);
+		if (parents != null) {
+			for (int parentNid : parents) {
+				if (!parentNidSet.isMember(parentNid)) {
+					parentNidSet.setMember(parentNid);
+					addParents(parentNid, parentNidSet);
+				}
+			}
+		}
+	}
 
-    @Override
-    public abstract void processUnfetchedConceptData(int cNid,
-            ConceptFetcherBI fcfc) throws Exception;
+	protected boolean isKindOfNoLatch(int childNid, int parentNid) {
+		if (!cancelled) {
+			if (childNid == parentNid) {
+				return true;
+			}
+			int[] parents = (int[]) typeMap.get(childNid);
+			if (parents != null) {
+				for (int pNid : parents) {
+					if (isKindOfNoLatch(pNid, parentNid)) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
 
-    @Override
-    public void setParallelConceptIterators(List<ParallelConceptIterator> pcis) {
-        this.pcis = pcis;
-    }
+	@Override
+	public abstract void processUnfetchedConceptData(int cNid,
+			ConceptFetcherBI fcfc) throws Exception;
 
-    @Override
-    public boolean continueWork() {
-        return true;
-    }
+	@Override
+	public void setParallelConceptIterators(List<ParallelConceptIterator> pcis) {
+		this.pcis = pcis;
+	}
+
+	@Override
+	public boolean continueWork() {
+		return true;
+	}
 }
