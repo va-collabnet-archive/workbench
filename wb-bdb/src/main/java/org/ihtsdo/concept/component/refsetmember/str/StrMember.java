@@ -219,7 +219,7 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append(this.getClass().getSimpleName()).append(": ");
-        buf.append(" stringValue:" + "'").append(this.stringValue).append("'");
+        buf.append(" stringValue: '").append(this.stringValue).append("'");
         buf.append("; ");
         buf.append(super.toString());
         return buf.toString();

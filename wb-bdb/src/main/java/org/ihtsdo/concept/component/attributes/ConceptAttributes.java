@@ -113,6 +113,7 @@ public class ConceptAttributes
             return ConceptAttributes.this.getVersions(c);
         }
 
+        @Override
         public List<? extends Version> getVersions() {
             return ConceptAttributes.this.getVersions();
         }
@@ -192,6 +193,7 @@ public class ConceptAttributes
             return getStatusNid();
         }
 
+        @Override
         public ArrayIntList getVariableVersionNids() {
             if (index >= 0) {
                 ArrayIntList resultList = new ArrayIntList(2);
@@ -248,6 +250,7 @@ public class ConceptAttributes
      * 
      * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#getConId()
      */
+    @Override
     public int getConId() {
         return nid;
     }
@@ -257,6 +260,7 @@ public class ConceptAttributes
      * 
      * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#getTuples()
      */
+    @Override
     public List<Version> getTuples() {
         return Collections.unmodifiableList(new ArrayList<Version>(getVersions()));
     }
@@ -293,6 +297,7 @@ public class ConceptAttributes
      * .jar.I_MapNativeToNative)
      */
 
+    @Override
     public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
         throw new UnsupportedOperationException();
     }
@@ -306,6 +311,7 @@ public class ConceptAttributes
      * @see
      * org.dwfa.vodb.types.I_ConceptAttributeVersioned#getLocalFixedConcept()
      */
+    @Override
     public I_ConceptualizeLocally getLocalFixedConcept() {
         return LocalFixedConcept.get(nid, !defined);
     }
@@ -334,6 +340,7 @@ public class ConceptAttributes
         return LocalFixedTerminology.getStore().getUids(id);
     }
 
+    @Override
     public UniversalAceConceptAttributes getUniversal() throws IOException,
             TerminologyException {
         UniversalAceConceptAttributes conceptAttributes = new UniversalAceConceptAttributes(
@@ -354,10 +361,10 @@ public class ConceptAttributes
      */
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
-        buf.append(this.getClass().getSimpleName() + ":{");
-        buf.append("defined:" + this.defined);
+        buf.append(this.getClass().getSimpleName()).append(":{");
+        buf.append("defined:").append(this.defined);
         buf.append(" ");
         buf.append(super.toString());
         return buf.toString();
@@ -425,6 +432,7 @@ public class ConceptAttributes
         return returnList;
     }
 
+    @Override
     public boolean promote(PositionBI viewPosition,
             PathSetReadOnly promotionPaths, NidSetBI allowedStatus, Precedence precedence) {
         int viewPathId = viewPosition.getPath().getConceptNid();
@@ -520,13 +528,14 @@ public class ConceptAttributes
      */
     public String validate(ConceptAttributes another) throws IOException {
         assert another != null;
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         // Compare defined
         if (this.defined != another.defined) {
-            buf.append("\tConceptAttributes.defined not equal: \n"
-                    + "\t\tthis.defined = " + this.defined + "\n"
-                    + "\t\tanother.defined = " + another.defined + "\n");
+            buf.append("\tConceptAttributes.defined not equal: "
+                    + "\n\t\tthis.defined = ").append(this.defined).
+                    append("\n" + "\t\tanother.defined = ").
+                    append(another.defined).append("\n");
         }
 
         // Compare the parents 
@@ -554,7 +563,7 @@ public class ConceptAttributes
     public ConceptAttributes.Version getVersion(ViewCoordinate c)
             throws ContraditionException {
         List<ConceptAttributes.Version> vForC = getVersions(c);
-        if (vForC.size() == 0) {
+        if (vForC.isEmpty()) {
             return null;
         }
         if (vForC.size() > 1) {
@@ -573,7 +582,7 @@ public class ConceptAttributes
 
     @Override
     public String toUserString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("concept ");
         if (defined) {
             buf.append("is fully defined");

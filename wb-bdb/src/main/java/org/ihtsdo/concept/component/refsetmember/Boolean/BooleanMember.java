@@ -4,7 +4,6 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
@@ -19,7 +18,6 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetBooleanMember;
 import org.ihtsdo.etypes.ERefsetBooleanRevision;
-import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
 import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
@@ -31,8 +29,8 @@ import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanRevisio
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
-	implements I_ExtendByRefPartBoolean<BooleanRevision>, RefexBooleanAnalogBI<BooleanRevision> {
+public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
+        implements I_ExtendByRefPartBoolean<BooleanRevision>, RefexBooleanAnalogBI<BooleanRevision> {
 
     private static VersionComputer<RefsetMember<BooleanRevision, BooleanMember>.Version> computer =
             new VersionComputer<RefsetMember<BooleanRevision, BooleanMember>.Version>();
@@ -43,10 +41,9 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
 
     public class Version
             extends RefsetMember<BooleanRevision, BooleanMember>.Version
-            implements I_ExtendByRefVersion<BooleanRevision>, 
-            		I_ExtendByRefPartBoolean<BooleanRevision>,
-            		RefexBooleanAnalogBI<BooleanRevision>
-            	 {
+            implements I_ExtendByRefVersion<BooleanRevision>,
+            I_ExtendByRefPartBoolean<BooleanRevision>,
+            RefexBooleanAnalogBI<BooleanRevision> {
 
         private Version() {
             super();
@@ -61,8 +58,8 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
             return new ArrayIntList();
         }
 
-        @SuppressWarnings({ "rawtypes", "unchecked" })
-		@Override
+        @SuppressWarnings({"rawtypes", "unchecked"})
+        @Override
         public int compareTo(I_ExtendByRefPart o) {
             if (I_ExtendByRefPartBoolean.class.isAssignableFrom(o.getClass())) {
                 I_ExtendByRefPartBoolean another = (I_ExtendByRefPartBoolean) o;
@@ -97,6 +94,7 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
             }
             BooleanMember.this.setBooleanValue(value);
         }
+
         @Override
         public boolean getBoolean1() {
             if (index >= 0) {
@@ -259,6 +257,8 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
         StringBuilder buf = new StringBuilder();
         buf.append(this.getClass().getSimpleName()).append(":{");
         buf.append(" booleanValue:").append(this.booleanValue);
+        buf.append("; ");
+        buf.append(super.toString());
         return buf.toString();
     }
 
@@ -279,31 +279,33 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
         return HashFunction.hashCode(new int[]{nid});
     }
 
-	@Override
-	public int getPartsHashCode() {
-		if (getBooleanValue())
-			return 1;
-		else 
-			return 0;
-	}
-	
-	@Override
-	public boolean getBoolean1() {
-		return this.booleanValue;
-	}
+    @Override
+    public int getPartsHashCode() {
+        if (getBooleanValue()) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
 
-	@Override
-	public void setBoolean1(boolean l) throws PropertyVetoException {
-		this.booleanValue = l;
-		modified();
-	}
+    @Override
+    public boolean getBoolean1() {
+        return this.booleanValue;
+    }
 
-	protected TK_REFSET_TYPE getTkRefsetType() {
-		return TK_REFSET_TYPE.BOOLEAN;
-	}
+    @Override
+    public void setBoolean1(boolean l) throws PropertyVetoException {
+        this.booleanValue = l;
+        modified();
+    }
 
-	protected void addSpecProperties(RefexAmendmentSpec rcs) {
-		rcs.with(RefexProperty.BOOLEAN1, getBoolean1());
-	}
+    @Override
+    protected TK_REFSET_TYPE getTkRefsetType() {
+        return TK_REFSET_TYPE.BOOLEAN;
+    }
 
+    @Override
+    protected void addSpecProperties(RefexAmendmentSpec rcs) {
+        rcs.with(RefexProperty.BOOLEAN1, getBoolean1());
+    }
 }
