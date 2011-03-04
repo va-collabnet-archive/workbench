@@ -61,7 +61,7 @@ public class ConfigTranslationModule  implements Serializable{
 		try {
 			Set<I_GetConceptData> roles = TranslatorDefaultEditorModePanel.getTranslationRoles();
 			for (I_GetConceptData role : roles) {
-				translatorRoles.put(role.getUids().iterator().next(), EditorMode.READ_ONLY);
+				translatorRoles.put(role.getUids().iterator().next(), EditorMode.PREFERRED_TERM_EDITOR);
 			}
 		} catch (TerminologyException e) {
 			e.printStackTrace();
