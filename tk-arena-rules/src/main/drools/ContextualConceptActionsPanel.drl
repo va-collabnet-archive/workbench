@@ -52,42 +52,288 @@ rule "add if null concept in host"
 		actions.add(actionFactory.make(new File("plugins/component/new_concept.bp")));
 end
 
-rule "add if not in refset"
-	when 
-		$c: ConceptVersionBI (this not isMemberOf Refsets.TEST);
-	then 
-		actions.add(actionFactory.make(new File("plugins/add-concept/add_to_refset_test.bp")));
-end
-
-
-rule "remove if in refset"
-	when
-		$c: ConceptVersionBI (this isMemberOf Refsets.TEST); 
-	then 
-		actions.add(actionFactory.make(new File("plugins/remove-concept/remove_from_refset_test.bp")));
-end
-
-rule "add if not in refset test2"
-	when 
-		$c: ConceptVersionBI (this not isMemberOf Refsets.TEST2);
-	then 
-		actions.add(actionFactory.make(new File("plugins/add-concept/add_to_refset_test2.bp")));
-end
-
-
-rule "remove if in refset test2"
-	when
-		$c: ConceptVersionBI (this isMemberOf Refsets.TEST2); 
-	then 
-		actions.add(actionFactory.make(new File("plugins/remove-concept/remove_from_refset_test2.bp")));
-end
-
-rule "retire if no children"
+rule "retire or move"
 	when
 		$c: ConceptVersionBI (); 
 	then
 		actions.add(actionFactory.make(new File("plugins/retire/retire-concept.bp")));
 		actions.add(actionFactory.make(new File("plugins/retire/move-concept.bp")));
 end
+
+/*
+
+rule "add if not in refset: concept inactivation"
+	when 
+		$c: ConceptVersionBI (this not isMemberOf Refsets.CONCEPT_INACTIVATION);
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/add-concept/add_to_concept_inactivation_refset.bp")));
+end
+
+
+rule "remove if in refset: concept inactivation"
+	when
+		$c: ConceptVersionBI (this isMemberOf Refsets.CONCEPT_INACTIVATION); 
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/remove-concept/remove_from_concept_inactivation_refset.bp")));
+end
+
+rule "add if not in refset: CTV3ID"
+	when 
+		$c: ConceptVersionBI (this not isMemberOf Refsets.CTV3ID);
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/add-concept/add_to_CTV3ID_refset.bp")));
+end
+
+
+rule "remove if in refset: CTV3ID"
+	when
+		$c: ConceptVersionBI (this isMemberOf Refsets.CTV3ID); 
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/remove-concept/remove_from_CTV3ID_refset.bp")));
+end
+
+rule "add if not in refset: Description inactivation refset"
+	when 
+		$c: ConceptVersionBI (this not isMemberOf Refsets.DESC_INACTIVATION);
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/add-concept/add_to_Description_inactivation_refset.bp")));
+end
+
+
+rule "remove if in refset: Description inactivation refset"
+	when
+		$c: ConceptVersionBI (this isMemberOf Refsets.DESC_INACTIVATION); 
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/remove-concept/remove_from_Description_inactivation_refset.bp")));
+end
+
+rule "add if not in refset: Description type refset"
+	when 
+		$c: ConceptVersionBI (this not isMemberOf Refsets.DESC_TYPE);
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/add-concept/add_to_Description_type_refset.bp")));
+end
+
+
+rule "remove if in refset: Description type refset"
+	when
+		$c: ConceptVersionBI (this isMemberOf Refsets.DESC_TYPE); 
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/remove-concept/remove_from_Description_type_refset.bp")));
+end
+
+rule "add if not in refset: en-GB language refset"
+	when 
+		$c: ConceptVersionBI (this not isMemberOf Refsets.EN_GB_LANG);
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/add-concept/add_to_en-GB_language_refset.bp")));
+end
+
+
+rule "remove if in refset: en-GB language refset"
+	when
+		$c: ConceptVersionBI (this isMemberOf Refsets.EN_GB_LANG); 
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/remove-concept/remove_from_en-GB_language_refset.bp")));
+end
+
+rule "add if not in refset: en-US language refset"
+	when 
+		$c: ConceptVersionBI (this not isMemberOf Refsets.EN_US_LANG);
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/add-concept/add_to_en-US_language_refset.bp")));
+end
+
+
+rule "remove if in refset: en-US language refset"
+	when
+		$c: ConceptVersionBI (this isMemberOf Refsets.EN_US_LANG); 
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/remove-concept/remove_from_en-US_language_refset.bp")));
+end
+
+rule "add if not in refset: Historical association refset"
+	when 
+		$c: ConceptVersionBI (this not isMemberOf Refsets.HISTORICAL_ASSOC);
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/add-concept/add_to_Historical_association_refset.bp")));
+end
+
+
+rule "remove if in refset: Historical association refset"
+	when
+		$c: ConceptVersionBI (this isMemberOf Refsets.HISTORICAL_ASSOC); 
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/remove-concept/remove_from_Historical_association_refset.bp")));
+end
+
+rule "add if not in refset: ICD-O3 Refset"
+	when 
+		$c: ConceptVersionBI (this not isMemberOf Refsets.ICD_03);
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/add-concept/add_to_ICD-O3_Refset.bp")));
+end
+
+
+rule "remove if in refset: ICD-O3 Refset"
+	when
+		$c: ConceptVersionBI (this isMemberOf Refsets.ICD_03); 
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/remove-concept/remove_from_ICD-O3_Refset.bp")));
+end
+
+rule "add if not in refset: Module dependency refset"
+	when 
+		$c: ConceptVersionBI (this not isMemberOf Refsets.MODULE_DEPENDENCY);
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/add-concept/add_to_Module_dependency_refset.bp")));
+end
+
+
+rule "remove if in refset: Module dependency refset"
+	when
+		$c: ConceptVersionBI (this isMemberOf Refsets.MODULE_DEPENDENCY); 
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/remove-concept/remove_from_Module_dependency_refset.bp")));
+end */
+
+rule "add if not in refset: Non-Human refset"
+	when 
+		$c: ConceptVersionBI (this not isMemberOf Refsets.NON_HUMAN);
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/add-concept/add_to_Non-Human_refset.bp")));
+end
+
+
+rule "remove if in refset: Non-Human refset"
+	when
+		$c: ConceptVersionBI (this isMemberOf Refsets.NON_HUMAN); 
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/remove-concept/remove_from_Non-Human_refset.bp")));
+end
+/*
+rule "add if not in refset: References refset"
+	when 
+		$c: ConceptVersionBI (this not isMemberOf Refsets.REFERENCES);
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/add-concept/add_to_References_refset.bp")));
+end
+
+
+rule "remove if in refset: References refset"
+	when
+		$c: ConceptVersionBI (this isMemberOf Refsets.REFERENCES); 
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/remove-concept/remove_from_References_refset.bp")));
+end
+
+rule "add if not in refset: Refinability refset"
+	when 
+		$c: ConceptVersionBI (this not isMemberOf Refsets.REFINABILITY);
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/add-concept/add_to_Refinability_refset.bp")));
+end
+
+
+rule "remove if in refset: Refinability refset"
+	when
+		$c: ConceptVersionBI (this isMemberOf Refsets.REFINABILITY); 
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/remove-concept/remove_from_Refinability_refset.bp")));
+end
+
+rule "add if not in refset: Refset descriptor refset"
+	when 
+		$c: ConceptVersionBI (this not isMemberOf Refsets.REFSET_DESCRIPTOR);
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/add-concept/add_to_Refset_descriptor_refset.bp")));
+end
+
+
+rule "remove if in refset: Refset descriptor refset"
+	when
+		$c: ConceptVersionBI (this isMemberOf Refsets.REFSET_DESCRIPTOR); 
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/remove-concept/remove_from_Refset_descriptor_refset.bp")));
+end
+
+rule "add if not in refset: SNOMEDID refset"
+	when 
+		$c: ConceptVersionBI (this not isMemberOf Refsets.SNOMEDID);
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/add-concept/add_to_SNOMEDID_refset.bp")));
+end
+
+
+rule "remove if in refset: SNOMEDID refset"
+	when
+		$c: ConceptVersionBI (this isMemberOf Refsets.SNOMEDID); 
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/remove-concept/remove_from_SNOMEDID_refset.bp")));
+end */
+
+rule "add if not in refset: VMP refset"
+	when 
+		$c: ConceptVersionBI (this not isMemberOf Refsets.VMP);
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/add-concept/add_to_VMP_refset.bp")));
+end
+
+
+rule "remove if in refset: VMP refset"
+	when
+		$c: ConceptVersionBI (this isMemberOf Refsets.VMP); 
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/remove-concept/remove_from_VMP_refset.bp")));
+end
+
+rule "add if not in refset: VTM refset"
+	when 
+		$c: ConceptVersionBI (this not isMemberOf Refsets.VTM);
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/add-concept/add_to_VTM_refset.bp")));
+end
+
+
+rule "remove if in refset: VTM refset"
+	when
+		$c: ConceptVersionBI (this isMemberOf Refsets.VTM); 
+	then 
+		actions.add(actionFactory.make(
+			new File("plugins/remove-concept/remove_from_VTM_refset.bp")));
+end
+
+
 
 
