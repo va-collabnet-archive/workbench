@@ -13,8 +13,6 @@ import java.io.IOException;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
@@ -123,7 +121,6 @@ public class DragPanelConceptAttributes extends ComponentVersionDragPanel<ConAtt
         add(statedDefinedLabel, gbc);
         gbc.gridx++;
         gbc.weightx = 0;
-
 
         JButton collapseExpandButton = getCollapseExpandButton();
         add(collapseExpandButton, gbc);

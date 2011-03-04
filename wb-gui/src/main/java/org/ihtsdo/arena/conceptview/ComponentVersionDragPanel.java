@@ -33,9 +33,11 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
    private static final long serialVersionUID = 1L;
 
    private void updateCollapseExpandButton() {
-      if (getSubpanelCount() == 0 && collapseExpandButton.isVisible()) {
-         collapseExpandButton.setVisible(false);
-         collapseExpandButton.setEnabled(false);
+      if (getSubpanelCount() == 0) {
+          if (collapseExpandButton.isVisible()) {
+            collapseExpandButton.setVisible(false);
+            collapseExpandButton.setEnabled(false);
+          }
       } else {
          if (!collapseExpandButton.isVisible()) {
             collapseExpandButton.setVisible(true);
