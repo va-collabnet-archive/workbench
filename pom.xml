@@ -25,7 +25,7 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.ihtsdo</groupId>
    <artifactId>wb-mmb</artifactId>
-   <version>2.6.0-trek-14-SNAPSHOT</version>
+   <version>2.6.0-trek-15-SNAPSHOT</version>
    <packaging>pom</packaging>
    <name>${branch}: (MMP) Workbench Toolkit</name>
    <description>The IHTSDO Workbench provides two software frameworks for
@@ -235,5 +235,6 @@
       <module>tk-qa-ws-client</module>
       <module>rule-engine-integration</module>
       <module>tk-spelling-variants</module>
+      <module>bdb-properties</module>
    </modules>
 </project>
