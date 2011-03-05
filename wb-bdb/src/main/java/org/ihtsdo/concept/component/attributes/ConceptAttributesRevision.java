@@ -113,11 +113,11 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
      */
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
-        buf.append(this.getClass().getSimpleName() + ":{");
-        buf.append("conceptAttributes: " + this.primordialComponent.nid);
-        buf.append(" defined: " + this.defined);
+        buf.append(this.getClass().getSimpleName()).append(":{");
+        buf.append("conceptAttributes: ").append(this.primordialComponent.nid);
+        buf.append(" defined: ").append(this.defined);
         buf.append(super.toString());
         return buf.toString();
     }
@@ -156,7 +156,7 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
 
     @Override
     public String toUserString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("concept ");
         if (defined) {
             buf.append("is fully defined");

@@ -42,7 +42,7 @@ import org.ihtsdo.tk.api.PositionBI;
 
 public class Position implements I_Position {
 
-   private int version;
+   private long time;
    private PathBI path;
 
    /*
@@ -62,7 +62,7 @@ public class Position implements I_Position {
     */
    @Override
    public int getVersion() {
-      return version;
+      return Terms.get().convertToThinVersion(time);
    }
 
    public Position(int version, PathBI path) {
@@ -70,7 +70,16 @@ public class Position implements I_Position {
       if (path == null) {
          throw new IllegalArgumentException("path cannot be null");
       }
-      this.version = version;
+      this.time = Terms.get().convertToThickVersion(version);
+      this.path = path;
+   }
+
+      public Position(long time, PathBI path) {
+      super();
+      if (path == null) {
+         throw new IllegalArgumentException("path cannot be null");
+      }
+      this.time = time;
       this.path = path;
    }
 
@@ -85,7 +94,7 @@ public class Position implements I_Position {
          return true;
       }
       if (path.getConceptNid() == pathId) {
-         return this.version >= version;
+         return this.time >= Terms.get().convertToThickVersion(version);
       }
       return checkSubsequentOrEqualToOrigins(path.getOrigins(), version, pathId);
    }
@@ -101,10 +110,35 @@ public class Position implements I_Position {
          return true;
       }
       if (path.getConceptNid() == pathId) {
-         return this.version <= version;
+         return this.time <= Terms.get().convertToThickVersion(version);
       }
       return checkAntecedentOrEqualToOrigins(path.getOrigins(), version, pathId);
    }
+   
+   
+   
+    @Override
+    public boolean isSubsequentOrEqualTo(long time, int pathId) {
+       if (equals(time, pathId)) {
+         return true;
+      }
+      if (path.getConceptNid() == pathId) {
+         return this.time >= time;
+      }
+      return checkSubsequentOrEqualToOrigins(path.getOrigins(), time, pathId);
+    }
+
+    @Override
+    public boolean isAntecedentOrEqualTo(long time, int pathId) {
+       if (equals(time, pathId)) {
+         return true;
+      }
+      if (path.getConceptNid() == pathId) {
+         return this.time <= time;
+      }
+      return checkAntecedentOrEqualToOrigins(path.getOrigins(), time, pathId);
+   }
+
 
    private boolean checkSubsequentOrEqualToOrigins(Collection<? extends PositionBI> origins, int testVersion, int testPathId) {
       for (PositionBI origin : origins) {
@@ -128,6 +162,28 @@ public class Position implements I_Position {
       return false;
    }
 
+     private boolean checkSubsequentOrEqualToOrigins(Collection<? extends PositionBI> origins, long testTime, int testPathId) {
+      for (PositionBI origin : origins) {
+         if (testPathId == origin.getPath().getConceptNid()) {
+            return origin.getTime() >= testTime;
+         } else if (checkSubsequentOrEqualToOrigins(origin.getPath().getOrigins(), testTime, testPathId)) {
+            return true;
+         }
+      }
+      return false;
+   }
+
+   private boolean checkAntecedentOrEqualToOrigins(Collection<? extends PositionBI> origins, long testTime, int testPathId) {
+      for (PositionBI origin : origins) {
+         if (testPathId == origin.getPath().getConceptNid()) {
+            return origin.getTime() <= testTime;
+         } else if (checkAntecedentOrEqualToOrigins(origin.getPath().getOrigins(), testTime, testPathId)) {
+            return true;
+         }
+      }
+      return false;
+   }
+
    /*
     * (non-Javadoc)
     *
@@ -141,7 +197,7 @@ public class Position implements I_Position {
          return true;
       }
       if (path.getConceptNid() == another.getPath().getConceptNid()) {
-         return version <= another.getVersion();
+         return time <= another.getTime();
       }
       return checkAntecedentOrEqualToOrigins(another.getPath().getOrigins());
    }
@@ -157,7 +213,7 @@ public class Position implements I_Position {
    public boolean checkAntecedentOrEqualToOrigins(Collection<? extends PositionBI> origins) {
       for (PositionBI origin : origins) {
          if (path.getConceptNid() == origin.getPath().getConceptNid()) {
-            return version <= origin.getVersion();
+            return time <= origin.getTime();
          } else if (checkAntecedentOrEqualToOrigins(origin.getPath().getOrigins())) {
             return true;
          }
@@ -184,7 +240,7 @@ public class Position implements I_Position {
     */
    @Override
    public boolean equals(int version, int pathId) {
-      return ((this.version == version) && (path.getConceptNid() == pathId));
+      return ((this.time == Terms.get().convertToThickVersion(version)) && (path.getConceptNid() == pathId));
    }
 
    /*
@@ -193,8 +249,13 @@ public class Position implements I_Position {
     * @see org.dwfa.vodb.types.I_Position#equals(org.dwfa.vodb.types.Position)
     */
    public boolean equals(I_Position another) {
-      return ((version == another.getVersion()) && (path.getConceptNid() == another.getPath().getConceptNid()));
+      return ((time == another.getTime()) && (path.getConceptNid() == another.getPath().getConceptNid()));
    }
+
+      @Override
+    public boolean equals(long time, int pathId) {
+      return ((this.time == time) && (path.getConceptNid() == pathId));
+    }
 
    @Override
    public boolean equals(Object obj) {
@@ -206,7 +267,7 @@ public class Position implements I_Position {
 
    @Override
    public int hashCode() {
-      return HashFunction.hashCode(new int[]{version, path.getConceptNid()});
+      return HashFunction.hashCode(new int[]{ getVersion(), path.getConceptNid()});
    }
 
    /*
@@ -327,12 +388,12 @@ public class Position implements I_Position {
          AceLog.getAppLog().alertAndLogException(e);
       }
       buff.append(": ");
-      if (version == Integer.MAX_VALUE) {
+      if (time == Long.MAX_VALUE) {
          buff.append("Latest");
-      } else if (version == Integer.MIN_VALUE) {
+      } else if (time == Long.MIN_VALUE) {
          buff.append("BOT");
       } else {
-         Date positionDate = new Date(Terms.get().convertToThickVersion(version));
+         Date positionDate = new Date(time);
          buff.append(dateFormatter.format(positionDate));
       }
       return buff.toString();
@@ -350,6 +411,7 @@ public class Position implements I_Position {
 
    @Override
    public long getTime() {
-      return Terms.get().convertToThickVersion(version);
+      return time;
    }
-}
+
+ }

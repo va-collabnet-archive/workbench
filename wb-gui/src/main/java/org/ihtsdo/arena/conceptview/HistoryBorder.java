@@ -14,7 +14,6 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
 import javax.swing.JComponent;
 import javax.swing.border.AbstractBorder;
 import javax.swing.border.Border;

@@ -96,7 +96,6 @@ import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.util.Stopwatch;
 import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.I_ConceptualizeLocally;
-import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -171,15 +170,14 @@ import com.sleepycat.je.DatabaseException;
 public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_Search {
 
     private BdbPathManager pathManager;
-    private Map<IsaCoordinate,? extends KindOfCacheBI> isaCache;
+    private Map<IsaCoordinate, ? extends KindOfCacheBI> isaCache;
     private HashMap<Integer, KnowledgeBase> knowledgeBaseCache;
-
     private File envHome;
 
     public static void canEdit(I_ConfigAceFrame aceFrameConfig) throws TerminologyException {
         if (aceFrameConfig.getEditingPathSet().isEmpty()) {
             throw new TerminologyException(
-                "<br><br>You must select an editing path before editing...<br><br>No editing path selected.");
+                    "<br><br>You must select an editing path before editing...<br><br>No editing path selected.");
         }
     }
 
@@ -284,8 +282,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     @Override
     public SearchResult doLuceneSearch(String query) throws IOException, org.apache.lucene.queryParser.ParseException {
         Query q =
-                new QueryParser(LuceneManager.version, "desc", new StandardAnalyzer(LuceneManager.version))
-                    .parse(query);
+                new QueryParser(LuceneManager.version, "desc", new StandardAnalyzer(LuceneManager.version)).parse(query);
         return LuceneManager.search(q);
     }
 
@@ -313,7 +310,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     public void forget(I_ConceptAttributeVersioned attr) throws IOException {
         BdbCommitManager.forget(attr);
     }
-
     I_ConfigAceFrame activeAceFrameConfig;
 
     @Override
@@ -337,18 +333,18 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         for (NidPairForRefset pair : pairs) {
             I_ExtendByRef ext = (I_ExtendByRef) Bdb.getComponent(pair.getMemberNid());
             if (ext != null && !addedMembers.contains(ext.getNid())) {
-            	addedMembers.add(ext.getNid());
+                addedMembers.add(ext.getNid());
                 returnValues.add(ext);
             }
         }
-        
-        ComponentBI component = 
+
+        ComponentBI component =
                 Bdb.getComponent(nid);
         if (component instanceof Concept) {
             component = ((Concept) component).getConceptAttributes();
         }
         ComponentChroncileBI<?> cc = (ComponentChroncileBI<?>) component;
-        for (RefexChronicleBI annotation: cc.getAnnotations()) {
+        for (RefexChronicleBI annotation : cc.getAnnotations()) {
             returnValues.add((I_ExtendByRef) annotation);
         }
         return returnValues;
@@ -366,7 +362,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             if (pair.getRefsetNid() == refsetNid) {
                 I_ExtendByRef ext = (I_ExtendByRef) Bdb.getComponent(pair.getMemberNid());
                 if (ext != null && !addedMembers.contains(ext.getNid())) {
-                	addedMembers.add(ext.getNid());
+                    addedMembers.add(ext.getNid());
                     returnValues.add(ext);
                 }
             }
@@ -701,14 +697,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public boolean hasPath(int nid) throws IOException {
-        try {
-            return pathManager.hasPath(nid);
-        } catch (PathNotExistsException e) {
-            return false;
-        } catch (TerminologyException e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        }
-        return false;
+        return pathManager.hasPath(nid);
     }
 
     @Override
@@ -724,6 +713,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     private class IterateConceptsAdaptor implements I_ProcessConceptData {
+
         private I_ProcessConcepts processor;
 
         public IterateConceptsAdaptor(I_ProcessConcepts procesor) {
@@ -740,10 +730,11 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         public boolean continueWork() {
             return true;
         }
-		@Override
-		public NidBitSetBI getNidSet() throws IOException {
-			return Bdb.getConceptDb().getReadOnlyConceptIdSet();
-		}       
+
+        @Override
+        public NidBitSetBI getNidSet() throws IOException {
+            return Bdb.getConceptDb().getReadOnlyConceptIdSet();
+        }
     }
 
     @Override
@@ -777,6 +768,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     public static class MakeNewAceFrame implements Runnable {
+
         I_ConfigAceFrame frameConfig;
         Exception ex;
 
@@ -907,7 +899,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     public Description newDescription(UUID newDescriptionId, I_GetConceptData concept, String lang, String text,
             I_ConceptualizeLocally descType, I_ConfigAceFrame aceFrameConfig) throws TerminologyException, IOException {
         return newDescription(newDescriptionId, concept, lang, text, Terms.get().getConcept(descType.getNid()),
-            aceFrameConfig);
+                aceFrameConfig);
     }
 
     @Override
@@ -922,7 +914,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             I_GetConceptData descriptionType, I_ConfigAceFrame aceFrameConfig, int statusNid)
             throws TerminologyException, IOException {
         return newDescription(descUuid, concept, lang, text, descriptionType, aceFrameConfig,
-            Bdb.getConcept(statusNid), Long.MAX_VALUE);
+                Bdb.getConcept(statusNid), Long.MAX_VALUE);
     }
 
     @Override
@@ -947,7 +939,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             if (d.primordialSapNid == Integer.MIN_VALUE) {
                 d.primordialSapNid =
                         Bdb.getSapDb().getSapNid(status.getNid(), getUserNid(aceFrameConfig), p.getConceptNid(),
-                            effectiveDate);
+                        effectiveDate);
             } else {
                 if (d.revisions == null) {
                     d.revisions = new CopyOnWriteArrayList<DescriptionRevision>();
@@ -985,7 +977,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         I_ConfigAceFrame config = getActiveAceFrameConfig();
         RefsetMember<?, ?> member =
                 createMember(memberPrimUuid, componentId, EConcept.REFSET_TYPES.nidToType(typeId), refsetConcept,
-                    config, new RefsetPropertyMap());
+                config, new RefsetPropertyMap());
         addUncommitted(refsetConcept);
         return member;
     }
@@ -997,7 +989,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         I_ConfigAceFrame config = getActiveAceFrameConfig();
         RefsetMember<?, ?> member =
                 createMember(memberPrimUuid, componentId, EConcept.REFSET_TYPES.classToType(partType), refsetConcept,
-                    config, new RefsetPropertyMap());
+                config, new RefsetPropertyMap());
         addUncommitted(refsetConcept);
         return member;
     }
@@ -1016,7 +1008,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             Concept refsetConcept, I_ConfigAceFrame config) throws IOException {
         UUID primordialUuid = Bdb.getUuidsToNidMap().getUuidsForNid(memberId).iterator().next();
         return createMember(primordialUuid, referencedComponentNid, type, refsetConcept, config,
-            new RefsetPropertyMap());
+                new RefsetPropertyMap());
     }
 
     public static RefsetMember<?, ?> createMember(UUID primordialUuid, int referencedComponentNid,
@@ -1025,73 +1017,73 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         assert referencedComponentNid != 0 : " invalid referencedComponentNid for refset: " + refsetConcept;
         RefsetMember<?, ?> member = null;
         switch (type) {
-        case BOOLEAN:
-            member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new BooleanMember(),
+            case BOOLEAN:
+                member =
+                        setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new BooleanMember(),
                         propMap);
-            break;
-        case CID:
-            member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidMember(),
+                break;
+            case CID:
+                member =
+                        setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidMember(),
                         propMap);
-            break;
-        case CID_CID:
-            member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidCidMember(),
+                break;
+            case CID_CID:
+                member =
+                        setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidCidMember(),
                         propMap);
-            break;
-        case CID_CID_CID:
-            member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config,
+                break;
+            case CID_CID_CID:
+                member =
+                        setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config,
                         new CidCidCidMember(), propMap);
-            break;
-        case CID_CID_STR:
-            member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config,
+                break;
+            case CID_CID_STR:
+                member =
+                        setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config,
                         new CidCidStrMember(), propMap);
-            break;
-        case CID_FLOAT:
-            member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidFloatMember(),
+                break;
+            case CID_FLOAT:
+                member =
+                        setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidFloatMember(),
                         propMap);
-            break;
-        case CID_INT:
-            member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidIntMember(),
+                break;
+            case CID_INT:
+                member =
+                        setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidIntMember(),
                         propMap);
-            break;
-        case CID_LONG:
-            member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidLongMember(),
+                break;
+            case CID_LONG:
+                member =
+                        setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidLongMember(),
                         propMap);
-            break;
-        case CID_STR:
-            member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidStrMember(),
+                break;
+            case CID_STR:
+                member =
+                        setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new CidStrMember(),
                         propMap);
-            break;
-        case INT:
-            member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new IntMember(),
+                break;
+            case INT:
+                member =
+                        setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new IntMember(),
                         propMap);
-            break;
-        case LONG:
-            member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new LongMember(),
+                break;
+            case LONG:
+                member =
+                        setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new LongMember(),
                         propMap);
-            break;
-        case MEMBER:
-            member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config,
+                break;
+            case MEMBER:
+                member =
+                        setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config,
                         new MembershipMember(), propMap);
-            break;
-        case STR:
-            member =
-                    setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new StrMember(),
+                break;
+            case STR:
+                member =
+                        setupNewMember(primordialUuid, referencedComponentNid, refsetConcept, config, new StrMember(),
                         propMap);
-            break;
-        default:
-            throw new UnsupportedOperationException("Can't handle refset type: " + type);
+                break;
+            default:
+                throw new UnsupportedOperationException("Can't handle refset type: " + type);
         }
         return member;
     }
@@ -1130,7 +1122,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
         }
         if (refsetConcept.isAnnotationStyleRefex()) {
-            ConceptComponent<?,?> referencedComponent = (ConceptComponent<?, ?>) Bdb.getComponent(referencedComponentNid);
+            ConceptComponent<?, ?> referencedComponent = (ConceptComponent<?, ?>) Bdb.getComponent(referencedComponentNid);
             referencedComponent.addAnnotation(member);
             member.enclosingConceptNid = Bdb.getConceptNid(referencedComponentNid);
         } else {
@@ -1199,9 +1191,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     @Override
     public Relationship newRelationship(UUID newRelUid, I_GetConceptData concept, I_ConfigAceFrame aceFrameConfig)
             throws TerminologyException, IOException {
-        return newRelationship(newRelUid, concept, aceFrameConfig.getDefaultRelationshipType(), aceFrameConfig
-            .getHierarchySelection(), aceFrameConfig.getDefaultRelationshipCharacteristic(), aceFrameConfig
-            .getDefaultRelationshipRefinability(), aceFrameConfig.getDefaultStatus(), 0, aceFrameConfig);
+        return newRelationship(newRelUid, concept, aceFrameConfig.getDefaultRelationshipType(), aceFrameConfig.getHierarchySelection(), aceFrameConfig.getDefaultRelationshipCharacteristic(), aceFrameConfig.getDefaultRelationshipRefinability(), aceFrameConfig.getDefaultStatus(), 0, aceFrameConfig);
     }
 
     @Override
@@ -1210,7 +1200,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             I_GetConceptData relStatus, int relGroup, I_ConfigAceFrame aceFrameConfig) throws TerminologyException,
             IOException {
         return newRelationship(newRelUid, concept, relType, relDestination, relCharacteristic, relRefinability,
-            relStatus, relGroup, aceFrameConfig, Long.MAX_VALUE);
+                relStatus, relGroup, aceFrameConfig, Long.MAX_VALUE);
     }
 
     @Override
@@ -1221,7 +1211,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         canEdit(aceFrameConfig);
         if (concept == null) {
             AceLog.getAppLog().alertAndLogException(
-                new Exception("Cannot add a relationship while the component viewer is empty..."));
+                    new Exception("Cannot add a relationship while the component viewer is empty..."));
             return null;
         }
         Concept c = (Concept) concept;
@@ -1243,7 +1233,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             if (r.primordialSapNid == Integer.MIN_VALUE) {
                 r.primordialSapNid =
                         Bdb.getSapDb().getSapNid(statusNid, getUserNid(aceFrameConfig), p.getConceptNid(),
-                            effectiveDate);
+                        effectiveDate);
             } else {
                 if (r.revisions == null) {
                     r.revisions = new CopyOnWriteArrayList<RelationshipRevision>();
@@ -1280,7 +1270,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         r.setGroup(group);
         r.primordialSapNid =
                 Bdb.getSapDb().getSapNid(relStatusNid,
-                    getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptNid(), pathNid, effectiveDate);
+                getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptNid(), pathNid, effectiveDate);
         c.getSourceRels().add(r);
         return r;
     }
@@ -1360,11 +1350,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public void writePath(PathBI p, I_ConfigAceFrame config) throws IOException {
-        try {
-            pathManager.write(p, config);
-        } catch (TerminologyException e) {
-            throw new IOException(e);
-        }
+        pathManager.write(p, config);
     }
 
     @Override
@@ -1373,7 +1359,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public void writePathOrigin(PathBI path, PositionBI origin, I_ConfigAceFrame config) throws TerminologyException {
+    public void writePathOrigin(PathBI path, PositionBI origin, I_ConfigAceFrame config) throws IOException {
         pathManager.writeOrigin(path, origin, config);
     }
 
@@ -1453,11 +1439,11 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         private List<I_TestSearchResults> checkList;
         private I_ConfigAceFrame config;
         private I_RepresentIdSet matches;
-    	private NidBitSetBI nidSet;
-    	
-    	public NidBitSetBI getNidSet() {
-    		return nidSet;
-    	}
+        private NidBitSetBI nidSet;
+
+        public NidBitSetBI getNidSet() {
+            return nidSet;
+        }
 
         public ConceptSearcher(CountDownLatch conceptLatch, I_TrackContinuation tracker,
                 List<I_TestSearchResults> checkList, I_ConfigAceFrame config, I_RepresentIdSet matches) throws IOException {
@@ -1498,60 +1484,60 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             return tracker.continueWork();
         }
     }
+
     @Override
-	public //CountDownLatch 
-	void searchWfHx(I_TrackContinuation tracker, Collection<WorkflowHistoryJavaBean> matches,
-									//CountDownLatch latch, 
-									List<I_TestWorkflowHistorySearchResults> checkList,I_ConfigAceFrame config, 
-									WfHxProgressUpdator updater)
-			throws Exception
-    {
-    	Stopwatch timer = new Stopwatch();
+    public //CountDownLatch 
+            void searchWfHx(I_TrackContinuation tracker, Collection<WorkflowHistoryJavaBean> matches,
+            //CountDownLatch latch, 
+            List<I_TestWorkflowHistorySearchResults> checkList, I_ConfigAceFrame config,
+            WfHxProgressUpdator updater)
+            throws Exception {
+        Stopwatch timer = new Stopwatch();
         ;
         timer.start();
 
         WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
 
-    	//updater.setIndeterminate(true);
-    	//updater.setProgressInfo("Starting StandardAnalyzer lucene query...");
-    	long startTime = System.currentTimeMillis();
+        //updater.setIndeterminate(true);
+        //updater.setProgressInfo("Starting StandardAnalyzer lucene query...");
+        long startTime = System.currentTimeMillis();
         //updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime)
-         //       + " ms.");
+        //       + " ms.");
         throw new Exception();
         /*
         SortedSet<WorkflowHistoryJavaBean> searchFindings = searcher.getAllWfHxSortedByTime(); 
         
         
         AceLog.getAppLog().info("StandardAnalyzer query returned " + searchFindings.size() + " hits");
-//        updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime)
-//                + " ms. Hits: " + searchFindings.size());
-
+        //        updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime)
+        //                + " ms. Hits: " + searchFindings.size());
+        
         //CountDownLatch hitLatch = new CountDownLatch(searchFindings.size());
-//        updater.setHits(searchFindings.size());
-//        updater.setIndeterminate(false);
-
+        //        updater.setHits(searchFindings.size());
+        //        updater.setIndeterminate(false);
+        
         Iterator<WorkflowHistoryJavaBean> itr = searchFindings.iterator();
         while (itr.hasNext())
         {
-        	WorkflowHistoryJavaBean bean = (WorkflowHistoryJavaBean)itr.next(); 
+        WorkflowHistoryJavaBean bean = (WorkflowHistoryJavaBean)itr.next(); 
         
-            ACE.threadPool.execute(new CheckAndProcessWorkflowHistoryMatch(//hitLatch, 
-            		updater, bean, matches,
-            		checkList, config));
+        ACE.threadPool.execute(new CheckAndProcessWorkflowHistoryMatch(//hitLatch, 
+        updater, bean, matches,
+        checkList, config));
         }
         
         if (AceLog.getAppLog().isLoggable(Level.INFO)) {
-            if (tracker.continueWork()) {
-                AceLog.getAppLog().info("Search time 1: " + timer.getElapsedTime());
-            } else {
-                AceLog.getAppLog().info("Search 1 Canceled. Elapsed time: " + timer.getElapsedTime());
-            }
+        if (tracker.continueWork()) {
+        AceLog.getAppLog().info("Search time 1: " + timer.getElapsedTime());
+        } else {
+        AceLog.getAppLog().info("Search 1 Canceled. Elapsed time: " + timer.getElapsedTime());
         }
-                timer.stop();
-
-        */
+        }
+        timer.stop();
         
-       // return hitLatch;
+         */
+
+        // return hitLatch;
     }
 
     @Override
@@ -1577,8 +1563,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         timer.start();
         try {
             Query q =
-                    new QueryParser(LuceneManager.version, "desc", new StandardAnalyzer(LuceneManager.version))
-                        .parse(query);
+                    new QueryParser(LuceneManager.version, "desc", new StandardAnalyzer(LuceneManager.version)).parse(query);
             if (LuceneManager.indexExists() == false) {
                 updater.setProgressInfo("Making lucene index -- this may take a while...");
                 LuceneManager.createLuceneDescriptionIndex();
@@ -1587,7 +1572,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             updater.setProgressInfo("Starting StandardAnalyzer lucene query...");
             long startTime = System.currentTimeMillis();
             updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime)
-                + " ms.");
+                    + " ms.");
             SearchResult result = LuceneManager.search(q);
 
             if (result.topDocs.totalHits > 0) {
@@ -1595,13 +1580,13 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             } else {
                 updater.setProgressInfo("Starting WhitespaceAnalyzer lucene query...");
                 AceLog.getAppLog().info(
-                    "StandardAnalyzer query returned no results. Now trying WhitespaceAnalyzer query");
+                        "StandardAnalyzer query returned no results. Now trying WhitespaceAnalyzer query");
                 q = new QueryParser(LuceneManager.version, "desc", new WhitespaceAnalyzer()).parse(query);
                 result = LuceneManager.search(q);
             }
 
             updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime)
-                + " ms. Hits: " + result.topDocs.totalHits);
+                    + " ms. Hits: " + result.topDocs.totalHits);
 
             CountDownLatch hitLatch = new CountDownLatch(result.topDocs.totalHits);
             updater.setHits(result.topDocs.totalHits);
@@ -1615,7 +1600,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                 }
 
                 ACE.threadPool.execute(new CheckAndProcessLuceneMatch(hitLatch, updater, doc, score, matches,
-                    checkList, config));
+                        checkList, config));
             }
             if (AceLog.getAppLog().isLoggable(Level.INFO)) {
                 if (tracker.continueWork()) {
@@ -1652,11 +1637,11 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         private I_ConfigAceFrame config;
         private Pattern p;
         Collection<I_DescriptionVersioned<?>> matches;
-    	private NidBitSetBI nidSet;
-    	
-    	public NidBitSetBI getNidSet() {
-    		return nidSet;
-    	}
+        private NidBitSetBI nidSet;
+
+        public NidBitSetBI getNidSet() {
+            return nidSet;
+        }
 
         public RegexSearcher(CountDownLatch conceptLatch, I_TrackContinuation tracker, Semaphore checkSemaphore,
                 List<I_TestSearchResults> checkList, I_ConfigAceFrame config, Pattern p,
@@ -1685,7 +1670,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                         AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
                     }
                     ACE.threadPool.execute(new CheckAndProcessRegexMatch(descriptionLatch, checkSemaphore, p, matches,
-                        descV, checkList, config));
+                            descV, checkList, config));
                 }
                 try {
                     descriptionLatch.await();
@@ -1720,7 +1705,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         RegexSearcher searcher =
                 new RegexSearcher(conceptLatch, tracker, checkSemaphore, checkList, config, p, matches);
         assert conceptLatch.getCount() == Bdb.getConceptDb().getCount() : " counts do not match. Latch count: "
-            + conceptLatch.getCount() + " Db count: " + Bdb.getConceptDb().getCount();
+                + conceptLatch.getCount() + " Db count: " + Bdb.getConceptDb().getCount();
         try {
             Bdb.getConceptDb().iterateConceptDataInParallel(searcher);
             conceptLatch.await();
@@ -1749,7 +1734,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     public void removeFromWatchList(I_GetConceptData c) {
         Bdb.removeFromWatchList(c);
     }
-
     SpecRefsetHelper specRefsetHelper;
 
     @Override
@@ -1799,7 +1783,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @SuppressWarnings("unchecked")
-	@Override
+    @Override
     public Condition computeRefset(int refsetNid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig) throws Exception {
         AceLog.getAppLog().info(">>>>>>>>>> Computing RefsetSpecQuery: " + query);
         List<String> dangleWarnings = RefsetQueryFactory.removeDangles(query);
@@ -1884,8 +1868,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
 
             AceLog.getAppLog().info(">>>>>>>>> Finished computing spec - committing.");
-            BdbCommitManager.commit(frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy(), frameConfig
-                .getDbConfig().getChangeSetWriterThreading());
+            BdbCommitManager.commit(frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy(), frameConfig.getDbConfig().getChangeSetWriterThreading());
             if (!computer.continueWork()) {
                 for (I_ShowActivity a : activities) {
                     a.cancel();
@@ -1919,8 +1902,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             } else if (getRootCause(e) instanceof InterruptedException) {
                 // Nothing to do
             } else {
-
-                e.printStackTrace();
                 throw new TerminologyException(e);
             }
         }
@@ -1941,6 +1922,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     private static class ConceptFetcher implements I_FetchConceptFromCursor {
+
         Concept concept;
 
         public void setConcept(Concept concept) {
@@ -1951,7 +1933,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         public Concept fetch() {
             return concept;
         }
-
     }
 
     @Override
@@ -1974,7 +1955,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             if (img.primordialSapNid == Integer.MIN_VALUE) {
                 img.primordialSapNid =
                         Bdb.getSapDb().getSapNid(statusNid, aceConfig.getDbConfig().getUserConcept().getNid(),
-                            p.getConceptNid(), Long.MAX_VALUE);
+                        p.getConceptNid(), Long.MAX_VALUE);
             } else {
                 if (img.revisions == null) {
                     img.revisions = new CopyOnWriteArrayList<ImageRevision>();
@@ -2007,28 +1988,33 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         BdbCommitManager.setCheckCommitDataEnabled(enabled);
     }
 
+    @Override
     public void resetViewPositions() {
         Bdb.getSapDb().clearMapperCache();
     }
 
+    @Override
     public void setCacheSize(String cacheSize) {
         Bdb.setCacheSize(cacheSize);
     }
 
+    @Override
     public long getCacheSize() {
         return Bdb.getCacheSize();
     }
 
+    @Override
     public void setCachePercent(String cachePercent) {
         Bdb.setCachePercent(cachePercent);
     }
 
+    @Override
     public int getCachePercent() {
         return Bdb.getCachePercent();
     }
 
     @Override
-    public void removeOrigin(PathBI path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException {
+    public void removeOrigin(PathBI path, I_Position origin, I_ConfigAceFrame config) throws IOException {
         pathManager.removeOrigin(path, origin, config);
     }
 
@@ -2036,7 +2022,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     public I_GetConceptData getConceptForNid(int componentNid) throws IOException {
         return Bdb.getConceptForComponent(componentNid);
     }
-
     private int authorNid = Integer.MAX_VALUE;
 
     @Override
@@ -2044,7 +2029,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         if (authorNid == Integer.MAX_VALUE) {
             try {
                 if (getActiveAceFrameConfig() != null && getActiveAceFrameConfig().getDbConfig() != null
-                    && getActiveAceFrameConfig().getDbConfig().getUserConcept() != null) {
+                        && getActiveAceFrameConfig().getDbConfig().getUserConcept() != null) {
                     authorNid = getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptNid();
                 } else {
                     authorNid = uuidToNative(TkRevision.unspecifiedUserUuid);
@@ -2061,44 +2046,43 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         return new EConceptChangeSetWriter(changeSetFileName, changeSetTempFileName, policy, true);
     }
 
-	@Override
-	public KindOfCacheBI setupIsaCache(IsaCoordinate isaCoordinate) throws IOException {
-		KindOfCacheBI tmpIsaCache = KindOfComputer.setupIsaCache(isaCoordinate);
-		isaCache = KindOfComputer.getIsaCacheMap();
-		return tmpIsaCache;
-	}
+    @Override
+    public KindOfCacheBI setupIsaCache(IsaCoordinate isaCoordinate) throws IOException {
+        KindOfCacheBI tmpIsaCache = KindOfComputer.setupIsaCache(isaCoordinate);
+        isaCache = KindOfComputer.getIsaCacheMap();
+        return tmpIsaCache;
+    }
 
-	@Override
-	public KindOfCacheBI setupIsaCacheAndWait(IsaCoordinate isaCoordinate) throws IOException,
-			InterruptedException {
-		KindOfCacheBI tmpIsaCache = KindOfComputer.setupIsaCacheAndWait(isaCoordinate);
-		isaCache = KindOfComputer.getIsaCacheMap();
-		return tmpIsaCache;
-	}
+    @Override
+    public KindOfCacheBI setupIsaCacheAndWait(IsaCoordinate isaCoordinate) throws IOException,
+            InterruptedException {
+        KindOfCacheBI tmpIsaCache = KindOfComputer.setupIsaCacheAndWait(isaCoordinate);
+        isaCache = KindOfComputer.getIsaCacheMap();
+        return tmpIsaCache;
+    }
 
-	@Override
-	public void updateIsaCache(IsaCoordinate isaCoordinate, int cNid) throws Exception {
-		KindOfComputer.updateIsaCache(isaCoordinate, cNid);
-	}
+    @Override
+    public void updateIsaCache(IsaCoordinate isaCoordinate, int cNid) throws Exception {
+        KindOfComputer.updateIsaCache(isaCoordinate, cNid);
+    }
 
-	@Override
-	public void persistIsaCache() throws Exception {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public void persistIsaCache() throws Exception {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public void loadIsaCacheFromFile() throws Exception {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public void loadIsaCacheFromFile() throws Exception {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public HashMap<Integer, KnowledgeBase> getKnowledgeBaseCache() {
-		return knowledgeBaseCache;
-	}
+    @Override
+    public HashMap<Integer, KnowledgeBase> getKnowledgeBaseCache() {
+        return knowledgeBaseCache;
+    }
 
-	@Override
-	public void setKnowledgeBaseCache(HashMap<Integer, KnowledgeBase> kbCache) {
-		knowledgeBaseCache = kbCache;
-	}
-
+    @Override
+    public void setKnowledgeBaseCache(HashMap<Integer, KnowledgeBase> kbCache) {
+        knowledgeBaseCache = kbCache;
+    }
 }

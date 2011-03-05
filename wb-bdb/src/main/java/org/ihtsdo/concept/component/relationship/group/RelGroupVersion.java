@@ -7,8 +7,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.dwfa.vodb.types.Position;
+import org.ihtsdo.tk.Ts;
 
 import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -193,4 +196,11 @@ public class RelGroupVersion
     public Set<Integer> getAllSapNids() throws IOException {
         return rg.getAllSapNids();
     }
+    
+    
+    @Override
+    public PositionBI getPosition() throws IOException {
+        return new Position(getTime(), Ts.get().getPath(getPathNid()));
+    }
+
 }

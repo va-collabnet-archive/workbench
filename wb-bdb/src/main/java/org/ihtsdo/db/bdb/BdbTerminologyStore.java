@@ -102,6 +102,12 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
       return metadataVC;
    }
 
+   
+    @Override
+    public PathBI getPath(int pathNid) throws IOException {
+        return BdbPathManager.get().get(pathNid);
+    }
+
    @Override
    public ComponentChroncileBI<?> getComponent(int nid) throws IOException {
       return (ComponentChroncileBI<?>) Bdb.getComponent(nid);

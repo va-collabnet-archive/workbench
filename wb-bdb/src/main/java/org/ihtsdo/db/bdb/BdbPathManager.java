@@ -39,7 +39,6 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.PathNotExistsException;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.I_Manage;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
@@ -50,6 +49,7 @@ import org.ihtsdo.concept.component.refsetmember.cidInt.CidIntMember;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.refset.RefsetHelper;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 
@@ -112,7 +112,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
 
     private static Lock l = new ReentrantLock();
 
-    public static BdbPathManager get() throws TerminologyException {
+    public static BdbPathManager get() throws IOException {
         if (singleton == null) {
             l.lock();
             try {
@@ -129,12 +129,12 @@ public class BdbPathManager implements I_Manage<PathBI> {
 
     }
 
-    private BdbPathManager() throws TerminologyException {
+    private BdbPathManager() throws IOException {
         try {
             editPath = new Path(ReferenceConcepts.TERM_AUXILIARY_PATH.getNid(), null);
             setupPathMap();
         } catch (Exception e) {
-            throw new TerminologyException("Unable to initialise path management.", e);
+            throw new IOException("Unable to initialise path management.", e);
         }
     }
 
@@ -146,15 +146,15 @@ public class BdbPathManager implements I_Manage<PathBI> {
         return getFromDisk(cNid) != null;
     }
 
-    public boolean existsFast(int cNid) throws TerminologyException, IOException {
+    public boolean existsFast(int cNid) throws IOException {
         if (pathMap.containsKey(cNid)) {
             return true;
         }
-        return false;
+        return false; 
     }
 
    @Override
-    public PathBI get(int nid) throws IOException, TerminologyException {
+    public PathBI get(int nid) throws IOException {
         if (exists(nid)) {
             return pathMap.get(nid);
         } else {
@@ -167,11 +167,12 @@ public class BdbPathManager implements I_Manage<PathBI> {
             new PathNotExistsException("Path not found: " + TerminologyHelper.conceptToString(nid) + " uuid: "
                 + Bdb.getUuidsToNidMap().getUuidsForNid(nid)));
 
-        pathMap.put(nid, pathMap.get(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize().getNid()));
+        pathMap.put(nid, pathMap.get(Ts.get().getNidForUuids(
+                ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids())));
         return pathMap.get(nid);
     }
 
-    public boolean hasPath(int nid) throws IOException, TerminologyException {
+    public boolean hasPath(int nid) throws IOException {
         if (exists(nid)) {
             return true;
         } else {
@@ -185,7 +186,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
     }
 
     @SuppressWarnings("unchecked")
-    public Set<Integer> getPathNids() throws TerminologyException {
+    public Set<Integer> getPathNids() throws IOException {
         try {
             HashSet<Integer> result = new HashSet<Integer>();
 
@@ -196,12 +197,12 @@ public class BdbPathManager implements I_Manage<PathBI> {
             return result;
 
         } catch (Exception e) {
-            throw new TerminologyException("Unable to retrieve all paths.", e);
+            throw new IOException("Unable to retrieve all paths.", e);
         }
     }
 
    @Override
-    public Set<PathBI> getAll() throws TerminologyException {
+    public Set<PathBI> getAll() {
         return new HashSet<PathBI>(pathMap.values());
     }
 
@@ -256,7 +257,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
         return null;
     }
 
-    public List<PositionBI> getAllPathOrigins(int nid) throws TerminologyException, IOException {
+    public List<PositionBI> getAllPathOrigins(int nid) throws IOException {
         Path p = pathMap.get(nid);
         if (p == null) {
             p = getFromDisk(nid);
@@ -264,20 +265,20 @@ public class BdbPathManager implements I_Manage<PathBI> {
         return new ArrayList<PositionBI>(p.getInheritedOrigins());
     }
 
-    public Collection<? extends PositionBI> getPathOrigins(int nid) throws TerminologyException {
+    public Collection<? extends PositionBI> getPathOrigins(int nid) throws IOException {
         try {
             Path p = pathMap.get(nid);
             return p.getOrigins();
         } catch (Exception e) {
-            throw new TerminologyException("Unable to retrieve path children.", e);
+            throw new IOException("Unable to retrieve path children.", e);
         }
     }
 
-    private List<I_Position> getPathOriginsFromDb(int nid) throws TerminologyException {
+    private List<I_Position> getPathOriginsFromDb(int nid) throws IOException {
         return getPathOriginsWithDepth(nid, 0);
     }
 
-    private List<I_Position> getPathOriginsWithDepth(int nid, int depth) throws TerminologyException {
+    private List<I_Position> getPathOriginsWithDepth(int nid, int depth) throws IOException {
         try {
             ArrayList<I_Position> result = new ArrayList<I_Position>();
             Concept pathConcept = Bdb.getConceptDb().getConcept(nid);
@@ -317,7 +318,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
             }
             return result;
         } catch (Exception e) {
-            throw new TerminologyException("Unable to retrieve path origins.", e);
+            throw new IOException("Unable to retrieve path origins.", e);
         }
     }
 
@@ -333,7 +334,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
      * automatically remove origins. This must be done explicitly with {@link #removeOrigin(PathBI, I_Position)}.
      */
    @Override
-    public void write(final PathBI path, I_ConfigAceFrame config) throws TerminologyException {
+    public void write(final PathBI path, I_ConfigAceFrame config) throws IOException {
         try {
             // write path
 
@@ -352,7 +353,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
             pathMap.put(path.getConceptNid(), (Path) path);
             logger.log(Level.INFO, "Wrote path : {0}", path);
         } catch (Exception e) {
-            throw new TerminologyException("Unable to write path: " + path, e);
+            throw new IOException("Unable to write path: " + path, e);
         }
     }
 
@@ -360,7 +361,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
      * Set an origin on a path
      */
     public void writeOrigin(final PathBI path, final PositionBI origin, I_ConfigAceFrame config)
-            throws TerminologyException {
+            throws IOException {
         assert path.getOrigins().contains(origin) : "Must add origin: " + origin + " before writing: " + path;
         RefsetHelper refsetHelper = helperGetter.get(config);
         try {
@@ -395,11 +396,11 @@ public class BdbPathManager implements I_Manage<PathBI> {
 
             pathMap.put(path.getConceptNid(), (Path) path);
         } catch (Exception e) {
-            throw new TerminologyException("Unable to write path origin: " + origin + " to path " + path, e);
+            throw new IOException("Unable to write path origin: " + origin + " to path " + path, e);
         }
     }
 
-    public void removeOrigin(PathBI path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException {
+    public void removeOrigin(PathBI path, I_Position origin, I_ConfigAceFrame config) throws IOException {
         assert path.getOrigins().contains(origin) : "Must remove origin: " + origin + " before removing: " + path;
         try {
             RefsetHelper refsetHelper = helperGetter.get(config);
@@ -411,7 +412,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
 
             logger.log(Level.INFO, "Removed origin path : {0} from path {1}", new Object[]{origin, path});
         } catch (Exception e) {
-            throw new TerminologyException("Unable to remove path origin: " + origin + " from path " + path, e);
+            throw new IOException("Unable to remove path origin: " + origin + " from path " + path, e);
         }
     }
 

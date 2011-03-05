@@ -218,6 +218,7 @@ public interface I_TermFactory {
     LogWithAlerts getEditLog();
 
     PathBI getPath(int nid) throws TerminologyException, IOException;
+
     PathBI getPath(Collection<UUID> uids) throws TerminologyException, IOException;
 
     PathBI getPath(UUID... ids) throws TerminologyException, IOException;
@@ -265,7 +266,6 @@ public interface I_TermFactory {
      * 
      * @return Data Constraint failures that would be encountered if <code>commit()</code> is called.
      */
-
     List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings();
 
     public void commit() throws Exception;
@@ -403,7 +403,6 @@ public interface I_TermFactory {
      * 
      * @throws IOException
      */
-
     void cancel() throws IOException;
 
     /**
@@ -496,9 +495,9 @@ public interface I_TermFactory {
     List<? extends I_ExtendByRef> getAllExtensionsForComponent(int componentId, boolean addUncommitted)
             throws IOException;
 
-    List<? extends I_ExtendByRef> getRefsetExtensionsForComponent(int refsetNid, 
-   		 int nid) throws IOException;
-    
+    List<? extends I_ExtendByRef> getRefsetExtensionsForComponent(int refsetNid,
+            int nid) throws IOException;
+
     String getStats() throws IOException;
 
     /**
@@ -573,11 +572,10 @@ public interface I_TermFactory {
     /**
      * Add or update an origin position to a path
      */
-    public void writePathOrigin(PathBI path, PositionBI origin, I_ConfigAceFrame config) throws TerminologyException;
+    public void writePathOrigin(PathBI path, PositionBI origin, I_ConfigAceFrame config) throws IOException;
 
     public List<UUID> nativeToUuid(int nid) throws IOException;
- 
-    
+
     public UUID nidToUuid(int nid) throws IOException;
 
     public I_ImageVersioned getImage(UUID fromString) throws IOException;
@@ -589,6 +587,7 @@ public interface I_TermFactory {
             throws IOException, ParseException;
 
     public boolean pathExists(int pathConceptId) throws TerminologyException, IOException;
+
     public boolean pathExistsFast(int pathConceptId) throws TerminologyException, IOException;
 
     /**
@@ -654,23 +653,23 @@ public interface I_TermFactory {
 
     public int getCachePercent();
 
-    public void removeOrigin(PathBI path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException;
+    public void removeOrigin(PathBI path, I_Position origin, I_ConfigAceFrame config) throws IOException;
 
     public I_GetConceptData getConceptForNid(int componentNid) throws IOException;
 
-	public int getAuthorNid();
-	
-	public KindOfCacheBI setupIsaCache(IsaCoordinate isaCoordinate) throws IOException;
-	
-	public KindOfCacheBI setupIsaCacheAndWait(IsaCoordinate isaCoordinate) throws IOException, InterruptedException;
-	
-	public void updateIsaCache(IsaCoordinate isaCoordinate, int cNid) throws Exception;
-	
-	public void persistIsaCache() throws Exception;
+    public int getAuthorNid();
 
-	public void loadIsaCacheFromFile() throws Exception;
-	
-	public HashMap<Integer, KnowledgeBase> getKnowledgeBaseCache();
-	
-	public void setKnowledgeBaseCache(HashMap<Integer, KnowledgeBase> kbCache);
+    public KindOfCacheBI setupIsaCache(IsaCoordinate isaCoordinate) throws IOException;
+
+    public KindOfCacheBI setupIsaCacheAndWait(IsaCoordinate isaCoordinate) throws IOException, InterruptedException;
+
+    public void updateIsaCache(IsaCoordinate isaCoordinate, int cNid) throws Exception;
+
+    public void persistIsaCache() throws Exception;
+
+    public void loadIsaCacheFromFile() throws Exception;
+
+    public HashMap<Integer, KnowledgeBase> getKnowledgeBaseCache();
+
+    public void setKnowledgeBaseCache(HashMap<Integer, KnowledgeBase> kbCache);
 }

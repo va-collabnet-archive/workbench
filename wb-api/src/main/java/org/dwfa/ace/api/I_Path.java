@@ -56,7 +56,7 @@ public interface I_Path extends PathBI {
 
     public void convertIds(I_MapNativeToNative jarToDbNativeMap);
 
-    public UniversalAcePath getUniversal() throws IOException, TerminologyException;
+    public UniversalAcePath getUniversal() throws IOException;
 
     public String toHtmlString() throws IOException;
 
@@ -70,5 +70,5 @@ public interface I_Path extends PathBI {
      *            an origin
      * @throws TerminologyException If unable to complete
      */
-    public void addOrigin(PositionBI position, I_ConfigAceFrame config) throws TerminologyException;
+    public void addOrigin(PositionBI position, I_ConfigAceFrame config) throws IOException;
 }

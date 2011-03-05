@@ -44,13 +44,12 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 
 public class Path implements PathBI, I_Path {
+
     /**
-	 *
-	 */
+     *
+     */
     private static final long serialVersionUID = 1L;
-
     int conceptNid;
-
     Set<PositionBI> origins;
 
     public Path(int conceptId, List<? extends PositionBI> origins) {
@@ -153,21 +152,21 @@ public class Path implements PathBI, I_Path {
 
     public static String toHtmlString(PathBI path) throws IOException {
         try {
-			StringBuffer buff = new StringBuffer();
-			buff.append("<html><font color='blue' size='+1'><u>");
-			I_GetConceptData cb = Terms.get().getConcept(path.getConceptNid());
-			buff.append(cb.getInitialText());
-			buff.append("</u></font>");
-			if (path != null) {
-			    for (PositionBI origin : path.getOrigins()) {
-			        buff.append("<br>&nbsp;&nbsp;&nbsp;Origin: ");
-			        buff.append(origin);
-			    }
-			}
-			return buff.toString();
-		} catch (TerminologyException e) {
-			throw new IOException(e);
-		}
+            StringBuffer buff = new StringBuffer();
+            buff.append("<html><font color='blue' size='+1'><u>");
+            I_GetConceptData cb = Terms.get().getConcept(path.getConceptNid());
+            buff.append(cb.getInitialText());
+            buff.append("</u></font>");
+            if (path != null) {
+                for (PositionBI origin : path.getOrigins()) {
+                    buff.append("<br>&nbsp;&nbsp;&nbsp;Origin: ");
+                    buff.append(origin);
+                }
+            }
+            return buff.toString();
+        } catch (TerminologyException e) {
+            throw new IOException(e);
+        }
     }
 
 
@@ -188,26 +187,26 @@ public class Path implements PathBI, I_Path {
         throw new UnsupportedOperationException();
     }
 
-    public UniversalAcePath getUniversal() throws IOException, TerminologyException {
-             List<UniversalAcePosition> universalOrigins = new ArrayList<UniversalAcePosition>(origins.size());
-            for (PositionBI position : origins) {
-                universalOrigins.add(new UniversalAcePosition(Terms.get().nativeToUuid(
+    public UniversalAcePath getUniversal() throws IOException {
+        List<UniversalAcePosition> universalOrigins = new ArrayList<UniversalAcePosition>(origins.size());
+        for (PositionBI position : origins) {
+            universalOrigins.add(new UniversalAcePosition(Terms.get().nativeToUuid(
                     position.getPath().getConceptNid()), Terms.get().convertToThickVersion(position.getVersion())));
-            }
-            return new UniversalAcePath(Terms.get().nativeToUuid(conceptNid), universalOrigins);
+        }
+        return new UniversalAcePath(Terms.get().nativeToUuid(conceptNid), universalOrigins);
     }
 
     public static void writePath(ObjectOutputStream out, PathBI p) throws IOException {
-    	List<UUID> uuids = Terms.get().nativeToUuid(p.getConceptNid());
-    	if (uuids.size() > 0) {
-    		out.writeObject(Terms.get().nativeToUuid(p.getConceptNid()));
-    	} else {
-    		throw new IOException("no uuids for component: " + p);
-    	}
-    	out.writeInt(p.getOrigins().size());
-    	for (PositionBI origin : p.getOrigins()) {
-    		Position.writePosition(out, origin);
-    	}
+        List<UUID> uuids = Terms.get().nativeToUuid(p.getConceptNid());
+        if (uuids.size() > 0) {
+            out.writeObject(Terms.get().nativeToUuid(p.getConceptNid()));
+        } else {
+            throw new IOException("no uuids for component: " + p);
+        }
+        out.writeInt(p.getOrigins().size());
+        for (PositionBI origin : p.getOrigins()) {
+            Position.writePosition(out, origin);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -223,9 +222,7 @@ public class Path implements PathBI, I_Path {
             }
 
         } catch (TerminologyException e) {
-            IOException newEx = new IOException();
-            newEx.initCause(e);
-            throw newEx;
+            throw new IOException(e);
         }
         int size = in.readInt();
         List<PositionBI> origins = new ArrayList<PositionBI>(size);
@@ -259,8 +256,9 @@ public class Path implements PathBI, I_Path {
         }
     }
 
+    @Override
     public String toString() {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         try {
             I_GetConceptData cb = Terms.get().getConcept(getConceptNid());
             buff.append(cb.getInitialText());
@@ -270,36 +268,31 @@ public class Path implements PathBI, I_Path {
         } catch (TerminologyException e) {
             buff.append(e.getMessage());
             AceLog.getAppLog().alertAndLogException(e);
-		}
+        }
         return buff.toString();
     }
 
+    @Override
     public String toHtmlString() throws IOException {
         return Path.toHtmlString(this);
     }
 
-    public void addOrigin(PositionBI position, I_ConfigAceFrame config) throws TerminologyException {
-        assert this.origins.contains(position) == false: "Attempt to add duplicate origin to path: " +
-            this.toString() + " duplicate origin: " + position;
+    @Override
+    public void addOrigin(PositionBI position, I_ConfigAceFrame config) throws IOException {
+        assert this.origins.contains(position) == false : "Attempt to add duplicate origin to path: "
+                + this.toString() + " duplicate origin: " + position;
         this.origins.add(position);
         Terms.get().writePathOrigin(this, position, config);
     }
 
-    public void remmoveOrigin(I_Position position, I_ConfigAceFrame config) throws TerminologyException {
-        assert this.origins.contains(position) == false: "Attempt to remove origin that is not in path: " +
-            this.toString() + " erroneous origin: " + position;
-        this.origins.remove(position);
-        Terms.get().removeOrigin(this, position, config);
+    @Override
+    public List<UUID> getUUIDs() {
+        try {
+            return new ArrayList<UUID>(Terms.get().getUids(conceptNid));
+        } catch (TerminologyException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
-
-	@Override
-	public List<UUID> getUUIDs() {
-		try {
-			return new ArrayList<UUID>(Terms.get().getUids(conceptNid));
-		} catch (TerminologyException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
 }

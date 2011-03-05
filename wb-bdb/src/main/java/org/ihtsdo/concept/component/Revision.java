@@ -22,12 +22,14 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import org.dwfa.vodb.types.Position;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.PositionBI;
 
-public abstract class Revision<V extends Revision<V, C>,
-        C extends ConceptComponent<V, C>>
+public abstract class Revision<V extends Revision<V, C>, C extends ConceptComponent<V, C>>
         implements I_AmPart<V>,
-            I_HandleFutureStatusAtPositionSetup,
-            AnalogBI {
+        I_HandleFutureStatusAtPositionSetup,
+        AnalogBI {
 
     public static SimpleDateFormat fileDateFormat =
             new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
@@ -182,7 +184,7 @@ public abstract class Revision<V extends Revision<V, C>,
 
     @Override
     public abstract V makeAnalog(int statusNid, int authorNid,
-                                 int pathNid, long time);
+            int pathNid, long time);
 
     public void setStatusAtPosition(int statusNid, int authorNid,
             int pathNid, long time) {
@@ -287,10 +289,10 @@ public abstract class Revision<V extends Revision<V, C>,
                     append(another.sapNid).append("\n");
         }
         if (!this.primordialComponent.equals(another.primordialComponent)) {
-             buf.append("\t\tRevision.primordialComponent not equal: "
-                     + "\n\t\t\tthis.primordialComponent = ").
+            buf.append("\t\tRevision.primordialComponent not equal: "
+                    + "\n\t\t\tthis.primordialComponent = ").
                     append(this.primordialComponent).append(
-                     "\n\t\t\tanother.primordialComponent = ").
+                    "\n\t\t\tanother.primordialComponent = ").
                     append(another.primordialComponent).append("\n");
         }
         return buf.toString();
@@ -346,7 +348,7 @@ public abstract class Revision<V extends Revision<V, C>,
         return getTime() == Long.MAX_VALUE;
     }
 
-	public Collection<? extends RefexChronicleBI<?>> getAnnotations() {
+    public Collection<? extends RefexChronicleBI<?>> getAnnotations() {
         return primordialComponent.getAnnotations();
     }
 
@@ -354,31 +356,34 @@ public abstract class Revision<V extends Revision<V, C>,
         return primordialComponent.addAnnotation(annotation);
     }
 
-
     public final void setNid(int nid) throws PropertyVetoException {
         throw new PropertyVetoException("nid", null);
-     }
+    }
 
-	@Override
-	public Collection<? extends RefexChronicleBI<?>> getRefexes()
-			throws IOException {
-		return primordialComponent.getRefexes();
-	}
+    @Override
+    public Collection<? extends RefexChronicleBI<?>> getRefexes()
+            throws IOException {
+        return primordialComponent.getRefexes();
+    }
 
-	@Override
-	public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
-			ViewCoordinate xyz) throws IOException {
-		return primordialComponent.getCurrentRefexes(xyz);
-	}
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
+            ViewCoordinate xyz) throws IOException {
+        return primordialComponent.getCurrentRefexes(xyz);
+    }
 
-	@Override
-	public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
-			ViewCoordinate xyz) throws IOException {
-		return primordialComponent.getCurrentAnnotations(xyz);
-	}
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
+            ViewCoordinate xyz) throws IOException {
+        return primordialComponent.getCurrentAnnotations(xyz);
+    }
 
-   public Set<Integer> getAllSapNids() throws IOException {
-      return primordialComponent.getAllSapNids();
-   }
+    public Set<Integer> getAllSapNids() throws IOException {
+        return primordialComponent.getAllSapNids();
+    }
 
+    @Override
+    public PositionBI getPosition() throws IOException {
+        return new Position(getTime(), Ts.get().getPath(getPathNid()));
+    }
 }

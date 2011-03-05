@@ -40,4 +40,6 @@ public interface TerminologyTransactionDI {
    Set<PathBI> getPathSetFromSapSet(Set<Integer> sapNids) throws IOException;
 
    Set<PathBI> getPathSetFromPositionSet(Set<PositionBI> positions) throws IOException;
+   
+   PathBI getPath(int pathNid) throws IOException;
 }

@@ -21,14 +21,12 @@ import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.cern.colt.map.OpenIntIntHashMap;
 import org.ihtsdo.concept.component.relationship.group.RelGroupVersion;
-import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.NidList;
 import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSetBI;
-import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
@@ -531,25 +529,24 @@ public class ConceptVersion implements ConceptVersionBI {
     @Override
     public DescriptionVersionBI getFullySpecifiedDescription()
             throws IOException, ContraditionException {
-      if (fsnOrder == null) {
+        if (fsnOrder == null) {
             fsnOrder = new IntList();
             fsnOrder.add(ReferenceConcepts.FULLY_SPECIFIED_RF1.getNid());
             fsnOrder.add(ReferenceConcepts.PREFERRED_ACCEPTABILITY.getNid());
             fsnOrder.add(ReferenceConcepts.PREFERRED_RF1.getNid());
         }
-       return concept.getDescTuple(fsnOrder,
+        return concept.getDescTuple(fsnOrder,
                 vc.getLangPrefList(),
                 vc.getAllowedStatusNids(),
                 vc.getPositionSet(),
                 LANGUAGE_SORT_PREF.getPref(vc.getLangSort()),
                 vc.getPrecedence(),
                 vc.getContradictionManager());
-   }
-
+    }
     NidListBI preferredOrder;
     NidListBI fsnOrder;
     NidListBI synonymOrder;
-    
+
     @Override
     public DescriptionVersionBI getPreferredDescription() throws IOException,
             ContraditionException {
@@ -566,7 +563,7 @@ public class ConceptVersion implements ConceptVersionBI {
                 LANGUAGE_SORT_PREF.getPref(vc.getLangSort()),
                 vc.getPrecedence(),
                 vc.getContradictionManager());
-  }
+    }
 
     @Override
     public Collection<? extends DescriptionVersionBI> getSynonyms()
@@ -576,7 +573,7 @@ public class ConceptVersion implements ConceptVersionBI {
             synonymOrder.add(ReferenceConcepts.ACCEPTABLE_ACCEPTABILITY.getNid());
             synonymOrder.add(ReferenceConcepts.SYNONYM.getNid());
         }
-       throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -586,88 +583,88 @@ public class ConceptVersion implements ConceptVersionBI {
 
     //TODO
     @Override
-    public boolean isMember(int collectionNid) throws IOException{
-    	boolean isMember = false;
-    	try{
-    	Collection<? extends RefexChronicleBI<?>> refexes =
-    		concept.getConceptAttributes().getCurrentRefexes(vc);
+    public boolean isMember(int collectionNid) throws IOException {
+        boolean isMember = false;
+        try {
+            Collection<? extends RefexChronicleBI<?>> refexes =
+                    concept.getConceptAttributes().getCurrentRefexes(vc);
 
-    	if (refexes != null) {
-    	for (RefexChronicleBI<?> refex : refexes) {
-    		if (refex.getCollectionNid() == collectionNid) {
-    			return true;
-    		}
-    	}
-    	}
-    	return isMember;
-    	}catch (Exception e) {
-    		throw new IOException(e); //AceLog.getAppLog().alertAndLogException(e);
+            if (refexes != null) {
+                for (RefexChronicleBI<?> refex : refexes) {
+                    if (refex.getCollectionNid() == collectionNid) {
+                        return true;
+                    }
+                }
+            }
+            return isMember;
+        } catch (Exception e) {
+            throw new IOException(e); //AceLog.getAppLog().alertAndLogException(e);
         }
 
     }
 
     @Override
-    public boolean hasHistoricalRels () throws IOException, ContraditionException {
-    	boolean history = false;
-    	ConceptSpec[] historicalTypes = HistoricalRelType.getHistoricalTypes();
-    	Collection<? extends RelationshipChronicleBI> outRels =  getRelsOutgoing();
-    	ViewCoordinate c = this.getViewCoordinate();
-    	I_TermFactory tf = Terms.get();
-    	if (outRels != null){
-    		for(ConceptSpec historicalType : historicalTypes){
-    			for(RelationshipChronicleBI outRel : outRels){
-					RelationshipVersionBI<?> vOutRel = outRel.getVersion(c);
-					int typeNid = vOutRel.getTypeNid();
-					UUID[] compUuids = historicalType.getUuids();
-					for (UUID compUuid: compUuids){
-						if (tf.nidToUuid(typeNid).compareTo(compUuid) == 0){
-							history = true;
-							}
-						}
-					}
-    			}
-    		}
-    	return history;
-    	}
-
-    @Override
-    public boolean hasChildren() throws IOException, ContraditionException{
-    	Collection<? extends RelationshipVersionBI> children = this.getRelsIncomingActive();
-    	if(children.size() == 0){
-    		return false;
-    	}
-
-    	return true;
+    public boolean hasHistoricalRels() throws IOException, ContraditionException {
+        boolean history = false;
+        ConceptSpec[] historicalTypes = HistoricalRelType.getHistoricalTypes();
+        Collection<? extends RelationshipChronicleBI> outRels = getRelsOutgoing();
+        ViewCoordinate c = this.getViewCoordinate();
+        I_TermFactory tf = Terms.get();
+        if (outRels != null) {
+            for (ConceptSpec historicalType : historicalTypes) {
+                for (RelationshipChronicleBI outRel : outRels) {
+                    RelationshipVersionBI<?> vOutRel = outRel.getVersion(c);
+                    int typeNid = vOutRel.getTypeNid();
+                    UUID[] compUuids = historicalType.getUuids();
+                    for (UUID compUuid : compUuids) {
+                        if (tf.nidToUuid(typeNid).compareTo(compUuid) == 0) {
+                            history = true;
+                        }
+                    }
+                }
+            }
+        }
+        return history;
     }
 
-	@Override
-	public Collection<? extends RefexChronicleBI<?>> getRefexes()
-			throws IOException {
-		return concept.getRefexes();
-	}
+    @Override
+    public boolean hasChildren() throws IOException, ContraditionException {
+        Collection<? extends RelationshipVersionBI> children = this.getRelsIncomingActive();
+        if (children.isEmpty()) {
+            return false;
+        }
 
-	@Override
-	public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
-			ViewCoordinate xyz) throws IOException {
-		return concept.getCurrentRefexes(xyz);
-	}
+        return true;
+    }
 
-	@Override
-	public boolean addAnnotation(RefexChronicleBI<?> annotation) throws IOException {
-		return concept.addAnnotation(annotation);
-	}
+    @Override
+    public Collection<? extends RefexChronicleBI<?>> getRefexes()
+            throws IOException {
+        return concept.getRefexes();
+    }
 
-	@Override
-	public Collection<? extends RefexChronicleBI<?>> getAnnotations()
-			throws IOException {
-		return concept.getAnnotations();
-	}
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
+            ViewCoordinate xyz) throws IOException {
+        return concept.getCurrentRefexes(xyz);
+    }
 
-	@Override
-	public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
-			ViewCoordinate xyz) throws IOException {
-		return concept.getCurrentAnnotations(xyz);
-	}
+    @Override
+    public boolean addAnnotation(RefexChronicleBI<?> annotation) throws IOException {
+        return concept.addAnnotation(annotation);
+    }
+
+    @Override
+    public Collection<? extends RefexChronicleBI<?>> getAnnotations()
+            throws IOException {
+        return concept.getAnnotations();
+    }
+
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
+            ViewCoordinate xyz) throws IOException {
+        return concept.getCurrentAnnotations(xyz);
+    }
 
     @Override
     public ConceptVersionBI getVersion(ViewCoordinate c) throws ContraditionException {
@@ -689,40 +686,39 @@ public class ConceptVersion implements ConceptVersionBI {
         return concept;
     }
 
-   @Override
-   public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers() throws IOException {
-      return concept.getCurrentRefsetMembers(vc);
-   }
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers() throws IOException {
+        return concept.getCurrentRefsetMembers(vc);
+    }
 
-   @Override
-   public Collection<? extends RefexChronicleBI<?>> getRefsetMembers() throws IOException {
-      return concept.getRefsetMembers();
-   }
+    @Override
+    public Collection<? extends RefexChronicleBI<?>> getRefsetMembers() throws IOException {
+        return concept.getRefsetMembers();
+    }
 
-   @Override
-   public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc) throws IOException {
-      return concept.getCurrentRefsetMembers(vc);
-   }
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc) throws IOException {
+        return concept.getCurrentRefsetMembers(vc);
+    }
 
-   @Override
-   public Set<Integer> getAllSapNids() throws IOException {
-      return concept.getAllSapNids();
-   }
+    @Override
+    public Set<Integer> getAllSapNids() throws IOException {
+        return concept.getAllSapNids();
+    }
 
+    @Override
+    public void cancel() throws IOException {
+        concept.cancel();
+    }
 
-   @Override
-   public void cancel() throws IOException {
-      concept.cancel();
-   }
+    @Override
+    public void commit(ChangeSetGenerationPolicy changeSetPolicy, ChangeSetGenerationThreadingPolicy changeSetWriterThreading) throws IOException {
+        concept.commit(changeSetPolicy, changeSetWriterThreading);
+    }
 
-   @Override
-   public void commit(ChangeSetGenerationPolicy changeSetPolicy, ChangeSetGenerationThreadingPolicy changeSetWriterThreading) throws IOException {
-      concept.commit(changeSetPolicy, changeSetWriterThreading);
-   }
-
-   public void commit(ChangeSetPolicy changeSetPolicy, ChangeSetWriterThreading changeSetWriterThreading) throws IOException {
-      concept.commit(changeSetPolicy, changeSetWriterThreading);
-   }
+    public void commit(ChangeSetPolicy changeSetPolicy, ChangeSetWriterThreading changeSetWriterThreading) throws IOException {
+        concept.commit(changeSetPolicy, changeSetWriterThreading);
+    }
 
     @Override
     public void setAnnotationStyleRefex(boolean annotationStyleRefset) {
@@ -754,5 +750,8 @@ public class ConceptVersion implements ConceptVersionBI {
         return concept.getUUIDs();
     }
 
- }
-
+    @Override
+    public PositionBI getPosition() throws IOException {
+        throw new UnsupportedOperationException();
+    }
+}

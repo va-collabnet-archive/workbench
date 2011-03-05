@@ -63,6 +63,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.types.Position;
 import org.ihtsdo.arena.ScrollablePanel;
 import org.ihtsdo.arena.context.action.DropActionPanel;
 import org.ihtsdo.arena.drools.EditPanelKb;
@@ -88,7 +89,8 @@ import org.ihtsdo.tk.spec.SpecFactory;
 import org.ihtsdo.util.swing.GuiUtil;
 
 public class ConceptView extends JPanel {
-   private final ConceptViewRenderer cvRenderer;
+
+    private final ConceptViewRenderer cvRenderer;
 
     private void setupPrefMap() {
         prefMap.put(PanelSection.CONCEPT, new CollapsePanelPrefs());
@@ -166,7 +168,7 @@ public class ConceptView extends JPanel {
                         add(cpe, gbc);
                         gbc.gridy++;
                         I_TermFactory tf = Terms.get();
-                        ConAttrAnalogBI cav = 
+                        ConAttrAnalogBI cav =
                                 (ConAttrAnalogBI) cv.getConAttrsActive();
                         DragPanelConceptAttributes cac = getConAttrComponent(
                                 (ConAttrAnalogBI) cav, cpe);
@@ -313,52 +315,52 @@ public class ConceptView extends JPanel {
             }
             GuiUtil.tickle(ConceptView.this);
             if (settings.getNavigator() != null) {
-               settings.getNavigator().updateHistoryPanel();
+                settings.getNavigator().updateHistoryPanel();
             }
         }
 
-      private void setupHistoryPane() throws IOException, ContraditionException {
-         int row = 0;
-         cvRenderer.getHistoryPanel().removeAll();
-         cvRenderer.getHistoryPanel().setLayout(new GridBagLayout());
-         GridBagConstraints gbc = new GridBagConstraints();
-         gbc.weightx = 1;
-         gbc.weighty = 0;
-         gbc.anchor = GridBagConstraints.NORTHWEST;
-         gbc.fill = GridBagConstraints.BOTH;
-         gbc.gridheight = 1;
-         gbc.gridwidth = 1;
-         gbc.gridx = 1;
-         gbc.gridy = 0;
-         pathRowMap = new HashMap<PathBI, Integer>();
-         for (PathBI path : paths) {
-            pathRowMap.put(path, row);
-            row++;
-            ConceptVersionBI pathVersion =
-                    Ts.get().getConceptVersion(coordinate, path.getConceptNid());
-            JCheckBox pathCheck = getJCheckBox();
+        private void setupHistoryPane() throws IOException, ContraditionException {
+            int row = 0;
+            cvRenderer.getHistoryPanel().removeAll();
+            cvRenderer.getHistoryPanel().setLayout(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.weightx = 1;
+            gbc.weighty = 0;
+            gbc.anchor = GridBagConstraints.NORTHWEST;
+            gbc.fill = GridBagConstraints.BOTH;
+            gbc.gridheight = 1;
+            gbc.gridwidth = 1;
+            gbc.gridx = 1;
+            gbc.gridy = 0;
+            pathRowMap = new HashMap<PathBI, Integer>();
+            for (PathBI path : paths) {
+                pathRowMap.put(path, row);
+                row++;
+                ConceptVersionBI pathVersion =
+                        Ts.get().getConceptVersion(coordinate, path.getConceptNid());
+                JCheckBox pathCheck = getJCheckBox();
 
 
-            if (settings.getNavigator().getDropSide()
-                    == ConceptViewSettings.SIDE.LEFT) {
-               gbc.anchor = GridBagConstraints.NORTHWEST;
-               pathCheck.setHorizontalTextPosition(SwingConstants.RIGHT);
-               pathCheck.setHorizontalAlignment(SwingConstants.LEFT);
-            } else {
-               gbc.anchor = GridBagConstraints.NORTHEAST;
-               pathCheck.setHorizontalTextPosition(SwingConstants.LEFT);
-               pathCheck.setHorizontalAlignment(SwingConstants.RIGHT);
+                if (settings.getNavigator().getDropSide()
+                        == ConceptViewSettings.SIDE.LEFT) {
+                    gbc.anchor = GridBagConstraints.NORTHWEST;
+                    pathCheck.setHorizontalTextPosition(SwingConstants.RIGHT);
+                    pathCheck.setHorizontalAlignment(SwingConstants.LEFT);
+                } else {
+                    gbc.anchor = GridBagConstraints.NORTHEAST;
+                    pathCheck.setHorizontalTextPosition(SwingConstants.LEFT);
+                    pathCheck.setHorizontalAlignment(SwingConstants.RIGHT);
+                }
+
+                pathCheck.setText(pathVersion.getPreferredDescription().getText());
+                historyComponents.add(pathCheck);
+                pathCheck.setVisible(ConceptView.this.historyShown);
+                cvRenderer.getHistoryPanel().add(pathCheck, gbc);
+                gbc.gridy++;
             }
-
-            pathCheck.setText(pathVersion.getPreferredDescription().getText());
-            historyComponents.add(pathCheck);
-            pathCheck.setVisible(ConceptView.this.historyShown);
-            cvRenderer.getHistoryPanel().add(pathCheck, gbc);
-            gbc.gridy++;
-         }
-      }
-   }
-       private Object lastThingBeingDropped;
+        }
+    }
+    private Object lastThingBeingDropped;
 
     public void setupDrop(Object thingBeingDropped) {
 
@@ -527,7 +529,7 @@ public class ConceptView extends JPanel {
     }
 
     private class UpdateTextTemplateDocumentListener
-    implements DocumentListener, ActionListener {
+            implements DocumentListener, ActionListener {
 
         FixedWidthJEditorPane editorPane;
         DescriptionSpec desc;
@@ -603,6 +605,9 @@ public class ConceptView extends JPanel {
     private Collection<JComponent> historyComponents =
             Collections.synchronizedList(new ArrayList<JComponent>());
     private boolean historyShown = false;
+    private Map<PositionBI, 
+                Collection<? extends ComponentVersionDragPanel<?>>> positionPanelMap =
+                new HashMap<PositionBI, Collection<? extends ComponentVersionDragPanel<?>>>();
 
     public ConceptView(I_ConfigAceFrame config,
             ConceptViewSettings settings, ConceptViewRenderer cvRenderer) {
@@ -614,6 +619,19 @@ public class ConceptView extends JPanel {
         addCommitListener(settings);
         setupPrefMap();
     }
+
+    
+    public Map<PositionBI, Collection<? extends ComponentVersionDragPanel<?>>> getPositionPanelMap() {
+        return positionPanelMap;
+    }
+    
+    private void addToPositionPanelMap(ComponentVersionDragPanel<?> panel) {
+        ComponentVersionBI cv = panel.getComponentVersion();
+        PositionBI position = new Position(WIDTH, null);
+        cv.getPathNid();
+        cv.getTime();
+    }
+
 
     public void addHostListener(PropertyChangeListener l) {
         if (settings != null && settings.getHost() != null) {
@@ -824,17 +842,17 @@ public class ConceptView extends JPanel {
         destLabel.addPropertyChangeListener("termComponent",
                 new PropertyChangeListener() {
 
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                try {
-                    spec.setDestinationSpec(SpecFactory.get(
-                            (I_GetConceptData) evt.getNewValue(),
-                            config.getViewCoordinate()));
-                } catch (IOException ex) {
-                    Logger.getLogger(ConceptView.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        });
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        try {
+                            spec.setDestinationSpec(SpecFactory.get(
+                                    (I_GetConceptData) evt.getNewValue(),
+                                    config.getViewCoordinate()));
+                        } catch (IOException ex) {
+                            Logger.getLogger(ConceptView.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                });
         return relPanel;
     }
 
@@ -870,23 +888,23 @@ public class ConceptView extends JPanel {
         typeLabel.addPropertyChangeListener("termComponent",
                 new PropertyChangeManager<RelationshipAnalogBI>((RelationshipAnalogBI) r) {
 
-            @Override
-            protected void changeProperty(I_GetConceptData newValue) {
-                try {
-                    getComponent().setTypeNid(newValue.getNid());
-                    if (getComponent().isUncommitted()) {
-                        Terms.get().addUncommitted(Terms.get().getConcept(
-                                getComponent().getOriginNid()));
+                    @Override
+                    protected void changeProperty(I_GetConceptData newValue) {
+                        try {
+                            getComponent().setTypeNid(newValue.getNid());
+                            if (getComponent().isUncommitted()) {
+                                Terms.get().addUncommitted(Terms.get().getConcept(
+                                        getComponent().getOriginNid()));
+                            }
+                        } catch (PropertyVetoException e) {
+                            AceLog.getAppLog().alertAndLogException(e);
+                        } catch (TerminologyException e) {
+                            AceLog.getAppLog().alertAndLogException(e);
+                        } catch (IOException e) {
+                            AceLog.getAppLog().alertAndLogException(e);
+                        }
                     }
-                } catch (PropertyVetoException e) {
-                    AceLog.getAppLog().alertAndLogException(e);
-                } catch (TerminologyException e) {
-                    AceLog.getAppLog().alertAndLogException(e);
-                } catch (IOException e) {
-                    AceLog.getAppLog().alertAndLogException(e);
-                }
-            }
-        });
+                });
         relPanel.add(typeLabel, gbc);
         gbc.gridx++;
         relPanel.add(new JSeparator(SwingConstants.VERTICAL), gbc);
@@ -896,23 +914,23 @@ public class ConceptView extends JPanel {
         typeLabel.addPropertyChangeListener("termComponent",
                 new PropertyChangeManager<RelationshipAnalogBI>((RelationshipAnalogBI) r) {
 
-            @Override
-            protected void changeProperty(I_GetConceptData newValue) {
-                try {
-                    getComponent().setDestinationNid(newValue.getNid());
-                    if (getComponent().isUncommitted()) {
-                        Terms.get().addUncommitted(Terms.get().getConcept(
-                                getComponent().getOriginNid()));
+                    @Override
+                    protected void changeProperty(I_GetConceptData newValue) {
+                        try {
+                            getComponent().setDestinationNid(newValue.getNid());
+                            if (getComponent().isUncommitted()) {
+                                Terms.get().addUncommitted(Terms.get().getConcept(
+                                        getComponent().getOriginNid()));
+                            }
+                        } catch (PropertyVetoException e) {
+                            AceLog.getAppLog().alertAndLogException(e);
+                        } catch (TerminologyException e) {
+                            AceLog.getAppLog().alertAndLogException(e);
+                        } catch (IOException e) {
+                            AceLog.getAppLog().alertAndLogException(e);
+                        }
                     }
-                } catch (PropertyVetoException e) {
-                    AceLog.getAppLog().alertAndLogException(e);
-                } catch (TerminologyException e) {
-                    AceLog.getAppLog().alertAndLogException(e);
-                } catch (IOException e) {
-                    AceLog.getAppLog().alertAndLogException(e);
-                }
-            }
-        });
+                });
         relPanel.add(destLabel, gbc);
         return relPanel;
     }
@@ -924,14 +942,12 @@ public class ConceptView extends JPanel {
         return l;
     }
 
-
-   JCheckBox getJCheckBox() {
-      JCheckBox check = new JCheckBox();
+    JCheckBox getJCheckBox() {
+        JCheckBox check = new JCheckBox();
         check.setFont(check.getFont().deriveFont(settings.getFontSize()));
         check.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
         return check;
-   }
-
+    }
 
     private TermComponentLabel getLabel(int nid, boolean canDrop)
             throws TerminologyException, IOException {
@@ -999,30 +1015,29 @@ public class ConceptView extends JPanel {
         return pathRowMap;
     }
 
-   public TreeSet<PositionBI> getPositionOrderedSet() {
+    public TreeSet<PositionBI> getPositionOrderedSet() {
 
-      TreeSet positionSet = new TreeSet(new PositionComparator());
-      if (positionOrderedSet != null){
-    	  positionSet.addAll(positionOrderedSet);
-      }
-      return positionSet;
-   }
+        TreeSet positionSet = new TreeSet(new PositionComparator());
+        if (positionOrderedSet != null) {
+            positionSet.addAll(positionOrderedSet);
+        }
+        return positionSet;
+    }
 
-   static class PositionComparator implements Comparator<PositionBI> {
+    static class PositionComparator implements Comparator<PositionBI> {
 
-      public PositionComparator() {
-      }
+        public PositionComparator() {
+        }
 
-      @Override
-      public int compare(PositionBI t, PositionBI t1) {
-         if (t.getTime() != t1.getTime()) {
-            if (t.getTime() > t1.getTime()) {
-               return 1;
+        @Override
+        public int compare(PositionBI t, PositionBI t1) {
+            if (t.getTime() != t1.getTime()) {
+                if (t.getTime() > t1.getTime()) {
+                    return 1;
+                }
+                return -1;
             }
-            return -1;
-         }
-         return t.getPath().getConceptNid() - t1.getPath().getConceptNid();
-      }
-   }
-
+            return t.getPath().getConceptNid() - t1.getPath().getConceptNid();
+        }
+    }
 }

@@ -60,8 +60,10 @@ import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierUuid;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concept.component.refset.RefsetMemberFactory;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
@@ -432,7 +434,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       @Deprecated
       public int getPathId() {
          if (index >= 0) {
-            return getMutablePart().getPathId();
+            return getMutablePart().getPathNid();
          }
          return Bdb.getSapDb().getPathNid(primordialSapNid);
       }
@@ -449,7 +451,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       @Deprecated
       public int getStatusId() {
          if (index >= 0) {
-            return getMutablePart().getStatusId();
+            return getMutablePart().getStatusNid();
          }
          return Bdb.getSapDb().getStatusNid(primordialSapNid);
       }
@@ -519,9 +521,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       @Deprecated
       public void setPathId(int pathId) {
          if (index >= 0) {
-            revisions.get(index).setPathId(pathId);
+            revisions.get(index).setPathNid(pathId);
          } else {
-            ConceptComponent.this.setPathId(pathId);
+            ConceptComponent.this.setPathNid(pathId);
          }
       }
 
@@ -546,6 +548,15 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             revisions.get(index).setStatusNid(statusNid);
          } else {
             ConceptComponent.this.setStatusNid(statusNid);
+         }
+      }
+
+      @Override
+      public PositionBI getPosition() throws IOException {
+         if (index >= 0) {
+            return revisions.get(index).getPosition();
+         } else {
+            return ConceptComponent.this.getPosition();
          }
       }
 
@@ -1974,4 +1985,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       }
       return Collections.unmodifiableCollection(returnValues);
    }
+
+    @Override
+    public PositionBI getPosition() throws IOException {
+      return new Position(getTime(), Ts.get().getPath(getPathNid()));
+    }
+   
+   
 }
