@@ -1799,4 +1799,11 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
       data.cancel();
       BdbCommitManager.fireCancel();
    }
+
+    @Override
+    public Set<PositionBI> getPositions() throws IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+   
+   
 }

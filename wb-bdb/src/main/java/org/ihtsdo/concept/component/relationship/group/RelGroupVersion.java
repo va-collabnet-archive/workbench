@@ -203,4 +203,9 @@ public class RelGroupVersion
         return new Position(getTime(), Ts.get().getPath(getPathNid()));
     }
 
+    @Override
+    public Set<PositionBI> getPositions() throws IOException {
+        return rg.getPositions();
+    }
+
 }

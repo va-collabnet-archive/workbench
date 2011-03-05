@@ -380,6 +380,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
+        public Set getPositions() throws IOException {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
     }
 
 
@@ -788,6 +793,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         @Override
         public PositionBI getPosition() throws IOException {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public Set getPositions() throws IOException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 

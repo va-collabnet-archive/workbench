@@ -13,6 +13,7 @@ import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -139,5 +140,14 @@ public class RelGroupChronicle implements RelGroupChronicleBI {
             sapNids.addAll(r.getAllSapNids());
         }
         return sapNids;
+    }
+
+    @Override
+    public Set<PositionBI> getPositions() throws IOException {
+        Set<PositionBI> positions = new HashSet<PositionBI>();
+        for (RelationshipChronicleBI rc : rels) {
+            positions.addAll(rc.getPositions());
+        }
+        return positions;
     }
 }

@@ -348,14 +348,17 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
         return getTime() == Long.MAX_VALUE;
     }
 
+    @Override
     public Collection<? extends RefexChronicleBI<?>> getAnnotations() {
         return primordialComponent.getAnnotations();
     }
 
+    @Override
     public boolean addAnnotation(@SuppressWarnings("rawtypes") RefexChronicleBI annotation) {
         return primordialComponent.addAnnotation(annotation);
     }
 
+    @Override
     public final void setNid(int nid) throws PropertyVetoException {
         throw new PropertyVetoException("nid", null);
     }
@@ -385,5 +388,9 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     @Override
     public PositionBI getPosition() throws IOException {
         return new Position(getTime(), Ts.get().getPath(getPathNid()));
+    }
+    
+    public Set<PositionBI> getPositions() throws IOException { 
+        return primordialComponent.getPositions();
     }
 }

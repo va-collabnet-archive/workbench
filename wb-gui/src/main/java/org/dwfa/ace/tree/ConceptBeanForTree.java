@@ -72,6 +72,10 @@ import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<ConceptBeanForTree> {
     I_GetConceptData bean;
 
+    public Set<PositionBI> getPositions() throws IOException {
+        return bean.getPositions();
+    }
+
    public Set<Integer> getAllSapNids() throws IOException {
       return bean.getAllSapNids();
    }

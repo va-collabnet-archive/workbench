@@ -754,4 +754,11 @@ public class ConceptVersion implements ConceptVersionBI {
     public PositionBI getPosition() throws IOException {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public Set<PositionBI> getPositions() throws IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    
 }
