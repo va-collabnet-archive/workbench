@@ -235,6 +235,6 @@
       <module>tk-qa-ws-client</module>
       <module>rule-engine-integration</module>
       <module>tk-spelling-variants</module>
-      <module>bdb-properties</module>
+ <!--     <module>bdb-properties</module> -->
    </modules>
 </project>
