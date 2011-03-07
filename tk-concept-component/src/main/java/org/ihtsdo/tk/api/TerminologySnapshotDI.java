@@ -11,15 +11,19 @@ import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 
 public interface TerminologySnapshotDI extends TerminologyTransactionDI {
 
-	ComponentVersionBI getComponentVersion(int nid) throws IOException, ContraditionException;
-	ComponentVersionBI getComponentVersion(UUID... uuids) throws IOException, ContraditionException;
-	ComponentVersionBI getComponentVersion(Collection<UUID> uuids) throws IOException, ContraditionException;
-	
-	ConceptVersionBI getConceptVersion(int cNid) throws IOException;
-	ConceptVersionBI getConceptVersion(UUID... uuids) throws IOException;
-	ConceptVersionBI getConceptVersion(Collection<UUID> uuids) throws IOException;
+    ComponentVersionBI getComponentVersion(int nid) throws IOException, ContraditionException;
+
+    ComponentVersionBI getComponentVersion(UUID... uuids) throws IOException, ContraditionException;
+
+    ComponentVersionBI getComponentVersion(Collection<UUID> uuids) throws IOException, ContraditionException;
+
+    ConceptVersionBI getConceptVersion(int cNid) throws IOException;
+
+    ConceptVersionBI getConceptVersion(UUID... uuids) throws IOException;
+
+    ConceptVersionBI getConceptVersion(Collection<UUID> uuids) throws IOException;
+
     Map<Integer, ConceptVersionBI> getConceptVersions(NidBitSetBI cNids) throws IOException;
 
-	TerminologyAmendmentBI getAmender(EditCoordinate ec);
-
+    TerminologyAmendmentBI getAmender(EditCoordinate ec);
 }
