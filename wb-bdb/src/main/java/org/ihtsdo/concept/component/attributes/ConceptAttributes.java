@@ -42,6 +42,7 @@ import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import org.ihtsdo.tk.api.ComponentChroncileBI;
 
 public class ConceptAttributes
         extends ConceptComponent<ConceptAttributesRevision, ConceptAttributes>
@@ -73,8 +74,8 @@ public class ConceptAttributes
     public class Version
             extends ConceptComponent<ConceptAttributesRevision, ConceptAttributes>.Version
             implements I_ConceptAttributeTuple<ConceptAttributesRevision>,
-            I_ConceptAttributePart<ConceptAttributesRevision>, 
-            ConAttrAnalogBI<ConceptAttributesRevision>{
+            I_ConceptAttributePart<ConceptAttributesRevision>,
+            ConAttrAnalogBI<ConceptAttributesRevision> {
 
         public Version() {
             super();
@@ -592,4 +593,5 @@ public class ConceptAttributes
         }
         return buf.toString();
     }
+
 }

@@ -35,10 +35,9 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 public class ConceptSpec implements SpecBI {
 
     /**
-	 * 
-	 */
+     * 
+     */
     private static final long serialVersionUID = 1L;
-
     private static final int dataVersion = 1;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -59,11 +58,8 @@ public class ConceptSpec implements SpecBI {
         }
 
     }
-
     private UUID[] uuids;
-
     private String description;
-
     private RelSpec[] relSpecs;
 
     /**
@@ -74,7 +70,7 @@ public class ConceptSpec implements SpecBI {
     }
 
     public ConceptSpec(String description, String uuid) {
-        this(description, uuid, new RelSpec[] {});
+        this(description, uuid, new RelSpec[]{});
     }
 
     public ConceptSpec(String description, String uuid, RelSpec... relSpecs) {
@@ -82,11 +78,11 @@ public class ConceptSpec implements SpecBI {
     }
 
     public ConceptSpec(String description, UUID uuid) {
-        this(description, new UUID[] { uuid }, new RelSpec[] {});
+        this(description, new UUID[]{uuid}, new RelSpec[]{});
     }
 
     public ConceptSpec(String description, UUID uuid, RelSpec... relSpecs) {
-        this(description, new UUID[] { uuid }, relSpecs);
+        this(description, new UUID[]{uuid}, relSpecs);
     }
 
     public ConceptSpec(String description, UUID[] uuids, RelSpec... relSpecs) {
@@ -95,15 +91,15 @@ public class ConceptSpec implements SpecBI {
         this.relSpecs = relSpecs;
     }
 
-    public ConceptVersionBI get(ViewCoordinate c) throws IOException  {
-            try {
-				ConceptVersionBI local = Ts.get().getConceptVersion(c, uuids);
-				validateDescription(local, c);
-				validateRelationships(local, c);
-				return local;
-			} catch (ContraditionException e) {
-				throw new ValidationException(e);
-			}
+    public ConceptVersionBI get(ViewCoordinate c) throws IOException {
+        try {
+            ConceptVersionBI local = Ts.get().getConceptVersion(c, uuids);
+            validateDescription(local, c);
+            validateRelationships(local, c);
+            return local;
+        } catch (ContraditionException e) {
+            throw new ValidationException(e);
+        }
     }
 
     private boolean validateRelationships(ConceptVersionBI local, ViewCoordinate c) throws IOException {
@@ -112,12 +108,12 @@ public class ConceptSpec implements SpecBI {
         }
 
         for (RelSpec relSpec : relSpecs) {
-        	ConceptVersionBI relType = relSpec.getRelTypeSpec().get(c);
-        	ConceptVersionBI destination = relSpec.getDestinationSpec().get(c);
+            ConceptVersionBI relType = relSpec.getRelTypeSpec().get(c);
+            ConceptVersionBI destination = relSpec.getDestinationSpec().get(c);
             List<ConceptVersionBI> destinationsOfType = new ArrayList<ConceptVersionBI>();
             NidSetBI typeNids = new NidSet();
             typeNids.add(relType.getNid());
-            
+
             for (ConceptVersionBI dest : local.getRelsOutgoingDestinations(typeNids)) {
                 destinationsOfType.add(dest);
                 if (dest.equals(destination)) {
@@ -181,7 +177,7 @@ public class ConceptSpec implements SpecBI {
     public void setUuids(UUID[] uuids) {
         this.uuids = uuids;
     }
-    
+
     public void setUuidStrs(String[] uuidStrs) {
         this.uuids = new UUID[uuidStrs.length];
         for (int i = 0; i < uuidStrs.length; i++) {
@@ -215,9 +211,7 @@ public class ConceptSpec implements SpecBI {
 
     @Override
     public String toString() {
-        return "ConceptSpec{" + description + "; " + Arrays.asList(uuids) +
-                "}";
+        return "ConceptSpec{" + description + "; " + Arrays.asList(uuids)
+                + "}";
     }
-    
-    
 }

@@ -1,33 +1,29 @@
 package org.ihtsdo.arena.conceptview;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeSet;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.ihtsdo.arena.conceptview.ConceptViewSettings.SIDE;
-import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.PositionBI;
 
 public class ConceptNavigator extends JPanel {
 
@@ -35,7 +31,13 @@ public class ConceptNavigator extends JPanel {
 
         @Override
         public void propertyChange(PropertyChangeEvent pce) {
-            updateHistoryPanel();
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    updateHistoryPanel();
+                }
+            });
         }
     }
 
@@ -55,12 +57,19 @@ public class ConceptNavigator extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            updateHistoryPanel();
+            view.setHistoryShown(true);
+
             treeScroller.setVisible(false);
             focusDrop.setVisible(false);
             historyScroller.setVisible(true);
-            view.setHistoryShown(true);
             statedInferredScroller.setVisible(false);
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    updateHistoryPanel();
+                }
+            });
         }
     }
 
@@ -106,8 +115,11 @@ public class ConceptNavigator extends JPanel {
     }
 
     protected void updateHistoryPanel() {
-        JPanel historyPanel = HistoryPanel.setupHistoryPanel(view);
-        historyScroller.setViewportView(historyPanel);
+        try {
+            HistoryPanel.setupHistoryPanel(view, historyScroller);
+        } catch (IOException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
     }
 
     public void setDropSide(SIDE side) {

@@ -14,6 +14,8 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
@@ -64,41 +66,48 @@ import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concept.component.refset.RefsetMemberFactory;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>> implements
-        I_AmTermComponent, I_AmPart<R>, I_AmTuple<R>, I_Identify, I_IdPart, I_IdVersion, I_HandleFutureStatusAtPositionSetup {
+        I_AmTermComponent, I_AmPart<R>, 
+        I_AmTuple<R>, I_Identify, I_IdPart, 
+        I_IdVersion, I_HandleFutureStatusAtPositionSetup {
 
-    public static void addTextToBuffer(StringBuffer buf, int nidToConvert) {
+    public static void addTextToBuffer(Appendable buf, int nidToConvert) {
         try {
             if (nidToConvert != 0 && Terms.get().hasConcept(nidToConvert)) {
-                buf.append(Terms.get().getConcept(nidToConvert).getInitialText());
+                buf.append(Ts.get().getConcept(nidToConvert).toString());
             } else {
-                buf.append(nidToConvert);
+                buf.append(Integer.toString(nidToConvert));
             }
         } catch (IOException e) {
-            buf.append(e.getLocalizedMessage());
-        } catch (TerminologyException e) {
-            buf.append(e.getLocalizedMessage());
+            try {
+                buf.append(e.getLocalizedMessage());
+            } catch (IOException ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
         }
     }
 
-    public static void addNidToBuffer(StringBuffer buf, int nidToConvert) {
+    public static void addNidToBuffer(Appendable buf, int nidToConvert) {
         try {
             if (nidToConvert != 0 && Terms.get().hasConcept(nidToConvert)) {
                 buf.append("\"");
-                buf.append(Terms.get().getConcept(nidToConvert).getInitialText());
+                buf.append(Ts.get().getConcept(nidToConvert).toString());
                 buf.append("\" [");
-                buf.append(nidToConvert);
+                buf.append(Integer.toString(nidToConvert));
                 buf.append("]");
             } else {
-                buf.append(nidToConvert);
+                buf.append(Integer.toString(nidToConvert));
             }
         } catch (IOException e) {
-            buf.append(e.getLocalizedMessage());
-        } catch (TerminologyException e) {
-            buf.append(e.getLocalizedMessage());
+            try {
+                buf.append(e.getLocalizedMessage());
+            } catch (IOException ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
         }
     }
 
@@ -229,10 +238,16 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     };
 
     public abstract class Version
-            implements I_AmTuple<R>, I_Identify {
+            implements I_AmTuple<R>, I_Identify, ComponentVersionBI {
 
         protected int index = -1;
         private boolean dup = false;
+
+
+        @Override
+        public ComponentChroncileBI getChronicle() {
+            return ConceptComponent.this.getChronicle();
+        }
 
         public Set<Integer> getAllSapNids() throws IOException {
             return ConceptComponent.this.getAllSapNids();
@@ -2004,4 +2019,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
         return positions;
     }
+    
+    @Override
+    public ComponentChroncileBI getChronicle() {
+        return (ComponentChroncileBI) this;
+    }
+
 }

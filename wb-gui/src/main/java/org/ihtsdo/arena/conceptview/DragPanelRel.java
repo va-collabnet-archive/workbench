@@ -9,53 +9,51 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 public class DragPanelRel extends ComponentVersionDragPanel<RelationshipVersionBI> {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
-	
-	public DragPanelRel(ConceptViewSettings settings,
-           CollapsePanel parentCollapsePanel, RelationshipVersionBI rel) {
-		super(settings, parentCollapsePanel, rel);
-	}
+    public DragPanelRel(ConceptViewSettings settings,
+            CollapsePanel parentCollapsePanel, RelationshipVersionBI rel) {
+        super(settings, parentCollapsePanel, rel);
+    }
 
-	public DragPanelRel(LayoutManager layout, ConceptViewSettings settings,
-           CollapsePanel parentCollapsePanel, RelationshipVersionBI rel) {
-		super(layout, settings, parentCollapsePanel, rel);
-	}
+    public DragPanelRel(LayoutManager layout, ConceptViewSettings settings,
+            CollapsePanel parentCollapsePanel, RelationshipVersionBI rel) {
+        super(layout, settings, parentCollapsePanel, rel);
+    }
 
-	@Override
-	public DataFlavor[] getTransferDataFlavors() {
-		return new DataFlavor[] { DragPanelDataFlavors.relVersionFlavor };
-	}
-	
-	@Override
-	public DataFlavor getNativeDataFlavor() {
-		return DragPanelDataFlavors.relVersionFlavor ;
-	}
+    @Override
+    public DataFlavor[] getTransferDataFlavors() {
+        return new DataFlavor[]{DragPanelDataFlavors.relVersionFlavor};
+    }
 
-	@Override
-	public boolean isDataFlavorSupported(DataFlavor flavor) {
-		return false;
-	}
+    @Override
+    public DataFlavor getNativeDataFlavor() {
+        return DragPanelDataFlavors.relVersionFlavor;
+    }
 
-	@Override
-	protected int getTransferMode() {
-		return TransferHandler.COPY;
-	}
+    @Override
+    public boolean isDataFlavorSupported(DataFlavor flavor) {
+        return false;
+    }
 
-   @Override
-	public RelationshipVersionBI getThingToDrag() {
-		return thingToDrag;
-	}
+    @Override
+    protected int getTransferMode() {
+        return TransferHandler.COPY;
+    }
 
-	public RelationshipVersionBI getDraggedThing() {
-		return thingToDrag;
-	}
-	
+    @Override
+    public RelationshipVersionBI getThingToDrag() {
+        return thingToDrag;
+    }
 
-	public void setDraggedThing(RelationshipVersionBI rel) {
-		// TODO handle drop.
-	}
+    public RelationshipVersionBI getDraggedThing() {
+        return thingToDrag;
+    }
+
+    public void setDraggedThing(RelationshipVersionBI rel) {
+        // TODO handle drop.
+    }
 }

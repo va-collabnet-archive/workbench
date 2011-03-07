@@ -137,10 +137,12 @@ public class Description
             // TODO Auto-generated method stub
         }
 
+        @Override
         public int getTypeId() {
             return getTypeNid();
         }
 
+        @Override
         public int getTypeNid() {
             if (index >= 0) {
                 return revisions.get(index).getTypeNid();
@@ -148,6 +150,7 @@ public class Description
             return Description.this.typeNid;
         }
 
+        @Override
         public List<? extends Version> getVersions() {
             return Description.this.getVersions();
         }
@@ -171,6 +174,7 @@ public class Description
             }
         }
 
+        @Override
         public ArrayIntList getVariableVersionNids() {
             if (index >= 0) {
                 ArrayIntList resultList = new ArrayIntList(3);
@@ -279,14 +283,14 @@ public class Description
      */
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(this.getClass().getSimpleName() + ":{");
-        buf.append("cNid: " + this.enclosingConceptNid + " ");
-        buf.append("text: '" + this.getText() + "'");
-        buf.append(" caseSig: " + isInitialCaseSignificant());
+        StringBuilder buf = new StringBuilder();
+        buf.append(this.getClass().getSimpleName()).append(":{");
+        buf.append("cNid: ").append(this.enclosingConceptNid).append(" ");
+        buf.append("text: '").append(this.getText()).append("'");
+        buf.append(" caseSig: ").append(isInitialCaseSignificant());
         buf.append(" type:");
         ConceptComponent.addNidToBuffer(buf, typeNid);
-        buf.append(" lang:" + this.getLang());
+        buf.append(" lang:").append(this.getLang());
         buf.append(" ");
         buf.append(super.toString());
         return buf.toString();
@@ -294,10 +298,10 @@ public class Description
 
     @Override
     public String toUserString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         ConceptComponent.addTextToBuffer(buf, typeNid);
         buf.append(": ");
-        buf.append("'" + this.getText() + "'");
+        buf.append("'").append(this.getText()).append("'");
         return buf.toString();
     }
 

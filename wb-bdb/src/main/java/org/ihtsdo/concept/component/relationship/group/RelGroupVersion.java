@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ComponentChroncileBI;
 
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PositionBI;
@@ -206,6 +207,11 @@ public class RelGroupVersion
     @Override
     public Set<PositionBI> getPositions() throws IOException {
         return rg.getPositions();
+    }
+
+    @Override
+    public ComponentChroncileBI getChronicle() {
+        return rg;
     }
 
 }

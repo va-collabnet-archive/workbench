@@ -11,4 +11,6 @@ public interface ComponentVersionBI extends ComponentBI {
     long getTime();
     int getSapNid();
     PositionBI getPosition() throws IOException;
+    ComponentChroncileBI getChronicle();
+    
 }

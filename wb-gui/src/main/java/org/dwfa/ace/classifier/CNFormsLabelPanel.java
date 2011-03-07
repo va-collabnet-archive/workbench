@@ -67,6 +67,7 @@ import org.dwfa.ace.task.classify.SnoRel;
 import org.dwfa.ace.task.classify.SnoTable;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
+import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
@@ -382,6 +383,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         @Override
         public Set getPositions() throws IOException {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public ComponentChroncileBI getChronicle() {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
@@ -798,6 +804,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         @Override
         public Set getPositions() throws IOException {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public ComponentChroncileBI getChronicle() {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 

@@ -16,6 +16,7 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.AnalogBI;
+import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -393,4 +394,11 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     public Set<PositionBI> getPositions() throws IOException { 
         return primordialComponent.getPositions();
     }
+
+    @Override
+    public ComponentChroncileBI getChronicle() {
+        return (ComponentChroncileBI) primordialComponent;
+    }
+    
+    
 }

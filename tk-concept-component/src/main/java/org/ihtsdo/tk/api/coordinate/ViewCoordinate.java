@@ -1,13 +1,17 @@
 package org.ihtsdo.tk.api.coordinate;
 
+import java.io.IOException;
 import java.util.Arrays;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.hash.Hashcode;
 
 public class ViewCoordinate {
@@ -112,18 +116,30 @@ public class ViewCoordinate {
 
     @Override
     public String toString() {
+        TerminologySnapshotDI snap = Ts.get().getSnapshot(this);
         StringBuilder sb = new StringBuilder();
         sb.append("precedence: ").append(precedence);
         sb.append(" \npositions: ").append(positionSet);
         sb.append(" \nallowedStatus: ").append(allowedStatusNids);
         sb.append(" \nisaTypes: ").append(isaTypeNids);
         sb.append(" \ncontradiction: ").append(contradictionManager);
-        sb.append(" \nlanguage: ").append(languageNid);
-        sb.append(" \nclassifier: ").append(classifierNid);
+        getConceptText(sb.append(" \nlanguage: "), snap, languageNid);
+        getConceptText(sb.append(" \nclassifier: "), snap, classifierNid);
         sb.append(" \nrelAssertionType: ").append(relAssertionType);
 
         return sb.toString();
     }
+
+    private void getConceptText(StringBuilder sb, TerminologySnapshotDI snap, int nid) {
+        try {
+            sb.append(snap.getConceptVersion(nid).getPreferredDescription().getText());
+        } catch (IOException ex) {
+            sb.append(ex.getLocalizedMessage());
+        } catch (ContraditionException ex) {
+            sb.append(ex.getLocalizedMessage());
+        }
+    }
+
 
     @Override
     public boolean equals(Object o) {
