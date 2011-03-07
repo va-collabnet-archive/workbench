@@ -132,7 +132,12 @@ public class ViewCoordinate {
 
     private void getConceptText(StringBuilder sb, TerminologySnapshotDI snap, int nid) {
         try {
-            sb.append(snap.getConceptVersion(nid).getPreferredDescription().getText());
+            if (snap.getConceptVersion(nid) != null &&
+                    snap.getConceptVersion(nid).getPreferredDescription() != null) {
+                sb.append(snap.getConceptVersion(nid).getPreferredDescription().getText());
+            } else {
+                sb.append(Integer.toString(nid));
+            }
         } catch (IOException ex) {
             sb.append(ex.getLocalizedMessage());
         } catch (ContraditionException ex) {
