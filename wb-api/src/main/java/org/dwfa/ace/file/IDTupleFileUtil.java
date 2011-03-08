@@ -136,7 +136,7 @@ public class IDTupleFileUtil {
 
                     if (termFactory.hasConcept(versioned.getNid())) {
                         I_GetConceptData concept = termFactory.getConcept(versioned.getNid());
-                        termFactory.addUncommitted(concept);
+                        termFactory.addUncommittedNoChecks(concept);
                     }
                 }
             } else {

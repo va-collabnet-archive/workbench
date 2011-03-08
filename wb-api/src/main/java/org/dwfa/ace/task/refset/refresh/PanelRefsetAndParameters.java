@@ -162,7 +162,7 @@ public class PanelRefsetAndParameters extends JPanel {
 
         if (refsetParent == null) {
             editors = getAllUsers();
-            reviewers = new HashSet<Object>(getAllUsers());
+            reviewers = new TreeSet<Object>(getAllUsers());
         } else {
             editors = getValidEditors();
             reviewers = getValidReviewers();
@@ -347,20 +347,21 @@ public class PanelRefsetAndParameters extends JPanel {
         attachmentScroller.setBorder(BorderFactory.createTitledBorder("Attachments (optional):"));
         add(attachmentScroller, gbc);
 
-        // Using validate(), Tell the panel to lay out its subcomponents again. It should be invoked
-        // when this container's subcomponents are modified after the container has been displayed.
+        // Using validate(), Tell the panel to lay out its subcomponents again.
+        // It should be invoked
+        // when this container's subcomponents are modified after the container
+        // has been displayed.
         this.validate();
 
     }
 
-    private Set<? extends I_GetConceptData> getAllUsers() {
+    private TreeSet<? extends I_GetConceptData> getAllUsers() {
         try {
             // TODO replace with passed in config...
             I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-            I_GetConceptData userParent =
-                    Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
+            I_GetConceptData userParent = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
             I_IntSet allowedTypes = config.getDestRelTypes();
-            Set<I_GetConceptData> users = new TreeSet<I_GetConceptData>(new Comparator<Object>() {
+            TreeSet<I_GetConceptData> users = new TreeSet<I_GetConceptData>(new Comparator<Object>() {
 
                 @Override
                 public int compare(Object o1, Object o2) {

@@ -44,6 +44,8 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
      */
     private static final long serialVersionUID = 1L;
 
+    private I_ChangeTableInSwing tableChangedSwingWorker;
+
     public class TableChangedSwingWorker extends SwingWorker<Boolean> implements I_ChangeTableInSwing {
         Integer memberId;
 
@@ -56,6 +58,7 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
 
         @Override
         protected Boolean construct() throws Exception {
+
             if (refConWorker != null) {
                 refConWorker.stop();
             }
@@ -75,15 +78,14 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
             I_IntSet statusSet = host.getConfig().getAllowedStatus();
             Set<PositionBI> positionSet = host.getConfig().getViewPositionSet();
             if (positionSet == null || positionSet.size() == 0) {
-                AceLog.getAppLog().alertAndLogException(new Exception("View position set is empty: " + 
-                    positionSet));
+                AceLog.getAppLog().alertAndLogException(new Exception("View position set is empty: " + positionSet));
             }
             if (host.getShowHistory() == true) {
                 statusSet = null;
                 positionSet = null;
             }
-            for (I_ExtendByRefPart part : extension.getTuples(statusSet, new PositionSetReadOnly(positionSet),
-                    host.getConfig().getPrecedence(), host.getConfig().getConflictResolutionStrategy())) {
+            for (I_ExtendByRefPart part : extension.getTuples(statusSet, new PositionSetReadOnly(positionSet), host
+                .getConfig().getPrecedence(), host.getConfig().getConflictResolutionStrategy())) {
             	I_ExtendByRefVersion ebrTuple = (I_ExtendByRefVersion) part;
                 for (ReflexiveRefsetFieldData col : columns) {
                     if (col.getType() == REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER) {
@@ -117,8 +119,7 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
                             }
                             break;
                         default:
-                            throw new UnsupportedOperationException("Don't know how to handle: "
-                                + col.invokeOnObjectType);
+                            throw new UnsupportedOperationException("Don't know how to handle: " + col.invokeOnObjectType);
                         }
                     }
 
@@ -126,16 +127,19 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
                 if (stopWork) {
                     return false;
                 }
+
                 if (allTuples == null) {
                     AceLog.getAppLog().info("all tuples for RefsetMemberTableModel is  null");
                     return false;
                 }
                 allTuples.add(ebrTuple);
+
             }
 
             refConWorker = new ReferencedConceptsSwingWorker();
             refConWorker.start();
             return true;
+
         }
 
         @Override
@@ -178,13 +182,28 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
 
     @Override
     protected I_ChangeTableInSwing getTableChangedSwingWorker(int tableComponentId2, Integer promotionFilterId) {
-        return new TableChangedSwingWorker(tableComponentId2);
+        if (tableChangedSwingWorker == null) {
+            tableChangedSwingWorker = new TableChangedSwingWorker(tableComponentId2);
+        } else {
+            while (!tableChangedSwingWorker.isDone()) {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+    }
+            }
+            tableChangedSwingWorker = new TableChangedSwingWorker(tableComponentId2);
+        }
+        return tableChangedSwingWorker;
     }
 
     public void propertyChange(PropertyChangeEvent arg0) {
+
         if (tableChangeWorker != null) {
             tableChangeWorker.setStopWork(true);
         }
+
         allTuples = null;
         values = null;
         allExtensions = null;
@@ -204,6 +223,7 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
             AceLog.getAppLog().alertAndLogException(e);
         }
         fireTableDataChanged();
+
     }
 
     public int getRowCount() {
@@ -224,9 +244,8 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
     }
 
     @Override
-    protected Object getPromotionRefsetValue(I_ExtendByRef extension,
-            ReflexiveRefsetFieldData reflexiveRefsetFieldData) throws IOException, IllegalAccessException,
-            InvocationTargetException {
+    protected Object getPromotionRefsetValue(I_ExtendByRef extension, ReflexiveRefsetFieldData reflexiveRefsetFieldData)
+            throws IOException, IllegalAccessException, InvocationTargetException {
         throw new UnsupportedOperationException();
     }
 }

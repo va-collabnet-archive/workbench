@@ -30,16 +30,13 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery.GROUPING_TYPE;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.time.TimeUtil;
@@ -55,6 +52,8 @@ import org.ihtsdo.tk.api.Precedence;
  */
 public class RelationshipStatement extends RefsetSpecStatement {
 
+    private Collection<I_ShowActivity> activities;
+
     /**
      * Constructor for refset spec statement.
      * 
@@ -63,8 +62,8 @@ public class RelationshipStatement extends RefsetSpecStatement {
      * @param queryConstraint The destination concept (e.g. "paracetamol")
      * @throws Exception
      */
-    public RelationshipStatement(boolean useNotQualifier, I_GetConceptData queryToken,
-            I_AmTermComponent queryConstraint, int refsetSpecNid, I_ConfigAceFrame config) throws Exception {
+    public RelationshipStatement(boolean useNotQualifier, I_GetConceptData queryToken, I_AmTermComponent queryConstraint,
+            int refsetSpecNid, I_ConfigAceFrame config) throws Exception {
         super(useNotQualifier, queryToken, queryConstraint, refsetSpecNid, config);
         this.config = config;
         for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
@@ -87,164 +86,131 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
 		if (version != null || v1_is != null || v2_is != null) {
 			if (version == null)
-				throw new TerminologyException("Not in scope of V1 or V2: "
-						+ tokenEnum + " " + relTuple);
+                throw new TerminologyException("Not in scope of V1 or V2: " + tokenEnum + " " + relTuple);
 			if (v1_is == null)
-				throw new TerminologyException("Need to set V1 IS: "
-						+ tokenEnum + " " + relTuple);
+                throw new TerminologyException("Need to set V1 IS: " + tokenEnum + " " + relTuple);
 			if (v2_is == null)
-				throw new TerminologyException("Need to set V2 IS: "
-						+ tokenEnum + " " + relTuple);
+                throw new TerminologyException("Need to set V2 IS: " + tokenEnum + " " + relTuple);
 		}
         switch (tokenEnum) {
         case REL_IS:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relIs(relTuple);
         case REL_RESTRICTION_IS:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relRestrictionIs(relTuple);
         case REL_IS_MEMBER_OF:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relIsMemberOf(relTuple);
         case REL_STATUS_IS:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relStatusIs(relTuple);
         case REL_STATUS_IS_KIND_OF:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relStatusIsKindOf(relTuple);
         case REL_STATUS_IS_CHILD_OF:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relStatusIsChildOf(relTuple);
         case REL_STATUS_IS_DESCENDENT_OF:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relStatusIsDescendentOf(relTuple);
         case REL_TYPE_IS:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relTypeIs(relTuple);
         case REL_TYPE_IS_KIND_OF:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relTypeIsKindOf(relTuple);
         case REL_TYPE_IS_CHILD_OF:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relTypeIsChildOf(relTuple);
         case REL_TYPE_IS_DESCENDENT_OF:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relTypeIsDescendentOf(relTuple);
         case REL_LOGICAL_QUANTIFIER_IS:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relLogicalQuantifierIs(relTuple);
         case REL_LOGICAL_QUANTIFIER_IS_KIND_OF:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relLogicalQuantifierIsKindOf(relTuple);
         case REL_LOGICAL_QUANTIFIER_IS_CHILD_OF:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relLogicalQuantifierIsChildOf(relTuple);
         case REL_LOGICAL_QUANTIFIER_IS_DESCENDENT_OF:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relLogicalQuantifierIsDescendentOf(relTuple);
         case REL_CHARACTERISTIC_IS:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relCharIs(relTuple);
         case REL_CHARACTERISTIC_IS_KIND_OF:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relCharIsKindOf(relTuple);
         case REL_CHARACTERISTIC_IS_CHILD_OF:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relCharIsChildOf(relTuple);
         case REL_CHARACTERISTIC_IS_DESCENDENT_OF:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relCharIsDescendentOf(relTuple);
         case REL_REFINABILITY_IS:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relRefinabilityIs(relTuple);
         case REL_REFINABILITY_IS_KIND_OF:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relRefinabilityIsKindOf(relTuple);
         case REL_REFINABILITY_IS_CHILD_OF:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relRefinabilityIsChildOf(relTuple);
         case REL_REFINABILITY_IS_DESCENDENT_OF:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relRefinabilityIsDescendentOf(relTuple);
         case REL_DESTINATION_IS:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relDestinationIs(relTuple);
         case REL_DESTINATION_IS_KIND_OF:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relDestinationIsKindOf(relTuple);
         case REL_DESTINATION_IS_CHILD_OF:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relDestinationIsChildOf(relTuple);
         case REL_DESTINATION_IS_DESCENDENT_OF:
 			if (version != null)
-				throw new TerminologyException(tokenEnum
-						+ ": Unsupported operation for version scope.");
+                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
             return relDestinationIsDescendentOf(relTuple);
 		case ADDED_RELATIONSHIP:
 			return addedRelationship(relVersioned, version, v1_is, v2_is);
 		case CHANGED_RELATIONSHIP_CHARACTERISTIC:
-			return changedRelationshipCharacteristic(relVersioned, version,
-					v1_is, v2_is);
+            return changedRelationshipCharacteristic(relVersioned, version, v1_is, v2_is);
 		case CHANGED_RELATIONSHIP_GROUP:
 			return changedRelationshipGroup(relVersioned, version, v1_is, v2_is);
 		case CHANGED_RELATIONSHIP_REFINABILITY:
-			return changedRelationshipRefinability(relVersioned, version,
-					v1_is, v2_is);
+            return changedRelationshipRefinability(relVersioned, version, v1_is, v2_is);
 		case CHANGED_RELATIONSHIP_STATUS:
-			return changedRelationshipStatus(relVersioned, version, v1_is,
-					v2_is);
+            return changedRelationshipStatus(relVersioned, version, v1_is, v2_is);
 		case CHANGED_RELATIONSHIP_TYPE:
 			return changedRelationshipType(relVersioned, version, v1_is, v2_is);
         default:
@@ -255,17 +221,14 @@ public class RelationshipStatement extends RefsetSpecStatement {
     @Override
     public I_RepresentIdSet getPossibleConcepts(I_RepresentIdSet parentPossibleConcepts,
             Collection<I_ShowActivity> activities) throws TerminologyException, IOException {
-        I_ShowActivity activity =
-                Terms.get().newActivityPanel(true, config, "<html>Possible: <br>" + this.toHtmlFragment(), true);
-        activities.add(activity);
-        activity.setIndeterminate(true);
+        I_ShowActivity activity = null;
         long startTime = System.currentTimeMillis();
+        this.activities = activities;
 
         I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();
         if (parentPossibleConcepts == null) {
             parentPossibleConcepts = termFactory.getConceptNidSet();
         }
-        activity.setProgressInfoLower("Incoming count: " + parentPossibleConcepts.cardinality());
 
         switch (tokenEnum) {
         case REL_IS_MEMBER_OF:
@@ -324,12 +287,14 @@ public class RelationshipStatement extends RefsetSpecStatement {
         }
         setPossibleConceptsCount(possibleConcepts.cardinality());
 
+        if (activity != null) {
         long endTime = System.currentTimeMillis();
         long elapsed = endTime - startTime;
         String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
         activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Incoming count: "
             + parentPossibleConcepts.cardinality() + "; Outgoing count: " + possibleConcepts.cardinality());
         activity.complete();
+        }
         return possibleConcepts;
     }
 
@@ -421,9 +386,8 @@ public class RelationshipStatement extends RefsetSpecStatement {
         try {
 
             Set<? extends I_GetConceptData> children =
-                    requiredCharType.getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
-                        .getConflictResolutionStrategy());
+                    requiredCharType.getDestRelOrigins(currentStatuses, allowedTypes, termFactory.getActiveAceFrameConfig()
+                        .getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
 
             for (I_GetConceptData child : children) {
                 if (relCharIs(child, relTuple)) {
@@ -530,9 +494,8 @@ public class RelationshipStatement extends RefsetSpecStatement {
         try {
 
             Set<? extends I_GetConceptData> children =
-                    requiredRelType.getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
-                        .getConflictResolutionStrategy());
+                    requiredRelType.getDestRelOrigins(currentStatuses, allowedTypes, termFactory.getActiveAceFrameConfig()
+                        .getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
 
             for (I_GetConceptData child : children) {
                 if (relTypeIs(child, relTuple)) {
@@ -558,9 +521,8 @@ public class RelationshipStatement extends RefsetSpecStatement {
         try {
 
             Set<? extends I_GetConceptData> children =
-                    requiredStatus.getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
-                        .getConflictResolutionStrategy());
+                    requiredStatus.getDestRelOrigins(currentStatuses, allowedTypes, termFactory.getActiveAceFrameConfig()
+                        .getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
 
             for (I_GetConceptData child : children) {
                 if (relStatusIs(child, relTuple)) {

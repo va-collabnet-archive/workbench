@@ -39,6 +39,7 @@ import org.ihtsdo.time.TimeUtil;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.Depth;
 import org.tigris.subversion.javahl.Revision;
+import org.tmatesoft.svn.core.SVNErrorCode;
 
 /**
  * Common SVN helper methods used by the Ace Runner and AceLoginDialog.
@@ -60,6 +61,7 @@ public class SvnHelper {
 	private Class<?> jiniClass;
 	private static boolean connectToSubversion = false;
 	private Map<String, SubversionData> subversionMap = new HashMap<String, SubversionData>();
+    private int numberOfNonUserDirsInProfilesDir = 2; // startup and shutdown
 
 	public Map<String, SubversionData> getSubversionMap() {
 		return subversionMap;
@@ -80,11 +82,9 @@ public class SvnHelper {
                     (String[]) jiniConfig.getEntry(jiniClass.getName(), "svnCheckoutOnStart", String[].class,
 					new String[] {});
             svnUpdateOnStart =
-                    (String[]) jiniConfig.getEntry(jiniClass.getName(), "svnUpdateOnStart", String[].class,
-					new String[] {});
+                    (String[]) jiniConfig.getEntry(jiniClass.getName(), "svnUpdateOnStart", String[].class, new String[] {});
             csImportOnStart =
-                    (String[]) jiniConfig.getEntry(jiniClass.getName(), "csImportOnStart", String[].class,
-                        new String[] {});
+                    (String[]) jiniConfig.getEntry(jiniClass.getName(), "csImportOnStart", String[].class, new String[] {});
 			if (csImportOnStart != null) {
 				for (String importLoc : csImportOnStart) {
 					changeLocations.add(new File(importLoc));
@@ -93,8 +93,9 @@ public class SvnHelper {
 		}
 	}
 
-	void initialSubversionOperationsAndChangeSetImport(File acePropertiesFile, boolean connectToSubversion, SvnPrompter prompter)
-	throws ConfigurationException, FileNotFoundException, IOException, TaskFailedException, ClientException {
+    void initialSubversionOperationsAndChangeSetImport(File acePropertiesFile, boolean connectToSubversion,
+            SvnPrompter prompter) throws ConfigurationException, FileNotFoundException, IOException, TaskFailedException,
+            ClientException {
 		Properties aceProperties = new Properties();
 		aceProperties.setProperty("initial-svn-checkout", "true");
 
@@ -125,6 +126,20 @@ public class SvnHelper {
 						}
 					}
 
+                } catch (ClientException e) {
+                    if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "Unable to connect to Subversion - please check network connection and try again.",
+                            "Unable to connect", JOptionPane.INFORMATION_MESSAGE);
+                        connectToSubversion = false;
+                        Svn.setConnectedToSvn(connectToSubversion);
+                        AceLog.getAppLog().info(
+                            "### Unable to connect to Subversion - please check network connection and try again.");
+                        System.exit(0);
+                    } else {
+                        AceLog.getAppLog().info("### User cancelled Subversion log in.");
+                        System.exit(0);
+                    }
 				} finally {
 					Svn.rwl.release(Svn.SEMAPHORE_PERMITS);
 					try {
@@ -142,7 +157,12 @@ public class SvnHelper {
 				aceProperties.storeToXML(new FileOutputStream(acePropertiesFile), null);
 			} else {
 				if (new File("profiles").exists() == false) {
-					throw new TaskFailedException("User did not want to connect to Subversion.");
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "No profiles are available. Please re-run bundle and checkout profiles from Subversion.",
+                        "No profiles", JOptionPane.INFORMATION_MESSAGE);
+                    connectToSubversion = false;
+                    Svn.setConnectedToSvn(connectToSubversion);
+                    System.exit(0);
 				}
 			}
 		} else if (changeLocations.size() > 0) {
@@ -150,8 +170,8 @@ public class SvnHelper {
 		}
 	}
 
-	public void initialSubversionOperationsAndChangeSetImport(File acePropertiesFile,  SvnPrompter prompter) throws ConfigurationException,
-	FileNotFoundException, IOException, TaskFailedException, ClientException {
+    public void initialSubversionOperationsAndChangeSetImport(File acePropertiesFile, SvnPrompter prompter)
+            throws ConfigurationException, FileNotFoundException, IOException, TaskFailedException, ClientException {
 
 		Properties wbProperties = new Properties();
 		wbProperties.setProperty("initial-svn-checkout", "true");
@@ -206,15 +226,28 @@ public class SvnHelper {
 				wbProperties.storeToXML(new FileOutputStream(acePropertiesFile), null);
 			} else {
 				if (new File("profiles").exists() == false) {
-					throw new TaskFailedException("User did not want to connect to Subversion.");
+                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "No profiles are available. Please re-run bundle and checkout profiles from Subversion.",
+                            "No profiles", JOptionPane.INFORMATION_MESSAGE);
+                        connectToSubversion = false;
+                        Svn.setConnectedToSvn(connectToSubversion);
+                        System.exit(0);
 				}
 			}
             } catch (ClientException e) {
+                if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                     "Unable to connect to Subversion - please check network connection and try again.",
                     "Unable to connect", JOptionPane.INFORMATION_MESSAGE);
                 connectToSubversion = false;
                 Svn.setConnectedToSvn(connectToSubversion);
+                    AceLog.getAppLog().info(
+                        "### Unable to connect to Subversion - please check network connection and try again.");
+                    System.exit(0);
+                } else {
+                    AceLog.getAppLog().info("### User cancelled Subversion log in.");
+                    System.exit(0);
+            }
             }
 		} else if (changeLocations.size() > 0) {
 			doChangeSetImport();
@@ -223,11 +256,22 @@ public class SvnHelper {
 
 	void handleSvnProfileCheckout(Properties aceProperties) throws ClientException, TaskFailedException {
 		if (new File("profiles").exists()) {
+            if (aceProperties.getProperty("last-profile-dir") != null) {
 			// A checkout has previously completed. 
 			return;
 		}
+            File profilesFolder = new File("profiles");
+            File[] subFolders = profilesFolder.listFiles();
+
+            if (subFolders.length > numberOfNonUserDirsInProfilesDir) {
+                // a checkout has previously completed
+                return;
+            }
+        }
+        try {
 		SubversionData svd = new SubversionData(svnCheckoutProfileOnStart, null);
 		List<String> listing = Svn.list(svd);
+            if (listing != null) {
 		Map<String, String> profileMap = new HashMap<String, String>();
 		for (String item : listing) {
 			if (item.endsWith(".ace")) {
@@ -236,12 +280,19 @@ public class SvnHelper {
 		}
 		SortedSet<String> sortedProfiles = new TreeSet<String>(profileMap.keySet());
 		JFrame emptyFrame = new JFrame();
+                if (sortedProfiles.size() == 0) {
+                    return;
+                }
         String selectedProfile =
                 (String) SelectObjectDialog.showDialog(emptyFrame, emptyFrame, "Select profile to checkout:",
                     "Checkout profile:", sortedProfiles.toArray(), null, null);
+
 		String selectedPath = profileMap.get(selectedProfile);
 		if (selectedPath == null) {
-			return;
+                    AceLog.getAppLog().info("### No profile selected - shutting down.");
+                    connectToSubversion = false;
+                    Svn.setConnectedToSvn(connectToSubversion);
+                    System.exit(0);
 		}
 		if (selectedPath.startsWith("/")) {
 			selectedPath = selectedPath.substring(1);
@@ -273,7 +324,6 @@ public class SvnHelper {
 		subversionMap.put(svnCheckoutData.getWorkingCopyStr(), svnCheckoutData);
 		aceProperties.setProperty("last-profile-dir", "profiles/" + selectedProfile);
 		
-		
 		String moduleName = svnCheckoutData.getRepositoryUrlStr();
 		String destPath = svnCheckoutData.getWorkingCopyStr();
 		Revision revision = Revision.HEAD;
@@ -285,9 +335,24 @@ public class SvnHelper {
 				allowUnverObstructions);
 		changeLocations.add(new File(destPath));
 	}
+        } catch (ClientException e) {
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                    "Unable to connect to Subversion - please check network connection and try again.", "Unable to connect",
+                    JOptionPane.INFORMATION_MESSAGE);
+                connectToSubversion = false;
+                Svn.setConnectedToSvn(connectToSubversion);
+                AceLog.getAppLog().info(
+                    "### Unable to connect to Subversion - please check network connection and try again.");
+                System.exit(0);
+            } else {
+                AceLog.getAppLog().info("### User cancelled Subversion log in.");
+                System.exit(0);
+            }
+        }
+    }
 
-	private void handleSvnCheckout(List<File> changeLocations, String svnSpec) throws TaskFailedException,
-	ClientException {
+    private void handleSvnCheckout(List<File> changeLocations, String svnSpec) throws TaskFailedException, ClientException {
 		AceLog.getAppLog().info("Got svn checkout spec: " + svnSpec);
         String[] specParts =
                 new String[] { svnSpec.substring(0, svnSpec.lastIndexOf("|")),
@@ -302,6 +367,7 @@ public class SvnHelper {
 			subversionMap.put(specParts[local], new SubversionData(specParts[server], specParts[local]));
 		} else {
 
+            try {
 			// do the checkout...
 			AceLog.getAppLog().info("svn checkout " + specParts[server] + " to: " + specParts[local]);
 			subversionMap.put(specParts[local], new SubversionData(specParts[server], specParts[local]));
@@ -315,10 +381,26 @@ public class SvnHelper {
 			Svn.getSvnClient().checkout(moduleName, destPath, revision, pegRevision, depth, ignoreExternals,
 					allowUnverObstructions);
 			changeLocations.add(checkoutLocation);
+            } catch (ClientException e) {
+                if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "Unable to connect to Subversion - please check network connection and try again.",
+                        "Unable to connect", JOptionPane.INFORMATION_MESSAGE);
+                    connectToSubversion = false;
+                    Svn.setConnectedToSvn(connectToSubversion);
+                    AceLog.getAppLog().info(
+                        "### Unable to connect to Subversion - please check network connection and try again.");
+                    System.exit(0);
+                } else {
+                    AceLog.getAppLog().info("### User cancelled Subversion log in.");
+                    System.exit(0);
 		}
 	}
+        }
+    }
 
-	private void handleSvnUpdate(List<File> changeLocations, String path, SvnPrompter prompter) {
+    private void handleSvnUpdate(List<File> changeLocations, String path, SvnPrompter prompter) throws ClientException,
+            TaskFailedException {
 		AceLog.getAppLog().info("Got svn update spec: " + path);
 		try {
 			Revision revision = Revision.HEAD;
@@ -332,18 +414,28 @@ public class SvnHelper {
 				Svn.revertNoLock(svd, prompter);
 				changeLocations.add(new File("profiles"));
 				
-				
-				
 			} 
 			AceLog.getAppLog().info("Starting svn update for: " + path);
 			Svn.getSvnClient().update(path, revision, depth, depthIsSticky, ignoreExternals, allowUnverObstructions);
 			AceLog.getAppLog().info("Finished svn update for: " + path);
 			changeLocations.add(new File(path));
-
-		} catch (Exception e) {
-			AceLog.getAppLog().alertAndLogException(e);
+        } catch (ClientException e) {
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                    "Unable to connect to Subversion - please check network connection and try again.", "Unable to connect",
+                    JOptionPane.INFORMATION_MESSAGE);
+                connectToSubversion = false;
+                Svn.setConnectedToSvn(connectToSubversion);
+                AceLog.getAppLog().info(
+                    "### Unable to connect to Subversion - please check network connection and try again.");
+                System.exit(0);
+            } else {
+                AceLog.getAppLog().info("### User cancelled Subversion log in.");
+                System.exit(0);
 		}
 	}
+    }
+
 	public void doChangeSetImport() {
 		if (Terms.get() == null) {
 			AceLog.getAppLog().info("Database not setup for eccs import: " + changeLocations);
@@ -376,13 +468,13 @@ public class SvnHelper {
 			};
 
 			for (File checkoutLocation : changeLocations) {
-                jcsImporter.importAllChangeSets(AceLog.getAppLog().getLogger(), null, checkoutLocation
-                    .getAbsolutePath(), false, ".eccs", "bootstrap.init");
+                jcsImporter.importAllChangeSets(AceLog.getAppLog().getLogger(), null, checkoutLocation.getAbsolutePath(),
+                    false, ".eccs", "bootstrap.init");
 			}
 
 			for (File checkoutLocation : changeLocations) {
-                jcsImporter.importAllChangeSets(AceLog.getAppLog().getLogger(), null, checkoutLocation
-                    .getAbsolutePath(), false, ".eccs");
+                jcsImporter.importAllChangeSets(AceLog.getAppLog().getLogger(), null, checkoutLocation.getAbsolutePath(),
+                    false, ".eccs");
 			}
 
 			AceLog.getAppLog().info("Finished eccs import");

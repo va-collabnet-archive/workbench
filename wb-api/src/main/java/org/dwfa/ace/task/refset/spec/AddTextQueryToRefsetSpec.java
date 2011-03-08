@@ -21,6 +21,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
@@ -56,10 +57,9 @@ public abstract class AddTextQueryToRefsetSpec extends AbstractAddRefsetSpecTask
 
     protected abstract int getStructuralQueryTokenId() throws IOException, TerminologyException;
 
-    
     @Override
-    protected RefsetPropertyMap getRefsetPropertyMap(I_TermFactory tf, I_ConfigAceFrame configFrame)
-            throws IOException, TerminologyException {
+    protected RefsetPropertyMap getRefsetPropertyMap(I_TermFactory tf, I_ConfigAceFrame configFrame) throws IOException,
+            TerminologyException {
     	RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.CID_CID_STR);
         if (getClauseIsTrue()) {
         	refsetMap.put(REFSET_PROPERTY.CID_ONE, trueNid);
@@ -67,7 +67,13 @@ public abstract class AddTextQueryToRefsetSpec extends AbstractAddRefsetSpecTask
         	refsetMap.put(REFSET_PROPERTY.CID_ONE, falseNid);
         }
     	refsetMap.put(REFSET_PROPERTY.CID_TWO, getStructuralQueryTokenId());
-    	refsetMap.put(REFSET_PROPERTY.STRING_VALUE, "queue"); // TODO
+        I_DescriptionTuple selectedDescription = tf.getActiveAceFrameConfig().getSearchResultsSelection();
+        if (selectedDescription != null) {
+            refsetMap.put(REFSET_PROPERTY.STRING_VALUE, selectedDescription.getText());
+        } else {
+            refsetMap.put(REFSET_PROPERTY.STRING_VALUE, "No description selected in search panel");
+        }
+
     	refsetMap.put(REFSET_PROPERTY.STATUS, configFrame.getDefaultStatus().getNid());
         return refsetMap;
     }

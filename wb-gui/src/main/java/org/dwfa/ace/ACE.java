@@ -1053,6 +1053,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private JToggleButton showProcessBuilder;
 
+    private JButton newInboxButton;
+
+    private JButton addExistingInboxButton;
+
+    private JButton moveListenerButton;
+
+    private JToggleButton showAllQueuesButton;
+
     private TogglePanelsActionListener resizeListener = new TogglePanelsActionListener();
 
     private ManageBottomPaneActionListener bottomPanelActionListener = new ManageBottomPaneActionListener();
@@ -1455,16 +1463,17 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     }
 
-    private static void addActionButton(ActionListener actionListener, String resource, String tooltipText,
+    private static JButton addActionButton(ActionListener actionListener, String resource, String tooltipText,
             JPanel topPanel, GridBagConstraints c) {
         JButton newProcess = new JButton(new ImageIcon(ACE.class.getResource(resource)));
         newProcess.setToolTipText(tooltipText);
         newProcess.addActionListener(actionListener);
         topPanel.add(newProcess, c);
         c.gridx++;
+        return newProcess;
     }
 
-    private static void addActionToggleButton(ActionListener actionListener, String resource, String tooltipText,
+    private static JToggleButton addActionToggleButton(ActionListener actionListener, String resource, String tooltipText,
             JPanel topPanel, GridBagConstraints c, int size) {
         JToggleButton newProcess;
         switch (size) {
@@ -1485,6 +1494,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         newProcess.addActionListener(actionListener);
         topPanel.add(newProcess, c);
         c.gridx++;
+        return newProcess;
     }
 
     private JComponent getContentPanel() throws Exception {
@@ -1742,14 +1752,48 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         listEditorTopPanel.add(new JLabel(" "), c); // filler
         c.gridx++;
         c.weightx = 0.0;
-        addActionButton(new NewQueueListener(this), "/24x24/plain/inbox_new.png",
-            "Create new inbox and add to profile", listEditorTopPanel, c);
-        addActionButton(new AddQueueListener(this), "/24x24/plain/inbox_add.png", "Add existing inbox to profile",
-            listEditorTopPanel, c);
-        addActionButton(new MoveListener(), "/24x24/plain/outbox_out.png",
-            "Take Selected Processes and Save To Disk (no transaction)", listEditorTopPanel, c);
-        addActionToggleButton(new ShowAllQueuesListener(), "/24x24/plain/funnel_delete.png", "Show all queues",
-            listEditorTopPanel, c, 24);
+        /*
+         *
+         org.dwfa.ace.ACE {
+            showQueueButtons = Boolean.TRUE;
+         }
+
+         */
+        boolean showQueueButtons = false;
+        try {
+            showQueueButtons =
+                           (Boolean) config.getEntry(this.getClass().getName(), "showQueueButtons", Boolean.class,
+                               Boolean.FALSE);
+        } catch (ConfigurationException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
+
+        newInboxButton =
+                addActionButton(new NewQueueListener(this), "/24x24/plain/inbox_new.png",
+                    "Create new inbox and add to profile", listEditorTopPanel, c);
+
+        newInboxButton.setEnabled(showQueueButtons);
+        newInboxButton.setVisible(showQueueButtons);
+
+        addExistingInboxButton =
+                addActionButton(new AddQueueListener(this), "/24x24/plain/inbox_add.png", "Add existing inbox to profile",
+                    listEditorTopPanel, c);
+        addExistingInboxButton.setEnabled(showQueueButtons);
+        addExistingInboxButton.setVisible(showQueueButtons);
+
+        moveListenerButton =
+                addActionButton(new MoveListener(), "/24x24/plain/outbox_out.png",
+                    "Take Selected Processes and Save To Disk (no transaction)", listEditorTopPanel, c);
+
+        moveListenerButton.setEnabled(showQueueButtons);
+        moveListenerButton.setVisible(showQueueButtons);
+
+        showAllQueuesButton =
+                addActionToggleButton(new ShowAllQueuesListener(), "/24x24/plain/funnel_delete.png", "Show all queues",
+                    listEditorTopPanel, c, 24);
+
+        showAllQueuesButton.setEnabled(showQueueButtons);
+        showAllQueuesButton.setVisible(showQueueButtons);
         return listEditorTopPanel;
 
     }
@@ -2413,7 +2457,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 JComboBox cb = (JComboBox) e.getSource();
                 CLASSIFIER_INPUT_MODE_PREF modePref = (CLASSIFIER_INPUT_MODE_PREF) cb.getSelectedItem();
                 aceFrameConfig.setClassifierInputMode(modePref);
-                
+
                 try {
 
                     PathBI editPath = null;
@@ -3160,6 +3204,39 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             updateSvnPalette();
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
+        }
+    }
+
+
+    public void setEnabledNewInboxButton(boolean enable) {
+        AceLog.getAppLog().info("set enable new inbox button: " + enable);
+        if (newInboxButton != null) {
+            newInboxButton.setEnabled(enable);
+            newInboxButton.setVisible(true);
+        }
+    }
+
+    public void setEnabledExistingInboxButton(boolean enable) {
+        AceLog.getAppLog().info("set enable add-existing-inbox button: " + enable);
+        if (addExistingInboxButton != null) {
+            addExistingInboxButton.setEnabled(enable);
+            addExistingInboxButton.setVisible(true);
+        }
+    }
+
+    public void setEnabledMoveListenerButton(boolean enable) {
+        AceLog.getAppLog().info("set enable move-listener button: " + enable);
+        if (moveListenerButton != null) {
+            moveListenerButton.setEnabled(enable);
+            moveListenerButton.setVisible(true);
+        }
+    }
+
+    public void setEnabledAllQueuesButton(boolean enable) {
+        AceLog.getAppLog().info("set enable all queues button: " + enable);
+        if (showAllQueuesButton != null) {
+            showAllQueuesButton.setEnabled(enable);
+            showAllQueuesButton.setVisible(true);
         }
     }
 

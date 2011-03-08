@@ -68,6 +68,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.tigris.subversion.javahl.ClientException;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -122,8 +123,7 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
 		config.removeViewPosition(p);
 	}
 
-	public void replaceViewPosition(PositionBI oldPosition,
-			PositionBI newPosition) {
+    public void replaceViewPosition(PositionBI oldPosition, PositionBI newPosition) {
 		config.replaceViewPosition(oldPosition, newPosition);
 	}
 
@@ -444,8 +444,7 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         return config.getRefsetInSpecEditor();
     }
 
-    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException,
-            IOException {
+    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException, IOException {
         return config.getRefsetPreferencesForToggle(toggle);
     }
 
@@ -1085,7 +1084,7 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         config.svnImport(svd);
     }
 
-    public List<String> svnList(SubversionData svd) throws TaskFailedException {
+    public List<String> svnList(SubversionData svd) throws TaskFailedException, ClientException {
         return config.svnList(svd);
     }
 
@@ -1126,11 +1125,11 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
     }
 
     public void svnUnlock(SubversionData svd, File toUnlock, PromptUserPassword3 authenticator, boolean interactive)
-            throws TaskFailedException {
+            throws TaskFailedException, ClientException {
         config.svnUnlock(svd, toUnlock, authenticator, interactive);
     }
 
-    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException {
+    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException, ClientException {
         config.svnUnlock(svd, toUnLock);
     }
 
@@ -1193,11 +1192,29 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
     public void setShowPromotionTab(Boolean show) {
         config.setShowPromotionTab(show);
     }
+    @Override
+    public void setEnabledAllQueuesButton(boolean enable) {
+        config.setEnabledAllQueuesButton(enable);
+    }
 
 	@Override
 	public boolean isAutoApproveOn() {
 		return config.isAutoApproveOn();
 	}
+    @Override
+    public void setEnabledExistingInboxButton(boolean enable) {
+        config.setEnabledExistingInboxButton(enable);
+    }
+
+    @Override
+    public void setEnabledMoveListenerButton(boolean enable) {
+        config.setEnabledMoveListenerButton(enable);
+    }
+
+    @Override
+    public void setEnabledNewInboxButton(boolean enable) {
+        config.setEnabledNewInboxButton(enable);
+    }
 
 	@Override
 	public boolean isOverrideOn() {

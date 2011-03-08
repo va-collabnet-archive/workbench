@@ -60,8 +60,10 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * This task prepares the Workflow Details Sheet to display the PanelRefsetAndParameters
- * panel where the user will be asked to enter a number of fields required to start the
+ * This task prepares the Workflow Details Sheet to display the
+ * PanelRefsetAndParameters
+ * panel where the user will be asked to enter a number of fields required to
+ * start the
  * Refresh Refset process.
  * 
  * @author Perry Reid
@@ -140,7 +142,8 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
     }
 
     /**
-     * Handles actions required by the task after normal task completion (such as moving a
+     * Handles actions required by the task after normal task completion (such
+     * as moving a
      * process to another user's input queue).
      * 
      * @return void
@@ -155,8 +158,10 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
     }
 
     /**
-     * Performs the primary action of the task, which in this case is to gather and
-     * validate data that has been entered by the user on the Workflow Details Sheet.
+     * Performs the primary action of the task, which in this case is to gather
+     * and
+     * validate data that has been entered by the user on the Workflow Details
+     * Sheet.
      * 
      * @return The exit condition of the task
      * @param process The currently executing Workflow process
@@ -218,7 +223,8 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
 
             // ----------------------------------------------------------------------------------
             // INITIALIZE DATA FIELDS
-            // Initialize the fields on this panel with the previously entered values (if any).
+            // Initialize the fields on this panel with the previously entered
+            // values (if any).
             // ----------------------------------------------------------------------------------
 
             // -----------------------------------------
@@ -233,7 +239,8 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
                     newPanel.setRefset(previousRefsetSpec);
                 }
             } catch (NullPointerException e) {
-                // TODO Just ignore the NPE for now - remove this when you add the
+                // TODO Just ignore the NPE for now - remove this when you add
+                // the
                 // isPropertyDefined class back in.
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
@@ -252,8 +259,10 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
                 I_GetConceptData previousEditor = null;
 
                 // TODO: UUID[] CONVERT
-                // UUID[] editorUUID = (UUID[]) process.getProperty(editorUuidPropName);
-                // previousEditor = (I_GetConceptData) AceTaskUtil.getConceptFromObject(editorUUID);
+                // UUID[] editorUUID = (UUID[])
+                // process.getProperty(editorUuidPropName);
+                // previousEditor = (I_GetConceptData)
+                // AceTaskUtil.getConceptFromObject(editorUUID);
                 previousEditor = termFactory.getConcept((UUID[]) process.getProperty(editorUuidPropName));
 
                 if (previousEditor != null) {
@@ -261,7 +270,8 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
                     newPanel.setEditor(previousEditor);
                 }
             } catch (NullPointerException e) {
-                // TODO Just ignore the NPE for now - remove this when you add the
+                // TODO Just ignore the NPE for now - remove this when you add
+                // the
                 // isPropertyDefined class back in.
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
@@ -281,8 +291,10 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
 
                 // TODO: UUID[] CONVERT
                 // Retrieve the UUID for the reviewer
-                // UUID reviewerUUID = (UUID) process.getProperty(reviewerUuidPropName);
-                // previousReviewer = (I_GetConceptData) AceTaskUtil.getConceptFromObject(reviewerUUID);
+                // UUID reviewerUUID = (UUID)
+                // process.getProperty(reviewerUuidPropName);
+                // previousReviewer = (I_GetConceptData)
+                // AceTaskUtil.getConceptFromObject(reviewerUUID);
                 previousReviewer = termFactory.getConcept((UUID[]) process.getProperty(reviewerUuidPropName));
 
                 if (previousReviewer != null) {
@@ -290,7 +302,8 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
                     newPanel.setReviewer(previousReviewer);
                 }
             } catch (NullPointerException e) {
-                // TODO Just ignore the NPE for now - remove this when you add the
+                // TODO Just ignore the NPE for now - remove this when you add
+                // the
                 // isPropertyDefined class back in.
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
@@ -352,8 +365,8 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
         }
     }
 
-    private Set<I_GetConceptData> getValidRefsetSpecs() throws Exception {
-        Set<I_GetConceptData> refsetSpecs = new TreeSet<I_GetConceptData>(new Comparator<Object>() {
+    private TreeSet<I_GetConceptData> getValidRefsetSpecs() throws Exception {
+        TreeSet<I_GetConceptData> refsetSpecs = new TreeSet<I_GetConceptData>(new Comparator<Object>() {
 
             @Override
             public int compare(Object o1, Object o2) {
@@ -369,8 +382,9 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
         I_IntSet allowedTypes = config.getDestRelTypes();
 
         for (I_GetConceptData parent : permissibleRefsetParents) {
-            Set<? extends I_GetConceptData> children = parent.getDestRelOrigins(null, allowedTypes, null, 
-                    config.getPrecedence(), config.getConflictResolutionStrategy());
+            Set<? extends I_GetConceptData> children =
+                    parent.getDestRelOrigins(null, allowedTypes, null, config.getPrecedence(), config
+                        .getConflictResolutionStrategy());
             for (I_GetConceptData child : children) {
                 if (isRefset(child)) {
                     RefsetSpec spec = new RefsetSpec(child, true, config);
@@ -388,8 +402,9 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize().getNid());
 
-        List<? extends I_RelTuple> relationships = child.getDestRelTuples(null, allowedTypes, null, 
-            config.getPrecedence(), config.getConflictResolutionStrategy());
+        List<? extends I_RelTuple> relationships =
+                child.getDestRelTuples(null, allowedTypes, null, config.getPrecedence(), config
+                    .getConflictResolutionStrategy());
         if (relationships.size() > 0) {
             return true;
         } else {

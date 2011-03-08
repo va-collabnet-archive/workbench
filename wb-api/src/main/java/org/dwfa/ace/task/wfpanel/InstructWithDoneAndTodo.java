@@ -113,8 +113,7 @@ public class InstructWithDoneAndTodo extends AbstractTask {
         public void actionPerformed(ActionEvent e) {
         	if (Terms.get().getUncommitted().size() > 0) {
         		for (I_Transact c: Terms.get().getUncommitted()) {
-        			AceLog.getAppLog().warning("Uncommitted changes to: " 
-        					+ ((I_GetConceptData) c).toLongString());
+                    AceLog.getAppLog().warning("Uncommitted changes to: " + ((I_GetConceptData) c).toLongString());
         			
         		}
         		HasUncommittedChanges.askToCommit(process);
@@ -141,12 +140,27 @@ public class InstructWithDoneAndTodo extends AbstractTask {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent e) {
+            if (Terms.get().getUncommitted().size() > 0) {
+                for (I_Transact c : Terms.get().getUncommitted()) {
+                    AceLog.getAppLog().warning("Uncommitted changes to: " + ((I_GetConceptData) c).toLongString());
+
+                }
+                HasUncommittedChanges.askToCommit(process);
+            }
+            if (Terms.get().getUncommitted().size() > 0) {
+                if (!DwfaEnv.isHeadless()) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "There are uncommitted changes - please cancel or commit before continuing.", "",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
             returnCondition = Condition.ITEM_CANCELED;
             done = true;
             synchronized (InstructWithDoneAndTodo.this) {
                 InstructWithDoneAndTodo.this.notifyAll();
             }
         }
+    }
     }
 
     protected void waitTillDone(Logger l) {
@@ -222,9 +236,9 @@ public class InstructWithDoneAndTodo extends AbstractTask {
 
         builderVisible = config.isBuilderToggleVisible();
         config.setBuilderToggleVisible(false);
-        subversionButtonVisible = config.isBuilderToggleVisible();
+        subversionButtonVisible = config.isSubversionToggleVisible();
         config.setSubversionToggleVisible(false);
-        inboxButtonVisible = config.isSubversionToggleVisible();
+        inboxButtonVisible = config.isInboxToggleVisible();
         config.setInboxToggleVisible(false);
         workflowPanel = config.getWorkflowPanel();
     }

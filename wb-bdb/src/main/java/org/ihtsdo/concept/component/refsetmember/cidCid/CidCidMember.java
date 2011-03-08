@@ -182,7 +182,9 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
         }
         if (CidCidMember.class.isAssignableFrom(obj.getClass())) {
             CidCidMember another = (CidCidMember) obj;
-            return this.c1Nid == another.c1Nid && this.c2Nid == another.c2Nid;
+            return this.c1Nid == another.c1Nid && this.c2Nid == another.c2Nid &&
+            this.nid == another.nid &&
+            this.referencedComponentNid == another.referencedComponentNid;
         }
         return false;
     }

@@ -19,6 +19,8 @@ package org.dwfa.ace.table.refset;
 import java.beans.PropertyChangeEvent;
 import java.util.Set;
 
+import javax.swing.event.TableModelEvent;
+
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
@@ -39,13 +41,16 @@ public class ReflexiveRefsetCommentTableModel extends ReflexiveRefsetTableModel 
     private static final long serialVersionUID = 1L;
 
     public void propertyChange(PropertyChangeEvent arg0) {
+
         if (tableChangeWorker != null) {
             tableChangeWorker.setStopWork(true);
         }
+
         allTuples = null;
         values = null;
         allExtensions = null;
         conceptCache = null;
+
         if (getProgress() != null) {
             getProgress().setVisible(true);
             getProgress().getProgressBar().setValue(0);
@@ -57,9 +62,10 @@ public class ReflexiveRefsetCommentTableModel extends ReflexiveRefsetTableModel 
                 I_GetConceptData refsetConcept = Terms.get().getConcept(host.getTermComponent().getNid());
                 I_IntSet allowedTypes = new IntSet();
                 allowedTypes.add(RefsetAuxiliary.Concept.COMMENTS_REL.localize().getNid());
-                Set<? extends I_GetConceptData> commentRefsets = refsetConcept.getSourceRelTargets(host.getConfig()
-                    .getAllowedStatus(), allowedTypes, host.getConfig().getViewPositionSetReadOnly(), 
-                    host.getConfig().getPrecedence(), host.getConfig().getConflictResolutionStrategy());
+                Set<? extends I_GetConceptData> commentRefsets =
+                        refsetConcept.getSourceRelTargets(host.getConfig().getAllowedStatus(), allowedTypes, host
+                            .getConfig().getViewPositionSetReadOnly(), host.getConfig().getPrecedence(), host.getConfig()
+                            .getConflictResolutionStrategy());
                 if (commentRefsets.size() > 0) {
                     this.tableComponentId = commentRefsets.iterator().next().getConceptNid();
                 }
@@ -69,5 +75,6 @@ public class ReflexiveRefsetCommentTableModel extends ReflexiveRefsetTableModel 
 
         }
         fireTableDataChanged();
+        fireTableChanged(new TableModelEvent(this));
     }
 }

@@ -28,6 +28,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -37,7 +38,8 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Tests if the refset spec contains a negated OR. These aren't allowed due to user confusion (they generally lead to a
+ * Tests if the refset spec contains a negated OR. These aren't allowed due to
+ * user confusion (they generally lead to a
  * very large proportion of the database being added to the resulting refset).
  * 
  * @author Christine Hill
@@ -66,8 +68,7 @@ public class TestForNegatedOr extends AbstractExtensionTest {
     }
 
     @Override
-    public List<AlertToDataConstraintFailure> test(I_ExtendByRef extension, boolean forCommit)
-            throws TaskFailedException {
+    public List<AlertToDataConstraintFailure> test(I_ExtendByRef extension, boolean forCommit) throws TaskFailedException {
         try {
             ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
 
@@ -83,8 +84,7 @@ public class TestForNegatedOr extends AbstractExtensionTest {
             }
 
             I_GetConceptData refsetSpecConcept = termFactory.getConcept(extension.getRefsetId());
-            I_GetConceptData specifiesRefsetRel =
-                    termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
+            I_GetConceptData specifiesRefsetRel = termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
             I_GetConceptData memberRefset = getLatestRelationshipTarget(refsetSpecConcept, specifiesRefsetRel);
             if (memberRefset == null) { // not a refset spec being edited
                 return alertList;
@@ -92,20 +92,38 @@ public class TestForNegatedOr extends AbstractExtensionTest {
 
             RefsetSpec specHelper = new RefsetSpec(refsetSpecConcept, configFrame);
             AlertToDataConstraintFailure.ALERT_TYPE alertType = AlertToDataConstraintFailure.ALERT_TYPE.WARNING;
-            if (forCommit) {
-                alertType = AlertToDataConstraintFailure.ALERT_TYPE.ERROR;
-            }
 
-            if (extension.getMutableParts().get(0) instanceof I_ExtendByRefPartCidCid) {
+            if (extension.getMutableParts().get(0) instanceof I_ExtendByRefPartCidCidCid) {
+                I_ExtendByRefPartCidCidCid part = (I_ExtendByRefPartCidCidCid) extension.getMutableParts().get(0);
+                // check for negated clause under an OR
+                if (part.getC1id() == RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_FALSE.localize().getNid()) {
+                    if (termFactory.hasExtension(extension.getComponentNid())) {
+                        I_ExtendByRef parentClause = termFactory.getExtension(extension.getComponentNid());
+                        if (parentClause.getMutableParts().get(0) instanceof I_ExtendByRefPartCidCid) {
+                            I_ExtendByRefPartCidCid parentClausePart =
+                                    (I_ExtendByRefPartCidCid) parentClause.getMutableParts().get(0);
+                            // check for OR
+                            if (parentClausePart.getC2id() == RefsetAuxiliary.Concept.REFSET_OR_GROUPING.localize().getNid()) {
+                                alertList
+                                    .add(new AlertToDataConstraintFailure(
+                                        alertType,
+                                        formatAlertMessage("Negated clause under an OR detected - these can result in an extremely large number of results."),
+                                        specHelper.getRefsetSpecConcept()));
+            }
+                        }
+                    }
+                }
+            } else if (extension.getMutableParts().get(0) instanceof I_ExtendByRefPartCidCid) {
                 I_ExtendByRefPartCidCid part = (I_ExtendByRefPartCidCid) extension.getMutableParts().get(0);
+                // check for negated OR
                 if (part.getC1id() == RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_FALSE.localize().getNid()
                     && part.getC2id() == RefsetAuxiliary.Concept.REFSET_OR_GROUPING.localize().getNid()) {
-                    alertList.add(new AlertToDataConstraintFailure(alertType,
-                        formatAlertMessage("Negated OR detected - please remove before committing."), specHelper
-                            .getRefsetSpecConcept()));
+                    alertList
+                        .add(new AlertToDataConstraintFailure(
+                            alertType,
+                            formatAlertMessage("Negated OR detected - these can result in an extremely large number of results."),
+                            specHelper.getRefsetSpecConcept()));
                 }
-            } else {
-                return alertList;
             }
 
             return alertList;

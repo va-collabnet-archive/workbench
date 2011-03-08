@@ -131,7 +131,8 @@ public class LogViewerFrame extends ComponentFrame {
                 ServiceTemplate template = new ServiceTemplate(null, new Class[] { I_ManageLogs.class }, null);
                 ServiceItem[] logServices;
                 logServices = worker.lookup(template, 1, 20, null, 1000 * 60);
-                ServiceItem item = (ServiceItem) this.selectFromList(logServices, "Select Log Manager Service",
+                ServiceItem item =
+                        (ServiceItem) this.selectFromList(logServices, "Select Log Manager Service",
                     "Select the log manager service you want to subscribe to:");
                 if (item != null) {
                     String loggerName = "Anonymous Remote";
@@ -221,7 +222,7 @@ public class LogViewerFrame extends ComponentFrame {
      * @see org.dwfa.bpa.util.ComponentFrame#getQuitMenu()
      */
     public JMenu getQuitMenu() {
-        return logMenu;
+        return null;
     }
 
     public void addInternalFrames(JMenu menu) {

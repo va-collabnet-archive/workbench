@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -73,15 +73,16 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 /**
  * Implements I_ConfigAceFrame with only the properties needed for search, and
  * puts those properties into unsynchronized collections so that changes in the
  * underlying configuration will not affect a search while in progress.
- * 
+ *
  * @author kec
- * 
+ *
  */
 public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
@@ -129,8 +130,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 		baseFrame.removeViewPosition(p);
 	}
 
-	public void replaceViewPosition(PositionBI oldPosition,
-			PositionBI newPosition) {
+    public void replaceViewPosition(PositionBI oldPosition, PositionBI newPosition) {
 		baseFrame.replaceViewPosition(oldPosition, newPosition);
 	}
 
@@ -265,7 +265,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
     public void setClassificationRoot(I_GetConceptData classificationRoot) {
         baseFrame.setClassificationRoot(classificationRoot);
     }
-    
+
     public void setClassifierInputMode(CLASSIFIER_INPUT_MODE_PREF classifierInputMode) {
         baseFrame.setClassifierInputMode(classifierInputMode);
      }
@@ -367,11 +367,11 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
     }
 
     public void svnUnlock(SubversionData svd, File toUnlock, PromptUserPassword3 authenticator, boolean interactive)
-            throws TaskFailedException {
+            throws TaskFailedException, ClientException {
         baseFrame.svnUnlock(svd, toUnlock, authenticator, interactive);
     }
 
-    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException {
+    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException, ClientException {
         baseFrame.svnUnlock(svd, toUnLock);
     }
 
@@ -405,7 +405,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         baseFrame.svnUpdate(svd, authenticator, interactive);
     }
 
-    public List<String> svnList(SubversionData svd) throws TaskFailedException {
+    public List<String> svnList(SubversionData svd) throws TaskFailedException, ClientException {
         return baseFrame.svnList(svd);
     }
 
@@ -783,7 +783,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
     public void setShowWorkflowSignpostPanel(boolean show) {
     	throw new UnsupportedOperationException();
     }
-    
+
     public void setShowViewerImagesInTaxonomy(Boolean showViewerImagesInTaxonomy) {
         throw new UnsupportedOperationException();
 
@@ -1070,8 +1070,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         return baseFrame.getQueueAddressesToShow();
     }
 
-    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException,
-            IOException {
+    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException, IOException {
         return baseFrame.getRefsetPreferencesForToggle(toggle);
     }
 
@@ -1271,7 +1270,6 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         baseFrame.addPromotionPath(p);
     }
 
- 
     public void removePromotionPath(PathBI p) {
         baseFrame.removePromotionPath(p);
     }
@@ -1332,6 +1330,26 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 		return baseFrame.isAutoApproveOn();
 	}
 
+    @Override
+    public void setEnabledAllQueuesButton(boolean enable) {
+        baseFrame.setEnabledAllQueuesButton(enable);
+    }
+
+    @Override
+    public void setEnabledExistingInboxButton(boolean enable) {
+        baseFrame.setEnabledExistingInboxButton(enable);
+    }
+
+    @Override
+    public void setEnabledMoveListenerButton(boolean enable) {
+        baseFrame.setEnabledMoveListenerButton(enable);
+    }
+
+    @Override
+    public void setEnabledNewInboxButton(boolean enable) {
+        baseFrame.setEnabledNewInboxButton(enable);
+    }
+
 	@Override
 	public boolean isOverrideOn() {
 		return baseFrame.isOverrideOn();
@@ -1366,7 +1384,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 	public void setWorkflowStates(TreeSet<? extends I_GetConceptData> states) {
 		baseFrame.setWorkflowStates(states);
 	}
-	
+
 	@Override
 	public TreeSet<? extends I_GetConceptData> getWorkflowActions() {
 		return baseFrame.getWorkflowActions();

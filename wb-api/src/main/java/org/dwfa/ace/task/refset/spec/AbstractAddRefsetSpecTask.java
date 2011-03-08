@@ -182,7 +182,7 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
                     selectedNode = (DefaultMutableTreeNode) selection.getLastPathComponent();
                     I_ExtendByRef selectedSpec = (I_ExtendByRef) selectedNode.getUserObject();
                     componentId = selectedSpec.getMemberId();
-                    if (selectedSpec.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize()
+                    if (selectedSpec.getTypeNid() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize()
                         .getNid()) {
                         canAdd = true;
                     }

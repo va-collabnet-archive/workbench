@@ -30,7 +30,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -73,7 +72,7 @@ public class RefsetQueryFactory {
         // create refset spec query
         I_GetConceptData orConcept = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_OR_GROUPING.getUids());
 
-        RefsetSpecQuery query = new RefsetSpecQuery(orConcept, refsetSpec.getNid(), configFrame);
+        RefsetSpecQuery query = new RefsetSpecQuery(orConcept, true, refsetSpec.getNid(), configFrame);
         query = processNode(root, query, refsetType, configFrame, termFactory, refsetSpec.getNid());
 
         return query;
@@ -109,13 +108,17 @@ public class RefsetQueryFactory {
      * @throws ParseException
      */
     /*
-     * public static RefsetSpecQuery createPossibleQuery(I_ConfigAceFrame configFrame, I_TermFactory termFactory,
-     * I_GetConceptData refsetSpec, I_GetConceptData refset) throws IOException, TerminologyException,
+     * public static RefsetSpecQuery createPossibleQuery(I_ConfigAceFrame
+     * configFrame, I_TermFactory termFactory,
+     * I_GetConceptData refsetSpec, I_GetConceptData refset) throws IOException,
+     * TerminologyException,
      * ParseException {
      * // create tree object that corresponds to the database's refset spec
      * List<I_ExtendByRef> extensions =
-     * Terms.get().getAllExtensionsForComponent(refsetSpec.getConceptNid(), true);
-     * HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
+     * Terms.get().getAllExtensionsForComponent(refsetSpec.getConceptNid(),
+     * true);
+     * HashMap<Integer, DefaultMutableTreeNode> extensionMap = new
+     * HashMap<Integer, DefaultMutableTreeNode>();
      * HashSet<Integer> fetchedComponents = new HashSet<Integer>();
      * fetchedComponents.add(refsetSpec.getConceptNid());
      * addExtensionsToMap(extensions, extensionMap, fetchedComponents);
@@ -129,7 +132,9 @@ public class RefsetQueryFactory {
      * }
      * }
      * // create refset spec query
-     * I_GetConceptData orConcept = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_OR_GROUPING.getUids());
+     * I_GetConceptData orConcept =
+     * termFactory.getConcept(RefsetAuxiliary.Concept
+     * .REFSET_OR_GROUPING.getUids());
      * RefsetSpecQuery query = new RefsetSpecQuery(orConcept);
      * query = processNode(root, query, CONCEPT, configFrame, termFactory);
      * return query;
@@ -232,20 +237,14 @@ public class RefsetQueryFactory {
                     RefsetComputeType statementType = RefsetComputeType.getTypeFromQueryToken(groupingToken);
                     switch (statementType) {
 					case CONCEPT: {
-						if (part.getC2id() == RefsetAuxiliary.Concept.DIFFERENCE_V1_IS
-								.localize().getNid()
-								|| part.getC2id() == RefsetAuxiliary.Concept.DIFFERENCE_V2_IS
-										.localize().getNid()) {
+                        if (part.getC2id() == RefsetAuxiliary.Concept.DIFFERENCE_V1_IS.localize().getNid()
+                            || part.getC2id() == RefsetAuxiliary.Concept.DIFFERENCE_V2_IS.localize().getNid()) {
 							String pos_str = part.getStringValue();
 							// System.out.println("1:" + pos_str);
-							pos_str = pos_str.substring(pos_str
-									.lastIndexOf("(") + 1, pos_str
-									.lastIndexOf(")"));
+                            pos_str = pos_str.substring(pos_str.lastIndexOf("(") + 1, pos_str.lastIndexOf(")"));
 							// System.out.println("2:" + pos_str);
-							String p_str = pos_str.substring(0, pos_str
-									.indexOf(" "));
-							String v_str = pos_str.substring(pos_str
-									.indexOf(" ") + 1);
+                            String p_str = pos_str.substring(0, pos_str.indexOf(" "));
+                            String v_str = pos_str.substring(pos_str.indexOf(" ") + 1);
 							// System.out.println("p:" + p_str);
 							// System.out.println("v:" + v_str);
 							PathBI path = Terms.get().getPath(
@@ -303,15 +302,21 @@ public class RefsetQueryFactory {
                     }
 
                     // add subquery
-                    RefsetSpecQuery subquery = query.addSubquery(groupingToken);
+                    boolean truth;
+                    if (truthToken.getNid() == RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_TRUE.localize().getNid()) {
+                        truth = true;
+                    } else {
+                        truth = false;
+                    }
+                    RefsetSpecQuery subquery = query.addSubquery(groupingToken, truth);
 
                     // process each grandchild
                     if (!childNode.isLeaf()) {
                         processNode(childNode, subquery, newComputeType, configFrame, termFactory, refsetSpecNid);
                     }
-                    if (negate) {
-                        subquery.negateQuery();
-                    }
+                    //if (negate) {
+                    //    subquery.negateQuery();
+                    //}
                 } else if (thinPart instanceof I_ExtendByRefPartStr) {
                     // ignore - comments refset
                 } else if (thinPart instanceof I_ExtendByRefPartCid) {

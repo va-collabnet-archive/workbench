@@ -142,7 +142,15 @@ public enum ProcessAttachmentKeys {
     QUEUE_UTIL_CONTRACT,
     LAST_USER_TASKID,
     QUEUE_UTIL_CONTRACT_UUID,
-    ;
+    SME_NAME,
+    TRACKER_ID,
+    NAME1,
+    NAME2,
+    TRACKER_TITLE,
+    DESCRIPTION,
+    SEND_TO_USER,
+    SEND_COMMENT,
+    COLLABNET_ARTIFACT_SUBMITTER;
 
     public String getAttachmentKey() {
         return "A: " + this.name();

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import net.jini.config.ConfigurationException;
 
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.Condition;
@@ -34,17 +35,22 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 import com.sun.jini.start.LifeCycle;
+import net.jini.config.Configuration;
+import net.jini.config.ConfigurationProvider;
+import net.jini.core.entry.Entry;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
+import org.dwfa.jini.ElectronicAddress;
 
-@BeanList(specs = { @Spec(directory = "tasks/ide/queue", type = BeanType.TASK_BEAN) })
+@BeanList(specs = {
+    @Spec(directory = "tasks/ide/queue", type = BeanType.TASK_BEAN)})
 public class OpenQueuesInFolder extends AbstractTask {
 
     /**
      *
      */
     private static final long serialVersionUID = 1L;
-
     private static final int dataVersion = 1;
-
     private String queueDir = "profiles/queues";
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -61,17 +67,20 @@ public class OpenQueuesInFolder extends AbstractTask {
         }
     }
 
+    @Override
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
+    @Override
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             File directory = new File(queueDir);
+            I_ConfigAceFrame frameConfig = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
             if (directory.listFiles() != null) {
                 for (File dir : directory.listFiles()) {
-                    processFile(dir, null);
+                    processFile(dir, null, worker, frameConfig);
                 }
             }
 
@@ -83,27 +92,51 @@ public class OpenQueuesInFolder extends AbstractTask {
         }
     }
 
-    private void processFile(File file, LifeCycle lc) throws Exception {
+    private void processFile(File file, LifeCycle lc, I_Work worker,
+            I_ConfigAceFrame frameConfig) throws Exception {
         if (file.isDirectory() == false) {
             if (file.getName().equalsIgnoreCase("queue.config")) {
+                if (file.getParentFile().getName().toLowerCase().contains("collabnet")) {
+                    if (file.getParentFile().getName().toLowerCase().contains(frameConfig.getUsername().toLowerCase())) {
+                        AceLog.getAppLog().info("Found queue2: " + file.toURI().toURL().toExternalForm());
+                        if (QueueServer.started(file)) {
+                            AceLog.getAppLog().info("Queue already started: " + file.toURI().toURL().toExternalForm());
+                            addToVisibleQueues(file, frameConfig);
+                        } else {
+                            setupQueue(file, lc, frameConfig);
+                        }
+                    } else {
+                        AceLog.getAppLog().info("Queue not for this user: " + file.toURI().toURL().toExternalForm());
+                    }
+
+                } else {
                 AceLog.getAppLog().info("Found queue: " + file.toURI().toURL().toExternalForm());
                 if (QueueServer.started(file)) {
                     AceLog.getAppLog().info("Queue already started: " + file.toURI().toURL().toExternalForm());
                 } else {
-                    new QueueServer(new String[] { file.getCanonicalPath() }, lc);
+                        setupQueue(file, lc, frameConfig);
                 }
+            }
             }
         } else {
             for (File f : file.listFiles()) {
-                processFile(f, lc);
+                processFile(f, lc, worker, frameConfig);
             }
         }
     }
 
+    
+    private void setupQueue(File file, LifeCycle lc, I_ConfigAceFrame frameConfig) throws Exception, ConfigurationException, IOException {
+        new QueueServer(new String[]{file.getCanonicalPath()}, lc);
+        addToVisibleQueues(file, frameConfig);
+    }
+
+    @Override
     public int[] getDataContainerIds() {
         return new int[] {};
     }
 
+    @Override
     public Collection<Condition> getConditions() {
         return AbstractTask.CONTINUE_CONDITION;
     }
@@ -114,6 +147,23 @@ public class OpenQueuesInFolder extends AbstractTask {
 
     public void setQueueDir(String queueDir) {
         this.queueDir = queueDir;
+    }
+
+
+    private void addToVisibleQueues(File file, I_ConfigAceFrame frameConfig) throws ConfigurationException {
+        if (file.getParentFile().getName().toLowerCase().endsWith(".inbox") &&
+                file.getParentFile().getName().toLowerCase().contains(frameConfig.getUsername())) {
+            Configuration queueConfig = ConfigurationProvider.getInstance(new String[]{file.getAbsolutePath()});
+            Entry[] entries = (Entry[]) queueConfig.getEntry("org.dwfa.queue.QueueServer", "entries",
+                    Entry[].class, new Entry[]{});
+            for (Entry entry : entries) {
+                if (ElectronicAddress.class.isAssignableFrom(entry.getClass())) {
+                    ElectronicAddress ea = (ElectronicAddress) entry;
+                    frameConfig.getQueueAddressesToShow().add(ea.address);
+                    break;
+}
+            }
+        }
     }
 
 }

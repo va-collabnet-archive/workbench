@@ -35,7 +35,6 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.SNOMED;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -63,13 +62,11 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
     }
 
     @Override
-    public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit)
-            throws TaskFailedException {
+    public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit) throws TaskFailedException {
         try {
 
             ArrayList<I_DescriptionVersioned> descriptions = new ArrayList<I_DescriptionVersioned>();
-            List<? extends I_DescriptionTuple> descriptionTupleList =
-                    getDescriptionTupleList(concept, getFrameConfig());
+            List<? extends I_DescriptionTuple> descriptionTupleList = getDescriptionTupleList(concept, getFrameConfig());
             for (I_DescriptionTuple desc : descriptionTupleList) {
                 descriptions.add(desc.getDescVersioned());
             }
@@ -96,8 +93,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
         if (fsn_type == null)
             return alertList;
         I_IntSet actives = getActiveStatus(Terms.get());
-        HashMap<String, ArrayList<I_DescriptionVersioned>> langs =
-                new HashMap<String, ArrayList<I_DescriptionVersioned>>();
+        HashMap<String, ArrayList<I_DescriptionVersioned>> langs = new HashMap<String, ArrayList<I_DescriptionVersioned>>();
         for (I_DescriptionVersioned<?> desc : descriptions) {
             for (I_DescriptionPart part : desc.getMutableParts()) {
                 if (!actives.contains(part.getStatusNid()))
@@ -106,8 +102,8 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                     if (part.getText().matches(".*\\(\\?+\\).*") && part.getTime() == Long.MAX_VALUE) {
                         alertList.add(new AlertToDataConstraintFailure(
                             (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
-                                      : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
-                            "<html>Unedited semantic tag: " + part.getText(), concept));
+                                      : AlertToDataConstraintFailure.ALERT_TYPE.WARNING), "<html>Unedited semantic tag: "
+                                + part.getText(), concept));
                     }
                     String lang = part.getLang();
                     if (langs.get(lang) != null) {
@@ -161,9 +157,9 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
             }
         }
         if (langs.get("en") == null)
-            alertList.add(new AlertToDataConstraintFailure(
-                (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
-                          : AlertToDataConstraintFailure.ALERT_TYPE.WARNING), "<html>No FSN for en", concept));
+            alertList.add(new AlertToDataConstraintFailure((forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
+                                                                     : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
+                "<html>No FSN for en", concept));
         return alertList;
     }
 }

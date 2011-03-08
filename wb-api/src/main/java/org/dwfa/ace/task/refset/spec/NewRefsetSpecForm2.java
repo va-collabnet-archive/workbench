@@ -26,9 +26,8 @@ import java.awt.event.ItemListener;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.swing.Box;
@@ -69,18 +68,18 @@ public class NewRefsetSpecForm2 extends JPanel {
     private JButton addReviewerButton;
     private Set<String> editors;
     private Set<String> reviewers;
-    private HashMap<String, I_GetConceptData> validUserMap;
-    private HashMap<String, I_GetConceptData> validNewRefsetParentMap;
+    private TreeMap<String, I_GetConceptData> validUserMap;
+    private TreeMap<String, I_GetConceptData> validNewRefsetParentMap;
     private Set<String> selectedReviewers;
 
     private NewRefsetSpecWizard wizard;
 
-    public NewRefsetSpecForm2(NewRefsetSpecWizard wizard, HashMap<String, I_GetConceptData> validUserMap,
-            HashMap<String, I_GetConceptData> validNewRefsetParentMap) {
+    public NewRefsetSpecForm2(NewRefsetSpecWizard wizard, TreeMap<String, I_GetConceptData> validUserMap,
+            TreeMap<String, I_GetConceptData> validNewRefsetParentMap) {
         super();
         this.validUserMap = validUserMap;
         this.validNewRefsetParentMap = validNewRefsetParentMap;
-        selectedReviewers = new HashSet<String>();
+        selectedReviewers = new TreeSet<String>();
         this.wizard = wizard;
         init();
     }
@@ -177,7 +176,7 @@ public class NewRefsetSpecForm2 extends JPanel {
             for (String key : validUserMap.keySet()) {
                 I_GetConceptData concept = validUserMap.get(key);
                 TestForEditRefsetPermission permissionTest = new TestForEditRefsetPermission();
-                Set<I_GetConceptData> permissibleRefsetParents = new HashSet<I_GetConceptData>();
+                TreeSet<I_GetConceptData> permissibleRefsetParents = new TreeSet<I_GetConceptData>();
                 permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromIndividualUserPermissions(concept));
                 permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromRolePermissions(concept));
 

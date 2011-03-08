@@ -23,8 +23,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.TreeSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -203,7 +202,7 @@ public class AceLoginDialog extends javax.swing.JDialog implements ActionListene
      */
     public File getUserProfile(File profileDirToSet) throws TaskFailedException {
         if (profileDirToSet != null) {
-            List<File> profiles = new ArrayList<File>();
+            TreeSet<File> profiles = new TreeSet<File>();
             getProfiles(profiles, new File("profiles"));
             profileSelectionBox.setModel(new DefaultComboBoxModel(profiles.toArray()));
             profileSelectionBox.validate();
@@ -216,7 +215,7 @@ public class AceLoginDialog extends javax.swing.JDialog implements ActionListene
         return getProfile();
     }
 
-    private void getProfiles(List<File> profiles, File dir) {
+    private void getProfiles(TreeSet<File> profiles, File dir) {
         if (dir.listFiles() != null) {
             for (File f : dir.listFiles()) {
                 if (f.isDirectory()) {
@@ -241,6 +240,7 @@ public class AceLoginDialog extends javax.swing.JDialog implements ActionListene
         svnConnectCheckBox.setSelected(connect);
         Svn.setConnectedToSvn(connect);
     }
+
     /**
      * True if the user is connecting to SVN
      * 
@@ -258,7 +258,8 @@ public class AceLoginDialog extends javax.swing.JDialog implements ActionListene
      */
     private File getProfile() throws TaskFailedException {
         if (profile == null) {
-            throw new TaskFailedException("No Profile selected.");
+            AceLog.getAppLog().info("### No profile selected - shutting down.");
+            System.exit(0);
         }
         return profile;
     }

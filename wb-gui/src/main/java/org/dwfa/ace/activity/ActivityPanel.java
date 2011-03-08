@@ -81,6 +81,7 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         }
     }
 
+
     private class ActivityPanelImpl extends JPanel {
 
         /**
@@ -260,6 +261,7 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
     }
 
     private class ActivityProgress extends JProgressBar {
+
 
         /**
          *

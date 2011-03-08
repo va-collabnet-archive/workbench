@@ -91,8 +91,7 @@ public class InstructAndWait extends AbstractTask {
         public void actionPerformed(ActionEvent e) {
         	if (Terms.get().getUncommitted().size() > 0) {
         		for (I_Transact c: Terms.get().getUncommitted()) {
-        			AceLog.getAppLog().warning("Uncommitted changes to: " 
-        					+ ((I_GetConceptData) c).toLongString());
+                    AceLog.getAppLog().warning("Uncommitted changes to: " + ((I_GetConceptData) c).toLongString());
         			
         		}
         		HasUncommittedChanges.askToCommit(process);
@@ -135,12 +134,13 @@ public class InstructAndWait extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         this.done = false;
         this.process = process;
-        I_ConfigAceFrame config =
-                (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+        I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
         boolean builderVisible = config.isBuilderToggleVisible();
         config.setBuilderToggleVisible(false);
-        boolean subversionButtonVisible = config.isBuilderToggleVisible();
+        boolean subversionButtonVisible = config.isSubversionToggleVisible();
         config.setSubversionToggleVisible(false);
+        boolean inboxButtonVisible = config.isInboxToggleVisible();
+        config.setInboxToggleVisible(false);
         try {
 
             final JPanel workflowPanel = config.getWorkflowPanel();
@@ -213,6 +213,7 @@ public class InstructAndWait extends AbstractTask {
         }
         config.setBuilderToggleVisible(builderVisible);
         config.setSubversionToggleVisible(subversionButtonVisible);
+        config.setInboxToggleVisible(inboxButtonVisible);
         return Condition.CONTINUE;
     }
 

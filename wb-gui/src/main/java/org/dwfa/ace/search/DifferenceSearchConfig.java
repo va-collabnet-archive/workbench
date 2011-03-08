@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -71,6 +71,7 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class DifferenceSearchConfig implements I_ConfigAceFrame {
@@ -106,17 +107,14 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 		frameConfig.quit();
 	}
 
-
     @Override
 	public ViewCoordinate getViewCoordinate() {
 		return frameConfig.getViewCoordinate();
 	}
 
-
 	public Set<PathBI> getPromotionPathSet() {
 		return frameConfig.getPromotionPathSet();
 	}
-
 
 	public void addViewPosition(PositionBI p) {
 		frameConfig.addViewPosition(p);
@@ -126,8 +124,7 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 		frameConfig.removeViewPosition(p);
 	}
 
-	public void replaceViewPosition(PositionBI oldPosition,
-			PositionBI newPosition) {
+    public void replaceViewPosition(PositionBI oldPosition, PositionBI newPosition) {
 		frameConfig.replaceViewPosition(oldPosition, newPosition);
 	}
 
@@ -439,8 +436,7 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         return frameConfig.getRefsetInSpecEditor();
     }
 
-    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException,
-            IOException {
+    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException, IOException {
         return frameConfig.getRefsetPreferencesForToggle(toggle);
     }
 
@@ -935,7 +931,7 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
     public void setShowWorkflowSignpostPanel(boolean show) {
     	frameConfig.setShowWorkflowSignpostPanel(show);
     }
-    
+
     public void setShowViewerImagesInTaxonomy(Boolean showViewerImagesInTaxonomy) {
         frameConfig.setShowViewerImagesInTaxonomy(showViewerImagesInTaxonomy);
     }
@@ -1052,7 +1048,7 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         frameConfig.svnImport(svd);
     }
 
-    public List<String> svnList(SubversionData svd) throws TaskFailedException {
+    public List<String> svnList(SubversionData svd) throws TaskFailedException, ClientException {
         return frameConfig.svnList(svd);
     }
 
@@ -1093,11 +1089,11 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
     }
 
     public void svnUnlock(SubversionData svd, File toUnlock, PromptUserPassword3 authenticator, boolean interactive)
-            throws TaskFailedException {
+            throws TaskFailedException, ClientException {
         frameConfig.svnUnlock(svd, toUnlock, authenticator, interactive);
     }
 
-    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException {
+    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException, ClientException {
         frameConfig.svnUnlock(svd, toUnLock);
     }
 
@@ -1207,7 +1203,25 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 	public boolean isAutoApproveOn() {
 		return frameConfig.isAutoApproveOn();
 	}
+    @Override
+    public void setEnabledAllQueuesButton(boolean enable) {
+        frameConfig.setEnabledAllQueuesButton(enable);
+    }
 
+    @Override
+    public void setEnabledExistingInboxButton(boolean enable) {
+        frameConfig.setEnabledExistingInboxButton(enable);
+    }
+
+    @Override
+    public void setEnabledMoveListenerButton(boolean enable) {
+        frameConfig.setEnabledMoveListenerButton(enable);
+    }
+
+    @Override
+    public void setEnabledNewInboxButton(boolean enable) {
+        frameConfig.setEnabledNewInboxButton(enable);
+    }
 
 	@Override
 	public boolean isOverrideOn() {
@@ -1245,7 +1259,7 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 	public void setWorkflowStates(TreeSet<? extends I_GetConceptData> states) {
 		frameConfig.setWorkflowStates(states);
 	}
-	
+
 	@Override
 	public TreeSet<? extends I_GetConceptData> getWorkflowActions() {
 		return frameConfig.getWorkflowActions();

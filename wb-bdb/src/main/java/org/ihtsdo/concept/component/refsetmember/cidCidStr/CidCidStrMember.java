@@ -217,7 +217,8 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
         if (CidCidStrMember.class.isAssignableFrom(obj.getClass())) {
             CidCidStrMember another = (CidCidStrMember) obj;
             return this.c1Nid == another.c1Nid
-                    && this.c2Nid == another.c2Nid;
+                && this.c2Nid == another.c2Nid && this.nid == another.nid
+                && this.referencedComponentNid == another.referencedComponentNid;
         }
         return false;
     }

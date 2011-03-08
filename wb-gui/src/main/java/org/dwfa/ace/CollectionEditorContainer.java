@@ -353,8 +353,6 @@ public class CollectionEditorContainer extends JPanel {
             }
         }
 
-        listEditorTopPanel.add(new Toggle32x32(new ImageIcon(ACE.class.getResource("/32x32/plain/branch_delete.png"))),
-            c);
         return listEditorTopPanel;
 
     }

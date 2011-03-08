@@ -22,30 +22,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.search.ScoreDoc;
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
-import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery.GROUPING_TYPE;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.lucene.SearchResult;
@@ -115,8 +110,8 @@ public class DescStatement extends RefsetSpecStatement {
      *            String value for regex or lucene search
      * @throws Exception
      */
-    public DescStatement(boolean useNotQualifier, I_GetConceptData queryToken, String queryConstraint,
-            int refsetSpecNid, I_ConfigAceFrame config) throws Exception {
+    public DescStatement(boolean useNotQualifier, I_GetConceptData queryToken, String queryConstraint, int refsetSpecNid,
+            I_ConfigAceFrame config) throws Exception {
         super(useNotQualifier, queryToken, queryConstraint, refsetSpecNid, config);
 
         for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
@@ -134,19 +129,16 @@ public class DescStatement extends RefsetSpecStatement {
 			PositionSetBI v2_is) throws IOException, TerminologyException {
         if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
             I_DescriptionVersioned descriptionVersioned = (I_DescriptionVersioned) component;
-			I_DescriptionTuple descriptionTuple = descriptionVersioned
-					.getLastTuple();
+            I_DescriptionTuple descriptionTuple = descriptionVersioned.getLastTuple();
 
 			if (version != null || v1_is != null || v2_is != null) {
 				if (version == null)
-					throw new TerminologyException("Not in scope of V1 or V2: "
-							+ tokenEnum + " " + descriptionTuple.getText());
+                    throw new TerminologyException("Not in scope of V1 or V2: " + tokenEnum + " "
+                        + descriptionTuple.getText());
 				if (v1_is == null)
-					throw new TerminologyException("Need to set V1 IS: "
-							+ tokenEnum + " " + descriptionTuple.getText());
+                    throw new TerminologyException("Need to set V1 IS: " + tokenEnum + " " + descriptionTuple.getText());
 				if (v2_is == null)
-					throw new TerminologyException("Need to set V2 IS: "
-							+ tokenEnum + " " + descriptionTuple.getText());
+                    throw new TerminologyException("Need to set V2 IS: " + tokenEnum + " " + descriptionTuple.getText());
 			}
 
             switch (tokenEnum) {
@@ -154,105 +146,86 @@ public class DescStatement extends RefsetSpecStatement {
 				if (version == null) {
                 return descriptionIs(descriptionTuple);
 				} else {
-					return descriptionIs(descriptionVersioned, getVersion(
-							version, v1_is, v2_is));
+                    return descriptionIs(descriptionVersioned, getVersion(version, v1_is, v2_is));
 				}
             case DESC_IS_MEMBER_OF:
 				if (version == null) {
                 return descriptionIsMemberOf(descriptionTuple);
 				} else {
-					throw new TerminologyException(tokenEnum
-							+ ": Unsupported operation for version scope.");
+                    throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
 				}
             case DESC_STATUS_IS:
 				if (version == null) {
                 return descriptionStatusIs(descriptionTuple);
 				} else {
-					return descriptionStatusIs(descriptionVersioned,
-							getVersion(version, v1_is, v2_is));
+                    return descriptionStatusIs(descriptionVersioned, getVersion(version, v1_is, v2_is));
 				}
             case DESC_STATUS_IS_CHILD_OF:
 				if (version == null) {
                 return descriptionStatusIsChildOf(descriptionTuple);
 				} else {
-					return descriptionStatusIsChildOf(descriptionVersioned,
-							getVersion(version, v1_is, v2_is));
+                    return descriptionStatusIsChildOf(descriptionVersioned, getVersion(version, v1_is, v2_is));
 				}
             case DESC_STATUS_IS_KIND_OF:
 				if (version == null) {
                 return descriptionStatusIsKindOf(descriptionTuple);
 				} else {
-					return descriptionStatusIsKindOf(descriptionVersioned,
-							getVersion(version, v1_is, v2_is));
+                    return descriptionStatusIsKindOf(descriptionVersioned, getVersion(version, v1_is, v2_is));
 				}
             case DESC_STATUS_IS_DESCENDENT_OF:
 				if (version == null) {
            		     return descriptionStatusIsDescendentOf(descriptionTuple);
 				} else {
-					return descriptionStatusIsDescendentOf(
-							descriptionVersioned, getVersion(version, v1_is,
-									v2_is));
+                    return descriptionStatusIsDescendentOf(descriptionVersioned, getVersion(version, v1_is, v2_is));
 				}
             case DESC_TYPE_IS:
 				if (version == null) {
                 return descriptionTypeIs(descriptionTuple);
 				} else {
-					return descriptionTypeIs(descriptionVersioned, getVersion(
-							version, v1_is, v2_is));
+                    return descriptionTypeIs(descriptionVersioned, getVersion(version, v1_is, v2_is));
 				}
             case DESC_TYPE_IS_CHILD_OF:
 				if (version == null) {
                 return descriptionTypeIsChildOf(descriptionTuple);
 				} else {
-					return descriptionTypeIsChildOf(descriptionVersioned,
-							getVersion(version, v1_is, v2_is));
+                    return descriptionTypeIsChildOf(descriptionVersioned, getVersion(version, v1_is, v2_is));
 				}
             case DESC_TYPE_IS_KIND_OF:
 				if (version == null) {
                 return descriptionTypeIsKindOf(descriptionTuple);
 				} else {
-					return descriptionTypeIsKindOf(descriptionVersioned,
-							getVersion(version, v1_is, v2_is));
+                    return descriptionTypeIsKindOf(descriptionVersioned, getVersion(version, v1_is, v2_is));
 				}
             case DESC_TYPE_IS_DESCENDENT_OF:
 				if (version == null) {
                 return descriptionTypeIsDescendentOf(descriptionTuple);
 				} else {
-					return descriptionTypeIsDescendentOf(descriptionVersioned,
-							getVersion(version, v1_is, v2_is));
+                    return descriptionTypeIsDescendentOf(descriptionVersioned, getVersion(version, v1_is, v2_is));
 				}
             case DESC_REGEX_MATCH:
 				if (version == null) {
                 return descriptionRegexMatch(descriptionTuple);
 				} else {
-					return descriptionRegexMatch(descriptionVersioned,
-							getVersion(version, v1_is, v2_is));
+                    return descriptionRegexMatch(descriptionVersioned, getVersion(version, v1_is, v2_is));
 				}
             case DESC_LUCENE_MATCH:
 				if (version == null) {
                 return descriptionLuceneMatch(descriptionTuple);
 				} else {
-					throw new TerminologyException(tokenEnum
-							+ ": Unsupported operation for version scope.");
+                    throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
 				}
 			case ADDED_DESCRIPTION:
-				return addedDescription(descriptionVersioned, version, v1_is,
-						v2_is);
+                return addedDescription(descriptionVersioned, version, v1_is, v2_is);
 			case CHANGED_DESCRIPTION_CASE:
-				return changedDescriptionCase(descriptionVersioned, version,
-						v1_is, v2_is);
+                return changedDescriptionCase(descriptionVersioned, version, v1_is, v2_is);
 			case CHANGED_DESCRIPTION_LANGUAGE:
-				return changedDescriptionLanguage(descriptionVersioned,
-						version, v1_is, v2_is);
+                return changedDescriptionLanguage(descriptionVersioned, version, v1_is, v2_is);
 			case CHANGED_DESCRIPTION_STATUS:
-				return changedDescriptionStatus(descriptionVersioned, version,
-						v1_is, v2_is);
+                return changedDescriptionStatus(descriptionVersioned, version, v1_is, v2_is);
 			case CHANGED_DESCRIPTION_TERM:
-				return changedDescriptionTerm(descriptionVersioned, version,
-						v1_is, v2_is);
+                return changedDescriptionTerm(descriptionVersioned, version, v1_is, v2_is);
 			case CHANGED_DESCRIPTION_TYPE:
-				return changedDescriptionType(descriptionVersioned, version,
-						v1_is, v2_is);
+                return changedDescriptionType(descriptionVersioned, version, v1_is, v2_is);
             default:
                 throw new RuntimeException("Can't handle queryToken: " + queryToken);
             }
@@ -272,15 +245,14 @@ public class DescStatement extends RefsetSpecStatement {
 
     public I_RepresentIdSet getPossibleConcepts(I_RepresentIdSet parentPossibleConcepts,
             Collection<I_ShowActivity> activities) throws TerminologyException, IOException {
-        I_ShowActivity activity = setupActivityPanel(parentPossibleConcepts);
-        activities.add(activity);
+        I_ShowActivity activity = null;
         long startTime = System.currentTimeMillis();
+        this.activities = activities;
 
         I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();
         if (parentPossibleConcepts == null) {
             parentPossibleConcepts = termFactory.getConceptNidSet();
         }
-        activity.setProgressInfoLower("Incoming count: " + parentPossibleConcepts.cardinality());
 
         switch (tokenEnum) {
         case DESC_IS:
@@ -291,7 +263,7 @@ public class DescStatement extends RefsetSpecStatement {
                     termFactory.getRefsetExtensionMembers(((I_GetConceptData) queryConstraint).getConceptNid());
             Set<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
             for (I_ExtendByRef ext : refsetExtensions) {
-                refsetMembers.add(termFactory.getConcept(ext.getComponentId()));
+                refsetMembers.add(termFactory.getConcept(ext.getComponentNid()));
             }
             I_RepresentIdSet refsetMemberSet = termFactory.getIdSetfromTermCollection(refsetMembers);
             if (isNegated()) {
@@ -332,12 +304,14 @@ public class DescStatement extends RefsetSpecStatement {
         }
         setPossibleConceptsCount(possibleConcepts.cardinality());
 
+        if (activity != null) {
         long endTime = System.currentTimeMillis();
         long elapsed = endTime - startTime;
         String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
         activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Incoming count: "
             + parentPossibleConcepts.cardinality() + "; Outgoing count: " + possibleConcepts.cardinality());
         activity.complete();
+        }
         return possibleConcepts;
     }
 
@@ -408,14 +382,15 @@ public class DescStatement extends RefsetSpecStatement {
                     }
                     possibleLuceneConcMatches = Terms.get().getEmptyIdSet();
                     possibleLuceneDescMatches = Terms.get().getEmptyIdSet();
-                    for (ScoreDoc scoreDoc: results.topDocs.scoreDocs) {
-                        Document doc = results.searcher.doc(scoreDoc.doc);
+                    for (int i = 0; i < results.topDocs.totalHits; i++) {
+                        Document doc = results.searcher.doc(results.topDocs.scoreDocs[i].doc);
 
                         int cnid = Integer.parseInt(doc.get("cnid"));
                         int dnid = Integer.parseInt(doc.get("dnid"));
                         possibleLuceneDescMatches.setMember(dnid);
                         possibleLuceneConcMatches.setMember(cnid);
                         possibleDescriptions.setMember(dnid);
+
                     }
                 } catch (ParseException e) {
                     e.printStackTrace();
@@ -446,8 +421,7 @@ public class DescStatement extends RefsetSpecStatement {
         return descriptionTypeIs((I_GetConceptData) queryConstraint, descriptionBeingTested);
     }
 
-    private boolean descriptionTypeIs(I_GetConceptData requiredDescriptionType,
-            I_DescriptionTuple descriptionBeingTested) {
+    private boolean descriptionTypeIs(I_GetConceptData requiredDescriptionType, I_DescriptionTuple descriptionBeingTested) {
         return descriptionBeingTested.getTypeNid() == requiredDescriptionType.getConceptNid();
     }
 
@@ -475,13 +449,13 @@ public class DescStatement extends RefsetSpecStatement {
      * @throws IOException
      * @throws TerminologyException
      */
-    private boolean descriptionTypeIsDescendentOf(I_GetConceptData requiredType,
-            I_DescriptionTuple descriptionBeingChecked) throws IOException, TerminologyException {
+    private boolean descriptionTypeIsDescendentOf(I_GetConceptData requiredType, I_DescriptionTuple descriptionBeingChecked)
+            throws IOException, TerminologyException {
 
         I_GetConceptData descTypeBeingChecked = termFactory.getConcept(descriptionBeingChecked.getTypeNid());
 
-        return (((I_GetConceptData) queryConstraint).isParentOf(descTypeBeingChecked, currentStatuses, allowedTypes,
-            config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy()));
+        return (((I_GetConceptData) queryConstraint).isParentOf(descTypeBeingChecked, currentStatuses, allowedTypes, config
+            .getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy()));
     }
 
     private boolean descriptionTypeIsDescendentOf(I_DescriptionTuple descriptionBeingChecked) throws IOException,
@@ -542,8 +516,8 @@ public class DescStatement extends RefsetSpecStatement {
         }
     }
 
-    private boolean descriptionStatusIsDescendentOf(I_DescriptionTuple descriptionBeingChecked)
-            throws TerminologyException, IOException {
+    private boolean descriptionStatusIsDescendentOf(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException,
+            IOException {
         return descriptionStatusIsDescendentOf((I_GetConceptData) queryConstraint, descriptionBeingChecked);
     }
 
@@ -552,8 +526,8 @@ public class DescStatement extends RefsetSpecStatement {
 
         I_GetConceptData statusBeingChecked = termFactory.getConcept(descriptionBeingChecked.getStatusNid());
 
-        return (((I_GetConceptData) queryConstraint).isParentOf(statusBeingChecked, currentStatuses, allowedTypes,
-            config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy()));
+        return (((I_GetConceptData) queryConstraint).isParentOf(statusBeingChecked, currentStatuses, allowedTypes, config
+            .getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy()));
 
     }
 
@@ -561,9 +535,8 @@ public class DescStatement extends RefsetSpecStatement {
             IOException {
         I_GetConceptData statusBeingChecked = termFactory.getConcept(descriptionBeingChecked.getStatusNid());
 
-        return (((I_GetConceptData) queryConstraint).isParentOfOrEqualTo(statusBeingChecked, currentStatuses,
-            allowedTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config
-                .getConflictResolutionStrategy()));
+        return (((I_GetConceptData) queryConstraint).isParentOfOrEqualTo(statusBeingChecked, currentStatuses, allowedTypes,
+            config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy()));
     }
 
     private boolean descriptionIs(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException {
@@ -586,10 +559,13 @@ public class DescStatement extends RefsetSpecStatement {
     }
 
     private boolean descriptionLuceneMatch(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException {
-        if (possibleLuceneDescMatches != null) {
-            return possibleLuceneDescMatches.isMember(descriptionBeingChecked.getDescId());
-        }
         String queryConstraintString = (String) queryConstraint;
+        if (possibleLuceneDescMatches != null) {
+            if (possibleLuceneDescMatches.isMember(descriptionBeingChecked.getDescId())) {
+                return true;
+        }
+        }
+
         SearchResult results;
         try {
         	results = termFactory.doLuceneSearch(queryConstraintString);
@@ -597,14 +573,15 @@ public class DescStatement extends RefsetSpecStatement {
             if (results == null || results.topDocs.totalHits == 0) {
                 return false;
             } else {
+                for (int i = 0; i < results.topDocs.totalHits; i++) {
+                    Document doc = results.searcher.doc(results.topDocs.scoreDocs[i].doc);
 
-                 for (ScoreDoc scoreDoc: results.topDocs.scoreDocs) {
-                    Document doc = results.searcher.doc(scoreDoc.doc);
                     int dnid = Integer.parseInt(doc.get("dnid"));
                     int cnid = Integer.parseInt(doc.get("cnid"));
 
                     I_DescriptionVersioned description = termFactory.getDescription(dnid, cnid);
-                    if (descriptionBeingChecked.getDescId() == description.getDescId()) {
+                    if (descriptionBeingChecked.getDescId() == description.getDescId()
+                        && descriptionBeingChecked.getConceptNid() == description.getConceptNid()) {
                         return true;
                     }
                 }
@@ -753,8 +730,7 @@ public class DescStatement extends RefsetSpecStatement {
 			throws TerminologyException {
 		I_DescriptionVersioned queryConstraintDesc = (I_DescriptionVersioned) queryConstraint;
 		I_DescriptionTuple a = getVersion(descriptionBeingTested, pos);
-		return (a != null && descriptionBeingTested.getDescId() == queryConstraintDesc
-				.getDescId());
+        return (a != null && descriptionBeingTested.getDescId() == queryConstraintDesc.getDescId());
 	}
 
 	private boolean descriptionStatusIs(
@@ -823,8 +799,7 @@ public class DescStatement extends RefsetSpecStatement {
 	private boolean descriptionTypeIsKindOf(
 			I_DescriptionVersioned descriptionBeingTested, PositionSetBI pos)
 			throws TerminologyException, IOException {
-		return descriptionTypeIs(descriptionBeingTested, pos)
-				|| descriptionTypeIsDescendentOf(descriptionBeingTested, pos);
+        return descriptionTypeIs(descriptionBeingTested, pos) || descriptionTypeIsDescendentOf(descriptionBeingTested, pos);
 	}
 
 	private boolean descriptionRegexMatch(
@@ -833,9 +808,7 @@ public class DescStatement extends RefsetSpecStatement {
 		if (regexPattern == null) {
 			String queryConstraintString = (String) queryConstraint;
 			regexPattern = Pattern.compile(queryConstraintString);
-			AceLog.getAppLog().info(
-					"Compiling regex: " + regexPattern + " into: "
-							+ regexPattern);
+            AceLog.getAppLog().info("Compiling regex: " + regexPattern + " into: " + regexPattern);
 		}
 		I_DescriptionTuple a = getVersion(descriptionBeingTested, pos);
 		if (a == null)

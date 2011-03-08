@@ -49,6 +49,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 
 public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
+    I_ChangeTableInSwing tableChangedSwingWorker;
 
     /**
      * 
@@ -70,8 +71,8 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                 promotionRefsetIds.add(RefsetAuxiliary.Concept.PROMOTION_REL.localize().getNid());
                 promotionTuples =
                         refsetConcept.getSourceRelTuples(host.getConfig().getAllowedStatus(), promotionRefsetIds, host
-                            .getConfig().getViewPositionSetReadOnly(), host.getConfig().getPrecedence(),
-                            host.getConfig().getConflictResolutionStrategy());
+                            .getConfig().getViewPositionSetReadOnly(), host.getConfig().getPrecedence(), host.getConfig()
+                            .getConflictResolutionStrategy());
                 Iterator<? extends I_RelTuple> promotionIterator = promotionTuples.iterator();
                 promotionRefsetComponentMap = new HashMap<Integer, I_ExtendByRef>();
                 if (promotionIterator.hasNext()) {
@@ -83,6 +84,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                         promotionRefsetComponentMap.put(ext.getComponentId(), ext);
                     }
                 }
+
             } catch (Exception e) {
                 AceLog.getAppLog().alertAndLogException(e);
             } 
@@ -94,6 +96,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
 
         @Override
         protected Boolean construct() throws Exception {
+
             if (refConWorker != null) {
                 refConWorker.stop();
             }
@@ -126,8 +129,8 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                 }
 
                 List<? extends I_ExtendByRefVersion> original =
-                        extension.getTuples(statusSet, positionSet, 
-                            host.getConfig().getPrecedence(), host.getConfig().getConflictResolutionStrategy());
+                        extension.getTuples(statusSet, positionSet, host.getConfig().getPrecedence(), host.getConfig()
+                            .getConflictResolutionStrategy());
                 List<I_ExtendByRefVersion> allParts = new ArrayList<I_ExtendByRefVersion>();
                 allParts.addAll(original);
 
@@ -180,8 +183,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                                 throw new UnsupportedOperationException();
                             case IMMUTABLE:
                                 if (col.readParamaters != null) {
-                                    conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple,
-                                        col.readParamaters));
+                                    conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple, col.readParamaters));
                                 } else {
                                     conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple));
                                 }
@@ -212,8 +214,8 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                                                             new Exception(obj + " is not an instance of Integer"));
                                                     }
                                                 } catch (Exception e) {
-                                                    AceLog.getAppLog().alertAndLogException(new Exception(
-                                                        "ReflexiveRefsetTableModel.CONCEPT_IDENTIFIER:", e));
+                                                    AceLog.getAppLog().alertAndLogException(
+                                                        new Exception("ReflexiveRefsetTableModel.CONCEPT_IDENTIFIER:", e));
                                                 }
                                             } 
                                         }
@@ -254,21 +256,25 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                     if (stopWork) {
                         return false;
                     }
+
                     if (allTuples == null) {
                         AceLog.getAppLog().info("all tuples for RefsetMemberTableModel is  null");
                         return false;
                     }
+
                     if (addPart) {
                         allTuples.add(ebrTuple);
                     } else {
                         allTuples.remove(ebrTuple);
                     }
+
                 }
             }
 
             refConWorker = new ReferencedConceptsSwingWorker();
             refConWorker.start();
             return true;
+
         }
 
         @Override
@@ -314,16 +320,13 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
     @SuppressWarnings("unchecked")
     public Object getPromotionRefsetValue(I_ExtendByRef extension, ReflexiveRefsetFieldData col) throws IOException,
             IllegalAccessException, InvocationTargetException, TerminologyException {
-        if (promotionRefsetComponentMap != null && 
-                promotionRefsetComponentMap.containsKey(extension.getNid())) {
+        if (promotionRefsetComponentMap != null && promotionRefsetComponentMap.containsKey(extension.getNid())) {
             I_ExtendByRef promotionMember = promotionRefsetComponentMap.get(extension.getNid());
             if (promotionMember != null) {
-                List<I_ExtendByRefVersion> promotionTuples = (List<I_ExtendByRefVersion>) 
-                promotionMember.getTuples(
-                    host.getConfig().getAllowedStatus(), 
-                    host.getConfig().getViewPositionSetReadOnly(),
-                    host.getConfig().getPrecedence(), 
-                    host.getConfig().getConflictResolutionStrategy());
+                List<I_ExtendByRefVersion> promotionTuples =
+                        (List<I_ExtendByRefVersion>) promotionMember.getTuples(host.getConfig().getAllowedStatus(), host
+                            .getConfig().getViewPositionSetReadOnly(), host.getConfig().getPrecedence(), host.getConfig()
+                            .getConflictResolutionStrategy());
                 if (promotionTuples.size() > 0) {
                     return col.getReadMethod().invoke(promotionTuples.get(0).getMutablePart());
                 }
@@ -336,6 +339,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
         if (tableChangeWorker != null) {
             tableChangeWorker.setStopWork(true);
         }
+
         allTuples = null;
         values = null;
         allExtensions = null;
@@ -349,6 +353,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
             this.tableComponentId = host.getTermComponent().getNid();
         }
         fireTableDataChanged();
+
     }
 
     public I_GetConceptData getPromotionRefsetIdentityConcept() {
@@ -366,10 +371,25 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
 
     @Override
     protected I_ChangeTableInSwing getTableChangedSwingWorker(int tableComponentId2, Integer promotionFilterId) {
-        return new TableChangedSwingWorker(tableComponentId2, promotionFilterId);
+
+        if (tableChangedSwingWorker == null) {
+            tableChangedSwingWorker = new TableChangedSwingWorker(tableComponentId2, promotionFilterId);
+        } else {
+            while (!tableChangedSwingWorker.isDone()) {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+    }
+            }
+            tableChangedSwingWorker = new TableChangedSwingWorker(tableComponentId2, promotionFilterId);
+        }
+        return tableChangedSwingWorker;
     }
 
     public Set<Integer> getSelectedTuples() {
+
         Set<Integer> memberNids = new HashSet<Integer>(checkedRows.cardinality());
         for (int i = checkedRows.nextSetBit(0); i >= 0; i = checkedRows.nextSetBit(i + 1)) {
             if (i < allTuples.size()) {
@@ -377,19 +397,21 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                 memberNids.add(tuple.getNid());
             } else {
             	//TODO verify this is correct behaviour -- Chrissy...
-            	/* Why did we previously get: 
-            	
-            	Exception in thread "AWT-EventQueue-0" java.lang.IndexOutOfBoundsException: Index: 18, Size: 18
-            	at java.util.ArrayList.RangeCheck(ArrayList.java:547)
-            	at java.util.ArrayList.get(ArrayList.java:322)
-            	at org.dwfa.ace.table.refset.ReflexiveRefsetTableModel.getSelectedTuples(ReflexiveRefsetTableModel.java:364)
-
+                /*
+                 * Why did we previously get:
+                 * 
+                 * Exception in thread "AWT-EventQueue-0"
+                 * java.lang.IndexOutOfBoundsException: Index: 18, Size: 18
+                 * at java.util.ArrayList.RangeCheck(ArrayList.java:547)
+                 * at java.util.ArrayList.get(ArrayList.java:322)
+                 * atorg.dwfa.ace.table.refset.ReflexiveRefsetTableModel.
+                 * getSelectedTuples(ReflexiveRefsetTableModel.java:364)
             	*/
-                AceLog.getAppLog().warning("Selected row > row collection: " + i + 
-                    " all tuples: " + allTuples);
+                AceLog.getAppLog().warning("Selected row > row collection: " + i + " all tuples: " + allTuples);
             }
         }
         return memberNids;
+
     }
 
     public void clearSelectedTuples() {
