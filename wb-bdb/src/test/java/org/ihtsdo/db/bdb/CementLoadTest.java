@@ -29,7 +29,6 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class CementLoadTest {
@@ -38,7 +37,6 @@ public class CementLoadTest {
     DataOutputStream eConceptDOS;
 
     @Test
-    @Ignore
     public void cementLoadTest() {
         try {
             dbTarget = "target/" + UUID.randomUUID();

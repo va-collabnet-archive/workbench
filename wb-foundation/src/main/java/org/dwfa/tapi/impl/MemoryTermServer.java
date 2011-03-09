@@ -90,10 +90,12 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
 
     private static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
 
+    @Override
     public Collection<I_ConceptualizeLocally> doConceptSearch(String[] words) throws IOException, TerminologyException {
         return doConceptSearch(Arrays.asList(words));
     }
 
+    @Override
     public Collection<I_ConceptualizeLocally> doConceptSearch(List<String> words) throws IOException,
             TerminologyException {
         Set<I_ConceptualizeLocally> concepts = new HashSet<I_ConceptualizeLocally>();
@@ -103,11 +105,13 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
         return concepts;
     }
 
+    @Override
     public Collection<I_DescribeConceptLocally> doDescriptionSearch(String[] words) throws IOException,
             TerminologyException {
         return doDescriptionSearch(Arrays.asList(words));
     }
 
+    @Override
     public Collection<I_DescribeConceptLocally> doDescriptionSearch(List<String> words) throws IOException,
             TerminologyException {
         List<Pattern> patterns = new ArrayList<Pattern>(words.size());
@@ -131,20 +135,24 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
         return matchList;
     }
 
+    @Override
     public I_ConceptualizeLocally getConcept(int conceptNid) throws IOException, TerminologyException {
         return conceptMap.get(conceptNid);
     }
 
+    @Override
     public I_DescribeConceptLocally getDescription(int descriptionNid, int conceptNid) throws IOException,
             TerminologyException {
         return descMap.get(descriptionNid);
     }
 
+    @Override
     public Collection<I_DescribeConceptLocally> getDescriptionsForConcept(I_ConceptualizeLocally concept)
             throws IOException, TerminologyException {
         return conNidDescMap.get(concept.getNid());
     }
 
+    @Override
     public Collection<I_RelateConceptsLocally> getDestRels(I_ConceptualizeLocally dest) throws IOException,
             TerminologyException {
         Collection<I_RelateConceptsLocally> rels = destRelMap.get(dest.getNid());
@@ -154,6 +162,7 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
         return rels;
     }
 
+    @Override
     public int getNid(UUID uid) throws NoMappingException {
         if (uuidIntMap.containsKey(uid) == false) {
             if (generateIds) {
@@ -168,6 +177,7 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
         return uuidIntMap.get(uid);
     }
 
+    @Override
     public int getNid(Collection<UUID> uids) throws NoMappingException {
         for (UUID uid : uids) {
             if (uuidIntMap.containsKey(uid)) {
@@ -185,14 +195,17 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
         throw new NoMappingException("No nid found for: " + uids);
     }
 
+    @Override
     public I_RelateConceptsLocally getRel(int relNid) {
         return relMap.get(relNid);
     }
 
+    @Override
     public Collection<I_ConceptualizeLocally> getRoots() {
         return roots;
     }
 
+    @Override
     public Collection<I_RelateConceptsLocally> getSourceRels(I_ConceptualizeLocally source) {
         Collection<I_RelateConceptsLocally> rels = srcRelMap.get(source.getNid());
         if (rels == null) {
@@ -201,6 +214,7 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
         return rels;
     }
 
+    @Override
     public Collection<UUID> getUids(int nid) {
         return intUuidMap.get(nid);
     }
@@ -240,6 +254,7 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
         intUuidMap.put(idl.getNid(), idu.getUids());
     }
 
+    @Override
     public I_ExtendLocally getExtension(I_ManifestLocally component, I_ConceptualizeLocally extensionType) {
         if (extensions.containsKey(component.getNid())) {
             Map<Integer, I_ExtendLocally> types = extensions.get(component.getNid());
