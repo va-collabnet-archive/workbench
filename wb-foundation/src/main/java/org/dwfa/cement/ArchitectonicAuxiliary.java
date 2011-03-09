@@ -427,6 +427,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                     new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             IS_SAME_AS_REL("is same as (relationship type)",
                      new I_ConceptualizeUniversally[] { RELATIONSHIP }),
+            IS_ORIGIN("is a Path Origin of (relationship type)",
+                             new I_ConceptualizeUniversally[] { RELATIONSHIP }),         
             IS_ANALOG("is an analog of (relationship type)",
                              new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             IS_READ_V2_V3_ANALOG("is a Read V2 analog of Read V3(relationship type)",
