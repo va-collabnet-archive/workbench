@@ -1138,7 +1138,7 @@ public class BdbCommitManager {
                                 if (canceled) return runnerAlerts;
                             }
                         }
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         AceLog.getEditLog().alertAndLogException(e);
                     }
                     latch.countDown();
