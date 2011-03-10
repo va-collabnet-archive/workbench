@@ -89,19 +89,41 @@ import org.ihtsdo.tk.spec.SpecFactory;
 import org.ihtsdo.util.swing.GuiUtil;
 
 public class ConceptView extends JPanel {
-    
+
     private final ConceptViewRenderer cvRenderer;
-    
+
+    private class PanelsChangedActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            settings.getNavigator().updateHistoryPanel();
+                        }
+                    });
+                }
+            });
+        }
+    }
+
     private void setupPrefMap() {
         prefMap.put(PanelSection.CONCEPT, new CollapsePanelPrefs());
         prefMap.put(PanelSection.DESC, new CollapsePanelPrefs());
         prefMap.put(PanelSection.REL, new CollapsePanelPrefs());
         prefMap.put(PanelSection.REL_GRP, new CollapsePanelPrefs());
         prefMap.put(PanelSection.EXTRAS, new CollapsePanelPrefs());
+
+
     }
-    
+
     public class LayoutConceptWorker extends SwingWorker<Map<SpecBI, Integer>, Boolean> {
-        
+
         private Set<Integer> saps;
         private Set<PositionBI> positions;
         private Set<PathBI> paths;
@@ -112,11 +134,11 @@ public class ConceptView extends JPanel {
         private Collection<? extends RelGroupVersionBI> relGroups;
         private List<? extends I_DescriptionTuple> descriptions;
         private I_GetConceptData layoutConcept;
-        
+
         public LayoutConceptWorker() {
             super();
         }
-        
+
         @Override
         protected Map<SpecBI, Integer> doInBackground() throws Exception {
             //TODO move all layout to background thread, and return a complte panel...
@@ -144,7 +166,7 @@ public class ConceptView extends JPanel {
             }
             return kb.setConcept(layoutConcept);
         }
-        
+
         @Override
         protected void done() {
             try {
@@ -164,9 +186,10 @@ public class ConceptView extends JPanel {
                         gbc.gridy = 0;
                         setupHistoryPane();
                         gbc.anchor = GridBagConstraints.NORTHWEST;
-                        
+
                         CollapsePanel cpe = new CollapsePanel("concept:", settings,
                                 prefMap.get(PanelSection.CONCEPT), PanelSection.CONCEPT);
+                        cpe.addPanelsChangedActionListener(pcal);
                         add(cpe, gbc);
                         gbc.gridy++;
                         I_TermFactory tf = Terms.get();
@@ -181,8 +204,8 @@ public class ConceptView extends JPanel {
                         cpe.setTemplateCount(0);
                         add(cac, gbc);
                         gbc.gridy++;
-                        
-                        
+
+
                         if (memberRefsets != null) {
                             for (RefexVersionBI<?> extn : memberRefsets) {
                                 int refsetNid = extn.getCollectionNid();
@@ -203,9 +226,10 @@ public class ConceptView extends JPanel {
                                 }
                             }
                         }
-                        
+
                         CollapsePanel cpd = new CollapsePanel("descriptions:", settings,
                                 prefMap.get(PanelSection.DESC), PanelSection.DESC);
+                        cpd.addPanelsChangedActionListener(pcal);
                         cpd.setAlertCount(0);
                         cpd.setRefexCount(0);
                         cpd.setHistoryCount(1);
@@ -222,10 +246,11 @@ public class ConceptView extends JPanel {
                             cpd.setHistoryCount(cpd.historyCount += dc.getHistorySubpanelCount());
                             cpd.setTemplateCount(cpd.templateCount += dc.getTemplateSubpanelCount());
                         }
-                        
-                        
+
+
                         CollapsePanel cpr = new CollapsePanel("relationships:", settings,
                                 prefMap.get(PanelSection.REL), PanelSection.REL);
+                        cpr.addPanelsChangedActionListener(pcal);
                         cpr.setAlertCount(0);
                         cpr.setRefexCount(0);
                         cpr.setHistoryCount(0);
@@ -248,7 +273,7 @@ public class ConceptView extends JPanel {
                                 cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
                             }
                         }
-                        
+
                         try {
                             for (RelGroupVersionBI r : relGroups) {
                                 Collection<? extends RelationshipVersionBI> currentRels =
@@ -272,11 +297,12 @@ public class ConceptView extends JPanel {
                         } catch (ContraditionException e) {
                             AceLog.getAppLog().alertAndLogException(e);
                         }
-                        
+
                         if (templates.size() > 0) {
                             CollapsePanel cptemplate =
                                     new CollapsePanel("aggregate extras", settings,
                                     prefMap.get(PanelSection.EXTRAS), PanelSection.EXTRAS);
+                            cptemplate.addPanelsChangedActionListener(pcal);
                             cptemplate.setTemplateCount(templates.size());
                             cptemplate.setRefexCount(0);
                             cptemplate.setHistoryCount(0);
@@ -319,7 +345,7 @@ public class ConceptView extends JPanel {
             if (settings.getNavigator() != null
                     && settings.getNavigatorButton().isSelected()) {
                 SwingUtilities.invokeLater(new Runnable() {
-                    
+
                     @Override
                     public void run() {
                         settings.getNavigator().updateHistoryPanel();
@@ -327,16 +353,15 @@ public class ConceptView extends JPanel {
                 });
             }
         }
-        
+
         public class RefreshHistoryViewListener implements ActionListener {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
                 settings.getNavigator().updateHistoryPanel();
             }
-            
         }
-        
+
         private void setupHistoryPane() throws IOException, ContraditionException {
             int row = 0;
             getHistoryPanel().removeAll();
@@ -356,7 +381,7 @@ public class ConceptView extends JPanel {
                         Ts.get().getConceptVersion(coordinate, path.getConceptNid());
                 JCheckBox pathCheck = getJCheckBox();
                 pathCheck.addActionListener(new RefreshHistoryViewListener());
-                
+
                 if (settings.getNavigator().getDropSide()
                         == ConceptViewSettings.SIDE.LEFT) {
                     gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -367,7 +392,7 @@ public class ConceptView extends JPanel {
                     pathCheck.setHorizontalTextPosition(SwingConstants.LEFT);
                     pathCheck.setHorizontalAlignment(SwingConstants.RIGHT);
                 }
-                
+
                 pathCheck.setText(pathVersion.getPreferredDescription().getText());
                 pathCheck.setSelected(true);
                 rowToPathCheckMap.put(row, pathCheck);
@@ -379,9 +404,9 @@ public class ConceptView extends JPanel {
         }
     }
     private Object lastThingBeingDropped;
-    
+
     public void setupDrop(Object thingBeingDropped) {
-        
+
         if (thingBeingDropped != null) {
             if (lastThingBeingDropped == null
                     || thingBeingDropped.equals(lastThingBeingDropped) == false) {
@@ -403,12 +428,14 @@ public class ConceptView extends JPanel {
             System.out.println("Changing to null");
             actionList.clear();
             dropComponents.clear();
+
+
         }
-        
+
     }
-    
+
     public class DropPanelActionManager implements ActionListener, I_DispatchDragStatus {
-        
+
         private Timer timer;
         private boolean dragging = false;
         private JComponent dropPanel = new JLabel("dropPanel");
@@ -417,7 +444,7 @@ public class ConceptView extends JPanel {
         private boolean gridLayout = true;
         private JPanel sfp;
         private Collection<JComponent> addedDropComponents = new ArrayList<JComponent>();
-        
+
         public DropPanelActionManager() {
             super();
             new DropPanelProxy(this);
@@ -426,17 +453,17 @@ public class ConceptView extends JPanel {
         /* (non-Javadoc)
          * @see org.ihtsdo.arena.conceptview.I_DispatchDragStatus#dragStarted()
          */
-        
+
         @Override
         public void dragStarted() {
-            
+
             LayoutManager layout = new FlowLayout(FlowLayout.LEADING, 5, 5);
             sfp = new ScrollablePanel(layout);
             if (gridLayout) {
                 layout = new GridLayout(0, 1, 5, 5);
                 sfp = new JPanel(layout);
             }
-            
+
             sfp.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
             dropPanel = new JPanel(new GridLayout(1, 1));
             sfpScroller = new JScrollPane(sfp);
@@ -451,7 +478,7 @@ public class ConceptView extends JPanel {
         /* (non-Javadoc)
          * @see org.ihtsdo.arena.conceptview.I_DispatchDragStatus#dragFinished()
          */
-        
+
         @Override
         public void dragFinished() {
             timer.stop();
@@ -466,7 +493,7 @@ public class ConceptView extends JPanel {
         /* (non-Javadoc)
          * @see org.ihtsdo.arena.conceptview.I_DispatchDragStatus#actionPerformed(java.awt.event.ActionEvent)
          */
-        
+
         @Override
         public void actionPerformed(ActionEvent e) {
             if (dragging) {
@@ -513,13 +540,13 @@ public class ConceptView extends JPanel {
                     } else {
                         setDragPanelVisible(false);
                     }
-                    
+
                 }
             } else {
                 setDragPanelVisible(false);
             }
         }
-        
+
         private void setDragPanelVisible(boolean visible) {
             if (visible) {
                 if (ConceptView.this.isVisible()) {
@@ -545,16 +572,16 @@ public class ConceptView extends JPanel {
             }
         }
     }
-    
+
     private class UpdateTextTemplateDocumentListener
             implements DocumentListener, ActionListener {
-        
+
         FixedWidthJEditorPane editorPane;
         DescriptionSpec desc;
         Timer t;
         I_GetConceptData c;
         boolean update = false;
-        
+
         public UpdateTextTemplateDocumentListener(FixedWidthJEditorPane editorPane,
                 DescriptionSpec desc) throws TerminologyException, IOException {
             super();
@@ -564,22 +591,22 @@ public class ConceptView extends JPanel {
             t.start();
             c = Terms.get().getConcept(desc.getConceptSpec().get(config.getViewCoordinate()).getNid());
         }
-        
+
         @Override
         public void insertUpdate(DocumentEvent e) {
             update = true;
         }
-        
+
         @Override
         public void removeUpdate(DocumentEvent e) {
             update = true;
         }
-        
+
         @Override
         public void changedUpdate(DocumentEvent e) {
             update = true;
         }
-        
+
         @Override
         public void actionPerformed(ActionEvent e) {
             if (update) {
@@ -600,9 +627,9 @@ public class ConceptView extends JPanel {
             Collections.synchronizedCollection(new ArrayList<Action>());
     private KnowledgeBase kbase;
     private I_GetConceptData concept;
-    
+
     public enum PanelSection {
-        
+
         CONCEPT,
         DESC, REL, REL_GRP, EXTRAS
     };
@@ -610,11 +637,12 @@ public class ConceptView extends JPanel {
             new EnumMap<PanelSection, CollapsePanelPrefs>(PanelSection.class);
     private TreeSet<PositionBI> positionOrderedSet = new TreeSet(new PositionComparator());
     private Map<PathBI, Integer> pathRowMap = new HashMap<PathBI, Integer>();
-    
+    private PanelsChangedActionListener pcal = new PanelsChangedActionListener();
+
     public I_GetConceptData getConcept() {
         return concept;
     }
-    
+
     public void setConcept(I_GetConceptData concept) {
         this.concept = concept;
     }
@@ -624,7 +652,7 @@ public class ConceptView extends JPanel {
     private Map<PositionBI, Collection<ComponentVersionDragPanel<?>>> positionPanelMap =
             new HashMap<PositionBI, Collection<ComponentVersionDragPanel<?>>>();
     private Map<Integer, JCheckBox> rowToPathCheckMap = new HashMap<Integer, JCheckBox>();
-    
+
     public ConceptView(I_ConfigAceFrame config,
             ConceptViewSettings settings, ConceptViewRenderer cvRenderer) {
         super();
@@ -635,15 +663,15 @@ public class ConceptView extends JPanel {
         addCommitListener(settings);
         setupPrefMap();
     }
-    
+
     public Map<Integer, JCheckBox> getRowToPathCheckMap() {
         return rowToPathCheckMap;
     }
-    
+
     public Map<PositionBI, Collection<ComponentVersionDragPanel<?>>> getPositionPanelMap() {
         return positionPanelMap;
     }
-    
+
     private void addToPositionPanelMap(ComponentVersionDragPanel<?> panel) throws IOException {
         ComponentVersionBI cv = panel.getComponentVersion();
         PositionBI position = cv.getPosition();
@@ -655,21 +683,21 @@ public class ConceptView extends JPanel {
         }
         panels.add(panel);
     }
-    
+
     public void addHostListener(PropertyChangeListener l) {
         if (settings != null && settings.getHost() != null) {
             settings.getHost().addPropertyChangeListener("termComponent", l);
         }
     }
-    
+
     public JPanel getHistoryPanel() {
         return cvRenderer.getHistoryPanel();
     }
-    
+
     public boolean isHistoryShown() {
         return historyShown;
     }
-    
+
     public void setHistoryShown(boolean historyShown) {
         if (historyShown != this.historyShown) {
             this.historyShown = historyShown;
@@ -679,7 +707,7 @@ public class ConceptView extends JPanel {
             if (historyShown) {
                 if (settings.getNavigator() != null) {
                     SwingUtilities.invokeLater(new Runnable() {
-                        
+
                         @Override
                         public void run() {
                             settings.getNavigator().updateHistoryPanel();
@@ -689,30 +717,31 @@ public class ConceptView extends JPanel {
             }
         }
     }
-    
+
     private void addCommitListener(ConceptViewSettings settings) {
         settings.getConfig().addPropertyChangeListener("commit",
                 new PropertyChangeListener() {
-                    
+
                     @Override
                     public void propertyChange(PropertyChangeEvent evt) {
                         layoutConcept(ConceptView.this.concept);
                     }
                 });
     }
-    
+
     public void layoutConcept(I_GetConceptData concept) {
         removeAll();
         this.concept = concept;
         (new LayoutConceptWorker()).execute();
     }
-    
+
     public DragPanelRelGroup getRelGroupComponent(RelGroupVersionBI group,
             CollapsePanel parentCollapsePanel)
             throws TerminologyException, IOException, ContraditionException {
         DragPanelRelGroup relGroupPanel =
                 new DragPanelRelGroup(new GridBagLayout(), settings,
                 parentCollapsePanel, group);
+        relGroupPanel.addPanelsChangedActionListener(pcal);
         relGroupPanel.setupDrag(group);
         relGroupPanel.setBorder(BorderFactory.createRaisedBevelBorder());
         JLabel relGroupLabel = getJLabel(" ");
@@ -736,6 +765,7 @@ public class ConceptView extends JPanel {
         CollapsePanel cprg = new CollapsePanel("group:", settings,
                 new CollapsePanelPrefs(prefMap.get(PanelSection.REL_GRP)),
                 PanelSection.REL_GRP);
+        cprg.addPanelsChangedActionListener(pcal);
         cprg.setAlertCount(0);
         cprg.setRefexCount(0);
         cprg.setHistoryCount(0);
@@ -744,6 +774,7 @@ public class ConceptView extends JPanel {
         gbc.gridy++;
         for (RelationshipVersionBI r : group.getCurrentRels()) { //TODO getCurrentRels
             DragPanelRel dpr = getRelComponent(r, parentCollapsePanel);
+            dpr.addPanelsChangedActionListener(pcal);
             cprg.addToggleComponent(dpr);
             dpr.setInGroup(true);
             relGroupPanel.add(dpr, gbc);
@@ -753,31 +784,33 @@ public class ConceptView extends JPanel {
             cprg.setHistoryCount(cprg.historyCount += dpr.getHistorySubpanelCount());
             cprg.setTemplateCount(cprg.templateCount += dpr.getTemplateSubpanelCount());
         }
-        
+
         return relGroupPanel;
-        
+
     }
-    
+
     public DragPanelConceptAttributes getConAttrComponent(ConAttrAnalogBI conAttr,
             CollapsePanel parentCollapsePanel)
             throws TerminologyException, IOException {
         DragPanelConceptAttributes dragConAttrPanel =
                 new DragPanelConceptAttributes(new GridBagLayout(), settings,
                 parentCollapsePanel, conAttr);
+        dragConAttrPanel.addPanelsChangedActionListener(pcal);
         addToPositionPanelMap(dragConAttrPanel);
         return dragConAttrPanel;
     }
-    
+
     public DragPanelDescription getDescComponent(DescriptionAnalogBI desc,
             CollapsePanel parentCollapsePanel)
             throws TerminologyException, IOException {
         DragPanelDescription dragDescPanel =
                 new DragPanelDescription(new GridBagLayout(), settings,
                 parentCollapsePanel, desc);
+        dragDescPanel.addPanelsChangedActionListener(pcal);
         addToPositionPanelMap(dragDescPanel);
         return dragDescPanel;
     }
-    
+
     public DragPanelDescTemplate getDescTemplate(final DescriptionSpec desc)
             throws TerminologyException, IOException {
         DragPanelDescTemplate descPanel =
@@ -804,7 +837,7 @@ public class ConceptView extends JPanel {
         descPanel.add(typeLabel, gbc);
         typeLabel.addPropertyChangeListener("termComponent",
                 new PropertyChangeListener() {
-                    
+
                     @Override
                     public void propertyChange(PropertyChangeEvent evt) {
                         try {
@@ -817,7 +850,7 @@ public class ConceptView extends JPanel {
                         }
                     }
                 });
-        
+
         gbc.gridx++;
         descPanel.add(new JSeparator(SwingConstants.VERTICAL), gbc);
         gbc.weightx = 1;
@@ -825,7 +858,7 @@ public class ConceptView extends JPanel {
         FixedWidthJEditorPane textPane = new FixedWidthJEditorPane();
         textPane.setEditable(true);
         textPane.setOpaque(false);
-        
+
         textPane.setFont(textPane.getFont().deriveFont(settings.getFontSize()));
         textPane.setText(desc.getDescText());
         descPanel.add(textPane, gbc);
@@ -833,7 +866,7 @@ public class ConceptView extends JPanel {
                 new UpdateTextTemplateDocumentListener(textPane, desc));
         return descPanel;
     }
-    
+
     public DragPanelRelTemplate getRelTemplate(final RelSpec spec)
             throws TerminologyException, IOException {
         ViewCoordinate coordinate = config.getViewCoordinate();
@@ -861,7 +894,7 @@ public class ConceptView extends JPanel {
         relPanel.add(typeLabel, gbc);
         typeLabel.addPropertyChangeListener("termComponent",
                 new PropertyChangeListener() {
-                    
+
                     @Override
                     public void propertyChange(PropertyChangeEvent evt) {
                         try {
@@ -881,7 +914,7 @@ public class ConceptView extends JPanel {
         relPanel.add(destLabel, gbc);
         destLabel.addPropertyChangeListener("termComponent",
                 new PropertyChangeListener() {
-                    
+
                     @Override
                     public void propertyChange(PropertyChangeEvent evt) {
                         try {
@@ -895,7 +928,7 @@ public class ConceptView extends JPanel {
                 });
         return relPanel;
     }
-    
+
     public DragPanelRel getRelComponent(RelationshipVersionBI r,
             CollapsePanel parentCollapsePanel)
             throws TerminologyException, IOException {
@@ -928,7 +961,7 @@ public class ConceptView extends JPanel {
         TermComponentLabel typeLabel = getLabel(r.getTypeNid(), canDrop);
         typeLabel.addPropertyChangeListener("termComponent",
                 new PropertyChangeManager<RelationshipAnalogBI>((RelationshipAnalogBI) r) {
-                    
+
                     @Override
                     protected void changeProperty(I_GetConceptData newValue) {
                         try {
@@ -954,7 +987,7 @@ public class ConceptView extends JPanel {
         TermComponentLabel destLabel = getLabel(r.getDestinationNid(), canDrop);
         typeLabel.addPropertyChangeListener("termComponent",
                 new PropertyChangeManager<RelationshipAnalogBI>((RelationshipAnalogBI) r) {
-                    
+
                     @Override
                     protected void changeProperty(I_GetConceptData newValue) {
                         try {
@@ -975,21 +1008,21 @@ public class ConceptView extends JPanel {
         relPanel.add(destLabel, gbc);
         return relPanel;
     }
-    
+
     public JLabel getJLabel(String text) {
         JLabel l = new JLabel(text);
         l.setFont(l.getFont().deriveFont(settings.getFontSize()));
         l.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
         return l;
     }
-    
+
     JCheckBox getJCheckBox() {
         JCheckBox check = new JCheckBox();
         check.setFont(check.getFont().deriveFont(settings.getFontSize()));
         check.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
         return check;
     }
-    
+
     private TermComponentLabel getLabel(int nid, boolean canDrop)
             throws TerminologyException, IOException {
         TermComponentLabel termLabel = new TermComponentLabel();
@@ -1001,7 +1034,7 @@ public class ConceptView extends JPanel {
         termLabel.setTermComponent(Terms.get().getConcept(nid));
         return termLabel;
     }
-    
+
     private void getKbActions(Object thingToDrop) {
         if (kbase == null) {
             try {
@@ -1018,12 +1051,12 @@ public class ConceptView extends JPanel {
                 thingToDrop = Ts.get().getConceptVersion(config.getViewCoordinate(),
                         conceptToDrop.getConceptNid());
             }
-            
+
             if (ComponentVersionBI.class.isAssignableFrom(thingToDrop.getClass())
                     || SpecBI.class.isAssignableFrom(thingToDrop.getClass())) {
                 StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
                 boolean uselogger = false;
-                
+
                 KnowledgeRuntimeLogger logger = null;
                 if (uselogger) {
                     logger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
@@ -1051,25 +1084,25 @@ public class ConceptView extends JPanel {
             AceLog.getAppLog().alertAndLogException(e);
         }
     }
-    
+
     public Map<PathBI, Integer> getPathRowMap() {
         return pathRowMap;
     }
-    
+
     public TreeSet<PositionBI> getPositionOrderedSet() {
-        
+
         TreeSet positionSet = new TreeSet(new PositionComparator());
         if (positionOrderedSet != null) {
             positionSet.addAll(positionOrderedSet);
         }
         return positionSet;
     }
-    
+
     static class PositionComparator implements Comparator<PositionBI> {
-        
+
         public PositionComparator() {
         }
-        
+
         @Override
         public int compare(PositionBI t, PositionBI t1) {
             if (t.getTime() != t1.getTime()) {
@@ -1080,5 +1113,13 @@ public class ConceptView extends JPanel {
             }
             return t.getPath().getConceptNid() - t1.getPath().getConceptNid();
         }
+    }
+
+    public ConceptViewRenderer getCvRenderer() {
+        return cvRenderer;
+    }
+
+    public I_ConfigAceFrame getConfig() {
+        return config;
     }
 }

@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,6 +32,33 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
     *
     */
    private static final long serialVersionUID = 1L;
+
+    private void setupCollapseExpandButton() {
+        collapseExpandButton = new JButton(new AbstractAction("", new ImageIcon(
+                ConceptViewRenderer.class.getResource(
+                ArenaComponentSettings.IMAGE_PATH + "maximize.gif"))) {
+
+           /**
+            *
+            */
+           private static final long serialVersionUID = 1L;
+
+           @Override
+           public void actionPerformed(ActionEvent e) {
+              collapsed = !collapsed;
+              if (collapsed) {
+                 hideSubPanels(ComponentVersionDragPanel.this.parentCollapsePanel.getSubpanelsToShow());
+              } else {
+                 showSubPanels(ComponentVersionDragPanel.this.parentCollapsePanel.getSubpanelsToShow());
+              }
+              ((JButton) e.getSource()).setIcon(new ImageIcon(
+                      CollapsePanel.class.getResource(ArenaComponentSettings.IMAGE_PATH
+                      + (collapsed ? "maximize.gif"
+                      : "minimize.gif"))));
+              updateCollapseExpandButton();
+           }
+        });
+    }
 
    private void updateCollapseExpandButton() {
       if (getSubpanelCount() == 0) {
@@ -92,6 +120,7 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
            CollapsePanel parentCollapsePanel, T component) {
       super(settings, component);
       this.parentCollapsePanel = parentCollapsePanel;
+      setupCollapseExpandButton();
    }
 
    public ComponentVersionDragPanel(LayoutManager layout,
@@ -99,6 +128,13 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
            CollapsePanel parentCollapsePanel, T component) {
       super(layout, settings, component);
       this.parentCollapsePanel = parentCollapsePanel;
+      setupCollapseExpandButton();
+   }
+
+   public void addPanelsChangedActionListener(ActionListener l) {
+       if (collapseExpandButton != null) {
+        collapseExpandButton.addActionListener(l);
+       }
    }
 
    protected JLabel getJLabel(String text) {
@@ -212,30 +248,6 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
    }
 
    protected JButton getCollapseExpandButton() {
-      collapseExpandButton = new JButton(new AbstractAction("", new ImageIcon(
-              ConceptViewRenderer.class.getResource(
-              ArenaComponentSettings.IMAGE_PATH + "maximize.gif"))) {
-
-         /**
-          *
-          */
-         private static final long serialVersionUID = 1L;
-
-         @Override
-         public void actionPerformed(ActionEvent e) {
-            collapsed = !collapsed;
-            if (collapsed) {
-               hideSubPanels(parentCollapsePanel.getSubpanelsToShow());
-            } else {
-               showSubPanels(parentCollapsePanel.getSubpanelsToShow());
-            }
-            ((JButton) e.getSource()).setIcon(new ImageIcon(
-                    CollapsePanel.class.getResource(ArenaComponentSettings.IMAGE_PATH
-                    + (collapsed ? "maximize.gif"
-                    : "minimize.gif"))));
-            updateCollapseExpandButton();
-         }
-      });
       collapseExpandButton.setPreferredSize(new Dimension(21, 16));
       collapseExpandButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
       collapseExpandButton.setToolTipText("Collapse/Expand");

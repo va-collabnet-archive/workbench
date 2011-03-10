@@ -8,8 +8,6 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -26,6 +24,7 @@ import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.ihtsdo.arena.conceptview.ConceptViewSettings.SIDE;
 
 public class ConceptNavigator extends JPanel {
+    private HistoryPanel historyPanel;
 
     public class ConceptChangeListener implements PropertyChangeListener {
 
@@ -35,7 +34,7 @@ public class ConceptNavigator extends JPanel {
 
                 @Override
                 public void run() {
-                    updateHistoryPanel();
+                    historyPanel = null;
                 }
             });
         }
@@ -116,7 +115,11 @@ public class ConceptNavigator extends JPanel {
 
     protected void updateHistoryPanel() {
         try {
-            HistoryPanel.setupHistoryPanel(view, historyScroller);
+            if (historyPanel == null) {
+                historyPanel = new HistoryPanel(view, historyScroller);
+            } else {
+                historyPanel.resizeIfNeeded();
+            }
         } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }

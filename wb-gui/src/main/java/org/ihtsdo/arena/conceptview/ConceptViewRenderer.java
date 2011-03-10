@@ -756,4 +756,9 @@ public class ConceptViewRenderer extends JLayeredPane {
         int dividerLocation = workflowPanel.getHeight() / 2;
         workflowPanel.setDividerLocation(dividerLocation);
     }
+    
+    public JScrollPane getConceptScrollPane() {
+        return conceptScrollPane;
+    }
+    
 }
