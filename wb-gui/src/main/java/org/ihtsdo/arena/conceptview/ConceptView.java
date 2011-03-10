@@ -392,8 +392,11 @@ public class ConceptView extends JPanel {
                     pathCheck.setHorizontalTextPosition(SwingConstants.LEFT);
                     pathCheck.setHorizontalAlignment(SwingConstants.RIGHT);
                 }
-
-                pathCheck.setText(pathVersion.getPreferredDescription().getText());
+                if (pathVersion.getPreferredDescription() != null) {
+                    pathCheck.setText(pathVersion.getPreferredDescription().getText());
+                } else {
+                   pathCheck.setText(pathVersion.toString());
+                }
                 pathCheck.setSelected(true);
                 rowToPathCheckMap.put(row, pathCheck);
                 pathCheck.setVisible(ConceptView.this.historyShown);

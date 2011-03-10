@@ -70,6 +70,7 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -388,6 +389,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         @Override
         public ComponentChroncileBI getChronicle() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public String toUserString(TerminologySnapshotDI snapshot) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
@@ -809,6 +815,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         @Override
         public ComponentChroncileBI getChronicle() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public String toUserString(TerminologySnapshotDI snapshot) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 

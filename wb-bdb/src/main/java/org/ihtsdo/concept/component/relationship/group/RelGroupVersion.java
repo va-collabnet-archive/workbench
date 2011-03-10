@@ -13,6 +13,7 @@ import org.ihtsdo.tk.api.ComponentChroncileBI;
 
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -182,6 +183,13 @@ public class RelGroupVersion
         }
         return buff.toString();
     }
+    
+        @Override
+    public String toUserString(TerminologySnapshotDI snapshot)
+            throws IOException, ContraditionException {
+        return toUserString();
+    }
+
 
     @Override
     public boolean isUncommitted() {

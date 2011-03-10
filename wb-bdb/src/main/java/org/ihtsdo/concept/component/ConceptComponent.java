@@ -14,8 +14,6 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
@@ -67,12 +65,14 @@ import org.ihtsdo.concept.component.refset.RefsetMemberFactory;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>> implements
-        I_AmTermComponent, I_AmPart<R>, 
-        I_AmTuple<R>, I_Identify, I_IdPart, 
+        I_AmTermComponent, I_AmPart<R>,
+        I_AmTuple<R>, I_Identify, I_IdPart,
         I_IdVersion, I_HandleFutureStatusAtPositionSetup {
 
     public static void addTextToBuffer(Appendable buf, int nidToConvert) {
@@ -243,7 +243,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         protected int index = -1;
         private boolean dup = false;
 
-
         @Override
         public ComponentChroncileBI getChronicle() {
             return ConceptComponent.this.getChronicle();
@@ -262,6 +261,15 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 ConceptComponent.this.setNid(nid);
             }
             throw new PropertyVetoException(null, null);
+        }
+
+        @Override
+        public String toUserString(TerminologySnapshotDI snapshot)
+                throws IOException, ContraditionException {
+            if (index >= 0) {
+                return revisions.get(index).toUserString(snapshot);
+            }
+            return ConceptComponent.this.toUserString(snapshot);
         }
 
         @Override
@@ -575,7 +583,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             }
         }
 
-
         public Set<PositionBI> getPositions() throws IOException {
             return ConceptComponent.this.getPositions();
         }
@@ -850,6 +857,12 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     @Override
     public abstract String toUserString();
+
+    @Override
+    public String toUserString(TerminologySnapshotDI snapshot)
+            throws IOException, ContraditionException {
+        return toUserString();
+    }
 
     public boolean removeRevision(R r) {
         boolean changed = false;
@@ -2019,10 +2032,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
         return positions;
     }
-    
+
     @Override
     public ComponentChroncileBI getChronicle() {
         return (ComponentChroncileBI) this;
     }
-
 }

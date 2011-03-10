@@ -42,14 +42,14 @@ import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.TerminologySnapshotDI;
 
-public abstract class RefsetMember<R extends RefsetRevision<R, C>,
-        C extends RefsetMember<R, C>>
+public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends RefsetMember<R, C>>
         extends ConceptComponent<R, C>
         implements I_ExtendByRef,
-                   RefexChronicleBI<R>,
-                   RefexAnalogBI<R>
-                    {
+        RefexChronicleBI<R>,
+        RefexAnalogBI<R> {
 
     public int referencedComponentNid;
     public int refsetNid;
@@ -74,12 +74,12 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
             }
         }
 
-    @Override
-		public int getCollectionNid() {
-			return refsetNid;
-		}
+        @Override
+        public int getCollectionNid() {
+            return refsetNid;
+        }
 
-	@Override
+        @Override
         public ArrayIntList getVariableVersionNids() {
             if (index >= 0) {
                 return revisions.get(index).getVariableVersionNids();
@@ -161,7 +161,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
         }
 
         public void setCollectionNid(int collectionNid) throws PropertyVetoException {
-        	RefsetMember.this.setCollectionNid(collectionNid);
+            RefsetMember.this.setCollectionNid(collectionNid);
         }
 
         @Override
@@ -203,7 +203,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
         }
 
         @SuppressWarnings("unchecked")
-		@Override
+        @Override
         public I_ExtendByRefPart<R> getMutablePart() {
             return (I_ExtendByRefPart<R>) super.getMutablePart();
         }
@@ -228,9 +228,9 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
         }
 
         @Override
-		public int getPartsHashCode() {
-			return getMutablePart().getPartsHashCode();
-		}
+        public int getPartsHashCode() {
+            return getMutablePart().getPartsHashCode();
+        }
 
         @Override
         public int getReferencedComponentNid() {
@@ -267,7 +267,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
     }
 
     @SuppressWarnings("unchecked")
-    public RefsetMember<R, C> merge(RefsetMember<R,C> component) throws IOException {
+    public RefsetMember<R, C> merge(RefsetMember<R, C> component) throws IOException {
         return (RefsetMember<R, C>) super.merge((C) component);
     }
 
@@ -424,7 +424,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
     }
 
     @SuppressWarnings("deprecation")
-	@Override
+    @Override
     public int getTypeNid() {
         return getTypeId();
     }
@@ -478,7 +478,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
     }
 
     @SuppressWarnings("unchecked")
-	public List<? extends Version> getVersions() {
+    public List<? extends Version> getVersions() {
         if (versions == null) {
             int count = 1;
             if (revisions != null) {
@@ -523,7 +523,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
     }
 
     @SuppressWarnings("unchecked")
-	public I_ExtendByRefPart<R> makePromotionPart(PathBI promotionPath) {
+    public I_ExtendByRefPart<R> makePromotionPart(PathBI promotionPath) {
         return (I_ExtendByRefPart<R>) makeAnalog(getStatusNid(), promotionPath.getConceptNid(), Long.MAX_VALUE);
     }
 
@@ -533,8 +533,8 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 
     protected abstract VersionComputer<RefsetMember<R, C>.Version> getVersionComputer();
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-	@Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @Override
     public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
             List<I_ExtendByRefVersion> returnTuples, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
             throws TerminologyException, IOException {
@@ -544,7 +544,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
         returnTuples.addAll((Collection<? extends I_ExtendByRefVersion>) versionsToAdd);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public void addTuples(List<I_ExtendByRefVersion> returnTuples,
             Precedence precedencePolicy, I_ManageContradiction contradictionManager)
@@ -556,7 +556,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
         returnTuples.addAll((Collection<? extends I_ExtendByRefVersion<R>>) versionsToAdd);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public List<? extends I_ExtendByRefVersion> getTuples(I_IntSet allowedStatus,
             PositionSetReadOnly positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
@@ -568,7 +568,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
     }
 
     @SuppressWarnings("rawtypes")
-	@Override
+    @Override
     public List<? extends I_ExtendByRefVersion> getTuples(I_ManageContradiction contradictionMgr)
             throws TerminologyException, IOException {
         // TODO Implement contradictionMgr part...
@@ -610,17 +610,25 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
     public String toUserString() {
         return toString();
     }
+    
+    
+    @Override
+    public String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContraditionException {
+        ComponentVersionBI c1Component = snapshot.getConceptVersion(refsetNid);
+        return "refex: " + c1Component.toUserString(snapshot);
+    }
+
 
     @Override
-	public int getCollectionNid() {
-		return refsetNid;
-	}
+    public int getCollectionNid() {
+        return refsetNid;
+    }
 
     @Override
-	public void setCollectionNid(int collectionNid) throws PropertyVetoException {
-        if (this.refsetNid == Integer.MAX_VALUE ||
-                this.refsetNid == collectionNid ||
-                getTime() == Long.MAX_VALUE) {
+    public void setCollectionNid(int collectionNid) throws PropertyVetoException {
+        if (this.refsetNid == Integer.MAX_VALUE
+                || this.refsetNid == collectionNid
+                || getTime() == Long.MAX_VALUE) {
             if (this.refsetNid != collectionNid) {
                 this.refsetNid = collectionNid;
             }
@@ -629,16 +637,15 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
         }
     }
 
-   @Override
+    @Override
     public RefexAmendmentSpec getRefexEditSpec() throws IOException {
-    	RefexAmendmentSpec rcs = new RefexAmendmentSpec(getTkRefsetType(),
-        		getReferencedComponentNid(), getRefsetId(), getPrimUuid());
-    	addSpecProperties(rcs);
-    	return rcs;
+        RefexAmendmentSpec rcs = new RefexAmendmentSpec(getTkRefsetType(),
+                getReferencedComponentNid(), getRefsetId(), getPrimUuid());
+        addSpecProperties(rcs);
+        return rcs;
     }
 
-	protected abstract TK_REFSET_TYPE getTkRefsetType();
+    protected abstract TK_REFSET_TYPE getTkRefsetType();
 
-	protected abstract void addSpecProperties(RefexAmendmentSpec rcs);
-
+    protected abstract void addSpecProperties(RefexAmendmentSpec rcs);
 }

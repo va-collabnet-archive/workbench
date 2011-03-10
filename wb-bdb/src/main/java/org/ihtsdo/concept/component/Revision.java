@@ -25,7 +25,9 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.TerminologySnapshotDI;
 
 public abstract class Revision<V extends Revision<V, C>, C extends ConceptComponent<V, C>>
         implements I_AmPart<V>,
@@ -345,6 +347,12 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     @Override
     public abstract String toUserString();
 
+    @Override
+    public String toUserString(TerminologySnapshotDI snapshot)
+            throws IOException, ContraditionException {
+        return toUserString();
+    }
+
     public boolean isUncommitted() {
         return getTime() == Long.MAX_VALUE;
     }
@@ -390,8 +398,8 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     public PositionBI getPosition() throws IOException {
         return new Position(getTime(), Ts.get().getPath(getPathNid()));
     }
-    
-    public Set<PositionBI> getPositions() throws IOException { 
+
+    public Set<PositionBI> getPositions() throws IOException {
         return primordialComponent.getPositions();
     }
 
@@ -399,6 +407,4 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     public ComponentChroncileBI getChronicle() {
         return (ComponentChroncileBI) primordialComponent;
     }
-    
-    
 }

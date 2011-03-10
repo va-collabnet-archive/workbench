@@ -288,9 +288,13 @@ public class HistoryPanel {
                 sb.append("<html>");
                 sb.append(p.toString());
                 sb.append("<br>");
-                sb.append(author.getPreferredDescription().getText());
+                if (author.getPreferredDescription() != null) {
+                    sb.append(author.getPreferredDescription().getText());
+                } else {
+                    sb.append(author.toString());
+                }
                 sb.append("<br>");
-                sb.append(version.toUserString());
+                sb.append(version.toUserString(Ts.get().getSnapshot(view.getConfig().getViewCoordinate())));
                 sb.append("</html>");
                 button.setToolTipText(sb.toString());
             }

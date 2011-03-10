@@ -12,5 +12,7 @@ public interface ComponentVersionBI extends ComponentBI {
     int getSapNid();
     PositionBI getPosition() throws IOException;
     ComponentChroncileBI getChronicle();
+    String toUserString(TerminologySnapshotDI snapshot) 
+            throws IOException, ContraditionException;
     
 }

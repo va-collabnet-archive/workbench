@@ -19,7 +19,9 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetCidMember;
 import org.ihtsdo.etypes.ERefsetCidRevision;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
 import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
@@ -29,6 +31,7 @@ import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 
 public class CidMember extends RefsetMember<CidRevision, CidMember>
         implements I_ExtendByRefPartCid<CidRevision>, RefexCnidAnalogBI<CidRevision> {
@@ -36,6 +39,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
     private static VersionComputer<RefsetMember<CidRevision, CidMember>.Version> computer =
             new VersionComputer<RefsetMember<CidRevision, CidMember>.Version>();
 
+    @Override
     protected VersionComputer<RefsetMember<CidRevision, CidMember>.Version> getVersionComputer() {
         return computer;
     }
@@ -216,10 +220,12 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
         modified();
     }
 
+    @Override
     public int getCnid1() {
         return c1Nid;
     }
 
+    @Override
     public void setCnid1(int c1Nid) {
         this.c1Nid = c1Nid;
         modified();
@@ -248,6 +254,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public I_ExtendByRefPart<CidRevision> duplicate() {
         throw new UnsupportedOperationException();
     }
@@ -258,14 +265,23 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
-        buf.append(this.getClass().getSimpleName() + ":{");
+        buf.append(this.getClass().getSimpleName()).append(":{");
         buf.append("c1Nid: ");
         addNidToBuffer(buf, c1Nid);
         buf.append(super.toString());
         return buf.toString();
     }
 
+    @Override
+    public String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContraditionException {
+        ComponentVersionBI c1Component = snapshot.getComponentVersion(c1Nid);
+        return super.toUserString(snapshot) + " c1: " + c1Component.toUserString(snapshot);
+    }
+    
+    
+
     @SuppressWarnings("unchecked")
+    @Override
     public List<Version> getVersions() {
         if (versions == null) {
             int count = 1;
@@ -288,6 +304,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
         return (List<Version>) versions;
     }
 
+    @Override
     protected TK_REFSET_TYPE getTkRefsetType() {
         return TK_REFSET_TYPE.CID;
     }
@@ -297,6 +314,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
         return HashFunction.hashCode(new int[]{getC1Nid()});
     }
 
+    @Override
     protected void addSpecProperties(RefexAmendmentSpec rcs) {
         rcs.with(RefexProperty.CNID1, getCnid1());
     }

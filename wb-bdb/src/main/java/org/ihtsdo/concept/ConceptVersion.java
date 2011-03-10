@@ -27,6 +27,7 @@ import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
@@ -350,6 +351,12 @@ public class ConceptVersion implements ConceptVersionBI {
     @Override
     public String toUserString() {
         return concept.toString();
+    }
+    
+    @Override
+    public String toUserString(TerminologySnapshotDI snapshot) 
+            throws IOException, ContraditionException {
+        return getPreferredDescription().getText();
     }
 
     @Override
