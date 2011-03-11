@@ -47,6 +47,10 @@ public class IsaCache extends TypeCache {
         NidSet parentSet = getParentSet(c);
         typeMap.put(cNid, parentSet.getSetValues());
     }
+    
+    public boolean isTested(int cNid) {
+    	return typeMap.containsKey(cNid);
+    }
 
     @Override
     public NidBitSetBI getNidSet() throws IOException {

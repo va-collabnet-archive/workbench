@@ -65,7 +65,8 @@ public class KindOfComputer {
 	throws IOException, TerminologyException {
 		Map<IsaCoordinate, IsaCache> debugMap = isaCache;
 		IsaCache debugIsaCache = debugMap.get(spec.getIsaCoordinate());
-		if (isaCache.get(spec.getIsaCoordinate()) != null && isaCache.get(spec.getIsaCoordinate()).isReady()) {
+		if (isaCache.get(spec.getIsaCoordinate()) != null && isaCache.get(spec.getIsaCoordinate()).isReady() &&
+				isaCache.get(spec.getIsaCoordinate()).isTested(c.getNid())) {
 			return cachedIsKindOfWithDepth(c, spec, 0);
 		}
 		return isKindOfWithDepth(c, spec, 0);
