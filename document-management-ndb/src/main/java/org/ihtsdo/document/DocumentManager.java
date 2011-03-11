@@ -70,6 +70,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
@@ -112,12 +113,16 @@ public class DocumentManager {
 				counter++;
 				try {
 					ContentHandler textHandler = new BodyContentHandler();
+					String pdfText = null; 
 					if (f.getName().endsWith(".pdf")) {
 						FileInputStream fi = new FileInputStream(f);
 						Metadata metadata = new Metadata();
-						ParseContext context = new ParseContext();
-						org.apache.tika.parser.pdf.PDFParser parser = new org.apache.tika.parser.pdf.PDFParser();
-						parser.parse(fi, textHandler, metadata, context);
+						//ParseContext context = new ParseContext();
+						Tika tika = new Tika();
+						tika.setMaxStringLength(3*1024*1024);
+						pdfText = tika.parseToString(fi,metadata);
+						//org.apache.tika.parser.pdf.PDFParser parser = new org.apache.tika.parser.pdf.PDFParser();
+						//parser.parse(fi, textHandler, metadata, context);
 						fi.close();
 					} else if (f.getName().endsWith(".doc") || f.getName().endsWith(".xls")) {
 						FileInputStream fi = new FileInputStream(f);
@@ -138,7 +143,11 @@ public class DocumentManager {
 					}
 					Document doc = new Document();
 					doc.add(new Field("path", f.getPath(), Field.Store.YES, Field.Index.ANALYZED));
-					doc.add(new Field("text", textHandler.toString(), Field.Store.YES, Field.Index.ANALYZED));
+					if (f.getName().endsWith(".pdf")) {
+						doc.add(new Field("text", pdfText, Field.Store.YES, Field.Index.ANALYZED));
+					}else{
+						doc.add(new Field("text", textHandler.toString(), Field.Store.YES, Field.Index.ANALYZED));
+					}
 					writer.addDocument(doc);
 					output = output + counter + ") Indexing:" + doc.get("path") + " Size:" + doc.get("text").length() + "<br>";
 				} catch (IOException e) {
