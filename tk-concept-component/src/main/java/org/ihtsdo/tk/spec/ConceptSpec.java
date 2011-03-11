@@ -137,7 +137,7 @@ public class ConceptSpec implements SpecBI {
             throw new RuntimeException("No description matching: '" + 
                     description + "' found for:\n" + 
                     local + "\n\n" +
-                    local.getChronicle());
+                    local.getChronicle().toLongString());
         }
     }
 
