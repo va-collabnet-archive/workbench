@@ -45,5 +45,13 @@ public interface ConceptChronicleBI extends
             ChangeSetGenerationThreadingPolicy changeSetWriterThreading) throws IOException;
 
     void cancel() throws IOException;
+    
+   /**
+    * Returns a longer - more complete - string representation of the chronicle. 
+    * Useful for diagnostic purposes.
+    *
+    * @return
+    */
+   public String toLongString();
 
 }

@@ -133,7 +133,11 @@ public class ConceptSpec implements SpecBI {
             }
         }
         if (found == false) {
-            throw new RuntimeException("No description matching: '" + description + "' found for:\n" + local);
+            
+            throw new RuntimeException("No description matching: '" + 
+                    description + "' found for:\n" + 
+                    local + "\n\n" +
+                    local.getChronicle());
         }
     }
 

@@ -345,12 +345,17 @@ public class ConceptVersion implements ConceptVersionBI {
 
     @Override
     public String toString() {
-        return concept.toString() + " viewCoordinate: " + vc;
+        return concept.toString() + "\n\nviewCoordinate:\n" + vc;
     }
 
     @Override
     public String toUserString() {
         return concept.toString();
+    }
+    
+    @Override
+    public String toLongString() {
+        return concept.toLongString();
     }
     
     @Override

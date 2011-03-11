@@ -120,7 +120,13 @@ public class ViewCoordinate {
         StringBuilder sb = new StringBuilder();
         sb.append("precedence: ").append(precedence);
         sb.append(" \npositions: ").append(positionSet);
-        sb.append(" \nallowedStatus: ").append(allowedStatusNids);
+        String statusStr = allowedStatusNids.toString();
+        sb.append(" \nallowedStatus: ");
+        if (statusStr.length() < 50) {
+            sb.append(statusStr);
+        } else {
+            sb.append(statusStr.substring(0, 50)).append("...");
+        }
         sb.append(" \nisaTypes: ").append(isaTypeNids);
         sb.append(" \ncontradiction: ").append(contradictionManager);
         getConceptText(sb.append(" \nlanguage: "), snap, languageNid);

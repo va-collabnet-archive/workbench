@@ -82,11 +82,12 @@ public class DragPanelConceptAttributes extends ComponentVersionDragPanel<ConAtt
     }
 
     private void layoutConceptAttrs() throws TerminologyException, IOException {
-        boolean canDrop = false;
+        if (getAttr() == null) {
+            return;
+        }
         if (getAttr().getTime() == Long.MAX_VALUE) {
             setOpaque(true);
             setBackground(Color.YELLOW);
-            canDrop = true;
         }
         setupDrag(getAttr());
         setBorder(BorderFactory.createRaisedBevelBorder());
