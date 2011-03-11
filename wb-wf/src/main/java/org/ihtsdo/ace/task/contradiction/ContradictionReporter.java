@@ -23,6 +23,7 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
  
 public class ContradictionReporter {
 	private Writer outputFile = null;
@@ -49,7 +50,7 @@ public class ContradictionReporter {
 	        I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
 	        model.clear();
 
-	        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createPreferredTermComparer());
+	        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createFsnComparer());
 	        for (Integer nid : nids)
 	        {
 	        	I_GetConceptData concept = Terms.get().getConcept(nid);
@@ -61,7 +62,6 @@ public class ContradictionReporter {
 	        	model.addElement(con);
 
         	Terms.get().getActiveAceFrameConfig().showListView();
-        	Terms.get().getActiveAceFrameConfig().setShowProcessBuilder(false);
         	
 		} catch (TerminologyException e) {
 			// TODO Auto-generated catch block
@@ -181,6 +181,24 @@ public class ContradictionReporter {
 		}
 
 		outputFile.flush();
+	}
+
+	public void printSingleConcepts(TreeSet<I_GetConceptData> singleConcepts) {
+		System.out.println("\n\n\n\n*********Singles*********");
+
+		for (I_GetConceptData c : singleConcepts)
+			System.out.println(WorkflowHelper.identifyFSN(c));
+				
+		System.out.println("*********End Of Singles*********\n\n\n\n");
+	}
+	
+	public void printConflictConcepts(TreeSet<I_GetConceptData> singleConcepts) {
+		System.out.println("\n\n\n\n*********Conflicts*********");
+
+		for (I_GetConceptData c : singleConcepts)
+			System.out.println(WorkflowHelper.identifyFSN(c));
+				
+		System.out.println("*********End Of Conflicts*********\n\n\n\n");
 	}
 	
 }

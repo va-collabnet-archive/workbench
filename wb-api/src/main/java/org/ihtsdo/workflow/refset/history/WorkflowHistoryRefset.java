@@ -138,7 +138,7 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 		return new WfHxFsnJavaBeanComparer();
 	}
 
-	public static Comparator<I_GetConceptData> createWorkflowFsnComparer() {
+	public static Comparator<I_GetConceptData> createFsnComparer() {
 		return new WorkflowFsnComparator();
 	}
 

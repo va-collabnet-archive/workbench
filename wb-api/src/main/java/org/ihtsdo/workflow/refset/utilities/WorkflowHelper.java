@@ -111,7 +111,8 @@ public class WorkflowHelper {
         try {
 			for (I_DescriptionVersioned<?> descv: con.getDescriptions()) {
 			    for (I_DescriptionTuple p: descv.getTuples()) {
-					if (p.getTypeNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()).getNid())
+					if (p.getTypeNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()).getNid() &&
+						p.getLang().equalsIgnoreCase("en"))
 						return p.getText();
 			    }
 			}
@@ -126,7 +127,8 @@ public class WorkflowHelper {
 		try {
 			for (I_DescriptionVersioned<?> descv: con.getDescriptions()) {
 			    for (I_DescriptionTuple p: descv.getTuples()) {
-					if (p.getTypeNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()).getNid())
+					if (p.getTypeNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()).getNid() &&
+						p.getLang().equalsIgnoreCase("en"))
 						return p.getText();
 		   		}
 	   		}

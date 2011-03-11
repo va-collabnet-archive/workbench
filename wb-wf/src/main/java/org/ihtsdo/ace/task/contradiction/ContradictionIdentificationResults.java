@@ -1,5 +1,6 @@
 package org.ihtsdo.ace.task.contradiction;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -14,6 +15,12 @@ public class ContradictionIdentificationResults {
 	private Set<Integer> singleConcepts = null;
 	private Set<Integer> nonConflictingConcepts = null;
 
+	public ContradictionIdentificationResults() {
+		conflictingConcepts = new HashSet<Integer>();
+		singleConcepts = new HashSet<Integer>();
+		nonConflictingConcepts = new HashSet<Integer>();
+	}
+	
 	public void addConflict(Integer nid) {
 		conflictingConcepts.add(nid);
 	}
@@ -27,7 +34,7 @@ public class ContradictionIdentificationResults {
 	}
 	
 	public TreeSet<I_GetConceptData> getConflictingConcepts() {
-		TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createPreferredTermComparer());
+		TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createFsnComparer());
 
 		try {
 			for (Integer i : conflictingConcepts)
@@ -43,7 +50,7 @@ public class ContradictionIdentificationResults {
 	}
 
 	public TreeSet<I_GetConceptData> getSingleConcepts() {
-		TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createPreferredTermComparer());
+		TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createFsnComparer());
 
 		try {
 			for (Integer i : singleConcepts)
@@ -59,7 +66,7 @@ public class ContradictionIdentificationResults {
 	}
 
 	public TreeSet<I_GetConceptData> getNoneConflictingConcepts() {
-		TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createPreferredTermComparer());
+		TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createFsnComparer());
 
 		try {
 			for (Integer i : nonConflictingConcepts)

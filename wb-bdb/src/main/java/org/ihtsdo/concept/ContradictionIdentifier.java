@@ -31,13 +31,14 @@ import org.ihtsdo.db.bdb.computer.version.PositionMapper;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper.RELATIVE_POSITION;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 
-public class ConflictIdentifier {
+public class ContradictionIdentifier {
     public enum CONTRADICTION_INVESTIGATION_TYPE {
         ATTRIBUTE, DESCRIPTION, RELATIONSHIP, REFSET;
     };
@@ -55,7 +56,7 @@ public class ConflictIdentifier {
 	private ViewCoordinate coord = null;
 	private I_ConfigAceFrame config;
 		
-    public ConflictIdentifier() {
+    public ContradictionIdentifier() {
 		// Initialize the positions found for the concept
 		Set<HashSet<PositionBI>> sortedOrigins = new HashSet<HashSet<PositionBI>>();
 		Set<PositionBI> allOrigins = new HashSet<PositionBI>();
@@ -126,9 +127,9 @@ public class ConflictIdentifier {
 		
 		if (result.equals(CONTRADICTION_RESULT.CONTRADICTION))
 			return result;
-		else if (isUnreachable)
+		else if (isUnreachable || result.equals(CONTRADICTION_RESULT.UNREACHABLE))
 			return CONTRADICTION_RESULT.UNREACHABLE;
-		else if (isSingle)
+		else if (isSingle || result.equals(CONTRADICTION_RESULT.SINGLE))
 			return CONTRADICTION_RESULT.SINGLE;
 		else
 			return CONTRADICTION_RESULT.NONE;
@@ -141,8 +142,8 @@ public class ConflictIdentifier {
 		try
 		{
 			// REFSETS
-			 position = refsetMembershipConflictFound(concept, foundPositions, comp.getNid(), comparer.getComponentType());
-
+//			 position = refsetMembershipConflictFound(concept, foundPositions, comp.getNid(), comparer.getComponentType());
+			
 			if (position != CONTRADICTION_RESULT.CONTRADICTION && comp.getVersions().size() > 2)
 			{
 				CONTRADICTION_RESULT retVal = CONTRADICTION_RESULT.NONE;
@@ -172,18 +173,18 @@ public class ConflictIdentifier {
 							}
 						}
 					}
-				}
-
-				updateFoundPositions(concept, foundPositions, comp.getVersions().iterator(), comp.getNid(), comparer.getComponentType());
-
-				return retVal;
+				} 
 			} 
-			else
-			{
-				CONTRADICTION_INVESTIGATION_TYPE compType = comparer.getComponentType();
-				comparer.clear();
-				return foundPositionsReachable(concept, foundPositions, comp.getVersions(), compType, comp.getNid(), 0);
-			}
+//				updateFoundPositions(concept, foundPositions, comp.getVersions().iterator(), comp.getNid(), comparer.getComponentType());
+
+//				return foundPositionsReachable(concept, foundPositions, comp.getVersions(), compType, comp.getNid(), 0);
+//	
+//			else
+//			{
+			CONTRADICTION_INVESTIGATION_TYPE compType = comparer.getComponentType();
+			comparer.clear();
+			return foundPositionsReachable(concept, foundPositions, comp.getVersions(), compType, comp.getNid(), 0);
+//			}
 			
 		} 
 		catch (Exception e) {
@@ -213,10 +214,16 @@ public class ConflictIdentifier {
 				isSubstituted = true;
 
 			String s = currentPos.toString();
-			if (compType != CONTRADICTION_INVESTIGATION_TYPE.REFSET)
-				currentVersion = getCurrentVersionByType(concept, compType, versionCoord, componentNid, memberNid);
-			else
-				currentVersion = getCurrentRefsetVersion(version, versionCoord);
+			
+			try 
+			{
+				if (compType != CONTRADICTION_INVESTIGATION_TYPE.REFSET)
+					currentVersion = getCurrentVersionByType(concept, compType, versionCoord, componentNid, memberNid);
+				else
+					currentVersion = getCurrentRefsetVersion(version, versionCoord);
+			} catch (ContraditionException ce) {
+				return CONTRADICTION_RESULT.CONTRADICTION;
+			}
 
 			if (!foundPositions.containsKey(currentPos)) 
 			{
@@ -234,21 +241,21 @@ public class ConflictIdentifier {
 						}
 						
 						try {
-							retPosition = conflictMapper.relativePosition(currentVersion, testVersion);
+							retPosition = conflictMapper.fastRelativePosition(currentVersion, testVersion, Terms.get().getActiveAceFrameConfig().getPrecedence());
 						} catch (Exception e) {
 			            	AceLog.getAppLog().log(Level.WARNING, "Error in calling position mapper method", e);
 						}
 						
 						if (retPosition.equals(RELATIVE_POSITION.CONTRADICTION))
 						{ 
-							if (matchingComponentNid)
-							{
+//							if (matchingComponentNid)
+//							{
 								return CONTRADICTION_RESULT.CONTRADICTION;
-							}
-							else
-							{
-								isUnreachable = true;
-							}
+//							}
+//							else
+//							{
+//								isUnreachable = true;
+//							}
 						}
 						else if (retPosition.equals(RELATIVE_POSITION.UNREACHABLE))
 						{
@@ -310,7 +317,11 @@ public class ConflictIdentifier {
 					}
 				}
 
-				updateFoundPositions(concept, foundPositions, member.getMutableParts().iterator(), componentNid, compType);		
+				try {
+					updateFoundPositions(concept, foundPositions, member.getMutableParts().iterator(), componentNid, compType);
+				} catch (ContraditionException ce) {
+					return CONTRADICTION_RESULT.CONTRADICTION;
+				}
 			} 
 			else 
 			{ 
@@ -487,7 +498,7 @@ int ss = data.getRefsetMembers().size();
 	}
 
 	@SuppressWarnings("unchecked")
-	private Version getCurrentVersionByType(Concept concept, CONTRADICTION_INVESTIGATION_TYPE compType, ViewCoordinate versionCoord, int componentNid, int memberNid)
+	private Version getCurrentVersionByType(Concept concept, CONTRADICTION_INVESTIGATION_TYPE compType, ViewCoordinate versionCoord, int componentNid, int memberNid) throws ContraditionException
 	{
 		Version currentVersion = null;
 		try
@@ -505,7 +516,7 @@ int ss = data.getRefsetMembers().size();
 				Description.Version currentDescriptionVersion = desc.getVersion(versionCoord);
 				currentVersion = (Version)currentDescriptionVersion;
 			} 
-			else if (compType == CONTRADICTION_INVESTIGATION_TYPE.DESCRIPTION)
+			else if (compType == CONTRADICTION_INVESTIGATION_TYPE.RELATIONSHIP)
 			{
 				Relationship.Version currentRelationshipVersion = null;
 				Relationship rel = concept.getRelationship(componentNid);
@@ -524,7 +535,7 @@ int ss = data.getRefsetMembers().size();
 	
 				}
 			} 			
-		} catch (Exception e) {
+		} catch (IOException e) {
         	AceLog.getAppLog().log(Level.WARNING, "Error in identifying version of type: " + compType + "for component: " + componentNid, e);
 		}
 		
@@ -560,7 +571,7 @@ int ss = data.getRefsetMembers().size();
 		return versionCoord;
 	}
 
-	private void updateFoundPositions(Concept concept, Map<PositionForSet, HashMap<Integer,Version>> foundPositions, Iterator<?> versions, int componentNid, CONTRADICTION_INVESTIGATION_TYPE compType) {
+	private void updateFoundPositions(Concept concept, Map<PositionForSet, HashMap<Integer,Version>> foundPositions, Iterator<?> versions, int componentNid, CONTRADICTION_INVESTIGATION_TYPE compType) throws ContraditionException {
 		
 		while(versions.hasNext())
 		{

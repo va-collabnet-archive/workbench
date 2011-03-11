@@ -1,6 +1,6 @@
 package org.ihtsdo.concept;
 
-import org.ihtsdo.concept.ConflictIdentifier.CONTRADICTION_INVESTIGATION_TYPE;
+import org.ihtsdo.concept.ContradictionIdentifier.CONTRADICTION_INVESTIGATION_TYPE;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
