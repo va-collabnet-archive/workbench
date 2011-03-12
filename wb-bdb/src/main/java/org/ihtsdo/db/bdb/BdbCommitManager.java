@@ -97,8 +97,9 @@ public class BdbCommitManager {
             } catch (Throwable e) {
                 Exception newEx = new Exception("Writing: " + c.toLongString(), e);
                 AceLog.getAppLog().alertAndLogException(e);
+            } finally {
+                dbWriterPermit.release();
             }
-            dbWriterPermit.release();
         }
     }
 
