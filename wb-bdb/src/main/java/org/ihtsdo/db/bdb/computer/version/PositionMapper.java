@@ -25,7 +25,7 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbPathManager;
-import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 
@@ -81,8 +81,8 @@ public class PositionMapper {
                     if (closed) {
                         return;
                     }
-                    // m.setup();
-                    m.setup__int();
+                    m.setup();
+                    //m.setup__int();
                 } catch (Throwable e) {
                     AceLog.getAppLog().alertAndLogException(e);
                 }
@@ -344,7 +344,7 @@ public class PositionMapper {
                             "Creating new PositionMapper for: "
                             + pathConcept.getNid() + ": "
                             + pathDesc + " time: "
-                            + TimeUtil.formatDate(destination.getTime())
+                            + TimeHelper.formatDate(destination.getTime())
                             + " thread: " + Thread.currentThread().getName());
                 }
                 Collection<PositionBI> origins =
@@ -468,7 +468,7 @@ public class PositionMapper {
                         "Finished setup for new PositionMapper for: "
                         + pathConcept.getNid() + ": "
                         + pathDesc + " time: "
-                        + TimeUtil.formatDate(destination.getTime())
+                        + TimeHelper.formatDate(destination.getTime())
                         + " thread: " + Thread.currentThread().getName());
             } catch (Throwable e) {
                 e.printStackTrace();
@@ -505,7 +505,7 @@ public class PositionMapper {
                     AceLog.getAppLog().fine(
                             "Creating new PositionMapper for: " + pathConcept.getNid() + ": "
                                     + pathDesc + " time: "
-                                    + TimeUtil.formatDate(destination.getTime()) + " thread: "
+                                    + TimeHelper.formatDate(destination.getTime()) + " thread: "
                                     + Thread.currentThread().getName());
                 }
                 Collection<PositionBI> origins = pathManager.getAllPathOrigins(destination
@@ -676,7 +676,7 @@ public class PositionMapper {
                 completeLatch.countDown();
                 AceLog.getAppLog().info(
                         "Finished setup for new PositionMapper for: " + pathConcept.getNid() + ": "
-                                + pathDesc + " time: " + TimeUtil.formatDate(destination.getTime())
+                                + pathDesc + " time: " + TimeHelper.formatDate(destination.getTime())
                                 + " thread: " + Thread.currentThread().getName());
             } catch (Throwable e) {
                 e.printStackTrace();
