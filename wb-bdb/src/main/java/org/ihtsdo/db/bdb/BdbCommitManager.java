@@ -94,7 +94,8 @@ public class BdbCommitManager {
                 while (c.isUnwritten() && !c.isCanceled()) {
                     Bdb.getConceptDb().writeConcept(c);
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                Exception newEx = new Exception("Writing: " + c.toLongString(), e);
                 AceLog.getAppLog().alertAndLogException(e);
             }
             dbWriterPermit.release();
