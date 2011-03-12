@@ -95,8 +95,10 @@ public class BdbCommitManager {
                     Bdb.getConceptDb().writeConcept(c);
                 }
             } catch (Throwable e) {
-                Exception newEx = new Exception("Writing: " + c.toLongString(), e);
-                AceLog.getAppLog().alertAndLogException(e);
+                String exceptionStr = "Exception Writing: " + c.toLongString();
+                Exception newEx = new Exception(exceptionStr, e);
+                System.out.println(exceptionStr + "\n\n" + e.toString());
+                AceLog.getAppLog().alertAndLogException(newEx);
             } finally {
                 dbWriterPermit.release();
             }
