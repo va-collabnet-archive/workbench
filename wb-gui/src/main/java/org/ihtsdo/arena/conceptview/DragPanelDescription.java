@@ -2,10 +2,13 @@ package org.ihtsdo.arena.conceptview;
 
 import java.awt.Color;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
 import java.awt.datatransfer.DataFlavor;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -30,7 +33,7 @@ public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionA
     private static final long serialVersionUID = 1L;
 
     public DragPanelDescription(ConceptViewSettings settings,
-            CollapsePanel parentCollapsePanel, 
+            CollapsePanel parentCollapsePanel,
             DescriptionAnalogBI desc)
             throws TerminologyException, IOException {
         super(settings, parentCollapsePanel, desc);
@@ -46,8 +49,9 @@ public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionA
     }
 
     private DescriptionAnalogBI getDesc() {
-       return getComponentVersion();
+        return getComponentVersion();
     }
+
     @Override
     public DataFlavor[] getTransferDataFlavors() {
         return new DataFlavor[]{DragPanelDataFlavors.descVersionFlavor};
@@ -92,7 +96,11 @@ public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionA
         setBorder(BorderFactory.createRaisedBevelBorder());
 
         JLabel descLabel = getJLabel(" ");
-        descLabel.setBackground(Color.ORANGE);
+        if (getParentCollapsePanel() == null) {
+         descLabel.setBackground(Color.ORANGE.darker());
+        } else {
+         descLabel.setBackground(Color.ORANGE);
+        }
         descLabel.setOpaque(true);
         setDropPopupInset(descLabel.getPreferredSize().width);
 
@@ -169,9 +177,25 @@ public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionA
             textPane.getDocument().addDocumentListener(
                     new UpdateTextDocumentListener(textPane, getDesc()));
         }
-        
         addSubPanels(gbc);
-     }
-    
-    
+    }
+
+    @Override
+    public Collection<ComponentVersionDragPanel<DescriptionAnalogBI>> getOtherVersionPanels() 
+            throws IOException, TerminologyException {
+        Collection<ComponentVersionDragPanel<DescriptionAnalogBI>> panelList =
+                new ArrayList<ComponentVersionDragPanel<DescriptionAnalogBI>>();
+        Collection<DescriptionAnalogBI> versions = thingToDrag.getChronicle().getVersions();
+        for (DescriptionAnalogBI dav : versions) {
+            if (!thingToDrag.equals(dav)) {
+                DragPanelDescription dpd = new DragPanelDescription(
+                        new GridBagLayout(), 
+                        getSettings(),
+                        null,
+                        dav);
+                panelList.add(dpd);
+            }
+        }
+        return panelList;
+    }
 }

@@ -6,6 +6,8 @@ import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
 import java.awt.datatransfer.DataFlavor;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
@@ -13,6 +15,7 @@ import javax.swing.SwingConstants;
 
 import javax.swing.TransferHandler;
 import org.dwfa.ace.TermComponentLabel;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.Ts;
 
 import org.ihtsdo.tk.api.ComponentVersionBI;
@@ -45,6 +48,26 @@ public class DragPanelExtension
       super(layout, settings, parentCollapsePanel, refex);
       layoutExtension();
    }
+
+     
+    @Override
+    public Collection<ComponentVersionDragPanel<RefexVersionBI<?>>> getOtherVersionPanels() 
+            throws IOException, TerminologyException {
+        Collection<ComponentVersionDragPanel<RefexVersionBI<?>>> panelList =
+                new ArrayList<ComponentVersionDragPanel<RefexVersionBI<?>>>();
+        Collection<RefexVersionBI<?>> versions = thingToDrag.getChronicle().getVersions();
+        for (RefexVersionBI<?> dav : versions) {
+            if (!thingToDrag.equals(dav)) {
+                DragPanelExtension dpd = new DragPanelExtension(
+                        new GridBagLayout(), 
+                        getSettings(),
+                        null,
+                        dav);
+                panelList.add(dpd);
+            }
+        }
+        return panelList;
+    }
 
    @Override
    public DataFlavor[] getTransferDataFlavors() {

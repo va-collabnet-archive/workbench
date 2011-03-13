@@ -7,15 +7,19 @@ package org.ihtsdo.arena.conceptview;
 
 import java.awt.Color;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
 import java.awt.datatransfer.DataFlavor;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.TransferHandler;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
+import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 /**
@@ -130,5 +134,25 @@ public class DragPanelConceptAttributes extends ComponentVersionDragPanel<ConAtt
      }
     
     
+    @Override
+    public Collection<ComponentVersionDragPanel<ConAttrAnalogBI>> 
+            getOtherVersionPanels() 
+            throws IOException, TerminologyException {
+        Collection<ComponentVersionDragPanel<ConAttrAnalogBI>> panelList =
+                new ArrayList<ComponentVersionDragPanel<ConAttrAnalogBI>>();
+        Collection<ConAttrAnalogBI> versions = thingToDrag.getChronicle().getVersions();
+        for (ConAttrAnalogBI dav : versions) {
+            if (!thingToDrag.equals(dav)) {
+                DragPanelConceptAttributes dpd = new DragPanelConceptAttributes(
+                        new GridBagLayout(), 
+                        getSettings(),
+                        null,
+                        dav);
+                panelList.add(dpd);
+            }
+        }
+        return panelList;
+    }
+
 }
 

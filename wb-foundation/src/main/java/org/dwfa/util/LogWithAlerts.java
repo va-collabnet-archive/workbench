@@ -36,7 +36,7 @@ import org.dwfa.app.DwfaEnv;
 
 public class LogWithAlerts {
 
-    Logger logger;
+    private Logger logger;
 
     public LogWithAlerts(String logName) {
         super();
@@ -65,6 +65,7 @@ public class LogWithAlerts {
                 alertAndLogPrivate(getActiveFrame(parent), level, message, ex);
             } else {
                 SwingUtilities.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         alertAndLogPrivate(getActiveFrame(parent), level, message, ex);
                     }
@@ -107,6 +108,7 @@ public class LogWithAlerts {
             this.parent = parent;
         }
 
+        @Override
         public void run() {
             parent.requestFocus();
         }
@@ -129,6 +131,7 @@ public class LogWithAlerts {
                 } else {
                     try {
                         SwingUtilities.invokeAndWait(new Runnable() {
+                            @Override
                             public void run() {
                                 setupActiveFrame();
                             }

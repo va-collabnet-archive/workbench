@@ -1,9 +1,14 @@
 package org.ihtsdo.arena.conceptview;
 
+import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
 import java.awt.datatransfer.DataFlavor;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.swing.TransferHandler;
+import org.dwfa.tapi.TerminologyException;
 
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
@@ -22,6 +27,26 @@ public class DragPanelRel extends ComponentVersionDragPanel<RelationshipVersionB
     public DragPanelRel(LayoutManager layout, ConceptViewSettings settings,
             CollapsePanel parentCollapsePanel, RelationshipVersionBI rel) {
         super(layout, settings, parentCollapsePanel, rel);
+    }
+
+         
+    @Override
+    public Collection<ComponentVersionDragPanel<RelationshipVersionBI>> getOtherVersionPanels() 
+            throws IOException, TerminologyException {
+        Collection<ComponentVersionDragPanel<RelationshipVersionBI>> panelList =
+                new ArrayList<ComponentVersionDragPanel<RelationshipVersionBI>>();
+        Collection<RelationshipVersionBI> versions = thingToDrag.getChronicle().getVersions();
+        for (RelationshipVersionBI dav : versions) {
+            if (!thingToDrag.equals(dav)) {
+                DragPanelRel dpd = new DragPanelRel(
+                        new GridBagLayout(), 
+                        getSettings(),
+                        null,
+                        dav);
+                panelList.add(dpd);
+            }
+        }
+        return panelList;
     }
 
     @Override
