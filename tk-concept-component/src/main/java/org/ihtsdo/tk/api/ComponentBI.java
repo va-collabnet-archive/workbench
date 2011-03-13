@@ -26,6 +26,8 @@ public interface ComponentBI {
 
     Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz) throws IOException;
 
+    Collection<? extends RefexVersionBI<?>> getInactiveRefexes(ViewCoordinate xyz) throws IOException;
+
     boolean addAnnotation(RefexChronicleBI<?> annotation) throws IOException;
 
     Collection<? extends RefexChronicleBI<?>> getAnnotations() throws IOException;

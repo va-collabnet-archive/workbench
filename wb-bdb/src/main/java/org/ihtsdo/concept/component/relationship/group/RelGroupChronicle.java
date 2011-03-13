@@ -128,6 +128,12 @@ public class RelGroupChronicle implements RelGroupChronicleBI {
     }
 
     @Override
+    public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(
+            ViewCoordinate xyz) throws IOException {
+        throw new UnsupportedOperationException("Not supported.");
+    }
+
+    @Override
     public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
             ViewCoordinate xyz) throws IOException {
         throw new UnsupportedOperationException("Not supported.");

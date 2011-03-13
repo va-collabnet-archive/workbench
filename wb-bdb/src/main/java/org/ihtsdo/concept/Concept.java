@@ -1732,6 +1732,13 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
            ViewCoordinate xyz) throws IOException {
       return getConceptAttributes().getCurrentRefexes(xyz);
    }
+   
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(ViewCoordinate xyz) throws IOException {
+      return getConceptAttributes().getInactiveRefexes(xyz);
+    }
+
+
 
    @Override
    public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc)

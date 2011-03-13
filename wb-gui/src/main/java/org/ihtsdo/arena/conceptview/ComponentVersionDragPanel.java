@@ -1,6 +1,5 @@
 package org.ihtsdo.arena.conceptview;
 
-import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -106,6 +105,7 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
         REFEX, ALERT, TEMPLATE, HISTORY
     };
     private List<JComponent> refexSubPanels = new ArrayList<JComponent>();
+    private List<JComponent> historicalRefexSubPanels = new ArrayList<JComponent>();
     private List<JComponent> alertSubPanels = new ArrayList<JComponent>();
     private List<JComponent> templateSubPanels = new ArrayList<JComponent>();
     private List<JComponent> historySubPanels = new ArrayList<JComponent>();
@@ -177,6 +177,8 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
         }
         setPanelVisibility(historySubPanels, panels, SubPanelTypes.HISTORY);
         setPanelVisibility(refexSubPanels, panels, SubPanelTypes.REFEX);
+        setPanelVisibility(historicalRefexSubPanels, panels, 
+                EnumSet.of(SubPanelTypes.REFEX, SubPanelTypes.HISTORY));
         setPanelVisibility(alertSubPanels, panels, SubPanelTypes.ALERT);
         setPanelVisibility(templateSubPanels, panels, SubPanelTypes.TEMPLATE);
     }
@@ -190,10 +192,11 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
                     + (collapsed ? "maximize.gif"
                     : "minimize.gif"))));
         }
-        setPanelVisibility(historySubPanels, panels, null);
-        setPanelVisibility(refexSubPanels, panels, null);
-        setPanelVisibility(alertSubPanels, panels, null);
-        setPanelVisibility(templateSubPanels, panels, null);
+        setPanelVisibility(historySubPanels, panels, (SubPanelTypes)null);
+        setPanelVisibility(refexSubPanels, panels, (SubPanelTypes)null);
+        setPanelVisibility(historicalRefexSubPanels, panels, (SubPanelTypes)null);
+        setPanelVisibility(alertSubPanels, panels, (SubPanelTypes)null);
+        setPanelVisibility(templateSubPanels, panels, (SubPanelTypes)null);
     }
 
     private void setPanelVisibility(List<JComponent> componentList,
@@ -204,6 +207,18 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
                 panel.setVisible(false);
             } else {
                 panel.setVisible(subpanelsToShow.contains(panelType));
+            }
+        }
+    }
+
+        private void setPanelVisibility(List<JComponent> componentList,
+            EnumSet<SubPanelTypes> subpanelsToShow,
+            EnumSet<SubPanelTypes> panelTypes) {
+        for (JComponent panel : componentList) {
+            if (panelTypes == null) {
+                panel.setVisible(false);
+            } else {
+                panel.setVisible(subpanelsToShow.containsAll(panelTypes));
             }
         }
     }
@@ -233,7 +248,7 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
     }
 
     public int getHistorySubpanelCount() {
-        return historySubPanels.size();
+        return historySubPanels.size() + historicalRefexSubPanels.size();
     }
 
     public int getTemplateSubpanelCount() {
@@ -242,7 +257,7 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
 
     public int getSubpanelCount() {
         return getAlertSubpanelCount() + getRefexSubpanelCount()
-                + getTemplateSubpanelCount();
+                + getTemplateSubpanelCount() + getHistorySubpanelCount();
     }
 
     @Override
@@ -304,7 +319,7 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
         }
     }
 
-    public void addRefexPanels(GridBagConstraints gbc) throws IOException {
+    public void addRefexPanels(GridBagConstraints gbc) throws IOException, TerminologyException {
         gbc.gridy++;
         gbc.gridwidth = gbc.gridx;
         gbc.gridx = 1;
@@ -323,6 +338,27 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
             refexSubPanels.add(dpe);
             gbc.gridy++;
         }
+
+        Collection<? extends RefexVersionBI<?>> tempRefexList =
+                getThingToDrag().
+                    getInactiveRefexes(getSettings().getConfig().getViewCoordinate());
+ 
+        for (RefexVersionBI<?> rx : tempRefexList) {
+            DragPanelExtension dpe =
+                    new DragPanelExtension(getSettings(), getParentCollapsePanel(), rx);
+            dpe.setInactiveBackground();
+            dpe.setBorder(BorderFactory.createEtchedBorder());
+            dpe.setVisible(parentCollapsePanel.isShown(SubPanelTypes.REFEX)
+                    && parentCollapsePanel.areExtrasShown());
+            add(dpe, gbc);
+            historicalRefexSubPanels.add(dpe);
+            gbc.gridy++;
+        }
+
+    }
+
+    public List<JComponent> getHistoricalRefexSubPanels() {
+        return historicalRefexSubPanels;
     }
 
     public void addWarningPanels(GridBagConstraints gbc) throws IOException {

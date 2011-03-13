@@ -96,10 +96,10 @@ public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionA
         setBorder(BorderFactory.createRaisedBevelBorder());
 
         JLabel descLabel = getJLabel(" ");
-        if (getParentCollapsePanel() == null) {
-         descLabel.setBackground(Color.ORANGE.darker());
+        if (getParentCollapsePanel() == null || !getSettings().getView().getConfig().getAllowedStatus().contains(getDesc().getStatusNid())) {
+            descLabel.setBackground(Color.ORANGE.darker());
         } else {
-         descLabel.setBackground(Color.ORANGE);
+            descLabel.setBackground(Color.ORANGE);
         }
         descLabel.setOpaque(true);
         setDropPopupInset(descLabel.getPreferredSize().width);
@@ -181,7 +181,7 @@ public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionA
     }
 
     @Override
-    public Collection<ComponentVersionDragPanel<DescriptionAnalogBI>> getOtherVersionPanels() 
+    public Collection<ComponentVersionDragPanel<DescriptionAnalogBI>> getOtherVersionPanels()
             throws IOException, TerminologyException {
         Collection<ComponentVersionDragPanel<DescriptionAnalogBI>> panelList =
                 new ArrayList<ComponentVersionDragPanel<DescriptionAnalogBI>>();
@@ -189,7 +189,7 @@ public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionA
         for (DescriptionAnalogBI dav : versions) {
             if (!thingToDrag.equals(dav)) {
                 DragPanelDescription dpd = new DragPanelDescription(
-                        new GridBagLayout(), 
+                        new GridBagLayout(),
                         getSettings(),
                         null,
                         dav);

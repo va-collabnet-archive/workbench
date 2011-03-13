@@ -72,6 +72,10 @@ import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<ConceptBeanForTree> {
     I_GetConceptData bean;
 
+    public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(ViewCoordinate xyz) throws IOException {
+        return bean.getInactiveRefexes(xyz);
+    }
+
     public Set<PositionBI> getPositions() throws IOException {
         return bean.getPositions();
     }

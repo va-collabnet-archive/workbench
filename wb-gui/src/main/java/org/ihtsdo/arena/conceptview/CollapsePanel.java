@@ -95,6 +95,11 @@ public class CollapsePanel extends JPanel {
     private List<JComponent> refexPanels = new ArrayList<JComponent>();
     private List<JComponent> templatePanels = new ArrayList<JComponent>();
     private List<JComponent> historyPanels = new ArrayList<JComponent>();
+    private List<JComponent> retiredPanels = new ArrayList<JComponent>();
+
+    public List<JComponent> getRetiredPanels() {
+        return retiredPanels;
+    }
     private JButton collapseExpandButton;
     private JButton dynamicPopupMenuButton;
     private CollapsePanelPrefs prefs;
@@ -193,8 +198,9 @@ public class CollapsePanel extends JPanel {
         historyButton.addActionListener(l);
         templatessButton.addActionListener(l);
         collapseExpandButton.addActionListener(l);
-        
+
     }
+
     private class DoDynamicPopup implements ActionListener {
 
         @Override
@@ -387,7 +393,11 @@ public class CollapsePanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SubPanelTypes subpanelType = SubPanelTypes.HISTORY;
-                Icon icon = (!isShown(subpanelType) ? showHistoryIcon : hideHistoryIcon);
+                boolean shown = isShown(subpanelType);
+                Icon icon = (!shown ? showHistoryIcon : hideHistoryIcon);
+                for (JComponent retiredPanel : retiredPanels) {
+                    retiredPanel.setVisible(!shown);
+                }
                 handleToggleAction(subpanelType, e, icon);
             }
         });
@@ -543,7 +553,7 @@ public class CollapsePanel extends JPanel {
 
     public void setHistoryCount(int historyCount) {
         this.historyCount = historyCount;
-        if (historyCount == 0) {
+        if (historyCount + retiredPanels.size() == 0) {
             historyButton.setIcon(null);
             historyButton.setEnabled(false);
             historyButton.setMaximumSize(emptyDimension);

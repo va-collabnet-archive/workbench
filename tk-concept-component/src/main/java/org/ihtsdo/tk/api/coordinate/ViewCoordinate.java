@@ -66,6 +66,20 @@ public class ViewCoordinate {
         this.langSort = langSort;
     }
 
+    public ViewCoordinate(ViewCoordinate another) {
+        super();
+        this.precedence = another.precedence;
+        this.positionSet = another.positionSet;
+        this.allowedStatusNids = another.allowedStatusNids;
+        this.isaTypeNids = another.isaTypeNids;
+        this.contradictionManager = another.contradictionManager;
+        this.languageNid = another.languageNid;
+        this.classifierNid = another.classifierNid;
+        this.relAssertionType = another.relAssertionType;
+        this.langPrefList = another.langPrefList;
+        this.langSort = another.langSort;
+    }
+
     public LANGUAGE_SORT getLangSort() {
         return langSort;
     }
@@ -138,8 +152,8 @@ public class ViewCoordinate {
 
     private void getConceptText(StringBuilder sb, TerminologySnapshotDI snap, int nid) {
         try {
-            if (snap.getConceptVersion(nid) != null &&
-                    snap.getConceptVersion(nid).getPreferredDescription() != null) {
+            if (snap.getConceptVersion(nid) != null
+                    && snap.getConceptVersion(nid).getPreferredDescription() != null) {
                 sb.append(snap.getConceptVersion(nid).getPreferredDescription().getText());
             } else {
                 sb.append(Integer.toString(nid));
@@ -151,29 +165,48 @@ public class ViewCoordinate {
         }
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
-           return true;
+            return true;
         }
         if (o instanceof ViewCoordinate) {
             ViewCoordinate another = (ViewCoordinate) o;
-            if (!testEquals(precedence, another.precedence)) return false;
-            if (!testEquals(positionSet, another.positionSet)) return false;
-            if (!testEquals(allowedStatusNids, another.allowedStatusNids)) return false;
-            if (!testEquals(isaTypeNids, another.isaTypeNids)) return false;
-            if (!testEquals(contradictionManager, another.contradictionManager)) return false;
-            if (!testEquals(languageNid, another.languageNid)) return false;
-            if (!testEquals(classifierNid, another.classifierNid)) return false;
-            if (!testEquals(relAssertionType, another.relAssertionType)) return false;
-            if (!testEquals(langPrefList, another.langPrefList)) return false;
-            if (!testEquals(langSort, another.langSort)) return false;
+            if (!testEquals(precedence, another.precedence)) {
+                return false;
+            }
+            if (!testEquals(positionSet, another.positionSet)) {
+                return false;
+            }
+            if (!testEquals(allowedStatusNids, another.allowedStatusNids)) {
+                return false;
+            }
+            if (!testEquals(isaTypeNids, another.isaTypeNids)) {
+                return false;
+            }
+            if (!testEquals(contradictionManager, another.contradictionManager)) {
+                return false;
+            }
+            if (!testEquals(languageNid, another.languageNid)) {
+                return false;
+            }
+            if (!testEquals(classifierNid, another.classifierNid)) {
+                return false;
+            }
+            if (!testEquals(relAssertionType, another.relAssertionType)) {
+                return false;
+            }
+            if (!testEquals(langPrefList, another.langPrefList)) {
+                return false;
+            }
+            if (!testEquals(langSort, another.langSort)) {
+                return false;
+            }
             return true;
         }
         return false;
     }
-    
+
     private static boolean testEquals(Object o1, Object o2) {
         if (o1 == null && o2 == null) {
             return true;
@@ -185,13 +218,13 @@ public class ViewCoordinate {
             NidSetBI ns1 = (NidSetBI) o1;
             NidSetBI ns2 = (NidSetBI) o2;
             return Arrays.equals(ns1.getSetValues(), ns2.getSetValues());
-                    
+
         }
         if (o1 instanceof NidListBI) {
             NidListBI ns1 = (NidListBI) o1;
             NidListBI ns2 = (NidListBI) o2;
             return Arrays.equals(ns1.getListArray(), ns2.getListArray());
-                    
+
         }
         if (o1 instanceof PositionSetBI) {
             PositionSetBI ns1 = (PositionSetBI) o1;
@@ -201,7 +234,7 @@ public class ViewCoordinate {
                     return ns1.getPositionArray()[0].equals(ns2.getPositionArray()[0]);
                 }
             }
-            return Arrays.equals(ns1.getPositionArray(), ns2.getPositionArray());                    
+            return Arrays.equals(ns1.getPositionArray(), ns2.getPositionArray());
         }
         if (o1.equals(o2)) {
             return true;
@@ -212,19 +245,22 @@ public class ViewCoordinate {
     @Override
     public int hashCode() {
         int hashCode = 0;
-        for (PositionBI pos: positionSet.getPositionArray()) {
-            hashCode = Hashcode.compute(new int[] {hashCode, 
-                pos.getPath().getConceptNid(), 
-                pos.getVersion()});
+        for (PositionBI pos : positionSet.getPositionArray()) {
+            hashCode = Hashcode.compute(new int[]{hashCode,
+                        pos.getPath().getConceptNid(),
+                        pos.getVersion()});
         }
         return hashCode;
     }
-    
+
     public IsaCoordinate getIsaCoordinate() {
-    	IsaCoordinate isaCoordinate = new IsaCoordinate(positionSet.iterator().next(), allowedStatusNids, isaTypeNids, 
-    			precedence, contradictionManager, classifierNid, relAssertionType);
-    	return isaCoordinate;
+        IsaCoordinate isaCoordinate = new IsaCoordinate(positionSet.iterator().next(), 
+                allowedStatusNids, isaTypeNids,
+                precedence, contradictionManager, classifierNid, relAssertionType);
+        return isaCoordinate;
     }
-    
-    
+
+    public void setAllowedStatusNids(NidSetBI allowedStatusNids) {
+        this.allowedStatusNids = allowedStatusNids;
+    }
 }

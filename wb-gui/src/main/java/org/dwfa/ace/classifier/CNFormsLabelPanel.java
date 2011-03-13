@@ -397,6 +397,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
+        public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(ViewCoordinate xyz) throws IOException {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
     }
 
 
@@ -820,6 +825,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         @Override
         public String toUserString(TerminologySnapshotDI snapshot) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(ViewCoordinate xyz) throws IOException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 

@@ -352,14 +352,14 @@ public class ConceptVersion implements ConceptVersionBI {
     public String toUserString() {
         return concept.toString();
     }
-    
+
     @Override
     public String toLongString() {
         return concept.toLongString();
     }
-    
+
     @Override
-    public String toUserString(TerminologySnapshotDI snapshot) 
+    public String toUserString(TerminologySnapshotDI snapshot)
             throws IOException, ContraditionException {
         return getPreferredDescription().getText();
     }
@@ -662,6 +662,11 @@ public class ConceptVersion implements ConceptVersionBI {
     }
 
     @Override
+    public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(ViewCoordinate xyz) throws IOException {
+        return concept.getInactiveRefexes(xyz);
+    }
+
+    @Override
     public boolean addAnnotation(RefexChronicleBI<?> annotation) throws IOException {
         return concept.addAnnotation(annotation);
     }
@@ -771,6 +776,4 @@ public class ConceptVersion implements ConceptVersionBI {
     public Set<PositionBI> getPositions() throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
-    
 }

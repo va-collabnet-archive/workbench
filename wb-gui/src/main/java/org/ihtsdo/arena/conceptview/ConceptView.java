@@ -57,6 +57,7 @@ import org.drools.runtime.StatefulKnowledgeSession;
 import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
@@ -133,6 +134,7 @@ public class ConceptView extends JPanel {
         private ViewCoordinate coordinate;
         private Collection<? extends RelGroupVersionBI> relGroups;
         private List<? extends I_DescriptionTuple> descriptions;
+        private List<? extends I_DescriptionTuple> inactiveDescriptions;
         private I_GetConceptData layoutConcept;
 
         public LayoutConceptWorker() {
@@ -163,6 +165,14 @@ public class ConceptView extends JPanel {
                 descriptions = layoutConcept.getDescriptionTuples(config.getAllowedStatus(),
                         null, config.getViewPositionSetReadOnly(),
                         config.getPrecedence(), config.getConflictResolutionStrategy());
+                List<? extends I_DescriptionTuple> tempDescList = layoutConcept.getDescriptionTuples(null,
+                        null, config.getViewPositionSetReadOnly(),
+                        config.getPrecedence(), config.getConflictResolutionStrategy());
+                HashSet<I_DescriptionTuple> descSet = 
+                        new HashSet<I_DescriptionTuple>(tempDescList);
+                tempDescList.removeAll(descriptions);
+                inactiveDescriptions = new ArrayList<I_DescriptionTuple>(tempDescList);
+                
             }
             return kb.setConcept(layoutConcept);
         }
@@ -200,7 +210,7 @@ public class ConceptView extends JPanel {
                         cpe.addToggleComponent(cac);
                         cpe.setAlertCount(0);
                         cpe.setRefexCount(cav.getRefexes().size());
-                        cpe.setHistoryCount(0);
+                        cpe.setHistoryCount(cac.getHistorySubpanelCount());
                         cpe.setTemplateCount(0);
                         add(cac, gbc);
                         gbc.gridy++;
@@ -239,6 +249,20 @@ public class ConceptView extends JPanel {
                         for (I_DescriptionTuple desc : descriptions) {
                             DragPanelDescription dc = getDescComponent(desc, cpd);
                             cpd.addToggleComponent(dc);
+                            add(dc, gbc);
+                            gbc.gridy++;
+                            cpd.setAlertCount(cpd.alertCount += dc.getAlertSubpanelCount());
+                            cpd.setRefexCount(cpd.refexCount += dc.getRefexSubpanelCount());
+                            cpd.setHistoryCount(cpd.historyCount += dc.getHistorySubpanelCount());
+                            cpd.setTemplateCount(cpd.templateCount += dc.getTemplateSubpanelCount());
+                        }
+
+                        boolean historyIsShow = cpd.isShown(ComponentVersionDragPanel.SubPanelTypes.HISTORY);
+                        for (I_DescriptionTuple desc : inactiveDescriptions) {
+                            DragPanelDescription dc = getDescComponent(desc, cpd);
+                            dc.setVisible(historyIsShow);
+                            cpd.addToggleComponent(dc);
+                            cpd.getRetiredPanels().add(dc);
                             add(dc, gbc);
                             gbc.gridy++;
                             cpd.setAlertCount(cpd.alertCount += dc.getAlertSubpanelCount());
@@ -938,77 +962,8 @@ public class ConceptView extends JPanel {
         DragPanelRel relPanel = new DragPanelRel(new GridBagLayout(), settings,
                 parentCollapsePanel, r);
         addToPositionPanelMap(relPanel);
-        boolean canDrop = false;
-        if (r.getTime() == Long.MAX_VALUE) {
-            relPanel.setOpaque(true);
-            relPanel.setBackground(Color.YELLOW);
-            canDrop = true;
-        }
-        relPanel.setupDrag(r);
-        relPanel.setBorder(BorderFactory.createRaisedBevelBorder());
-        JLabel relLabel = getJLabel(" ");
-        relLabel.setBackground(Color.BLUE);
-        relLabel.setOpaque(true);
-        relPanel.setDropPopupInset(relLabel.getPreferredSize().width);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.weightx = 0;
-        gbc.weighty = 0;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.gridheight = 1;
-        gbc.gridwidth = 1;
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        relPanel.add(relLabel, gbc);
-        gbc.gridx++;
-        TermComponentLabel typeLabel = getLabel(r.getTypeNid(), canDrop);
-        typeLabel.addPropertyChangeListener("termComponent",
-                new PropertyChangeManager<RelationshipAnalogBI>((RelationshipAnalogBI) r) {
+        
 
-                    @Override
-                    protected void changeProperty(I_GetConceptData newValue) {
-                        try {
-                            getComponent().setTypeNid(newValue.getNid());
-                            if (getComponent().isUncommitted()) {
-                                Terms.get().addUncommitted(Terms.get().getConcept(
-                                        getComponent().getOriginNid()));
-                            }
-                        } catch (PropertyVetoException e) {
-                            AceLog.getAppLog().alertAndLogException(e);
-                        } catch (TerminologyException e) {
-                            AceLog.getAppLog().alertAndLogException(e);
-                        } catch (IOException e) {
-                            AceLog.getAppLog().alertAndLogException(e);
-                        }
-                    }
-                });
-        relPanel.add(typeLabel, gbc);
-        gbc.gridx++;
-        relPanel.add(new JSeparator(SwingConstants.VERTICAL), gbc);
-        gbc.weightx = 1;
-        gbc.gridx++;
-        TermComponentLabel destLabel = getLabel(r.getDestinationNid(), canDrop);
-        typeLabel.addPropertyChangeListener("termComponent",
-                new PropertyChangeManager<RelationshipAnalogBI>((RelationshipAnalogBI) r) {
-
-                    @Override
-                    protected void changeProperty(I_GetConceptData newValue) {
-                        try {
-                            getComponent().setDestinationNid(newValue.getNid());
-                            if (getComponent().isUncommitted()) {
-                                Terms.get().addUncommitted(Terms.get().getConcept(
-                                        getComponent().getOriginNid()));
-                            }
-                        } catch (PropertyVetoException e) {
-                            AceLog.getAppLog().alertAndLogException(e);
-                        } catch (TerminologyException e) {
-                            AceLog.getAppLog().alertAndLogException(e);
-                        } catch (IOException e) {
-                            AceLog.getAppLog().alertAndLogException(e);
-                        }
-                    }
-                });
-        relPanel.add(destLabel, gbc);
         return relPanel;
     }
 

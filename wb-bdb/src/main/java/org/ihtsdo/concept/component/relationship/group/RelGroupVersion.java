@@ -40,6 +40,12 @@ public class RelGroupVersion
     }
 
     @Override
+    public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(
+            ViewCoordinate xyz) throws IOException {
+        return rg.getInactiveRefexes(xyz);
+    }
+
+    @Override
     public boolean addAnnotation(RefexChronicleBI<?> annotation)
             throws IOException {
         return rg.addAnnotation(annotation);

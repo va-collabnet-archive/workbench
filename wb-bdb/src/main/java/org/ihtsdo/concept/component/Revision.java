@@ -407,4 +407,10 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     public ComponentChroncileBI getChronicle() {
         return (ComponentChroncileBI) primordialComponent;
     }
+
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(
+            ViewCoordinate xyz) throws IOException {
+        return getChronicle().getInactiveRefexes(xyz);
+    }
 }

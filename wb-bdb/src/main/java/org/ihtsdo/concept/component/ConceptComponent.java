@@ -283,7 +283,13 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 ViewCoordinate xyz) throws IOException {
             return ConceptComponent.this.getCurrentRefexes(xyz);
         }
-
+        
+        @Override
+        public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(
+                ViewCoordinate xyz) throws IOException {
+            return ConceptComponent.this.getInactiveRefexes(xyz);
+        }
+        
         @Override
         public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
                 ViewCoordinate xyz) throws IOException {
@@ -1998,6 +2004,28 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         for (RefexChronicleBI<?> refex : refexes) {
             for (RefexVersionBI<?> version : refex.getVersions(xyz)) {
                 returnValues.add(version);
+            }
+        }
+        return Collections.unmodifiableCollection(returnValues);
+    }
+
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(
+            ViewCoordinate xyz) throws IOException {
+        Collection<? extends RefexVersionBI<?>> currentRefexes = new HashSet(getCurrentRefexes(xyz));
+
+        Collection<? extends RefexChronicleBI<?>> refexes = getRefexes();
+        List<RefexVersionBI<?>> returnValues =
+                new ArrayList<RefexVersionBI<?>>(refexes.size());
+
+        ViewCoordinate allStatus = new ViewCoordinate(xyz);
+        allStatus.setAllowedStatusNids(null);
+
+        for (RefexChronicleBI<?> refex : refexes) {
+            for (RefexVersionBI<?> version : refex.getVersions(allStatus)) {
+                if (!currentRefexes.contains(version)) {
+                    returnValues.add(version);
+                }
             }
         }
         return Collections.unmodifiableCollection(returnValues);

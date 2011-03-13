@@ -19,7 +19,6 @@ import javax.swing.JLabel;
 import javax.swing.TransferHandler;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
-import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 /**
