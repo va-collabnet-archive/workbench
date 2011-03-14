@@ -29,7 +29,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -53,12 +52,9 @@ import org.ihtsdo.ace.task.search.I_TestWorkflowHistorySearchResults;
 
 public class WorkflowHistoryCriterionPanel extends CriterionPanel {
 
-    private List<I_TestWorkflowHistorySearchResults> criterionOptions;
-
-    public I_TestWorkflowHistorySearchResults bean;
-
 	private static final long serialVersionUID = 1L;
-
+	private List<I_TestWorkflowHistorySearchResults> criterionOptions;
+    private I_TestWorkflowHistorySearchResults bean;
 	private Map<String, I_TestWorkflowHistorySearchResults> menuBeanMap = new HashMap<String, I_TestWorkflowHistorySearchResults>();
 
 	public class WorkflowCriterionListener implements ActionListener {
@@ -69,7 +65,7 @@ public class WorkflowHistoryCriterionPanel extends CriterionPanel {
 	                editorPanel.setLayout(new GridBagLayout());
 	                GridBagConstraints gbc = new GridBagConstraints();
 	                gbc.anchor = GridBagConstraints.WEST;
-	               // gbc.fill = GridBagConstraints.HORIZONTAL;
+
 	                gbc.gridx = 0;
 	                gbc.gridy = 0;
 	                gbc.gridwidth = 1;
@@ -100,7 +96,7 @@ public class WorkflowHistoryCriterionPanel extends CriterionPanel {
 
 	                    editor.addPropertyChangeListener(new EditorGlue(editor, pd.getWriteMethod(), bean));
 	                    JComponent editorComponent = (JComponent) editor.getCustomEditor();
-	                    //editorComponent.setBorder(BorderFactory.createEmptyBorder(2, 5, 0, 8));
+
 	                    gbc.fill = GridBagConstraints.BOTH;
 	                    editorPanel.add(editorComponent, gbc);
 
@@ -116,7 +112,7 @@ public class WorkflowHistoryCriterionPanel extends CriterionPanel {
 	                WorkflowHistoryCriterionPanel.this.validate();
 	                WorkflowHistoryCriterionPanel.this.doLayout();
 	            } catch (Exception ex) {
-	                AceLog.getAppLog().alertAndLogException(ex);
+	                AceLog.getAppLog().log(Level.WARNING, "Unable to display workflow search criteria in search panel");
 	            }
 	        }
 
@@ -129,7 +125,13 @@ public class WorkflowHistoryCriterionPanel extends CriterionPanel {
     public WorkflowHistoryCriterionPanel(I_MakeCriterionPanel searchPanel, I_TestWorkflowHistorySearchResults beanToSet,
             List<I_TestWorkflowHistorySearchResults> criterionOptions) {
     	super(false);
-        GridBagConstraints gbc = new GridBagConstraints();
+
+        setupWorkflowHistoryCriterionOptions(criterionOptions);
+
+        if (criterionOptions.size() == 0)
+        	return;
+        
+    	GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridx = 0;
@@ -145,20 +147,16 @@ public class WorkflowHistoryCriterionPanel extends CriterionPanel {
         add(addButton, gbc);
         addButton.setToolTipText("add a new AND search clause to end of query");
         gbc.gridx++;
+        
         JButton removeButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/delete2.png")));
         removeButton.addActionListener(new RemoveCriterion(searchPanel, this));
         removeButton.setIconTextGap(0);
         add(removeButton, gbc);
         removeButton.setToolTipText("remove this search clause");
-
         gbc.gridx++;
 
-        setupWorkflowHistoryCriterionOptions(criterionOptions);
-
-        criterionCombo = new JComboBox(comboItems.toArray()) {
-            /**
-			 *
-			 */
+        criterionCombo = new JComboBox(comboItems.toArray()) 
+        {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -191,33 +189,19 @@ public class WorkflowHistoryCriterionPanel extends CriterionPanel {
             }
 
         };
+        
         criterionCombo.setMinimumSize(new Dimension(175, 20));
         gbc.fill = GridBagConstraints.VERTICAL;
         add(criterionCombo, gbc);
         criterionCombo.addActionListener(new WorkflowCriterionListener());
+        
         if (criterionCombo.getItemCount() > 0) {
-         criterionCombo.setSelectedIndex(0);
+        	criterionCombo.setSelectedIndex(0);
         }
+        
         gbc.fill = GridBagConstraints.NONE;
-
-        gbc.weightx = 1;
-        //gbc.fill = GridBagConstraints.BOTH;
-        gbc.gridx++;
-/*
         gbc.weightx = 1;
         gbc.gridx++;
-        this.searchPhraseField = new JTextField(200);
-        this.searchPhraseField.setDragEnabled(true);
-        this.searchPhraseField.setMinimumSize(new Dimension(400, 20));
-        this.searchPhraseField.setText("search criteria");
-        add(searchPhraseField, gbc);
-
-        gbc.gridx++;
-        gbc.gridheight = 2;
-        gbc.weightx = 0;
-        gbc.fill = GridBagConstraints.NONE;
-*/
-
 
         add(editorPanel, gbc);
     }
@@ -228,18 +212,23 @@ public class WorkflowHistoryCriterionPanel extends CriterionPanel {
 
     @SuppressWarnings("unchecked")
     public void setupWorkflowHistoryCriterionOptions(List<I_TestWorkflowHistorySearchResults> criterionOptions) {
-          File searchPluginFolder = new File("search/workflow");
-
-        this.criterionOptions = new ArrayList<I_TestWorkflowHistorySearchResults>();
-        if (criterionOptions == null || criterionOptions.isEmpty()) {
+        File searchPluginFolder = new File("search/workflow");
+        this.setCriterionOptions(new ArrayList<I_TestWorkflowHistorySearchResults>());
+        
+        if (criterionOptions == null || criterionOptions.isEmpty()) 
+        {
             File[] searchPlugins = searchPluginFolder.listFiles(new FilenameFilter() {
                 public boolean accept(File dir, String name) {
                     return name.endsWith(".task");
                 }
             });
-            if (searchPlugins != null) {
-                for (File plugin : searchPlugins) {
-                    try {
+            
+            if (searchPlugins != null) 
+            {
+                for (File plugin : searchPlugins) 
+                {
+                    try 
+                    {
                         ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(
                             plugin)));
                         Object pluginObj = ois.readObject();
@@ -247,19 +236,21 @@ public class WorkflowHistoryCriterionPanel extends CriterionPanel {
                         if (I_TestWorkflowHistorySearchResults.class.isAssignableFrom(pluginObj.getClass())) {
                             criterionOptions.add((I_TestWorkflowHistorySearchResults) pluginObj);
                         }
-                    } catch (IOException ex) {
-                        AceLog.getAppLog().alertAndLogException(ex);
-                    } catch (ClassNotFoundException ex) {
-                        AceLog.getAppLog().alertAndLogException(ex);
+                    } catch (Exception ex) {
+                        AceLog.getAppLog().log(Level.WARNING, "Unable to read InputStream of workflow search plugin: " + plugin.getAbsolutePath());
                     }
                 }
             } else {
-                AceLog.getAppLog().log(Level.WARNING, "No search plugins found in folder: " + searchPluginFolder.getAbsolutePath());
+                AceLog.getAppLog().log(Level.WARNING, "No workflow search plugins found in folder: " + searchPluginFolder.getAbsolutePath());
             }
         }
-        for (I_TestWorkflowHistorySearchResults bean : criterionOptions) {
-            try {
-                String searchInfoClassName = bean.getClass().getName() + "SearchInfo";
+        
+        for (I_TestWorkflowHistorySearchResults bean : criterionOptions) 
+        {
+        	String searchInfoClassName = null;
+            try 
+            {
+                searchInfoClassName = bean.getClass().getName() + "SearchInfo";
                 Class<BeanInfo> searchInfoClass = (Class<BeanInfo>) bean.getClass().getClassLoader().loadClass(
                     searchInfoClassName);
                 BeanInfo searchInfo = searchInfoClass.newInstance();
@@ -267,7 +258,7 @@ public class WorkflowHistoryCriterionPanel extends CriterionPanel {
                 menuInfoMap.put(searchInfo.getBeanDescriptor().getDisplayName(), searchInfo);
                 menuBeanMap.put(searchInfo.getBeanDescriptor().getDisplayName(), bean);
             } catch (Exception ex) {
-                AceLog.getAppLog().alertAndLogException(ex);
+                AceLog.getAppLog().log(Level.WARNING, "Unable to load class info defined in workflow search bean: " + searchInfoClassName);
             }
         }
 
@@ -276,4 +267,12 @@ public class WorkflowHistoryCriterionPanel extends CriterionPanel {
     public I_TestWorkflowHistorySearchResults getBean() {
         return bean;
     }
+
+	public void setCriterionOptions(List<I_TestWorkflowHistorySearchResults> criterionOptions) {
+		this.criterionOptions = criterionOptions;
+	}
+
+	public List<I_TestWorkflowHistorySearchResults> getCriterionOptions() {
+		return criterionOptions;
+	}
 }
