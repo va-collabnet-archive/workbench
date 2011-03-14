@@ -7,6 +7,7 @@ package org.ihtsdo.arena.conceptview;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -17,8 +18,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
@@ -29,7 +32,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.dwfa.ace.log.AceLog;
@@ -48,6 +54,7 @@ import org.ihtsdo.util.swing.GuiUtil;
 public class HistoryPanel {
 
     private static final int HISTORY_LABEL_WIDTH = 11;
+
     private JLabel setupLabel(String hxString, int locX) {
         JLabel historyLabel = new JLabel("");
         historyLabel.setVisible(false);
@@ -119,12 +126,64 @@ public class HistoryPanel {
     List<JCheckBox> positionCheckList = new ArrayList<JCheckBox>();
     Map<JCheckBox, JLabel> positionHeaderCheckLabelMap = new HashMap<JCheckBox, JLabel>();
     Map<JCheckBox, JLabel> positionVersionPanelCheckLabelMap = new HashMap<JCheckBox, JLabel>();
-    Map<PositionPanelKey, JRadioButton> panelRadioMap = new HashMap<PositionPanelKey, JRadioButton>();
-    Map<JRadioButton, PositionPanelKey> radioPanelMap = new HashMap<JRadioButton, PositionPanelKey>();
     int hxWidth = 0;
     Map<PathBI, Integer> pathRowMap;
     Map<Integer, JCheckBox> rowToPathCheckMap;
     private final Map<PositionBI, Collection<ComponentVersionDragPanel<?>>> positionPanelMap;
+    private final Map<Integer, ButtonGroup> nidGroupMap = new HashMap<Integer, ButtonGroup>();
+    private final Map<NidSapNid, JRadioButton> nidSapNidButtonMap = new HashMap<NidSapNid, JRadioButton>();
+    private final Map<JRadioButton, Integer> buttonSapMap = new HashMap<JRadioButton, Integer>();
+    private final Map<JRadioButton, Set<JComponent>> buttonPanelSetMap =
+            new HashMap<JRadioButton, Set<JComponent>>();
+
+    private static class NidSapNid {
+
+        int nid;
+        int sapNid;
+
+        public NidSapNid(int nid, int sapNid) {
+            this.nid = nid;
+            this.sapNid = sapNid;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof NidSapNid) {
+                NidSapNid another = (NidSapNid) o;
+                return nid == another.nid && sapNid
+                        == another.sapNid;
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Hashcode.compute(new int[]{nid, sapNid});
+        }
+    }
+
+    private boolean isPanelVisibleForButton(JRadioButton button) {
+        Set<JComponent> panels = buttonPanelSetMap.get(button);
+        if (panels == null) {
+            return false;
+        }
+        boolean visible = false;
+        for (JComponent panel : panels) {
+            if (panel.isVisible()) {
+                return true;
+            }
+        }
+        return visible;
+    }
+
+    private void putPanelInButtonMap(JRadioButton button, JComponent panel) {
+        Set<JComponent> panels = buttonPanelSetMap.get(button);
+        if (panels == null) {
+            panels = new HashSet<JComponent>();
+            buttonPanelSetMap.put(button, panels);
+        }
+        panels.add(panel);
+    }
 
     private class HistoryHierarchyListener implements HierarchyListener {
 
@@ -238,6 +297,15 @@ public class HistoryPanel {
         }
     }
 
+    private ButtonGroup getButtonGroup(int componentNid) {
+        ButtonGroup group = nidGroupMap.get(componentNid);
+        if (group == null) {
+            group = new ButtonGroup();
+            nidGroupMap.put(componentNid, group);
+        }
+        return group;
+    }
+
     private void processPanel(ComponentVersionDragPanel<?> dragPanel) throws IOException {
         ComponentVersionBI version = dragPanel.getComponentVersion();
         List<ComponentVersionDragPanel<?>> versionPanels =
@@ -247,7 +315,7 @@ public class HistoryPanel {
         if (versionPanels.isEmpty()) {
             processAllPositions(version, dragPanel);
         } else {
-            ButtonGroup group = new ButtonGroup();
+            ButtonGroup group = getButtonGroup(version.getNid());
             processPosition(group,
                     version, version, dragPanel);
             for (ComponentVersionDragPanel panel : versionPanels) {
@@ -262,43 +330,9 @@ public class HistoryPanel {
 
     private void processAllPositions(ComponentVersionBI version, ComponentVersionDragPanel<?> dragPanel) throws IOException {
         Collection<ComponentVersionBI> positionVersions = version.getChronicle().getVersions();
-        ButtonGroup group = new ButtonGroup();
+        ButtonGroup group = getButtonGroup(version.getNid());
         for (ComponentVersionBI positionVersion : positionVersions) {
             processPosition(group, version, positionVersion, dragPanel);
-        }
-    }
-
-    private class PositionPanelKey {
-
-        PositionBI p;
-        ComponentVersionDragPanel<?> dragPanel;
-
-        public PositionPanelKey(PositionBI p, ComponentVersionDragPanel<?> dragPanel) {
-            this.p = p;
-            this.dragPanel = dragPanel;
-        }
-
-        public ComponentVersionDragPanel<?> getDragPanel() {
-            return dragPanel;
-        }
-
-        public PositionBI getP() {
-            return p;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o instanceof PositionPanelKey) {
-                PositionPanelKey ppk = (PositionPanelKey) o;
-                return this.p.equals(ppk.p)
-                        && this.dragPanel.equals(ppk.dragPanel);
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return Hashcode.compute(new int[]{p.hashCode(), dragPanel.hashCode()});
         }
     }
 
@@ -308,12 +342,14 @@ public class HistoryPanel {
         try {
             boolean add = false;
             PositionBI p = positionVersion.getPosition();
-            PositionPanelKey ppk = new PositionPanelKey(p, dragPanel);
-            JRadioButton button = panelRadioMap.get(ppk);
+            int sapNid = positionVersion.getSapNid();
+            NidSapNid nidSapNidKey = new NidSapNid(viewVersion.getNid(), sapNid);
+            JRadioButton button = nidSapNidButtonMap.get(nidSapNidKey);
+            putPanelInButtonMap(button, dragPanel);
             if (button == null) {
                 button = new JRadioButton();
-                panelRadioMap.put(ppk, button);
-                radioPanelMap.put(button, ppk);
+                nidSapNidButtonMap.put(nidSapNidKey, button);
+                buttonSapMap.put(button, sapNid);
                 add = true;
                 ConceptVersionBI author =
                         Ts.get().getConceptVersion(
@@ -386,15 +422,9 @@ public class HistoryPanel {
                 ComponentVersionDragPanel cvdp =
                         (ComponentVersionDragPanel) comp;
                 if (cvdp.isVisible()) {
-                        if (cvdp.getComponentVersion().getChronicle().equals(
-                                dragPanel.getComponentVersion().getChronicle())) {
-                            versionPanels.add(cvdp);
-                    }
-                } else {
-                    PositionPanelKey ppk = new PositionPanelKey(cvdp.getComponentVersion().getPosition(), dragPanel);
-                    JRadioButton button = panelRadioMap.get(ppk);
-                    if (button != null) {
-                        button.setVisible(false);
+                    if (cvdp.getComponentVersion().getChronicle().equals(
+                            dragPanel.getComponentVersion().getChronicle())) {
+                        versionPanels.add(cvdp);
                     }
                 }
             }
@@ -414,11 +444,6 @@ public class HistoryPanel {
                         dragPanel.getComponentVersion().getChronicle())) {
                     versionPanels.add(cvdp);
                 }
-            } else {
-                JRadioButton button = panelRadioMap.get(comp);
-                if (button != null) {
-                    button.setVisible(false);
-                }
             }
         }
         return versionPanels;
@@ -427,6 +452,10 @@ public class HistoryPanel {
 
     private void combineHistoryPanels() {
         topHistoryPanel.removeAll();
+        for (JRadioButton button : buttonSapMap.keySet()) {
+            button.setVisible(false);
+        }
+
         historyHeaderPanel.setSize(hxWidth,
                 view.getHistoryPanel().getHeight() - insetAdjustment);
         historyHeaderPanel.setPreferredSize(historyHeaderPanel.getSize());
@@ -449,7 +478,6 @@ public class HistoryPanel {
 
     private void redoLayout() {
 
-
         int currentX = xStartLoc;
         next:
         for (JCheckBox positionCheck : positionCheckList) {
@@ -465,12 +493,7 @@ public class HistoryPanel {
                 boolean visible = positionCheck.isVisible();
                 if (visible && componentInColumn instanceof JRadioButton) {
                     JRadioButton radioButton = (JRadioButton) componentInColumn;
-                    PositionPanelKey ppk = radioPanelMap.get(radioButton);
-                    if (ppk != null && ppk.dragPanel != null) {
-                        if (!ppk.dragPanel.isVisible()) {
-                            visible = false;
-                        }
-                    }
+                    visible = isPanelVisibleForButton(radioButton);
                 }
                 componentInColumn.setVisible(visible);
                 componentInColumn.setLocation(currentX, componentInColumn.getY());
@@ -495,6 +518,35 @@ public class HistoryPanel {
                 }
             }
         }
+        redoGrid();
+    }
+    private List<JSeparator> seperators = new ArrayList<JSeparator>();
+
+    private void redoGrid() {
+        for (JSeparator sep : seperators) {
+            versionPanel.remove(sep);
+        }
+        seperators.clear();
+        for (JComponent comp : view.getSeperatorComponents()) {
+            if (comp.isVisible()) {
+
+                JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
+                sep.setSize(versionPanel.getWidth(), 6);
+
+                int yLoc = comp.getY();
+                Component parentPanel = comp.getParent();
+                while (parentPanel != null && parentPanel != view) {
+                    yLoc += parentPanel.getY();
+                    parentPanel = parentPanel.getParent();
+                }
+
+                sep.setLocation(0, yLoc - 6);
+                versionPanel.add(sep);
+                seperators.add(sep);
+            }
+
+        }
+
     }
 
     private void setupHeader(ConceptView view) {

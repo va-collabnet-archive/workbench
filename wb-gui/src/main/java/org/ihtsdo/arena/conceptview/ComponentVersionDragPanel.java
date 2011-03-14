@@ -272,6 +272,7 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
         collapseExpandButton.setOpaque(false);
         collapseExpandButton.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 6));
         updateCollapseExpandButton();
+        addPanelsChangedActionListener(getSettings().getView().getPanelsChangedActionListener());
         return collapseExpandButton;
     }
 
@@ -331,6 +332,7 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
         for (RefexVersionBI<?> rx : refexes) {
             DragPanelExtension dpe =
                     new DragPanelExtension(getSettings(), getParentCollapsePanel(), rx);
+            getSettings().getView().getSeperatorComponents().add(dpe);
             dpe.setBorder(BorderFactory.createEtchedBorder());
             dpe.setVisible(parentCollapsePanel.isShown(SubPanelTypes.REFEX)
                     && parentCollapsePanel.areExtrasShown());
@@ -346,6 +348,7 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
         for (RefexVersionBI<?> rx : tempRefexList) {
             DragPanelExtension dpe =
                     new DragPanelExtension(getSettings(), getParentCollapsePanel(), rx);
+            getSettings().getView().getSeperatorComponents().add(dpe);
             dpe.setInactiveBackground();
             dpe.setBorder(BorderFactory.createEtchedBorder());
             dpe.setVisible(parentCollapsePanel.isShown(SubPanelTypes.REFEX)

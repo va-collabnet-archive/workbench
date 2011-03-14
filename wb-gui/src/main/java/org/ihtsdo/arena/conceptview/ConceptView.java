@@ -13,7 +13,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,7 +56,6 @@ import org.drools.runtime.StatefulKnowledgeSession;
 import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
@@ -78,7 +76,6 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 import org.ihtsdo.tk.drools.facts.Context;
@@ -146,6 +143,7 @@ public class ConceptView extends JPanel {
             //TODO move all layout to background thread, and return a complte panel...
             positionPanelMap.clear();
             positionOrderedSet.clear();
+            seperatorComponents.clear();
             pathRowMap.clear();
             layoutConcept = concept;
             if (layoutConcept != null) {
@@ -168,11 +166,11 @@ public class ConceptView extends JPanel {
                 List<? extends I_DescriptionTuple> tempDescList = layoutConcept.getDescriptionTuples(null,
                         null, config.getViewPositionSetReadOnly(),
                         config.getPrecedence(), config.getConflictResolutionStrategy());
-                HashSet<I_DescriptionTuple> descSet = 
+                HashSet<I_DescriptionTuple> descSet =
                         new HashSet<I_DescriptionTuple>(tempDescList);
                 tempDescList.removeAll(descriptions);
                 inactiveDescriptions = new ArrayList<I_DescriptionTuple>(tempDescList);
-                
+
             }
             return kb.setConcept(layoutConcept);
         }
@@ -207,6 +205,8 @@ public class ConceptView extends JPanel {
                                 (ConAttrAnalogBI) cv.getConAttrsActive();
                         DragPanelConceptAttributes cac = getConAttrComponent(
                                 (ConAttrAnalogBI) cav, cpe);
+                        seperatorComponents.add(cac);
+                        
                         cpe.addToggleComponent(cac);
                         cpe.setAlertCount(0);
                         cpe.setRefexCount(cav.getRefexes().size());
@@ -225,6 +225,7 @@ public class ConceptView extends JPanel {
                                 for (I_ExtendByRefPart cr : currentRefsets) {
                                     DragPanelExtension ce =
                                             new DragPanelExtension(settings, cpe, extn);
+                                    seperatorComponents.add(ce);
                                     cpe.addToggleComponent(ce);
                                     add(ce, gbc);
                                     cpe.getRefexPanels().add(ce);
@@ -248,6 +249,8 @@ public class ConceptView extends JPanel {
                         gbc.gridy++;
                         for (I_DescriptionTuple desc : descriptions) {
                             DragPanelDescription dc = getDescComponent(desc, cpd);
+                            seperatorComponents.add(dc);
+
                             cpd.addToggleComponent(dc);
                             add(dc, gbc);
                             gbc.gridy++;
@@ -257,10 +260,11 @@ public class ConceptView extends JPanel {
                             cpd.setTemplateCount(cpd.templateCount += dc.getTemplateSubpanelCount());
                         }
 
-                        boolean historyIsShow = cpd.isShown(ComponentVersionDragPanel.SubPanelTypes.HISTORY);
+                        boolean historyIsShown = cpd.isShown(ComponentVersionDragPanel.SubPanelTypes.HISTORY);
                         for (I_DescriptionTuple desc : inactiveDescriptions) {
                             DragPanelDescription dc = getDescComponent(desc, cpd);
-                            dc.setVisible(historyIsShow);
+                            seperatorComponents.add(dc);
+                            dc.setVisible(historyIsShown);
                             cpd.addToggleComponent(dc);
                             cpd.getRetiredPanels().add(dc);
                             add(dc, gbc);
@@ -288,6 +292,8 @@ public class ConceptView extends JPanel {
                                     cprAdded = true;
                                 }
                                 DragPanelRel rc = getRelComponent(r, cpr);
+                                seperatorComponents.add(rc);
+
                                 cpr.addToggleComponent(rc);
                                 add(rc, gbc);
                                 gbc.gridy++;
@@ -309,6 +315,7 @@ public class ConceptView extends JPanel {
                                         cprAdded = true;
                                     }
                                     DragPanelRelGroup rgc = getRelGroupComponent(r, cpr);
+                                    seperatorComponents.add(rgc);
                                     cpr.addToggleComponent(rgc);
                                     add(rgc, gbc);
                                     gbc.gridy++;
@@ -419,7 +426,7 @@ public class ConceptView extends JPanel {
                 if (pathVersion.getPreferredDescription() != null) {
                     pathCheck.setText(pathVersion.getPreferredDescription().getText());
                 } else {
-                   pathCheck.setText(pathVersion.toString());
+                    pathCheck.setText(pathVersion.toString());
                 }
                 pathCheck.setSelected(true);
                 rowToPathCheckMap.put(row, pathCheck);
@@ -666,6 +673,10 @@ public class ConceptView extends JPanel {
     private Map<PathBI, Integer> pathRowMap = new HashMap<PathBI, Integer>();
     private PanelsChangedActionListener pcal = new PanelsChangedActionListener();
 
+    public ActionListener getPanelsChangedActionListener() {
+        return pcal;
+    }
+
     public I_GetConceptData getConcept() {
         return concept;
     }
@@ -679,6 +690,7 @@ public class ConceptView extends JPanel {
     private Map<PositionBI, Collection<ComponentVersionDragPanel<?>>> positionPanelMap =
             new HashMap<PositionBI, Collection<ComponentVersionDragPanel<?>>>();
     private Map<Integer, JCheckBox> rowToPathCheckMap = new HashMap<Integer, JCheckBox>();
+    private List<JComponent> seperatorComponents = new ArrayList<JComponent>();
 
     public ConceptView(I_ConfigAceFrame config,
             ConceptViewSettings settings, ConceptViewRenderer cvRenderer) {
@@ -768,7 +780,6 @@ public class ConceptView extends JPanel {
         DragPanelRelGroup relGroupPanel =
                 new DragPanelRelGroup(new GridBagLayout(), settings,
                 parentCollapsePanel, group);
-        relGroupPanel.addPanelsChangedActionListener(pcal);
         relGroupPanel.setupDrag(group);
         relGroupPanel.setBorder(BorderFactory.createRaisedBevelBorder());
         JLabel relGroupLabel = getJLabel(" ");
@@ -792,7 +803,6 @@ public class ConceptView extends JPanel {
         CollapsePanel cprg = new CollapsePanel("group:", settings,
                 new CollapsePanelPrefs(prefMap.get(PanelSection.REL_GRP)),
                 PanelSection.REL_GRP);
-        cprg.addPanelsChangedActionListener(pcal);
         cprg.setAlertCount(0);
         cprg.setRefexCount(0);
         cprg.setHistoryCount(0);
@@ -801,7 +811,6 @@ public class ConceptView extends JPanel {
         gbc.gridy++;
         for (RelationshipVersionBI r : group.getCurrentRels()) { //TODO getCurrentRels
             DragPanelRel dpr = getRelComponent(r, parentCollapsePanel);
-            dpr.addPanelsChangedActionListener(pcal);
             cprg.addToggleComponent(dpr);
             dpr.setInGroup(true);
             relGroupPanel.add(dpr, gbc);
@@ -822,7 +831,6 @@ public class ConceptView extends JPanel {
         DragPanelConceptAttributes dragConAttrPanel =
                 new DragPanelConceptAttributes(new GridBagLayout(), settings,
                 parentCollapsePanel, conAttr);
-        dragConAttrPanel.addPanelsChangedActionListener(pcal);
         addToPositionPanelMap(dragConAttrPanel);
         return dragConAttrPanel;
     }
@@ -833,7 +841,6 @@ public class ConceptView extends JPanel {
         DragPanelDescription dragDescPanel =
                 new DragPanelDescription(new GridBagLayout(), settings,
                 parentCollapsePanel, desc);
-        dragDescPanel.addPanelsChangedActionListener(pcal);
         addToPositionPanelMap(dragDescPanel);
         return dragDescPanel;
     }
@@ -962,7 +969,7 @@ public class ConceptView extends JPanel {
         DragPanelRel relPanel = new DragPanelRel(new GridBagLayout(), settings,
                 parentCollapsePanel, r);
         addToPositionPanelMap(relPanel);
-        
+
 
         return relPanel;
     }
@@ -1079,5 +1086,9 @@ public class ConceptView extends JPanel {
 
     public I_ConfigAceFrame getConfig() {
         return config;
+    }
+
+    public List<JComponent> getSeperatorComponents() {
+        return seperatorComponents;
     }
 }

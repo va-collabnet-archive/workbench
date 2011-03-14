@@ -16,6 +16,11 @@
  */
 package org.dwfa.util;
 
+/**
+ * 
+ * @author kec
+ * @deprecated use Hashcode.compute
+ */
 @Deprecated
 // Moved to DTOs & API
 public class HashFunction {
