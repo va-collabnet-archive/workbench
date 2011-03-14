@@ -483,7 +483,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
       HashSet<PathBI> paths = new HashSet<PathBI>(positions.size());
       for (PositionBI position: positions) {
          paths.add(position.getPath());
-         addOrigins(paths, position.getPath().getInheritedOrigins());
+         //addOrigins(paths, position.getPath().getInheritedOrigins());
       }
       return paths;
    }

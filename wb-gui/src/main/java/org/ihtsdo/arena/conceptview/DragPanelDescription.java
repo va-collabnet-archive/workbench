@@ -157,7 +157,6 @@ public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionA
             lang = lang.substring(0, 2);
         }
         JLabel langLabel = getJLabel(lang);
-        langLabel.setOpaque(true);
         add(langLabel, gbc);
         gbc.gridx++;
         String caseStr = "ci";
@@ -165,10 +164,8 @@ public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionA
             caseStr = "Cs";
         }
         JLabel caseLabel = getJLabel(caseStr);
-        langLabel.setOpaque(true);
         add(caseLabel, gbc);
         gbc.gridx++;
-
 
         JButton collapseExpandButton = getCollapseExpandButton();
         add(collapseExpandButton, gbc);

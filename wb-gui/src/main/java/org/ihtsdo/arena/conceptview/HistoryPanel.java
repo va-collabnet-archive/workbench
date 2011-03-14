@@ -7,7 +7,6 @@ package org.ihtsdo.arena.conceptview;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -26,6 +25,8 @@ import java.util.TreeSet;
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -35,15 +36,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.AnalogGeneratorBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.hash.Hashcode;
 import org.ihtsdo.util.swing.GuiUtil;
 
@@ -83,6 +84,35 @@ public class HistoryPanel {
         historyScrollModel.setMinimum(eventModel.getMinimum());
         historyScrollModel.setValue(eventModel.getValue());
         versionPanel.setLocation(0, -eventModel.getValue());
+    }
+
+    private class SelectedVersionChangedListener implements ChangeListener {
+
+        @Override
+        public void stateChanged(ChangeEvent ce) {
+            JRadioButton button = (JRadioButton) ce.getSource();
+            if (button.isSelected()) {
+                if (originalButtonSelections.contains(button)) {
+                    // back to original state
+                } else {
+                    // unimplemented change
+                    button.setBackground(Color.YELLOW);
+                    button.setOpaque(true);
+                    changedSelections.add(button);
+                }
+            } else {
+                button.setBackground(versionPanel.getBackground());
+                button.setOpaque(false);
+                changedSelections.remove(button);
+            }
+            if (changedSelections.size() > 0) {
+                applyButton.setVisible(true);
+                applyButton.setEnabled(true);
+            } else {
+                applyButton.setVisible(false);
+                applyButton.setEnabled(false);
+            }
+        }
     }
 
     private class UpdateHistoryBorder implements ActionListener {
@@ -127,14 +157,18 @@ public class HistoryPanel {
     Map<JCheckBox, JLabel> positionHeaderCheckLabelMap = new HashMap<JCheckBox, JLabel>();
     Map<JCheckBox, JLabel> positionVersionPanelCheckLabelMap = new HashMap<JCheckBox, JLabel>();
     int hxWidth = 0;
-    Map<PathBI, Integer> pathRowMap;
-    Map<Integer, JCheckBox> rowToPathCheckMap;
     private final Map<PositionBI, Collection<ComponentVersionDragPanel<?>>> positionPanelMap;
     private final Map<Integer, ButtonGroup> nidGroupMap = new HashMap<Integer, ButtonGroup>();
     private final Map<NidSapNid, JRadioButton> nidSapNidButtonMap = new HashMap<NidSapNid, JRadioButton>();
     private final Map<JRadioButton, Integer> buttonSapMap = new HashMap<JRadioButton, Integer>();
     private final Map<JRadioButton, Set<JComponent>> buttonPanelSetMap =
             new HashMap<JRadioButton, Set<JComponent>>();
+    private final Map<JRadioButton, ComponentVersionBI> buttonVersionMap =
+            new HashMap<JRadioButton, ComponentVersionBI>();
+    private final Set<JRadioButton> originalButtonSelections = new HashSet<JRadioButton>();
+    private final Set<JRadioButton> changedSelections = new HashSet<JRadioButton>();
+    private final SelectedVersionChangedListener svcl = new SelectedVersionChangedListener();
+    private final JButton applyButton = new JButton();
 
     private static class NidSapNid {
 
@@ -247,13 +281,39 @@ public class HistoryPanel {
         }
     }
 
+    private class ApplyVersionChangesListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            try {
+                for (JRadioButton button : changedSelections) {
+                    EditCoordinate ec = view.getConfig().getEditCoordinate();
+                    ComponentVersionBI cv = buttonVersionMap.get(button);
+                    for (int pathNid : ec.getEditPaths()) {
+                        ((AnalogGeneratorBI) cv).makeAnalog(
+                                cv.getStatusNid(),
+                                ec.getAuthorNid(),
+                                pathNid, Long.MAX_VALUE);
+                    }
+                }
+                Ts.get().addUncommitted(view.getConcept());
+                reset();
+            } catch (IOException ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
+    }
+
     public HistoryPanel(ConceptView view, JScrollPane historyScroller) throws IOException {
         this.view = view;
-        pathRowMap = view.getPathRowMap();
-        rowToPathCheckMap = view.getRowToPathCheckMap();
         positionPanelMap = view.getPositionPanelMap();
+        applyButton.setToolTipText("apply selected version changes");
+        applyButton.setIcon(new ImageIcon(
+                HistoryPanel.class.getResource("/16x16/plain/magic-wand.png")));
+        applyButton.addActionListener(new ApplyVersionChangesListener());
+
         TreeSet<PositionBI> positionOrderedSet = view.getPositionOrderedSet();
-        if (pathRowMap != null && positionOrderedSet != null) {
+        if (view.getPathRowMap() != null && positionOrderedSet != null) {
             setupHeader(view);
             combineHistoryPanels();
             setupVersionPanel(positionPanelMap);
@@ -271,6 +331,14 @@ public class HistoryPanel {
         ((JScrollPane) view.getParent().getParent()).getVerticalScrollBar().
                 getModel().addChangeListener(new VerticalScrollActionListener());
         redoLayout();
+    }
+
+    private void reset() {
+        nidSapNidButtonMap.clear();
+        buttonSapMap.clear();
+        buttonPanelSetMap.clear();
+        originalButtonSelections.clear();
+        changedSelections.clear();
     }
 
     public void resizeIfNeeded() {
@@ -348,6 +416,12 @@ public class HistoryPanel {
             putPanelInButtonMap(button, dragPanel);
             if (button == null) {
                 button = new JRadioButton();
+                button.addChangeListener(svcl);
+                buttonVersionMap.put(button, positionVersion);
+                if (viewVersion == positionVersion) {
+                    originalButtonSelections.add(button);
+                    button.setSelected(true);
+                }
                 nidSapNidButtonMap.put(nidSapNidKey, button);
                 buttonSapMap.put(button, sapNid);
                 add = true;
@@ -388,11 +462,6 @@ public class HistoryPanel {
                 if (add) {
                     group.add(button);
                 }
-            }
-            if (viewVersion == positionVersion) {
-                button.setSelected(true);
-                button.setBackground(Color.LIGHT_GRAY);
-                button.setOpaque(true);
             }
             int yLoc = dragPanel.getY();
             Component parentPanel = dragPanel.getParent();
@@ -472,6 +541,13 @@ public class HistoryPanel {
         versionPanel.setLocation(0, 0);
         versionPanel.setSize(hxWidth, view.getHeight());
         versionPanel.setPreferredSize(versionPanel.getPreferredSize());
+
+        topHistoryPanel.add(applyButton);
+        applyButton.setBorder(BorderFactory.createEmptyBorder());
+        applyButton.setSize(30, 20);
+        applyButton.setLocation((topHistoryPanel.getWidth() / 2)
+                - (applyButton.getWidth() / 2),
+                topHistoryPanel.getHeight() - applyButton.getHeight() - 1);
         syncVerticalLayout();
     }
     private static final int xStartLoc = 5;
@@ -485,8 +561,12 @@ public class HistoryPanel {
             if (position == null) {
                 continue next;
             }
-            int row = pathRowMap.get(position.getPath());
-            JCheckBox rowCheck = rowToPathCheckMap.get(row);
+            Integer row = view.getPathRowMap().get(position.getPath());
+            if (row == null) {
+                continue next;
+            }
+
+            JCheckBox rowCheck = view.getRowToPathCheckMap().get(row);
             positionCheck.setVisible(rowCheck.isSelected());
             positionCheck.setLocation(currentX, positionCheck.getY());
             for (JComponent componentInColumn : checkComponentMap.get(positionCheck)) {
@@ -551,22 +631,22 @@ public class HistoryPanel {
 
     private void setupHeader(ConceptView view) {
         TreeSet<PositionBI> positionOrderedSet = view.getPositionOrderedSet();
-        if (pathRowMap == null
-                || rowToPathCheckMap == null
+        if (view.getPathRowMap() == null
+                || view.getRowToPathCheckMap() == null
                 || positionOrderedSet == null) {
             return;
         }
         int locX = xStartLoc;
         for (PositionBI p : positionOrderedSet) {
             assert p != null;
-            assert pathRowMap != null;
-            assert rowToPathCheckMap != null;
+            assert view.getPathRowMap() != null;
+            assert view.getRowToPathCheckMap() != null;
             assert p.getPath() != null;
-            Integer row = pathRowMap.get(p.getPath());
+            Integer row = view.getPathRowMap().get(p.getPath());
             if (row == null) {
                 continue;
             }
-            JCheckBox rowCheck = rowToPathCheckMap.get(row);
+            JCheckBox rowCheck = view.getRowToPathCheckMap().get(row);
             JCheckBox positionCheck = view.getJCheckBox();
             positionCheck.setVisible(rowCheck.isSelected());
             positionCheckList.add(positionCheck);

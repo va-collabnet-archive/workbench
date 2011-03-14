@@ -60,8 +60,8 @@ public class DragPanelRel extends ComponentVersionDragPanel<RelationshipVersionB
                         getSettings(),
                         null,
                         dav);
-               dpd.setInactiveBackground();
-               panelList.add(dpd);
+                dpd.setInactiveBackground();
+                panelList.add(dpd);
             }
         }
         return panelList;
@@ -116,6 +116,7 @@ public class DragPanelRel extends ComponentVersionDragPanel<RelationshipVersionB
                 });
         add(typeLabel, gbc);
         gbc.gridx++;
+        gbc.weightx = 0;
         add(new JSeparator(SwingConstants.VERTICAL), gbc);
         gbc.weightx = 1;
         gbc.gridx++;

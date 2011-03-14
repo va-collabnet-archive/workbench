@@ -28,6 +28,7 @@ import java.util.TooManyListenersException;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,6 +47,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -90,10 +93,15 @@ public class ConceptView extends JPanel {
 
     private final ConceptViewRenderer cvRenderer;
 
-    private class PanelsChangedActionListener implements ActionListener {
+    private class PanelsChangedActionListener 
+        implements ActionListener, ChangeListener, PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent ae) {
+            doUpdateLater();
+        }
+
+        private void doUpdateLater() {
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
@@ -107,6 +115,16 @@ public class ConceptView extends JPanel {
                     });
                 }
             });
+        }
+
+        @Override
+        public void stateChanged(ChangeEvent ce) {
+            doUpdateLater();
+        }
+
+        @Override
+        public void propertyChange(PropertyChangeEvent pce) {
+           doUpdateLater();
         }
     }
 
@@ -140,7 +158,7 @@ public class ConceptView extends JPanel {
 
         @Override
         protected Map<SpecBI, Integer> doInBackground() throws Exception {
-            //TODO move all layout to background thread, and return a complte panel...
+            //TODO move all layout to background thread, and return a complete panel...
             positionPanelMap.clear();
             positionOrderedSet.clear();
             seperatorComponents.clear();
@@ -670,7 +688,7 @@ public class ConceptView extends JPanel {
     private Map<PanelSection, CollapsePanelPrefs> prefMap =
             new EnumMap<PanelSection, CollapsePanelPrefs>(PanelSection.class);
     private TreeSet<PositionBI> positionOrderedSet = new TreeSet(new PositionComparator());
-    private Map<PathBI, Integer> pathRowMap = new HashMap<PathBI, Integer>();
+    private Map<PathBI, Integer> pathRowMap = new ConcurrentHashMap<PathBI, Integer>();
     private PanelsChangedActionListener pcal = new PanelsChangedActionListener();
 
     public ActionListener getPanelsChangedActionListener() {
@@ -688,8 +706,8 @@ public class ConceptView extends JPanel {
             Collections.synchronizedList(new ArrayList<JComponent>());
     private boolean historyShown = false;
     private Map<PositionBI, Collection<ComponentVersionDragPanel<?>>> positionPanelMap =
-            new HashMap<PositionBI, Collection<ComponentVersionDragPanel<?>>>();
-    private Map<Integer, JCheckBox> rowToPathCheckMap = new HashMap<Integer, JCheckBox>();
+            new ConcurrentHashMap<PositionBI, Collection<ComponentVersionDragPanel<?>>>();
+    private Map<Integer, JCheckBox> rowToPathCheckMap = new ConcurrentHashMap<Integer, JCheckBox>();
     private List<JComponent> seperatorComponents = new ArrayList<JComponent>();
 
     public ConceptView(I_ConfigAceFrame config,
@@ -700,6 +718,7 @@ public class ConceptView extends JPanel {
         this.cvRenderer = cvRenderer;
         kb = new EditPanelKb(config);
         addCommitListener(settings);
+        settings.getConfig().addPropertyChangeListener("commit", pcal);
         setupPrefMap();
     }
 
