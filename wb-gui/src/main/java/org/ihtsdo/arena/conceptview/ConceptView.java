@@ -732,6 +732,9 @@ public class ConceptView extends JPanel {
 
     private void addToPositionPanelMap(ComponentVersionDragPanel<?> panel) throws IOException {
         ComponentVersionBI cv = panel.getComponentVersion();
+        if (cv == null) {
+            return;
+        }
         PositionBI position = cv.getPosition();
         Collection<ComponentVersionDragPanel<?>> panels =
                 positionPanelMap.get(position);
