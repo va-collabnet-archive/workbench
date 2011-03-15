@@ -535,6 +535,15 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         return null;
     }
 
+    public I_ConfigAceFrame getActiveConfig() {
+        for (I_ConfigAceFrame f : aceFrames) {
+            if (f.isActive()) {
+                return f;
+            }
+        }
+        return null;
+    }
+
     public I_GetConceptData getUserConcept() {
         return userConcept;
     }

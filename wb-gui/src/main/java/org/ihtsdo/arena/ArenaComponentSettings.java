@@ -68,7 +68,7 @@ public abstract class ArenaComponentSettings implements Serializable,
     private mxRectangle alternateBounds = new mxRectangle();
     private float fontSize = 9;
     // transient
-    protected ACE ace;
+    protected I_ConfigAceFrame config;
     protected mxCell cell;
     protected mxGraph graph;
     protected JLabel resizeLabel;
@@ -105,15 +105,12 @@ public abstract class ArenaComponentSettings implements Serializable,
     }
 
     public I_ConfigAceFrame getConfig() {
-        if (ace != null) {
-            return ace.getAceFrameConfig();
-        }
-        return null;
+        return config;
     }
 
-    public void setup(ACE ace, mxCell cell, mxGraphComponent graphContainer,
+    public void setup(I_ConfigAceFrame config, mxCell cell, mxGraphComponent graphContainer,
             mxGraph graph, JComponent renderer) {
-        this.ace = ace;
+        this.config = config;
         this.cell = cell;
         this.graphContainer = graphContainer;
         this.graph = graph;

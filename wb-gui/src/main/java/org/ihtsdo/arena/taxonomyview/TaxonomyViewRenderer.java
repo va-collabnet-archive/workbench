@@ -18,11 +18,11 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.dwfa.ace.ACE;
 
 import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 
 public class TaxonomyViewRenderer extends JComponent {
 
@@ -61,12 +61,12 @@ public class TaxonomyViewRenderer extends JComponent {
      * 
      */
     public TaxonomyViewRenderer(Object cellObj,
-            final mxGraphComponent graphContainer, ACE ace) {
+            final mxGraphComponent graphContainer, I_ConfigAceFrame config) {
         this.cell = (mxCell) cellObj;
         this.graphContainer = graphContainer;
         this.graph = graphContainer.getGraph();
         this.settings = (TaxonomyViewSettings) this.cell.getValue();
-        this.settings.setup(ace, cell, graphContainer, graph, this);
+        this.settings.setup(config, cell, graphContainer, graph, this);
         this.settings.addHostListener(new HostListener());
         setLayout(new BorderLayout());
 
@@ -77,7 +77,7 @@ public class TaxonomyViewRenderer extends JComponent {
         JScrollPane scrollPane = null;
 
         if (graph.getModel().getChildCount(cell) == 0) {
-            renderedComponent = settings.getComponent(ace.getAceFrameConfig());
+            renderedComponent = settings.getComponent(config);
             if (JScrollPane.class.isAssignableFrom(renderedComponent.getClass())) {
                 scrollPane = (JScrollPane) renderedComponent;
             } else {

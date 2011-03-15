@@ -226,13 +226,11 @@ public class ConceptViewSettings extends ArenaComponentSettings {
     protected ConceptNavigator getNavigator() {
         if (navigator == null) {
             try {
-                TermTreeHelper hierarchicalTreeHelper = new TermTreeHelper(ace.getAceFrameConfig(),
-                        ace);
+                TermTreeHelper hierarchicalTreeHelper = new TermTreeHelper(config);
                 JScrollPane treeScroller = hierarchicalTreeHelper.getHierarchyPanel();
                 navigatorTree = (JTreeWithDragImage) treeScroller.getViewport().getView();
                 navigatorTree.setFont(navigatorTree.getFont().deriveFont(getFontSize()));
-                navigator = new ConceptNavigator(treeScroller, ace.getAceFrameConfig(),
-                        view);
+                navigator = new ConceptNavigator(treeScroller, config, view);
                 //navigator.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, Color.GRAY));
                 navigator.setOpaque(true);
                 navigator.setBounds(0, 0, 350, 20);
@@ -244,7 +242,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
         if (getHost() != null) {
             if (getHost().getTermComponent() != null) {
                 try {
-                    new ExpandPathToNodeStateListener(navigatorTree, this.ace.getAceFrameConfig(),
+                    new ExpandPathToNodeStateListener(navigatorTree, config,
                             (I_GetConceptData) getHost().getTermComponent());
                 } catch (IOException e) {
                     AceLog.getAppLog().alertAndLogException(e);

@@ -84,6 +84,7 @@ import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.INVOKE_ON_OBJECT_TYPE;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.tree.TermTreeHelper;
+import org.dwfa.ace.tree.TreeMouseListener;
 import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.ComputationCanceled;
@@ -166,15 +167,15 @@ public class RefsetSpecPanel extends JPanel {
         split.setOneTouchExpandable(true);
 
         hierarchicalTreeHelper =
-                new TermTreeHelper(new RefsetSpecFrameConfig(ace.getAceFrameConfig(), new IntSet(), false), ace);
-
+                new TermTreeHelper(new RefsetSpecFrameConfig(ace.getAceFrameConfig(), new IntSet(), false));
         refsetAndParentOnlyTreeHelper =
-                new TermTreeHelper(new RefsetSpecFrameConfig(ace.getAceFrameConfig(), new IntSet(), true), ace);
-
+                new TermTreeHelper(new RefsetSpecFrameConfig(ace.getAceFrameConfig(), new IntSet(), true));
         bottomPanelVerticalBox = new Box(BoxLayout.Y_AXIS);
         bottomTabs = new JTabbedPane();
         bottomTabs.addTab(HIERARCHICAL_VIEW, hierarchicalTreeHelper.getHierarchyPanel());
         bottomTabs.addTab(REFSET_AND_PARENT_ONLY_VIEW, refsetAndParentOnlyTreeHelper.getHierarchyPanel());
+        hierarchicalTreeHelper.addMouseListener(new TreeMouseListener(ace));
+        refsetAndParentOnlyTreeHelper.addMouseListener(new TreeMouseListener(ace));
 
         editor = new RefsetSpecEditor(ace, hierarchicalTreeHelper, refsetAndParentOnlyTreeHelper, this);
         split.setTopComponent(editor.getContentPanel());

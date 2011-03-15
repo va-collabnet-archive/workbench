@@ -23,6 +23,7 @@ import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -41,15 +42,13 @@ import javax.swing.event.ListDataListener;
 public class OpenFrames implements PropertyChangeListener {
 
     private static OpenFrames singleton = new OpenFrames();
-
     private Collection<JFrame> frames;
-
     private Collection<I_InitComponentMenus> newWindowMenuItemGenerators;
-
-    private Collection<ListDataListener> frameListeners = Collections.synchronizedList(new ArrayList<ListDataListener>());
+    private final Collection<ListDataListener> frameListeners = Collections.synchronizedList(new ArrayList<ListDataListener>());
 
     private static class FrameComparator implements Comparator<JFrame> {
 
+        @Override
         public int compare(JFrame f1, JFrame f2) {
             return f1.getTitle().compareTo(f2.getTitle());
         }
@@ -57,6 +56,7 @@ public class OpenFrames implements PropertyChangeListener {
 
     private static class MenuComparator implements Comparator<JMenuItem> {
 
+        @Override
         public int compare(JMenuItem m1, JMenuItem m2) {
             return m1.getText().compareTo(m2.getText());
         }
@@ -135,7 +135,6 @@ public class OpenFrames implements PropertyChangeListener {
     // notification on this event type. The event instance
     // is lazily created using the parameters passed into
     // the fire method.
-
     protected void fireContentsChanged(ListDataEvent e) {
         synchronized (frameListeners) {
             for (ListDataListener l : frameListeners) {
@@ -163,6 +162,7 @@ public class OpenFrames implements PropertyChangeListener {
     /**
      * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
      */
+    @Override
     public void propertyChange(PropertyChangeEvent arg0) {
         ListDataEvent lde = new ListDataEvent(singleton, ListDataEvent.CONTENTS_CHANGED, 0, singleton.frames.size() - 1);
         this.fireContentsChanged(lde);
@@ -174,21 +174,18 @@ public class OpenFrames implements PropertyChangeListener {
         for (I_InitComponentMenus generator : singleton.newWindowMenuItemGenerators) {
             JMenuItem[] newMenuItems = generator.getNewWindowMenu();
             if (newMenuItems != null) {
-                for (JMenuItem item : newMenuItems) {
-                    items.add(item);
-                }
+                items.addAll(Arrays.asList(newMenuItems));
             }
         }
         return items;
     }
 
-	public static Component getActiveFrame() {
-		for (JFrame f: singleton.frames) {
-			if (f.isActive()) {
-				return f;
-			}
-		}		
-		return new JFrame();
-	}
-
+    public static Component getActiveFrame() {
+        for (JFrame f : singleton.frames) {
+            if (f.isActive()) {
+                return f;
+            }
+        }
+        return new JFrame();
+    }
 }

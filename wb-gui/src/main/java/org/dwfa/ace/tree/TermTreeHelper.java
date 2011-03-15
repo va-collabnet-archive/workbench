@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.tree;
 
+import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -37,7 +38,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import org.dwfa.ace.ACE;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -48,13 +48,16 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.thread.NamedThreadFactory;
 
 public class TermTreeHelper implements PropertyChangeListener {
-	private static ThreadGroup treeExpansionGroup = new ThreadGroup("Tree expansion ");
-    private Map<TreeIdPath, ExpandNodeSwingWorker> expansionWorkers = new HashMap<TreeIdPath, ExpandNodeSwingWorker>();
-    private ExecutorService treeExpandThread = Executors.newFixedThreadPool(1, new NamedThreadFactory(treeExpansionGroup, 
-	"tree expansion "));
 
-    private ACE ace;
+    private static ThreadGroup treeExpansionGroup = new ThreadGroup("Tree expansion ");
+    private final Map<TreeIdPath, ExpandNodeSwingWorker> expansionWorkers = new HashMap<TreeIdPath, ExpandNodeSwingWorker>();
+    private ExecutorService treeExpandThread = Executors.newFixedThreadPool(1, new NamedThreadFactory(treeExpansionGroup,
+            "tree expansion "));
     private JTreeWithDragImage tree;
+
+    public synchronized void addMouseListener(MouseListener ml) {
+        tree.addMouseListener(ml);
+    }
     private ActivityPanel activity;
     private TermTreeCellRenderer renderer;
     private I_ConfigAceFrame aceFrameConfig;
@@ -71,10 +74,9 @@ public class TermTreeHelper implements PropertyChangeListener {
         return tree;
     }
 
-    public TermTreeHelper(I_ConfigAceFrame aceFrameConfig, ACE ace) {
+    public TermTreeHelper(I_ConfigAceFrame config) {
         super();
-        this.ace = ace;
-        this.aceFrameConfig = aceFrameConfig;
+        this.aceFrameConfig = config;
     }
 
     public JScrollPane getHierarchyPanel() throws TerminologyException, IOException {
@@ -91,7 +93,6 @@ public class TermTreeHelper implements PropertyChangeListener {
         }
         tree = new JTreeWithDragImage(aceFrameConfig, this);
         tree.putClientProperty("JTree.lineStyle", "None");
-        tree.addMouseListener(new TreeMouseListener(ace));
         tree.setLargeModel(true);
         // tree.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         tree.setTransferHandler(new TerminologyTransferHandler(tree));
@@ -117,10 +118,13 @@ public class TermTreeHelper implements PropertyChangeListener {
         model.setAsksAllowsChildren(true);
 
         tree.addTreeExpansionListener(new TreeExpansionListener() {
+
+            @Override
             public void treeExpanded(TreeExpansionEvent evt) {
                 treeTreeExpanded(evt);
             }
 
+            @Override
             public void treeCollapsed(TreeExpansionEvent evt) {
                 treeTreeCollapsed(evt, aceFrameConfig);
             }
@@ -128,10 +132,10 @@ public class TermTreeHelper implements PropertyChangeListener {
 
         tree.addTreeSelectionListener(new TreeSelectionListener() {
 
+            @Override
             public void valueChanged(TreeSelectionEvent evt) {
                 treeValueChanged(evt);
             }
-
         });
         JScrollPane treeView = new JScrollPane(tree);
         tree.setScroller(treeView);
@@ -173,7 +177,7 @@ public class TermTreeHelper implements PropertyChangeListener {
 
         for (int rootId : aceFrameConfig.getRoots().getSetValues()) {
             root.add(new DefaultMutableTreeNode(ConceptBeanForTree.get(rootId, Integer.MIN_VALUE, 0, false,
-                aceFrameConfig), true));
+                    aceFrameConfig), true));
         }
         model.setRoot(root);
         return model;
@@ -207,7 +211,7 @@ public class TermTreeHelper implements PropertyChangeListener {
                 aceFrameConfig.getChildrenExpandedNodes().add(userObject.getConceptNid());
                 FrameConfigSnapshot configSnap = new FrameConfigSnapshot(aceFrameConfig);
                 ExpandNodeSwingWorker worker = new ExpandNodeSwingWorker((DefaultTreeModel) tree.getModel(), tree,
-                    node, new CompareConceptBeansForTree(configSnap), this, configSnap);
+                        node, new CompareConceptBeansForTree(configSnap), this, configSnap);
                 treeExpandThread.execute(worker);
                 expansionWorkers.put(idPath, worker);
             }
@@ -303,13 +307,13 @@ public class TermTreeHelper implements PropertyChangeListener {
         return treeExpandThread;
     }
 
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         try {
-			setRoots();
-		} catch (Throwable e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		}
+            setRoots();
+        } catch (Throwable e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
         updateHierarchyView(evt.getPropertyName());
     }
-
 }

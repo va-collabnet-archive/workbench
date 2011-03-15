@@ -156,7 +156,6 @@ import org.dwfa.ace.search.SearchPanel;
 import org.dwfa.ace.table.refset.RefsetDefaults;
 import org.dwfa.ace.table.refset.RefsetDefaultsConcept;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
-import org.dwfa.ace.task.classify.SnoAB;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.commit.I_Fixup;
 import org.dwfa.ace.task.commit.I_TestDataConstraints;
@@ -164,6 +163,7 @@ import org.dwfa.ace.task.gui.toptoggles.TopToggleTypes;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.ace.tree.TermTreeHelper;
+import org.dwfa.ace.tree.TreeMouseListener;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.gui.glue.PropertyListenerGlue;
@@ -200,7 +200,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             this.aceConfig = aceConfig;
         }
 
-      @Override
+        @Override
         public void actionPerformed(ActionEvent e) {
             I_TermFactory tf = Terms.get();
             try {
@@ -218,9 +218,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             }
 
         }
-
     }
-
     private List<TermComponentDataCheckSelectionListener> dataCheckListeners =
             new ArrayList<TermComponentDataCheckSelectionListener>();
 
@@ -229,6 +227,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     public class ProcessMenuActionListener implements ActionListener {
+
         private class MenuProcessThread implements Runnable {
 
             private String action;
@@ -241,7 +240,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 this.action = action;
             }
 
-         @Override
+            @Override
             public void run() {
                 try {
                     ObjectInputStream ois =
@@ -257,12 +256,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
                     worker.getLogger().log(Level.SEVERE, ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                        "<html>Exception processing action: " + action + "<p><p>" + ex.getMessage()
+                            "<html>Exception processing action: " + action + "<p><p>" + ex.getMessage()
                             + "<p><p>See log for details.");
                 }
             }
         };
-
         private File processFile;
         private I_Work worker;
 
@@ -272,7 +270,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             this.worker = worker;
         }
 
-      @Override
+        @Override
         public void actionPerformed(ActionEvent e) {
             new Thread(new MenuProcessThread(e.getActionCommand()), "Menu Process Execution").start();
         }
@@ -284,17 +282,17 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public class ListenForDataChecks implements ListDataListener, ActionListener {
 
-      @Override
+        @Override
         public void contentsChanged(ListDataEvent listEvt) {
             layoutAlerts();
         }
 
-      @Override
+        @Override
         public void intervalAdded(ListDataEvent arg0) {
             layoutAlerts();
         }
 
-      @Override
+        @Override
         public void intervalRemoved(ListDataEvent arg0) {
             layoutAlerts();
         }
@@ -302,7 +300,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         private void layoutAlerts() {
             SwingUtilities.invokeLater(new Runnable() {
 
-            @Override
+                @Override
                 public void run() {
                     if (editMode) {
                         if (dataCheckListPanel == null) {
@@ -351,8 +349,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                             if (dataCheckPanel == null) {
                                 try {
                                     dataCheckPanel =
-                                            new ConceptPanel(HOST_ENUM.CONCPET_PANEL_DATA_CHECK, ACE.this,
-                                                LINK_TYPE.DATA_CHECK_LINK, conceptTabs, Integer.MAX_VALUE);
+                                            new ConceptPanel(HOST_ENUM.CONCPET_PANEL_DATA_CHECK, aceFrameConfig,
+                                            LINK_TYPE.DATA_CHECK_LINK, conceptTabs, Integer.MAX_VALUE, ACE.this.pluginRoot);
                                     conceptPanels.add(dataCheckPanel);
                                 } catch (IOException e) {
                                     AceLog.getAppLog().alertAndLogException(e);
@@ -365,7 +363,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                                 }
                             }
                             conceptTabs.addTab("Checks", ConceptPanel.SMALL_ALERT_LINK_ICON, dataCheckPanel,
-                                "Data Checks Linked");
+                                    "Data Checks Linked");
 
                         } else {
                             //leftTabs.setSelectedIndex(taxonomyIndex);
@@ -393,17 +391,17 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 JLabel label = new JLabel();
                 label.setText(alert.getAlertMessage());
                 switch (alert.getAlertType()) {
-                case ERROR:
-                    label.setIcon(AceImages.errorIcon);
-                case INFORMATIONAL:
-                    label.setIcon(AceImages.errorIcon);
-                    break;
-                case RESOLVED:
-                    label.setIcon(AceImages.errorIcon);
-                    break;
-                case WARNING:
-                    label.setIcon(AceImages.errorIcon);
-                    break;
+                    case ERROR:
+                        label.setIcon(AceImages.errorIcon);
+                    case INFORMATIONAL:
+                        label.setIcon(AceImages.errorIcon);
+                        break;
+                    case RESOLVED:
+                        label.setIcon(AceImages.errorIcon);
+                        break;
+                    case WARNING:
+                        label.setIcon(AceImages.errorIcon);
+                        break;
                 }
 
                 JPanel componentPanel = new JPanel(new GridBagLayout());
@@ -437,10 +435,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 boolean isSelected = false;
                 if (isSelected) {
                     componentPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 1,
-                        1, 1, Color.BLUE), BorderFactory.createEmptyBorder(1, 0, 0, 0)));
+                            1, 1, Color.BLUE), BorderFactory.createEmptyBorder(1, 0, 0, 0)));
                 } else {
                     componentPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0,
-                        1, 0, Color.BLACK), BorderFactory.createEmptyBorder(1, 1, 0, 1)));
+                            1, 0, Color.BLACK), BorderFactory.createEmptyBorder(1, 1, 0, 1)));
                 }
 
                 addFocus(componentPanel, alert);
@@ -456,27 +454,27 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             component.setRequestFocusEnabled(true);
             component.addMouseListener(new MouseListener() {
 
-            @Override
+                @Override
                 public void mouseClicked(MouseEvent e) {
                     // nothing to do
                 }
 
-            @Override
+                @Override
                 public void mouseEntered(MouseEvent e) {
                     // nothing to do
                 }
 
-            @Override
+                @Override
                 public void mouseExited(MouseEvent e) {
                     // nothing to do
                 }
 
-            @Override
+                @Override
                 public void mousePressed(MouseEvent e) {
                     // nothing to do
                 }
 
-            @Override
+                @Override
                 public void mouseReleased(MouseEvent e) {
                     for (TermComponentDataCheckSelectionListener l : dataCheckListeners) {
                         l.setSelection(alert.getConceptWithAlert());
@@ -496,7 +494,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
              */
         }
 
-      @Override
+        @Override
         public void actionPerformed(ActionEvent evt) {
             JComboBox comboBox = (JComboBox) evt.getSource();
             if (I_Fixup.class.isAssignableFrom(comboBox.getSelectedItem().getClass())) {
@@ -515,7 +513,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public class SetRefsetInToggleVisible implements ActionListener {
 
         REFSET_TYPES type;
-
         TOGGLES t;
 
         public SetRefsetInToggleVisible(REFSET_TYPES type, TOGGLES t) {
@@ -524,7 +521,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             this.t = t;
         }
 
-      @Override
+        @Override
         public void actionPerformed(ActionEvent evt) {
             JToggleButton button = (JToggleButton) evt.getSource();
             aceFrameConfig.setRefsetInToggleVisible(type, t, button.isSelected());
@@ -532,6 +529,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     public class SetToggleVisibleListener implements ActionListener {
+
         TOGGLES t;
 
         public SetToggleVisibleListener(TOGGLES t) {
@@ -539,20 +537,16 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             this.t = t;
         }
 
-      @Override
+        @Override
         public void actionPerformed(ActionEvent evt) {
             JToggleButton button = (JToggleButton) evt.getSource();
             aceFrameConfig.setTogglesInComponentPanelVisible(t, button.isSelected());
         }
     }
-
     private static Set<I_Transact> uncommitted = Collections.synchronizedSet(new HashSet<I_Transact>());
-
     private static Map<I_GetConceptData, Collection<AlertToDataConstraintFailure>> dataCheckMap =
             new HashMap<I_GetConceptData, Collection<AlertToDataConstraintFailure>>();
-
     private static int maxHistoryListSize = 100;
-
     private static LinkedList<I_Transact> imported = new LinkedList<I_Transact>();
 
     public static void addImported(I_Transact to) {
@@ -570,13 +564,13 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             }
         }
     }
-
     private static List<I_TestDataConstraints> commitTests = new ArrayList<I_TestDataConstraints>();
-
     private static List<I_TestDataConstraints> creationTests = new ArrayList<I_TestDataConstraints>();
+
     public static void updateAlerts(final I_ConfigAceFrame frameConfig) {
         SwingUtilities.invokeLater(new Runnable() {
-         @Override
+
+            @Override
             public void run() {
                 doUpdate(frameConfig);
             }
@@ -612,11 +606,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             AceLog.getAppLog().warning(e.toString());
         }
     }
-
     private static Set<I_WriteChangeSet> csWriters = new HashSet<I_WriteChangeSet>();
-
     private static Set<I_ReadChangeSet> csReaders = new HashSet<I_ReadChangeSet>();
-
     public static int commitSequence = 0;
 
     public static List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings() {
@@ -641,7 +632,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
      * this class is listening and when the user fires one of these commands, it
      * calls the appropriate action on the currently focused component.
      */
+
     private class TransferActionListener implements ActionListener, PropertyChangeListener {
+
         private JComponent focusOwner = null;
 
         public TransferActionListener() {
@@ -649,7 +642,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             manager.addPropertyChangeListener("permanentFocusOwner", this);
         }
 
-      @Override
+        @Override
         public void propertyChange(PropertyChangeEvent e) {
             Object o = e.getNewValue();
             if (o instanceof JComponent) {
@@ -659,7 +652,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             }
         }
 
-      @Override
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (focusOwner == null) {
                 return;
@@ -676,17 +669,16 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public class MoveListener implements ActionListener {
 
-      @Override
+        @Override
         public void actionPerformed(ActionEvent evt) {
             queueViewer.getMoveListener().actionPerformed(evt);
 
         }
-
     }
 
     public class ShowAllQueuesListener implements ActionListener {
 
-      @Override
+        @Override
         public void actionPerformed(ActionEvent evt) {
             JToggleButton showButton = (JToggleButton) evt.getSource();
             aceFrameConfig.setShowAllQueues(showButton.isSelected());
@@ -700,19 +692,18 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private class StatusChangeListener implements PropertyChangeListener {
 
-      @Override
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             statusLabel.setText((String) evt.getNewValue());
         }
-
     }
 
     private class ManageBottomPaneActionListener implements ActionListener {
-        int lastLocation = 0;
 
+        int lastLocation = 0;
         boolean hidden = true;
 
-      @Override
+        @Override
         public void actionPerformed(ActionEvent e) {
             // AceLog.getAppLog().info("bottom panel action: " + e);
             boolean show = showSearchToggle.isSelected() || showSignpostPanelToggle.isSelected();
@@ -732,14 +723,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     }
                     int splitLoc = upperLowerSplit.getDividerLocation();
 
-                    if (showWorkflowInSignpostPanel)
-                    {
+                    if (showWorkflowInSignpostPanel) {
                         upperLowerSplit.setBottomComponent(wfSearchPanel);
                         shownContainer = wfSearchPanel;
-                    }
-                    else
-                    {
-                    	upperLowerSplit.setBottomComponent(signpostPanel);
+                    } else {
+                        upperLowerSplit.setBottomComponent(signpostPanel);
                         shownContainer = signpostPanel;
                     }
 
@@ -779,14 +767,15 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     private class WorkflowDetailsSheetActionListener implements ActionListener {
-      @Override
+
+        @Override
         public void actionPerformed(ActionEvent e) {
         }
-
     }
 
     private class PreferencesPaletteActionListener implements ActionListener {
-      @Override
+
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (preferencesPalette == null) {
                 try {
@@ -801,11 +790,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             }
             preferencesPalette.togglePalette(((JToggleButton) e.getSource()).isSelected(), TOGGLE_DIRECTION.LEFT_RIGHT);
         }
-
     }
 
     private class SubversionPaletteActionListener implements ActionListener {
-      @Override
+
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 updateSvnPalette();
@@ -816,16 +805,16 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     deselectOthers(showSubversionButton);
                 }
                 subversionPalette.togglePalette(((JToggleButton) e.getSource()).isSelected(),
-                    TOGGLE_DIRECTION.LEFT_RIGHT);
+                        TOGGLE_DIRECTION.LEFT_RIGHT);
             } catch (Exception e1) {
                 AceLog.getAppLog().alertAndLogException(e1);
             }
         }
-
     }
 
     private class QueuesPaletteActionListener implements ActionListener {
-      @Override
+
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (queuePalette == null) {
                 try {
@@ -838,31 +827,29 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 getRootPane().getLayeredPane().moveToFront(queuePalette);
                 deselectOthers(showQueuesButton);
             }
-            queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), conceptTabs
-                .getHeight() + 4);
+            queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), conceptTabs.getHeight() + 4);
             queuePalette.togglePalette(((JToggleButton) e.getSource()).isSelected(), TOGGLE_DIRECTION.LEFT_RIGHT);
             SwingUtilities.invokeLater(new Runnable() {
 
-            @Override
+                @Override
                 public void run() {
                     queueViewer.requestFocusOnEntry();
                 }
-
             });
         }
-
     }
 
     private class ResizeComponentAdaptor extends ComponentAdapter {
+
         @Override
         public void componentResized(ComponentEvent e) {
             resizePalttes();
         }
-
     }
 
     private class ProcessPaletteActionListener implements ActionListener {
-      @Override
+
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (processPalette == null) {
                 try {
@@ -875,16 +862,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 getRootPane().getLayeredPane().moveToFront(processPalette);
                 deselectOthers(showProcessBuilder);
             }
-            processPalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), conceptTabs
-                .getHeight() + 4);
+            processPalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), conceptTabs.getHeight() + 4);
             processPalette.togglePalette(((JToggleButton) e.getSource()).isSelected(), TOGGLE_DIRECTION.LEFT_RIGHT);
         }
-
     }
 
     private class HistoryPaletteActionListener implements ActionListener {
 
-      @Override
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (historyPalette == null) {
                 makeHistoryPalette();
@@ -898,7 +883,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private class AddressPaletteActionListener implements ActionListener {
 
-      @Override
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (addressPalette == null) {
                 makeAddressPalette();
@@ -915,6 +900,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         @Override
         public void actionPerformed(ActionEvent e) {
             SwingUtilities.invokeLater(new Runnable() {
+
                 @Override
                 public void run() {
                     showSearchToggle.doClick();
@@ -925,13 +911,12 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     private class TogglePanelsActionListener implements ActionListener, ComponentListener {
+
         private Integer origWidth;
-
         private Integer dividerLocation;
-
         private Rectangle bounds;
 
-      @Override
+        @Override
         public void actionPerformed(ActionEvent e) {
             bounds = getTopLevelAncestor().getBounds();
             if (origWidth == null) {
@@ -949,7 +934,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             if (e.getSource() == showComponentButton) {
                 if (showComponentButton.isSelected()) {
                     SwingUtilities.invokeLater(new Runnable() {
-                  @Override
+
+                        @Override
                         public void run() {
                             if (showTreeButton.isSelected()) {
                                 if (dividerLocation < 250) {
@@ -963,7 +949,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     });
                 } else {
                     SwingUtilities.invokeLater(new Runnable() {
-                  @Override
+
+                        @Override
                         public void run() {
                             termTreeConceptSplit.setDividerLocation(3000);
                             if (showTreeButton.isSelected() == false) {
@@ -984,7 +971,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     }
                 } else {
                     SwingUtilities.invokeLater(new Runnable() {
-                  @Override
+
+                        @Override
                         public void run() {
                             termTreeConceptSplit.setDividerLocation(0);
                             showComponentButton.setSelected(true);
@@ -994,142 +982,89 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             }
         }
 
-      @Override
+        @Override
         public void componentHidden(ComponentEvent e) {
         }
 
-      @Override
+        @Override
         public void componentMoved(ComponentEvent e) {
         }
 
-      @Override
+        @Override
         public void componentResized(ComponentEvent e) {
             bounds = getTopLevelAncestor().getBounds();
             origWidth = bounds.width;
             dividerLocation = termTreeConceptSplit.getDividerLocation();
         }
 
-      @Override
+        @Override
         public void componentShown(ComponentEvent e) {
         }
-
     }
-
     protected JMenuItem addQueueMI, moveToDiskMI;
-
     QueueViewerPanel queueViewer;
-
     private JLabel statusLabel = new JLabel();
-
     private JTabbedPane leftTabs = new MemoriousJTabbedPane();
-
     private JPanel topPanel;
-
     public JTabbedPane conceptTabs = new MemoriousJTabbedPane();
-
     private ConceptPanel c1Panel;
-
     private ConceptPanel c2Panel;
-
     public JComponent termTree;
-
     public SearchPanel searchPanel;
-
     private WorkflowHistorySearchPanel wfSearchPanel;
-
     public JSplitPane upperLowerSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-
     public JSplitPane termTreeConceptSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-
     private JToggleButton showComponentButton;
-
     private JToggleButton showTreeButton;
-
     private JToggleButton showSubversionButton;
-
     private static JButton synchronizeButton;
-
     private JToggleButton showQueuesButton;
-
     private JToggleButton showProcessBuilder;
-
     private JButton newInboxButton;
-
     private JButton addExistingInboxButton;
-
     private JButton moveListenerButton;
-
     private JToggleButton showAllQueuesButton;
-
     private TogglePanelsActionListener resizeListener = new TogglePanelsActionListener();
-
     private ManageBottomPaneActionListener bottomPanelActionListener = new ManageBottomPaneActionListener();
-
     private CdePalette preferencesPalette;
-
     private CdePalette subversionPalette;
-
     private CdePalette queuePalette;
-
     private CdePalette processPalette;
-
     private JToggleButton showHistoryButton;
-
     private CdePalette historyPalette;
-
     private JToggleButton showSearchToggle;
-
     public static ExecutorService threadPool =
             Executors.newFixedThreadPool(9, new NamedThreadFactory(new ThreadGroup("ACE "), "tree expansion "));
-
     public AceFrameConfig aceFrameConfig;
-
     public static AceConfig aceConfig;
-
     public static boolean editMode = true;
-
-	private boolean showWorkflowInSignpostPanel = false;
-
+    private boolean showWorkflowInSignpostPanel = false;
     private JMenu fileMenu;
-
     private JButton commitButton;
-
     private JButton cancelButton;
-
     private TerminologyListModel viewerHistoryTableModel = new TerminologyListModel();
-
     private TerminologyListModel favoritesTableModel = new TerminologyListModel();
-
     private JToggleButton showPreferencesButton;
-
     private Configuration config;
-
     private TerminologyList batchConceptList;
-
     private ArrayList<ConceptPanel> conceptPanels;
-
     private MasterWorker menuWorker;
-
     private UncommittedListModel dataCheckListModel;
     private ConceptPanel dataCheckPanel;
-
     public static final String DATA_CHECK_TAB_LABEL = "data checks";
     private static String taxonomyTabLabel = "taxonomy";
-
     /**
-	 *
-	 */
+     *
+     */
     private static final long serialVersionUID = 1L;
 
     private class RightPalettePoint implements I_GetPalettePoint {
 
-      @Override
+        @Override
         public Point getPalettePoint() {
             return new Point(topPanel.getLocation().x + topPanel.getWidth(), getMenuSpacer());
         }
-
     }
-
     private Integer offset;
 
     private int getMenuSpacer() {
@@ -1147,16 +1082,16 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         Integer offset;
 
-      @Override
+        @Override
         public Point getPalettePoint() {
             if (frame != null) {
                 JRootPane root = frame.getRootPane();
                 Point p = new Point(topPanel.getLocation().x, getMenuSpacer());
                 if (offset == null) {
                     if (System.getProperty("exe4j.isInstall4j") != null
-                        && System.getProperty("exe4j.isInstall4j").equals("true")
-                        && System.getProperty("os.name") != null
-                        && System.getProperty("os.name").toLowerCase().startsWith("window")) {
+                            && System.getProperty("exe4j.isInstall4j").equals("true")
+                            && System.getProperty("os.name") != null
+                            && System.getProperty("os.name").toLowerCase().startsWith("window")) {
                         System.out.println("Setting offset to 20");
                         offset = 20;
                     } else {
@@ -1173,7 +1108,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             return SwingUtilities.convertPoint(ACE.this, p, workflowPanel);
         }
     }
-
     private String pluginRoot;
     private JScrollPane dataCheckListScroller;
     private JPanel dataCheckListPanel;
@@ -1204,8 +1138,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
      */
     public ACE(Configuration config, String pluginRoot) {
         super(new GridBagLayout());
-
         this.pluginRoot = pluginRoot;
+        this.config = config;
         try {
             menuWorker = new MasterWorker(config);
 
@@ -1220,7 +1154,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        this.config = config;
 
         this.addComponentListener(new ResizeComponentAdaptor());
     }
@@ -1228,11 +1161,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private void loadTests(String directory, List<I_TestDataConstraints> list) {
         File componentPluginDir = new File(getPluginRoot() + File.separator + directory);
         File[] plugins = componentPluginDir.listFiles(new FilenameFilter() {
-         @Override
+
+            @Override
             public boolean accept(File arg0, String fileName) {
                 return fileName.toLowerCase().endsWith(".task");
             }
-
         });
 
         if (plugins != null) {
@@ -1290,9 +1223,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         searchPanel.addComponentListener(new ResizePalettesListener());
 
         try {
-             wfSearchPanel = new WorkflowHistorySearchPanel(aceFrameConfig, this);
-             wfSearchPanel.addComponentListener(new ResizePalettesListener());
-	          wfSearchPanel.setMinimumSize(new Dimension(0, 0));
+            wfSearchPanel = new WorkflowHistorySearchPanel(aceFrameConfig, this);
+            wfSearchPanel.addComponentListener(new ResizePalettesListener());
+            wfSearchPanel.setMinimumSize(new Dimension(0, 0));
         } catch (Exception e) {
             AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
         }
@@ -1327,7 +1260,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         startupTimer.setRepeats(false);
         startupTimer.start();
     }
-
     javax.swing.Timer startupTimer;
     private Arena arena;
 
@@ -1385,22 +1317,19 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         menuItem = new JMenuItem("Cut");
         menuItem.setActionCommand((String) TransferHandler.getCutAction().getValue(Action.NAME));
         menuItem.addActionListener(actionListener);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit()
-            .getMenuShortcutKeyMask()));
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menuItem.setMnemonic(KeyEvent.VK_T);
         editMenu.add(menuItem);
         menuItem = new JMenuItem("Copy");
         menuItem.setActionCommand((String) TransferHandler.getCopyAction().getValue(Action.NAME));
         menuItem.addActionListener(actionListener);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit()
-            .getMenuShortcutKeyMask()));
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menuItem.setMnemonic(KeyEvent.VK_C);
         editMenu.add(menuItem);
         menuItem = new JMenuItem("Paste");
         menuItem.setActionCommand((String) TransferHandler.getPasteAction().getValue(Action.NAME));
         menuItem.addActionListener(actionListener);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit()
-            .getMenuShortcutKeyMask()));
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menuItem.setMnemonic(KeyEvent.VK_P);
         editMenu.add(menuItem);
 
@@ -1408,17 +1337,15 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         menuItem = new JMenuItem("Copy XML");
         menuItem.setActionCommand("Copy XML");
         menuItem.addActionListener(actionListener);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit()
-            .getMenuShortcutKeyMask()
-            + java.awt.event.InputEvent.SHIFT_MASK));
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
+                + java.awt.event.InputEvent.SHIFT_MASK));
         editMenu.add(menuItem);
 
         menuItem = new JMenuItem("Copy Tab Delimited Text");
         menuItem.setActionCommand("Copy TDT");
         menuItem.addActionListener(actionListener);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit()
-            .getMenuShortcutKeyMask()
-            + java.awt.event.InputEvent.ALT_MASK));
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
+                + java.awt.event.InputEvent.ALT_MASK));
         editMenu.add(menuItem);
 
         menuBar.add(editMenu);
@@ -1477,18 +1404,18 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             JPanel topPanel, GridBagConstraints c, int size) {
         JToggleButton newProcess;
         switch (size) {
-        case 24:
-            newProcess = new JToggleButton(new ImageIcon(ACE.class.getResource(resource)));
-            break;
-        case 32:
-            newProcess = new JToggleButton(new ImageIcon(ACE.class.getResource(resource)));
-            break;
-        case 48:
-            newProcess = new JToggleButton(new ImageIcon(ACE.class.getResource(resource)));
-            break;
-        default:
-            newProcess = new JToggleButton(new ImageIcon(ACE.class.getResource(resource)));
-            break;
+            case 24:
+                newProcess = new JToggleButton(new ImageIcon(ACE.class.getResource(resource)));
+                break;
+            case 32:
+                newProcess = new JToggleButton(new ImageIcon(ACE.class.getResource(resource)));
+                break;
+            case 48:
+                newProcess = new JToggleButton(new ImageIcon(ACE.class.getResource(resource)));
+                break;
+            default:
+                newProcess = new JToggleButton(new ImageIcon(ACE.class.getResource(resource)));
+                break;
         }
         newProcess.setToolTipText(tooltipText);
         newProcess.addActionListener(actionListener);
@@ -1504,20 +1431,22 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         if (custUI != null && custUI.length() > 0) {
             I_ReturnMainPanel cp = (I_ReturnMainPanel) ObjectCache.get(custUI);
             return cp.getContentPanel(this);
-        }
-
-        else {
+        } else {
             return getDefaultContentPanel();
         }
     }
 
     private JComponent getDefaultContentPanel() throws Exception {
-        treeHelper = new TermTreeHelper(this.aceFrameConfig, this);
+        treeHelper = new TermTreeHelper(this.aceFrameConfig);
+
         termTree = treeHelper.getHierarchyPanel();
+        treeHelper.addMouseListener(new TreeMouseListener(this));
         conceptPanels = new ArrayList<ConceptPanel>();
-        c1Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R1, this, LINK_TYPE.TREE_LINK, conceptTabs, 1);
+        c1Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R1, aceFrameConfig, LINK_TYPE.TREE_LINK, conceptTabs, 1, this.pluginRoot);
+        c1Panel.setAce(this);
         conceptPanels.add(c1Panel);
-        c2Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R2, this, LINK_TYPE.SEARCH_LINK, conceptTabs, 2);
+        c2Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R2, aceFrameConfig, LINK_TYPE.SEARCH_LINK, conceptTabs, 2, this.pluginRoot);
+        c2Panel.setAce(this);
         conceptPanels.add(c2Panel);
         conceptTabs.addComponentListener(new ResizePalettesListener());
 
@@ -1528,46 +1457,50 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         conceptTabs.addTab("search", ConceptPanel.SMALL_SEARCH_LINK_ICON, c2Panel, "search Linked");
 
         // CONCEPT TAB R-3
-        ConceptPanel c3panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R3, this, LINK_TYPE.UNLINKED, conceptTabs, 3);
-        conceptPanels.add(c3panel);
-        conceptTabs.addTab("empty", null, c3panel, "Unlinked");
+        ConceptPanel c3Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R3, aceFrameConfig, LINK_TYPE.UNLINKED, conceptTabs, 3, this.pluginRoot);
+        c3Panel.setAce(this);
+        conceptPanels.add(c3Panel);
+        conceptTabs.addTab("empty", null, c3Panel, "Unlinked");
 
         // CONCEPT TAB R-4
-        ConceptPanel c4panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R4, this, LINK_TYPE.UNLINKED, conceptTabs, 4);
-        conceptPanels.add(c4panel);
-        conceptTabs.addTab("empty", null, c4panel, "Unlinked");
+        ConceptPanel c4Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R4, aceFrameConfig, LINK_TYPE.UNLINKED, conceptTabs, 4, this.pluginRoot);
+        c4Panel.setAce(this);
+
+        conceptPanels.add(c4Panel);
+        conceptTabs.addTab("empty", null, c4Panel, "Unlinked");
 
         // LIST TAB
         conceptTabs.addTab("   list   ", new ImageIcon(ACE.class.getResource("/16x16/plain/notebook.png")),
-            getConceptListEditor());
+                getConceptListEditor());
 
         // REFSET SPEC TAB
         refsetTabIndex = conceptTabs.getTabCount();
         refsetSpecPanel = new RefsetSpecPanel(this);
         refsetSpecPanel.setRefsetInSpecEditor(refsetSpecPanel.getRefsetInSpecEditor());
         conceptTabs.addTab("refSet spec", new ImageIcon(ACE.class.getResource("/16x16/plain/paperclip.png")),
-            refsetSpecPanel);
+                refsetSpecPanel);
 
         if (!refsetOnly) {
 
             // CLASSIFIER TAB
             snoRocketPanel = new SnoRocketTabPanel(this);
             conceptTabs.addTab("classifier", new ImageIcon(ACE.class.getResource("/16x16/plain/chrystal_ball.png")),
-                snoRocketPanel);
+                    snoRocketPanel);
 
-            arena = new Arena(this);
+            arena = new Arena(this.aceFrameConfig);
             conceptTabs.addTab("arena", new ImageIcon(ACE.class.getResource("/16x16/plain/eye.png")), arena);
         }
 
         /*
-        */
+         */
         conceptTabs.setMinimumSize(new Dimension(0, 0));
         c2Panel.setMinimumSize(new Dimension(0, 0));
 
         termTreeConceptSplit.setRightComponent(conceptTabs);
         leftTabs.addTab(taxonomyTabLabel, termTree);
 
-        ConceptPanel c5panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_L1, this, LINK_TYPE.UNLINKED, leftTabs, 3);
+        ConceptPanel c5panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_L1, aceFrameConfig, LINK_TYPE.UNLINKED, leftTabs, 3, this.pluginRoot);
+        c5panel.setAce(this);
         conceptPanels.add(c5panel);
         leftTabs.addTab("empty", null, c5panel, "Unlinked");
         leftTabs.setMinimumSize(new Dimension(0, 0));
@@ -1617,7 +1550,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
         return dataCheckListScroller;
     }
-
     CollectionEditorContainer conceptListEditor;
 
     public Component getConceptListEditor() throws IOException, ClassNotFoundException, NoSuchAlgorithmException,
@@ -1633,39 +1565,23 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
         return conceptListEditor;
     }
-
     protected JMenuItem newProcessMI, readProcessMI, takeProcessNoTranMI, takeProcessTranMI, saveProcessMI,
             saveForLauncherQueueMI, saveAsXmlMI;
-
     private JPanel masterProcessBuilderPanel;
-
     private JPanel descListProcessBuilderPanel;
-
     private JPanel workflowPanel;
-
     private JPanel workflowDetailsSheet;
-
     private JPanel signpostPanel = new JPanel();
-
     private JToggleButton showAddressesButton;
-
     private CdePalette addressPalette;
-
     private JList addressList;
-
     private PreferencesPaletteActionListener preferencesActionListener;
-
     private HistoryPaletteActionListener hpal;
-
     private AddressPaletteActionListener apal;
-
     private ProcessPaletteActionListener showProcessBuilderActionListener;
-
     private QueuesPaletteActionListener showQueuesActionListener;
-
     private JToggleButton showSignpostPanelToggle;
     private JTabbedPane svnTabs;
-
     private static boolean runShutdownProcesses = true;
 
     private void makeProcessPalette() throws Exception {
@@ -1703,7 +1619,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         MasterWorker worker = new MasterWorker(config);
         worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), aceFrameConfig);
         queuePalette.add(makeQueueViewerPanel(config, worker, aceFrameConfig.getInboxQueueFilter()),
-            BorderLayout.CENTER);
+                BorderLayout.CENTER);
         queuePalette.setBorder(BorderFactory.createRaisedBevelBorder());
         int width = getWidth() - termTreeConceptSplit.getDividerLocation();
         int height = getHeight() - topPanel.getHeight();
@@ -1754,43 +1670,43 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c.weightx = 0.0;
         /*
          *
-         org.dwfa.ace.ACE {
-            showQueueButtons = Boolean.TRUE;
-         }
-
+        org.dwfa.ace.ACE {
+        showQueueButtons = Boolean.TRUE;
+        }
+        
          */
         boolean showQueueButtons = false;
         try {
             showQueueButtons =
-                           (Boolean) config.getEntry(this.getClass().getName(), "showQueueButtons", Boolean.class,
-                               Boolean.FALSE);
+                    (Boolean) config.getEntry(this.getClass().getName(), "showQueueButtons", Boolean.class,
+                    Boolean.FALSE);
         } catch (ConfigurationException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
 
         newInboxButton =
                 addActionButton(new NewQueueListener(this), "/24x24/plain/inbox_new.png",
-                    "Create new inbox and add to profile", listEditorTopPanel, c);
+                "Create new inbox and add to profile", listEditorTopPanel, c);
 
         newInboxButton.setEnabled(showQueueButtons);
         newInboxButton.setVisible(showQueueButtons);
 
         addExistingInboxButton =
                 addActionButton(new AddQueueListener(this), "/24x24/plain/inbox_add.png", "Add existing inbox to profile",
-                    listEditorTopPanel, c);
+                listEditorTopPanel, c);
         addExistingInboxButton.setEnabled(showQueueButtons);
         addExistingInboxButton.setVisible(showQueueButtons);
 
         moveListenerButton =
                 addActionButton(new MoveListener(), "/24x24/plain/outbox_out.png",
-                    "Take Selected Processes and Save To Disk (no transaction)", listEditorTopPanel, c);
+                "Take Selected Processes and Save To Disk (no transaction)", listEditorTopPanel, c);
 
         moveListenerButton.setEnabled(showQueueButtons);
         moveListenerButton.setVisible(showQueueButtons);
 
         showAllQueuesButton =
                 addActionToggleButton(new ShowAllQueuesListener(), "/24x24/plain/funnel_delete.png", "Show all queues",
-                    listEditorTopPanel, c, 24);
+                listEditorTopPanel, c, 24);
 
         showAllQueuesButton.setEnabled(showQueueButtons);
         showAllQueuesButton.setVisible(showQueueButtons);
@@ -1831,7 +1747,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             }
         }
     }
-
     boolean svnPositionSet = false;
     private JButton showProgressButton;
     private ActivityPanel topActivity;
@@ -1861,7 +1776,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         preferencesTab.addTab("edit", makeEditConfig());
         JTabbedPane pathPanes = new JTabbedPane();
         pathPanes.addTab("configure", new SelectPathAndPositionPanelWithCombo(false, "for view", aceFrameConfig,
-            new PropertySetListenerGlue("removeViewPosition", "addViewPosition", "replaceViewPosition",
+                new PropertySetListenerGlue("removeViewPosition", "addViewPosition", "replaceViewPosition",
                 "getViewPositionSet", PositionBI.class, aceFrameConfig)));
         pathPanes.addTab("create", new CreatePathPanel(aceFrameConfig));
         preferencesTab.addTab("path", pathPanes);
@@ -1922,22 +1837,23 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         JPanel controlPanel = new JPanel(new GridLayout(3, 1));
         controlPanel.add(getCheckboxEditor("show contradictions in taxonomy view", "highlightConflictsInTaxonomyView",
-            aceFrameConfig.getHighlightConflictsInTaxonomyView(), true));
+                aceFrameConfig.getHighlightConflictsInTaxonomyView(), true));
         controlPanel.add(getCheckboxEditor("show contradictions in component panel",
-            "highlightConflictsInComponentPanel", aceFrameConfig.getHighlightConflictsInComponentPanel(), true));
+                "highlightConflictsInComponentPanel", aceFrameConfig.getHighlightConflictsInComponentPanel(), true));
 
         final JTextPane descriptionPanel = new JTextPane();
         descriptionPanel.setEditable(false);
         descriptionPanel.setContentType("text/html");
         JScrollPane descriptionScroll =
                 new JScrollPane(descriptionPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
         JComboBox conflictComboBox = new JComboBox(aceFrameConfig.getAllConflictResolutionStrategies());
         conflictComboBox.setSelectedItem(aceFrameConfig.getConflictResolutionStrategy());
         descriptionPanel.setText(aceFrameConfig.getConflictResolutionStrategy().getDescription());
         conflictComboBox.addActionListener(new ActionListener() {
-         @Override
+
+            @Override
             public void actionPerformed(ActionEvent actionevent) {
                 JComboBox cb = (JComboBox) actionevent.getSource();
                 I_ManageContradiction conflictResolutionStrategy = (I_ManageContradiction) cb.getSelectedItem();
@@ -1964,13 +1880,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         descriptionPanel.setContentType("text/html");
         JScrollPane descriptionScroll =
                 new JScrollPane(descriptionPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
         JComboBox precedenceCombo = new JComboBox(Precedence.values());
         precedenceCombo.setSelectedItem(aceFrameConfig.getPrecedence());
         descriptionPanel.setText(aceFrameConfig.getPrecedence().getDescription());
         precedenceCombo.addActionListener(new ActionListener() {
-         @Override
+
+            @Override
             public void actionPerformed(ActionEvent actionevent) {
                 JComboBox cb = (JComboBox) actionevent.getSource();
                 Precedence selectedPrecedence = (Precedence) cb.getSelectedItem();
@@ -2035,7 +1952,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         sortOrderCombo.setSelectedItem(aceFrameConfig.getLanguageSortPref());
         langPrefPanel.add(sortOrderCombo, gbc);
         sortOrderCombo.addActionListener(new ActionListener() {
-         @Override
+
+            @Override
             public void actionPerformed(ActionEvent e) {
                 JComboBox cb = (JComboBox) e.getSource();
                 LANGUAGE_SORT_PREF sortPref = (LANGUAGE_SORT_PREF) cb.getSelectedItem();
@@ -2049,8 +1967,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         gbc.weighty = 1;
         gbc.gridwidth = 2;
 
-        langPrefPanel.add(new JScrollPane(makeTermList("Langauge (Dialect) preference order:", aceFrameConfig
-            .getLanguagePreferenceList())), gbc);
+        langPrefPanel.add(new JScrollPane(makeTermList("Langauge (Dialect) preference order:", aceFrameConfig.getLanguagePreferenceList())), gbc);
 
         gbc.gridy++;
         TerminologyListModel shortLabelPrefOrderTableModel = new TerminologyListModel();
@@ -2137,13 +2054,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         gbc.gridx = 1;
         JComboBox relAssertionTypeComboBox = new JComboBox(RelAssertionType.values());
         relAssertionTypeComboBox.setSelectedItem(aceFrameConfig.getRelAssertionType());
-         relAssertionTypeComboBox.addActionListener(new ActionListener() {
+        relAssertionTypeComboBox.addActionListener(new ActionListener() {
+
             @Override
             public void actionPerformed(ActionEvent actionevent) {
                 JComboBox cb = (JComboBox) actionevent.getSource();
                 RelAssertionType relAssertionType = (RelAssertionType) cb.getSelectedItem();
                 aceFrameConfig.setRelAssertionType(relAssertionType);
-             }
+            }
         });
 
         checkPanel.add(relAssertionTypeComboBox, gbc);
@@ -2152,28 +2070,27 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         gbc.gridx = 0;
         gbc.gridwidth = 2;
         checkPanel.add(getCheckboxEditor("show viewer images in taxonomy view", "showViewerImagesInTaxonomy",
-            aceFrameConfig.getShowViewerImagesInTaxonomy(), true), gbc);
+                aceFrameConfig.getShowViewerImagesInTaxonomy(), true), gbc);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridy++;
         checkPanel.add(getCheckboxEditor("rel assertion type in taxonomy view", "setRelAssertionType",
-            aceFrameConfig.getShowViewerImagesInTaxonomy(), true), gbc);
+                aceFrameConfig.getShowViewerImagesInTaxonomy(), true), gbc);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridy++;
 
-         checkPanel.add(getCheckboxEditor("show refset info in taxonomy view", "showRefsetInfoInTaxonomy",
-            aceFrameConfig.getShowRefsetInfoInTaxonomy(), true), gbc);
+        checkPanel.add(getCheckboxEditor("show refset info in taxonomy view", "showRefsetInfoInTaxonomy",
+                aceFrameConfig.getShowRefsetInfoInTaxonomy(), true), gbc);
 
         /*
         gbc.weighty = 1;
         gbc.gridheight = 3;
         gbc.gridy++;
         checkPanel.add(new JScrollPane(makeTermList("Refsets to show in taxonomy view: ", aceFrameConfig
-            .getRefsetsToShowInTaxonomy())), gbc);
+        .getRefsetsToShowInTaxonomy())), gbc);
          *
          */
         relPrefPanel.add(checkPanel);
-        relPrefPanel.add(new JScrollPane(makeTermList("Refsets to show in taxonomy view: ", aceFrameConfig
-            .getRefsetsToShowInTaxonomy())));
+        relPrefPanel.add(new JScrollPane(makeTermList("Refsets to show in taxonomy view: ", aceFrameConfig.getRefsetsToShowInTaxonomy())));
 
 
 
@@ -2186,14 +2103,12 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridheight = 1;
-        checkPanel2.add(getCheckboxEditor("sort taxonomy using refsets", "sortTaxonomyUsingRefset", aceFrameConfig
-            .getSortTaxonomyUsingRefset(), true), gbc);
+        checkPanel2.add(getCheckboxEditor("sort taxonomy using refsets", "sortTaxonomyUsingRefset", aceFrameConfig.getSortTaxonomyUsingRefset(), true), gbc);
         gbc.weighty = 1;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridy++;
         gbc.gridheight = 3;
-        checkPanel2.add(new JScrollPane(makeTermList("Refsets to sort taxonomy view: ", aceFrameConfig
-            .getRefsetsToSortTaxonomy())), gbc);
+        checkPanel2.add(new JScrollPane(makeTermList("Refsets to sort taxonomy view: ", aceFrameConfig.getRefsetsToSortTaxonomy())), gbc);
         relPrefPanel.add(checkPanel2);
 
         return relPrefPanel;
@@ -2206,9 +2121,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         checkBoxEditor.setPropertyDisplayName(label);
         aceFrameConfig.addPropertyChangeListener("show" + propertyName.toUpperCase().substring(0, 1)
-            + propertyName.substring(1), new PropertyListenerGlue("setValue", Object.class, checkBoxEditor));
+                + propertyName.substring(1), new PropertyListenerGlue("setValue", Object.class, checkBoxEditor));
         checkBoxEditor.addPropertyChangeListener(new PropertyListenerGlue("set"
-            + propertyName.toUpperCase().substring(0, 1) + propertyName.substring(1), Boolean.class, aceFrameConfig));
+                + propertyName.toUpperCase().substring(0, 1) + propertyName.substring(1), Boolean.class, aceFrameConfig));
 
         return checkBoxEditor.getCustomEditor();
     }
@@ -2306,38 +2221,31 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         defaultsPane.add(editDefaultsTabs, c);
 
         switch (type) {
-        case BOOLEAN:
-            addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
-                .getBooleanPreferences(), type);
-            break;
-        case CONCEPT:
-            addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
-                .getConceptPreferences(), type);
-            editDefaultsTabs.addTab("concept types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
-                .getRefsetPreferencesForToggle(toggle).getConceptPreferences().getConceptPopupIds(),
-                "Concept types for popup:")));
+            case BOOLEAN:
+                addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle).getBooleanPreferences(), type);
+                break;
+            case CONCEPT:
+                addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle).getConceptPreferences(), type);
+                editDefaultsTabs.addTab("concept types", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getRefsetPreferencesForToggle(toggle).getConceptPreferences().getConceptPopupIds(),
+                        "Concept types for popup:")));
 
-            break;
-        case CON_INT:
-            addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
-                .getConIntPreferences(), type);
-            editDefaultsTabs.addTab("concept types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
-                .getRefsetPreferencesForToggle(toggle).getConIntPreferences().getConceptPopupIds(),
-                "Concept types for popup:")));
+                break;
+            case CON_INT:
+                addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle).getConIntPreferences(), type);
+                editDefaultsTabs.addTab("concept types", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getRefsetPreferencesForToggle(toggle).getConIntPreferences().getConceptPopupIds(),
+                        "Concept types for popup:")));
 
-            break;
-        case INTEGER:
-            addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
-                .getIntegerPreferences(), type);
+                break;
+            case INTEGER:
+                addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle).getIntegerPreferences(), type);
 
-            break;
-        case STRING:
-            addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
-                .getStringPreferences(), type);
+                break;
+            case STRING:
+                addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle).getStringPreferences(), type);
 
-            break;
-        default:
-            break;
+                break;
+            default:
+                break;
         }
 
         return defaultsPane;
@@ -2361,47 +2269,47 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         wrapAndAdd(refsetsDefault, defaultStatus, "Default status: ");
 
         switch (type) {
-        case BOOLEAN:
-            // @todo
-            break;
-        case CONCEPT:
-            TermComponentLabel defaultForConceptRefset = new TermComponentLabel(aceFrameConfig);
-            defaultForConceptRefset.setTermComponent(((RefsetDefaultsConcept) defaults).getDefaultForConceptRefset());
-            gluePreferenceLabel(defaults, "defaultForConceptRefset", defaultForConceptRefset);
-            wrapAndAdd(refsetsDefault, defaultForConceptRefset, "Default concept: ");
-            break;
-        case CON_INT:
-            TermComponentLabel defaultForConIntRefset = new TermComponentLabel(aceFrameConfig);
-            defaultForConIntRefset.setTermComponent(((RefsetDefaultsConcept) defaults).getDefaultForConceptRefset());
-            gluePreferenceLabel(defaults, "defaultForConIntRefset", defaultForConIntRefset);
-            wrapAndAdd(refsetsDefault, defaultForConIntRefset, "Default concept: ");
-            break;
-        case INTEGER:
-            // @todo
-            break;
-        case STRING:
-            // @todo string
-            break;
-        default:
-            break;
+            case BOOLEAN:
+                // @todo
+                break;
+            case CONCEPT:
+                TermComponentLabel defaultForConceptRefset = new TermComponentLabel(aceFrameConfig);
+                defaultForConceptRefset.setTermComponent(((RefsetDefaultsConcept) defaults).getDefaultForConceptRefset());
+                gluePreferenceLabel(defaults, "defaultForConceptRefset", defaultForConceptRefset);
+                wrapAndAdd(refsetsDefault, defaultForConceptRefset, "Default concept: ");
+                break;
+            case CON_INT:
+                TermComponentLabel defaultForConIntRefset = new TermComponentLabel(aceFrameConfig);
+                defaultForConIntRefset.setTermComponent(((RefsetDefaultsConcept) defaults).getDefaultForConceptRefset());
+                gluePreferenceLabel(defaults, "defaultForConIntRefset", defaultForConIntRefset);
+                wrapAndAdd(refsetsDefault, defaultForConIntRefset, "Default concept: ");
+                break;
+            case INTEGER:
+                // @todo
+                break;
+            case STRING:
+                // @todo string
+                break;
+            default:
+                break;
         }
         editDefaultsTabs.addTab("defaults", refsetsDefault);
 
         // add standard popups...
         editDefaultsTabs.addTab("refsets", new JScrollPane(makePopupConfigPanel(defaults.getRefsetPopupIds(),
-            "Refsets for popup:")));
+                "Refsets for popup:")));
 
         editDefaultsTabs.addTab("status types", new JScrollPane(makePopupConfigPanel(defaults.getStatusPopupIds(),
-            "Status for popup:")));
+                "Status for popup:")));
 
     }
 
     private void gluePreferenceLabel(RefsetDefaults defaults, String propertyName, TermComponentLabel labelToGlue) {
         defaults.addPropertyChangeListener(propertyName, new PropertyListenerGlue("setTermComponent",
-            I_AmTermComponent.class, labelToGlue));
+                I_AmTermComponent.class, labelToGlue));
 
         labelToGlue.addPropertyChangeListener("termComponent", new PropertyListenerGlue("set"
-            + propertyName.toUpperCase().charAt(0) + propertyName.substring(1), I_GetConceptData.class, defaults));
+                + propertyName.toUpperCase().charAt(0) + propertyName.substring(1), I_GetConceptData.class, defaults));
     }
 
     private JPanel makeComponentToggleCheckboxPane() {
@@ -2452,7 +2360,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         pathSelectCombo.setSelectedItem(aceFrameConfig.getClassifierInputMode());
         classifierPrefInputSubpanel.add(pathSelectCombo, gbc);
         pathSelectCombo.addActionListener(new ActionListener() {
-         @Override
+
+            @Override
             public void actionPerformed(ActionEvent e) {
                 JComboBox cb = (JComboBox) e.getSource();
                 CLASSIFIER_INPUT_MODE_PREF modePref = (CLASSIFIER_INPUT_MODE_PREF) cb.getSelectedItem();
@@ -2501,34 +2410,34 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         TermComponentLabel classifierRootLabel = new TermComponentLabel(aceFrameConfig);
         classifierRootLabel.setTermComponent(aceFrameConfig.getClassificationRoot());
         aceFrameConfig.addPropertyChangeListener("classificationRoot", new PropertyListenerGlue("setTermComponent",
-            I_AmTermComponent.class, classifierRootLabel));
+                I_AmTermComponent.class, classifierRootLabel));
         classifierRootLabel.addTermChangeListener(new PropertyListenerGlue("setClassificationRoot",
-            I_GetConceptData.class, aceFrameConfig));
+                I_GetConceptData.class, aceFrameConfig));
 
         wrapAndAdd(classifierPrefPanel, classifierRootLabel, "Classification root: ");
 
         TermComponentLabel classifierRoleRootLabel = new TermComponentLabel(aceFrameConfig);
         classifierRoleRootLabel.setTermComponent(aceFrameConfig.getClassificationRoleRoot());
         aceFrameConfig.addPropertyChangeListener("classificationRoleRoot", new PropertyListenerGlue("setTermComponent",
-            I_AmTermComponent.class, classifierRoleRootLabel));
+                I_AmTermComponent.class, classifierRoleRootLabel));
         classifierRoleRootLabel.addTermChangeListener(new PropertyListenerGlue("setClassificationRoleRoot",
-            I_GetConceptData.class, aceFrameConfig));
+                I_GetConceptData.class, aceFrameConfig));
         wrapAndAdd(classifierPrefPanel, classifierRoleRootLabel, "Role root: ");
 
         TermComponentLabel classificationIsaLabel = new TermComponentLabel(aceFrameConfig);
         classificationIsaLabel.setTermComponent(aceFrameConfig.getClassifierIsaType());
         aceFrameConfig.addPropertyChangeListener("classifierIsaType", new PropertyListenerGlue("setTermComponent",
-            I_AmTermComponent.class, classificationIsaLabel));
+                I_AmTermComponent.class, classificationIsaLabel));
         classificationIsaLabel.addTermChangeListener(new PropertyListenerGlue("setClassifierIsaType",
-            I_GetConceptData.class, aceFrameConfig));
+                I_GetConceptData.class, aceFrameConfig));
         wrapAndAdd(classifierPrefPanel, classificationIsaLabel, "Classification 'Is a': ");
 
         TermComponentLabel classifierConceptLabel = new TermComponentLabel(aceFrameConfig);
         classifierConceptLabel.setTermComponent(aceFrameConfig.getClassifierConcept());
         aceFrameConfig.addPropertyChangeListener("classifierConcept", new PropertyListenerGlue("setTermComponent",
-            I_AmTermComponent.class, classifierConceptLabel));
+                I_AmTermComponent.class, classifierConceptLabel));
         classifierConceptLabel.addTermChangeListener(new PropertyListenerGlue("setClassifierConcept",
-            I_GetConceptData.class, aceFrameConfig));
+                I_GetConceptData.class, aceFrameConfig));
         wrapAndAdd(classifierPrefPanel, classifierConceptLabel, "Classifier identity: ");
 
         return classifierPrefPanel;
@@ -2539,17 +2448,16 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab("defaults", new JScrollPane(madeDefaultsPanel()));
         tabs.addTab("rel type", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditRelTypePopup(),
-            "Relationship types for popup:")));
+                "Relationship types for popup:")));
         tabs.addTab("rel refinabilty", new JScrollPane(makePopupConfigPanel(
-            aceFrameConfig.getEditRelRefinabiltyPopup(), "Relationship refinability for popup:")));
-        tabs.addTab("rel characteristic", new JScrollPane(makePopupConfigPanel(aceFrameConfig
-            .getEditRelCharacteristicPopup(), "Relationship characteristics for popup:")));
+                aceFrameConfig.getEditRelRefinabiltyPopup(), "Relationship refinability for popup:")));
+        tabs.addTab("rel characteristic", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditRelCharacteristicPopup(), "Relationship characteristics for popup:")));
         tabs.addTab("desc type", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditDescTypePopup(),
-            "Description types for popup:")));
+                "Description types for popup:")));
         tabs.addTab("image type", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditImageTypePopup(),
-            "Image types for popup:")));
+                "Image types for popup:")));
         tabs.addTab("status", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditStatusTypePopup(),
-            "Status values for popup:")));
+                "Status values for popup:")));
         return tabs;
     }
 
@@ -2559,50 +2467,50 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         TermComponentLabel defaultStatus = new TermComponentLabel(aceFrameConfig);
         defaultStatus.setTermComponent(aceFrameConfig.getDefaultStatus());
         aceFrameConfig.addPropertyChangeListener("defaultStatus", new PropertyListenerGlue("setTermComponent",
-            I_AmTermComponent.class, defaultStatus));
+                I_AmTermComponent.class, defaultStatus));
         defaultStatus.addTermChangeListener(new PropertyListenerGlue("setDefaultStatus", I_GetConceptData.class,
-            aceFrameConfig));
+                aceFrameConfig));
 
         wrapAndAdd(defaultsPanel, defaultStatus, "Default status: ");
 
         TermComponentLabel defaultImageType = new TermComponentLabel(aceFrameConfig);
         defaultImageType.setTermComponent(aceFrameConfig.getDefaultImageType());
         aceFrameConfig.addPropertyChangeListener("defaultImageType", new PropertyListenerGlue("setTermComponent",
-            I_AmTermComponent.class, defaultImageType));
+                I_AmTermComponent.class, defaultImageType));
         defaultImageType.addTermChangeListener(new PropertyListenerGlue("setDefaultImageType", I_GetConceptData.class,
-            aceFrameConfig));
+                aceFrameConfig));
         wrapAndAdd(defaultsPanel, defaultImageType, "Default image type: ");
 
         TermComponentLabel defaultDescType = new TermComponentLabel(aceFrameConfig);
         defaultDescType.setTermComponent(aceFrameConfig.getDefaultDescriptionType());
         aceFrameConfig.addPropertyChangeListener("defaultDescriptionType", new PropertyListenerGlue("setTermComponent",
-            I_AmTermComponent.class, defaultDescType));
+                I_AmTermComponent.class, defaultDescType));
         defaultDescType.addTermChangeListener(new PropertyListenerGlue("setDefaultDescriptionType",
-            I_GetConceptData.class, aceFrameConfig));
+                I_GetConceptData.class, aceFrameConfig));
         wrapAndAdd(defaultsPanel, defaultDescType, "Default description type: ");
 
         TermComponentLabel defaultRelType = new TermComponentLabel(aceFrameConfig);
         defaultRelType.setTermComponent(aceFrameConfig.getDefaultRelationshipType());
         aceFrameConfig.addPropertyChangeListener("defaultRelationshipType", new PropertyListenerGlue(
-            "setTermComponent", I_AmTermComponent.class, defaultRelType));
+                "setTermComponent", I_AmTermComponent.class, defaultRelType));
         defaultRelType.addTermChangeListener(new PropertyListenerGlue("setDefaultRelationshipType",
-            I_GetConceptData.class, aceFrameConfig));
+                I_GetConceptData.class, aceFrameConfig));
         wrapAndAdd(defaultsPanel, defaultRelType, "Default relationship type: ");
 
         TermComponentLabel defaultRelCharacteristicType = new TermComponentLabel(aceFrameConfig);
         defaultRelCharacteristicType.setTermComponent(aceFrameConfig.getDefaultRelationshipCharacteristic());
         aceFrameConfig.addPropertyChangeListener("defaultRelationshipCharacteristic", new PropertyListenerGlue(
-            "setTermComponent", I_AmTermComponent.class, defaultRelCharacteristicType));
+                "setTermComponent", I_AmTermComponent.class, defaultRelCharacteristicType));
         defaultRelCharacteristicType.addTermChangeListener(new PropertyListenerGlue(
-            "setDefaultRelationshipCharacteristic", I_GetConceptData.class, aceFrameConfig));
+                "setDefaultRelationshipCharacteristic", I_GetConceptData.class, aceFrameConfig));
         wrapAndAdd(defaultsPanel, defaultRelCharacteristicType, "Default relationship characteristic: ");
 
         TermComponentLabel defaultRelRefinability = new TermComponentLabel(aceFrameConfig);
         defaultRelRefinability.setTermComponent(aceFrameConfig.getDefaultRelationshipRefinability());
         aceFrameConfig.addPropertyChangeListener("defaultRelationshipRefinability", new PropertyListenerGlue(
-            "setTermComponent", I_AmTermComponent.class, defaultRelRefinability));
+                "setTermComponent", I_AmTermComponent.class, defaultRelRefinability));
         defaultRelRefinability.addTermChangeListener(new PropertyListenerGlue("setDefaultRelationshipRefinability",
-            I_GetConceptData.class, aceFrameConfig));
+                I_GetConceptData.class, aceFrameConfig));
         wrapAndAdd(defaultsPanel, defaultRelRefinability, "Default relationship refinability: ");
 
         return defaultsPanel;
@@ -2733,6 +2641,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         showProgressButton = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/gears_view.png")));
         showProgressButton.setToolTipText("Show the activity viewer, and bring to the front.");
         showProgressButton.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent arg0) {
                 ActivityViewer.toFront();
             }
@@ -2752,11 +2661,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         File componentPluginDir = new File(getPluginRoot() + File.separator + "viewer");
         File[] plugins = componentPluginDir.listFiles(new FilenameFilter() {
-         @Override
+
+            @Override
             public boolean accept(File arg0, String fileName) {
                 return fileName.toLowerCase().endsWith(".bp");
             }
-
         });
 
         if (plugins != null) {
@@ -2850,6 +2759,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     private class PluginListener implements ActionListener {
+
         File pluginProcessFile;
 
         private PluginListener(File pluginProcessFile) {
@@ -2857,7 +2767,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             this.pluginProcessFile = pluginProcessFile;
         }
 
-      @Override
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 FileInputStream fis = new FileInputStream(pluginProcessFile);
@@ -2871,14 +2781,15 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), aceFrameConfig);
                 worker.writeAttachment(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name(), this);
                 Runnable r = new Runnable() {
+
                     private String exceptionMessage;
 
-               @Override
+                    @Override
                     public void run() {
                         I_EncodeBusinessProcess process = bp;
                         try {
                             worker.getLogger().log(
-                                Level.INFO, "Worker: {0} ({1}) executing process: {2}", new Object[]{worker.getWorkerDesc(), worker.getId(), process.getName()});
+                                    Level.INFO, "Worker: {0} ({1}) executing process: {2}", new Object[]{worker.getWorkerDesc(), worker.getId(), process.getName()});
                             worker.execute(process);
                             SortedSet<ExecutionRecord> sortedRecords =
                                     new TreeSet<ExecutionRecord>(process.getExecutionRecords());
@@ -2896,21 +2807,20 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                             exceptionMessage = e1.toString();
                         }
                         SwingUtilities.invokeLater(new Runnable() {
-                     @Override
+
+                            @Override
                             public void run() {
                                 aceFrameConfig.setStatusMessage("<html><font color='#006400'>execute");
                                 if (exceptionMessage.equals("")) {
                                     aceFrameConfig.setStatusMessage("<html>Execution of <font color='blue'>"
-                                        + bp.getName() + "</font> complete.");
+                                            + bp.getName() + "</font> complete.");
                                 } else {
-                                    aceFrameConfig
-                                        .setStatusMessage("<html><font color='blue'>Process complete: <font color='red'>"
+                                    aceFrameConfig.setStatusMessage("<html><font color='blue'>Process complete: <font color='red'>"
                                             + exceptionMessage);
                                 }
                             }
                         });
                     }
-
                 };
                 new Thread(r).start();
             } catch (Exception e1) {
@@ -2918,7 +2828,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 AceLog.getAppLog().alertAndLogException(e1);
             }
         }
-
     }
 
     JPanel getBottomPanel() {
@@ -2982,22 +2891,23 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     public class ResizePalettesListener implements ComponentListener {
-      @Override
+
+        @Override
         public void componentHidden(ComponentEvent e) {
             resizePalttes();
         }
 
-      @Override
+        @Override
         public void componentMoved(ComponentEvent e) {
             resizePalttes();
         }
 
-      @Override
+        @Override
         public void componentResized(ComponentEvent e) {
             resizePalttes();
         }
 
-      @Override
+        @Override
         public void componentShown(ComponentEvent e) {
             resizePalttes();
         }
@@ -3014,8 +2924,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public void removeSearchLinkedComponent(I_ContainTermComponent component) {
         searchPanel.removeLinkedComponent(component);
     }
-
     private static Timer swingTimer = new Timer(500, null);
+
     static {
         swingTimer.start();
     }
@@ -3029,6 +2939,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         this.topActivity = (ActivityPanel) activity;
         SwingUtilities.invokeLater(new Runnable() {
+
             @Override
             public void run() {
                 if (activityPanel != null) {
@@ -3052,12 +2963,12 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         return topActivity;
     }
 
-   @Override
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if ("viewPositions".equals(evt.getPropertyName()) || "showPathInfoInTaxonomy".equals(evt.getPropertyName())
-            || "showRefsetInfoInTaxonomy".equals(evt.getPropertyName())
-            || "showViewerImagesInTaxonomy".equals(evt.getPropertyName())
-            || "updateHierarchyView".equals(evt.getPropertyName())) {
+                || "showRefsetInfoInTaxonomy".equals(evt.getPropertyName())
+                || "showViewerImagesInTaxonomy".equals(evt.getPropertyName())
+                || "updateHierarchyView".equals(evt.getPropertyName())) {
             treeHelper.updateHierarchyView(evt.getPropertyName());
         } else if (evt.getPropertyName().equals("commit")) {
             treeHelper.updateHierarchyView(evt.getPropertyName());
@@ -3207,7 +3118,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
     }
 
-
     public void setEnabledNewInboxButton(boolean enable) {
         AceLog.getAppLog().info("set enable new inbox button: " + enable);
         if (newInboxButton != null) {
@@ -3256,14 +3166,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
     }
 
-   @Override
+    @Override
     public boolean quit() {
 
         if (editMode) {
             if (okToClose()) {
                 int option =
                         JOptionPane.showConfirmDialog(this, "Save profile before quitting?", "Save profile?",
-                            JOptionPane.YES_NO_OPTION);
+                        JOptionPane.YES_NO_OPTION);
                 if (option == JOptionPane.YES_OPTION) {
                     try {
                         AceConfig.config.save();
@@ -3305,7 +3215,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             }
 
             JOptionPane.showMessageDialog(this,
-                "<html>There are uncommitted changes.<p>Please commit or cancel before quitting.");
+                    "<html>There are uncommitted changes.<p>Please commit or cancel before quitting.");
             return false;
         }
         return true;
@@ -3332,7 +3242,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                         AceLog.getAppLog().info("Finished shutdown business process: " + startupFiles[i]);
                     } catch (Throwable e1) {
                         AceLog.getAppLog().alertAndLog(Level.SEVERE, e1.getMessage() + " thrown by " + startupFiles[i],
-                            e1);
+                                e1);
                     }
                 }
             } else {
@@ -3353,7 +3263,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             bottomPanelActionListener.actionPerformed(new ActionEvent(showSignpostPanelToggle, 0, "toggle"));
 
             if (show) {
-    			setShowWorkflowSignpostPanel(false);
+                setShowWorkflowSignpostPanel(false);
             }
         }
     }
@@ -3373,7 +3283,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private void resizePalttes() {
         SwingUtilities.invokeLater(new Runnable() {
 
-         @Override
+            @Override
             public void run() {
                 if (queuePalette != null) {
 
@@ -3381,8 +3291,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                         getRootPane().getLayeredPane().moveToFront(queuePalette);
                         deselectOthers(showQueuesButton);
                     }
-                    queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), conceptTabs
-                        .getHeight() + 4);
+                    queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), conceptTabs.getHeight() + 4);
 
                     revalidateAllParents(queuePalette);
                     queuePalette.componentResized(null);
@@ -3393,8 +3302,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                         getRootPane().getLayeredPane().moveToFront(processPalette);
                         deselectOthers(showProcessBuilder);
                     }
-                    processPalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), conceptTabs
-                        .getHeight() + 4);
+                    processPalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), conceptTabs.getHeight() + 4);
 
                     revalidateAllParents(processPalette);
                     processPalette.componentResized(null);
@@ -3460,7 +3368,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public void setAddressToggleVisible(final boolean visible) {
         SwingUtilities.invokeLater(new Runnable() {
-         @Override
+
+            @Override
             public void run() {
                 showAddressesButton.setVisible(visible);
             }
@@ -3469,7 +3378,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public void setBuilderToggleVisible(final boolean visible) {
         SwingUtilities.invokeLater(new Runnable() {
-         @Override
+
+            @Override
             public void run() {
                 showProcessBuilder.setVisible(visible);
             }
@@ -3478,7 +3388,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public void setComponentToggleVisible(final boolean visible) {
         SwingUtilities.invokeLater(new Runnable() {
-         @Override
+
+            @Override
             public void run() {
                 showComponentButton.setVisible(visible);
             }
@@ -3487,7 +3398,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public void setHierarchyToggleVisible(final boolean visible) {
         SwingUtilities.invokeLater(new Runnable() {
-         @Override
+
+            @Override
             public void run() {
                 showTreeButton.setVisible(visible);
             }
@@ -3496,7 +3408,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public void setHistoryToggleVisible(final boolean visible) {
         SwingUtilities.invokeLater(new Runnable() {
-         @Override
+
+            @Override
             public void run() {
                 showHistoryButton.setVisible(visible);
             }
@@ -3505,7 +3418,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public void setInboxToggleVisible(final boolean visible) {
         SwingUtilities.invokeLater(new Runnable() {
-         @Override
+
+            @Override
             public void run() {
                 showQueuesButton.setVisible(visible);
             }
@@ -3514,7 +3428,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public void setPreferencesToggleVisible(final boolean visible) {
         SwingUtilities.invokeLater(new Runnable() {
-         @Override
+
+            @Override
             public void run() {
                 showPreferencesButton.setVisible(visible);
             }
@@ -3523,7 +3438,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public void setSubversionToggleVisible(final boolean visible) {
         SwingUtilities.invokeLater(new Runnable() {
-         @Override
+
+            @Override
             public void run() {
                 showSubversionButton.setVisible(visible);
             }
@@ -3532,7 +3448,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public void setCommitAbortButtonsVisible(final boolean visible) {
         SwingUtilities.invokeLater(new Runnable() {
-         @Override
+
+            @Override
             public void run() {
                 commitButton.setVisible(visible);
                 cancelButton.setVisible(visible);
@@ -3632,7 +3549,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public void setWorfklowDetailSheetVisible(final boolean visible) {
         SwingUtilities.invokeLater(new Runnable() {
 
-         @Override
+            @Override
             public void run() {
                 workflowDetailsSheet.setVisible(visible);
             }
@@ -3699,7 +3616,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         refsetSpecPanel.setShowPromotionTab(show);
     }
 
-	public void setShowWorkflowSignpostPanel(boolean show) {
-		showWorkflowInSignpostPanel  = show;
-	}
+    public void setShowWorkflowSignpostPanel(boolean show) {
+        showWorkflowInSignpostPanel = show;
+    }
 }

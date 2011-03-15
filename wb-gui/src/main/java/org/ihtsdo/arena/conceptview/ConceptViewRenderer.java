@@ -180,7 +180,7 @@ public class ConceptViewRenderer extends JLayeredPane {
      *
      */
     public ConceptViewRenderer(Object cellObj,
-            final mxGraphComponent graphContainer, ACE ace) {
+            final mxGraphComponent graphContainer, I_ConfigAceFrame config) {
 
         wizardPanel =
                 new WizardPanel(new FlowLayout(FlowLayout.LEADING, 10, 10), this);
@@ -199,7 +199,7 @@ public class ConceptViewRenderer extends JLayeredPane {
         this.graphContainer = graphContainer;
         this.graph = graphContainer.getGraph();
         this.settings = (ConceptViewSettings) this.cell.getValue();
-        this.settings.setup(ace, cell, graphContainer, graph, this);
+        this.settings.setup(config, cell, graphContainer, graph, this);
         wizardPanel.add(new JLabel("Wizard Panel"));
         setLayout(new BorderLayout());
 
@@ -210,7 +210,7 @@ public class ConceptViewRenderer extends JLayeredPane {
         conceptScrollPane = null;
 
         if (graph.getModel().getChildCount(cell) == 0) {
-            renderedComponent = settings.getComponent(ace.getAceFrameConfig());
+            renderedComponent = settings.getComponent(config);
             if (JScrollPane.class.isAssignableFrom(renderedComponent.getClass())) {
                 conceptScrollPane = (JScrollPane) renderedComponent;
             } else {

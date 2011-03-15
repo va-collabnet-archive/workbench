@@ -59,7 +59,7 @@ import org.dwfa.bpa.gui.action.BringWindowToFront;
  */
 public class FrameWithOpenFramesListener extends JFrame implements I_ManageStandardAppFunctions, ListDataListener,
         ActionListener {
-    protected static Logger logger = Logger.getLogger(FrameWithOpenFramesListener.class.getName());
+    protected static final Logger logger = Logger.getLogger(FrameWithOpenFramesListener.class.getName());
     /**
      * 
      */
@@ -70,6 +70,7 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
         /**
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 String userDir = System.getProperty("user.dir");
@@ -175,6 +176,7 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
              */
             private static final long serialVersionUID = 1L;
 
+            @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
                     boolean cellHasFocus) {
                 UIManager.LookAndFeelInfo lafValue = (UIManager.LookAndFeelInfo) value;
@@ -186,6 +188,7 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
 
         lookAndFeelList.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     JComboBox comboBox = (JComboBox) e.getSource();
@@ -240,6 +243,7 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
         setJMenuBar(mainMenuBar);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == quitMI) {
             quit();
@@ -253,6 +257,7 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
     // General info dialog. The OSXAdapter calls this method when "About
     // OSXAdapter"
     // is selected from the application menu.
+    @Override
     public void about() {
         aboutBox = AboutBox.getAboutBox(this);
         aboutBox.pack();
@@ -265,6 +270,7 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
     // General preferences dialog. The OSXAdapter calls this method when
     // "Preferences..."
     // is selected from the application menu.
+    @Override
     public void preferences() {
         prefs.setSize(320, 240);
         prefs.setLocation((int) this.getLocation().getX() + 22, (int) this.getLocation().getY() + 22);
@@ -276,6 +282,7 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
     // OSXAdapter"
     // is selected from the application menu, Cmd-Q is pressed, or "Quit" is
     // selected from the Dock.
+    @Override
     public boolean quit() {
         int option = JOptionPane.showConfirmDialog(this, "Are you sure you want to quit?", "[b] Quit?",
             JOptionPane.YES_NO_OPTION);
@@ -292,6 +299,7 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
     /**
      * @see javax.swing.event.ListDataListener#intervalAdded(javax.swing.event.ListDataEvent)
      */
+    @Override
     public final void intervalAdded(ListDataEvent e) {
         this.contentsChanged(e);
     }
@@ -299,6 +307,7 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
     /**
      * @see javax.swing.event.ListDataListener#intervalRemoved(javax.swing.event.ListDataEvent)
      */
+    @Override
     public final void intervalRemoved(ListDataEvent e) {
         this.contentsChanged(e);
     }
@@ -327,23 +336,28 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
     /**
      * @see javax.swing.event.ListDataListener#contentsChanged(javax.swing.event.ListDataEvent)
      */
+    @Override
     public final void contentsChanged(ListDataEvent e) {
         this.windowMenu.removeAll();
         addFramesToWindowMenu();
     }
 
+    @Override
     public void openApplication() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public void openFile() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public void printFile() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public void reOpenApplication() {
         throw new UnsupportedOperationException();
     }
