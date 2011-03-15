@@ -41,6 +41,7 @@ public class LangCodeSelectorEditor extends AbstractComboEditor {
 		langCodes.add("sv");
 		langCodes.add("sv-SE");
 		langCodes.add("da");
+		langCodes.add("da-DK");
 		langCodes.add("fr-CA");
 		return new EditorComponent(langCodes.toArray());
 	}
