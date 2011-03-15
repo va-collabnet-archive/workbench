@@ -413,7 +413,6 @@ public class HistoryPanel {
             int sapNid = positionVersion.getSapNid();
             NidSapNid nidSapNidKey = new NidSapNid(viewVersion.getNid(), sapNid);
             JRadioButton button = nidSapNidButtonMap.get(nidSapNidKey);
-            putPanelInButtonMap(button, dragPanel);
             if (button == null) {
                 button = new JRadioButton();
                 button.addChangeListener(svcl);
@@ -458,6 +457,7 @@ public class HistoryPanel {
                 sb.append("</html>");
                 button.setToolTipText(sb.toString());
             }
+            putPanelInButtonMap(button, dragPanel);
             if (group != null) {
                 if (add) {
                     group.add(button);
@@ -470,13 +470,15 @@ public class HistoryPanel {
                 parentPanel = parentPanel.getParent();
             }
             JCheckBox positionCheck = positionCheckMap.get(p);
-            button.setVisible(positionCheck.isVisible());
-            checkComponentMap.get(positionCheck).add(button);
-            button.setLocation(positionCheck.getX(), yLoc);
-            if (add) {
-                versionPanel.add(button);
+            if (positionCheck != null) {
+                button.setVisible(positionCheck.isVisible());
+                checkComponentMap.get(positionCheck).add(button);
+                button.setLocation(positionCheck.getX(), yLoc);
+                if (add) {
+                    versionPanel.add(button);
+                }
+                button.setSize(button.getPreferredSize());
             }
-            button.setSize(button.getPreferredSize());
         } catch (Throwable ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
