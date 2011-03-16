@@ -227,7 +227,7 @@ public class ConceptView extends JPanel {
                         
                         cpe.addToggleComponent(cac);
                         cpe.setAlertCount(0);
-                        if (cav.getRefexes() == null) {
+                        if (cav == null || cav.getRefexes() == null) {
                             cpe.setRefexCount(0);
                         } else {
                             cpe.setRefexCount(cav.getRefexes().size());
