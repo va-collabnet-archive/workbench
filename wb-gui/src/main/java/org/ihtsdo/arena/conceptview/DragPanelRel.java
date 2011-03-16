@@ -121,7 +121,7 @@ public class DragPanelRel extends ComponentVersionDragPanel<RelationshipVersionB
         gbc.weightx = 1;
         gbc.gridx++;
         TermComponentLabel destLabel = getLabel(getRel().getDestinationNid(), canDrop);
-        typeLabel.addPropertyChangeListener("termComponent",
+        destLabel.addPropertyChangeListener("termComponent",
                 new PropertyChangeManager<RelationshipAnalogBI>(
                 (RelationshipAnalogBI) getRel()) {
 
