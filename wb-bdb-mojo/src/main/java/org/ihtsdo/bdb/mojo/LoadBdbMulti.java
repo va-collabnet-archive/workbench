@@ -232,9 +232,9 @@ public class LoadBdbMulti extends AbstractMojo {
 
                     RefexAmendmentSpec newOriginSpec =
                             new RefexAmendmentSpec(TK_REFSET_TYPE.CID_INT,
-                            ReferenceConcepts.PATH.getNid(),
+                            path.getNid(),
                             ReferenceConcepts.REFSET_PATH_ORIGINS.getNid());
-                    newOriginSpec.with(RefexProperty.CNID1, path.getNid());
+                    newOriginSpec.with(RefexProperty.CNID1, origin.getNid());
                     newOriginSpec.with(RefexProperty.INTEGER1, Integer.MAX_VALUE);
                     newOriginSpec.with(RefexProperty.STATUS_NID, ReferenceConcepts.CURRENT.getNid());
                     newOriginSpec.setMemberContentUuid();
