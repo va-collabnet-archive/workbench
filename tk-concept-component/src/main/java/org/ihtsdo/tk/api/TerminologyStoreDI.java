@@ -73,4 +73,6 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
 
     NidBitSetBI getAllConceptNids() throws IOException;
 
+    NidBitSetBI getEmptyNidSet() throws IOException;
+    
 }
