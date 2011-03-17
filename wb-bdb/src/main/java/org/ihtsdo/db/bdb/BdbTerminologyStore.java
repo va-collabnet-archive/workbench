@@ -23,6 +23,7 @@ import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.ConceptVersion;
+import org.ihtsdo.concept.ContradictionIdentifier;
 import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
 import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
@@ -54,6 +55,7 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
 import org.ihtsdo.tk.db.DbDependency;
 import org.ihtsdo.tk.db.EccsDependency;
 
@@ -491,4 +493,11 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     public NidBitSetBI getEmptyNidSet() throws IOException {
         return Bdb.getConceptDb().getEmptyIdSet();
     }
+
+    @Override
+    public ContradictionIdentifierBI getConflictIdentifier() {
+        return new ContradictionIdentifier();
+    }
+    
+    
 }

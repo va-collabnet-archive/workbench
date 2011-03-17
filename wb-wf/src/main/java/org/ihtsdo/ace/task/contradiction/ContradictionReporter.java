@@ -24,181 +24,175 @@ import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
- 
+
 public class ContradictionReporter {
-	private Writer outputFile = null;
-	private ViewCoordinate ViewCoordinate = null;
-	
-	public ContradictionReporter(String outputFileLocation) {
-		try {
-			outputFile = new OutputStreamWriter(new FileOutputStream(outputFileLocation));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public ContradictionReporter() {
-	}
-	
-	public void setCoordinate(ViewCoordinate c) {
-		ViewCoordinate = c;
-	}
-	
-	public void identifyInConceptListPanel(Set<Integer> nids) {
-		try {
-			JList conceptList = Terms.get().getActiveAceFrameConfig().getBatchConceptList();
-	        I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
-	        model.clear();
 
-	        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createFsnComparer());
-	        for (Integer nid : nids)
-	        {
-	        	I_GetConceptData concept = Terms.get().getConcept(nid);
-	        	sortedConcepts.add(concept);
-	        	
-	        }
-	        
-	        for (I_GetConceptData con : sortedConcepts)
-	        	model.addElement(con);
+    private Writer outputFile = null;
+    private ViewCoordinate ViewCoordinate = null;
 
-        	Terms.get().getActiveAceFrameConfig().showListView();
-        	
-		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	
-	}
-	
-	public void identifyAsText(Set<Integer> nids) {
-		try {
-			for (Integer nid : nids)
-			{
-				I_GetConceptData con = Terms.get().getConcept(nid);
-				
-				identifyConflictingConceptAttributes(con);
-				identifyConflictingDescriptions(con);
-				identifyConflictingSourceRelationships(con);
-				identifyConflictingDestinationRelationships(con);
-				
-				outputFile.flush();
-				outputFile.close();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private void identifyConflictingConceptAttributes(I_GetConceptData con) throws IOException {
-		// not with ViewCoordinate
-		Collection<? extends ConAttrVersionBI> conAttrVersions = con.getConAttrs().getVersions();
-		outputFile.write("Handling Concept Attributes");
+    public ContradictionReporter(String outputFileLocation) {
+        try {
+            outputFile = new OutputStreamWriter(new FileOutputStream(outputFileLocation));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
-		int counter = 1;
-		for (ConAttrVersionBI version : conAttrVersions)
-		{
-			String s = "\nCount: " + counter++;
-			outputFile.write(s);
-			
-			s = "\tWith Values: " + version.toUserString();
-			outputFile.write(s);
-		}
+    public ContradictionReporter() {
+    }
 
-		outputFile.flush();
-	}
+    public void setCoordinate(ViewCoordinate c) {
+        ViewCoordinate = c;
+    }
 
-	private void identifyConflictingDescriptions(I_GetConceptData con) throws IOException {
-		Collection<? extends DescriptionChronicleBI> descriptions = con.getDescs();
-		outputFile.write("\n\nHandling Descriptions");
+    public void identifyInConceptListPanel(Set<Integer> nids) {
+        try {
+            JList conceptList = Terms.get().getActiveAceFrameConfig().getBatchConceptList();
+            I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
+            model.clear();
 
-		int counter = 1;
-		Iterator<? extends DescriptionChronicleBI> itr = descriptions.iterator();
+            TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createFsnComparer());
+            for (Integer nid : nids) {
+                I_GetConceptData concept = Terms.get().getConcept(nid);
+                sortedConcepts.add(concept);
 
-		while (itr.hasNext())
-		{
-			DescriptionChronicleBI desc = (DescriptionChronicleBI) itr.next();
-			for (DescriptionVersionBI d : desc.getVersions(ViewCoordinate))
-			{
-				String s = "\nCount: " + counter++;
-				outputFile.write(s);
-				
-				s = "\tWith Values: " + d.toUserString();
-				outputFile.write(s);
-			}
-		}
-		
-		outputFile.flush();
-	}
+            }
 
-	private void identifyConflictingSourceRelationships(I_GetConceptData con) throws IOException {
-		Collection<? extends RelationshipChronicleBI> relationships = con.getSourceRels();
-		outputFile.write("\n\nHandling Source Relationships");
+            for (I_GetConceptData con : sortedConcepts) {
+                model.addElement(con);
+            }
+
+            Terms.get().getActiveAceFrameConfig().showListView();
+
+        } catch (TerminologyException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
+
+    public void identifyAsText(Set<Integer> nids) {
+        try {
+            for (Integer nid : nids) {
+                I_GetConceptData con = Terms.get().getConcept(nid);
+
+                identifyConflictingConceptAttributes(con);
+                identifyConflictingDescriptions(con);
+                identifyConflictingSourceRelationships(con);
+                identifyConflictingDestinationRelationships(con);
+
+                outputFile.flush();
+                outputFile.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void identifyConflictingConceptAttributes(I_GetConceptData con) throws IOException {
+        // not with ViewCoordinate
+        Collection<? extends ConAttrVersionBI> conAttrVersions = con.getConAttrs().getVersions();
+        outputFile.write("Handling Concept Attributes");
+
+        int counter = 1;
+        for (ConAttrVersionBI version : conAttrVersions) {
+            String s = "\nCount: " + counter++;
+            outputFile.write(s);
+
+            s = "\tWith Values: " + version.toUserString();
+            outputFile.write(s);
+        }
+
+        outputFile.flush();
+    }
+
+    private void identifyConflictingDescriptions(I_GetConceptData con) throws IOException {
+        Collection<? extends DescriptionChronicleBI> descriptions = con.getDescs();
+        outputFile.write("\n\nHandling Descriptions");
+
+        int counter = 1;
+        Iterator<? extends DescriptionChronicleBI> itr = descriptions.iterator();
+
+        while (itr.hasNext()) {
+            DescriptionChronicleBI desc = (DescriptionChronicleBI) itr.next();
+            for (DescriptionVersionBI d : desc.getVersions(ViewCoordinate)) {
+                String s = "\nCount: " + counter++;
+                outputFile.write(s);
+
+                s = "\tWith Values: " + d.toUserString();
+                outputFile.write(s);
+            }
+        }
+
+        outputFile.flush();
+    }
+
+    private void identifyConflictingSourceRelationships(I_GetConceptData con) throws IOException {
+        Collection<? extends RelationshipChronicleBI> relationships = con.getSourceRels();
+        outputFile.write("\n\nHandling Source Relationships");
 
 
-		int counter = 1;
-		
-		Iterator<? extends RelationshipChronicleBI> itr = relationships.iterator();
+        int counter = 1;
 
-		while (itr.hasNext())
-		{
-			RelationshipChronicleBI desc = (RelationshipChronicleBI) itr.next();
-			for (RelationshipVersionBI r : desc.getVersions(ViewCoordinate))
-			{
-				String s = "\nCount: " + counter++;
-				outputFile.write(s);
-				
-				s = "\tWith Values: " + r.toUserString();
-				outputFile.write(s);
-			}
-		}
+        Iterator<? extends RelationshipChronicleBI> itr = relationships.iterator();
 
-		outputFile.flush();
-	}
+        while (itr.hasNext()) {
+            RelationshipChronicleBI desc = (RelationshipChronicleBI) itr.next();
+            for (RelationshipVersionBI r : desc.getVersions(ViewCoordinate)) {
+                String s = "\nCount: " + counter++;
+                outputFile.write(s);
 
-	private void identifyConflictingDestinationRelationships(I_GetConceptData con) throws IOException {
-		Collection<? extends RelationshipChronicleBI> relationships = con.getSourceRels();
-		outputFile.write("\n\nHandling Destination Relationships");
+                s = "\tWith Values: " + r.toUserString();
+                outputFile.write(s);
+            }
+        }
+
+        outputFile.flush();
+    }
+
+    private void identifyConflictingDestinationRelationships(I_GetConceptData con) throws IOException {
+        Collection<? extends RelationshipChronicleBI> relationships = con.getSourceRels();
+        outputFile.write("\n\nHandling Destination Relationships");
 
 
-		int counter = 1;
-		
-		Iterator<? extends RelationshipChronicleBI> itr = relationships.iterator();
+        int counter = 1;
 
-		while (itr.hasNext())
-		{
-			RelationshipChronicleBI desc = (RelationshipChronicleBI) itr.next();
-			for (RelationshipVersionBI r : desc.getVersions(ViewCoordinate))
-			{
-				String s = "\nCount: " + counter++;
-				outputFile.write(s);
-				
-				s = "\tWith Values: " + r.toUserString();
-				outputFile.write(s);
-			}
-		}
+        Iterator<? extends RelationshipChronicleBI> itr = relationships.iterator();
 
-		outputFile.flush();
-	}
+        while (itr.hasNext()) {
+            RelationshipChronicleBI desc = (RelationshipChronicleBI) itr.next();
+            for (RelationshipVersionBI r : desc.getVersions(ViewCoordinate)) {
+                String s = "\nCount: " + counter++;
+                outputFile.write(s);
 
-	public void printSingleConcepts(TreeSet<I_GetConceptData> singleConcepts) {
-		System.out.println("\n\n\n\n*********Singles*********");
+                s = "\tWith Values: " + r.toUserString();
+                outputFile.write(s);
+            }
+        }
 
-		for (I_GetConceptData c : singleConcepts)
-			System.out.println(WorkflowHelper.identifyFSN(c));
-				
-		System.out.println("*********End Of Singles*********\n\n\n\n");
-	}
-	
-	public void printConflictConcepts(TreeSet<I_GetConceptData> singleConcepts) {
-		System.out.println("\n\n\n\n*********Conflicts*********");
+        outputFile.flush();
+    }
 
-		for (I_GetConceptData c : singleConcepts)
-			System.out.println(WorkflowHelper.identifyFSN(c));
-				
-		System.out.println("*********End Of Conflicts*********\n\n\n\n");
-	}
-	
+    public void printSingleConcepts(TreeSet<I_GetConceptData> singleConcepts) {
+        System.out.println("\n\n\n\n*********Singles*********");
+
+        for (I_GetConceptData c : singleConcepts) {
+            System.out.println(WorkflowHelper.identifyFSN(c));
+        }
+
+        System.out.println("*********End Of Singles*********\n\n\n\n");
+    }
+
+    public void printConflictConcepts(TreeSet<I_GetConceptData> singleConcepts) {
+        System.out.println("\n\n\n\n*********Conflicts*********");
+
+        for (I_GetConceptData c : singleConcepts) {
+            System.out.println(WorkflowHelper.identifyFSN(c));
+        }
+
+        System.out.println("*********End Of Conflicts*********\n\n\n\n");
+    }
 }

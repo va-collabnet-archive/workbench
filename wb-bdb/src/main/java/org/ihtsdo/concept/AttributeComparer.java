@@ -1,13 +1,13 @@
 package org.ihtsdo.concept;
 
-import org.ihtsdo.concept.ContradictionIdentifier.CONTRADICTION_INVESTIGATION_TYPE;
 import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.contradiction.ContradictionInvestigationType;
 
 public abstract class AttributeComparer {
 	protected boolean comparerInitialized = false;
-	protected CONTRADICTION_INVESTIGATION_TYPE componentType = null;;
+	protected ContradictionInvestigationType componentType = null;;
 	
-	protected CONTRADICTION_INVESTIGATION_TYPE getComponentType() {
+	protected ContradictionInvestigationType getComponentType() {
 		return componentType;
 	}
 	

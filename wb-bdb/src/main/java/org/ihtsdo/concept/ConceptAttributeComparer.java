@@ -1,8 +1,8 @@
 package org.ihtsdo.concept;
 
-import org.ihtsdo.concept.ContradictionIdentifier.CONTRADICTION_INVESTIGATION_TYPE;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.contradiction.ContradictionInvestigationType;
 
 public class ConceptAttributeComparer extends AttributeComparer {
 
@@ -11,7 +11,7 @@ public class ConceptAttributeComparer extends AttributeComparer {
 
 	public ConceptAttributeComparer() {
 		super();
-		componentType = CONTRADICTION_INVESTIGATION_TYPE.ATTRIBUTE;
+		componentType = ContradictionInvestigationType.ATTRIBUTE;
 	}
 
 	@Override

@@ -8,6 +8,9 @@ import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.MarshalledObject;
+import java.util.Set;
+import javax.naming.ConfigurationException;
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -33,6 +36,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.ComponentFrame;
 import org.dwfa.bpa.util.OpenFramesWindowListener;
 import org.ihtsdo.arena.Arena;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  *
@@ -47,7 +51,7 @@ public class ContradictionEditorFrame extends ComponentFrame {
     private JTabbedPane conceptTabs = new JTabbedPane();
     private ConceptPanel c1Panel;
     private final TerminologyList batchConceptList;
- 
+
     public ConceptPanel getC1Panel() {
         return c1Panel;
     }
@@ -74,24 +78,44 @@ public class ContradictionEditorFrame extends ComponentFrame {
                 newFrameConfig, LINK_TYPE.UNLINKED,
                 conceptTabs, 1, "plugins/contradiction");
         conceptTabs.add(c1Panel);
-        
-        
 
         arena = new Arena(newFrameConfig);
-        conceptTabs.addTab("arena", 
+        conceptTabs.addTab("arena",
                 new ImageIcon(ACE.class.getResource("/16x16/plain/eye.png")), arena);
-
+        conceptTabs.setSelectedIndex(1);
         this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.addWindowListener(new OpenFramesWindowListener(this, this.cfb));
         this.setBounds(getDefaultFrameSize());
-        
-         TerminologyListModel batchListModel =
-                    new TerminologyListModel(newFrameConfig.getTabHistoryMap().get("batchList"));
-         batchConceptList = new TerminologyList(batchListModel, true, true, newFrameConfig);
-         topSplit.setLeftComponent(new JScrollPane(batchConceptList));
-         batchConceptList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-         batchConceptList.addListSelectionListener(new SelectionListener());
+        TerminologyListModel batchListModel =
+                new TerminologyListModel(newFrameConfig.getTabHistoryMap().get("batchList"));
+        batchConceptList = new TerminologyList(batchListModel, true, true, newFrameConfig);
+        topSplit.setLeftComponent(new JScrollPane(batchConceptList));
+        batchConceptList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        topSplit.setDividerLocation(350);
+
+        batchConceptList.addListSelectionListener(new SelectionListener());
+    }
+
+    private class FindContradictionAction extends AbstractAction {
+
+        public FindContradictionAction() {
+            super("Run Contradiction Finder");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            Set<PositionBI> viewPositions = newFrameConfig.getViewPositionSet();
+            for (PositionBI p : viewPositions) {
+                ContradictionFinderSwingWorker worker =
+                        new ContradictionFinderSwingWorker(p,
+                        (TerminologyListModel) batchConceptList.getModel());
+                worker.execute();
+            }
+
+
+        }
     }
 
     /**
@@ -100,6 +124,7 @@ public class ContradictionEditorFrame extends ComponentFrame {
     @Override
     public void addAppMenus(JMenuBar mainMenuBar) throws Exception {
         mainMenuBar.add(adjudicatorMenu = new JMenu("Adjudicator"));
+        adjudicatorMenu.add(new FindContradictionAction());
     }
 
     /**
@@ -127,14 +152,13 @@ public class ContradictionEditorFrame extends ComponentFrame {
         public void valueChanged(ListSelectionEvent lse) {
             int selectedIndex = batchConceptList.getSelectedIndex();
             if (selectedIndex >= 0) {
-                TerminologyListModel tm = (TerminologyListModel) 
-                        batchConceptList.getModel();
+                TerminologyListModel tm = (TerminologyListModel) batchConceptList.getModel();
                 I_GetConceptData concept = tm.getElementAt(selectedIndex);
                 c1Panel.setTermComponent(concept);
             }
         }
-        
     }
+
     public class NewAdjudicatorFrame implements ActionListener {
 
         @Override

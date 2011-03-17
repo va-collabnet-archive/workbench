@@ -19,9 +19,7 @@ package org.ihtsdo.ace.task.contradiction;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
-import java.util.Set;
 
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -31,7 +29,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PositionBI;
 
 
@@ -55,6 +53,7 @@ public class TestCR extends AbstractTask {
 
     }
     
+    @Override
     public Condition evaluate(I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         
     	try {
@@ -63,11 +62,11 @@ public class TestCR extends AbstractTask {
     		ContradictionConceptProcessor processor = new ContradictionConceptProcessor (viewPos);
             
     		// Create Resolver (currently used to report results)
-    		//ContradictionReporter reporter = new ContradictionReporter("E:\\Workspaces\\conflict-resolution\\output\\test2.txt");
+    		// ContradictionReporter reporter = new ContradictionReporter("E:\\Workspaces\\conflict-resolution\\output\\test2.txt");
     		ContradictionReporter reporter = new ContradictionReporter();
     		
     		// Iterate over each concept calling processUnfetchedConceptData() on each Concept 
-    		Bdb.getConceptDb().iterateConceptDataInParallel(processor);
+    		Ts.get().iterateConceptDataInParallel(processor);
     		ContradictionIdentificationResults results = processor.getResults();
     		
     		// Report any conflicts
@@ -87,6 +86,7 @@ public class TestCR extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
+    @Override
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
 
@@ -95,6 +95,7 @@ public class TestCR extends AbstractTask {
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
      */
+    @Override
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;
     }
@@ -102,6 +103,7 @@ public class TestCR extends AbstractTask {
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
      */
+    @Override
     public int[] getDataContainerIds() {
         return new int[] {};
     }

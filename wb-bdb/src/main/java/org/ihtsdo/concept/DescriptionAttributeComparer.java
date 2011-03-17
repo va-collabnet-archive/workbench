@@ -1,9 +1,8 @@
 package org.ihtsdo.concept;
 
-import org.ihtsdo.concept.ContradictionIdentifier.CONTRADICTION_INVESTIGATION_TYPE;
-import org.ihtsdo.db.bdb.computer.version.PositionMapper.RELATIVE_POSITION;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.contradiction.ContradictionInvestigationType;
 
 public class DescriptionAttributeComparer extends AttributeComparer {
 
@@ -14,7 +13,7 @@ public class DescriptionAttributeComparer extends AttributeComparer {
 	
 	public DescriptionAttributeComparer() {
 		super();
-		componentType = CONTRADICTION_INVESTIGATION_TYPE.DESCRIPTION;
+		componentType = ContradictionInvestigationType.DESCRIPTION;
 	}
 
 	@Override

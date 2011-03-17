@@ -1,3 +1,4 @@
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 <!--
  !  Copyright (c) 2009 International Health Terminology Standards Development Organisation
@@ -16,9 +17,9 @@
  -->
 
     <parent>
-      <groupId>org.ihtsdo</groupId>
-      <artifactId>wb-mmb</artifactId>
-    	<version>2.6.0-trek-14-SNAPSHOT</version>
+        <groupId>org.ihtsdo</groupId>
+        <artifactId>wb-mmb</artifactId>
+        <version>2.6.0-trek-14-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>wb-gui</artifactId>
@@ -32,90 +33,95 @@
         </license>
     </licenses>
     <dependencies>
-   	<dependency>
-    		<groupId>org.ihtsdo</groupId>
-       	<artifactId>tk-arena-spec</artifactId>
-    		<version>${project.version}</version>
-    		<type>jar</type>
-     	</dependency>
-    	<dependency>
-    		<groupId>${project.groupId}</groupId>
-    		<artifactId>tk-arena-spec</artifactId>
-    		<version>${project.version}</version>
-    	</dependency>
-    	<dependency>
-    		<groupId>org.drools</groupId>
-    		<artifactId>drools-core</artifactId>
-    		<type>jar</type>
-    		<optional>false</optional>
-    	</dependency>
-    	<dependency>
-    		<groupId>org.drools</groupId>
-    		<artifactId>drools-api</artifactId>
-    		<type>jar</type>
-    		<optional>false</optional>
-    	</dependency>
-    	<dependency>
-    		<groupId>org.drools</groupId>
-    		<artifactId>drools-compiler</artifactId>
-    		<type>jar</type>
-    		<optional>false</optional>
-    	</dependency>
-    	<dependency>
-    		<groupId>org.drools</groupId>
-    		<artifactId>drools-templates</artifactId>
-    		<type>jar</type>
-    		<optional>false</optional>
-    	</dependency>
-    	<dependency>
-    		<groupId>org.ihtsdo</groupId>
-    		<artifactId>wb-api</artifactId>
-    		<version>${project.version}</version>
-    		<type>jar</type>
-    		<optional>false</optional>
-    	</dependency>
-    	<dependency>
-    		<groupId>jgraphx</groupId>
-    		<artifactId>jgraphx</artifactId>
-    		<version>1.5.0.0</version>
-    		<type>jar</type>
-    		<optional>false</optional>
-    	</dependency>
-    	<dependency>
-    		<groupId>jgraphx</groupId>
-    		<artifactId>jgraphx-examples</artifactId>
-    		<version>1.5.0.0</version>
-    		<type>jar</type>
-    		<optional>false</optional>
-    	</dependency>
-    	<dependency>
-    		<groupId>junit</groupId>
-    		<artifactId>junit</artifactId>
-    		<version>4.7</version>
-    		<type>jar</type>
-    		<scope>test</scope>
-    		<optional>false</optional>
-    	</dependency>
-    	<dependency>
-    		<groupId>org.tmatesoft.svnkit</groupId>
-    		<artifactId>svnkit</artifactId>
-    		<type>jar</type>
-    		<optional>false</optional>
-    	</dependency>
-    	<dependency>
-    		<groupId>org.ihtsdo</groupId>
-    		<artifactId>tk-drools</artifactId>
-    		<version>${project.version}</version>
-    		<type>jar</type>
-    		<optional>false</optional>
-    	</dependency>
-    	<dependency>
-    		<groupId>org.ihtsdo</groupId>
-    		<artifactId>rule-engine-integration</artifactId>
-    		<version>${project.version}</version>
-    		<type>jar</type>
-    		<optional>false</optional>
-    	</dependency>
+        <dependency>
+            <groupId>org.ihtsdo</groupId>
+            <artifactId>tk-arena-spec</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>tk-arena-spec</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>wb-wf</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-core</artifactId>
+            <type>jar</type>
+            <optional>false</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-api</artifactId>
+            <type>jar</type>
+            <optional>false</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-compiler</artifactId>
+            <type>jar</type>
+            <optional>false</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-templates</artifactId>
+            <type>jar</type>
+            <optional>false</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.ihtsdo</groupId>
+            <artifactId>wb-api</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+            <optional>false</optional>
+        </dependency>
+        <dependency>
+            <groupId>jgraphx</groupId>
+            <artifactId>jgraphx</artifactId>
+            <version>1.5.0.0</version>
+            <type>jar</type>
+            <optional>false</optional>
+        </dependency>
+        <dependency>
+            <groupId>jgraphx</groupId>
+            <artifactId>jgraphx-examples</artifactId>
+            <version>1.5.0.0</version>
+            <type>jar</type>
+            <optional>false</optional>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.7</version>
+            <type>jar</type>
+            <scope>test</scope>
+            <optional>false</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.tmatesoft.svnkit</groupId>
+            <artifactId>svnkit</artifactId>
+            <type>jar</type>
+            <optional>false</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.ihtsdo</groupId>
+            <artifactId>tk-drools</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+            <optional>false</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.ihtsdo</groupId>
+            <artifactId>rule-engine-integration</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+            <optional>false</optional>
+        </dependency>
     </dependencies>
     <reporting>
         <plugins>

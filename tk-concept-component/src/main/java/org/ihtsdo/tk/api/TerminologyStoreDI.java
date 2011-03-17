@@ -11,6 +11,7 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
 import org.ihtsdo.tk.db.DbDependency;
 
 public interface TerminologyStoreDI extends TerminologyTransactionDI {
@@ -74,5 +75,7 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
     NidBitSetBI getAllConceptNids() throws IOException;
 
     NidBitSetBI getEmptyNidSet() throws IOException;
+    
+    ContradictionIdentifierBI getConflictIdentifier();
     
 }

@@ -15,10 +15,12 @@
 		<artifactId>wb-api</artifactId>
 		<version>${project.version}</version>
         </dependency>
+        <!--
 	<dependency>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-bdb</artifactId>
 		<version>${project.version}</version>
 	</dependency>
+        -->
     </dependencies>
 </project>
