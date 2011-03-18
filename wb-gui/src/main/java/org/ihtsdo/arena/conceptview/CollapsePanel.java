@@ -41,6 +41,8 @@ import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.arena.ArenaComponentSettings;
 import org.ihtsdo.arena.conceptview.ComponentVersionDragPanel.SubPanelTypes;
 import org.ihtsdo.arena.conceptview.ConceptView.PanelSection;
+import org.ihtsdo.arena.context.action.BpActionFactory;
+import org.ihtsdo.arena.context.action.BpActionFactoryNoPanel;
 import org.ihtsdo.arena.drools.EditPanelKb;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -266,6 +268,10 @@ public class CollapsePanel extends JPanel {
                 ksession.setGlobal("conceptActions", conceptActions);
                 ksession.setGlobal("descriptionActions", descriptionActions);
                 ksession.setGlobal("relActions", relActions);
+                ksession.setGlobal("actionFactory", new BpActionFactoryNoPanel(
+                        settings.getConfig(),
+                        settings.getHost()));
+                
                 if (settings.getConcept() != null) {
                     ConceptFact cFact = new ConceptFact(Context.FOCUS_CONCEPT,
                             Ts.get().getConceptVersion(coordinate,
