@@ -36,5 +36,13 @@ public class Snomed {
 	public static ConceptSpec EXTENSION_13 = 
 		new ConceptSpec("Extension Namespace 1000013",
 						UUID.fromString("bb57db0f-def7-3fb7-b7f2-89fa7710bffa"));
+	
+	public static ConceptSpec CONCEPT_HISTORY_ATTRIB = 
+		new ConceptSpec("Concept history attribute",
+						UUID.fromString("f323b5dd-1f97-3873-bcbc-3563663dda14"));
+	
+	public static ConceptSpec PRODUCT = 
+		new ConceptSpec("Pharmaceutical / biologic product (product)",
+						UUID.fromString("5032532f-6b58-31f9-84c1-4a365dde4449"));
 
 }
