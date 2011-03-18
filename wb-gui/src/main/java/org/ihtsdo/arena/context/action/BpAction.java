@@ -87,6 +87,52 @@ public class BpAction extends AbstractAction implements Runnable {
 		}
  	}
 
+	public BpAction(String processUrlStr, I_ConfigAceFrame frameConfig,
+			I_HostConceptPlugins host)
+           throws MalformedURLException, IOException, ClassNotFoundException {
+		this(new URL(processUrlStr), frameConfig, host);
+ 	}
+	
+	public BpAction(URL processUrl, I_ConfigAceFrame frameConfig,
+			I_HostConceptPlugins host)
+           throws MalformedURLException, IOException, ClassNotFoundException {
+		super();
+		processURL =processUrl;
+		this.frameConfig = frameConfig;
+		this.host = host;
+        I_EncodeBusinessProcess process = getProcess();
+
+        putValue(NAME, process.getName());
+        putValue(SHORT_DESCRIPTION, process.getSubject());
+        try {
+        	String longDesc = process.getProcessDocumentation();
+        	if (longDesc != null) {
+    			putValue(LONG_DESCRIPTION, longDesc);
+        	}
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+        try {
+            byte[] iconBytes = (byte[]) process.readAttachement("menu_icon");
+            if (iconBytes != null) {
+                ImageIcon icon = new ImageIcon(iconBytes);
+       			putValue(SMALL_ICON, icon);
+            }
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+        try {
+            byte[] iconBytes = (byte[]) process.readAttachement("button_icon");
+            if (iconBytes != null) {
+                ImageIcon icon = new ImageIcon(iconBytes);
+       			putValue(LARGE_ICON_KEY, icon);
+            }
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+ 	}
+	
+
 	private I_EncodeBusinessProcess getProcess() throws FileNotFoundException,
 			IOException, ClassNotFoundException {
 		InputStream inStream;
