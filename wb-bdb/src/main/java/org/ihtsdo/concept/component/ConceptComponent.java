@@ -994,7 +994,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             this.annotations = new ConcurrentSkipListSet<RefexChronicleBI<?>>();
             for (TkRefsetAbstractMember<?> eAnnot : eComponent.getAnnotations()) {
                 RefsetMember<?, ?> annot = RefsetMemberFactory.create(
-                        eAnnot, this.nid);
+                        eAnnot, enclosingConceptNid);
                 this.annotations.add(annot);
             }
         }

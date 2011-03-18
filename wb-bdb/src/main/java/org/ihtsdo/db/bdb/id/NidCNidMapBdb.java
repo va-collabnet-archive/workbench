@@ -22,7 +22,6 @@ import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
-import org.ihtsdo.tk.Ts;
 
 /**
  *
@@ -210,6 +209,7 @@ public class NidCNidMapBdb extends ComponentBdb {
         int indexInMap = (nid - Integer.MIN_VALUE) % NID_CNID_MAP_SIZE;
         assert indexInMap < NID_CNID_MAP_SIZE : "cNid: " + cNid + " nid: " + nid + " mapIndex: " + mapIndex
                 + " indexInMap: " + indexInMap;
+        assert cNid == nid || hasConcept(cNid): cNid + " is not a concept nid. nid: " + nid;
 
         ensureCapacity(nid);
         assert nidCNidMaps.get()[mapIndex][indexInMap] == Integer.MAX_VALUE

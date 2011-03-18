@@ -16,8 +16,8 @@ public class IndexGenerator implements I_ProcessConceptData {
     private int lineCounter = 0;
     private int descCounter = 0;
     private int conceptCounter = 0;
-    private int feedbackInterval =  1000;
- 
+    private int feedbackInterval = 1000;
+
     @Override
     public NidBitSetBI getNidSet() {
         return nidSet;
@@ -32,20 +32,20 @@ public class IndexGenerator implements I_ProcessConceptData {
     @Override
     public void processConceptData(Concept concept) throws Exception {
         conceptCounter++;
-       for (Description d : concept.getDescriptions()) {
+        for (Description d : concept.getDescriptions()) {
             writer.addDocument(LuceneManager.createDoc(d));
             descCounter++;
-            
+
             if (descCounter % feedbackInterval == 0) {
                 System.out.print(".");
                 lineCounter++;
                 if (lineCounter > 80) {
                     lineCounter = 0;
                     System.out.println();
-                    System.out.print("c:" + conceptCounter + 
-                            " d:" + descCounter);
+                    System.out.print("c:" + conceptCounter
+                            + " d:" + descCounter);
                 }
-             }
+            }
         }
     }
 
