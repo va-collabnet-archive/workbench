@@ -17,8 +17,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
@@ -32,22 +34,17 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import org.drools.KnowledgeBase;
-import org.drools.logger.KnowledgeRuntimeLogger;
-import org.drools.logger.KnowledgeRuntimeLoggerFactory;
-import org.drools.runtime.StatefulKnowledgeSession;
 import org.dwfa.ace.log.AceLog;
 
 import org.ihtsdo.arena.ArenaComponentSettings;
 import org.ihtsdo.arena.conceptview.ComponentVersionDragPanel.SubPanelTypes;
 import org.ihtsdo.arena.conceptview.ConceptView.PanelSection;
-import org.ihtsdo.arena.context.action.BpActionFactory;
 import org.ihtsdo.arena.context.action.BpActionFactoryNoPanel;
-import org.ihtsdo.arena.drools.EditPanelKb;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.drools.facts.Context;
+import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 
 public class CollapsePanel extends JPanel {
 
@@ -107,7 +104,8 @@ public class CollapsePanel extends JPanel {
     private CollapsePanelPrefs prefs;
     private PanelSection sectionType;
     private final ConceptViewSettings settings;
-    private KnowledgeBase contextualConceptActionsKBase = null;
+    private Set<File> kbFiles = new HashSet<File>();
+    private String kbKey;
 
     public void setShown(boolean shown, SubPanelTypes type) {
         prefs.setShown(shown, type);
@@ -146,10 +144,11 @@ public class CollapsePanel extends JPanel {
         this.prefs = prefs;
         this.sectionType = sectionType;
         this.settings = settings;
+        this.kbFiles.add(new File("drools-rules/ContextualSectionDropdown.drl"));
+        this.kbKey = labelStr + CollapsePanel.class.getCanonicalName();
+
         try {
-            contextualConceptActionsKBase =
-                    EditPanelKb.setupKb(
-                    new File("drools-rules/ContextualSectionDropdown.drl"));
+            DroolsExecutionManager.setup(kbKey, kbFiles);
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }
@@ -250,43 +249,32 @@ public class CollapsePanel extends JPanel {
         relActions.clear();
 
         try {
-            if (contextualConceptActionsKBase == null) {
-                return;
-            }
-            StatefulKnowledgeSession ksession =
-                    contextualConceptActionsKBase.newStatefulKnowledgeSession();
-            boolean uselogger = false;
-
-            KnowledgeRuntimeLogger logger = null;
-            if (uselogger) {
-                logger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
-            }
-            try {
-
+            if (settings.getConcept() != null) {
                 ViewCoordinate coordinate = settings.getConfig().getViewCoordinate();
-                ksession.setGlobal("vc", coordinate);
-                ksession.setGlobal("conceptActions", conceptActions);
-                ksession.setGlobal("descriptionActions", descriptionActions);
-                ksession.setGlobal("relActions", relActions);
-                ksession.setGlobal("actionFactory", new BpActionFactoryNoPanel(
+                Map<String, Object> globals = new HashMap<String, Object>();
+                globals.put("vc", coordinate);
+                globals.put("conceptActions", conceptActions);
+                globals.put("descriptionActions", descriptionActions);
+                globals.put("relActions", relActions);
+                globals.put("actionFactory", new BpActionFactoryNoPanel(
                         settings.getConfig(),
                         settings.getHost()));
-                
-                if (settings.getConcept() != null) {
-                    ConceptFact cFact = new ConceptFact(Context.FOCUS_CONCEPT,
-                            Ts.get().getConceptVersion(coordinate,
-                            settings.getConcept().getNid()));
-                    ksession.insert(cFact);
-                }
-                ksession.fireAllRules();
-            } catch (IOException e) {
-                AceLog.getAppLog().alertAndLogException(e);
-            } finally {
-                if (logger != null) {
-                    logger.close();
-                }
+
+                Collection<Object> facts = new ArrayList<Object>();
+                ConceptFact cFact = new ConceptFact(Context.FOCUS_CONCEPT,
+                        Ts.get().getConceptVersion(coordinate,
+                        settings.getConcept().getNid()));
+                facts.add(cFact);
+
+                DroolsExecutionManager.fireAllRules(
+                        ConceptView.class.getCanonicalName(),
+                        kbFiles,
+                        globals,
+                        facts,
+                        false);
             }
-        } catch (Throwable e) {
+
+        } catch (IOException e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
     }

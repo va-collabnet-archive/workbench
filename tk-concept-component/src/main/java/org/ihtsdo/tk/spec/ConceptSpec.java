@@ -19,18 +19,20 @@ package org.ihtsdo.tk.spec;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 public class ConceptSpec implements SpecBI {
 
@@ -91,7 +93,18 @@ public class ConceptSpec implements SpecBI {
         this.relSpecs = relSpecs;
     }
 
-    public ConceptVersionBI get(ViewCoordinate c) throws IOException {
+    public ConceptChronicleBI getLenient() throws IOException {
+        try {
+            ConceptChronicleBI local = Ts.get().getConcept(uuids);
+            validateDescription(local);
+            validateRelationships(local);
+            return local;
+        } catch (ContraditionException e) {
+            throw new ValidationException(e);
+        }
+    }
+
+    public ConceptVersionBI getStrict(ViewCoordinate c) throws IOException {
         try {
             ConceptVersionBI local = Ts.get().getConceptVersion(c, uuids);
             validateDescription(local, c);
@@ -102,26 +115,83 @@ public class ConceptSpec implements SpecBI {
         }
     }
 
-    private boolean validateRelationships(ConceptVersionBI local, ViewCoordinate c) throws IOException {
+
+    /**
+     * 
+     * @param c
+     * @return
+     * @throws IOException
+     * @deprecated Use getStrict or getLienient instead. 
+     */
+    @Deprecated
+    public ConceptVersionBI get(ViewCoordinate c) throws IOException {
+        return getStrict(c);
+    }
+
+    private void validateRelationships(ConceptVersionBI local, ViewCoordinate c) throws IOException {
         if (relSpecs == null || relSpecs.length == 0) {
-            return true;
+            return;
         }
 
+        next: 
         for (RelSpec relSpec : relSpecs) {
-            ConceptVersionBI relType = relSpec.getRelTypeSpec().get(c);
-            ConceptVersionBI destination = relSpec.getDestinationSpec().get(c);
-            List<ConceptVersionBI> destinationsOfType = new ArrayList<ConceptVersionBI>();
+            
+            ConceptVersionBI relType = relSpec.getRelTypeSpec().getStrict(c);
+            ConceptVersionBI destination = relSpec.getDestinationSpec().getStrict(c);
             NidSetBI typeNids = new NidSet();
             typeNids.add(relType.getNid());
 
             for (ConceptVersionBI dest : local.getRelsOutgoingDestinations(typeNids)) {
-                destinationsOfType.add(dest);
                 if (dest.equals(destination)) {
-                    return true;
+                    continue next;
                 }
             }
+            throw new ValidationException("No match for RelSpec: " + relSpec);
         }
-        return false;
+    }
+
+    private void validateRelationships(ConceptChronicleBI local) throws IOException {
+        if (relSpecs == null || relSpecs.length == 0) {
+            return;
+        }
+
+        next: 
+        for (RelSpec relSpec : relSpecs) {
+            
+            ConceptChronicleBI relType = relSpec.getRelTypeSpec().getLenient();
+            ConceptChronicleBI destination = relSpec.getDestinationSpec().getLenient();
+            NidSetBI typeNids = new NidSet();
+            typeNids.add(relType.getNid());
+
+            for (RelationshipChronicleBI rel: local.getRelsOutgoing()) {
+                for (RelationshipVersionBI rv: rel.getVersions()) {
+                    if (rv.getTypeNid() == relType.getNid() &&
+                            rv.getDestinationNid() == destination.getNid()) {
+                        continue next;
+                    }
+                }
+            }
+            throw new ValidationException("No match for RelSpec: " + relSpec);
+        }
+    }
+
+    
+    private void validateDescription(ConceptChronicleBI local) throws IOException, ContraditionException {
+        boolean found = false;
+        for (DescriptionChronicleBI desc : local.getDescs()) {
+            for (DescriptionVersionBI descv: desc.getVersions()) {
+           if (descv.getText().equals(description)) {
+                found = true;
+                break;
+            }
+            }
+         }
+        if (found == false) {
+            
+            throw new ValidationException("No description matching: '" + 
+                    description + "' found for:\n" + 
+                    local);
+        }
     }
 
     private void validateDescription(ConceptVersionBI local, ViewCoordinate c) throws IOException, ContraditionException {
@@ -134,11 +204,9 @@ public class ConceptSpec implements SpecBI {
         }
         if (found == false) {
             
-            throw new RuntimeException("No description matching: '" + 
+            throw new ValidationException("No description matching: '" + 
                     description + "' found for:\n" + 
-                    local + "\n\n" +
-                    local.getChronicle().toLongString() + "\n\n active desc:\n" +
-                    local.getDescsActive());
+                    local);
         }
     }
 

@@ -46,10 +46,8 @@ import javax.swing.SwingConstants;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
-import org.drools.KnowledgeBase;
 import org.drools.logger.KnowledgeRuntimeLogger;
 import org.drools.logger.KnowledgeRuntimeLoggerFactory;
-import org.drools.runtime.StatefulKnowledgeSession;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -62,7 +60,6 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.arena.WizardPanel;
 import org.ihtsdo.arena.context.action.BpActionFactory;
-import org.ihtsdo.arena.drools.EditPanelKb;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -79,6 +76,14 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import org.ihtsdo.arena.context.action.BpActionFactoryNoPanel;
+import org.ihtsdo.tk.drools.facts.ConceptFact;
+import org.ihtsdo.tk.drools.facts.Context;
+import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 
 /**
  * @author Administrator
@@ -163,7 +168,6 @@ public class ConceptViewRenderer extends JLayeredPane {
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     private WizardPanel wizardPanel;
     private JScrollPane wizardScrollPane;
-    private KnowledgeBase contextualConceptActionsKBase;
     private JScrollPane conceptScrollPane;
     private JToggleButton workflowToggleButton;
     private JToggleButton oopsButton;
@@ -175,6 +179,7 @@ public class ConceptViewRenderer extends JLayeredPane {
         return historyPanel;
     }
     private JPanel conceptViewPanel = new JPanel(new BorderLayout());
+    private Set<File> kbFiles = new HashSet<File>();
 
     /**
      *
@@ -187,11 +192,12 @@ public class ConceptViewRenderer extends JLayeredPane {
         wizardScrollPane = new JScrollPane(wizardPanel,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+       this.kbFiles.add(new File("drools-rules/ContextualConceptActionsPanel.drl"));
+
         try {
-            contextualConceptActionsKBase = EditPanelKb.setupKb(
-                    new File("drools-rules/ContextualConceptActionsPanel.drl"));
+            DroolsExecutionManager.setup(CollapsePanel.class.getCanonicalName(), kbFiles);
         } catch (IOException e1) {
-            throw new RuntimeException(e1);
+            AceLog.getAppLog().alertAndLogException(e1);
         }
         applicationWorkflowPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
         conceptWorkflowPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
@@ -616,35 +622,25 @@ public class ConceptViewRenderer extends JLayeredPane {
         Collection<Action> actions = new ArrayList<Action>();
 
         try {
-            StatefulKnowledgeSession ksession =
-                    contextualConceptActionsKBase.newStatefulKnowledgeSession();
-            boolean uselogger = false;
-
-            KnowledgeRuntimeLogger logger = null;
-            if (uselogger) {
-                logger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
-            }
-            try {
-
+            if (settings.getConcept() != null) {
                 ViewCoordinate coordinate = settings.getConfig().getViewCoordinate();
-                ksession.setGlobal("vc", coordinate);
-                ksession.setGlobal("actions", actions);
-                ksession.setGlobal("actionFactory", new BpActionFactory(
+                Map<String, Object> globals = new HashMap<String, Object>();
+                globals.put("vc", coordinate);
+                globals.put("actions", actions);
+                globals.put("actionFactory", new BpActionFactory(
                         settings.getConfig(),
                         settings.getHost(), wizardPanel));
-                if (settings.getConcept() != null) {
-                    ksession.insert(Ts.get().getConceptVersion(coordinate,
+
+                Collection<Object> facts = new ArrayList<Object>();
+                facts.add(Ts.get().getConceptVersion(coordinate,
                             settings.getConcept().getNid()));
-                } else {
-                    ksession.insert("null concept");
-                }
-                ksession.fireAllRules();
-            } catch (IOException e) {
-                AceLog.getAppLog().alertAndLogException(e);
-            } finally {
-                if (logger != null) {
-                    logger.close();
-                }
+
+                DroolsExecutionManager.fireAllRules(
+                        ConceptView.class.getCanonicalName(),
+                        kbFiles,
+                        globals,
+                        facts,
+                        false);
             }
         } catch (Throwable e) {
             AceLog.getAppLog().alertAndLogException(e);

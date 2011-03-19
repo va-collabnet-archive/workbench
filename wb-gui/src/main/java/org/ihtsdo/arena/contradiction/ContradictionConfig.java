@@ -44,6 +44,7 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.SubversionData;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -53,6 +54,7 @@ import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -1009,6 +1011,7 @@ public class ContradictionConfig implements I_ConfigAceFrame {
         return config.getEditRelCharacteristicPopup();
     }
 
+    @Override
     public I_IntList getEditImageTypePopup() {
         return config.getEditImageTypePopup();
     }
@@ -1018,7 +1021,9 @@ public class ContradictionConfig implements I_ConfigAceFrame {
     }
 
     public EditCoordinate getEditCoordinate() {
-        return config.getEditCoordinate();
+      NidSet editPaths = new NidSet(getEditingPathSet());
+      return new EditCoordinate(Terms.get().getAuthorNid(),
+              editPaths);
     }
 
     public I_IntSet getDestRelTypes() {

@@ -25,7 +25,6 @@ import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
-import org.ihtsdo.tk.api.NidList;
 
 public class TerminologyListModel extends AbstractListModel implements I_ModelTerminologyList {
 

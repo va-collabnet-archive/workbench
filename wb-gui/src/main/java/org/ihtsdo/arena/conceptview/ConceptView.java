@@ -88,13 +88,14 @@ import org.ihtsdo.tk.spec.RelSpec;
 import org.ihtsdo.tk.spec.SpecBI;
 import org.ihtsdo.tk.spec.SpecFactory;
 import org.ihtsdo.util.swing.GuiUtil;
+import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 
 public class ConceptView extends JPanel {
 
     private final ConceptViewRenderer cvRenderer;
 
-    private class PanelsChangedActionListener 
-        implements ActionListener, ChangeListener, PropertyChangeListener {
+    private class PanelsChangedActionListener
+            implements ActionListener, ChangeListener, PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent ae) {
@@ -124,7 +125,7 @@ public class ConceptView extends JPanel {
 
         @Override
         public void propertyChange(PropertyChangeEvent pce) {
-           doUpdateLater();
+            doUpdateLater();
         }
     }
 
@@ -224,7 +225,7 @@ public class ConceptView extends JPanel {
                         DragPanelConceptAttributes cac = getConAttrComponent(
                                 (ConAttrAnalogBI) cav, cpe);
                         seperatorComponents.add(cac);
-                        
+
                         cpe.addToggleComponent(cac);
                         cpe.setAlertCount(0);
                         if (cav == null || cav.getCurrentRefexes(coordinate) == null) {
@@ -681,7 +682,6 @@ public class ConceptView extends JPanel {
     private I_DispatchDragStatus dropPanelMgr = new DropPanelActionManager();
     private Collection<Action> actionList =
             Collections.synchronizedCollection(new ArrayList<Action>());
-    private KnowledgeBase kbase;
     private I_GetConceptData concept;
 
     public enum PanelSection {
@@ -713,6 +713,7 @@ public class ConceptView extends JPanel {
             new ConcurrentHashMap<PositionBI, Collection<ComponentVersionDragPanel<?>>>();
     private Map<Integer, JCheckBox> rowToPathCheckMap = new ConcurrentHashMap<Integer, JCheckBox>();
     private List<JComponent> seperatorComponents = new ArrayList<JComponent>();
+    private Set<File> kbFiles = new HashSet<File>();
 
     public ConceptView(I_ConfigAceFrame config,
             ConceptViewSettings settings, ConceptViewRenderer cvRenderer) {
@@ -720,6 +721,8 @@ public class ConceptView extends JPanel {
         this.config = config;
         this.settings = settings;
         this.cvRenderer = cvRenderer;
+        kbFiles.add(new File("drools-rules/ContextualDropActions.drl"));
+
         kb = new EditPanelKb(config);
         addCommitListener(settings);
         settings.getConfig().addPropertyChangeListener("commit", pcal);
@@ -1027,15 +1030,8 @@ public class ConceptView extends JPanel {
     }
 
     private void getKbActions(Object thingToDrop) {
-        if (kbase == null) {
-            try {
-                kbase = EditPanelKb.setupKb(
-                        new File("drools-rules/ContextualDropActions.drl"));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
         try {
+
             actionList.clear();
             if (I_GetConceptData.class.isAssignableFrom(thingToDrop.getClass())) {
                 I_GetConceptData conceptToDrop = (I_GetConceptData) thingToDrop;
@@ -1045,31 +1041,31 @@ public class ConceptView extends JPanel {
 
             if (ComponentVersionBI.class.isAssignableFrom(thingToDrop.getClass())
                     || SpecBI.class.isAssignableFrom(thingToDrop.getClass())) {
-                StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
-                boolean uselogger = false;
 
-                KnowledgeRuntimeLogger logger = null;
-                if (uselogger) {
-                    logger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+                Map<String, Object> globals = new HashMap<String, Object>();
+                globals.put("actions", actionList);
+                globals.put("vc", config.getViewCoordinate());
+
+                Collection<Object> facts = new ArrayList<Object>();
+                facts.add(FactFactory.get(
+                        Context.DROP_OBJECT, thingToDrop));
+                facts.add(FactFactory.get(Context.DROP_TARGET,
+                        Ts.get().getConceptVersion(
+                        config.getViewCoordinate(), concept.getNid())));
+                
+                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                    AceLog.getAppLog().fine("dropTarget: " + concept);
+                    AceLog.getAppLog().fine("thingToDrop: " + thingToDrop);
                 }
-                try {
-                    ksession.setGlobal("actions", actionList);
-                    ksession.setGlobal("vc", config.getViewCoordinate());
-                    if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                        AceLog.getAppLog().fine("dropTarget: " + concept);
-                        AceLog.getAppLog().fine("thingToDrop: " + thingToDrop);
-                    }
-                    ksession.insert(FactFactory.get(
-                            Context.DROP_OBJECT, thingToDrop));
-                    ksession.insert(FactFactory.get(Context.DROP_TARGET,
-                            Ts.get().getConceptVersion(
-                            config.getViewCoordinate(), concept.getNid())));
-                    ksession.fireAllRules();
-                } finally {
-                    if (logger != null) {
-                        logger.close();
-                    }
-                }
+
+
+                DroolsExecutionManager.fireAllRules(
+                        ConceptView.class.getCanonicalName(),
+                        kbFiles,
+                        globals,
+                        facts,
+                        false);
+
             }
         } catch (Throwable e) {
             AceLog.getAppLog().alertAndLogException(e);

@@ -1,0 +1,230 @@
+/*
+ * Copyright 2011 International Health Terminology Standards Development Organisation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.intsdo.tk.drools.manager;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import org.drools.KnowledgeBase;
+import org.drools.KnowledgeBaseConfiguration;
+import org.drools.KnowledgeBaseFactory;
+import org.drools.builder.KnowledgeBuilder;
+import org.drools.builder.KnowledgeBuilderConfiguration;
+import org.drools.builder.KnowledgeBuilderFactory;
+import org.drools.builder.ResourceType;
+import org.drools.builder.conf.EvaluatorOption;
+import org.drools.conf.ConsequenceExceptionHandlerOption;
+import org.drools.definition.KnowledgePackage;
+import org.drools.io.Resource;
+import org.drools.io.ResourceFactory;
+import org.drools.logger.KnowledgeRuntimeLogger;
+import org.drools.logger.KnowledgeRuntimeLoggerFactory;
+import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.runtime.rule.ConsequenceExceptionHandler;
+import org.ihtsdo.tk.drools.IsKindOfEvaluatorDefinition;
+import org.ihtsdo.tk.drools.IsMemberOfEvaluatorDefinition;
+import org.ihtsdo.tk.drools.IsMissingDescForDialectEvaluatorDefinition;
+import org.ihtsdo.tk.drools.IsParentMemberOfEvaluatorDefinition;
+import org.ihtsdo.tk.drools.SatisfiesConstraintEvaluatorDefinition;
+
+/**
+ *
+ * @author kec
+ */
+public class DroolsExecutionManager {
+
+    private KnowledgeBase kbase;
+    private final Set<File> kbFiles;
+    private final File drlPkgFile;
+    private final KnowledgeBaseConfiguration kBaseConfig;
+
+    public static enum ExtraEvaluators {
+
+        IS_KIND_OF, SAFISFIES_CONSTRAINT,
+        IS_MEMBER_OF, IS_PARENT_MEMBER_OF, IS_MISSING_DESC_FOR;
+    }
+    private boolean failed = false;
+    Collection<KnowledgePackage> kpkgs = null;
+
+    public DroolsExecutionManager(Set<File> kbFiles, String kbKey) throws IOException {
+        this(EnumSet.allOf(ExtraEvaluators.class),
+                kbFiles, kbKey);
+    }
+
+    public DroolsExecutionManager(EnumSet<ExtraEvaluators> extraEvaluators,
+            Set<File> kbFiles, String kbKey) throws IOException {
+
+        boolean buildKb = false;
+        File ruleDirectory = new File("rules");
+        ruleDirectory.mkdirs();
+        this.kbFiles = kbFiles;
+        drlPkgFile = new File(ruleDirectory, kbKey + ".kpkgs");
+        for (File f : this.kbFiles) {
+            if (!drlPkgFile.exists() || drlPkgFile.lastModified() < f.lastModified()) {
+                buildKb = true;
+                break;
+            }
+        }
+
+        if (buildKb) {
+            loadKnowledgePackages(kbFiles, extraEvaluators, drlPkgFile);
+        } else {
+            ObjectInputStream in = new ObjectInputStream(new FileInputStream(drlPkgFile));
+            try {
+                kpkgs = (Collection<KnowledgePackage>) in.readObject();
+            } catch (ClassNotFoundException e) {
+                throw new IOException(e);
+            } finally {
+                in.close();
+            }
+        }
+
+        kBaseConfig =
+                KnowledgeBaseFactory.newKnowledgeBaseConfiguration();
+
+        Class<? extends ConsequenceExceptionHandler> exHandlerClass =
+                DroolsExceptionHandler.class;
+
+        ConsequenceExceptionHandlerOption cehOption =
+                ConsequenceExceptionHandlerOption.get(exHandlerClass);
+
+        kBaseConfig.setOption(cehOption);
+        kbase = KnowledgeBaseFactory.newKnowledgeBase(kBaseConfig);
+        if (kpkgs != null) {
+            kbase.addKnowledgePackages(kpkgs);
+        }
+    }
+
+    public final void loadKnowledgePackages(Set<File> kbFiles, EnumSet<ExtraEvaluators> extraEvaluators, File drlPkgFile) throws RuntimeException, IOException {
+        HashMap<Resource, ResourceType> resources = new HashMap<Resource, ResourceType>();
+        for (File f : kbFiles) {
+            resources.put(ResourceFactory.newFileResource(f), ResourceType.DRL);
+        }
+        KnowledgeBuilderConfiguration builderConfig =
+                KnowledgeBuilderFactory.newKnowledgeBuilderConfiguration();
+
+        if (extraEvaluators.contains(ExtraEvaluators.IS_KIND_OF)) {
+            builderConfig.setOption(EvaluatorOption.get(
+                    IsKindOfEvaluatorDefinition.IS_KIND_OF.getOperatorString(),
+                    new IsKindOfEvaluatorDefinition()));
+        }
+        if (extraEvaluators.contains(ExtraEvaluators.SAFISFIES_CONSTRAINT)) {
+            builderConfig.setOption(EvaluatorOption.get(
+                    SatisfiesConstraintEvaluatorDefinition.SATISFIES_CONSTRAINT.getOperatorString(),
+                    new SatisfiesConstraintEvaluatorDefinition()));
+        }
+        if (extraEvaluators.contains(ExtraEvaluators.IS_MEMBER_OF)) {
+            builderConfig.setOption(EvaluatorOption.get(
+                    IsMemberOfEvaluatorDefinition.IS_MEMBER_OF.getOperatorString(),
+                    new IsMemberOfEvaluatorDefinition()));
+        }
+        if (extraEvaluators.contains(ExtraEvaluators.IS_PARENT_MEMBER_OF)) {
+            builderConfig.setOption(EvaluatorOption.get(
+                    IsParentMemberOfEvaluatorDefinition.IS_PARENT_MEMBER_OF.getOperatorString(),
+                    new IsParentMemberOfEvaluatorDefinition()));
+        }
+        if (extraEvaluators.contains(ExtraEvaluators.IS_MISSING_DESC_FOR)) {
+            builderConfig.setOption(EvaluatorOption.get(
+                    IsMissingDescForDialectEvaluatorDefinition.IS_MISSING_DESC_FOR.getOperatorString(),
+                    new IsMissingDescForDialectEvaluatorDefinition()));
+        }
+
+
+        kbase = KnowledgeBaseFactory.newKnowledgeBase(kBaseConfig);
+        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder(kbase, builderConfig);
+        for (Resource resource : resources.keySet()) {
+            kbuilder.add(resource, resources.get(resource));
+        }
+        if (kbuilder.hasErrors()) {
+            throw new RuntimeException(kbuilder.getErrors().toString());
+        }
+
+        kpkgs = kbuilder.getKnowledgePackages();
+        ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(drlPkgFile));
+        out.writeObject(kpkgs);
+        out.close();
+    }
+    private static ConcurrentHashMap<String, DroolsExecutionManager> managerMap =
+            new ConcurrentHashMap<String, DroolsExecutionManager>();
+
+    public static void setup(String kbKey, Set<File> kbFiles) throws IOException {
+        if (!managerMap.containsKey(kbKey)) {
+            managerMap.put(kbKey, new DroolsExecutionManager(kbFiles, kbKey));
+        }
+
+    }
+
+    public static boolean fireAllRules(String kbKey, Set<File> kbFiles,
+            Map<String, Object> globals, Collection<Object> facts, boolean useLogger)
+            throws IOException, DroolsException {
+        KnowledgeRuntimeLogger logger = null;
+        DroolsExecutionManager mgr = managerMap.get(kbKey);
+        try {
+            if (mgr == null) {
+                mgr = new DroolsExecutionManager(kbFiles, kbKey);
+                managerMap.put(kbKey, mgr);
+            }
+            if (mgr.failed) {
+                return false;
+            }
+
+            StatefulKnowledgeSession ksession = mgr.kbase.newStatefulKnowledgeSession();
+            if (useLogger) {
+                logger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+            }
+            for (Map.Entry<String, Object> e : globals.entrySet()) {
+                ksession.setGlobal(e.getKey(), e.getValue());
+            }
+            for (Object fact : facts) {
+                ksession.insert(fact);
+            }
+            ksession.fireAllRules();
+        } catch (Throwable ex) {
+            if (mgr != null) {
+                mgr.failed = true;
+            }
+            if (ex instanceof IOException) {
+                IOException ioe = (IOException) ex;
+                throw ioe;
+            }
+            if (ex instanceof DroolsException) {
+                DroolsException de = (DroolsException) ex;
+                throw de;
+            }
+            throw new IOException(ex);
+        } finally {
+            if (logger != null) {
+                logger.close();
+            }
+        }
+        return true;
+    }
+
+    public static void resetFailures() {
+        for (DroolsExecutionManager mgr : managerMap.values()) {
+            mgr.failed = false;
+        }
+    }
+}

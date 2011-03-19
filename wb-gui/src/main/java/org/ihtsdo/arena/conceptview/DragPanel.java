@@ -38,6 +38,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.TooManyListenersException;
 import java.util.logging.Level;
@@ -56,25 +59,22 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.TransferHandler;
 
-import org.drools.KnowledgeBase;
-import org.drools.logger.KnowledgeRuntimeLogger;
-import org.drools.logger.KnowledgeRuntimeLoggerFactory;
-import org.drools.runtime.StatefulKnowledgeSession;
 import org.dwfa.ace.TermLabelMaker;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.arena.ScrollablePanel;
 import org.ihtsdo.arena.ScrollablePanel.ScrollDirection;
 import org.ihtsdo.arena.context.action.DropActionPanel;
-import org.ihtsdo.arena.drools.EditPanelKb;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 import org.ihtsdo.tk.drools.facts.Context;
 import org.ihtsdo.tk.drools.facts.FactFactory;
 import org.ihtsdo.tk.spec.SpecBI;
+import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 
 import sun.awt.dnd.SunDragSourceContextPeer;
 
@@ -401,7 +401,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
     @SuppressWarnings("unused")
     private Set<DataFlavor> supportedImportFlavors = null;
     protected boolean inGroup;
-    private static KnowledgeBase kbase;
+    private Set<File> kbFiles = new HashSet<File>();
 
     public boolean isInGroup() {
         return inGroup;
@@ -427,13 +427,12 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
     private void setup(ConceptViewSettings settings) {
         this.settings = settings;
         this.setMinimumSize(new Dimension(minSize, minSize));
-        if (kbase == null) {
-            try {
-                kbase = EditPanelKb.setupKb(
-                        new File("drools-rules/ContextualDropActions.drl"));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        this.kbFiles.add(new File("drools-rules/ContextualDropActions.drl"));
+
+        try {
+            DroolsExecutionManager.setup(DragPanel.class.getCanonicalName(), kbFiles);
+        } catch (IOException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
         }
     }
     private static final int minSize = 24;
@@ -521,32 +520,33 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
         settings.getView().setupDrop(thingToDrop);
         try {
             actionList.clear();
-            if (I_GetConceptData.class.isAssignableFrom(thingToDrop.getClass())) {
-                I_GetConceptData conceptToDrop = (I_GetConceptData) thingToDrop;
-                thingToDrop = Ts.get().getConceptVersion(settings.getConfig().getViewCoordinate(), conceptToDrop.getConceptNid());
-            } else if (ComponentVersionBI.class.isAssignableFrom(thingToDrop.getClass())
-                    || SpecBI.class.isAssignableFrom(thingToDrop.getClass())) {
-                StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
-                boolean uselogger = false;
 
-                KnowledgeRuntimeLogger logger = null;
-                if (uselogger) {
-                    logger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
-                }
-                try {
-                    ksession.setGlobal("actions", actionList);
-                    ksession.setGlobal("vc", this.settings.getHost().getConfig().getViewCoordinate());
+            if (settings.getConcept() != null) {
+                if (I_GetConceptData.class.isAssignableFrom(thingToDrop.getClass())) {
+                    I_GetConceptData conceptToDrop = (I_GetConceptData) thingToDrop;
+                    thingToDrop = Ts.get().getConceptVersion(settings.getConfig().getViewCoordinate(), conceptToDrop.getConceptNid());
+                } else if (ComponentVersionBI.class.isAssignableFrom(thingToDrop.getClass())
+                        || SpecBI.class.isAssignableFrom(thingToDrop.getClass())) {
+                    ViewCoordinate coordinate = settings.getConfig().getViewCoordinate();
+                    Map<String, Object> globals = new HashMap<String, Object>();
+                    globals.put("vc", coordinate);
+                    globals.put("actions", actionList);
                     if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                         AceLog.getAppLog().fine("dropTarget: " + thingToDrag);
                         AceLog.getAppLog().fine("thingToDrop: " + thingToDrop);
                     }
-                    ksession.insert(FactFactory.get(Context.DROP_OBJECT, thingToDrop));
-                    ksession.insert(FactFactory.get(Context.DROP_TARGET, thingToDrag));
-                    ksession.fireAllRules();
-                } finally {
-                    if (logger != null) {
-                        logger.close();
-                    }
+
+                    Collection<Object> facts = new ArrayList<Object>();
+                    facts.add(FactFactory.get(Context.DROP_OBJECT, thingToDrop));
+                    facts.add(FactFactory.get(Context.DROP_TARGET, thingToDrag));
+
+
+                    DroolsExecutionManager.fireAllRules(
+                            ConceptView.class.getCanonicalName(),
+                            kbFiles,
+                            globals,
+                            facts,
+                            false);
                 }
             }
         } catch (Throwable e) {
