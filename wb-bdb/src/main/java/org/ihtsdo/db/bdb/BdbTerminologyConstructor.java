@@ -11,6 +11,7 @@ import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.blueprint.ConceptCAB;
 import org.ihtsdo.tk.api.blueprint.DescCAB;
 
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
@@ -19,6 +20,7 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.blueprint.RelCAB;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
@@ -207,6 +209,16 @@ public class BdbTerminologyConstructor implements TerminologyConstructorBI {
 
     @Override
     public MediaChronicleBI constructIfNotCurrent(MediaCAB spec) throws IOException, InvalidCAB {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public ConceptChronicleBI construct(ConceptCAB spec) throws IOException, InvalidCAB {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public ConceptChronicleBI constructIfNotCurrent(ConceptCAB spec) throws IOException, InvalidCAB {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }
