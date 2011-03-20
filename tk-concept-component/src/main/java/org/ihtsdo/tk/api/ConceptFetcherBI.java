@@ -17,6 +17,8 @@
 package org.ihtsdo.tk.api;
 
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
  *
@@ -24,4 +26,5 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
  */
 public interface ConceptFetcherBI {
    ConceptChronicleBI fetch() throws Exception;
+   ConceptVersionBI fetch(ViewCoordinate vc) throws Exception;
 }

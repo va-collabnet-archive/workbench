@@ -17,6 +17,7 @@ import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConceptFromCursor {
 
@@ -72,6 +73,15 @@ public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConcep
             return fetchThree();
         default:
             break;
+        }
+        return null;
+    }
+    
+    @Override
+    public ConceptVersion fetch(ViewCoordinate vc) throws Exception {
+        Concept c = fetch();
+        if (c != null) {
+            return c.getVersion(vc);
         }
         return null;
     }

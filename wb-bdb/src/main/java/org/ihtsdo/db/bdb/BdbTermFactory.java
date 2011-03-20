@@ -166,6 +166,8 @@ import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetSearcher;
 
 import com.sleepycat.je.DatabaseException;
+import org.ihtsdo.concept.ConceptVersion;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_Search {
 
@@ -1932,6 +1934,15 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         @Override
         public Concept fetch() {
             return concept;
+        }
+
+        @Override
+        public ConceptVersion fetch(ViewCoordinate vc) throws Exception {
+            Concept c = fetch();
+            if (c != null) {
+                return c.getVersion(vc);
+            }
+            return null;
         }
     }
 
