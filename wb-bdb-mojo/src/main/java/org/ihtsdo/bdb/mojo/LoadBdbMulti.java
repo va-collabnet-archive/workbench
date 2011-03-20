@@ -60,7 +60,7 @@ import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.spec.PathSpec;
 
 /**
@@ -224,7 +224,7 @@ public class LoadBdbMulti extends AbstractMojo {
                             " with origin: " + spec.getOriginConcept().getDescription());
 
                     RefexAmendmentSpec newPathSpec =
-                            new RefexAmendmentSpec(TK_REFSET_TYPE.CID,
+                            new RefexAmendmentSpec(TkRefsetType.CID,
                             ReferenceConcepts.PATH.getNid(),
                             ReferenceConcepts.REFSET_PATHS.getNid());
                     newPathSpec.with(RefexProperty.CNID1, path.getNid());
@@ -232,7 +232,7 @@ public class LoadBdbMulti extends AbstractMojo {
                     newPathSpec.setMemberContentUuid();
 
                     RefexAmendmentSpec newOriginSpec =
-                            new RefexAmendmentSpec(TK_REFSET_TYPE.CID_INT,
+                            new RefexAmendmentSpec(TkRefsetType.CID_INT,
                             path.getNid(),
                             ReferenceConcepts.REFSET_PATH_ORIGINS.getNid());
                     newOriginSpec.with(RefexProperty.CNID1, origin.getNid());
@@ -372,7 +372,7 @@ public class LoadBdbMulti extends AbstractMojo {
                         String word = parts[wordIndex];
                         String variant = parts[variantIndex];
 
-                        RefexAmendmentSpec textRefexSpec = new RefexAmendmentSpec(TK_REFSET_TYPE.STR,
+                        RefexAmendmentSpec textRefexSpec = new RefexAmendmentSpec(TkRefsetType.STR,
                                 enTextWithVariantsRefexColl.getNid(), enTextWithVariantsRefexColl.getNid());
                         textRefexSpec.with(RefexProperty.STRING1, word);
                         textRefexSpec.with(RefexProperty.STATUS_NID, ReferenceConcepts.CURRENT.getNid());
@@ -380,7 +380,7 @@ public class LoadBdbMulti extends AbstractMojo {
 
                         RefexChronicleBI<?> textRefex = amender.amendIfNotCurrent(textRefexSpec);
 
-                        RefexAmendmentSpec variantRefexSpec = new RefexAmendmentSpec(TK_REFSET_TYPE.STR,
+                        RefexAmendmentSpec variantRefexSpec = new RefexAmendmentSpec(TkRefsetType.STR,
                                 textRefex.getNid(), dialectVariantsRefexColl.getNid());
 
                         variantRefexSpec.with(RefexProperty.STRING1, variant);

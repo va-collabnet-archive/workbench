@@ -18,7 +18,7 @@ import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_int.RefexIntAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -193,8 +193,8 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
 	}
 	
     
-	protected TK_REFSET_TYPE getTkRefsetType() {
-		return TK_REFSET_TYPE.INT;
+	protected TkRefsetType getTkRefsetType() {
+		return TkRefsetType.INT;
 	}
 
 	protected void addSpecProperties(RefexAmendmentSpec rcs) {

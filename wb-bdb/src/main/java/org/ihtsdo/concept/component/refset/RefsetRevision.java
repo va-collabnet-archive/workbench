@@ -9,7 +9,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
 import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import java.io.IOException;
@@ -128,7 +128,7 @@ public abstract class RefsetRevision
     	return rcs;
     }
 
-	protected abstract TK_REFSET_TYPE getTkRefsetType();
+	protected abstract TkRefsetType getTkRefsetType();
 
 	protected abstract void addSpecProperties(RefexAmendmentSpec rcs);
 

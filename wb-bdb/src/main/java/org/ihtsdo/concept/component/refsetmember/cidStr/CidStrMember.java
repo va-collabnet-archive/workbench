@@ -23,7 +23,7 @@ import org.ihtsdo.etypes.ERefsetCidStrRevision;
 import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
 import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
 import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrRevision;
 
@@ -342,8 +342,8 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember> imp
         return c1Nid;
     }
 
-    protected TK_REFSET_TYPE getTkRefsetType() {
-        return TK_REFSET_TYPE.CID_STR;
+    protected TkRefsetType getTkRefsetType() {
+        return TkRefsetType.CID_STR;
     }
 
     protected void addSpecProperties(RefexAmendmentSpec rcs) {

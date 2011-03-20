@@ -24,7 +24,7 @@ import org.ihtsdo.etypes.ERefsetCidIntRevision;
 import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
 import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
 import org.ihtsdo.tk.api.refex.type_cnid_int.RefexCnidIntAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.dto.concept.component.refset.cidint.TkRefsetCidIntMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidint.TkRefsetCidIntRevision;
 
@@ -348,8 +348,8 @@ public class CidIntMember extends RefsetMember<CidIntRevision, CidIntMember>
         return (List<Version>) versions;
     }
 
-    protected TK_REFSET_TYPE getTkRefsetType() {
-        return TK_REFSET_TYPE.CID_INT;
+    protected TkRefsetType getTkRefsetType() {
+        return TkRefsetType.CID_INT;
     }
 
     @Override

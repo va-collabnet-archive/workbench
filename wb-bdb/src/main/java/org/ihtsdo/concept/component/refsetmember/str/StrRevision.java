@@ -18,7 +18,7 @@ import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -196,8 +196,8 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
 	public String getStr1() {
 		return stringValue;
 	}
-	protected TK_REFSET_TYPE getTkRefsetType() {
-		return TK_REFSET_TYPE.STR;
+	protected TkRefsetType getTkRefsetType() {
+		return TkRefsetType.STR;
 	}
 
 	protected void addSpecProperties(RefexAmendmentSpec rcs) {

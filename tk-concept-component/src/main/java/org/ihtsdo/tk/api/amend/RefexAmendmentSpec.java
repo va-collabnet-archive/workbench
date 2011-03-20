@@ -44,7 +44,7 @@ import org.ihtsdo.tk.api.refex.type_long.RefexLongAnalogBI;
 import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrAnalogBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.example.binding.TermAux;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
@@ -52,11 +52,11 @@ import org.ihtsdo.tk.uuid.UuidT5Generator;
  *
  * @author kec
  */
-public final class RefexAmendmentSpec {
+public final class RefexAmendmentSpec extends AmendmentSpec {
 
     public static final UUID refexSpecNamespace =
             UUID.fromString("c44bc030-1166-11e0-ac64-0800200c9a66");
-    private TK_REFSET_TYPE memberType;
+    private TkRefsetType memberType;
 
     public UUID computeMemberReferencedComponentUuid() throws IOException, InvalidAmendmentSpec {
         try {
@@ -146,7 +146,7 @@ public final class RefexAmendmentSpec {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    public RefexAmendmentSpec(TK_REFSET_TYPE memberType,
+    public RefexAmendmentSpec(TkRefsetType memberType,
             int rcNid, int collectionNid) throws IOException, InvalidAmendmentSpec {
         this(memberType, rcNid, collectionNid, null);
 
@@ -154,7 +154,7 @@ public final class RefexAmendmentSpec {
                 computeMemberReferencedComponentUuid());
     }
 
-    public RefexAmendmentSpec(TK_REFSET_TYPE memberType,
+    public RefexAmendmentSpec(TkRefsetType memberType,
             int rcNid, int collectionNid,
             UUID memberUuid) throws IOException {
         this.memberType = memberType;
@@ -355,7 +355,7 @@ public final class RefexAmendmentSpec {
 
     public boolean validate(RefexVersionBI<?> version) {
         if (memberType != null) {
-            if (TK_REFSET_TYPE.classToType(version.getClass()) != memberType) {
+            if (TkRefsetType.classToType(version.getClass()) != memberType) {
                 return false;
             }
         }
@@ -486,11 +486,11 @@ public final class RefexAmendmentSpec {
         return (UUID) properties.get(RefexProperty.MEMBER_UUID);
     }
 
-    public TK_REFSET_TYPE getMemberType() {
+    public TkRefsetType getMemberType() {
         return memberType;
     }
 
-    public void setMemberType(TK_REFSET_TYPE memberType) {
+    public void setMemberType(TkRefsetType memberType) {
         this.memberType = memberType;
     }
 

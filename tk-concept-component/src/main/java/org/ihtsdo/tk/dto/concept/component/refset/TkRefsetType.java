@@ -3,7 +3,6 @@ package org.ihtsdo.tk.dto.concept.component.refset;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
@@ -18,7 +17,7 @@ import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
 import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 
-public enum TK_REFSET_TYPE {
+public enum TkRefsetType {
 
     /**
      * CID = Component IDentifier
@@ -43,7 +42,7 @@ public enum TK_REFSET_TYPE {
     private int externalizedToken;
     private Class<? extends RefexVersionBI> rxc;
 
-    TK_REFSET_TYPE(int externalizedToken, Class<? extends RefexVersionBI> rxc) {
+    TkRefsetType(int externalizedToken, Class<? extends RefexVersionBI> rxc) {
         this.externalizedToken = externalizedToken;
         this.rxc = rxc;
     }
@@ -56,7 +55,7 @@ public enum TK_REFSET_TYPE {
         output.writeByte(externalizedToken);
     }
 
-    public static TK_REFSET_TYPE classToType(Class<?> c) {
+    public static TkRefsetType classToType(Class<?> c) {
         if (RefexCnidCnidCnidVersionBI.class.isAssignableFrom(c)) {
             return CID_CID_CID;
         }
@@ -99,7 +98,7 @@ public enum TK_REFSET_TYPE {
         return UNKNOWN;
     }
 
-    public static TK_REFSET_TYPE readType(DataInput input) throws IOException {
+    public static TkRefsetType readType(DataInput input) throws IOException {
         int type = input.readByte();
         switch (type) {
             case 1:

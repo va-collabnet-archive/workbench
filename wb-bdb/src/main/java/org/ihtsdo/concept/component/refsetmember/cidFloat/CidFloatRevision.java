@@ -19,7 +19,7 @@ import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid_float.RefexCnidFloatAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.dto.concept.component.refset.cidflt.TkRefsetCidFloatRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -225,8 +225,8 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
 	public float getFloat1() {
 		return this.floatValue;
 	}
-	protected TK_REFSET_TYPE getTkRefsetType() {
-		return TK_REFSET_TYPE.CID_FLOAT;
+	protected TkRefsetType getTkRefsetType() {
+		return TkRefsetType.CID_FLOAT;
 	}
 
 	protected void addSpecProperties(RefexAmendmentSpec rcs) {

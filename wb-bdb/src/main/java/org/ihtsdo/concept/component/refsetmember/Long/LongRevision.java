@@ -19,7 +19,7 @@ import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_long.RefexLongAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -183,8 +183,8 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
     }
 
     @Override
-    protected TK_REFSET_TYPE getTkRefsetType() {
-        return TK_REFSET_TYPE.LONG;
+    protected TkRefsetType getTkRefsetType() {
+        return TkRefsetType.LONG;
     }
 
     @Override

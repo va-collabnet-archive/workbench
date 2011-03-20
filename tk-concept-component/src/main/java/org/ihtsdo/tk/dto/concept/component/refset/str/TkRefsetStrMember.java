@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 public class TkRefsetStrMember extends TkRefsetAbstractMember<TkRefsetStrRevision> {
@@ -55,8 +55,8 @@ public class TkRefsetStrMember extends TkRefsetAbstractMember<TkRefsetStrRevisio
     }
 
     @Override
-    public TK_REFSET_TYPE getType() {
-        return TK_REFSET_TYPE.STR;
+    public TkRefsetType getType() {
+        return TkRefsetType.STR;
     }
 
     public List<TkRefsetStrRevision> getRevisionList() {

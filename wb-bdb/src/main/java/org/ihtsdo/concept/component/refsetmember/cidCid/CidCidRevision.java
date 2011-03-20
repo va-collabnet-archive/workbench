@@ -21,7 +21,7 @@ import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.dto.concept.component.refset.cidcid.TkRefsetCidCidRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -251,8 +251,8 @@ public class CidCidRevision extends RefsetRevision<CidCidRevision, CidCidMember>
 	public int getCnid2() {
 		return c2Nid;
 	}
-	protected TK_REFSET_TYPE getTkRefsetType() {
-		return TK_REFSET_TYPE.CID_CID;
+	protected TkRefsetType getTkRefsetType() {
+		return TkRefsetType.CID_CID;
 	}
 
 	protected void addSpecProperties(RefexAmendmentSpec rcs) {

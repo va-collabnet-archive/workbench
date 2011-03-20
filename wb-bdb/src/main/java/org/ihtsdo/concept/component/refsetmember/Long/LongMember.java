@@ -22,7 +22,7 @@ import org.ihtsdo.etypes.ERefsetLongRevision;
 import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
 import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
 import org.ihtsdo.tk.api.refex.type_long.RefexLongAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongMember;
 import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongRevision;
 
@@ -271,8 +271,8 @@ public class LongMember extends RefsetMember<LongRevision, LongMember>
         return HashFunction.hashCode(new int[]{new Long(getLongValue()).hashCode()});
     }
 
-    protected TK_REFSET_TYPE getTkRefsetType() {
-        return TK_REFSET_TYPE.LONG;
+    protected TkRefsetType getTkRefsetType() {
+        return TkRefsetType.LONG;
     }
 
     protected void addSpecProperties(RefexAmendmentSpec rcs) {

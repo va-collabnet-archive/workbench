@@ -22,7 +22,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
 import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanMember;
 import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanRevision;
 
@@ -300,8 +300,8 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
     }
 
     @Override
-    protected TK_REFSET_TYPE getTkRefsetType() {
-        return TK_REFSET_TYPE.BOOLEAN;
+    protected TkRefsetType getTkRefsetType() {
+        return TkRefsetType.BOOLEAN;
     }
 
     @Override

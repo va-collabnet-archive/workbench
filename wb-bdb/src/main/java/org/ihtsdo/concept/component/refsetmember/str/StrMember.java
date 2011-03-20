@@ -22,7 +22,7 @@ import org.ihtsdo.etypes.ERefsetStrRevision;
 import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
 import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrRevision;
 
@@ -270,8 +270,8 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
         return stringValue;
     }
 
-    protected TK_REFSET_TYPE getTkRefsetType() {
-        return TK_REFSET_TYPE.STR;
+    protected TkRefsetType getTkRefsetType() {
+        return TkRefsetType.STR;
     }
 
     protected void addSpecProperties(RefexAmendmentSpec rcs) {
