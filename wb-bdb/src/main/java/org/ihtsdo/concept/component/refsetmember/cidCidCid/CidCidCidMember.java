@@ -18,8 +18,8 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetCidCidCidMember;
 import org.ihtsdo.etypes.ERefsetCidCidCidRevision;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
+import org.ihtsdo.tk.api.blueprint.RefexCUB;
+import org.ihtsdo.tk.api.blueprint.RefexCUB.RefexProperty;
 import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.dto.concept.component.refset.cidcidcid.TkRefsetCidCidCidMember;
@@ -362,7 +362,7 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
         return TkRefsetType.CID_CID_CID;
     }
 
-    protected void addSpecProperties(RefexAmendmentSpec rcs) {
+    protected void addSpecProperties(RefexCUB rcs) {
         rcs.with(RefexProperty.CNID1, getCnid1());
         rcs.with(RefexProperty.CNID2, getCnid2());
         rcs.with(RefexProperty.CNID3, getCnid3());

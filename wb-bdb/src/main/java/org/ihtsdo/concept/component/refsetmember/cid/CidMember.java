@@ -22,8 +22,8 @@ import org.ihtsdo.etypes.ERefsetCidRevision;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
+import org.ihtsdo.tk.api.blueprint.RefexCUB;
+import org.ihtsdo.tk.api.blueprint.RefexCUB.RefexProperty;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
@@ -315,7 +315,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
     }
 
     @Override
-    protected void addSpecProperties(RefexAmendmentSpec rcs) {
+    protected void addSpecProperties(RefexCUB rcs) {
         rcs.with(RefexProperty.CNID1, getCnid1());
     }
 }

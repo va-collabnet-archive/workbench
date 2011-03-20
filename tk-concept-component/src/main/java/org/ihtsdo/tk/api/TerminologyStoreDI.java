@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.ihtsdo.tk.api.amend.TerminologyAmendmentBI;
+import org.ihtsdo.tk.api.blueprint.TerminologyAmendmentBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;

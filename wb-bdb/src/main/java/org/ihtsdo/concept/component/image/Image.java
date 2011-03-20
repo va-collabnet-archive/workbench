@@ -232,7 +232,7 @@ public class Image
 
     public Image(TkMedia eMedia, Concept enclosingConcept) throws IOException {
         super(eMedia, enclosingConcept.getNid());
-        image = eMedia.getImage();
+        image = eMedia.getDataBytes();
         format = eMedia.getFormat();
         textDescription = eMedia.getTextDescription();
         typeNid = Bdb.uuidToNid(eMedia.getTypeUuid());

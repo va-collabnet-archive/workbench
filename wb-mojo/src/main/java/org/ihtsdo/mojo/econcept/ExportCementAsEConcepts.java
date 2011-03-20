@@ -259,7 +259,7 @@ public class ExportCementAsEConcepts extends AbstractMojo {
 				media.conceptUuid = eC.conceptAttributes.primordialUuid;
 				media.textDescription = textDescription;
 				media.format = format;
-				media.image = image;
+				media.dataBytes = image;
 				media.typeUuid = typeUuid;
 				media.statusUuid = eC.conceptAttributes.statusUuid;
 				media.authorUuid = eC.conceptAttributes.authorUuid;

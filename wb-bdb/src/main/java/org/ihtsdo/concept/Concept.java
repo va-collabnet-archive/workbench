@@ -1772,13 +1772,15 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
    }
 
    @Override
-   public ConceptVersionBI getVersion(ViewCoordinate c) throws ContraditionException {
-      throw new UnsupportedOperationException("Not supported yet.");
+   public ConceptVersion getVersion(ViewCoordinate c) {
+      return new ConceptVersion(this, c);
    }
 
    @Override
-   public Collection<? extends ConceptVersionBI> getVersions(ViewCoordinate c) {
-      throw new UnsupportedOperationException("Not supported yet.");
+   public Collection<ConceptVersion> getVersions(ViewCoordinate c) {
+        ArrayList<ConceptVersion> cvList = new ArrayList<ConceptVersion>(1);
+        cvList.add(new ConceptVersion(this, c));
+        return cvList;
    }
 
    @Override

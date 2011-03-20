@@ -13,8 +13,8 @@ import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.concept.component.refsetmember.Boolean.BooleanMember.Version;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
+import org.ihtsdo.tk.api.blueprint.RefexCUB;
+import org.ihtsdo.tk.api.blueprint.RefexCUB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanAnalogBI;
@@ -196,7 +196,7 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
 		return TkRefsetType.BOOLEAN;
 	}
 
-	protected void addSpecProperties(RefexAmendmentSpec rcs) {
+	protected void addSpecProperties(RefexCUB rcs) {
 		rcs.with(RefexProperty.BOOLEAN1, getBoolean1());
 	}
 

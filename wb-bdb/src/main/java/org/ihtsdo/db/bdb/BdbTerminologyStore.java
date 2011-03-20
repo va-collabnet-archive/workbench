@@ -48,7 +48,7 @@ import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
-import org.ihtsdo.tk.api.amend.TerminologyAmendmentBI;
+import org.ihtsdo.tk.api.blueprint.TerminologyAmendmentBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;

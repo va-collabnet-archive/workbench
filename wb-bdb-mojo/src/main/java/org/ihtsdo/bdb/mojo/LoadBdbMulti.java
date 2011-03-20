@@ -52,9 +52,9 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
-import org.ihtsdo.tk.api.amend.TerminologyAmendmentBI;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
+import org.ihtsdo.tk.api.blueprint.RefexCUB;
+import org.ihtsdo.tk.api.blueprint.TerminologyAmendmentBI;
+import org.ihtsdo.tk.api.blueprint.RefexCUB.RefexProperty;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
@@ -223,16 +223,16 @@ public class LoadBdbMulti extends AbstractMojo {
                     getLog().info("Adding path: " + spec.getPathConcept().getDescription() +
                             " with origin: " + spec.getOriginConcept().getDescription());
 
-                    RefexAmendmentSpec newPathSpec =
-                            new RefexAmendmentSpec(TkRefsetType.CID,
+                    RefexCUB newPathSpec =
+                            new RefexCUB(TkRefsetType.CID,
                             ReferenceConcepts.PATH.getNid(),
                             ReferenceConcepts.REFSET_PATHS.getNid());
                     newPathSpec.with(RefexProperty.CNID1, path.getNid());
                     newPathSpec.with(RefexProperty.STATUS_NID, ReferenceConcepts.CURRENT.getNid());
                     newPathSpec.setMemberContentUuid();
 
-                    RefexAmendmentSpec newOriginSpec =
-                            new RefexAmendmentSpec(TkRefsetType.CID_INT,
+                    RefexCUB newOriginSpec =
+                            new RefexCUB(TkRefsetType.CID_INT,
                             path.getNid(),
                             ReferenceConcepts.REFSET_PATH_ORIGINS.getNid());
                     newOriginSpec.with(RefexProperty.CNID1, origin.getNid());
@@ -372,7 +372,7 @@ public class LoadBdbMulti extends AbstractMojo {
                         String word = parts[wordIndex];
                         String variant = parts[variantIndex];
 
-                        RefexAmendmentSpec textRefexSpec = new RefexAmendmentSpec(TkRefsetType.STR,
+                        RefexCUB textRefexSpec = new RefexCUB(TkRefsetType.STR,
                                 enTextWithVariantsRefexColl.getNid(), enTextWithVariantsRefexColl.getNid());
                         textRefexSpec.with(RefexProperty.STRING1, word);
                         textRefexSpec.with(RefexProperty.STATUS_NID, ReferenceConcepts.CURRENT.getNid());
@@ -380,7 +380,7 @@ public class LoadBdbMulti extends AbstractMojo {
 
                         RefexChronicleBI<?> textRefex = amender.amendIfNotCurrent(textRefexSpec);
 
-                        RefexAmendmentSpec variantRefexSpec = new RefexAmendmentSpec(TkRefsetType.STR,
+                        RefexCUB variantRefexSpec = new RefexCUB(TkRefsetType.STR,
                                 textRefex.getNid(), dialectVariantsRefexColl.getNid());
 
                         variantRefexSpec.with(RefexProperty.STRING1, variant);

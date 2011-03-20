@@ -139,7 +139,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                             eImages.add(eImg);
                             eImg.setConceptUuid(Bdb.getPrimUuidForConcept(v.getConceptNid()));
                             eImg.setFormat(v.getFormat());
-                            eImg.setImage(v.getImage());
+                            eImg.setDataBytes(v.getImage());
                             eImg.setTextDescription(v.getTextDescription());
                             eImg.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
                             setupFirstVersion(eImg, v);

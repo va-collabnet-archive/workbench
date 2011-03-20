@@ -25,7 +25,7 @@ public class EImage extends TkMedia {
         I_ImagePart part = imageVer.getMutableParts().get(0);
         conceptUuid = Terms.get().nidToUuid(imageVer.getConceptNid());
         format = imageVer.getFormat();
-        image = imageVer.getImage();
+        dataBytes = imageVer.getImage();
         textDescription = part.getTextDescription();
         typeUuid = Terms.get().nidToUuid(part.getTypeId());
         pathUuid = Terms.get().nidToUuid(part.getPathId());

@@ -11,14 +11,18 @@ import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.blueprint.DescCUB;
 
-import org.ihtsdo.tk.api.amend.InvalidAmendmentSpec;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
-import org.ihtsdo.tk.api.amend.RelAmendmentSpec;
-import org.ihtsdo.tk.api.amend.TerminologyAmendmentBI;
+import org.ihtsdo.tk.api.blueprint.InvalidCUB;
+import org.ihtsdo.tk.api.blueprint.MediaCUB;
+import org.ihtsdo.tk.api.blueprint.RefexCUB;
+import org.ihtsdo.tk.api.blueprint.RefexCUB.RefexProperty;
+import org.ihtsdo.tk.api.blueprint.RelCUB;
+import org.ihtsdo.tk.api.blueprint.TerminologyAmendmentBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
+import org.ihtsdo.tk.api.media.MediaChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
@@ -36,8 +40,8 @@ public class BdbAmender implements TerminologyAmendmentBI {
     }
 
     @Override
-    public RefexChronicleBI<?> amend(RefexAmendmentSpec res)
-            throws IOException, InvalidAmendmentSpec {
+    public RefexChronicleBI<?> amend(RefexCUB res)
+            throws IOException, InvalidCUB {
         RefsetMember<?, ?> refex = getRefex(res);
         if (refex != null) {
             return updateRefex(refex, res);
@@ -46,7 +50,7 @@ public class BdbAmender implements TerminologyAmendmentBI {
     }
 
     private RefexChronicleBI<?> updateRefex(RefsetMember<?, ?> refex,
-            RefexAmendmentSpec res) throws InvalidAmendmentSpec {
+            RefexCUB res) throws InvalidCUB {
         for (int pathNid : ec.getEditPaths()) {
             RefsetRevision refexRevision =
                     refex.makeAnalog(res.getInt(RefexProperty.STATUS_NID),
@@ -54,15 +58,15 @@ public class BdbAmender implements TerminologyAmendmentBI {
             try {
                 res.setPropertiesExceptSap(refexRevision);
             } catch (PropertyVetoException ex) {
-                throw new InvalidAmendmentSpec("Refex: " + refex
+                throw new InvalidCUB("Refex: " + refex
                         + "\n\nRefexAmendmentSpec: " + res, ex);
             }
         }
         return refex;
     }
 
-    private RefsetMember<?, ?> getRefex(RefexAmendmentSpec res)
-            throws InvalidAmendmentSpec, IOException {
+    private RefsetMember<?, ?> getRefex(RefexCUB res)
+            throws InvalidCUB, IOException {
         if (Ts.get().hasUuid(res.getMemberUUID())) {
             ComponentChroncileBI<?> component =
                     Ts.get().getComponent(res.getMemberUUID());
@@ -73,7 +77,7 @@ public class BdbAmender implements TerminologyAmendmentBI {
                     == TkRefsetType.classToType(component.getClass())) {
                 return (RefsetMember<?, ?>) component;
             } else {
-                throw new InvalidAmendmentSpec(
+                throw new InvalidCUB(
                         "Component exists of different type: "
                         + component + "\n\nRefexAmendmentSpec: " + res);
             }
@@ -82,8 +86,8 @@ public class BdbAmender implements TerminologyAmendmentBI {
     }
 
     @Override
-    public RefexChronicleBI<?> amendIfNotCurrent(RefexAmendmentSpec res)
-            throws IOException, InvalidAmendmentSpec {
+    public RefexChronicleBI<?> amendIfNotCurrent(RefexCUB res)
+            throws IOException, InvalidCUB {
         RefsetMember<?, ?> refex = getRefex(res);
         if (refex != null) {
             boolean current = false;
@@ -102,13 +106,13 @@ public class BdbAmender implements TerminologyAmendmentBI {
         return createRefex(res);
     }
 
-    private RefexChronicleBI<?> createRefex(RefexAmendmentSpec res)
-            throws IOException, InvalidAmendmentSpec {
+    private RefexChronicleBI<?> createRefex(RefexCUB res)
+            throws IOException, InvalidCUB {
         return RefsetMemberFactory.create(res, ec);
     }
 
-    private RelationshipChronicleBI getRel(RelAmendmentSpec res)
-            throws InvalidAmendmentSpec, IOException {
+    private RelationshipChronicleBI getRel(RelCUB res)
+            throws InvalidCUB, IOException {
         if (Ts.get().hasUuid(res.getComponentUuid())) {
             ComponentChroncileBI<?> component =
                     Ts.get().getComponent(res.getComponentUuid());
@@ -118,7 +122,7 @@ public class BdbAmender implements TerminologyAmendmentBI {
             if (component instanceof RelationshipChronicleBI) {
                 return (RelationshipChronicleBI) component;
             } else {
-                throw new InvalidAmendmentSpec(
+                throw new InvalidCUB(
                         "Component exists of different type: "
                         + component + "\n\nRelAmendmentSpec: " + res);
             }
@@ -127,7 +131,7 @@ public class BdbAmender implements TerminologyAmendmentBI {
     }
 
     @Override
-    public RelationshipChronicleBI amend(RelAmendmentSpec spec) throws IOException, InvalidAmendmentSpec {
+    public RelationshipChronicleBI amend(RelCUB spec) throws IOException, InvalidCUB {
         RelationshipChronicleBI relc = getRel(spec);
         int statusNid = TermAux.CURRENT.getStrict(Ts.get().getMetadataVC()).getNid();
 
@@ -180,9 +184,29 @@ public class BdbAmender implements TerminologyAmendmentBI {
     }
 
     @Override
-    public RelationshipChronicleBI amendIfNotCurrent(RelAmendmentSpec spec) throws IOException, InvalidAmendmentSpec {
+    public RelationshipChronicleBI amendIfNotCurrent(RelCUB spec) throws IOException, InvalidCUB {
         RelationshipChronicleBI relc = getRel(spec);
 
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public DescriptionChronicleBI amend(DescCUB spec) throws IOException, InvalidCUB {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public DescriptionChronicleBI amendIfNotCurrent(DescCUB spec) throws IOException, InvalidCUB {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public MediaChronicleBI amend(MediaCUB spec) throws IOException, InvalidCUB {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public MediaChronicleBI amendIfNotCurrent(MediaCUB spec) throws IOException, InvalidCUB {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }

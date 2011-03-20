@@ -10,8 +10,8 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
+import org.ihtsdo.tk.api.blueprint.RefexCUB;
+import org.ihtsdo.tk.api.blueprint.RefexCUB.RefexProperty;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetMember;
 import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetRevision;
@@ -160,7 +160,7 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
         return TkRefsetType.MEMBER;
     }
 
-    protected void addSpecProperties(RefexAmendmentSpec rcs) {
+    protected void addSpecProperties(RefexCUB rcs) {
         // no fields to add...
     }
 }

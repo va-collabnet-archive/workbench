@@ -13,8 +13,8 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
+import org.ihtsdo.tk.api.blueprint.RefexCUB;
+import org.ihtsdo.tk.api.blueprint.RefexCUB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrAnalogBI;
@@ -200,7 +200,7 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
 		return TkRefsetType.STR;
 	}
 
-	protected void addSpecProperties(RefexAmendmentSpec rcs) {
+	protected void addSpecProperties(RefexCUB rcs) {
 		rcs.with(RefexProperty.STRING1, getStr1());
 	}
 

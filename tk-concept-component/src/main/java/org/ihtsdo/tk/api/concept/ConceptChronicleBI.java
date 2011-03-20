@@ -46,6 +46,8 @@ public interface ConceptChronicleBI extends
 
     void cancel() throws IOException;
     
+    ConceptVersionBI getVersion(ViewCoordinate vc);
+    
    /**
     * Returns a longer - more complete - string representation of the chronicle. 
     * Useful for diagnostic purposes.

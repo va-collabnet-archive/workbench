@@ -112,7 +112,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.getVersions(c);
     }
 
-    public ConceptVersionBI getVersion(ViewCoordinate c) throws ContraditionException {
+    public ConceptVersionBI getVersion(ViewCoordinate c) {
         return bean.getVersion(c);
     }
 

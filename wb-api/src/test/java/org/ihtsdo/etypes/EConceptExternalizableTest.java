@@ -156,7 +156,7 @@ public class EConceptExternalizableTest {
         EImage img = new EImage();
         img.conceptUuid = new UUID(120, 130);
         img.format = "jpg";
-        img.image = new byte[] {0, 2, 3, 4, 5, 6, 7, 8, 9 };
+        img.dataBytes = new byte[] {0, 2, 3, 4, 5, 6, 7, 8, 9 };
         img.textDescription = "interesting image";
         img.typeUuid = new UUID(121, 132);
         img.pathUuid = new UUID(450, 569);

@@ -21,8 +21,8 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetCidIntMember;
 import org.ihtsdo.etypes.ERefsetCidIntRevision;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
+import org.ihtsdo.tk.api.blueprint.RefexCUB;
+import org.ihtsdo.tk.api.blueprint.RefexCUB.RefexProperty;
 import org.ihtsdo.tk.api.refex.type_cnid_int.RefexCnidIntAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.dto.concept.component.refset.cidint.TkRefsetCidIntMember;
@@ -357,7 +357,7 @@ public class CidIntMember extends RefsetMember<CidIntRevision, CidIntMember>
         return HashFunction.hashCode(new int[]{getC1id(), getIntValue()});
     }
 
-    protected void addSpecProperties(RefexAmendmentSpec rcs) {
+    protected void addSpecProperties(RefexCUB rcs) {
         rcs.with(RefexProperty.CNID1, getCnid1());
         rcs.with(RefexProperty.INTEGER1, getInt1());
     }

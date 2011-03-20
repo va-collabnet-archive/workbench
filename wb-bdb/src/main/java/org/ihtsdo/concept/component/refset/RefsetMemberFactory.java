@@ -41,9 +41,9 @@ import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.amend.InvalidAmendmentSpec;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
+import org.ihtsdo.tk.api.blueprint.InvalidCUB;
+import org.ihtsdo.tk.api.blueprint.RefexCUB;
+import org.ihtsdo.tk.api.blueprint.RefexCUB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 
 public class RefsetMemberFactory {
@@ -128,9 +128,9 @@ public class RefsetMemberFactory {
         }
     }
 
-       public static RefsetMember<?, ?> createNoTx(RefexAmendmentSpec res,
+       public static RefsetMember<?, ?> createNoTx(RefexCUB res,
             EditCoordinate ec, long time)
-            throws IOException, InvalidAmendmentSpec {
+            throws IOException, InvalidCUB {
         RefsetMember<?, ?> member = createBlank(res);
         Concept refexColCon = (Concept) Ts.get().getConcept(res.getRefexColNid());
         int refexNid = Bdb.uuidToNid(res.getMemberUUID());
@@ -156,7 +156,7 @@ public class RefsetMemberFactory {
                 try {
                     res.setPropertiesExceptSap(member);
                 } catch (PropertyVetoException ex) {
-                    throw new InvalidAmendmentSpec("RefexAmendmentSpec: " + res, ex);
+                    throw new InvalidCUB("RefexAmendmentSpec: " + res, ex);
                 }
 
             } else {
@@ -176,9 +176,9 @@ public class RefsetMemberFactory {
         return member;
     }
 
-    public static RefsetMember<?, ?> create(RefexAmendmentSpec res,
+    public static RefsetMember<?, ?> create(RefexCUB res,
             EditCoordinate ec)
-            throws IOException, InvalidAmendmentSpec {
+            throws IOException, InvalidCUB {
         RefsetMember<?, ?> member = createBlank(res);
         Concept refexColCon = (Concept) Ts.get().getConcept(res.getRefexColNid());
         int refexNid = Bdb.uuidToNid(res.getMemberUUID());
@@ -204,7 +204,7 @@ public class RefsetMemberFactory {
                 try {
                     res.setPropertiesExceptSap(member);
                 } catch (PropertyVetoException ex) {
-                    throw new InvalidAmendmentSpec("RefexAmendmentSpec: " + res, ex);
+                    throw new InvalidCUB("RefexAmendmentSpec: " + res, ex);
                 }
 
             } else {
@@ -218,7 +218,7 @@ public class RefsetMemberFactory {
         return member;
     }
 
-    private static RefsetMember<?, ?> createBlank(RefexAmendmentSpec res) {
+    private static RefsetMember<?, ?> createBlank(RefexCUB res) {
         switch (res.getMemberType()) {
             case BOOLEAN:
                 return new BooleanMember();

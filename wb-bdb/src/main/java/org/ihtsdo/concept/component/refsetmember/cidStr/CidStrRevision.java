@@ -15,8 +15,8 @@ import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec;
-import org.ihtsdo.tk.api.amend.RefexAmendmentSpec.RefexProperty;
+import org.ihtsdo.tk.api.blueprint.RefexCUB;
+import org.ihtsdo.tk.api.blueprint.RefexCUB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrAnalogBI;
@@ -247,7 +247,7 @@ public class CidStrRevision extends RefsetRevision<CidStrRevision, CidStrMember>
 		return TkRefsetType.CID_STR;
 	}
 
-	protected void addSpecProperties(RefexAmendmentSpec rcs) {
+	protected void addSpecProperties(RefexCUB rcs) {
 		rcs.with(RefexProperty.CNID1, getCnid1());
 		rcs.with(RefexProperty.STRING1, getStr1());
 	}

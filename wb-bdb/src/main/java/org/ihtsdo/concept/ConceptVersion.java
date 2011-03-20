@@ -684,13 +684,13 @@ public class ConceptVersion implements ConceptVersionBI {
     }
 
     @Override
-    public ConceptVersionBI getVersion(ViewCoordinate c) throws ContraditionException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public ConceptVersionBI getVersion(ViewCoordinate c) {
+        return concept.getVersion(c);
     }
 
     @Override
     public Collection<? extends ConceptVersionBI> getVersions(ViewCoordinate c) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return concept.getVersions();
     }
 
     @Override
