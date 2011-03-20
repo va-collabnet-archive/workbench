@@ -42,7 +42,7 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.blueprint.RefexCUB;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
@@ -121,10 +121,10 @@ public class AddConceptInArenaToRefset extends AbstractTask {
                     config.getViewCoordinate()); 
             
             //add to refset
-            RefexCUB refexSpec = 
-                    new RefexCUB(TkRefsetType.CID, 
+            RefexCAB refexSpec = 
+                    new RefexCAB(TkRefsetType.CID, 
                     conceptToAdd.getNid(), refsetConcept.getNid());
-            refexSpec.with(RefexCUB.RefexProperty.CNID1, 
+            refexSpec.with(RefexCAB.RefexProperty.CNID1, 
                     member.getConceptNid());
             ammender.constructIfNotCurrent(refexSpec); 
 

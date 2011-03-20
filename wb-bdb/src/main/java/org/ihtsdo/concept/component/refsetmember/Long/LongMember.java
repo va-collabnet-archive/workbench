@@ -19,8 +19,8 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetLongMember;
 import org.ihtsdo.etypes.ERefsetLongRevision;
-import org.ihtsdo.tk.api.blueprint.RefexCUB;
-import org.ihtsdo.tk.api.blueprint.RefexCUB.RefexProperty;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.refex.type_long.RefexLongAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongMember;
@@ -275,7 +275,7 @@ public class LongMember extends RefsetMember<LongRevision, LongMember>
         return TkRefsetType.LONG;
     }
 
-    protected void addSpecProperties(RefexCUB rcs) {
+    protected void addSpecProperties(RefexCAB rcs) {
         rcs.with(RefexProperty.LONG1, getLong1());
     }
 }

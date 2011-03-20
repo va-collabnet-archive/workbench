@@ -52,13 +52,13 @@ import org.ihtsdo.tk.uuid.UuidT5Generator;
  *
  * @author kec
  */
-public final class RefexCUB extends CreateOrUpdateBlueprint {
+public final class RefexCAB extends CreateOrAmendBlueprint {
 
     public static final UUID refexSpecNamespace =
             UUID.fromString("c44bc030-1166-11e0-ac64-0800200c9a66");
     private TkRefsetType memberType;
 
-    public UUID computeMemberReferencedComponentUuid() throws IOException, InvalidCUB {
+    public UUID computeMemberReferencedComponentUuid() throws IOException, InvalidCAB {
         try {
             return UuidT5Generator.get(refexSpecNamespace,
                     memberType.name()
@@ -71,7 +71,7 @@ public final class RefexCUB extends CreateOrUpdateBlueprint {
         }
     }
 
-    public UUID setMemberContentUuid() throws InvalidCUB, IOException {
+    public UUID setMemberContentUuid() throws InvalidCAB, IOException {
         UUID memberContentUuid = computeMemberContentUuid();
         properties.put(RefexProperty.MEMBER_UUID, memberContentUuid);
         return memberContentUuid;
@@ -84,7 +84,7 @@ public final class RefexCUB extends CreateOrUpdateBlueprint {
      * @throws InvalidAmendmentSpec
      * @throws IOException
      */
-    public UUID computeMemberContentUuid() throws InvalidCUB, IOException {
+    public UUID computeMemberContentUuid() throws InvalidCAB, IOException {
         try {
             StringBuilder sb = new StringBuilder();
             for (RefexProperty prop: RefexProperty.values()) {
@@ -113,10 +113,10 @@ public final class RefexCUB extends CreateOrUpdateBlueprint {
     }
 
     private String getPrimoridalUuidStr(RefexProperty prop)
-            throws IOException, InvalidCUB {
+            throws IOException, InvalidCAB {
         Object nidObj = properties.get(prop);
         if (nidObj == null) {
-            throw new InvalidCUB(
+            throw new InvalidCAB(
                     "No data for: " + prop);
         }
         int nid = (Integer) nidObj;
@@ -128,7 +128,7 @@ public final class RefexCUB extends CreateOrUpdateBlueprint {
         if (uuids.size() == 1) {
             return uuids.get(0).toString();
         }
-        throw new InvalidCUB("Can't find nid for: " + prop +
+        throw new InvalidCAB("Can't find nid for: " + prop +
                 " props: " + this.properties);
     }
     protected EnumMap<RefexProperty, Object> properties =
@@ -146,15 +146,15 @@ public final class RefexCUB extends CreateOrUpdateBlueprint {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    public RefexCUB(TkRefsetType memberType,
-            int rcNid, int collectionNid) throws IOException, InvalidCUB {
+    public RefexCAB(TkRefsetType memberType,
+            int rcNid, int collectionNid) throws IOException, InvalidCAB {
         this(memberType, rcNid, collectionNid, null);
 
         this.properties.put(RefexProperty.MEMBER_UUID,
                 computeMemberReferencedComponentUuid());
     }
 
-    public RefexCUB(TkRefsetType memberType,
+    public RefexCAB(TkRefsetType memberType,
             int rcNid, int collectionNid,
             UUID memberUuid) throws IOException {
         this.memberType = memberType;
@@ -221,18 +221,18 @@ public final class RefexCUB extends CreateOrUpdateBlueprint {
                 + memberType + " " + properties;
     }
 
-    public RefexCUB with(RefexProperty key, Number value) {
+    public RefexCAB with(RefexProperty key, Number value) {
         put(key, value);
         return this;
     }
 
-    public RefexCUB with(RefexProperty key, String value) {
+    public RefexCAB with(RefexProperty key, String value) {
         assert key == RefexProperty.STRING1;
         properties.put(key, value);
         return this;
     }
 
-    public RefexCUB with(RefexProperty key, Boolean value) {
+    public RefexCAB with(RefexProperty key, Boolean value) {
         assert key == RefexProperty.BOOLEAN1;
         properties.put(key, value);
         return this;
@@ -494,7 +494,7 @@ public final class RefexCUB extends CreateOrUpdateBlueprint {
         this.memberType = memberType;
     }
 
-    public void setContentUuid() throws InvalidCUB, IOException {
+    public void setContentUuid() throws InvalidCAB, IOException {
         this.properties.put(RefexProperty.MEMBER_UUID,
                 computeMemberContentUuid());
     }

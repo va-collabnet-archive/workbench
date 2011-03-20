@@ -25,53 +25,54 @@ import org.ihtsdo.tk.uuid.UuidT5Generator;
  *
  * @author kec
  */
-public class DescCUB extends CreateOrUpdateBlueprint {
+public class MediaCAB extends CreateOrAmendBlueprint {
 
-    public static final UUID descSpecNamespace =
-            UUID.fromString("457e4a20-5284-11e0-b8af-0800200c9a66");
+    public static final UUID mediaSpecNamespace =
+            UUID.fromString("743f0510-5285-11e0-b8af-0800200c9a66");
     private UUID componentUuid;
     private UUID conceptUuid;
-
     private UUID typeUuid;
-    public String lang;
-    public String text;
-    public boolean initialCaseSignificant;
 
-    public DescCUB(
-            int conceptNid, int typeNid, String lang, String text,
-            boolean initialCaseSignificant)
+    public String format;
+
+    public String textDescription;
+
+    public byte[] dataBytes;
+
+    public MediaCAB(
+            int conceptNid, int typeNid, String format, String textDescription,
+            byte[] dataBytes)
             throws IOException {
         this(Ts.get().getComponent(conceptNid).getPrimUuid(),
                 Ts.get().getComponent(typeNid).getPrimUuid(),
-                lang, text, initialCaseSignificant);
+                format, textDescription, dataBytes);
     }
 
-    public DescCUB(
-            UUID conceptUuid, UUID typeUuid, String lang, String text,
-            boolean initialCaseSignificant)
+    public MediaCAB(
+            UUID conceptUuid, UUID typeUuid, String format, String textDescription,
+            byte[] dataBytes)
             throws IOException {
-        this(conceptUuid, typeUuid, lang, text, initialCaseSignificant, null);
+        this(conceptUuid, typeUuid, format, textDescription, dataBytes, null);
     }
 
-    public DescCUB(
-            UUID conceptUuid, UUID typeUuid, String lang, String text,
-            boolean initialCaseSignificant, UUID componentUuid) throws IOException {
+    public MediaCAB(
+            UUID conceptUuid, UUID typeUuid, String format, String textDescription,
+            byte[] dataBytes, UUID componentUuid) throws IOException {
 
         this.conceptUuid = conceptUuid;
-        this.lang = lang;
-        this.text = text;
-        this.initialCaseSignificant = initialCaseSignificant;
-        this.componentUuid = componentUuid;
         this.typeUuid = typeUuid;
+        this.format = format;
+        this.textDescription = textDescription;
+        this.dataBytes = dataBytes;
+        this.componentUuid = componentUuid;
         if (componentUuid == null) {
             try {
-                componentUuid = UuidT5Generator.get(descSpecNamespace,
+                componentUuid = UuidT5Generator.get(mediaSpecNamespace,
                         getPrimoridalUuidStr(conceptUuid)
-                        + lang
-                        + text);
+                        + dataBytes);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
-            } catch (InvalidCUB ex) {
+            } catch (InvalidCAB ex) {
                 throw new RuntimeException(ex);
             } catch (NoSuchAlgorithmException ex) {
                 throw new RuntimeException(ex);
@@ -102,16 +103,18 @@ public class DescCUB extends CreateOrUpdateBlueprint {
     public UUID getConceptUuid() {
         return conceptUuid;
     }
-
-    public boolean isInitialCaseSignificant() {
-        return initialCaseSignificant;
+    
+    public byte[] getDataBytes() {
+        return dataBytes;
     }
 
-    public String getLang() {
-        return lang;
+    public String getFormat() {
+        return format;
     }
 
-    public String getText() {
-        return text;
+    public String getTextDescription() {
+        return textDescription;
     }
+
 }
+

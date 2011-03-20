@@ -11,13 +11,13 @@ import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
-import org.ihtsdo.tk.api.blueprint.DescCUB;
+import org.ihtsdo.tk.api.blueprint.DescCAB;
 
-import org.ihtsdo.tk.api.blueprint.InvalidCUB;
-import org.ihtsdo.tk.api.blueprint.MediaCUB;
-import org.ihtsdo.tk.api.blueprint.RefexCUB;
-import org.ihtsdo.tk.api.blueprint.RefexCUB.RefexProperty;
-import org.ihtsdo.tk.api.blueprint.RelCUB;
+import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.MediaCAB;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
+import org.ihtsdo.tk.api.blueprint.RelCAB;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -40,8 +40,8 @@ public class BdbTerminologyConstructor implements TerminologyConstructorBI {
     }
 
     @Override
-    public RefexChronicleBI<?> construct(RefexCUB res)
-            throws IOException, InvalidCUB {
+    public RefexChronicleBI<?> construct(RefexCAB res)
+            throws IOException, InvalidCAB {
         RefsetMember<?, ?> refex = getRefex(res);
         if (refex != null) {
             return updateRefex(refex, res);
@@ -50,7 +50,7 @@ public class BdbTerminologyConstructor implements TerminologyConstructorBI {
     }
 
     private RefexChronicleBI<?> updateRefex(RefsetMember<?, ?> refex,
-            RefexCUB res) throws InvalidCUB {
+            RefexCAB res) throws InvalidCAB {
         for (int pathNid : ec.getEditPaths()) {
             RefsetRevision refexRevision =
                     refex.makeAnalog(res.getInt(RefexProperty.STATUS_NID),
@@ -58,15 +58,15 @@ public class BdbTerminologyConstructor implements TerminologyConstructorBI {
             try {
                 res.setPropertiesExceptSap(refexRevision);
             } catch (PropertyVetoException ex) {
-                throw new InvalidCUB("Refex: " + refex
+                throw new InvalidCAB("Refex: " + refex
                         + "\n\nRefexAmendmentSpec: " + res, ex);
             }
         }
         return refex;
     }
 
-    private RefsetMember<?, ?> getRefex(RefexCUB res)
-            throws InvalidCUB, IOException {
+    private RefsetMember<?, ?> getRefex(RefexCAB res)
+            throws InvalidCAB, IOException {
         if (Ts.get().hasUuid(res.getMemberUUID())) {
             ComponentChroncileBI<?> component =
                     Ts.get().getComponent(res.getMemberUUID());
@@ -77,7 +77,7 @@ public class BdbTerminologyConstructor implements TerminologyConstructorBI {
                     == TkRefsetType.classToType(component.getClass())) {
                 return (RefsetMember<?, ?>) component;
             } else {
-                throw new InvalidCUB(
+                throw new InvalidCAB(
                         "Component exists of different type: "
                         + component + "\n\nRefexAmendmentSpec: " + res);
             }
@@ -86,8 +86,8 @@ public class BdbTerminologyConstructor implements TerminologyConstructorBI {
     }
 
     @Override
-    public RefexChronicleBI<?> constructIfNotCurrent(RefexCUB res)
-            throws IOException, InvalidCUB {
+    public RefexChronicleBI<?> constructIfNotCurrent(RefexCAB res)
+            throws IOException, InvalidCAB {
         RefsetMember<?, ?> refex = getRefex(res);
         if (refex != null) {
             boolean current = false;
@@ -106,13 +106,13 @@ public class BdbTerminologyConstructor implements TerminologyConstructorBI {
         return createRefex(res);
     }
 
-    private RefexChronicleBI<?> createRefex(RefexCUB res)
-            throws IOException, InvalidCUB {
+    private RefexChronicleBI<?> createRefex(RefexCAB res)
+            throws IOException, InvalidCAB {
         return RefsetMemberFactory.create(res, ec);
     }
 
-    private RelationshipChronicleBI getRel(RelCUB res)
-            throws InvalidCUB, IOException {
+    private RelationshipChronicleBI getRel(RelCAB res)
+            throws InvalidCAB, IOException {
         if (Ts.get().hasUuid(res.getComponentUuid())) {
             ComponentChroncileBI<?> component =
                     Ts.get().getComponent(res.getComponentUuid());
@@ -122,7 +122,7 @@ public class BdbTerminologyConstructor implements TerminologyConstructorBI {
             if (component instanceof RelationshipChronicleBI) {
                 return (RelationshipChronicleBI) component;
             } else {
-                throw new InvalidCUB(
+                throw new InvalidCAB(
                         "Component exists of different type: "
                         + component + "\n\nRelAmendmentSpec: " + res);
             }
@@ -131,7 +131,7 @@ public class BdbTerminologyConstructor implements TerminologyConstructorBI {
     }
 
     @Override
-    public RelationshipChronicleBI construct(RelCUB spec) throws IOException, InvalidCUB {
+    public RelationshipChronicleBI construct(RelCAB spec) throws IOException, InvalidCAB {
         RelationshipChronicleBI relc = getRel(spec);
         int statusNid = TermAux.CURRENT.getStrict(Ts.get().getMetadataVC()).getNid();
 
@@ -184,29 +184,29 @@ public class BdbTerminologyConstructor implements TerminologyConstructorBI {
     }
 
     @Override
-    public RelationshipChronicleBI constructIfNotCurrent(RelCUB spec) throws IOException, InvalidCUB {
+    public RelationshipChronicleBI constructIfNotCurrent(RelCAB spec) throws IOException, InvalidCAB {
         RelationshipChronicleBI relc = getRel(spec);
 
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public DescriptionChronicleBI construct(DescCUB spec) throws IOException, InvalidCUB {
+    public DescriptionChronicleBI construct(DescCAB spec) throws IOException, InvalidCAB {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public DescriptionChronicleBI constructIfNotCurrent(DescCUB spec) throws IOException, InvalidCUB {
+    public DescriptionChronicleBI constructIfNotCurrent(DescCAB spec) throws IOException, InvalidCAB {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public MediaChronicleBI construct(MediaCUB spec) throws IOException, InvalidCUB {
+    public MediaChronicleBI construct(MediaCAB spec) throws IOException, InvalidCAB {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public MediaChronicleBI constructIfNotCurrent(MediaCUB spec) throws IOException, InvalidCUB {
+    public MediaChronicleBI constructIfNotCurrent(MediaCAB spec) throws IOException, InvalidCAB {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }

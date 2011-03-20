@@ -26,11 +26,11 @@ import org.ihtsdo.tk.api.ComponentBI;
  *
  * @author kec
  */
-public abstract class CreateOrUpdateBlueprint {
+public abstract class CreateOrAmendBlueprint {
 
 
     protected String getPrimoridalUuidStr(int nid)
-            throws IOException, InvalidCUB {
+            throws IOException, InvalidCAB {
         ComponentBI component = Ts.get().getComponent(nid);
         if (component!= null) {
             return component.getPrimUuid().toString();
@@ -39,11 +39,11 @@ public abstract class CreateOrUpdateBlueprint {
         if (uuids.size() == 1) {
             return uuids.get(0).toString();
         }
-        throw new InvalidCUB("Can't find primordialUuid for: " + component);
+        throw new InvalidCAB("Can't find primordialUuid for: " + component);
     }
 
     protected String getPrimoridalUuidStr(UUID uuid)
-            throws IOException, InvalidCUB {
+            throws IOException, InvalidCAB {
         ComponentBI component = Ts.get().getComponent(uuid);
         if (component!= null) {
             return component.getPrimUuid().toString();
@@ -52,7 +52,7 @@ public abstract class CreateOrUpdateBlueprint {
         if (uuids.size() == 1) {
             return uuids.get(0).toString();
         }
-        throw new InvalidCUB("Can't find primordialUuid for: " + component);
+        throw new InvalidCAB("Can't find primordialUuid for: " + component);
     }
 
 }

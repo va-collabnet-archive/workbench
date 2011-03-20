@@ -19,8 +19,8 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetBooleanMember;
 import org.ihtsdo.etypes.ERefsetBooleanRevision;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.blueprint.RefexCUB;
-import org.ihtsdo.tk.api.blueprint.RefexCUB.RefexProperty;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanMember;
@@ -305,7 +305,7 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
     }
 
     @Override
-    protected void addSpecProperties(RefexCUB rcs) {
+    protected void addSpecProperties(RefexCAB rcs) {
         rcs.with(RefexProperty.BOOLEAN1, getBoolean1());
     }
 }

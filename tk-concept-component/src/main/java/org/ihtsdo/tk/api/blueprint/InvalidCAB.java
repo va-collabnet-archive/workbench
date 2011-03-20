@@ -21,26 +21,26 @@ package org.ihtsdo.tk.api.blueprint;
  *
  * @author kec
  */
-public class InvalidCUB extends Exception {
+public class InvalidCAB extends Exception {
 
     /**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public InvalidCUB(Throwable thrwbl) {
+	public InvalidCAB(Throwable thrwbl) {
         super(thrwbl);
     }
 
-    public InvalidCUB(String string, Throwable thrwbl) {
+    public InvalidCAB(String string, Throwable thrwbl) {
         super(string, thrwbl);
     }
 
-    public InvalidCUB(String string) {
+    public InvalidCAB(String string) {
         super(string);
     }
 
-    public InvalidCUB() {
+    public InvalidCAB() {
     }
 
 }

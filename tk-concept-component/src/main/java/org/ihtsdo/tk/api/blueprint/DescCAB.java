@@ -25,54 +25,53 @@ import org.ihtsdo.tk.uuid.UuidT5Generator;
  *
  * @author kec
  */
-public class MediaCUB extends CreateOrUpdateBlueprint {
+public class DescCAB extends CreateOrAmendBlueprint {
 
-    public static final UUID mediaSpecNamespace =
-            UUID.fromString("743f0510-5285-11e0-b8af-0800200c9a66");
+    public static final UUID descSpecNamespace =
+            UUID.fromString("457e4a20-5284-11e0-b8af-0800200c9a66");
     private UUID componentUuid;
     private UUID conceptUuid;
+
     private UUID typeUuid;
+    public String lang;
+    public String text;
+    public boolean initialCaseSignificant;
 
-    public String format;
-
-    public String textDescription;
-
-    public byte[] dataBytes;
-
-    public MediaCUB(
-            int conceptNid, int typeNid, String format, String textDescription,
-            byte[] dataBytes)
+    public DescCAB(
+            int conceptNid, int typeNid, String lang, String text,
+            boolean initialCaseSignificant)
             throws IOException {
         this(Ts.get().getComponent(conceptNid).getPrimUuid(),
                 Ts.get().getComponent(typeNid).getPrimUuid(),
-                format, textDescription, dataBytes);
+                lang, text, initialCaseSignificant);
     }
 
-    public MediaCUB(
-            UUID conceptUuid, UUID typeUuid, String format, String textDescription,
-            byte[] dataBytes)
+    public DescCAB(
+            UUID conceptUuid, UUID typeUuid, String lang, String text,
+            boolean initialCaseSignificant)
             throws IOException {
-        this(conceptUuid, typeUuid, format, textDescription, dataBytes, null);
+        this(conceptUuid, typeUuid, lang, text, initialCaseSignificant, null);
     }
 
-    public MediaCUB(
-            UUID conceptUuid, UUID typeUuid, String format, String textDescription,
-            byte[] dataBytes, UUID componentUuid) throws IOException {
+    public DescCAB(
+            UUID conceptUuid, UUID typeUuid, String lang, String text,
+            boolean initialCaseSignificant, UUID componentUuid) throws IOException {
 
         this.conceptUuid = conceptUuid;
-        this.typeUuid = typeUuid;
-        this.format = format;
-        this.textDescription = textDescription;
-        this.dataBytes = dataBytes;
+        this.lang = lang;
+        this.text = text;
+        this.initialCaseSignificant = initialCaseSignificant;
         this.componentUuid = componentUuid;
+        this.typeUuid = typeUuid;
         if (componentUuid == null) {
             try {
-                componentUuid = UuidT5Generator.get(mediaSpecNamespace,
+                componentUuid = UuidT5Generator.get(descSpecNamespace,
                         getPrimoridalUuidStr(conceptUuid)
-                        + dataBytes);
+                        + lang
+                        + text);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
-            } catch (InvalidCUB ex) {
+            } catch (InvalidCAB ex) {
                 throw new RuntimeException(ex);
             } catch (NoSuchAlgorithmException ex) {
                 throw new RuntimeException(ex);
@@ -103,18 +102,16 @@ public class MediaCUB extends CreateOrUpdateBlueprint {
     public UUID getConceptUuid() {
         return conceptUuid;
     }
-    
-    public byte[] getDataBytes() {
-        return dataBytes;
+
+    public boolean isInitialCaseSignificant() {
+        return initialCaseSignificant;
     }
 
-    public String getFormat() {
-        return format;
+    public String getLang() {
+        return lang;
     }
 
-    public String getTextDescription() {
-        return textDescription;
+    public String getText() {
+        return text;
     }
-
 }
-

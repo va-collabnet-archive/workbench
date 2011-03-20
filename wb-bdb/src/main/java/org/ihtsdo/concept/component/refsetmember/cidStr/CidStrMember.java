@@ -20,8 +20,8 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetCidStrMember;
 import org.ihtsdo.etypes.ERefsetCidStrRevision;
-import org.ihtsdo.tk.api.blueprint.RefexCUB;
-import org.ihtsdo.tk.api.blueprint.RefexCUB.RefexProperty;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrMember;
@@ -346,7 +346,7 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember> imp
         return TkRefsetType.CID_STR;
     }
 
-    protected void addSpecProperties(RefexCUB rcs) {
+    protected void addSpecProperties(RefexCAB rcs) {
         rcs.with(RefexProperty.CNID1, getCnid1());
         rcs.with(RefexProperty.STRING1, getStr1());
     }

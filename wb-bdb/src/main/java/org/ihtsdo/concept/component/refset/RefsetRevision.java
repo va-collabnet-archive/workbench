@@ -6,7 +6,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.tk.api.blueprint.RefexCUB;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
@@ -119,8 +119,8 @@ public abstract class RefsetRevision
 	}
 
 	@Override
-    public RefexCUB getRefexEditSpec() throws IOException {
-    	RefexCUB rcs = new RefexCUB(getTkRefsetType(), 
+    public RefexCAB getRefexEditSpec() throws IOException {
+    	RefexCAB rcs = new RefexCAB(getTkRefsetType(), 
     			primordialComponent.getReferencedComponentNid(), 
     			primordialComponent.getRefsetId(),
         		getPrimUuid());
@@ -130,7 +130,7 @@ public abstract class RefsetRevision
 
 	protected abstract TkRefsetType getTkRefsetType();
 
-	protected abstract void addSpecProperties(RefexCUB rcs);
+	protected abstract void addSpecProperties(RefexCAB rcs);
 
     @Override
     public int getReferencedComponentNid() {

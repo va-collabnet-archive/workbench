@@ -32,7 +32,7 @@ import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.api.blueprint.RefexCUB;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
@@ -66,7 +66,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
             super(index);
         }
 
-        public RefexCUB getRefexEditSpec() throws IOException {
+        public RefexCAB getRefexEditSpec() throws IOException {
             if (index >= 0) {
                 return revisions.get(index).getRefexEditSpec();
             } else {
@@ -638,8 +638,8 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     }
 
     @Override
-    public RefexCUB getRefexEditSpec() throws IOException {
-        RefexCUB rcs = new RefexCUB(getTkRefsetType(),
+    public RefexCAB getRefexEditSpec() throws IOException {
+        RefexCAB rcs = new RefexCAB(getTkRefsetType(),
                 getReferencedComponentNid(), getRefsetId(), getPrimUuid());
         addSpecProperties(rcs);
         return rcs;
@@ -647,5 +647,5 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
 
     protected abstract TkRefsetType getTkRefsetType();
 
-    protected abstract void addSpecProperties(RefexCUB rcs);
+    protected abstract void addSpecProperties(RefexCAB rcs);
 }

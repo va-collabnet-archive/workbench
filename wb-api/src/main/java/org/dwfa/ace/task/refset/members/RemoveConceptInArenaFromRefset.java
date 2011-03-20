@@ -42,7 +42,7 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.blueprint.RefexCUB;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.example.binding.TermAux;
@@ -120,12 +120,12 @@ public class RemoveConceptInArenaFromRefset extends AbstractTask {
                     config.getViewCoordinate()); 
             
             //add to refset
-            RefexCUB refexSpec = 
-                    new RefexCUB(TkRefsetType.CID, 
+            RefexCAB refexSpec = 
+                    new RefexCAB(TkRefsetType.CID, 
                     conceptToAdd.getNid(), refsetConcept.getNid());
-            refexSpec.with(RefexCUB.RefexProperty.CNID1, 
+            refexSpec.with(RefexCAB.RefexProperty.CNID1, 
                     member.getConceptNid());
-            refexSpec.with(RefexCUB.RefexProperty.STATUS_NID, 
+            refexSpec.with(RefexCAB.RefexProperty.STATUS_NID, 
                     TermAux.RETIRED.get(config.getViewCoordinate()).getNid());
             
             ammender.constructIfNotCurrent(refexSpec); 

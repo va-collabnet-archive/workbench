@@ -13,8 +13,8 @@ import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
-import org.ihtsdo.tk.api.blueprint.RefexCUB;
-import org.ihtsdo.tk.api.blueprint.RefexCUB.RefexProperty;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.refex.type_cnid_float.RefexCnidFloatAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.dto.concept.component.refset.cidflt.TkRefsetCidFloatMember;
@@ -212,7 +212,7 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
         return TkRefsetType.CID_FLOAT;
     }
 
-    protected void addSpecProperties(RefexCUB rcs) {
+    protected void addSpecProperties(RefexCAB rcs) {
         rcs.with(RefexProperty.CNID1, getCnid1());
         rcs.with(RefexProperty.FLOAT1, getFloat1());
     }

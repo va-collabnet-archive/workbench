@@ -1,11 +1,13 @@
 package org.ihtsdo.tk.api;
 
 import java.io.IOException;
-import org.ihtsdo.tk.api.blueprint.DescCUB;
-import org.ihtsdo.tk.api.blueprint.InvalidCUB;
-import org.ihtsdo.tk.api.blueprint.MediaCUB;
-import org.ihtsdo.tk.api.blueprint.RefexCUB;
-import org.ihtsdo.tk.api.blueprint.RelCUB;
+import org.ihtsdo.tk.api.blueprint.ConceptCAB;
+import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.MediaCAB;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RelCAB;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.media.MediaChronicleBI;
 
@@ -21,7 +23,7 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    RefexChronicleBI<?> construct(RefexCUB spec) throws IOException, InvalidCUB;
+    RefexChronicleBI<?> construct(RefexCAB spec) throws IOException, InvalidCAB;
 
     /**
      *  This method incurs an extra cost to determine if a current version already meets the specification. 
@@ -30,7 +32,7 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    RefexChronicleBI<?> constructIfNotCurrent(RefexCUB spec) throws IOException, InvalidCUB;
+    RefexChronicleBI<?> constructIfNotCurrent(RefexCAB spec) throws IOException, InvalidCAB;
 
     /**
      *  
@@ -39,7 +41,7 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    RelationshipChronicleBI construct(RelCUB spec) throws IOException, InvalidCUB;
+    RelationshipChronicleBI construct(RelCAB spec) throws IOException, InvalidCAB;
 
     /**
      *  This method incurs an extra cost to determine if a current version already meets the specification. 
@@ -48,7 +50,7 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    RelationshipChronicleBI constructIfNotCurrent(RelCUB spec) throws IOException, InvalidCUB;
+    RelationshipChronicleBI constructIfNotCurrent(RelCAB spec) throws IOException, InvalidCAB;
 
     /**
      *  
@@ -57,7 +59,7 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    DescriptionChronicleBI construct(DescCUB spec) throws IOException, InvalidCUB;
+    DescriptionChronicleBI construct(DescCAB spec) throws IOException, InvalidCAB;
 
     /**
      *  This method incurs an extra cost to determine if a current version already meets the specification. 
@@ -66,7 +68,7 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    DescriptionChronicleBI constructIfNotCurrent(DescCUB spec) throws IOException, InvalidCUB;
+    DescriptionChronicleBI constructIfNotCurrent(DescCAB spec) throws IOException, InvalidCAB;
 
     /**
      *  
@@ -75,7 +77,7 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    MediaChronicleBI construct(MediaCUB spec) throws IOException, InvalidCUB;
+    MediaChronicleBI construct(MediaCAB spec) throws IOException, InvalidCAB;
 
     /**
      *  This method incurs an extra cost to determine if a current version already meets the specification. 
@@ -84,5 +86,24 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    MediaChronicleBI constructIfNotCurrent(MediaCUB spec) throws IOException, InvalidCUB;
+    MediaChronicleBI constructIfNotCurrent(MediaCAB spec) throws IOException, InvalidCAB;
+
+        /**
+     *  
+     * @param res
+     * @return A <code>MediaChronicleBI</code> if the <code>spec</code> regardless of if the RelationshipChronicleBI was modified. 
+     * @throws IOException
+     * @throws InvalidAmendmentSpec
+     */
+    ConceptChronicleBI construct(ConceptCAB spec) throws IOException, InvalidCAB;
+
+    /**
+     *  This method incurs an extra cost to determine if a current version already meets the specification. 
+     * @param res
+     * @return A <code>MediaChronicleBI</code> if the <code>spec</code> regardless of if the RelationshipChronicleBI was modified. 
+     * @throws IOException
+     * @throws InvalidAmendmentSpec
+     */
+    ConceptChronicleBI constructIfNotCurrent(ConceptCAB spec) throws IOException, InvalidCAB;
+
 }

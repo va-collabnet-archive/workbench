@@ -22,7 +22,7 @@ import java.util.UUID;
  *
  * @author kec
  */
-public class ConceptCUB extends CreateOrUpdateBlueprint {
+public class ConceptCAB extends CreateOrAmendBlueprint {
     
     public static final UUID conceptSpecNamespace =
             UUID.fromString("620d1f30-5285-11e0-b8af-0800200c9a66");

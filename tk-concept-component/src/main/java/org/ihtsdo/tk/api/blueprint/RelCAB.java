@@ -27,7 +27,7 @@ import org.ihtsdo.tk.uuid.UuidT5Generator;
  *
  * @author kec
  */
-public class RelCUB extends CreateOrUpdateBlueprint {
+public class RelCAB extends CreateOrAmendBlueprint {
 
     public static final UUID relSpecNamespace =
             UUID.fromString("16d79820-5289-11e0-b8af-0800200c9a66");
@@ -39,7 +39,7 @@ public class RelCUB extends CreateOrUpdateBlueprint {
     private UUID characteristicUuid;
     private UUID refinabilityUuid;
 
-    public RelCUB(
+    public RelCAB(
             int sourceNid, int typeNid, int destNid, int group, TkRelType type)
             throws IOException {
         this(Ts.get().getComponent(sourceNid).getPrimUuid(),
@@ -48,13 +48,13 @@ public class RelCUB extends CreateOrUpdateBlueprint {
                 group, null, type);
     }
 
-    public RelCUB(
+    public RelCAB(
             UUID sourceUuid, UUID typeUuid, UUID destUuid, int group, TkRelType type)
             throws IOException {
         this(sourceUuid, typeUuid, destUuid, group, null, type);
     }
 
-    public RelCUB(
+    public RelCAB(
             UUID sourceUuid, UUID typeUuid, UUID destUuid, int group,
             UUID componentUuid, TkRelType type) throws IOException {
 
@@ -111,7 +111,7 @@ public class RelCUB extends CreateOrUpdateBlueprint {
                         + group);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
-            } catch (InvalidCUB ex) {
+            } catch (InvalidCAB ex) {
                 throw new RuntimeException(ex);
             } catch (NoSuchAlgorithmException ex) {
                 throw new RuntimeException(ex);

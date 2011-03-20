@@ -19,8 +19,8 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetIntMember;
 import org.ihtsdo.etypes.ERefsetIntRevision;
-import org.ihtsdo.tk.api.blueprint.RefexCUB;
-import org.ihtsdo.tk.api.blueprint.RefexCUB.RefexProperty;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.refex.type_int.RefexIntAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntMember;
@@ -272,7 +272,7 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
 		return HashFunction.hashCode(new int[]{ getIntValue()});
 	}
 	
-	protected void addSpecProperties(RefexCUB rcs) {
+	protected void addSpecProperties(RefexCAB rcs) {
 		rcs.with(RefexProperty.INTEGER1, this.intValue);
 	}
 

@@ -9,7 +9,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.blueprint.RefexCUB;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
@@ -155,7 +155,7 @@ public class MembershipRevision extends RefsetRevision<MembershipRevision, Membe
 		return TkRefsetType.MEMBER;
 	}
 
-	protected void addSpecProperties(RefexCUB rcs) {
+	protected void addSpecProperties(RefexCAB rcs) {
 		// no fields to add...
 	}
 	
