@@ -151,6 +151,15 @@ public class ViewCoordinate {
     }
 
     private void getConceptText(StringBuilder sb, TerminologySnapshotDI snap, int nid) {
+        if (nid == Integer.MAX_VALUE) {
+            sb.append("Integer.MAX_VALUE");
+            return;
+        }
+        if (nid == Integer.MIN_VALUE) {
+            sb.append("Integer.MIN_VALUE");
+            return;
+        }
+        
         try {
             if (snap.getConceptVersion(nid) != null
                     && snap.getConceptVersion(nid).getPreferredDescription() != null) {
