@@ -48,7 +48,7 @@ import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
-import org.ihtsdo.tk.api.blueprint.TerminologyAmendmentBI;
+import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -425,8 +425,8 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
 
     @Override
-    public TerminologyAmendmentBI getAmender(EditCoordinate ec, ViewCoordinate vc) {
-        return new BdbAmender(ec, vc);
+    public TerminologyConstructorBI getTerminologyConstructor(EditCoordinate ec, ViewCoordinate vc) {
+        return new BdbTerminologyConstructor(ec, vc);
     }
 
     @Override

@@ -53,7 +53,7 @@ import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.blueprint.RefexCUB;
-import org.ihtsdo.tk.api.blueprint.TerminologyAmendmentBI;
+import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.blueprint.RefexCUB.RefexProperty;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -323,7 +323,7 @@ public class LoadBdbMulti extends AbstractMojo {
             int authorNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.USER.getUids());
             int pathNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
             EditCoordinate ec = new EditCoordinate(authorNid, pathNid);
-            TerminologyAmendmentBI amender = Ts.get().getAmender(ec, config.getViewCoordinate());
+            TerminologyConstructorBI amender = Ts.get().getTerminologyConstructor(ec, config.getViewCoordinate());
 
             for (File df : dialectFiles) {
                 getLog().info("processing dialectFile: " + df.getName());
@@ -378,7 +378,7 @@ public class LoadBdbMulti extends AbstractMojo {
                         textRefexSpec.with(RefexProperty.STATUS_NID, ReferenceConcepts.CURRENT.getNid());
                         textRefexSpec.setMemberContentUuid();
 
-                        RefexChronicleBI<?> textRefex = amender.amendIfNotCurrent(textRefexSpec);
+                        RefexChronicleBI<?> textRefex = amender.constructIfNotCurrent(textRefexSpec);
 
                         RefexCUB variantRefexSpec = new RefexCUB(TkRefsetType.STR,
                                 textRefex.getNid(), dialectVariantsRefexColl.getNid());
@@ -386,7 +386,7 @@ public class LoadBdbMulti extends AbstractMojo {
                         variantRefexSpec.with(RefexProperty.STRING1, variant);
                         variantRefexSpec.with(RefexProperty.STATUS_NID, ReferenceConcepts.CURRENT.getNid());
                         variantRefexSpec.setMemberContentUuid();
-                        amender.amendIfNotCurrent(variantRefexSpec);
+                        amender.constructIfNotCurrent(variantRefexSpec);
 
                         line = br.readLine();
                     }

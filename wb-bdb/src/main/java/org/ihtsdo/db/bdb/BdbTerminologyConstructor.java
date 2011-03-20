@@ -18,7 +18,7 @@ import org.ihtsdo.tk.api.blueprint.MediaCUB;
 import org.ihtsdo.tk.api.blueprint.RefexCUB;
 import org.ihtsdo.tk.api.blueprint.RefexCUB.RefexProperty;
 import org.ihtsdo.tk.api.blueprint.RelCUB;
-import org.ihtsdo.tk.api.blueprint.TerminologyAmendmentBI;
+import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
@@ -29,18 +29,18 @@ import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 import org.ihtsdo.tk.example.binding.TermAux;
 
-public class BdbAmender implements TerminologyAmendmentBI {
+public class BdbTerminologyConstructor implements TerminologyConstructorBI {
 
     EditCoordinate ec;
     ViewCoordinate vc;
 
-    public BdbAmender(EditCoordinate ec, ViewCoordinate vc) {
+    public BdbTerminologyConstructor(EditCoordinate ec, ViewCoordinate vc) {
         this.ec = ec;
         this.vc = vc;
     }
 
     @Override
-    public RefexChronicleBI<?> amend(RefexCUB res)
+    public RefexChronicleBI<?> construct(RefexCUB res)
             throws IOException, InvalidCUB {
         RefsetMember<?, ?> refex = getRefex(res);
         if (refex != null) {
@@ -86,7 +86,7 @@ public class BdbAmender implements TerminologyAmendmentBI {
     }
 
     @Override
-    public RefexChronicleBI<?> amendIfNotCurrent(RefexCUB res)
+    public RefexChronicleBI<?> constructIfNotCurrent(RefexCUB res)
             throws IOException, InvalidCUB {
         RefsetMember<?, ?> refex = getRefex(res);
         if (refex != null) {
@@ -131,7 +131,7 @@ public class BdbAmender implements TerminologyAmendmentBI {
     }
 
     @Override
-    public RelationshipChronicleBI amend(RelCUB spec) throws IOException, InvalidCUB {
+    public RelationshipChronicleBI construct(RelCUB spec) throws IOException, InvalidCUB {
         RelationshipChronicleBI relc = getRel(spec);
         int statusNid = TermAux.CURRENT.getStrict(Ts.get().getMetadataVC()).getNid();
 
@@ -184,29 +184,29 @@ public class BdbAmender implements TerminologyAmendmentBI {
     }
 
     @Override
-    public RelationshipChronicleBI amendIfNotCurrent(RelCUB spec) throws IOException, InvalidCUB {
+    public RelationshipChronicleBI constructIfNotCurrent(RelCUB spec) throws IOException, InvalidCUB {
         RelationshipChronicleBI relc = getRel(spec);
 
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public DescriptionChronicleBI amend(DescCUB spec) throws IOException, InvalidCUB {
+    public DescriptionChronicleBI construct(DescCUB spec) throws IOException, InvalidCUB {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public DescriptionChronicleBI amendIfNotCurrent(DescCUB spec) throws IOException, InvalidCUB {
+    public DescriptionChronicleBI constructIfNotCurrent(DescCUB spec) throws IOException, InvalidCUB {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public MediaChronicleBI amend(MediaCUB spec) throws IOException, InvalidCUB {
+    public MediaChronicleBI construct(MediaCUB spec) throws IOException, InvalidCUB {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public MediaChronicleBI amendIfNotCurrent(MediaCUB spec) throws IOException, InvalidCUB {
+    public MediaChronicleBI constructIfNotCurrent(MediaCUB spec) throws IOException, InvalidCUB {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }
