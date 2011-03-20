@@ -29,7 +29,6 @@ public class DescCAB extends CreateOrAmendBlueprint {
 
     public static final UUID descSpecNamespace =
             UUID.fromString("457e4a20-5284-11e0-b8af-0800200c9a66");
-    private UUID componentUuid;
     private UUID conceptUuid;
 
     private UUID typeUuid;
@@ -56,19 +55,19 @@ public class DescCAB extends CreateOrAmendBlueprint {
     public DescCAB(
             UUID conceptUuid, UUID typeUuid, String lang, String text,
             boolean initialCaseSignificant, UUID componentUuid) throws IOException {
+        super(componentUuid);
 
         this.conceptUuid = conceptUuid;
         this.lang = lang;
         this.text = text;
         this.initialCaseSignificant = initialCaseSignificant;
-        this.componentUuid = componentUuid;
         this.typeUuid = typeUuid;
-        if (componentUuid == null) {
+        if (getComponentUuid() == null) {
             try {
-                componentUuid = UuidT5Generator.get(descSpecNamespace,
+                setComponentUuid(UuidT5Generator.get(descSpecNamespace,
                         getPrimoridalUuidStr(conceptUuid)
                         + lang
-                        + text);
+                        + text));
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             } catch (InvalidCAB ex) {
@@ -79,16 +78,8 @@ public class DescCAB extends CreateOrAmendBlueprint {
         }
     }
 
-    public UUID getComponentUuid() {
-        return componentUuid;
-    }
-
     public UUID getTypeUuid() {
         return typeUuid;
-    }
-
-    public int getComponentNid() throws IOException {
-        return Ts.get().getNidForUuids(componentUuid);
     }
 
     public int getTypeNid() throws IOException {

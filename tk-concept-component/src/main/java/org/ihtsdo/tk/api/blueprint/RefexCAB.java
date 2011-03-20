@@ -76,6 +76,7 @@ public final class RefexCAB extends CreateOrAmendBlueprint {
         properties.put(RefexProperty.MEMBER_UUID, memberContentUuid);
         return memberContentUuid;
     }
+
     /**
      * Use when the 1-1 relationship between a refex and a referenced component does 
      * not apply. 
@@ -87,7 +88,7 @@ public final class RefexCAB extends CreateOrAmendBlueprint {
     public UUID computeMemberContentUuid() throws InvalidCAB, IOException {
         try {
             StringBuilder sb = new StringBuilder();
-            for (RefexProperty prop: RefexProperty.values()) {
+            for (RefexProperty prop : RefexProperty.values()) {
                 switch (prop) {
                     case MEMBER_UUID:
                     case STATUS_NID:
@@ -121,15 +122,15 @@ public final class RefexCAB extends CreateOrAmendBlueprint {
         }
         int nid = (Integer) nidObj;
         ComponentBI component = Ts.get().getComponent(nid);
-        if (component!= null) {
+        if (component != null) {
             return component.getPrimUuid().toString();
         }
         List<UUID> uuids = Ts.get().getUuidsForNid(nid);
         if (uuids.size() == 1) {
             return uuids.get(0).toString();
         }
-        throw new InvalidCAB("Can't find nid for: " + prop +
-                " props: " + this.properties);
+        throw new InvalidCAB("Can't find nid for: " + prop
+                + " props: " + this.properties);
     }
     protected EnumMap<RefexProperty, Object> properties =
             new EnumMap<RefexProperty, Object>(RefexProperty.class);
@@ -157,13 +158,64 @@ public final class RefexCAB extends CreateOrAmendBlueprint {
     public RefexCAB(TkRefsetType memberType,
             int rcNid, int collectionNid,
             UUID memberUuid) throws IOException {
+        super(memberUuid);
         this.memberType = memberType;
         this.properties.put(RefexProperty.RC_NID, rcNid);
         this.properties.put(RefexProperty.COLLECTION_NID, collectionNid);
-        this.properties.put(RefexProperty.STATUS_NID, 
+        this.properties.put(RefexProperty.STATUS_NID,
                 TermAux.CURRENT.getStrict(Ts.get().getMetadataVC()).getNid());
-        if (memberUuid != null) {
+        if (getMemberUUID() != null) {
             this.properties.put(RefexProperty.MEMBER_UUID, memberUuid);
+        }
+        if (this.properties.get(RefexProperty.STATUS_NID) != null) {
+            setStatusUuid(Ts.get().getComponent(
+                    (Integer) this.properties.get(RefexProperty.STATUS_NID)).getPrimUuid());
+        }
+    }
+
+    @Override
+    public void setCurrent() {
+        super.setCurrent();
+        try {
+            this.properties.put(RefexProperty.STATUS_NID,
+                    Ts.get().getNidForUuids(super.getStatusUuid()));
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    @Override
+    public void setRetired() {
+        super.setRetired();
+        try {
+            this.properties.put(RefexProperty.STATUS_NID,
+                    Ts.get().getNidForUuids(super.getStatusUuid()));
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    @Override
+    public UUID getStatusUuid() {
+        try {
+            super.setStatusUuid(Ts.get().getComponent(
+                    (Integer) this.properties.get(RefexProperty.STATUS_NID)).getPrimUuid());
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        return super.getStatusUuid();
+    }
+
+    @Override
+    public void setStatusUuid(UUID statusUuid) {
+        super.setStatusUuid(statusUuid);
+        if (this.properties.get(RefexProperty.STATUS_NID) != null) {
+            try {
+                this.properties.put(RefexProperty.STATUS_NID,
+                        Ts.get().getNidForUuids(statusUuid));
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
@@ -180,7 +232,14 @@ public final class RefexCAB extends CreateOrAmendBlueprint {
         INTEGER1,
         STRING1,
         LONG1,
-        FLOAT1,
+        FLOAT1,}
+
+    public UUID getMemberUuid() {
+        return getComponentUuid();
+    }
+
+    public void setMemberUuid(UUID memberUuid) {
+        setComponentUuid(memberUuid);
     }
 
     public boolean containsKey(RefexProperty key) {
@@ -304,7 +363,7 @@ public final class RefexCAB extends CreateOrAmendBlueprint {
                     try {
                         int nid = Ts.get().getNidForUuids((UUID) entry.getValue());
                         if (version.getNid() != nid) {
-                           version.setNid(nid);
+                            version.setNid(nid);
                         }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
@@ -362,15 +421,15 @@ public final class RefexCAB extends CreateOrAmendBlueprint {
         for (Entry<RefexProperty, Object> entry : properties.entrySet()) {
             switch (entry.getKey()) {
                 case RC_NID:
-                   if (!entry.getValue().equals(version.getReferencedComponentNid())) {
+                    if (!entry.getValue().equals(version.getReferencedComponentNid())) {
                         return false;
-                   }
-                   break;
+                    }
+                    break;
                 case COLLECTION_NID:
-                   if (!entry.getValue().equals(version.getCollectionNid())) {
+                    if (!entry.getValue().equals(version.getCollectionNid())) {
                         return false;
-                   }
-                   break;
+                    }
+                    break;
                 case MEMBER_UUID:
                     try {
                         if (version.getNid() != Ts.get().getNidForUuids((UUID) entry.getValue())) {

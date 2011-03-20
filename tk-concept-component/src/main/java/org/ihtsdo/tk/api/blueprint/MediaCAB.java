@@ -29,14 +29,10 @@ public class MediaCAB extends CreateOrAmendBlueprint {
 
     public static final UUID mediaSpecNamespace =
             UUID.fromString("743f0510-5285-11e0-b8af-0800200c9a66");
-    private UUID componentUuid;
     private UUID conceptUuid;
     private UUID typeUuid;
-
     public String format;
-
     public String textDescription;
-
     public byte[] dataBytes;
 
     public MediaCAB(
@@ -58,18 +54,19 @@ public class MediaCAB extends CreateOrAmendBlueprint {
     public MediaCAB(
             UUID conceptUuid, UUID typeUuid, String format, String textDescription,
             byte[] dataBytes, UUID componentUuid) throws IOException {
+        super(componentUuid);
 
         this.conceptUuid = conceptUuid;
         this.typeUuid = typeUuid;
         this.format = format;
         this.textDescription = textDescription;
         this.dataBytes = dataBytes;
-        this.componentUuid = componentUuid;
-        if (componentUuid == null) {
+        if (getComponentUuid() == null) {
             try {
-                componentUuid = UuidT5Generator.get(mediaSpecNamespace,
+                setComponentUuid(
+                        UuidT5Generator.get(mediaSpecNamespace,
                         getPrimoridalUuidStr(conceptUuid)
-                        + dataBytes);
+                        + dataBytes));
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             } catch (InvalidCAB ex) {
@@ -80,30 +77,22 @@ public class MediaCAB extends CreateOrAmendBlueprint {
         }
     }
 
-    public UUID getComponentUuid() {
-        return componentUuid;
-    }
-
     public UUID getTypeUuid() {
         return typeUuid;
-    }
-
-    public int getComponentNid() throws IOException {
-        return Ts.get().getNidForUuids(componentUuid);
     }
 
     public int getTypeNid() throws IOException {
         return Ts.get().getNidForUuids(typeUuid);
     }
-    
+
     public int getConceptNid() throws IOException {
         return Ts.get().getNidForUuids(conceptUuid);
     }
-    
+
     public UUID getConceptUuid() {
         return conceptUuid;
     }
-    
+
     public byte[] getDataBytes() {
         return dataBytes;
     }
@@ -115,6 +104,4 @@ public class MediaCAB extends CreateOrAmendBlueprint {
     public String getTextDescription() {
         return textDescription;
     }
-
 }
-

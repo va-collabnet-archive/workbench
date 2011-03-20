@@ -31,7 +31,6 @@ public class RelCAB extends CreateOrAmendBlueprint {
 
     public static final UUID relSpecNamespace =
             UUID.fromString("16d79820-5289-11e0-b8af-0800200c9a66");
-    private UUID componentUuid;
     private UUID sourceUuid;
     private UUID typeUuid;
     private UUID destUuid;
@@ -57,8 +56,7 @@ public class RelCAB extends CreateOrAmendBlueprint {
     public RelCAB(
             UUID sourceUuid, UUID typeUuid, UUID destUuid, int group,
             UUID componentUuid, TkRelType type) throws IOException {
-
-        this.componentUuid = componentUuid;
+        super(componentUuid);
         this.sourceUuid = sourceUuid;
         this.typeUuid = typeUuid;
         this.destUuid = destUuid;
@@ -123,10 +121,6 @@ public class RelCAB extends CreateOrAmendBlueprint {
         return characteristicUuid;
     }
 
-    public UUID getComponentUuid() {
-        return componentUuid;
-    }
-
     public UUID getDestUuid() {
         return destUuid;
     }
@@ -149,10 +143,6 @@ public class RelCAB extends CreateOrAmendBlueprint {
 
     public int getCharacteristicNid() throws IOException {
         return Ts.get().getNidForUuids(characteristicUuid);
-    }
-
-    public int getComponentNid() throws IOException {
-        return Ts.get().getNidForUuids(componentUuid);
     }
 
     public int getDestNid() throws IOException {
