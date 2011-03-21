@@ -264,7 +264,7 @@ public class Rf1ToArfTextDefMojo extends AbstractMojo implements Serializable {
 
         int count1, count2; // records in arrays 1 & 2
         String fName1, fName2; // file path name
-        String yRevDateStr; // :!!!: int in processConcepts
+        String yRevDateStr;
 
         Rf1TextDef[] a1;
         Rf1TextDef[] a2, a3 = null;
