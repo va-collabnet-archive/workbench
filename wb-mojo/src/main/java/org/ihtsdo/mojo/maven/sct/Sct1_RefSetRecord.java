@@ -38,9 +38,11 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
     long revTime;
 
     int pathIdx;
+    int authorIdx;
 
+    // BOOLEAN
     public Sct1_RefSetRecord(UUID refsetUuid, UUID memberUuid, UUID componentUuid, int status,
-            long zRevTime, int zPathIdx, boolean valueBoolean) {
+            long zRevTime, int zPathIdx, boolean valueBoolean, int zAuthIdx) {
         super();
         this.conUuidMsb = Long.MAX_VALUE;
         this.conUuidLsb = Long.MAX_VALUE;
@@ -62,10 +64,12 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
         this.status = status;
         this.revTime = zRevTime;
         this.pathIdx = zPathIdx;
+        this.authorIdx = zAuthIdx;
     }
 
+    // CONCEPT
     public Sct1_RefSetRecord(UUID refsetUuid, UUID memberUuid, UUID componentUuid, int status,
-            long zRevTime, int zPathIdx, UUID vConcept) {
+            long zRevTime, int zPathIdx, UUID vConcept, int zAuthIdx) {
         super();
         this.conUuidMsb = Long.MAX_VALUE;
         this.conUuidLsb = Long.MAX_VALUE;
@@ -87,10 +91,12 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
         this.status = status;
         this.revTime = zRevTime;
         this.pathIdx = zPathIdx;
+        this.authorIdx = zAuthIdx;
     }
 
+    // INTEGER
     public Sct1_RefSetRecord(UUID refsetUuid, UUID memberUuid, UUID componentUuid, int status,
-            long zRevTime, int zPathIdx, int vInteger) {
+            long zRevTime, int zPathIdx, int vInteger, int zAuthIdx) {
         super();
         this.conUuidMsb = Long.MAX_VALUE;
         this.conUuidLsb = Long.MAX_VALUE;
@@ -112,10 +118,12 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
         this.status = status;
         this.revTime = zRevTime;
         this.pathIdx = zPathIdx;
+        this.authorIdx = zAuthIdx;
     }
 
+    // STRING
     public Sct1_RefSetRecord(UUID refsetUuid, UUID memberUuid, UUID componentUuid, int status,
-            long zRevTime, int zPathIdx, String vString) {
+            long zRevTime, int zPathIdx, String vString, int zAuthIdx) {
         super();
         this.conUuidMsb = Long.MAX_VALUE;
         this.conUuidLsb = Long.MAX_VALUE;
@@ -137,6 +145,7 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
         this.status = status;
         this.revTime = zRevTime;
         this.pathIdx = zPathIdx;
+        this.authorIdx = zAuthIdx;
     }
 
     public void setEnvelopConUuid(UUID conUuid, ComponentType cType) {
