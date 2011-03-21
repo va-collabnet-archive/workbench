@@ -351,6 +351,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                                     dataCheckPanel =
                                             new ConceptPanel(HOST_ENUM.CONCPET_PANEL_DATA_CHECK, aceFrameConfig,
                                             LINK_TYPE.DATA_CHECK_LINK, conceptTabs, Integer.MAX_VALUE, ACE.this.pluginRoot);
+                                    dataCheckPanel.setAce(ACE.this, LINK_TYPE.DATA_CHECK_LINK);
                                     conceptPanels.add(dataCheckPanel);
                                 } catch (IOException e) {
                                     AceLog.getAppLog().alertAndLogException(e);
@@ -1443,10 +1444,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         treeHelper.addMouseListener(new TreeMouseListener(this));
         conceptPanels = new ArrayList<ConceptPanel>();
         c1Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R1, aceFrameConfig, LINK_TYPE.TREE_LINK, conceptTabs, 1, this.pluginRoot);
-        c1Panel.setAce(this);
+        c1Panel.setAce(this, LINK_TYPE.TREE_LINK);
         conceptPanels.add(c1Panel);
         c2Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R2, aceFrameConfig, LINK_TYPE.SEARCH_LINK, conceptTabs, 2, this.pluginRoot);
-        c2Panel.setAce(this);
+        c2Panel.setAce(this, LINK_TYPE.SEARCH_LINK);
         conceptPanels.add(c2Panel);
         conceptTabs.addComponentListener(new ResizePalettesListener());
 
@@ -1458,13 +1459,13 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         // CONCEPT TAB R-3
         ConceptPanel c3Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R3, aceFrameConfig, LINK_TYPE.UNLINKED, conceptTabs, 3, this.pluginRoot);
-        c3Panel.setAce(this);
+        c3Panel.setAce(this, LINK_TYPE.UNLINKED);
         conceptPanels.add(c3Panel);
         conceptTabs.addTab("empty", null, c3Panel, "Unlinked");
 
         // CONCEPT TAB R-4
         ConceptPanel c4Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R4, aceFrameConfig, LINK_TYPE.UNLINKED, conceptTabs, 4, this.pluginRoot);
-        c4Panel.setAce(this);
+        c4Panel.setAce(this, LINK_TYPE.UNLINKED);
 
         conceptPanels.add(c4Panel);
         conceptTabs.addTab("empty", null, c4Panel, "Unlinked");
@@ -1500,7 +1501,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         leftTabs.addTab(taxonomyTabLabel, termTree);
 
         ConceptPanel c5panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_L1, aceFrameConfig, LINK_TYPE.UNLINKED, leftTabs, 3, this.pluginRoot);
-        c5panel.setAce(this);
+        c5panel.setAce(this, LINK_TYPE.UNLINKED);
         conceptPanels.add(c5panel);
         leftTabs.addTab("empty", null, c5panel, "Unlinked");
         leftTabs.setMinimumSize(new Dimension(0, 0));

@@ -846,8 +846,9 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
     private JList linkedList;
     private ACE ace;
 
-    public void setAce(ACE ace) {
+    public void setAce(ACE ace, LINK_TYPE link) {
         this.ace = ace;
+        changeLinkListener(link);
     }
 
     public void changeLinkListener(LINK_TYPE type) {

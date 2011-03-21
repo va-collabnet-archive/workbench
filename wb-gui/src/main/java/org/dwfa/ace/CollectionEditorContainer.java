@@ -229,7 +229,7 @@ public class CollectionEditorContainer extends JPanel {
         conceptPanel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_LIST_VIEW, ace.aceFrameConfig, 
         		LINK_TYPE.LIST_LINK, true,
             Integer.MIN_VALUE, ace.getPluginRoot());
-        conceptPanel.setAce(ace);
+        conceptPanel.setAce(ace, LINK_TYPE.LIST_LINK);
         conceptPanel.setLinkedList(list);
         conceptPanel.changeLinkListener(LINK_TYPE.LIST_LINK);
         GridBagConstraints c = new GridBagConstraints();
