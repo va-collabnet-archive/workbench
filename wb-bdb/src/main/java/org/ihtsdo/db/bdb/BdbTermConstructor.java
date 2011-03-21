@@ -7,6 +7,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.description.DescriptionRevision;
+import org.ihtsdo.concept.component.image.Image;
+import org.ihtsdo.concept.component.image.ImageRevision;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.concept.component.refset.RefsetMemberFactory;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
@@ -29,6 +31,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.media.MediaChronicleBI;
+import org.ihtsdo.tk.api.media.MediaVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
@@ -292,23 +295,94 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
         return desc;
     }
 
+
+    private MediaChronicleBI getMedia(MediaCAB blueprint)
+            throws InvalidCAB, IOException {
+        if (Ts.get().hasUuid(blueprint.getComponentUuid())) {
+            ComponentChroncileBI<?> component =
+                    Ts.get().getComponent(blueprint.getComponentUuid());
+            if (component == null) {
+                return null;
+            }
+            if (component instanceof MediaChronicleBI) {
+                return (MediaChronicleBI) component;
+            } else {
+                throw new InvalidCAB(
+                        "Component exists of different type: "
+                        + component + "\n\nMediaCAB: " + blueprint);
+            }
+        }
+        return null;
+    }
     @Override
-    public MediaChronicleBI constructIfNotCurrent(MediaCAB spec) throws IOException, InvalidCAB {
+    public MediaChronicleBI constructIfNotCurrent(MediaCAB blueprint) throws IOException, InvalidCAB {
+        MediaChronicleBI mediaC = getMedia(blueprint);
+        if (mediaC == null) {
+            return construct(blueprint);
+        }
+        Collection<? extends MediaVersionBI> mediaV = mediaC.getVersions(vc);
+        for (MediaVersionBI dv : mediaV) {
+            if (!blueprint.validate(dv)) {
+                return construct(blueprint);
+            }
+        }
+        return mediaC;
+    }
+
+    @Override
+    public MediaChronicleBI construct(MediaCAB blueprint) throws IOException, InvalidCAB {
+       MediaChronicleBI imgC = getMedia(blueprint);
+
+        if (imgC == null) {
+            Concept c = (Concept) Ts.get().getConcept(blueprint.getConceptNid());
+            Image img = new Image();
+            imgC = img;
+            Bdb.gVersion.incrementAndGet();
+            img.enclosingConceptNid = c.getNid();
+            img.nid = Bdb.uuidToNid(blueprint.getComponentUuid());
+            Bdb.getNidCNidMap().setCNidForNid(c.getNid(), img.nid);
+            img.primordialUNid = Bdb.getUuidsToNidMap().getUNid(blueprint.getComponentUuid());
+            img.setTypeNid(blueprint.getTypeNid());
+            img.setFormat(blueprint.getFormat());
+            img.setImage(blueprint.getDataBytes());
+            img.setTextDescription(blueprint.getTextDescription());
+            img.primordialSapNid = Integer.MIN_VALUE;
+            for (int p : ec.getEditPaths()) {
+                if (img.primordialSapNid == Integer.MIN_VALUE) {
+                    img.primordialSapNid =
+                            Bdb.getSapDb().getSapNid(blueprint.getStatusNid(), ec.getAuthorNid(), p,
+                            Long.MAX_VALUE);
+                } else {
+                    if (img.revisions == null) {
+                        img.revisions = new CopyOnWriteArrayList<ImageRevision>();
+                    }
+                    img.revisions.add((ImageRevision) img.makeAnalog(blueprint.getStatusNid(),
+                            ec.getAuthorNid(), p, Long.MAX_VALUE));
+                }
+            }
+            c.getMedia().add(img);
+            return img;
+        } else {
+            Image img = (Image) imgC;
+            for (int p : ec.getEditPaths()) {
+                ImageRevision imgR = img.makeAnalog(blueprint.getStatusNid(),
+                        ec.getAuthorNid(),
+                        p,
+                        Long.MAX_VALUE);
+                imgR.setTypeNid(blueprint.getTypeNid());
+                imgR.setTextDescription(blueprint.getTextDescription());
+            }
+        }
+        return imgC;
+    }
+
+    @Override
+    public ConceptChronicleBI constructIfNotCurrent(ConceptCAB blueprint) throws IOException, InvalidCAB {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public MediaChronicleBI construct(MediaCAB spec) throws IOException, InvalidCAB {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public ConceptChronicleBI constructIfNotCurrent(ConceptCAB spec) throws IOException, InvalidCAB {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public ConceptChronicleBI construct(ConceptCAB spec) throws IOException, InvalidCAB {
+    public ConceptChronicleBI construct(ConceptCAB blueprint) throws IOException, InvalidCAB {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }

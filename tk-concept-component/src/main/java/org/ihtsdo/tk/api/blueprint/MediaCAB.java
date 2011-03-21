@@ -17,8 +17,10 @@ package org.ihtsdo.tk.api.blueprint;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.UUID;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.media.MediaVersionBI;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
 /**
@@ -104,4 +106,31 @@ public class MediaCAB extends CreateOrAmendBlueprint {
     public String getTextDescription() {
         return textDescription;
     }
+    
+       
+    public boolean validate(MediaVersionBI version) throws IOException {
+        if (version.getStatusNid() != getStatusNid()) {
+            return false;
+        }
+        if (version.getNid() != getComponentNid()) {
+            return false;
+        }
+        if (version.getConceptNid() != getConceptNid()) {
+            return false;
+        }
+        if (version.getTypeNid() != getTypeNid()) {
+            return false;
+        }
+        if (!version.getFormat().equals(getFormat())) {
+            return false;
+        }
+        if (!version.getTextDescription().equals(getTextDescription())) {
+            return false;
+        }
+        if (!Arrays.equals(version.getMedia(), getDataBytes())) {
+            return false;
+        }
+        return true;
+    }
+
 }
