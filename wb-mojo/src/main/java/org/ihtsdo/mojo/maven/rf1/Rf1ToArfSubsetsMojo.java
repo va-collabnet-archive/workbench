@@ -556,7 +556,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
             BufferedWriter bwc) throws MojoFailureException, IOException, NoSuchAlgorithmException {
 
         int count1, count2; // records in arrays 1 & 2
-        String yRevDateStr; // :!!!: int in processConcepts
+        String yRevDateStr;
         Rf1SubsetId tmpSid;
         String tmpArf;
 
@@ -607,20 +607,20 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
                 a3 = new Rf1SubsetMember[count2]; // max3
                 while ((r1 < count1) && (r2 < count2)) {
 
-                    // :!!!:DEBUG
+                    // :DEBUG
 //                    if (a1[r1].memberId == 370698009 || a2[r2].memberId == 370698009) {
-//                        System.out.println(":!!!:DEBUG: ... " + yRevDateStr);
-//                        System.out.println(":!!!:DEBUG: origSubsetId a1[r1]=" + a1[r1].origSubsetId
+//                        System.out.println(":DEBUG: ... " + yRevDateStr);
+//                        System.out.println(":DEBUG: origSubsetId a1[r1]=" + a1[r1].origSubsetId
 //                                + " , a2[r2]=" + a2[r2].origSubsetId);
-//                        System.out.println(":!!!:DEBUG: memberId a1[r1]=" + a1[r1].memberId + " ,a2[r2]="
+//                        System.out.println(":DEBUG: memberId a1[r1]=" + a1[r1].memberId + " ,a2[r2]="
 //                                + a2[r2].memberId);
-//                        System.out.println(":!!!:DEBUG: status " + a1[r1].status + " , "
+//                        System.out.println(":DEBUG: status " + a1[r1].status + " , "
 //                                + a2[r2].status);
-//                        System.out.println(":!!!:DEBUG: a1[r1].memberId=="
+//                        System.out.println(":DEBUG: a1[r1].memberId=="
 //                                + Type3UuidFactory.fromSNOMED(a1[r1].memberId));
-//                        System.out.println(":!!!:DEBUG: a2[r2].memberId=="
+//                        System.out.println(":DEBUG: a2[r2].memberId=="
 //                                + Type3UuidFactory.fromSNOMED(a2[r2].memberId));
-//                        System.out.println(":!!!:DEBUG: compare == "
+//                        System.out.println(":DEBUG: compare == "
 //                                + compareMember(a1[r1], a2[r2]));
 //                    }
 

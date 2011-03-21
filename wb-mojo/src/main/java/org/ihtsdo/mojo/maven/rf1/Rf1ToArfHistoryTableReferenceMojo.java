@@ -40,7 +40,6 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
 import org.dwfa.util.id.Type5UuidFactory;
 
@@ -287,7 +286,7 @@ public class Rf1ToArfHistoryTableReferenceMojo extends AbstractMojo implements S
             throws MojoFailureException, IOException, NoSuchAlgorithmException {
         int count1, count2; // records in arrays 1 & 2
         String fName1, fName2; // file path name
-        String yRevDateStr; // :!!!: int in processConcepts
+        String yRevDateStr;
         String tmpArf;
 
         Rf1HistoryTableReference[] a1, a2, a3 = null;
