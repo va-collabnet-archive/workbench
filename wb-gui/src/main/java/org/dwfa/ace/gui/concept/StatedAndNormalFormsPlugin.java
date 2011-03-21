@@ -36,7 +36,6 @@ public class StatedAndNormalFormsPlugin extends AbstractPlugin {
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
 
-    // private transient LogicalFormsPanel formsPanel; :!!!:
     private transient CNFormsTablePanel formsPanel;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
