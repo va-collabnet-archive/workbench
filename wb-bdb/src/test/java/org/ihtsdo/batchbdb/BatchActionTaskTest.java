@@ -19,6 +19,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
 
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.tapi.impl.MemoryTermServer;
@@ -37,11 +38,12 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
 import org.ihtsdo.tk.example.binding.TermAux;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -55,7 +57,6 @@ public class BatchActionTaskTest {
     String dbTarget;
     DataOutputStream eConceptDOS;
 
-    @Ignore
     @Test
     public void batchActionTaskTest() {
         try {
@@ -64,7 +65,7 @@ public class BatchActionTaskTest {
             int userNid = ArchitectonicAuxiliary.Concept.USER.localize().getNid();
             EditCoordinate ec = new EditCoordinate(userNid, pathNid);
             ViewCoordinate vc = profile.getViewCoordinate();
-            
+            Object terms = Terms.get();
             PathBI editPath = Terms.get().getPath(pathNid); // :!!!: THROWS EXCEPTION
             profile.addEditingPath(editPath);
 
@@ -94,17 +95,17 @@ public class BatchActionTaskTest {
 
             // 'inferred'
             UUID parentToDelUuid = UUID.fromString("d8fb4fb0-18c3-3352-9431-4919193f85bc");
-            
+
             // 'subsumed' -- remove the 'inferred' parent, leave the 'stated' parent
             UUID cUuid3 = UUID.fromString("05997863-1f18-3c14-8b3b-059dd2ba28d8");
             ConceptChronicleBI c3 = Ts.get().getConcept(cUuid3);
             concepts.add(c3);
-            
+
             // 'entry term' -- move from 'description type' parent to 'definition type' parent
             UUID cUuid4 = UUID.fromString("8b3058dd-b236-300a-9a00-dda3a88caa71");
             ConceptChronicleBI c4 = Ts.get().getConcept(cUuid4);
             concepts.add(c4);
-            
+
             // SETUP BatchActionTaskList
             // :!!!:NYI: CREATE BatchActionTaskListParents
             List<BatchActionTask> batl = new ArrayList<BatchActionTask>();
@@ -118,7 +119,7 @@ public class BatchActionTaskTest {
             Ts.get().iterateConceptDataInParallel(bap);
 
             System.out.print(BatchActionEventReporter.createReportTSV());
-            
+
             // Assert.assertTrue(TF);
             // Assert.assertEquals(A, B);
 
@@ -144,6 +145,8 @@ public class BatchActionTaskTest {
             mts.setGenerateIds(true);
             ArchitectonicAuxiliary aa = new ArchitectonicAuxiliary();
             aa.addToMemoryTermServer(mts);
+            RefsetAuxiliary ra = new RefsetAuxiliary();
+            ra.addToMemoryTermServer(mts);
             File directory = new File(dbTarget);
             directory.mkdirs();
 
@@ -154,6 +157,21 @@ public class BatchActionTaskTest {
             eConceptDOS = new DataOutputStream(eConceptsBos);
             for (I_ConceptualizeLocally localConcept : mts.getConcepts()) {
                 EConcept eC = new EConcept(localConcept, mts);
+                if (RefsetAuxiliary.Concept.REFSET_PATHS.getUids().contains(eC.getPrimordialUuid())) {
+                    // Add the workbench auxiliary path...
+                    TkRefsetCidMember member = new TkRefsetCidMember();
+                    member.primordialUuid = UUID.fromString("9353a710-a1c0-11df-981c-0800200c9a66");
+                    member.componentUuid = ArchitectonicAuxiliary.Concept.PATH.getPrimoridalUid();
+                    member.c1Uuid = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getPrimoridalUid();
+                    member.setRefsetUuid(eC.primordialUuid);
+                    member.statusUuid = eC.conceptAttributes.statusUuid;
+                    member.authorUuid = eC.conceptAttributes.authorUuid;
+                    member.pathUuid = eC.conceptAttributes.pathUuid;
+                    member.time = eC.conceptAttributes.time;
+                    List<TkRefsetAbstractMember<?>> memberList = new ArrayList<TkRefsetAbstractMember<?>>();
+                    memberList.add(member);
+                    eC.setRefsetMembers(memberList);
+                }
                 eC.writeExternal(eConceptDOS);
             }
             eConceptDOS.close();
