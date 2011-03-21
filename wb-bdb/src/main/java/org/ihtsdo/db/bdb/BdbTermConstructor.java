@@ -18,6 +18,7 @@ import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.blueprint.ConAttrAB;
 import org.ihtsdo.tk.api.blueprint.DescCAB;
 
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
@@ -27,6 +28,8 @@ import org.ihtsdo.tk.api.blueprint.RelCAB;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.MediaCAB;
+import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
+import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -58,6 +61,15 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
             return updateRefex(refex, blueprint);
         }
         return createRefex(blueprint);
+    }
+
+    public ConceptAttributes getConAttr(ConAttrAB blueprint) throws IOException, InvalidCAB {
+        ConceptAttributes cac = (ConceptAttributes) Ts.get().getConcept(blueprint.getComponentUuid()).getConAttrs();
+        if (cac == null) {
+            throw new InvalidCAB("ConAttrAB can only be used for amendment, not creation."
+                    + " Use ConceptCB instead. " + blueprint);
+        }
+        return cac;
     }
 
     private RefexChronicleBI<?> updateRefex(RefsetMember<?, ?> blueprint,
@@ -424,24 +436,66 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
         for (int p : ec.getEditPaths()) {
             if (a.primordialSapNid == Integer.MIN_VALUE) {
                 a.primordialSapNid =
-                        Bdb.getSapDb().getSapNid(blueprint.getStatusNid(), 
+                        Bdb.getSapDb().getSapNid(blueprint.getStatusNid(),
                         ec.getAuthorNid(), p, Long.MAX_VALUE);
             } else {
                 if (a.revisions == null) {
-                    a.revisions = 
+                    a.revisions =
                             new CopyOnWriteArrayList<ConceptAttributesRevision>();
                 }
-                a.revisions.add((ConceptAttributesRevision) 
-                        a.makeAnalog(blueprint.getStatusNid(), 
+                a.revisions.add((ConceptAttributesRevision) a.makeAnalog(blueprint.getStatusNid(),
                         ec.getAuthorNid(), p, Long.MAX_VALUE));
             }
         }
-        
+
         construct(blueprint.getFsnCAB());
         construct(blueprint.getPreferredCAB());
-        for (RelCAB parentCAB: blueprint.getParentCABs()) {
+        for (RelCAB parentCAB : blueprint.getParentCABs()) {
             construct(parentCAB);
         }
         return newC;
+    }
+
+    @Override
+    public ConAttrChronicleBI construct(ConAttrAB blueprint) throws IOException, InvalidCAB {
+        ConceptAttributes cac = getConAttr(blueprint);
+        for (ConAttrVersionBI cav : cac.getVersions(vc)) {
+            for (int p : ec.getEditPaths()) {
+
+                if (cac.revisions == null) {
+                    cac.revisions =
+                            new CopyOnWriteArrayList<ConceptAttributesRevision>();
+                }
+                ConceptAttributesRevision r = (ConceptAttributesRevision) cac.makeAnalog(blueprint.getStatusNid(),
+                        ec.getAuthorNid(), p, Long.MAX_VALUE);
+                cac.revisions.add(r);
+
+            }
+        }
+
+        return cac;
+    }
+
+    @Override
+    public ConAttrChronicleBI constructIfNotCurrent(ConAttrAB blueprint) throws IOException, InvalidCAB {
+        ConceptAttributes cac = getConAttr(blueprint);
+        for (ConAttrVersionBI cav : cac.getVersions(vc)) {
+            if (blueprint.validate(cav)) {
+                return cac;
+            }
+            for (int p : ec.getEditPaths()) {
+
+                if (cac.revisions == null) {
+                    cac.revisions =
+                            new CopyOnWriteArrayList<ConceptAttributesRevision>();
+                }
+                ConceptAttributesRevision r = (ConceptAttributesRevision) cac.makeAnalog(blueprint.getStatusNid(),
+                        ec.getAuthorNid(), p, Long.MAX_VALUE);
+                cac.revisions.add(r);
+
+            }
+        }
+
+        return cac;
     }
 }

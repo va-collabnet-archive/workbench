@@ -1,12 +1,14 @@
 package org.ihtsdo.tk.api;
 
 import java.io.IOException;
+import org.ihtsdo.tk.api.blueprint.ConAttrAB;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.DescCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.MediaCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RelCAB;
+import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.media.MediaChronicleBI;
@@ -19,91 +21,119 @@ public interface TerminologyConstructorBI {
     /**
      *  
      * @param res
-     * @return A <code>RefexChronicleBI</code> if the <code>spec</code> regardless of if the Refex was modified. 
+     * @return A <code>RefexChronicleBI</code> if the <code>blueprint</code> 
+     * regardless of if the RefexChronicleBI was modified. 
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    RefexChronicleBI<?> construct(RefexCAB spec) throws IOException, InvalidCAB;
+    RefexChronicleBI<?> construct(RefexCAB blueprint) throws IOException, InvalidCAB;
 
     /**
      *  This method incurs an extra cost to determine if a current version already meets the specification. 
      * @param res
-     * @return A <code>RefexChronicleBI</code> if the <code>spec</code> regardless of if the Refex was modified. 
+     * @return A <code>RefexChronicleBI</code> if the <code>blueprint</code> 
+     * regardless of if the RefexChronicleBI was modified. 
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    RefexChronicleBI<?> constructIfNotCurrent(RefexCAB spec) throws IOException, InvalidCAB;
+    RefexChronicleBI<?> constructIfNotCurrent(RefexCAB blueprint) throws IOException, InvalidCAB;
 
     /**
      *  
      * @param res
-     * @return A <code>RelationshipChronicleBI</code> if the <code>spec</code> regardless of if the RelationshipChronicleBI was modified. 
+     * @return A <code>RelationshipChronicleBI</code> if the <code>blueprint</code> 
+     * regardless of if the RelationshipChronicleBI was modified. 
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    RelationshipChronicleBI construct(RelCAB spec) throws IOException, InvalidCAB;
+    RelationshipChronicleBI construct(RelCAB blueprint) throws IOException, InvalidCAB;
 
     /**
      *  This method incurs an extra cost to determine if a current version already meets the specification. 
      * @param res
-     * @return A <code>RelationshipChronicleBI</code> if the <code>spec</code> regardless of if the RelationshipChronicleBI was modified. 
+     * @return A <code>RelationshipChronicleBI</code> if the 
+     * <code>blueprint</code> regardless of if the RelationshipChronicleBI was modified. 
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    RelationshipChronicleBI constructIfNotCurrent(RelCAB spec) throws IOException, InvalidCAB;
+    RelationshipChronicleBI constructIfNotCurrent(RelCAB blueprint) throws IOException, InvalidCAB;
 
     /**
      *  
      * @param res
-     * @return A <code>DescriptionChronicleBI</code> if the <code>spec</code> regardless of if the RelationshipChronicleBI was modified. 
+     * @return A <code>DescriptionChronicleBI</code> if the <code>blueprint</code> 
+     * regardless of if the DescriptionChronicleBI was modified. 
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    DescriptionChronicleBI construct(DescCAB spec) throws IOException, InvalidCAB;
+    DescriptionChronicleBI construct(DescCAB blueprint) throws IOException, InvalidCAB;
 
     /**
      *  This method incurs an extra cost to determine if a current version already meets the specification. 
      * @param res
-     * @return A <code>DescriptionChronicleBI</code> if the <code>spec</code> regardless of if the RelationshipChronicleBI was modified. 
+     * @return A <code>DescriptionChronicleBI</code> if the
+     * <code>blueprint</code> regardless of if the DescriptionChronicleBI was modified. 
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    DescriptionChronicleBI constructIfNotCurrent(DescCAB spec) throws IOException, InvalidCAB;
+    DescriptionChronicleBI constructIfNotCurrent(DescCAB blueprint) throws IOException, InvalidCAB;
 
     /**
      *  
      * @param res
-     * @return A <code>MediaChronicleBI</code> if the <code>spec</code> regardless of if the RelationshipChronicleBI was modified. 
+     * @return A <code>MediaChronicleBI</code> if the <code>blueprint</code> 
+     * regardless of if the MediaChronicleBI was modified. 
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    MediaChronicleBI construct(MediaCAB spec) throws IOException, InvalidCAB;
+    MediaChronicleBI construct(MediaCAB blueprint) throws IOException, InvalidCAB;
 
     /**
      *  This method incurs an extra cost to determine if a current version already meets the specification. 
      * @param res
-     * @return A <code>MediaChronicleBI</code> if the <code>spec</code> regardless of if the RelationshipChronicleBI was modified. 
+     * @return A <code>MediaChronicleBI</code> if the <code>blueprint</code> 
+     *         regardless of if the MediaChronicleBI was modified. 
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    MediaChronicleBI constructIfNotCurrent(MediaCAB spec) throws IOException, InvalidCAB;
+    MediaChronicleBI constructIfNotCurrent(MediaCAB blueprint) throws IOException, InvalidCAB;
 
-        /**
+    /**
      *  
      * @param res
-     * @return A <code>MediaChronicleBI</code> if the <code>spec</code> regardless of if the RelationshipChronicleBI was modified. 
+     * @return A <code>ConceptChronicleBI</code> if the <code>blueprint</code> 
+     *          regardless of if the ConceptChronicleBI was modified. 
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    ConceptChronicleBI construct(ConceptCB spec) throws IOException, InvalidCAB;
+    ConceptChronicleBI construct(ConceptCB blueprint) throws IOException, InvalidCAB;
+
+    /**
+     *  This method incurs an extra cost to determine if a current version 
+     *  already meets the specification. 
+     * @param res
+     * @return A <code>ConceptChronicleBI</code> if the <code>blueprint</code> 
+     *          regardless of if the ConceptChronicleBI was modified. 
+     * @throws IOException
+     * @throws InvalidAmendmentSpec
+     */
+    ConceptChronicleBI constructIfNotCurrent(ConceptCB blueprint) throws IOException, InvalidCAB;
+
+    /**
+     *  
+     * @param res
+     * @return A <code>ConAttrChronicleBI</code> if the <code>blueprint</code> regardless of if the ConAttrChronicleBI was modified. 
+     * @throws IOException
+     * @throws InvalidAmendmentSpec
+     */
+    ConAttrChronicleBI construct(ConAttrAB blueprint) throws IOException, InvalidCAB;
 
     /**
      *  This method incurs an extra cost to determine if a current version already meets the specification. 
      * @param res
-     * @return A <code>MediaChronicleBI</code> if the <code>spec</code> regardless of if the RelationshipChronicleBI was modified. 
+     * @return A <code>ConAttrChronicleBI</code> if the <code>blueprint</code> regardless of if the ConAttrChronicleBI was modified. 
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    ConceptChronicleBI constructIfNotCurrent(ConceptCB spec) throws IOException, InvalidCAB;
-
+    ConAttrChronicleBI constructIfNotCurrent(ConAttrAB blueprint) throws IOException, InvalidCAB;
 }
