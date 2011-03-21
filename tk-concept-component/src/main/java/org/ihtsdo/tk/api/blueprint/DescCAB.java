@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
 /**
@@ -105,4 +106,31 @@ public class DescCAB extends CreateOrAmendBlueprint {
     public String getText() {
         return text;
     }
+    
+    public boolean validate(DescriptionVersionBI version) throws IOException {
+        if (version.getStatusNid() != getStatusNid()) {
+            return false;
+        }
+        if (version.getNid() != getComponentNid()) {
+            return false;
+        }
+        if (version.getConceptNid() != getConceptNid()) {
+            return false;
+        }
+        if (version.getTypeNid() != getTypeNid()) {
+            return false;
+        }
+        if (!version.getLang().equals(getLang())) {
+            return false;
+        }
+        if (!version.getText().equals(getText())) {
+            return false;
+        }
+        if (version.isInitialCaseSignificant() != isInitialCaseSignificant()) {
+            return false;
+        }
+        return true;
+    }
 }
+
+

@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelType;
 import org.ihtsdo.tk.example.binding.TermAux;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
@@ -159,5 +160,30 @@ public class RelCAB extends CreateOrAmendBlueprint {
 
     public int getTypeNid() throws IOException {
         return Ts.get().getNidForUuids(typeUuid);
+    }
+    
+    public boolean validate(RelationshipVersionBI version) throws IOException {
+        if (version.getStatusNid() != getStatusNid()) {
+            return false;
+        }
+        if (version.getNid() != getComponentNid()) {
+            return false;
+        }
+        if (version.getConceptNid() != getSourceNid()) {
+            return false;
+        }
+        if (version.getTypeNid() != getTypeNid()) {
+            return false;
+        }
+        if (version.getRefinabilityNid() != getRefinabilityNid()) {
+            return false;
+        }
+        if (version.getCharacteristicNid() != getCharacteristicNid()) {
+            return false;
+        }
+        if (version.getDestinationNid() != getDestNid()) {
+            return false;
+        }
+        return true;
     }
 }

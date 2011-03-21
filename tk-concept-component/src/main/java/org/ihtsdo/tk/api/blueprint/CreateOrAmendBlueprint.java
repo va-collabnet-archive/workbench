@@ -92,6 +92,10 @@ public abstract class CreateOrAmendBlueprint {
          return statusUuid;
     }
 
+    public int getStatusNid() throws IOException {
+         return Ts.get().getNidForUuids(statusUuid);
+    }
+
     public void setStatusUuid(UUID statusUuid) {
         this.statusUuid = statusUuid;
     }

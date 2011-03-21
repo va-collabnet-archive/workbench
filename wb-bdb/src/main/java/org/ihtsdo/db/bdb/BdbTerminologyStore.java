@@ -426,7 +426,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
     @Override
     public TerminologyConstructorBI getTerminologyConstructor(EditCoordinate ec, ViewCoordinate vc) {
-        return new BdbTerminologyConstructor(ec, vc);
+        return new BdbTermConstructor(ec, vc);
     }
 
     @Override
