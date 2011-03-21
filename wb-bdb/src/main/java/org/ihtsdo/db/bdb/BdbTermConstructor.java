@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.ihtsdo.concept.Concept;
+import org.ihtsdo.concept.component.attributes.ConceptAttributes;
+import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.description.DescriptionRevision;
 import org.ihtsdo.concept.component.image.Image;
@@ -23,7 +25,7 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.blueprint.RelCAB;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
-import org.ihtsdo.tk.api.blueprint.ConceptCAB;
+import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.MediaCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -295,7 +297,6 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
         return desc;
     }
 
-
     private MediaChronicleBI getMedia(MediaCAB blueprint)
             throws InvalidCAB, IOException {
         if (Ts.get().hasUuid(blueprint.getComponentUuid())) {
@@ -314,6 +315,7 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
         }
         return null;
     }
+
     @Override
     public MediaChronicleBI constructIfNotCurrent(MediaCAB blueprint) throws IOException, InvalidCAB {
         MediaChronicleBI mediaC = getMedia(blueprint);
@@ -331,7 +333,7 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
 
     @Override
     public MediaChronicleBI construct(MediaCAB blueprint) throws IOException, InvalidCAB {
-       MediaChronicleBI imgC = getMedia(blueprint);
+        MediaChronicleBI imgC = getMedia(blueprint);
 
         if (imgC == null) {
             Concept c = (Concept) Ts.get().getConcept(blueprint.getConceptNid());
@@ -376,13 +378,70 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
         return imgC;
     }
 
-    @Override
-    public ConceptChronicleBI constructIfNotCurrent(ConceptCAB blueprint) throws IOException, InvalidCAB {
-        throw new UnsupportedOperationException("Not supported yet.");
+    private ConceptChronicleBI getConcept(ConceptCB blueprint)
+            throws InvalidCAB, IOException {
+        if (Ts.get().hasUuid(blueprint.getComponentUuid())) {
+            ComponentChroncileBI<?> component =
+                    Ts.get().getComponent(blueprint.getComponentUuid());
+            if (component == null) {
+                return null;
+            }
+            if (component instanceof ConceptChronicleBI) {
+                return (ConceptChronicleBI) component;
+            } else {
+                throw new InvalidCAB(
+                        "Component exists of different type: "
+                        + component + "\n\nConceptCAB: " + blueprint);
+            }
+        }
+        return null;
     }
 
     @Override
-    public ConceptChronicleBI construct(ConceptCAB blueprint) throws IOException, InvalidCAB {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public ConceptChronicleBI constructIfNotCurrent(ConceptCB blueprint) throws IOException, InvalidCAB {
+        ConceptChronicleBI cc = getConcept(blueprint);
+        if (cc == null) {
+            return construct(blueprint);
+        }
+        throw new InvalidCAB(
+                "Concept already exists: "
+                + cc + "\n\nConceptCAB cannot be used for update: " + blueprint);
+    }
+
+    @Override
+    public ConceptChronicleBI construct(ConceptCB blueprint) throws IOException, InvalidCAB {
+        int cNid = Bdb.uuidToNid(blueprint.getComponentUuid());
+        Bdb.getNidCNidMap().setCNidForNid(cNid, cNid);
+        Concept newC = Concept.get(cNid);
+        ConceptAttributes a = new ConceptAttributes();
+        a.nid = cNid;
+        a.enclosingConceptNid = cNid;
+        newC.setConceptAttributes(a);
+        a.setDefined(blueprint.isDefined());
+        a.primordialUNid = Bdb.getUuidsToNidMap().getUNid(blueprint.getComponentUuid());
+        a.primordialSapNid = Integer.MIN_VALUE;
+
+        for (int p : ec.getEditPaths()) {
+            if (a.primordialSapNid == Integer.MIN_VALUE) {
+                a.primordialSapNid =
+                        Bdb.getSapDb().getSapNid(blueprint.getStatusNid(), 
+                        ec.getAuthorNid(), p, Long.MAX_VALUE);
+            } else {
+                if (a.revisions == null) {
+                    a.revisions = 
+                            new CopyOnWriteArrayList<ConceptAttributesRevision>();
+                }
+                a.revisions.add((ConceptAttributesRevision) 
+                        a.makeAnalog(blueprint.getStatusNid(), 
+                        ec.getAuthorNid(), p, Long.MAX_VALUE));
+            }
+        }
+        
+        construct(blueprint.getFsnCAB());
+        construct(blueprint.getPreferredCAB());
+        for (RelCAB parentCAB: blueprint.getParentCABs()) {
+            construct(parentCAB);
+        }
+        return newC;
     }
 }

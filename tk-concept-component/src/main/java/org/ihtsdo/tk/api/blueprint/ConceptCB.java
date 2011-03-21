@@ -17,26 +17,30 @@ package org.ihtsdo.tk.api.blueprint;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.TreeSet;
 import java.util.UUID;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelType;
+import org.ihtsdo.tk.example.binding.WbDescType;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
 /**
  *
  * @author kec
  */
-public class ConceptCAB extends CreateOrAmendBlueprint {
+public class ConceptCB extends CreateOrAmendBlueprint {
 
     public static final UUID conceptSpecNamespace =
             UUID.fromString("620d1f30-5285-11e0-b8af-0800200c9a66");
     private String fullySpecifiedName;
-
     private String preferredName;
+    private boolean initialCaseSensitive = false;
     private String lang;
     private UUID isaType;
-    
+    private boolean defined;
     private Collection<UUID> parents = new TreeSet<UUID>() {
 
         @Override
@@ -66,14 +70,13 @@ public class ConceptCAB extends CreateOrAmendBlueprint {
             comupteComponentUuid();
             return result;
         }
-    
     };
 
     public Collection<UUID> getParents() {
         return parents;
     }
 
-    public ConceptCAB(String fullySpecifiedName,
+    public ConceptCB(String fullySpecifiedName,
             String preferredName,
             String lang,
             UUID isaType,
@@ -108,8 +111,8 @@ public class ConceptCAB extends CreateOrAmendBlueprint {
             throw new RuntimeException(ex);
         }
     }
-    
-        public String getFullySpecifiedName() {
+
+    public String getFullySpecifiedName() {
         return fullySpecifiedName;
     }
 
@@ -145,4 +148,52 @@ public class ConceptCAB extends CreateOrAmendBlueprint {
         comupteComponentUuid();
     }
 
+    public boolean isDefined() {
+        return defined;
+    }
+
+    public void setDefined(boolean defined) {
+        this.defined = defined;
+    }
+
+    public boolean isInitialCaseSensitive() {
+        return initialCaseSensitive;
+    }
+
+    public void setInitialCaseSensitive(boolean initialCaseSensitive) {
+        this.initialCaseSensitive = initialCaseSensitive;
+    }
+
+    public DescCAB getFsnCAB() throws IOException {
+        return new DescCAB(
+                getComponentUuid(),
+                WbDescType.FULLY_SPECIFIED.getLenient().getPrimUuid(),
+                getLang(),
+                getFullySpecifiedName(),
+                isInitialCaseSensitive());
+    }
+
+    public DescCAB getPreferredCAB() throws IOException {
+        return new DescCAB(
+                getComponentUuid(),
+                WbDescType.PREFERRED.getLenient().getPrimUuid(),
+                getLang(),
+                getPreferredName(),
+                isInitialCaseSensitive());
+    }
+
+    public List<RelCAB> getParentCABs() throws IOException {
+        List<RelCAB> parentCabs = 
+                new ArrayList<RelCAB>(getParents().size());
+        for (UUID parentUuid: parents) {
+            RelCAB parent = new RelCAB(
+                    getComponentUuid(), 
+                    isaType, 
+                    parentUuid, 
+                    0, 
+                    TkRelType.STATED_HIERARCHY);
+            parentCabs.add(parent);
+        }
+        return parentCabs;
+    }
 }

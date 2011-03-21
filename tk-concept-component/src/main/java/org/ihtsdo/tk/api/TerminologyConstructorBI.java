@@ -1,7 +1,7 @@
 package org.ihtsdo.tk.api;
 
 import java.io.IOException;
-import org.ihtsdo.tk.api.blueprint.ConceptCAB;
+import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.DescCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.MediaCAB;
@@ -95,7 +95,7 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    ConceptChronicleBI construct(ConceptCAB spec) throws IOException, InvalidCAB;
+    ConceptChronicleBI construct(ConceptCB spec) throws IOException, InvalidCAB;
 
     /**
      *  This method incurs an extra cost to determine if a current version already meets the specification. 
@@ -104,6 +104,6 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    ConceptChronicleBI constructIfNotCurrent(ConceptCAB spec) throws IOException, InvalidCAB;
+    ConceptChronicleBI constructIfNotCurrent(ConceptCB spec) throws IOException, InvalidCAB;
 
 }
