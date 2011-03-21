@@ -1767,7 +1767,6 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             parseConcepts(fName1, a1, count1, ctv3idTF, snomedrtTF);
             writeConcepts(oos, a1, count1, xRevDate, xPathID);
 
-            // :!!!:TODO: properly write ids with associated source
             // writeConceptIds(idstxt, a1, count1, sourceUUID, revDate, pathID);
 
             while (fit.hasNext()) {
@@ -2156,10 +2155,6 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
                         a2[r2].xRevision = xRevDate;
                         oos.writeUnshared(a2[r2]);
 
-                        // :xxx: bw.write(a2[r2].toStringArf(revDate, pathID));
-                        // :!!!: double check dropping idstxt.write()
-                        // if (a2[r2].id < Long.MAX_VALUE)
-                        //     idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate, pathID));
                         // hold pointer to append to master
                         a3[r3] = a2[r2];
                         r2++;
@@ -2206,11 +2201,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
                         a2[r2].xPath = xPathID;
                         a2[r2].xRevision = xRevDate;
                         oos.writeUnshared(a2[r2]);
-                        // :xxx: bw.write(a2[r2].toStringArf(revDate, pathID));
 
-                        // :!!!: double check dropping...
-                        // if (a2[r2].id < Long.MAX_VALUE)
-                        //     idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate, pathID));
                         // Add to append array
                         a3[r3] = a2[r2];
                         nAdd++;

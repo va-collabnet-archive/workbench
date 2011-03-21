@@ -1878,7 +1878,6 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
     }
 
     private TkIdentifier createEIdentifier(SctYIdRecord id) {
-        // :!!!:NYI: add Long, String, type detection.
         // This version is just for string identifiers.
         EIdentifierString eId = new EIdentifierString();
         eId.setAuthorityUuid(lookupSrcSystemUUID(id.srcSystemIdx));
@@ -2041,7 +2040,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     SctYRefSetRecord rsRec = aRs.get(idxRsA);
                     SctYDesRecord desRec = (SctYDesRecord) obj;
 
-                    // :DEBUG:!!!:
+                    // :DEBUG:
                     //                    UUID debugThis = new UUID(rsRec.componentUuidMsb, rsRec.componentUuidLsb);
                     //                    UUID debugThat = new UUID(desRec.desUuidMsb, desRec.desUuidLsb);
                     //                    if (UUID.fromString("7c57f6b4-4a63-52ad-b762-73acc15f23de").equals(debugThis)) 
@@ -2242,7 +2241,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             oos.flush();
             oos.close();
 
-            // :!!!:NYI: check to see if any refset member remained unassigned. 
+            // :NYI: check to see if any refset member remained unassigned. 
 
             aRs = null;
             System.gc();
@@ -2279,7 +2278,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
         }
     }
 
-    // :!!!:NYI: concepts may not need to be sorted again after previous step.
+    // :NYI: concepts may not need to be sorted again after previous step.
     private void executeMojoStep6() throws MojoFailureException {
         getLog().info("*** SctSiToEConcept Step #6 BEGINNING -- SORT BY CONCEPT ***");
         long start = System.currentTimeMillis();
@@ -2622,7 +2621,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
         statRsByCon = 0;
         statRsByRs = 0;
 
-        // :DEBUG:!!!:
+        // :DEBUG:
         //        int xyzdebug = 0;
         //        for (UUID u : yPathArray)
         //            getLog().info("PATH UUID :: " + u + " #=" + xyzdebug++);
@@ -3167,7 +3166,6 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             List<UUID> listRefsetUuidMemberUuidForCon = new ArrayList<UUID>();
             List<UUID> listRefsetUuidMemberUuidForDes = new ArrayList<UUID>();
             List<UUID> listRefsetUuidMemberUuidForImage = new ArrayList<UUID>();
-            // :!!!:???: review detail on how to handle Refset Members
             List<UUID> listRefsetUuidMemberUuidForRefsetMember = new ArrayList<UUID>();
             List<UUID> listRefsetUuidMemberUuidForRel = new ArrayList<UUID>();
 
@@ -3213,9 +3211,6 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     tmp.setStatusUuid(yStatusUuidArray[r.status]);
                     tmp.setTime(yRevDateArray[r.yRevision]);
                     tmp.setPathUuid(yPathArray[r.yPath]);
-                    // :!!!: tmp.setAdditionalIdComponents(additionalIdComponents);
-                    // :!!!: tmp.setRevisions(revisions);
-
                     tmp.setBooleanValue(r.valueBoolean);
 
                     listErm.add(tmp);
@@ -3227,9 +3222,6 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     tmp.setStatusUuid(yStatusUuidArray[r.status]);
                     tmp.setTime(yRevDateArray[r.yRevision]);
                     tmp.setPathUuid(yPathArray[r.yPath]);
-                    // :!!!: tmp.setAdditionalIdComponents(additionalIdComponents);
-                    // :!!!: tmp.setRevisions(revisions);
-
                     tmp.setC1Uuid(new UUID(r.valueConUuidMsb, r.valueConUuidLsb));
 
                     listErm.add(tmp);
@@ -3241,9 +3233,6 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     tmp.setStatusUuid(yStatusUuidArray[r.status]);
                     tmp.setTime(yRevDateArray[r.yRevision]);
                     tmp.setPathUuid(yPathArray[r.yPath]);
-                    // :!!!: tmp.setAdditionalIdComponents(additionalIdComponents);
-                    // :!!!: tmp.setRevisions(revisions);
-
                     tmp.setIntValue(r.valueInt);
 
                     listErm.add(tmp);
@@ -3255,8 +3244,6 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     tmp.setStatusUuid(yStatusUuidArray[r.status]);
                     tmp.setTime(yRevDateArray[r.yRevision]);
                     tmp.setPathUuid(yPathArray[r.yPath]);
-                    // :!!!: tmp.setAdditionalIdComponents(additionalIdComponents);
-                    // :!!!: tmp.setRevisions(revisions);
 
                     tmp.setStrValue(r.valueString);
 
@@ -3816,9 +3803,6 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             parseConcepts(fName1, a1, count1, ctv3idTF, snomedrtTF);
             writeConcepts(oos, a1, count1, xRevDate, yPathID);
 
-            // :!!!:TODO: properly write ids with associated source
-            // writeConceptIds(idstxt, a1, count1, sourceUUID, revDate, pathID);
-
             while (fit.hasNext()) {
                 // SETUP CURRENT CONCEPTS INPUT FILE
                 SCTFile f2 = fit.next();
@@ -4198,10 +4182,6 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                         a2[r2].yRevision = xRevDate;
                         oos.writeUnshared(a2[r2]);
 
-                        // :xxx: bw.write(a2[r2].toStringArf(revDate, pathID));
-                        // :!!!: double check dropping idstxt.write()
-                        // if (a2[r2].id < Long.MAX_VALUE)
-                        //     idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate, pathID));
                         // hold pointer to append to master
                         a3[r3] = a2[r2];
                         r2++;
@@ -4248,11 +4228,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                         a2[r2].yPath = yPathID;
                         a2[r2].yRevision = xRevDate;
                         oos.writeUnshared(a2[r2]);
-                        // :xxx: bw.write(a2[r2].toStringArf(revDate, pathID));
 
-                        // :!!!: double check dropping...
-                        // if (a2[r2].id < Long.MAX_VALUE)
-                        //     idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate, pathID));
                         // Add to append array
                         a3[r3] = a2[r2];
                         nAdd++;
