@@ -87,8 +87,8 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
     private HashMap<String, String> categoryBpMap; 
     private boolean disabled = false;
 
-    // :NYI:!!!: CollabAuthenticator extends Authenticator see MailAuthenticator
-    // :NYI:!!!: public class SvnPrompter implements PromptUserPassword3
+    // :NYI: CollabAuthenticator extends Authenticator see MailAuthenticator
+    // :NYI: public class SvnPrompter implements PromptUserPassword3
 
     /**
      * @param config
@@ -147,7 +147,7 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
         splitIdx = tmpStr.indexOf("/");
         categoryBpMap.put(tmpStr.substring(0, splitIdx), tmpStr.substring(splitIdx + 1));
         
-        // :NYI:!!!: ADD Authenticator. PROMPTS FOR PWD IF NOT PRESENT.
+        // :NYI: ADD Authenticator. PROMPTS FOR PWD IF NOT PRESENT.
         if (!validLoginDetails()) {
             JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Invalid CollabNet username or password.", "",
                 JOptionPane.ERROR_MESSAGE);
@@ -253,7 +253,7 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
 
                     AttachmentSoapList attachList = tracker.listAttachments(artifactId);
                     AttachmentSoapRow[] attachSoapRowArray = attachList.getDataRows();
-                    // :!!!:NYI: should only have one attachment
+                    // :NYI: should only have one attachment
                     // Get DataOjbect to be able to change values
                     ArtifactSoapDO asdo = tracker.getArtifactData(sessionId, artifactId);
                     logArtfSoapDO(asdo);
