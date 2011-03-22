@@ -52,7 +52,7 @@ import org.ihtsdo.tk.uuid.UuidT5Generator;
  *
  * @author kec
  */
-public final class RefexCAB extends CreateOrAmendBlueprint {
+public class RefexCAB extends CreateOrAmendBlueprint {
 
     public static final UUID refexSpecNamespace =
             UUID.fromString("c44bc030-1166-11e0-ac64-0800200c9a66");
