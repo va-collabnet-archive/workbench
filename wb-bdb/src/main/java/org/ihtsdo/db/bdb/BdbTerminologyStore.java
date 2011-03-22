@@ -185,7 +185,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
     @Override
     public void commit(ConceptVersionBI concept) throws IOException {
-        throw new UnsupportedOperationException();
+        this.addUncommitted(concept.getChronicle());
     }
 
     @Override
