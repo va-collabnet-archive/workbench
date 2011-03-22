@@ -58,5 +58,6 @@ rule "retire or move"
 	then
 		actions.add(actionFactory.make(new File("plugins/retire/retire-concept.bp")));
 		actions.add(actionFactory.make(new File("plugins/retire/move-concept.bp")));
+		actions.add(actionFactory.make(new File("plugins/arena/newconcept.bp")));
 end
 

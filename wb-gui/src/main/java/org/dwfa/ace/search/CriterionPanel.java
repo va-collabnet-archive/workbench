@@ -58,6 +58,7 @@ public class CriterionPanel extends JPanel {
 
     public class CriterionListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 editorPanel.removeAll();
@@ -250,8 +251,9 @@ public class CriterionPanel extends JPanel {
             InstantiationException, IllegalAccessException {
         File searchPluginFolder = new File("search");
         this.criterionOptions = new ArrayList<I_TestSearchResults>();
-        if (criterionOptions == null || criterionOptions.size() == 0) {
+        if (criterionOptions == null || criterionOptions.isEmpty()) {
             File[] searchPlugins = searchPluginFolder.listFiles(new FilenameFilter() {
+                @Override
                 public boolean accept(File dir, String name) {
                     return name.endsWith(".task");
                 }
@@ -277,15 +279,15 @@ public class CriterionPanel extends JPanel {
                     new Exception("No search plugins in folder: " + searchPluginFolder.getAbsolutePath()));
             }
         }
-        for (I_TestSearchResults bean : criterionOptions) {
+        for (I_TestSearchResults optionBean : criterionOptions) {
             try {
-                String searchInfoClassName = bean.getClass().getName() + "SearchInfo";
-                Class<BeanInfo> searchInfoClass = (Class<BeanInfo>) bean.getClass().getClassLoader().loadClass(
+                String searchInfoClassName = optionBean.getClass().getName() + "SearchInfo";
+                Class<BeanInfo> searchInfoClass = (Class<BeanInfo>) optionBean.getClass().getClassLoader().loadClass(
                     searchInfoClassName);
                 BeanInfo searchInfo = searchInfoClass.newInstance();
                 comboItems.add(searchInfo.getBeanDescriptor().getDisplayName());
                 menuInfoMap.put(searchInfo.getBeanDescriptor().getDisplayName(), searchInfo);
-                menuBeanMap.put(searchInfo.getBeanDescriptor().getDisplayName(), bean);
+                menuBeanMap.put(searchInfo.getBeanDescriptor().getDisplayName(), optionBean);
             } catch (Exception ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
