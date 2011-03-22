@@ -12,7 +12,7 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetMember;
 import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetRevision;
 
@@ -156,8 +156,8 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
         return (List<Version>) versions;
     }
 
-    protected TkRefsetType getTkRefsetType() {
-        return TkRefsetType.MEMBER;
+    protected TK_REFSET_TYPE getTkRefsetType() {
+        return TK_REFSET_TYPE.MEMBER;
     }
 
     protected void addSpecProperties(RefexCAB rcs) {

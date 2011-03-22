@@ -44,7 +44,7 @@ import org.ihtsdo.tk.api.refex.type_long.RefexLongAnalogBI;
 import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrAnalogBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.example.binding.TermAux;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
@@ -56,7 +56,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
 
     public static final UUID refexSpecNamespace =
             UUID.fromString("c44bc030-1166-11e0-ac64-0800200c9a66");
-    private TkRefsetType memberType;
+    private TK_REFSET_TYPE memberType;
 
     public UUID computeMemberReferencedComponentUuid() throws IOException, InvalidCAB {
         try {
@@ -147,7 +147,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    public RefexCAB(TkRefsetType memberType,
+    public RefexCAB(TK_REFSET_TYPE memberType,
             int rcNid, int collectionNid) throws IOException, InvalidCAB {
         this(memberType, rcNid, collectionNid, null);
 
@@ -155,7 +155,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                 computeMemberReferencedComponentUuid());
     }
 
-    public RefexCAB(TkRefsetType memberType,
+    public RefexCAB(TK_REFSET_TYPE memberType,
             int rcNid, int collectionNid,
             UUID memberUuid) throws IOException {
         super(memberUuid);
@@ -414,7 +414,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
 
     public boolean validate(RefexVersionBI<?> version) {
         if (memberType != null) {
-            if (TkRefsetType.classToType(version.getClass()) != memberType) {
+            if (TK_REFSET_TYPE.classToType(version.getClass()) != memberType) {
                 return false;
             }
         }
@@ -545,11 +545,11 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         return (UUID) properties.get(RefexProperty.MEMBER_UUID);
     }
 
-    public TkRefsetType getMemberType() {
+    public TK_REFSET_TYPE getMemberType() {
         return memberType;
     }
 
-    public void setMemberType(TkRefsetType memberType) {
+    public void setMemberType(TK_REFSET_TYPE memberType) {
         this.memberType = memberType;
     }
 

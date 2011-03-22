@@ -20,7 +20,7 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -243,8 +243,8 @@ public class CidStrRevision extends RefsetRevision<CidStrRevision, CidStrMember>
 	public String getStr1() {
 		return strValue;
 	}
-	protected TkRefsetType getTkRefsetType() {
-		return TkRefsetType.CID_STR;
+	protected TK_REFSET_TYPE getTkRefsetType() {
+		return TK_REFSET_TYPE.CID_STR;
 	}
 
 	protected void addSpecProperties(RefexCAB rcs) {

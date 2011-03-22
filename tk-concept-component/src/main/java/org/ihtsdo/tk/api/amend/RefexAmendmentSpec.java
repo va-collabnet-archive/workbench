@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.UUID;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
 /**
  *
@@ -30,11 +30,11 @@ import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
 @Deprecated
 public class RefexAmendmentSpec extends RefexCAB {
 
-    public RefexAmendmentSpec(TkRefsetType memberType, int rcNid, int collectionNid, UUID memberUuid) throws IOException {
+    public RefexAmendmentSpec(TK_REFSET_TYPE memberType, int rcNid, int collectionNid, UUID memberUuid) throws IOException {
         super(memberType, rcNid, collectionNid, memberUuid);
     }
 
-    public RefexAmendmentSpec(TkRefsetType memberType, int rcNid, int collectionNid) throws IOException, InvalidCAB {
+    public RefexAmendmentSpec(TK_REFSET_TYPE memberType, int rcNid, int collectionNid) throws IOException, InvalidCAB {
         super(memberType, rcNid, collectionNid);
     }
 

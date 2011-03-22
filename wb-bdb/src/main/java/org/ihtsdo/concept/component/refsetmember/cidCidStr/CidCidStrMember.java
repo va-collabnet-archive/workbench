@@ -22,7 +22,7 @@ import org.ihtsdo.etypes.ERefsetCidCidStrRevision;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.refex.type_cnid_cnid_str.RefexCnidCnidStrAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.cidcidstr.TkRefsetCidCidStrMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidcidstr.TkRefsetCidCidStrRevision;
 
@@ -428,8 +428,8 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
         return HashFunction.hashCode(new int[]{getC1id(), getC2id(), getStringValue().hashCode()});
     }
 
-    protected TkRefsetType getTkRefsetType() {
-        return TkRefsetType.CID_CID_STR;
+    protected TK_REFSET_TYPE getTkRefsetType() {
+        return TK_REFSET_TYPE.CID_CID_STR;
     }
 
     protected void addSpecProperties(RefexCAB rcs) {

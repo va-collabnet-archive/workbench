@@ -56,7 +56,7 @@ public abstract class TkRefsetAbstractMember<V extends TkRevision> extends TkCom
         this.componentUuid = componentUuid;
     }
 
-    public abstract TkRefsetType getType();
+    public abstract TK_REFSET_TYPE getType();
 
     /**
      * Returns a string representation of the object.

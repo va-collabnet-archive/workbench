@@ -45,7 +45,7 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset/membership", type = BeanType.TASK_BEAN) })
 public class AddConceptInArenaToRefset extends AbstractTask {
@@ -122,7 +122,7 @@ public class AddConceptInArenaToRefset extends AbstractTask {
             
             //add to refset
             RefexCAB refexSpec = 
-                    new RefexCAB(TkRefsetType.CID, 
+                    new RefexCAB(TK_REFSET_TYPE.CID, 
                     conceptToAdd.getNid(), refsetConcept.getNid());
             refexSpec.with(RefexCAB.RefexProperty.CNID1, 
                     member.getConceptNid());

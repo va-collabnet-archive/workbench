@@ -17,7 +17,7 @@ import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
 import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 
-public enum TkRefsetType {
+public enum TK_REFSET_TYPE {
 
     /**
      * CID = Component IDentifier
@@ -42,7 +42,7 @@ public enum TkRefsetType {
     private int externalizedToken;
     private Class<? extends RefexVersionBI> rxc;
 
-    TkRefsetType(int externalizedToken, Class<? extends RefexVersionBI> rxc) {
+    TK_REFSET_TYPE(int externalizedToken, Class<? extends RefexVersionBI> rxc) {
         this.externalizedToken = externalizedToken;
         this.rxc = rxc;
     }
@@ -55,7 +55,7 @@ public enum TkRefsetType {
         output.writeByte(externalizedToken);
     }
 
-    public static TkRefsetType classToType(Class<?> c) {
+    public static TK_REFSET_TYPE classToType(Class<?> c) {
         if (RefexCnidCnidCnidVersionBI.class.isAssignableFrom(c)) {
             return CID_CID_CID;
         }
@@ -98,7 +98,7 @@ public enum TkRefsetType {
         return UNKNOWN;
     }
 
-    public static TkRefsetType readType(DataInput input) throws IOException {
+    public static TK_REFSET_TYPE readType(DataInput input) throws IOException {
         int type = input.readByte();
         switch (type) {
             case 1:

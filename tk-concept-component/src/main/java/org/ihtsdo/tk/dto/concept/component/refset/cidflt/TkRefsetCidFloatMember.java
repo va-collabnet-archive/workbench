@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 public class TkRefsetCidFloatMember extends TkRefsetAbstractMember<TkRefsetCidFloatRevision> {
@@ -57,8 +57,8 @@ public class TkRefsetCidFloatMember extends TkRefsetAbstractMember<TkRefsetCidFl
     }
 
     @Override
-    public TkRefsetType getType() {
-        return TkRefsetType.CID_FLOAT;
+    public TK_REFSET_TYPE getType() {
+        return TK_REFSET_TYPE.CID_FLOAT;
     }
 
     public List<TkRefsetCidFloatRevision> getRevisionList() {

@@ -16,7 +16,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.refex.type_cnid_float.RefexCnidFloatAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.cidflt.TkRefsetCidFloatMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidflt.TkRefsetCidFloatRevision;
 
@@ -208,8 +208,8 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
         return this.floatValue;
     }
 
-    protected TkRefsetType getTkRefsetType() {
-        return TkRefsetType.CID_FLOAT;
+    protected TK_REFSET_TYPE getTkRefsetType() {
+        return TK_REFSET_TYPE.CID_FLOAT;
     }
 
     protected void addSpecProperties(RefexCAB rcs) {

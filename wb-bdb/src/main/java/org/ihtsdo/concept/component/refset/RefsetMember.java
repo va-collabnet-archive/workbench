@@ -37,7 +37,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -645,7 +645,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         return rcs;
     }
 
-    protected abstract TkRefsetType getTkRefsetType();
+    protected abstract TK_REFSET_TYPE getTkRefsetType();
 
     protected abstract void addSpecProperties(RefexCAB rcs);
 }

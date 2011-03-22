@@ -15,7 +15,7 @@ import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierString;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierUuid;
 import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanMember;
 import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongMember;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidcid.TkRefsetCidCidMember;
@@ -79,7 +79,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
         if (annotationCount > 0) {
             annotations = new ArrayList<TkRefsetAbstractMember<?>>(annotationCount);
             for (int i = 0; i < annotationCount; i++) {
-                TkRefsetType type = TkRefsetType.readType(in);
+                TK_REFSET_TYPE type = TK_REFSET_TYPE.readType(in);
                 switch (type) {
                     case CID:
                         annotations.add(new TkRefsetCidMember(in, dataVersion));

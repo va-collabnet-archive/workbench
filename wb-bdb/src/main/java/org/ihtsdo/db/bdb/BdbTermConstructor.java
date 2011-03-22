@@ -41,7 +41,7 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
 public class BdbTermConstructor implements TerminologyConstructorBI {
 
@@ -97,7 +97,7 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
                 return null;
             }
             if (blueprint.getMemberType()
-                    == TkRefsetType.classToType(component.getClass())) {
+                    == TK_REFSET_TYPE.classToType(component.getClass())) {
                 return (RefsetMember<?, ?>) component;
             } else {
                 throw new InvalidCAB(

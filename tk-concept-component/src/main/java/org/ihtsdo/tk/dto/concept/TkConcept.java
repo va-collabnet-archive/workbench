@@ -10,7 +10,7 @@ import java.util.UUID;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanMember;
 import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongMember;
@@ -84,7 +84,7 @@ public class TkConcept {
         if (refsetMemberCount > 0) {
             refsetMembers = new ArrayList<TkRefsetAbstractMember<?>>(refsetMemberCount);
             for (int i = 0; i < refsetMemberCount; i++) {
-                TkRefsetType type = TkRefsetType.readType(in);
+                TK_REFSET_TYPE type = TK_REFSET_TYPE.readType(in);
                 switch (type) {
                     case CID:
                         refsetMembers.add(new TkRefsetCidMember(in, readDataVersion));

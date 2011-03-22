@@ -17,7 +17,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.refex.type_cnid_long.RefexCnidLongAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.cidlong.TkRefsetCidLongMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidlong.TkRefsetCidLongRevision;
 
@@ -213,8 +213,8 @@ public class CidLongMember
         return c1Nid;
     }
 
-    protected TkRefsetType getTkRefsetType() {
-        return TkRefsetType.CID_LONG;
+    protected TK_REFSET_TYPE getTkRefsetType() {
+        return TK_REFSET_TYPE.CID_LONG;
     }
 
     protected void addSpecProperties(RefexCAB rcs) {

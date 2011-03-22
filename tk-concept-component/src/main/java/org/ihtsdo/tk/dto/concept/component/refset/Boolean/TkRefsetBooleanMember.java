@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 public class TkRefsetBooleanMember extends TkRefsetAbstractMember<TkRefsetBooleanRevision> {
@@ -52,8 +52,8 @@ public class TkRefsetBooleanMember extends TkRefsetAbstractMember<TkRefsetBoolea
     }
 
     @Override
-    public TkRefsetType getType() {
-        return TkRefsetType.BOOLEAN;
+    public TK_REFSET_TYPE getType() {
+        return TK_REFSET_TYPE.BOOLEAN;
     }
 
     public List<TkRefsetBooleanRevision> getRevisionList() {

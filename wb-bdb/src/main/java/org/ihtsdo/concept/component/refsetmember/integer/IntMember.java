@@ -22,7 +22,7 @@ import org.ihtsdo.etypes.ERefsetIntRevision;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.refex.type_int.RefexIntAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntMember;
 import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntRevision;
 
@@ -263,8 +263,8 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
         return (List<Version>) versions;
     }
     
-	protected TkRefsetType getTkRefsetType() {
-		return TkRefsetType.INT;
+	protected TK_REFSET_TYPE getTkRefsetType() {
+		return TK_REFSET_TYPE.INT;
 	}
 
 	@Override

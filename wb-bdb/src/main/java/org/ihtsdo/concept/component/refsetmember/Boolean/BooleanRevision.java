@@ -18,7 +18,7 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetType;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -192,8 +192,8 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
 		return this.booleanValue;
 	}
 	
-	protected TkRefsetType getTkRefsetType() {
-		return TkRefsetType.BOOLEAN;
+	protected TK_REFSET_TYPE getTkRefsetType() {
+		return TK_REFSET_TYPE.BOOLEAN;
 	}
 
 	protected void addSpecProperties(RefexCAB rcs) {
