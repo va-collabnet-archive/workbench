@@ -15,9 +15,18 @@ public class ContradictionIdentificationResults {
     private Set<Integer> conflictingConcepts = new ConcurrentSkipListSet<Integer>();
     private Set<Integer> singleConcepts = new ConcurrentSkipListSet<Integer>();
     private Set<Integer> nonConflictingConcepts = new ConcurrentSkipListSet<Integer>();
-
+    private Set<Integer> conflictingConceptsWithSameValuesSameCompId = new ConcurrentSkipListSet<Integer>();
+    private Set<Integer> conflictingConceptsWithSameValuesDifferentCompId = new ConcurrentSkipListSet<Integer>();
+    
     public void addConflict(Integer nid) {
         conflictingConcepts.add(nid);
+    }
+
+    public void addConflictingWithSameValueSameCompId(Integer nid) {
+    	conflictingConceptsWithSameValuesSameCompId.add(nid);
+    }
+    public void addConflictingWithSameValueDifferentCompId(Integer nid) {
+    	conflictingConceptsWithSameValuesDifferentCompId.add(nid);
     }
 
     public void addSingle(Integer nid) {
@@ -33,6 +42,36 @@ public class ContradictionIdentificationResults {
 
         try {
             for (Integer i : conflictingConcepts) {
+                I_GetConceptData con = Terms.get().getConcept(i);
+                sortedConcepts.add(con);
+            }
+        } catch (Exception e) {
+            AceLog.getAppLog().log(Level.WARNING, "Error in getting concept from detection results", e);
+        }
+
+        return sortedConcepts;
+    }
+
+    public TreeSet<I_GetConceptData> getConflictingConceptsWithSameValueSameCompId() {
+        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createFsnComparer());
+
+        try {
+            for (Integer i : conflictingConceptsWithSameValuesSameCompId) {
+                I_GetConceptData con = Terms.get().getConcept(i);
+                sortedConcepts.add(con);
+            }
+        } catch (Exception e) {
+            AceLog.getAppLog().log(Level.WARNING, "Error in getting concept from detection results", e);
+        }
+
+        return sortedConcepts;
+    }
+
+    public TreeSet<I_GetConceptData> getConflictingConceptsWithSameValueDifferentCompId() {
+        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createFsnComparer());
+
+        try {
+            for (Integer i : conflictingConceptsWithSameValuesDifferentCompId) {
                 I_GetConceptData con = Terms.get().getConcept(i);
                 sortedConcepts.add(con);
             }
@@ -75,6 +114,14 @@ public class ContradictionIdentificationResults {
 
     public Set<Integer> getConflictingNids() {
         return conflictingConcepts;
+    }
+
+    public Set<Integer> getConflictingWithSameValueSameCompIdNids() {
+        return conflictingConceptsWithSameValuesSameCompId;
+    }
+
+    public Set<Integer> getConflictingWithSameValueDifferentCompIdNids() {
+        return conflictingConceptsWithSameValuesDifferentCompId;
     }
 
     public Set<Integer> getSingleNids() {

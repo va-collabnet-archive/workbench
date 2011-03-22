@@ -70,7 +70,11 @@ public class TestCR extends AbstractTask {
     		ContradictionIdentificationResults results = processor.getResults();
     		
     		// Report any conflicts
-    		reporter.identifyInConceptListPanel(results.getConflictingNids());
+//    		reporter.identifyInConceptListPanel(results.getConflictingNids());
+    		reporter.printConflictConcepts(results.getConflictingConcepts());
+    		reporter.printConflictingWithSameValueSameCompId(results.getConflictingConceptsWithSameValueSameCompId());
+    		reporter.printConflictingWithSameValueDifferentCompId(results.getConflictingConceptsWithSameValueDifferentCompId());
+    		reporter.printSingleConcepts(results.getSingleConcepts());
     		
     		// Some Changes
 //    		Set<I_GetConceptData> set = results.getUnreachableConcepts();
