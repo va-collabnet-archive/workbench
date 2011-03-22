@@ -24,6 +24,7 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Level;
 
 import javax.security.auth.login.LoginException;
 import javax.swing.DefaultComboBoxModel;
@@ -45,6 +46,7 @@ import net.jini.config.ConfigurationException;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -221,11 +223,31 @@ public class ListComponentViewerPanel extends JPanel {
 							if (selRows.length<2){
 								int rowModel=listTable.convertRowIndexToModel(row);
 								ContextualizedDescription node = (ContextualizedDescription)model.getValueAt(rowModel,0);				
+								if (node == null) {
+									node = (ContextualizedDescription)model.getValueAt(rowModel,1);
+								}
+								if (node == null) {
+									node = (ContextualizedDescription)model.getValueAt(rowModel,2);
+								}
+								if (node == null) {
+									AceLog.getAppLog().alertAndLog(Level.SEVERE, 
+											"No description data.", new Exception("No description data."));
+								}
 								descSet.add(node.getConceptId());
 							}else{
 								for (int i=0;i<selRows.length;i++){
 									int rowModel=listTable.convertRowIndexToModel(selRows[i]);
 									ContextualizedDescription node = (ContextualizedDescription)model.getValueAt(rowModel,0);				
+									if (node == null) {
+										node = (ContextualizedDescription)model.getValueAt(rowModel,1);
+									}
+									if (node == null) {
+										node = (ContextualizedDescription)model.getValueAt(rowModel,2);
+									}
+									if (node == null) {
+										AceLog.getAppLog().alertAndLog(Level.SEVERE, 
+												"No description data.", new Exception("No description data."));
+									}
 									descSet.add(node.getConceptId());
 								}
 							}

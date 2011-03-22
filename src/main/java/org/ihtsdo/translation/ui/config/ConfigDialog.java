@@ -360,7 +360,7 @@ public class ConfigDialog extends JDialog {
 			category = new DefaultMutableTreeNode(new ConfigTreeInfo("Inbox item configuration", ConfigurationConstants.INBOX_ITEM_CONFIGURATION_PANEL));
 			top.add(category);
 
-			category = new DefaultMutableTreeNode(new ConfigTreeInfo("Preferd term default mode", ConfigurationConstants.PREFERD_TERM_DEFAULT_PANEL));
+			category = new DefaultMutableTreeNode(new ConfigTreeInfo("Preferred term default mode", ConfigurationConstants.PREFERD_TERM_DEFAULT_PANEL));
 			top.add(category);
 			
 			category = new DefaultMutableTreeNode(new ConfigTreeInfo("Source descriptions display", ConfigurationConstants.SOURCE_TREE_COMPONENTS_PANEL));
