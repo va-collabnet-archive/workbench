@@ -1,6 +1,10 @@
 package org.ihtsdo.batch;
 
+import java.io.IOException;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RelCAB;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelType;
@@ -21,11 +25,26 @@ public class BatchActionTaskParentAddNew extends BatchActionTask {
     }
     
     @Override
-    public boolean execute(ConceptVersionBI c) throws Exception {
+    public boolean execute(ConceptVersionBI c)  {
         System.out.println("## BatchActionTaskParentAddNew concept: " + c);
                
-        RelCAB rc = new RelCAB(c.getPrimUuid(), selectedRoleTypeUuid, selectedDestUuid, 0, TkRelType.STATED_HIERARCHY);
-        termConstructor.construct(rc);
+        RelCAB rc = null;
+        try {
+            if (c.getPrimUuid() == null) {
+                System.out.println("found bad: " + c.getPrimUuid());
+            }
+            rc = new RelCAB(c.getPrimUuid(), selectedRoleTypeUuid, selectedDestUuid, 0, TkRelType.STATED_HIERARCHY);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        
+        try {
+            termConstructor.construct(rc);
+        } catch (IOException ex) {
+           throw new RuntimeException(ex);
+        } catch (InvalidCAB ex) {
+           throw new RuntimeException(ex);
+        }
 
         BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.PARENT_ADD_NEW));
         return true; 

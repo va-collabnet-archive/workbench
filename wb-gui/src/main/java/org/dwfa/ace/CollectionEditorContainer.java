@@ -242,7 +242,7 @@ public class CollectionEditorContainer extends JPanel {
         this.list = list;
         this.processBuilder = descListProcessBuilderPanel;
         batchActionEditor = new BatchActionEditor(this);
-        batchResults = new JTextArea("<html>Batch results here");
+        batchResults = new JTextArea("<html>Batch results here"); // :!!!: BATCH ACTION RESULTS GO HERE
         batchResultsScroller = new JScrollPane(batchResults);
         conceptPanel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_LIST_VIEW, ace.aceFrameConfig, 
         		LINK_TYPE.LIST_LINK, true,
@@ -251,7 +251,7 @@ public class CollectionEditorContainer extends JPanel {
         conceptPanel.setLinkedList(list);
         conceptPanel.changeLinkListener(LINK_TYPE.LIST_LINK);
         bottomTabs.addTab("concept details", conceptPanel);
-        bottomTabs.addTab("batch action results", batchResultsScroller);
+        bottomTabs.addTab("batch action results", batchResultsScroller);  // :!!!: BATCH RESULTS TAB
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;

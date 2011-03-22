@@ -14,6 +14,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.management.RuntimeErrorException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
@@ -127,7 +128,6 @@ public class BatchActionTaskTest {
             // Assert.assertEquals(A, B);
 
         } catch (Exception e) {
-            Assert.fail(e.toString());
             try {
                 Bdb.close();
             } catch (InterruptedException ex) {
@@ -135,7 +135,8 @@ public class BatchActionTaskTest {
             } catch (ExecutionException ex) {
                 Logger.getLogger(BatchActionTaskTest.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
+            throw new RuntimeException(e);
+        } 
 
     }
 
@@ -196,8 +197,9 @@ public class BatchActionTaskTest {
             System.out.println("finished load, start sync");
             Bdb.sync();
         } catch (Exception e) {
-            Assert.fail(e.toString());
+            
             Bdb.close();
+            throw new RuntimeException(e);
         }
     }
 

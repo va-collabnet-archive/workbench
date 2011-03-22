@@ -56,7 +56,7 @@ public class BatchActionProcessor implements ProcessUnfetchedConceptDataBI {
         if (conceptSet.isMember(cNid) && e == null) {
             ConceptVersionBI c = fetcher.fetch(vc);
 
-            try {
+//            try {
                 boolean changed = false;
                 for (BatchActionTask bat : batchActionList) {
                     if (bat.execute(c)) {
@@ -67,9 +67,9 @@ public class BatchActionProcessor implements ProcessUnfetchedConceptDataBI {
                     Ts.get().addUncommitted(c);
                 }
 
-            } catch (Exception exception) {
-                e = exception; // :!!!: add GUI code for handling exception
-            }
+//            } catch (Exception exception) {
+//                e = exception; // :!!!: add GUI code for handling exception
+//            }
         }
     }
 

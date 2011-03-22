@@ -293,6 +293,9 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
     	
         descriptions = new ArrayList<TkDescription>(cNoHx.getDescriptions().size());
     	for (I_DescribeConceptLocally descNoHx: cNoHx.getDescriptions()) {
+                assert descNoHx != null;
+                assert descNoHx.getUids() != null: descNoHx;
+                assert descNoHx.getUids().iterator() != null: descNoHx;
     		EDescription desc  = new EDescription();
     		desc.primordialUuid = descNoHx.getUids().iterator().next();
     		desc.statusUuid = currentUuid;

@@ -23,6 +23,8 @@ public class BatchActionEditor {
     }
     public BatchActionEditor(CollectionEditorContainer cec) {
         this.cec = cec;
+        
+        // :!!!: BATCH ACTION EDITOR
         batchEditorPanel.add(new JLabel("Batch editor actions here"));
     }
 

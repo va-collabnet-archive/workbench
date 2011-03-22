@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,23 +65,23 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
 
     private List<I_ConceptualizeLocally> roots = new ArrayList<I_ConceptualizeLocally>();
 
-    private Map<UUID, Integer> uuidIntMap = new HashMap<UUID, Integer>();
+    private Map<UUID, Integer> uuidIntMap = new ConcurrentHashMap<UUID, Integer>();
 
-    private Map<Integer, Collection<UUID>> intUuidMap = new HashMap<Integer, Collection<UUID>>();
+    private Map<Integer, Collection<UUID>> intUuidMap = new ConcurrentHashMap<Integer, Collection<UUID>>();
 
-    private Map<Integer, I_ConceptualizeLocally> conceptMap = new HashMap<Integer, I_ConceptualizeLocally>();
+    private Map<Integer, I_ConceptualizeLocally> conceptMap = new ConcurrentHashMap<Integer, I_ConceptualizeLocally>();
 
-    private Map<Integer, I_DescribeConceptLocally> descMap = new HashMap<Integer, I_DescribeConceptLocally>();
+    private Map<Integer, I_DescribeConceptLocally> descMap = new ConcurrentHashMap<Integer, I_DescribeConceptLocally>();
 
-    private Map<Integer, Collection<I_DescribeConceptLocally>> conNidDescMap = new HashMap<Integer, Collection<I_DescribeConceptLocally>>();
+    private Map<Integer, Collection<I_DescribeConceptLocally>> conNidDescMap = new ConcurrentHashMap<Integer, Collection<I_DescribeConceptLocally>>();
 
-    private Map<Integer, I_RelateConceptsLocally> relMap = new HashMap<Integer, I_RelateConceptsLocally>();
+    private Map<Integer, I_RelateConceptsLocally> relMap = new ConcurrentHashMap<Integer, I_RelateConceptsLocally>();
 
-    private Map<Integer, Collection<I_RelateConceptsLocally>> srcRelMap = new HashMap<Integer, Collection<I_RelateConceptsLocally>>();
+    private Map<Integer, Collection<I_RelateConceptsLocally>> srcRelMap = new ConcurrentHashMap<Integer, Collection<I_RelateConceptsLocally>>();
 
-    private Map<Integer, Collection<I_RelateConceptsLocally>> destRelMap = new HashMap<Integer, Collection<I_RelateConceptsLocally>>();
+    private Map<Integer, Collection<I_RelateConceptsLocally>> destRelMap = new ConcurrentHashMap<Integer, Collection<I_RelateConceptsLocally>>();
 
-    private Map<Integer, Map<Integer, I_ExtendLocally>> extensions = new HashMap<Integer, Map<Integer, I_ExtendLocally>>();
+    private Map<Integer, Map<Integer, I_ExtendLocally>> extensions = new ConcurrentHashMap<Integer, Map<Integer, I_ExtendLocally>>();
 
     private Set<I_ConceptualizeLocally> extensionTypes = new HashSet<I_ConceptualizeLocally>();
 
@@ -276,7 +277,7 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
     public synchronized void addExtension(I_ManifestLocally component, I_ConceptualizeLocally extensionType,
             I_ExtendLocally extension) {
         if (extensions.containsKey(component.getNid()) == false) {
-            extensions.put(component.getNid(), new HashMap<Integer, I_ExtendLocally>());
+            extensions.put(component.getNid(), new ConcurrentHashMap<Integer, I_ExtendLocally>());
         }
         extensions.get(component.getNid()).put(extensionType.getNid(), extension);
         extensionTypes.add(extensionType);

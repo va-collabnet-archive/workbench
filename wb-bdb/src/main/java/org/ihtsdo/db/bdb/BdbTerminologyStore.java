@@ -300,6 +300,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
     @Override
     public boolean hasUuid(UUID memberUUID) {
+        assert memberUUID != null;
         return Bdb.hasUuid(memberUUID);
     }
 

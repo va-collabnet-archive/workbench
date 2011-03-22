@@ -15,7 +15,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
 
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -30,13 +29,13 @@ import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -50,6 +49,7 @@ public class BatchActionTaskSimpleTest {
     String dbTarget;
     DataOutputStream eConceptDOS;
 
+    @Ignore
     @Test
     public void batchActionTaskTest() {
         try {
@@ -86,7 +86,6 @@ public class BatchActionTaskSimpleTest {
             Logger.getLogger(BatchActionTaskSimpleTest.class.getName()).log(Level.INFO, BatchActionEventReporter.createReportTSV());
 
         } catch (Exception e) {
-            Assert.fail(e.toString());
             try {
                 Bdb.close();
             } catch (InterruptedException ex) {
@@ -94,6 +93,7 @@ public class BatchActionTaskSimpleTest {
             } catch (ExecutionException ex) {
                 Logger.getLogger(BatchActionTaskSimpleTest.class.getName()).log(Level.SEVERE, null, ex);
             }
+            throw new RuntimeException(e);
         }
 
     }
