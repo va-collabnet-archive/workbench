@@ -58,6 +58,10 @@ public class RelCAB extends CreateOrAmendBlueprint {
             UUID sourceUuid, UUID typeUuid, UUID destUuid, int group,
             UUID componentUuid, TkRelType type) throws IOException {
         super(componentUuid);
+        assert sourceUuid != null;
+        assert typeUuid != null;
+        assert destUuid != null;
+        assert type != null;
         this.sourceUuid = sourceUuid;
         this.typeUuid = typeUuid;
         this.destUuid = destUuid;
@@ -101,13 +105,13 @@ public class RelCAB extends CreateOrAmendBlueprint {
                         TermAux.REL_NOT_REFINABLE.getStrict(Ts.get().getMetadataVC()).getPrimUuid();
                 break;
         }
-        if (componentUuid == null) {
+        if (getComponentUuid() == null) {
             try {
-                componentUuid = UuidT5Generator.get(relSpecNamespace,
+                setComponentUuid(UuidT5Generator.get(relSpecNamespace,
                         getPrimoridalUuidStr(sourceUuid)
                         + getPrimoridalUuidStr(typeUuid)
                         + getPrimoridalUuidStr(destUuid)
-                        + group);
+                        + group));
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             } catch (InvalidCAB ex) {
