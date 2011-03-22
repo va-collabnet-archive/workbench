@@ -108,11 +108,9 @@ public class IsParentMemberOfEvaluatorDefinition implements EvaluatorDefinition 
 				ViewCoordinate vc = possibleMember.getViewCoordinate();
 				ConceptVersionBI possibleRefsetCV = null;
 				ConceptSpec possibleRefset = null;
-				boolean parentMember = false;
 				Collection<? extends ConceptVersionBI> parents = possibleMember.getRelsOutgoingDestinationsActiveIsa();
 				
 				int evalRefsetNid = 0;
-				for(ConceptVersionBI parent : parents){
 					
 				if (ConceptVersionBI.class.isAssignableFrom(value2.getClass())) {
 					possibleRefsetCV = (ConceptVersionBI) value2;
@@ -125,18 +123,34 @@ public class IsParentMemberOfEvaluatorDefinition implements EvaluatorDefinition 
 					possibleRefsetCV = (ConceptVersionBI) fact.getConcept();
 					evalRefsetNid = possibleRefsetCV.getNid();
 				}
-				parentMember = parent.isMember(evalRefsetNid);
 				
-				if(parentMember){
-					break;
-				}
-				}
-				return this.getOperator().isNegated() ^ (parentMember); 
+				return this.getOperator().isNegated() ^ (testParentOf(evalRefsetNid, parents, possibleMember)); 
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			} catch (ContraditionException e) {
 				throw new RuntimeException(e);
 			}
+		}
+		
+		private boolean testParentOf (int evalRefsetNid, Collection<? extends ConceptVersionBI> parents, ConceptVersionBI possibleMember){
+			boolean parentMember = false;
+			try{
+				for(ConceptVersionBI parent : parents){
+					parentMember = parent.isMember(evalRefsetNid);
+					if(parentMember){
+						break;
+					}
+					else if (!parentMember && parent.getRelsOutgoingDestinationsActiveIsa().size() != 0){
+						parentMember =  testParentOf(evalRefsetNid, parent.getRelsOutgoingDestinationsActiveIsa(), possibleMember);
+					}
+					}
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			} catch (ContraditionException e) {
+				throw new RuntimeException(e);
+			}
+			
+			return parentMember;
 		}
 
 		@Override
