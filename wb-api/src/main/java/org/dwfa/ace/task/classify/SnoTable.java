@@ -193,6 +193,10 @@ public class SnoTable {
 
         // GET ALL EDIT_PATH ORIGINS
         I_GetConceptData cEditPathObj = config.getClassifierInputPath();
+        if(cEditPathObj == null){
+        	cEditPathObj = tf.getConcept(ArchitectonicAuxiliary.Concept.RELEASE.getUids());
+        	config.setClassifierInputPath(cEditPathObj);
+        }
         if (cEditPathObj != null) {
             PathBI cEditIPath = tf.getPath(cEditPathObj.getUids());
             cStatedPath = new ArrayList<PositionBI>();
@@ -209,6 +213,10 @@ public class SnoTable {
 
         // GET ALL CLASSIFER_PATH ORIGINS
         I_GetConceptData cClassPathObj = config.getClassifierOutputPath();
+        if(cClassPathObj == null){
+        	cClassPathObj = tf.getConcept(ArchitectonicAuxiliary.Concept.RELEASE.getUids());
+        	config.setClassifierOutputPath(cClassPathObj);
+        }
         if (cClassPathObj != null) {
             PathBI cClassIPath = tf.getPath(cClassPathObj.getUids());
             cInferredPath = new ArrayList<PositionBI>();

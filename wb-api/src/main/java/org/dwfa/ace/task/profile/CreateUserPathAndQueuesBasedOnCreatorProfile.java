@@ -443,7 +443,14 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
     }
 
     private void createClassifierPath(I_ConfigAceFrame newConfig, I_ConfigAceFrame creatorConfig) throws Exception {
-        Collection<? extends PositionBI> inputSet = Terms.get().getPath(creatorConfig.getClassifierOutputPath().getUids()).getOrigins();
+    	
+    	I_GetConceptData ccOP = creatorConfig.getClassifierOutputPath();
+    	if(ccOP == null){
+    		ccOP = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.RELEASE.getUids());
+    		creatorConfig.setClassifierOutputPath(ccOP);
+    	}
+
+        Collection<? extends PositionBI> inputSet = Terms.get().getPath(ccOP.getUids()).getOrigins();
         PathBI classifierPath = createNewPath(newConfig, creatorConfig, inputSet, " classifier path");
         newConfig.setClassifierOutputPath(Terms.get().getConcept(classifierPath.getConceptNid()));
     }
@@ -479,9 +486,9 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
             throw new TaskFailedException();
         }
         AceLog.getAppLog().info(positionSet.toString());
-        if (positionSet.size() == 0) {
+        /*if (positionSet.size() == 0) {
             throw new TaskFailedException("You must select at least one origin for path.");
-        }
+        }*/
         UUID newPathUid = UUID.randomUUID();
 
         // Needs a concept record...
