@@ -190,7 +190,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
     @Override
     public void addUncommitted(ConceptVersionBI cv) throws IOException {
-        commit(cv);
+        addUncommitted(cv.getChronicle());
     }
 
     @Override
