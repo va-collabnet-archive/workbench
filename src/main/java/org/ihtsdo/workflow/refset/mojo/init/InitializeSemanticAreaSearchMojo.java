@@ -94,7 +94,7 @@ public class InitializeSemanticAreaSearchMojo extends AbstractMojo {
     				AceLog.getAppLog().log(Level.WARNING, line, new Exception("Unable to import this row into semantic area search refset"));
     			}
         	} catch (Exception e) {
-        		AceLog.getAppLog().log(Level.WARNING, line, e);
+            	AceLog.getAppLog().log(Level.WARNING, "Exception: " + e.getMessage() + " at line: " + line);
         	}
         };
 

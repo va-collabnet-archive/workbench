@@ -129,7 +129,7 @@ public class InitializeWorkflowHistoryMojo extends AbstractMojo {
 
             }	
         } catch (Exception e) {
-        	AceLog.getAppLog().log(Level.WARNING, line, e);
+        	AceLog.getAppLog().log(Level.WARNING, "Exception: " + e.getMessage() + " at line: " + line);
 		}
 	}
 
@@ -160,7 +160,7 @@ public class InitializeWorkflowHistoryMojo extends AbstractMojo {
 				// current release which for current testing is 2011-01-31
 				releases.put(timestamp, snomedConcept.getPrimUuid());
 			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to identify the release description for timestamp: " + timestamp, e);
+		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to identify the release description for timestamp: " + timestamp);
 			}
     	} 
 

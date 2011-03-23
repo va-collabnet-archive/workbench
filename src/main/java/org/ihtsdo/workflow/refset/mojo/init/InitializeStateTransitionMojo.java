@@ -86,19 +86,14 @@ public class InitializeStateTransitionMojo extends AbstractMojo {
 
         	if (columns.length == numberOfColumns)
         	{
-	        	try 
-	        	{
-		        	I_GetConceptData category = WorkflowHelper.lookupEditorCategory(columns[categoryPosition]);
-	    			
-		        	writer.setCategory(category);
-	    			writer.setInitialState(WorkflowHelper.lookupState(columns[initialStatePosition]));
-		        	writer.setAction(WorkflowHelper.lookupAction(columns[actionPosition]));
-		        	writer.setFinalState(WorkflowHelper.lookupState(columns[finalStatePosition]));
-	
-		        	writer.addMember();
-	        	} catch (Exception e) {
-	        		AceLog.getAppLog().log(Level.WARNING, line, e);
-	        	}
+	        	I_GetConceptData category = WorkflowHelper.lookupEditorCategory(columns[categoryPosition]);
+    			
+	        	writer.setCategory(category);
+    			writer.setInitialState(WorkflowHelper.lookupState(columns[initialStatePosition]));
+	        	writer.setAction(WorkflowHelper.lookupAction(columns[actionPosition]));
+	        	writer.setFinalState(WorkflowHelper.lookupState(columns[finalStatePosition]));
+
+	        	writer.addMember();
         	}
     		else if (reportErrors) {
             	AceLog.getAppLog().log(Level.WARNING, line, new Exception("Unable to import this row into state transition refset"));        
