@@ -176,7 +176,7 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 			try {
 				setReferencedComponentId(uid);
 			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: ", e);
+		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId");
 			}
 		}
 		
@@ -235,7 +235,7 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 			try {
 				return Terms.get().getConcept(getReferencedComponentId());
 			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: ", e);
+		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId");
 			}
 			
 			return null;

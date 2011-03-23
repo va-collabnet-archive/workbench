@@ -59,7 +59,7 @@ public class StateTransitionRefsetWriter extends WorkflowRefsetWriter
 		try {
 			return Terms.get().getConcept(getReferencedComponentUid());
 		} catch (Exception e) {
-	    	AceLog.getAppLog().log(Level.SEVERE, "Unable to get the Category (refCompId) from the StateTransitionRefset", e);
+	    	AceLog.getAppLog().log(Level.SEVERE, "Unable to get the Category (refCompId) from the StateTransitionRefset");
 		}
 		
 		return null;
@@ -91,7 +91,7 @@ public class StateTransitionRefsetWriter extends WorkflowRefsetWriter
 			try {
 				setReferencedComponentId(uid);
 			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: ", e);
+		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: " + uid);
 			}
 		}
 		
@@ -120,7 +120,7 @@ public class StateTransitionRefsetWriter extends WorkflowRefsetWriter
 			try {
 				return Terms.get().getConcept(getReferencedComponentId());
 			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: ", e);
+		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: ");
 			}
 			
 			return null;
@@ -161,7 +161,7 @@ public class StateTransitionRefsetWriter extends WorkflowRefsetWriter
 					   "\nAction = " + action.getInitialText() +
 					   "\nFinal State= " + finalState.getInitialText();
 			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to identify the relCompId of the row", e);
+		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to identify the relCompId of the row");
 				return ""; 
 			}
 		}

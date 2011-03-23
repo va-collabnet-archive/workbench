@@ -48,7 +48,7 @@ public class SemanticAreaSearchRefsetWriter extends WorkflowRefsetWriter
 		try {
 			return Terms.get().getConcept(getReferencedComponentUid());
 		} catch (Exception e) {
-	    	AceLog.getAppLog().log(Level.SEVERE, "Unable to get the Category (refCompId) from the SemanticAreaSearch Refset", e);
+	    	AceLog.getAppLog().log(Level.SEVERE, "Unable to get the Category (refCompId) from the SemanticAreaSearch Refset");
 		}
 		
 		return null;
@@ -72,7 +72,7 @@ public class SemanticAreaSearchRefsetWriter extends WorkflowRefsetWriter
 			try {
 				setReferencedComponentId(uid);
 			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: ", e);
+		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: " + uid);
 			}
 		}
 		
@@ -88,7 +88,7 @@ public class SemanticAreaSearchRefsetWriter extends WorkflowRefsetWriter
 			try {
 				return Terms.get().getConcept(getReferencedComponentId());
 			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: ", e);
+		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId");
 			}
 			
 			return null;

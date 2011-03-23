@@ -52,7 +52,7 @@ public class EditorCategoryRefsetWriter extends WorkflowRefsetWriter
 		try {
 			return Terms.get().getConcept(getReferencedComponentUid());
 		} catch (Exception e) {
-	    	AceLog.getAppLog().log(Level.SEVERE, "Unable to get the Category (refCompId) from the EditorCategory Refset", e);
+	    	AceLog.getAppLog().log(Level.SEVERE, "Unable to get the Category (refCompId) from the EditorCategory Refset");
 		}
 		
 		return null;
@@ -86,7 +86,7 @@ public class EditorCategoryRefsetWriter extends WorkflowRefsetWriter
 			try {
 				setReferencedComponentId(uid);
 			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: ", e);
+		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: " + uid);
 			}
 		}
 		
@@ -98,7 +98,7 @@ public class EditorCategoryRefsetWriter extends WorkflowRefsetWriter
 			try {
 				return Terms.get().getConcept(getReferencedComponentId());
 			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: ", e);
+		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId");
 			}
 			
 			return null;
