@@ -189,7 +189,7 @@ public class StateTransitionRefsetWriter extends WorkflowRefsetWriter
 				str.append("\ninitialState:" + initialState);
 				str.append("\naction:" + action);
 				str.append("\nfinalState:" + finalState);
-				AceLog.getAppLog().log(Level.WARNING, str.toString(), new Exception("Failure in updating State Transition Refset"));
+				AceLog.getAppLog().log(Level.WARNING, "Failure in updating State Transition Refset for concept: " + str.toString());
 			}
 			
 			return retVal;

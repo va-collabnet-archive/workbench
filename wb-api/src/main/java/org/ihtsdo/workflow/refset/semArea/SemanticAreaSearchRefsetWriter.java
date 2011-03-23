@@ -135,8 +135,9 @@ public class SemanticAreaSearchRefsetWriter extends WorkflowRefsetWriter
 					str.append("\nError in adding to Semantic Area Search Refset");
 					str.append("\nReferencedComponentId:" + getReferencedComponent().getInitialText());
 					str.append("\nsearchTerm:" + searchTerm);
+					AceLog.getAppLog().log(Level.WARNING, "Failure in updating Semantic Area Search Refset for concept: " + str.toString());
 				} catch (Exception e) {
-					AceLog.getAppLog().log(Level.WARNING, str.toString(), new Exception("Failure in updating Semantic Area Search Refset", e));
+					AceLog.getAppLog().log(Level.WARNING, "Failure in updating Semantic Area Search Refset for concept: " + str.toString());
 				}
 			}
 			

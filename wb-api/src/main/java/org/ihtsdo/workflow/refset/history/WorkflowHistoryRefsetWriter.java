@@ -358,7 +358,7 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 				str.append("\nautoApproved:" + autoApproved);
 				str.append("\nworkflowTime:" + workflowTime);
 				str.append("\neffectiveTime:" + effectiveTime);
-	        	AceLog.getAppLog().log(Level.WARNING, str.toString(), new Exception("Failure in updating Workflow History Refset"));
+				AceLog.getAppLog().log(Level.WARNING, "Failure in updating Workflow History Refset for concept: " + str.toString());
 			}
 			
 			return retVal;

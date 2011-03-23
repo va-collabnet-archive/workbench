@@ -153,7 +153,7 @@ public class EditorCategoryRefsetWriter extends WorkflowRefsetWriter
 				str.append("\nReferencedComponentId:" + getReferencedComponentId());
 				str.append("\nsemanticArea:" + semanticArea);
 				str.append("\neditorCategory:" + editorCategory);
-				AceLog.getAppLog().log(Level.WARNING, str.toString(), new Exception("Failure in updating Editor Category Refset"));
+				AceLog.getAppLog().log(Level.WARNING, "Failure in updating Editor Category Refset for concept: " + str.toString());
 			}
 			
 			return retVal;
