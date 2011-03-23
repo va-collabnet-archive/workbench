@@ -72,7 +72,7 @@ public class InitializeSemanticAreaHierarchyMojo extends AbstractMojo {
 
             Terms.get().addUncommitted(writer.getRefsetConcept());
 		} catch (Exception e) {
-			throw new MojoExecutionException(e.getMessage());
+        	AceLog.getAppLog().log(Level.WARNING, "Exception: " + e.getMessage());
 		}
 
 	}
