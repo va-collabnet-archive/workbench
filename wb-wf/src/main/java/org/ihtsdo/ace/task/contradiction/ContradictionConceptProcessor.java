@@ -94,7 +94,7 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
 
 		try
 		{
-			buildSet1(set);
+			buildSet2(set);
         } catch (Exception e) {
             AceLog.getAppLog().log(Level.WARNING, "Error in intializing Contradiction Concept Processor", e);
         }
@@ -112,6 +112,7 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
 		// Unit Test #2  (Newly Modeled Concept #1 (under SCT Model Comp))
 		// Unit Test #60 (Newly Modeled Concept #2 (under SCT Model Comp))
 		// Unit Test #61 (Newly Modeled Concept #3 (under SCT Model Comp))
+		/* Find out how this will work */
 		set.setMember(Terms.get().getConcept(UUID.fromString("a0f7b747-807c-42a8-8bc2-ab4d7dbbf284")).getConceptNid());
 		set.setMember(Terms.get().getConcept(UUID.fromString("31bcce91-09f7-457b-8263-7cceb49b9b64")).getConceptNid());
 		set.setMember(Terms.get().getConcept(UUID.fromString("a4eec73d-1770-4505-abea-652ae0314ba9")).getConceptNid());
@@ -262,43 +263,75 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
 	private void buildSet2(I_RepresentIdSet set) throws TerminologyException, IOException {
 		
 		/* SHEET #2 - POST RESOLUTION*/
-
+/* Broken for now . . . how to handle these cases? 
 		// Unit Test #1 (Physical force (physical force))
  		// Unit Test #2 (agente infeccioso (organismo))
  		// Unit Test #3 (Animal (organism))
-		set.setMember(Terms.get().getConcept(UUID.fromString("32213bf6-c073-3ce1-b0c7-9463e43af2f1")).getConceptNid());
-//   	set.setMember(Terms.get().getConcept(UUID.fromString("9b33681b-377b-326f-8f9f-72263eaf5e98")).getConceptNid());
-// 		set.setMember(Terms.get().getConcept(UUID.fromString("61f6d84f-175e-3cce-96f8-67902dfdab9b")).getConceptNid());
-
- 		// Unit Test #4 (Antimicrobial resistant organism (organism))
-		// Unit Test #5 (Fungus (organism)) 
- 		// Unit Test #6 (Kingdom Chromista (organism)) 
-// 		set.setMember(Terms.get().getConcept(UUID.fromString("2c90345f-f003-311f-b128-95981c04c65f")).getConceptNid());
-//		set.setMember(Terms.get().getConcept(UUID.fromString("20653851-cd5d-3115-994a-f6077236d10b")).getConceptNid());
-//		set.setMember(Terms.get().getConcept(UUID.fromString("bb5fc878-253a-34f4-b043-64f2241bc965")).getConceptNid());
-			
- 		// Unit Test #7 (Life-cycle form (organism)) 
- 		// Unit Test #8 (Microorganism (organism)) 
-		// Unit Test #9 (Pathogenic organism (navigational concept)) 
-//		set.setMember(Terms.get().getConcept(UUID.fromString("adc51007-36f4-3d62-9aa1-9fe318ed700e")).getConceptNid());
-//		set.setMember(Terms.get().getConcept(UUID.fromString("85133052-e1b7-3a5d-aa09-2fd1fafc982e")).getConceptNid());
-//		set.setMember(Terms.get().getConcept(UUID.fromString("aa8eb5c9-1271-32cd-bf3e-1fe3013f3556")).getConceptNid());
-
- 		// Unit Test #10 (reino Animalia (organismo)) 
- 		// Unit Test #11 (Renotrophic organism (organism)) 
- 		// Unit Test #12 (Trophic life form (organism)) 
-//		set.setMember(Terms.get().getConcept(UUID.fromString("43ebc439-132e-3236-983e-7a13d8015e8e")).getConceptNid());
-//		set.setMember(Terms.get().getConcept(UUID.fromString("183af4ef-3c52-3834-a242-2542cdac2cc0")).getConceptNid());
-//		set.setMember(Terms.get().getConcept(UUID.fromString("e4bd2e96-a2c6-32b0-a521-5ec576ae7910")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("a0f7b747-807c-42a8-8bc2-ab4d7dbbf284")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("31bcce91-09f7-457b-8263-7cceb49b9b64")).getConceptNid());
+ 		set.setMember(Terms.get().getConcept(UUID.fromString("a4eec73d-1770-4505-abea-652ae0314ba9")).getConceptNid());
+*/
 		
- 		// Unit Test #13 (Unknown living organism (organism)) 
- 		// Unit Test #14 (vegetal (organismo)) 
- 		// Unit Test #15 (Angiosperm (organism)) 
-//		set.setMember(Terms.get().getConcept(UUID.fromString("24ad2011-2243-3551-b1af-214b0b4f343a")).getConceptNid());
-//		set.setMember(Terms.get().getConcept(UUID.fromString("c4ac913b-f6e9-3993-a1a8-d6a6a429b2bd")).getConceptNid());
-//		set.setMember(Terms.get().getConcept(UUID.fromString("2e831ed8-878d-314a-a71d-b94176e7b664")).getConceptNid());
-	}
+ 		// Unit Test #4 (Body structure (body structure))
+		// Unit Test #5 (Anatomical or acquired body structure (body structure)) 
+ 		// Unit Test #6 (Anatomical organizational pattern (body structure)) 
+ 		set.setMember(Terms.get().getConcept(UUID.fromString("4be3f62e-28d5-3bb4-a424-9aa7856a1790")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("619c5b5f-1677-3a35-b624-2a23d35fc039")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("bfb87649-850d-32bc-bd96-bc67e850a6fe")).getConceptNid());
+			
+ 		// Unit Test #7 (Anatomical site notations for tumor staging (body structure)) 
+ 		// Unit Test #8 (Body structure, altered from its original anatomical structure (morphologic abnormality)) 
+		// Unit Test #9 (Nonspecific site (body structure)) 
+		// Unit Test #10 (Physical anatomical entity (body structure)m) 
+ 		set.setMember(Terms.get().getConcept(UUID.fromString("45b6a265-15cc-3f2f-8727-79122b0fd180")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("9defab14-6d7b-3173-bbc2-ac30b76928b3")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("6df01706-a920-3444-9014-91253f16e1e5")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("afee3454-a2ef-3d89-a51e-c3337317296a")).getConceptNid());
 
+ 		// Unit Test #11 (Activity of daily living procedures and interventions (procedure))
+ 		// Unit Test #12 (Clinical history/examination observable (observable entity)) 
+ 		// Unit Test #13 (Clinical stage finding (finding)) 
+ 		// Unit Test #14 (Cyanosis (finding)) 
+ 		// Unit Test #15 (Function (observable entity)) 
+ 		// Unit Test #16 (Age AND/OR growth period (observable entity)) 
+ 		// Unit Test #17 (Body product observable (observable entity)) 
+ 		// Unit Test #18 (Disease outbreak (event)) 
+ 		// Unit Test #19 (Environmental event (event)) 
+ 		// Unit Test #20 (Exposure to potentially harmful entity (event)) 
+		set.setMember(Terms.get().getConcept(UUID.fromString("f1aa24f1-a3e9-3cb4-ac2a-a7a41b678559")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("3ee307a6-c10c-3145-bdbe-1126cee4f149")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("a9ed3709-70ef-3e27-9651-a8d034fccb28")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("d52fb8f7-095c-3f34-9cb0-db4102dc1803")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("ecad6cb8-d639-39c5-b8a6-b88196b6a96b")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("ea200c6b-7184-3f76-9f20-67a9945fa993")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("8b16bdf8-a552-317c-ae59-3d55f8c9ecf0")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("4895c796-da12-396e-9f8f-a677ee887a08")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("bc38e179-f284-317e-b8a5-5da4af35dac4")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("9a4977e0-259d-3281-9edb-3eb576676109")).getConceptNid());
+		
+ 		// Unit Test #21 (Life-cycle form (organism)) 
+ 		// Unit Test #22 (Altitude (physical force)) 
+ 		// Unit Test #23 (Determination of information related to transfusion (procedure)) 
+ 		// Unit Test #24 (Immediately dangerous to life and health condition (event)) 
+ 		// Unit Test #25 (Abuse (event)
+		 
+ 		// Unit Test #26 (Accidental event (event))
+		// Unit Test #27 (Bioterrorism related event (event)) 
+ 		// Unit Test #28 (Disease outbreak (event)) 
+ 		// Unit Test #29 (Explosion (physical force)) 
+ 		// Unit Test #30 (Drug therapy observable (observable entity)) 
+		set.setMember(Terms.get().getConcept(UUID.fromString("85133052-e1b7-3a5d-aa09-2fd1fafc982e")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("01403529-5182-37d4-842c-92cd68aa4a0a")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("3e67adcd-0740-34a3-90c9-f06d5c5da830")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("a28c605f-0830-3f0a-a0cb-080db7bf07cf")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("d721d31d-8131-3164-972d-0f53cb591f17")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("4ad9817a-ff22-3d19-9213-de5270beb17a")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("90bda575-2b85-3e8e-9a9d-e259ed2d5fe8")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("4895c796-da12-396e-9f8f-a677ee887a08")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("64df8df0-8efa-3a13-a52c-643ad7ebe7d8")).getConceptNid());
+		set.setMember(Terms.get().getConcept(UUID.fromString("a0b5514e-ef66-3361-b4db-50207dd27ed8")).getConceptNid());
+	}
+ 
 
 	
 	
@@ -320,7 +353,8 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
 		set.setMember(Terms.get().getConcept(UUID.fromString("800e6651-a619-3edf-bb90-74ab279966c9")).getConceptNid());
 		*/
     	
- 		set.setMember(Terms.get().getConcept(UUID.fromString("ff611b01-6d07-3eaf-b5bd-f95e2b8dd7fe")).getConceptNid());
+ 		set.setMember(Terms.get().getConcept(UUID.fromString("d721d31d-8131-3164-972d-0f53cb591f17")).getConceptNid());
+			
 
 	}
     public ContradictionIdentificationResults getResults() {
