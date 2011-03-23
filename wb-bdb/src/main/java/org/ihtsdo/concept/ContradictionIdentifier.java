@@ -138,7 +138,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
             Concept concept, 
             Map<PositionForSet, HashMap<Integer, Version>> foundPositionsMap, 
             ComponentType type) throws IOException 
-           {
+    {
         boolean isSingle = false;
         boolean isDuplicate = false;
         AttributeComparer comparer = null;
@@ -191,15 +191,18 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
         boolean isSingle = false;
         boolean isDuplicate = false;
         boolean isContradiction = false;
+        boolean updateFoundPositions = true;
 		ContradictionResult componentResult = ContradictionResult.NONE;
         ContradictionInvestigationType compType = comparer.getComponentType();
-
+        Set<ComponentVersionBI> foundPositionsVersions = new HashSet<ComponentVersionBI>();
+        
         try {
             // Examine Refsets.  Only continue to concept's components if refset check doesn't identify contradiction
 //			ContradictionResult refsetResult = refsetMembershipConflictFound(concept, foundPositionsMap, comp.getNid(), compType);
             ContradictionResult refsetResult = ContradictionResult.NONE;
 
 			ComponentVersionBI latestOriginVersion = null;
+			Version adjudicatorVersion = null; 
 			Set<ComponentVersionBI> developerVersions = new HashSet<ComponentVersionBI>();
 			
 			if (refsetResult != ContradictionResult.CONTRADICTION)
@@ -240,12 +243,14 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 				{
 					// Avoid investigation & adding to foundPositions
 					return ContradictionResult.NONE;
-				}
+				} 
 				
+
 				if (latestAdjudicatedVersion != null)
 				{
+					foundPositionsVersions.addAll(developerVersions);
 					PositionBI adjudicatorVersionPosition = getVersionPosition(latestAdjudicatedVersion);
-					Version adjudicatorVersion = getAdjudicatorVersionByType(concept, compType, latestAdjudicatedVersion.getNid(), adjudicatorVersionPosition);
+					adjudicatorVersion = getAdjudicatorVersionByType(concept, compType, latestAdjudicatedVersion.getNid(), adjudicatorVersionPosition);
 
 					// Using Adj Versions, run fastRelativeMapper twice to identify changes since
 					for (ComponentVersionBI version : developerVersions)
@@ -264,16 +269,26 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
 							if (relPosition == RELATIVE_POSITION.AFTER || relPosition == RELATIVE_POSITION.BEFORE) 
 							{
-								// For Edge Case
+								if (relPosition == RELATIVE_POSITION.BEFORE)
+								{
+									throw new Exception("My first time here");
+								}
+								
+								// For Edge Case -- Time-based contradiction Idetifier
 								RELATIVE_POSITION relSecondPosition = conflictMapper.fastRelativePosition(adjudicatorVersion, testingVersion, Precedence.TIME);
 								if (relSecondPosition != relPosition) 
 								{
-									if (!isContradictionWithSameValues(comparer, adjudicatorVersion, comp)) {
-										// Concept contains contradiction.  No need to update positions as check complete for concept
-										return ContradictionResult.CONTRADICTION;
+									if (!isSingle) {
+										isSingle = true;
 									} else {
-										isDuplicate = true;
+										isContradiction = true;
 									}
+								}
+
+								if (relPosition != RELATIVE_POSITION.BEFORE && relSecondPosition != RELATIVE_POSITION.BEFORE)
+								{
+									// Remove Pre-Adjudication Versions from Dev list
+									foundPositionsVersions.remove(testingVersion);
 								}
 							}
 						} 
@@ -286,8 +301,11 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 					int developerPathNid = 0;
 						
 					// Check for STRICTLY multiple modifications to single component by Single developer, else Contradiction
+					// TODO: ? Should I use fastRelPosMapper ?
 					for (ComponentVersionBI version : developerVersions)
 					{
+						foundPositionsVersions.add(version);
+
 						if (developerPathNid == 0) {
 							developerPathNid = version.getPathNid();
 						} else if (developerPathNid != version.getPathNid()) {
@@ -298,10 +316,17 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 				}
 			}
 	
-			if (isContradiction && !isDuplicate)
+			if (isContradiction)
 			{
+				ComponentVersionBI compareWithVersion;
+				if (adjudicatorVersion != null) {
+					compareWithVersion = adjudicatorVersion;
+				} else {
+					compareWithVersion = latestOriginVersion;
+				}
+				
 				// Check if for given CompId, have multiple versions with same changes
-				if (!isContradictionWithSameValues(comparer, latestOriginVersion, comp)) {
+				if (!isContradictionWithSameValues(comparer, compareWithVersion, foundPositionsVersions)) {
 					// Concept contains contradiction.  No need to update positions as check complete for concept
 					return ContradictionResult.CONTRADICTION;
 				} else {
@@ -310,7 +335,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 			}
 
 			// Add Position to List
-			updateFoundPositionsForAllVersions(concept, foundPositionsMap, developerVersions.iterator(), comp.getNid(), compType);
+			updateFoundPositionsForAllVersions(concept, foundPositionsMap, foundPositionsVersions.iterator(), comp.getNid(), compType);
 		} catch (ContraditionException ce) {
 			return ContradictionResult.CONTRADICTION;
 		} catch (Exception e) 
@@ -330,6 +355,11 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	
 
 
+	private boolean isIdenticalVersions(AttributeComparer comparer, Version adjudicatorVersion, Version testingVersion) {
+		comparer.initializeAttributes(adjudicatorVersion);
+		return comparer.hasSameAttributes(testingVersion);
+	}
+
 	private boolean isOriginVersion(PathBI originPath, ComponentVersionBI version) throws IOException {
 		for (PositionBI origin : originPath.getInheritedOrigins())
 		{
@@ -341,38 +371,35 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	}
 
 
-	private boolean isContradictionWithSameValues(AttributeComparer comparer, ComponentVersionBI latestOriginVersion, ComponentChroncileBI<?> comp) throws Exception
+	private boolean isContradictionWithSameValues(AttributeComparer comparer, ComponentVersionBI baseVersion, Set<ComponentVersionBI> testVersions) throws Exception
 	{ 
 		boolean isNewComponent = false;
 		AttributeComparer secondaryComparer = comparer.getClass().newInstance();
 		
-		if (latestOriginVersion != null) {
-			comparer.initializeAttributes(latestOriginVersion);
+		if (baseVersion != null) {
+			comparer.initializeAttributes(baseVersion);
 		} else {
 			// New Component with multiple versions!
 			isNewComponent = true;
-			if (comp.getVersions().size() < 2) {
+			if (testVersions.size() < 2) {
 				throw new Exception("Shouldn't have single version without latestOriginVersion");
 			}
 		}
 		
-		for (ComponentVersionBI version : comp.getVersions())
+		for (ComponentVersionBI version : testVersions)
 		{
-			if (!version.getPosition().isAntecedentOrEqualTo(leastCommonAncestorForViewPosition))
-			{
-				if (isNewComponent) {
-					comparer.initializeAttributes(version);
-				} else {
-					if (!comparer.hasSameAttributes(version))
+			if (isNewComponent) {
+				comparer.initializeAttributes(version);
+			} else {
+				if (!comparer.hasSameAttributes(version))
+				{
+					if (!secondaryComparer.isInitialized())
 					{
-						if (!secondaryComparer.isInitialized())
-						{
-							secondaryComparer.initializeAttributes(version);
-						}
-						else if (!secondaryComparer.hasSameAttributes(version))
-						{
-							return false;
-						}
+						secondaryComparer.initializeAttributes(version);
+					}
+					else if (!secondaryComparer.hasSameAttributes(version))
+					{
+						return false;
 					}
 				}
 			}
