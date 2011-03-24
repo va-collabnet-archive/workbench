@@ -13,10 +13,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
@@ -24,7 +21,6 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -36,9 +32,7 @@ import javax.swing.SwingWorker;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
@@ -46,7 +40,6 @@ import org.dwfa.ace.task.InstructAndWait;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.ace.task.wfpanel.PreviousNextOrCancel;
-import org.dwfa.ace.task.wfpanel.PreviousNextOrCancel.ContinueActionListener;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -54,10 +47,8 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.helper.dialect.DialectHelper;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
-import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.WizardBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.DescCAB;
@@ -74,9 +65,9 @@ import org.ihtsdo.tk.helper.TerminologyHelperDrools;
  *
  * @author kec
  */
-
-@BeanList(specs = { @Spec(directory = "tasks/ide/instruct", type = BeanType.TASK_BEAN),
-        @Spec(directory = "tasks/arena/wizard", type = BeanType.TASK_BEAN) })
+@BeanList(specs = {
+    @Spec(directory = "tasks/ide/instruct", type = BeanType.TASK_BEAN),
+    @Spec(directory = "tasks/arena/wizard", type = BeanType.TASK_BEAN)})
 public class NewConcept extends PreviousNextOrCancel {
 
     /*
@@ -153,8 +144,7 @@ public class NewConcept extends PreviousNextOrCancel {
             // Present the user interface in the Workflow panel
             wizard = (WizardBI) worker.readAttachement(WorkerAttachmentKeys.WIZARD_PANEL.name());
             config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-            host = (I_HostConceptPlugins) 
-            worker.readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name());
+            host = (I_HostConceptPlugins) worker.readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name());
 
             DoSwing swinger = new DoSwing(process);
             swinger.execute();
@@ -187,29 +177,36 @@ public class NewConcept extends PreviousNextOrCancel {
     }
 
     public void doRun(final I_EncodeBusinessProcess process, I_Work worker) {
-
+       wizard.setWizardPanelVisible(false);
+ 
         try {
             // check return condition for CONTINUE or ITEM_CANCELLED
             if (returnCondition == Condition.CONTINUE) {
-            	createBlueprints();
-            	if(addUsDesc){
-            		tc.construct(descSpecUs);
-            		tc.construct(refexSpecUs);
-            	}
-            	if(addGbDesc){
-            		tc.construct(descSpecGb);
-            		tc.construct(refexSpecGb);
-            	}
-            	I_AmTermComponent newTerm = (I_AmTermComponent) newConcept;
-            	Ts.get().addUncommitted(newConcept);
-            	host.setTermComponent(newTerm);
-            	wizard.setWizardPanelVisible(false);
+                createBlueprints();
+                if (addUsDesc) {
+                    tc.construct(descSpecUs);
+                    tc.construct(refexSpecUs);
+                }
+                if (addGbDesc) {
+                    tc.construct(descSpecGb);
+                    tc.construct(refexSpecGb);
+                }
+                Ts.get().addUncommitted(newConcept);
+
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        I_AmTermComponent newTerm = (I_AmTermComponent) newConcept;
+                         host.setTermComponent(newTerm);
+                        wizard.setWizardPanelVisible(false);
+                    }
+                });
             }
         } catch (Exception e) {
             e.printStackTrace();
             returnCondition = Condition.ITEM_CANCELED;
         }
-        wizard.setWizardPanelVisible(false);
     }
 
     /**
@@ -270,44 +267,44 @@ public class NewConcept extends PreviousNextOrCancel {
                 c.gridwidth = 1;
                 setUpButtons(wizardPanel, c);
 
-                
+
                 c.gridx = 0;
-                c.gridy ++;
+                c.gridy++;
                 c.weightx = 0.0;
                 c.gridwidth = 10;
                 wizardPanel.add(new JSeparator(), c);
                 c.gridwidth = 6;
-                c.gridy ++;
+                c.gridy++;
                 wizardPanel.add(new JLabel("fully specified name:"), c);
-                c.gridy ++;
+                c.gridy++;
                 c.weightx = 1.0;
                 fsn = new JTextField();
                 fsn.addActionListener(new CopyTextActionListener());
                 wizardPanel.add(fsn, c);
 
-                c.gridy ++;
+                c.gridy++;
                 c.weightx = 0.0;
                 wizardPanel.add(new JLabel("preferred name:"), c);
-                c.gridy ++;
+                c.gridy++;
                 c.weightx = 1.0;
-                pref = new JTextField(); 
+                pref = new JTextField();
                 wizardPanel.add(pref, c);
 
-                
-                c.gridy ++;
+
+                c.gridy++;
                 c.weightx = 0.0;
                 wizardPanel.add(new JLabel("parents:"), c);
-                c.gridy ++;
+                c.gridy++;
                 c.weightx = 1.0;
                 c.weighty = 1.0;
                 tl = new TerminologyList(config);
                 wizardPanel.add(tl, c);
                 c.weighty = 0.0;
-                
-                c.gridy ++;
+
+                c.gridy++;
                 c.gridwidth = 10;
                 wizardPanel.add(new JSeparator(), c);
-                c.gridy ++;
+                c.gridy++;
                 c.weightx = 1.0;
                 c.gridwidth = 1;
                 c.weightx = 0.0;
@@ -327,18 +324,18 @@ public class NewConcept extends PreviousNextOrCancel {
                 gbLabel = new JLabel("en-GB");
                 gbLabel.setVisible(false);
                 wizardPanel.add(gbLabel, c);
-                c.gridy ++;
+                c.gridy++;
                 c.gridx = 0;
                 c.weightx = 0.0;
                 c.gridwidth = 10;
                 wizardPanel.add(new JSeparator(), c);
-                c.gridy ++;
-                
-                
-                c.gridy ++;
+                c.gridy++;
+
+
+                c.gridy++;
                 c.gridwidth = 10;
                 wizardPanel.add(new JSeparator(), c);
-                c.gridy ++;
+                c.gridy++;
                 c.weightx = 1.0;
                 c.gridwidth = 1;
                 c.weightx = 0.0;
@@ -358,12 +355,12 @@ public class NewConcept extends PreviousNextOrCancel {
                 usLabel = new JLabel("en-US");
                 usLabel.setVisible(false);
                 wizardPanel.add(usLabel, c);
-                c.gridy ++;
+                c.gridy++;
                 c.gridx = 0;
                 c.weightx = 0.0;
                 c.gridwidth = 10;
                 wizardPanel.add(new JSeparator(), c);
-                c.gridy ++;
+                c.gridy++;
 
                 //empty thing
                 c.gridx = 0;
@@ -411,165 +408,160 @@ public class NewConcept extends PreviousNextOrCancel {
         continueButton.requestFocusInWindow();
         wizardPanel.repaint();
     }
-    
-   public class CopyTextActionListener implements ActionListener{
-	   
-	   @Override
-	   public void actionPerformed(ActionEvent e) {
-		String fsnText = fsn.getText();
-		int paren = fsnText.indexOf("(");
-		String prefText = "";
-		
-		if (paren == -1){
-			prefText = fsnText;
-			pref.setText(prefText);
-		}
-		else{
-			prefText = fsnText.substring(0, paren-1);
-			pref.setText(prefText);
-		}
-		
-		addSpellingVarients(prefText);
-	}
-	   
-   }
-    
-    public void addSpellingVarients(String prefText){
-    	TerminologyHelperDrools th = new TerminologyHelperDrools();
-    	String us = "en-us";
-    	String gb = "en-gb";
-    	String varient = "";
-    	
-    	if(th.loadProperties()){
-    		if(th.checkTermSpelling(prefText, us) && th.checkTermSpelling(prefText, gb)){
-    			//do nothing
-    		}else if(th.checkTermSpelling(prefText, us)){ //check if lang is en-us
-    			varient = th.getSpellingTerm(prefText,us);
-    			this.gb.setText(varient);
-    			this.gbBox.setVisible(true);
-    			this.gb.setVisible(true);
-    			this.gbLabel.setVisible(true);
-    		}else if(th.checkTermSpelling(prefText, gb)){ //check if lang is en-gb
-    			varient = th.getSpellingTerm(prefText,gb);
-    			this.us.setText(varient);
-    			this.usBox.setVisible(true);
-    			this.us.setVisible(true);
-    			this.usLabel.setVisible(true);
-    		}
-    	}
+
+    public class CopyTextActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String fsnText = fsn.getText();
+            int paren = fsnText.indexOf("(");
+            String prefText = "";
+
+            if (paren == -1) {
+                prefText = fsnText;
+                pref.setText(prefText);
+            } else {
+                prefText = fsnText.substring(0, paren - 1);
+                pref.setText(prefText);
+            }
+
+            addSpellingVarients(prefText);
+        }
     }
 
-   
-    private void createBlueprints(){
-    	UUID isa = UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25"); //this is for "Is a"
-    	tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(), 
-                 config.getViewCoordinate());
-    	
-    	try {
-    	//get parents
-    	TerminologyListModel model = (TerminologyListModel) tl.getModel();
-    	nidList = model.getNidsInList();
-    	UUID[] uuidArray = new UUID[nidList.size()];
-   
-    	for(int index = 0; index < nidList.size(); index++){
-    		uuidArray[index] = Terms.get().nidToUuid(nidList.get(index));
-    	}
+    public void addSpellingVarients(String prefText) {
+        TerminologyHelperDrools th = new TerminologyHelperDrools();
+        String us = "en-us";
+        String gb = "en-gb";
+        String varient = "";
 
-   	 	
-    	//create concept blue print
-    	 conceptSpec = new ConceptCB(fsn.getText(), pref.getText(), "en", isa, uuidArray);
-    	 newConcept = tc.construct(conceptSpec);
-    	} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidCAB e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        if (th.loadProperties()) {
+            if (th.checkTermSpelling(prefText, us) && th.checkTermSpelling(prefText, gb)) {
+                //do nothing
+            } else if (th.checkTermSpelling(prefText, us)) { //check if lang is en-us
+                varient = th.getSpellingTerm(prefText, us);
+                this.gb.setText(varient);
+                this.gbBox.setVisible(true);
+                this.gb.setVisible(true);
+                this.gbLabel.setVisible(true);
+            } else if (th.checkTermSpelling(prefText, gb)) { //check if lang is en-gb
+                varient = th.getSpellingTerm(prefText, gb);
+                this.us.setText(varient);
+                this.usBox.setVisible(true);
+                this.us.setVisible(true);
+                this.usLabel.setVisible(true);
+            }
+        }
     }
-    
-    public class BlueprintContinueActionListener implements ActionListener{
 
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			if(fsn.getText() == ""){
-        		//please enter the fsn
-        		JOptionPane.showMessageDialog(new JFrame(), "please enter the fsn");
-        	}
-        	/*if(){
-        	 	// Test for parents
-        		//please list parents for the new concept
-        		JOptionPane.showMessageDialog(new JFrame(), "please list parents for the new concept");
-        	}*/else {
+    private void createBlueprints() {
+        UUID isa = UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25"); //this is for "Is a"
+        tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
+                config.getViewCoordinate());
+
+        try {
+            //get parents
+            TerminologyListModel model = (TerminologyListModel) tl.getModel();
+            nidList = model.getNidsInList();
+            UUID[] uuidArray = new UUID[nidList.size()];
+
+            for (int index = 0; index < nidList.size(); index++) {
+                uuidArray[index] = Terms.get().nidToUuid(nidList.get(index));
+            }
+
+
+            //create concept blue print
+            conceptSpec = new ConceptCB(fsn.getText(), pref.getText(), "en", isa, uuidArray);
+            newConcept = tc.construct(conceptSpec);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InvalidCAB e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public class BlueprintContinueActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (fsn.getText().equals("")) {
+                //please enter the fsn
+                JOptionPane.showMessageDialog(new JFrame(), "please enter the fsn");
+            } /*if(){
+            // Test for parents
+            //please list parents for the new concept
+            JOptionPane.showMessageDialog(new JFrame(), "please list parents for the new concept");
+            }*/ else {
                 returnCondition = Condition.CONTINUE;
                 done = true;
                 NewConcept.this.notifyTaskDone();
-                }
-        	}
-    }	
-    public class GbDialectActionListener implements ActionListener{
+            }
+        }
+    }
 
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			//create desc blueprint and construct 
-			try{
-    		 descSpecGb = new DescCAB(
-    				 		conceptSpec.getComponentUuid(),
-    				 		WbDescType.SYNONYM.getLenient().getPrimUuid(), 
-    				 		"en", us.getText(),
-    				 		false);
-    		 
-        	//create refsex blueprint for GB dialect refset and construct
-    		 UUID gbUuid = UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd");
-    		 refexSpecGb = new RefexCAB(
-    				TK_REFSET_TYPE.CID,
-    				descSpecGb.getComponentNid(),
-    				Ts.get().getNidForUuids(gbUuid)); 
-    		 addGbDesc = true;
-    		
-			} catch (IOException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			} catch (InvalidCAB ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			}
-			
-    }
-    }
-    
-    public class UsDialectActionListener implements ActionListener{
+    public class GbDialectActionListener implements ActionListener {
 
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			//create desc blueprint and construct
-			try{
-				 descSpecUs = new DescCAB(
-	   				 		conceptSpec.getComponentUuid(), 
-	   				 		WbDescType.SYNONYM.getLenient().getPrimUuid(), "en", 
-	   				 		gb.getText(),
-	   				 		false);
-	   		
-	   		 
-	       	//create refsex blueprint for US dialect refset and construct
-	   		 UUID usUuid = UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6");
-	   		 refexSpecUs = new RefexCAB(
-	   				 TK_REFSET_TYPE.CID,
-	   				 descSpecUs.getComponentNid(),
-	   				 Ts.get().getNidForUuids(usUuid)); 
-	   		 addUsDesc = true;
-	   		
-			} catch (IOException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			} catch (InvalidCAB ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			}	
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //create desc blueprint and construct 
+            try {
+                descSpecGb = new DescCAB(
+                        conceptSpec.getComponentUuid(),
+                        WbDescType.SYNONYM.getLenient().getPrimUuid(),
+                        "en", us.getText(),
+                        false);
+
+                //create refsex blueprint for GB dialect refset and construct
+                UUID gbUuid = UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd");
+                refexSpecGb = new RefexCAB(
+                        TK_REFSET_TYPE.CID,
+                        descSpecGb.getComponentNid(),
+                        Ts.get().getNidForUuids(gbUuid));
+                addGbDesc = true;
+
+            } catch (IOException ex) {
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            } catch (InvalidCAB ex) {
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            }
+
+        }
     }
+
+    public class UsDialectActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //create desc blueprint and construct
+            try {
+                descSpecUs = new DescCAB(
+                        conceptSpec.getComponentUuid(),
+                        WbDescType.SYNONYM.getLenient().getPrimUuid(), "en",
+                        gb.getText(),
+                        false);
+
+
+                //create refsex blueprint for US dialect refset and construct
+                UUID usUuid = UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6");
+                refexSpecUs = new RefexCAB(
+                        TK_REFSET_TYPE.CID,
+                        descSpecUs.getComponentNid(),
+                        Ts.get().getNidForUuids(usUuid));
+                addUsDesc = true;
+
+            } catch (IOException ex) {
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            } catch (InvalidCAB ex) {
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            }
+        }
     }
-		  
-    
 
     /**
      * Get the instructions for this task
