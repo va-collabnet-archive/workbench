@@ -158,11 +158,11 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
             } else {
             returnCondition = Condition.ITEM_CANCELED;
             done = true;
-            synchronized (PreviousNextOrCancel.this) {
-                PreviousNextOrCancel.this.notifyAll();
-            }
+            notifyTaskDone();
         }
     }
+
+		
     }
 
     protected void waitTillDone(Logger l) {
@@ -174,6 +174,12 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
             }
         }
     }
+    
+    protected void notifyTaskDone() {
+		synchronized (PreviousNextOrCancel.this) {
+            PreviousNextOrCancel.this.notifyAll();
+        }
+	}
 
     public String getInvalidInputMessage() {
         return "Invalid input";
