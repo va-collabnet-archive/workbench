@@ -20,9 +20,9 @@ public class DescriptionAttributeComparer extends AttributeComparer {
 	boolean hasSameAttributes(ComponentVersionBI v) {
 		DescriptionVersionBI descVersion = (DescriptionVersionBI)v;
 
-		if ((!descVersion.getLang().equalsIgnoreCase(lcaLanguage)) ||
+		if ((!descVersion.getLang().equals(lcaLanguage)) ||
 			(descVersion.isInitialCaseSignificant() != lcaInitialCaseSignificance)||
-			(!descVersion.getText().equalsIgnoreCase(lcaText)) ||
+			(!descVersion.getText().equals(lcaText)) ||
 			(descVersion.getStatusNid() != lcaStatusNid))
 			return false;
 		

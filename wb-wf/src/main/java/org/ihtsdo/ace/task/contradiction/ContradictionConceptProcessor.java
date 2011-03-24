@@ -336,24 +336,8 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
 	
 	
     private void buildSet3(I_RepresentIdSet set) throws TerminologyException, IOException {
-		/* SHEET #3 - REFSETS*/
-    	/*
-		// Unit Test #1  (Death) 
- 		// Unit Test #2  
- 		// Unit Test #3  (Accidental Death)
- 		// Unit Test #4  (Death-Expected)
- 		// Unit Test #5  (Death by ashphyxiation)
- 		// Unit Test #6  (Death by electrocution)
- 		// Unit Test #7  (Alejandro Lopez)
-		set.setMember(Terms.get().getConcept(UUID.fromString("ba7e96f8-7cad-3157-8c95-0290395c13d2")).getConceptNid());
-		set.setMember(Terms.get().getConcept(UUID.fromString("c4d25f5f-1f63-37e9-8775-c851fe99cb87")).getConceptNid());
-		set.setMember(Terms.get().getConcept(UUID.fromString("21cdeb5d-f402-3124-9f8d-00c6176dc37f")).getConceptNid());
-		set.setMember(Terms.get().getConcept(UUID.fromString("935ca22f-7703-3370-9e9f-1025694f3f9b")).getConceptNid());
-		set.setMember(Terms.get().getConcept(UUID.fromString("5a27bef4-41e0-33e7-8da3-76450d82cbf5")).getConceptNid());
-		set.setMember(Terms.get().getConcept(UUID.fromString("800e6651-a619-3edf-bb90-74ab279966c9")).getConceptNid());
-		*/
-    	
- 		set.setMember(Terms.get().getConcept(UUID.fromString("d721d31d-8131-3164-972d-0f53cb591f17")).getConceptNid());
+    	/* Single Test */
+    	set.setMember(Terms.get().getConcept(UUID.fromString("9a4977e0-259d-3281-9edb-3eb576676109")).getConceptNid());
 			
 
 	}

@@ -203,7 +203,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
 			ComponentVersionBI latestOriginVersion = null;
 			Version adjudicatorVersion = null; 
-			Set<ComponentVersionBI> developerVersions = new HashSet<ComponentVersionBI>();
+			Map<Integer, ComponentVersionBI> developerLatestVersionsMap = new HashMap<Integer, ComponentVersionBI>();
 			
 			if (refsetResult != ContradictionResult.CONTRADICTION)
 			{
@@ -235,25 +235,39 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 						}							
 					} else {
 						// Identify Developer versions
-						developerVersions.add(part);
+						//developerLatestVersionsMap.put(<dev>, part);
+
+						boolean putIntoMap = true;
+						Integer pathNidObj = new Integer(part.getPathNid());
+						ComponentVersionBI latestVersion = developerLatestVersionsMap.get(pathNidObj);
+						
+						if (latestVersion != null) {
+							if (latestVersion.getTime() > part.getTime()) {
+								putIntoMap = false;
+							}
+						} 
+						
+						if (putIntoMap) {
+							developerLatestVersionsMap.put(pathNidObj, part);
+						}
 					}
 				}
 				
-				if (developerVersions.isEmpty())
+				if (developerLatestVersionsMap.isEmpty())
 				{
 					// Avoid investigation & adding to foundPositions
 					return ContradictionResult.NONE;
-				} 
+				}
 				
 
 				if (latestAdjudicatedVersion != null)
 				{
-					foundPositionsVersions.addAll(developerVersions);
+					foundPositionsVersions.addAll(developerLatestVersionsMap.values());
 					PositionBI adjudicatorVersionPosition = getVersionPosition(latestAdjudicatedVersion);
 					adjudicatorVersion = getAdjudicatorVersionByType(concept, compType, latestAdjudicatedVersion.getNid(), adjudicatorVersionPosition);
 
 					// Using Adj Versions, run fastRelativeMapper twice to identify changes since
-					for (ComponentVersionBI version : developerVersions)
+					for (ComponentVersionBI version : developerLatestVersionsMap.values())
 					{
 						PositionBI developerVersionPosition = getVersionPosition(version);
 						Version testingVersion = getCurrentVersionByType(concept, compType, version.getNid(), developerVersionPosition);
@@ -302,7 +316,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 						
 					// Check for STRICTLY multiple modifications to single component by Single developer, else Contradiction
 					// TODO: ? Should I use fastRelPosMapper ?
-					for (ComponentVersionBI version : developerVersions)
+					for (ComponentVersionBI version : developerLatestVersionsMap.values())
 					{
 						foundPositionsVersions.add(version);
 
