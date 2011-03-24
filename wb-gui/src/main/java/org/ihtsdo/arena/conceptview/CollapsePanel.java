@@ -267,7 +267,7 @@ public class CollapsePanel extends JPanel {
                 facts.add(cFact);
 
                 DroolsExecutionManager.fireAllRules(
-                        ConceptView.class.getCanonicalName(),
+                		CollapsePanel.class.getCanonicalName(),
                         kbFiles,
                         globals,
                         facts,

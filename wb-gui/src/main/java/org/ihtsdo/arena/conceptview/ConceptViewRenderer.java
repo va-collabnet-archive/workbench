@@ -195,7 +195,7 @@ public class ConceptViewRenderer extends JLayeredPane {
        this.kbFiles.add(new File("drools-rules/ContextualConceptActionsPanel.drl"));
 
         try {
-            DroolsExecutionManager.setup(CollapsePanel.class.getCanonicalName(), kbFiles);
+            DroolsExecutionManager.setup(ConceptViewRenderer.class.getCanonicalName(), kbFiles);
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }
@@ -636,7 +636,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                             settings.getConcept().getNid()));
 
                 DroolsExecutionManager.fireAllRules(
-                        ConceptView.class.getCanonicalName(),
+                        ConceptViewRenderer.class.getCanonicalName(),
                         kbFiles,
                         globals,
                         facts,

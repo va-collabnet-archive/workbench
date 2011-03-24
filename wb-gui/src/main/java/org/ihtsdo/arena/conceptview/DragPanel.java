@@ -542,7 +542,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
 
 
                     DroolsExecutionManager.fireAllRules(
-                            ConceptView.class.getCanonicalName(),
+                            DragPanel.class.getCanonicalName(),
                             kbFiles,
                             globals,
                             facts,
