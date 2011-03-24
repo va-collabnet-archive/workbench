@@ -40,37 +40,6 @@ public class ContradictionReporter {
         	AceLog.getAppLog().log(Level.SEVERE, "Error in populating contradiction detection results in the list panel");
 		}
 	}
-	
-/* 
- * OLD VERSION? 
- * 
-    public void identifyInConceptListPanel(Set<Integer> nids) {
-        try {
-            JList conceptList = Terms.get().getActiveAceFrameConfig().getBatchConceptList();
-            I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
-            model.clear();
-
-            TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createFsnComparer());
-            for (Integer nid : nids) {
-                I_GetConceptData concept = Terms.get().getConcept(nid);
-                sortedConcepts.add(concept);
-
-            }
-
-            for (I_GetConceptData con : sortedConcepts) {
-                model.addElement(con);
-            }
-
-            Terms.get().getActiveAceFrameConfig().showListView();
-
-        } catch (TerminologyException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-*/
-
 	public void printSingleConcepts(TreeSet<I_GetConceptData> singleConcepts) {
 		System.out.println("\n\n*********Singles with count of: " + singleConcepts.size() + "*********");
 
