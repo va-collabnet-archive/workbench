@@ -8,7 +8,7 @@ import java.util.logging.Level;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
+import org.ihtsdo.workflow.refset.utilities.WfComparator;
 
 public class ContradictionIdentificationResults {
 
@@ -38,7 +38,7 @@ public class ContradictionIdentificationResults {
     }
 
     public TreeSet<I_GetConceptData> getConflictingConcepts() {
-        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createFsnComparer());
+        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createFsnComparer());
 
         try {
             for (Integer i : conflictingConcepts) {
@@ -53,7 +53,7 @@ public class ContradictionIdentificationResults {
     }
 
     public TreeSet<I_GetConceptData> getConflictingConceptsWithSameValueSameCompId() {
-        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createFsnComparer());
+        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createFsnComparer());
 
         try {
             for (Integer i : conflictingConceptsWithSameValuesSameCompId) {
@@ -68,7 +68,7 @@ public class ContradictionIdentificationResults {
     }
 
     public TreeSet<I_GetConceptData> getConflictingConceptsWithSameValueDifferentCompId() {
-        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createFsnComparer());
+        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createFsnComparer());
 
         try {
             for (Integer i : conflictingConceptsWithSameValuesDifferentCompId) {
@@ -83,7 +83,7 @@ public class ContradictionIdentificationResults {
     }
 
     public TreeSet<I_GetConceptData> getSingleConcepts() {
-        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createFsnComparer());
+        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createFsnComparer());
 
         try {
             for (Integer i : singleConcepts) {
@@ -98,7 +98,7 @@ public class ContradictionIdentificationResults {
     }
 
     public TreeSet<I_GetConceptData> getNoneConflictingConcepts() {
-        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createFsnComparer());
+        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createFsnComparer());
 
         try {
             for (Integer i : nonConflictingConcepts) {

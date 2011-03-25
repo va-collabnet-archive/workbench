@@ -25,14 +25,13 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.tasks.editor.AbstractComboEditor;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
+import org.ihtsdo.workflow.refset.utilities.WfComparator;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 public class WorkflowModelerEditor extends AbstractComboEditor {
@@ -40,8 +39,8 @@ public class WorkflowModelerEditor extends AbstractComboEditor {
     @Override
     public EditorComponent setupEditor() {
     	
-    	TreeSet<I_GetConceptData> activeModelers = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createPreferredTermComparer());
-    	TreeSet<I_GetConceptData> inactiveModelers = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createPreferredTermComparer());
+    	TreeSet<I_GetConceptData> activeModelers = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createPreferredTermComparer());
+    	TreeSet<I_GetConceptData> inactiveModelers = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createPreferredTermComparer());
     	List<I_GetConceptData> modelers = new LinkedList<I_GetConceptData>();
 		I_GetConceptData defaultModeler = null;
 

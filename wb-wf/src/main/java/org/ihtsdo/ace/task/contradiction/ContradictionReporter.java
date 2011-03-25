@@ -10,7 +10,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
+import org.ihtsdo.workflow.refset.utilities.WfComparator;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 public class ContradictionReporter {
@@ -23,7 +23,7 @@ public class ContradictionReporter {
 	        I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
 	        model.clear();
 
-	        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WorkflowHistoryRefset.createFsnComparer());
+	        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createFsnComparer());
 	        for (Integer nid : nids)
 	        {
 	        	I_GetConceptData concept = Terms.get().getConcept(nid);

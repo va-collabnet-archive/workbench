@@ -30,6 +30,7 @@ import org.ihtsdo.ace.task.search.I_TestWorkflowHistorySearchResults;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.example.binding.Taxonomies;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
+import org.ihtsdo.workflow.refset.utilities.WfComparator;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
 
@@ -127,8 +128,8 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		String normalizedBeforeTimestamp = null;
 		String normalizedAfterTimestamp = null;
 		UUID currentWorkflowID = null;
-		SortedSet<WorkflowHistoryJavaBean> returnList = new TreeSet<WorkflowHistoryJavaBean>(WorkflowHistoryRefset.createWfHxFsnJavaBeanComparer());
-		SortedSet<WorkflowHistoryJavaBean> sortedInputList = new TreeSet<WorkflowHistoryJavaBean>(WorkflowHistoryRefset.ConceptWorkflowTimestampComparer());
+		SortedSet<WorkflowHistoryJavaBean> returnList = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxFsnJavaBeanComparer());
+		SortedSet<WorkflowHistoryJavaBean> sortedInputList = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createConceptWorkflowTimestampComparer());
 		long beforeTimestamp = 0;
 		long afterTimestamp = 0;
 		
@@ -228,7 +229,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		UUID currentWorkflow = null;
 		Set<UUID> processedConcepts = new HashSet<UUID>();
 		Map<UUID, TreeSet<WorkflowHistoryJavaBean>> retSet = new HashMap<UUID, TreeSet<WorkflowHistoryJavaBean>>();
-		TreeSet<WorkflowHistoryJavaBean> currentWorkflowBucket = new TreeSet<WorkflowHistoryJavaBean>(WorkflowHistoryRefset.createTimestampComparer());
+		TreeSet<WorkflowHistoryJavaBean> currentWorkflowBucket = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createTimestampComparer());
 		
 		for (WorkflowHistoryJavaBean bean : sortedInputList)
 		{
@@ -264,7 +265,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 					retSet.put(currentWorkflow, currentWorkflowBucket);
 				} 
 					
-				currentWorkflowBucket = new TreeSet<WorkflowHistoryJavaBean>(WorkflowHistoryRefset.createTimestampComparer());
+				currentWorkflowBucket = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createTimestampComparer());
 				currentWorkflow = bean.getWorkflowId();
 			}	
 			
@@ -331,7 +332,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 	}
 
 	private SortedSet<WorkflowHistoryJavaBean> processCurrentRelease() throws IOException, NumberFormatException, TerminologyException {
-		 SortedSet<WorkflowHistoryJavaBean> sortedBeans = new TreeSet<WorkflowHistoryJavaBean>(WorkflowHistoryRefset.ConceptWorkflowTimestampComparer());
+		 SortedSet<WorkflowHistoryJavaBean> sortedBeans = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createConceptWorkflowTimestampComparer());
 
 		 for (I_ExtendByRef row : Terms.get().getRefsetExtensionsForComponent(refsetId, snomedConcept.getConceptNid())) 
 		 {
@@ -347,7 +348,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 	}
 
 	private SortedSet<WorkflowHistoryJavaBean> processAllReleases(String before, String after) throws NumberFormatException, IOException, TerminologyException {
-	 	SortedSet<WorkflowHistoryJavaBean> sortedBeans = new TreeSet<WorkflowHistoryJavaBean>(WorkflowHistoryRefset.ConceptWorkflowTimestampComparer());
+	 	SortedSet<WorkflowHistoryJavaBean> sortedBeans = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createConceptWorkflowTimestampComparer());
 		SortedMap<String, ComponentVersionBI> allReleasesMap = getAllReleasesMap();
 
 		for (String timestamp : allReleasesMap.keySet())
@@ -452,7 +453,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 						// TODO: Add Comparer
 						HashMap<UUID, SortedSet<WorkflowHistoryJavaBean>> newWorkflowMap = new HashMap<UUID, SortedSet<WorkflowHistoryJavaBean>>();
 						
-						SortedSet<WorkflowHistoryJavaBean> newWorkflow = new TreeSet<WorkflowHistoryJavaBean>(WorkflowHistoryRefset.createWfHxJavaBeanComparer());
+						SortedSet<WorkflowHistoryJavaBean> newWorkflow = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxJavaBeanComparer());
 						newWorkflowMap.put(bean.getWorkflowId(), newWorkflow);
 						returnCollection.put(bean.getConcept(), newWorkflowMap);
 					}
@@ -472,7 +473,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 	{
 		if (!conceptHistory.containsKey(history.getWorkflowId()))
 		{
-			SortedSet<WorkflowHistoryJavaBean> newWorkflowSet = new TreeSet<WorkflowHistoryJavaBean>(WorkflowHistoryRefset.createWfHxJavaBeanComparer());			
+			SortedSet<WorkflowHistoryJavaBean> newWorkflowSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxJavaBeanComparer());			
 
 			conceptHistory.put(history.getWorkflowId(), newWorkflowSet);
 		}
@@ -499,7 +500,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 	
 	public SortedSet<WorkflowHistoryJavaBean> getLatestWorkflowHistoryForConcept(I_GetConceptData con)
 	{
-		SortedSet<WorkflowHistoryJavaBean> retSet = new TreeSet<WorkflowHistoryJavaBean>(WorkflowHistoryRefset.createWfHxJavaBeanComparer());
+		SortedSet<WorkflowHistoryJavaBean> retSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxJavaBeanComparer());
 		Map<UUID, SortedSet<WorkflowHistoryJavaBean>> conHx = getAllWorkflowHistoryForConcept(con);
 		
 		for (UUID key : conHx.keySet())
@@ -577,7 +578,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		// @TODO Add if (currentState == currentStatusNid)
 		if (releasesMap == null)
 		{
-			releasesMap = new TreeMap<String, ComponentVersionBI>(WorkflowHistoryRefset.createComponentStringTimestampComparer());
+			releasesMap = new TreeMap<String, ComponentVersionBI>(WfComparator.getInstance().createComponentStringTimestampComparer());
 			String dateString = new String();
 			try {
 				
