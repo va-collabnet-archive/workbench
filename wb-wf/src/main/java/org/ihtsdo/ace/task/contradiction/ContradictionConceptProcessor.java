@@ -22,6 +22,19 @@ import org.ihtsdo.tk.contradiction.ContradictionResult;
 
 public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDataBI {
 
+    private void buildInvestigationSet() {
+        I_RepresentIdSet set = new IdentifierSet();
+
+		try
+		{
+			buildSet1(set);
+        } catch (Exception e) {
+            AceLog.getAppLog().log(Level.WARNING, "Error in intializing Contradiction Concept Processor", e);
+        }
+
+        setNidSet(set);
+    }
+
     NidBitSetBI cNids = new IdentifierSet();
     private ContradictionIdentifierBI detector = null;
     private ContradictionIdentificationResults results = null;
@@ -62,21 +75,23 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
         
         if (cNids.isMember(cNid)) { 
             ConceptChronicleBI c = fcfc.fetch();
-            ContradictionResult position = (detector.inConflict(c));
+            ContradictionResult position = (detector.isConceptInConflict(c));
 
             if (position.equals(ContradictionResult.CONTRADICTION)) {
                 results.addConflict(c.getConceptNid());
                 found.incrementAndGet();
-            } else if (position.equals(ContradictionResult.CONTRADICTON_SAME_VALUES_SINGLE_COMPID)) {
+            } else if (position.equals(ContradictionResult.DUPLICATE_EDIT)) {
                 results.addConflictingWithSameValueSameCompId(c.getConceptNid());
                 found.incrementAndGet();
-	        } else if (position.equals(ContradictionResult.CONTRADICTON_SAME_VALUES_DIFFERENT_COMPID)) {
+	        } else if (position.equals(ContradictionResult.DUPLICATE_NEW_COMPONENT)) {
 	            results.addConflictingWithSameValueDifferentCompId(c.getConceptNid());
 	            found.incrementAndGet();
-	        } 
+	        } else if (position.equals(ContradictionResult.ERROR)) {
+	        	throw new Exception("Failure in detecting contradictions on concept: " + c.getPrimUuid());
+	        }
             // else if (position.equals(CONTRADICTION_RESULT.UNREACHABLE))
             //		results.addUnreachable(c.getConceptNid());
-            else if (position.equals(ContradictionResult.SINGLE)) {
+            else if (position.equals(ContradictionResult.SINGLE_MODELER_CHANGE)) {
                 results.addSingle(c.getConceptNid());
             } else {
                 results.addNoneConflicting(c.getConceptNid());
@@ -89,18 +104,6 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
         }
     }
 
-    private void buildInvestigationSet() {
-        I_RepresentIdSet set = new IdentifierSet();
-
-		try
-		{
-			buildSet2(set);
-        } catch (Exception e) {
-            AceLog.getAppLog().log(Level.WARNING, "Error in intializing Contradiction Concept Processor", e);
-        }
-
-        setNidSet(set);
-    }
 
 
 
@@ -159,7 +162,7 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
  		// Unit Test #19 (Bioterrorism related event (event))
 
 		// Unit Test #20 (Death (event))
- 		// Unit Test #21 (Disease outbreak (event))
+ 		// Unit Test #21 (Legal intervention (event))
  		// Unit Test #22 (Environmental event (event))
 		
  		// Unit Test #23 (Event of undetermined intent (event))
@@ -174,7 +177,7 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
  		set.setMember(Terms.get().getConcept(UUID.fromString("90bda575-2b85-3e8e-9a9d-e259ed2d5fe8")).getConceptNid());
  
  		set.setMember(Terms.get().getConcept(UUID.fromString("ba7e96f8-7cad-3157-8c95-0290395c13d2")).getConceptNid());
- 		set.setMember(Terms.get().getConcept(UUID.fromString("4895c796-da12-396e-9f8f-a677ee887a08")).getConceptNid());
+ 		set.setMember(Terms.get().getConcept(UUID.fromString("7d25ce7c-d547-35d9-a0f8-3b19fa854cb6")).getConceptNid());
  		set.setMember(Terms.get().getConcept(UUID.fromString("bc38e179-f284-317e-b8a5-5da4af35dac4")).getConceptNid());
 
  		set.setMember(Terms.get().getConcept(UUID.fromString("45b68c33-459d-3142-885d-3112c6b80167")).getConceptNid());
@@ -295,7 +298,7 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
  		// Unit Test #15 (Function (observable entity)) 
  		// Unit Test #16 (Age AND/OR growth period (observable entity)) 
  		// Unit Test #17 (Body product observable (observable entity)) 
- 		// Unit Test #18 (Disease outbreak (event)) 
+ 		// Unit Test #21 (Legal intervention (event))
  		// Unit Test #19 (Environmental event (event)) 
  		// Unit Test #20 (Exposure to potentially harmful entity (event)) 
 		set.setMember(Terms.get().getConcept(UUID.fromString("f1aa24f1-a3e9-3cb4-ac2a-a7a41b678559")).getConceptNid());
@@ -305,7 +308,7 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
 		set.setMember(Terms.get().getConcept(UUID.fromString("ecad6cb8-d639-39c5-b8a6-b88196b6a96b")).getConceptNid());
 		set.setMember(Terms.get().getConcept(UUID.fromString("ea200c6b-7184-3f76-9f20-67a9945fa993")).getConceptNid());
 		set.setMember(Terms.get().getConcept(UUID.fromString("8b16bdf8-a552-317c-ae59-3d55f8c9ecf0")).getConceptNid());
-		set.setMember(Terms.get().getConcept(UUID.fromString("4895c796-da12-396e-9f8f-a677ee887a08")).getConceptNid());
+ 		set.setMember(Terms.get().getConcept(UUID.fromString("7d25ce7c-d547-35d9-a0f8-3b19fa854cb6")).getConceptNid());
 		set.setMember(Terms.get().getConcept(UUID.fromString("bc38e179-f284-317e-b8a5-5da4af35dac4")).getConceptNid());
 		set.setMember(Terms.get().getConcept(UUID.fromString("9a4977e0-259d-3281-9edb-3eb576676109")).getConceptNid());
 		
@@ -317,12 +320,12 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
 		 
  		// Unit Test #26 (Accidental event (event))
 		// Unit Test #27 (Bioterrorism related event (event)) 
- 		// Unit Test #28 (Disease outbreak (event)) 
+/* To fix 		// Unit Test #28 (Disease outbreak (event)) */ 
  		// Unit Test #29 (Explosion (physical force)) 
  		// Unit Test #30 (Drug therapy observable (observable entity)) 
 		set.setMember(Terms.get().getConcept(UUID.fromString("85133052-e1b7-3a5d-aa09-2fd1fafc982e")).getConceptNid());
 		set.setMember(Terms.get().getConcept(UUID.fromString("01403529-5182-37d4-842c-92cd68aa4a0a")).getConceptNid());
-		set.setMember(Terms.get().getConcept(UUID.fromString("3e67adcd-0740-34a3-90c9-f06d5c5da830")).getConceptNid());
+/* 		set.setMember(Terms.get().getConcept(UUID.fromString("3e67adcd-0740-34a3-90c9-f06d5c5da830")).getConceptNid()); */
 		set.setMember(Terms.get().getConcept(UUID.fromString("a28c605f-0830-3f0a-a0cb-080db7bf07cf")).getConceptNid());
 		set.setMember(Terms.get().getConcept(UUID.fromString("d721d31d-8131-3164-972d-0f53cb591f17")).getConceptNid());
 		set.setMember(Terms.get().getConcept(UUID.fromString("4ad9817a-ff22-3d19-9213-de5270beb17a")).getConceptNid());
