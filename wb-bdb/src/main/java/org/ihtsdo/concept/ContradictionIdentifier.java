@@ -38,7 +38,7 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.contradiction.ComponentType;
 import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
-import org.ihtsdo.tk.contradiction.ContradictionInvestigationType;
+import org.ihtsdo.tk.contradiction.ComponentType;
 import org.ihtsdo.tk.contradiction.ContradictionResult;
 import org.ihtsdo.tk.contradiction.PositionForSet;
 
@@ -94,38 +94,44 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
     // If single change found, save state and only return state if no contradiction found in each concept's component type
     @Override
     public ContradictionResult inConflict(ConceptChronicleBI conceptChronicle) throws IOException, ParseException {
-        Concept concept = (Concept) conceptChronicle;
-        boolean isSingle = false;
-        boolean isDuplicateSingleComp = false;
+        boolean isSingleChange = false;
+        boolean isDuplicateEdit = false;
         ContradictionResult result = ContradictionResult.NONE;
-        Map<PositionForSet, HashMap<Integer, Version>> foundPositionsMap = new HashMap<PositionForSet, HashMap<Integer, Version>>();
+        Map<PositionForSet, HashMap<Integer, ComponentVersionBI>> foundPositionsMap = new HashMap<PositionForSet, HashMap<Integer, ComponentVersionBI>>();
 
+        Concept concept = (Concept) conceptChronicle;
+        
         for (ComponentType type : ComponentType.values()) {
+        	// Cycle through 4 component types
             if (type == ComponentType.ATTRIBUTE) {
-                result = checkForComponentConflicts(concept, foundPositionsMap, concept.getConAttrs(), new ConceptAttributeComparer());
+            	// Concept Attribute is the only componentType with a Single CompId
+            	result = checkForComponentConflicts(concept, foundPositionsMap, concept.getConAttrs(), new ConceptAttributeComparer());
             } else {
+            	// Descriptions & Relationships componentTypes each have multiple CompIds 
                 result = checkMultipleComponentsForConflicts(concept, foundPositionsMap, type);
             }
 
             if (result.equals(ContradictionResult.CONTRADICTION)) {
                 return ContradictionResult.CONTRADICTION;
-            } else if (result.equals(ContradictionResult.CONTRADICTON_SAME_VALUES_SINGLE_COMPID)) {
-                isDuplicateSingleComp = true;
-            } else if (result.equals(ContradictionResult.SINGLE)) {
-                isSingle = true;
+            } else if (result.equals(ContradictionResult.DUPLICATE_EDIT)) {
+                isDuplicateEdit = true;
+            } else if (result.equals(ContradictionResult.SINGLE_MODELER_CHANGE)) {
+                isSingleChange = true;
             }
         }
         
+        // If Contradiction not already found, ensure new changes are visible to one another.  
+        // Otherwise, is a contradiction or possible duplicate new component
         ContradictionResult foundPosResult = areFoundPositionsReachable(concept, foundPositionsMap);
 
         if (foundPosResult.equals(ContradictionResult.CONTRADICTION)) {
             return ContradictionResult.CONTRADICTION;
-        } else if (isDuplicateSingleComp) {
-            return ContradictionResult.CONTRADICTON_SAME_VALUES_SINGLE_COMPID;
-        } else if (foundPosResult.equals(ContradictionResult.CONTRADICTON_SAME_VALUES_DIFFERENT_COMPID)) {
-            return ContradictionResult.CONTRADICTON_SAME_VALUES_DIFFERENT_COMPID;
-        } else if (isSingle) {
-            return ContradictionResult.SINGLE;
+        } else if (isDuplicateEdit) {
+            return ContradictionResult.DUPLICATE_EDIT;
+        } else if (foundPosResult.equals(ContradictionResult.DUPLICATE_NEW_COMPONENT)) {
+            return ContradictionResult.DUPLICATE_NEW_COMPONENT;
+        } else if (isSingleChange) {
+            return ContradictionResult.SINGLE_MODELER_CHANGE;
         } else {
             return ContradictionResult.NONE;
         }
@@ -136,11 +142,11 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
     // If single change found, save state and only return state if no contradiction found in each concept's component type	
     public ContradictionResult checkMultipleComponentsForConflicts(
             Concept concept, 
-            Map<PositionForSet, HashMap<Integer, Version>> foundPositionsMap, 
+            Map<PositionForSet, HashMap<Integer, ComponentVersionBI>> foundPositionsMap, 
             ComponentType type) throws IOException 
     {
-        boolean isSingle = false;
-        boolean isDuplicate = false;
+        boolean isSingleEdit = false;
+        boolean isDuplicateEdit = false;
         AttributeComparer comparer = null;
         Collection<? extends ComponentChroncileBI<?>> componentTuples = null;
 
@@ -151,9 +157,9 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
         } else {
             comparer = new RelationshipAttributeComparer();
 
-            if (type == ComponentType.SOURCE_RELATIONSHIP) {
+            if (type == ComponentType.SRC_RELATIONSHIP) {
                 componentTuples = concept.getSourceRels();
-            } else if (type == ComponentType.DESTINATION_RELATIONSHIP) {
+            } else if (type == ComponentType.DEST_RELATIONSHIP) {
                 componentTuples = concept.getDestRels();
             }
         }
@@ -164,19 +170,19 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
             if (pos.equals(ContradictionResult.CONTRADICTION)) {
                 return pos;
-            } else if (pos.equals(ContradictionResult.CONTRADICTON_SAME_VALUES_SINGLE_COMPID)) {
-                isDuplicate = true;
-            } else if (pos.equals(ContradictionResult.SINGLE)) {
-                isSingle = true;
+            } else if (pos.equals(ContradictionResult.DUPLICATE_EDIT)) {
+                isDuplicateEdit = true;
+            } else if (pos.equals(ContradictionResult.SINGLE_MODELER_CHANGE)) {
+                isSingleEdit = true;
             }
 
             comparer.clear();
         }
 
-        if (isDuplicate) {
-        	return ContradictionResult.CONTRADICTON_SAME_VALUES_SINGLE_COMPID;
-        }  else if (isSingle) {
-            return ContradictionResult.SINGLE;
+        if (isDuplicateEdit) {
+        	return ContradictionResult.DUPLICATE_EDIT;
+        }  else if (isSingleEdit) {
+            return ContradictionResult.SINGLE_MODELER_CHANGE;
         } else {
             return ContradictionResult.NONE;
         }
@@ -185,37 +191,32 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
     // For a given concept's componentId, see if the component has contradiction
      public ContradictionResult checkForComponentConflicts(
             Concept concept, Map<PositionForSet, 
-            HashMap<Integer, Version>> foundPositionsMap, 
+            HashMap<Integer, ComponentVersionBI>> foundPositionsMap, 
             ComponentChroncileBI<?> comp, 
-            AttributeComparer comparer) {
+            AttributeComparer comparer) 
+     {
         boolean isSingle = false;
         boolean isDuplicate = false;
         boolean isContradiction = false;
-        boolean updateFoundPositions = true;
-		ContradictionResult componentResult = ContradictionResult.NONE;
-        ContradictionInvestigationType compType = comparer.getComponentType();
+		ComponentVersionBI latestOriginVersion = null;
+	    ContradictionResult refsetResult = ContradictionResult.NONE;
+
+	    Version adjudicatorVersion = null; 
+	    ComponentType compType = comparer.getComponentType();
         Set<ComponentVersionBI> foundPositionsVersions = new HashSet<ComponentVersionBI>();
+		Map<Integer, ComponentVersionBI> developerLatestVersionsMap = new HashMap<Integer, ComponentVersionBI>();
         
         try {
-            // Examine Refsets.  Only continue to concept's components if refset check doesn't identify contradiction
-//			ContradictionResult refsetResult = refsetMembershipConflictFound(concept, foundPositionsMap, comp.getNid(), compType);
-            ContradictionResult refsetResult = ContradictionResult.NONE;
+			PathBI originPath = Terms.get().getPath(originPathNid);
 
-			ComponentVersionBI latestOriginVersion = null;
-			Version adjudicatorVersion = null; 
-			Map<Integer, ComponentVersionBI> developerLatestVersionsMap = new HashMap<Integer, ComponentVersionBI>();
+			// Examine Refsets.  Only continue to concept's components if refset check doesn't identify contradiction
+//			ContradictionResult refsetResult = refsetMembershipConflictFound(concept, foundPositionsMap, comp.getNid(), compType);
 			
 			if (refsetResult != ContradictionResult.CONTRADICTION)
 			{
-				ComponentVersionBI earliestVersion = null;
 				ComponentVersionBI latestAdjudicatedVersion = null;
 				Set<ComponentVersionBI> originVersions = new HashSet<ComponentVersionBI>();
 				
-				PathBI originPath = Terms.get().getPath(originPathNid);
-				
-//				Set<ComponentVersionBI> mutableParts = identifyMutableParts(compType, comp);
-//				
-//				for (ComponentVersionBI part : mutableParts)
 				for (ComponentVersionBI part : comp.getVersions())
 				{
 					// Identify Adjudication versions and find latest 
@@ -235,8 +236,6 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 						}							
 					} else {
 						// Identify Developer versions
-						//developerLatestVersionsMap.put(<dev>, part);
-
 						boolean putIntoMap = true;
 						Integer pathNidObj = new Integer(part.getPathNid());
 						ComponentVersionBI latestVersion = developerLatestVersionsMap.get(pathNidObj);
@@ -264,13 +263,13 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 				{
 					foundPositionsVersions.addAll(developerLatestVersionsMap.values());
 					PositionBI adjudicatorVersionPosition = getVersionPosition(latestAdjudicatedVersion);
-					adjudicatorVersion = getAdjudicatorVersionByType(concept, compType, latestAdjudicatedVersion.getNid(), adjudicatorVersionPosition);
+					adjudicatorVersion = (Version)getAdjudicatorVersionByType(concept, compType, latestAdjudicatedVersion.getNid(), adjudicatorVersionPosition);
 
 					// Using Adj Versions, run fastRelativeMapper twice to identify changes since
 					for (ComponentVersionBI version : developerLatestVersionsMap.values())
 					{
 						PositionBI developerVersionPosition = getVersionPosition(version);
-						Version testingVersion = getCurrentVersionByType(concept, compType, version.getNid(), developerVersionPosition);
+						Version testingVersion = (Version)getCurrentVersionByType(concept, compType, version.getNid(), developerVersionPosition);
 
 						RELATIVE_POSITION relPosition = conflictMapper.fastRelativePosition(adjudicatorVersion, testingVersion, Terms.get().getActiveAceFrameConfig().getPrecedence());
 						
@@ -359,9 +358,9 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		}
 		
 		if (isDuplicate) {
-			return ContradictionResult.CONTRADICTON_SAME_VALUES_SINGLE_COMPID;
+			return ContradictionResult.DUPLICATE_EDIT;
 		} else if (isSingle) {
-			return ContradictionResult.SINGLE;
+			return ContradictionResult.SINGLE_MODELER_CHANGE;
 		}
 		
 		return ContradictionResult.NONE;
@@ -369,7 +368,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	
 
 
-	private boolean isIdenticalVersions(AttributeComparer comparer, Version adjudicatorVersion, Version testingVersion) {
+	private boolean isIdenticalVersions(AttributeComparer comparer, ComponentVersionBI adjudicatorVersion, ComponentVersionBI testingVersion) {
 		comparer.initializeAttributes(adjudicatorVersion);
 		return comparer.hasSameAttributes(testingVersion);
 	}
@@ -452,32 +451,32 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
     private ContradictionResult areFoundPositionsReachable(
             Concept concept, 
             Map<PositionForSet, 
-            HashMap<Integer, Version>> foundPositionsMap) {
+            HashMap<Integer, ComponentVersionBI>> foundPositionsMap) {
 		// Todo: Per Position Found, only store one item 
 		// TODO: Also remove CompNid as not needed?
 
         Version currentVersion = null;
-		Version testingVersion = null;
+        Version testingVersion = null;
 
 		try {
 			for (PositionForSet currentPositionKey : foundPositionsMap.keySet())
 			{
-				HashMap<Integer, Version> currentVersionMap = foundPositionsMap.get(currentPositionKey);
-				currentVersion = currentVersionMap.get(currentVersionMap.keySet().iterator().next());
+				HashMap<Integer, ComponentVersionBI> currentVersionMap = foundPositionsMap.get(currentPositionKey);
+				currentVersion = (Version)currentVersionMap.get(currentVersionMap.keySet().iterator().next());
 	
 				for (PositionForSet testingPositionKey : foundPositionsMap.keySet())
 				{
 					if (!currentPositionKey.equals(testingPositionKey))
 					{
-						HashMap<Integer, Version> testingVersionMap = foundPositionsMap.get(testingPositionKey);
-						testingVersion = testingVersionMap.get(testingVersionMap.keySet().iterator().next());
+						HashMap<Integer, ComponentVersionBI> testingVersionMap = foundPositionsMap.get(testingPositionKey);
+						testingVersion = (Version)testingVersionMap.get(testingVersionMap.keySet().iterator().next());
 	
 						RELATIVE_POSITION retPosition = conflictMapper.fastRelativePosition(currentVersion, testingVersion, Terms.get().getActiveAceFrameConfig().getPrecedence());
 						
 						if (retPosition == RELATIVE_POSITION.CONTRADICTION)
 						{
 							if (isSameVersionValues(currentVersion, testingVersion))
-								return ContradictionResult.CONTRADICTON_SAME_VALUES_DIFFERENT_COMPID;
+								return ContradictionResult.DUPLICATE_NEW_COMPONENT;
 							else
 								return ContradictionResult.CONTRADICTION;
 						}
@@ -492,7 +491,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	}
 
 
-	private boolean isSameVersionValues(Version testingVersion, Version currentVersion)
+	private boolean isSameVersionValues(ComponentVersionBI testingVersion, ComponentVersionBI currentVersion)
 	{
 		Class testingClass = testingVersion.getClass();
 		AttributeComparer comparer = null;
@@ -586,14 +585,14 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
     }
 
     // For a component Type & Nid, get the version corresponding to the View Coordinate 
-    private Version getCurrentVersionByType(Concept concept, 
-            ContradictionInvestigationType compType, 
+    private ComponentVersionBI getCurrentVersionByType(Concept concept, 
+            ComponentType compType, 
             int componentNid, PositionBI position) throws ContraditionException {
-        Version currentVersion = null;
+        ComponentVersionBI currentVersion = null;
 
 		try
 		{
-			if (compType == ContradictionInvestigationType.ATTRIBUTE)
+			if (compType == ComponentType.ATTRIBUTE)
 			{
 				ConceptAttributes attr = concept.getConceptAttributes();
 				Collection<ConceptAttributes.Version> currentAttributesVersions = attr.getVersions();
@@ -607,7 +606,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 					}
 				}
 			}
-			else if (compType == ContradictionInvestigationType.DESCRIPTION)
+			else if (compType == ComponentType.DESCRIPTION)
 			{
 				
 				Description desc = concept.getDescription(componentNid);
@@ -622,7 +621,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 					}
 				}
 			} 
-			else if (compType == ContradictionInvestigationType.RELATIONSHIP)
+			else if (compType == ComponentType.RELATIONSHIP)
 			{
 				// Assume Source Rel first.  If returns null, 
 				Collection<org.ihtsdo.concept.component.relationship.Relationship.Version> currentRelationshipVersions = null;
@@ -652,20 +651,20 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		return currentVersion;
 	}
 
-	private Version getAdjudicatorVersionByType(Concept concept, ContradictionInvestigationType compType, int componentNid, PositionBI position) throws ContraditionException 
+	private ComponentVersionBI getAdjudicatorVersionByType(Concept concept, ComponentType compType, int componentNid, PositionBI position) throws ContraditionException 
 	{
-		Version currentVersion = null;
+		ComponentVersionBI currentVersion = null;
 
 		try
 		{
 			ViewCoordinate viewCoord = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
 
-			if (compType == ContradictionInvestigationType.ATTRIBUTE)
+			if (compType == ComponentType.ATTRIBUTE)
 			{
 				ConceptAttributes attr = concept.getConceptAttributes();
 				currentVersion = attr.getVersion(viewCoord);
 			}
-			else if (compType == ContradictionInvestigationType.DESCRIPTION)
+			else if (compType == ComponentType.DESCRIPTION)
 			{
 				
 				Description desc = concept.getDescription(componentNid);
@@ -680,7 +679,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 					}
 				}
 			} 
-			else if (compType == ContradictionInvestigationType.RELATIONSHIP)
+			else if (compType == ComponentType.SRC_RELATIONSHIP || compType == ComponentType.DEST_RELATIONSHIP)
 			{
 				// Assume Source Rel first.  If returns null, 
 				Collection<org.ihtsdo.concept.component.relationship.Relationship.Version> currentRelationshipVersions = null;
@@ -744,17 +743,17 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
     // For all versions of a componentId, add them individually to the "Found Positions" collection 
     private void updateFoundPositionsForAllVersions(
             Concept concept, 
-            Map<PositionForSet, HashMap<Integer, Version>> foundPositionsMap, 
+            Map<PositionForSet, HashMap<Integer, ComponentVersionBI>> foundPositionsMap, 
             Iterator<?> versions, 
             int componentNid, 
-            ContradictionInvestigationType compType) throws ContraditionException {
+            ComponentType compType) throws ContraditionException {
         while (versions.hasNext()) {
             ComponentVersionBI v = (ComponentVersionBI) versions.next();
 
 			PositionForSet pfsKey = new PositionForSet(v.getTime(), v.getPathNid());
 			
 			PositionBI developerVersionPosition = getVersionPosition(v);
-			Version developerVersion = getCurrentVersionByType(concept, compType, componentNid, developerVersionPosition);
+			ComponentVersionBI developerVersion = getCurrentVersionByType(concept, compType, componentNid, developerVersionPosition);
 
 			updateFoundPositionWithVersion(foundPositionsMap, pfsKey, componentNid, developerVersion);
         }
@@ -786,22 +785,22 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
     // Add version to found positions map
     private void updateFoundPositionWithVersion(
-            Map<PositionForSet, HashMap<Integer, Version>> foundPositionsMap, 
+            Map<PositionForSet, HashMap<Integer, ComponentVersionBI>> foundPositionsMap, 
             PositionForSet currentPos, 
             int componentNid, 
-            Version currentVersion) {
+            ComponentVersionBI currentVersion) {
         if (currentVersion == null) {
             currentVersion = null;
         }
 
         if (!foundPositionsMap.containsKey(currentPos)) {
             // First time position viewed, create new map and add componentId-version map to position
-            HashMap<Integer, Version> newPositionMap = new HashMap<Integer, Version>();
+            HashMap<Integer, ComponentVersionBI> newPositionMap = new HashMap<Integer, ComponentVersionBI>();
             newPositionMap.put(componentNid, currentVersion);
             foundPositionsMap.put(currentPos, newPositionMap);
         } else {
             // Position already found, add componentId-version map to position 
-            HashMap<Integer, Version> positionMap = foundPositionsMap.get(currentPos);
+            HashMap<Integer, ComponentVersionBI> positionMap = foundPositionsMap.get(currentPos);
             positionMap.put(componentNid, currentVersion);
         }
 
@@ -840,7 +839,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
     }
 
     // FOR REFSETS
-    private Version getCurrentRefsetVersion(ComponentVersionBI version) {
+    private ComponentVersionBI getCurrentRefsetVersion(ComponentVersionBI version) {
         // TODO: Haven't done this yet, but need viewCoord
         try {
             ViewCoordinate versionCoord = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
@@ -854,9 +853,9 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
     // FOR REFSETS
     private ContradictionResult refsetMembershipConflictFound(
             Concept concept, 
-            Map<PositionForSet, HashMap<Integer, Version>> foundPositionsMap, 
+            Map<PositionForSet, HashMap<Integer, ComponentVersionBI>> foundPositionsMap, 
             int componentNid, 
-            ContradictionInvestigationType compType) throws TerminologyException, IOException, ParseException {
+            ComponentType compType) throws TerminologyException, IOException, ParseException {
         List<? extends I_ExtendByRef> members = Terms.get().getAllExtensionsForComponent(componentNid);
         ContradictionResult position = ContradictionResult.NONE;
         boolean isUnreachable = false;
@@ -873,7 +872,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
                     if ((p.isSubsequentOrEqualTo(leastCommonAncestorForViewPosition)) && leastCommonAncestorHashCode != v.getPartsHashCode()) {
                         if (secondaryHashCode < 0) {
-                            position = ContradictionResult.SINGLE;
+                            position = ContradictionResult.SINGLE_MODELER_CHANGE;
                             secondaryHashCode = v.getPartsHashCode();
                         } else {
                             if (secondaryHashCode != v.getPartsHashCode()) {
@@ -894,14 +893,14 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
                 int ss = data.getRefsetMembers().size();
                 int size = member.getMutableParts().size();
                 RefsetMember a = concept.getRefsetMember(member.getMemberId());
-                // position = areFoundPositionsReachable(concept, foundPositionsMap, member.getMutableParts(), ContradictionInvestigationType.REFSET, componentNid);
+                // position = areFoundPositionsReachable(concept, foundPositionsMap, member.getMutableParts(), ComponentType.REFSET, componentNid);
             }
 
             if (position.equals(ContradictionResult.CONTRADICTION)) {
                 return position;
             } else if (position.equals(ContradictionResult.UNREACHABLE)) {
                 isUnreachable = true;
-            } else if (position.equals(ContradictionResult.SINGLE)) {
+            } else if (position.equals(ContradictionResult.SINGLE_MODELER_CHANGE)) {
                 isSingle = true;
             }
         }
@@ -909,7 +908,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
         if (isUnreachable) {
             return ContradictionResult.UNREACHABLE;
         } else if (isSingle) {
-            return ContradictionResult.SINGLE;
+            return ContradictionResult.SINGLE_MODELER_CHANGE;
         } else {
             return ContradictionResult.NONE;
         }
