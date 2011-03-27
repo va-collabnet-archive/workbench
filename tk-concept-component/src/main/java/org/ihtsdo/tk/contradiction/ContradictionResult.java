@@ -22,7 +22,18 @@ package org.ihtsdo.tk.contradiction;
  */
 public enum ContradictionResult {
     
-    NONE, SINGLE, UNREACHABLE, CONTRADICTION, CONTRADICTON_SAME_VALUES_SINGLE_COMPID, CONTRADICTON_SAME_VALUES_DIFFERENT_COMPID, ERROR;
+    NONE,						// No changes by any developers have been made to a concept
+    
+    SINGLE_MODELER_CHANGE, 		// Single change by a single modeler on a concept, be it a edit on an existing component, a new component, or the creation of a new concept
 
+    UNREACHABLE, 				// DEPRECATED?
+
+    DUPLICATE_EDIT,				// An edit by two or more developers on a given component where all developers have made the same exact modification to the component 
+
+    DUPLICATE_NEW_COMPONENT, 	// A creation of a new component on a given concept by two or more developers where all developers have made the same component type with the same values
+
+    CONTRADICTION, 				// Two or more modelers make changes to the same concept such that the change doesn't isn't of type DUPLICATE_EDIT nor DUPLICATE_NEW_COMPONENT 
+
+	ERROR;						// An Error in detection
 
 }
