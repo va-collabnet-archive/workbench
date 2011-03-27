@@ -18,6 +18,10 @@ public class RelationshipAttributeComparer extends AttributeComparer {
         componentType = ComponentType.RELATIONSHIP;
     }
 
+    public void setRelationshipType(ComponentType rel) {
+        componentType = rel;
+    }
+
     @Override
     boolean hasSameAttributes(ComponentVersionBI v) {
         RelationshipVersionBI relAttributeVersion = (RelationshipVersionBI) v;
