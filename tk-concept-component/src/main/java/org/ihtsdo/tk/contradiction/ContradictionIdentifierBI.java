@@ -16,8 +16,6 @@
 
 package org.ihtsdo.tk.contradiction;
 
-import java.io.IOException;
-import java.text.ParseException;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 /**
@@ -27,6 +25,6 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 public interface ContradictionIdentifierBI {
 
 
-    ContradictionResult inConflict(ConceptChronicleBI concept) throws IOException, ParseException;
+    ContradictionResult isConceptInConflict(ConceptChronicleBI concept) throws Exception;
 
 }
