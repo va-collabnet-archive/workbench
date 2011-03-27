@@ -2,7 +2,7 @@ package org.ihtsdo.concept;
 
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.contradiction.ContradictionInvestigationType;
+import org.ihtsdo.tk.contradiction.ComponentType;
 
 public class RelationshipAttributeComparer extends AttributeComparer {
 
@@ -15,7 +15,7 @@ public class RelationshipAttributeComparer extends AttributeComparer {
 
     public RelationshipAttributeComparer() {
         super();
-        componentType = ContradictionInvestigationType.RELATIONSHIP;
+        componentType = ComponentType.RELATIONSHIP;
     }
 
     @Override

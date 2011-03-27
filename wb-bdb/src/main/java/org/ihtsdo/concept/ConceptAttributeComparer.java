@@ -2,7 +2,7 @@ package org.ihtsdo.concept;
 
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
-import org.ihtsdo.tk.contradiction.ContradictionInvestigationType;
+import org.ihtsdo.tk.contradiction.ComponentType;
 
 public class ConceptAttributeComparer extends AttributeComparer {
 
@@ -11,7 +11,7 @@ public class ConceptAttributeComparer extends AttributeComparer {
 
 	public ConceptAttributeComparer() {
 		super();
-		componentType = ContradictionInvestigationType.ATTRIBUTE;
+		componentType = ComponentType.ATTRIBUTE;
 	}
 
 	@Override

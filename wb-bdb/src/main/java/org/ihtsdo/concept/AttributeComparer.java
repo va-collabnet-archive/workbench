@@ -1,13 +1,13 @@
 package org.ihtsdo.concept;
 
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.contradiction.ContradictionInvestigationType;
+import org.ihtsdo.tk.contradiction.ComponentType;
 
 public abstract class AttributeComparer {
 	protected boolean comparerInitialized = false;
-	protected ContradictionInvestigationType componentType = null;;
+	protected ComponentType componentType = null;;
 	
-	protected ContradictionInvestigationType getComponentType() {
+	protected ComponentType getComponentType() {
 		return componentType;
 	}
 	
