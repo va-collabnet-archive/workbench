@@ -128,6 +128,11 @@ public class FileIO {
         BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(outName));
         copyFile(is, os, true);
     }
+    
+    public static void copyFile(InputStream is, File outFile) throws IOException {
+        FileOutputStream fos = new FileOutputStream(outFile);
+        copyFile(is, fos, true);
+    }
 
     /** Copy a file from an opened InputStream to an opened OutputStream */
     public static void copyFile(InputStream is, OutputStream os, boolean close) throws IOException {

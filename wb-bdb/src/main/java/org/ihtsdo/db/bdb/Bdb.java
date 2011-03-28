@@ -2,6 +2,7 @@ package org.ihtsdo.db.bdb;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +59,8 @@ import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.je.EnvironmentLockedException;
 import com.sleepycat.je.EnvironmentMutableConfig;
+import java.io.InputStream;
+import org.dwfa.util.io.FileIO;
 
 public class Bdb {
 
@@ -142,6 +145,63 @@ public class Bdb {
 
     public static int getCachePercent() {
         return Bdb.mutable.bdbEnv.getMutableConfig().getCachePercent();
+    }
+
+    private enum HeapSize {
+
+        HEAP_1200("je-prop-options/1200.je.properties"),
+        HEAP_1400("je-prop-options/1400.je.properties"),
+        HEAP_2000("je-prop-options/2G.je.properties"),
+        HEAP_4000("je-prop-options/4G.je.properties"),
+        HEAP_6000("je-prop-options/6G.je.properties"),
+        HEAP_8000("je-prop-options/8G.je.properties");
+        String configFileName;
+
+        private HeapSize(String configFileName) {
+            this.configFileName = configFileName;
+        }
+
+        public InputStream getPropFile(File rootDir) throws IOException {
+            File propFile = new File(rootDir, configFileName);
+            if (propFile.exists()) {
+                return propFile.toURI().toURL().openStream();
+            }
+            return Bdb.class.getResourceAsStream("/" + configFileName);
+        }
+    };
+    private static HeapSize heapSize = HeapSize.HEAP_1200;
+
+    public static void selectJeProperties(File configDir, File dbDir) throws IOException {
+        long maxMem = Runtime.getRuntime().maxMemory();
+
+        File mutableDir = new File(dbDir, "mutable");
+        mutableDir.mkdirs();
+        if (maxMem > 8000000000L) {
+            heapSize = HeapSize.HEAP_8000;
+            FileIO.copyFile(HeapSize.HEAP_8000.getPropFile(configDir),
+                    new File(mutableDir, "je.properties"));
+        } else if (maxMem > 6000000000L) {
+            heapSize = HeapSize.HEAP_6000;
+            FileIO.copyFile(HeapSize.HEAP_6000.getPropFile(configDir),
+                    new File(mutableDir, "je.properties"));
+        } else if (maxMem > 4000000000L) {
+            heapSize = HeapSize.HEAP_4000;
+            FileIO.copyFile(HeapSize.HEAP_4000.getPropFile(configDir),
+                    new File(mutableDir, "je.properties"));
+        } else if (maxMem > 2000000000) {
+            heapSize = HeapSize.HEAP_2000;
+            FileIO.copyFile(HeapSize.HEAP_2000.getPropFile(configDir),
+                    new File(mutableDir, "je.properties"));
+        } else if (maxMem > 1400000000) {
+            heapSize = HeapSize.HEAP_1400;
+            FileIO.copyFile(HeapSize.HEAP_1400.getPropFile(configDir),
+                    new File(mutableDir, "je.properties"));
+        } else {
+            heapSize = HeapSize.HEAP_1200;
+            FileIO.copyFile(HeapSize.HEAP_1200.getPropFile(configDir),
+                    new File(mutableDir, "je.properties"));
+        }
+        System.out.println("!## maxMem: " + maxMem + " heapSize: " + heapSize);
     }
 
     public static void setup(String dbRoot, ActivityPanel activity) {
@@ -593,11 +653,11 @@ public class Bdb {
     public static boolean isConcept(int cNid) {
         return cNid == Bdb.getConceptNid(cNid);
     }
-    
+
     public static Concept getConcept(int cNid) throws IOException {
-        assert cNid == Bdb.getConceptNid(cNid) : 
-                " Not a concept nid: " + cNid + 
-                " Bdb cNid:" + Bdb.getConceptNid(cNid);
+        assert cNid == Bdb.getConceptNid(cNid) :
+                " Not a concept nid: " + cNid
+                + " Bdb cNid:" + Bdb.getConceptNid(cNid);
         return conceptDb.getConcept(cNid);
     }
 

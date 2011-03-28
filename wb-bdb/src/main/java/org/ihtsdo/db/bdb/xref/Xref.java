@@ -46,7 +46,7 @@ import org.ihtsdo.tk.api.NidSetBI;
 public class Xref extends ComponentBdb implements I_ProcessUnfetchedConceptData {
 
     // Find power-of-two sizes best matching arguments
-    private static int concurrencyLevel = 128;
+    private static final int concurrencyLevel = 128;
     private static int sshift = 0;
     private static int ssize = 1;
 
@@ -129,7 +129,10 @@ public class Xref extends ComponentBdb implements I_ProcessUnfetchedConceptData 
             }
         } else {
             readOnlyXref = new HashMap<Integer, long[]>(Bdb.getConceptDb().getCount() * 2);
+            preloadReadOnly();
             readXref(readOnly);
+            closeReadOnly();
+            preloadMutable();
             readXref(mutable);
         }
     }

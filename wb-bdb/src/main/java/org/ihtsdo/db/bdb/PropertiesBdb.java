@@ -16,7 +16,6 @@ package org.ihtsdo.db.bdb;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,118 +33,114 @@ import com.sleepycat.je.OperationStatus;
 
 public class PropertiesBdb extends ComponentBdb {
 
-	private TupleBinding<String> stringBinder = TupleBinding
-			.getPrimitiveBinding(String.class);
+    private TupleBinding<String> stringBinder = TupleBinding.getPrimitiveBinding(String.class);
 
-	public PropertiesBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv)
-			throws IOException {
-		super(readOnlyBdbEnv, mutableBdbEnv);
-	}
+    public PropertiesBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv)
+            throws IOException {
+        super(readOnlyBdbEnv, mutableBdbEnv);
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.impl.I_StoreMetaData#getProperty(java.lang.String)
-	 */
-	public String getProperty(String key) throws IOException {
-		DatabaseEntry propKey = new DatabaseEntry();
-		DatabaseEntry propValue = new DatabaseEntry();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.impl.I_StoreMetaData#getProperty(java.lang.String)
+     */
+    public String getProperty(String key) throws IOException {
+        DatabaseEntry propKey = new DatabaseEntry();
+        DatabaseEntry propValue = new DatabaseEntry();
 
-		stringBinder.objectToEntry(key, propKey);
-		try {
-			if (mutable.get(null, propKey, propValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-				return (String) stringBinder.entryToObject(propValue);
-			}
-			if (readOnly.get(null, propKey, propValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-				return (String) stringBinder.entryToObject(propValue);
-			}
-		} catch (DatabaseException e) {
-			throw new ToIoException(e);
-		}
-		return null;
-	}
+        stringBinder.objectToEntry(key, propKey);
+        try {
+            if (mutable.get(null, propKey, propValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+                return (String) stringBinder.entryToObject(propValue);
+            }
+            if (readOnly.get(null, propKey, propValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+                return (String) stringBinder.entryToObject(propValue);
+            }
+        } catch (DatabaseException e) {
+            throw new ToIoException(e);
+        }
+        return null;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.impl.I_StoreMetaData#getProperties()
-	 */
-	public Map<String, String> getProperties() throws IOException {
-		try {
-			Cursor propCursor = mutable.openCursor(null, null);
-			DatabaseEntry foundKey = new DatabaseEntry();
-			DatabaseEntry foundData = new DatabaseEntry();
-			HashMap<String, String> propMap = new HashMap<String, String>();
-			try {
-				while (propCursor
-						.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-					String key = (String) stringBinder.entryToObject(foundKey);
-					String value = (String) stringBinder
-							.entryToObject(foundData);
-					propMap.put(key, value);
-				}
-			} finally {
-				propCursor.close();
-			}
-			propCursor = readOnly.openCursor(null, null);
-			try {
-				while (propCursor
-						.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-					String key = (String) stringBinder.entryToObject(foundKey);
-					String value = (String) stringBinder
-							.entryToObject(foundData);
-					if (propMap.containsKey(key) == false) {
-						propMap.put(key, value);
-					}
-				}
-			} finally {
-				propCursor.close();
-			}
-			return Collections.unmodifiableMap(propMap);
-		} catch (Exception e) {
-			throw new ToIoException(e);
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.impl.I_StoreMetaData#getProperties()
+     */
+    public Map<String, String> getProperties() throws IOException {
+        try {
+            Cursor propCursor = mutable.openCursor(null, null);
+            DatabaseEntry foundKey = new DatabaseEntry();
+            DatabaseEntry foundData = new DatabaseEntry();
+            HashMap<String, String> propMap = new HashMap<String, String>();
+            try {
+                while (propCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+                    String key = (String) stringBinder.entryToObject(foundKey);
+                    String value = (String) stringBinder.entryToObject(foundData);
+                    propMap.put(key, value);
+                }
+            } finally {
+                propCursor.close();
+            }
+            propCursor = readOnly.openCursor(null, null);
+            try {
+                while (propCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+                    String key = (String) stringBinder.entryToObject(foundKey);
+                    String value = (String) stringBinder.entryToObject(foundData);
+                    if (propMap.containsKey(key) == false) {
+                        propMap.put(key, value);
+                    }
+                }
+            } finally {
+                propCursor.close();
+            }
+            return Collections.unmodifiableMap(propMap);
+        } catch (Exception e) {
+            throw new ToIoException(e);
+        }
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.impl.I_StoreMetaData#setProperty(java.lang.String,
-	 * java.lang.String)
-	 */
-	public void setProperty(String key, String value) throws IOException {
-		DatabaseEntry propKey = new DatabaseEntry();
-		DatabaseEntry propValue = new DatabaseEntry();
-		stringBinder.objectToEntry(key, propKey);
-		stringBinder.objectToEntry(value, propValue);
-		try {
-			mutable.put(null, propKey, propValue);
-		} catch (DatabaseException e) {
-			throw new ToIoException(e);
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.impl.I_StoreMetaData#setProperty(java.lang.String,
+     * java.lang.String)
+     */
+    public void setProperty(String key, String value) throws IOException {
+        DatabaseEntry propKey = new DatabaseEntry();
+        DatabaseEntry propValue = new DatabaseEntry();
+        stringBinder.objectToEntry(key, propKey);
+        stringBinder.objectToEntry(value, propValue);
+        try {
+            mutable.put(null, propKey, propValue);
+        } catch (DatabaseException e) {
+            throw new ToIoException(e);
+        }
+    }
 
-	public void close() throws DatabaseException {
-		try {
-			sync();
-		} catch (IOException e) {
-			AceLog.getAppLog().severe(e.getLocalizedMessage(), e);
-		}
-		super.close();
-	}
+    @Override
+    public void close() throws DatabaseException {
+        try {
+            sync();
+        } catch (IOException e) {
+            AceLog.getAppLog().severe(e.getLocalizedMessage(), e);
+        }
+        super.close();
+    }
 
-	public void sync() throws IOException {
-		super.sync();
-	}
+    @Override
+    public void sync() throws IOException {
+        super.sync();
+    }
 
-	@Override
-	protected String getDbName() {
-		return "properties";
-	}
+    @Override
+    protected String getDbName() {
+        return "properties";
+    }
 
-	@Override
-	protected void init() throws IOException {
-		// Nothing to do...
-
-	}
+    @Override
+    protected void init() throws IOException {
+        // Nothing to do...
+    }
 }

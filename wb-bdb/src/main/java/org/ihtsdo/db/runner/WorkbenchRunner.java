@@ -251,7 +251,9 @@ public class WorkbenchRunner {
                 }
             }
 
-            Bdb.setup("berkeley-db", activity);
+            File berkeleyDbDir = new File("berkeley-db");
+            Bdb.selectJeProperties(berkeleyDbDir, berkeleyDbDir);
+            Bdb.setup(berkeleyDbDir.getName(), activity);
             activity.setProgressInfoLower("complete");
             activity.complete();
             long loadTime = System.currentTimeMillis() - startTime;

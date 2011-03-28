@@ -42,6 +42,7 @@ public class NidCNidMapBdb extends ComponentBdb {
 
     @Override
     protected void init() throws IOException {
+        preloadBoth();
         int maxId = Bdb.getUuidsToNidMap().getCurrentMaxNid();
         readOnlyRecords = (int) readOnly.count();
         int mutableRecords = (int) mutable.count();
@@ -58,6 +59,7 @@ public class NidCNidMapBdb extends ComponentBdb {
         maxId = (nidCNidMaps.get().length * NID_CNID_MAP_SIZE) - Integer.MIN_VALUE;
 
         readMaps(readOnly, true);
+        closeReadOnly();
         readMaps(mutable, false);
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             printKeys("Read only keys: ", readOnly);

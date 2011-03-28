@@ -133,7 +133,10 @@ public class LoadBdbMulti extends AbstractMojo {
             }
 
             long startTime = System.currentTimeMillis();
-            FileIO.recursiveDelete(berkeleyDir);
+            FileIO.recursiveDelete(new File(berkeleyDir, "mutable"));
+            FileIO.recursiveDelete(new File(berkeleyDir, "read-only"));
+            Bdb.selectJeProperties(new File(berkeleyDir, "je-prop-options"), 
+                    berkeleyDir);
             Bdb.setup(berkeleyDir.getAbsolutePath());
             if (initialPaths != null) {
                getLog().info("initialPaths: " + Arrays.asList(initialPaths));
@@ -282,8 +285,11 @@ public class LoadBdbMulti extends AbstractMojo {
             getLog().info("elapsed time: " + (System.currentTimeMillis() - startTime));
 
             if (moveToReadOnly) {
+                File mutableFile = new File(berkeleyDir, "mutable");
                 FileIO.recursiveDelete(new File(berkeleyDir, "read-only"));
-                File dirToMove = new File(berkeleyDir, "mutable");
+                File jePropFile = new File(mutableFile, "je.properties");
+                jePropFile.delete();
+                File dirToMove = mutableFile;
                 dirToMove.renameTo(new File(berkeleyDir, "read-only"));
             }
         } catch (Exception ex) {
