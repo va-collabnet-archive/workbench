@@ -55,7 +55,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 
 	public WorkflowHistoryRefsetSearcher()
 	{
-		try {
+		try { 
 			refset = new WorkflowHistoryRefset();
 			setRefsetName(refset.getRefsetName());
 			setRefsetId(refset.getRefsetId());
