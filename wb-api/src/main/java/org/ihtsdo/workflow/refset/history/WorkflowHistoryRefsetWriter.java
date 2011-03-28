@@ -49,16 +49,12 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 		((WorkflowHistoryRSFields)fields).setReferencedComponentUid(uid);
 }
 
-	public void setReleaseDescriptionUid(UUID uid) {
-		setReferencedComponentId(uid);
-}
-
 	public void setWorkflowUid(UUID uid) {
-			((WorkflowHistoryRSFields)fields).setWorkflowUid(uid);
+		((WorkflowHistoryRSFields)fields).setWorkflowUid(uid);
 	}
 
  	public void setConceptUid(UUID uid) {
-			((WorkflowHistoryRSFields)fields).setConceptUid(uid);
+		((WorkflowHistoryRSFields)fields).setReferencedComponentUid(uid);
 	}
 	
 	public void setPathUid(UUID path) {
@@ -103,12 +99,8 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 		return ((WorkflowHistoryRSFields)fields).getReferencedComponentId();
 	}
 	
-	public UUID getReleaseDescriptionUid() {
-		return getReferencedComponentUid();
-	}
-	
 	public UUID getConceptUid() {
-		return ((WorkflowHistoryRSFields)fields).getConceptUid();
+		return ((WorkflowHistoryRSFields)fields).getReferencedComponentId();
 	}
 	
 	public UUID getWorkflowUid() {
@@ -157,7 +149,6 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 	// Actual Fields
 	public class WorkflowHistoryRSFields extends WorkflowRefsetFields {
 	
-		public UUID concept = null;
 		public UUID workflowId = null;
 		public UUID path = null;
 		public UUID modeler = null;
@@ -168,9 +159,7 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 		public Long effectiveTime = null;
 		public boolean autoApproved = false;
 		public boolean override = false;
-		
-
-		
+				
 		
 		public void setReferencedComponentUid(UUID uid) {
 			try {
@@ -180,12 +169,8 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 			}
 		}
 		
-		public void setReleaseDescriptionUid(UUID uid) {
-			setReferencedComponentUid(uid);
-		}
-		
 		public void setConceptUid(UUID uid) {
-			concept = uid;
+			setReferencedComponentUid(uid);
 		}
 
 		public void setWorkflowUid(UUID uid) {
@@ -232,25 +217,15 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 		
 		
 		public I_GetConceptData getReferencedComponent() {
-			try {
-				return Terms.get().getConcept(getReferencedComponentId());
-			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId");
-			}
-			
-			return null;
+			return getReferencedComponent();
 		}
 		
 		public UUID getReferencedComponentUid() {
 			return getReferencedComponentId();
 		}
 		
-		public UUID getReleaseDescriptionUid() {
-			return getReferencedComponentUid();
-		}
-		
 		public UUID getConceptUid() {
-			return concept;
+			return getReferencedComponentUid();
 		}
 		
 		public UUID getWorkflowUid() {
@@ -296,18 +271,17 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 			try { 
 				I_TermFactory tf = Terms.get();
 
-				return "\nReferenced Component Id(Concept) = " + getReferencedComponent().getInitialText() + 
-				   "\nConcept = " + tf.getConcept(concept).getInitialText() +
-				   "\nWorkflow Uid = " + workflowId.toString() +
-				   "\nPath = " + tf.getConcept(path).getInitialText() +
-				   "\nModeler = " + tf.getConcept(modeler).getInitialText() +
-				   "\nAction = " + tf.getConcept(action).getInitialText() +
-				   "\nState = " + tf.getConcept(state).getInitialText() +
-				   "\nWorkflow Timestamp = " + workflowTime +
-				   "\nEffectiveTime = " + effectiveTime +
-				   "\nAutoApproved = " + autoApproved + 
-				   "\nOverridden = " + override + 
-				   "\nFSN = " + fsn;
+				return "\nConcept (Referenced Component Id) = " + getReferencedComponent().getInitialText() + 
+					   "\nWorkflow Uid = " + workflowId.toString() +
+					   "\nPath = " + tf.getConcept(path).getInitialText() +
+					   "\nModeler = " + tf.getConcept(modeler).getInitialText() +
+					   "\nAction = " + tf.getConcept(action).getInitialText() +
+					   "\nState = " + tf.getConcept(state).getInitialText() +
+					   "\nWorkflow Timestamp = " + workflowTime +
+					   "\nEffectiveTime = " + effectiveTime +
+					   "\nAutoApproved = " + autoApproved + 
+					   "\nOverridden = " + override + 
+					   "\nFSN = " + fsn;
 			} catch (Exception io) {
 				return "Failed to identify referencedComponentId for StressTest" + 
 					   "\nError msg: " + io.getMessage();
@@ -317,7 +291,6 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 		@Override
 		public void cleanValues() {
 			setReferencedComponentUid(null);
-			concept = null;
 			workflowId = null;
 			path = null;
 			modeler = null;
@@ -326,13 +299,14 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 			fsn = null;
 			workflowTime = null;
 			effectiveTime = null;
+			autoApproved = false;
+			override = false;
 		}
 
 
 		@Override
 		public boolean valuesExist() {
 			boolean retVal =  getReferencedComponentUid() != null &&
-							  concept != null &&
 							  workflowId != null && 
 							  path != null &&
 							  modeler != null && 
@@ -346,8 +320,7 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 			{
 				StringBuffer str = new StringBuffer();
 				str.append("\nError in adding to Workflow History Refset");
-				str.append("\nReferencedComponentId:" + getReferencedComponentId());
-				str.append("\nconceptId:" + concept);
+				str.append("\nConcept (ReferencedComponentId):" + getReferencedComponentId());
 				str.append("\nworkflowId:" + workflowId);
 				str.append("\npath:" + path);
 				str.append("\nmodeler:" + modeler);
@@ -368,10 +341,6 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 	@Override
 	public String fieldsToRefsetString() throws IOException {
 		return "<properties>\n" +
-				   	"<property>" +
-				   		"<key>concept</key>" +
-				   		"<value>" + getConceptUid() + "</value>" +
-				   	"</property>" + 
 				   	"<property>" +
 				   		"<key>workflowId</key>" +
 				   		"<value>" + getWorkflowUid() + "</value>" +
@@ -413,7 +382,6 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 	
 	public void updateWorkflowHistory(WorkflowHistoryJavaBean update) throws Exception
 	{
-		setReleaseDescriptionUid(update.getReleaseDescription());
 		setConceptUid(update.getConcept());
     	setWorkflowUid(update.getWorkflowId());
     	setActionUid(update.getAction());
@@ -426,6 +394,7 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
     	
     	java.util.Date today = new java.util.Date();
         setEffectiveTime(Long.MAX_VALUE);
+ 
         // Add new timestamp for new version (in case this row is retired for WFid)
 		setWorkflowTime(today.getTime());
         

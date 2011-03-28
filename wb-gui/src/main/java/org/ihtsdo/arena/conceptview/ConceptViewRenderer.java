@@ -428,10 +428,6 @@ public class ConceptViewRenderer extends JLayeredPane {
 	                                java.util.Date today = new java.util.Date();
 	                                bean.setWorkflowTime(today.getTime());
 	
-	                                // TODO: For now, currnet release is denote by SNOMED-CT concept
-	            			        I_GetConceptData snomedConcept = Terms.get().getConcept(Taxonomies.SNOMED.getUuids());
-	            			        bean.setReleaseDescription(snomedConcept.getPrimUuid());
-	
 	                                WorkflowHistoryJavaBean latestBean = searcher.getLatestWfHxJavaBeanForConcept(selectedConcept);
 	
 	    				            if (latestBean == null || !WorkflowHelper.isEndWorkflowAction(Terms.get().getConcept(latestBean.getAction())))

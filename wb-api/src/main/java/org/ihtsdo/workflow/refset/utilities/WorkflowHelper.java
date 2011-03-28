@@ -147,7 +147,6 @@ public class WorkflowHelper {
 		try {
 			writer = new WorkflowHistoryRefsetWriter();
 
-			writer.setReleaseDescriptionUid(bean.getReleaseDescription());
 			writer.setPathUid(bean.getPath());
 			writer.setModelerUid(bean.getModeler());
 			writer.setConceptUid(bean.getConcept());
@@ -157,7 +156,6 @@ public class WorkflowHelper {
 
 			writer.setWorkflowUid(bean.getWorkflowId());
 
-			java.util.Date today = new java.util.Date();
 			writer.setEffectiveTime(Long.MAX_VALUE);
 			// Must use previous Refset Timestamp to revert proper Str
 			writer.setWorkflowTime(bean.getWorkflowTime());
@@ -301,15 +299,12 @@ public class WorkflowHelper {
     	WorkflowHistoryJavaBean bean = new WorkflowHistoryJavaBean();
     	WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
 
-    	bean.setReleaseDescription(refComponentId);
     	bean.setWorkflowId(refset.getWorkflowId(fieldValues));
-    	bean.setConcept(refset.getConceptUid(fieldValues));
-    	bean.setAction(refset.getActionUid(fieldValues));
+    	bean.setConcept(refComponentId);
     	bean.setState(refset.getStateUid(fieldValues));
     	bean.setPath(refset.getPathUid(fieldValues));
     	bean.setModeler(refset.getModelerUid(fieldValues));
     	bean.setAction(refset.getActionUid(fieldValues));
-    	bean.setState(refset.getStateUid(fieldValues));
     	bean.setFSN(refset.getFSN(fieldValues));
     	bean.setWorkflowTime(refset.getWorkflowTime(fieldValues));
     	bean.setAutoApproved(refset.getAutoApproved(fieldValues));
@@ -608,12 +603,12 @@ public class WorkflowHelper {
 	            templateBean.setFSN(latestBean.getFSN());
 	            templateBean.setModeler(latestBean.getModeler());
 	            templateBean.setPath(latestBean.getPath());
-	            templateBean.setEffectiveTime(latestBean.getEffectiveTime());
-	            templateBean.setWorkflowTime(latestBean.getWorkflowTime());
-	            templateBean.setReleaseDescription(latestBean.getReleaseDescription());
-
 	            templateBean.setAction(key.getUids().get(0));
 	            templateBean.setState(actionMap.get(key).getUids().get(0));
+	            templateBean.setEffectiveTime(latestBean.getEffectiveTime());
+	            templateBean.setWorkflowTime(latestBean.getWorkflowTime());
+	            templateBean.setOverridden(latestBean.getOverridden());
+	            templateBean.setAutoApproved(latestBean.getAutoApproved());
 	            retList.add(templateBean);
 	        }
         }
@@ -723,9 +718,6 @@ public class WorkflowHelper {
 		        writer.setEffectiveTime(today.getTime());
 		        writer.setWorkflowTime(today.getTime());
 
-		        // RefCompId
-		        writer.setReleaseDescriptionUid(snomedConcept.getPrimUuid());
-		        // 
 		        // Write Member
 				WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
 				writer.addMember();

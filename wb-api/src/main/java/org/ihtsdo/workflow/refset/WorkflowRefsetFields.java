@@ -17,7 +17,6 @@ import org.dwfa.tapi.TerminologyException;
 * 
 */
 public abstract class WorkflowRefsetFields {
-	private UUID referencedComponentId = null;
 	private I_GetConceptData referencedComponent = null;
 	
 	public abstract String toString();
@@ -29,7 +28,6 @@ public abstract class WorkflowRefsetFields {
 	}
 
 	public void setReferencedComponentId(UUID refCompId) {
-		referencedComponentId = refCompId;
 		try {
 			if (refCompId == null)
 				referencedComponent = null;
@@ -41,7 +39,7 @@ public abstract class WorkflowRefsetFields {
 	}
 
 	public UUID getReferencedComponentId() {
-		return referencedComponentId;
+		return referencedComponent.getPrimUuid();
 	}
 	
 	public I_GetConceptData getReferencedComponent() {

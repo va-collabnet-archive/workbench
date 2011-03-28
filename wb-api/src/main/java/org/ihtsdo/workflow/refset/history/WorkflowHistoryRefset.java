@@ -33,9 +33,6 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 	}
 
 	// I_GetConceptData values where appropriate
-	public I_GetConceptData getConcept(String props) throws NumberFormatException, TerminologyException, IOException {
-		return getConcept("concept", props);
-	}
 	public I_GetConceptData getState(String props) throws NumberFormatException, TerminologyException, IOException {
 		return getConcept("state", props);
 	}
@@ -56,9 +53,6 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 	}
 	public Long getEffectiveTime(String props) throws NumberFormatException, TerminologyException, IOException {
 		return Long.parseLong(getProp("effectiveTime", props));
-	}
-	public UUID getConceptUid(String props) throws NumberFormatException, TerminologyException, IOException {
-		return getUUID("concept", props);
 	}
 	public UUID getStateUid(String props) throws NumberFormatException, TerminologyException, IOException {
 		return getUUID("state", props);

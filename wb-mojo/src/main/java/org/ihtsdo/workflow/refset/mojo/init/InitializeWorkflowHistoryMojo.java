@@ -23,7 +23,7 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 /**
  * @author Jesse Efron
  *
- * @goal initialize-workflow-history-refset
+ * @goal initialize-workflow-history-refset-old
  * @requiresDependencyResolution compile
  */
 
@@ -100,8 +100,6 @@ public class InitializeWorkflowHistoryMojo extends AbstractMojo {
 
             	if (columns.length == numberOfColumns)
             	{
-            		UUID releaseDescription = identifyReleaseDescription(columns[timeStampPosition]);
-            		writer.setReleaseDescriptionUid(releaseDescription);
             		writer.setWorkflowUid(UUID.fromString(columns[workflowIdPosition]));
 	            	writer.setConceptUid(UUID.fromString(columns[conceptIdPosition]));
 	            	writer.setPathUid(UUID.fromString(columns[pathPosition]));
@@ -109,6 +107,8 @@ public class InitializeWorkflowHistoryMojo extends AbstractMojo {
 	            	writer.setActionUid(WorkflowHelper.lookupAction(columns[actionPosition]).getPrimUuid());
 	            	writer.setStateUid(WorkflowHelper.lookupState(columns[statePosition]).getPrimUuid());
 	            	writer.setFSN(columns[fsnPosition]);
+	            	writer.setAutoApproved(false);
+	            	writer.setOverride(false);
 	            	
         			long timestamp = format.parse(columns[timeStampPosition]).getTime();
 	            	writer.setEffectiveTime(timestamp);
@@ -131,40 +131,6 @@ public class InitializeWorkflowHistoryMojo extends AbstractMojo {
         } catch (Exception e) {
         	AceLog.getAppLog().log(Level.WARNING, "Exception: " + e.getMessage() + " at line: " + line);
 		}
-	}
-
-    private UUID identifyReleaseDescription(String timestamp) 
-    {
-    	if (!releases.containsKey(timestamp))
-    	{
-	    	// timestamp format: 2008-07-31 00:00:00
-	    	UUID retId = null;
-			String searchStringPrefix = "version: ";
-			String searchDate = timestamp.substring(0, 4) + timestamp.substring(5,7) + timestamp.substring(8, 10);
-			
-			try {
-				for ( I_DescriptionVersioned desc : snomedConcept.getDescriptions())
-				{
-					I_DescriptionTuple tuple = desc.getLastTuple();
-					int currentState = tuple.getStatusNid();
-					
-					if (tuple.getText().contains(searchStringPrefix + searchDate))
-					{
-						releases.put(timestamp, desc.getPrimUuid());
-						return desc.getPrimUuid();
-					}
-				}
-				
-				// TODO Fix this with new solution &&&& InitWfHxOnCommit as will be using this RefCompId
-				// If here, means that the first time for which a member is being added for the 
-				// current release which for current testing is 2011-01-31
-				releases.put(timestamp, snomedConcept.getPrimUuid());
-			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to identify the release description for timestamp: " + timestamp);
-			}
-    	} 
-
-   		return releases.get(timestamp);
 	}
 
 	public File getTargetDirectory() {

@@ -16,7 +16,6 @@ import org.ihtsdo.tk.api.workflow.WorkflowHistoryJavaBeanBI;
 * 
 */
 public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
-	private UUID releaseDescription = null;
 	private UUID workflowId = null;
 	private UUID concept = null;
 	private UUID path = null;
@@ -28,16 +27,6 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 	private Long effectiveTime = null;
 	private boolean autoApproved;
 	private boolean overridden;
-
-	@Override
-	public void setReleaseDescription(UUID id ) {
-		releaseDescription = id;
-	}
-
-	@Override
-	public UUID getReleaseDescription() {
-		return releaseDescription;
-	}
 
 	@Override
 	public void setWorkflowId(UUID id ) {
@@ -149,8 +138,7 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 		try {
 			I_TermFactory tf = Terms.get();
 			
-			return "\nRelease Description (Referenced Component Id) = " + tf.getConcept(getReleaseDescription()).getInitialText() + 
-				   "\nConcept = " + tf.getConcept(concept).getInitialText() +
+			return "\nConcept (Referenced Component Id) = " + tf.getConcept(concept).getInitialText() +
 				   "\nWorkflow Id = " + workflowId.toString() +
 				   "\nPath = " + tf.getConcept(path).getInitialText() +
 				   "\nModeler = " + tf.getConcept(modeler).getInitialText() + 
@@ -182,7 +170,6 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 			this.getState().equals(o2.getState()) &&
 			this.getEffectiveTime().equals(o2.getEffectiveTime()) &&
 			this.getWorkflowTime().equals(o2.getWorkflowTime()) &&
-			this.getReleaseDescription().equals(o2.getReleaseDescription()) &&
 			this.getWorkflowId().equals(o2.getWorkflowId()) &&
 			this.getAutoApproved() == o2.getAutoApproved() && 
 			this.getOverridden() == o2.getOverridden()

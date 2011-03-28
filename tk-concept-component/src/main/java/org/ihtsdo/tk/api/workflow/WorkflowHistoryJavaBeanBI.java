@@ -4,7 +4,6 @@ import java.util.UUID;
 
 
 public interface WorkflowHistoryJavaBeanBI {
-	public void setReleaseDescription(UUID id);
 	public void setConcept(UUID id);
 	public void setWorkflowId(UUID id);
 	public void setPath(UUID id);
@@ -15,7 +14,6 @@ public interface WorkflowHistoryJavaBeanBI {
 	public void setEffectiveTime(Long t);
 	public void setWorkflowTime(Long t);
 	
-	public UUID getReleaseDescription();
 	public UUID getConcept();
 	public UUID getWorkflowId();
 	public UUID getPath();
