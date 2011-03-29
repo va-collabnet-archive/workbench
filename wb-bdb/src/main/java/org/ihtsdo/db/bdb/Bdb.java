@@ -214,6 +214,7 @@ public class Bdb {
             FileIO.copyFile(HeapSize.HEAP_1200.getPropFile(configDir),
                     new File(readOnlyDir, "je.properties"));
         }
+        
         System.out.println("!## maxMem: " + maxMem + " heapSize: " + heapSize);
     }
 
@@ -301,6 +302,7 @@ public class Bdb {
         dbConfig.setReadOnly(readOnly);
         dbConfig.setAllowCreate(!readOnly);
         dbConfig.setDeferredWrite(!readOnly);
+        
         return bdb.bdbEnv.openDatabase(null,
                 dbName, dbConfig);
     }
@@ -313,6 +315,14 @@ public class Bdb {
             envConfig.setSharedCache(true);
             envConfig.setReadOnly(readOnly);
             envConfig.setAllowCreate(!readOnly);
+            int primeForLockTable = 
+                    SieveForPrimeNumbers.largestPrime(
+                        Runtime.getRuntime().availableProcessors() - 1);
+            /*
+            envConfig.setConfigParam("je.lock.nLockTables", 
+                    Integer.toString(primeForLockTable));
+             * 
+             */
             bdbEnv = new Environment(directory, envConfig);
         } catch (EnvironmentLockedException e) {
             throw new IOException(e);
