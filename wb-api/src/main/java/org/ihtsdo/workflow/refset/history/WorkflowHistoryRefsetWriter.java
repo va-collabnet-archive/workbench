@@ -45,10 +45,6 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 	}
 
 	// Setters
-	public void setReferencedComponentId(UUID uid) {
-		((WorkflowHistoryRSFields)fields).setReferencedComponentUid(uid);
-}
-
 	public void setWorkflowUid(UUID uid) {
 		((WorkflowHistoryRSFields)fields).setWorkflowUid(uid);
 	}
@@ -161,14 +157,6 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 		public boolean override = false;
 				
 		
-		public void setReferencedComponentUid(UUID uid) {
-			try {
-				setReferencedComponentId(uid);
-			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId");
-			}
-		}
-		
 		public void setConceptUid(UUID uid) {
 			setReferencedComponentUid(uid);
 		}
@@ -212,16 +200,9 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 		public void setOverride(boolean b) {
 			this.override = b;
 		}
-
-
 		
-		
-		public I_GetConceptData getReferencedComponent() {
+		public I_GetConceptData getConcept() {
 			return getReferencedComponent();
-		}
-		
-		public UUID getReferencedComponentUid() {
-			return getReferencedComponentId();
 		}
 		
 		public UUID getConceptUid() {

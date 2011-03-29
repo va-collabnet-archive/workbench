@@ -8,6 +8,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter.WorkflowHistoryRSFields;
 
 
 
@@ -27,22 +28,33 @@ public abstract class WorkflowRefsetFields {
 		
 	}
 
+	public void setReferencedComponent(I_GetConceptData con) {
+		referencedComponent = con;
+	}
+
 	public void setReferencedComponentId(UUID refCompId) {
 		try {
-			if (refCompId == null)
-				referencedComponent = null;
-			else
-				referencedComponent = Terms.get().getConcept(refCompId);
+			referencedComponent = Terms.get().getConcept(refCompId);
 		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.WARNING, "Failed to Add Member", e);
+			referencedComponent = null;
 		}
+	}
+
+	public void setReferencedComponentUid(UUID uid) {
+		setReferencedComponentId(uid);
+	}
+
+
+	public I_GetConceptData getReferencedComponent() {
+		return referencedComponent;
 	}
 
 	public UUID getReferencedComponentId() {
 		return referencedComponent.getPrimUuid();
 	}
 	
-	public I_GetConceptData getReferencedComponent() {
-		return referencedComponent;
+	public UUID getReferencedComponentUid() {
+		return getReferencedComponentId();
 	}
+	
 }
