@@ -175,31 +175,44 @@ public class Bdb {
         long maxMem = Runtime.getRuntime().maxMemory();
 
         File mutableDir = new File(dbDir, "mutable");
+        File readOnlyDir = new File(dbDir, "read-only");
         mutableDir.mkdirs();
         if (maxMem > 8000000000L) {
             heapSize = HeapSize.HEAP_8000;
             FileIO.copyFile(HeapSize.HEAP_8000.getPropFile(configDir),
                     new File(mutableDir, "je.properties"));
+            FileIO.copyFile(HeapSize.HEAP_8000.getPropFile(configDir),
+                    new File(readOnlyDir, "je.properties"));
         } else if (maxMem > 6000000000L) {
             heapSize = HeapSize.HEAP_6000;
             FileIO.copyFile(HeapSize.HEAP_6000.getPropFile(configDir),
                     new File(mutableDir, "je.properties"));
+            FileIO.copyFile(HeapSize.HEAP_6000.getPropFile(configDir),
+                    new File(readOnlyDir, "je.properties"));
         } else if (maxMem > 4000000000L) {
             heapSize = HeapSize.HEAP_4000;
             FileIO.copyFile(HeapSize.HEAP_4000.getPropFile(configDir),
                     new File(mutableDir, "je.properties"));
+            FileIO.copyFile(HeapSize.HEAP_4000.getPropFile(configDir),
+                    new File(readOnlyDir, "je.properties"));
         } else if (maxMem > 2000000000) {
             heapSize = HeapSize.HEAP_2000;
             FileIO.copyFile(HeapSize.HEAP_2000.getPropFile(configDir),
                     new File(mutableDir, "je.properties"));
+            FileIO.copyFile(HeapSize.HEAP_2000.getPropFile(configDir),
+                    new File(readOnlyDir, "je.properties"));
         } else if (maxMem > 1400000000) {
             heapSize = HeapSize.HEAP_1400;
             FileIO.copyFile(HeapSize.HEAP_1400.getPropFile(configDir),
                     new File(mutableDir, "je.properties"));
+            FileIO.copyFile(HeapSize.HEAP_1400.getPropFile(configDir),
+                    new File(readOnlyDir, "je.properties"));
         } else {
             heapSize = HeapSize.HEAP_1200;
             FileIO.copyFile(HeapSize.HEAP_1200.getPropFile(configDir),
                     new File(mutableDir, "je.properties"));
+            FileIO.copyFile(HeapSize.HEAP_1200.getPropFile(configDir),
+                    new File(readOnlyDir, "je.properties"));
         }
         System.out.println("!## maxMem: " + maxMem + " heapSize: " + heapSize);
     }
@@ -261,6 +274,14 @@ public class Bdb {
             pathManager = BdbPathManager.get();
             tf.setPathManager(pathManager);
             inform(activity, "Database open...");
+            AceLog.getAppLog().info("mutable maxMem: " + 
+                    Bdb.mutable.bdbEnv.getConfig().getConfigParam("je.maxMemory"));
+            AceLog.getAppLog().info("mutable shared cache: " + 
+                    Bdb.mutable.bdbEnv.getConfig().getSharedCache());
+            AceLog.getAppLog().info("readOnly maxMem: " + 
+                    Bdb.readOnly.bdbEnv.getConfig().getConfigParam("je.maxMemory"));
+            AceLog.getAppLog().info("readOnly shared cache: " + 
+                    Bdb.readOnly.bdbEnv.getConfig().getSharedCache());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

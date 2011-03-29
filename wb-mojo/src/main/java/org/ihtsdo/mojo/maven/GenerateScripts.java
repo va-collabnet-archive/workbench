@@ -198,18 +198,38 @@ public class GenerateScripts extends AbstractMojo {
                 } else if (name.equalsIgnoreCase("pStartJehri")) {
                     startAllScript(jars, "pStartJehri", "start-jehri.config", "500m", "500m", "Jehri Bundle", true,
                         false, false, true);
+                    startAllScript(jars, "pStartJehri", "start-jehri.config", "500m", "500m", "Jehri Bundle", true,
+                        false, false, true);
                 }  else if (name.equalsIgnoreCase("wb")) {
                     startAllScript(jars, "wb", "start-wb-local.config", "1400m", "1400m", "Workbench Bundle", true, false, false,
+                        false);
+                    startAllScript64(jars, "wb", "start-wb-local.config", "5g", "5g", "Workbench Bundle", true, false, false,
                         false);
                 }  else if (name.equalsIgnoreCase("dWb")) {
                     startAllScript(jars, "dWb", "start-wb-local.config", "1400m", "1400m", "Workbench Bundle", true, false, true,
                         false);
+                    startAllScript64(jars, "dWb", "start-wb-local.config", "5g", "5g", "Workbench Bundle", true, false, true,
+                        false);
                 }  else if (name.equalsIgnoreCase("pWb")) {
                     startAllScript(jars, "pWb", "start-wb-local.config", "1400m", "1400m", "Workbench Bundle", true, false, false,
+                        true);
+                    startAllScript64(jars, "pWb", "start-wb-local.config", "5g", "5g", "Workbench Bundle", true, false, false,
                         true);
                 }
             }
         }
+    }
+
+    private void startAllScript(File[] jars, String scriptName, String startFileName, String startHeap, String maxHeap,
+            String xdockName, boolean jiniSecurity, boolean bundledJre, boolean debug, boolean profile) throws MojoExecutionException {
+        startAllScript(jars, scriptName, startFileName, startHeap, maxHeap,
+            xdockName, jiniSecurity, bundledJre, debug, profile, false);
+    }
+
+    private void startAllScript64(File[] jars, String scriptName, String startFileName, String startHeap, String maxHeap,
+            String xdockName, boolean jiniSecurity, boolean bundledJre, boolean debug, boolean profile) throws MojoExecutionException {
+        startAllScript(jars, scriptName, startFileName, startHeap, maxHeap,
+            xdockName, jiniSecurity, bundledJre, debug, profile, true);
     }
 
     /**
@@ -217,13 +237,16 @@ public class GenerateScripts extends AbstractMojo {
      * @throws MojoExecutionException
      */
     private void startAllScript(File[] jars, String scriptName, String startFileName, String startHeap, String maxHeap,
-            String xdockName, boolean jiniSecurity, boolean bundledJre, boolean debug, boolean profile)
+            String xdockName, boolean jiniSecurity, boolean bundledJre, boolean debug, boolean profile, boolean d64)
             throws MojoExecutionException {
 
+        if (d64) {
+            scriptName = scriptName + "64";
+        }
         File windowScript = new File(outputDirectory + fileSep + scriptOutputDir + fileSep + scriptName + ".bat");
         File linuxScript = new File(outputDirectory + fileSep + scriptOutputDir + fileSep + scriptName + "Linux.sh");
         File unixScript = new File(outputDirectory + fileSep + scriptOutputDir + fileSep + scriptName + "OsX.sh");
-
+ 
         List<Scripter> scripters = new ArrayList<Scripter>();
 
         scripters.add(new WindowsScripter(windowScript, libDir));
@@ -233,7 +256,7 @@ public class GenerateScripts extends AbstractMojo {
         for (Scripter scripter : scripters) {
             try {
                 scripter.writeStartupScript(jars, startFileName, startHeap, maxHeap, xdockName, jiniSecurity,
-                    bundledJre, debug, profile);
+                    bundledJre, debug, profile, d64);
             } catch (IOException e) {
                 throw new MojoExecutionException("Error creating script file.", e);
             }
@@ -280,7 +303,7 @@ public class GenerateScripts extends AbstractMojo {
          * @throws IOException Thrown when there is trouble writing to the file
          */
         public void writeStartupScript(File[] jars, String startFileName, String startHeap, String maxHeap,
-                String xdockName, boolean jiniSecurity, boolean bundledJre, boolean debug, boolean profile)
+                String xdockName, boolean jiniSecurity, boolean bundledJre, boolean debug, boolean profile, boolean d64)
                 throws IOException {
             // make parent directories
             scriptFile.getParentFile().mkdirs();
@@ -295,6 +318,14 @@ public class GenerateScripts extends AbstractMojo {
                 fw.write("java");
             }
             fw.write(lineContinuance());
+            
+            if (d64) {
+                if (isOSX()) {
+                    writeLine(fw, "-d64 -XX:+UseCompressedOops");
+                } else {
+                    writeLine(fw, "-XX:+UseCompressedOops");
+                }
+            }
 
             // write debug options
             if (debug) {
