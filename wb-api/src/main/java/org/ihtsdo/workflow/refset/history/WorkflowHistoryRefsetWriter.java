@@ -23,12 +23,13 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 
 	private static boolean inUse = false;
 
-	public WorkflowHistoryRefsetWriter() throws IOException, TerminologyException {
-		refset = new WorkflowHistoryRefset();
+	public WorkflowHistoryRefsetWriter(boolean setupDatabaseObjects) throws IOException, TerminologyException {
+		super(setupDatabaseObjects);
+		refset = new WorkflowHistoryRefset(setupDatabaseObjects);
 		fields = new WorkflowHistoryRSFields();
 		
 		setRefsetName(refset.getRefsetName());
-		setRefsetId(refset.getRefsetId());
+		setRefsetId(refset.getRefsetId(), setupDatabaseObjects);
 	}
 	
 	// Statics

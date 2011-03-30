@@ -19,7 +19,7 @@ import org.ihtsdo.workflow.refset.WorkflowRefset;
 public class EditorCategoryRefset extends WorkflowRefset {
 	
 	public EditorCategoryRefset() throws IOException, TerminologyException {
-		super (RefsetAuxiliary.Concept.EDITOR_CATEGORY);
+		super (RefsetAuxiliary.Concept.EDITOR_CATEGORY, true);
 	}
 
 	public Collection<UUID> getRefsetUids() throws TerminologyException, IOException {

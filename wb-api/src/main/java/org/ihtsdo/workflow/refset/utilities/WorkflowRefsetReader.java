@@ -42,7 +42,7 @@ public class WorkflowRefsetReader extends WorkflowRefset {
 	}
 
 	protected WorkflowRefsetReader(int nid, String name) throws TerminologyException, IOException {
-		super(nid, name);
+		super(nid, name, true);
 	}
 
 	public Collection<UUID> getRefsetUids() throws TerminologyException, IOException

@@ -22,11 +22,12 @@ public class SemanticAreaHierarchyRefsetWriter extends WorkflowRefsetWriter {
 	private final I_GetConceptData identifiedReferencedComponent = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SEMANTIC_PARENT_REL.getUids());
 	
 	public SemanticAreaHierarchyRefsetWriter() throws IOException, TerminologyException {
+		super(false);
 		refset = new SemanticAreaHierarchyRefset();
 		fields = new SemanticAreaHierarchyRSFields();
 
 		setRefsetName(refset.getRefsetName());
-		setRefsetId(refset.getRefsetId());
+		setRefsetId(refset.getRefsetId(), true);
 	}
 	
 	public void setReferencedComponentId(UUID uid) {

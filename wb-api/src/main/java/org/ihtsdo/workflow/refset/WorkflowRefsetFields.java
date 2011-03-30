@@ -19,6 +19,7 @@ import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter.WorkflowHi
 */
 public abstract class WorkflowRefsetFields {
 	private I_GetConceptData referencedComponent = null;
+	private UUID referencedComponentUid = null;
 	
 	public abstract String toString();
 	public abstract boolean valuesExist();
@@ -30,9 +31,12 @@ public abstract class WorkflowRefsetFields {
 
 	public void setReferencedComponent(I_GetConceptData con) {
 		referencedComponent = con;
+		referencedComponentUid = con.getPrimUuid();
 	}
 
 	public void setReferencedComponentId(UUID refCompId) {
+		referencedComponentUid = refCompId;
+		
 		try {
 			referencedComponent = Terms.get().getConcept(refCompId);
 		} catch (Exception e) {
@@ -50,7 +54,7 @@ public abstract class WorkflowRefsetFields {
 	}
 
 	public UUID getReferencedComponentId() {
-		return referencedComponent.getPrimUuid();
+		return referencedComponentUid;
 	}
 	
 	public UUID getReferencedComponentUid() {

@@ -24,9 +24,11 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 
 	public abstract String fieldsToRefsetString() throws IOException;
 	
-	protected WorkflowRefsetWriter() throws TerminologyException, IOException {
-		super();
-		helper = Terms.get().getRefsetHelper(Terms.get().getActiveAceFrameConfig());		
+	protected WorkflowRefsetWriter(boolean setupDatabaseObjects) throws TerminologyException, IOException {
+ 		super();
+ 		if (setupDatabaseObjects) {
+			helper = Terms.get().getRefsetHelper(Terms.get().getActiveAceFrameConfig());		
+		}
 	}
 
 	public boolean addMember() {

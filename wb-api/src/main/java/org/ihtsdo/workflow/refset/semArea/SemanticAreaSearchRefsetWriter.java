@@ -20,11 +20,12 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetWriter;
 public class SemanticAreaSearchRefsetWriter extends WorkflowRefsetWriter 
 {
 	public SemanticAreaSearchRefsetWriter() throws IOException, TerminologyException {
+		super(false);
 		refset = new SemanticAreaSearchRefset();
 		fields = new SemanticAreaSearchRSFields();
 	
 		setRefsetName(refset.getRefsetName());
-		setRefsetId(refset.getRefsetId());
+		setRefsetId(refset.getRefsetId(), true);
 	}
 	
 	public void setReferencedComponentId(UUID uid) {

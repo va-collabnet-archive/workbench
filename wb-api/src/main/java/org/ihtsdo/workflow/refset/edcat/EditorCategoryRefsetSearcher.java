@@ -32,7 +32,7 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 		refset = new EditorCategoryRefset();
 
 		setRefsetName(refset.getRefsetName());
-		setRefsetId(refset.getRefsetId());
+		setRefsetId(refset.getRefsetId(), true);
 	}
 
 	public boolean isAutomaticApprovalAvailable(I_GetConceptData modeler) throws NumberFormatException, TerminologyException, IOException, Exception {

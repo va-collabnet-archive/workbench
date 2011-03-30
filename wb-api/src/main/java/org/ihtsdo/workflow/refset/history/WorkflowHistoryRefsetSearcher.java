@@ -58,7 +58,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		try { 
 			refset = new WorkflowHistoryRefset();
 			setRefsetName(refset.getRefsetName());
-			setRefsetId(refset.getRefsetId());
+			setRefsetId(refset.getRefsetId(), true);
         	snomedConcept = Terms.get().getConcept(Taxonomies.SNOMED.getUuids());
         	earliestWorkflowHistoryReleaseTimestamp = format.parse(earliestWorkflowHistoryRelease).getTime();
 			currentStatusNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid());

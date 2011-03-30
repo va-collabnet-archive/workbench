@@ -17,21 +17,21 @@ import java.util.logging.Level;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.ace.api.DatabaseSetupConfig;
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.etypes.EConceptAttributes;
+import org.ihtsdo.etypes.EDescription;
+import org.ihtsdo.etypes.ERelationship;
+import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
+import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
-import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 /**
  * Export the workflow history to initialize the WfHx refset in the database
@@ -50,16 +50,9 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
      */
 
     /**
-     * Editing path UUIDs
-     *
-     * @parameter
-     */
-    private String editPathUuid;
-
-    /**
      * Size of cache used by the database.
      *
-     * @parameter
+     * @parameter 
      */
     Long cacheSize = 600000000L;
 
@@ -77,13 +70,6 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
      * @parameter
      */
     private String generatedDirectory = "generated-resources";
-
-    /**
-     * Location of the input Read-Only Database for analyzing and converting to EConcept.
-     *
-     * @parameter
-     */
-    private String databaseDirectory = "berkeley-db";
 
     /**
      * Specifies whether to create new files (default) or append to existing
@@ -137,11 +123,11 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 	private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	private UUID wfHxRefsetId = null;
-	private UUID pathUuid = null;
+	private UUID snomedPathUid = null;
 	private UUID authorUuid = null;
+	private UUID currentStatus = null;
 
 	private DataOutputStream eConceptDOS = null;
-	private DatabaseSetupConfig dbSetupConfig ;
 
 	public void execute() throws MojoExecutionException, MojoFailureException
 	{
@@ -153,7 +139,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
         try
         {
 			// Initialize Loop
-        	openAndInitializeReadOnlyWfHxDatabase();
+        	//openAndInitializeReadOnlyWfHxDatabase();
         	initializeExport();
         	EConcept econcept = initializeEConcept();
 			
@@ -171,7 +157,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 			econcept.setRefsetMembers(memberList);
 			econcept.writeExternal(eConceptDOS);
 			eConceptDOS.close();
-	        Terms.get().close();
+	        //Terms.get().close();
 
         } catch (Exception e) {
             throw new MojoExecutionException(e.getMessage(), e);
@@ -204,8 +190,9 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 	{
 		String[] row = ((String)textScanner.nextLine()).split("\t");
 
-		I_GetConceptData con = Terms.get().getConcept(wfHxRefsetId);
-		EConcept eC = new EConcept(con);
+		//I_GetConceptData con = Terms.get().getConcept();
+		//EConcept eC = new EConcept(con);
+		EConcept eC = makeEConcept(wfHxRefsetId);
 
 		TkRefsetStrMember initialMember = createTkMember(row);
 		memberList = new ArrayList<TkRefsetAbstractMember<?>>();
@@ -228,13 +215,13 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 		member.setRefsetUuid(wfHxRefsetId);
 
 		// Member Status Act/Inact
-		member.statusUuid = ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid();
+		member.statusUuid = currentStatus;
 
 		// Author of WfHx
 		member.authorUuid = authorUuid;
 
 		// Path writing on
-		member.pathUuid = pathUuid;
+		member.pathUuid = snomedPathUid;
 
 		member.time = format.parse(row[timeStampPosition]).getTime();
 
@@ -247,22 +234,24 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 	{
         wfHxRefsetId = RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid();
 
-        pathUuid = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getPrimoridalUid();
+        snomedPathUid = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getPrimoridalUid();
 
         authorUuid = ArchitectonicAuxiliary.Concept.IHTSDO.getPrimoridalUid();
+        
+        currentStatus = ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid();
 	}
 
 	private String toXml(String[] row, long effectiveTimestamp) throws IOException, TerminologyException
 	{
 		try 
 		{
-			UUID modeler = WorkflowHelper.lookupModelerUid(row[modelerPosition]);
-			UUID action = WorkflowHelper.lookupAction(row[actionPosition]).getPrimUuid();
-			UUID state = WorkflowHelper.lookupState(row[statePosition]).getPrimUuid();
+			UUID modeler = lookupModeler(row[modelerPosition]);
+			UUID action = lookupAction(row[actionPosition]);
+			UUID state = lookupState(row[statePosition]);
 
 			long wfTimestamp = format.parse(row[refsetColumnTimeStampPosition]).getTime();
 
-        	WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter(); 
+        	WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter(false); 
 			
 			writer.setWorkflowUid(UUID.fromString(row[workflowIdPosition]));
 			writer.setPathUid(UUID.fromString(row[pathPosition]));
@@ -275,45 +264,22 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 			writer.setOverride(false);
 			writer.setFSN(row[fsnPosition]);
 
-			return writer.fieldsToRefsetString();
+			// Setting of Concept in writer is not needed for EConcept, but required for valuesExist() method
+			writer.setConceptUid(UUID.fromString(row[conceptIdPosition]));
 			
+			if (writer.getProperties().valuesExist())
+				return writer.fieldsToRefsetString();
+			else
+				throw new Exception("Couldn't identify all values in refset row");
 		} catch (Exception e) {
-			AceLog.getAppLog().log(Level.WARNING, row.toString(), new Exception("Failure in creating Workflow History EConcepts"));
+			AceLog.getAppLog().log(Level.WARNING, row.toString(), e);
 		}
 
 		return "";
 	}
 
 
-	private I_TermFactory openAndInitializeReadOnlyWfHxDatabase() throws Exception
-	{
-        	 File inputDatabase = getDatabaseFile();
 
-            // Create database
-            dbSetupConfig = new DatabaseSetupConfig();
-            getLog().info("vodb dir: " + inputDatabase.getAbsolutePath());
-            I_TermFactory origTF = Terms.get();
-
-            try
-            {
-            	Terms.createFactory(inputDatabase, false, cacheSize, dbSetupConfig);
-
-	            // Setup Config
-	            I_TermFactory tf = Terms.get();
-	
-	            I_ConfigAceFrame activeConfig = null;
-	
-	            if (Terms.get().getActiveAceFrameConfig() == null) {
-	            	activeConfig = NewDefaultProfile.newProfile(null, null, null, null, null);
-	            	tf.setActiveAceFrameConfig(activeConfig);
-            	}
-	
-	        } catch (Exception e) {
-            	AceLog.getAppLog().log(Level.WARNING, "Unable to import this row into workflow history refset");
-            }
-
-            return origTF;
-	}
 
 	private File getOutputFile() {
 		String outputPath = projectDirectoryPath + File.separatorChar + generatedDirectory + File.separatorChar + outputDirectory + File.separatorChar;
@@ -324,12 +290,6 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
         return new File(directory, outputFileName);
 	}
 
-	private File getDatabaseFile() {
-		String databasePath = projectDirectoryPath + File.separatorChar + databaseDirectory + File.separatorChar;
-
-		return new File(databasePath);
-	}
-
 	private File getInputTextFile() 
 	{
 		String inputTextFilePath = projectDirectoryPath + File.separatorChar + generatedDirectory + File.separatorChar + inputFileDirectory + File.separatorChar;
@@ -337,4 +297,180 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
         return new File(inputTextFilePath, inputFileName);
 	}
 
+    private EConcept makeEConcept(UUID primUuid) throws IOException, TerminologyException {
+        EConcept testConcept = new EConcept();
+
+        // Create Concept Attributes
+        EConceptAttributes ca = new EConceptAttributes();
+        ca.additionalIds = null;
+        ca.primordialUuid = primUuid;
+        ca.setDefined(true);
+        ca.revisions = null;
+        ca.additionalIds = null;
+        ca.setPathUuid(snomedPathUid);
+        ca.setStatusUuid(currentStatus);
+        ca.setTime(Long.MAX_VALUE);
+
+        // Add a EDescription
+        List<TkDescription> descriptionList = new ArrayList<TkDescription>(1);
+        EDescription descFsn = new EDescription();
+        descFsn.additionalIds = null;
+        descFsn.primordialUuid = UUID.randomUUID();
+        descFsn.setConceptUuid(primUuid);
+        descFsn.setInitialCaseSignificant(false);
+        descFsn.setLang("en");
+        descFsn.setPathUuid(snomedPathUid);
+        descFsn.setStatusUuid(currentStatus);
+        descFsn.setTypeUuid(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getPrimoridalUid());
+        descFsn.setText("Workflow History (EConcept)");
+        descFsn.setTime(Long.MAX_VALUE);
+        descFsn.revisions = new ArrayList<TkDescriptionRevision>(1);
+        descriptionList.add(descFsn);
+        
+        // add an EDescriptionVersion version
+        EDescription descPrefTerm = new EDescription();
+        descPrefTerm.additionalIds = null;
+        descPrefTerm.primordialUuid = UUID.randomUUID();
+        descPrefTerm.setConceptUuid(primUuid);
+        descPrefTerm.setInitialCaseSignificant(false);
+        descPrefTerm.setLang("en");
+        descPrefTerm.setPathUuid(snomedPathUid);
+        descPrefTerm.setStatusUuid(currentStatus);
+        descPrefTerm.setTypeUuid(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getPrimoridalUid());
+        descPrefTerm.setText("Workflow History");
+        descPrefTerm.setTime(Long.MAX_VALUE);
+        descPrefTerm.revisions = new ArrayList<TkDescriptionRevision>(1);
+        descriptionList.add(descPrefTerm);
+
+        // Add Relationships
+        List<TkRelationship> relList =  new ArrayList<TkRelationship>(1);
+
+        ERelationship rel = new ERelationship();
+        rel.additionalIds = null;
+        rel.setAdditionalIdComponents(null);
+        rel.setC1Uuid(primUuid);
+        rel.setC2Uuid(ArchitectonicAuxiliary.Concept.WORKFLOW_CONCEPTS.getPrimoridalUid());
+        rel.setCharacteristicUuid(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getPrimoridalUid());
+        rel.setPathUuid(snomedPathUid); 
+        rel.setPrimordialComponentUuid(UUID.randomUUID());
+        rel.setRefinabilityUuid(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getPrimoridalUid());
+        rel.setRelGroup(0);
+        rel.setStatusUuid(currentStatus);
+        rel.setTime(Long.MAX_VALUE);
+        rel.setTypeUuid(ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid());
+        rel.revisions = new ArrayList<TkRelationshipRevision>(2);
+        relList.add(rel);
+        
+        testConcept.setConceptAttributes(ca);
+        testConcept.setDescriptions(descriptionList);
+        testConcept.setRelationships(relList);
+        
+        return testConcept;
+    }
+    
+    private UUID lookupModeler(String modeler) throws IOException, TerminologyException {
+    	if (modeler.equalsIgnoreCase("IHTSDO")) {
+    		return ArchitectonicAuxiliary.Concept.IHTSDO.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("spackman")) {
+    		return ArchitectonicAuxiliary.Concept.KENT_SPACKMAN.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("mvanber")) {
+    		return ArchitectonicAuxiliary.Concept.MONIQUE_VAN_BERKUM.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("khaake")) {
+    		return ArchitectonicAuxiliary.Concept.KIRSTEN_HAAKE.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("jmirza")) {
+    		return ArchitectonicAuxiliary.Concept.JALEH_MIZRA.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("llivesa")) {
+    		return ArchitectonicAuxiliary.Concept.PENNY_LIVESAY.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("mgerard")) {
+    		return ArchitectonicAuxiliary.Concept.MARY_GERARD.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("msmith")) {
+    		return ArchitectonicAuxiliary.Concept.MIKE_SMITH.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("phought")) {
+    		return ArchitectonicAuxiliary.Concept.PATRICIA_HOUGHTON.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("pbrottm")) {
+    		return ArchitectonicAuxiliary.Concept.PHILLIP_BROTTMAN.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("greynos")) {
+    		return ArchitectonicAuxiliary.Concept.GUILLERMO_REYNOSO.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("alopez")) {
+    		return ArchitectonicAuxiliary.Concept.ALEJANDRO_LOPEZ.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("emme")) {
+    		return ArchitectonicAuxiliary.Concept.EMMA_MELHUISH.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("dkonice")) {
+    		return ArchitectonicAuxiliary.Concept.DEBORAH_KONICEK.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("jogo")) {
+    		return ArchitectonicAuxiliary.Concept.JO_GOULDING.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("clundbe")) {
+    		return ArchitectonicAuxiliary.Concept.CYNDIE_LUNDBERG.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("rmoldwi")) {
+    		return ArchitectonicAuxiliary.Concept.RICHARD_MOLDWIN.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("nalbarr")) {
+    		return ArchitectonicAuxiliary.Concept.NARCISO_ALBARRACIN.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("vparekh")) {
+    		return ArchitectonicAuxiliary.Concept.VARSHA_PAREKH.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("cspisla")) {
+    		return ArchitectonicAuxiliary.Concept.CHRISTINE_SPISLA.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("dmcginn")) {
+    		return ArchitectonicAuxiliary.Concept.DORIS_MCGINNESS.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("asyed")) {
+    		return ArchitectonicAuxiliary.Concept.ASIF_SYED.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("cvalles")) {
+    		return ArchitectonicAuxiliary.Concept.CECILIA_VALLESE.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("alejandro")) {
+    		return ArchitectonicAuxiliary.Concept.ALEJANDRO_RODRIGUEZ.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("NHS")) {
+    		return ArchitectonicAuxiliary.Concept.NHS.getPrimoridalUid();
+    	}
+
+    	
+    	return null;
+    }
+    	
+	public static UUID lookupAction(String action) throws TerminologyException, IOException {
+		if (action.equalsIgnoreCase("Accept workflow action")) {
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_ACCEPT_ACTION.getPrimoridalUid();
+		} else if (action.equalsIgnoreCase("Chief Terminologist review workflow action")) {
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_CHIEF_TERMINOLOGIST_REVIEW_ACTION.getPrimoridalUid();
+		} else if (action.equalsIgnoreCase("Commit workflow action")) {
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_ACTION.getPrimoridalUid();
+		} else if (action.equalsIgnoreCase("Commit in batch workflow action")) {
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_IN_BATCH_ACTION.getPrimoridalUid();
+		} else if (action.equalsIgnoreCase("Discuss workflow action")) {
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_DISCUSS_ACTION.getPrimoridalUid();
+		} else if (action.equalsIgnoreCase("Escalate workflow action")) {
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_ESCALATE_ACTION.getPrimoridalUid();
+		} else if (action.equalsIgnoreCase("Review workflow action")) {
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_REVIEW_ACTION.getPrimoridalUid();
+		} else if (action.equalsIgnoreCase("Override workflow action")) {
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_OVERRIDE_ACTION.getPrimoridalUid();
+		} else {
+			return null;
+		} 
+				
+	}
+
+	public static UUID lookupState(String state) throws TerminologyException, IOException {
+		if (state.equalsIgnoreCase("Approved workflow state")) {
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_APPROVED_STATE.getPrimoridalUid();
+		} else if (state.equalsIgnoreCase("Changed workflow state")) {
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_CHANGED_STATE.getPrimoridalUid();
+		} else if (state.equalsIgnoreCase("Changed in batch workflow state")) {
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_CHANGED_IN_BATCH_STATE.getPrimoridalUid();
+		} else if (state.equalsIgnoreCase("For Chief Terminologist review workflow state")) {
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_CHIEF_TERMINOLOGIST_REVIEW_STATE.getPrimoridalUid();
+		} else if (state.equalsIgnoreCase("Concept having no prior workflow state")) {
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_EMPTY_NO_WFHX_STATE.getPrimoridalUid();
+		} else if (state.equalsIgnoreCase("Concept not previously existing workflow state")) {
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_EMPTY_NOT_EXISTING_STATE.getPrimoridalUid();
+		} else if (state.equalsIgnoreCase("Escalated workflow state")) {
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_ESCALATED_STATE.getPrimoridalUid();
+		} else if ((state.equalsIgnoreCase("New workflow state")) || (state.equalsIgnoreCase("first review")))  {
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_NEW_STATE.getPrimoridalUid();
+		} else if (state.equalsIgnoreCase("For review workflow state") || state.equalsIgnoreCase("review chief term")) {
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_REVIEW_STATE.getPrimoridalUid();
+		} else if (state.equalsIgnoreCase("For discussion workflow state")) {
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_DISCUSSION_STATE.getPrimoridalUid();
+		} else {
+			return null;		
+		}
+	}
 }

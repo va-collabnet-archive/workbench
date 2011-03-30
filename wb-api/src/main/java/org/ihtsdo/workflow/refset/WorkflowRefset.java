@@ -27,24 +27,31 @@ public abstract class WorkflowRefset
 	protected String refsetName = null;
 	protected I_HelpRefsets helper = null;
 	
-	public WorkflowRefset(Concept con) throws IOException, TerminologyException {
-		this(con.localize().getNid(), con.toString());
-		helper = Terms.get().getRefsetHelper(Terms.get().getActiveAceFrameConfig());		
+	public abstract Collection<UUID> getRefsetUids() throws TerminologyException, IOException;
+
+	public WorkflowRefset(Concept con, boolean setupDatabaseObjects) throws IOException, TerminologyException {
+		this(con.localize().getNid(), con.toString(), setupDatabaseObjects);
+		if (setupDatabaseObjects) {
+			helper = Terms.get().getRefsetHelper(Terms.get().getActiveAceFrameConfig());
+		}
 	}
 	
-	public WorkflowRefset (int id, String name) {
+	public WorkflowRefset (int id, String name, boolean setupDatabaseObjects) {
 		setRefsetName(name);
-		setRefsetId(id);
-		setRefsetConcept(id);
+		setRefsetId(id, setupDatabaseObjects);
+		
+		if (setupDatabaseObjects) {
+			setRefsetConcept(id, setupDatabaseObjects);
+		}
 	}
 	
 	public WorkflowRefset() {
 
 	}
 
-	public void setRefsetId(int id) {
+	public void setRefsetId(int id, boolean setupDatabaseObjects) {
 		refsetId = id;
-		setRefsetConcept(id);
+		setRefsetConcept(id, setupDatabaseObjects);
 	}
 	
 	public void setRefsetName(String name) {
@@ -91,15 +98,16 @@ public abstract class WorkflowRefset
 		return s.substring(startIndex + "<value>".length(), endIndex);
 	}
 
-	private void setRefsetConcept(int uid) {
-		try {
-			refset = Terms.get().getConcept(uid);
-		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.WARNING, "Error retrieving Refset Concept: " + uid, e);
+	private void setRefsetConcept(int uid, boolean setupDatabaseObjects) {
+		if (setupDatabaseObjects) {
+			try {
+				refset = Terms.get().getConcept(uid);
+			} catch (Exception e) {
+	        	AceLog.getAppLog().log(Level.WARNING, "Error retrieving Refset Concept: " + uid, e);
+			}
 		}
 	}
-	public abstract Collection<UUID> getRefsetUids() throws TerminologyException, IOException;
-
+	
 	protected I_GetConceptData getConcept(String key, String props) {
 		String UidString = getProp(key, props);
 		

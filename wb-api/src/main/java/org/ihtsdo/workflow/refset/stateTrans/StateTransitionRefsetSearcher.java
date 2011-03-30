@@ -30,7 +30,7 @@ public  class StateTransitionRefsetSearcher extends WorkflowRefsetSearcher
 		refset = new StateTransitionRefset();
 		
 		setRefsetName(refset.getRefsetName());
-		setRefsetId(refset.getRefsetId());
+		setRefsetId(refset.getRefsetId(), true);
 	}
 
 	// From Category and InitialState

@@ -20,11 +20,12 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetWriter;
 public class StateTransitionRefsetWriter extends WorkflowRefsetWriter 
 {
 	public StateTransitionRefsetWriter() throws IOException, TerminologyException {
+		super(false);
 		refset = new StateTransitionRefset();
 		fields = new StateTransitionRSFields();
 	
 		setRefsetName(refset.getRefsetName());
-		setRefsetId(refset.getRefsetId());
+		setRefsetId(refset.getRefsetId(), true);
 	}
 	
 	public void setReferencedComponentId(UUID uid) {

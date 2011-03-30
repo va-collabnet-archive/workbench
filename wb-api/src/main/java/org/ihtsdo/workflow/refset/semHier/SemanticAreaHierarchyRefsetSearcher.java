@@ -38,7 +38,7 @@ public  class SemanticAreaHierarchyRefsetSearcher extends WorkflowRefsetSearcher
 		fullySpecifiedTermDescriptionTypeNid = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()).getNid();	
 
 		setRefsetName(refset.getRefsetName());
-		setRefsetId(refset.getRefsetId());
+		setRefsetId(refset.getRefsetId(), true);
 	}
 
 	public String getConceptHierarchyTagFromEditorCategoryTags(I_GetConceptData con, Set<String> possibleTags) throws Exception {

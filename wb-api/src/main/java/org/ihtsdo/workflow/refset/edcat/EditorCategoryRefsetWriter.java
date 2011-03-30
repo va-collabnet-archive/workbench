@@ -21,11 +21,12 @@ public class EditorCategoryRefsetWriter extends WorkflowRefsetWriter
 {
 	public EditorCategoryRefsetWriter() throws IOException, TerminologyException 
 	{
+		super(false);
 		refset = new EditorCategoryRefset();
 		fields = new EditorCategoryRSFields();
 
 		setRefsetName(refset.getRefsetName());
-		setRefsetId(refset.getRefsetId());
+		setRefsetId(refset.getRefsetId(), true);
 	}
 	
 	public void setReferencedComponentId(UUID uid) {

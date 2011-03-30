@@ -145,7 +145,7 @@ public class WorkflowHelper {
 		WorkflowHistoryRefsetWriter writer;
 
 		try {
-			writer = new WorkflowHistoryRefsetWriter();
+			writer = new WorkflowHistoryRefsetWriter(true);
 
 			writer.setPathUid(bean.getPath());
 			writer.setModelerUid(bean.getModeler());
@@ -667,7 +667,7 @@ public class WorkflowHelper {
         	if (modeler != null && WorkflowHelper.isActiveModeler(modeler))
         	{
         		I_TermFactory tf = Terms.get();
-        		WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter();
+        		WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter(true);
 
 				WorkflowHistoryRefsetWriter.lockMutex();
 

@@ -24,7 +24,7 @@ public class StateTransitionRefset extends WorkflowRefset  {
 	}
 
 	public StateTransitionRefset() throws IOException, TerminologyException {
-		super (RefsetAuxiliary.Concept.STATE_TRANSITION);
+		super (RefsetAuxiliary.Concept.STATE_TRANSITION, true);
 	}
 
 

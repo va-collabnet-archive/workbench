@@ -416,7 +416,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 	                                updateOopsButton(selectedConcept);
 	
 	                                UUID selectedActionUid = (UUID) worker.readAttachement(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name());
-	                                WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter();
+	                                WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter(true);
 	
 	                                WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
 	                                WorkflowHistoryJavaBean bean = new WorkflowHistoryJavaBean();

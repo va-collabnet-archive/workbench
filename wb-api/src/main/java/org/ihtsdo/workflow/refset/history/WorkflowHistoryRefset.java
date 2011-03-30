@@ -19,7 +19,11 @@ import org.ihtsdo.workflow.refset.WorkflowRefset;
 public class WorkflowHistoryRefset extends WorkflowRefset  {
 	
 	public WorkflowHistoryRefset() throws IOException, TerminologyException {
-		super (RefsetAuxiliary.Concept.WORKFLOW_HISTORY);
+		super (RefsetAuxiliary.Concept.WORKFLOW_HISTORY, true);
+	}
+	
+	public WorkflowHistoryRefset(boolean setupHelper) throws IOException, TerminologyException {
+		super (RefsetAuxiliary.Concept.WORKFLOW_HISTORY, setupHelper);
 	}
 
 	public Collection<UUID> getRefsetUids() throws TerminologyException, IOException {
