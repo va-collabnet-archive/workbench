@@ -798,7 +798,7 @@ public class NewConcept extends PreviousNextOrCancel {
                     TK_REFSET_TYPE.CID,
                     componentNid,
                     Ts.get().getNidForUuids(gbUuid));
-            refexSpecGbFsn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(WbDescType.SYNONYM.getLenient().getPrimUuid()));
+            refexSpecGbPref.put(RefexProperty.CNID1, Ts.get().getNidForUuids(WbDescType.SYNONYM.getLenient().getPrimUuid()));
             
             tc.construct(refexSpecGbPref);
         } catch (IOException ex) {
@@ -837,7 +837,7 @@ public class NewConcept extends PreviousNextOrCancel {
                     componentNid,
                     Ts.get().getNidForUuids(usUuid));
             
-            refexSpecGbFsn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(WbDescType.FULLY_SPECIFIED.getLenient().getPrimUuid()));
+            refexSpecUsFsn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(WbDescType.FULLY_SPECIFIED.getLenient().getPrimUuid()));
             
             tc.construct(refexSpecUsFsn);
         } catch (IOException ex) {
@@ -876,7 +876,7 @@ public class NewConcept extends PreviousNextOrCancel {
                     componentNid,
                     Ts.get().getNidForUuids(usUuid));
             
-            refexSpecGbFsn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(WbDescType.SYNONYM.getLenient().getPrimUuid()));
+            refexSpecUsPref.put(RefexProperty.CNID1, Ts.get().getNidForUuids(WbDescType.SYNONYM.getLenient().getPrimUuid()));
             
             tc.construct(refexSpecUsPref);
         } catch (IOException ex) {
