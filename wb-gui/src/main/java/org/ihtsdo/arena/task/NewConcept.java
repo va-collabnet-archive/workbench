@@ -10,6 +10,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -18,6 +20,8 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -29,6 +33,8 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -44,9 +50,11 @@ import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.arena.conceptview.FixedWidthJEditorPane;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.WizardBI;
@@ -54,6 +62,7 @@ import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.DescCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.example.binding.WbDescType;
@@ -86,25 +95,39 @@ public class NewConcept extends PreviousNextOrCancel {
     private I_HostConceptPlugins host;
     private transient WizardBI wizard;
     private TerminologyList tl;
-    private JTextField fsn;
-    private JTextField pref;
-    private JTextField us;
-    private JTextField gb;
-    private JCheckBox gbBox;
-    private JCheckBox usBox;
-    private JLabel gbLabel;
-    private JLabel usLabel;
-    private boolean addUsDesc = false;
-    private boolean addGbDesc = false;
+    private FixedWidthJEditorPane fsn;
+    private JLabel inputFsnLabel;
+    private JLabel inputPrefLabel;
+    private FixedWidthJEditorPane pref;
+    private FixedWidthJEditorPane usFsn;
+    private FixedWidthJEditorPane gbFsn;
+    private JCheckBox gbBoxFsn;
+    private JCheckBox usBoxFsn;
+    private JLabel gbLabelFsn;
+    private JLabel usLabelFsn;
+    private FixedWidthJEditorPane usPref;
+    private FixedWidthJEditorPane gbPref;
+    private JCheckBox gbBoxPref;
+    private JCheckBox usBoxPref;
+    private JLabel gbLabelPref;
+    private JLabel usLabelPref;
+    private boolean addUsDescFsn = false;
+    private boolean addGbDescFsn = false;
+    private boolean addUsDescPref = false;
+    private boolean addGbDescPref = false;
     private List<Integer> nidList;
     private ConceptCB conceptSpec;
-    private DescCAB descSpecGb;
-    private DescCAB descSpecUs;
-    private RefexCAB refexSpecGb;
-    private RefexCAB refexSpecUs;
+    private DescCAB descSpecGbFsn;
+    private DescCAB descSpecUsFsn;
+    private RefexCAB refexSpecGbFsn;
+    private RefexCAB refexSpecUsFsn;
+    private DescCAB descSpecGbPref;
+    private DescCAB descSpecUsPref;
+    private RefexCAB refexSpecGbPref;
+    private RefexCAB refexSpecUsPref;
     private TerminologyConstructorBI tc;
     private ConceptChronicleBI newConcept;
-
+    private String lang;
 
     /*
      * -----------------------
@@ -182,14 +205,36 @@ public class NewConcept extends PreviousNextOrCancel {
         try {
             // check return condition for CONTINUE or ITEM_CANCELLED
             if (returnCondition == Condition.CONTINUE) {
-                createBlueprints();
-                if (addUsDesc) {
-                    tc.construct(descSpecUs);
-                    tc.construct(refexSpecUs);
+                createBlueprintConcept();
+                if (addUsDescFsn) {
+                	createBlueprintUsFsnDesc();
+                	createBlueprintUsFsnRefex(descSpecUsFsn.getComponentNid());
                 }
-                if (addGbDesc) {
-                    tc.construct(descSpecGb);
-                    tc.construct(refexSpecGb);
+                if (addGbDescFsn) {
+                	createBlueprintGbFsnDesc();
+                	createBlueprintGbFsnRefex(descSpecGbFsn.getComponentNid());
+                }
+                if (addUsDescPref) {
+                	createBlueprintUsPrefDesc();
+                	createBlueprintUsPrefRefex(descSpecUsPref.getComponentNid());
+                }
+                if (addGbDescPref) {
+                	createBlueprintGbPrefDesc();
+                	createBlueprintGbPrefRefex(descSpecGbPref.getComponentNid());
+                }
+                if(lang.equals("en")){
+                	createBlueprintUsFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
+                	createBlueprintGbFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
+                	createBlueprintUsPrefRefex(conceptSpec.getPreferredCAB().getComponentNid());
+                	createBlueprintGbPrefRefex(conceptSpec.getPreferredCAB().getComponentNid());
+                }
+                if(lang.equals("en-us")){
+                	createBlueprintUsFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
+                	createBlueprintUsPrefRefex(conceptSpec.getPreferredCAB().getComponentNid());
+                }
+                if(lang.equals("en-gb")){
+                	createBlueprintGbFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
+                	createBlueprintGbPrefRefex(conceptSpec.getPreferredCAB().getComponentNid());
                 }
                 Ts.get().addUncommitted(newConcept);
 
@@ -238,7 +283,7 @@ public class NewConcept extends PreviousNextOrCancel {
             return true;
         }
 
-        @Override
+		@Override
         protected void done() {
             try {
                 get();
@@ -278,17 +323,47 @@ public class NewConcept extends PreviousNextOrCancel {
                 wizardPanel.add(new JLabel("fully specified name:"), c);
                 c.gridy++;
                 c.weightx = 1.0;
-                fsn = new JTextField();
-                fsn.addActionListener(new CopyTextActionListener());
+                fsn = new FixedWidthJEditorPane();
+                fsn.setText("");
+                fsn.setFixedWidth(300);
+                fsn.setEditable(true);
+                fsn.getDocument().addDocumentListener(new CopyTextDocumentListener());
                 wizardPanel.add(fsn, c);
+                //TODO
+                c.gridwidth = 4;
+                c.gridx += c.gridwidth;
+                c.gridwidth = 2;
+                c.weightx = 0.0;
+                inputFsnLabel = new JLabel("fsn"); //TODO ########TEST##########
+                inputFsnLabel.setVisible(false);
+                wizardPanel.add(inputFsnLabel, c);
+                c.gridy++;
+                c.gridx = 0;
+                c.weightx = 0.0;
+                //TODO to here
 
                 c.gridy++;
                 c.weightx = 0.0;
                 wizardPanel.add(new JLabel("preferred name:"), c);
                 c.gridy++;
                 c.weightx = 1.0;
-                pref = new JTextField();
+                pref = new FixedWidthJEditorPane();
+                pref.setText("");
+                pref.setFixedWidth(300);
+                pref.setEditable(true);
                 wizardPanel.add(pref, c);
+                //TODO
+                c.gridwidth = 4;
+                c.gridx += c.gridwidth;
+                c.gridwidth = 2;
+                c.weightx = 0.0;
+                inputPrefLabel = new JLabel("pref"); //TODO ########TEST##########
+                inputPrefLabel.setVisible(false);
+                wizardPanel.add(inputPrefLabel, c);
+                c.gridy++;
+                c.gridx = 0;
+                c.weightx = 0.0;
+                //TODO to here
 
 
                 c.gridy++;
@@ -302,35 +377,71 @@ public class NewConcept extends PreviousNextOrCancel {
                 c.weighty = 0.0;
 
                 c.gridy++;
+                c.gridx = 0; //TODO THIS
                 c.gridwidth = 10;
                 wizardPanel.add(new JSeparator(), c);
                 c.gridy++;
                 c.weightx = 1.0;
                 c.gridwidth = 1;
                 c.weightx = 0.0;
-                gbBox = new JCheckBox();
-                gbBox.addActionListener(new GbDialectActionListener());
-                gbBox.setVisible(false);
-                wizardPanel.add(gbBox, c);
+                gbBoxFsn = new JCheckBox();
+                gbBoxFsn.addItemListener(new GbDialectFsnItemListener());
+                gbBoxFsn.setVisible(false);
+                wizardPanel.add(gbBoxFsn, c);
                 c.gridx++;
                 c.gridwidth = 3;
                 c.weightx = 1.0;
-                gb = new JTextField();
-                gb.setVisible(false);
-                wizardPanel.add(gb, c);
+                gbFsn = new FixedWidthJEditorPane();
+                gbFsn.setFixedWidth(300);
+                gbFsn.setEditable(true);
+                gbFsn.setVisible(false);
+                wizardPanel.add(gbFsn, c);
                 c.gridx += c.gridwidth;
                 c.gridwidth = 2;
                 c.weightx = 0.0;
-                gbLabel = new JLabel("en-GB");
-                gbLabel.setVisible(false);
-                wizardPanel.add(gbLabel, c);
+                gbLabelFsn = new JLabel("fsn en-GB");
+                gbLabelFsn.setVisible(false);
+                wizardPanel.add(gbLabelFsn, c);
                 c.gridy++;
                 c.gridx = 0;
                 c.weightx = 0.0;
                 c.gridwidth = 10;
                 wizardPanel.add(new JSeparator(), c);
                 c.gridy++;
-
+                
+                
+                c.gridy++;
+                c.gridwidth = 10;
+                wizardPanel.add(new JSeparator(), c);
+                c.gridy++;
+                c.weightx = 1.0;
+                c.gridwidth = 1;
+                c.weightx = 0.0;
+                gbBoxPref = new JCheckBox();
+                gbBoxPref.addItemListener(new GbDialectPrefItemListener());
+                gbBoxPref.setVisible(false);
+                wizardPanel.add(gbBoxPref, c);
+                c.gridx++;
+                c.gridwidth = 3;
+                c.weightx = 1.0;
+                gbPref = new FixedWidthJEditorPane();
+                gbPref.setFixedWidth(300);
+                gbPref.setEditable(true);
+                gbPref.setVisible(false);
+                wizardPanel.add(gbPref, c);
+                c.gridx += c.gridwidth;
+                c.gridwidth = 2;
+                c.weightx = 0.0;
+                gbLabelPref = new JLabel("pref en-GB");
+                gbLabelPref.setVisible(false);
+                wizardPanel.add(gbLabelPref, c);
+                c.gridy++;
+                c.gridx = 0;
+                c.weightx = 0.0;
+                c.gridwidth = 10;
+                wizardPanel.add(new JSeparator(), c);
+                c.gridy++;
+               
 
                 c.gridy++;
                 c.gridwidth = 10;
@@ -339,29 +450,59 @@ public class NewConcept extends PreviousNextOrCancel {
                 c.weightx = 1.0;
                 c.gridwidth = 1;
                 c.weightx = 0.0;
-                usBox = new JCheckBox();
-                usBox.addActionListener(new UsDialectActionListener());
-                usBox.setVisible(false);
-                wizardPanel.add(usBox, c);
+                usBoxFsn = new JCheckBox();
+                usBoxFsn.addItemListener(new UsDialectFsnItemListener());
+                usBoxFsn.setVisible(false);
+                wizardPanel.add(usBoxFsn, c);
                 c.gridx++;
                 c.gridwidth = 3;
                 c.weightx = 1.0;
-                us = new JTextField();
-                us.setVisible(false);
-                wizardPanel.add(us, c);
+                usFsn = new FixedWidthJEditorPane();
+                usFsn.setFixedWidth(300);
+                usFsn.setEditable(true);
+                usFsn.setVisible(false);
+                wizardPanel.add(usFsn, c);
                 c.gridx += c.gridwidth;
                 c.gridwidth = 2;
                 c.weightx = 0.0;
-                usLabel = new JLabel("en-US");
-                usLabel.setVisible(false);
-                wizardPanel.add(usLabel, c);
+                usLabelFsn = new JLabel("fsn en-US");
+                usLabelFsn.setVisible(false);
+                wizardPanel.add(usLabelFsn, c);
                 c.gridy++;
                 c.gridx = 0;
                 c.weightx = 0.0;
                 c.gridwidth = 10;
                 wizardPanel.add(new JSeparator(), c);
                 c.gridy++;
+                
 
+                c.gridy++;
+                c.gridwidth = 10;
+                wizardPanel.add(new JSeparator(), c);
+                c.gridy++;
+                c.weightx = 1.0;
+                c.gridwidth = 1;
+                c.weightx = 0.0;
+                usBoxPref = new JCheckBox();
+                usBoxPref.addItemListener(new UsDialectPrefItemListener());
+                usBoxPref.setVisible(false);
+                wizardPanel.add(usBoxPref, c);
+                c.gridx++;
+                c.gridwidth = 3;
+                c.weightx = 1.0;
+                usPref = new FixedWidthJEditorPane();
+                usPref.setFixedWidth(300);
+                usPref.setEditable(true);
+                usPref.setVisible(false);
+                wizardPanel.add(usPref, c);
+                c.gridx += c.gridwidth;
+                c.gridwidth = 2;
+                c.weightx = 0.0;
+                usLabelPref = new JLabel("pref en-US");
+                usLabelPref.setVisible(false);
+                wizardPanel.add(usLabelPref, c);
+                
+                
                 //empty thing
                 c.gridx = 0;
                 c.gridy++;
@@ -408,16 +549,18 @@ public class NewConcept extends PreviousNextOrCancel {
         continueButton.requestFocusInWindow();
         wizardPanel.repaint();
     }
-
-    public class CopyTextActionListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String fsnText = fsn.getText();
-            int paren = fsnText.indexOf("(");
-            String prefText = "";
-
-            if (paren == -1) {
+    
+    public class CopyTextDocumentListener implements DocumentListener {
+    	
+    	String fsnText = "";
+        int paren;
+        String prefText = "";
+        
+    	@Override
+    	public void changedUpdate(DocumentEvent arg0) {
+    		fsnText = fsn.extractText();
+    		paren = fsnText.indexOf("(");
+    		if (paren == -1) {
                 prefText = fsnText;
                 pref.setText(prefText);
             } else {
@@ -425,44 +568,154 @@ public class NewConcept extends PreviousNextOrCancel {
                 pref.setText(prefText);
             }
 
-            addSpellingVarients(prefText);
-        }
-    }
+            addSpellingVarients(prefText, fsnText);
+    		
+    	}
 
-    public void addSpellingVarients(String prefText) {
+
+    	@Override
+    	public void insertUpdate(DocumentEvent arg0) {
+    		fsnText = fsn.extractText();
+    		paren = fsnText.indexOf("(");
+    		if (paren == -1) {
+                prefText = fsnText;
+                pref.setText(prefText);
+            } else {
+                prefText = fsnText.substring(0, paren - 1);
+                pref.setText(prefText);
+            }
+
+            addSpellingVarients(prefText, fsnText);
+    		
+    	}
+
+
+    	@Override
+    	public void removeUpdate(DocumentEvent arg0) {
+    		fsnText = fsn.extractText();
+    		paren = fsnText.indexOf("(");
+           if (paren == -1) {
+                prefText = fsnText;
+                pref.setText(prefText);
+            } else {
+                prefText = fsnText.substring(0, paren - 1);
+                pref.setText(prefText);
+            }
+
+            addSpellingVarients(prefText, fsnText);
+    		
+    	} 
+    }
+    
+
+    public void addSpellingVarients(String prefText, String fsnText) {
         TerminologyHelperDrools th = new TerminologyHelperDrools();
         String us = "en-us";
         String gb = "en-gb";
         String varient = "";
+        String extra = "";
+        if(fsnText.indexOf("(") != -1 && fsnText.indexOf(")") != -1){
+        	extra = fsnText.substring(fsnText.indexOf("("), fsnText.indexOf(")") + 1);
+        }
 
         if (th.loadProperties()) {
             if (th.checkTermSpelling(prefText, us) && th.checkTermSpelling(prefText, gb)) {
-                //do nothing
+            	lang = "en";
+            
+            	this.inputFsnLabel.setText("fsn en-GB / en-US");
+            	this.inputFsnLabel.setVisible(true);
+            	this.inputPrefLabel.setText("pref en-GB / en-US");
+            	this.inputPrefLabel.setVisible(true);
+            	
+            	this.usBoxPref.setVisible(false);
+                this.usPref.setVisible(false);
+                this.usLabelPref.setVisible(false);
+                
+                this.gbBoxPref.setVisible(false);
+                this.gbPref.setVisible(false);
+                this.gbLabelPref.setVisible(false);
+                
+                this.gbBoxFsn.setSelected(false);
+                this.gbBoxFsn.setVisible(false);
+                this.gbFsn.setVisible(false);
+                this.gbLabelFsn.setVisible(false);
+                
+                this.usBoxFsn.setVisible(false);
+                this.usBoxFsn.setSelected(false);
+                this.usFsn.setVisible(false);
+                this.usLabelFsn.setVisible(false);
             } else if (th.checkTermSpelling(prefText, us)) { //check if lang is en-us
+            	lang = "en-us";
+            	
+            	this.inputFsnLabel.setText("fsn en-US");
+            	this.inputFsnLabel.setVisible(true);
+            	this.inputPrefLabel.setText("pref en-US");
+            	this.inputPrefLabel.setVisible(true);
+                //get fsn
+            	varient = th.getSpellingTerm(prefText, us);
+                this.gbFsn.setText(varient + " " + extra);
+                this.gbBoxFsn.setSelected(true);
+                this.gbBoxFsn.setVisible(true);
+                this.gbFsn.setVisible(true);
+                this.gbLabelFsn.setVisible(true);
+                this.usBoxFsn.setVisible(false);
+                this.usBoxFsn.setSelected(false);
+                this.usFsn.setVisible(false);
+                this.usLabelFsn.setVisible(false);
+                
+                //get pref
                 varient = th.getSpellingTerm(prefText, us);
-                this.gb.setText(varient);
-                this.gbBox.setVisible(true);
-                this.gb.setVisible(true);
-                this.gbLabel.setVisible(true);
+                this.gbPref.setText(varient);
+                this.gbBoxPref.setSelected(true);
+                this.gbBoxPref.setVisible(true);
+                this.gbPref.setVisible(true);
+                this.gbLabelPref.setVisible(true);
+                this.usBoxPref.setVisible(false);
+                this.usBoxPref.setSelected(false);
+                this.usPref.setVisible(false);
+                this.usLabelPref.setVisible(false);
+                
             } else if (th.checkTermSpelling(prefText, gb)) { //check if lang is en-gb
+            	lang = "en-gb";
+            	
+            	this.inputFsnLabel.setText("fsn en-GB");
+            	this.inputFsnLabel.setVisible(true);
+            	this.inputPrefLabel.setText("pref en-GB");
+            	this.inputPrefLabel.setVisible(true);
+                //get fsn
+            	varient = th.getSpellingTerm(prefText, gb);
+                this.usFsn.setText(varient + " " + extra);
+                this.usBoxFsn.setSelected(true);
+                this.usBoxFsn.setVisible(true);
+                this.usFsn.setVisible(true);
+                this.usLabelFsn.setVisible(true);
+                this.gbBoxFsn.setVisible(false);
+                this.gbBoxFsn.setSelected(false);
+                this.gbFsn.setVisible(false);
+                this.gbLabelFsn.setVisible(false);
+                
+                //get pref
                 varient = th.getSpellingTerm(prefText, gb);
-                this.us.setText(varient);
-                this.usBox.setVisible(true);
-                this.us.setVisible(true);
-                this.usLabel.setVisible(true);
+                this.usPref.setText(varient);
+                this.usBoxPref.setSelected(true);
+                this.usBoxPref.setVisible(true);
+                this.usPref.setVisible(true);
+                this.usLabelPref.setVisible(true);
+                this.gbBoxPref.setVisible(false);
+                this.gbBoxPref.setSelected(false);
+                this.gbPref.setVisible(false);
+                this.gbLabelPref.setVisible(false);
             }
-        }
+            }
     }
 
-    private void createBlueprints() {
+    private void createBlueprintConcept() {
         UUID isa = UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25"); //this is for "Is a"
         tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
                 config.getViewCoordinate());
 
         try {
             //get parents
-            TerminologyListModel model = (TerminologyListModel) tl.getModel();
-            nidList = model.getNidsInList();
             UUID[] uuidArray = new UUID[nidList.size()];
 
             for (int index = 0; index < nidList.size(); index++) {
@@ -471,7 +724,7 @@ public class NewConcept extends PreviousNextOrCancel {
 
 
             //create concept blue print
-            conceptSpec = new ConceptCB(fsn.getText(), pref.getText(), "en", isa, uuidArray);
+            conceptSpec = new ConceptCB(fsn.extractText(), pref.extractText(), "en", isa, uuidArray);
             newConcept = tc.construct(conceptSpec);
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -481,87 +734,255 @@ public class NewConcept extends PreviousNextOrCancel {
             e.printStackTrace();
         }
     }
+    
+    private void createBlueprintGbFsnDesc(){
+    	try {
+            descSpecGbFsn = new DescCAB(
+                    conceptSpec.getComponentUuid(),
+                    WbDescType.FULLY_SPECIFIED.getLenient().getPrimUuid(), 
+                    "en-gb",
+                    gbFsn.extractText(),
+                    false);
+
+            tc.construct(descSpecGbFsn);
+        } catch (IOException ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        } catch (InvalidCAB ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        }
+    }
+    
+    private void createBlueprintGbFsnRefex(int componentNid){
+    	try {
+            UUID gbUuid = UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd");
+            refexSpecGbFsn = new RefexCAB(
+                    TK_REFSET_TYPE.CID,
+                    componentNid,
+                    Ts.get().getNidForUuids(gbUuid));
+            refexSpecGbFsn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(WbDescType.FULLY_SPECIFIED.getLenient().getPrimUuid()));
+            tc.construct(refexSpecGbFsn);
+        } catch (IOException ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        } catch (InvalidCAB ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        }
+    }
+    
+    private void createBlueprintGbPrefDesc(){
+        try {
+            descSpecGbPref = new DescCAB(
+                    conceptSpec.getComponentUuid(),
+                    WbDescType.SYNONYM.getLenient().getPrimUuid(),
+                    "en",
+                    gbPref.extractText(),
+                    false);
+
+            tc.construct(descSpecGbPref);
+        } catch (IOException ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        } catch (InvalidCAB ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        }
+    }
+    
+    private void createBlueprintGbPrefRefex(int componentNid){
+        try {
+            UUID gbUuid = UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd");
+            refexSpecGbPref = new RefexCAB(
+                    TK_REFSET_TYPE.CID,
+                    componentNid,
+                    Ts.get().getNidForUuids(gbUuid));
+            refexSpecGbFsn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(WbDescType.SYNONYM.getLenient().getPrimUuid()));
+            
+            tc.construct(refexSpecGbPref);
+        } catch (IOException ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        } catch (InvalidCAB ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        }
+    }
+    
+    private void createBlueprintUsFsnDesc(){
+    	try {
+            descSpecUsFsn = new DescCAB(
+                    conceptSpec.getComponentUuid(),
+                    WbDescType.FULLY_SPECIFIED.getLenient().getPrimUuid(),
+                    "en-us", 
+                    usFsn.extractText(),
+                    false);
+
+            tc.construct(descSpecUsFsn);
+        } catch (IOException ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        } catch (InvalidCAB ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        }
+    }
+    
+    private void createBlueprintUsFsnRefex(int componentNid){
+    	try {
+            UUID usUuid = UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6");
+            refexSpecUsFsn = new RefexCAB(
+                    TK_REFSET_TYPE.CID,
+                    componentNid,
+                    Ts.get().getNidForUuids(usUuid));
+            
+            refexSpecGbFsn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(WbDescType.FULLY_SPECIFIED.getLenient().getPrimUuid()));
+            
+            tc.construct(refexSpecUsFsn);
+        } catch (IOException ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        } catch (InvalidCAB ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        }
+    }
+    
+    private void createBlueprintUsPrefDesc(){
+        try {
+            descSpecUsPref = new DescCAB(
+                    conceptSpec.getComponentUuid(),
+                    WbDescType.SYNONYM.getLenient().getPrimUuid(),
+                    "en",
+                    usPref.extractText(),
+                    false);
+
+            tc.construct(descSpecUsPref);
+        } catch (IOException ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        } catch (InvalidCAB ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        }
+    }
+    
+    private void createBlueprintUsPrefRefex(int componentNid){
+        try {
+           UUID usUuid = UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6");
+            refexSpecUsPref = new RefexCAB(
+                    TK_REFSET_TYPE.CID,
+                    componentNid,
+                    Ts.get().getNidForUuids(usUuid));
+            
+            refexSpecGbFsn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(WbDescType.SYNONYM.getLenient().getPrimUuid()));
+            
+            tc.construct(refexSpecUsPref);
+        } catch (IOException ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        } catch (InvalidCAB ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        }
+    }
 
     public class BlueprintContinueActionListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (fsn.getText().equals("")) {
+        	
+        	TerminologyListModel model = (TerminologyListModel) tl.getModel();
+            nidList = model.getNidsInList();
+        	
+            if (fsn.extractText().length() == 0) {
                 //please enter the fsn
-                JOptionPane.showMessageDialog(new JFrame(), "please enter the fsn");
-            } /*if(){
-            // Test for parents
-            //please list parents for the new concept
-            JOptionPane.showMessageDialog(new JFrame(), "please list parents for the new concept");
-            }*/ else {
+            	JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "please enter the fsn", "",
+                        JOptionPane.ERROR_MESSAGE);
+            }else if(fsn.extractText().length() != 0 && fsn.extractText().indexOf("(") == -1){
+            	//test for semantic tag
+            	JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "please enter the semtaic tag", "",
+                        JOptionPane.ERROR_MESSAGE);
+            }else if(nidList.isEmpty()){
+            	//please list parents for the new concept
+            	JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "please list parents for the new concept", "",
+                        JOptionPane.ERROR_MESSAGE);
+            }else if (fsn.extractText().length() != 0 && fsn.extractText().indexOf("(") > 0 
+            		  && fsn.extractText().indexOf(")") > fsn.extractText().indexOf("(") ){
                 returnCondition = Condition.CONTINUE;
                 done = true;
                 NewConcept.this.notifyTaskDone();
+            }else {
+            	JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "you're missing something", "",
+                        JOptionPane.ERROR_MESSAGE);
+            }
             }
         }
-    }
 
-    public class GbDialectActionListener implements ActionListener {
+    public class GbDialectFsnItemListener implements ItemListener {
 
         @Override
-        public void actionPerformed(ActionEvent e) {
-            //create desc blueprint and construct 
-            try {
-                descSpecGb = new DescCAB(
-                        conceptSpec.getComponentUuid(),
-                        WbDescType.SYNONYM.getLenient().getPrimUuid(),
-                        "en", us.getText(),
-                        false);
-
-                //create refsex blueprint for GB dialect refset and construct
-                UUID gbUuid = UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd");
-                refexSpecGb = new RefexCAB(
-                        TK_REFSET_TYPE.CID,
-                        descSpecGb.getComponentNid(),
-                        Ts.get().getNidForUuids(gbUuid));
-                addGbDesc = true;
-
-            } catch (IOException ex) {
-                // TODO Auto-generated catch block
-                ex.printStackTrace();
-            } catch (InvalidCAB ex) {
-                // TODO Auto-generated catch block
-                ex.printStackTrace();
+        public void itemStateChanged(ItemEvent e) {
+        	AbstractButton abstractButton = (AbstractButton) e.getSource();
+            boolean selected = abstractButton.getModel().isSelected();
+            
+            if(selected){
+            	addGbDescFsn = true;
+            }else{
+            	addGbDescFsn = false;
             }
-
+            }
         }
-    }
 
-    public class UsDialectActionListener implements ActionListener {
+    public class UsDialectFsnItemListener implements ItemListener {
 
         @Override
-        public void actionPerformed(ActionEvent e) {
-            //create desc blueprint and construct
-            try {
-                descSpecUs = new DescCAB(
-                        conceptSpec.getComponentUuid(),
-                        WbDescType.SYNONYM.getLenient().getPrimUuid(), "en",
-                        gb.getText(),
-                        false);
-
-
-                //create refsex blueprint for US dialect refset and construct
-                UUID usUuid = UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6");
-                refexSpecUs = new RefexCAB(
-                        TK_REFSET_TYPE.CID,
-                        descSpecUs.getComponentNid(),
-                        Ts.get().getNidForUuids(usUuid));
-                addUsDesc = true;
-
-            } catch (IOException ex) {
-                // TODO Auto-generated catch block
-                ex.printStackTrace();
-            } catch (InvalidCAB ex) {
-                // TODO Auto-generated catch block
-                ex.printStackTrace();
+        public void itemStateChanged(ItemEvent e) {
+        	AbstractButton abstractButton = (AbstractButton) e.getSource();
+            boolean selected = abstractButton.getModel().isSelected();
+            
+            if(selected){
+            	addUsDescFsn = true;
+            }else{
+            	addUsDescFsn = false;
+            }
             }
         }
+    
+    public class GbDialectPrefItemListener implements ItemListener {
+
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+        	AbstractButton abstractButton = (AbstractButton) e.getSource();
+            boolean selected = abstractButton.getModel().isSelected();
+            
+            if(selected){
+            	addGbDescPref = true;
+            }else{
+            	addGbDescPref = false;
+            }
+            }
     }
+
+    public class UsDialectPrefItemListener implements ItemListener {
+
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+        	AbstractButton abstractButton = (AbstractButton) e.getSource();
+            boolean selected = abstractButton.getModel().isSelected();
+            
+            if(selected){
+            	addUsDescPref = true;
+            } else{
+            	addUsDescPref = false;
+            }
+            }
+        }
 
     /**
      * Get the instructions for this task
