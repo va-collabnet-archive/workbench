@@ -84,7 +84,7 @@ public class InitializeWorkflowHistoryMojo extends AbstractMojo {
         try {
         	snomedConcept = Terms.get().getConcept(Taxonomies.SNOMED.getUuids());
         	
-            writer = new WorkflowHistoryRefsetWriter();
+            writer = new WorkflowHistoryRefsetWriter(true);
             Scanner scanner = new Scanner(new File(filePath));
             int lineCounter = 1;
             
