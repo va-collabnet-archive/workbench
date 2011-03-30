@@ -34,6 +34,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.identifier.IdentifierVersion;
 import org.ihtsdo.concept.component.identifier.IdentifierVersionLong;
@@ -41,34 +42,35 @@ import org.ihtsdo.concept.component.identifier.IdentifierVersionString;
 import org.ihtsdo.concept.component.identifier.IdentifierVersionUuid;
 import org.ihtsdo.concept.component.refset.AnnotationWriter;
 import org.ihtsdo.concept.component.refset.RefsetMember;
+import org.ihtsdo.concept.component.refset.RefsetMemberFactory;
+import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
+import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.util.NidPairForRefset;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.TerminologySnapshotDI;
+import org.ihtsdo.tk.api.coordinate.PositionSet;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierLong;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierString;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierUuid;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
-import org.dwfa.vodb.types.Position;
-import org.ihtsdo.concept.component.refset.RefsetMemberFactory;
-import org.ihtsdo.concept.component.refset.RefsetRevision;
-import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.TerminologySnapshotDI;
-import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>> implements
         I_AmTermComponent, I_AmPart<R>,
@@ -341,7 +343,17 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         public List<? extends I_IdPart> getMutableIdParts() {
             return ConceptComponent.this.getMutableIdParts();
         }
-
+        
+        @Override
+        public List<? extends I_IdPart> getVisibleIds(PositionSet viewpointSet, int... authorityNids) {
+        	return ConceptComponent.this.getVisibleIds(viewpointSet, authorityNids);
+        }
+        
+        @Override
+        public List<? extends I_IdPart> getVisibleIds(PositionSet viewpointSet) {
+        	return ConceptComponent.this.getVisibleIds(viewpointSet);
+        }
+        
         @Override
         @Deprecated
         public Set<TimePathId> getTimePathSet() {
@@ -833,6 +845,21 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     @Override
+    public List<? extends I_IdPart> getVisibleIds(PositionSet viewpointSet,
+    		int... authorityNids) {
+    	List<I_IdPart> visibleIdParts = new ArrayList<I_IdPart>();
+		VersionComputer versionComputer = new VersionComputer();
+		visibleIdParts.addAll(versionComputer.getSpecifiedIdParts(viewpointSet, getMutableIdParts(), authorityNids));
+		
+		return visibleIdParts;
+    }
+    
+    @Override
+    public List<? extends I_IdPart> getVisibleIds(PositionSet viewpointSet) {
+    	return getVisibleIds(viewpointSet, new int[] {});
+    }
+
+	@Override
     public Collection<? extends RefexChronicleBI<?>> getAnnotations() {
         if (annotations == null) {
             return Collections.unmodifiableCollection(

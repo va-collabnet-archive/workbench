@@ -17,6 +17,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 
+import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
@@ -148,6 +149,36 @@ public class PositionMapper {
             return positionDistance[version.getSapNid()] >= 0;
         }
         return false;
+    }
+    
+    public boolean idsOnRoute(I_IdPart idVersion) {
+    	queryCount++;
+    	if (Bdb.getSapNid(idVersion.getStatusNid(), idVersion.getAuthorNid(), 
+    			idVersion.getPathNid(), idVersion.getTime()) < 0) {
+    		return false;
+    	}
+    	// Forms a barrier to ensure that the setup is complete prior to use
+    	try {
+    		completeLatch.await();
+    	} catch (InterruptedException e) {
+    		throw new RuntimeException(e);
+    	}
+    	lastRequestTime = System.currentTimeMillis();
+    	if (idVersion.getTime() == Long.MAX_VALUE) {
+    		return true;
+    	}
+    	assert Bdb.getSapNid(idVersion.getStatusNid(), idVersion.getAuthorNid(), 
+    			idVersion.getPathNid(), idVersion.getTime()) < positionDistance.length : "sapNid: " + 
+    			Bdb.getSapNid(idVersion.getStatusNid(), idVersion.getAuthorNid(), idVersion.getPathNid(), idVersion.getTime())
+    			+ " length: " + positionDistance.length + " version: " + idVersion;
+    	if (idVersion.getTime() < Long.MAX_VALUE) {
+    		return positionDistance[Bdb.getSapNid(idVersion.getStatusNid(), idVersion.getAuthorNid(), 
+        			idVersion.getPathNid(), idVersion.getTime())] >= 0;
+    	} else if (destination.getTime() > System.currentTimeMillis()) {
+    		return positionDistance[Bdb.getSapNid(idVersion.getStatusNid(), idVersion.getAuthorNid(), 
+        			idVersion.getPathNid(), idVersion.getTime())] >= 0;
+    	}
+    	return false;
     }
 
     public boolean isSetup() {
@@ -285,6 +316,69 @@ public class PositionMapper {
             default:
                 throw new RuntimeException("Can't handle policy: " + precedencePolicy);
         }
+    }
+    
+    public RELATIVE_POSITION fastRelativeIdPartsPosition(I_IdPart part1, I_IdPart part2, Precedence precedencePolicy) {
+    	queryCount++;
+    	lastRequestTime = System.currentTimeMillis();
+    	// Forms a barrier to ensure that the setup is complete prior to use
+    	try {
+    		completeLatch.await();
+    		assert Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()) < conflictMatrix.length :
+    			"SapNid: " + Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()) + " out of range; "
+    			+ " rows: " + conflictMatrix.length
+    			+ " columns: " + conflictMatrix.length
+    			+ " time: " + new Date(Bdb.getSapDb().getTime(Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())))
+    		+ " status: " + Concept.get(Bdb.getSapDb().getStatusNid(Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())))
+    		+ " path: " + Concept.get(Bdb.getSapDb().getPathNid(Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())))
+    		+ " destination: " + destination + " latch: " + completeLatch.getCount()
+    		+ " positionCount: " + positionCount;
+    		assert Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()) < conflictMatrix.length :
+    			"SapNid: " + Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()) + " out of range; "
+    			+ " rows: " + conflictMatrix.length
+    			+ " columns: " + conflictMatrix.length
+    			+ " time: " + new Date(Bdb.getSapDb().getTime(Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())))
+    		+ " status: " + Concept.get(Bdb.getSapDb().getStatusNid(Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())))
+    		+ " path: " + Concept.get(Bdb.getSapDb().getPathNid(Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())))
+    		+ " destination: " + destination + " latch: " + completeLatch.getCount()
+    		+ " positionCount: " + positionCount;
+    	} catch (IOException e) {
+    		throw new RuntimeException(e);
+    	} catch (InterruptedException e) {
+    		throw new RuntimeException(e);
+    	}
+    	switch (precedencePolicy) {
+    	case PATH:
+    		if (inConflict(Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()), Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()))) {
+    			return RELATIVE_POSITION.CONTRADICTION;
+    		} else if (positionDistance[Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]
+    		                            > positionDistance[Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]) {
+    			return RELATIVE_POSITION.BEFORE;
+    		} else if (positionDistance[Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]
+    		                            < positionDistance[Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]) {
+    			return RELATIVE_POSITION.AFTER;
+    		}
+    		if (part1.getAuthorNid() != part2.getAuthorNid()) {
+    			return RELATIVE_POSITION.CONTRADICTION;
+    		}
+    		return RELATIVE_POSITION.EQUAL;
+    	case TIME:
+    		if (part1.getTime() == part2.getTime()) {
+    			if (positionDistance[Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]
+    			                     > positionDistance[Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]) {
+    				return RELATIVE_POSITION.BEFORE;
+    			} else if (positionDistance[Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]
+    			                            < positionDistance[Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]) {
+    				return RELATIVE_POSITION.AFTER;
+    			}
+    			return RELATIVE_POSITION.CONTRADICTION;
+    		} else if (part1.getTime() < part2.getTime()) {
+    			return RELATIVE_POSITION.BEFORE;
+    		}
+    		return RELATIVE_POSITION.AFTER;
+    	default:
+    		throw new RuntimeException("Can't handle policy: " + precedencePolicy);
+    	}
     }
     /**
      * A bit matrix of the combinations of position identifiers that are
