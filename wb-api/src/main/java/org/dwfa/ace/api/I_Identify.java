@@ -23,13 +23,18 @@ import java.util.UUID;
 
 import org.dwfa.ace.utypes.UniversalAceIdentification;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.coordinate.PositionSet;
 
 public interface I_Identify extends I_AmTermComponent {
 
     public int getNid();
 
     public List<? extends I_IdPart> getMutableIdParts();
-
+    
+    public List<? extends I_IdPart> getVisibleIds(PositionSet viewpointSet);
+    
+    public List<? extends I_IdPart> getVisibleIds(PositionSet viewpointSet, int... authorityNids);
+    
     public List<UUID> getUUIDs();
 
     @Deprecated
