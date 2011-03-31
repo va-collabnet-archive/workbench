@@ -30,21 +30,6 @@ global Collection actions;
 global BpActionFactory actionFactory;
 global ViewCoordinate vc;
 
-rule "add from directory"
-	when
-		$c : ConceptVersionBI();
-	then
-		actions.addAll(actionFactory.fromDir("plugins/component"));
-end
-
-rule "add from other directory"
-	when
-		$c : ConceptVersionBI(
-				this isKindOf Taxonomies.REFSET_AUX);
-	then 
-		actions.addAll(actionFactory.fromDir("plugins/component-test"));
-end
-
 rule "add if null concept in host"
 	when
 		String(this == "null concept");
