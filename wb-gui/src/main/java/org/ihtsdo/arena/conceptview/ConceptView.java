@@ -1048,10 +1048,11 @@ public class ConceptView extends JPanel {
 
                 Collection<Object> facts = new ArrayList<Object>();
                 facts.add(FactFactory.get(
-                        Context.DROP_OBJECT, thingToDrop));
+                        Context.DROP_OBJECT, thingToDrop, config.getViewCoordinate()));
                 facts.add(FactFactory.get(Context.DROP_TARGET,
                         Ts.get().getConceptVersion(
-                        config.getViewCoordinate(), concept.getNid())));
+                        config.getViewCoordinate(), concept.getNid()),
+                        config.getViewCoordinate()));
                 
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                     AceLog.getAppLog().fine("dropTarget: " + concept);

@@ -263,7 +263,8 @@ public class CollapsePanel extends JPanel {
                 Collection<Object> facts = new ArrayList<Object>();
                 ConceptFact cFact = new ConceptFact(Context.FOCUS_CONCEPT,
                         Ts.get().getConceptVersion(coordinate,
-                        settings.getConcept().getNid()));
+                        settings.getConcept().getNid()),
+                        coordinate);
                 facts.add(cFact);
 
                 DroolsExecutionManager.fireAllRules(

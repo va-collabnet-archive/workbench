@@ -537,8 +537,8 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
                     }
 
                     Collection<Object> facts = new ArrayList<Object>();
-                    facts.add(FactFactory.get(Context.DROP_OBJECT, thingToDrop));
-                    facts.add(FactFactory.get(Context.DROP_TARGET, thingToDrag));
+                    facts.add(FactFactory.get(Context.DROP_OBJECT, thingToDrop, coordinate));
+                    facts.add(FactFactory.get(Context.DROP_TARGET, thingToDrag, coordinate));
 
 
                     DroolsExecutionManager.fireAllRules(
