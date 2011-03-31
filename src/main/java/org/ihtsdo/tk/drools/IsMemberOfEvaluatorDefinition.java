@@ -19,6 +19,7 @@ package org.ihtsdo.tk.drools;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Collection;
 
 import org.drools.base.BaseEvaluator;
 import org.drools.base.ValueType;
@@ -30,10 +31,14 @@ import org.drools.rule.VariableRestriction.VariableContextEntry;
 import org.drools.spi.Evaluator;
 import org.drools.spi.FieldValue;
 import org.drools.spi.InternalReadAccessor;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.spec.ConceptSpec;
+import org.ihtsdo.tk.drools.facts.DescFact;
 
 
 public class IsMemberOfEvaluatorDefinition implements EvaluatorDefinition {
@@ -90,19 +95,88 @@ public class IsMemberOfEvaluatorDefinition implements EvaluatorDefinition {
 		}
 
 		private boolean testMemberOf(final Object value1, final Object value2) { 
-			try { 
-				
+			
+				boolean isMember = false;
 				//value1 (concept): this could be concept VersionBI or conceptFact
 				//value2 (refset): this will be put in Refset.java (tk-arena-rules) as a ConceptSpec
 				
 				ConceptVersionBI possibleMember = null;
 				if (ConceptVersionBI.class.isAssignableFrom(value1.getClass())) {
 					possibleMember = (ConceptVersionBI) value1;
+					isMember = testConcept(possibleMember, value2);
 				} else if (ConceptFact.class.isAssignableFrom(value1.getClass())) {
 					possibleMember = ((ConceptFact) value1).getConcept();
-				} else {
+					isMember = testConcept(possibleMember, value2);
+				} else if (DescFact.class.isAssignableFrom(value1.getClass())) {
+					DescFact dFact = (DescFact) value1;
+					isMember = testDesc(dFact, value2);
+				}else {
 					throw new UnsupportedOperationException("Can't convert: " + value1);
 				}
+				/*ViewCoordinate vc = possibleMember.getViewCoordinate();
+				ConceptVersionBI possibleRefsetCV = null;
+				ConceptSpec possibleRefset = null;
+				
+				int evalRefsetNid = 0;
+				
+				if (ConceptVersionBI.class.isAssignableFrom(value2.getClass())) {
+					possibleRefsetCV = (ConceptVersionBI) value2;
+					evalRefsetNid = possibleRefsetCV.getNid();
+				} else if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
+					possibleRefset = (ConceptSpec) value2;
+					evalRefsetNid = possibleRefset.get(vc).getNid();
+				} else if (ConceptFact.class.isAssignableFrom(value2.getClass())) {
+					ConceptFact fact = (ConceptFact) value2;
+					possibleRefsetCV = (ConceptVersionBI) fact.getConcept();
+					evalRefsetNid = possibleRefsetCV.getNid();
+				} */
+				return this.getOperator().isNegated() ^ (isMember);
+				//return this.getOperator().isNegated() ^ (possibleMember.isMember(evalRefsetNid)); 
+		}
+		//TODO
+		private boolean testDesc(DescFact dFact, final Object value2){
+			boolean member = false;
+			
+			try{
+				DescriptionVersionBI desc = dFact.getComponent();
+				ViewCoordinate vc = dFact.getVc();
+				ConceptVersionBI possibleRefsetCV = null;
+				ConceptSpec possibleRefset = null;
+				
+				int evalRefsetNid = 0;
+				
+				if (ConceptVersionBI.class.isAssignableFrom(value2.getClass())) {
+					possibleRefsetCV = (ConceptVersionBI) value2;
+					evalRefsetNid = possibleRefsetCV.getNid();
+				} else if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
+					possibleRefset = (ConceptSpec) value2;
+					evalRefsetNid = possibleRefset.get(vc).getNid();
+				} else if (ConceptFact.class.isAssignableFrom(value2.getClass())) {
+					ConceptFact fact = (ConceptFact) value2;
+					possibleRefsetCV = (ConceptVersionBI) fact.getConcept();
+					evalRefsetNid = possibleRefsetCV.getNid();
+				} 
+		
+			            Collection<? extends RefexChronicleBI<?>> refexes =
+			                    desc.getCurrentRefexes(vc);
+
+			            if (refexes != null) {
+			                for (RefexChronicleBI<?> refex : refexes) {
+			                    if (refex.getCollectionNid() == evalRefsetNid) {
+			                        member = true;
+			                    }
+			                }
+			            }
+				
+				return member;
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		
+		private boolean testConcept(ConceptVersionBI possibleMember, final Object value2){
+			boolean member = false;
+			try{
 				ViewCoordinate vc = possibleMember.getViewCoordinate();
 				ConceptVersionBI possibleRefsetCV = null;
 				ConceptSpec possibleRefset = null;
@@ -119,13 +193,14 @@ public class IsMemberOfEvaluatorDefinition implements EvaluatorDefinition {
 					ConceptFact fact = (ConceptFact) value2;
 					possibleRefsetCV = (ConceptVersionBI) fact.getConcept();
 					evalRefsetNid = possibleRefsetCV.getNid();
-				}
-				return this.getOperator().isNegated() ^ (possibleMember.isMember(evalRefsetNid)); 
+				} 
+				
+				return member;
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		}
-
+		//TODO
 		@Override
 		public boolean evaluateCachedLeft(InternalWorkingMemory workingMemory,
 				VariableContextEntry context, Object right) {
