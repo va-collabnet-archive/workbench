@@ -35,7 +35,10 @@ import org.ihtsdo.arena.context.action.UngroupRelAction;
 import org.ihtsdo.arena.context.action.UngroupRelGroupAction;
 import org.ihtsdo.arena.context.action.UpdateDescFromSpecAction;
 import org.ihtsdo.arena.context.action.ReplaceAction;
-import org.ihtsdo.arena.context.action.TESTAction;
+import org.ihtsdo.arena.context.action.MakeAcceptableAction;
+import org.ihtsdo.arena.context.action.MakeNotAcceptableAction;
+import org.ihtsdo.arena.context.action.MakePreferredAction;
+
 
 import org.ihtsdo.tk.drools.facts.ComponentFact;
 import org.ihtsdo.tk.drools.facts.ConAttrFact;
@@ -60,6 +63,7 @@ import org.ihtsdo.tk.example.binding.Taxonomies;
 import org.ihtsdo.tk.example.binding.TermAux;
 import org.ihtsdo.tk.example.binding.WbDescType;
 import org.ihtsdo.arena.spec.Refsets; 
+import org.ihtsdo.arena.spec.AcceptabilityType;
 
 
 
@@ -284,11 +288,62 @@ rule "rule 14" #historical rel template onto rel"
 		actions.add(new ReplaceAction("Replace with", $dropObject, $dropTarget));
 end
 
-rule "rule 15" #select acceptibility
+rule "rule 15" #pref acceptability GB
 	when
-		$dropTarget: DescFact(this isMemberOf Refsets.EN_GB_LANG, context == Context.DROP_TARGET, vc == vc)
-		$dropObject : DescFact(context == Context.DROP_OBJECT, vc == vc, component == $dropTarget.component);
-								   								   
+		$dropTarget: DescFact(this isGbMemberTypeOf AcceptabilityType.PREF, 
+							  context == Context.DROP_TARGET, vc == vc)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, vc == vc, component == $dropTarget.component);				   								   
 	then
-		actions.add(new TESTAction("ACCEPTIBILITY", $dropTarget));
+		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget));
+		actions.add(new MakeNotAcceptableAction("GB Not Acceptable", $dropTarget));
+end
+
+rule "rule 16" #pref acceptibility US
+	when
+		$dropTarget: DescFact(this isUsMemberTypeOf AcceptabilityType.PREF, 
+							  context == Context.DROP_TARGET, vc == vc)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, vc == vc, component == $dropTarget.component);				   								   
+	then
+		actions.add(new MakeAcceptableAction("US Acceptable", $dropTarget));
+		actions.add(new MakeNotAcceptableAction("US Not Acceptable", $dropTarget));
+end
+
+rule "rule 17" #acceptable acceptability GB
+	when
+		$dropTarget: DescFact(this isGbMemberTypeOf AcceptabilityType.ACCEPTABLE, 
+							  context == Context.DROP_TARGET, vc == vc)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, vc == vc, component == $dropTarget.component);					   								   
+	then
+		actions.add(new MakePreferredAction("GB Preferred", $dropTarget));
+		actions.add(new MakeNotAcceptableAction("GB Not Acceptable", $dropTarget));
+end
+
+rule "rule 18" #aceptable acceptibility US
+	when
+		$dropTarget: DescFact(this isUsMemberTypeOf AcceptabilityType.ACCEPTABLE, 
+							  context == Context.DROP_TARGET, vc == vc)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, vc == vc, component == $dropTarget.component);				   								   
+	then
+		actions.add(new MakePreferredAction("US Preferred", $dropTarget));
+		actions.add(new MakeNotAcceptableAction("US Not Acceptable", $dropTarget));
+end
+
+rule "rule 19" #not acceptable acceptability GB
+	when
+		$dropTarget: DescFact(this isGbMemberTypeOf AcceptabilityType.NOT_ACCEPTABLE, 
+							  context == Context.DROP_TARGET, vc == vc)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, vc == vc, component == $dropTarget.component);					   								   
+	then
+		actions.add(new MakePreferredAction("GB Preferred", $dropTarget));
+		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget));
+end
+
+rule "rule 20" #not acceptable acceptibility US
+	when
+		$dropTarget: DescFact(this isUsMemberTypeOf AcceptabilityType.NOT_ACCEPTABLE, 
+							  context == Context.DROP_TARGET, vc == vc)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, vc == vc, component == $dropTarget.component);					   								   
+	then
+		actions.add(new MakePreferredAction("GB Preferred", $dropTarget));
+		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget));
 end
