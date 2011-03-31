@@ -47,7 +47,9 @@ import org.ihtsdo.tk.drools.IsKindOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsMemberOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsMissingDescForDialectEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsParentMemberOfEvaluatorDefinition;
+import org.ihtsdo.tk.drools.IsUsMemberTypeOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.SatisfiesConstraintEvaluatorDefinition;
+import org.ihtsdo.tk.drools.IsGbMemberTypeOfEvaluatorDefinition;
 
 /**
  *
@@ -63,7 +65,9 @@ public class DroolsExecutionManager {
     public static enum ExtraEvaluators {
 
         IS_KIND_OF, SAFISFIES_CONSTRAINT,
-        IS_MEMBER_OF, IS_PARENT_MEMBER_OF, IS_MISSING_DESC_FOR;
+        IS_MEMBER_OF, IS_PARENT_MEMBER_OF,
+        IS_MISSING_DESC_FOR, IS_GB_MEMBER_TYPE_OF,
+        IS_US_MEMBER_TYPE_OF;
     }
     private boolean failed = false;
     Collection<KnowledgePackage> kpkgs = null;
@@ -149,6 +153,18 @@ public class DroolsExecutionManager {
             builderConfig.setOption(EvaluatorOption.get(
                     IsMissingDescForDialectEvaluatorDefinition.IS_MISSING_DESC_FOR.getOperatorString(),
                     new IsMissingDescForDialectEvaluatorDefinition()));
+        }
+        
+        if (extraEvaluators.contains(ExtraEvaluators.IS_GB_MEMBER_TYPE_OF)) {
+            builderConfig.setOption(EvaluatorOption.get(
+                    IsGbMemberTypeOfEvaluatorDefinition.IS_GB_MEMBER_TYPE_OF.getOperatorString(),
+                    new IsGbMemberTypeOfEvaluatorDefinition()));
+        }
+        
+        if (extraEvaluators.contains(ExtraEvaluators.IS_US_MEMBER_TYPE_OF)) {
+            builderConfig.setOption(EvaluatorOption.get(
+                    IsUsMemberTypeOfEvaluatorDefinition.IS_US_MEMBER_TYPE_OF.getOperatorString(),
+                    new IsUsMemberTypeOfEvaluatorDefinition()));
         }
 
 
