@@ -61,24 +61,25 @@ public class MakeAcceptableAction extends AbstractAction {
 	                	if (refex.getCollectionNid() == evalRefsetNid) {
 	                		//make analog
 	                		componentVersion = (I_AmPart) refex;
-	                		/*AnalogBI newStuff;
+	                		AnalogBI newStuff = null;
 	                		for (PathBI ep : config.getEditingPathSet()) {
 	                            newStuff = componentVersion.makeAnalog(
 	                                    ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
 	                                    config.getDbConfig().getUserConcept().getNid(),
 	                                    ep.getConceptNid(),
 	                                    Long.MAX_VALUE);
-	                        }*/
+	                        }
+	                		RefexVersionBI newRefex = (RefexVersionBI) newStuff;
 	                		//test member type
-	                		if(RefexVersionBI.class.isAssignableFrom(refex.getClass())){
-		                		RefexVersionBI<?> rv = (RefexVersionBI<?>) refex;
+	                		if(RefexVersionBI.class.isAssignableFrom(newRefex.getClass())){
+		                		RefexVersionBI<?> rv = (RefexVersionBI<?>) newRefex;
 		                		if (RefexCnidVersionBI.class.isAssignableFrom(rv.getClass())){
 		                			RefexCnidVersionBI rcv = (RefexCnidVersionBI) rv;
 		                			RefexCnidAnalogBI rca = (RefexCnidAnalogBI) rcv;
 		                			
 		                			rca.setCnid1(Ts.get().getNidForUuids(AcceptabilityType.ACCEPTABLE.getLenient().getPrimUuid()));
 
-		                			I_GetConceptData concept = Terms.get().getConceptForNid(componentVersion.getNid());
+		                			I_GetConceptData concept = Terms.get().getConceptForNid(newRefex.getNid());
 		                            Terms.get().addUncommitted(concept);
 		                			}
 		                		}else{
@@ -96,24 +97,24 @@ public class MakeAcceptableAction extends AbstractAction {
 		                	if (refex.getCollectionNid() == evalRefsetNid) {
 		                		//test member type
 		                		componentVersion = (I_AmPart) refex;
-		                		/*AnalogBI newStuff = null;
+		                		AnalogBI newStuff = null;
 		                		for (PathBI ep : config.getEditingPathSet()) {
 	                               newStuff =  componentVersion.makeAnalog(
 	                                        ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
 	                                        config.getDbConfig().getUserConcept().getNid(),
 	                                        ep.getConceptNid(),
 	                                        Long.MAX_VALUE);
-	                            }
-		                		RefexVersionBI newRefex = (RefexVersionBI) newStuff;*/
-		                		if(RefexVersionBI.class.isAssignableFrom(refex.getClass())){
-			                		RefexVersionBI<?> rv = (RefexVersionBI<?>) refex;
+		                		}
+		                		RefexVersionBI newRefex = (RefexVersionBI) newStuff;
+		                		if(RefexVersionBI.class.isAssignableFrom(newRefex.getClass())){
+			                		RefexVersionBI<?> rv = (RefexVersionBI<?>) newRefex;
 			                		if (RefexCnidVersionBI.class.isAssignableFrom(rv.getClass())){
 			                			RefexCnidVersionBI rcv = (RefexCnidVersionBI) rv;
 			                			RefexCnidAnalogBI rca = (RefexCnidAnalogBI) rcv;
 			                			
 			                			rca.setCnid1(Ts.get().getNidForUuids(AcceptabilityType.ACCEPTABLE.getLenient().getPrimUuid()));
 
-			                			I_GetConceptData concept = Terms.get().getConceptForNid(componentVersion.getNid());
+			                			I_GetConceptData concept = Terms.get().getConceptForNid(newRefex.getNid());
 			                            Terms.get().addUncommitted(concept);
 			                			}
 			                		}else{

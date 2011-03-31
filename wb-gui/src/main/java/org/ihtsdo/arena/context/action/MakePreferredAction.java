@@ -17,6 +17,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.spec.AcceptabilityType;
 import org.ihtsdo.arena.spec.Refsets;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
@@ -44,7 +45,7 @@ public class MakePreferredAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
     	I_ConfigAceFrame config;
 		try {
-			I_AmPart componentVersion = (I_AmPart) desc;
+			I_AmPart componentVersion;
 			config = Terms.get().getActiveAceFrameConfig();
 			TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
 	                config.getViewCoordinate());
@@ -57,24 +58,27 @@ public class MakePreferredAction extends AbstractAction {
 	            if (refexes != null) {
 	                for (RefexChronicleBI refex : refexes) {
 	                	if (refex.getCollectionNid() == evalRefsetNid) {
+	                		//make analog
+	                		componentVersion = (I_AmPart) refex;
+	                		AnalogBI newStuff = null;
+	                		for (PathBI ep : config.getEditingPathSet()) {
+	                            newStuff = componentVersion.makeAnalog(
+	                                    ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+	                                    config.getDbConfig().getUserConcept().getNid(),
+	                                    ep.getConceptNid(),
+	                                    Long.MAX_VALUE);
+	                        }
+	                		RefexVersionBI newRefex = (RefexVersionBI) newStuff;
 	                		//test member type
-	                		if(RefexVersionBI.class.isAssignableFrom(refex.getClass())){
-		                		RefexVersionBI<?> rv = (RefexVersionBI<?>) refex;
-		                		
+	                		if(RefexVersionBI.class.isAssignableFrom(newRefex.getClass())){
+		                		RefexVersionBI<?> rv = (RefexVersionBI<?>) newRefex;
 		                		if (RefexCnidVersionBI.class.isAssignableFrom(rv.getClass())){
 		                			RefexCnidVersionBI rcv = (RefexCnidVersionBI) rv;
 		                			RefexCnidAnalogBI rca = (RefexCnidAnalogBI) rcv;
 		                			
 		                			rca.setCnid1(Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid()));
 
-		                			for (PathBI ep : config.getEditingPathSet()) {
-		                                componentVersion.makeAnalog(
-		                                        ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
-		                                        config.getDbConfig().getUserConcept().getNid(),
-		                                        ep.getConceptNid(),
-		                                        Long.MAX_VALUE);
-		                            }
-		                			I_GetConceptData concept = Terms.get().getConceptForNid(componentVersion.getNid());
+		                			I_GetConceptData concept = Terms.get().getConceptForNid(newRefex.getNid());
 		                            Terms.get().addUncommitted(concept);
 		                			}
 		                		}else{
@@ -91,23 +95,25 @@ public class MakePreferredAction extends AbstractAction {
 		                for (RefexChronicleBI refex : refexes) {
 		                	if (refex.getCollectionNid() == evalRefsetNid) {
 		                		//test member type
-		                		if(RefexVersionBI.class.isAssignableFrom(refex.getClass())){
-			                		RefexVersionBI<?> rv = (RefexVersionBI<?>) refex;
-			                		
+		                		componentVersion = (I_AmPart) refex;
+		                		AnalogBI newStuff = null;
+		                		for (PathBI ep : config.getEditingPathSet()) {
+	                               newStuff =  componentVersion.makeAnalog(
+	                                        ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+	                                        config.getDbConfig().getUserConcept().getNid(),
+	                                        ep.getConceptNid(),
+	                                        Long.MAX_VALUE);
+		                		}
+		                		RefexVersionBI newRefex = (RefexVersionBI) newStuff;
+		                		if(RefexVersionBI.class.isAssignableFrom(newRefex.getClass())){
+			                		RefexVersionBI<?> rv = (RefexVersionBI<?>) newRefex;
 			                		if (RefexCnidVersionBI.class.isAssignableFrom(rv.getClass())){
 			                			RefexCnidVersionBI rcv = (RefexCnidVersionBI) rv;
 			                			RefexCnidAnalogBI rca = (RefexCnidAnalogBI) rcv;
 			                			
 			                			rca.setCnid1(Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid()));
 
-			                			for (PathBI ep : config.getEditingPathSet()) {
-			                                componentVersion.makeAnalog(
-			                                        ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
-			                                        config.getDbConfig().getUserConcept().getNid(),
-			                                        ep.getConceptNid(),
-			                                        Long.MAX_VALUE);
-			                            }
-			                			I_GetConceptData concept = Terms.get().getConceptForNid(componentVersion.getNid());
+			                			I_GetConceptData concept = Terms.get().getConceptForNid(newRefex.getNid());
 			                            Terms.get().addUncommitted(concept);
 			                			}
 			                		}else{
@@ -131,5 +137,7 @@ public class MakePreferredAction extends AbstractAction {
 		} catch (PropertyVetoException ex) {
 			AceLog.getAppLog().alertAndLogException(ex);
 		}
+    	
+       
     }
 }
