@@ -11,12 +11,12 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 
 public class ConceptMembershipRefset extends ConceptRefset {
-	public ConceptMembershipRefset(I_GetConceptData languageMembershipRefset) throws Exception {
+	public ConceptMembershipRefset(I_GetConceptData conceptMembershipRefset) throws Exception {
 		super();
-		validateRefsetAsMembership(languageMembershipRefset.getConceptNid());
-		this.refsetConcept = languageMembershipRefset;
-		this.refsetName = languageMembershipRefset.toString();
-		this.refsetId = languageMembershipRefset.getConceptNid();
+		validateRefsetAsMembership(conceptMembershipRefset.getConceptNid());
+		this.refsetConcept = conceptMembershipRefset;
+		this.refsetName = conceptMembershipRefset.toString();
+		this.refsetId = conceptMembershipRefset.getConceptNid();
 		termFactory = Terms.get();
 	}
 
@@ -53,6 +53,8 @@ public class ConceptMembershipRefset extends ConceptRefset {
 			tf.newRelationship(UUID.randomUUID(), newMembershipConcept, typeRelConcept, memberTypeConcept, defining, refinability, 
 					current, 0, config);
 			
+			tf.addUncommittedNoChecks(newMembershipConcept);
+			
 			tf.commit();
 			
 			newConceptMembershipRefset = new ConceptMembershipRefset(newMembershipConcept);
@@ -75,13 +77,13 @@ public class ConceptMembershipRefset extends ConceptRefset {
 		}
 	}
 
-	private static void validateRefsetAsMembership(int languageRefsetId) throws Exception {
+	private static void validateRefsetAsMembership(int conceptRefsetId) throws Exception {
 		I_TermFactory tf = Terms.get();
-		I_GetConceptData languageRefsetConcept = tf.getConcept(languageRefsetId);
+		I_GetConceptData conceptRefsetConcept = tf.getConcept(conceptRefsetId);
 		I_GetConceptData refsetTypeConcept = tf.getConcept(
 				RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids());
 		I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-		Set<? extends I_GetConceptData> refsetTypes = getSourceRelTarget(languageRefsetConcept, config, 
+		Set<? extends I_GetConceptData> refsetTypes = getSourceRelTarget(conceptRefsetConcept, config, 
 				RefsetAuxiliary.Concept.REFSET_TYPE_REL.localize().getNid());
 		boolean isValid = false;
 		for (I_GetConceptData refsetType : refsetTypes) {
@@ -89,7 +91,7 @@ public class ConceptMembershipRefset extends ConceptRefset {
 				isValid = true;
 			}
 		}
-		if (!isValid) throw new Exception("Refset type must be a refset spec");
+		if (!isValid) throw new Exception("Refset type must be a concept membership refset");
 		return;
 	}
 
