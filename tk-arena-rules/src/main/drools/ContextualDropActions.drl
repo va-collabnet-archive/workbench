@@ -35,6 +35,7 @@ import org.ihtsdo.arena.context.action.UngroupRelAction;
 import org.ihtsdo.arena.context.action.UngroupRelGroupAction;
 import org.ihtsdo.arena.context.action.UpdateDescFromSpecAction;
 import org.ihtsdo.arena.context.action.ReplaceAction;
+import org.ihtsdo.arena.context.action.TESTAction;
 
 import org.ihtsdo.tk.drools.facts.ComponentFact;
 import org.ihtsdo.tk.drools.facts.ConAttrFact;
@@ -58,6 +59,7 @@ import org.ihtsdo.tk.example.binding.SnomedRelSpec;
 import org.ihtsdo.tk.example.binding.Taxonomies;
 import org.ihtsdo.tk.example.binding.TermAux;
 import org.ihtsdo.tk.example.binding.WbDescType;
+import org.ihtsdo.arena.spec.Refsets; 
 
 
 
@@ -70,8 +72,8 @@ rule "rule 1" #concept onto different SNOMED concept
 
    when
       (and
-         ($dropTarget: ConceptFact(this isKindOf Taxonomies.SNOMED, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropTarget: ConceptFact(this isKindOf Taxonomies.SNOMED, context == Context.DROP_TARGET, vc == vc))
+         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, vc == vc, component.time != Long.MAX_VALUE))
       )
    then
       actions.add(new CreateRelAction("Is-a", $dropTarget, Snomed.IS_A, $dropObject));
@@ -82,8 +84,8 @@ rule "rule 2" #concept onto SNOMED clinical finiding concpet
 
    when
       (and
-         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET, vc == vc))
+         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, vc == vc, component.time != Long.MAX_VALUE))
       )
    then
       actions.add(new CreateRelAction("finding-site", $dropTarget, Snomed.FINDING_SITE, $dropObject));
@@ -94,8 +96,8 @@ rule "rule 3" #concept onto NOT snomed concept
 
    when
       (and
-         ($dropTarget: ConceptFact(this not isKindOf Taxonomies.SNOMED, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropTarget: ConceptFact(this not isKindOf Taxonomies.SNOMED, context == Context.DROP_TARGET, vc == vc))
+         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, vc == vc, component.time != Long.MAX_VALUE))
       )
    then
       actions.add(new CreateRelAction("is-a", $dropTarget, TermAux.IS_A, $dropObject));
@@ -105,8 +107,8 @@ end
 rule "rule 4" #concept onto same concept
 
    when
-         $dropTarget: ComponentFact(context == Context.DROP_TARGET)
-         $dropObject: ComponentFact(context == Context.DROP_OBJECT, component == $dropTarget.component,
+         $dropTarget: ComponentFact(context == Context.DROP_TARGET, vc == vc)
+         $dropObject: ComponentFact(context == Context.DROP_OBJECT, vc == vc, component == $dropTarget.component,
             component.time != Long.MAX_VALUE)
          not $groupConcept: RelGroupFact(context == Context.DROP_TARGET)
 
@@ -121,7 +123,7 @@ rule "rule 5" #template onto concept
 
    when
       (and
-         ($dropTarget: ConceptFact(context == Context.DROP_TARGET))
+         ($dropTarget: ConceptFact(context == Context.DROP_TARGET, vc == vc))
          ($dropObject: DescSpecFact(context == Context.DROP_OBJECT))
       )
 
@@ -134,7 +136,7 @@ rule "rule 6" #rel template onto concept
 
    when
       (and
-         ($dropTarget: ConceptFact(context == Context.DROP_TARGET))
+         ($dropTarget: ConceptFact(context == Context.DROP_TARGET, vc == vc))
          ($dropObject: RelSpecFact(context == Context.DROP_OBJECT))
       )
 
@@ -145,8 +147,9 @@ end
 rule "rule 7" #rel onto rel (in group)
 
    when
-         $dropTarget: RelFact(context == Context.DROP_TARGET)
+         $dropTarget: RelFact(context == Context.DROP_TARGET, vc == vc)
          $dropObject: RelFact(context == Context.DROP_OBJECT,
+         					  vc == vc,
                               component == $dropTarget.component,
                               component.group != 0,
                               component.time != Long.MAX_VALUE)
@@ -160,8 +163,9 @@ rule "rule 8" #desc onto concept
 
    when
       (and
-         ($dropTarget: ConceptFact(context == Context.DROP_TARGET))
+         ($dropTarget: ConceptFact(context == Context.DROP_TARGET, vc == vc))
          ($dropObject: DescFact(context == Context.DROP_OBJECT,
+         						vc == vc,
                                 component.conceptNid != $dropTarget.component.conceptNid,
                                 component.time != Long.MAX_VALUE))
          (eval($dropObject.getDesc().getTypeNid() !=
@@ -175,8 +179,9 @@ end
 
 rule "rule 9" #rel (w/o group) onto rel group"
    when
-      $dropTarget: RelGroupFact(context == Context.DROP_TARGET)
+      $dropTarget: RelGroupFact(context == Context.DROP_TARGET, vc == vc)
       $dropObject: RelFact(context == Context.DROP_OBJECT,
+      					   vc == vc,
                            component.group == 0,
                            component.time != Long.MAX_VALUE)
 
@@ -187,9 +192,12 @@ end
 
 rule "rule 10" #rel w/group onto different rel group"
    when
-      $dropTarget: RelGroupFact(context == Context.DROP_TARGET)
-      $dropObject: RelFact(context == Context.DROP_OBJECT, component.group != 0, component.time != Long.MAX_VALUE,
-         component.conceptNid != $dropTarget.component.conceptNid ||
+      $dropTarget: RelGroupFact(context == Context.DROP_TARGET, vc == vc)
+      $dropObject: RelFact(context == Context.DROP_OBJECT,
+      					   vc == vc, 
+      					   component.group != 0,
+      					   component.time != Long.MAX_VALUE,
+      					   component.conceptNid != $dropTarget.component.conceptNid ||
          (component.conceptNid == $dropTarget.component.conceptNid && component.group != $dropTarget.component.relGroup))
    then
       actions.add(new MoveToRelGroupAction("move to rel group", $dropObject, $dropTarget));
@@ -199,8 +207,8 @@ end
 rule "rule 11" #rel onto concept"
 
    when
-   $dropTarget: ConceptFact(context == Context.DROP_TARGET)
-   $dropObject: RelFact(context == Context.DROP_OBJECT, component.conceptNid != $dropTarget.component.conceptNid,
+   $dropTarget: ConceptFact(context == Context.DROP_TARGET, vc == vc)
+   $dropObject: RelFact(context == Context.DROP_OBJECT, vc == vc, component.conceptNid != $dropTarget.component.conceptNid,
       component.time != Long.MAX_VALUE)
 
    then
@@ -215,8 +223,8 @@ rule "rule 11.1" #clone rel (in rel group) onto concept
 
    when
 
-   $dropTarget: ConceptFact(context == Context.DROP_TARGET)
-   $dropObject: RelFact(context == Context.DROP_OBJECT, component.group != 0,
+   $dropTarget: ConceptFact(context == Context.DROP_TARGET, vc == vc)
+   $dropObject: RelFact(context == Context.DROP_OBJECT, vc == vc, component.group != 0,
       component.conceptNid == $dropTarget.component.conceptNid, component.time != Long.MAX_VALUE)
 
    then
@@ -228,8 +236,9 @@ rule "rule 12" #rel group onto same concept"
 
    when
    #concept  origin
-   $dropTarget: ConceptFact(context == Context.DROP_TARGET)
-   $dropObject: RelGroupFact(context == Context.DROP_OBJECT, component.conceptNid == $dropTarget.component.conceptNid)
+   $dropTarget: ConceptFact(context == Context.DROP_TARGET, vc == vc)
+   $dropObject: RelGroupFact(context == Context.DROP_OBJECT, vc == vc, 
+   							 component.conceptNid == $dropTarget.component.conceptNid)
 
    then
    actions.add(new CloneRelGroupAction("clone rel group", $dropObject, $dropTarget));
@@ -243,8 +252,9 @@ rule "rule 12.1" #rel group onto concept"
 
    when
    #concept != origin
-   $dropTarget: ConceptFact(context == Context.DROP_TARGET)
-   $dropObject: RelGroupFact(context == Context.DROP_OBJECT, component.conceptNid != $dropTarget.component.conceptNid)
+   $dropTarget: ConceptFact(context == Context.DROP_TARGET, vc == vc)
+   $dropObject: RelGroupFact(context == Context.DROP_OBJECT, vc == vc,
+   							 component.conceptNid != $dropTarget.component.conceptNid)
 
    then
    actions.add(new CopyRelGroupAction("copy rel group", $dropObject, $dropTarget));
@@ -258,7 +268,7 @@ end
 rule "rule 13" #rel template onto rel group"
    when
    $dropObject: RelSpecFact(context == Context.DROP_TARGET)
-   $dropTarget: RelGroupFact(context == Context.DROP_OBJECT)
+   $dropTarget: RelGroupFact(context == Context.DROP_OBJECT, vc == vc)
 
 
    then
@@ -267,9 +277,18 @@ end
 
 rule "rule 14" #historical rel template onto rel"
 	when
-		$dropObject : RelFact(context == Context.DROP_OBJECT);
+		$dropObject : RelFact(context == Context.DROP_OBJECT, vc == vc);
 		$dropTarget : RelSpecFact(context == Context.DROP_TARGET);
 
 	then
 		actions.add(new ReplaceAction("Replace with", $dropObject, $dropTarget));
+end
+
+rule "rule 15" #select acceptibility
+	when
+		$dropTarget: DescFact(this isMemberOf Refsets.EN_GB_LANG, context == Context.DROP_TARGET, vc == vc)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, vc == vc, component == $dropTarget.component);
+								   								   
+	then
+		actions.add(new TESTAction("ACCEPTIBILITY", $dropTarget));
 end
