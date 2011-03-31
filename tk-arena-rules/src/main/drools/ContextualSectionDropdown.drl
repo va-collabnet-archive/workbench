@@ -75,7 +75,7 @@ global ViewCoordinate vc;
 rule "rule 4" #concept onto same concept
 
    when
-         $focus: ConceptFact(context == Context.FOCUS_CONCEPT, vc == vc)
+         $focus: ConceptFact(context == Context.FOCUS_CONCEPT)
 
    then
       # These are not meant to work. Just put up menu items as a starting example.
@@ -94,7 +94,7 @@ rule "add if not in refset: Non-Human refset"
 	when
  			$c: ConceptFact(this not isMemberOf Refsets.NON_HUMAN,
  							this not isParentMemberOf Refsets.NON_HUMAN,
- 							context == Context.FOCUS_CONCEPT, vc == vc)
+ 							context == Context.FOCUS_CONCEPT)
 
 	then 
 		conceptActions.add(actionFactory.make(
@@ -106,7 +106,7 @@ rule "remove if in refset: Non-Human refset"
 	when
 		$c: ConceptFact(this isMemberOf Refsets.NON_HUMAN,
  						this isParentMemberOf Refsets.NON_HUMAN,
- 						context == Context.FOCUS_CONCEPT, vc == vc)
+ 						context == Context.FOCUS_CONCEPT)
 	then 
 		conceptActions.add(actionFactory.make(
 			new File("plugins/remove-concept/remove_from_Non-Human_refset.bp")));
@@ -115,7 +115,7 @@ end
 rule "add if not in refset: VMP refset"
 	when 
 		$c: ConceptFact(this not isMemberOf Refsets.VMP, this isKindOf Snomed.PRODUCT,
-						 context == Context.FOCUS_CONCEPT, vc == vc)
+						 context == Context.FOCUS_CONCEPT)
 	then 
 		conceptActions.add(actionFactory.make(
 			new File("plugins/add-concept/add_to_VMP_refset.bp")));
@@ -125,7 +125,7 @@ end
 rule "remove if in refset: VMP refset"
 	when
 		$c:ConceptFact(this isMemberOf Refsets.VMP, this isKindOf Snomed.PRODUCT,
-						context == Context.FOCUS_CONCEPT, vc == vc)
+						context == Context.FOCUS_CONCEPT)
 	then 
 		conceptActions.add(actionFactory.make(
 			new File("plugins/remove-concept/remove_from_VMP_refset.bp")));
@@ -134,7 +134,7 @@ end
 rule "add if not in refset: VTM refset"
 	when 
 		$c: ConceptFact(this not isMemberOf Refsets.VTM, this isKindOf Snomed.PRODUCT,
-						 context == Context.FOCUS_CONCEPT, vc == vc)
+						 context == Context.FOCUS_CONCEPT)
 	then 
 		conceptActions.add(actionFactory.make(
 			new File("plugins/add-concept/add_to_VTM_refset.bp")));
@@ -144,7 +144,7 @@ end
 rule "remove if in refset: VTM refset"
 	when
 		$c: ConceptFact(this isMemberOf Refsets.VTM, this isKindOf Snomed.PRODUCT,
-						 context == Context.FOCUS_CONCEPT, vc == vc)
+						 context == Context.FOCUS_CONCEPT)
 	then 
 		conceptActions.add(actionFactory.make(
 			new File("plugins/remove-concept/remove_from_VTM_refset.bp")));

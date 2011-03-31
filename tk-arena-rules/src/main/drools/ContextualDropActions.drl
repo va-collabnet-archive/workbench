@@ -76,8 +76,8 @@ rule "rule 1" #concept onto different SNOMED concept
 
    when
       (and
-         ($dropTarget: ConceptFact(this isKindOf Taxonomies.SNOMED, context == Context.DROP_TARGET, vc == vc))
-         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, vc == vc, component.time != Long.MAX_VALUE))
+         ($dropTarget: ConceptFact(this isKindOf Taxonomies.SNOMED, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
       )
    then
       actions.add(new CreateRelAction("Is-a", $dropTarget, Snomed.IS_A, $dropObject));
@@ -88,8 +88,8 @@ rule "rule 2" #concept onto SNOMED clinical finiding concpet
 
    when
       (and
-         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET, vc == vc))
-         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, vc == vc, component.time != Long.MAX_VALUE))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
       )
    then
       actions.add(new CreateRelAction("finding-site", $dropTarget, Snomed.FINDING_SITE, $dropObject));
@@ -100,8 +100,8 @@ rule "rule 3" #concept onto NOT snomed concept
 
    when
       (and
-         ($dropTarget: ConceptFact(this not isKindOf Taxonomies.SNOMED, context == Context.DROP_TARGET, vc == vc))
-         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, vc == vc, component.time != Long.MAX_VALUE))
+         ($dropTarget: ConceptFact(this not isKindOf Taxonomies.SNOMED, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
       )
    then
       actions.add(new CreateRelAction("is-a", $dropTarget, TermAux.IS_A, $dropObject));
@@ -111,8 +111,8 @@ end
 rule "rule 4" #concept onto same concept
 
    when
-         $dropTarget: ComponentFact(context == Context.DROP_TARGET, vc == vc)
-         $dropObject: ComponentFact(context == Context.DROP_OBJECT, vc == vc, component == $dropTarget.component,
+         $dropTarget: ComponentFact(context == Context.DROP_TARGET)
+         $dropObject: ComponentFact(context == Context.DROP_OBJECT, component == $dropTarget.component,
             component.time != Long.MAX_VALUE)
          not $groupConcept: RelGroupFact(context == Context.DROP_TARGET)
 
@@ -127,7 +127,7 @@ rule "rule 5" #template onto concept
 
    when
       (and
-         ($dropTarget: ConceptFact(context == Context.DROP_TARGET, vc == vc))
+         ($dropTarget: ConceptFact(context == Context.DROP_TARGET))
          ($dropObject: DescSpecFact(context == Context.DROP_OBJECT))
       )
 
@@ -140,7 +140,7 @@ rule "rule 6" #rel template onto concept
 
    when
       (and
-         ($dropTarget: ConceptFact(context == Context.DROP_TARGET, vc == vc))
+         ($dropTarget: ConceptFact(context == Context.DROP_TARGET))
          ($dropObject: RelSpecFact(context == Context.DROP_OBJECT))
       )
 
@@ -151,9 +151,8 @@ end
 rule "rule 7" #rel onto rel (in group)
 
    when
-         $dropTarget: RelFact(context == Context.DROP_TARGET, vc == vc)
+         $dropTarget: RelFact(context == Context.DROP_TARGET)
          $dropObject: RelFact(context == Context.DROP_OBJECT,
-         					  vc == vc,
                               component == $dropTarget.component,
                               component.group != 0,
                               component.time != Long.MAX_VALUE)
@@ -167,9 +166,8 @@ rule "rule 8" #desc onto concept
 
    when
       (and
-         ($dropTarget: ConceptFact(context == Context.DROP_TARGET, vc == vc))
+         ($dropTarget: ConceptFact(context == Context.DROP_TARGET))
          ($dropObject: DescFact(context == Context.DROP_OBJECT,
-         						vc == vc,
                                 component.conceptNid != $dropTarget.component.conceptNid,
                                 component.time != Long.MAX_VALUE))
          (eval($dropObject.getDesc().getTypeNid() !=
@@ -183,9 +181,8 @@ end
 
 rule "rule 9" #rel (w/o group) onto rel group"
    when
-      $dropTarget: RelGroupFact(context == Context.DROP_TARGET, vc == vc)
+      $dropTarget: RelGroupFact(context == Context.DROP_TARGET)
       $dropObject: RelFact(context == Context.DROP_OBJECT,
-      					   vc == vc,
                            component.group == 0,
                            component.time != Long.MAX_VALUE)
 
@@ -196,9 +193,8 @@ end
 
 rule "rule 10" #rel w/group onto different rel group"
    when
-      $dropTarget: RelGroupFact(context == Context.DROP_TARGET, vc == vc)
+      $dropTarget: RelGroupFact(context == Context.DROP_TARGET)
       $dropObject: RelFact(context == Context.DROP_OBJECT,
-      					   vc == vc, 
       					   component.group != 0,
       					   component.time != Long.MAX_VALUE,
       					   component.conceptNid != $dropTarget.component.conceptNid ||
@@ -211,8 +207,8 @@ end
 rule "rule 11" #rel onto concept"
 
    when
-   $dropTarget: ConceptFact(context == Context.DROP_TARGET, vc == vc)
-   $dropObject: RelFact(context == Context.DROP_OBJECT, vc == vc, component.conceptNid != $dropTarget.component.conceptNid,
+   $dropTarget: ConceptFact(context == Context.DROP_TARGET)
+   $dropObject: RelFact(context == Context.DROP_OBJECT, component.conceptNid != $dropTarget.component.conceptNid,
       component.time != Long.MAX_VALUE)
 
    then
@@ -227,8 +223,8 @@ rule "rule 11.1" #clone rel (in rel group) onto concept
 
    when
 
-   $dropTarget: ConceptFact(context == Context.DROP_TARGET, vc == vc)
-   $dropObject: RelFact(context == Context.DROP_OBJECT, vc == vc, component.group != 0,
+   $dropTarget: ConceptFact(context == Context.DROP_TARGET)
+   $dropObject: RelFact(context == Context.DROP_OBJECT, component.group != 0,
       component.conceptNid == $dropTarget.component.conceptNid, component.time != Long.MAX_VALUE)
 
    then
@@ -240,8 +236,8 @@ rule "rule 12" #rel group onto same concept"
 
    when
    #concept  origin
-   $dropTarget: ConceptFact(context == Context.DROP_TARGET, vc == vc)
-   $dropObject: RelGroupFact(context == Context.DROP_OBJECT, vc == vc, 
+   $dropTarget: ConceptFact(context == Context.DROP_TARGET)
+   $dropObject: RelGroupFact(context == Context.DROP_OBJECT,  
    							 component.conceptNid == $dropTarget.component.conceptNid)
 
    then
@@ -256,8 +252,8 @@ rule "rule 12.1" #rel group onto concept"
 
    when
    #concept != origin
-   $dropTarget: ConceptFact(context == Context.DROP_TARGET, vc == vc)
-   $dropObject: RelGroupFact(context == Context.DROP_OBJECT, vc == vc,
+   $dropTarget: ConceptFact(context == Context.DROP_TARGET)
+   $dropObject: RelGroupFact(context == Context.DROP_OBJECT,
    							 component.conceptNid != $dropTarget.component.conceptNid)
 
    then
@@ -272,7 +268,7 @@ end
 rule "rule 13" #rel template onto rel group"
    when
    $dropObject: RelSpecFact(context == Context.DROP_TARGET)
-   $dropTarget: RelGroupFact(context == Context.DROP_OBJECT, vc == vc)
+   $dropTarget: RelGroupFact(context == Context.DROP_OBJECT)
 
 
    then
@@ -281,7 +277,7 @@ end
 
 rule "rule 14" #historical rel template onto rel"
 	when
-		$dropObject : RelFact(context == Context.DROP_OBJECT, vc == vc);
+		$dropObject : RelFact(context == Context.DROP_OBJECT);
 		$dropTarget : RelSpecFact(context == Context.DROP_TARGET);
 
 	then
@@ -291,59 +287,59 @@ end
 rule "rule 15" #pref acceptability GB
 	when
 		$dropTarget: DescFact(this isGbMemberTypeOf AcceptabilityType.PREF, 
-							  context == Context.DROP_TARGET, vc == vc)
-		$dropObject : DescFact(context == Context.DROP_OBJECT, vc == vc, component == $dropTarget.component);				   								   
+							  context == Context.DROP_TARGET)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
 	then
-		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget));
-		actions.add(new MakeNotAcceptableAction("GB Not Acceptable", $dropTarget));
+		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget, "en-gb"));
+		actions.add(new MakeNotAcceptableAction("GB Not Acceptable", $dropTarget, "en-gb"));
 end
 
 rule "rule 16" #pref acceptibility US
 	when
 		$dropTarget: DescFact(this isUsMemberTypeOf AcceptabilityType.PREF, 
-							  context == Context.DROP_TARGET, vc == vc)
-		$dropObject : DescFact(context == Context.DROP_OBJECT, vc == vc, component == $dropTarget.component);				   								   
+							  context == Context.DROP_TARGET)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
 	then
-		actions.add(new MakeAcceptableAction("US Acceptable", $dropTarget));
-		actions.add(new MakeNotAcceptableAction("US Not Acceptable", $dropTarget));
+		actions.add(new MakeAcceptableAction("US Acceptable", $dropTarget, "en-us"));
+		actions.add(new MakeNotAcceptableAction("US Not Acceptable", $dropTarget, "en-us"));
 end
 
 rule "rule 17" #acceptable acceptability GB
 	when
 		$dropTarget: DescFact(this isGbMemberTypeOf AcceptabilityType.ACCEPTABLE, 
-							  context == Context.DROP_TARGET, vc == vc)
-		$dropObject : DescFact(context == Context.DROP_OBJECT, vc == vc, component == $dropTarget.component);					   								   
+							  context == Context.DROP_TARGET)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);					   								   
 	then
-		actions.add(new MakePreferredAction("GB Preferred", $dropTarget));
-		actions.add(new MakeNotAcceptableAction("GB Not Acceptable", $dropTarget));
+		actions.add(new MakePreferredAction("GB Preferred", $dropTarget, "en-gb"));
+		actions.add(new MakeNotAcceptableAction("GB Not Acceptable", $dropTarget, "en-gb"));
 end
 
 rule "rule 18" #aceptable acceptibility US
 	when
 		$dropTarget: DescFact(this isUsMemberTypeOf AcceptabilityType.ACCEPTABLE, 
-							  context == Context.DROP_TARGET, vc == vc)
-		$dropObject : DescFact(context == Context.DROP_OBJECT, vc == vc, component == $dropTarget.component);				   								   
+							  context == Context.DROP_TARGET)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
 	then
-		actions.add(new MakePreferredAction("US Preferred", $dropTarget));
-		actions.add(new MakeNotAcceptableAction("US Not Acceptable", $dropTarget));
+		actions.add(new MakePreferredAction("US Preferred", $dropTarget, "en-us"));
+		actions.add(new MakeNotAcceptableAction("US Not Acceptable", $dropTarget, "en-us"));
 end
 
 rule "rule 19" #not acceptable acceptability GB
 	when
 		$dropTarget: DescFact(this isGbMemberTypeOf AcceptabilityType.NOT_ACCEPTABLE, 
-							  context == Context.DROP_TARGET, vc == vc)
-		$dropObject : DescFact(context == Context.DROP_OBJECT, vc == vc, component == $dropTarget.component);					   								   
+							  context == Context.DROP_TARGET)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);					   								   
 	then
-		actions.add(new MakePreferredAction("GB Preferred", $dropTarget));
-		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget));
+		actions.add(new MakePreferredAction("GB Preferred", $dropTarget, "en-gb"));
+		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget, "en-gb"));
 end
 
 rule "rule 20" #not acceptable acceptibility US
 	when
 		$dropTarget: DescFact(this isUsMemberTypeOf AcceptabilityType.NOT_ACCEPTABLE, 
-							  context == Context.DROP_TARGET, vc == vc)
-		$dropObject : DescFact(context == Context.DROP_OBJECT, vc == vc, component == $dropTarget.component);					   								   
+							  context == Context.DROP_TARGET)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);					   								   
 	then
-		actions.add(new MakePreferredAction("GB Preferred", $dropTarget));
-		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget));
+		actions.add(new MakePreferredAction("GB Preferred", $dropTarget, "en-us"));
+		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget, "en-us"));
 end
