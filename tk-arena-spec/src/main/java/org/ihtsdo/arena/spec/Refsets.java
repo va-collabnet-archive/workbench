@@ -14,6 +14,26 @@ public class Refsets {
 		new ConceptSpec("Refset Auxiliary Concept", 
 						UUID.fromString("1c698388-c309-3dfa-96f0-86248753fac5"));
 	
+	public static ConceptSpec EN_GB_LANG = 
+		new ConceptSpec("GB English Dialect Subset", 
+						UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd"));
+	
+	public static ConceptSpec EN_US_LANG = 
+		new ConceptSpec("US English Dialect Subset", 
+						UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6"));
+	
+	public static ConceptSpec NON_HUMAN = 
+		new ConceptSpec("Non-Human refset", 
+						UUID.fromString("3636a34d-cdf0-3f8f-a73e-c1e8f4c8cd2a"));
+	
+	public static ConceptSpec VMP = 
+		new ConceptSpec("VMP refset", 
+						UUID.fromString("0fcbf94e-2918-365a-8fb7-c29ed2c2189e"));
+	
+	public static ConceptSpec VTM = 
+		new ConceptSpec("VTM refset", 
+						UUID.fromString("e65ea362-72d4-3641-bfba-fe4429eea6f9"));
+	/*
 	public static ConceptSpec CONCEPT_INACTIVATION = 
 		new ConceptSpec("Concept inactivation refset", 
 						UUID.fromString("938fcf78-7c92-3bf6-b9d0-12ed3ca96198"));
@@ -30,14 +50,6 @@ public class Refsets {
 		new ConceptSpec("Description type refset", 
 						UUID.fromString("73ea5fc2-7840-3f53-945f-5f26473b2596"));
 	
-	public static ConceptSpec EN_GB_LANG = 
-		new ConceptSpec("en-GB language refset", 
-						UUID.fromString("bcb9242f-c54b-3593-81cf-a053e7c8a6f3"));
-	
-	public static ConceptSpec EN_US_LANG = 
-		new ConceptSpec("en-US language refset", 
-						UUID.fromString("cb69e372-155f-3488-8ea2-67d599bdbf66"));
-	
 	public static ConceptSpec HISTORICAL_ASSOC = 
 		new ConceptSpec("Historical association refset", 
 						UUID.fromString("4cbb35a9-72fb-3708-bb0a-56e217685f70"));
@@ -49,10 +61,6 @@ public class Refsets {
 	public static ConceptSpec MODULE_DEPENDENCY = 
 		new ConceptSpec("Module dependency refset", 
 						UUID.fromString("517a39da-81c1-3075-9908-8eba85a19a28"));
-	
-	public static ConceptSpec NON_HUMAN = 
-		new ConceptSpec("Non-Human refset", 
-						UUID.fromString("3636a34d-cdf0-3f8f-a73e-c1e8f4c8cd2a"));
 	
 	public static ConceptSpec REFERENCES = 
 		new ConceptSpec("References refset", 
@@ -68,13 +76,6 @@ public class Refsets {
 	
 	public static ConceptSpec SNOMEDID = 
 		new ConceptSpec("SNOMEDID refset", 
-						UUID.fromString("be81d0ca-bc50-31a8-a12a-b602957180e0"));
+						UUID.fromString("be81d0ca-bc50-31a8-a12a-b602957180e0"));*/
 	
-	public static ConceptSpec VMP = 
-		new ConceptSpec("VMP refset", 
-						UUID.fromString("0fcbf94e-2918-365a-8fb7-c29ed2c2189e"));
-	
-	public static ConceptSpec VTM = 
-		new ConceptSpec("VTM refset", 
-						UUID.fromString("e65ea362-72d4-3641-bfba-fe4429eea6f9"));
 }
