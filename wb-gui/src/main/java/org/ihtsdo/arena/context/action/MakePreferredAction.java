@@ -1,100 +1,135 @@
 package org.ihtsdo.arena.context.action;
 
 import java.awt.event.ActionEvent;
+import java.beans.PropertyVetoException;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.UUID;
+import java.util.Collection;
 
 import javax.swing.AbstractAction;
 
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.arena.spec.AcceptabilityType;
+import org.ihtsdo.arena.spec.Refsets;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
-import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.drools.facts.ComponentFact;
-import org.ihtsdo.tk.drools.facts.ConceptFact;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
+import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.drools.facts.DescFact;
 
 public class MakePreferredAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
-    ComponentVersionBI component;
+    DescriptionVersionBI desc;
+    String dialect;
 
-    public MakePreferredAction(String actionName, DescFact fact) {
+    public MakePreferredAction(String actionName, DescFact fact, String dialect) {
         super(actionName);
-        this.component = fact.getComponent();
+        this.desc = fact.getComponent();
+        this.dialect = dialect;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-    	System.out.println("######## IT WORKED ########");
-       /* try {
-            I_GetConceptData concept = Terms.get().getConceptForNid(component.getNid());
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-            Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
-            if (ConAttrVersionBI.class.isAssignableFrom(component.getClass())) {
-                throw new UnsupportedOperationException();
-            }
-            if (ConceptVersionBI.class.isAssignableFrom(component.getClass())) {
-                throw new UnsupportedOperationException();
-            }
-            if (DescriptionVersionBI.class.isAssignableFrom(component.getClass())) {
-                DescriptionVersionBI desc = (DescriptionVersionBI) component;
-                Terms.get().newDescription(UUID.randomUUID(), concept,
-                        desc.getLang(), desc.getText(), Terms.get().getConcept(desc.getTypeNid()),
-                        config, Terms.get().getConcept(desc.getStatusNid()), Long.MAX_VALUE);
-            }
-            if (RelationshipVersionBI.class.isAssignableFrom(component.getClass())) {
-                RelationshipVersionBI rel = (RelationshipVersionBI) component;
-                I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), concept,
-                        rel.getTypeNid(),
-                        rel.getDestinationNid(),
-                        rel.getCharacteristicNid(),
-                        rel.getRefinabilityNid(),
-                        rel.getGroup(),
-                        rel.getStatusNid(),
-                        config.getDbConfig().getUserConcept().getNid(),
-                        pathItr.next().getConceptNid(),
-                        Long.MAX_VALUE);
+    	I_ConfigAceFrame config;
+		try {
+			I_AmPart componentVersion = (I_AmPart) desc;
+			config = Terms.get().getActiveAceFrameConfig();
+			TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
+	                config.getViewCoordinate());
+			ViewCoordinate vc = config.getViewCoordinate();
+			Collection<? extends RefexChronicleBI> refexes =
+                desc.getCurrentRefexes(vc);
+		
+			if(dialect.equals("en-us")){
+				int evalRefsetNid = Ts.get().getNidForUuids(Refsets.EN_US_LANG.getLenient().getPrimUuid());
+	            if (refexes != null) {
+	                for (RefexChronicleBI refex : refexes) {
+	                	if (refex.getCollectionNid() == evalRefsetNid) {
+	                		//test member type
+	                		if(RefexVersionBI.class.isAssignableFrom(refex.getClass())){
+		                		RefexVersionBI<?> rv = (RefexVersionBI<?>) refex;
+		                		
+		                		if (RefexCnidVersionBI.class.isAssignableFrom(rv.getClass())){
+		                			RefexCnidVersionBI rcv = (RefexCnidVersionBI) rv;
+		                			RefexCnidAnalogBI rca = (RefexCnidAnalogBI) rcv;
+		                			
+		                			rca.setCnid1(Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid()));
 
-                while (pathItr.hasNext()) {
-                    newRel.makeAnalog(newRel.getStatusNid(), newRel.getAuthorNid(),
-                            pathItr.next().getConceptNid(), Long.MAX_VALUE);
-                }
-            }
+		                			for (PathBI ep : config.getEditingPathSet()) {
+		                                componentVersion.makeAnalog(
+		                                        ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+		                                        config.getDbConfig().getUserConcept().getNid(),
+		                                        ep.getConceptNid(),
+		                                        Long.MAX_VALUE);
+		                            }
+		                			I_GetConceptData concept = Terms.get().getConceptForNid(componentVersion.getNid());
+		                            Terms.get().addUncommitted(concept);
+		                			}
+		                		}else{
+			                		throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
+			                	}
+		                	}else{
+		                		throw new UnsupportedOperationException("Can't convert: RefexVersionBI");
+		                	}
+	                	}
+	                }
+	            }else if(dialect.equals("en-gb")){
+	            	int evalRefsetNid = Ts.get().getNidForUuids(Refsets.EN_GB_LANG.getLenient().getPrimUuid());
+		            if (refexes != null) {
+		                for (RefexChronicleBI refex : refexes) {
+		                	if (refex.getCollectionNid() == evalRefsetNid) {
+		                		//test member type
+		                		if(RefexVersionBI.class.isAssignableFrom(refex.getClass())){
+			                		RefexVersionBI<?> rv = (RefexVersionBI<?>) refex;
+			                		
+			                		if (RefexCnidVersionBI.class.isAssignableFrom(rv.getClass())){
+			                			RefexCnidVersionBI rcv = (RefexCnidVersionBI) rv;
+			                			RefexCnidAnalogBI rca = (RefexCnidAnalogBI) rcv;
+			                			
+			                			rca.setCnid1(Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid()));
 
-
-
-
-            if (I_AmPart.class.isAssignableFrom(component.getClass())) {
-                I_AmPart componentVersion = (I_AmPart) component;
-                for (PathBI ep : config.getEditingPathSet()) {
-                    componentVersion.makeAnalog(
-                            ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
-                            config.getDbConfig().getUserConcept().getNid(),
-                            ep.getConceptNid(),
-                            Long.MAX_VALUE);
-                }
-            }
-
-            Terms.get().addUncommitted(concept);
-
-
-        } catch (TerminologyException e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
-        } catch (IOException e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
-        }*/
-
+			                			for (PathBI ep : config.getEditingPathSet()) {
+			                                componentVersion.makeAnalog(
+			                                        ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+			                                        config.getDbConfig().getUserConcept().getNid(),
+			                                        ep.getConceptNid(),
+			                                        Long.MAX_VALUE);
+			                            }
+			                			I_GetConceptData concept = Terms.get().getConceptForNid(componentVersion.getNid());
+			                            Terms.get().addUncommitted(concept);
+			                			}
+			                		}else{
+				                		throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
+				                	}
+			                	}else{
+			                		throw new UnsupportedOperationException("Can't convert: RefexVersionBI");
+			                	}
+		                	}
+		                }
+				
+			}else{
+				throw new UnsupportedOperationException("Dialect not supported");
+			}
+			
+			
+		} catch (TerminologyException ex) {
+			AceLog.getAppLog().alertAndLogException(ex);
+		} catch (IOException ex) {
+			AceLog.getAppLog().alertAndLogException(ex);
+		} catch (PropertyVetoException ex) {
+			AceLog.getAppLog().alertAndLogException(ex);
+		}
     }
 }
