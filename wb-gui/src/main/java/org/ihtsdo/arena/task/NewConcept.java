@@ -68,6 +68,7 @@ import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.example.binding.WbDescType;
 import org.ihtsdo.util.swing.GuiUtil;
 
+import org.ihtsdo.arena.spec.AcceptabilityType;
 import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 
 /**
@@ -761,7 +762,7 @@ public class NewConcept extends PreviousNextOrCancel {
                     TK_REFSET_TYPE.CID,
                     componentNid,
                     Ts.get().getNidForUuids(gbUuid));
-            refexSpecGbFsn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(WbDescType.FULLY_SPECIFIED.getLenient().getPrimUuid()));
+            refexSpecGbFsn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid()));
             tc.construct(refexSpecGbFsn);
         } catch (IOException ex) {
             // TODO Auto-generated catch block
@@ -798,7 +799,7 @@ public class NewConcept extends PreviousNextOrCancel {
                     TK_REFSET_TYPE.CID,
                     componentNid,
                     Ts.get().getNidForUuids(gbUuid));
-            refexSpecGbPref.put(RefexProperty.CNID1, Ts.get().getNidForUuids(WbDescType.SYNONYM.getLenient().getPrimUuid()));
+            refexSpecGbPref.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid())); //WbDescType.SYNONYM.getLenient().getPrimUuid())
             
             tc.construct(refexSpecGbPref);
         } catch (IOException ex) {
@@ -837,7 +838,7 @@ public class NewConcept extends PreviousNextOrCancel {
                     componentNid,
                     Ts.get().getNidForUuids(usUuid));
             
-            refexSpecUsFsn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(WbDescType.FULLY_SPECIFIED.getLenient().getPrimUuid()));
+            refexSpecUsFsn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid()));
             
             tc.construct(refexSpecUsFsn);
         } catch (IOException ex) {
@@ -876,7 +877,7 @@ public class NewConcept extends PreviousNextOrCancel {
                     componentNid,
                     Ts.get().getNidForUuids(usUuid));
             
-            refexSpecUsPref.put(RefexProperty.CNID1, Ts.get().getNidForUuids(WbDescType.SYNONYM.getLenient().getPrimUuid()));
+            refexSpecUsPref.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid()));
             
             tc.construct(refexSpecUsPref);
         } catch (IOException ex) {
