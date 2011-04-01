@@ -20,7 +20,10 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.tapi.impl.LocalFixedTerminology;
+import org.dwfa.tapi.impl.MemoryTermServer;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
 import org.ihtsdo.etypes.EDescription;
@@ -144,15 +147,25 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
         	EConcept econcept = initializeEConcept();
 			
 			// Read Each Line of txt file
+        	int counter = 0;
+        	System.out.print("\n\n1-");
 			while (textScanner.hasNext())
 			{
 				row = ((String)textScanner.nextLine()).split("\t");
 				TkRefsetStrMember member = createTkMember(row);
+				
+				if (++counter % 100 == 0) {
+                    System.out.print('.');
+				}
 
+				if (counter % 8000 == 0) {
+                    System.out.print("\n" + counter + "-");
+				}
 				memberList.add(member);
 				conceptCounter++;
 			}
-
+			System.out.print("\n\n");
+			
 			// Finalize
 			econcept.setRefsetMembers(memberList);
 			econcept.writeExternal(eConceptDOS);
@@ -272,7 +285,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 			else
 				throw new Exception("Couldn't identify all values in refset row");
 		} catch (Exception e) {
-			AceLog.getAppLog().log(Level.WARNING, row.toString(), e);
+			AceLog.getAppLog().log(Level.WARNING, row.toString() + " with error: " + e.getMessage());
 		}
 
 		return "";
@@ -298,73 +311,23 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 	}
 
     private EConcept makeEConcept(UUID primUuid) throws IOException, TerminologyException {
-        EConcept testConcept = new EConcept();
-
-        // Create Concept Attributes
-        EConceptAttributes ca = new EConceptAttributes();
-        ca.additionalIds = null;
-        ca.primordialUuid = primUuid;
-        ca.setDefined(true);
-        ca.revisions = null;
-        ca.additionalIds = null;
-        ca.setPathUuid(snomedPathUid);
-        ca.setStatusUuid(currentStatus);
-        ca.setTime(Long.MAX_VALUE);
-
-        // Add a EDescription
-        List<TkDescription> descriptionList = new ArrayList<TkDescription>(1);
-        EDescription descFsn = new EDescription();
-        descFsn.additionalIds = null;
-        descFsn.primordialUuid = UUID.randomUUID();
-        descFsn.setConceptUuid(primUuid);
-        descFsn.setInitialCaseSignificant(false);
-        descFsn.setLang("en");
-        descFsn.setPathUuid(snomedPathUid);
-        descFsn.setStatusUuid(currentStatus);
-        descFsn.setTypeUuid(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getPrimoridalUid());
-        descFsn.setText("Workflow History (EConcept)");
-        descFsn.setTime(Long.MAX_VALUE);
-        descFsn.revisions = new ArrayList<TkDescriptionRevision>(1);
-        descriptionList.add(descFsn);
+        MemoryTermServer mts = new MemoryTermServer();
+        EConcept testConcept = null;
+        RefsetAuxiliary ra = new RefsetAuxiliary();
         
-        // add an EDescriptionVersion version
-        EDescription descPrefTerm = new EDescription();
-        descPrefTerm.additionalIds = null;
-        descPrefTerm.primordialUuid = UUID.randomUUID();
-        descPrefTerm.setConceptUuid(primUuid);
-        descPrefTerm.setInitialCaseSignificant(false);
-        descPrefTerm.setLang("en");
-        descPrefTerm.setPathUuid(snomedPathUid);
-        descPrefTerm.setStatusUuid(currentStatus);
-        descPrefTerm.setTypeUuid(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getPrimoridalUid());
-        descPrefTerm.setText("Workflow History");
-        descPrefTerm.setTime(Long.MAX_VALUE);
-        descPrefTerm.revisions = new ArrayList<TkDescriptionRevision>(1);
-        descriptionList.add(descPrefTerm);
+        try {
+            LocalFixedTerminology.setStore(mts);
+            mts.setGenerateIds(true);
 
-        // Add Relationships
-        List<TkRelationship> relList =  new ArrayList<TkRelationship>(1);
+            ra.addToMemoryTermServer(mts);
+			I_ConceptualizeLocally con = mts.getConcept(mts.getNid(primUuid));
+	    
+			testConcept = new EConcept(con, mts);
+        } catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-        ERelationship rel = new ERelationship();
-        rel.additionalIds = null;
-        rel.setAdditionalIdComponents(null);
-        rel.setC1Uuid(primUuid);
-        rel.setC2Uuid(ArchitectonicAuxiliary.Concept.WORKFLOW_CONCEPTS.getPrimoridalUid());
-        rel.setCharacteristicUuid(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getPrimoridalUid());
-        rel.setPathUuid(snomedPathUid); 
-        rel.setPrimordialComponentUuid(UUID.randomUUID());
-        rel.setRefinabilityUuid(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getPrimoridalUid());
-        rel.setRelGroup(0);
-        rel.setStatusUuid(currentStatus);
-        rel.setTime(Long.MAX_VALUE);
-        rel.setTypeUuid(ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid());
-        rel.revisions = new ArrayList<TkRelationshipRevision>(2);
-        relList.add(rel);
-        
-        testConcept.setConceptAttributes(ca);
-        testConcept.setDescriptions(descriptionList);
-        testConcept.setRelationships(relList);
-        
         return testConcept;
     }
     
@@ -385,6 +348,8 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
     		return ArchitectonicAuxiliary.Concept.MARY_GERARD.getPrimoridalUid();
     	} else if (modeler.equalsIgnoreCase("msmith")) {
     		return ArchitectonicAuxiliary.Concept.MIKE_SMITH.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("rturnbu")) {
+    		return ArchitectonicAuxiliary.Concept.ROBERT_TURNBULL.getPrimoridalUid();
     	} else if (modeler.equalsIgnoreCase("phought")) {
     		return ArchitectonicAuxiliary.Concept.PATRICIA_HOUGHTON.getPrimoridalUid();
     	} else if (modeler.equalsIgnoreCase("pbrottm")) {
