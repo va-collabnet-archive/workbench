@@ -491,13 +491,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
    @Override
    public void set(ConceptAttributes attr) throws IOException {
       if (attributes.get() != null) {
-     	 // TODO Added to avoid failure if attributes.get() returns not null
-     	 // Therefore, must find proper solution
-     	 // Happens with EConcept import with EConcept = workflow history refset only
-    	  if (!descriptions.get().iterator().next().getText().equalsIgnoreCase("workflow history refset"))
-    		  throw new IOException("Attributes is already set. Please modify the exisiting attributes object.");
-    	  else
-    		  return;
+    	  throw new IOException("Attributes is already set. Please modify the exisiting attributes object.");
       }
       if (!attributes.compareAndSet(null, attr)) {
          throw new IOException("Attributes is already set. Please modify the exisiting attributes object.");
