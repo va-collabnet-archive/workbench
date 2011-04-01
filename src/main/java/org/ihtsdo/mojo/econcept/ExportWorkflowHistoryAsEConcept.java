@@ -25,15 +25,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.tapi.impl.MemoryTermServer;
 import org.ihtsdo.etypes.EConcept;
-import org.ihtsdo.etypes.EConceptAttributes;
-import org.ihtsdo.etypes.EDescription;
-import org.ihtsdo.etypes.ERelationship;
-import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
-import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
-import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
-import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
 
 /**
@@ -173,7 +166,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 	        //Terms.get().close();
 
         } catch (Exception e) {
-            throw new MojoExecutionException(e.getMessage(), e);
+			AceLog.getAppLog().log(Level.WARNING, row.toString() + " with error: " + e.getMessage());
         }
     }
 
@@ -285,7 +278,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 			else
 				throw new Exception("Couldn't identify all values in refset row");
 		} catch (Exception e) {
-			AceLog.getAppLog().log(Level.WARNING, row.toString() + " with error: " + e.getMessage());
+			AceLog.getAppLog().log(Level.WARNING, "Error in processing row: " + row.toString() + " with error: " + e.getMessage());
 		}
 
 		return "";
@@ -324,8 +317,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 	    
 			testConcept = new EConcept(con, mts);
         } catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			AceLog.getAppLog().log(Level.WARNING, "Failed creating EConcept with error: " + e.getMessage());
 		}
 
         return testConcept;
