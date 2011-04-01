@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
@@ -146,8 +147,20 @@ public class DragPanelRel extends ComponentVersionDragPanel<RelationshipVersionB
         JButton collapseExpandButton = getCollapseExpandButton();
         gbc.weightx = 0;
         gbc.gridx++;
+        if (getRel().isInferred()) {
+            add(new JLabel(getInferredIcon()), gbc);
+            gbc.gridx++;
+        }
         add(collapseExpandButton, gbc);
         addSubPanels(gbc);
+    }
+    
+    ImageIcon inferredIcon;
+    private ImageIcon getInferredIcon() {
+        if (inferredIcon == null) {
+            inferredIcon = new ImageIcon(DragPanelRel.class.getResource("/16x16/plain/chrystal_ball.png"));
+        }
+        return inferredIcon;
     }
 
     @Override

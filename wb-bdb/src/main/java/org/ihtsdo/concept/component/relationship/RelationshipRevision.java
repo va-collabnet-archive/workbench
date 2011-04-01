@@ -292,4 +292,16 @@ public class RelationshipRevision
         ConceptComponent.addTextToBuffer(buf, primordialComponent.getDestinationNid());
         return buf.toString();
     }
+
+    @Override
+    public boolean isInferred() {
+        return getAuthorNid() == Relationship.getClassifierAuthorNid();
+    }
+
+    @Override
+    public boolean isStated() {
+        return !isInferred();
+    }
+    
+    
 }

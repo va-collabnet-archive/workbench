@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -40,13 +42,26 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
-import org.ihtsdo.tk.api.RelAssertionType;
 
 public class Relationship extends ConceptComponent<RelationshipRevision, Relationship>
         implements I_RelVersioned<RelationshipRevision>,
         I_RelPart<RelationshipRevision>,
         RelationshipAnalogBI<RelationshipRevision> {
 
+    private static int classifierAuthorNid = Integer.MIN_VALUE;
+    public static int getClassifierAuthorNid() {
+        if (classifierAuthorNid == Integer.MIN_VALUE) {
+            try {
+                classifierAuthorNid = org.dwfa.cement.ArchitectonicAuxiliary.Concept.SNOROCKET.localize().getNid();
+            } catch (IOException ex) {
+               throw new RuntimeException(ex);
+            } catch (TerminologyException ex) {
+                throw new RuntimeException(ex);
+           }
+        }
+        return classifierAuthorNid;
+    }
+    
     public class Version
             extends ConceptComponent<RelationshipRevision, Relationship>.Version
             implements I_RelTuple<RelationshipRevision>,
@@ -69,6 +84,19 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         @Override
         public int getC2Id() {
             return c2Nid;
+        }
+
+        @Override
+        public boolean isInferred() {
+            if (index >= 0) {
+                return revisions.get(index).isInferred();
+            }
+            return Relationship.this.isInferred();
+        }
+
+        @Override
+        public boolean isStated() {
+            return !isInferred();
         }
 
         @Override
@@ -891,4 +919,16 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         ConceptComponent.addTextToBuffer(buf, c2Nid);
         return buf.toString();
     }
+    
+    
+    @Override
+    public boolean isInferred() {
+        return getAuthorNid() == Relationship.getClassifierAuthorNid();
+    }
+
+    @Override
+    public boolean isStated() {
+        return !isInferred();
+    }
+
 }

@@ -833,6 +833,16 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
+        public boolean isInferred() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public boolean isStated() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
     }
 
     /**

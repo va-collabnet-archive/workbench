@@ -13,4 +13,9 @@ public interface RelationshipVersionBI<A extends RelationshipAnalogBI>
     public int getCharacteristicNid();
 
     public int getGroup();
+
+    public boolean isInferred();
+    
+    public boolean isStated();
+
 }

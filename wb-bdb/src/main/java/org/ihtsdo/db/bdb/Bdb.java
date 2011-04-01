@@ -327,14 +327,19 @@ public class Bdb {
             envConfig.setSharedCache(true);
             envConfig.setReadOnly(readOnly);
             envConfig.setAllowCreate(!readOnly);
+            /*
             int primeForLockTable =
                     SieveForPrimeNumbers.largestPrime(
                     Runtime.getRuntime().availableProcessors() - 1);
-            /*
+            
             envConfig.setConfigParam("je.lock.nLockTables", 
             Integer.toString(primeForLockTable));
+            envConfig.setConfigParam("je.log.faultReadSize", 
+                                     "4096");
              * 
              */
+            
+            
             bdbEnv = new Environment(directory, envConfig);
         } catch (EnvironmentLockedException e) {
             throw new IOException(e);
