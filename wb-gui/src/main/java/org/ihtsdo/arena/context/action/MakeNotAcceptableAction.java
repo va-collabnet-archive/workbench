@@ -60,71 +60,61 @@ public class MakeNotAcceptableAction extends AbstractAction {
 	                	if (refex.getCollectionNid() == evalRefsetNid) {
 	                		//make analog
 	                		componentVersion = (I_AmPart) refex;
-	                		AnalogBI newStuff = null;
+	                		AnalogBI analog = null;
 	                		for (PathBI ep : config.getEditingPathSet()) {
-	                            newStuff = componentVersion.makeAnalog(
+	                            analog = componentVersion.makeAnalog(
 	                                    ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
 	                                    config.getDbConfig().getUserConcept().getNid(),
 	                                    ep.getConceptNid(),
 	                                    Long.MAX_VALUE);
 	                        }
-	                		RefexVersionBI newRefex = (RefexVersionBI) newStuff;
+	                		RefexVersionBI<?> newRefex = (RefexVersionBI<?>) analog;
 	                		//test member type
-	                		if(RefexVersionBI.class.isAssignableFrom(newRefex.getClass())){
-		                		RefexVersionBI<?> rv = (RefexVersionBI<?>) newRefex;
-		                		if (RefexCnidVersionBI.class.isAssignableFrom(rv.getClass())){
-		                			RefexCnidVersionBI rcv = (RefexCnidVersionBI) rv;
+		                		if (RefexCnidVersionBI.class.isAssignableFrom(newRefex.getClass())){
+		                			RefexCnidVersionBI rcv = (RefexCnidVersionBI) newRefex;
 		                			RefexCnidAnalogBI rca = (RefexCnidAnalogBI) rcv;
 		                			
 		                			rca.setCnid1(Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
 
 		                			I_GetConceptData concept = Terms.get().getConceptForNid(newRefex.getNid());
 		                            Terms.get().addUncommitted(concept);
-		                			}
-		                		}else{
-			                		throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
-			                	}
-		                	}else{
-		                		throw new UnsupportedOperationException("Can't convert: RefexVersionBI");
+		                			}else{
+				                		throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
+				                	}
 		                	}
 	                	}
 	                }
 	            }else if(dialect.equals("en-gb")){
 	            	int evalRefsetNid = Ts.get().getNidForUuids(Refsets.EN_GB_LANG.getLenient().getPrimUuid());
-		            if (refexes != null) {
+	            	if (refexes != null) {
 		                for (RefexChronicleBI refex : refexes) {
 		                	if (refex.getCollectionNid() == evalRefsetNid) {
-		                		//test member type
+		                		//make analog
 		                		componentVersion = (I_AmPart) refex;
-		                		AnalogBI newStuff = null;
+		                		AnalogBI analog = null;
 		                		for (PathBI ep : config.getEditingPathSet()) {
-	                               newStuff =  componentVersion.makeAnalog(
-	                                        ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
-	                                        config.getDbConfig().getUserConcept().getNid(),
-	                                        ep.getConceptNid(),
-	                                        Long.MAX_VALUE);
-		                		}
-		                		RefexVersionBI newRefex = (RefexVersionBI) newStuff;
-		                		if(RefexVersionBI.class.isAssignableFrom(newRefex.getClass())){
-			                		RefexVersionBI<?> rv = (RefexVersionBI<?>) newRefex;
-			                		if (RefexCnidVersionBI.class.isAssignableFrom(rv.getClass())){
-			                			RefexCnidVersionBI rcv = (RefexCnidVersionBI) rv;
+		                            analog = componentVersion.makeAnalog(
+		                                    ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+		                                    config.getDbConfig().getUserConcept().getNid(),
+		                                    ep.getConceptNid(),
+		                                    Long.MAX_VALUE);
+		                        }
+		                		RefexVersionBI<?> newRefex = (RefexVersionBI<?>) analog;
+		                		//test member type
+			                		if (RefexCnidVersionBI.class.isAssignableFrom(newRefex.getClass())){
+			                			RefexCnidVersionBI rcv = (RefexCnidVersionBI) newRefex;
 			                			RefexCnidAnalogBI rca = (RefexCnidAnalogBI) rcv;
 			                			
 			                			rca.setCnid1(Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
 
 			                			I_GetConceptData concept = Terms.get().getConceptForNid(newRefex.getNid());
 			                            Terms.get().addUncommitted(concept);
-			                			}
-			                		}else{
-				                		throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
-				                	}
-			                	}else{
-			                		throw new UnsupportedOperationException("Can't convert: RefexVersionBI");
+			                			}else{
+					                		throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
+					                	}
 			                	}
 		                	}
 		                }
-				
 			}else{
 				throw new UnsupportedOperationException("Dialect not supported");
 			}
@@ -140,6 +130,5 @@ public class MakeNotAcceptableAction extends AbstractAction {
     	
        
     }
-
-
+ 
 }
