@@ -38,7 +38,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.spec.ConceptSpec;
-
+ 
 /**
  *
  * @author kec
