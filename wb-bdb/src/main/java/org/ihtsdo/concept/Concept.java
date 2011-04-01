@@ -100,7 +100,8 @@ import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
-public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI {
+public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI,
+        Comparable<Concept> {
 
    public static ReferenceType refType = ReferenceType.WEAK;
    public static ConcurrentReferenceHashMap<Integer, Concept> conceptsCRHM =
@@ -115,6 +116,11 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
    
     static {
         Bdb.addMemoryMonitorListener(new ConceptLowMemoryListener());
+    }
+
+    @Override
+    public int compareTo(Concept o) {
+        return getNid() - o.getNid();
     }
 
     public static class ConceptLowMemoryListener implements LowMemoryListener {
