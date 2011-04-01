@@ -19,7 +19,7 @@ public  class SemanticAreaSearchRefsetSearcher extends WorkflowRefsetSearcher
 		refset = new SemanticAreaSearchRefset();
 		
 		setRefsetName(refset.getRefsetName());
-		setRefsetId(refset.getRefsetId(), true);
+		setRefsetId(refset.getRefsetId());
 	}
 
 	

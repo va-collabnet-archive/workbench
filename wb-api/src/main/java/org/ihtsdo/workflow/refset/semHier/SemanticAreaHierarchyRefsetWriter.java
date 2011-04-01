@@ -22,12 +22,11 @@ public class SemanticAreaHierarchyRefsetWriter extends WorkflowRefsetWriter {
 	private final I_GetConceptData identifiedReferencedComponent = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SEMANTIC_PARENT_REL.getUids());
 	
 	public SemanticAreaHierarchyRefsetWriter() throws IOException, TerminologyException {
-		super(false);
 		refset = new SemanticAreaHierarchyRefset();
 		fields = new SemanticAreaHierarchyRSFields();
 
 		setRefsetName(refset.getRefsetName());
-		setRefsetId(refset.getRefsetId(), true);
+		setRefsetId(refset.getRefsetId());
 	}
 	
 	public void setReferencedComponentId(UUID uid) {
@@ -69,7 +68,7 @@ public class SemanticAreaHierarchyRefsetWriter extends WorkflowRefsetWriter {
 			try {
 				setReferencedComponentId(uid);
 			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: " + uid);
+		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: " + uid + " with error: " + e.getMessage());
 			}
 		}
 
@@ -77,7 +76,7 @@ public class SemanticAreaHierarchyRefsetWriter extends WorkflowRefsetWriter {
 			try {
 				return Terms.get().getConcept(getReferencedComponentId());
 			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId");
+		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId with error: " + e.getMessage());
 			}
 			
 			return null;
@@ -135,7 +134,6 @@ public class SemanticAreaHierarchyRefsetWriter extends WorkflowRefsetWriter {
 				str.append("\nReferencedComponentId:" + getReferencedComponentId());
 				str.append("\nparentSemanticArea:" + parentSemanticArea);
 				str.append("\nchildSemanticArea:" + childSemanticArea);
-				AceLog.getAppLog().log(Level.WARNING, "Failure in updating Semantic Area Hierarchy Refset for concept: " + str.toString());
 			}
 			
 			return retVal;

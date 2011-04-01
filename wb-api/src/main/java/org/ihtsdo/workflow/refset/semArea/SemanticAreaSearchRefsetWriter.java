@@ -20,12 +20,11 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetWriter;
 public class SemanticAreaSearchRefsetWriter extends WorkflowRefsetWriter 
 {
 	public SemanticAreaSearchRefsetWriter() throws IOException, TerminologyException {
-		super(false);
 		refset = new SemanticAreaSearchRefset();
 		fields = new SemanticAreaSearchRSFields();
 	
 		setRefsetName(refset.getRefsetName());
-		setRefsetId(refset.getRefsetId(), true);
+		setRefsetId(refset.getRefsetId());
 	}
 	
 	public void setReferencedComponentId(UUID uid) {
@@ -49,7 +48,7 @@ public class SemanticAreaSearchRefsetWriter extends WorkflowRefsetWriter
 		try {
 			return Terms.get().getConcept(getReferencedComponentUid());
 		} catch (Exception e) {
-	    	AceLog.getAppLog().log(Level.SEVERE, "Unable to get the Category (refCompId) from the SemanticAreaSearch Refset");
+	    	AceLog.getAppLog().log(Level.SEVERE, "Unable to get the Category (refCompId) from the SemanticAreaSearch Refset with error: " + e.getMessage());
 		}
 		
 		return null;
@@ -73,7 +72,7 @@ public class SemanticAreaSearchRefsetWriter extends WorkflowRefsetWriter
 			try {
 				setReferencedComponentId(uid);
 			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: " + uid);
+		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: " + uid + " with error: " + e.getMessage());
 			}
 		}
 		
@@ -89,7 +88,7 @@ public class SemanticAreaSearchRefsetWriter extends WorkflowRefsetWriter
 			try {
 				return Terms.get().getConcept(getReferencedComponentId());
 			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId");
+		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId with error: " + e.getMessage());
 			}
 			
 			return null;
@@ -132,14 +131,9 @@ public class SemanticAreaSearchRefsetWriter extends WorkflowRefsetWriter
 			if (!retVal)
 			{
 				StringBuffer str = new StringBuffer();
-				try {
-					str.append("\nError in adding to Semantic Area Search Refset");
-					str.append("\nReferencedComponentId:" + getReferencedComponent().getInitialText());
-					str.append("\nsearchTerm:" + searchTerm);
-					AceLog.getAppLog().log(Level.WARNING, "Failure in updating Semantic Area Search Refset for concept: " + str.toString());
-				} catch (Exception e) {
-					AceLog.getAppLog().log(Level.WARNING, "Failure in updating Semantic Area Search Refset for concept: " + str.toString());
-				}
+				str.append("\nError in adding to Semantic Area Search Refset");
+				str.append("\nReferencedComponentId:" + getReferencedComponent().getPrimUuid());
+				str.append("\nsearchTerm:" + searchTerm);
 			}
 			
 			return retVal;

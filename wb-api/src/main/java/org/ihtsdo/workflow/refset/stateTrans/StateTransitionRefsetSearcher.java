@@ -30,7 +30,7 @@ public  class StateTransitionRefsetSearcher extends WorkflowRefsetSearcher
 		refset = new StateTransitionRefset();
 		
 		setRefsetName(refset.getRefsetName());
-		setRefsetId(refset.getRefsetId(), true);
+		setRefsetId(refset.getRefsetId());
 	}
 
 	// From Category and InitialState
@@ -84,7 +84,7 @@ public  class StateTransitionRefsetSearcher extends WorkflowRefsetSearcher
 			StringBuffer str = new StringBuffer();
 			str.append("\ntestInitState: " + matchInitialStateNid);
 			str.append("\nOn Row: " + props.getStringValue());
-			AceLog.getAppLog().log(Level.WARNING, str.toString(), new Exception("Failure in updating Editor Category Refset"));
+			AceLog.getAppLog().log(Level.WARNING, str.toString() + " with error: " + e.getMessage());
 		}
 		
 		return results;

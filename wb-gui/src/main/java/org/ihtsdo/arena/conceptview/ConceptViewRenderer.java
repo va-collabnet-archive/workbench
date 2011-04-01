@@ -23,8 +23,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -46,8 +50,6 @@ import javax.swing.SwingConstants;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
-import org.drools.logger.KnowledgeRuntimeLogger;
-import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -65,25 +67,17 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.workflow.WorkflowHandlerBI;
 import org.ihtsdo.tk.api.workflow.WorkflowHistoryJavaBeanBI;
-import org.ihtsdo.tk.example.binding.Taxonomies;
 import org.ihtsdo.util.swing.GuiUtil;
 import org.ihtsdo.workflow.WorkflowHandler;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetSearcher;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
+import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 
 import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import org.ihtsdo.arena.context.action.BpActionFactoryNoPanel;
-import org.ihtsdo.tk.drools.facts.ConceptFact;
-import org.ihtsdo.tk.drools.facts.Context;
-import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 
 /**
  * @author Administrator
@@ -311,7 +305,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 	                    availableActions = wfHandler.getAllAvailableWorkflowActionUids();
 	                    possibleActions = wfHandler.getAvailableWorkflowActions(concept);
 	                } catch (Exception e1) {
-	                	AceLog.getAppLog().log(Level.WARNING, "Error in setting up Workflow");
+	                	AceLog.getAppLog().log(Level.WARNING, "Error in setting up Workflow with error: " + e1.getMessage());
 	                } 
 
                     capWorkflowSetup(capWorkflow, availableActions, wfBpFile, wfHandler, possibleActions);
@@ -421,27 +415,29 @@ public class ConceptViewRenderer extends JLayeredPane {
 	                                WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
 	                                WorkflowHistoryJavaBean bean = new WorkflowHistoryJavaBean();
 	
+	                                bean.setConcept(selectedConcept.getUids().iterator().next());
+
 	                                bean.setPath(Terms.get().nidToUuid(selectedConcept.getConceptAttributes().getPathNid()));
 	                                bean.setModeler(WorkflowHelper.getCurrentModeler().getPrimUuid());
-	                                bean.setConcept(selectedConcept.getUids().iterator().next());
 	                                bean.setFSN(WorkflowHelper.identifyFSN(selectedConcept));
+	                                bean.setAction(selectedActionUid);
+	                                bean.setState(currConcept.getPrimUuid());
+	                                bean.setOverridden(true);
+	                                bean.setAutoApproved(false);
+	                                
 	                                java.util.Date today = new java.util.Date();
 	                                bean.setWorkflowTime(today.getTime());
 	
 	                                WorkflowHistoryJavaBean latestBean = searcher.getLatestWfHxJavaBeanForConcept(selectedConcept);
-	
 	    				            if (latestBean == null || !WorkflowHelper.isEndWorkflowAction(Terms.get().getConcept(latestBean.getAction())))
 	                                    bean.setWorkflowId(UUID.randomUUID());
 	    				            else
 	                                    bean.setWorkflowId(latestBean.getWorkflowId());
 	
-	                                bean.setOverridden(true);
-	                                bean.setAction(selectedActionUid);
-	                                bean.setState(currConcept.getPrimUuid());
 	                                writer.updateWorkflowHistory(bean);
 	                            }
 	                        } catch (Exception e1) {
-	                        	AceLog.getAppLog().log(Level.WARNING, "Error in Executing Override in Workflow");
+	                        	AceLog.getAppLog().log(Level.WARNING, "Error in Executing Override in Workflow with error: " + e1.getMessage());
 	                        }
 	                    }
                     });
@@ -499,7 +495,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 		                                            updateOopsButton(settings.getConcept());
 		                                            workflowToggleButton.doClick();
 		                                        } catch (Exception e1) {
-		                                        	AceLog.getAppLog().log(Level.WARNING, "Error Advancing Workflow");
+		                                        	AceLog.getAppLog().log(Level.WARNING, "Error Advancing Workflow with error: " + e1.getMessage());
 		                                        }
 		
 		                                    }
@@ -517,7 +513,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                             }
                         }
                     } catch (Exception e) {
-                    	AceLog.getAppLog().log(Level.WARNING, "Error in setting up Workflow");
+                    	AceLog.getAppLog().log(Level.WARNING, "Error in setting up Workflow with error: " + e.getMessage());
                     }
                 }
             }
@@ -557,7 +553,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                                 }
                             }
                         } catch (Exception e1) {
-                        	AceLog.getAppLog().log(Level.WARNING, "Error in performing Undo on Workflow");
+                        	AceLog.getAppLog().log(Level.WARNING, "Error in performing Undo on Workflow with error: " + e1.getMessage());
                         }
                     }
                 });
@@ -703,7 +699,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                 oopsButton.setEnabled(true);
             }
         } catch (Exception e) {
-        	AceLog.getAppLog().log(Level.WARNING, "Error in finding Undo-Button's State");
+        	AceLog.getAppLog().log(Level.WARNING, "Error in finding Undo-Button's State with error: " + e.getMessage());
         }
     }
 

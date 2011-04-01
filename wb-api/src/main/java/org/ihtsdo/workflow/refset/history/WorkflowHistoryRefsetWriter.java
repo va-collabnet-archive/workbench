@@ -313,7 +313,6 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 				str.append("\nautoApproved:" + autoApproved);
 				str.append("\nworkflowTime:" + workflowTime);
 				str.append("\neffectiveTime:" + effectiveTime);
-				AceLog.getAppLog().log(Level.WARNING, "Failure in updating Workflow History Refset for concept: " + str.toString());
 			}
 			
 			return retVal;
@@ -374,12 +373,12 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
     	setAutoApproved(update.getAutoApproved());
     	setOverride(update.getOverridden());
     	
+    	// Add new timestamp for new version (in case this row is retired for WFid)
     	java.util.Date today = new java.util.Date();
-        setEffectiveTime(Long.MAX_VALUE);
- 
-        // Add new timestamp for new version (in case this row is retired for WFid)
 		setWorkflowTime(today.getTime());
         
+        setEffectiveTime(Long.MAX_VALUE);
+
         WorkflowHistoryRefsetWriter.lockMutex();
         addMember();
         Terms.get().addUncommitted(this.getRefsetConcept());

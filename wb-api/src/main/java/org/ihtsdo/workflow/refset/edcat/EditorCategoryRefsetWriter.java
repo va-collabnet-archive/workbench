@@ -21,12 +21,11 @@ public class EditorCategoryRefsetWriter extends WorkflowRefsetWriter
 {
 	public EditorCategoryRefsetWriter() throws IOException, TerminologyException 
 	{
-		super(false);
 		refset = new EditorCategoryRefset();
 		fields = new EditorCategoryRSFields();
 
 		setRefsetName(refset.getRefsetName());
-		setRefsetId(refset.getRefsetId(), true);
+		setRefsetId(refset.getRefsetId());
 	}
 	
 	public void setReferencedComponentId(UUID uid) {
@@ -154,7 +153,6 @@ public class EditorCategoryRefsetWriter extends WorkflowRefsetWriter
 				str.append("\nReferencedComponentId:" + getReferencedComponentId());
 				str.append("\nsemanticArea:" + semanticArea);
 				str.append("\neditorCategory:" + editorCategory);
-				AceLog.getAppLog().log(Level.WARNING, "Failure in updating Editor Category Refset for concept: " + str.toString());
 			}
 			
 			return retVal;

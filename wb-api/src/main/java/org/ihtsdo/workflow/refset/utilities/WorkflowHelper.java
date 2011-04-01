@@ -1,10 +1,13 @@
 package org.ihtsdo.workflow.refset.utilities;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,7 +33,6 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.example.binding.Taxonomies;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
@@ -57,11 +59,17 @@ public class WorkflowHelper {
 	private static int isARelNid = 0;
 	private static Set<UUID> beginWorkflowActions = null;
 	private static UUID endWorkflowActionUid = null;
+	private static Date latestReleaseTimestamp;
 
 	public static final int EARLIEST_WORKFLOW_HISTORY_YEAR = 2007;
 	public static final int EARLIEST_WORKFLOW_HISTORY_MONTH = Calendar.OCTOBER; 
 	public static final int EARLIEST_WORKFLOW_HISTORY_DATE = 19;
 	private static final String unrecognizedLoginMessage = "Login is unrecognlized.  You will be defaulted to generic-user workflow permissions";
+	
+	public static final String LATEST_RELEASE_STRING = "01/01/2010";
+    private static final DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+    
+;
 
 	public WorkflowHelper() {
 		initialize();
@@ -70,21 +78,27 @@ public class WorkflowHelper {
 	public static void initialize() {
 
 		try {
+		    latestReleaseTimestamp = formatter.parse(LATEST_RELEASE_STRING);
 			currentNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid());
 			isARelNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid());
 		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.SEVERE, "Error in creating WF Class WorkflowHelper", e);
+        	AceLog.getAppLog().log(Level.SEVERE, "Error in creating WF Class WorkflowHelper with error: " + e.getMessage());
 		}
 	}
 
 	
+	public static Date getLatestReleaseTimestamp() {
+		return latestReleaseTimestamp;
+	}
+
+
 	private static class WfHxConceptComparer implements Comparator<I_GetConceptData> {
 		@Override
 		public int compare(I_GetConceptData o1, I_GetConceptData o2) {
 			try {
 				return (o1.getInitialText().toLowerCase().compareTo(o2.getInitialText().toLowerCase()));
 			} catch (IOException e) {
-	        	AceLog.getAppLog().log(Level.SEVERE, "Error in creating WF Class WfHxConceptComparer", e);
+	        	AceLog.getAppLog().log(Level.SEVERE, "Error in creating WF Class WfHxConceptComparer with error: " + e.getMessage());
 			}
 			return -1;
 		}
@@ -96,7 +110,7 @@ public class WorkflowHelper {
 			try {
 				return (Terms.get().getConcept(o1).getInitialText().toLowerCase().compareTo(Terms.get().getConcept(o2).getInitialText().toLowerCase()));
 			} catch (Exception e) {
-	        	AceLog.getAppLog().log(Level.SEVERE, "Error in creating WF Class WfHxUidConceptComparer", e);
+	        	AceLog.getAppLog().log(Level.SEVERE, "Error in creating WF Class WfHxUidConceptComparer with error: " + e.getMessage());
 			}
 			return -1;
 		}
@@ -117,7 +131,7 @@ public class WorkflowHelper {
 			    }
 			}
 		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.SEVERE, "Error in identifying current editor", e);
+        	AceLog.getAppLog().log(Level.SEVERE, "Error in identifying current editor with error: " + e.getMessage());
 		}
 
         return "";
@@ -133,7 +147,7 @@ public class WorkflowHelper {
 		   		}
 	   		}
 		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.SEVERE, "Error in identifying current concept's FSN", e);
+        	AceLog.getAppLog().log(Level.SEVERE, "Error in identifying current concept's FSN with error: " + e.getMessage());
 		}
 
    		return "";
@@ -169,7 +183,7 @@ public class WorkflowHelper {
 			Terms.get().commit();
 
 		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.SEVERE, "Error in retiring workflow history row: " + bean.toString(), e);
+        	AceLog.getAppLog().log(Level.SEVERE, "Error in retiring workflow history row: " + bean.toString() + "  with error: " + e.getMessage());
 		}
 		WorkflowHistoryRefsetWriter.unLockMutex();
 	}
@@ -193,7 +207,7 @@ public class WorkflowHelper {
 		    	modelers.put(getLoginId(editor), editor);
 			}
 		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.WARNING, "Error in updating modelers", e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error in updating modelers with error: " + e.getMessage());
 		}
     }
 	
@@ -253,7 +267,7 @@ public class WorkflowHelper {
 					}
 				}
 			} catch (Exception e ) {
-            	AceLog.getAppLog().log(Level.WARNING, "Unable to lookup modeler: " + name, e);
+            	AceLog.getAppLog().log(Level.WARNING, "Unable to lookup modeler: " + name + " with error: " + e.getMessage());
 			}
 
 			return defaultModeler;
@@ -283,7 +297,7 @@ public class WorkflowHelper {
 				}
 			}
 		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.WARNING, "Error in identifying lead modeler", e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error in identifying lead modeler with error: " + e.getMessage());
 		}
 		
 		return leadModeler;
@@ -299,8 +313,9 @@ public class WorkflowHelper {
     	WorkflowHistoryJavaBean bean = new WorkflowHistoryJavaBean();
     	WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
 
-    	bean.setWorkflowId(refset.getWorkflowId(fieldValues));
     	bean.setConcept(refComponentId);
+
+    	bean.setWorkflowId(refset.getWorkflowId(fieldValues));
     	bean.setState(refset.getStateUid(fieldValues));
     	bean.setPath(refset.getPathUid(fieldValues));
     	bean.setModeler(refset.getModelerUid(fieldValues));
@@ -328,7 +343,7 @@ public class WorkflowHelper {
 
     		Terms.get().getActiveAceFrameConfig().setWorkflowRoles(sortedRoles);
     	} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.SEVERE, "Error in updating workflow user roles", e);
+        	AceLog.getAppLog().log(Level.SEVERE, "Error in updating workflow user roles with error: " + e.getMessage());
     	}
     }
 
@@ -345,7 +360,7 @@ public class WorkflowHelper {
 
     		Terms.get().getActiveAceFrameConfig().setWorkflowStates(sortedStates);
     	} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.SEVERE, "Error in updating workflow states", e);
+        	AceLog.getAppLog().log(Level.SEVERE, "Error in updating workflow states with error: " + e.getMessage());
     	}
     }
 
@@ -384,7 +399,7 @@ public class WorkflowHelper {
     		Terms.get().getActiveAceFrameConfig().setWorkflowActions(sortedActions);
     		Terms.get().getActiveAceFrameConfig().setAllAvailableWorkflowActionUids(sortedAvailableActions);
     	} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.SEVERE, "Error in updating workflow actions", e);
+        	AceLog.getAppLog().log(Level.SEVERE, "Error in updating workflow actions with error: " + e.getMessage());
     	}
     }
 
@@ -503,7 +518,7 @@ public class WorkflowHelper {
 					rels.add(rel);
 			}
 		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.WARNING, "Error in getting workflow-based attribute", e);
+        	AceLog.getAppLog().log(Level.WARNING, "Error in getting workflow-based attribute with error: " + e.getMessage());
 		}
 		
 		return rels;
@@ -529,7 +544,7 @@ public class WorkflowHelper {
 					}
     	    	}
 	    	} catch (Exception e) {
-	        	AceLog.getAppLog().log(Level.SEVERE, "Error in identifying if current action is a BEGIN-WORKFLOW action", e);
+	        	AceLog.getAppLog().log(Level.SEVERE, "Error in identifying if current action is a BEGIN-WORKFLOW action with error: " + e.getMessage());
 	    	}
 		}
 
@@ -557,7 +572,7 @@ public class WorkflowHelper {
 					}
 				}
 	    	} catch (Exception e) {
-	        	AceLog.getAppLog().log(Level.SEVERE, "Error in identifying if current action is a END-WORKFLOW action", e);
+	        	AceLog.getAppLog().log(Level.SEVERE, "Error in identifying if current action is a END-WORKFLOW action with error: " + e.getMessage());
 	    	}
 		}
 
@@ -655,10 +670,7 @@ public class WorkflowHelper {
 	}
 
 	public void initializeWorkflowForConcept(I_GetConceptData concept, boolean inBatch) throws TerminologyException, IOException {
-    	if (snomedConcept  == null)
-    		snomedConcept = Terms.get().getConcept(Taxonomies.SNOMED.getUuids());
-    	
-    	if (inBatch || !WorkflowHistoryRefsetWriter.isInUse()) // Not in the middle of an existing commit
+		if (inBatch || !WorkflowHistoryRefsetWriter.isInUse()) // Not in the middle of an existing commit
     	{
         	WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
 
@@ -672,13 +684,14 @@ public class WorkflowHelper {
 				WorkflowHistoryRefsetWriter.lockMutex();
 
 				// Path
+				// TODO: Update Path properly
 	            writer.setPathUid(Terms.get().nidToUuid(concept.getConceptAttributes().getPathNid()));
 
 	            // Modeler
 	            writer.setModelerUid(WorkflowHelper.getCurrentModeler().getPrimUuid());
 
 	            // Concept & FSN
-	            writer.setConceptUid(concept.getUids().iterator().next());
+	            writer.setConceptUid(concept.getPrimUuid());
 	            writer.setFSN(WorkflowHelper.identifyFSN(concept));
 
             	// Action
@@ -719,11 +732,12 @@ public class WorkflowHelper {
 		        writer.setWorkflowTime(today.getTime());
 
 		        // Write Member
-				WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
 				writer.addMember();
+				
+				WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
 		        Terms.get().addUncommitted(refset.getRefsetConcept());
-			}
-        }	
+        	}
+    	}	
 	}
 
 	private UUID identifyNextState(UUID modelerUid, I_GetConceptData concept, UUID commitActionUid)
