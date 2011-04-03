@@ -2092,4 +2092,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public ComponentChroncileBI getChronicle() {
         return (ComponentChroncileBI) this;
     }
+    
+    
+    
 }

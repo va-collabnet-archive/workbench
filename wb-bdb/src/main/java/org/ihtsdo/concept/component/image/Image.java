@@ -62,6 +62,11 @@ public class Image
         }
 
         @Override
+        public Image getPrimordialVersion() {
+            return Image.this;
+        }
+
+        @Override
         public int getConceptNid() {
             return enclosingConceptNid;
         }
@@ -680,5 +685,10 @@ public class Image
         buf.append(": ");
         buf.append(textDescription);
         return buf.toString();
+    }
+
+    @Override
+    public Image getPrimordialVersion() {
+        return Image.this;
     }
 }

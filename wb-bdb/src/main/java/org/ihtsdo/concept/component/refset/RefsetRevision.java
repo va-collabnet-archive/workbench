@@ -14,9 +14,7 @@ import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import com.sleepycat.bind.tuple.TupleInput;
 import java.io.IOException;
 
-public abstract class RefsetRevision
-			<V extends RefsetRevision<V, C>, 
-			 C extends RefsetMember<V, C>>
+public abstract class RefsetRevision<V extends RefsetRevision<V, C>, C extends RefsetMember<V, C>>
         extends Revision<V, C>
         implements I_ExtendByRefPart<V>, RefexAnalogBI<V> {
 
@@ -107,34 +105,34 @@ public abstract class RefsetRevision
     public String toUserString() {
         return toString();
     }
-    
+
     @Override
-	public int getCollectionNid() {
-		return primordialComponent.refsetNid;
-	}
-
-	@Override
-	public void setCollectionNid(int collectionNid) throws PropertyVetoException {
-		primordialComponent.setCollectionNid(collectionNid);
-	}
-
-	@Override
-    public RefexCAB getRefexEditSpec() throws IOException {
-    	RefexCAB rcs = new RefexCAB(getTkRefsetType(), 
-    			primordialComponent.getReferencedComponentNid(), 
-    			primordialComponent.getRefsetId(),
-        		getPrimUuid());
-    	addSpecProperties(rcs);
-    	return rcs;
+    public int getCollectionNid() {
+        return primordialComponent.refsetNid;
     }
 
-	protected abstract TK_REFSET_TYPE getTkRefsetType();
+    @Override
+    public void setCollectionNid(int collectionNid) throws PropertyVetoException {
+        primordialComponent.setCollectionNid(collectionNid);
+    }
 
-	protected abstract void addSpecProperties(RefexCAB rcs);
+    @Override
+    public RefexCAB getRefexEditSpec() throws IOException {
+        RefexCAB rcs = new RefexCAB(getTkRefsetType(),
+                primordialComponent.getReferencedComponentNid(),
+                primordialComponent.getRefsetId(),
+                getPrimUuid());
+        addSpecProperties(rcs);
+        return rcs;
+    }
+
+    protected abstract TK_REFSET_TYPE getTkRefsetType();
+
+    protected abstract void addSpecProperties(RefexCAB rcs);
 
     @Override
     public int getReferencedComponentNid() {
-       return primordialComponent.getReferencedComponentNid();
+        return primordialComponent.getReferencedComponentNid();
     }
 
     @Override
@@ -142,4 +140,8 @@ public abstract class RefsetRevision
         primordialComponent.setReferencedComponentNid(componentNid);
     }
 
+    @Override
+    public RefsetMember getPrimordialVersion() {
+        return primordialComponent;
+    }
 }

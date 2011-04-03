@@ -302,6 +302,10 @@ public class RelationshipRevision
     public boolean isStated() {
         return !isInferred();
     }
+    @Override
+    public Relationship getPrimordialVersion() {
+        return primordialComponent;
+    }
     
     
 }

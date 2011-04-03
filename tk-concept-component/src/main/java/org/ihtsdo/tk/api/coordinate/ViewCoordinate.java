@@ -92,6 +92,10 @@ public class ViewCoordinate {
         return positionSet;
     }
 
+    public void setPositionSet(PositionSetBI positionSet) {
+        this.positionSet = positionSet;
+    }
+
     public NidSetBI getAllowedStatusNids() {
         return allowedStatusNids;
     }

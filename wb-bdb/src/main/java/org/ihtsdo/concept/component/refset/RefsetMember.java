@@ -66,6 +66,11 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
             super(index);
         }
 
+        @Override
+        public RefsetMember getPrimordialVersion() {
+            return RefsetMember.this;
+        }
+
         public RefexCAB getRefexEditSpec() throws IOException {
             if (index >= 0) {
                 return revisions.get(index).getRefexEditSpec();
@@ -610,14 +615,12 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     public String toUserString() {
         return toString();
     }
-    
-    
+
     @Override
     public String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContraditionException {
         ComponentVersionBI c1Component = snapshot.getConceptVersion(refsetNid);
         return "refex: " + c1Component.toUserString(snapshot);
     }
-
 
     @Override
     public int getCollectionNid() {
@@ -648,4 +651,9 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     protected abstract TK_REFSET_TYPE getTkRefsetType();
 
     protected abstract void addSpecProperties(RefexCAB rcs);
+
+    @Override
+    public RefsetMember getPrimordialVersion() {
+        return RefsetMember.this;
+    }
 }

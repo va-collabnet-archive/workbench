@@ -81,7 +81,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if (termComponent != null
-                    && I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
+                    &&  I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
                 try {
                     I_GetConceptData igcd = (I_GetConceptData) termComponent;
                     if (igcd.isCanceled()) {

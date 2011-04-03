@@ -7,8 +7,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -49,19 +47,20 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         RelationshipAnalogBI<RelationshipRevision> {
 
     private static int classifierAuthorNid = Integer.MIN_VALUE;
+
     public static int getClassifierAuthorNid() {
         if (classifierAuthorNid == Integer.MIN_VALUE) {
             try {
                 classifierAuthorNid = org.dwfa.cement.ArchitectonicAuxiliary.Concept.SNOROCKET.localize().getNid();
             } catch (IOException ex) {
-               throw new RuntimeException(ex);
+                throw new RuntimeException(ex);
             } catch (TerminologyException ex) {
                 throw new RuntimeException(ex);
-           }
+            }
         }
         return classifierAuthorNid;
     }
-    
+
     public class Version
             extends ConceptComponent<RelationshipRevision, Relationship>.Version
             implements I_RelTuple<RelationshipRevision>,
@@ -74,6 +73,11 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
         public Version(int index) {
             super(index);
+        }
+
+        @Override
+        public Relationship getPrimordialVersion() {
+            return Relationship.this;
         }
 
         @Override
@@ -262,10 +266,12 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
             return Relationship.this.getVersions(c);
         }
 
+        @Override
         public List<? extends Version> getVersions() {
             return Relationship.this.getVersions();
         }
 
+        @Override
         public void setTypeNid(int type) {
             if (index >= 0) {
                 revisions.get(index).setTypeNid(type);
@@ -275,10 +281,12 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
         }
 
+        @Override
         public Relationship getFixedPart() {
             return Relationship.this;
         }
 
+        @Override
         public ArrayIntList getVariableVersionNids() {
             if (index >= 0) {
                 ArrayIntList resultList = new ArrayIntList(7);
@@ -294,7 +302,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
         @Override
         public RelationshipRevision makeAnalog(int statusNid, int pathNid, long time) {
-             if (index >= 0) {
+            if (index >= 0) {
                 RelationshipRevision rev = revisions.get(index);
                 if (rev.getTime() == Long.MAX_VALUE && rev.getPathNid() == pathNid) {
                     rev.setStatusNid(statusNid);
@@ -919,8 +927,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         ConceptComponent.addTextToBuffer(buf, c2Nid);
         return buf.toString();
     }
-    
-    
+
     @Override
     public boolean isInferred() {
         return getAuthorNid() == Relationship.getClassifierAuthorNid();
@@ -931,4 +938,8 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         return !isInferred();
     }
 
+    @Override
+    public Relationship getPrimordialVersion() {
+        return Relationship.this;
+    }
 }

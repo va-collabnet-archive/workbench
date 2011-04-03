@@ -232,6 +232,7 @@
       <module>tk-qa-ws-client</module>
       <module>rule-engine-integration</module>
       <module>tk-spelling-variants</module>
+      <module>tk-junit-ext</module>
  <!--     <module>bdb-properties</module> -->
    </modules>
 </project>

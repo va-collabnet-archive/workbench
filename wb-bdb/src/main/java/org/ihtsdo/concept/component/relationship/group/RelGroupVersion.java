@@ -228,4 +228,9 @@ public class RelGroupVersion
         return rg;
     }
 
+    @Override
+    public RelGroupVersionBI getPrimordialVersion() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

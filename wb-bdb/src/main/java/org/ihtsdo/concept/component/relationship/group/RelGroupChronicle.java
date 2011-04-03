@@ -156,4 +156,9 @@ public class RelGroupChronicle implements RelGroupChronicleBI {
         }
         return positions;
     }
+
+    @Override
+    public RelGroupVersionBI getPrimordialVersion() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

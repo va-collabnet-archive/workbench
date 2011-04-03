@@ -123,6 +123,11 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return getNid() - o.getNid();
     }
 
+    @Override
+    public ConceptVersionBI getPrimordialVersion() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     public static class ConceptLowMemoryListener implements LowMemoryListener {
 
         @Override

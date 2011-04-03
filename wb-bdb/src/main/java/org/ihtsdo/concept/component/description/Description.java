@@ -66,6 +66,11 @@ public class Description
         }
 
         @Override
+        public Description getPrimordialVersion() {
+            return Description.this;
+        }
+
+        @Override
         public int getConceptNid() {
             return enclosingConceptNid;
         }
@@ -707,5 +712,10 @@ public class Description
         computer.addSpecifiedVersions(c.getAllowedStatusNids(), (NidSetBI) null, c.getPositionSet(),
                 returnTuples, getVersions(), c.getPrecedence(), c.getContradictionManager());
         return returnTuples;
+    }
+
+    @Override
+    public Description getPrimordialVersion() {
+        return Description.this;
     }
 }

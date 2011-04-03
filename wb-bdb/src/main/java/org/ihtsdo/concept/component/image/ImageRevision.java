@@ -255,7 +255,11 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 
     @Override
     public Collection<? extends MediaVersionBI> getVersions() {
-        return ((Image)primordialComponent).getVersions();
+        return ((Image) primordialComponent).getVersions();
     }
 
+    @Override
+    public Image getPrimordialVersion() {
+        return primordialComponent;
+    }
 }

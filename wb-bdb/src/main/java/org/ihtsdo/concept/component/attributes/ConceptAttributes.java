@@ -42,7 +42,6 @@ import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
 
 public class ConceptAttributes
         extends ConceptComponent<ConceptAttributesRevision, ConceptAttributes>
@@ -83,6 +82,11 @@ public class ConceptAttributes
 
         public Version(int index) {
             super(index);
+        }
+
+        @Override
+        public ConceptAttributes getPrimordialVersion() {
+            return ConceptAttributes.this;
         }
 
         @Override
@@ -594,4 +598,8 @@ public class ConceptAttributes
         return buf.toString();
     }
 
+    @Override
+    public ConceptAttributes getPrimordialVersion() {
+        return this;
+    }
 }

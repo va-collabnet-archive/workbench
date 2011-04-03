@@ -322,7 +322,12 @@ public class DescriptionRevision
         StringBuffer buf = new StringBuffer();
         ConceptComponent.addTextToBuffer(buf, typeNid);
         buf.append(": ");
-        buf.append("'" + this.getText() + "'");
+        buf.append("'").append(this.getText()).append("'");
         return buf.toString();
+    }
+
+    @Override
+    public Description getPrimordialVersion() {
+        return primordialComponent;
     }
 }

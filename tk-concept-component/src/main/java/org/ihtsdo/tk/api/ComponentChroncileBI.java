@@ -20,5 +20,7 @@ public interface ComponentChroncileBI<T extends ComponentVersionBI>
     Set<Integer> getAllSapNids() throws IOException;
     
     Set<PositionBI> getPositions() throws IOException;
+    
+    T getPrimordialVersion();
 
 }

@@ -68,6 +68,7 @@ import org.dwfa.ace.task.classify.SnoTable;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
@@ -93,74 +94,73 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
  * 2. handle path comparison
  * 3.
  */
-
 public class CNFormsLabelPanel extends JPanel implements ActionListener {
+
     private static final long serialVersionUID = 1L;
 
     public static class ConceptAttrVersion implements I_ConceptAttributeTuple {
+
         I_ConceptAttributeVersioned<?> core;
 
         public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
-				ViewCoordinate xyz) throws IOException {
-			return core.getCurrentRefexes(xyz);
-		}
+                ViewCoordinate xyz) throws IOException {
+            return core.getCurrentRefexes(xyz);
+        }
 
-		public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
-				ViewCoordinate xyz) throws IOException {
-			return core.getCurrentAnnotations(xyz);
-		}
+        public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
+                ViewCoordinate xyz) throws IOException {
+            return core.getCurrentAnnotations(xyz);
+        }
 
-		public boolean isUncommitted() {
-			return core.isUncommitted();
-		}
+        public boolean isUncommitted() {
+            return core.isUncommitted();
+        }
 
-		public String toUserString() {
-			return core.toUserString();
-		}
+        public String toUserString() {
+            return core.toUserString();
+        }
 
-		public List<UUID> getUUIDs() {
-			return core.getUUIDs();
-		}
+        public List<UUID> getUUIDs() {
+            return core.getUUIDs();
+        }
 
-		public ConAttrVersionBI getVersion(ViewCoordinate c)
-				throws ContraditionException {
-			return core.getVersion(c);
-		}
+        public ConAttrVersionBI getVersion(ViewCoordinate c)
+                throws ContraditionException {
+            return core.getVersion(c);
+        }
 
-		public Collection<? extends ConAttrVersionBI> getVersions() {
-			return core.getVersions();
-		}
+        public Collection<? extends ConAttrVersionBI> getVersions() {
+            return core.getVersions();
+        }
 
-		public Collection<? extends ConAttrVersionBI> getVersions(ViewCoordinate c) {
-			return core.getVersions(c);
-		}
-
-		I_ConceptAttributePart part;
+        public Collection<? extends ConAttrVersionBI> getVersions(ViewCoordinate c) {
+            return core.getVersions(c);
+        }
+        I_ConceptAttributePart part;
 
         public int getPathNid() {
-			return part.getPathNid();
-		}
+            return part.getPathNid();
+        }
 
-		public int getStatusNid() {
-			return part.getStatusNid();
-		}
+        public int getStatusNid() {
+            return part.getStatusNid();
+        }
 
-		public void setPathNid(int pathNid) {
-			part.setPathNid(pathNid);
-		}
+        public void setPathNid(int pathNid) {
+            part.setPathNid(pathNid);
+        }
 
-		public void setStatusNid(int statusNid) {
-			part.setStatusNid(statusNid);
-		}
+        public void setStatusNid(int statusNid) {
+            part.setStatusNid(statusNid);
+        }
 
-		public ArrayIntList getPartComponentNids() {
+        public ArrayIntList getPartComponentNids() {
             return part.getPartComponentNids();
         }
 
         public void setConceptStatus(int conceptStatus) {
             part.setStatusNid(conceptStatus);
         }
-
         transient Integer hash;
 
         public ConceptAttrVersion(I_ConceptAttributeVersioned core, I_ConceptAttributePart part) {
@@ -273,14 +273,14 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         @Override
         public int hashCode() {
             if (hash == null) {
-                hash = HashFunction.hashCode(new int[] { core.hashCode(), part.hashCode() });
+                hash = HashFunction.hashCode(new int[]{core.hashCode(), part.hashCode()});
             }
             return hash;
         }
 
         public String toString() {
             return "ThinConTuple id: " + getConId() + " status: " + getConceptStatus() + " defined: " + isDefined()
-                + " path: " + getPathId() + " version: " + getVersion();
+                    + " path: " + getPathId() + " version: " + getVersion();
         }
 
         public I_ConceptAttributePart getMutablePart() {
@@ -298,7 +298,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         public void setVersion(int version) {
-           throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException();
         }
 
         public I_ConceptAttributeVersioned getFixedPart() {
@@ -314,42 +314,42 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             return core.getNid();
         }
 
-    	public long getTime() {
-    		return part.getTime();
-    	}
+        public long getTime() {
+            return part.getTime();
+        }
 
-    	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-    		return (I_AmPart) part.makeAnalog(statusNid, pathNid, time);
-    	}
+        public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+            return (I_AmPart) part.makeAnalog(statusNid, pathNid, time);
+        }
 
-    	public ConAttrAnalogBI makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-    		return (ConAttrAnalogBI) part.makeAnalog(statusNid, authorNid, pathNid, time);
-    	}
+        public ConAttrAnalogBI makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+            return (ConAttrAnalogBI) part.makeAnalog(statusNid, authorNid, pathNid, time);
+        }
 
-		@Override
-		public void setTime(long value) {
-			part.setTime(value);
-		}
+        @Override
+        public void setTime(long value) {
+            part.setTime(value);
+        }
 
-		@Override
-		public int getAuthorNid() {
-			return part.getAuthorNid();
-		}
+        @Override
+        public int getAuthorNid() {
+            return part.getAuthorNid();
+        }
 
-		@Override
-		public void setAuthorNid(int authorNid) {
-			part.setAuthorNid(authorNid);
-		}
+        @Override
+        public void setAuthorNid(int authorNid) {
+            part.setAuthorNid(authorNid);
+        }
 
-		@Override
-		public int getConceptNid() {
-			return part.getConceptNid();
-		}
+        @Override
+        public int getConceptNid() {
+            return part.getConceptNid();
+        }
 
-		@Override
-		public UUID getPrimUuid() {
-			return core.getPrimUuid();
-		}
+        @Override
+        public UUID getPrimUuid() {
+            return core.getPrimUuid();
+        }
 
         @Override
         public boolean addAnnotation(RefexChronicleBI<?> annotation) {
@@ -366,16 +366,16 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
-		@Override
-		public Collection<? extends RefexChronicleBI<?>> getRefexes()
-				throws IOException {
+        @Override
+        public Collection<? extends RefexChronicleBI<?>> getRefexes()
+                throws IOException {
             throw new UnsupportedOperationException("Not supported yet.");
-		}
+        }
 
-      @Override
-      public Set getAllSapNids() throws IOException {
-         throw new UnsupportedOperationException("Not supported yet.");
-      }
+        @Override
+        public Set getAllSapNids() throws IOException {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
 
         @Override
         public PositionBI getPosition() throws IOException {
@@ -402,114 +402,115 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        public ConceptAttrVersion getPrimordialVersion() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
     }
-
 
     private static class RelVersion implements I_RelTuple {
 
         I_RelVersioned<?> fixedPart;
+
         public boolean isUncommitted() {
-			return fixedPart.isUncommitted();
-		}
-
-		public String toUserString() {
-			return fixedPart.toUserString();
-		}
-
-		public List<UUID> getUUIDs() {
-			return fixedPart.getUUIDs();
-		}
-
-		public RelationshipVersionBI<?> getVersion(ViewCoordinate c)
-				throws ContraditionException {
-			return fixedPart.getVersion(c);
-		}
-
-		public Collection<? extends RelationshipVersionBI> getVersions() {
-			return fixedPart.getVersions();
-		}
-
-		public Collection<? extends RelationshipVersionBI> getVersions(
-				ViewCoordinate c) {
-			return fixedPart.getVersions(c);
-		}
-
-		public int getCharacteristicNid() {
-			return fixedPart.getCharacteristicNid();
-		}
-
-		public int getDestinationNid() {
-			return fixedPart.getDestinationNid();
-		}
-
-		public int getOriginNid() {
-			return fixedPart.getOriginNid();
-		}
-
-		public int getConceptNid() {
-			return fixedPart.getOriginNid();
-		}
-
-		public int getRefinabilityNid() {
-			return fixedPart.getRefinabilityNid();
-		}
-
-		public void setC2Id(int destId) {
-			fixedPart.setC2Id(destId);
-		}
-
-		public void setCharacteristicNid(int nid) {
-			fixedPart.setCharacteristicNid(nid);
-		}
-
-		public void setDestinationNid(int nid) throws PropertyVetoException {
-			fixedPart.setDestinationNid(nid);
-		}
-
-		public void setRefinabilityNid(int nid) {
-			fixedPart.setRefinabilityNid(nid);
-		}
-
-		@Override
-		public UUID getPrimUuid() {
-			return fixedPart.getPrimUuid();
-		}
-
-		I_RelPart part;
-
-        public RelationshipAnalogBI makeAnalog(int statusNid, int authorNid, int pathNid,
-				long time) {
-			return (RelationshipAnalogBI) part.makeAnalog(statusNid, authorNid, pathNid, time);
-		}
-
-		public int getPathNid() {
-			return part.getPathNid();
-		}
-
-		public int getStatusNid() {
-			return part.getStatusNid();
-		}
-
-		public void setPathNid(int pathNid) {
-			part.setPathNid(pathNid);
-		}
-
-		public void setStatusNid(int statusNid) {
-			part.setStatusNid(statusNid);
-		}
-
-		public int getAuthorNid() {
-			return part.getAuthorNid();
-		}
-
-		public void setAuthorNid(int authorNid) {
-			part.setAuthorNid(authorNid);
-		}
-
-		public ArrayIntList getPartComponentNids() {
-            return part.getPartComponentNids();
+            return fixedPart.isUncommitted();
         }
 
+        public String toUserString() {
+            return fixedPart.toUserString();
+        }
+
+        public List<UUID> getUUIDs() {
+            return fixedPart.getUUIDs();
+        }
+
+        public RelationshipVersionBI<?> getVersion(ViewCoordinate c)
+                throws ContraditionException {
+            return fixedPart.getVersion(c);
+        }
+
+        public Collection<? extends RelationshipVersionBI> getVersions() {
+            return fixedPart.getVersions();
+        }
+
+        public Collection<? extends RelationshipVersionBI> getVersions(
+                ViewCoordinate c) {
+            return fixedPart.getVersions(c);
+        }
+
+        public int getCharacteristicNid() {
+            return fixedPart.getCharacteristicNid();
+        }
+
+        public int getDestinationNid() {
+            return fixedPart.getDestinationNid();
+        }
+
+        public int getOriginNid() {
+            return fixedPart.getOriginNid();
+        }
+
+        public int getConceptNid() {
+            return fixedPart.getOriginNid();
+        }
+
+        public int getRefinabilityNid() {
+            return fixedPart.getRefinabilityNid();
+        }
+
+        public void setC2Id(int destId) {
+            fixedPart.setC2Id(destId);
+        }
+
+        public void setCharacteristicNid(int nid) {
+            fixedPart.setCharacteristicNid(nid);
+        }
+
+        public void setDestinationNid(int nid) throws PropertyVetoException {
+            fixedPart.setDestinationNid(nid);
+        }
+
+        public void setRefinabilityNid(int nid) {
+            fixedPart.setRefinabilityNid(nid);
+        }
+
+        @Override
+        public UUID getPrimUuid() {
+            return fixedPart.getPrimUuid();
+        }
+        I_RelPart part;
+
+        public RelationshipAnalogBI makeAnalog(int statusNid, int authorNid, int pathNid,
+                long time) {
+            return (RelationshipAnalogBI) part.makeAnalog(statusNid, authorNid, pathNid, time);
+        }
+
+        public int getPathNid() {
+            return part.getPathNid();
+        }
+
+        public int getStatusNid() {
+            return part.getStatusNid();
+        }
+
+        public void setPathNid(int pathNid) {
+            part.setPathNid(pathNid);
+        }
+
+        public void setStatusNid(int statusNid) {
+            part.setStatusNid(statusNid);
+        }
+
+        public int getAuthorNid() {
+            return part.getAuthorNid();
+        }
+
+        public void setAuthorNid(int authorNid) {
+            part.setAuthorNid(authorNid);
+        }
+
+        public ArrayIntList getPartComponentNids() {
+            return part.getPartComponentNids();
+        }
         transient Integer hash;
 
         public RelVersion(int relNid) {
@@ -590,6 +591,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         public int getTypeId() {
             return part.getTypeId();
         }
+
         public int getTypeNid() {
             return part.getTypeNid();
         }
@@ -700,7 +702,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         @Override
         public int hashCode() {
             if (hash == null) {
-                hash = HashFunction.hashCode(new int[] { fixedPart.hashCode(), part.hashCode() });
+                hash = HashFunction.hashCode(new int[]{fixedPart.hashCode(), part.hashCode()});
             }
             return hash;
         }
@@ -745,24 +747,23 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             return fixedPart.getNid();
         }
 
-    	public long getTime() {
-    		return part.getTime();
-    	}
+        public long getTime() {
+            return part.getTime();
+        }
 
-    	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-    		return (I_AmPart) part.makeAnalog(statusNid, pathNid, time);
-    	}
+        public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+            return (I_AmPart) part.makeAnalog(statusNid, pathNid, time);
+        }
 
-		@Override
-		public void setTime(long value) {
-			part.setTime(value);
-		}
+        @Override
+        public void setTime(long value) {
+            part.setTime(value);
+        }
 
         @Override
         public boolean hasExtensions() {
             return false;
         }
-
 
         @Override
         public Collection<? extends RefexChronicleBI<?>> getAnnotations() {
@@ -779,34 +780,34 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
-		@Override
-		public Collection<? extends RefexChronicleBI<?>> getRefexes()
-				throws IOException {
+        @Override
+        public Collection<? extends RefexChronicleBI<?>> getRefexes()
+                throws IOException {
             throw new UnsupportedOperationException("Not supported yet.");
-		}
+        }
 
-		@Override
-		public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
-				ViewCoordinate xyz) throws IOException {
+        @Override
+        public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
+                ViewCoordinate xyz) throws IOException {
             throw new UnsupportedOperationException("Not supported yet.");
-		}
+        }
 
-		@Override
-		public boolean addAnnotation(RefexChronicleBI<?> annotation)
-				throws IOException {
+        @Override
+        public boolean addAnnotation(RefexChronicleBI<?> annotation)
+                throws IOException {
             throw new UnsupportedOperationException("Not supported yet.");
-		}
+        }
 
-		@Override
-		public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
-				ViewCoordinate xyz) throws IOException {
+        @Override
+        public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
+                ViewCoordinate xyz) throws IOException {
             throw new UnsupportedOperationException("Not supported yet.");
-		}
+        }
 
-      @Override
-      public Set getAllSapNids() throws IOException {
-         throw new UnsupportedOperationException("Not supported yet.");
-      }
+        @Override
+        public Set getAllSapNids() throws IOException {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
 
         @Override
         public PositionBI getPosition() throws IOException {
@@ -843,6 +844,10 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
+        public RelVersion getPrimordialVersion() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
     }
 
     /**
@@ -854,7 +859,6 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
     public static class DeltaColors {
 
         private List<Color> colorList = new ArrayList<Color>(); // AWT: Color
-
         int currentColor = 0;
 
         public DeltaColors() {
@@ -888,40 +892,32 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             currentColor = 0;
         }
     }
-
     // ** WORKBENCH PARTICULARS **
     private I_GetConceptData theCBean;
     private I_ConfigAceFrame config;
-
     // ** CLASSIFIER PARTICULARS **
     List<I_Position> cEditPathPos; // Edit (Stated) Path I_Positions
     List<I_Position> cClassPathPos; // Classifier (Inferred) Path I_Positions
     private SnoTable cSnoTable;
-
     // ** CONFIGURATION PARTICULARS **
     @SuppressWarnings("unused")
-	private static final boolean debug = false; // :DEBUG:
+    private static final boolean debug = false; // :DEBUG:
     boolean showGroupLabels = true; // toggles grouped vs. single label display
-
     // ** GUI PARTICULARS **
     private JPanel commonJPanel;
     private JPanel commonPartJPanel;
     private JPanel deltaJPanel;
     private JPanel deltaPartJPanel;
     private JPanel formsJPanel; // sub panels added using tmpJPanel
-
     private JCheckBox showStatusCB = new JCheckBox("show status");
     private JCheckBox showDetailCB = new JCheckBox("show detail");
     private JCheckBox showDistFormCB = new JCheckBox("Distribution");
     private JCheckBox showAuthFormCB = new JCheckBox("Authoring");
     private JCheckBox showLongFormCB = new JCheckBox("Long Canonical");
     private JCheckBox showShortFormCB = new JCheckBox("Short Canonical");
-
     private DeltaColors colors = new DeltaColors();
-
     // JLabel with ActionListener
     private List<I_ImplementActiveLabel> commonLabels;
-
     // AWT: Dimension(int Width, int Height) in pixels(???)
     private Dimension maxPartPanelSize = new Dimension(TermLabelMaker.LABEL_WIDTH + 20, 4000);
     private Dimension minPartPanelSize = new Dimension(TermLabelMaker.LABEL_WIDTH + 20, 100);
@@ -933,6 +929,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
     private JPanel newMinMaxJPanel() {
         JPanel p = new JPanel() {
+
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -1072,8 +1069,9 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         deltaJPanel.removeAll();
         formsJPanel.removeAll(); // FORMS HAS SUBPANELS: STATED & COMPUTED
 
-        if (conceptIn == null)
+        if (conceptIn == null) {
             return;
+        }
 
         // COMMON & DIFFERENT SECTION
         // COMMON PANEL
@@ -1102,7 +1100,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         Map<I_RelTuple, Color> relColorMap = new HashMap<I_RelTuple, Color>();
         colors.reset();
         Collection<I_ImplementActiveLabel> deltaLabels = getDeltaLabels(showDetailCB.isSelected(),
-            showStatusCB.isSelected(), config, colors, conAttrColorMap, desColorMap, relColorMap); // ####
+                showStatusCB.isSelected(), config, colors, conAttrColorMap, desColorMap, relColorMap); // ####
         deltaPartJPanel = new JPanel();
         deltaPartJPanel.setLayout(new BoxLayout(deltaPartJPanel, BoxLayout.Y_AXIS));
         for (I_ImplementActiveLabel l : deltaLabels) {
@@ -1132,7 +1130,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                 c.gridy++;
             }
             tmpJPanel = newFormDistJPanel("Distribution Normal Form:", config, conAttrColorMap, desColorMap,
-                relColorMap); // ####
+                    relColorMap); // ####
             setMinMaxSize(tmpJPanel);
             formsJPanel.add(tmpJPanel, c);
         }
@@ -1222,8 +1220,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
             // concept attributes
             List<? extends I_ConceptAttributeTuple> conTuplesForPosition = this.theCBean.getConceptAttributeTuples(
-                config.getAllowedStatus(), posSet,
-                config.getPrecedence(), config.getConflictResolutionStrategy()); // ####
+                    config.getAllowedStatus(), posSet,
+                    config.getPrecedence(), config.getConflictResolutionStrategy()); // ####
             // ALL
             // COMMON
             // CON
@@ -1231,8 +1229,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
             // relationships
             List<? extends I_RelTuple> relTuplesForPosition = this.theCBean.getSourceRelTuples(config.getAllowedStatus(), null,
-                posSet,
-                config.getPrecedence(), config.getConflictResolutionStrategy()); // ####
+                    posSet,
+                    config.getPrecedence(), config.getConflictResolutionStrategy()); // ####
             // ALL
             // REL
             allRelTuples.addAll(relTuplesForPosition);
@@ -1293,7 +1291,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         // SHOW SELF CONCEPT
         I_ConceptAttributeTuple cTuple = findSelf(theCBean, cEditPathPos);
         I_ImplementActiveLabel tmpTLabel = TermLabelMaker.newLabelForm(cTuple, showDetailCB.isSelected(),
-            showStatusCB.isSelected());
+                showStatusCB.isSelected());
         tLabelList.add((LabelForTuple) tmpTLabel);
         Color tmpDeltaColor = conAttrColorMap.get(cTuple);
         setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -1303,12 +1301,14 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         // SHOW PROXIMAL ISAs -- as relationships
         SnoGrpList isaSGList = cSnoTable.getIsaProx();
         List<I_RelTuple> isaList = new ArrayList<I_RelTuple>();
-        for (SnoGrp sg : isaSGList)
-            for (SnoRel sr : sg)
+        for (SnoGrp sg : isaSGList) {
+            for (SnoRel sr : sg) {
                 isaList.add(new RelVersion(sr.relNid));
+            }
+        }
         for (I_RelTuple t : isaList) {
             I_ImplementActiveLabel tLabel = TermLabelMaker.newLabel(t, showDetailCB.isSelected(),
-                showStatusCB.isSelected());
+                    showStatusCB.isSelected());
             tLabelList.add((LabelForTuple) tLabel);
             Color deltaColor = relColorMap.get(t);
             setBorder(tLabel.getLabel(), deltaColor);
@@ -1327,7 +1327,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                 for (SnoRel sr : sg) {
                     I_RelTuple rTuple = new RelVersion(sr.relNid);
                     tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
-                        showStatusCB.isSelected());
+                            showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
                     tmpDeltaColor = relColorMap.get(rTuple);
                     setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -1340,8 +1340,9 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             // show each of the groups
             for (; i < sgl.size(); i++) {
                 sg = sgl.get(i);
-                if (sg.size() == 0)
+                if (sg.size() == 0) {
                     continue; // :TODO: investigate why empty sets exist
+                }
                 if (showGroupLabels) { // true shows one label per group
                     List<I_RelTuple> grpTuple = new ArrayList<I_RelTuple>();
                     for (SnoRel sr : sg) {
@@ -1357,7 +1358,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     for (SnoRel sr : sg) {
                         I_RelTuple rTuple = new RelVersion(sr.relNid);
                         tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
-                            showStatusCB.isSelected());
+                                showStatusCB.isSelected());
                         tLabelList.add((LabelForTuple) tmpTLabel);
                         tmpDeltaColor = relColorMap.get(rTuple);
                         setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -1402,7 +1403,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         // SHOW SELF CONCEPT
         I_ConceptAttributeTuple cTuple = findSelf(theCBean, cEditPathPos);
         I_ImplementActiveLabel tmpTLabel = TermLabelMaker.newLabelForm(cTuple, showDetailCB.isSelected(),
-            showStatusCB.isSelected());
+                showStatusCB.isSelected());
         tLabelList.add((LabelForTuple) tmpTLabel);
         Color tmpDeltaColor = conAttrColorMap.get(cTuple);
         setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -1412,9 +1413,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         // SHOW PROXIMAL ISAs -- as relationships
         SnoGrpList isaSGList = cSnoTable.getIsaProx();
         List<I_RelTuple> isaList = new ArrayList<I_RelTuple>();
-        for (SnoGrp sg : isaSGList)
-            for (SnoRel sr : sg)
+        for (SnoGrp sg : isaSGList) {
+            for (SnoRel sr : sg) {
                 isaList.add(new RelVersion(sr.relNid));
+            }
+        }
         for (I_RelTuple rTuple : isaList) {
             tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(), showStatusCB.isSelected());
             tLabelList.add((LabelForTuple) tmpTLabel);
@@ -1434,7 +1437,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                 for (SnoRel sr : sg) {
                     I_RelTuple rTuple = new RelVersion(sr.relNid);
                     tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
-                        showStatusCB.isSelected());
+                            showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
                     tmpDeltaColor = relColorMap.get(rTuple);
                     setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -1447,8 +1450,9 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             // show each of the groups
             for (; i < sgl.size(); i++) {
                 sg = sgl.get(i);
-                if (sg.size() == 0)
+                if (sg.size() == 0) {
                     continue;
+                }
                 if (showGroupLabels) { // true shows one label per group
                     List<I_RelTuple> grpTuple = new ArrayList<I_RelTuple>();
                     for (SnoRel sr : sg) {
@@ -1464,7 +1468,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     for (SnoRel sr : sg) {
                         I_RelTuple rTuple = new RelVersion(sr.relNid);
                         tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
-                            showStatusCB.isSelected());
+                                showStatusCB.isSelected());
                         tLabelList.add((LabelForTuple) tmpTLabel);
                         tmpDeltaColor = relColorMap.get(rTuple);
                         setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -1509,7 +1513,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         // SHOW SELF CONCEPT
         I_ConceptAttributeTuple cTuple = findSelf(theCBean, cEditPathPos);
         I_ImplementActiveLabel tmpTLabel = TermLabelMaker.newLabel(cTuple, showDetailCB.isSelected(),
-            showStatusCB.isSelected());
+                showStatusCB.isSelected());
         tLabelList.add((LabelForTuple) tmpTLabel);
         Color tmpDeltaColor = conAttrColorMap.get(cTuple);
         setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -1519,9 +1523,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         // SHOW PROXIMAL ISAs -- as relationships
         SnoGrpList isaSGList = cSnoTable.getIsaProxPrim();
         List<I_RelTuple> isaList = new ArrayList<I_RelTuple>();
-        for (SnoGrp sg : isaSGList)
-            for (SnoRel sr : sg)
+        for (SnoGrp sg : isaSGList) {
+            for (SnoRel sr : sg) {
                 isaList.add(new RelVersion(sr.relNid));
+            }
+        }
         for (I_RelTuple rTuple : isaList) {
             tmpTLabel = TermLabelMaker.newLabel(rTuple, showDetailCB.isSelected(), showStatusCB.isSelected());
             tLabelList.add((LabelForTuple) tmpTLabel);
@@ -1541,7 +1547,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                 for (SnoRel sr : sg) {
                     I_RelTuple rTuple = new RelVersion(sr.relNid);
                     tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
-                        showStatusCB.isSelected());
+                            showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
                     tmpDeltaColor = relColorMap.get(rTuple);
                     setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -1554,8 +1560,9 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             // show each of the groups
             for (; i < sgl.size(); i++) {
                 sg = sgl.get(i);
-                if (sg.size() == 0)
+                if (sg.size() == 0) {
                     continue;
+                }
                 if (showGroupLabels) { // set to true to show one label per
                     // group
                     List<I_RelTuple> grpTuple = new ArrayList<I_RelTuple>();
@@ -1572,7 +1579,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     for (SnoRel sr : sg) {
                         I_RelTuple rTuple = new RelVersion(sr.relNid);
                         tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
-                            showStatusCB.isSelected());
+                                showStatusCB.isSelected());
                         tLabelList.add((LabelForTuple) tmpTLabel);
                         tmpDeltaColor = relColorMap.get(rTuple);
                         setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -1618,7 +1625,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         // SHOW SELF CONCEPT
         I_ConceptAttributeTuple cTuple = findSelf(theCBean, cEditPathPos);
         I_ImplementActiveLabel tmpTLabel = TermLabelMaker.newLabelForm(cTuple, showDetailCB.isSelected(),
-            showStatusCB.isSelected());
+                showStatusCB.isSelected());
         tLabelList.add((LabelForTuple) tmpTLabel);
         Color tmpDeltaColor = conAttrColorMap.get(cTuple);
         setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -1628,12 +1635,14 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         // SHOW PROXIMAL PRIMITIVE ISAs -- as relationships
         SnoGrpList isaSGList = cSnoTable.getIsaProxPrim();
         List<I_RelTuple> isaList = new ArrayList<I_RelTuple>();
-        for (SnoGrp sg : isaSGList)
-            for (SnoRel sr : sg)
+        for (SnoGrp sg : isaSGList) {
+            for (SnoRel sr : sg) {
                 isaList.add(new RelVersion(sr.relNid));
+            }
+        }
         for (I_RelTuple t : isaList) {
             I_ImplementActiveLabel tLabel = TermLabelMaker.newLabel(t, showDetailCB.isSelected(),
-                showStatusCB.isSelected());
+                    showStatusCB.isSelected());
             tLabelList.add((LabelForTuple) tLabel);
             Color deltaColor = relColorMap.get(t);
             setBorder(tLabel.getLabel(), deltaColor);
@@ -1651,7 +1660,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                 for (SnoRel sr : sg) {
                     I_RelTuple rTuple = new RelVersion(sr.relNid);
                     tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
-                        showStatusCB.isSelected());
+                            showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
                     tmpDeltaColor = relColorMap.get(rTuple);
                     setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -1664,8 +1673,9 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             // show each of the groups
             for (; i < sgl.size(); i++) {
                 sg = sgl.get(i);
-                if (sg.size() == 0)
+                if (sg.size() == 0) {
                     continue;
+                }
                 if (showGroupLabels) { // true shows one label per group
                     List<I_RelTuple> grpTuple = new ArrayList<I_RelTuple>();
                     for (SnoRel sr : sg) {
@@ -1681,7 +1691,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     for (SnoRel sr : sg) {
                         I_RelTuple rTuple = new RelVersion(sr.relNid);
                         tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
-                            showStatusCB.isSelected());
+                                showStatusCB.isSelected());
                         tLabelList.add((LabelForTuple) tmpTLabel);
                         tmpDeltaColor = relColorMap.get(rTuple);
                         setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -1723,7 +1733,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         // SHOW SELF CONCEPT
         I_ConceptAttributeTuple cTuple = findSelf(theCBean, cEditPathPos);
         I_ImplementActiveLabel tmpTLabel = TermLabelMaker.newLabelForm(cTuple, showDetailCB.isSelected(),
-            showStatusCB.isSelected());
+                showStatusCB.isSelected());
         tLabelList.add((LabelForTuple) tmpTLabel);
         Color tmpDeltaColor = conAttrColorMap.get(cTuple);
         setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -1733,9 +1743,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         // SHOW PROXIMAL ISAs -- as relationships
         SnoGrpList isaSGList = cSnoTable.getStatedIsaProx();
         List<I_RelTuple> isaList = new ArrayList<I_RelTuple>();
-        for (SnoGrp sg : isaSGList)
-            for (SnoRel sr : sg)
+        for (SnoGrp sg : isaSGList) {
+            for (SnoRel sr : sg) {
                 isaList.add(new RelVersion(sr.relNid));
+            }
+        }
         for (I_RelTuple rTuple : isaList) {
             tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(), showStatusCB.isSelected());
             tLabelList.add((LabelForTuple) tmpTLabel);
@@ -1756,7 +1768,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                 for (SnoRel sr : sg) {
                     I_RelTuple rTuple = new RelVersion(sr.relNid);
                     tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
-                        showStatusCB.isSelected());
+                            showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
                     tmpDeltaColor = relColorMap.get(rTuple);
                     setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -1769,8 +1781,9 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             // show each of the groups
             for (; i < sgl.size(); i++) {
                 sg = sgl.get(i);
-                if (sg.size() == 0)
+                if (sg.size() == 0) {
                     continue;
+                }
                 if (showGroupLabels) { // true shows one label per group
                     List<I_RelTuple> grpTuple = new ArrayList<I_RelTuple>();
                     for (SnoRel sr : sg) {
@@ -1786,7 +1799,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     for (SnoRel sr : sg) {
                         I_RelTuple rTuple = new RelVersion(sr.relNid);
                         tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
-                            showStatusCB.isSelected());
+                                showStatusCB.isSelected());
                         tLabelList.add((LabelForTuple) tmpTLabel);
                         tmpDeltaColor = relColorMap.get(rTuple);
                         setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -1812,7 +1825,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
         Dimension size = tLabel.getSize();
         tLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createRaisedBevelBorder(),
-            BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 5, 1, 5, deltaColor),
+                BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 5, 1, 5, deltaColor),
                 BorderFactory.createEmptyBorder(1, 3, 1, 3))));
         size.width = size.width + 18;
         size.height = size.height + 6;
@@ -1834,7 +1847,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     if (cp.getPathNid() == pos.getPath().getConceptNid()) {
                         if (cp1 == null) {
                             cp1 = cp; // ... KEEP FIRST_INSTANCE PART
-                        } else if (cp1.getTime()< cp.getTime()) {
+                        } else if (cp1.getTime() < cp.getTime()) {
                             cp1 = cp; // ... KEEP MORE_RECENT PART
                         } else if (cp1.getTime() == cp.getTime()) {
                             // !!! THIS DUPLICATE SHOULD NEVER HAPPEN
@@ -1854,5 +1867,4 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
         return null;
     }
-
 }

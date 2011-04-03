@@ -785,4 +785,9 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 		return bean.getCommonRelTuples(config);
 	}
 
+    @Override
+    public ConceptVersionBI getPrimordialVersion() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

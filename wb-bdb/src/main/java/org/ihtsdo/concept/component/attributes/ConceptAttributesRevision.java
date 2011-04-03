@@ -166,4 +166,10 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
         }
         return buf.toString();
     }
+    
+        @Override
+    public ConceptAttributes getPrimordialVersion() {
+        return primordialComponent;
+    }
+
 }
