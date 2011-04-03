@@ -33,8 +33,8 @@ public @interface BdbTestRunnerConfig {
      * path will be correct for Maven projects.
      * 
      * <p>
-     * Default value: <code>target/test-resources/berkeley-db</code>
+     * Default value: <code>test-resources/berkeley-db</code>
      * </p>
      */
-    String bdbLocation() default "target/test-resources/berkeley-db";
+    String bdbLocation() default "test-resources/berkeley-db";
 }

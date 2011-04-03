@@ -32,15 +32,21 @@ public class BdbTestRunner extends BlockJUnit4ClassRunner {
 
     private static boolean addHook = true;
     private static String bdbLocation = null;
+    private File buildDirFile;
 
     public BdbTestRunner(Class<?> klass) throws InitializationError {
         super(klass);
+        String surefireClassPath = System.getProperty("surefire.test.class.path");
+        String[] surefireClassPathParts = surefireClassPath.split(":");
+        buildDirFile = new File(surefireClassPathParts[0].replaceAll("test-classes$", ""));
+        System.out.println(buildDirFile.getAbsolutePath());
         BdbTestRunnerConfig annotation = klass.getAnnotation(BdbTestRunnerConfig.class);
         if (annotation == null) {
             throw new InitializationError(
                     "You must specify a BdbTestRunnerConfig annotation for the test");
         }
-        if (bdbLocation != null && !bdbLocation.equals(annotation.bdbLocation())) {
+        File dbDir = new File(buildDirFile, annotation.bdbLocation());
+        if (bdbLocation != null && !bdbLocation.equals(dbDir.getAbsolutePath())) {
             try {
                 Bdb.close();
                 bdbLocation = null;
@@ -51,14 +57,13 @@ public class BdbTestRunner extends BlockJUnit4ClassRunner {
             }
         }
         if (bdbLocation == null) {
-            File dbDir = new File(annotation.bdbLocation());
             try {
                 Bdb.selectJeProperties(dbDir, dbDir);
             } catch (IOException ex) {
                 throw new InitializationError(ex);
             }
-            Bdb.setup(annotation.bdbLocation());
-            bdbLocation = annotation.bdbLocation();
+            Bdb.setup(dbDir.getAbsolutePath());
+            bdbLocation = dbDir.getAbsolutePath();
         }
         System.out.println("Created BdbTestRunner for: " + klass);
         if (addHook) {
