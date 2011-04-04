@@ -477,7 +477,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		boolean bPendTerm=true;
 		if (saveDesc){
 			if (descriptionInEditor!=null ){
-				if (!(descriptionInEditor.getText().trim().equals(textField1.getText().trim()) && (
+				if (!(descriptionInEditor.getText().trim().equals(targetTextField.getText().trim()) && (
 						descriptionInEditor.isInitialCaseSignificant() == rbYes.isSelected())
 						&& descriptionInEditor.getAcceptabilityId()== ((I_GetConceptData)cmbAccep.getSelectedItem()).getConceptNid()
 						&& ((descriptionInEditor.getExtensionStatusId()==active.getConceptNid()
@@ -489,7 +489,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 					bPendTerm=false;
 				}
 			}else{
-				if (!textField1.getText().trim().equals("")){
+				if (!targetTextField.getText().trim().equals("")){
 					bPendTerm=false;
 				}
 			}
@@ -513,13 +513,13 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 						}
 					}
 					descriptionInEditor=null;
-					textField1.setText("");
+					targetTextField.setText("");
 					return true;
 				} else if (!bPendTerm){
 					if (saveDescActionPerformed()){
 
 						descriptionInEditor=null;
-						textField1.setText("");
+						targetTextField.setText("");
 						return true;
 					}else{
 						return false;
@@ -534,7 +534,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 	
 	private void setReadOnlyMode(boolean readOnly){
 		this.readOnlyMode=readOnly;
-		textField1.setEnabled(!readOnly);
+		targetTextField.setEnabled(!readOnly);
 		comboBox1.setEnabled(!readOnly);
 		cmbAccep.setEnabled(!readOnly);
 		saveDesc=!readOnly;
@@ -559,8 +559,8 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		cmbAccep.setEnabled(false);
 		//		label4.setVisible(true);
 		//		label4.setText("");
-		textField1.setText("");
-		textField1.setEnabled(false);
+		targetTextField.setText("");
+		targetTextField.setEnabled(false);
 		rbYes.setSelected(false);
 		panel2.revalidate();
 		mSpellChk.setEnabled(false);
@@ -628,8 +628,8 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 			if (fsnDesc==null){
 				if (verifySavePending()){
 					descriptionInEditor = null;
-					textField1.setText("");
-					textField1.setEnabled(true);
+					targetTextField.setText("");
+					targetTextField.setEnabled(true);
 					panel2.revalidate();
 					saveDesc=true;
 					mSpellChk.setEnabled(true);
@@ -674,7 +674,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		AceFrameConfig config;
 		try {
 			config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
-			textField1.setText(DocumentManager .spellcheckPhrase(textField1.getText(), null, targetLangRefset.getLangCode(config)));
+			targetTextField.setText(DocumentManager .spellcheckPhrase(targetTextField.getText(), null, targetLangRefset.getLangCode(config)));
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -710,8 +710,8 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 	private void mAddPrefActionPerformed() {
 		if (verifySavePending()){
 			descriptionInEditor = null;
-			textField1.setText("");
-			textField1.setEnabled(true);
+			targetTextField.setText("");
+			targetTextField.setEnabled(true);
 			panel2.revalidate();
 			saveDesc=true;
 			mSpellChk.setEnabled(true);
@@ -732,8 +732,8 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 			descriptionInEditor = null;
 			//		label4.setText("");
 			//		label4.setVisible(false);
-			textField1.setText("");
-			textField1.setEnabled(true);
+			targetTextField.setText("");
+			targetTextField.setEnabled(true);
 			panel2.revalidate();
 			saveDesc=true;
 			mSpellChk.setEnabled(true);
@@ -836,10 +836,10 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 			ConfigTranslationModule confTransMod = LanguageUtil.getTranslationConfig(config);
 			System.out.println(confTransMod.isEnableSpellChecker());
 			if(confTransMod.isEnableSpellChecker()){
-				textField1.setText(DocumentManager.spellcheckPhrase(textField1.getText(), null,targetLangRefset.getLangCode(config)));
+				targetTextField.setText(DocumentManager.spellcheckPhrase(targetTextField.getText(), null,targetLangRefset.getLangCode(config)));
 			}
 
-			if (descriptionInEditor == null && !textField1.getText().trim().equals("") && rbAct.isSelected() && !((I_GetConceptData)cmbAccep.getSelectedItem()).equals(notAcceptable)) {
+			if (descriptionInEditor == null && !targetTextField.getText().trim().equals("") && rbAct.isSelected() && !((I_GetConceptData)cmbAccep.getSelectedItem()).equals(notAcceptable)) {
 				descriptionInEditor=(ContextualizedDescription) ContextualizedDescription.createNewContextualizedDescription(concept.getConceptNid(), targetId, targetLangRefset.getLangCode(config));
 
 				//				if (((I_GetConceptData)comboBox1.getSelectedItem()).equals(notAcceptable)){
@@ -847,7 +847,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 				//				}
 			}
 			if (descriptionInEditor != null ){ 
-				descriptionInEditor.setText(textField1.getText());
+				descriptionInEditor.setText(targetTextField.getText());
 				descriptionInEditor.setInitialCaseSignificant(rbYes.isSelected());
 
 				//set description type like RF1
@@ -1335,7 +1335,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		panel2 = new JPanel();
 		label2 = new JLabel();
 		scrollPane5 = new JScrollPane();
-		textField1 = new JTextArea();
+		targetTextField = new JTextArea();
 		label1 = new JLabel();
 		panel7 = new JPanel();
 		label4 = new JLabel();
@@ -1708,9 +1708,9 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 							//======== scrollPane5 ========
 							{
 
-								//---- textField1 ----
-								textField1.setRows(2);
-								scrollPane5.setViewportView(textField1);
+								//---- targetTextField ----
+								targetTextField.setRows(2);
+								scrollPane5.setViewportView(targetTextField);
 							}
 							panel2.add(scrollPane5, new GridBagConstraints(1, 1, 3, 3, 0.0, 0.0,
 								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -2017,7 +2017,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 	private JPanel panel2;
 	private JLabel label2;
 	private JScrollPane scrollPane5;
-	private JTextArea textField1;
+	private JTextArea targetTextField;
 	private JLabel label1;
 	private JPanel panel7;
 	private JLabel label4;
@@ -2645,8 +2645,8 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 
 		bAddFSN.setEnabled(!bHasFSN && bHasPref);
 		comboBox1.setEnabled(false);
-		textField1.setVisible(true);
-		textField1.setEnabled(false);
+		targetTextField.setVisible(true);
+		targetTextField.setEnabled(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -2927,7 +2927,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 				if (descriptionInEditor == null) {
 					update = true;
 				} else {
-					if (descriptionInEditor.getText().trim().equals(textField1.getText().trim()) && (
+					if (descriptionInEditor.getText().trim().equals(targetTextField.getText().trim()) && (
 							descriptionInEditor.isInitialCaseSignificant() == rbYes.isSelected())
 							&& descriptionInEditor.getAcceptabilityId()== ((I_GetConceptData)cmbAccep.getSelectedItem()).getConceptNid()
 							&& ((descriptionInEditor.getExtensionStatusId()==active.getConceptNid()
@@ -2966,7 +2966,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 					if (descrpt == null) {
 						descriptionInEditor = null;
 						//			label4.setText("");
-						textField1.setText("");
+						targetTextField.setText("");
 						rbYes.setSelected(false);
 						panel2.revalidate();
 						//			saveDesc.setEnabled(false);
@@ -2981,7 +2981,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 //						rbAct.setEnabled(true);
 //						rbInact.setEnabled(true);
 //						cmbAccep.setEnabled(true);
-						textField1.setEnabled(false);
+						targetTextField.setEnabled(false);
 					} else {
 						editingRow=rowModel;
 						if (descrpt.getLanguageRefsetId()==targetId){
@@ -3001,11 +3001,11 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 								} catch (IOException ex) {
 									ex.printStackTrace();
 								}
-								textField1.setEnabled(true);
+								targetTextField.setEnabled(true);
 								//						bDescIssue.setEnabled(false);
 								descriptionInEditor = descrpt;
 								//	label4.setText(Terms.get().getConcept(descriptionInEditor.getTypeId()).toString());
-								textField1.setText(descriptionInEditor.getText().trim());
+								targetTextField.setText(descriptionInEditor.getText().trim());
 								if (descriptionInEditor.isInitialCaseSignificant()) 
 									rbYes.setSelected(true);
 								else
@@ -3047,10 +3047,10 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 				if (currentRoleConfiguration.containsKey(uuid)) {
 					EditorMode selectedEditorModeForCurrentRole = currentRoleConfiguration.get(uuid);
 					if(selectedEditorModeForCurrentRole.equals(EditorMode.READ_ONLY)){
-						textField1.setEnabled(false);
-						textField1.setEditable(false);
+						targetTextField.setEnabled(false);
+						targetTextField.setEditable(false);
 					}else{
-						textField1.setEnabled(true);
+						targetTextField.setEnabled(true);
 					}
 				}
 			}
@@ -3092,7 +3092,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 				if (targetPreferred.equals("") ){
 					mAddPrefActionPerformed();
 					String pref=LanguageUtil.getDefaultPreferredTermText(concept, sourceLangRefsets.iterator().next(), targetLangRefset, config);
-					textField1.setText(pref);
+					targetTextField.setText(pref);
 				}
 				else{
 					if (targetPreferredRow!=null){
@@ -3116,7 +3116,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 					if (targetPreferred.equals("") ){
 						mAddPrefActionPerformed();
 						String pref=LanguageUtil.getDefaultPreferredTermText(concept, sourceLangRefsets.iterator().next(), targetLangRefset, config);
-						textField1.setText(pref);
+						targetTextField.setText(pref);
 					}
 					else{
 						if (targetPreferredRow!=null){
@@ -3166,7 +3166,8 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 				tabbedPane2.setTitleAt(1, "<html>Issues <font><style size=1>(Inactive)</style></font></html>");
 
 			}
-
+			targetTextField.requestFocusInWindow();
+			targetTextField.setCaretPosition(targetTextField.getText().length());
 //			mClose.setEnabled(false);
 		} catch (Exception e) {
 			e.printStackTrace();

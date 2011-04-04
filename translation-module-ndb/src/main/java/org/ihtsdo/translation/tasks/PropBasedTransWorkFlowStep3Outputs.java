@@ -320,12 +320,12 @@ public class PropBasedTransWorkFlowStep3Outputs extends AbstractTask {
 				if (!bPanelExists){
 					//if (uiPanelName.trim().equals("standardTranslationPanel")) {
 					uiPanel = new TranslationConceptEditor6();
+					tp.addTab(TranslationHelperPanel.TRANSLATION_TAB_NAME, uiPanel);
+					tp.setSelectedIndex(tabCount);
 					uiPanel.setAutoKeepFunction(new ThisAutoKeep());
 					uiPanel.setUnloaded(false);
 					uiPanel.updateUI(translationProject, workListMember, role);
 					//}
-					tp.addTab(TranslationHelperPanel.TRANSLATION_TAB_NAME, uiPanel);
-					tp.setSelectedIndex(tabCount);
 				}
 				tp.revalidate();
 				tp.repaint();
