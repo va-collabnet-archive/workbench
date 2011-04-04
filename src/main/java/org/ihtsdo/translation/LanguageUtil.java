@@ -354,7 +354,7 @@ public class LanguageUtil {
 
 				if (matchedDescription.getTuples(config.getConflictResolutionStrategy()).iterator().next().getTypeNid() ==
 					ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid() &&
-					matchedDescription.getTuples(config.getConflictResolutionStrategy()).iterator().next().getLang().trim().equals(sourceLangCode) &&
+					sourceLangCode.toLowerCase().startsWith(matchedDescription.getTuples(config.getConflictResolutionStrategy()).iterator().next().getLang().trim().toLowerCase().substring(0,2)) &&
 					matchedDescription.getTuples(config.getConflictResolutionStrategy()).iterator().next().getStatusNid() == 
 						ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()) {
 
@@ -366,10 +366,12 @@ public class LanguageUtil {
 							config.getPrecedence(), config.getConflictResolutionStrategy());
 
 					for (I_DescriptionTuple tuple : tuples) {
-						if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid() &&
-								tuple.getLang().trim().equals(targetLangCode)) {
+						if (targetLangCode.toLowerCase().startsWith(tuple.getLang().trim().toLowerCase().substring(0,2))) {
 							targetText = tuple.getText();
 							targetDescriptionId = tuple.getDescId();
+							if(tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()){
+								break;
+							}
 						}
 					}
 				}
@@ -1229,7 +1231,7 @@ public class LanguageUtil {
 
 				for (ContextualizedDescription loopDescription : sourceDescriptions) {
 					if (loopDescription.getTypeId() == fsn.getConceptNid() && 
-							isActive(loopDescription.getDescriptionStatusId())) {
+							isActive(loopDescription.getDescriptionStatusId()) && loopDescription.getLanguageRefsetId() == sourceLangRefset.getRefsetId()) {
 						sourceFSN = loopDescription;
 					}
 				}
@@ -1252,7 +1254,7 @@ public class LanguageUtil {
 
 
 					if (!matches.isEmpty()) {
-						defaultPreferredTerm = matches.iterator().next().toString();
+						defaultPreferredTerm = matches.iterator().next().getTargetText().toString();
 					}
 
 				}
