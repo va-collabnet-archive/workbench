@@ -121,7 +121,7 @@ public class DragPanelConceptAttributes extends ComponentVersionDragPanel<ConAtt
             statedDefinedStr = "defined";
         }
         JLabel statedDefinedLabel = getJLabel(statedDefinedStr);
-        statedDefinedLabel.setOpaque(true);
+        statedDefinedLabel.setOpaque(false);
         add(statedDefinedLabel, gbc);
         gbc.gridx++;
         gbc.weightx = 0;

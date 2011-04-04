@@ -112,6 +112,11 @@ public class DragPanelExtension
         setLayout(new GridBagLayout());
         boolean canDrop = false;
         TerminologyStoreDI ts = Ts.get();
+        if (getRefexV().getTime() == Long.MAX_VALUE) {
+            setOpaque(true);
+            setBackground(Color.YELLOW);
+            canDrop = true;
+        }
 
         setBorder(BorderFactory.createRaisedBevelBorder());
         extensionLabel = getJLabel(" ");
@@ -143,6 +148,8 @@ public class DragPanelExtension
         if (RefexCnidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
             int cnid = ((RefexCnidVersionBI) getRefexV()).getCnid1();
             TermComponentLabel ext = getLabel(cnid, canDrop);
+            ext.setOpaque(false);
+            ext.setBackground(getBackground());
             add(ext, gbc);
             gbc.gridx++;
             classFound = true;
@@ -150,6 +157,8 @@ public class DragPanelExtension
         if (RefexCnidCnidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
             int cnid = ((RefexCnidCnidVersionBI) getRefexV()).getCnid1();
             TermComponentLabel ext = getLabel(cnid, canDrop);
+            ext.setOpaque(false);
+            ext.setBackground(getBackground());
             add(ext, gbc);
             gbc.gridx++;
             classFound = true;
@@ -157,6 +166,8 @@ public class DragPanelExtension
         if (RefexCnidCnidCnidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
             int cnid = ((RefexCnidCnidCnidVersionBI) getRefexV()).getCnid1();
             TermComponentLabel ext = getLabel(cnid, canDrop);
+            ext.setOpaque(false);
+            ext.setBackground(getBackground());
             add(ext, gbc);
             gbc.gridx++;
             classFound = true;
@@ -167,6 +178,7 @@ public class DragPanelExtension
             FixedWidthJEditorPane textPane = new FixedWidthJEditorPane();
             textPane.setEditable(canDrop);
             textPane.setOpaque(false);
+            textPane.setBackground(getBackground());
             textPane.setFont(textPane.getFont().deriveFont(getSettings().getFontSize()));
             textPane.setText(text);
             add(textPane, gbc);
@@ -178,6 +190,7 @@ public class DragPanelExtension
             int value = ((RefexIntVersionBI) getRefexV()).getInt1();
             JLabel valueLabel = new JLabel(Integer.toString(value));
             valueLabel.setOpaque(false);
+            valueLabel.setBackground(getBackground());
             valueLabel.setFont(valueLabel.getFont().deriveFont(getSettings().getFontSize()));
             valueLabel.setText(Integer.toString(value));
             add(valueLabel, gbc);
@@ -188,6 +201,7 @@ public class DragPanelExtension
             FixedWidthJEditorPane textPane = new FixedWidthJEditorPane();
             textPane.setEditable(canDrop);
             textPane.setOpaque(false);
+            textPane.setBackground(getBackground());
             textPane.setFont(textPane.getFont().deriveFont(getSettings().getFontSize()));
             textPane.setText(getRefexV().toUserString());
             add(textPane, gbc);
