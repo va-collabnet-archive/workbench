@@ -249,9 +249,4 @@ public class CidIntRevision
 		rcs.with(RefexProperty.CNID1, getCnid1());
 		rcs.with(RefexProperty.INTEGER1, getInt1());
 	}
-
-	@Override
-	public int getPartsHashCode() {
-		return HashFunction.hashCode(new int[]{ getC1id(), getIntValue()});
-	}
 }

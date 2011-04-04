@@ -140,11 +140,16 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember> imp
         @Override
         public ERefsetCidStrMember getERefsetMember() throws TerminologyException, IOException {
             return new ERefsetCidStrMember(this);
-        }
+        } 
 
         @Override
         public ERefsetCidStrRevision getERefsetRevision() throws TerminologyException, IOException {
             return new ERefsetCidStrRevision(this);
+        }
+
+        @Override
+        public int hashCodeOfParts() {
+            return HashFunction.hashCode(new int[]{getC1Nid(), getStringValue().hashCode()});
         }
     }
     private int c1Nid;
@@ -330,11 +335,6 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember> imp
     public void setStr1(String str) throws PropertyVetoException {
         this.strValue = str;
         modified();
-    }
-
-    @Override
-    public int getPartsHashCode() {
-        return HashFunction.hashCode(new int[]{getC1id(), getStringValue().hashCode()});
     }
 
     @Override

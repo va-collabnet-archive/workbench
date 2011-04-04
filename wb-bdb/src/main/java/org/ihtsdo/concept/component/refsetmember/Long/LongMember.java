@@ -111,6 +111,11 @@ public class LongMember extends RefsetMember<LongRevision, LongMember>
         public ERefsetLongRevision getERefsetRevision() throws TerminologyException, IOException {
             return new ERefsetLongRevision(this);
         }
+
+        @Override
+        public int hashCodeOfParts() {
+            return HashFunction.hashCode(new int[]{new Long(getLongValue()).hashCode()});
+        }
     }
     private long longValue;
 
@@ -264,11 +269,6 @@ public class LongMember extends RefsetMember<LongRevision, LongMember>
             versions = list;
         }
         return (List<Version>) versions;
-    }
-
-    @Override
-    public int getPartsHashCode() {
-        return HashFunction.hashCode(new int[]{new Long(getLongValue()).hashCode()});
     }
 
     protected TK_REFSET_TYPE getTkRefsetType() {

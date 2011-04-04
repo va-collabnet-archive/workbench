@@ -109,6 +109,11 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
         public ERefsetStrRevision getERefsetRevision() throws TerminologyException, IOException {
             return new ERefsetStrRevision(this);
         }
+
+        @Override
+        public int hashCodeOfParts() {
+            return HashFunction.hashCode(new int[]{getStringValue().hashCode()});
+        }
     }
     private String stringValue;
 
@@ -252,11 +257,6 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
             versions = list;
         }
         return (List<Version>) versions;
-    }
-
-    @Override
-    public int getPartsHashCode() {
-        return HashFunction.hashCode(new int[]{getStringValue().hashCode()});
     }
 
     @Override

@@ -158,9 +158,4 @@ public class MembershipRevision extends RefsetRevision<MembershipRevision, Membe
 	protected void addSpecProperties(RefexCAB rcs) {
 		// no fields to add...
 	}
-	
-	@Override
-	public int getPartsHashCode() {
-		return 0;
-	}	
 }

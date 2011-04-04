@@ -206,9 +206,4 @@ public class CidRevision extends RefsetRevision<CidRevision, CidMember>
 	protected void addSpecProperties(RefexCAB rcs) {
 		rcs.with(RefexProperty.CNID1, getCnid1());
 	}
-
-	@Override
-	public int getPartsHashCode() {
-		return HashFunction.hashCode(new int[]{ getC1id()});
-	}
 }

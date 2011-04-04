@@ -27,7 +27,7 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
 
 		try
 		{
-			buildSet1(set);
+			buildRefset1(set);
         } catch (Exception e) {
             AceLog.getAppLog().log(Level.WARNING, "Error in intializing Contradiction Concept Processor", e);
         }
@@ -325,7 +325,7 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
  		// Unit Test #30 (Drug therapy observable (observable entity)) 
 		set.setMember(Terms.get().getConcept(UUID.fromString("85133052-e1b7-3a5d-aa09-2fd1fafc982e")).getConceptNid());
 		set.setMember(Terms.get().getConcept(UUID.fromString("01403529-5182-37d4-842c-92cd68aa4a0a")).getConceptNid());
-/* 		set.setMember(Terms.get().getConcept(UUID.fromString("3e67adcd-0740-34a3-90c9-f06d5c5da830")).getConceptNid()); */
+ 		set.setMember(Terms.get().getConcept(UUID.fromString("3e67adcd-0740-34a3-90c9-f06d5c5da830")).getConceptNid()); 
 		set.setMember(Terms.get().getConcept(UUID.fromString("a28c605f-0830-3f0a-a0cb-080db7bf07cf")).getConceptNid());
 		set.setMember(Terms.get().getConcept(UUID.fromString("d721d31d-8131-3164-972d-0f53cb591f17")).getConceptNid());
 		set.setMember(Terms.get().getConcept(UUID.fromString("4ad9817a-ff22-3d19-9213-de5270beb17a")).getConceptNid());
@@ -340,10 +340,14 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
 	
     private void buildSet3(I_RepresentIdSet set) throws TerminologyException, IOException {
     	/* Single Test */
-    	set.setMember(Terms.get().getConcept(UUID.fromString("9a4977e0-259d-3281-9edb-3eb576676109")).getConceptNid());
+    	set.setMember(Terms.get().getConcept(UUID.fromString("3e67adcd-0740-34a3-90c9-f06d5c5da830")).getConceptNid());
 			
 
 	}
+    
+    private void buildRefset1(I_RepresentIdSet set) throws TerminologyException, IOException {
+    	set.setMember(Terms.get().getConcept(UUID.fromString("aa4052f3-0faa-39dd-b838-a4d1802ccd59")).getConceptNid());
+    }
     public ContradictionIdentificationResults getResults() {
         return results;
     }

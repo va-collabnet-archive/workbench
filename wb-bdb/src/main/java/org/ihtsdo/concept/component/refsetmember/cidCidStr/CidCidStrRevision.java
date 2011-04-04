@@ -306,10 +306,4 @@ public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidS
 		rcs.with(RefexProperty.CNID2, getCnid2());
 		rcs.with(RefexProperty.STRING1, getStr1());
 	}
-
-	@Override
-	public int getPartsHashCode() {
-		return HashFunction.hashCode(new int[]{ getC1id(), getC2id(), getStringValue().hashCode() });
-	}
-
 }

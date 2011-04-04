@@ -191,9 +191,4 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
     protected void addSpecProperties(RefexCAB rcs) {
         rcs.with(RefexProperty.LONG1, getLong1());
     }
-
-    @Override
-    public int getPartsHashCode() {
-        return HashFunction.hashCode(new int[]{new Long(getLongValue()).hashCode()});
-    }
 }

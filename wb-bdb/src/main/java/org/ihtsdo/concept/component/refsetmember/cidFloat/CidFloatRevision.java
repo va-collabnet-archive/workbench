@@ -233,9 +233,4 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
 		rcs.with(RefexProperty.CNID1, getCnid1());
 		rcs.with(RefexProperty.FLOAT1, getFloat1());
 	}
-
-	@Override
-	public int getPartsHashCode() {
-		return HashFunction.hashCode(new int[]{ getC1Nid(), new Float(getFloatValue()).hashCode()});
-	}		
 }

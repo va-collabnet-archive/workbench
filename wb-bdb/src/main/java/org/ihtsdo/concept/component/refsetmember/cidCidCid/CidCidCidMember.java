@@ -126,6 +126,11 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
         public ERefsetCidCidCidRevision getERefsetRevision() throws TerminologyException, IOException {
             return new ERefsetCidCidCidRevision(this);
         }
+
+    	@Override
+        public int hashCodeOfParts() {
+    		return HashFunction.hashCode(new int[]{getC1Nid(), getC2Nid(), getC3Nid()});
+        }
     }
     private int c1Nid;
     private int c2Nid;
@@ -336,11 +341,6 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
             versions = list;
         }
         return (List<Version>) versions;
-    }
-
-    @Override
-    public int getPartsHashCode() {
-        return HashFunction.hashCode(new int[]{getC1id(), getC2id(), getC3id()});
     }
 
     @Override

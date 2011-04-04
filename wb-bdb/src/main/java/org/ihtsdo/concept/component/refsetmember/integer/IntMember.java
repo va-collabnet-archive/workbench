@@ -108,6 +108,11 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
         public ERefsetIntRevision getERefsetRevision() throws TerminologyException, IOException {
             return new ERefsetIntRevision(this);
         }
+    
+        @Override
+        public int hashCodeOfParts() {
+            return HashFunction.hashCode(new int[]{getIntValue()});
+        }
     }
     private int intValue;
 
@@ -267,11 +272,6 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
 		return TK_REFSET_TYPE.INT;
 	}
 
-	@Override
-	public int getPartsHashCode() {
-		return HashFunction.hashCode(new int[]{ getIntValue()});
-	}
-	
 	protected void addSpecProperties(RefexCAB rcs) {
 		rcs.with(RefexProperty.INTEGER1, this.intValue);
 	}

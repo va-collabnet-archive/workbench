@@ -204,8 +204,4 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
 		rcs.with(RefexProperty.STRING1, getStr1());
 	}
 
-	@Override
-	public int getPartsHashCode() {
-		return HashFunction.hashCode(new int[]{ getStringValue().hashCode()});
-	}
 }

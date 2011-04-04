@@ -53,4 +53,5 @@ public interface I_ExtendByRefVersion<T extends RefexAnalogBI<T>> extends I_Exte
 
     public I_ExtendByRefPart<T> getMutablePart();
 
+    public int hashCodeOfParts(); 
 }

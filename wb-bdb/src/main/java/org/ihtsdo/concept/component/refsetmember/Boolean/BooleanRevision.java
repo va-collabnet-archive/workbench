@@ -199,12 +199,4 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
 	protected void addSpecProperties(RefexCAB rcs) {
 		rcs.with(RefexProperty.BOOLEAN1, getBoolean1());
 	}
-
-	@Override
-	public int getPartsHashCode() {
-		if (getBooleanValue())
-			return 1;
-		else 
-			return 0;
-	}
 }

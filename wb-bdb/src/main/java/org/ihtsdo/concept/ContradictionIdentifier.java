@@ -5,12 +5,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -221,8 +224,8 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
      {
         boolean isSingleEdit = false;
         boolean isDuplicateEdit = false;
+        boolean isContradiction = false;
         ContradictionResult result = ContradictionResult.NONE;
-		ContradictionResult refsetResult = ContradictionResult.NONE;
 	    
 	    ComponentVersionBI latestOriginVersion = null;
 	    ComponentVersionBI latestAdjudicatedVersion = null; 
@@ -232,7 +235,15 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
         
         try {
 			// Examine Refsets.  Only continue to concept's components if refset check doesn't identify contradiction
-//			ContradictionResult refsetResult = refsetMembershipConflictFound(concept, foundPositionsMap, comp.getNid(), compType);
+			ContradictionResult refsetResult = refsetMembershipConflictFound(concept, foundPositionsVersions, comp.getNid());
+			
+			if (refsetResult == ContradictionResult.CONTRADICTION) {
+				isContradiction = true;
+			} else if (refsetResult == ContradictionResult.SINGLE_MODELER_CHANGE) {
+				isSingleEdit = true;
+        	} else if (refsetResult == ContradictionResult.DUPLICATE_EDIT){
+        		isDuplicateEdit = true;
+        	} 
 			
         	if (refsetResult != ContradictionResult.CONTRADICTION)
 			{
@@ -251,36 +262,37 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 						result = handleNonAdjudication(latestDeveloperVersionMap, foundPositionsVersions);
 					}
 				}
-			}
 	
-        	if (result == ContradictionResult.SINGLE_MODELER_CHANGE) {
-				isSingleEdit = true;
-        	} else if (result == ContradictionResult.CONTRADICTION)	{
-	        	// Have potential contradiction, unless developers made same changes
-				ComponentVersionBI compareWithVersion = latestOriginVersion;
-				if (latestAdjudicatedVersion != null) {
-					compareWithVersion = latestAdjudicatedVersion;
+	        	if (result == ContradictionResult.SINGLE_MODELER_CHANGE) {
+					isSingleEdit = true;
+	        	} else if (result == ContradictionResult.CONTRADICTION)	{
+		        	// Have potential contradiction, unless developers made same changes
+					ComponentVersionBI compareWithVersion = latestOriginVersion;
+					if (latestAdjudicatedVersion != null) {
+						compareWithVersion = latestAdjudicatedVersion;
+					} 
+					
+					// Check if for given CompId, have multiple versions with same changes
+					if (!isContradictionWithSameValues(comparer, compareWithVersion, foundPositionsVersions)) {
+						// Concept contains contradiction.  No need to update positions as check complete for concept
+						isContradiction = true;
+					} else {
+						isDuplicateEdit = true;
+					}
 				} 
-				
-				// Check if for given CompId, have multiple versions with same changes
-				if (!isContradictionWithSameValues(comparer, compareWithVersion, foundPositionsVersions)) {
-					// Concept contains contradiction.  No need to update positions as check complete for concept
-					return ContradictionResult.CONTRADICTION;
-				} else {
-					isDuplicateEdit = true;
-				}
-			} 
+		   }
+		
 
 			// Add Position to List
-			updateFoundPositionsForAllVersions(concept, foundPositionsMap, foundPositionsVersions.iterator(), comp.getNid(), compType);
+        	if (!isContradiction && refsetResult != ContradictionResult.CONTRADICTION) {
+				updateFoundPositionsForAllVersions(concept, foundPositionsMap, foundPositionsVersions.iterator(), comp.getNid(), compType);
+        	}
 		} catch (ContraditionException ce) {
 			return ContradictionResult.CONTRADICTION;
 		} 
 		
-		return identifyContradictionResult(false, isSingleEdit, isDuplicateEdit, false);
-	}
-	
-
+		return identifyContradictionResult(isContradiction, isSingleEdit, isDuplicateEdit, false);
+     }
 
      // Compare between developer versions to see if two or more developers modified the component
      private ContradictionResult handleNonAdjudication(Map<Integer, ComponentVersionBI> latestDeveloperVersionMap, Set<ComponentVersionBI> foundPositionsVersions) throws TerminologyException, IOException {
@@ -748,190 +760,100 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
     }
 
-
-    // FOR REFSETS
-    /*
-    private int getLeastCommonRefsetAncestorHashCode(
-            ComponentVersionBI leastCommonAncestorVersion, 
-            I_ExtendByRef member) {
-        for (I_ExtendByRefPart version : member.getMutableParts()) {
-            if (leastCommonAncestorVersion.getTime() == version.getTime()
-                    && leastCommonAncestorVersion.getPathNid() == version.getPathNid()) {
-                return version.getPartsHashCode();
-            }
-        }
-
-        return -1;
-    }
-
-    // FOR REFSETS
-    // Of all versions, identify least common ancestor
-    private ComponentVersionBI identifyLeastCommonAncestorVersion(
-            Iterator<?> versions) {
-        ComponentVersionBI v = null;
-        Map<PositionBI, ComponentVersionBI> possibleVersions = new HashMap<PositionBI, ComponentVersionBI>();
-
-        try {
-            while (versions.hasNext()) {
-                v = (ComponentVersionBI) versions.next();
-				PositionBI p = new Position(v.getTime(), Terms.get().getPath(v.getPathNid()));
-
-                if (leastCommonAncestorForViewPosition.isSubsequentOrEqualTo(p)) {
-                    possibleVersions.put(p, v);
-                }
-            }
-
-            return getLeastCommonAncestorVersion(possibleVersions);
-        } catch (Exception e) {
-            AceLog.getAppLog().log(Level.WARNING, "Error in accessing path: " + v.getPathNid());
-        }
-
-        return null;
-    }
-
-
-    // FOR REFSETS
-    private ComponentVersionBI getCurrentRefsetVersion(ComponentVersionBI version) {
-        // TODO: Haven't done this yet, but need viewCoord
-        try {
-            ViewCoordinate versionCoord = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
-        } catch (Exception e) {
-            AceLog.getAppLog().log(Level.WARNING, "Error in accessing path: " + version.getPathNid());
-        }
-
-        return null;
-    }
-
-    // FOR REFSETS
     private ContradictionResult refsetMembershipConflictFound(
             Concept concept, 
-            Map<PositionForSet, HashMap<Integer, ComponentVersionBI>> foundPositionsMap, 
-            int componentNid, 
-            ComponentType compType) throws TerminologyException, IOException, ParseException {
-        List<? extends I_ExtendByRef> members = Terms.get().getAllExtensionsForComponent(componentNid);
-        ContradictionResult position = ContradictionResult.NONE;
-        boolean isUnreachable = false;
+            Set<ComponentVersionBI> foundPositionsVersions, 
+            int componentNid) throws TerminologyException, IOException, ContraditionException 
+	{
         boolean isSingleEdit = false;
+        boolean isDuplicateEdit = false;
+        boolean isContradiction = false;
+	    ContradictionResult result = ContradictionResult.NONE;
+
+	    I_ExtendByRefPart latestAdjudicatedVersion = null;
+	    I_ExtendByRefPart latestOriginVersion = null;
+	    Map<Integer, ComponentVersionBI> latestDeveloperVersionMap = new HashMap<Integer, ComponentVersionBI>();
+
+	    PathBI originPath = Terms.get().getPath(originPathNid);
+        List<? extends I_ExtendByRef> members = Terms.get().getAllExtensionsForComponent(componentNid);
 
         for (I_ExtendByRef member : members) {
-            if (member.getMutableParts().size() > 2) {
-                ComponentVersionBI lcaDiscoveredVersion = identifyLeastCommonAncestorVersion(member.getMutableParts().iterator());
-                int leastCommonAncestorHashCode = getLeastCommonRefsetAncestorHashCode(lcaDiscoveredVersion, member);
-                int secondaryHashCode = -1;
-
-                for (I_ExtendByRefPart v : member.getMutableParts()) {
-                    PositionBI p = new Position(v.getTime(), Terms.get().getPath(v.getPathNid()));
-
-                    if ((p.isSubsequentOrEqualTo(leastCommonAncestorForViewPosition)) && leastCommonAncestorHashCode != v.getPartsHashCode()) {
-                        if (secondaryHashCode < 0) {
-                            position = ContradictionResult.SINGLE_MODELER_CHANGE;
-                            secondaryHashCode = v.getPartsHashCode();
-                        } else {
-                            if (secondaryHashCode != v.getPartsHashCode()) {
-                                position = ContradictionResult.CONTRADICTION;
-                                break;
-                            }
-                        }
+         	for (I_ExtendByRefPart part : member.getMutableParts()) {
+     			// Identify Adjudication versions and find latest 
+     			if (part.getPathNid() == adjudicatorPathNid) {
+     				if (latestAdjudicatedVersion  == null || part.getTime() > latestAdjudicatedVersion.getTime()) {
+     					latestAdjudicatedVersion = part;
                     }
                 }
-
-                try {
-                    updateFoundPositionsForAllVersions(concept, foundPositionsMap, member.getMutableParts().iterator(), componentNid, compType);
-                } catch (ContraditionException ce) {
-                    return ContradictionResult.CONTRADICTION;
-                }
-            } else {
-                ConceptDataSimpleReference data = new ConceptDataSimpleReference(concept);
-                int ss = data.getRefsetMembers().size();
-                int size = member.getMutableParts().size();
-                RefsetMember a = concept.getRefsetMember(member.getMemberId());
-                // position = areFoundPositionsReachable(concept, foundPositionsMap, member.getMutableParts(), ComponentType.REFSET, componentNid);
             }
 
-            if (position.equals(ContradictionResult.CONTRADICTION)) {
-                return position;
-            } else if (position.equals(ContradictionResult.UNREACHABLE)) {
-                isUnreachable = true;
-            } else if (position.equals(ContradictionResult.SINGLE_MODELER_CHANGE)) {
-                isSingleEdit = true;
-            }
-        }
+         	for (I_ExtendByRefPart part : member.getMutableParts()) {
+    			// Identify Origins versions and find latest
+    			if ((part.getPathNid() == originPathNid) || (isOriginVersion(originPath, part))) {
+     				if (latestOriginVersion  == null || part.getTime() > latestOriginVersion.getTime()) {
+     					latestOriginVersion = part;
+		            }
+		        }
+     		}
 
-        if (isUnreachable) {
-            return ContradictionResult.UNREACHABLE;
-        } else if (isSingleEdit) {
-            return ContradictionResult.SINGLE_MODELER_CHANGE;
-        } else {
-            return ContradictionResult.NONE;
-        }
-    }
+    	    for (I_ExtendByRefPart part : member.getMutableParts()) {
+    	    	boolean putIntoMap = false;
+    	    	Integer pathNidObj = null;
 
-*
-*
-*    private static PositionBI leastCommonAncestorForViewPosition = null;
-    leastCommonAncestorForViewPosition = determineLeastCommonAncestor(sortedOrigins);
-    // For set of origins, identify origin (by position) that is the least common ancestor of the other origins
-    // ie, the version by which to identify original version of concept
-    private PositionBI determineLeastCommonAncestor(
-            Set<HashSet<PositionBI>> originsByVersion) {
-        int smallestSize = -1;
-        Set<PositionBI> smallestSet = new HashSet<PositionBI>();
+    	    	if ((part.getPathNid() != adjudicatorPathNid) &&
+    				(part.getPathNid() != originPathNid) &&
+    				(!isOriginVersion(originPath, part))) 
+    	    	{
+    				// Identify Developer versions
+    				putIntoMap = true;
+    				pathNidObj = new Integer(part.getPathNid());
+    				ComponentVersionBI latestVersion = latestDeveloperVersionMap.get(pathNidObj);
 
-        for (HashSet<PositionBI> origins : originsByVersion) {
-            // Identify smallest set
-            if ((origins.size() < smallestSize) || (smallestSize < 0)) {
-                smallestSize = origins.size();
-                smallestSet = origins;
-            }
-        }
+    				if (latestVersion != null) {
+    					if (latestVersion.getTime() > part.getTime()) {
+    						putIntoMap = false;
+    					}
+	                }
+	            }
 
-        originsByVersion.remove(smallestSet);
-        Set<PositionBI> testingAncestors = new HashSet<PositionBI>();
+    			if (putIntoMap) {
+    				latestDeveloperVersionMap.put(pathNidObj, part);
+	            }
+	        }
 
-        for (PositionBI testingPos : smallestSet) {
-            boolean success = true;
-            for (HashSet<PositionBI> originSet : originsByVersion) {
-                if (!originSet.contains(testingPos)) {
-                    success = false;
-                }
-            }
+			if (!latestDeveloperVersionMap.isEmpty()) {
+				if (latestAdjudicatedVersion != null) { 
+					// if adjudication has been performed on componentId
+					result = handleAdjudication(concept, ComponentType.REFSET, latestAdjudicatedVersion, latestOriginVersion, latestDeveloperVersionMap, foundPositionsVersions);
+				} else {
+					// if never had adjudication performed on componentId
+					result = handleNonAdjudication(latestDeveloperVersionMap, foundPositionsVersions);
+	            }
+	        }
 
-            if (success) {
-                testingAncestors.add(testingPos);
-            }
-        }
-
-        PositionBI leastCommonAncestor = null;
-        for (PositionBI ancestor : testingAncestors) {
-            if (leastCommonAncestor == null || leastCommonAncestor.isAntecedentOrEqualTo(ancestor)) {
-                leastCommonAncestor = ancestor;
-            }
-        }
-
-        return leastCommonAncestor;
-    }
-    // identify the version of a component that is the least common ancestor of all versions
-    private ComponentVersionBI getLeastCommonAncestorVersion(
-            Map<PositionBI, ComponentVersionBI> versions) {
-        Set<PositionBI> keys = versions.keySet();
-        PositionBI leastCommonAncestorPositionBI = null;
-
-        // Find the lowest possible Path
-        for (PositionBI key : keys) {
-            if (leastCommonAncestorPositionBI == null) {
-                leastCommonAncestorPositionBI = key;
-            } else {
-                if (key.isSubsequentOrEqualTo(leastCommonAncestorPositionBI)) {
-                    leastCommonAncestorPositionBI = key;
+        	if (result == ContradictionResult.SINGLE_MODELER_CHANGE) {
+				isSingleEdit = true;
+        	} else if (result == ContradictionResult.CONTRADICTION)	{
+	        	// Have potential contradiction, unless developers made same changes
+				ComponentVersionBI compareWithVersion = latestOriginVersion;
+				if (latestAdjudicatedVersion != null) {
+					compareWithVersion = latestAdjudicatedVersion;
+				}
+				
+				// Check if for given CompId, have multiple versions with same changes
+				if (!isContradictionWithSameValues(new RefsetAttributeComparer(), compareWithVersion, foundPositionsVersions)) 
+				{
+					// Concept contains contradiction.  No need to update positions as check complete for concept
+					isContradiction = true;
+					break;
+	            } else {
+					isDuplicateEdit = true;
                 }
             }
         }
 
-        return versions.get(leastCommonAncestorPositionBI);
+        return identifyContradictionResult(isContradiction, isSingleEdit, isDuplicateEdit, false);
     }
-
-
-*/
 }
 
 

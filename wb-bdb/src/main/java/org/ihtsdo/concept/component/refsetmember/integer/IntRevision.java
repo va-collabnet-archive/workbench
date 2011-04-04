@@ -200,9 +200,4 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
 	protected void addSpecProperties(RefexCAB rcs) {
 		rcs.with(RefexProperty.INTEGER1, this.intValue);
 	}
-
-	@Override
-	public int getPartsHashCode() {
-		return HashFunction.hashCode(new int[]{ getIntValue()});
-	}
 }

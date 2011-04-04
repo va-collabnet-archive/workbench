@@ -138,6 +138,11 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
         public ERefsetCidCidRevision getERefsetRevision() throws TerminologyException, IOException {
             return new ERefsetCidCidRevision(this);
         }
+        
+    	@Override
+        public int hashCodeOfParts() {
+    		return HashFunction.hashCode(new int[]{getC1Nid(), getC2Nid()});
+        }
     }
     private int c1Nid;
     private int c2Nid;
@@ -348,11 +353,6 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
 
     protected TK_REFSET_TYPE getTkRefsetType() {
         return TK_REFSET_TYPE.CID_CID;
-    }
-
-    @Override
-    public int getPartsHashCode() {
-        return HashFunction.hashCode(new int[]{getC1id(), getC2id()});
     }
 
     @Override

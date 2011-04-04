@@ -233,11 +233,6 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         }
 
         @Override
-        public int getPartsHashCode() {
-            return getMutablePart().getPartsHashCode();
-        }
-
-        @Override
         public int getReferencedComponentNid() {
             return RefsetMember.this.getReferencedComponentNid();
         }
@@ -246,6 +241,12 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         public void setReferencedComponentNid(int componentNid) throws PropertyVetoException {
             RefsetMember.this.setReferencedComponentNid(componentNid);
         }
+        
+        @Override
+        public int hashCodeOfParts() {
+        	return 0;
+        }
+
     }
 
     public RefsetMember(int enclosingConceptNid, TupleInput input) throws IOException {
