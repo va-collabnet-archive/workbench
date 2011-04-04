@@ -1,13 +1,11 @@
 package org.ihtsdo.mojo.release.core;
 
 import java.io.File;
-import java.security.NoSuchAlgorithmException;
 
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.ihtsdo.mojo.maven.MojoUtil;
 import org.ihtsdo.rf2.core.factory.RF2RelationshipFactory;
-import org.ihtsdo.rf2.mojo.ConfigMojo;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
 import org.ihtsdo.rf2.util.JAXBUtil;
@@ -19,7 +17,7 @@ import org.ihtsdo.rf2.util.JAXBUtil;
  * @requiresDependencyResolution compile
  */
 
-public class RF2RelationshipExporterMojo extends ConfigMojo {
+public class RF2RelationshipExporterMojo extends AbstractMojo {
 
 	/**
 	 * Location of the build directory.
@@ -28,25 +26,38 @@ public class RF2RelationshipExporterMojo extends ConfigMojo {
 	 * @required
 	 */
 	private File targetDirectory;
+	
+	/**
+	 * release date.
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String releaseDate;
+
+	/**
+	 * Location of the exportFoler.
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String exportFolder;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		System.setProperty("java.awt.headless", "true");
 		try {
-			try {
-				if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName(), this.getClass(), targetDirectory)) {
-					return;
-				}
-			} catch (NoSuchAlgorithmException e) {
-				throw new MojoExecutionException(e.getLocalizedMessage(), e);
-			}
 
 			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/relationship.xml");
 
 			// set all the values passed via mojo
-			setConfig(config);
+			config.setOutputFolderName(exportFolder);
+			config.setReleaseDate(releaseDate);
+			config.setFlushCount(10000);
+			config.setInvokeDroolRules("false");
+			config.setFileExtension("txt");
 
-			// initialize ace framwork and meta hierarchy
+			// initialize meta hierarchy
 			ExportUtil.init();
+
 
 			RF2RelationshipFactory factory = new RF2RelationshipFactory(config);
 			factory.export();
