@@ -92,7 +92,7 @@ public class Bdb {
     }
 
     static {
-        memoryMonitor.setPercentageUsageThreshold(0.9);
+        memoryMonitor.setPercentageUsageThreshold(0.96);
     }
 
     public static boolean isClosed() {

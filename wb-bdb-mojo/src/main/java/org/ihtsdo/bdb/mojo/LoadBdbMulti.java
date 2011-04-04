@@ -127,7 +127,6 @@ public class LoadBdbMulti extends AbstractMojo {
     void executeMojo(String[] conceptsFileNames, String generatedResources,
             File berkeleyDir) throws MojoExecutionException {
         try {
-            runtimeConverterSize = 1;
             for (int i = 0; i < runtimeConverterSize; i++) {
                 converters.put(new ConvertConcept());
             }
@@ -135,8 +134,8 @@ public class LoadBdbMulti extends AbstractMojo {
             long startTime = System.currentTimeMillis();
             FileIO.recursiveDelete(new File(berkeleyDir, "mutable"));
             FileIO.recursiveDelete(new File(berkeleyDir, "read-only"));
-            Bdb.selectJeProperties(new File(berkeleyDir, "je-prop-options"), 
-                    berkeleyDir);
+//            Bdb.selectJeProperties(new File(berkeleyDir, "je-prop-options"), 
+//                    berkeleyDir);
             Bdb.setup(berkeleyDir.getAbsolutePath());
             if (initialPaths != null) {
                getLog().info("initialPaths: " + Arrays.asList(initialPaths));
