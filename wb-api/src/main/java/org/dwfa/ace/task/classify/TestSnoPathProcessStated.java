@@ -1,11 +1,10 @@
 package org.dwfa.ace.task.classify;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
@@ -100,7 +99,7 @@ public class TestSnoPathProcessStated extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         logger = worker.getLogger();
-        logger.info("\r\n::: [TestSnoPathConcepts] evaluate() -- begin");
+        logger.info("\r\n::: [TestSnoPathProcessStated] evaluate() -- begin");
 
         try {
             long startTime = System.currentTimeMillis();
@@ -120,14 +119,14 @@ public class TestSnoPathProcessStated extends AbstractTask {
                         allowedRoleTypes, statusSet, cEditPosSet, null, config.getPrecedence(),
                         config.getConflictResolutionStrategy());
                 tf.iterateConcepts(pcEdit);
-                logger.info("\r\n::: [TestSnoPathConcepts] GET STATED (Edit) PATH DATA : "
+                logger.info("\r\n::: [TestSnoPathProcessStated] GET STATED (Edit) PATH DATA : "
                         + pcEdit.getStats(startTime));
             } else if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH) {
                 pcEdit = new SnoPathProcessStated(logger, cEditSnoCons, cEditSnoRels,
                         allowedRoleTypes, statusSet, cViewPosSet, null, config.getPrecedence(),
                         config.getConflictResolutionStrategy());
                 tf.iterateConcepts(pcEdit);
-                logger.info("\r\n::: [TestSnoPathConcepts] GET STATED (View) PATH DATA : "
+                logger.info("\r\n::: [TestSnoPathProcessStated] GET STATED (View) PATH DATA : "
                         + pcEdit.getStats(startTime));
             } else if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH_WITH_EDIT_PRIORITY) {
                 pcEdit = new SnoPathProcessStated(logger, cEditSnoCons, cEditSnoRels,
@@ -135,13 +134,13 @@ public class TestSnoPathProcessStated extends AbstractTask {
                                 .getPrecedence(), config.getConflictResolutionStrategy());
                 tf.iterateConcepts(pcEdit);
                 logger
-                        .info("\r\n::: [TestSnoPathConcepts] GET STATED (View w/ edit priority) PATH DATA : "
+                        .info("\r\n::: [TestSnoPathProcessStated] GET STATED (View w/ edit priority) PATH DATA : "
                                 + pcEdit.getStats(startTime));
             } else {
-                throw new TaskFailedException("(Classifier) Inferred Path case not implemented.");
+                throw new TaskFailedException("config.getClassifierInputMode() case not implemented.");
             }
             
-            dumpSnoRel(cEditSnoRels, "TestSnoPathConcepts_sctIds_t" + startTime + ".txt", 6);
+            dumpSnoRelSctIds(cEditSnoRels, "TestSnoPathProcessStated_sctIds_t" + startTime + ".txt");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -150,7 +149,7 @@ public class TestSnoPathProcessStated extends AbstractTask {
         cEditSnoRels = null;
         System.gc();
 
-        logger.info("\r\n::: [TestSnoPathConcepts] evaluate() -- completed");
+        logger.info("\r\n::: [TestSnoPathProcessStated] evaluate() -- completed");
         return Condition.CONTINUE;
     }
 
@@ -169,12 +168,12 @@ public class TestSnoPathProcessStated extends AbstractTask {
 
             // GET ALL EDIT_PATH ORIGINS
             if (config.getEditingPathSet() == null) {
-                String errStr = "(Classification error) Edit path is not set.";
+                String errStr = "(Edit Path error) Edit path is not set.";
                 AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
                         new TaskFailedException(errStr));
                 return Condition.STOP;
             } else if (config.getEditingPathSet().size() != 1) {
-                String errStr = "(Classification error) Profile must have exactly one edit path. Found: "
+                String errStr = "(Edit Path error) Profile must have exactly one edit path. Found: "
                         + config.getEditingPathSet();
                 AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
                         new TaskFailedException(errStr));
@@ -210,10 +209,8 @@ public class TestSnoPathProcessStated extends AbstractTask {
             getPathOrigins(cViewPathListPositionBI, cViewPathBI);
 
         } catch (TerminologyException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -432,191 +429,81 @@ public class TestSnoPathProcessStated extends AbstractTask {
         return s.toString();
     }
 
-    private void dumpSnoRel(List<SnoRel> srl, String fName, int format) {
-        try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(fName));
-            if (format == 1) { // RAW NIDs
-                for (SnoRel sr : srl) {
-                    bw
-                            .write(sr.c1Id + "\t" + sr.typeId + "\t" + sr.c2Id + "\t" + sr.group
-                                    + "\r\n");
-                }
-            }
-            if (format == 2) { // UUIDs
-                for (SnoRel sr : srl) {
-                    I_GetConceptData c1 = tf.getConcept(sr.c1Id);
-                    I_GetConceptData t = tf.getConcept(sr.typeId);
-                    I_GetConceptData c2 = tf.getConcept(sr.c2Id);
-                    int g = sr.group;
-                    bw.write(c1.getUids().iterator().next() + "\t" + t.getUids().iterator().next()
-                            + "\t" + c2.getUids().iterator().next() + "\t" + g + "\r\n");
-                }
-            }
-            if (format == 3) { // Initial Text
-                for (SnoRel sr : srl) {
-                    I_GetConceptData c1 = tf.getConcept(sr.c1Id);
-                    I_GetConceptData t = tf.getConcept(sr.typeId);
-                    I_GetConceptData c2 = tf.getConcept(sr.c2Id);
-                    int g = sr.group;
-                    bw.write(c1.getInitialText() + "\t" + t.getInitialText() + "\t"
-                            + c2.getInitialText() + "\t" + g + "\r\n");
-                }
-            }
-            if (format == 4) { // "FULL": rNID, UUIDs, NIDs, **_index, Initial
-                // Text
-                int index = 0;
-                for (SnoRel sr : srl) {
-                    I_GetConceptData c1 = tf.getConcept(sr.c1Id);
-                    I_GetConceptData t = tf.getConcept(sr.typeId);
-                    I_GetConceptData c2 = tf.getConcept(sr.c2Id);
-                    int g = sr.group;
-                    bw.write(sr.relNid + "\t" + c1.getUids().iterator().next() + "\t"
-                            + t.getUids().iterator().next() + "\t" + c2.getUids().iterator().next()
-                            + "\t" + g + "\t");
-                    bw.write(sr.c1Id + "\t" + sr.typeId + "\t" + sr.c2Id + "\t" + sr.group + "\t");
-                    bw.write("**_" + index + "\t|");
-                    bw.write(c1.getInitialText() + "\t|" + t.getInitialText() + "\t|"
-                            + c2.getInitialText() + "\t" + g + "\r\n");
-                    index += 1;
-                }
-            }
-            if (format == 5) { // "COMPARE": UUIDs only
-                for (SnoRel sr : srl) {
-                    StringBuilder sb = new StringBuilder();
+    private void dumpSnoRelSctIds(List<SnoRel> srl, String fName) throws TerminologyException, IOException {
+        List<SnoRelLong> srlSctId = new ArrayList<SnoRelLong>();
 
-                    if (sr.c1Id == Integer.MAX_VALUE) {
-                        sb.append("_INTMAX\t");
-                    } else {
-                        try {
-                            I_GetConceptData c1 = tf.getConcept(sr.c1Id);
-                            if (c1.getUids().iterator().hasNext())
-                                sb.append(c1.getUids().iterator().next() + "\t");
-                            else
-                                sb.append(sr.c1Id + "_INTNoNext\t");
-                        } catch (Exception e) {
-                            sb.append(sr.c1Id + "_INTExcept\t");
+        // Convert native id to sct id
+        long c1 = Long.MAX_VALUE, role = Long.MAX_VALUE, c2 = Long.MAX_VALUE;
+        for (SnoRel sr : srl) {
+            //c1
+            I_GetConceptData cb = tf.getConcept(sr.c1Id);
+            if (cb != null) {
+                List<? extends I_IdVersion> idv1 = cb.getIdentifier().getIdVersions();
+                c1 = Long.MAX_VALUE;
+                for (I_IdVersion id : idv1) {
+                    if (id.getAuthorityNid() == snomedLongAuthorityNid) {
+                        c1 = (Long) id.getDenotation();
+                        break;
+                    }
+                }
+            } else {
+                logger.info("\r\n::: [TestSnoPathInferred] error c1Id = " + sr.c1Id);
+            }
+
+            // c2
+            I_GetConceptData cb2 = tf.getConcept(sr.c2Id);
+            if (cb2 != null) {
+                I_Identify idfr2 = cb2.getIdentifier();
+                if (idfr2 != null) {
+                    List<? extends I_IdVersion> idv2 = idfr2.getIdVersions();
+                    c2 = Long.MAX_VALUE;
+                    for (I_IdVersion id : idv2) {
+                        if (id.getAuthorityNid() == snomedLongAuthorityNid) {
+                            c2 = (Long) id.getDenotation();
+                            break;
                         }
                     }
+                } else {
+                    logger.info("\r\n::: [TestSnoPathInferred] no identifier error c2Id = "
+                            + sr.c2Id + " " + cb2.getPrimUuid() + " "
+                            + cb2.getInitialText() + " where... c1Id " + sr.c1Id + " "
+                            + cb.getPrimUuid() + " " + cb.getInitialText());
+                }
+            } else {
+                logger.info("\r\n::: [TestSnoPathInferred] error c2Id = " + sr.c2Id);
+            }
 
-                    if (sr.typeId == Integer.MAX_VALUE) {
-                        sb.append("_INTMAX\t");
-                    } else {
-                        try {
-                            I_GetConceptData t = tf.getConcept(sr.typeId);
-                            if (t.getUids().iterator().hasNext())
-                                sb.append(t.getUids().iterator().next() + "\t");
-                            else
-                                sb.append(sr.typeId + "_INTNoNext\t");
-                        } catch (Exception e) {
-                            sb.append(sr.typeId + "_INTExcept\t");
+            // role
+            cb = tf.getConcept(sr.typeId);
+            if (cb != null) {
+                I_Identify idfr = cb.getIdentifier();
+                if (idfr != null) {
+                    List<? extends I_IdVersion> idv3 = idfr.getIdVersions();
+                    role = Long.MAX_VALUE;
+                    for (I_IdVersion id : idv3) {
+                        if (id.getAuthorityNid() == snomedLongAuthorityNid) {
+                            role = (Long) id.getDenotation();
+                            break;
                         }
                     }
-
-                    if (sr.c2Id == Integer.MAX_VALUE) {
-                        sb.append("_INTMAX\t");
-                    } else {
-                        try {
-                            I_GetConceptData c2 = tf.getConcept(sr.c2Id);
-                            if (c2.getUids().iterator().hasNext())
-                                sb.append(c2.getUids().iterator().next() + "\t");
-                            else
-                                sb.append(sr.c2Id + "_INTNoNext\t");
-                        } catch (Exception e) {
-                            sb.append(sr.c2Id + "_INTExcept\t");
-                        }
-                    }
-
-                    sb.append(sr.group);
-                    sb.append("\r\n");
-
-                    bw.write(sb.toString());
+                } else {
+                    logger.info("\r\n::: [TestSnoPathInferred] no identifier error typeId = "
+                            + sr.typeId
+                            + " "
+                            + cb.getPrimUuid()
+                            + " "
+                            + cb.getInitialText());
                 }
+            } else {
+                logger.info("\r\n::: [TestSnoPathInferred] error typeId = " + sr.typeId);
             }
-            if (format == 6) { // Distribution Form
-                int index = 0;
-                bw.write("RELATIONSHIPID\t" + "CONCEPTID1\t" + "RELATIONSHIPTYPE\t"
-                        + "CONCEPTID2\t" + "CHARACTERISTICTYPE\t" + "REFINABILITY\t"
-                        + "RELATIONSHIPGROUP\r\n");
 
-                long c1 = Long.MAX_VALUE, role = Long.MAX_VALUE, c2 = Long.MAX_VALUE;
-                for (SnoRel sr : srl) {
-                    index += 1;
-
-                    //c1
-                    I_GetConceptData cb = tf.getConcept(sr.c1Id);
-                    if (cb != null) {
-                        List<? extends I_IdVersion> idv1 = cb.getIdentifier().getIdVersions();
-                        c1 = Long.MAX_VALUE;
-                        for (I_IdVersion id : idv1)
-                            if (id.getAuthorityNid() == snomedLongAuthorityNid) {
-                                c1 = (Long) id.getDenotation();
-                                break;
-                            }
-                    } else
-                        logger.info("\r\n::: [TestSnoPathConcepts] error c1Id = " + sr.c1Id);
-
-                    // c2
-                    I_GetConceptData cb2 = tf.getConcept(sr.c2Id);
-                    if (cb2 != null) {
-                        I_Identify idfr2 = cb2.getIdentifier();
-                        if (idfr2 != null) {
-                            List<? extends I_IdVersion> idv2 = idfr2.getIdVersions();
-                            c2 = Long.MAX_VALUE;
-                            for (I_IdVersion id : idv2) {
-                                if (id.getAuthorityNid() == snomedLongAuthorityNid) {
-                                    c2 = (Long) id.getDenotation();
-                                    break;
-                                }
-                            }
-                        } else
-                            logger.info("\r\n::: [TestSnoPathConcepts] no identifier error c2Id = "
-                                    + sr.c2Id + " " + cb2.getPrimUuid() + " "
-                                    + cb2.getInitialText() + " where... c1Id " + sr.c1Id + " "
-                                    + cb.getPrimUuid() + " " + cb.getInitialText());
-                    } else
-                        logger.info("\r\n::: [TestSnoPathConcepts] error c2Id = " + sr.c2Id);
-
-                    // role
-                    cb = tf.getConcept(sr.typeId);
-                    if (cb != null) {
-                        I_Identify idfr = cb.getIdentifier();
-                        if (idfr != null) {
-                            List<? extends I_IdVersion> idv3 = idfr.getIdVersions();
-                            role = Long.MAX_VALUE;
-                            for (I_IdVersion id : idv3)
-                                if (id.getAuthorityNid() == snomedLongAuthorityNid) {
-                                    role = (Long) id.getDenotation();
-                                    break;
-                                }
-                        } else
-                            logger
-                                    .info("\r\n::: [TestSnoPathConcepts] no identifier error typeId = "
-                                            + sr.typeId
-                                            + " "
-                                            + cb.getPrimUuid()
-                                            + " "
-                                            + cb.getInitialText());
-                    } else
-                        logger.info("\r\n::: [TestSnoPathConcepts] error typeId = " + sr.typeId);
-
-                    // RELATIONSHIPID + CONCEPTID1 + RELATIONSHIPTYPE +
-                    // CONCEPTID2
-                    bw.write("\t" + c1 + "\t" + role + "\t" + c2 + "\t");
-                    // CHARACTERISTICTYPE + REFINABILITY + RELATIONSHIPGROUP
-                    bw.write("0\t" + "0\t" + sr.group + "\r\n");
-                }
-            }
-            bw.flush();
-            bw.close();
-        } catch (TerminologyException e) {
-            // TODO Auto-generated catch block
-            // due to tf.getConcept()
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            // due to new FileWriter
-            e.printStackTrace();
+            // CONCEPTID1 + RELATIONSHIPTYPE + CONCEPTID2 + RELATIONSHIPGROUP
+            srlSctId.add(new SnoRelLong(c1, c2, role, sr.group));
         }
+
+        Collections.sort(srlSctId);
+        SnoRelLong.dumpToFile(srlSctId, fName);
     }
 
 }

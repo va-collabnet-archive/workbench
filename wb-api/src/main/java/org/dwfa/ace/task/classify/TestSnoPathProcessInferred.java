@@ -1,11 +1,10 @@
 package org.dwfa.ace.task.classify;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
@@ -40,17 +39,17 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 
-@BeanList(specs = { @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN) })
+@BeanList(specs = {
+    @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN)})
 public class TestSnoPathProcessInferred extends AbstractTask {
-    private static final long serialVersionUID = 1L;
 
+    private static final long serialVersionUID = 1L;
     // USER INTERFACE
     private Logger logger;
     private I_TermFactory tf;
     private I_ConfigAceFrame config = null;
     private Precedence precedence;
     private I_ManageContradiction contradictionMgr;
-
     // CORE CONSTANTS
     private static int isaNid = Integer.MIN_VALUE;
     private static int rootNid = Integer.MIN_VALUE;
@@ -67,28 +66,22 @@ public class TestSnoPathProcessInferred extends AbstractTask {
     private static int isCh_STATED_AND_SUBSUMED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int sourceUnspecifiedNid;
     private static int workbenchAuxPath = Integer.MIN_VALUE;
-
     private static int snorocketAuthorNid = Integer.MIN_VALUE;
-
     private UUID uuidSourceSnomedLong = null;
     private static int snomedLongAuthorityNid = Integer.MIN_VALUE;
-
     // NID SETS
     I_IntSet statusSet = null;
     PositionSetReadOnly cViewPosSet = null;
     PositionSetReadOnly cEditPosSet = null;
     I_IntSet allowedRoleTypes = null;
-
     // INPUT PATHS
     int cEditPathNid = Integer.MIN_VALUE; // :TODO: move to logging
     PathBI cEditPathBI = null;
     List<PositionBI> cEditPathListPositionBI = null; // Edit (Stated) Path I_Positions
-
     // OUTPUT PATHS
     int cViewPathNid; // :TODO: move to logging
     PathBI cViewPathBI; // Used for write back value
     List<PositionBI> cViewPathListPositionBI; // Classifier (Inferred) Path I_Positions
-
     // MASTER DATA SETS
     List<SnoRel> cEditSnoRels; // "Edit Path" Concepts
     List<SnoCon> cEditSnoCons; // "Edit Path" Relationships
@@ -104,7 +97,7 @@ public class TestSnoPathProcessInferred extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         logger = worker.getLogger();
-        logger.info("\r\n::: [TestSnoPathInferred] evaluate() -- begin");
+        logger.info("\r\n::: [TestSnoPathProcessInferred] evaluate() -- begin");
 
         try {
             long startTime = System.currentTimeMillis();
@@ -112,7 +105,7 @@ public class TestSnoPathProcessInferred extends AbstractTask {
             config = tf.getActiveAceFrameConfig();
             precedence = config.getPrecedence();
             contradictionMgr = config.getConflictResolutionStrategy();
-            
+
             cClassSnoRels = new ArrayList<SnoRel>();
 
             setupCoreNids();
@@ -124,31 +117,31 @@ public class TestSnoPathProcessInferred extends AbstractTask {
             pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
                     statusSet, cEditPosSet, cViewPosSet, null, precedence, contradictionMgr);
             tf.iterateConcepts(pcClass);
-            logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED (View) PATH DATA : "
+            logger.info("\r\n::: [TestSnoPathProcessInferred] GET INFERRED (View) PATH DATA : "
                     + pcClass.getStats(startTime));
 //            if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.EDIT_PATH) {
 //                pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
 //                        statusSet, cEditPosSet, cEditPosSet, null, precedence, contradictionMgr);
 //                tf.iterateConcepts(pcClass);
-//                logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED (Edit) PATH DATA : "
+//                logger.info("\r\n::: [TestSnoPathProcessInferred] GET INFERRED (Edit) PATH DATA : "
 //                        + pcClass.getStats(startTime));
 //            } else if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH) {
 //                pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
 //                        statusSet, cViewPosSet, cViewPosSet, null, precedence, contradictionMgr);
 //                tf.iterateConcepts(pcClass);
-//                logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED (View) PATH DATA : "
+//                logger.info("\r\n::: [TestSnoPathProcessInferred] GET INFERRED (View) PATH DATA : "
 //                        + pcClass.getStats(startTime));
 //            } else if (config.getClassifierInputMode() == CLASSIFIER_INPUT_MODE_PREF.VIEW_PATH_WITH_EDIT_PRIORITY) {
 //                pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
 //                        statusSet, cEditPosSet, cViewPosSet, null, precedence, contradictionMgr);
 //                tf.iterateConcepts(pcClass);
-//                logger.info("\r\n::: [TestSnoPathInferred] GET INFERRED (View w/ edit priority) PATH DATA : "
+//                logger.info("\r\n::: [TestSnoPathProcessInferred] GET INFERRED (View w/ edit priority) PATH DATA : "
 //                        + pcClass.getStats(startTime));
 //            } else {
 //                throw new TaskFailedException("(Classifier) Inferred Path case not implemented.");
 //            }
 
-            dumpSnoRel(cClassSnoRels, "TestSnoPathInferred_sctIds_t" + startTime + ".txt", 6);
+            dumpSnoRelSctIds(cClassSnoRels, "TestSnoPathProcessInferred_sctIds_t" + startTime + ".txt");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -157,7 +150,7 @@ public class TestSnoPathProcessInferred extends AbstractTask {
         cEditSnoRels = null;
         System.gc();
 
-        logger.info("\r\n::: [TestSnoPathInferred] evaluate() -- completed");
+        logger.info("\r\n::: [TestSnoPathProcessInferred] evaluate() -- completed");
         return Condition.CONTINUE;
     }
 
@@ -239,12 +232,13 @@ public class TestSnoPathProcessInferred extends AbstractTask {
         while (thisLevel.size() > 0) {
             List<PositionBI> nextLevel = new ArrayList<PositionBI>();
             for (PositionBI p1 : thisLevel) {
-                for (PositionBI p2 : p1.getPath().getOrigins())
+                for (PositionBI p2 : p1.getPath().getOrigins()) {
                     if ((origins.contains(p2) == false)
                             && (p2.getPath().getConceptNid() != workbenchAuxPath)) {
                         origins.add(p2);
                         nextLevel.add(p2);
                     }
+                }
             }
 
             thisLevel = nextLevel;
@@ -302,30 +296,18 @@ public class TestSnoPathProcessInferred extends AbstractTask {
             isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
             isLIMITED = tf.uuidToNative(ArchitectonicAuxiliary.Concept.LIMITED.getUids());
             isRETIRED = tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
-            isOPTIONAL_REFINABILITY = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
-            isNOT_REFINABLE = tf.uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE
-                    .getUids());
-            isMANDATORY_REFINABILITY = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY.getUids());
-            isCh_STATED_RELATIONSHIP = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
-            isCh_DEFINING_CHARACTERISTIC = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
-            isCh_STATED_AND_INFERRED_RELATIONSHIP = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP
-                            .getUids());
-            isCh_STATED_AND_SUBSUMED_RELATIONSHIP = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP
-                            .getUids());
-            sourceUnspecifiedNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
-                    .getUids());
+            isOPTIONAL_REFINABILITY = tf.uuidToNative(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
+            isNOT_REFINABLE = tf.uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
+            isMANDATORY_REFINABILITY = tf.uuidToNative(ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY.getUids());
+            isCh_STATED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
+            isCh_DEFINING_CHARACTERISTIC = tf.uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
+            isCh_STATED_AND_INFERRED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP.getUids());
+            isCh_STATED_AND_SUBSUMED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP.getUids());
+            sourceUnspecifiedNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
 
-            snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET
-                    .getUids());
+            snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET.getUids());
 
-            uuidSourceSnomedLong = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids()
-                    .iterator().next();
+            uuidSourceSnomedLong = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next();
             snomedLongAuthorityNid = tf.uuidToNative(uuidSourceSnomedLong);
 
         } catch (TerminologyException e) {
@@ -360,13 +342,15 @@ public class TestSnoPathProcessInferred extends AbstractTask {
                                 rPart1 = rPart; // ... KEEP MORE_RECENT PART
                             } else if (rPart1.getVersion() == rPart.getVersion()) {
                                 countRelDuplVersion++;
-                                if (rPart.getStatusId() == isCURRENT)
+                                if (rPart.getStatusId() == isCURRENT) {
                                     rPart1 = rPart; // KEEP CURRENT PART
+                                }
                             }
                         }
                     }
-                    if (rPart1 != null)
+                    if (rPart1 != null) {
                         break; // IF FOUND ON THIS PATH, STOP SEARCHING
+                    }
                 }
 
                 if ((rPart1 != null) && (rPart1.getStatusId() == isCURRENT)
@@ -377,8 +361,9 @@ public class TestSnoPathProcessInferred extends AbstractTask {
                     // GET C1 DESTINATION RELS FOR NEXT LEVEL
                     I_GetConceptData c1 = tf.getConcept(rv.getC1Id());
                     Collection<? extends I_RelVersioned> c1Rels = c1.getDestRels();
-                    for (I_RelVersioned nextRel : c1Rels)
+                    for (I_RelVersioned nextRel : c1Rels) {
                         nextLevel.add(nextRel);
+                    }
                 }
             } // for thisLevel
 
@@ -418,10 +403,8 @@ public class TestSnoPathProcessInferred extends AbstractTask {
             sb.append(cNid + "\t");
             sb.append(c.getInitialText());
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (TerminologyException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -440,191 +423,80 @@ public class TestSnoPathProcessInferred extends AbstractTask {
         return s.toString();
     }
 
-    private void dumpSnoRel(List<SnoRel> srl, String fName, int format) {
-        try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(fName));
-            if (format == 1) { // RAW NIDs
-                for (SnoRel sr : srl) {
-                    bw
-                            .write(sr.c1Id + "\t" + sr.typeId + "\t" + sr.c2Id + "\t" + sr.group
-                                    + "\r\n");
-                }
-            }
-            if (format == 2) { // UUIDs
-                for (SnoRel sr : srl) {
-                    I_GetConceptData c1 = tf.getConcept(sr.c1Id);
-                    I_GetConceptData t = tf.getConcept(sr.typeId);
-                    I_GetConceptData c2 = tf.getConcept(sr.c2Id);
-                    int g = sr.group;
-                    bw.write(c1.getUids().iterator().next() + "\t" + t.getUids().iterator().next()
-                            + "\t" + c2.getUids().iterator().next() + "\t" + g + "\r\n");
-                }
-            }
-            if (format == 3) { // Initial Text
-                for (SnoRel sr : srl) {
-                    I_GetConceptData c1 = tf.getConcept(sr.c1Id);
-                    I_GetConceptData t = tf.getConcept(sr.typeId);
-                    I_GetConceptData c2 = tf.getConcept(sr.c2Id);
-                    int g = sr.group;
-                    bw.write(c1.getInitialText() + "\t" + t.getInitialText() + "\t"
-                            + c2.getInitialText() + "\t" + g + "\r\n");
-                }
-            }
-            if (format == 4) { // "FULL": rNID, UUIDs, NIDs, **_index, Initial
-                // Text
-                int index = 0;
-                for (SnoRel sr : srl) {
-                    I_GetConceptData c1 = tf.getConcept(sr.c1Id);
-                    I_GetConceptData t = tf.getConcept(sr.typeId);
-                    I_GetConceptData c2 = tf.getConcept(sr.c2Id);
-                    int g = sr.group;
-                    bw.write(sr.relNid + "\t" + c1.getUids().iterator().next() + "\t"
-                            + t.getUids().iterator().next() + "\t" + c2.getUids().iterator().next()
-                            + "\t" + g + "\t");
-                    bw.write(sr.c1Id + "\t" + sr.typeId + "\t" + sr.c2Id + "\t" + sr.group + "\t");
-                    bw.write("**_" + index + "\t|");
-                    bw.write(c1.getInitialText() + "\t|" + t.getInitialText() + "\t|"
-                            + c2.getInitialText() + "\t" + g + "\r\n");
-                    index += 1;
-                }
-            }
-            if (format == 5) { // "COMPARE": UUIDs only
-                for (SnoRel sr : srl) {
-                    StringBuilder sb = new StringBuilder();
+    private void dumpSnoRelSctIds(List<SnoRel> srl, String fName) throws TerminologyException, IOException {
+        List<SnoRelLong> srlSctId = new ArrayList<SnoRelLong>();
 
-                    if (sr.c1Id == Integer.MAX_VALUE) {
-                        sb.append("_INTMAX\t");
-                    } else {
-                        try {
-                            I_GetConceptData c1 = tf.getConcept(sr.c1Id);
-                            if (c1.getUids().iterator().hasNext())
-                                sb.append(c1.getUids().iterator().next() + "\t");
-                            else
-                                sb.append(sr.c1Id + "_INTNoNext\t");
-                        } catch (Exception e) {
-                            sb.append(sr.c1Id + "_INTExcept\t");
+        // Convert native id to sct id
+        long c1 = Long.MAX_VALUE, role = Long.MAX_VALUE, c2 = Long.MAX_VALUE;
+        for (SnoRel sr : srl) {
+            //c1
+            I_GetConceptData cb = tf.getConcept(sr.c1Id);
+            if (cb != null) {
+                List<? extends I_IdVersion> idv1 = cb.getIdentifier().getIdVersions();
+                c1 = Long.MAX_VALUE;
+                for (I_IdVersion id : idv1) {
+                    if (id.getAuthorityNid() == snomedLongAuthorityNid) {
+                        c1 = (Long) id.getDenotation();
+                        break;
+                    }
+                }
+            } else {
+                logger.info("\r\n::: [TestSnoPathProcessInferred] error c1Id = " + sr.c1Id);
+            }
+
+            // c2
+            I_GetConceptData cb2 = tf.getConcept(sr.c2Id);
+            if (cb2 != null) {
+                I_Identify idfr2 = cb2.getIdentifier();
+                if (idfr2 != null) {
+                    List<? extends I_IdVersion> idv2 = idfr2.getIdVersions();
+                    c2 = Long.MAX_VALUE;
+                    for (I_IdVersion id : idv2) {
+                        if (id.getAuthorityNid() == snomedLongAuthorityNid) {
+                            c2 = (Long) id.getDenotation();
+                            break;
                         }
                     }
+                } else {
+                    logger.info("\r\n::: [TestSnoPathProcessInferred] no identifier error c2Id = "
+                            + sr.c2Id + " " + cb2.getPrimUuid() + " "
+                            + cb2.getInitialText() + " where... c1Id " + sr.c1Id + " "
+                            + cb.getPrimUuid() + " " + cb.getInitialText());
+                }
+            } else {
+                logger.info("\r\n::: [TestSnoPathProcessInferred] error c2Id = " + sr.c2Id);
+            }
 
-                    if (sr.typeId == Integer.MAX_VALUE) {
-                        sb.append("_INTMAX\t");
-                    } else {
-                        try {
-                            I_GetConceptData t = tf.getConcept(sr.typeId);
-                            if (t.getUids().iterator().hasNext())
-                                sb.append(t.getUids().iterator().next() + "\t");
-                            else
-                                sb.append(sr.typeId + "_INTNoNext\t");
-                        } catch (Exception e) {
-                            sb.append(sr.typeId + "_INTExcept\t");
+            // role
+            cb = tf.getConcept(sr.typeId);
+            if (cb != null) {
+                I_Identify idfr = cb.getIdentifier();
+                if (idfr != null) {
+                    List<? extends I_IdVersion> idv3 = idfr.getIdVersions();
+                    role = Long.MAX_VALUE;
+                    for (I_IdVersion id : idv3) {
+                        if (id.getAuthorityNid() == snomedLongAuthorityNid) {
+                            role = (Long) id.getDenotation();
+                            break;
                         }
                     }
-
-                    if (sr.c2Id == Integer.MAX_VALUE) {
-                        sb.append("_INTMAX\t");
-                    } else {
-                        try {
-                            I_GetConceptData c2 = tf.getConcept(sr.c2Id);
-                            if (c2.getUids().iterator().hasNext())
-                                sb.append(c2.getUids().iterator().next() + "\t");
-                            else
-                                sb.append(sr.c2Id + "_INTNoNext\t");
-                        } catch (Exception e) {
-                            sb.append(sr.c2Id + "_INTExcept\t");
-                        }
-                    }
-
-                    sb.append(sr.group);
-                    sb.append("\r\n");
-
-                    bw.write(sb.toString());
+                } else {
+                    logger.info("\r\n::: [TestSnoPathProcessInferred] no identifier error typeId = "
+                            + sr.typeId
+                            + " "
+                            + cb.getPrimUuid()
+                            + " "
+                            + cb.getInitialText());
                 }
+            } else {
+                logger.info("\r\n::: [TestSnoPathProcessInferred] error typeId = " + sr.typeId);
             }
-            if (format == 6) { // Distribution Form
-                int index = 0;
-                bw.write("RELATIONSHIPID\t" + "CONCEPTID1\t" + "RELATIONSHIPTYPE\t"
-                        + "CONCEPTID2\t" + "CHARACTERISTICTYPE\t" + "REFINABILITY\t"
-                        + "RELATIONSHIPGROUP\r\n");
 
-                long c1 = Long.MAX_VALUE, role = Long.MAX_VALUE, c2 = Long.MAX_VALUE;
-                for (SnoRel sr : srl) {
-                    index += 1;
-
-                    //c1
-                    I_GetConceptData cb = tf.getConcept(sr.c1Id);
-                    if (cb != null) {
-                        List<? extends I_IdVersion> idv1 = cb.getIdentifier().getIdVersions();
-                        c1 = Long.MAX_VALUE;
-                        for (I_IdVersion id : idv1)
-                            if (id.getAuthorityNid() == snomedLongAuthorityNid) {
-                                c1 = (Long) id.getDenotation();
-                                break;
-                            }
-                    } else
-                        logger.info("\r\n::: [TestSnoPathInferred] error c1Id = " + sr.c1Id);
-
-                    // c2
-                    I_GetConceptData cb2 = tf.getConcept(sr.c2Id);
-                    if (cb2 != null) {
-                        I_Identify idfr2 = cb2.getIdentifier();
-                        if (idfr2 != null) {
-                            List<? extends I_IdVersion> idv2 = idfr2.getIdVersions();
-                            c2 = Long.MAX_VALUE;
-                            for (I_IdVersion id : idv2) {
-                                if (id.getAuthorityNid() == snomedLongAuthorityNid) {
-                                    c2 = (Long) id.getDenotation();
-                                    break;
-                                }
-                            }
-                        } else
-                            logger.info("\r\n::: [TestSnoPathInferred] no identifier error c2Id = "
-                                    + sr.c2Id + " " + cb2.getPrimUuid() + " "
-                                    + cb2.getInitialText() + " where... c1Id " + sr.c1Id + " "
-                                    + cb.getPrimUuid() + " " + cb.getInitialText());
-                    } else
-                        logger.info("\r\n::: [TestSnoPathInferred] error c2Id = " + sr.c2Id);
-
-                    // role
-                    cb = tf.getConcept(sr.typeId);
-                    if (cb != null) {
-                        I_Identify idfr = cb.getIdentifier();
-                        if (idfr != null) {
-                            List<? extends I_IdVersion> idv3 = idfr.getIdVersions();
-                            role = Long.MAX_VALUE;
-                            for (I_IdVersion id : idv3)
-                                if (id.getAuthorityNid() == snomedLongAuthorityNid) {
-                                    role = (Long) id.getDenotation();
-                                    break;
-                                }
-                        } else
-                            logger
-                                    .info("\r\n::: [TestSnoPathInferred] no identifier error typeId = "
-                                            + sr.typeId
-                                            + " "
-                                            + cb.getPrimUuid()
-                                            + " "
-                                            + cb.getInitialText());
-                    } else
-                        logger.info("\r\n::: [TestSnoPathInferred] error typeId = " + sr.typeId);
-
-                    // RELATIONSHIPID + CONCEPTID1 + RELATIONSHIPTYPE +
-                    // CONCEPTID2
-                    bw.write("\t" + c1 + "\t" + role + "\t" + c2 + "\t");
-                    // CHARACTERISTICTYPE + REFINABILITY + RELATIONSHIPGROUP
-                    bw.write("0\t" + "0\t" + sr.group + "\r\n");
-                }
-            }
-            bw.flush();
-            bw.close();
-        } catch (TerminologyException e) {
-            // TODO Auto-generated catch block
-            // due to tf.getConcept()
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            // due to new FileWriter
-            e.printStackTrace();
+            // CONCEPTID1 + RELATIONSHIPTYPE + CONCEPTID2 + RELATIONSHIPGROUP
+            srlSctId.add(new SnoRelLong(c1, c2, role, sr.group));
         }
-    }
 
+        Collections.sort(srlSctId);
+        SnoRelLong.dumpToFile(srlSctId, fName);
+    }
 }
