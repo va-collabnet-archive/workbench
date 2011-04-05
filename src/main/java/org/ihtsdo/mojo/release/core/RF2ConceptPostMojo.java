@@ -112,4 +112,28 @@ public class RF2ConceptPostMojo extends AbstractMojo {
 	public void setExportFolder(String exportFolder) {
 		this.exportFolder = exportFolder;
 	}
+
+	public String getPreviousReleaseDate() {
+		return previousReleaseDate;
+	}
+
+	public void setPreviousReleaseDate(String previousReleaseDate) {
+		this.previousReleaseDate = previousReleaseDate;
+	}
+
+	public String getRf2FullFolder() {
+		return rf2FullFolder;
+	}
+
+	public void setRf2FullFolder(String rf2FullFolder) {
+		this.rf2FullFolder = rf2FullFolder;
+	}
+
+	public String getOutputFolder() {
+		return outputFolder;
+	}
+
+	public void setOutputFolder(String outputFolder) {
+		this.outputFolder = outputFolder;
+	}
 }
