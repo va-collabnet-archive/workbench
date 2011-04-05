@@ -352,6 +352,7 @@ rule "rule 21" #rel (w/o group) onto rel (w/o group): create new rel group"
       							component.time != Long.MAX_VALUE)
       $dropObject: RelFact(context == Context.DROP_OBJECT,
       					   component != $dropTarget.component,
+      					   component.conceptNid == $dropTarget.component.conceptNid,
                            component.group == 0,
                            component.time != Long.MAX_VALUE)
 
