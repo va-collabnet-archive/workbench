@@ -9,6 +9,8 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.ihtsdo.rf2.core.factory.RF2ConceptFactory;
+import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportImpl;
+import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
 import org.ihtsdo.rf2.util.JAXBUtil;
@@ -80,8 +82,11 @@ public class RF2ConceptPostMojo extends AbstractMojo {
 			File conceptsFileName = new File(targetDirectory, 
 					config.getExportFileName() + releaseDate + "." + config.getFileExtension());
 			
+			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_CONCEPT, new File( rf2FullFolder),
+					 conceptsFileName, new File(outputFolder), targetDirectory,
+					 previousReleaseDate, releaseDate);
+			pExp.postProcess();
 			
-
 		} catch (Exception e) {
 			e.printStackTrace();
 			e.getMessage();
