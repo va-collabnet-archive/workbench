@@ -169,6 +169,7 @@ public class NewConcept extends PreviousNextOrCancel {
             wizard = (WizardBI) worker.readAttachement(WorkerAttachmentKeys.WIZARD_PANEL.name());
             config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             host = (I_HostConceptPlugins) worker.readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name());
+            host.unlink();
 
             DoSwing swinger = new DoSwing(process);
             swinger.execute();
