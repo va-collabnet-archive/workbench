@@ -8,19 +8,19 @@ import java.util.Date;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.ihtsdo.rf2.core.factory.RF2RelationshipFactory;
+import org.ihtsdo.rf2.core.factory.RF2ConceptFactory;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
 import org.ihtsdo.rf2.util.JAXBUtil;
 
 /**
- * @author Varsha Parekh
+ * @author Alo
  * 
- * @goal export-relationship
+ * @goal post-process-concept
  * @requiresDependencyResolution compile
  */
 
-public class RF2RelationshipExporterMojo extends AbstractMojo {
+public class RF2ConceptPostMojo extends AbstractMojo {
 
 	/**
 	 * Location of the build directory.
@@ -31,45 +31,56 @@ public class RF2RelationshipExporterMojo extends AbstractMojo {
 	private File targetDirectory;
 	
 	/**
-	 * release date.
+	 * release date. 20100731
 	 * 
 	 * @parameter
 	 * @required
 	 */
 	private String releaseDate;
+	
+	/**
+	 * previuous release date. 20100731
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String previousReleaseDate;
 
 	/**
-	 * Location of the exportFoler.
+	 * Location of the exportFoler. (input in this mojo)
 	 * 
 	 * @parameter
 	 * @required
 	 */
 	private String exportFolder;
+	
+	/**
+	 * Location of the rf2 full. (input in this mojo)
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String rf2FullFolder;
+	
+	/**
+	 * Location of the outputFolder. (output in this mojo)
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String outputFolder;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
-
-			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/relationship.xml");
+			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/concept.xml");
 
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
-
-			DateFormat df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
-			Date time = df.parse(releaseDate);
-			DateFormat releaseFormat = new SimpleDateFormat("yyyyMMdd");
-			String releaseDateString = releaseFormat.format(time);
-			config.setReleaseDate(releaseDateString);
-			
-			config.setFlushCount(10000);
-			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
-
-			// initialize meta hierarchy
-			ExportUtil.init();
-
-
-			RF2RelationshipFactory factory = new RF2RelationshipFactory(config);
-			factory.export();
+			File conceptsFileName = new File(targetDirectory, 
+					config.getExportFileName() + releaseDate + "." + config.getFileExtension());
+			
+			
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -84,5 +95,21 @@ public class RF2RelationshipExporterMojo extends AbstractMojo {
 
 	public void setTargetDirectory(File targetDirectory) {
 		this.targetDirectory = targetDirectory;
+	}
+
+	public String getReleaseDate() {
+		return releaseDate;
+	}
+
+	public void setReleaseDate(String releaseDate) {
+		this.releaseDate = releaseDate;
+	}
+
+	public String getExportFolder() {
+		return exportFolder;
+	}
+
+	public void setExportFolder(String exportFolder) {
+		this.exportFolder = exportFolder;
 	}
 }

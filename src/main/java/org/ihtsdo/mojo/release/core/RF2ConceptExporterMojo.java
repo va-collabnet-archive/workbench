@@ -1,11 +1,13 @@
 package org.ihtsdo.mojo.release.core;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.ace.api.Terms;
 import org.ihtsdo.rf2.core.factory.RF2ConceptFactory;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
@@ -50,7 +52,13 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
-			config.setReleaseDate(releaseDate);
+			
+			DateFormat df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
+			Date time = df.parse(releaseDate);
+			DateFormat releaseFormat = new SimpleDateFormat("yyyyMMdd");
+			String releaseDateString = releaseFormat.format(time);
+			config.setReleaseDate(releaseDateString);
+			
 			config.setFlushCount(10000);
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");

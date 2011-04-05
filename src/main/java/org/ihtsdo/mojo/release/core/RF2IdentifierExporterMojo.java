@@ -2,6 +2,9 @@ package org.ihtsdo.mojo.release.core;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -51,7 +54,13 @@ public class RF2IdentifierExporterMojo extends AbstractMojo {
 
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
-			config.setReleaseDate(releaseDate);
+
+			DateFormat df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
+			Date time = df.parse(releaseDate);
+			DateFormat releaseFormat = new SimpleDateFormat("yyyyMMdd");
+			String releaseDateString = releaseFormat.format(time);
+			config.setReleaseDate(releaseDateString);
+			
 			config.setFlushCount(10000);
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
