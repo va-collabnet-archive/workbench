@@ -1903,6 +1903,23 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
     	ES_ER, ES_PY, ES_SV, ES_UY, ES_VE, FR, FR_BE, FR_CA, FR_FR, FR_CH,
     	FR_LU, FR_MC, DA, DA_DK, PL, SV, SV_FI, SV_SE, LT, LT_LT, ZH,
         ZH_CN, ZH_HK, ZH_CHS, ZH_CHT, ZH_MO, ZH_SG, ZH_TW;
+    	
+    	public String getFormatedLanguageCode(){
+    		String result = "";
+    		String name = this.name();
+    		String [] nameArray = name.split("_");
+    		if(nameArray.length == 1){
+    			result = nameArray[0].toLowerCase();
+    		}else if(nameArray.length == 2){
+    			result = nameArray[0].toLowerCase() + "-" + nameArray[1].toUpperCase();
+    		}
+    		return result;
+    	}
+    	
+    	public String toString(){
+    		return this.name();
+    	}
+    	
     }
 
     public static I_ConceptualizeUniversally getLanguageConcept(String langCode) {
