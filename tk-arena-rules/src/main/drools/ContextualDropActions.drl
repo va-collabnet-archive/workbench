@@ -38,6 +38,7 @@ import org.ihtsdo.arena.context.action.ReplaceAction;
 import org.ihtsdo.arena.context.action.MakeAcceptableAction;
 import org.ihtsdo.arena.context.action.MakeNotAcceptableAction;
 import org.ihtsdo.arena.context.action.MakePreferredAction;
+import org.ihtsdo.arena.context.action.GroupRelsAction;
 
 
 import org.ihtsdo.tk.drools.facts.ComponentFact;
@@ -342,4 +343,18 @@ rule "rule 20" #not acceptable acceptibility US
 	then
 		actions.add(new MakePreferredAction("GB Preferred", $dropTarget, "en-us"));
 		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget, "en-us"));
+end
+
+rule "rule 21" #rel (w/o group) onto rel (w/o group): create new rel group"
+   when
+      $dropTarget: RelFact(context == Context.DROP_TARGET,
+      							component.group == 0,
+      							component.time != Long.MAX_VALUE)
+      $dropObject: RelFact(context == Context.DROP_OBJECT,
+      					   component != $dropTarget.component,
+                           component.group == 0,
+                           component.time != Long.MAX_VALUE)
+
+   then
+      actions.add(new GroupRelsAction("group rels", $dropObject, $dropTarget));
 end
