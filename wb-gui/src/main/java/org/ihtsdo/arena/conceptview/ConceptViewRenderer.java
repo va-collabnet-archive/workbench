@@ -206,7 +206,7 @@ public class ConceptViewRenderer extends JLayeredPane {
         title = new ConceptViewTitle(graph, cell, settings);
 
         add(title, BorderLayout.NORTH);
-
+        
         conceptScrollPane = null;
 
         if (graph.getModel().getChildCount(cell) == 0) {
@@ -278,6 +278,8 @@ public class ConceptViewRenderer extends JLayeredPane {
                     showConceptPanel();
                 }
             }
+            
+            
 
             private void setupWorkflow() 
             {
@@ -710,6 +712,7 @@ public class ConceptViewRenderer extends JLayeredPane {
         remove(workflowScrollPane);
       	conceptViewPanel.setVisible(true);
         workflowToggleButton.setSelected(false);
+        workflowToggleButton.setVisible(true);
 
         if (this.getIndexOf(conceptViewPanel) < 0)
             add(conceptViewPanel, BorderLayout.CENTER);
@@ -725,6 +728,7 @@ public class ConceptViewRenderer extends JLayeredPane {
         workflowPanel.setVisible(false);
         remove(workflowScrollPane);
         add(wizardScrollPane, BorderLayout.CENTER);
+        workflowToggleButton.setVisible(false);
         GuiUtil.tickle(ConceptViewRenderer.this);
     }
 
