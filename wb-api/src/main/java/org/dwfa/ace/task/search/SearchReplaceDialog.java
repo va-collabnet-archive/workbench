@@ -17,6 +17,7 @@
 package org.dwfa.ace.task.search;
 
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -27,6 +28,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.ListIterator;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -44,6 +46,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.ArchitectonicAuxiliary.LANG_CODE;
 import org.dwfa.tapi.TerminologyException;
 
 public class SearchReplaceDialog extends JDialog {
@@ -59,6 +62,7 @@ public class SearchReplaceDialog extends JDialog {
     private JTextField searchStringTextField;
     private JTextField replaceStringTextField;
     private JComboBox retireAsStatus;
+    private JComboBox languageCode;
     private JCheckBox caseSensitiveCheckBox;
     private JCheckBox fullySpecifiedNameCheckBox;
     private JCheckBox preferredTermCheckBox;
@@ -105,6 +109,19 @@ public class SearchReplaceDialog extends JDialog {
 
         try {
             termFactory = Terms.get();
+    		for (LANG_CODE lCode:ArchitectonicAuxiliary.LANG_CODE.values()){
+    			I_GetConceptData langName;
+    			try {
+    				langName = termFactory.getConcept(ArchitectonicAuxiliary.getLanguageConcept(lCode.name()).getUids());
+    				languageCode.addItem(langName);
+    			} catch (TerminologyException e) {
+    				e.printStackTrace();
+    			} catch (IOException e) {
+    				e.printStackTrace();
+    			}catch (Exception e){
+    			}
+    		}
+            
             statusIntList = termFactory.getActiveAceFrameConfig().getEditStatusTypePopup();
             retiredConceptId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids()
                 .iterator()
@@ -156,6 +173,10 @@ public class SearchReplaceDialog extends JDialog {
         return replaceStringTextField.getText();
     }
 
+	public String getLanguageCode() {
+		return "en";
+	}
+    
     public boolean isCaseSensitive() {
         return caseSensitiveCheckBox.isSelected();
     }
@@ -308,6 +329,21 @@ public class SearchReplaceDialog extends JDialog {
         gbc.weighty = 1.0;
         gbc.anchor = GridBagConstraints.WEST;
         panel2.add(caseSensitiveCheckBox, gbc);
+        final JPanel panel5 = new JPanel();
+        panel5.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 6;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        panel1.add(panel5, gbc);
+        languageCode = new JComboBox();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 5;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel1.add(languageCode, gbc);
         allCheckBox = new JCheckBox();
         allCheckBox.setSelected(true);
         allCheckBox.setText("All");
@@ -409,4 +445,5 @@ public class SearchReplaceDialog extends JDialog {
     public JComponent $$$getRootComponent$$$() {
         return contentPane;
     }
+
 }

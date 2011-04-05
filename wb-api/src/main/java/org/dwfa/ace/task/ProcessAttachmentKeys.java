@@ -69,6 +69,7 @@ public enum ProcessAttachmentKeys {
     REL_TYPE,
     REPLACE_TEXT,
     RETIRE_AS_STATUS,
+    LANGUAGE_CODE,
     ROOT_CONCEPT,
     SEARCH_ALL,
     SEARCH_FSN,
