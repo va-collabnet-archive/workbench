@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
@@ -23,50 +25,53 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.Precedence;
 
 public class SnoPathProcessStated implements I_ProcessConcepts {
+
     private List<SnoRel> snorels;
     private List<SnoCon> snocons;
-
     // STATISTICS COUNTERS
     private int countConSeen;
     private int countConRoot;
     private int countConDuplVersion;
     private int countConAdded; // ADDED TO LIST
     public int countRelAdded; // ADDED TO LIST
-
     private int countRelCharStated;
     private int countRelCharDefining;
     private int countRelCharStatedInferred;
     private int countRelCharStatedSubsumed;
     private int countRelCharInferred;
-
     // CORE CONSTANTS
     private int rootNid;
     private int isaNid;
-
     private static int isCh_STATED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int isCh_DEFINING_CHARACTERISTIC = Integer.MIN_VALUE;
     private static int isCh_STATED_AND_INFERRED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int isCh_STATED_AND_SUBSUMED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int isCh_INFERRED_RELATIONSHIP = Integer.MIN_VALUE;
-
     private static int snorocketAuthorNid = Integer.MIN_VALUE;
-
     private I_IntSet roleTypeSet;
     private I_IntSet statusSet;
     private PositionSetReadOnly fromPathPos;
     private PositionSetReadOnly fromPathPosPriority;
-
     // GUI
     I_ShowActivity gui;
     private Logger logger;
     private Precedence precedence;
     private I_ManageContradiction contradictionMgr;
 
+    private ConcurrentHashMap<Integer, UUID> watchList = null;
+    public void addWatchConcept(UUID uuid) throws TerminologyException, IOException {
+        if (watchList == null)
+            watchList = new ConcurrentHashMap<Integer, UUID>();
+        I_TermFactory tf = Terms.get();
+        Integer nid = Integer.valueOf(tf.uuidToNative(uuid));
+        watchList.put(nid, uuid);
+    }
+
     public SnoPathProcessStated(Logger logger, List<SnoCon> snocons, List<SnoRel> snorels,
             I_IntSet roleSet, I_IntSet statSet, PositionSetReadOnly pathPos,
             PositionSetReadOnly pathOverridePos, I_ShowActivity gui, Precedence precedence,
             I_ManageContradiction contradictionMgr) throws TerminologyException, IOException {
-
+        // Has additionof PositionSetReadOnly pathOverridePos parameter
         this.fromPathPosPriority = pathOverridePos;
 
         this.logger = logger;
@@ -137,33 +142,29 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
         rootNid = tf.uuidToNative(SNOMED.Concept.ROOT.getUids());
 
         // Characteristic
-        isCh_STATED_RELATIONSHIP = tf
-                .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
-        isCh_DEFINING_CHARACTERISTIC = tf
-                .uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
-        isCh_STATED_AND_INFERRED_RELATIONSHIP = tf
-                .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP
-                        .getUids());
-        isCh_STATED_AND_SUBSUMED_RELATIONSHIP = tf
-                .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP
-                        .getUids());
-        isCh_INFERRED_RELATIONSHIP = tf
-                .uuidToNative(ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids());
+        isCh_STATED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
+        isCh_DEFINING_CHARACTERISTIC = tf.uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
+        isCh_STATED_AND_INFERRED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP.getUids());
+        isCh_STATED_AND_SUBSUMED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP.getUids());
+        isCh_INFERRED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids());
 
-        snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET
-                .getUids());
+        snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET.getUids());
     }
 
     @Override
     public void processConcept(I_GetConceptData concept) throws Exception {
         // processUnfetchedConceptData(int cNid, I_FetchConceptFromCursor fcfc)
         int cNid = concept.getNid();
+
         if (++countConSeen % 25000 == 0) {
-            logger.info("::: [SnoPathProcess] Concepts viewed:\t" + countConSeen);
+            if (logger != null) {
+                logger.info("::: [SnoPathProcess] Concepts viewed:\t" + countConSeen);
+            }
         }
         if (cNid == rootNid) {
-            if (snocons != null)
+            if (snocons != null) {
                 snocons.add(new SnoCon(cNid, false));
+            }
 
             countConAdded++;
             countConRoot++;
@@ -174,14 +175,15 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
         List<? extends I_ConceptAttributeTuple> attribs = concept.getConceptAttributeTuples(
                 statusSet, fromPathPos, precedence, contradictionMgr);
 
-        if (attribs.size() == 1)
+        if (attribs.size() == 1) {
             passToCompare = true;
-        else if (attribs.size() == 0 && fromPathPosPriority != null) {
+        } else if (attribs.size() == 0 && fromPathPosPriority != null) {
             // check to see if attribute is only on edit path
             attribs = concept.getConceptAttributeTuples(statusSet, fromPathPosPriority, precedence,
                     contradictionMgr);
-            if (attribs.size() == 1)
+            if (attribs.size() == 1) {
                 passToCompare = true;
+            }
         }
 
         if (passToCompare) {
@@ -205,12 +207,14 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
             }
 
             if (snorelListA.size() > 0) { // "Is a" found if size > 0
-                if (snocons != null)
+                if (snocons != null) {
                     snocons.add(new SnoCon(cNid, attribs.get(0).isDefined()));
+                }
                 countConAdded++;
 
-                if (snorels != null)
+                if (snorels != null) {
                     snorels.addAll(snorelListA);
+                }
 
                 countRelAdded += snorelListA.size();
 
@@ -223,16 +227,21 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
         } // pass to compare
     }
 
-    private List<SnoRel> tupleToSnoRel(List<? extends I_RelTuple> relTupList) {
+    private List<SnoRel> tupleToSnoRel(List<? extends I_RelTuple> relTupList) throws Exception {
         List<SnoRel> snoRelList = new ArrayList<SnoRel>();
 
         boolean isaFound = false;
+        int c1 = Integer.MAX_VALUE;
         for (I_RelTuple rt : relTupList) {
+            c1 = rt.getC1Id();
             if (rt.getAuthorNid() == snorocketAuthorNid) // filter out classifier as user
+            {
                 continue;
+            }
 
-            if (rt.getTypeNid() == isaNid)
+            if (rt.getTypeNid() == isaNid) {
                 isaFound = true;
+            }
 
             int charId = rt.getCharacteristicId();
             boolean keep = false;
@@ -253,13 +262,19 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
                 countRelCharInferred++;
             }
 
-            if (keep)
-                snoRelList.add(new SnoRel(rt.getC1Id(), rt.getC2Id(), rt.getTypeNid(), rt
-                        .getGroup(), rt.getNid()));
+            if (keep) {
+                snoRelList.add(new SnoRel(rt.getC1Id(), rt.getC2Id(), rt.getTypeNid(), rt.getGroup(), rt.getNid()));
+            }
         }
 
-        if (!isaFound)
+        if (!isaFound) {
             snoRelList.clear();
+
+            if (watchList != null) {
+                if (watchList.containsKey(Integer.valueOf(c1)))
+                    throw new Exception("::: Relationship Exception -- 'Is a' relationship not found");
+            }
+        }
 
         return snoRelList;
     }
@@ -285,14 +300,16 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
 
     private boolean usePriorityListTest(List<SnoRel> snorelA, List<SnoRel> snorelB_Priority)
             throws TerminologyException, IOException {
-        
-        if (snorelA.size() == 0 && snorelB_Priority.size() == 0)
+
+        if (snorelA.size() == 0 && snorelB_Priority.size() == 0) {
             return false; // implies keep A
-        if (snorelA.size() >= 0 && snorelB_Priority.size() == 0)
+        }
+        if (snorelA.size() >= 0 && snorelB_Priority.size() == 0) {
             return true; // implies use B priority
-        if (snorelA.size() == 0 && snorelB_Priority.size() >= 0)
+        }
+        if (snorelA.size() == 0 && snorelB_Priority.size() >= 0) {
             return true; // implies use B priority
-            
+        }
         // STATISTICS COUNTERS
         int countConSeen = 0;
         int countSame = 0;
@@ -330,50 +347,57 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
 
                     // PROGESS GROUP ZERO
                     switch (compareSnoRel(rel_A, rel_B)) {
-                    case 1: // SAME
-                        // GATHER STATISTICS
-                        countSame++;
-                        countA_Total++;
-                        countB_Total++;
-                        if (rel_A.typeId == isaNid)
-                            countSameISA++;
-                        // NOTHING TO WRITE IN THIS CASE
-                        if (itA.hasNext())
-                            rel_A = itA.next();
-                        else
-                            done_A = true;
-                        if (itB.hasNext())
-                            rel_B = itB.next();
-                        else
-                            done_B = true;
-                        break;
+                        case 1: // SAME
+                            // GATHER STATISTICS
+                            countSame++;
+                            countA_Total++;
+                            countB_Total++;
+                            if (rel_A.typeId == isaNid) {
+                                countSameISA++;
+                            }
+                            // NOTHING TO WRITE IN THIS CASE
+                            if (itA.hasNext()) {
+                                rel_A = itA.next();
+                            } else {
+                                done_A = true;
+                            }
+                            if (itB.hasNext()) {
+                                rel_B = itB.next();
+                            } else {
+                                done_B = true;
+                            }
+                            break;
 
-                    case 2: // REL_A > REL_B -- B has extra stuff
-                        // WRITEBACK REL_B (Classifier Results) AS CURRENT
-                        countB_Diff++;
-                        countB_Total++;
-                        if (rel_B.typeId == isaNid)
-                            countB_DiffISA++;
+                        case 2: // REL_A > REL_B -- B has extra stuff
+                            // WRITEBACK REL_B (Classifier Results) AS CURRENT
+                            countB_Diff++;
+                            countB_Total++;
+                            if (rel_B.typeId == isaNid) {
+                                countB_DiffISA++;
+                            }
 
-                        if (itB.hasNext())
-                            rel_B = itB.next();
-                        else
-                            done_B = true;
-                        break;
+                            if (itB.hasNext()) {
+                                rel_B = itB.next();
+                            } else {
+                                done_B = true;
+                            }
+                            break;
 
-                    case 3: // REL_A < REL_B -- A has extra stuff
-                        // WRITEBACK REL_A (Classifier Input) AS RETIRED
-                        // GATHER STATISTICS
-                        countA_Diff++;
-                        countA_Total++;
-                        if (rel_A.typeId == isaNid)
-                            countA_DiffISA++;
+                        case 3: // REL_A < REL_B -- A has extra stuff
+                            // WRITEBACK REL_A (Classifier Input) AS RETIRED
+                            // GATHER STATISTICS
+                            countA_Diff++;
+                            countA_Total++;
+                            if (rel_A.typeId == isaNid) {
+                                countA_DiffISA++;
+                            }
 
-                        if (itA.hasNext())
-                            rel_A = itA.next();
-                        else
-                            done_A = true;
-                        break;
+                            if (itA.hasNext()) {
+                                rel_A = itA.next();
+                            } else {
+                                done_A = true;
+                            }
+                            break;
                     } // switch
                 }
 
@@ -381,12 +405,14 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
                 while (rel_A.c1Id == thisC1 && rel_A.group == 0 && !done_A) {
                     countA_Diff++;
                     countA_Total++;
-                    if (rel_A.typeId == isaNid)
+                    if (rel_A.typeId == isaNid) {
                         countA_DiffISA++;
-                    if (itA.hasNext())
+                    }
+                    if (itA.hasNext()) {
                         rel_A = itA.next();
-                    else
+                    } else {
                         done_A = true;
+                    }
                     break;
                 }
 
@@ -394,12 +420,14 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
                 while (rel_B.c1Id == thisC1 && rel_B.group == 0 && !done_B) {
                     countB_Diff++;
                     countB_Total++;
-                    if (rel_B.typeId == isaNid)
+                    if (rel_B.typeId == isaNid) {
                         countB_DiffISA++;
-                    if (itB.hasNext())
+                    }
+                    if (itB.hasNext()) {
                         rel_B = itB.next();
-                    else
+                    } else {
                         done_B = true;
+                    }
                     break;
                 }
 
@@ -420,10 +448,11 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
                     groupA.add(rel_A);
 
                     prevGroup = rel_A.group;
-                    if (itA.hasNext())
+                    if (itA.hasNext()) {
                         rel_A = itA.next();
-                    else
+                    } else {
                         done_A = true;
+                    }
                 }
                 // SEGMENT GROUPS IN LIST_B
                 prevGroup = Integer.MIN_VALUE;
@@ -436,10 +465,11 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
                     groupB.add(rel_B);
 
                     prevGroup = rel_B.group;
-                    if (itB.hasNext())
+                    if (itB.hasNext()) {
                         rel_B = itB.next();
-                    else
+                    } else {
                         done_B = true;
+                    }
                 }
 
                 // FIND GROUPS IN GROUPLIST_A WITHOUT AN EQUAL IN GROUPLIST_B
@@ -447,9 +477,11 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
                 SnoGrpList groupList_NotEqual;
                 if (groupList_A.size() > 0) {
                     groupList_NotEqual = groupList_A.whichNotEqual(groupList_B);
-                    for (SnoGrp sg : groupList_NotEqual)
-                        for (SnoRel sr_A : sg)
+                    for (SnoGrp sg : groupList_NotEqual) {
+                        for (SnoRel sr_A : sg) {
                             countA_Total += groupList_A.countRels();
+                        }
+                    }
                     countA_Diff += groupList_NotEqual.countRels();
                 }
 
@@ -457,9 +489,11 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
                 // WRITE THESE GROUPED RELS AS "NEW, CURRENT"
                 if (groupList_B.size() > 0) {
                     groupList_NotEqual = groupList_B.whichNotEqual(groupList_A);
-                    for (SnoGrp sg : groupList_NotEqual)
-                        for (SnoRel sr_B : sg)
+                    for (SnoGrp sg : groupList_NotEqual) {
+                        for (SnoRel sr_B : sg) {
                             countB_Total += groupList_A.countRels();
+                        }
+                    }
                     countB_Diff += groupList_NotEqual.countRels();
                 }
             } else if (rel_A.c1Id > rel_B.c1Id) {
@@ -469,8 +503,9 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
                 while (rel_B.c1Id == thisC1) {
                     countB_Diff++;
                     countB_Total++;
-                    if (rel_B.typeId == isaNid)
+                    if (rel_B.typeId == isaNid) {
                         countB_DiffISA++;
+                    }
                     if (itB.hasNext()) {
                         rel_B = itB.next();
                     } else {
@@ -486,8 +521,9 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
                 while (rel_A.c1Id == thisC1) {
                     countA_Diff++;
                     countA_Total++;
-                    if (rel_A.typeId == isaNid)
+                    if (rel_A.typeId == isaNid) {
                         countA_DiffISA++;
+                    }
                     if (itA.hasNext()) {
                         rel_A = itA.next();
                     } else {
@@ -509,8 +545,9 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
         while (!done_A) {
             countA_Diff++;
             countA_Total++;
-            if (rel_A.typeId == isaNid)
+            if (rel_A.typeId == isaNid) {
                 countA_DiffISA++;
+            }
             // COMPLETELY UPDATE ALL REMAINING REL_A AS RETIRED
             if (itA.hasNext()) {
                 rel_A = itA.next();
@@ -523,8 +560,9 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
         while (!done_B) {
             countB_Diff++;
             countB_Total++;
-            if (rel_B.typeId == isaNid)
+            if (rel_B.typeId == isaNid) {
                 countB_DiffISA++;
+            }
             // COMPLETELY UPDATE ALL REMAINING REL_B AS NEW, CURRENT
             if (itB.hasNext()) {
                 rel_B = itB.next();
@@ -534,10 +572,11 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
             }
         }
 
-        if (countA_Diff > 0 || countA_DiffISA > 0 || countB_DiffISA > 0 || countB_DiffISA > 0)
+        if (countA_Diff > 0 || countA_DiffISA > 0 || countB_DiffISA > 0 || countB_DiffISA > 0) {
             return true; // Use B... priority
-        else
+        } else {
             return false; // Use A... baseline
+        }
     }
 
     // STATS FROM PROCESS CONCEPTS (CLASSIFIER INPUT)
