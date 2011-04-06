@@ -8,6 +8,7 @@ package org.ihtsdo.arena.contradiction;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.HashSet;
 import javax.swing.SwingWorker;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ShowActivity;
@@ -43,7 +44,13 @@ extends SwingWorker<Set<Integer>, Integer> {
                 Ts.get().getAllConceptNids(),
                 actvityPanel);
         Ts.get().iterateConceptDataInParallel(ccp);
-        return ccp.getResults().getConflictingNids();
+        
+        Set<Integer> returnSet = new HashSet<Integer>();
+        returnSet.addAll(ccp.getResults().getConflictingNids());
+        returnSet.addAll(ccp.getResults().getDuplicateNewNids());
+        returnSet.addAll(ccp.getResults().getDuplicateEditNids());
+        
+        return returnSet;
     }
 
     @Override
