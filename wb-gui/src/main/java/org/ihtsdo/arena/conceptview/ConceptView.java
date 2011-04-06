@@ -52,10 +52,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import org.drools.KnowledgeBase;
-import org.drools.logger.KnowledgeRuntimeLogger;
-import org.drools.logger.KnowledgeRuntimeLoggerFactory;
-import org.drools.runtime.StatefulKnowledgeSession;
 import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -74,6 +70,7 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -163,17 +160,23 @@ public class ConceptView extends JPanel {
             positionPanelMap.clear();
             positionOrderedSet.clear();
             seperatorComponents.clear();
+            RelAssertionType relAssertionType = RelAssertionType.INFERRED;
+            if (settings.showStated()) {
+                relAssertionType = RelAssertionType.STATED;
+            }
             pathRowMap.clear();
             layoutConcept = concept;
             if (layoutConcept != null) {
-                coordinate = config.getViewCoordinate();
+                coordinate = new ViewCoordinate(config.getViewCoordinate());
+                coordinate.setRelAssertionType(relAssertionType);
                 saps = layoutConcept.getAllSapNids();
                 positions = Ts.get().getPositionSet(saps);
                 paths = Ts.get().getPathSetFromPositionSet(positions);
                 positionOrderedSet.addAll(positions);
                 rels = layoutConcept.getSourceRelTuples(config.getAllowedStatus(),
                         null, config.getViewPositionSetReadOnly(),
-                        config.getPrecedence(), config.getConflictResolutionStrategy());
+                        config.getPrecedence(), config.getConflictResolutionStrategy(),
+                        coordinate.getClassifierNid(), coordinate.getRelAssertionType());
                 cv = Ts.get().getConceptVersion(
                         config.getViewCoordinate(), layoutConcept.getNid());
                 //get refsets

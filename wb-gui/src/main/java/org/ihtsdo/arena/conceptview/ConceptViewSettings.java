@@ -44,6 +44,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
      */
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
+    private ConceptChangedListener conceptChangedListener;
 
     public enum SIDE {
 
@@ -56,6 +57,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
     private ConceptNavigator navigator;
     private JTreeWithDragImage navigatorTree;
     private JToggleButton navButton;
+    private JToggleButton statedToggleButton;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -100,8 +102,9 @@ public class ConceptViewSettings extends ArenaComponentSettings {
     @Override
     public ConceptView makeComponent(I_ConfigAceFrame config) {
         if (view == null) {
+            this.conceptChangedListener = new ConceptChangedListener();
             view = new ConceptView(config, this, (ConceptViewRenderer) this.renderer);
-            addHostListener(new ConceptChangedListener());
+            addHostListener(conceptChangedListener);
             view.layoutConcept((I_GetConceptData) getHost().getTermComponent());
         }
         return view;
@@ -154,6 +157,8 @@ public class ConceptViewSettings extends ArenaComponentSettings {
         List<AbstractButton> buttons = new ArrayList<AbstractButton>();
         navButton = getNavigatorButton();
         buttons.add(navButton);
+        statedToggleButton = getStatedInferredButton();
+        buttons.add(statedToggleButton);
         return buttons;
     }
 
@@ -161,6 +166,39 @@ public class ConceptViewSettings extends ArenaComponentSettings {
         if (navButton.isSelected()) {
             navButton.doClick();
         }
+    }
+    
+    private static ImageIcon statedView = new ImageIcon(
+                ConceptViewRenderer.class.getResource("/16x16/plain/graph_edge.png"));
+    private static ImageIcon inferredView = new ImageIcon(
+                ConceptViewRenderer.class.getResource("/16x16/plain/chrystal_ball.png"));
+    protected JToggleButton getStatedInferredButton() {
+        JToggleButton button = new JToggleButton(new AbstractAction("", statedView) {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JToggleButton button = (JToggleButton) e.getSource();
+                if (button.isSelected()) {
+                    button.setIcon(statedView);
+                    button.setToolTipText("showing stated, toggle to show inferred...");
+                    conceptChangedListener.propertyChange(null);
+                } else {
+                    button.setIcon(inferredView);
+                    button.setToolTipText("showing inferred, toggle to show stated...");
+                    conceptChangedListener.propertyChange(null);
+               }
+            }
+        });
+        button.setSelected(true);
+        button.setPreferredSize(new Dimension(21, 16));
+        button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        button.setOpaque(false);
+        button.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        return button;
+    }
+    
+    public boolean showStated() {
+        return statedToggleButton.isSelected();
     }
 
     protected JToggleButton getNavigatorButton() {

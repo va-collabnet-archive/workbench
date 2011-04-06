@@ -52,6 +52,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.ComputationCanceled;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.RelAssertionType;
 
 public class ExpandNodeSwingWorker extends SwingWorker<Object> implements ActionListener {
 
@@ -60,6 +61,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
     private int workerId = workerCount++;
     private static final Logger logger = 
             Logger.getLogger(ExpandNodeSwingWorker.class.getName());
+    private final RelAssertionType relAssertionType;
 
     private class StopActionListener implements ActionListener {
 
@@ -307,12 +309,12 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
         
         destRels = cb.getDestRelTuples(allowedStatus, destRelTypes, positions,
                 config.getPrecedence(), config.getConflictResolutionStrategy(),
-                config.getClassifierConcept().getNid(), config.getRelAssertionType());
+                config.getClassifierConcept().getNid(), relAssertionType);
         lowerProgressMessage = "getting source rels ";
         if (sourceRelTypes.size() > 0) {
          srcRels = cb.getSourceRelTuples(allowedStatus, sourceRelTypes, positions,
                 config.getPrecedence(), config.getConflictResolutionStrategy(),
-                config.getClassifierConcept().getNid(), config.getRelAssertionType());
+                config.getClassifierConcept().getNid(), relAssertionType);
         } else {
             srcRels = new ArrayList<I_RelTuple>(0);
         }
@@ -443,9 +445,14 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
     private I_ConfigAceFrame config;
     private static Map<Object, ExpandNodeSwingWorker> workers = new TreeMap<Object, ExpandNodeSwingWorker>();
 
-    public ExpandNodeSwingWorker(DefaultTreeModel model, JTreeWithDragImage tree, DefaultMutableTreeNode node,
-            Comparator<I_GetConceptDataForTree> conceptBeanComparator, TermTreeHelper acePanel, I_ConfigAceFrame config) {
+    public ExpandNodeSwingWorker(DefaultTreeModel model, JTreeWithDragImage tree, 
+            DefaultMutableTreeNode node,
+            Comparator<I_GetConceptDataForTree> conceptBeanComparator, 
+            TermTreeHelper acePanel, 
+            I_ConfigAceFrame config, 
+            RelAssertionType relAssertionType) {
         super();
+        this.relAssertionType = relAssertionType;
         if (workers.containsKey(node.getUserObject())) {
             ExpandNodeSwingWorker oldWorker = workers.get(node.getUserObject());
             oldWorker.stopWork("canceled 1");
