@@ -63,6 +63,8 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.workflow.WorkflowHandlerBI;
 import org.ihtsdo.tk.api.workflow.WorkflowHistoryJavaBeanBI;
+import org.ihtsdo.tk.drools.facts.ConceptFact;
+import org.ihtsdo.tk.drools.facts.Context;
 import org.ihtsdo.util.swing.GuiUtil;
 import org.ihtsdo.workflow.WorkflowHandler;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
@@ -617,7 +619,6 @@ public class ConceptViewRenderer extends JLayeredPane {
         Collection<Action> actions = new ArrayList<Action>();
 
         try {
-            if (settings.getConcept() != null) {
                 ViewCoordinate coordinate = settings.getConfig().getViewCoordinate();
                 Map<String, Object> globals = new HashMap<String, Object>();
                 globals.put("vc", coordinate);
@@ -625,18 +626,21 @@ public class ConceptViewRenderer extends JLayeredPane {
                 globals.put("actionFactory", new BpActionFactory(
                         settings.getConfig(),
                         settings.getHost(), wizardPanel));
-
                 Collection<Object> facts = new ArrayList<Object>();
-                facts.add(Ts.get().getConceptVersion(coordinate,
-                            settings.getConcept().getNid()));
-
+                ConceptVersionBI concept;
+                if (settings.getConcept() != null) {
+                	concept = settings.getConcept().getVersion(coordinate);
+                }else{
+                	concept = null;
+                }
+                facts.add(new ConceptFact(Context.FOCUS_CONCEPT,concept,coordinate));
+                
                 DroolsExecutionManager.fireAllRules(
                         ConceptViewRenderer.class.getCanonicalName(),
                         kbFiles,
                         globals,
                         facts,
                         false);
-            }
         } catch (Throwable e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
