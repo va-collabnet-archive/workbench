@@ -18,7 +18,7 @@ import org.ihtsdo.rf2.util.JAXBUtil;
 /**
  * @author Alo
  * 
- * @goal post-process-concept
+ * @goal post-process-relationship
  * @requiresDependencyResolution compile
  */
 
