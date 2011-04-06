@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
@@ -21,6 +22,7 @@ import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concept.component.ConceptComponent.Version;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.description.Description;
+import org.ihtsdo.concept.component.refsetmember.str.StrMember;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
@@ -39,6 +41,8 @@ import org.ihtsdo.tk.contradiction.ComponentType;
 import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
 import org.ihtsdo.tk.contradiction.ContradictionResult;
 import org.ihtsdo.tk.contradiction.PositionForSet;
+import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
@@ -71,7 +75,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		{
 	        NidSetBI allowedStatusNids = Terms.get().getActiveAceFrameConfig().getViewCoordinate().getAllowedStatusNids();
 	        allowedStatusNids.add(Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getPrimoridalUid()));
-			workflowRefsetNid =Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid());
+			workflowRefsetNid = Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid());
         } catch (Exception e) {
             AceLog.getAppLog().log(Level.WARNING, "Failure to Initialize Globals", e);
         }
@@ -282,27 +286,27 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 					} else {
 						// if never had adjudication performed on componentId
 						result = handleNonAdjudication(latestDeveloperVersionMap, developerVersions);
-				}
-	
-	        	if (result == ContradictionResult.SINGLE_MODELER_CHANGE) {
-					isSingleEdit = true;
-	        	} else if (result == ContradictionResult.CONTRADICTION)	{
-		        	// Have potential contradiction, unless developers made same changes
-					ComponentVersionBI compareWithVersion = latestOriginVersion;
-					if (latestAdjudicatedVersion != null) {
-						compareWithVersion = latestAdjudicatedVersion;
-					} 
-					
-					// Check if for given CompId, have multiple versions with same changes
-						if (!isContradictionWithSameValues(comparer, compareWithVersion, developerVersions)) {
-						// Concept contains contradiction.  No need to update positions as check complete for concept
-						isContradiction = true;
-					} else {
-						isDuplicateEdit = true;
 					}
-				} 
-
-			// Add Position to List
+		
+		        	if (result == ContradictionResult.SINGLE_MODELER_CHANGE) {
+						isSingleEdit = true;
+		        	} else if (result == ContradictionResult.CONTRADICTION)	{
+			        	// Have potential contradiction, unless developers made same changes
+						ComponentVersionBI compareWithVersion = latestOriginVersion;
+						if (latestAdjudicatedVersion != null) {
+							compareWithVersion = latestAdjudicatedVersion;
+						} 
+						
+						// Check if for given CompId, have multiple versions with same changes
+							if (!isContradictionWithSameValues(comparer, compareWithVersion, developerVersions)) {
+							// Concept contains contradiction.  No need to update positions as check complete for concept
+							isContradiction = true;
+						} else {
+							isDuplicateEdit = true;
+						}
+					} 
+	
+					// Add Position to List
 		        	if (!isContradiction) {
 		        		boolean success = updateFoundPositionsForAllVersions(concept, foundPositionsMap, developerVersions.iterator(), comp.getNid(), compType);
 						
@@ -311,7 +315,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 						}
 		        	}
 				}
-        	}
+	    	}
 		} catch (ContraditionException ce) {
 			return ContradictionResult.CONTRADICTION;
 		} 
@@ -824,10 +828,10 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	    PathBI originPath = Terms.get().getPath(commonOriginPathNid);
         List<? extends I_ExtendByRef> members = Terms.get().getAllExtensionsForComponent(componentNid);
 
-        for (I_ExtendByRef member : members) {
-        	if (member.getRefsetId() != workflowRefsetNid) {
-	         	for (ComponentVersionBI part : member.getMutableParts()) {
-     			// Identify Adjudication versions and find latest 
+        for (I_ExtendByRef member : members) 
+        {
+ 			// Identify Adjudication versions and find latest 
+         	for (ComponentVersionBI part : member.getMutableParts()) {
      			if (part.getPathNid() == viewPathNid) {
      				if (latestAdjudicatedVersion  == null || part.getTime() > latestAdjudicatedVersion.getTime()) {
      					latestAdjudicatedVersion = part;
@@ -835,8 +839,8 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
                 }
             }
 
-	         	for (ComponentVersionBI part : member.getMutableParts()) {
-    			// Identify Origins versions and find latest
+			// Identify Origins versions and find latest
+         	for (ComponentVersionBI part : member.getMutableParts()) {
     			if ((part.getPathNid() == commonOriginPathNid) || (isOriginVersion(originPath, part))) {
      				if (latestOriginVersion  == null || part.getTime() > latestOriginVersion.getTime()) {
      					latestOriginVersion = part;
@@ -844,7 +848,9 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		        }
      		}
 
-	    	    for (ComponentVersionBI part : member.getMutableParts()) {
+         	// Identify all developer edits and per path, get latest developer version
+    	    for (ComponentVersionBI part : member.getMutableParts()) 
+    	    {
     	    	boolean putIntoMap = false;
     	    	Integer pathNidObj = null;
 
@@ -852,7 +858,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
     				(part.getPathNid() != commonOriginPathNid) &&
     				(!isOriginVersion(originPath, part))) 
     	    	{
-    				// Identify Developer versions
+    				// Identify Latest Developer version
     				putIntoMap = true;
     				pathNidObj = new Integer(part.getPathNid());
     				ComponentVersionBI latestVersion = latestDeveloperVersionMap.get(pathNidObj);
@@ -864,41 +870,47 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	                }
 	            }
 
+    	    	// If going to put into map, ensure that version doesn't represent a commit wf action
+				if (putIntoMap && member.getRefsetId() == workflowRefsetNid && identifyIsCommitWfRefsetAction(part)) {
+					putIntoMap = false;
+				}
+				
     			if (putIntoMap) {
+    				// Overwrite current latest version
     				latestDeveloperVersionMap.put(pathNidObj, part);
 	            }
 	        }
 
-			if (!latestDeveloperVersionMap.isEmpty()) {
+			if (!latestDeveloperVersionMap.isEmpty()) 
+			{
 				if (latestAdjudicatedVersion != null) { 
 					// if adjudication has been performed on componentId
-						result = handleAdjudication(concept, ComponentType.REFSET, latestAdjudicatedVersion, latestOriginVersion, latestDeveloperVersionMap, developerVersions);
+					result = handleAdjudication(concept, ComponentType.REFSET, latestAdjudicatedVersion, latestOriginVersion, latestDeveloperVersionMap, developerVersions);
 				} else {
 					// if never had adjudication performed on componentId
-						result = handleNonAdjudication(latestDeveloperVersionMap, developerVersions);
+					result = handleNonAdjudication(latestDeveloperVersionMap, developerVersions);
 	            }
-	        }
-
-        	if (result == ContradictionResult.SINGLE_MODELER_CHANGE) {
-				isSingleEdit = true;
-        	} else if (result == ContradictionResult.CONTRADICTION)	{
-	        	// Have potential contradiction, unless developers made same changes
-				ComponentVersionBI compareWithVersion = latestOriginVersion;
-				if (latestAdjudicatedVersion != null) {
-					compareWithVersion = latestAdjudicatedVersion;
-				}
-				
-				// Check if for given CompId, have multiple versions with same changes
+	
+	        	if (result == ContradictionResult.SINGLE_MODELER_CHANGE) {
+					isSingleEdit = true;
+	        	} else if (result == ContradictionResult.CONTRADICTION)	{
+		        	// Have potential contradiction, unless developers made same changes
+					ComponentVersionBI compareWithVersion = latestOriginVersion;
+					if (latestAdjudicatedVersion != null) {
+						compareWithVersion = latestAdjudicatedVersion;
+					}
+					
+					// Check if for given CompId, have multiple versions with same changes
 					if (!isContradictionWithSameValues(new RefsetAttributeComparer(), compareWithVersion, developerVersions)) 
-				{
-					// Concept contains contradiction.  No need to update positions as check complete for concept
-					isContradiction = true;
-					break;
-	            } else {
-					isDuplicateEdit = true;
-                }
-            }
-
+					{
+						// Concept contains contradiction.  No need to update positions as check complete for concept
+						isContradiction = true;
+						break;
+		            } else {
+						isDuplicateEdit = true;
+	                }
+	            }
+	
 	        	// Add Position to List
 	        	if (!isContradiction) {
 					boolean success = updateFoundPositionsForAllVersions(concept, foundPositionsMap, developerVersions.iterator(), member.getMemberId(), ComponentType.REFSET);
@@ -912,6 +924,23 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
         return identifyContradictionResult(isContradiction, isSingleEdit, isDuplicateEdit, false);
     }
+
+	private boolean identifyIsCommitWfRefsetAction(ComponentVersionBI latestVersion) 
+	{
+		try {
+			// Know wfHxRefset at this point, so action is safe
+			WorkflowHistoryJavaBean wfRefsetJavaBean = createWfHxJavaBean((StrMember.Version)latestVersion);
+		
+			List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(Terms.get().getConcept(wfRefsetJavaBean.getAction()), 
+																				  ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE);
+	
+			return (relList != null && relList.size() > 0); 
+		} catch (Exception e) {
+            AceLog.getAppLog().log(Level.WARNING, "Failure to read WfHx Java Bean from Refset Version");
+		}
+		
+		return false;
+	}
 
 	private PositionBI determineLeastCommonAncestor(Set<HashSet<PositionBI>> originsByVersion)
 	{
@@ -943,6 +972,19 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		return leastCommonAncestor;
 	}
 
+
+	private WorkflowHistoryJavaBean createWfHxJavaBean(I_ExtendByRefVersion refsetVersion) {
+		try {
+			StrMember.Version stringVersion = (StrMember.Version)refsetVersion;
+			return WorkflowHelper.fillOutWorkflowHistoryJavaBean(Terms.get().nidToUuid(refsetVersion.getReferencedComponentNid()), 
+																					   stringVersion.getStringValue(), 
+																					   refsetVersion.getTime());
+		} catch (Exception e) {
+            AceLog.getAppLog().log(Level.WARNING, "Failure to read WfHx Java Bean from Refset Version");
+		}
+		
+		return null;
+	}
 }
 
 
