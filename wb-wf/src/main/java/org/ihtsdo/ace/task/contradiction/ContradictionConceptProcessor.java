@@ -1,5 +1,5 @@
-package org.ihtsdo.ace.task.contradiction;
 
+package org.ihtsdo.ace.task.contradiction;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,11 +27,10 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
 
 		try
 		{
-			buildRefset1(set);
+			buildSet3(set);
         } catch (Exception e) {
             AceLog.getAppLog().log(Level.WARNING, "Error in intializing Contradiction Concept Processor", e);
         }
-
         setNidSet(set);
     }
 
@@ -73,6 +72,8 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
     @Override
     public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fcfc) throws Exception {
         int currentCount = count.incrementAndGet();
+//        if (currentCount%12500 == 0) 
+//        	System.out.println("HERE with " + currentCount);
 //        if (activityMonitor != null && activityMonitor.isCanceled()) {
 //            return;
 //        }
@@ -344,11 +345,11 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
 	
     private void buildSet3(I_RepresentIdSet set) throws TerminologyException, IOException {
     	/* Single Test */
-    	set.setMember(Terms.get().getConcept(UUID.fromString("3e67adcd-0740-34a3-90c9-f06d5c5da830")).getConceptNid());
-			
-
+    	set.setMember(Terms.get().getConcept(UUID.fromString("842bb237-4872-3bf3-8a04-2786db39f084")).getConceptNid());
+    	set.setMember(Terms.get().getConcept(UUID.fromString("66387a1b-9bb6-361d-99f0-0a3147cad7f2")).getConceptNid());
+    	set.setMember(Terms.get().getConcept(UUID.fromString("77e33983-b911-3099-bac2-6107ee48065d")).getConceptNid());
 	}
-    
+
     private void buildRefset1(I_RepresentIdSet set) throws TerminologyException, IOException {
     	set.setMember(Terms.get().getConcept(UUID.fromString("aa4052f3-0faa-39dd-b838-a4d1802ccd59")).getConceptNid());
     }
@@ -373,3 +374,4 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
         return true;
     }
 }
+ 
