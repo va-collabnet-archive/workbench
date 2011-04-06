@@ -6,9 +6,9 @@ import java.io.File;
 import java.lang.String;
 import java.util.Collection;
 
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.drools.facts.ConceptFact;
+import org.ihtsdo.tk.drools.facts.Context;
 
 import org.ihtsdo.arena.context.action.BpActionFactory;
 import org.ihtsdo.arena.context.action.CopyDescAction;
@@ -30,19 +30,24 @@ global Collection actions;
 global BpActionFactory actionFactory;
 global ViewCoordinate vc;
 
+
 rule "add if null concept in host"
 	when
-		String(this == "null concept");
+		$c: ConceptFact(component == null)
 	then 
-		actions.add(actionFactory.make(new File("plugins/component/new_concept.bp")));
+		actions.add(actionFactory.make(new File("plugins/arena/newconcept.bp"))); 
 end
 
 rule "retire or move"
 	when
-		$c: ConceptVersionBI (); 
+		$c: ConceptFact(component != null); 
 	then
 		actions.add(actionFactory.make(new File("plugins/retire/retire-concept.bp")));
 		actions.add(actionFactory.make(new File("plugins/retire/move-concept.bp")));
 		actions.add(actionFactory.make(new File("plugins/arena/newconcept.bp")));
 end
+
+
+
+
 
