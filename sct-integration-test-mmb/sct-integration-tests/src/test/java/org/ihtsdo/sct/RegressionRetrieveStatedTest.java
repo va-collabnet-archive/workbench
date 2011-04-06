@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
@@ -24,7 +23,6 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.classify.SnoCon;
-import org.dwfa.ace.task.classify.SnoPathProcessInferred;
 import org.dwfa.ace.task.classify.SnoPathProcessStated;
 import org.dwfa.ace.task.classify.SnoRel;
 import org.dwfa.ace.task.classify.SnoRelLong;
@@ -32,7 +30,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
-import org.dwfa.vodb.types.Position;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -44,7 +41,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -76,8 +72,8 @@ public class RegressionRetrieveStatedTest {
     }
 
     @Test
-    public void retrieveInferredData() throws TerminologyException, IOException, Exception {
-        System.out.println(" ::: BEGIN RegressionRetrievalInferred.retrieveInferredData()");
+    public void retrieveStatedData() throws TerminologyException, IOException, Exception {
+        System.out.println(" ::: BEGIN RegressionRetrievalStated.retrieveStatedData()");
         long startTime = System.currentTimeMillis();
         tf = Terms.get();
         precedence = Precedence.PATH;
@@ -105,10 +101,10 @@ public class RegressionRetrieveStatedTest {
                 + pcEdit.getStats(startTime));
 
         // UNCOMMENT TO SAVE ALL RETRIEVED DATA TO A FILE
-        // dumpSnoRelSctIds(cEditSnoRels, "RegressionRetrievalInferred_sctIds_t" + startTime + ".txt");
+        // dumpSnoRelSctIds(cEditSnoRels, "RegressionRetrievalStated_sctIds_t" + startTime + ".txt");
 
         cEditSnoRels = null;
-        System.out.println(" ::: END RegressionRetrievalInferred.retrieveInferredData()");
+        System.out.println(" ::: END RegressionRetrievalStated.retrieveStatedData()");
     }
 
     private void setupPaths() throws Exception {
