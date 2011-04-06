@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.Terms;
@@ -31,6 +30,7 @@ import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -44,9 +44,8 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
      // Class Variables
     private static PositionMapper conflictMapper = null;
 
-	private String originPathUid = "4906ace4-537f-5ea9-9575-c5ce4182f292"; 
 	private int viewPathNid = 0;
-	private int originPathNid = 0;
+	private int commonOriginPathNid = 0;
 	
     public ContradictionIdentifier() 
     {
@@ -74,7 +73,8 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
                 }
             }
 
-			originPathNid = Terms.get().getPath(UUID.fromString(originPathUid)).getConceptNid();
+			commonOriginPathNid = identifyCommonOriginPosition().getPath().getConceptNid();
+
         } catch (Exception e) {
             AceLog.getAppLog().log(Level.WARNING, "Failure to get Active Ace Frame", e);
         }
@@ -84,6 +84,28 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	public void setViewPos(PositionBI position) {
 		// Note, adjudications are assumed to be based on view Path
 		viewPathNid = position.getPath().getConceptNid();
+	}
+
+    private PositionBI identifyCommonOriginPosition() throws TerminologyException, IOException {
+		// TODO Auto-generated method stub
+//		return new Position(Long.MAX_VALUE, Terms.get().getPath(UUID.fromString("4906ace4-537f-5ea9-9575-c5ce4182f292")));
+		Set<HashSet<PositionBI>> sortedOrigins = new HashSet<HashSet<PositionBI>>();
+		PositionSetBI positions = Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly();
+		
+		for (PositionBI viewPosParent : positions) {
+			// Ignoring actual viewPos as that will always be leastCommonAncestor by definition
+			for (PositionBI viewPos : viewPosParent.getPath().getOrigins()) {
+				if (!viewPos.equals(viewPosParent)) {
+					HashSet<PositionBI> s = new HashSet<PositionBI>();
+					s.add(viewPos);
+					s.addAll(viewPos.getPath().getInheritedOrigins());
+					sortedOrigins.add(s);
+				}
+			}
+		}
+		
+		// Filter out anything origin of LCA
+		return determineLeastCommonAncestor(sortedOrigins);
 	}
 
 	// For a given concept, look at a set of components at a time.
@@ -250,7 +272,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 			
         	if (refsetResult != ContradictionResult.CONTRADICTION)
 			{
-				PathBI originPath = Terms.get().getPath(originPathNid);
+				PathBI originPath = Terms.get().getPath(commonOriginPathNid);
 	
 				latestAdjudicatedVersion = identifyLatestAdjudicationVersion(comp);
 				latestOriginVersion = identifyLatestOriginVersion(comp, originPath);
@@ -409,7 +431,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
      	for (ComponentVersionBI part : comp.getVersions())
  		{
 			// Identify Origins versions and find latest
-			if ((part.getPathNid() == originPathNid) || (isOriginVersion(originPath, part))) {
+			if ((part.getPathNid() == commonOriginPathNid) || (isOriginVersion(originPath, part))) {
  				if (latestOriginVersion  == null || part.getTime() > latestOriginVersion.getTime()) {
  					latestOriginVersion = part;
  				}
@@ -427,7 +449,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	    	Integer pathNidObj = null;
 	    	
 	    	if ((part.getPathNid() != viewPathNid) &&
-				(part.getPathNid() != originPathNid) &&
+				(part.getPathNid() != commonOriginPathNid) &&
 				(!isOriginVersion(originPath, part))) 
 			{
 				// Identify Developer versions
@@ -777,7 +799,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	    I_ExtendByRefPart latestOriginVersion = null;
 	    Map<Integer, ComponentVersionBI> latestDeveloperVersionMap = new HashMap<Integer, ComponentVersionBI>();
 
-	    PathBI originPath = Terms.get().getPath(originPathNid);
+	    PathBI originPath = Terms.get().getPath(commonOriginPathNid);
         List<? extends I_ExtendByRef> members = Terms.get().getAllExtensionsForComponent(componentNid);
 
         for (I_ExtendByRef member : members) {
@@ -792,7 +814,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
          	for (I_ExtendByRefPart part : member.getMutableParts()) {
     			// Identify Origins versions and find latest
-    			if ((part.getPathNid() == originPathNid) || (isOriginVersion(originPath, part))) {
+    			if ((part.getPathNid() == commonOriginPathNid) || (isOriginVersion(originPath, part))) {
      				if (latestOriginVersion  == null || part.getTime() > latestOriginVersion.getTime()) {
      					latestOriginVersion = part;
 		            }
@@ -804,7 +826,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
     	    	Integer pathNidObj = null;
 
     	    	if ((part.getPathNid() != viewPathNid) &&
-    				(part.getPathNid() != originPathNid) &&
+    				(part.getPathNid() != commonOriginPathNid) &&
     				(!isOriginVersion(originPath, part))) 
     	    	{
     				// Identify Developer versions
@@ -858,6 +880,46 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
         return identifyContradictionResult(isContradiction, isSingleEdit, isDuplicateEdit, false);
     }
 
+	private PositionBI determineLeastCommonAncestor(Set<HashSet<PositionBI>> originsByVersion)
+	{
+		int smallestSize = -1;
+		Set<PositionBI> smallestSet = new HashSet<PositionBI>();
+		
+		for (HashSet<PositionBI> origins : originsByVersion)
+		{
+			// Identify smallest set
+			if ((origins.size() < smallestSize) || (smallestSize < 0))
+			{
+				smallestSize = origins.size();
+				smallestSet = origins;
+			}
+		}
+
+		originsByVersion.remove(smallestSet);
+		Set<PositionBI> testingAncestors = new HashSet<PositionBI>(); 
+
+		for (PositionBI testingPos : smallestSet)
+		{ 
+			boolean success = true;
+			for (HashSet<PositionBI> originSet : originsByVersion)
+			{
+				if (!originSet.contains(testingPos))
+					success = false;
+			}
+			
+			if (success)
+				testingAncestors.add(testingPos);
+		}
+
+		PositionBI leastCommonAncestor = null;
+		for (PositionBI ancestor : testingAncestors)
+		{
+			if (leastCommonAncestor == null || leastCommonAncestor.isAntecedentOrEqualTo(ancestor))
+				leastCommonAncestor = ancestor;
+		}
+		
+		return leastCommonAncestor;
+	}
 
 }
 
