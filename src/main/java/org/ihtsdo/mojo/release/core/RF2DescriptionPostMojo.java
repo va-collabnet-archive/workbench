@@ -74,7 +74,7 @@ public class RF2DescriptionPostMojo extends AbstractMojo {
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
-			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/concept.xml");
+			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/description.xml");
 
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
