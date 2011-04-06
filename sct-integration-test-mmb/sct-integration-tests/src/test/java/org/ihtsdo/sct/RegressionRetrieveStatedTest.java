@@ -168,7 +168,7 @@ public class RegressionRetrieveStatedTest {
         isaNid = tf.uuidToNative(SNOMED.Concept.IS_A.getUids());
         // rootNid = tf.uuidToNative(SNOMED.Concept.ROOT.getUids());
 
-        // :!!!: rootRoleNid = tf.uuidToNative(config.getClassificationRoleRoot().getUids());
+        rootRoleNid = tf.uuidToNative(UUID.fromString("6155818b-09ed-388e-82ce-caa143423e99"));
 
         // 0 CURRENT, 1 RETIRED
         isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
