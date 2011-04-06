@@ -6,7 +6,6 @@ package org.ihtsdo.project.panel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -17,7 +16,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.nio.channels.GatheringByteChannel;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -27,14 +25,11 @@ import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.task.util.DatePicker;
@@ -151,6 +146,7 @@ public class ProjectDatePeriodDialog extends JDialog {
 			}
 			if(startDate.compareTo(endDate) > 0){
 				errorLabel.setText("Start date must earlyer than end date");
+				return;
 			}
 			data = new HashMap<String, Object>();
 			data.put(PROJECT_KEY, projectComboBox.getSelectedItem());
@@ -261,7 +257,7 @@ public class ProjectDatePeriodDialog extends JDialog {
 					new Insets(0, 0, 7, 7), 0, 0));
 
 				//---- periodLabel ----
-				periodLabel.setText("Period (days)");
+				periodLabel.setText("Interval (days)");
 				projectPanel.add(periodLabel, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 0, 7), 0, 0));
