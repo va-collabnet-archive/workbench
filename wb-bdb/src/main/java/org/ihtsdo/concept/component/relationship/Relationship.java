@@ -40,6 +40,7 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import org.ihtsdo.tk.api.RelAssertionType;
 
 public class Relationship extends ConceptComponent<RelationshipRevision, Relationship>
         implements I_RelVersioned<RelationshipRevision>,
@@ -729,7 +730,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
             PositionSetBI positions, List<I_RelTuple> relTupleList,
             Precedence precedencePolicy, ContradictionManagerBI contradictionManager) {
         List<Version> tuplesToReturn = new ArrayList<Version>();
-        computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions, tuplesToReturn,
+        computer.addSpecifiedRelVersions(allowedStatus, allowedTypes, positions, tuplesToReturn,
                 getVersions(), precedencePolicy, contradictionManager);
         relTupleList.addAll(tuplesToReturn);
     }

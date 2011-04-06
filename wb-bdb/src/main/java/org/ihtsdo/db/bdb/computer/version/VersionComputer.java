@@ -14,6 +14,7 @@ import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper.RELATIVE_POSITION;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.NidSet;
@@ -169,8 +170,26 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                 matchingTuples, versions, precedencePolicy, contradictionManager);
     }
 
+    public void addSpecifiedRelVersions(NidSetBI allowedStatus, NidSetBI allowedTypes,
+            PositionSetBI positions, List<V> matchingTuples,
+            List<V> versions, Precedence precedencePolicy,
+            ContradictionManagerBI contradictionManager) {
+        if (positions == null || positions.isEmpty()) {
+            addSpecifiedVersionsNullPositions(allowedStatus, null,
+                    matchingTuples, versions, precedencePolicy,
+                    contradictionManager, null);
+        } else {
+                 addSpecifiedVersionsWithPositions(allowedStatus, allowedTypes,
+                        positions, matchingTuples, versions, precedencePolicy,
+                        contradictionManager, new AuthorFilter(ReferenceConcepts.SNOROCKET.getNid()));
+                addSpecifiedVersionsWithPositions(allowedStatus, allowedTypes,
+                        positions, matchingTuples, versions, precedencePolicy,
+                        contradictionManager, new AuthorAntiFilter(ReferenceConcepts.SNOROCKET.getNid()));
+        }
+    }
+
     public void addSpecifiedRelVersions(List<V> matchingVersions, List<V> versions, ViewCoordinate c) {
-        if (c.getPositionSet() == null || c.getPositionSet().size() < 1) {
+        if (c.getPositionSet() == null || c.getPositionSet().isEmpty()) {
             addSpecifiedVersionsNullPositions(c.getAllowedStatusNids(), null,
                     matchingVersions, versions, c.getPrecedence(),
                     c.getContradictionManager(), null);

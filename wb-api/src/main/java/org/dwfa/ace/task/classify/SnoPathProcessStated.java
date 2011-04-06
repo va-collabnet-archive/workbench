@@ -177,7 +177,7 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
 
         if (attribs.size() == 1) {
             passToCompare = true;
-        } else if (attribs.size() == 0 && fromPathPosPriority != null) {
+        } else if (attribs.isEmpty() && fromPathPosPriority != null) {
             // check to see if attribute is only on edit path
             attribs = concept.getConceptAttributeTuples(statusSet, fromPathPosPriority, precedence,
                     contradictionMgr);
