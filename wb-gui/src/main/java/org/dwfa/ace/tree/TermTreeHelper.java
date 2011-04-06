@@ -34,6 +34,7 @@ import java.util.concurrent.Executors;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -67,7 +68,7 @@ public class TermTreeHelper implements PropertyChangeListener {
     private ExecutorService treeExpandThread = Executors.newFixedThreadPool(1, new NamedThreadFactory(treeExpansionGroup,
             "tree expansion "));
     private JTreeWithDragImage tree;
-    private JToggleButton statedInferredButton;
+    private JButton statedInferredButton;
 
     public synchronized void addMouseListener(MouseListener ml) {
         tree.addMouseListener(ml);
@@ -91,6 +92,7 @@ public class TermTreeHelper implements PropertyChangeListener {
     public TermTreeHelper(I_ConfigAceFrame config) {
         super();
         this.aceFrameConfig = config;
+        this.assertionType = config.getRelAssertionType();
     }
 
     public JScrollPane getHierarchyPanel() throws TerminologyException, IOException {
@@ -161,22 +163,46 @@ public class TermTreeHelper implements PropertyChangeListener {
                 tree.expandPath(new TreePath(node.getPath()));
             }
         }
-        statedInferredButton = new JToggleButton(new AbstractAction("", statedView) {
+        statedInferredButton = new JButton(new AbstractAction("", statedView) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                JToggleButton button = (JToggleButton) e.getSource();
-                if (button.isSelected()) {
-                    button.setIcon(statedView);
-                    button.setToolTipText("showing stated, toggle to show inferred...");
-                    updateHierarchyView("changed from inferred to stated");
-                } else {
-                    button.setIcon(inferredView);
-                    button.setToolTipText("showing inferred, toggle to show stated...");
-                    updateHierarchyView("changed from stated to inferred");
+                switch (assertionType) {
+                    case INFERRED:
+                        assertionType = RelAssertionType.INFERRED_THEN_STATED;
+                        statedInferredButton.setIcon(inferredThenStatedView);
+                        statedInferredButton.setToolTipText("showing inferred then stated, toggle to show stated...");
+                        updateHierarchyView("changed from stated to inferred then stated");
+                        break;
+                    case INFERRED_THEN_STATED:
+                        assertionType = RelAssertionType.STATED;
+                        statedInferredButton.setIcon(statedView);
+                        statedInferredButton.setToolTipText("showing stated, toggle to show inferred...");
+                        updateHierarchyView("changed from inferred to stated");
+                        break;
+                    case STATED:
+                        assertionType = RelAssertionType.INFERRED;
+                        statedInferredButton.setIcon(inferredView);
+                        statedInferredButton.setToolTipText("showing inferred, toggle to show inferred then stated...");
+                        updateHierarchyView("changed from stated to inferred");
+                        break;
                 }
             }
         });
+        switch (assertionType) {
+            case INFERRED:
+                statedInferredButton.setIcon(inferredView);
+                statedInferredButton.setToolTipText("showing inferred, toggle to show inferred then stated...");
+                break;
+            case INFERRED_THEN_STATED:
+                statedInferredButton.setIcon(inferredThenStatedView);
+                statedInferredButton.setToolTipText("showing inferred then stated, toggle to show stated...");
+                break;
+            case STATED:
+                statedInferredButton.setIcon(inferredView);
+                statedInferredButton.setToolTipText("showing stated, toggle to show inferred...");
+                break;
+        }
         statedInferredButton.setSelected(true);
         statedInferredButton.setPreferredSize(new Dimension(20, 16));
         statedInferredButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -204,6 +230,9 @@ public class TermTreeHelper implements PropertyChangeListener {
             ConceptViewRenderer.class.getResource("/16x16/plain/graph_edge.png"));
     private static ImageIcon inferredView = new ImageIcon(
             ConceptViewRenderer.class.getResource("/16x16/plain/chrystal_ball.png"));
+    private static ImageIcon inferredThenStatedView = new ImageIcon(
+            ConceptViewRenderer.class.getResource("/16x16/plain/inferred-then-stated.png"));
+    private RelAssertionType assertionType;
 
     public TermTreeCellRenderer getRenderer() {
         return renderer;
@@ -262,10 +291,7 @@ public class TermTreeHelper implements PropertyChangeListener {
         stopWorkersOnPath(idPath, "stopping before expansion");
         I_GetConceptDataForTree userObject = (I_GetConceptDataForTree) node.getUserObject();
         if (userObject != null) {
-            RelAssertionType assertionType = RelAssertionType.INFERRED;
-            if (statedInferredButton != null && statedInferredButton.isSelected()) {
-                assertionType = RelAssertionType.STATED;
-            }
+
             aceFrameConfig.getChildrenExpandedNodes().add(userObject.getConceptNid());
             FrameConfigSnapshot configSnap = new FrameConfigSnapshot(aceFrameConfig);
             ExpandNodeSwingWorker worker = new ExpandNodeSwingWorker((DefaultTreeModel) tree.getModel(), tree,
