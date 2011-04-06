@@ -79,7 +79,7 @@ public class RF2ConceptPostMojo extends AbstractMojo {
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
 			config.setFileExtension("txt");
-			File conceptsFileName = new File(targetDirectory, 
+			File conceptsFileName = new File(exportFolder, 
 					config.getExportFileName() + releaseDate + "." + config.getFileExtension());
 			
 			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_CONCEPT, new File( rf2FullFolder),
