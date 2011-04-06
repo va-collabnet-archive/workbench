@@ -169,9 +169,11 @@ public class TermTreeHelper implements PropertyChangeListener {
                 if (button.isSelected()) {
                     button.setIcon(statedView);
                     button.setToolTipText("showing stated, toggle to show inferred...");
+                    updateHierarchyView("changed from inferred to stated");
                 } else {
                     button.setIcon(inferredView);
                     button.setToolTipText("showing inferred, toggle to show stated...");
+                    updateHierarchyView("changed from stated to inferred");
                 }
             }
         });
