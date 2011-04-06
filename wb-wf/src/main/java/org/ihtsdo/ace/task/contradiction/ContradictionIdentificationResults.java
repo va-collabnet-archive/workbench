@@ -15,18 +15,18 @@ public class ContradictionIdentificationResults {
     private Set<Integer> conflictingConcepts = new ConcurrentSkipListSet<Integer>();
     private Set<Integer> singleConcepts = new ConcurrentSkipListSet<Integer>();
     private Set<Integer> nonConflictingConcepts = new ConcurrentSkipListSet<Integer>();
-    private Set<Integer> conflictingConceptsWithSameValuesSameCompId = new ConcurrentSkipListSet<Integer>();
-    private Set<Integer> conflictingConceptsWithSameValuesDifferentCompId = new ConcurrentSkipListSet<Integer>();
+    private Set<Integer> duplicateEdit = new ConcurrentSkipListSet<Integer>();
+    private Set<Integer> duplicateNew = new ConcurrentSkipListSet<Integer>();
     
     public void addConflict(Integer nid) {
         conflictingConcepts.add(nid);
     }
 
     public void addConflictingWithSameValueSameCompId(Integer nid) {
-    	conflictingConceptsWithSameValuesSameCompId.add(nid);
+    	duplicateEdit.add(nid);
     }
     public void addConflictingWithSameValueDifferentCompId(Integer nid) {
-    	conflictingConceptsWithSameValuesDifferentCompId.add(nid);
+    	duplicateNew.add(nid);
     }
 
     public void addSingle(Integer nid) {
@@ -52,11 +52,11 @@ public class ContradictionIdentificationResults {
         return sortedConcepts;
     }
 
-    public TreeSet<I_GetConceptData> getConflictingConceptsWithSameValueSameCompId() {
+    public TreeSet<I_GetConceptData> getDuplicateEditCompId() {
         TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createFsnComparer());
 
         try {
-            for (Integer i : conflictingConceptsWithSameValuesSameCompId) {
+            for (Integer i : duplicateEdit) {
                 I_GetConceptData con = Terms.get().getConcept(i);
                 sortedConcepts.add(con);
             }
@@ -67,11 +67,11 @@ public class ContradictionIdentificationResults {
         return sortedConcepts;
     }
 
-    public TreeSet<I_GetConceptData> getConflictingConceptsWithSameValueDifferentCompId() {
+    public TreeSet<I_GetConceptData> getDuplicateNewCompId() {
         TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createFsnComparer());
 
         try {
-            for (Integer i : conflictingConceptsWithSameValuesDifferentCompId) {
+            for (Integer i : duplicateNew) {
                 I_GetConceptData con = Terms.get().getConcept(i);
                 sortedConcepts.add(con);
             }
@@ -116,12 +116,12 @@ public class ContradictionIdentificationResults {
         return conflictingConcepts;
     }
 
-    public Set<Integer> getConflictingWithSameValueSameCompIdNids() {
-        return conflictingConceptsWithSameValuesSameCompId;
+    public Set<Integer> getDuplicateEditNids() {
+        return duplicateEdit;
     }
 
-    public Set<Integer> getConflictingWithSameValueDifferentCompIdNids() {
-        return conflictingConceptsWithSameValuesDifferentCompId;
+    public Set<Integer> getDuplicateNewNids() {
+        return duplicateNew;
     }
 
     public Set<Integer> getSingleNids() {

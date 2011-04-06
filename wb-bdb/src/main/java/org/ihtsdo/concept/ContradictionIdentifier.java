@@ -44,10 +44,8 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
      // Class Variables
     private static PositionMapper conflictMapper = null;
 
-	// TODO: Assign values via building of wf metadata but in cr metadata
-	private String adjudicatorPathUid = "a55ae9d9-2e8a-5d04-a3b3-9c8a87ba34d1"; 
 	private String originPathUid = "4906ace4-537f-5ea9-9575-c5ce4182f292"; 
-	private int adjudicatorPathNid = 0;
+	private int viewPathNid = 0;
 	private int originPathNid = 0;
 	
     public ContradictionIdentifier() 
@@ -76,14 +74,19 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
                 }
             }
 
-			adjudicatorPathNid = Terms.get().getPath(UUID.fromString(adjudicatorPathUid)).getConceptNid();
 			originPathNid = Terms.get().getPath(UUID.fromString(originPathUid)).getConceptNid();
         } catch (Exception e) {
             AceLog.getAppLog().log(Level.WARNING, "Failure to get Active Ace Frame", e);
         }
     }
 
-    // For a given concept, look at a set of components at a time.
+	@Override
+	public void setViewPos(PositionBI position) {
+		// Note, adjudications are assumed to be based on view Path
+		viewPathNid = position.getPath().getConceptNid();
+	}
+
+	// For a given concept, look at a set of components at a time.
     // If contradiction found, return immediatly.  
     // If single change found, save state and only return state if no contradiction found in each concept's component type
     @Override
@@ -387,7 +390,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
      	for (ComponentVersionBI part : comp.getVersions())
  		{
  			// Identify Adjudication versions and find latest 
- 			if (part.getPathNid() == adjudicatorPathNid)
+ 			if (part.getPathNid() == viewPathNid)
  			
  			{
  				if (latestAdjudicatedVersion  == null || part.getTime() > latestAdjudicatedVersion.getTime())
@@ -423,7 +426,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	    	boolean putIntoMap = false;
 	    	Integer pathNidObj = null;
 	    	
-	    	if ((part.getPathNid() != adjudicatorPathNid) &&
+	    	if ((part.getPathNid() != viewPathNid) &&
 				(part.getPathNid() != originPathNid) &&
 				(!isOriginVersion(originPath, part))) 
 			{
@@ -780,7 +783,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
         for (I_ExtendByRef member : members) {
          	for (I_ExtendByRefPart part : member.getMutableParts()) {
      			// Identify Adjudication versions and find latest 
-     			if (part.getPathNid() == adjudicatorPathNid) {
+     			if (part.getPathNid() == viewPathNid) {
      				if (latestAdjudicatedVersion  == null || part.getTime() > latestAdjudicatedVersion.getTime()) {
      					latestAdjudicatedVersion = part;
                     }
@@ -800,7 +803,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
     	    	boolean putIntoMap = false;
     	    	Integer pathNidObj = null;
 
-    	    	if ((part.getPathNid() != adjudicatorPathNid) &&
+    	    	if ((part.getPathNid() != viewPathNid) &&
     				(part.getPathNid() != originPathNid) &&
     				(!isOriginVersion(originPath, part))) 
     	    	{
@@ -854,6 +857,8 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
         return identifyContradictionResult(isContradiction, isSingleEdit, isDuplicateEdit, false);
     }
+
+
 }
 
 

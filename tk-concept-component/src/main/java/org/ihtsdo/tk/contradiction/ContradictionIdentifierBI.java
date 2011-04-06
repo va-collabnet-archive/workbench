@@ -16,6 +16,7 @@
 
 package org.ihtsdo.tk.contradiction;
 
+import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 /**
@@ -27,4 +28,5 @@ public interface ContradictionIdentifierBI {
 
     ContradictionResult isConceptInConflict(ConceptChronicleBI concept) throws Exception;
 
+    void setViewPos(PositionBI viewPos);
 }

@@ -43,9 +43,11 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
     private AtomicInteger found = new AtomicInteger();
 
     public ContradictionConceptProcessor(PositionBI position) {
+        // Via Task
         buildInvestigationSet();
         results = new ContradictionIdentificationResults();
         detector = Ts.get().getConflictIdentifier();
+        detector.setViewPos(position);
     }
 
     public ContradictionConceptProcessor(PositionBI position,
@@ -53,6 +55,7 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
         this.cNids = cNids;
         results = new ContradictionIdentificationResults();
         detector = Ts.get().getConflictIdentifier();
+        detector.setViewPos(position);
     }
 
     public ContradictionConceptProcessor(PositionBI position,
@@ -60,6 +63,7 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
         this.cNids = cNids;
         results = new ContradictionIdentificationResults();
         detector = Ts.get().getConflictIdentifier();
+        detector.setViewPos(position);
         this.activityMonitor = activityMonitor;
         activityMonitor.setMaximum(cNids.cardinality());
         activityMonitor.setValue(count.get());
@@ -69,10 +73,10 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
     @Override
     public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fcfc) throws Exception {
         int currentCount = count.incrementAndGet();
-        if (activityMonitor != null && activityMonitor.isCanceled()) {
-            return;
-        }
-        
+//        if (activityMonitor != null && activityMonitor.isCanceled()) {
+//            return;
+//        }
+//        
         if (cNids.isMember(cNid)) { 
             ConceptChronicleBI c = fcfc.fetch();
             ContradictionResult position = (detector.isConceptInConflict(c));
@@ -98,10 +102,10 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
             }
         }
         
-        if (activityMonitor != null && currentCount % 500 == 0) {
-            activityMonitor.setValue(count.get());
-            activityMonitor.setProgressInfoLower("Contradictions: " + found.get());
-        }
+//        if (activityMonitor != null && currentCount % 5 == 0) {
+//            activityMonitor.setValue(count.get());
+//            activityMonitor.setProgressInfoLower("Contradictions: " + found.get());
+//        }
     }
 
 

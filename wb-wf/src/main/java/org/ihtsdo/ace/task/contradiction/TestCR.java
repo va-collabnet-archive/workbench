@@ -72,8 +72,8 @@ public class TestCR extends AbstractTask {
     		// Report any conflicts
     		reporter.populateConflictsInListPanel(results.getConflictingNids());
 //    		reporter.printConflictConcepts(results.getConflictingConcepts());
-    		reporter.printConflictingWithSameValueSameCompId(results.getConflictingConceptsWithSameValueSameCompId());
-    		reporter.printConflictingWithSameValueDifferentCompId(results.getConflictingConceptsWithSameValueDifferentCompId());
+    		reporter.printConflictingWithSameValueSameCompId(results.getDuplicateEditCompId());
+    		reporter.printConflictingWithSameValueDifferentCompId(results.getDuplicateNewCompId());
     		reporter.printSingleConcepts(results.getSingleConcepts());
     		
     		
