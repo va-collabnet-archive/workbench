@@ -48,13 +48,16 @@ public class ProjectHistoricalReport implements I_Report {
 
 	public ProjectHistoricalReport() {
 		super();
-		formatter = new SimpleDateFormat("yyyy/MM/dd");
+		formatter = new SimpleDateFormat("dd-MMM-yyyy");
 		tf = Terms.get();
 	}
 
 	@Override
-	public File getExcelSourceWorkbook() {
+	public File getExcelSourceWorkbook() throws Exception {
 		File csvFile = this.getCsv();
+		if (csvFile == null) {
+			return null;
+		}
 
 		FileReader input;
 		CSVReader reader;
@@ -115,22 +118,26 @@ public class ProjectHistoricalReport implements I_Report {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
+			throw e;
 		}
+		
 		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-hh-mm");
 		Date date = new Date();
 		File reportCopy = new File("reports/" + sdf.format(date) + "_project_history_report.xls");
+		
 		try {
 			ExcelReportUtil.copyFile(excelRep, reportCopy);
 		} catch (IOException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return reportCopy;
 	}
 
 	@Override
-	public File getCsv() {
+	public File getCsv() throws Exception {
 		File csvFile = null;
+		boolean dataFound = false;
 		try {
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 			I_ConfigAceFrame configVer;
@@ -189,10 +196,7 @@ public class ProjectHistoricalReport implements I_Report {
 										String key = iterator.next();
 										List<WorkListMember> members = wlMembersByStatus.get(key);
 										for (WorkListMember workListMember : members) {
-
-											System.out.println(strDate + "|" + projectName + "|" + worksetName + "|" + worklistName + "|" + workListMember.getName() + "|" + key + "|"
-													+ workListMember.getLastAuthorName());
-
+											dataFound = true;
 											pw.append(strDate + "|");
 											pw.append(projectName + "|");
 											pw.append(worksetName + "|");
@@ -209,15 +213,16 @@ public class ProjectHistoricalReport implements I_Report {
 					}
 					endThickVer = endThickVer - thickPeriod;
 				}
-
+				if (!dataFound) {
+					return null;
+				}
 				pw.flush();
 				pw.close();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return csvFile;
+			throw e;
 		}
-		System.out.println("CsvFile Created: " + csvFile.getAbsolutePath());
 		return csvFile;
 	}
 

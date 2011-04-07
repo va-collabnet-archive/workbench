@@ -27,9 +27,9 @@ public interface I_Report {
 		}
 	}
 	
-	public File getCsv(); 
-	public JFrame getReportPanel();
-	public File getExcelSourceWorkbook();
-	public File getExcelPivotTableWorkBook();
+	public File getCsv()throws Exception; 
+	public JFrame getReportPanel()throws Exception;
+	public File getExcelSourceWorkbook()throws Exception;
+	public File getExcelPivotTableWorkBook()throws Exception;
 	
 }

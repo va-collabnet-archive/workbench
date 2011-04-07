@@ -1,6 +1,5 @@
 package org.ihtsdo.document.report;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -40,12 +39,13 @@ import org.ihtsdo.project.panel.WorkListChooser;
 
 import au.com.bytecode.opencsv.CSVReader;
 
-public class WorklistMemberByStatusReport implements I_Report{
+public class WorklistMemberByStatusReport implements I_Report {
 
 	@Override
-	public File getCsv() {
+	public File getCsv() throws Exception {
 		File csvFile = null;
-		try{
+		boolean dataFound = false;
+		try {
 			I_TermFactory tf = Terms.get();
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 			WorkListChooser wlChooser = new WorkListChooser(config);
@@ -54,8 +54,8 @@ public class WorklistMemberByStatusReport implements I_Report{
 			PrintWriter pw = new PrintWriter(csvFile);
 			pw.append("worklist|status|term|last user");
 			pw.println();
-			
-			if(wl != null){
+
+			if (wl != null) {
 				HashMap<String, List<WorkListMember>> wlMembersByStatus = null;
 				List<WorkListMember> wlMembers = TerminologyProjectDAO.getAllWorkListMembers(wl, config);
 				if (wlMembers != null) {
@@ -76,6 +76,7 @@ public class WorklistMemberByStatusReport implements I_Report{
 							String key = iterator.next();
 							List<WorkListMember> members = wlMembersByStatus.get(key);
 							for (WorkListMember workListMember : members) {
+								dataFound = true;
 								pw.append(wl.getName() + "|");
 								pw.append(key + "|");
 								pw.append(workListMember.getName() + "|");
@@ -87,15 +88,16 @@ public class WorklistMemberByStatusReport implements I_Report{
 						pw.close();
 					}
 				}
-			}else{
-				return null;
 			}
-		}catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-			return csvFile;
+			throw e;
 		}
-		System.out.println("CsvFile Created: " + csvFile.getAbsolutePath());
-		return csvFile;
+		if (dataFound) {
+			return csvFile;
+		} else {
+			return null;
+		}
 	}
 
 	@Override
@@ -105,9 +107,11 @@ public class WorklistMemberByStatusReport implements I_Report{
 	}
 
 	@Override
-	public File getExcelSourceWorkbook() {
+	public File getExcelSourceWorkbook() throws Exception {
 		File csvFile = this.getCsv();
-		
+		if (csvFile == null) {
+			return null;
+		}
 		FileReader input;
 		CSVReader reader;
 		File excelRep = new File("reports/templates/worklist_members_byStatus.xls");
@@ -117,11 +121,10 @@ public class WorklistMemberByStatusReport implements I_Report{
 			if (excelRep.exists()) {
 				Workbook wb = ExcelReportUtil.readFile(excelRep);
 				FileOutputStream out = new FileOutputStream(excelRep);
-				
+
 				wb.removeSheetAt(1);
 				wb.createSheet("Data");
 				Sheet s = wb.getSheetAt(1);
-				
 
 				Row r = null;
 				Cell cell = null;
@@ -156,8 +159,8 @@ public class WorklistMemberByStatusReport implements I_Report{
 							cell.setCellStyle(cs2);
 						}
 						cell.setCellValue(nextLine[cellnum]);
-						if (s.getColumnWidth(cellnum) < 3000 + nextLine[cellnum].length() * 200)
-							{s.setColumnWidth((short) (cellnum),(short) (3000 + nextLine[cellnum].length() * 200));
+						if (s.getColumnWidth(cellnum) < 3000 + nextLine[cellnum].length() * 200) {
+							s.setColumnWidth((short) (cellnum), (short) (3000 + nextLine[cellnum].length() * 200));
 						}
 					}
 					rownum++;
@@ -168,50 +171,54 @@ public class WorklistMemberByStatusReport implements I_Report{
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
+			throw e;
 		}
 		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-hh-mm");
 		Date date = new Date();
 		File reportCopy = new File("reports/" + sdf.format(date) + "_worklist_member_by_status.xls");
-		try{
+		try {
 			ExcelReportUtil.copyFile(excelRep, reportCopy);
-		}catch (IOException e){
+		} catch (IOException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return reportCopy;
 	}
 
 	@Override
-	public JFrame getReportPanel() {
+	public JFrame getReportPanel() throws Exception {
 		JasperViewer jviewer = null;
 		File csvFile = this.getCsv();
+		if (csvFile == null) {
+			return null;
+		}
 		try {
 			JasperCompileManager.compileReportToFile("reports/templates/demo_report.jrxml");
 		} catch (JRException e1) {
 			e1.printStackTrace();
 		}
 		String fileName = "reports/templates/demo_report.jasper";
-        try {
-        	if(csvFile != null){
-	            // Fill the report using an empty data source
-	        	JRCsvDataSource csvDataSource = new JRCsvDataSource(csvFile);
-	        	csvDataSource.setRecordDelimiter(System.getProperty("line.separator"));
-	        	csvDataSource.setFieldDelimiter('|');
-	        	
-	        	csvDataSource.setUseFirstRowAsHeader(true);
-	            JasperPrint print = JasperFillManager.fillReport(fileName, null, csvDataSource);
-	            
-	            jviewer = new JasperViewer(print,false);
-        	}
-            
-        } catch (JRException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return jviewer;
+		try {
+			// Fill the report using an empty data source
+			JRCsvDataSource csvDataSource = new JRCsvDataSource(csvFile);
+			csvDataSource.setRecordDelimiter(System.getProperty("line.separator"));
+			csvDataSource.setFieldDelimiter('|');
+
+			csvDataSource.setUseFirstRowAsHeader(true);
+			JasperPrint print = JasperFillManager.fillReport(fileName, null, csvDataSource);
+
+			jviewer = new JasperViewer(print, false);
+
+		} catch (JRException e) {
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return jviewer;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Worklist members by status report";

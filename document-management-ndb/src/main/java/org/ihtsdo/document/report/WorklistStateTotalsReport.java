@@ -1,6 +1,5 @@
 package org.ihtsdo.document.report;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -40,31 +39,32 @@ import org.ihtsdo.project.model.WorkSet;
 
 import au.com.bytecode.opencsv.CSVReader;
 
-public class WorklistStateTotalsReport implements I_Report{
+public class WorklistStateTotalsReport implements I_Report {
 
 	@Override
-	public File getCsv() {
+	public File getCsv() throws Exception {
 		File csvFile = null;
-		try{
+		boolean dataFound = false;
+		try {
 			I_TermFactory tf = Terms.get();
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 			csvFile = File.createTempFile("workset_worklist_st_totals", ".csv");
 			PrintWriter writer = new PrintWriter(csvFile);
 			writer.append("Project|WorkSet|WorkList|Status|Total");
 			writer.println();
-			
+
 			List<I_TerminologyProject> projects = TerminologyProjectDAO.getAllProjects(config);
 			for (I_TerminologyProject iTerminologyProject : projects) {
 				String projectName = iTerminologyProject.getName();
-				
+
 				List<WorkSet> worksets = TerminologyProjectDAO.getAllWorkSetsForProject(iTerminologyProject, config);
 				for (WorkSet workSet : worksets) {
 					String worksetName = workSet.getName();
 					List<WorkList> worklists = TerminologyProjectDAO.getAllWorklistForWorkset(workSet, config);
 					for (WorkList workList : worklists) {
-						if(workList != null){
+						if (workList != null) {
 							String worklistName = workList.getName();
-							
+
 							HashMap<String, Integer> statusMembers = new HashMap<String, Integer>();
 							List<WorkListMember> wlMembList = TerminologyProjectDAO.getAllWorkListMembers(workList, config);
 							for (WorkListMember workListMember : wlMembList) {
@@ -76,9 +76,10 @@ public class WorklistStateTotalsReport implements I_Report{
 									statusMembers.put(activitiStatus.toString(), 1);
 								}
 							}
-							
+
 							Set<String> keySet = statusMembers.keySet();
 							for (Iterator<String> iterator = keySet.iterator(); iterator.hasNext();) {
+								dataFound = true;
 								String key = (String) iterator.next();
 								Integer total = statusMembers.get(key);
 								writer.append(projectName + '|');
@@ -94,12 +95,15 @@ public class WorklistStateTotalsReport implements I_Report{
 			}
 			writer.flush();
 			writer.close();
-		}catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-			return csvFile;
+			throw e;
 		}
-		System.out.println("CsvFile Created: " + csvFile.getAbsolutePath());
-		return csvFile;
+		if (dataFound) {
+			return csvFile;
+		} else {
+			return null;
+		}
 	}
 
 	@Override
@@ -109,9 +113,13 @@ public class WorklistStateTotalsReport implements I_Report{
 	}
 
 	@Override
-	public File getExcelSourceWorkbook() {
-		File csvFile = this.getCsv();
-	
+	public File getExcelSourceWorkbook() throws Exception {
+		File csvFile;
+		csvFile = this.getCsv();
+		if(csvFile == null){
+			return null;
+		}
+
 		FileReader input;
 		CSVReader reader;
 		File excelRep = new File("reports/templates/worklist_state_totals.xls");
@@ -125,7 +133,7 @@ public class WorklistStateTotalsReport implements I_Report{
 				wb.removeSheetAt(1);
 				wb.createSheet("Data");
 				Sheet s = wb.getSheetAt(1);
-				
+
 				Row r = null;
 				Cell cell = null;
 
@@ -161,8 +169,8 @@ public class WorklistStateTotalsReport implements I_Report{
 							cell.setCellStyle(cs2);
 						}
 						cell.setCellValue(nextLine[cellnum]);
-						if (s.getColumnWidth(cellnum) < 3000 + nextLine[cellnum].length() * 200)
-							{s.setColumnWidth((short) (cellnum),(short) (3000 + nextLine[cellnum].length() * 200));
+						if (s.getColumnWidth(cellnum) < 3000 + nextLine[cellnum].length() * 200) {
+							s.setColumnWidth((short) (cellnum), (short) (3000 + nextLine[cellnum].length() * 200));
 						}
 					}
 					rownum++;
@@ -173,51 +181,57 @@ public class WorklistStateTotalsReport implements I_Report{
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
+			throw e;
 		}
+		
 		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-hh-mm");
 		Date date = new Date();
 		File reportCopy = new File("reports/" + sdf.format(date) + "_worklist_state_totals.xls");
-		try{
-			ExcelReportUtil.copyFile(excelRep, reportCopy);
-		}catch (IOException e){
-			e.printStackTrace();
-		}
 		
+		try {
+			ExcelReportUtil.copyFile(excelRep, reportCopy);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw e;
+		}
+
 		return reportCopy;
 	}
 
 	@Override
-	public JFrame getReportPanel() {
+	public JFrame getReportPanel() throws Exception {
 		JasperViewer jviewer = null;
 		File csvFile = this.getCsv();
+		if(csvFile == null){
+			return null;
+		}
 		try {
 			JasperCompileManager.compileReportToFile("reports/templates/ProjectMembersStatusTotals.jrxml");
 		} catch (JRException e1) {
 			e1.printStackTrace();
 		}
 		String fileName = "reports/templates/ProjectMembersStatusTotals.jasper";
-        try {
-            // Fill the report using an empty data source
-        	if(csvFile != null){
-	        	JRCsvDataSource csvDataSource = new JRCsvDataSource(csvFile);
-	        	csvDataSource.setRecordDelimiter(System.getProperty("line.separator"));
-	        	csvDataSource.setFieldDelimiter('|');
-	        	
-	        	csvDataSource.setUseFirstRowAsHeader(true);
-	            JasperPrint print = JasperFillManager.fillReport(fileName, null, csvDataSource);
-	            
-	            jviewer = new JasperViewer(print,false);
-        	}
-            
-        } catch (JRException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return jviewer;
+		try {
+			// Fill the report using an empty data source
+			if (csvFile != null) {
+				JRCsvDataSource csvDataSource = new JRCsvDataSource(csvFile);
+				csvDataSource.setRecordDelimiter(System.getProperty("line.separator"));
+				csvDataSource.setFieldDelimiter('|');
+
+				csvDataSource.setUseFirstRowAsHeader(true);
+				JasperPrint print = JasperFillManager.fillReport(fileName, null, csvDataSource);
+
+				jviewer = new JasperViewer(print, false);
+			}
+
+		} catch (JRException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return jviewer;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Project worklists status totals";

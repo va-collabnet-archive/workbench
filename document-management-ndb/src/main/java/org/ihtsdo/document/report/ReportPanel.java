@@ -31,14 +31,11 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
-import javax.swing.border.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.config.AceFrame;
-import org.dwfa.ace.config.AceFrameConfig;
-import org.dwfa.bpa.process.Condition;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.document.report.I_Report.Reports;
 import org.ihtsdo.project.panel.PanelHelperFactory;
@@ -52,7 +49,9 @@ public class ReportPanel extends JPanel {
 	private static final long serialVersionUID = -5420825015191719954L;
 
 	private static final String NO_SELECTION_MESSAGE = "No reports selected.";
-	private static final String REPORT_NOT_CREATED = "Report not created.";
+	private static final String NO_DATA = "No data found to report";
+
+	private static final String EXCEPTION = "Exception creating report, check log for more details.";
 	private JFileChooser chooser;
 
 	private DefaultListModel reportListModel;
@@ -72,10 +71,10 @@ public class ReportPanel extends JPanel {
 		reportList.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				if(reportList.getSelectedValue() != null){
-					if(reportList.getSelectedValue() instanceof ProjectHistoricalReport){
+				if (reportList.getSelectedValue() != null) {
+					if (reportList.getSelectedValue() instanceof ProjectHistoricalReport) {
 						pdfReport.setEnabled(false);
-					}else{
+					} else {
 						pdfReport.setEnabled(true);
 					}
 					showMessage("");
@@ -89,83 +88,102 @@ public class ReportPanel extends JPanel {
 
 	}
 
-	private void showError(String error){
+	private void showError(String error) {
 		errorLabel.setForeground(Color.RED);
 		errorLabel.setText(error);
 	}
 
-	private void showMessage(String message){
+	private void showMessage(String message) {
 		errorLabel.setForeground(Color.BLACK);
 		errorLabel.setText(message);
 	}
 
 	private void pdfReportActionPerformed(ActionEvent e) {
-		I_Report report = (I_Report)reportList.getSelectedValue();
-		if(report != null){
+		I_Report report = (I_Report) reportList.getSelectedValue();
+		if (report != null) {
 			progressBar1.setVisible(true);
-			JFrame reportFrame = report.getReportPanel();
-			if(reportFrame != null){
-				reportFrame.setSize(new Dimension(750,800));
-				reportFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				reportFrame.setVisible(true);
+			JFrame reportFrame;
+			try {
+				reportFrame = report.getReportPanel();
+				if (reportFrame != null) {
+					reportFrame.setSize(new Dimension(750, 800));
+					reportFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+					reportFrame.setVisible(true);
+				}else{
+					showError(NO_DATA);
+				}
+			} catch (Exception e1) {
+				e1.printStackTrace();
+				showError(EXCEPTION);
+			} finally {
+				progressBar1.setVisible(false);
 			}
-			progressBar1.setVisible(false);
-			
-		}else{
+		} else {
 			showError(NO_SELECTION_MESSAGE);
 		}
 	}
 
 	private void excelReportActionPerformed(ActionEvent e) {
-		I_Report report = (I_Report)reportList.getSelectedValue();
-		if(report != null){
+		I_Report report = (I_Report) reportList.getSelectedValue();
+		if (report != null) {
 			progressBar1.setVisible(true);
-			File excelFile = report.getExcelSourceWorkbook();
-			if(excelFile != null){
-				try {
-					Desktop desktop = null;
-					if (Desktop.isDesktopSupported()) {
-						desktop = Desktop.getDesktop();
-						desktop.open(excelFile);
+			try {
+				File excelFile = report.getExcelSourceWorkbook();
+				if (excelFile != null) {
+					try {
+						Desktop desktop = null;
+						if (Desktop.isDesktopSupported()) {
+							desktop = Desktop.getDesktop();
+							desktop.open(excelFile);
+						}
+					} catch (IOException ioe) {
+						ioe.printStackTrace();
 					}
-				} catch (IOException ioe) {
-					ioe.printStackTrace();
+				} else {
+					showError(NO_DATA);
 				}
-			}else{
-				showError(REPORT_NOT_CREATED);
+			} catch (Exception e1) {
+				showError(EXCEPTION);
+			} finally {
+				progressBar1.setVisible(false);
 			}
-
-			progressBar1.setVisible(false);
-		}else{
+		} else {
 			showError(NO_SELECTION_MESSAGE);
 		}
 	}
 
 	private void csvFileActionPerformed(ActionEvent e) {
-		I_Report report = (I_Report)reportList.getSelectedValue();
-		if(report != null){
+		I_Report report = (I_Report) reportList.getSelectedValue();
+		if (report != null) {
 			progressBar1.setVisible(true);
 			chooser = new JFileChooser();
 			chooser.setCurrentDirectory(new java.io.File("."));
 			chooser.setDialogTitle("Select folder");
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			
+
 			chooser.setAcceptAllFileFilterUsed(false);
-			
+
 			if (chooser.showOpenDialog(this) == JFileChooser.OPEN_DIALOG) {
-				 File selectedFolder = chooser.getSelectedFile();
-				 SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-hh-mm");
-				 File result = new File(selectedFolder, sdf.format(new Date()) + "_" + report.toString().replace(' ', '_') +".csv");
-				 File csvFile = report.getCsv();
-				 try {
-					ExcelReportUtil.copyFile(csvFile, result);
+				File selectedFolder = chooser.getSelectedFile();
+				SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-hh-mm");
+				File result = new File(selectedFolder, sdf.format(new Date()) + "_" + report.toString().replace(' ', '_') + ".csv");
+				try {
+					File csvFile = report.getCsv();
+					if(csvFile != null){
+						ExcelReportUtil.copyFile(csvFile, result);
+					}else{
+						showError(NO_DATA);
+					}
 				} catch (IOException e1) {
 					e1.printStackTrace();
+				} catch (Exception e2) {
+					e2.printStackTrace();
+				}finally{
+					showError(EXCEPTION);
 					progressBar1.setVisible(false);
+					chooser.setVisible(false);
 				}
-			} 
-			progressBar1.setVisible(false);
-			chooser.setVisible(false);
+			}
 		}
 	}
 
@@ -173,10 +191,10 @@ public class ReportPanel extends JPanel {
 		try {
 			TranslationHelperPanel thp = PanelHelperFactory.getTranslationHelperPanel();
 			JTabbedPane tp = thp.getTabbedPanel();
-			if(tp != null){
+			if (tp != null) {
 				int tabCount = tp.getTabCount();
-				for(int i = 0; i< tabCount; i++){
-					if(tp.getTitleAt(i).equals(TranslationHelperPanel.REPORT_PANEL_NAME)){
+				for (int i = 0; i < tabCount; i++) {
+					if (tp.getTitleAt(i).equals(TranslationHelperPanel.REPORT_PANEL_NAME)) {
 						tp.remove(i);
 						tp.revalidate();
 						tp.repaint();
@@ -191,7 +209,8 @@ public class ReportPanel extends JPanel {
 	}
 
 	private void initComponents() {
-		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+		// JFormDesigner - Component initialization - DO NOT MODIFY
+		// //GEN-BEGIN:initComponents
 		panel1 = new JPanel();
 		pdfReport = new JButton();
 		excelReport = new JButton();
@@ -206,16 +225,16 @@ public class ReportPanel extends JPanel {
 		label1 = new JLabel();
 		label2 = new JLabel();
 
-		//======== this ========
+		// ======== this ========
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new BorderLayout(10, 10));
 
-		//======== panel1 ========
+		// ======== panel1 ========
 		{
 			panel1.setBorder(new MatteBorder(1, 0, 0, 0, Color.gray));
 			panel1.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-			//---- pdfReport ----
+			// ---- pdfReport ----
 			pdfReport.setText("Preview");
 			pdfReport.addActionListener(new ActionListener() {
 				@Override
@@ -225,7 +244,7 @@ public class ReportPanel extends JPanel {
 			});
 			panel1.add(pdfReport);
 
-			//---- excelReport ----
+			// ---- excelReport ----
 			excelReport.setText("Excel report");
 			excelReport.addActionListener(new ActionListener() {
 				@Override
@@ -235,7 +254,7 @@ public class ReportPanel extends JPanel {
 			});
 			panel1.add(excelReport);
 
-			//---- csvFile ----
+			// ---- csvFile ----
 			csvFile.setText("CSV data");
 			csvFile.addActionListener(new ActionListener() {
 				@Override
@@ -245,7 +264,7 @@ public class ReportPanel extends JPanel {
 			});
 			panel1.add(csvFile);
 
-			//---- closeButton ----
+			// ---- closeButton ----
 			closeButton.setText("Close");
 			closeButton.addActionListener(new ActionListener() {
 				@Override
@@ -257,47 +276,45 @@ public class ReportPanel extends JPanel {
 		}
 		add(panel1, BorderLayout.SOUTH);
 
-		//======== panel2 ========
+		// ======== panel2 ========
 		{
 			panel2.setLayout(new BorderLayout(5, 5));
 
-			//======== scrollPane1 ========
+			// ======== scrollPane1 ========
 			{
 				scrollPane1.setViewportView(reportList);
 			}
 			panel2.add(scrollPane1, BorderLayout.CENTER);
 
-			//======== panel3 ========
+			// ======== panel3 ========
 			{
 				panel3.setLayout(new GridBagLayout());
-				((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {109, 188, 0};
-				((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {0, 0};
-				((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
-				((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
-				panel3.add(errorLabel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
-				panel3.add(progressBar1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 0), 0, 0));
+				((GridBagLayout) panel3.getLayout()).columnWidths = new int[] { 109, 188, 0 };
+				((GridBagLayout) panel3.getLayout()).rowHeights = new int[] { 0, 0 };
+				((GridBagLayout) panel3.getLayout()).columnWeights = new double[] { 1.0, 0.0, 1.0E-4 };
+				((GridBagLayout) panel3.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+				panel3.add(errorLabel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel3.add(progressBar1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 			}
 			panel2.add(panel3, BorderLayout.SOUTH);
 
-			//---- label1 ----
+			// ---- label1 ----
 			label1.setText("Report list");
 			label1.setFont(label1.getFont().deriveFont(Font.BOLD, label1.getFont().getSize() + 2f));
 			panel2.add(label1, BorderLayout.NORTH);
 
-			//---- label2 ----
+			// ---- label2 ----
 			label2.setText("<html>Choose an item form the \"Report list\",and click<br> \"Preview\" button to visualize the report.<BR> \"Excel report\" button to open excel pivot table<br>report. Or simply get a CSV file clicking <br>\"CSV data\" </html>");
 			label2.setVerticalAlignment(SwingConstants.TOP);
 			panel2.add(label2, BorderLayout.EAST);
 		}
 		add(panel2, BorderLayout.CENTER);
-		// JFormDesigner - End of component initialization  //GEN-END:initComponents
+		// JFormDesigner - End of component initialization
+		// //GEN-END:initComponents
 	}
 
-	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	// JFormDesigner - Variables declaration - DO NOT MODIFY
+	// //GEN-BEGIN:variables
 	private JPanel panel1;
 	private JButton pdfReport;
 	private JButton excelReport;
@@ -311,5 +328,5 @@ public class ReportPanel extends JPanel {
 	private JProgressBar progressBar1;
 	private JLabel label1;
 	private JLabel label2;
-	// JFormDesigner - End of variables declaration  //GEN-END:variables
+	// JFormDesigner - End of variables declaration //GEN-END:variables
 }
