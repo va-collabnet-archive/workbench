@@ -13,6 +13,7 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 
 import org.ihtsdo.arena.context.action.AddFromSpecAction;
+import org.ihtsdo.arena.context.action.AddFromDialectSpecAction;
 import org.ihtsdo.arena.context.action.AddToRelGroupAction;
 import org.ihtsdo.arena.context.action.CopyAction;
 import org.ihtsdo.arena.context.action.CopyDescAction;
@@ -55,7 +56,9 @@ import org.dwfa.cement.ArchitectonicAuxiliary; //this
 
 
 import org.ihtsdo.tk.spec.DescriptionSpec;
+import org.ihtsdo.helper.dialect.DialectHelper;
 
+import org.ihtsdo.tk.example.binding.Language;
 import org.ihtsdo.tk.example.binding.Snomed;
 import org.ihtsdo.tk.example.binding.SnomedConstraints;
 import org.ihtsdo.tk.example.binding.SnomedRelType;
@@ -133,8 +136,16 @@ rule "rule 5" #template onto concept
       )
 
    then
-      actions.add(new AddFromSpecAction("add desc", $dropTarget, $dropObject));
-      actions.add(new UpdateDescFromSpecAction("update desc", $dropTarget, $dropObject));
+   	  if(DialectHelper.isTextForDialect($dropObject.getDescSpec().getDescText(),
+         		Language.EN_US.get(vc).getNid())){
+         		actions.add(new AddFromDialectSpecAction("add GB dialect", $dropTarget, $dropObject,"en-gb"));
+         		}
+      if(DialectHelper.isTextForDialect($dropObject.getDescSpec().getDescText(),
+         		Language.EN_UK.get(vc).getNid())){
+         		actions.add(new AddFromDialectSpecAction("add US dialect", $dropTarget, $dropObject,"en-us"));
+ 				}
+      	//actions.add(new AddFromSpecAction("add desc", $dropTarget, $dropObject));
+       // actions.add(new UpdateDescFromSpecAction("update desc", $dropTarget, $dropObject));	
 end
 
 rule "rule 6" #rel template onto concept
@@ -341,8 +352,8 @@ rule "rule 20" #not acceptable acceptibility US
 							  context == Context.DROP_TARGET)
 		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);					   								   
 	then
-		actions.add(new MakePreferredAction("GB Preferred", $dropTarget, "en-us"));
-		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget, "en-us"));
+		actions.add(new MakePreferredAction("US Preferred", $dropTarget, "en-us"));
+		actions.add(new MakeAcceptableAction("US Acceptable", $dropTarget, "en-us"));
 end
 
 rule "rule 21" #rel (w/o group) onto rel (w/o group): create new rel group"
