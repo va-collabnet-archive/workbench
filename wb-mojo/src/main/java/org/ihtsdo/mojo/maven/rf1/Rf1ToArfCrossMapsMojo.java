@@ -171,10 +171,10 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
         public CrossMapRecord(long id, String code, int p) {
             sctId = id;
             priority = p;
-            if (priority > 0)
-                targetCode = code + " [" + Integer.toString(priority) + "]";
-            else
-                targetCode = code;
+//            if (priority > 0)
+//                targetCode = code + " [" + Integer.toString(priority) + "]";
+//            else
+            targetCode = code;
             status = 0;
         }
 
