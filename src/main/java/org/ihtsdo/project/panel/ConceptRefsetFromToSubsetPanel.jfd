@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_20" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_24" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -699,6 +699,10 @@
             <void method="add"> 
              <object class="com.jformdesigner.model.FormComponent"> 
               <string>javax.swing.JTextPane</string> 
+              <void method="setProperty"> 
+               <string>enabled</string> 
+               <boolean>false</boolean> 
+              </void> 
               <void property="name"> 
                <string>txtIRes</string> 
               </void> 
@@ -1373,6 +1377,10 @@
             <void method="add"> 
              <object class="com.jformdesigner.model.FormComponent"> 
               <string>javax.swing.JTextPane</string> 
+              <void method="setProperty"> 
+               <string>enabled</string> 
+               <boolean>false</boolean> 
+              </void> 
               <void property="name"> 
                <string>txtERes</string> 
               </void> 

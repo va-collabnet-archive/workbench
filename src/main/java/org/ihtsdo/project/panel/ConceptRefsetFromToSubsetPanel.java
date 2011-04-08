@@ -753,6 +753,9 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 
 				//======== scrollPane2 ========
 				{
+
+					//---- txtIRes ----
+					txtIRes.setEnabled(false);
 					scrollPane2.setViewportView(txtIRes);
 				}
 				panel3.add(scrollPane2, new GridBagConstraints(1, 8, 1, 1, 0.0, 0.0,
@@ -947,6 +950,9 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 
 				//======== scrollPane1 ========
 				{
+
+					//---- txtERes ----
+					txtERes.setEnabled(false);
 					scrollPane1.setViewportView(txtERes);
 				}
 				panel2.add(scrollPane1, new GridBagConstraints(1, 9, 1, 1, 0.0, 0.0,
