@@ -863,11 +863,11 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 				//if some is wrong then all to retire 
 				if ((((I_GetConceptData)cmbAccep.getSelectedItem()).equals(notAcceptable)) || (rbInact.isSelected()) ){
 					descriptionInEditor.setExtensionStatusId(inactive.getConceptNid());
-					descriptionInEditor.setDescriptionStatusId(retired.getConceptNid());
+					//descriptionInEditor.(retired.getConceptNid());
 					descriptionInEditor.setAcceptabilityId(notAcceptable.getConceptNid());
 
 				}else{
-
+					// TODO: Discuss how to handle retirement and re-activation in liked descriptions form source language
 					//if all current
 					descriptionInEditor.setAcceptabilityId(((I_GetConceptData)cmbAccep.getSelectedItem()).getConceptNid());
 					descriptionInEditor.setDescriptionStatusId(current.getConceptNid());

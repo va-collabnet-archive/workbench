@@ -1311,7 +1311,9 @@ public class LanguageUtil {
 		if (!resultsCollector.getResultsItems().isEmpty()) {
 			htmlResponse = "<html><body>";
 			for (ResultsItem resultsItem: resultsCollector.getResultsItems()) {
-				htmlResponse = htmlResponse + resultsItem.getMessage() + "<br><br>";
+				if (resultsItem.getErrorCode() == 1099) {
+					htmlResponse = htmlResponse + resultsItem.getMessage() + "<br><br>";
+				}
 			}
 			htmlResponse = htmlResponse + "</body></html>";
 		}
