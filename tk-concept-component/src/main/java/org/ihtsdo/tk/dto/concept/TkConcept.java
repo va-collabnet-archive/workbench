@@ -379,10 +379,14 @@ public class TkConcept {
 
     public static void checkListInt(int int2Check) throws IOException{
     	if(int2Check < 0){
-    		throw new IOException(" checkListInt int was less than 0 and = "+int2Check);
+    		IOException ioe = new IOException(" checkListInt int was less than 0 and = "+int2Check);
+    		ioe.printStackTrace();
+    		throw ioe;
     	}
     	if(int2Check > 1000000){
-    		throw new IOException(" checkListInt int was less than 1000000 and = "+int2Check);
+    		IOException ioe = new IOException(" checkListInt int was less than 1000000 and = "+int2Check);
+    		ioe.printStackTrace();
+    		throw ioe;
     	}
     	
     }
