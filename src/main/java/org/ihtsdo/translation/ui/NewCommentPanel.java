@@ -23,11 +23,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import javax.swing.*;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -36,10 +34,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.Terms;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.project.model.WorkSetMember;
 import org.ihtsdo.project.refset.CommentsRefset;
 
 /**
@@ -53,6 +47,7 @@ public class NewCommentPanel extends JPanel {
 	public NewCommentPanel() {
 		initComponents();
 		updateCombo1();
+		txtComm.requestFocusInWindow();
 	}
 	
 	private void updateCombo1() {
