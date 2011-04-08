@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
@@ -47,6 +48,7 @@ public class TkRefsetStrMember extends TkRefsetAbstractMember<TkRefsetStrRevisio
         if (revisions == null) {
             out.writeInt(0);
         } else {
+        	TkConcept.checkListInt(revisions.size());
             out.writeInt(revisions.size());
             for (TkRefsetStrRevision rmv : revisions) {
                 rmv.writeExternal(out);

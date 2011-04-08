@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 
 public class TkMedia extends TkComponent<TkMediaRevision> {
@@ -57,6 +58,7 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
         out.writeLong(conceptUuid.getMostSignificantBits());
         out.writeLong(conceptUuid.getLeastSignificantBits());
         out.writeUTF(format);
+        TkConcept.checkListInt(image.length);
         out.writeInt(image.length);
         out.write(image);
         out.writeUTF(textDescription);
@@ -65,6 +67,7 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
         if (revisions == null) {
             out.writeInt(0);
         } else {
+        	TkConcept.checkListInt(revisions.size());
             out.writeInt(revisions.size());
             for (TkMediaRevision eiv : revisions) {
                 eiv.writeExternal(out);

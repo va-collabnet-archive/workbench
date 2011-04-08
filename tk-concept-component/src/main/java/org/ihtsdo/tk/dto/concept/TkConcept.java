@@ -74,6 +74,16 @@ public class TkConcept {
             }
         }
         int imgCount = in.readInt();
+        if(imgCount == 1587136848){
+        	System.out.println("imgCount = "+imgCount);
+        	while(imgCount != 0){
+        		imgCount = in.readInt();
+        		System.out.println("imgCount = "+imgCount);
+        	}
+        	
+        	
+        	
+        }
         if (imgCount > 0) {
             media = new ArrayList<TkMedia>(imgCount);
             for (int i = 0; i < imgCount; i++) {
@@ -146,6 +156,7 @@ public class TkConcept {
     }
 
     public void writeExternal(DataOutput out) throws IOException {
+    	TkConcept.checkListInt(dataVersion);
         out.writeInt(dataVersion);
         if (primordialUuid == null) {
             primordialUuid = conceptAttributes.primordialUuid;
@@ -161,6 +172,7 @@ public class TkConcept {
         if (descriptions == null) {
             out.writeInt(0);
         } else {
+        	TkConcept.checkListInt(descriptions.size());
             out.writeInt(descriptions.size());
             for (TkDescription d : descriptions) {
                 d.writeExternal(out);
@@ -169,6 +181,7 @@ public class TkConcept {
         if (relationships == null) {
             out.writeInt(0);
         } else {
+        	TkConcept.checkListInt(relationships.size());
             out.writeInt(relationships.size());
             for (TkRelationship r : relationships) {
                 r.writeExternal(out);
@@ -177,6 +190,7 @@ public class TkConcept {
         if (media == null) {
             out.writeInt(0);
         } else {
+        	TkConcept.checkListInt(media.size());
             out.writeInt(media.size());
             for (TkMedia img : media) {
                 img.writeExternal(out);
@@ -185,6 +199,7 @@ public class TkConcept {
         if (refsetMembers == null) {
             out.writeInt(0);
         } else {
+        	TkConcept.checkListInt(refsetMembers.size());
             out.writeInt(refsetMembers.size());
             for (TkRefsetAbstractMember<?> r : refsetMembers) {
                 r.getType().writeType(out);
@@ -362,4 +377,16 @@ public class TkConcept {
         this.annotationStyleRefex = annotationStyleRefex;
     }
 
+    public static void checkListInt(int int2Check) throws IOException{
+    	if(int2Check < 0){
+    		throw new IOException(" checkListInt int was less than 0 and = "+int2Check);
+    	}
+    	if(int2Check > 1000000){
+    		throw new IOException(" checkListInt int was less than 1000000 and = "+int2Check);
+    	}
+    	
+    }
+    
+    
+    
 }

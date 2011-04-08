@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.ihtsdo.tk.api.ext.I_RelateExternally;
+import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 
 public class TkRelationship extends TkComponent<TkRelationshipRevision> implements I_RelateExternally {
@@ -65,6 +66,7 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
         if (revisions == null) {
             out.writeInt(0);
         } else {
+        	TkConcept.checkListInt(revisions.size());
             out.writeInt(revisions.size());
             for (TkRelationshipRevision erv : revisions) {
                 erv.writeExternal(out);

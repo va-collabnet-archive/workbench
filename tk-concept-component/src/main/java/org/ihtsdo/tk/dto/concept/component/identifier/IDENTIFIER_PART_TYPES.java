@@ -18,6 +18,9 @@ public enum IDENTIFIER_PART_TYPES {
     }
 
     public void writeType(DataOutput output) throws IOException {
+    	if(externalPartTypeToken != 1 || externalPartTypeToken != 2 || externalPartTypeToken != 3){
+    		throw new IOException("IDENTIFIER_PART_TYPES  writeType int is not in enum externalPartTypeToken = "+externalPartTypeToken);
+    	}
         output.writeByte(externalPartTypeToken);
     }
 

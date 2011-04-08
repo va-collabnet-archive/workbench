@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.ihtsdo.tk.api.ext.I_DescribeExternally;
+import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 
 public class TkDescription extends TkComponent<TkDescriptionRevision> implements I_DescribeExternally {
@@ -62,6 +63,7 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
         if (revisions == null) {
             out.writeInt(0);
         } else {
+        	TkConcept.checkListInt(revisions.size());
             out.writeInt(revisions.size());
             for (TkDescriptionRevision edv : revisions) {
                 edv.writeExternal(out);
