@@ -93,9 +93,12 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
@@ -137,7 +140,8 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 import org.ihtsdo.translation.ui.InboxPanel.MenuItemListener;
 import org.ihtsdo.translation.ui.InboxPanel.RefreshServer;
 import org.ihtsdo.translation.ui.config.SwingUtils;
- public class TranslationConceptEditor6 extends JPanel {
+
+public class TranslationConceptEditor6 extends JPanel {
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
@@ -172,40 +176,44 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 	/**
 	 * Instantiates a new translation concept editor.
 	 * 
-	 * @param concept the concept
-	 * @param config the config
-	 * @param sourceLangCode the source lang code
-	 * @param targetLangCode the target lang code
+	 * @param concept
+	 *            the concept
+	 * @param config
+	 *            the config
+	 * @param sourceLangCode
+	 *            the source lang code
+	 * @param targetLangCode
+	 *            the target lang code
 	 */
 	public TranslationConceptEditor6() {
-		sourceIds=new ArrayList<Integer>();
-		//		if (sourceLangRefsets!=null)
-		//			for (LanguageMembershipRefset sourceRef:sourceLangRefsets){
-		//				sourceIds.add(sourceRef.getRefsetId());
-		//			}
-		//		if (targetLangRefset!=null)
-		//			targetId=targetLangRefset.getRefsetId();
-		I_ConfigAceFrame config=null;
+		sourceIds = new ArrayList<Integer>();
+		// if (sourceLangRefsets!=null)
+		// for (LanguageMembershipRefset sourceRef:sourceLangRefsets){
+		// sourceIds.add(sourceRef.getRefsetId());
+		// }
+		// if (targetLangRefset!=null)
+		// targetId=targetLangRefset.getRefsetId();
+		I_ConfigAceFrame config = null;
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
-			//			translConfig=LanguageUtil.getTranslationConfig(config);
-			//			if (translConfig==null){
-			//				setDefaultConfigValues(translConfig);
-			//			}
+			// translConfig=LanguageUtil.getTranslationConfig(config);
+			// if (translConfig==null){
+			// setDefaultConfigValues(translConfig);
+			// }
 			synonym = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
 			fsn = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
-			preferred =  Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+			preferred = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
 
-			//TODO review!! previously was DESCRIPTION_DESCRIPTION_TYPE
-			description =  Terms.get().getConcept(ArchitectonicAuxiliary.Concept.DESCRIPTION_TYPE.getUids());
+			// TODO review!! previously was DESCRIPTION_DESCRIPTION_TYPE
+			description = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.DESCRIPTION_TYPE.getUids());
 
-			notAcceptable =  Terms.get().getConcept(ArchitectonicAuxiliary.Concept.NOT_ACCEPTABLE.getUids());
-			inactive =Terms.get().getConcept(ArchitectonicAuxiliary.Concept.INACTIVE.getUids());
-			retired =Terms.get().getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
-			acceptable =  Terms.get().getConcept(ArchitectonicAuxiliary.Concept.ACCEPTABLE.getUids());
-			current =  Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-			active=Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-			definingChar=ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid();
+			notAcceptable = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.NOT_ACCEPTABLE.getUids());
+			inactive = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.INACTIVE.getUids());
+			retired = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
+			acceptable = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.ACCEPTABLE.getUids());
+			current = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+			active = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+			definingChar = ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid();
 			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
 			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());
 			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.localize().getNid());
@@ -218,18 +226,18 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		initComponents();
 		cmbTarComm.addItem(REFSET_COMMENT_NAME);
 		cmbTarComm.addItem(WORKLIST_COMMENT_NAME);
-		
+
 		label10.setIcon(IconUtilities.helpIcon);
 		label10.setText("");
 		label12.setIcon(IconUtilities.helpIcon);
 		label12.setText("");
 		label13.setIcon(IconUtilities.helpIcon);
 		label13.setText("");
-		
+
 		tblComm.setSelectionBackground(Color.YELLOW);
 		formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
 
-		//		bDescIssue.setEnabled(false);
+		// bDescIssue.setEnabled(false);
 		DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
 		comboBoxModel.addElement(fsn);
 		comboBoxModel.addElement(description);
@@ -246,27 +254,27 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		cmbAccep.setModel(comboBoxModel2);
 		cmbAccep.setSelectedIndex(1);
 		cmbAccep.setEnabled(false);
-		
-//		rbYes.setEnabled(false);
-//		rbNo.setEnabled(false);
-//		rbAct.setEnabled(false);
-//		rbInact.setEnabled(false);
 
-		//		tree1.setCellRenderer(new HtmlSafeTreeCellRenderer());
+		// rbYes.setEnabled(false);
+		// rbNo.setEnabled(false);
+		// rbAct.setEnabled(false);
+		// rbInact.setEnabled(false);
 
-//		tree1.setCellRenderer(new IconRenderer());
-//		tree1.setRootVisible(true);
-//		tree1.setShowsRootHandles(false);
-//
-//		tree2.setCellRenderer(new IconRenderer());
-//		tree2.setRootVisible(true);
-//		tree2.setShowsRootHandles(false);
+		// tree1.setCellRenderer(new HtmlSafeTreeCellRenderer());
+
+		// tree1.setCellRenderer(new IconRenderer());
+		// tree1.setRootVisible(true);
+		// tree1.setShowsRootHandles(false);
+		//
+		// tree2.setCellRenderer(new IconRenderer());
+		// tree2.setRootVisible(true);
+		// tree2.setShowsRootHandles(false);
 
 		tree3.setCellRenderer(new DetailsIconRenderer());
 		tree3.setRootVisible(true);
 		tree3.setShowsRootHandles(false);
 
-		setByCode=false;
+		setByCode = false;
 		saveDesc = false;
 		mSpellChk.setEnabled(false);
 		mAddDesc.setEnabled(true);
@@ -276,11 +284,11 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		bEscalate.setEnabled(false);
 		label4.setVisible(false);
 
-//		DefaultMutableTreeNode sourceRoot=new DefaultMutableTreeNode();
-//		tree1.setModel(new DefaultTreeModel(sourceRoot));
-//
-//		DefaultMutableTreeNode targetRoot=new DefaultMutableTreeNode();
-//		tree2.setModel(new DefaultTreeModel(targetRoot));
+		// DefaultMutableTreeNode sourceRoot=new DefaultMutableTreeNode();
+		// tree1.setModel(new DefaultTreeModel(sourceRoot));
+		//
+		// DefaultMutableTreeNode targetRoot=new DefaultMutableTreeNode();
+		// tree2.setModel(new DefaultTreeModel(targetRoot));
 		tabSou.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tabTar.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tabSou.setModel(new DefaultTableModel());
@@ -289,21 +297,20 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		tabTar.setUpdateSelectionOnSort(false);
 		tabSou.setUpdateSelectionOnSort(false);
 		tabSou.addMouseListener(new SourceTableMouselistener());
-		DefaultMutableTreeNode detailsRoot=new DefaultMutableTreeNode();
+		DefaultMutableTreeNode detailsRoot = new DefaultMutableTreeNode();
 		tree3.setModel(new DefaultTreeModel(detailsRoot));
 
 		ToolTipManager.sharedInstance().registerComponent(tree3);
 		createIssuePanel();
 		setMnemoInit();
 
-    	refTable.setContentType("text/html");
-    	refTable.setEditable(false);
-    	refTable.setOpaque(false);
-		//	populateTree();
-    	splitPane4.setResizeWeight(.4d);
+		refTable.setContentType("text/html");
+		refTable.setEditable(false);
+		refTable.setOpaque(false);
+		// populateTree();
+		splitPane4.setResizeWeight(.4d);
 	}
 
-	
 	public class SourceTableMouselistener extends MouseAdapter {
 		private JPopupMenu menu;
 		private JMenuItem mItem;
@@ -312,73 +319,74 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		private int xPoint;
 		private int yPoint;
 
-		SourceTableMouselistener (){
-			mItemListener=new MenuItemListener();
+		SourceTableMouselistener() {
+			mItemListener = new MenuItemListener();
 
 			getMenu();
 		}
 
-		private void getMenu(){
+		private void getMenu() {
 
-			menu=new JPopupMenu();
-			mItem=new JMenuItem();
+			menu = new JPopupMenu();
+			mItem = new JMenuItem();
 			mItem.setText("Send as preferred");
 			mItem.setActionCommand("Send as preferred");
 			mItem.addActionListener(mItemListener);
 			menu.add(mItem);
-			mItema=new JMenuItem();
+			mItema = new JMenuItem();
 			mItema.setText("Send as acceptable");
 			mItema.setActionCommand("Send as acceptable");
 			mItema.addActionListener(mItemListener);
 			menu.add(mItema);
 
 		}
+
 		@Override
 		public void mouseClicked(MouseEvent e) {
 
-			if (e.getButton()==e.BUTTON3 ){
+			if (e.getButton() == e.BUTTON3) {
 
 				xPoint = e.getX();
 				yPoint = e.getY();
-				int row=tabSou.rowAtPoint(new Point(xPoint,yPoint));
-				if (row>-1){
-					int rowModel=tabSou.convertRowIndexToModel(row);
-					DefaultTableModel model=(DefaultTableModel)tabSou.getModel();
+				int row = tabSou.rowAtPoint(new Point(xPoint, yPoint));
+				if (row > -1) {
+					int rowModel = tabSou.convertRowIndexToModel(row);
+					DefaultTableModel model = (DefaultTableModel) tabSou.getModel();
 
-					ContextualizedDescription description = (ContextualizedDescription)model.getValueAt(rowModel,TableSourceColumn.TERM.ordinal());
+					ContextualizedDescription description = (ContextualizedDescription) model.getValueAt(rowModel, TableSourceColumn.TERM.ordinal());
 
-					if (description.getDescriptionStatusId()==retired.getConceptNid()){
-							return;	
-							}
+					if (description.getDescriptionStatusId() == retired.getConceptNid()) {
+						return;
+					}
 					mItemListener.setItem(description);
 					SwingUtilities.invokeLater(new Runnable() {
 						public void run() {
-							menu.show(tabSou,xPoint, yPoint);
+							menu.show(tabSou, xPoint, yPoint);
 						}
 					});
 				}
 			}
 		}
 	}
-	class MenuItemListener implements ActionListener{
+
+	class MenuItemListener implements ActionListener {
 
 		private ContextualizedDescription contDescription;
 		private ActionEvent accEvent;
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (contDescription!=null){
-				this.accEvent=e;
-				SwingUtilities.invokeLater(new Runnable(){
-					public void run(){
+			if (contDescription != null) {
+				this.accEvent = e;
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
 						try {
-							if (accEvent.getActionCommand().equals("Send as preferred")){
-								contDescription.contextualizeThisDescription(targetLangRefset.getRefsetId(), 
-										preferred.getConceptNid());
+							if (accEvent.getActionCommand().equals("Send as preferred")) {
+								contDescription.contextualizeThisDescription(targetLangRefset.getRefsetId(), preferred.getConceptNid());
 								Terms.get().commit();
 							}
-							if (accEvent.getActionCommand().equals("Send as acceptable")){
-								contDescription.contextualizeThisDescription(targetLangRefset.getRefsetId(), 
-										acceptable.getConceptNid());
+							if (accEvent.getActionCommand().equals("Send as acceptable")) {
+								contDescription.contextualizeThisDescription(targetLangRefset.getRefsetId(), acceptable.getConceptNid());
 								Terms.get().commit();
 							}
 
@@ -393,7 +401,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 
 								});
 							} catch (Exception e1) {
-								
+
 								e1.printStackTrace();
 							}
 						} catch (TerminologyException e) {
@@ -404,54 +412,55 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 							e.printStackTrace();
 						} catch (Exception e) {
 							e.printStackTrace();
-						} 
+						}
 
 					}
 				});
 			}
 
 		}
-		public void setItem(ContextualizedDescription contDescription){
-			this.contDescription=contDescription;
+
+		public void setItem(ContextualizedDescription contDescription) {
+			this.contDescription = contDescription;
 		}
 
 	}
-	enum TableSourceColumn{
-		  LANGUAGE("Language"), TERM_TYPE("Term type"), ACCEPTABILITY("Acceptability"), ICS("ICS"),TERM("Term");
+
+	enum TableSourceColumn {
+		LANGUAGE("Language"), TERM_TYPE("Term type"), ACCEPTABILITY("Acceptability"), ICS("ICS"), TERM("Term");
 
 		private final String columnName;
-	
+
 		private TableSourceColumn(String name) {
 			this.columnName = name;
 		}
-	
+
 		public String getColumnName() {
 			return this.columnName;
 		}
 	}
 
-	enum TableTargetColumn{
-		 LANGUAGE("Language"), TERM_TYPE("Term type"), ACCEPTABILITY("Acceptability"), ICS("ICS"),TERM("Term");
+	enum TableTargetColumn {
+		LANGUAGE("Language"), TERM_TYPE("Term type"), ACCEPTABILITY("Acceptability"), ICS("ICS"), TERM("Term");
 
 		private final String columnName;
-	
+
 		private TableTargetColumn(String name) {
 			this.columnName = name;
 		}
-	
+
 		public String getColumnName() {
 			return this.columnName;
 		}
 	}
 
-	
-	private ConfigTranslationModule getTranslationProjectConfig(){
-		ConfigTranslationModule translProjConfig=null;
-		if (this.translationProject!=null){
-			translProjConfig=LanguageUtil.getDefaultTranslationConfig(this.translationProject);
+	private ConfigTranslationModule getTranslationProjectConfig() {
+		ConfigTranslationModule translProjConfig = null;
+		if (this.translationProject != null) {
+			translProjConfig = LanguageUtil.getDefaultTranslationConfig(this.translationProject);
 		}
 
-		if (translProjConfig==null){
+		if (translProjConfig == null) {
 			return translConfig;
 		}
 		translProjConfig.setColumnsDisplayedInInbox(translConfig.getColumnsDisplayedInInbox());
@@ -461,50 +470,44 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		return translProjConfig;
 	}
 
-	private void setMnemoInit(){
-		assignedMnemo="FPDYGKAXCRNLOIV";
+	private void setMnemoInit() {
+		assignedMnemo = "FPDYGKAXCRNLOIV";
 	}
 
-	public void unloadData(){
+	public void unloadData() {
 		if (updateUIThread != null && updateUIThread.isAlive()) {
 			updateUIThread.interrupt();
 		}
 		verifySavePending();
 		clearForm(true);
 	}
-	synchronized
-	public boolean verifySavePending() {
-		boolean bPendTerm=true;
-		if (saveDesc){
-			if (descriptionInEditor!=null ){
-				if (!(descriptionInEditor.getText().trim().equals(targetTextField.getText().trim()) && (
-						descriptionInEditor.isInitialCaseSignificant() == rbYes.isSelected())
-						&& descriptionInEditor.getAcceptabilityId()== ((I_GetConceptData)cmbAccep.getSelectedItem()).getConceptNid()
-						&& ((descriptionInEditor.getExtensionStatusId()==active.getConceptNid()
-								&& rbAct.isSelected()) 
-								||(descriptionInEditor.getExtensionStatusId()!=active.getConceptNid()
-										&& !rbAct.isSelected()) )
-										&& ((descriptionInEditor.getTypeId()==fsn.getConceptNid() && fsn.equals((I_GetConceptData)comboBox1.getSelectedItem()) )
-												|| (descriptionInEditor.getTypeId()!=fsn.getConceptNid() && !fsn.equals((I_GetConceptData)comboBox1.getSelectedItem()))))) {
-					bPendTerm=false;
+
+	synchronized public boolean verifySavePending() {
+		boolean bPendTerm = true;
+		if (saveDesc) {
+			if (descriptionInEditor != null) {
+				if (!(descriptionInEditor.getText().trim().equals(targetTextField.getText().trim())
+						&& (descriptionInEditor.isInitialCaseSignificant() == rbYes.isSelected())
+						&& descriptionInEditor.getAcceptabilityId() == ((I_GetConceptData) cmbAccep.getSelectedItem()).getConceptNid()
+						&& ((descriptionInEditor.getExtensionStatusId() == active.getConceptNid() && rbAct.isSelected()) || (descriptionInEditor.getExtensionStatusId() != active
+								.getConceptNid() && !rbAct.isSelected())) && ((descriptionInEditor.getTypeId() == fsn.getConceptNid() && fsn.equals((I_GetConceptData) comboBox1
+						.getSelectedItem())) || (descriptionInEditor.getTypeId() != fsn.getConceptNid() && !fsn.equals((I_GetConceptData) comboBox1.getSelectedItem()))))) {
+					bPendTerm = false;
 				}
-			}else{
-				if (!targetTextField.getText().trim().equals("")){
-					bPendTerm=false;
+			} else {
+				if (!targetTextField.getText().trim().equals("")) {
+					bPendTerm = false;
 				}
 			}
-			if (!bPendTerm ){
-				Object[] options = {"Discard unsaved data", "Save"};
-				int n = JOptionPane.showOptionDialog(null,
-						"Do you want to save the change you made to the term in the editor panel?",
-						"Unsaved data",
-						JOptionPane.YES_NO_OPTION,
-						JOptionPane.WARNING_MESSAGE,
-						null,     //do not use a custom Icon
-						options,  //the titles of buttons
-						options[1]); //default button title
+			if (!bPendTerm) {
+				Object[] options = { "Discard unsaved data", "Save" };
+				int n = JOptionPane.showOptionDialog(null, "Do you want to save the change you made to the term in the editor panel?", "Unsaved data", JOptionPane.YES_NO_OPTION,
+						JOptionPane.WARNING_MESSAGE, null, // do not use a
+															// custom Icon
+						options, // the titles of buttons
+						options[1]); // default button title
 				if (n == 0) {
-					if (Terms.get().getUncommitted().size()>0){
+					if (Terms.get().getUncommitted().size() > 0) {
 						try {
 							Terms.get().cancel();
 						} catch (IOException e) {
@@ -512,32 +515,32 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 							e.printStackTrace();
 						}
 					}
-					descriptionInEditor=null;
+					descriptionInEditor = null;
 					targetTextField.setText("");
 					return true;
-				} else if (!bPendTerm){
-					if (saveDescActionPerformed()){
+				} else if (!bPendTerm) {
+					if (saveDescActionPerformed()) {
 
-						descriptionInEditor=null;
+						descriptionInEditor = null;
 						targetTextField.setText("");
 						return true;
-					}else{
+					} else {
 						return false;
 					}
-				
+
 				}
 			}
 		}
 		return bPendTerm;
 
 	}
-	
-	private void setReadOnlyMode(boolean readOnly){
-		this.readOnlyMode=readOnly;
+
+	private void setReadOnlyMode(boolean readOnly) {
+		this.readOnlyMode = readOnly;
 		targetTextField.setEnabled(!readOnly);
 		comboBox1.setEnabled(!readOnly);
 		cmbAccep.setEnabled(!readOnly);
-		saveDesc=!readOnly;
+		saveDesc = !readOnly;
 		button5.setEnabled(!readOnly);
 		bAddFSN.setEnabled(!readOnly);
 		mAddPref.setEnabled(!readOnly);
@@ -549,45 +552,45 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		rbInact.setEnabled(!readOnly);
 
 	}
+
 	/**
 	 * Clear form.
 	 */
-	synchronized
-	private void clearForm(boolean clearAll){
+	synchronized private void clearForm(boolean clearAll) {
 		descriptionInEditor = null;
 		comboBox1.setEnabled(false);
 		cmbAccep.setEnabled(false);
-		//		label4.setVisible(true);
-		//		label4.setText("");
+		// label4.setVisible(true);
+		// label4.setText("");
 		targetTextField.setText("");
 		targetTextField.setEnabled(false);
 		rbYes.setSelected(false);
 		panel2.revalidate();
 		mSpellChk.setEnabled(false);
-		//button5.setEnabled(false);
-//		mAddDesc.setEnabled(true);
-//		mAddPref.setEnabled(true);
-		//mClose.setEnabled(true);
-//		rbYes.setEnabled(false);
-//		rbInact.setEnabled(false);
-//		rbNo.setEnabled(false);
-//		rbAct.setEnabled(false);
-		
-		if (clearAll){
-			saveDesc=false;
-//			DefaultMutableTreeNode root=new DefaultMutableTreeNode();
-//			tree1.setModel(new DefaultTreeModel(root));
-//			DefaultMutableTreeNode root2=new DefaultMutableTreeNode();
-//			tree2.setModel(new DefaultTreeModel(root2));
+		// button5.setEnabled(false);
+		// mAddDesc.setEnabled(true);
+		// mAddPref.setEnabled(true);
+		// mClose.setEnabled(true);
+		// rbYes.setEnabled(false);
+		// rbInact.setEnabled(false);
+		// rbNo.setEnabled(false);
+		// rbAct.setEnabled(false);
+
+		if (clearAll) {
+			saveDesc = false;
+			// DefaultMutableTreeNode root=new DefaultMutableTreeNode();
+			// tree1.setModel(new DefaultTreeModel(root));
+			// DefaultMutableTreeNode root2=new DefaultMutableTreeNode();
+			// tree2.setModel(new DefaultTreeModel(root2));
 
 			tabSou.setModel(new DefaultTableModel());
 			tabTar.setModel(new DefaultTableModel());
-			DefaultMutableTreeNode root3=new DefaultMutableTreeNode();
+			DefaultMutableTreeNode root3 = new DefaultMutableTreeNode();
 			tree3.setModel(new DefaultTreeModel(root3));
-			this.translationProject=null;
-			this.concept=null;
-			if (issueListPanel!=null){
-				issueListPanel.loadIssues(null,null,null);
+			this.translationProject = null;
+			this.concept = null;
+			if (issueListPanel != null) {
+				issueListPanel.loadIssues(null, null, null);
 			}
 			tabbedPane3.setSelectedIndex(0);
 			clearComments();
@@ -598,54 +601,49 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 	/**
 	 * Retire action performed.
 	 * 
-	 * @param e the e
+	 * @param e
+	 *            the e
 	 */
 	private void retireActionPerformed(ActionEvent e) {
 		clearForm(false);
 	}
-
 
 	/**
 	 * B add fsn action performed.
 	 */
 	private void bAddFSNActionPerformed() {
 		try {
-			ContextualizedDescription fsnDesc=null;
+			ContextualizedDescription fsnDesc = null;
 			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-			try{
-				fsnDesc= (ContextualizedDescription) LanguageUtil.generateFSN(concept, sourceLangRefsets.iterator().next(), targetLangRefset, translationProject, config);
-				
-			}catch (FSNGenerationException e1) {
-				e1.printStackTrace(); 
+			try {
+				fsnDesc = (ContextualizedDescription) LanguageUtil.generateFSN(concept, sourceLangRefsets.iterator().next(), targetLangRefset, translationProject, config);
 
-				JOptionPane.showOptionDialog(   
-						this,   
-						e1.getMessage(),   
-						"Warning", JOptionPane.DEFAULT_OPTION,   
-						JOptionPane.WARNING_MESSAGE, null, null,   
-						null );  
+			} catch (FSNGenerationException e1) {
+				e1.printStackTrace();
+
+				JOptionPane.showOptionDialog(this, e1.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
 			}
-			if (fsnDesc==null){
-				if (verifySavePending()){
+			if (fsnDesc == null) {
+				if (verifySavePending()) {
 					descriptionInEditor = null;
 					targetTextField.setText("");
 					targetTextField.setEnabled(true);
 					panel2.revalidate();
-					saveDesc=true;
+					saveDesc = true;
 					mSpellChk.setEnabled(true);
-					//		button5.setEnabled(true);
-//					comboBox1.setEnabled(true);
+					// button5.setEnabled(true);
+					// comboBox1.setEnabled(true);
 					comboBox1.setSelectedItem(fsn);
-//					cmbAccep.setEnabled(true);
+					// cmbAccep.setEnabled(true);
 					cmbAccep.setSelectedItem(preferred);
-//					rbNo.setEnabled(true);
-//					rbAct.setEnabled(true);
-//					rbYes.setEnabled(true);
-//					rbInact.setEnabled(true);
+					// rbNo.setEnabled(true);
+					// rbAct.setEnabled(true);
+					// rbYes.setEnabled(true);
+					// rbInact.setEnabled(true);
 				}
-			}else{
+			} else {
 				populateTargetTree();
-//				getPreviousComments();
+				// getPreviousComments();
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						Timer timer = new Timer(1100, new setInboxPanelFocus());
@@ -654,7 +652,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 					}
 
 				});
-				
+
 			}
 		} catch (TerminologyException e) {
 			e.printStackTrace();
@@ -664,17 +662,18 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Spellcheck action performed.
 	 * 
-	 * @param e the e
+	 * @param e
+	 *            the e
 	 */
 	private void mSpellChkActionPerformed() {
 		AceFrameConfig config;
 		try {
 			config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
-			targetTextField.setText(DocumentManager .spellcheckPhrase(targetTextField.getText(), null, targetLangRefset.getLangCode(config)));
+			targetTextField.setText(DocumentManager.spellcheckPhrase(targetTextField.getText(), null, targetLangRefset.getLangCode(config)));
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -687,12 +686,12 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		AceFrameConfig config;
 		try {
 			config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
-			AceFrame ace=config.getAceFrame();
-			JTabbedPane tp=ace.getCdePanel().getConceptTabs();
-			if (tp!=null){
-				int tabCount=tp.getTabCount();
-				for (int i=0;i<tabCount;i++){
-					if (tp.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)){
+			AceFrame ace = config.getAceFrame();
+			JTabbedPane tp = ace.getCdePanel().getConceptTabs();
+			if (tp != null) {
+				int tabCount = tp.getTabCount();
+				for (int i = 0; i < tabCount; i++) {
+					if (tp.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)) {
 						tp.remove(i);
 						tp.repaint();
 						tp.revalidate();
@@ -708,48 +707,46 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 	}
 
 	private void mAddPrefActionPerformed() {
-		if (verifySavePending()){
+		if (verifySavePending()) {
 			descriptionInEditor = null;
 			targetTextField.setText("");
 			targetTextField.setEnabled(true);
 			panel2.revalidate();
-			saveDesc=true;
+			saveDesc = true;
 			mSpellChk.setEnabled(true);
-			//		button5.setEnabled(true);
-//			comboBox1.setEnabled(true);
+			// button5.setEnabled(true);
+			// comboBox1.setEnabled(true);
 			comboBox1.setSelectedItem(description);
-//			cmbAccep.setEnabled(true);
+			// cmbAccep.setEnabled(true);
 			cmbAccep.setSelectedItem(preferred);
-//			rbNo.setEnabled(true);
-//			rbAct.setEnabled(true);
-//			rbYes.setEnabled(true);
-//			rbInact.setEnabled(true);
+			// rbNo.setEnabled(true);
+			// rbAct.setEnabled(true);
+			// rbYes.setEnabled(true);
+			// rbInact.setEnabled(true);
 		}
 	}
 
 	private void mAddDescActionPerformed() {
-		if (verifySavePending()){
+		if (verifySavePending()) {
 			descriptionInEditor = null;
-			//		label4.setText("");
-			//		label4.setVisible(false);
+			// label4.setText("");
+			// label4.setVisible(false);
 			targetTextField.setText("");
 			targetTextField.setEnabled(true);
 			panel2.revalidate();
-			saveDesc=true;
+			saveDesc = true;
 			mSpellChk.setEnabled(true);
-			//		button5.setEnabled(true);
-//			comboBox1.setEditable(true);
+			// button5.setEnabled(true);
+			// comboBox1.setEditable(true);
 			comboBox1.setSelectedItem(description);
-//			cmbAccep.setEditable(true);
+			// cmbAccep.setEditable(true);
 			cmbAccep.setSelectedItem(acceptable);
-//			rbNo.setSelected(true);
-//			rbAct.setSelected(true);
-//			rbInact.setEnabled(true);
-//			rbYes.setEnabled(true);
+			// rbNo.setSelected(true);
+			// rbAct.setSelected(true);
+			// rbInact.setEnabled(true);
+			// rbYes.setEnabled(true);
 		}
 	}
-
-
 
 	private void bKeepActionPerformed() {
 		clearForm(true);
@@ -757,19 +754,17 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		bKeep.setEnabled(false);
 		bReview.setEnabled(false);
 		bEscalate.setEnabled(false);
-		//		bExec.setEnabled(true);
-		//		table3.setEnabled(true);
-//		mClose.setEnabled(true);
+		// bExec.setEnabled(true);
+		// table3.setEnabled(true);
+		// mClose.setEnabled(true);
 	}
 
 	private void bReviewActionPerformed() {
-		//		clearAndRemove();
+		// clearAndRemove();
 	}
 
-
-
 	private void bEscalateActionPerformed() {
-		//		clearAndRemove();
+		// clearAndRemove();
 	}
 
 	private void saveComment(String comment, I_GetConceptData commentType, I_GetConceptData commentSubType) {
@@ -791,22 +786,23 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 				CommentsRefset commRefset = targetLangRefset.getCommentsRefset(config);
 				String fullName = config.getDbConfig().getFullName();
 				if (commentSubType != null) {
-					commRefset.addComment(this.concept.getConceptNid(), commentType.getConceptNid(), commentSubType.getConceptNid(), role.toString() + HEADER_SEPARATOR + "<b>" + fullName + "</b>" 
-							+ COMMENT_HEADER_SEP + comment);
+					commRefset.addComment(this.concept.getConceptNid(), commentType.getConceptNid(), commentSubType.getConceptNid(), role.toString() + HEADER_SEPARATOR + "<b>" + fullName
+							+ "</b>" + COMMENT_HEADER_SEP + comment);
 				} else {
-					commRefset.addComment(this.concept.getConceptNid(), commentType.getConceptNid(), role.toString() + HEADER_SEPARATOR + "<b>" + fullName + "</b>" + COMMENT_HEADER_SEP + comment);
+					commRefset.addComment(this.concept.getConceptNid(), commentType.getConceptNid(), role.toString() + HEADER_SEPARATOR + "<b>" + fullName + "</b>" + COMMENT_HEADER_SEP
+							+ comment);
 				}
 			}
-			//Terms.get().commit();
+			// Terms.get().commit();
 
 		} catch (TerminologyException e) {
-			
+
 			e.printStackTrace();
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		} catch (Exception e) {
-			
+
 			e.printStackTrace();
 		}
 		getPreviousComments();
@@ -823,80 +819,78 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 
 			});
 		} catch (Exception e1) {
-			
+
 			e1.printStackTrace();
 		}
 	}
 
 	private boolean saveDescActionPerformed() {
 		boolean result = true;
-		I_ConfigAceFrame config=null ;	
+		I_ConfigAceFrame config = null;
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
 			ConfigTranslationModule confTransMod = LanguageUtil.getTranslationConfig(config);
 			System.out.println(confTransMod.isEnableSpellChecker());
-			if(confTransMod.isEnableSpellChecker()){
-				targetTextField.setText(DocumentManager.spellcheckPhrase(targetTextField.getText(), null,targetLangRefset.getLangCode(config)));
+			if (confTransMod.isEnableSpellChecker()) {
+				targetTextField.setText(DocumentManager.spellcheckPhrase(targetTextField.getText(), null, targetLangRefset.getLangCode(config)));
 			}
 
-			if (descriptionInEditor == null && !targetTextField.getText().trim().equals("") && rbAct.isSelected() && !((I_GetConceptData)cmbAccep.getSelectedItem()).equals(notAcceptable)) {
-				descriptionInEditor=(ContextualizedDescription) ContextualizedDescription.createNewContextualizedDescription(concept.getConceptNid(), targetId, targetLangRefset.getLangCode(config));
+			if (descriptionInEditor == null && !targetTextField.getText().trim().equals("") && rbAct.isSelected() && !((I_GetConceptData) cmbAccep.getSelectedItem()).equals(notAcceptable)) {
+				descriptionInEditor = (ContextualizedDescription) ContextualizedDescription.createNewContextualizedDescription(concept.getConceptNid(), targetId,
+						targetLangRefset.getLangCode(config));
 
-				//				if (((I_GetConceptData)comboBox1.getSelectedItem()).equals(notAcceptable)){
-				//					
-				//				}
+				// if
+				// (((I_GetConceptData)comboBox1.getSelectedItem()).equals(notAcceptable)){
+				//
+				// }
 			}
-			if (descriptionInEditor != null ){ 
+			if (descriptionInEditor != null) {
 				descriptionInEditor.setText(targetTextField.getText());
 				descriptionInEditor.setInitialCaseSignificant(rbYes.isSelected());
 
-				//set description type like RF1
-				if (((I_GetConceptData)comboBox1.getSelectedItem()).equals(description)){
-					if ((((I_GetConceptData)cmbAccep.getSelectedItem()).equals(preferred))){
+				// set description type like RF1
+				if (((I_GetConceptData) comboBox1.getSelectedItem()).equals(description)) {
+					if ((((I_GetConceptData) cmbAccep.getSelectedItem()).equals(preferred))) {
 						descriptionInEditor.setTypeId(preferred.getConceptNid());
-					}else if ((((I_GetConceptData)cmbAccep.getSelectedItem()).equals(acceptable))){
+					} else if ((((I_GetConceptData) cmbAccep.getSelectedItem()).equals(acceptable))) {
 						descriptionInEditor.setTypeId(synonym.getConceptNid());
 					}
-				}else{
+				} else {
 					descriptionInEditor.setTypeId(fsn.getConceptNid());
 				}
-				//if some is wrong then all to retire 
-				if ((((I_GetConceptData)cmbAccep.getSelectedItem()).equals(notAcceptable)) || (rbInact.isSelected()) ){
+				// if some is wrong then all to retire
+				if ((((I_GetConceptData) cmbAccep.getSelectedItem()).equals(notAcceptable)) || (rbInact.isSelected())) {
 					descriptionInEditor.setExtensionStatusId(inactive.getConceptNid());
 					//descriptionInEditor.(retired.getConceptNid());
 					descriptionInEditor.setAcceptabilityId(notAcceptable.getConceptNid());
 
-				}else{
+				} else {
 					// TODO: Discuss how to handle retirement and re-activation in liked descriptions form source language
-					//if all current
-					descriptionInEditor.setAcceptabilityId(((I_GetConceptData)cmbAccep.getSelectedItem()).getConceptNid());
+					// if all current
+					descriptionInEditor.setAcceptabilityId(((I_GetConceptData) cmbAccep.getSelectedItem()).getConceptNid());
 					descriptionInEditor.setDescriptionStatusId(current.getConceptNid());
 					descriptionInEditor.setExtensionStatusId(active.getConceptNid());
 				}
 
 				result = descriptionInEditor.persistChanges();
-				ContextualizedDescription fsnDesc=null;
-				try{
-					fsnDesc= (ContextualizedDescription) LanguageUtil.generateFSN(concept, sourceLangRefsets.iterator().next(), targetLangRefset, translationProject, config);
+				ContextualizedDescription fsnDesc = null;
+				try {
+					fsnDesc = (ContextualizedDescription) LanguageUtil.generateFSN(concept, sourceLangRefsets.iterator().next(), targetLangRefset, translationProject, config);
 
-				}catch (FSNGenerationException e1) {
-					e1.printStackTrace(); 
+				} catch (FSNGenerationException e1) {
+					e1.printStackTrace();
 
-					JOptionPane.showOptionDialog(   
-							this,   
-							e1.getMessage(),   
-							"Warning", JOptionPane.DEFAULT_OPTION,   
-							JOptionPane.WARNING_MESSAGE, null, null,   
-							null );  
+					JOptionPane.showOptionDialog(this, e1.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
 				}
-//				if (fsnDesc!=null && result){
-//					if (!fsnDesc.persistChanges()) result = false;
-//				}
+				// if (fsnDesc!=null && result){
+				// if (!fsnDesc.persistChanges()) result = false;
+				// }
 			}
 
-			if (result) clearForm(false);
+			if (result)
+				clearForm(false);
 
-		}catch (IOException e1) {
+		} catch (IOException e1) {
 			e1.printStackTrace();
 			return false;
 		} catch (TerminologyException e1) {
@@ -918,7 +912,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 
 			});
 		} catch (Exception e1) {
-			
+
 			e1.printStackTrace();
 		}
 		return result;
@@ -933,43 +927,43 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		org.ihtsdo.project.panel.TranslationHelperPanel thp;
 		try {
 			thp = PanelHelperFactory.getTranslationHelperPanel();
-			JTabbedPane tp=thp.getTabbedPanel();
-			if (tp!=null){
+			JTabbedPane tp = thp.getTabbedPanel();
+			if (tp != null) {
 				I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-				IssueRepository repo= null;
-				if (translationProject.getProjectIssueRepo()!=null){
-					repo= IssueRepositoryDAO.getIssueRepository(translationProject.getProjectIssueRepo());
+				IssueRepository repo = null;
+				if (translationProject.getProjectIssueRepo() != null) {
+					repo = IssueRepositoryDAO.getIssueRepository(translationProject.getProjectIssueRepo());
 				}
-				IssueRepoRegistration regis=null;
-				WorklistMemberLogPanel wmlpanel=null;
-				if (repo!=null){
-					regis=IssueRepositoryDAO.getRepositoryRegistration(repo.getUuid(), config);
+				IssueRepoRegistration regis = null;
+				WorklistMemberLogPanel wmlpanel = null;
+				if (repo != null) {
+					regis = IssueRepositoryDAO.getRepositoryRegistration(repo.getUuid(), config);
 				}
-				int tabCount=tp.getTabCount();
-				for (int i=0;i<tabCount;i++){
-					if (tp.getTitleAt(i).equals(TranslationHelperPanel.CONCEPT_VERSIONS_TAB_NAME)){
+				int tabCount = tp.getTabCount();
+				for (int i = 0; i < tabCount; i++) {
+					if (tp.getTitleAt(i).equals(TranslationHelperPanel.CONCEPT_VERSIONS_TAB_NAME)) {
 						tp.setSelectedIndex(i);
-						wmlpanel=(WorklistMemberLogPanel)tp.getComponentAt(i);
-						wmlpanel.showMemberChanges(this.worklistMember,this.translationProject,repo, regis) ;
+						wmlpanel = (WorklistMemberLogPanel) tp.getComponentAt(i);
+						wmlpanel.showMemberChanges(this.worklistMember, this.translationProject, repo, regis);
 						thp.showTabbedPanel();
 						return;
 					}
 				}
 				wmlpanel = new WorklistMemberLogPanel();
-				wmlpanel.showMemberChanges(this.worklistMember,this.translationProject,repo, regis) ;
+				wmlpanel.showMemberChanges(this.worklistMember, this.translationProject, repo, regis);
 
 				tp.addTab(TranslationHelperPanel.CONCEPT_VERSIONS_TAB_NAME, wmlpanel);
-				tp.setSelectedIndex(tp.getTabCount()-1);
+				tp.setSelectedIndex(tp.getTabCount() - 1);
 				thp.showTabbedPanel();
 			}
 		} catch (TerminologyException e) {
-			
+
 			e.printStackTrace();
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		} catch (Exception e) {
-			
+
 			e.printStackTrace();
 		}
 	}
@@ -983,17 +977,14 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		NewCommentPanel cPanel;
 		cPanel = new NewCommentPanel();
 
-
-		int action =
-			JOptionPane.showOptionDialog(null, cPanel, "Enter new comment",
-					JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+		int action = JOptionPane.showOptionDialog(null, cPanel, "Enter new comment", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 
 		this.requestFocus();
 
 		if (action == JOptionPane.CANCEL_OPTION) {
-			return ;
-		} 
-		if (cPanel.getNewComment().trim().equals("")){
+			return;
+		}
+		if (cPanel.getNewComment().trim().equals("")) {
 			message("Cannot add a blank comment.");
 			return;
 		}
@@ -1003,38 +994,35 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 	/**
 	 * Message.
 	 * 
-	 * @param string the string
+	 * @param string
+	 *            the string
 	 */
 	private void message(String string) {
 
-         JOptionPane.showOptionDialog(   
-        		this,   
-                string,   
-                "Information", JOptionPane.DEFAULT_OPTION,   
-                JOptionPane.INFORMATION_MESSAGE, null, null,   
-                null );   
+		JOptionPane.showOptionDialog(this, string, "Information", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
 	}
 
-
-	
-	
-
 	private void refTableHyperlinkUpdate(HyperlinkEvent hle) {
-		if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {  
-			System.out.println("Opening: " + hle.getURL());  
-			System.out.println("Path: " +  hle.getURL().getHost() + hle.getURL().getPath());  
+		if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
+			System.out.println("Opening: " + hle.getURL());
+			System.out.println("Path: " + hle.getURL().getHost() + hle.getURL().getPath());
 			try {
 				Desktop desktop = null;
 				if (Desktop.isDesktopSupported()) {
 					desktop = Desktop.getDesktop();
-//						String absoluteUrl = hle.getURL().getProtocol() + "://" + new File(".").getAbsolutePath();
-//						absoluteUrl = absoluteUrl.substring(0, absoluteUrl.length() -1);
-//						absoluteUrl = absoluteUrl + hle.getURL().getHost().replace(" ", "%20");
-//						absoluteUrl = absoluteUrl + hle.getURL().getPath().replace(" ", "%20");
-//						absoluteUrl = absoluteUrl.trim() + "#search=" + queryField.getText().trim().replace(" ", "%20") + "";
-						
-//						System.out.println("URL: " + absoluteUrl);
-						desktop.browse(new URI(hle.getURL().toString()));
+					// String absoluteUrl = hle.getURL().getProtocol() + "://" +
+					// new File(".").getAbsolutePath();
+					// absoluteUrl = absoluteUrl.substring(0,
+					// absoluteUrl.length() -1);
+					// absoluteUrl = absoluteUrl +
+					// hle.getURL().getHost().replace(" ", "%20");
+					// absoluteUrl = absoluteUrl +
+					// hle.getURL().getPath().replace(" ", "%20");
+					// absoluteUrl = absoluteUrl.trim() + "#search=" +
+					// queryField.getText().trim().replace(" ", "%20") + "";
+
+					// System.out.println("URL: " + absoluteUrl);
+					desktop.browse(new URI(hle.getURL().toString()));
 				}
 			} catch (IOException ioe) {
 				ioe.printStackTrace();
@@ -1042,110 +1030,108 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 				e.printStackTrace();
 			}
 
-		}  
+		}
 	}
 
 	private void tblCommMouseClicked(MouseEvent e) {
-		if (e.getClickCount()==2){
+		if (e.getClickCount() == 2) {
 			viewComment();
 		}
 	}
 
 	private void viewComment() {
-		int row=tblComm.getSelectedRow();
-		if (row>-1){
-			CommentPanel cp=new CommentPanel();
-			String comm=(String) tblComm.getValueAt(row, 0) + "  -  " + tblComm.getValueAt(row, 1);
-			comm=comm.replace(htmlHeader,"");
-			comm=comm.replace(htmlFooter, "");
-			comm=comm.replace(endP, "");
-			String[] arrComm=comm.split(COMMENT_HEADER_SEP);
-			String header=arrComm[0];
-			String[] headerComp=header.split(HEADER_SEPARATOR);
-			String from="";
-			String role="";
-			String date="";
-			String source="";
-			if (headerComp.length>0){
-				source=headerComp[0];
-				if (headerComp.length>1){
-					date=headerComp[1];
-					if (headerComp.length>2){
-						role=headerComp[2];
-						if (headerComp.length>3){
-							from=headerComp[3];
-						}else{
-							from=headerComp[2];
-						}	
-					}else{
-						from=headerComp[0];
-					}	
-				}else{
-					from=headerComp[0];
+		int row = tblComm.getSelectedRow();
+		if (row > -1) {
+			CommentPanel cp = new CommentPanel();
+			String comm = (String) tblComm.getValueAt(row, 0) + "  -  " + tblComm.getValueAt(row, 1);
+			comm = comm.replace(htmlHeader, "");
+			comm = comm.replace(htmlFooter, "");
+			comm = comm.replace(endP, "");
+			String[] arrComm = comm.split(COMMENT_HEADER_SEP);
+			String header = arrComm[0];
+			String[] headerComp = header.split(HEADER_SEPARATOR);
+			String from = "";
+			String role = "";
+			String date = "";
+			String source = "";
+			if (headerComp.length > 0) {
+				source = headerComp[0];
+				if (headerComp.length > 1) {
+					date = headerComp[1];
+					if (headerComp.length > 2) {
+						role = headerComp[2];
+						if (headerComp.length > 3) {
+							from = headerComp[3];
+						} else {
+							from = headerComp[2];
+						}
+					} else {
+						from = headerComp[0];
+					}
+				} else {
+					from = headerComp[0];
 				}
 			}
-//			int sepLen=HEADER_SEPARATOR.length();
-//			if (header.length()>0){
-//				int toIndex=0;
-//				toIndex=header.indexOf(HEADER_SEPARATOR, toIndex);
-//				if (toIndex>-1){
-//					source= getTextFromHeader(header,toIndex);
-//					toIndex= header.indexOf(HEADER_SEPARATOR, toIndex + sepLen);
-//					if (toIndex>-1){
-//						date= getTextFromHeader(header,toIndex);
-//						from=header.substring(toIndex + sepLen);
-//						toIndex= header.indexOf(HEADER_SEPARATOR, toIndex +sepLen);
-//						if (toIndex>-1){
-//							role= getTextFromHeader(header,toIndex);
-//							toIndex= header.indexOf(HEADER_SEPARATOR, toIndex + sepLen);
-//							from=header.substring(toIndex + sepLen);
-//						}
-//					}
-//				}
-//			}else{
-//				from =header;
-//			}
-//			
+			// int sepLen=HEADER_SEPARATOR.length();
+			// if (header.length()>0){
+			// int toIndex=0;
+			// toIndex=header.indexOf(HEADER_SEPARATOR, toIndex);
+			// if (toIndex>-1){
+			// source= getTextFromHeader(header,toIndex);
+			// toIndex= header.indexOf(HEADER_SEPARATOR, toIndex + sepLen);
+			// if (toIndex>-1){
+			// date= getTextFromHeader(header,toIndex);
+			// from=header.substring(toIndex + sepLen);
+			// toIndex= header.indexOf(HEADER_SEPARATOR, toIndex +sepLen);
+			// if (toIndex>-1){
+			// role= getTextFromHeader(header,toIndex);
+			// toIndex= header.indexOf(HEADER_SEPARATOR, toIndex + sepLen);
+			// from=header.substring(toIndex + sepLen);
+			// }
+			// }
+			// }
+			// }else{
+			// from =header;
+			// }
+			//
 			cp.setFrom(from);
 			cp.setRole(role);
 			cp.setDate(date);
 			cp.setSource(source);
-			int index=comm.indexOf(COMMENT_HEADER_SEP);
+			int index = comm.indexOf(COMMENT_HEADER_SEP);
 			cp.setComment(comm.substring(index + COMMENT_HEADER_SEP.length()));
-	
-			JOptionPane.showMessageDialog (null, cp, "Comment",
-						 JOptionPane.INFORMATION_MESSAGE);
+
+			JOptionPane.showMessageDialog(null, cp, "Comment", JOptionPane.INFORMATION_MESSAGE);
 
 			this.requestFocus();
 
 		}
-		
+
 	}
 
 	private String getTextFromHeader(String header, int toIndex) {
-		
-		String tmp=header.substring(0,toIndex);
-		int lastInd=tmp.lastIndexOf(HEADER_SEPARATOR);
+
+		String tmp = header.substring(0, toIndex);
+		int lastInd = tmp.lastIndexOf(HEADER_SEPARATOR);
 		return tmp.substring(lastInd + HEADER_SEPARATOR.length());
-		
-		
+
 	}
 
 	private void mLogActionPerformed() {
-		try{
+		try {
 			TranslationWlstMemberLogPanel panel = getTranslMemberLogPanel();
 
 			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-			IssueRepository repo= null;
-			if (translationProject.getProjectIssueRepo()!=null){
-				repo= IssueRepositoryDAO.getIssueRepository(translationProject.getProjectIssueRepo());
+			IssueRepository repo = null;
+			if (translationProject.getProjectIssueRepo() != null) {
+				repo = IssueRepositoryDAO.getIssueRepository(translationProject.getProjectIssueRepo());
 			}
-			IssueRepoRegistration regis=null;
+			IssueRepoRegistration regis = null;
 
-			if (repo!=null){
-				regis=IssueRepositoryDAO.getRepositoryRegistration(repo.getUuid(), config);
+			if (repo != null) {
+				regis = IssueRepositoryDAO.getRepositoryRegistration(repo.getUuid(), config);
 			}
-			panel.showMemberChanges(this.worklistMember,this.translationProject,repo, regis) ;
+			panel.showMemberChanges(this.worklistMember, this.translationProject, repo, regis);
 
 		} catch (TerminologyException e) {
 
@@ -1159,18 +1145,17 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		}
 	}
 
-
 	private TranslationWlstMemberLogPanel getTranslMemberLogPanel() {
 		AceFrameConfig config;
 		try {
-			config = (AceFrameConfig)Terms.get().getActiveAceFrameConfig();
+			config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
 
-			AceFrame ace=config.getAceFrame();
-			JTabbedPane tp=ace.getCdePanel().getLeftTabs();
-			if (tp!=null){
-				int tabCount=tp.getTabCount();
-				for (int i=0;i<tabCount;i++){
-					if (tp.getTitleAt(i).equals(TranslationHelperPanel.MEMBER_LOG_TAB_NAME)){
+			AceFrame ace = config.getAceFrame();
+			JTabbedPane tp = ace.getCdePanel().getLeftTabs();
+			if (tp != null) {
+				int tabCount = tp.getTabCount();
+				for (int i = 0; i < tabCount; i++) {
+					if (tp.getTitleAt(i).equals(TranslationHelperPanel.MEMBER_LOG_TAB_NAME)) {
 						return (TranslationWlstMemberLogPanel) tp.getComponentAt(i);
 					}
 				}
@@ -1187,21 +1172,20 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 			e.printStackTrace();
 		}
 		return null;
-		
-	}
 
+	}
 
 	private boolean isMemberLogOpen() {
 		AceFrameConfig config;
 		try {
-			config = (AceFrameConfig)Terms.get().getActiveAceFrameConfig();
+			config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
 
-			AceFrame ace=config.getAceFrame();
-			JTabbedPane tp=ace.getCdePanel().getLeftTabs();
-			if (tp!=null){
-				int tabCount=tp.getTabCount();
-				for (int i=0;i<tabCount;i++){
-					if (tp.getTitleAt(i).equals(TranslationHelperPanel.MEMBER_LOG_TAB_NAME)){
+			AceFrame ace = config.getAceFrame();
+			JTabbedPane tp = ace.getCdePanel().getLeftTabs();
+			if (tp != null) {
+				int tabCount = tp.getTabCount();
+				for (int i = 0; i < tabCount; i++) {
+					if (tp.getTitleAt(i).equals(TranslationHelperPanel.MEMBER_LOG_TAB_NAME)) {
 						return true;
 					}
 				}
@@ -1214,7 +1198,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 			e.printStackTrace();
 		}
 		return false;
-		
+
 	}
 
 	private void label10MouseClicked(MouseEvent e) {
@@ -1246,7 +1230,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 			e1.printStackTrace();
 		}
 	}
-	
+
 	class SelectionListener implements ListSelectionListener {
 
 		/** The table. */
@@ -1257,34 +1241,38 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		/**
 		 * Instantiates a new selection listener.
 		 * 
-		 * @param table the table
+		 * @param table
+		 *            the table
 		 */
 		SelectionListener(JTable table) {
 			this.table = table;
 		}
 
-		/* (non-Javadoc)
-		 * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * javax.swing.event.ListSelectionListener#valueChanged(javax.swing.
+		 * event.ListSelectionEvent)
 		 */
 		public void valueChanged(ListSelectionEvent e) {
-			// If cell selection is enabled, both row and column change events are fired
-			if (!(e.getSource() == table.getSelectionModel()
-					&& table.getRowSelectionAllowed())) {
+			// If cell selection is enabled, both row and column change events
+			// are fired
+			if (!(e.getSource() == table.getSelectionModel() && table.getRowSelectionAllowed())) {
 				return;
 			}
 
 			if (e.getValueIsAdjusting()) {
 				// The mouse button has not yet been released
 				return;
-			}
-			else{
-				int  first=table.getSelectedRow();
-				if (first>-1){
-					int rowModel=table.convertRowIndexToModel(first);
-					ContextualizedDescription descrpt=(ContextualizedDescription) table.getModel().getValueAt(rowModel, TableTargetColumn.TERM.ordinal());
-					
-					if (descrpt!=null && !setByCode){
-						updatePropertiesPanel( descrpt,rowModel);
+			} else {
+				int first = table.getSelectedRow();
+				if (first > -1) {
+					int rowModel = table.convertRowIndexToModel(first);
+					ContextualizedDescription descrpt = (ContextualizedDescription) table.getModel().getValueAt(rowModel, TableTargetColumn.TERM.ordinal());
+
+					if (descrpt != null && !setByCode) {
+						updatePropertiesPanel(descrpt, rowModel);
 					}
 				}
 
@@ -1292,11 +1280,13 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		}
 
 	}
+
 	/**
 	 * Inits the components.
 	 */
 	private void initComponents() {
-		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+		// JFormDesigner - Component initialization - DO NOT MODIFY
+		// //GEN-BEGIN:initComponents
 		panel1 = new JPanel();
 		menuBar1 = new JMenuBar();
 		menu1 = new JMenu();
@@ -1975,10 +1965,11 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		ButtonGroup buttonGroup3 = new ButtonGroup();
 		buttonGroup3.add(rbAct);
 		buttonGroup3.add(rbInact);
-		// JFormDesigner - End of component initialization  //GEN-END:initComponents
+		// //GEN-END:initComponents
 	}
 
-	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	// JFormDesigner - Variables declaration - DO NOT MODIFY
+	// //GEN-BEGIN:variables
 	private JPanel panel1;
 	private JMenuBar menuBar1;
 	private JMenu menu1;
@@ -2047,18 +2038,18 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 	private JScrollPane scrollPane7;
 	private JTree tree3;
 	private HierarchyNavigator hierarchyNavigator1;
-	// JFormDesigner - End of variables declaration  //GEN-END:variables
+	// JFormDesigner - End of variables declaration //GEN-END:variables
 
 	/** The concept. */
 	private I_GetConceptData concept;
 
-	//	
-	//	/** The source lang code. */
-	//	private String sourceLangCode;
-	//	
-	//	/** The target lang code. */
-	//	private String targetLangCode;
-	//	
+	//
+	// /** The source lang code. */
+	// private String sourceLangCode;
+	//
+	// /** The target lang code. */
+	// private String targetLangCode;
+	//
 	/** The description in editor. */
 	private ContextualizedDescription descriptionInEditor;
 
@@ -2071,7 +2062,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 
 	/** The source sem tag. */
 	private String sourceSemTag;
-	private int definingChar=-1;
+	private int definingChar = -1;
 	private String sourceFSN;
 	private WorkListMember worklistMember;
 	private boolean setByCode;
@@ -2082,9 +2073,9 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 	private Integer editingRow;
 	private Integer targetPreferredRow;
 	private Integer targetFSNRow;
-	private String htmlFooter="</body></html>";
-	private String htmlHeader="<html><body><font style='color:blue'>";
-	private String endP= "</font>";
+	private String htmlFooter = "</body></html>";
+	private String htmlHeader = "<html><body><font style='color:blue'>";
+	private String endP = "</font>";
 	private JScrollPane scrollp;
 
 	/**
@@ -2099,166 +2090,168 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 	/**
 	 * Sets the concept.
 	 * 
-	 * @param concept the new concept
+	 * @param concept
+	 *            the new concept
 	 */
 	public void setConcept(I_GetConceptData concept) {
 		this.concept = concept;
 	}
 
-
 	/**
 	 * Populate tree.
 	 */
 	private void populateSourceTree() throws Exception {
-//		DefaultMutableTreeNode top = null;
-		//		translConfig=LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
-		int maxTermWidth=0;
+		// DefaultMutableTreeNode top = null;
+		// translConfig=LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
+		int maxTermWidth = 0;
 		LinkedHashSet<TreeComponent> sourceCom = translConfig.getSourceTreeComponents();
-		Object[][] data=null;
+		Object[][] data = null;
 		String[] columnNames = new String[TableSourceColumn.values().length];
-		for (int i=0;i<TableSourceColumn.values().length;i++){
-			columnNames[i]=TableSourceColumn.values()[i].getColumnName();
+		for (int i = 0; i < TableSourceColumn.values().length; i++) {
+			columnNames[i] = TableSourceColumn.values()[i].getColumnName();
 		}
-		
-		DefaultTableModel model=new DefaultTableModel(data, columnNames) {
+
+		DefaultTableModel model = new DefaultTableModel(data, columnNames) {
 			private static final long serialVersionUID = 1L;
 
 			public boolean isCellEditable(int x, int y) {
 				return false;
 			}
 		};
-		List<Object[]> tmpRows=new ArrayList<Object[]>();
+		List<Object[]> tmpRows = new ArrayList<Object[]>();
 		if (concept != null) {
 			try {
-//				top = new DefaultMutableTreeNode(new TreeEditorObjectWrapper(concept.toString(), TreeEditorObjectWrapper.CONCEPT, concept));
-				for (I_GetConceptData langRefset: this.translationProject.getSourceLanguageRefsets()){
-					List<ContextualizedDescription> descriptions = LanguageUtil.getContextualizedDescriptions(
-							concept.getConceptNid(), langRefset.getConceptNid(), true);
+				// top = new DefaultMutableTreeNode(new
+				// TreeEditorObjectWrapper(concept.toString(),
+				// TreeEditorObjectWrapper.CONCEPT, concept));
+				for (I_GetConceptData langRefset : this.translationProject.getSourceLanguageRefsets()) {
+					List<ContextualizedDescription> descriptions = LanguageUtil.getContextualizedDescriptions(concept.getConceptNid(), langRefset.getConceptNid(), true);
 
-					
-//					DefaultMutableTreeNode groupLang = new DefaultMutableTreeNode(
-//							new TreeEditorObjectWrapper(langRefset.getInitialText(), TreeEditorObjectWrapper.FOLDER,langRefset ));
+					// DefaultMutableTreeNode groupLang = new
+					// DefaultMutableTreeNode(
+					// new TreeEditorObjectWrapper(langRefset.getInitialText(),
+					// TreeEditorObjectWrapper.FOLDER,langRefset ));
 
-//					List<DefaultMutableTreeNode> nodesToAdd = new ArrayList<DefaultMutableTreeNode>();
+					// List<DefaultMutableTreeNode> nodesToAdd = new
+					// ArrayList<DefaultMutableTreeNode>();
 
 					boolean bSourceFSN = false;
-					boolean bNewNode=false;
+					boolean bNewNode = false;
 					for (I_ContextualizeDescription description : descriptions) {
-						if (description.getLanguageExtension()!=null && description.getLanguageRefsetId()==langRefset.getConceptNid()){
-							bNewNode=false;
-							Object[] rowClass=new Object[2];
-							Object[] row=new Object[TableSourceColumn.values().length];
-							Object[] termType_Status=new Object[2];
-							row[TableSourceColumn.TERM.ordinal()]=description;
-							row[TableSourceColumn.LANGUAGE.ordinal()]=description.getLang();
-							row[TableSourceColumn.ICS.ordinal()]=description.isInitialCaseSignificant();
-							
-							if (description.getAcceptabilityId()==notAcceptable.getConceptNid() ||
-									description.getExtensionStatusId()==inactive.getConceptNid() ||
-									description.getDescriptionStatusId()==retired.getConceptNid()){
-								if ( sourceCom.contains(ConfigTranslationModule.TreeComponent.RETIRED)){
-									rowClass[0]=TreeEditorObjectWrapper.NOTACCEPTABLE;
-									row[TableSourceColumn.ACCEPTABILITY.ordinal()]=notAcceptable;
-//									row[TableSourceColumn.STATUS.ordinal()]=inactive;
-									termType_Status[1]=inactive;
-									if (description.getTypeId() == fsn.getConceptNid()){ 
-//										row[TableSourceColumn.TERM_TYPE.ordinal()]=fsn;
-										termType_Status[0]=fsn;
-									}else{
-//										row[TableSourceColumn.TERM_TYPE.ordinal()]=this.description;
-										termType_Status[0]=this.description;
+						if (description.getLanguageExtension() != null && description.getLanguageRefsetId() == langRefset.getConceptNid()) {
+							bNewNode = false;
+							Object[] rowClass = new Object[2];
+							Object[] row = new Object[TableSourceColumn.values().length];
+							Object[] termType_Status = new Object[2];
+							row[TableSourceColumn.TERM.ordinal()] = description;
+							row[TableSourceColumn.LANGUAGE.ordinal()] = description.getLang();
+							row[TableSourceColumn.ICS.ordinal()] = description.isInitialCaseSignificant();
+
+							if (description.getAcceptabilityId() == notAcceptable.getConceptNid() || description.getExtensionStatusId() == inactive.getConceptNid()
+									|| description.getDescriptionStatusId() == retired.getConceptNid()) {
+								if (sourceCom.contains(ConfigTranslationModule.TreeComponent.RETIRED)) {
+									rowClass[0] = TreeEditorObjectWrapper.NOTACCEPTABLE;
+									row[TableSourceColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
+									// row[TableSourceColumn.STATUS.ordinal()]=inactive;
+									termType_Status[1] = inactive;
+									if (description.getTypeId() == fsn.getConceptNid()) {
+										// row[TableSourceColumn.TERM_TYPE.ordinal()]=fsn;
+										termType_Status[0] = fsn;
+									} else {
+										// row[TableSourceColumn.TERM_TYPE.ordinal()]=this.description;
+										termType_Status[0] = this.description;
 									}
-									row[TableSourceColumn.TERM_TYPE.ordinal()]=termType_Status;
-									bNewNode=true;
+									row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
+									bNewNode = true;
 								}
 							} else if (description.getTypeId() == fsn.getConceptNid()) {
-								if ( sourceCom.contains(ConfigTranslationModule.TreeComponent.FSN)){
-									rowClass[0]=TreeEditorObjectWrapper.FSNDESCRIPTION;
-									row[TableSourceColumn.ACCEPTABILITY.ordinal()]=preferred;
-									termType_Status[0]=fsn;
-									termType_Status[1]=active;
-									row[TableSourceColumn.TERM_TYPE.ordinal()]=termType_Status;
-									
-									bNewNode=true;
+								if (sourceCom.contains(ConfigTranslationModule.TreeComponent.FSN)) {
+									rowClass[0] = TreeEditorObjectWrapper.FSNDESCRIPTION;
+									row[TableSourceColumn.ACCEPTABILITY.ordinal()] = preferred;
+									termType_Status[0] = fsn;
+									termType_Status[1] = active;
+									row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
+
+									bNewNode = true;
 								}
 								int semtagLocation = description.getText().lastIndexOf("(");
-								if (semtagLocation == -1) semtagLocation = description.getText().length();
+								if (semtagLocation == -1)
+									semtagLocation = description.getText().length();
 
-								int endParenthesis=description.getText().lastIndexOf(")");
+								int endParenthesis = description.getText().lastIndexOf(")");
 
-								if (semtagLocation > -1 && semtagLocation<endParenthesis )
-									sourceSemTag=description.getText().substring( semtagLocation + 1,endParenthesis);
-								//saveDesc.setEnabled(true);
-								if (!bSourceFSN){
-									bSourceFSN=true;
-									sourceFSN=description.getText().substring(0, semtagLocation);
-									
+								if (semtagLocation > -1 && semtagLocation < endParenthesis)
+									sourceSemTag = description.getText().substring(semtagLocation + 1, endParenthesis);
+								// saveDesc.setEnabled(true);
+								if (!bSourceFSN) {
+									bSourceFSN = true;
+									sourceFSN = description.getText().substring(0, semtagLocation);
+
 									final SimilarityPanel similPanel = getSimilarityPanel();
-//									similPanel.updateTabs(sourceFSN,concept,sourceIds,targetId,translationProject,worklistMember);
+									// similPanel.updateTabs(sourceFSN,concept,sourceIds,targetId,translationProject,worklistMember);
 									Runnable simil = new Runnable() {
 										public void run() {
-											similPanel.updateTabs(sourceFSN,concept,sourceIds,targetId,translationProject,worklistMember);
+											similPanel.updateTabs(sourceFSN, concept, sourceIds, targetId, translationProject, worklistMember);
 										}
 									};
 									updateUIThread = new Thread(simil);
 									updateUIThread.start();
-//									Runnable tMemo = new Runnable() {
-//										public void run() {
-//											updateTransMemoryTable(sourceFSN);
-//										}
-//									};
-//									tMemo.run();
-//									Runnable gloss = new Runnable() {
-//										public void run() {
-//											//											updateGlossaryEnforcement(sourceFSN);
-//										}
-//									};
-//									gloss.run();
+									// Runnable tMemo = new Runnable() {
+									// public void run() {
+									// updateTransMemoryTable(sourceFSN);
+									// }
+									// };
+									// tMemo.run();
+									// Runnable gloss = new Runnable() {
+									// public void run() {
+									// // updateGlossaryEnforcement(sourceFSN);
+									// }
+									// };
+									// gloss.run();
 								}
-							} else if (description.getAcceptabilityId() == acceptable.getConceptNid()
-									&& sourceCom.contains(ConfigTranslationModule.TreeComponent.SYNONYM)) {
-								rowClass[0]=TreeEditorObjectWrapper.SYNONYMN;
-								row[TableSourceColumn.ACCEPTABILITY.ordinal()]=acceptable;
-								termType_Status[0]=this.description;
-								termType_Status[1]=active;
-								row[TableSourceColumn.TERM_TYPE.ordinal()]=termType_Status;
-								bNewNode=true;
-							} else if (description.getAcceptabilityId() == preferred.getConceptNid()
-									&& sourceCom.contains(ConfigTranslationModule.TreeComponent.PREFERRED)) {
-								rowClass[0]=TreeEditorObjectWrapper.PREFERRED;
-								row[TableSourceColumn.ACCEPTABILITY.ordinal()]=preferred;
-								termType_Status[0]=this.description;
-								termType_Status[1]=active;
-								row[TableSourceColumn.TERM_TYPE.ordinal()]=termType_Status;
-								bNewNode=true;
-							}else if ( sourceCom.contains(ConfigTranslationModule.TreeComponent.RETIRED)){
-								rowClass[0]=TreeEditorObjectWrapper.SYNONYMN;
-								row[TableSourceColumn.ACCEPTABILITY.ordinal()]=notAcceptable;
-								termType_Status[0]=this.description;
-								termType_Status[1]=inactive;
-								row[TableSourceColumn.TERM_TYPE.ordinal()]=termType_Status;
-								bNewNode=true;
+							} else if (description.getAcceptabilityId() == acceptable.getConceptNid() && sourceCom.contains(ConfigTranslationModule.TreeComponent.SYNONYM)) {
+								rowClass[0] = TreeEditorObjectWrapper.SYNONYMN;
+								row[TableSourceColumn.ACCEPTABILITY.ordinal()] = acceptable;
+								termType_Status[0] = this.description;
+								termType_Status[1] = active;
+								row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
+								bNewNode = true;
+							} else if (description.getAcceptabilityId() == preferred.getConceptNid() && sourceCom.contains(ConfigTranslationModule.TreeComponent.PREFERRED)) {
+								rowClass[0] = TreeEditorObjectWrapper.PREFERRED;
+								row[TableSourceColumn.ACCEPTABILITY.ordinal()] = preferred;
+								termType_Status[0] = this.description;
+								termType_Status[1] = active;
+								row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
+								bNewNode = true;
+							} else if (sourceCom.contains(ConfigTranslationModule.TreeComponent.RETIRED)) {
+								rowClass[0] = TreeEditorObjectWrapper.SYNONYMN;
+								row[TableSourceColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
+								termType_Status[0] = this.description;
+								termType_Status[1] = inactive;
+								row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
+								bNewNode = true;
 							}
-							if (bNewNode){
-								rowClass[1]=row;
+							if (bNewNode) {
+								rowClass[1] = row;
 								tmpRows.add(rowClass);
 							}
 						}
 					}
 					Font fontTmp = tabSou.getFont();
-					FontMetrics fontMetrics=new FontMetrics(fontTmp){};
+					FontMetrics fontMetrics = new FontMetrics(fontTmp) {
+					};
 					Rectangle2D bounds;
-					for (ConfigTranslationModule.TreeComponent tComp:sourceCom){
+					for (ConfigTranslationModule.TreeComponent tComp : sourceCom) {
 
-						switch (tComp){
+						switch (tComp) {
 						case FSN:
 							for (Object[] rowClass : tmpRows) {
-								if ((Integer)rowClass[0] == TreeEditorObjectWrapper.FSNDESCRIPTION) {
-									Object[] row=(Object[]) rowClass[1];
-									bounds = fontMetrics.getStringBounds(row[TableSourceColumn.TERM.ordinal()].toString(), null);  
-							        int tmpWidth = (int) bounds.getWidth();  
-									if (maxTermWidth< tmpWidth){
-										maxTermWidth=tmpWidth;
+								if ((Integer) rowClass[0] == TreeEditorObjectWrapper.FSNDESCRIPTION) {
+									Object[] row = (Object[]) rowClass[1];
+									bounds = fontMetrics.getStringBounds(row[TableSourceColumn.TERM.ordinal()].toString(), null);
+									int tmpWidth = (int) bounds.getWidth();
+									if (maxTermWidth < tmpWidth) {
+										maxTermWidth = tmpWidth;
 									}
 									model.addRow(row);
 								}
@@ -2267,12 +2260,12 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 						case PREFERRED:
 
 							for (Object[] rowClass : tmpRows) {
-								if ((Integer)rowClass[0] == TreeEditorObjectWrapper.PREFERRED) {
-									Object[] row=(Object[]) rowClass[1];
-									bounds = fontMetrics.getStringBounds(row[TableSourceColumn.TERM.ordinal()].toString(), null);  
-							        int tmpWidth = (int) bounds.getWidth();  
-									if (maxTermWidth< tmpWidth){
-										maxTermWidth=tmpWidth;
+								if ((Integer) rowClass[0] == TreeEditorObjectWrapper.PREFERRED) {
+									Object[] row = (Object[]) rowClass[1];
+									bounds = fontMetrics.getStringBounds(row[TableSourceColumn.TERM.ordinal()].toString(), null);
+									int tmpWidth = (int) bounds.getWidth();
+									if (maxTermWidth < tmpWidth) {
+										maxTermWidth = tmpWidth;
 									}
 									model.addRow(row);
 								}
@@ -2280,12 +2273,12 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 							break;
 						case SYNONYM:
 							for (Object[] rowClass : tmpRows) {
-								if ((Integer)rowClass[0] == TreeEditorObjectWrapper.SYNONYMN) {
-									Object[] row=(Object[]) rowClass[1];
-									bounds = fontMetrics.getStringBounds(row[TableSourceColumn.TERM.ordinal()].toString(), null);  
-							        int tmpWidth = (int) bounds.getWidth();  
-									if (maxTermWidth< tmpWidth){
-										maxTermWidth=tmpWidth;
+								if ((Integer) rowClass[0] == TreeEditorObjectWrapper.SYNONYMN) {
+									Object[] row = (Object[]) rowClass[1];
+									bounds = fontMetrics.getStringBounds(row[TableSourceColumn.TERM.ordinal()].toString(), null);
+									int tmpWidth = (int) bounds.getWidth();
+									if (maxTermWidth < tmpWidth) {
+										maxTermWidth = tmpWidth;
 									}
 									model.addRow(row);
 								}
@@ -2293,12 +2286,12 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 							break;
 						case RETIRED:
 							for (Object[] rowClass : tmpRows) {
-								if ((Integer)rowClass[0] == TreeEditorObjectWrapper.NOTACCEPTABLE) {
-									Object[] row=(Object[]) rowClass[1];
-									bounds = fontMetrics.getStringBounds(row[TableSourceColumn.TERM.ordinal()].toString(), null);  
-							        int tmpWidth = (int) bounds.getWidth();  
-									if (maxTermWidth< tmpWidth){
-										maxTermWidth=tmpWidth;
+								if ((Integer) rowClass[0] == TreeEditorObjectWrapper.NOTACCEPTABLE) {
+									Object[] row = (Object[]) rowClass[1];
+									bounds = fontMetrics.getStringBounds(row[TableSourceColumn.TERM.ordinal()].toString(), null);
+									int tmpWidth = (int) bounds.getWidth();
+									if (maxTermWidth < tmpWidth) {
+										maxTermWidth = tmpWidth;
 									}
 									model.addRow(row);
 								}
@@ -2314,68 +2307,67 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 				e.printStackTrace();
 			}
 		}
-		
-		tabSou.setModel(model);
-		if(maxTermWidth==0)
-			maxTermWidth=200;
-		else
-			maxTermWidth+=10;
-		TableColumnModel cmodel = tabSou.getColumnModel(); 
-		TermRenderer textAreaRenderer = new TermRenderer();
-		cmodel.getColumn(TableSourceColumn.TERM.ordinal()).setCellRenderer(textAreaRenderer); 
-		cmodel.getColumn(TableSourceColumn.TERM_TYPE.ordinal()).setCellRenderer(new TermTypeIconRenderer()); 
-		cmodel.getColumn(TableSourceColumn.ACCEPTABILITY.ordinal()).setCellRenderer(new AcceptabilityIconRenderer()); 
-		cmodel.getColumn(TableSourceColumn.LANGUAGE.ordinal()).setCellRenderer(new LanguageIconRenderer()); 
-		cmodel.getColumn(TableSourceColumn.ICS.ordinal()).setCellRenderer(new ICSIconRenderer()); 
 
-//		double widthAvai = panel9.getPreferredSize().getWidth();
-//		int termColAvai=(int) (widthAvai-100);
-//		if (termColAvai>maxTermWidth)
-//			cmodel.getColumn(TableSourceColumn.TERM.ordinal()).setPreferredWidth(termColAvai); 
-//		else
-//			cmodel.getColumn(TableSourceColumn.TERM.ordinal()).setPreferredWidth(maxTermWidth); 
+		tabSou.setModel(model);
+		if (maxTermWidth == 0)
+			maxTermWidth = 200;
+		else
+			maxTermWidth += 10;
+		TableColumnModel cmodel = tabSou.getColumnModel();
+		TermRenderer textAreaRenderer = new TermRenderer();
+		cmodel.getColumn(TableSourceColumn.TERM.ordinal()).setCellRenderer(textAreaRenderer);
+		cmodel.getColumn(TableSourceColumn.TERM_TYPE.ordinal()).setCellRenderer(new TermTypeIconRenderer());
+		cmodel.getColumn(TableSourceColumn.ACCEPTABILITY.ordinal()).setCellRenderer(new AcceptabilityIconRenderer());
+		cmodel.getColumn(TableSourceColumn.LANGUAGE.ordinal()).setCellRenderer(new LanguageIconRenderer());
+		cmodel.getColumn(TableSourceColumn.ICS.ordinal()).setCellRenderer(new ICSIconRenderer());
+
+		// double widthAvai = panel9.getPreferredSize().getWidth();
+		// int termColAvai=(int) (widthAvai-100);
+		// if (termColAvai>maxTermWidth)
+		// cmodel.getColumn(TableSourceColumn.TERM.ordinal()).setPreferredWidth(termColAvai);
+		// else
+		// cmodel.getColumn(TableSourceColumn.TERM.ordinal()).setPreferredWidth(maxTermWidth);
 		cmodel.getColumn(TableSourceColumn.TERM.ordinal()).setMinWidth(maxTermWidth);
-		
-		cmodel.getColumn(TableSourceColumn.TERM_TYPE.ordinal()).setMaxWidth(48); 
-		cmodel.getColumn(TableSourceColumn.ACCEPTABILITY.ordinal()).setMaxWidth(48); 
-		cmodel.getColumn(TableSourceColumn.ICS.ordinal()).setMaxWidth(48); 
-		cmodel.getColumn(TableSourceColumn.LANGUAGE.ordinal()).setMaxWidth(48); 
-		
+
+		cmodel.getColumn(TableSourceColumn.TERM_TYPE.ordinal()).setMaxWidth(48);
+		cmodel.getColumn(TableSourceColumn.ACCEPTABILITY.ordinal()).setMaxWidth(48);
+		cmodel.getColumn(TableSourceColumn.ICS.ordinal()).setMaxWidth(48);
+		cmodel.getColumn(TableSourceColumn.LANGUAGE.ordinal()).setMaxWidth(48);
+
 		tabSou.setRowHeight(24);
 		tabSou.setUpdateSelectionOnSort(true);
-		tabSou.revalidate();		
-		
-		if (isMemberLogOpen()){
+		tabSou.revalidate();
+
+		if (isMemberLogOpen()) {
 			mLogActionPerformed();
 		}
 
 	}
 
-
-	private SimilarityPanel getSimilarityPanel() {	
+	private SimilarityPanel getSimilarityPanel() {
 
 		AceFrameConfig config;
 		try {
-			config = (AceFrameConfig)Terms.get().getActiveAceFrameConfig();
+			config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
 
-			AceFrame ace=config.getAceFrame();
-			JTabbedPane tp=ace.getCdePanel().getLeftTabs();
-			if (tp!=null){
-				int tabCount=tp.getTabCount();
-				for (int i=0;i<tabCount;i++){
-					if (tp.getTitleAt(i).equals(TranslationHelperPanel.SIMILARITY_TAB_NAME)){
-//						tp.setSelectedIndex(i);
-//						tp.revalidate();
-//						tp.repaint();
+			AceFrame ace = config.getAceFrame();
+			JTabbedPane tp = ace.getCdePanel().getLeftTabs();
+			if (tp != null) {
+				int tabCount = tp.getTabCount();
+				for (int i = 0; i < tabCount; i++) {
+					if (tp.getTitleAt(i).equals(TranslationHelperPanel.SIMILARITY_TAB_NAME)) {
+						// tp.setSelectedIndex(i);
+						// tp.revalidate();
+						// tp.repaint();
 						return (SimilarityPanel) tp.getComponentAt(i);
 					}
 				}
 				SimilarityPanel uiPanel = new SimilarityPanel();
 
 				tp.addTab(TranslationHelperPanel.SIMILARITY_TAB_NAME, uiPanel);
-//				tp.setSelectedIndex(tabCount);
-//				tp.revalidate();
-//				tp.repaint();
+				// tp.setSelectedIndex(tabCount);
+				// tp.revalidate();
+				// tp.repaint();
 				return uiPanel;
 			}
 		} catch (TerminologyException e) {
@@ -2388,219 +2380,220 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 
 	private void populateTargetTree() throws Exception {
 		I_TermFactory tf = Terms.get();
-//		DefaultMutableTreeNode top = null;
-		boolean bHasPref =false;
-		boolean bHasFSN =false;
+		// DefaultMutableTreeNode top = null;
+		boolean bHasPref = false;
+		boolean bHasFSN = false;
 		bAddFSN.setEnabled(true);
-		targetPreferred="";
+		targetPreferred = "";
 		targetFSN = "";
-		targetPreferredICS=false;
-		targetPreferredRow=null;
-		targetFSNRow=null;
+		targetPreferredICS = false;
+		targetPreferredRow = null;
+		targetFSNRow = null;
 		int authId;
-		String authorColName="";
-		int authorColPos =-1;
-		int authorAdj=0;
-		int maxTermWidth=0;
-		HashMap<Integer,String> hashAuthId=new HashMap<Integer,String>();
+		String authorColName = "";
+		int authorColPos = -1;
+		int authorAdj = 0;
+		int maxTermWidth = 0;
+		HashMap<Integer, String> hashAuthId = new HashMap<Integer, String>();
 		translConfig = LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
-		translConfig=getTranslationProjectConfig();
+		translConfig = getTranslationProjectConfig();
 		LinkedHashSet<TreeComponent> targetCom = translConfig.getTargetTreeComponents();
 
-		if (translConfig.getTargetTreeComponents().contains(ConfigTranslationModule.TreeComponent.AUTHOR_PATH)){
+		if (translConfig.getTargetTreeComponents().contains(ConfigTranslationModule.TreeComponent.AUTHOR_PATH)) {
 			authorAdj = 1;
 			authorColPos = TableTargetColumn.values().length;
 			authorColName = "Author";
 		}
-		Object[][] data=null;
+		Object[][] data = null;
 		String[] columnNames = new String[TableTargetColumn.values().length + authorAdj];
-		for (int i=0;i<TableTargetColumn.values().length;i++){
-			columnNames[i]=TableTargetColumn.values()[i].getColumnName();
+		for (int i = 0; i < TableTargetColumn.values().length; i++) {
+			columnNames[i] = TableTargetColumn.values()[i].getColumnName();
 		}
-		if (authorAdj==1){
-			columnNames[authorColPos]=authorColName;
+		if (authorAdj == 1) {
+			columnNames[authorColPos] = authorColName;
 		}
-		DefaultTableModel model=new DefaultTableModel(data, columnNames) {
+		DefaultTableModel model = new DefaultTableModel(data, columnNames) {
 			private static final long serialVersionUID = 1L;
 
 			public boolean isCellEditable(int x, int y) {
 				return false;
 			}
 		};
-		List<Object[]> tmpRows=new ArrayList<Object[]>();
+		List<Object[]> tmpRows = new ArrayList<Object[]>();
 		if (concept != null) {
 			try {
-//				top = new DefaultMutableTreeNode(new TreeEditorObjectWrapper(concept.toString(), TreeEditorObjectWrapper.CONCEPT, concept));
-				I_GetConceptData langRefset=this.translationProject.getTargetLanguageRefset();
+				// top = new DefaultMutableTreeNode(new
+				// TreeEditorObjectWrapper(concept.toString(),
+				// TreeEditorObjectWrapper.CONCEPT, concept));
+				I_GetConceptData langRefset = this.translationProject.getTargetLanguageRefset();
 				if (langRefset == null) {
-					JOptionPane.showMessageDialog(new JDialog(), "Target language refset cannot be retrieved\nCheck project details", 
-							"Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(new JDialog(), "Target language refset cannot be retrieved\nCheck project details", "Error", JOptionPane.ERROR_MESSAGE);
 					throw new Exception("Target language refset cannot be retrieved.");
 				}
-				List<ContextualizedDescription> descriptions = LanguageUtil.getContextualizedDescriptions(
-						concept.getConceptNid(), langRefset.getConceptNid(), true);
+				List<ContextualizedDescription> descriptions = LanguageUtil.getContextualizedDescriptions(concept.getConceptNid(), langRefset.getConceptNid(), true);
 
-//				DefaultMutableTreeNode groupLang = new DefaultMutableTreeNode(
-//						new TreeEditorObjectWrapper(langRefset.getInitialText(), TreeEditorObjectWrapper.FOLDER,langRefset ));
+				// DefaultMutableTreeNode groupLang = new
+				// DefaultMutableTreeNode(
+				// new TreeEditorObjectWrapper(langRefset.getInitialText(),
+				// TreeEditorObjectWrapper.FOLDER,langRefset ));
 
-//				List<DefaultMutableTreeNode> nodesToAdd = new ArrayList<DefaultMutableTreeNode>();
+				// List<DefaultMutableTreeNode> nodesToAdd = new
+				// ArrayList<DefaultMutableTreeNode>();
 
-				boolean bNewNode=false;
+				boolean bNewNode = false;
 				for (I_ContextualizeDescription description : descriptions) {
-					if (description.getLanguageExtension()!=null && description.getLanguageRefsetId()==langRefset.getConceptNid()){
-//						DefaultMutableTreeNode descriptionNode = null;
-						bNewNode=false;
-						Object[] row=new Object[TableTargetColumn.values().length];
+					if (description.getLanguageExtension() != null && description.getLanguageRefsetId() == langRefset.getConceptNid()) {
+						// DefaultMutableTreeNode descriptionNode = null;
+						bNewNode = false;
+						Object[] row = new Object[TableTargetColumn.values().length];
 
-						Object[] rowClass=new Object[2];
-						Object[] termType_Status=new Object[2];
-						row[TableTargetColumn.TERM.ordinal()]=description;
-						row[TableTargetColumn.LANGUAGE.ordinal()]=description.getLang();
-						row[TableTargetColumn.ICS.ordinal()]=description.isInitialCaseSignificant();
-						
-						if (description.getAcceptabilityId()==notAcceptable.getConceptNid() ||
-								description.getExtensionStatusId()==inactive.getConceptNid() ||
-								description.getDescriptionStatusId()==retired.getConceptNid()){
-							if(targetCom.contains(ConfigTranslationModule.TreeComponent.RETIRED)){
-								rowClass[0]=TreeEditorObjectWrapper.NOTACCEPTABLE;
-								row[TableTargetColumn.ACCEPTABILITY.ordinal()]=notAcceptable;
-								termType_Status[1]=inactive;
-								if (description.getTypeId() == fsn.getConceptNid()){ 
-									termType_Status[0]=fsn;
-								}else{
-									termType_Status[0]=this.description;
+						Object[] rowClass = new Object[2];
+						Object[] termType_Status = new Object[2];
+						row[TableTargetColumn.TERM.ordinal()] = description;
+						row[TableTargetColumn.LANGUAGE.ordinal()] = description.getLang();
+						row[TableTargetColumn.ICS.ordinal()] = description.isInitialCaseSignificant();
+
+						if (description.getAcceptabilityId() == notAcceptable.getConceptNid() || description.getExtensionStatusId() == inactive.getConceptNid()
+								|| description.getDescriptionStatusId() == retired.getConceptNid()) {
+							if (targetCom.contains(ConfigTranslationModule.TreeComponent.RETIRED)) {
+								rowClass[0] = TreeEditorObjectWrapper.NOTACCEPTABLE;
+								row[TableTargetColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
+								termType_Status[1] = inactive;
+								if (description.getTypeId() == fsn.getConceptNid()) {
+									termType_Status[0] = fsn;
+								} else {
+									termType_Status[0] = this.description;
 								}
-								row[TableSourceColumn.TERM_TYPE.ordinal()]=termType_Status;
-								bNewNode=true;
+								row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
+								bNewNode = true;
 							}
-						} else if (description.getTypeId() == fsn.getConceptNid()){
+						} else if (description.getTypeId() == fsn.getConceptNid()) {
 							if (targetCom.contains(ConfigTranslationModule.TreeComponent.FSN)) {
-								rowClass[0]=TreeEditorObjectWrapper.FSNDESCRIPTION;
-								row[TableSourceColumn.ACCEPTABILITY.ordinal()]=preferred;
-								termType_Status[0]=fsn;
-								termType_Status[1]=active;
-								row[TableSourceColumn.TERM_TYPE.ordinal()]=termType_Status;
-								bNewNode=true;
-								bNewNode=true;
+								rowClass[0] = TreeEditorObjectWrapper.FSNDESCRIPTION;
+								row[TableSourceColumn.ACCEPTABILITY.ordinal()] = preferred;
+								termType_Status[0] = fsn;
+								termType_Status[1] = active;
+								row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
+								bNewNode = true;
+								bNewNode = true;
 								targetFSN = description.getText();
 							}
-							bHasFSN=true;
-						} else if (description.getAcceptabilityId() == acceptable.getConceptNid()
-								&& targetCom.contains(ConfigTranslationModule.TreeComponent.SYNONYM)) {
-							rowClass[0]=TreeEditorObjectWrapper.SYNONYMN;
-							row[TableSourceColumn.ACCEPTABILITY.ordinal()]=acceptable;
-							termType_Status[0]=this.description;
-							termType_Status[1]=active;
-							row[TableSourceColumn.TERM_TYPE.ordinal()]=termType_Status;
-							bNewNode=true;
-						} else if (description.getAcceptabilityId() == preferred.getConceptNid()
-								&& targetCom.contains(ConfigTranslationModule.TreeComponent.PREFERRED)) {
-							rowClass[0]=TreeEditorObjectWrapper.PREFERRED;
-							row[TableSourceColumn.ACCEPTABILITY.ordinal()]=preferred;
-							termType_Status[0]=this.description;
-							termType_Status[1]=active;
-							row[TableSourceColumn.TERM_TYPE.ordinal()]=termType_Status;
+							bHasFSN = true;
+						} else if (description.getAcceptabilityId() == acceptable.getConceptNid() && targetCom.contains(ConfigTranslationModule.TreeComponent.SYNONYM)) {
+							rowClass[0] = TreeEditorObjectWrapper.SYNONYMN;
+							row[TableSourceColumn.ACCEPTABILITY.ordinal()] = acceptable;
+							termType_Status[0] = this.description;
+							termType_Status[1] = active;
+							row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
+							bNewNode = true;
+						} else if (description.getAcceptabilityId() == preferred.getConceptNid() && targetCom.contains(ConfigTranslationModule.TreeComponent.PREFERRED)) {
+							rowClass[0] = TreeEditorObjectWrapper.PREFERRED;
+							row[TableSourceColumn.ACCEPTABILITY.ordinal()] = preferred;
+							termType_Status[0] = this.description;
+							termType_Status[1] = active;
+							row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
 							bHasPref = true;
-							targetPreferred=description.getText();
-							targetPreferredICS=description.isInitialCaseSignificant();
+							targetPreferred = description.getText();
+							targetPreferredICS = description.isInitialCaseSignificant();
 
-							bNewNode=true;
-						}else if (targetCom.contains(ConfigTranslationModule.TreeComponent.RETIRED)){
-							rowClass[0]=TreeEditorObjectWrapper.SYNONYMN;
-							row[TableSourceColumn.ACCEPTABILITY.ordinal()]=notAcceptable;
-							termType_Status[0]=this.description;
-							termType_Status[1]=inactive;
-							row[TableSourceColumn.TERM_TYPE.ordinal()]=termType_Status;
-							bNewNode=true;
+							bNewNode = true;
+						} else if (targetCom.contains(ConfigTranslationModule.TreeComponent.RETIRED)) {
+							rowClass[0] = TreeEditorObjectWrapper.SYNONYMN;
+							row[TableSourceColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
+							termType_Status[0] = this.description;
+							termType_Status[1] = inactive;
+							row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
+							bNewNode = true;
 						}
-						if (bNewNode){
-							if (translConfig.getTargetTreeComponents().contains(ConfigTranslationModule.TreeComponent.AUTHOR_PATH)){
+						if (bNewNode) {
+							if (translConfig.getTargetTreeComponents().contains(ConfigTranslationModule.TreeComponent.AUTHOR_PATH)) {
 
-								authId=description.getDescriptionVersioned().getLastTuple().getAuthorNid();
-								String userConcept="";
+								authId = description.getDescriptionVersioned().getLastTuple().getAuthorNid();
+								String userConcept = "";
 								if (hashAuthId.containsKey(authId))
-									userConcept=hashAuthId.get(authId);
-								else{
-									I_GetConceptData conc= tf.getConcept(authId);
-									if (conc!=null){
-										userConcept=conc.toString();
-										hashAuthId.put(authId,userConcept);
+									userConcept = hashAuthId.get(authId);
+								else {
+									I_GetConceptData conc = tf.getConcept(authId);
+									if (conc != null) {
+										userConcept = conc.toString();
+										hashAuthId.put(authId, userConcept);
 									}
 								}
-								if (!userConcept.equals("")){
-									//TODO There is an index out of band exception here..!  
-									row[authorColPos]=userConcept;
+								if (!userConcept.equals("")) {
+									// TODO There is an index out of band
+									// exception here..!
+									row[authorColPos] = userConcept;
 								}
 
 							}
-							rowClass[1]=row;
+							rowClass[1] = row;
 							tmpRows.add(rowClass);
 						}
 					}
 				}
 				Font fontTmp = tabTar.getFont();
-				FontMetrics fontMetrics=new FontMetrics(fontTmp){};
+				FontMetrics fontMetrics = new FontMetrics(fontTmp) {
+				};
 				Rectangle2D bounds;
-				for (ConfigTranslationModule.TreeComponent tComp:targetCom){
+				for (ConfigTranslationModule.TreeComponent tComp : targetCom) {
 
-						switch (tComp){
-						case FSN:
-							for (Object[] rowClass : tmpRows) {
-								if ((Integer)rowClass[0] == TreeEditorObjectWrapper.FSNDESCRIPTION) {
-									Object[] row=(Object[]) rowClass[1];
-									bounds = fontMetrics.getStringBounds(row[TableTargetColumn.TERM.ordinal()].toString(), null);  
-							        int tmpWidth = (int) bounds.getWidth();  
-									if (maxTermWidth< tmpWidth){
-										maxTermWidth=tmpWidth;
-									}
-									model.addRow(row);
-									targetFSNRow = model.getRowCount() -1;
+					switch (tComp) {
+					case FSN:
+						for (Object[] rowClass : tmpRows) {
+							if ((Integer) rowClass[0] == TreeEditorObjectWrapper.FSNDESCRIPTION) {
+								Object[] row = (Object[]) rowClass[1];
+								bounds = fontMetrics.getStringBounds(row[TableTargetColumn.TERM.ordinal()].toString(), null);
+								int tmpWidth = (int) bounds.getWidth();
+								if (maxTermWidth < tmpWidth) {
+									maxTermWidth = tmpWidth;
 								}
+								model.addRow(row);
+								targetFSNRow = model.getRowCount() - 1;
 							}
-							break;
-						case PREFERRED:
-							for (Object[] rowClass : tmpRows) {
-								if ((Integer)rowClass[0] == TreeEditorObjectWrapper.PREFERRED) {
-									Object[] row=(Object[]) rowClass[1];
-									bounds = fontMetrics.getStringBounds(row[TableTargetColumn.TERM.ordinal()].toString(), null);  
-							        int tmpWidth = (int) bounds.getWidth();  
-									if (maxTermWidth< tmpWidth){
-										maxTermWidth=tmpWidth;
-									}
-									model.addRow(row);
-									targetPreferredRow= model.getRowCount()-1;
-								}
-							}
-							break;
-						case SYNONYM:
-							for (Object[] rowClass : tmpRows) {
-								if ((Integer)rowClass[0] == TreeEditorObjectWrapper.SYNONYMN) {
-									Object[] row=(Object[]) rowClass[1];
-									bounds = fontMetrics.getStringBounds(row[TableTargetColumn.TERM.ordinal()].toString(), null);  
-							        int tmpWidth = (int) bounds.getWidth();  
-									if (maxTermWidth< tmpWidth){
-										maxTermWidth=tmpWidth;
-									}
-									model.addRow(row);
-								}
-							}
-							break;
-						case RETIRED:
-							for (Object[] rowClass : tmpRows) {
-								if ((Integer)rowClass[0] == TreeEditorObjectWrapper.NOTACCEPTABLE) {
-									Object[] row=(Object[]) rowClass[1];
-									bounds = fontMetrics.getStringBounds(row[TableTargetColumn.TERM.ordinal()].toString(), null);  
-							        int tmpWidth = (int) bounds.getWidth();  
-									if (maxTermWidth< tmpWidth){
-										maxTermWidth=tmpWidth;
-									}
-									model.addRow(row);
-								}
-							}
-							break;
 						}
+						break;
+					case PREFERRED:
+						for (Object[] rowClass : tmpRows) {
+							if ((Integer) rowClass[0] == TreeEditorObjectWrapper.PREFERRED) {
+								Object[] row = (Object[]) rowClass[1];
+								bounds = fontMetrics.getStringBounds(row[TableTargetColumn.TERM.ordinal()].toString(), null);
+								int tmpWidth = (int) bounds.getWidth();
+								if (maxTermWidth < tmpWidth) {
+									maxTermWidth = tmpWidth;
+								}
+								model.addRow(row);
+								targetPreferredRow = model.getRowCount() - 1;
+							}
+						}
+						break;
+					case SYNONYM:
+						for (Object[] rowClass : tmpRows) {
+							if ((Integer) rowClass[0] == TreeEditorObjectWrapper.SYNONYMN) {
+								Object[] row = (Object[]) rowClass[1];
+								bounds = fontMetrics.getStringBounds(row[TableTargetColumn.TERM.ordinal()].toString(), null);
+								int tmpWidth = (int) bounds.getWidth();
+								if (maxTermWidth < tmpWidth) {
+									maxTermWidth = tmpWidth;
+								}
+								model.addRow(row);
+							}
+						}
+						break;
+					case RETIRED:
+						for (Object[] rowClass : tmpRows) {
+							if ((Integer) rowClass[0] == TreeEditorObjectWrapper.NOTACCEPTABLE) {
+								Object[] row = (Object[]) rowClass[1];
+								bounds = fontMetrics.getStringBounds(row[TableTargetColumn.TERM.ordinal()].toString(), null);
+								int tmpWidth = (int) bounds.getWidth();
+								if (maxTermWidth < tmpWidth) {
+									maxTermWidth = tmpWidth;
+								}
+								model.addRow(row);
+							}
+						}
+						break;
+					}
 				}
-
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -2610,35 +2603,36 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		}
 
 		tabTar.setModel(model);
-		if(maxTermWidth==0)
-			maxTermWidth=200;
+		if (maxTermWidth == 0)
+			maxTermWidth = 200;
 		else
-			maxTermWidth+=10;
-		TableColumnModel cmodel = tabTar.getColumnModel(); 
+			maxTermWidth += 10;
+		TableColumnModel cmodel = tabTar.getColumnModel();
 		TermRenderer textAreaRenderer = new TermRenderer();
-		cmodel.getColumn(TableTargetColumn.TERM.ordinal()).setCellRenderer(textAreaRenderer); 
-		cmodel.getColumn(TableTargetColumn.TERM_TYPE.ordinal()).setCellRenderer(new TermTypeIconRenderer()); 
-		cmodel.getColumn(TableTargetColumn.ACCEPTABILITY.ordinal()).setCellRenderer(new AcceptabilityIconRenderer()); 
-		cmodel.getColumn(TableTargetColumn.LANGUAGE.ordinal()).setCellRenderer(new LanguageIconRenderer()); 
-		cmodel.getColumn(TableTargetColumn.ICS.ordinal()).setCellRenderer(new ICSIconRenderer()); 
+		cmodel.getColumn(TableTargetColumn.TERM.ordinal()).setCellRenderer(textAreaRenderer);
+		cmodel.getColumn(TableTargetColumn.TERM_TYPE.ordinal()).setCellRenderer(new TermTypeIconRenderer());
+		cmodel.getColumn(TableTargetColumn.ACCEPTABILITY.ordinal()).setCellRenderer(new AcceptabilityIconRenderer());
+		cmodel.getColumn(TableTargetColumn.LANGUAGE.ordinal()).setCellRenderer(new LanguageIconRenderer());
+		cmodel.getColumn(TableTargetColumn.ICS.ordinal()).setCellRenderer(new ICSIconRenderer());
 
-//		double widthAvai = panel8.getPreferredSize().getWidth();
+		// double widthAvai = panel8.getPreferredSize().getWidth();
 
-//		double widthAdj=0;
-//		if (authorAdj==1){
-//			widthAdj=cmodel.getColumn(authorColPos).getWidth();
-//		}
-//		int termColAvai=(int) (widthAvai-100-widthAdj);
-//		if (termColAvai>maxTermWidth)
-//			cmodel.getColumn(TableTargetColumn.TERM.ordinal()).setPreferredWidth(termColAvai); 
-////		if (cmodel.getColumn(TableTargetColumn.TERM.ordinal()).getWidth()<maxTermWidth)
-//		else
-//			cmodel.getColumn(TableTargetColumn.TERM.ordinal()).setPreferredWidth(maxTermWidth); 
+		// double widthAdj=0;
+		// if (authorAdj==1){
+		// widthAdj=cmodel.getColumn(authorColPos).getWidth();
+		// }
+		// int termColAvai=(int) (widthAvai-100-widthAdj);
+		// if (termColAvai>maxTermWidth)
+		// cmodel.getColumn(TableTargetColumn.TERM.ordinal()).setPreferredWidth(termColAvai);
+		// // if
+		// (cmodel.getColumn(TableTargetColumn.TERM.ordinal()).getWidth()<maxTermWidth)
+		// else
+		// cmodel.getColumn(TableTargetColumn.TERM.ordinal()).setPreferredWidth(maxTermWidth);
 		cmodel.getColumn(TableTargetColumn.TERM.ordinal()).setMinWidth(maxTermWidth);
-		cmodel.getColumn(TableTargetColumn.TERM_TYPE.ordinal()).setMaxWidth(48); 
-		cmodel.getColumn(TableTargetColumn.ACCEPTABILITY.ordinal()).setMaxWidth(48); 
-		cmodel.getColumn(TableTargetColumn.ICS.ordinal()).setMaxWidth(48); 
-		cmodel.getColumn(TableTargetColumn.LANGUAGE.ordinal()).setMaxWidth(48); 
+		cmodel.getColumn(TableTargetColumn.TERM_TYPE.ordinal()).setMaxWidth(48);
+		cmodel.getColumn(TableTargetColumn.ACCEPTABILITY.ordinal()).setMaxWidth(48);
+		cmodel.getColumn(TableTargetColumn.ICS.ordinal()).setMaxWidth(48);
+		cmodel.getColumn(TableTargetColumn.LANGUAGE.ordinal()).setMaxWidth(48);
 		tabTar.setRowHeight(24);
 		tabTar.setUpdateSelectionOnSort(true);
 		tabTar.revalidate();
@@ -2657,111 +2651,120 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 			try {
 				I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 
-//				top = new DefaultMutableTreeNode(new TreeEditorObjectWrapper(concept.toString(), IconUtilities.CONCEPT, concept));
+				// top = new DefaultMutableTreeNode(new
+				// TreeEditorObjectWrapper(concept.toString(),
+				// IconUtilities.CONCEPT, concept));
 				I_ConceptAttributeTuple attributes = null;
-				attributes = concept.getConceptAttributeTuples(config.getPrecedence(), 
-						config.getConflictResolutionStrategy()).iterator().next();
+				attributes = concept.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next();
 
-		//				String definedOrPrimitive = "";
-//				DefaultMutableTreeNode idNode=null;
+				// String definedOrPrimitive = "";
+				// DefaultMutableTreeNode idNode=null;
 				String statusName = tf.getConcept(attributes.getStatusId()).toString();
-				if (statusName.equalsIgnoreCase("retired") || statusName.equalsIgnoreCase("inactive")){
+				if (statusName.equalsIgnoreCase("retired") || statusName.equalsIgnoreCase("inactive")) {
 					top = new DefaultMutableTreeNode(new TreeEditorObjectWrapper(concept.toString(), IconUtilities.INACTIVE, concept));
-				}else if (attributes.isDefined()) {
-//					definedOrPrimitive = "fully defined";
+				} else if (attributes.isDefined()) {
+					// definedOrPrimitive = "fully defined";
 					top = new DefaultMutableTreeNode(new TreeEditorObjectWrapper(concept.toString(), IconUtilities.DEFINED, concept));
-				
-//					idNode= new DefaultMutableTreeNode(
-//							new TreeEditorObjectWrapper(definedOrPrimitive, IconUtilities.DEFINED, attributes.getMutablePart()));
-//					
+
+					// idNode= new DefaultMutableTreeNode(
+					// new TreeEditorObjectWrapper(definedOrPrimitive,
+					// IconUtilities.DEFINED, attributes.getMutablePart()));
+					//
 				} else {
 					top = new DefaultMutableTreeNode(new TreeEditorObjectWrapper(concept.toString(), IconUtilities.PRIMITIVE, concept));
-//					definedOrPrimitive = "primitive";
-//					idNode= new DefaultMutableTreeNode(
-//							new TreeEditorObjectWrapper(definedOrPrimitive, IconUtilities.PRIMITIVE, attributes.getMutablePart()));
-//					
+					// definedOrPrimitive = "primitive";
+					// idNode= new DefaultMutableTreeNode(
+					// new TreeEditorObjectWrapper(definedOrPrimitive,
+					// IconUtilities.PRIMITIVE, attributes.getMutablePart()));
+					//
 				}
-//				top.add(idNode);
+				
+				Long concpetID =  null;
+				I_Identify identifier = concept.getIdentifier();
+				List<? extends I_IdPart> parts = identifier.getMutableIdParts();
+				Long lastTime = Long.MIN_VALUE;
+				for (I_IdPart i_IdPart : parts) {
+					if(i_IdPart.getAuthorityNid() == tf.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids()) && 
+							i_IdPart.getTime() > lastTime){
+						lastTime = i_IdPart.getTime();
+						concpetID = (Long)i_IdPart.getDenotation();
+					}
+				}
+				DefaultMutableTreeNode conceptIdNode = new DefaultMutableTreeNode(new TreeEditorObjectWrapper("Concept ID: " + concpetID, IconUtilities.ID, concpetID));
+				top.add(conceptIdNode);
 
-//				String statusName = tf.getConcept(attributes.getStatusId()).toString();
-//				DefaultMutableTreeNode statusNode =null;
-//				if (statusName.equalsIgnoreCase("retired") || statusName.equalsIgnoreCase("inactive")){
-//					statusNode = new DefaultMutableTreeNode(
-//							new TreeEditorObjectWrapper(statusName, IconUtilities.INACTIVE, attributes.getMutablePart()));
-//				}else{
-//					statusNode = new DefaultMutableTreeNode(
-//							new TreeEditorObjectWrapper(statusName, IconUtilities.ATTRIBUTE, attributes.getMutablePart()));
-//				}
-//				top.add(statusNode);
+				// top.add(idNode);
+
+				// String statusName =
+				// tf.getConcept(attributes.getStatusId()).toString();
+				// DefaultMutableTreeNode statusNode =null;
+				// if (statusName.equalsIgnoreCase("retired") ||
+				// statusName.equalsIgnoreCase("inactive")){
+				// statusNode = new DefaultMutableTreeNode(
+				// new TreeEditorObjectWrapper(statusName,
+				// IconUtilities.INACTIVE, attributes.getMutablePart()));
+				// }else{
+				// statusNode = new DefaultMutableTreeNode(
+				// new TreeEditorObjectWrapper(statusName,
+				// IconUtilities.ATTRIBUTE, attributes.getMutablePart()));
+				// }
+				// top.add(statusNode);
 				List<I_RelTuple> relationships = (List<I_RelTuple>) concept.getSourceRelTuples(config.getAllowedStatus(), config.getDestRelTypes(), config.getViewPositionSetReadOnly(),
-						config.getPrecedence(), config.getConflictResolutionStrategy(),config.getClassifierConcept().getNid(), 
-						RelAssertionType.INFERRED);
-				//				List<I_RelVersioned> relationships2 = (List<I_RelVersioned>) concept.getDestRels();
+						config.getPrecedence(), config.getConflictResolutionStrategy(), config.getClassifierConcept().getNid(), RelAssertionType.INFERRED);
+				// List<I_RelVersioned> relationships2 = (List<I_RelVersioned>)
+				// concept.getDestRels();
 
 				List<DefaultMutableTreeNode> nodesToAdd = new ArrayList<DefaultMutableTreeNode>();
 
-				HashMap<Integer,List<DefaultMutableTreeNode>> mapGroup= new HashMap<Integer,List<DefaultMutableTreeNode>>() ;
-				List<DefaultMutableTreeNode> roleList=new ArrayList<DefaultMutableTreeNode>();
-				int group=0;
+				HashMap<Integer, List<DefaultMutableTreeNode>> mapGroup = new HashMap<Integer, List<DefaultMutableTreeNode>>();
+				List<DefaultMutableTreeNode> roleList = new ArrayList<DefaultMutableTreeNode>();
+				int group = 0;
 				for (I_RelTuple relationship : relationships) {
 					I_GetConceptData targetConcept = tf.getConcept(relationship.getC2Id());
 					I_GetConceptData typeConcept = tf.getConcept(relationship.getTypeNid());
 					String label = typeConcept + ": " + targetConcept;
 
-					if ((relationship.getTypeNid() == ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid())
-							|| (typeConcept.toString().equalsIgnoreCase("is a") )) {
-						attributes = targetConcept.getConceptAttributeTuples(config.getPrecedence(), 
-								config.getConflictResolutionStrategy()).iterator().next();
-						DefaultMutableTreeNode supertypeNode=null;
+					if ((relationship.getTypeNid() == ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid()) || (typeConcept.toString().equalsIgnoreCase("is a"))) {
+						attributes = targetConcept.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next();
+						DefaultMutableTreeNode supertypeNode = null;
 						statusName = tf.getConcept(attributes.getStatusNid()).toString();
-						if (statusName.equalsIgnoreCase("retired") || statusName.equalsIgnoreCase("inactive")){
-							supertypeNode = new DefaultMutableTreeNode(
-									new TreeEditorObjectWrapper(label, IconUtilities.INACTIVE_PARENT, relationship.getMutablePart()));
-							
-						}else if (attributes.isDefined()) {
-							supertypeNode = new DefaultMutableTreeNode(
-								new TreeEditorObjectWrapper(label, IconUtilities.DEFINED_PARENT, relationship.getMutablePart()));
-						}else{
-							supertypeNode = new DefaultMutableTreeNode(
-									new TreeEditorObjectWrapper(label, IconUtilities.PRIMITIVE_PARENT, relationship.getMutablePart()));
-							
+						if (statusName.equalsIgnoreCase("retired") || statusName.equalsIgnoreCase("inactive")) {
+							supertypeNode = new DefaultMutableTreeNode(new TreeEditorObjectWrapper(label, IconUtilities.INACTIVE_PARENT, relationship.getMutablePart()));
+
+						} else if (attributes.isDefined()) {
+							supertypeNode = new DefaultMutableTreeNode(new TreeEditorObjectWrapper(label, IconUtilities.DEFINED_PARENT, relationship.getMutablePart()));
+						} else {
+							supertypeNode = new DefaultMutableTreeNode(new TreeEditorObjectWrapper(label, IconUtilities.PRIMITIVE_PARENT, relationship.getMutablePart()));
+
 						}
 						nodesToAdd.add(supertypeNode);
 					} else {
-						if (relationship.getGroup()==0){
-							if (relationship.getCharacteristicId()==definingChar){
-								DefaultMutableTreeNode roleNode = new DefaultMutableTreeNode(
-										new TreeEditorObjectWrapper(label, IconUtilities.ROLE, relationship.getMutablePart()));
+						if (relationship.getGroup() == 0) {
+							if (relationship.getCharacteristicId() == definingChar) {
+								DefaultMutableTreeNode roleNode = new DefaultMutableTreeNode(new TreeEditorObjectWrapper(label, IconUtilities.ROLE, relationship.getMutablePart()));
+								nodesToAdd.add(roleNode);
+							} else {
+								DefaultMutableTreeNode roleNode = new DefaultMutableTreeNode(new TreeEditorObjectWrapper(label, IconUtilities.ASSOCIATION, relationship.getMutablePart()));
 								nodesToAdd.add(roleNode);
 							}
-							else{
-								DefaultMutableTreeNode roleNode = new DefaultMutableTreeNode(
-										new TreeEditorObjectWrapper(label, IconUtilities.ASSOCIATION, relationship.getMutablePart()));
-								nodesToAdd.add(roleNode);
-							}
-						}
-						else
-						{
+						} else {
 							group = relationship.getGroup();
-							if (mapGroup.containsKey(group)){
-								roleList=mapGroup.get(group);
-							}
-							else{
-								roleList=new ArrayList<DefaultMutableTreeNode>();
+							if (mapGroup.containsKey(group)) {
+								roleList = mapGroup.get(group);
+							} else {
+								roleList = new ArrayList<DefaultMutableTreeNode>();
 							}
 
-							roleList.add(new DefaultMutableTreeNode(
-									new TreeEditorObjectWrapper(label, IconUtilities.ROLE, relationship.getMutablePart())));
+							roleList.add(new DefaultMutableTreeNode(new TreeEditorObjectWrapper(label, IconUtilities.ROLE, relationship.getMutablePart())));
 							mapGroup.put(group, roleList);
 						}
 					}
 				}
 
-
-
 				for (DefaultMutableTreeNode loopNode : nodesToAdd) {
 					TreeEditorObjectWrapper nodeObject = (TreeEditorObjectWrapper) loopNode.getUserObject();
-					if (nodeObject.getType() == IconUtilities.DEFINED_PARENT || nodeObject.getType() == IconUtilities.PRIMITIVE_PARENT || nodeObject.getType() == IconUtilities.INACTIVE_PARENT) {
+					if (nodeObject.getType() == IconUtilities.DEFINED_PARENT || nodeObject.getType() == IconUtilities.PRIMITIVE_PARENT
+							|| nodeObject.getType() == IconUtilities.INACTIVE_PARENT) {
 						top.add(loopNode);
 					}
 				}
@@ -2772,11 +2775,10 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 						top.add(loopNode);
 					}
 				}
-				for (int key:mapGroup.keySet()){
-					List<DefaultMutableTreeNode> lRoles=(List<DefaultMutableTreeNode>)mapGroup.get(key);
-					DefaultMutableTreeNode groupNode = new DefaultMutableTreeNode(
-							new TreeEditorObjectWrapper("Group:" + key, IconUtilities.ROLEGROUP,lRoles ));
-					for (DefaultMutableTreeNode rNode: lRoles){
+				for (int key : mapGroup.keySet()) {
+					List<DefaultMutableTreeNode> lRoles = (List<DefaultMutableTreeNode>) mapGroup.get(key);
+					DefaultMutableTreeNode groupNode = new DefaultMutableTreeNode(new TreeEditorObjectWrapper("Group:" + key, IconUtilities.ROLEGROUP, lRoles));
+					for (DefaultMutableTreeNode rNode : lRoles) {
 						groupNode.add(rNode);
 					}
 					top.add(groupNode);
@@ -2787,7 +2789,6 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 						top.add(loopNode);
 					}
 				}
-
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -2808,31 +2809,30 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 
 	class TermTypeIconRenderer extends DefaultTableCellRenderer {
 
-		public Component getTableCellRendererComponent(JTable table, Object value,
-				boolean isSelected, boolean hasFocus, int row, int column) {
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
-			JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-			Object[] termType_status=(Object[])value;
-			String termType=termType_status[0].toString();
-			String status=termType_status[1].toString();
+			JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			Object[] termType_status = (Object[]) value;
+			String termType = termType_status[0].toString();
+			String status = termType_status[1].toString();
 			label.setIcon(IconUtilities.getIconForTermType_Status(termType, status));
 			label.setText("");
-			label.setToolTipText(status + " " + termType );
+			label.setToolTipText(status + " " + termType);
 			label.setHorizontalAlignment(CENTER);
 
 			return label;
 		}
 
 	}
+
 	class AcceptabilityIconRenderer extends DefaultTableCellRenderer {
 
-		public Component getTableCellRendererComponent(JTable table, Object value,
-				boolean isSelected, boolean hasFocus, int row, int column) {
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
-			JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-			label.setIcon (IconUtilities.getIconForAcceptability(value.toString()));
+			JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			label.setIcon(IconUtilities.getIconForAcceptability(value.toString()));
 			label.setText("");
-			label.setToolTipText(value.toString() );
+			label.setToolTipText(value.toString());
 			label.setHorizontalAlignment(CENTER);
 			return label;
 		}
@@ -2841,24 +2841,23 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 
 	class TermRenderer extends DefaultTableCellRenderer {
 
-		public Component getTableCellRendererComponent(JTable table, Object value,
-				boolean isSelected, boolean hasFocus, int row, int column) {
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
-			JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-			label.setToolTipText(value.toString() );
+			JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			label.setToolTipText(value.toString());
 			return label;
 		}
 
 	}
+
 	class LanguageIconRenderer extends DefaultTableCellRenderer {
 
-		public Component getTableCellRendererComponent(JTable table, Object value,
-				boolean isSelected, boolean hasFocus, int row, int column) {
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
-			JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 			label.setIcon(IconUtilities.getIconForLanguage(value.toString()));
 			label.setText("");
-			label.setToolTipText(value.toString() );
+			label.setToolTipText(value.toString());
 			label.setHorizontalAlignment(CENTER);
 
 			return label;
@@ -2868,234 +2867,229 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 
 	class ICSIconRenderer extends DefaultTableCellRenderer {
 
-		public Component getTableCellRendererComponent(JTable table, Object value,
-				boolean isSelected, boolean hasFocus, int row, int column) {
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
-			JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-			label.setIcon(IconUtilities.getIconForICS((Boolean)value));
+			JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			label.setIcon(IconUtilities.getIconForICS((Boolean) value));
 			label.setText("");
-			label.setToolTipText(value.toString() );
+			label.setToolTipText(value.toString());
 			label.setHorizontalAlignment(CENTER);
 
 			return label;
 		}
 
 	}
+
 	/**
 	 * Update properties panel.
-	 * @param rowModel 
+	 * 
+	 * @param rowModel
 	 */
 	private void updatePropertiesPanel(ContextualizedDescription descrpt, int rowModel) {
 		boolean update = false;
 
-//		DefaultMutableTreeNode node = (DefaultMutableTreeNode)  tree2.getLastSelectedPathComponent();
+		// DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+		// tree2.getLastSelectedPathComponent();
 
-		//		try {
-		//			translConfig=LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
-		//		} catch (IOException e1) {
-		//			e1.printStackTrace();
-		//		} catch (TerminologyException e1) {
-		//			e1.printStackTrace();
-		//		}
-//		if (node != null) {
-//			TreeEditorObjectWrapper nodeWrp = (TreeEditorObjectWrapper)node.getUserObject();
-//
-//			Object obj=nodeWrp.getUserObject();
-//			if (obj instanceof ContextualizedDescription){
-				if (translConfig.getSelectedEditorMode().equals(ConfigTranslationModule.EditorMode.PREFERRED_TERM_EDITOR)){
-					if (descrpt.getTypeId()!=preferred.getConceptNid()){
-						if (editingRow!=null){
-							setByCode=true;
-							int selrow=tabTar.convertRowIndexToView(editingRow);
-							tabTar.setRowSelectionInterval(selrow,selrow);
-							setByCode=false;
-						}
-						return;
-					}
+		// try {
+		// translConfig=LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
+		// } catch (IOException e1) {
+		// e1.printStackTrace();
+		// } catch (TerminologyException e1) {
+		// e1.printStackTrace();
+		// }
+		// if (node != null) {
+		// TreeEditorObjectWrapper nodeWrp =
+		// (TreeEditorObjectWrapper)node.getUserObject();
+		//
+		// Object obj=nodeWrp.getUserObject();
+		// if (obj instanceof ContextualizedDescription){
+		if (translConfig.getSelectedEditorMode().equals(ConfigTranslationModule.EditorMode.PREFERRED_TERM_EDITOR)) {
+			if (descrpt.getTypeId() != preferred.getConceptNid()) {
+				if (editingRow != null) {
+					setByCode = true;
+					int selrow = tabTar.convertRowIndexToView(editingRow);
+					tabTar.setRowSelectionInterval(selrow, selrow);
+					setByCode = false;
 				}
-				if (translConfig.getSelectedEditorMode().equals(ConfigTranslationModule.EditorMode.SYNONYMS_EDITOR)){
-					if (descrpt.getTypeId()!=synonym.getConceptNid()){
-						if (editingRow!=null){
-							setByCode=true;
-							int selrow=tabTar.convertRowIndexToView(editingRow);
-							tabTar.setRowSelectionInterval(selrow,selrow);
-							setByCode=false;
-						}
-						return;
-					}
+				return;
+			}
+		}
+		if (translConfig.getSelectedEditorMode().equals(ConfigTranslationModule.EditorMode.SYNONYMS_EDITOR)) {
+			if (descrpt.getTypeId() != synonym.getConceptNid()) {
+				if (editingRow != null) {
+					setByCode = true;
+					int selrow = tabTar.convertRowIndexToView(editingRow);
+					tabTar.setRowSelectionInterval(selrow, selrow);
+					setByCode = false;
 				}
-				if (descriptionInEditor == null) {
+				return;
+			}
+		}
+		if (descriptionInEditor == null) {
+			update = true;
+		} else {
+			if (descriptionInEditor.getText().trim().equals(targetTextField.getText().trim())
+					&& (descriptionInEditor.isInitialCaseSignificant() == rbYes.isSelected())
+					&& descriptionInEditor.getAcceptabilityId() == ((I_GetConceptData) cmbAccep.getSelectedItem()).getConceptNid()
+					&& ((descriptionInEditor.getExtensionStatusId() == active.getConceptNid() && rbAct.isSelected()) || (descriptionInEditor.getExtensionStatusId() != active.getConceptNid() && !rbAct
+							.isSelected()))
+					&& ((descriptionInEditor.getTypeId() == fsn.getConceptNid() && fsn.equals((I_GetConceptData) comboBox1.getSelectedItem())) || (descriptionInEditor.getTypeId() != fsn
+							.getConceptNid() && !fsn.equals((I_GetConceptData) comboBox1.getSelectedItem())))) {
+				update = true;
+			} else {
+				Object[] options = { "Discard unsaved data", "Cancel and continue editing" };
+				int n = JOptionPane.showOptionDialog(null, "Do you want to save the change you made to the term in the editor panel?", "Unsaved data", JOptionPane.YES_NO_OPTION,
+						JOptionPane.WARNING_MESSAGE, null, // do not use a
+															// custom Icon
+						options, // the titles of buttons
+						options[1]); // default button title
+				if (n == 0) {
 					update = true;
 				} else {
-					if (descriptionInEditor.getText().trim().equals(targetTextField.getText().trim()) && (
-							descriptionInEditor.isInitialCaseSignificant() == rbYes.isSelected())
-							&& descriptionInEditor.getAcceptabilityId()== ((I_GetConceptData)cmbAccep.getSelectedItem()).getConceptNid()
-							&& ((descriptionInEditor.getExtensionStatusId()==active.getConceptNid()
-									&& rbAct.isSelected()) 
-									||(descriptionInEditor.getExtensionStatusId()!=active.getConceptNid()
-											&& !rbAct.isSelected()) )
-											&& ((descriptionInEditor.getTypeId()==fsn.getConceptNid() && fsn.equals((I_GetConceptData)comboBox1.getSelectedItem()) )
-													|| (descriptionInEditor.getTypeId()!=fsn.getConceptNid() && !fsn.equals((I_GetConceptData)comboBox1.getSelectedItem())))) {
-						update = true;
-					} else {
-						Object[] options = {"Discard unsaved data", "Cancel and continue editing"};
-						int n = JOptionPane.showOptionDialog(null,
-								"Do you want to save the change you made to the term in the editor panel?",
-								"Unsaved data",
-								JOptionPane.YES_NO_OPTION,
-								JOptionPane.WARNING_MESSAGE,
-								null,     //do not use a custom Icon
-								options,  //the titles of buttons
-								options[1]); //default button title
-						if (n == 0) {
-							update = true;
-						} else {
-							update = false;
-							if (editingRow!=null){
-								setByCode=true;
-								int selrow=tabTar.convertRowIndexToView(editingRow);
-								tabTar.setRowSelectionInterval(selrow,selrow);
-								setByCode=false;
-							}
-						}
+					update = false;
+					if (editingRow != null) {
+						setByCode = true;
+						int selrow = tabTar.convertRowIndexToView(editingRow);
+						tabTar.setRowSelectionInterval(selrow, selrow);
+						setByCode = false;
 					}
 				}
+			}
+		}
 
-				if (update) {
+		if (update) {
 
-					if (descrpt == null) {
-						descriptionInEditor = null;
-						//			label4.setText("");
-						targetTextField.setText("");
-						rbYes.setSelected(false);
+			if (descrpt == null) {
+				descriptionInEditor = null;
+				// label4.setText("");
+				targetTextField.setText("");
+				rbYes.setSelected(false);
+				panel2.revalidate();
+				// saveDesc.setEnabled(false);
+				mSpellChk.setEnabled(false);
+				// button5.setEnabled(false);
+				// mAddPref.setEnabled(false);
+				// mAddDesc.setEnabled(true);
+				// label4.setVisible(true);
+				// comboBox1.setEnabled(true);
+				// rbYes.setEnabled(true);
+				// rbNo.setEnabled(true);
+				// rbAct.setEnabled(true);
+				// rbInact.setEnabled(true);
+				// cmbAccep.setEnabled(true);
+				targetTextField.setEnabled(false);
+			} else {
+				editingRow = rowModel;
+				if (descrpt.getLanguageRefsetId() == targetId) {
+					if (descrpt.getTypeId() == fsn.getConceptNid() || descrpt.getTypeId() == preferred.getConceptNid() || descrpt.getTypeId() == synonym.getConceptNid()) {
+
+						try {
+							if (fsn.getConceptNid() == descrpt.getTypeId()) {
+								comboBox1.setSelectedItem(fsn);
+							} else {
+								comboBox1.setSelectedItem(description);
+							}
+							cmbAccep.setSelectedItem(Terms.get().getConcept(descrpt.getAcceptabilityId()));
+						} catch (TerminologyException ex) {
+							ex.printStackTrace();
+						} catch (IOException ex) {
+							ex.printStackTrace();
+						}
+						targetTextField.setEnabled(true);
+						// bDescIssue.setEnabled(false);
+						descriptionInEditor = descrpt;
+						// label4.setText(Terms.get().getConcept(descriptionInEditor.getTypeId()).toString());
+						targetTextField.setText(descriptionInEditor.getText().trim());
+						if (descriptionInEditor.isInitialCaseSignificant())
+							rbYes.setSelected(true);
+						else
+							rbNo.setSelected(true);
+						rbAct.setSelected(descriptionInEditor.getExtensionStatusId() == active.getConceptNid());
 						panel2.revalidate();
-						//			saveDesc.setEnabled(false);
-						mSpellChk.setEnabled(false);
-						//			button5.setEnabled(false);
-//						mAddPref.setEnabled(false);
-//						mAddDesc.setEnabled(true);
-						//label4.setVisible(true);
-//						comboBox1.setEnabled(true);
-//						rbYes.setEnabled(true);
-//						rbNo.setEnabled(true);
-//						rbAct.setEnabled(true);
-//						rbInact.setEnabled(true);
-//						cmbAccep.setEnabled(true);
-						targetTextField.setEnabled(false);
-					} else {
-						editingRow=rowModel;
-						if (descrpt.getLanguageRefsetId()==targetId){
-							if (descrpt.getTypeId()==fsn.getConceptNid() ||
-									descrpt.getTypeId()==preferred.getConceptNid()  ||
-									descrpt.getTypeId()==synonym.getConceptNid() ) {
-
-								try {
-									if (fsn.getConceptNid()== descrpt.getTypeId()){
-										comboBox1.setSelectedItem(fsn);
-									}else{
-										comboBox1.setSelectedItem(description);
-									}
-									cmbAccep.setSelectedItem(Terms.get().getConcept(descrpt.getAcceptabilityId()));
-								} catch (TerminologyException ex) {
-									ex.printStackTrace();
-								} catch (IOException ex) {
-									ex.printStackTrace();
-								}
-								targetTextField.setEnabled(true);
-								//						bDescIssue.setEnabled(false);
-								descriptionInEditor = descrpt;
-								//	label4.setText(Terms.get().getConcept(descriptionInEditor.getTypeId()).toString());
-								targetTextField.setText(descriptionInEditor.getText().trim());
-								if (descriptionInEditor.isInitialCaseSignificant()) 
-									rbYes.setSelected(true);
-								else
-									rbNo.setSelected(true);
-								rbAct.setSelected(descriptionInEditor.getExtensionStatusId()==active.getConceptNid());
-								panel2.revalidate();
-								saveDesc=true;
-								mSpellChk.setEnabled(true);
-//								mAddPref.setEnabled(false);
-								//								mAddDesc.setEnabled(false);
-//								button5.setEnabled(true);
-								//	label4.setVisible(true);
-//								comboBox1.setEnabled(true);
-//								cmbAccep.setEnabled(true);
-//								rbAct.setEnabled(true);
-//								rbInact.setEnabled(true);
-//								rbYes.setEnabled(true);
-//								rbNo.setEnabled(true);
-							}
-						}
+						saveDesc = true;
+						mSpellChk.setEnabled(true);
+						// mAddPref.setEnabled(false);
+						// mAddDesc.setEnabled(false);
+						// button5.setEnabled(true);
+						// label4.setVisible(true);
+						// comboBox1.setEnabled(true);
+						// cmbAccep.setEnabled(true);
+						// rbAct.setEnabled(true);
+						// rbInact.setEnabled(true);
+						// rbYes.setEnabled(true);
+						// rbNo.setEnabled(true);
 					}
 				}
-//			}
-//		}
+			}
+		}
+		// }
+		// }
 	}
 
-	public void updateUI(TranslationProject translationProject,WorkListMember workListMember, I_GetConceptData role){
-	//	clearForm(true);
+	public void updateUI(TranslationProject translationProject, WorkListMember workListMember, I_GetConceptData role) {
+		// clearForm(true);
 		try {
-			this.translationProject=translationProject;
-			this.role=role;
-			translConfig=LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
-//			if (translConfig.isProjectDefaultConfiguration())
-			translConfig=getTranslationProjectConfig();
-		
+			this.translationProject = translationProject;
+			this.role = role;
+			translConfig = LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
+			// if (translConfig.isProjectDefaultConfiguration())
+			translConfig = getTranslationProjectConfig();
+
 			HashMap<UUID, EditorMode> currentRoleConfiguration = translConfig.getTranslatorRoles();
 			List<UUID> uidList = role.getUids();
 			for (UUID uuid : uidList) {
 				if (currentRoleConfiguration.containsKey(uuid)) {
 					EditorMode selectedEditorModeForCurrentRole = currentRoleConfiguration.get(uuid);
-					if(selectedEditorModeForCurrentRole.equals(EditorMode.READ_ONLY)){
+					if (selectedEditorModeForCurrentRole.equals(EditorMode.READ_ONLY)) {
 						targetTextField.setEnabled(false);
 						targetTextField.setEditable(false);
-					}else{
+					} else {
 						targetTextField.setEnabled(true);
 					}
 				}
 			}
 
-			this.concept=workListMember.getConcept();
-			this.worklistMember=workListMember;
-			sourceLangRefsets=new HashSet<LanguageMembershipRefset>();
-			sourceIds=new ArrayList<Integer>();
-			targetId=-1;
+			this.concept = workListMember.getConcept();
+			this.worklistMember = workListMember;
+			sourceLangRefsets = new HashSet<LanguageMembershipRefset>();
+			sourceIds = new ArrayList<Integer>();
+			targetId = -1;
 			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 			List<I_GetConceptData> sourceLangConcepts = translationProject.getSourceLanguageRefsets();
-			if (sourceLangConcepts!=null){
-				for (I_GetConceptData sourceLangConcept:sourceLangConcepts){
-					sourceLangRefsets.add(new LanguageMembershipRefset(sourceLangConcept,config));
+			if (sourceLangConcepts != null) {
+				for (I_GetConceptData sourceLangConcept : sourceLangConcepts) {
+					sourceLangRefsets.add(new LanguageMembershipRefset(sourceLangConcept, config));
 					sourceIds.add(sourceLangConcept.getConceptNid());
 				}
 			}
 			I_GetConceptData targetLangConcept = translationProject.getTargetLanguageRefset();
-			if (targetLangConcept!=null){
-				targetLangRefset=new LanguageMembershipRefset(targetLangConcept,config);
-				targetId=targetLangConcept.getConceptNid();
+			if (targetLangConcept != null) {
+				targetLangRefset = new LanguageMembershipRefset(targetLangConcept, config);
+				targetId = targetLangConcept.getConceptNid();
 			}
 			populateSourceTree();
 			populateTargetTree();
 			populateDetailsTree();
-			
+
 			hierarchyNavigator1.setContainerPanel(tabbedPane3);
 			hierarchyNavigator1.setFocusConcept(concept);
 
-			sourceICS=LanguageUtil.getDefaultICS(concept, sourceLangRefsets.iterator().next(), targetLangRefset, config);
-			if(sourceICS)
+			sourceICS = LanguageUtil.getDefaultICS(concept, sourceLangRefsets.iterator().next(), targetLangRefset, config);
+			if (sourceICS)
 				rbYes.setSelected(true);
 			else
 				rbNo.setSelected(true);
 
 			comboBox1.setEnabled(true);
 			cmbAccep.setEnabled(true);
-			if (translConfig.getSelectedEditorMode().equals(ConfigTranslationModule.EditorMode.PREFERRED_TERM_EDITOR)){
-				if (targetPreferred.equals("") ){
+			if (translConfig.getSelectedEditorMode().equals(ConfigTranslationModule.EditorMode.PREFERRED_TERM_EDITOR)) {
+				if (targetPreferred.equals("")) {
 					mAddPrefActionPerformed();
-					String pref=LanguageUtil.getDefaultPreferredTermText(concept, sourceLangRefsets.iterator().next(), targetLangRefset, config);
+					String pref = LanguageUtil.getDefaultPreferredTermText(concept, sourceLangRefsets.iterator().next(), targetLangRefset, config);
 					targetTextField.setText(pref);
-				}
-				else{
-					if (targetPreferredRow!=null){
+				} else {
+					if (targetPreferredRow != null) {
 						tabTar.setRowSelectionInterval(targetPreferredRow, targetPreferredRow);
 					}
 				}
@@ -3104,32 +3098,30 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 				mAddPref.setEnabled(true);
 				comboBox1.setEnabled(false);
 				cmbAccep.setEnabled(false);
-			}else if (translConfig.getSelectedEditorMode().equals(ConfigTranslationModule.EditorMode.SYNONYMS_EDITOR)){
+			} else if (translConfig.getSelectedEditorMode().equals(ConfigTranslationModule.EditorMode.SYNONYMS_EDITOR)) {
 				mAddDescActionPerformed();
 				bAddFSN.setEnabled(false);
 				mAddDesc.setEnabled(true);
 				mAddPref.setEnabled(false);
 				comboBox1.setEnabled(false);
 				cmbAccep.setEnabled(false);
-			}else if (translConfig.getSelectedEditorMode().equals(ConfigTranslationModule.EditorMode.FULL_EDITOR)){
-				if(translConfig.getEditingPanelOpenMode().equals(EditingPanelOpenMode.PREFFERD_TERM_MODE)){
-					if (targetPreferred.equals("") ){
+			} else if (translConfig.getSelectedEditorMode().equals(ConfigTranslationModule.EditorMode.FULL_EDITOR)) {
+				if (translConfig.getEditingPanelOpenMode().equals(EditingPanelOpenMode.PREFFERD_TERM_MODE)) {
+					if (targetPreferred.equals("")) {
 						mAddPrefActionPerformed();
-						String pref=LanguageUtil.getDefaultPreferredTermText(concept, sourceLangRefsets.iterator().next(), targetLangRefset, config);
+						String pref = LanguageUtil.getDefaultPreferredTermText(concept, sourceLangRefsets.iterator().next(), targetLangRefset, config);
 						targetTextField.setText(pref);
-					}
-					else{
-						if (targetPreferredRow!=null){
+					} else {
+						if (targetPreferredRow != null) {
 							tabTar.setRowSelectionInterval(targetPreferredRow, targetPreferredRow);
 						}
 					}
-				}else if(translConfig.getEditingPanelOpenMode().equals(EditingPanelOpenMode.FSN_TERM_MODE)){
-					if (targetFSN.equals("") ){
+				} else if (translConfig.getEditingPanelOpenMode().equals(EditingPanelOpenMode.FSN_TERM_MODE)) {
+					if (targetFSN.equals("")) {
 						mAddPrefActionPerformed();
 						comboBox1.setSelectedItem(fsn);
-					}
-					else{
-						if (targetFSNRow!=null){
+					} else {
+						if (targetFSNRow != null) {
 							tabTar.setRowSelectionInterval(targetFSNRow, targetFSNRow);
 						}
 					}
@@ -3141,77 +3133,73 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 				cmbAccep.setEnabled(true);
 			}
 			getPreviousComments();
-			
+
 			getWebReferences();
-			if (translationProject.getProjectIssueRepo()!=null){
+			if (translationProject.getProjectIssueRepo() != null) {
 				tabbedPane2.setTitleAt(1, "<html>Issues</html>");
-				Thread appthr=new Thread(){
-					synchronized
-					public void run(){
-						SwingUtilities.invokeLater(new Runnable(){
-							synchronized
-							@Override
+				Thread appthr = new Thread() {
+					synchronized public void run() {
+						SwingUtilities.invokeLater(new Runnable() {
+							synchronized @Override
 							public void run() {
 								loadIssues();
 
 							}
-
 
 						});
 					}
 
 				};
 				appthr.start();
-			}else{
+			} else {
 				tabbedPane2.setTitleAt(1, "<html>Issues <font><style size=1>(Inactive)</style></font></html>");
 
 			}
 			targetTextField.requestFocusInWindow();
 			targetTextField.setCaretPosition(targetTextField.getText().length());
-//			mClose.setEnabled(false);
+			// mClose.setEnabled(false);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
 
-
 	private void getWebReferences() {
 		I_ConfigAceFrame config;
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
-			HashMap<URL, String>urls=new HashMap<URL, String>();
+			HashMap<URL, String> urls = new HashMap<URL, String>();
 
-			StringBuffer sb=new StringBuffer("");
+			StringBuffer sb = new StringBuffer("");
 			sb.append("<html><body>");
-			int urlCount=0;
-			if (targetLangRefset!=null){
-				urls=targetLangRefset.getCommentsRefset(config).getUrls(this.concept.getConceptNid());	
-				urlCount=urls.size();
-				for (URL url:urls.keySet()) {
+			int urlCount = 0;
+			if (targetLangRefset != null) {
+				urls = targetLangRefset.getCommentsRefset(config).getUrls(this.concept.getConceptNid());
+				urlCount = urls.size();
+				for (URL url : urls.keySet()) {
 					sb.append("<a href=\"");
-					sb.append( url.toString() );
+					sb.append(url.toString());
 					sb.append("\">");
 					sb.append(url.toString());
 					sb.append("</a><br>");
 				}
 			}
-			urls=TerminologyProjectDAO.getWorkList(Terms.get().getConcept(worklistMember.getWorkListUUID()), config).getCommentsRefset(config).getUrls(this.concept.getConceptNid());
+			urls = TerminologyProjectDAO.getWorkList(Terms.get().getConcept(worklistMember.getWorkListUUID()), config).getCommentsRefset(config).getUrls(this.concept.getConceptNid());
 
-			urlCount+=urls.size();
-			for (URL url:urls.keySet()) {
+			urlCount += urls.size();
+			for (URL url : urls.keySet()) {
 				sb.append("<a href=\"");
-				sb.append( url.toString() );
+				sb.append(url.toString());
 				sb.append("\">");
 				sb.append(url.toString());
 				sb.append("</a><br>");
 			}
 			sb.append("</body></html>");
-			
+
 			refTable.setText(sb.toString());
-			if (urlCount>0){
+			if (urlCount > 0) {
 				tabbedPane1.setTitleAt(1, "<html>Web references <b><font color='red'>(" + urlCount + ")</font></b></html>");
-			}else {
+			} else {
 				tabbedPane1.setTitleAt(1, "<html>Web references (0)</font></b></html>");
 			}
 		} catch (TerminologyException e) {
@@ -3222,35 +3210,34 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 
 	}
 
-
 	protected void loadIssues() {
-		if (issueListPanel==null){
+		if (issueListPanel == null) {
 			createIssuePanel();
 		}
-		if (issueListPanel==null){
+		if (issueListPanel == null) {
 			return;
 		}
 
 		I_ConfigAceFrame config;
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
-			IssueRepository repo= IssueRepositoryDAO.getIssueRepository(translationProject.getProjectIssueRepo()); 
+			IssueRepository repo = IssueRepositoryDAO.getIssueRepository(translationProject.getProjectIssueRepo());
 			IssueRepoRegistration regis;
-			regis=IssueRepositoryDAO.getRepositoryRegistration(repo.getUuid(), config);
-			if (regis!=null && regis.getUserId()!= null && regis.getPassword()!=null){
-				Integer issuesTot = issueListPanel.loadIssues(concept,repo,regis);
-				if (issuesTot!=null && issuesTot>0){
+			regis = IssueRepositoryDAO.getRepositoryRegistration(repo.getUuid(), config);
+			if (regis != null && regis.getUserId() != null && regis.getPassword() != null) {
+				Integer issuesTot = issueListPanel.loadIssues(concept, repo, regis);
+				if (issuesTot != null && issuesTot > 0) {
 					tabbedPane2.setTitleAt(1, "<html>Issues <font><style color=red>*</style></font></html>");
 				}
 			}
 		} catch (TerminologyException e) {
-			
+
 			e.printStackTrace();
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		} catch (Exception e) {
-			
+
 			e.printStackTrace();
 		}
 	}
@@ -3259,14 +3246,12 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		I_ConfigAceFrame config;
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
-			if (config==null)
-				issueListPanel=new IssuesListPanel2();
+			if (config == null)
+				issueListPanel = new IssuesListPanel2();
 			else
-				issueListPanel=new IssuesListPanel2(config);
+				issueListPanel = new IssuesListPanel2(config);
 
-			panel11.add(issueListPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+			panel11.add(issueListPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -3275,11 +3260,10 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 			e.printStackTrace();
 		}
 
-
 	}
 
-	private void clearComments(){
-		String[] columnNames = {"Comment"};
+	private void clearComments() {
+		String[] columnNames = { "Comment" };
 		String[][] data = null;
 		DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
 			private static final long serialVersionUID = 1L;
@@ -3293,7 +3277,6 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		tblComm.revalidate();
 		tabbedPane1.setTitleAt(0, "<html>Comments</font></b></html>");
 	}
-
 
 	private void getPreviousComments() {
 		I_ConfigAceFrame config;
@@ -3309,28 +3292,30 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 					return false;
 				}
 			};
-			
 
 			if (targetLangRefset != null) {
 				commentsList = targetLangRefset.getCommentsRefset(config).getFullComments(concept.getConceptNid());
 				for (int i = commentsList.size() - 1; i > -1; i--) {
 					if (commentsList.get(i).getTypeCid() == commentsList.get(i).getSubTypeCid()) {
-						tableModel.addRow(new Object[] {"Language refset: " +  Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "", formatComment(commentsList.get(i).getComment()) });
+						tableModel
+								.addRow(new Object[] { "Language refset: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "", formatComment(commentsList.get(i).getComment()) });
 					} else {
-						tableModel.addRow(new Object[] {"Language refset: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "/" + Terms.get().getConcept(commentsList.get(i).getSubTypeCid()),
+						tableModel.addRow(new Object[] {
+								"Language refset: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "/" + Terms.get().getConcept(commentsList.get(i).getSubTypeCid()),
 								formatComment(commentsList.get(i).getComment()) });
 					}
 				}
 			}
 
-			commentsList = TerminologyProjectDAO.getWorkList(Terms.get().getConcept(worklistMember.getWorkListUUID()), config).getCommentsRefset(config).getFullComments(
-					this.concept.getConceptNid());
+			commentsList = TerminologyProjectDAO.getWorkList(Terms.get().getConcept(worklistMember.getWorkListUUID()), config).getCommentsRefset(config)
+					.getFullComments(this.concept.getConceptNid());
 
 			for (int i = commentsList.size() - 1; i > -1; i--) {
 				if (commentsList.get(i).getTypeCid() == commentsList.get(i).getSubTypeCid()) {
-					tableModel.addRow(new Object[] {"Worklist: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "", formatComment(commentsList.get(i).getComment()) });
+					tableModel.addRow(new Object[] { "Worklist: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "", formatComment(commentsList.get(i).getComment()) });
 				} else {
-					tableModel.addRow(new Object[] {"Worklist: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "/" + Terms.get().getConcept(commentsList.get(i).getSubTypeCid()),
+					tableModel.addRow(new Object[] {
+							"Worklist: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "/" + Terms.get().getConcept(commentsList.get(i).getSubTypeCid()),
 							formatComment(commentsList.get(i).getComment()) });
 				}
 			}
@@ -3369,22 +3354,22 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 
 	}
 
-	public void setWorkflowButtons(List<Component> buttons){
+	public void setWorkflowButtons(List<Component> buttons) {
 		removeWorkflowButtons();
 		addWorkflowButtons(buttons);
 	}
 
 	private void addWorkflowButtons(List<Component> buttons) {
-		
-		int columnsCount=(buttons.size() * 2) + 3;
-		if (scrollp!=null)
+
+		int columnsCount = (buttons.size() * 2) + 3;
+		if (scrollp != null)
 			panel6.remove(scrollp);
-		else if (buttonPanel!=null)
+		else if (buttonPanel != null)
 			panel6.remove(buttonPanel);
-		buttonPanel=new JPanel();
+		buttonPanel = new JPanel();
 		buttonPanel.setBackground(new Color(238, 238, 238));
 		buttonPanel.setLayout(new GridBagLayout());
-		
+
 		int col = 0;
 		int row = 0;
 		GridBagConstraints c = new GridBagConstraints();
@@ -3395,7 +3380,7 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		iconLabel.setIcon(IconUtilities.media_step_forwardIcon);
 		buttonPanel.add(iconLabel, c);
 		col++;
-		
+
 		for (Component loopComponent : buttons) {
 			setButtonMnemo(loopComponent);
 			if (col == 4) {
@@ -3409,8 +3394,8 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 			col++;
 		}
 
-		//---- button5 ----
-		button5=new JButton();
+		// ---- button5 ----
+		button5 = new JButton();
 		button5.setText("Cancel");
 		button5.addActionListener(new ActionListener() {
 			@Override
@@ -3428,36 +3413,40 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 		c.gridx = col;
 		c.gridy = row;
 		buttonPanel.add(button5, c);
-		
-		
-//		((GridBagLayout)buttonPanel.getLayout()).columnWidths = new int[columnsCount] ;
-//		((GridBagLayout)buttonPanel.getLayout()).rowHeights = new int[] {0, 0};
-//		((GridBagLayout)buttonPanel.getLayout()).columnWeights = new double[columnsCount] ;
-//
-//		((GridBagLayout)buttonPanel.getLayout()).columnWeights[0]=1.0;
-//		for (int i=1;i<columnsCount-1;i++){
-//			((GridBagLayout)buttonPanel.getLayout()).columnWeights[i]=0.0;
-//		}
-//		((GridBagLayout)buttonPanel.getLayout()).columnWeights[columnsCount-1]=1.0E-4;
-//
-//		((GridBagLayout)buttonPanel.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
-//
-//		//---- label8 ----
-//		label8=new JLabel();
-//		label8.setText("Workflow actions:      ");
-//		buttonPanel.add(label8, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-//				GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-//				new Insets(0, 0, 0, 5), 0, 0));
-//		for (int i=0;i<buttons.size();i++){
-//			Component btton=buttons.get(i);
-//			setButtonMnemo(btton);
-//			buttonPanel.add(btton, new GridBagConstraints((i+1) * 2 , 0, 1, 1, 0.0, 0.0,
-//					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-//					new Insets(0, 0, 0, 5), 0, 0));
-//		}
-		scrollp=new JScrollPane();
+
+		// ((GridBagLayout)buttonPanel.getLayout()).columnWidths = new
+		// int[columnsCount] ;
+		// ((GridBagLayout)buttonPanel.getLayout()).rowHeights = new int[] {0,
+		// 0};
+		// ((GridBagLayout)buttonPanel.getLayout()).columnWeights = new
+		// double[columnsCount] ;
+		//
+		// ((GridBagLayout)buttonPanel.getLayout()).columnWeights[0]=1.0;
+		// for (int i=1;i<columnsCount-1;i++){
+		// ((GridBagLayout)buttonPanel.getLayout()).columnWeights[i]=0.0;
+		// }
+		// ((GridBagLayout)buttonPanel.getLayout()).columnWeights[columnsCount-1]=1.0E-4;
+		//
+		// ((GridBagLayout)buttonPanel.getLayout()).rowWeights = new double[]
+		// {0.0, 1.0E-4};
+		//
+		// //---- label8 ----
+		// label8=new JLabel();
+		// label8.setText("Workflow actions:      ");
+		// buttonPanel.add(label8, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+		// GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+		// new Insets(0, 0, 0, 5), 0, 0));
+		// for (int i=0;i<buttons.size();i++){
+		// Component btton=buttons.get(i);
+		// setButtonMnemo(btton);
+		// buttonPanel.add(btton, new GridBagConstraints((i+1) * 2 , 0, 1, 1,
+		// 0.0, 0.0,
+		// GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+		// new Insets(0, 0, 0, 5), 0, 0));
+		// }
+		scrollp = new JScrollPane();
 		scrollp.setViewportView(buttonPanel);
-		Dimension minimumSize = new Dimension(panel6.getWidth(),(row + 1) * (button5.getPreferredSize().height+14));
+		Dimension minimumSize = new Dimension(panel6.getWidth(), (row + 1) * (button5.getPreferredSize().height + 14));
 		panel6.setMinimumSize(minimumSize);
 		panel6.add(scrollp);
 		panel6.revalidate();
@@ -3465,13 +3454,13 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 	}
 
 	private void setButtonMnemo(Component btton) {
-		if (btton instanceof JButton){
-			String buttName=((JButton)btton).getText();
-			for (int i=0;i<buttName.length();i++){
-				String MnemChar=buttName.substring(i,i + 1).toUpperCase();
-				if (!MnemChar.equals(" ") && assignedMnemo.indexOf(MnemChar)<0){
-					assignedMnemo=assignedMnemo + MnemChar;
-					((JButton)btton).setMnemonic(MnemChar.charAt(0));
+		if (btton instanceof JButton) {
+			String buttName = ((JButton) btton).getText();
+			for (int i = 0; i < buttName.length(); i++) {
+				String MnemChar = buttName.substring(i, i + 1).toUpperCase();
+				if (!MnemChar.equals(" ") && assignedMnemo.indexOf(MnemChar) < 0) {
+					assignedMnemo = assignedMnemo + MnemChar;
+					((JButton) btton).setMnemonic(MnemChar.charAt(0));
 					break;
 				}
 			}
@@ -3479,17 +3468,17 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 	}
 
 	public void removeWorkflowButtons() {
-		if (buttonPanel!=null){
-			for (int i=buttonPanel.getComponentCount()-1;i>-1;i--){
+		if (buttonPanel != null) {
+			for (int i = buttonPanel.getComponentCount() - 1; i > -1; i--) {
 
-				Component comp=buttonPanel.getComponent(i);
-				if (comp instanceof JButton){
-					for (ActionListener aListener :((JButton)comp).getActionListeners()){
-						((JButton)comp).removeActionListener(aListener);
+				Component comp = buttonPanel.getComponent(i);
+				if (comp instanceof JButton) {
+					for (ActionListener aListener : ((JButton) comp).getActionListeners()) {
+						((JButton) comp).removeActionListener(aListener);
 					}
 				}
 				buttonPanel.remove(comp);
-				comp=null;
+				comp = null;
 			}
 		}
 
@@ -3501,8 +3490,8 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 
 	public void setSourceLangRefsets(Set<LanguageMembershipRefset> sourceLangRefsets) {
 		this.sourceLangRefsets = sourceLangRefsets;
-		sourceIds=new ArrayList<Integer>();
-		for (LanguageMembershipRefset sourceRef:sourceLangRefsets){
+		sourceIds = new ArrayList<Integer>();
+		for (LanguageMembershipRefset sourceRef : sourceLangRefsets) {
 			sourceIds.add(sourceRef.getRefsetId());
 		}
 	}
@@ -3513,21 +3502,23 @@ import org.ihtsdo.translation.ui.config.SwingUtils;
 
 	public void setTargetLangRefset(LanguageMembershipRefset targetLangRefset) {
 		this.targetLangRefset = targetLangRefset;
-		targetId=targetLangRefset.getRefsetId();
+		targetId = targetLangRefset.getRefsetId();
 	}
-	public void AutokeepInInbox(){
-		if (this.keepIIClass!=null){
-			this.unloaded=false;
+
+	public void AutokeepInInbox() {
+		if (this.keepIIClass != null) {
+			this.unloaded = false;
 			this.keepIIClass.KeepInInbox();
 		}
 	}
+
 	public void setAutoKeepFunction(I_KeepTaskInInbox thisAutoKeep) {
-		this.keepIIClass=thisAutoKeep;
+		this.keepIIClass = thisAutoKeep;
 
 	}
 
 	public void setUnloaded(boolean b) {
-		this.unloaded=b;
+		this.unloaded = b;
 
 	}
 
