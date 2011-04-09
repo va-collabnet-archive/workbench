@@ -41,32 +41,32 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
 
         jPanelDndParentNew.setBorder(javax.swing.BorderFactory.createTitledBorder("New Parent"));
 
-        org.jdesktop.layout.GroupLayout jPanelDndParentNewLayout = new org.jdesktop.layout.GroupLayout(jPanelDndParentNew);
+        javax.swing.GroupLayout jPanelDndParentNewLayout = new javax.swing.GroupLayout(jPanelDndParentNew);
         jPanelDndParentNew.setLayout(jPanelDndParentNewLayout);
         jPanelDndParentNewLayout.setHorizontalGroup(
-            jPanelDndParentNewLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 210, Short.MAX_VALUE)
+            jPanelDndParentNewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 210, Short.MAX_VALUE)
         );
         jPanelDndParentNewLayout.setVerticalGroup(
-            jPanelDndParentNewLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 25, Short.MAX_VALUE)
+            jPanelDndParentNewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 25, Short.MAX_VALUE)
         );
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Is a", "is a" }));
 
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanelDndParentNew, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .add(jComboBox1, 0, 222, Short.MAX_VALUE)
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanelDndParentNew, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jComboBox1, 0, 222, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanelDndParentNew, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanelDndParentNew, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
