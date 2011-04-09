@@ -17,6 +17,7 @@
 
 package org.ihtsdo.project.issue.manager;
 
+import java.awt.*;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -536,11 +537,13 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 	private void initComponents() throws Exception {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		splitPane1 = new JSplitPane();
+		panel3 = new JPanel();
 		panel1 = new JPanel();
 		panel2 = new JPanel();
 		bCreateIssue = new JButton();
 		scrollPane1 = new JScrollPane();
 		table1 = new JTable();
+		panel4 = new JPanel();
 		issueCommentsPanel1 = new IssueCommentsPanel();
 
 		//======== this ========
@@ -555,51 +558,63 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 			splitPane1.setDividerLocation(250);
 			splitPane1.setResizeWeight(1.0);
 
-			//======== panel1 ========
+			//======== panel3 ========
 			{
-				panel1.setLayout(new GridBagLayout());
-				((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0};
-				((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0};
-				((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-				((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
+				panel3.setLayout(new BorderLayout());
 
-				//======== panel2 ========
+				//======== panel1 ========
 				{
-					panel2.setLayout(new GridBagLayout());
-					((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0, 0};
-					((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0};
-					((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0E-4};
-					((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+					panel1.setLayout(new GridBagLayout());
+					((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {159, 0};
+					((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0};
+					((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+					((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
 
-					//---- bCreateIssue ----
-					bCreateIssue.setText("Create Issue");
-					bCreateIssue.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							bCreateIssueActionPerformed();
-						}
-					});
-					panel2.add(bCreateIssue, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					//======== panel2 ========
+					{
+						panel2.setLayout(new GridBagLayout());
+						((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0, 0};
+						((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0};
+						((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0E-4};
+						((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+
+						//---- bCreateIssue ----
+						bCreateIssue.setText("Create Issue");
+						bCreateIssue.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								bCreateIssueActionPerformed();
+							}
+						});
+						panel2.add(bCreateIssue, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 0, 5), 0, 0));
+					}
+					panel1.add(panel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 5), 0, 0));
-				}
-				panel1.add(panel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 0), 0, 0));
+						new Insets(0, 0, 5, 0), 0, 0));
 
-				//======== scrollPane1 ========
-				{
+					//======== scrollPane1 ========
+					{
 
-					//---- table1 ----
-					table1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-					scrollPane1.setViewportView(table1);
+						//---- table1 ----
+						table1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+						scrollPane1.setViewportView(table1);
+					}
+					panel1.add(scrollPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 0), 0, 0));
 				}
-				panel1.add(scrollPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 0), 0, 0));
+				panel3.add(panel1, BorderLayout.CENTER);
 			}
-			splitPane1.setLeftComponent(panel1);
-			splitPane1.setRightComponent(issueCommentsPanel1);
+			splitPane1.setLeftComponent(panel3);
+
+			//======== panel4 ========
+			{
+				panel4.setLayout(new BorderLayout());
+				panel4.add(issueCommentsPanel1, BorderLayout.CENTER);
+			}
+			splitPane1.setRightComponent(panel4);
 		}
 		add(splitPane1, new GridBagConstraints(0, 0, 3, 1, 1.0, 1.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -609,11 +624,13 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
 	private JSplitPane splitPane1;
+	private JPanel panel3;
 	private JPanel panel1;
 	private JPanel panel2;
 	private JButton bCreateIssue;
 	private JScrollPane scrollPane1;
 	private JTable table1;
+	private JPanel panel4;
 	private IssueCommentsPanel issueCommentsPanel1;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 
