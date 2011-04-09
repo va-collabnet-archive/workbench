@@ -10,31 +10,7 @@
      <object class="com.jformdesigner.model.FormContainer"> 
       <string>javax.swing.JPanel</string> 
       <object class="com.jformdesigner.model.FormLayoutManager"> 
-       <class>java.awt.GridBagLayout</class> 
-       <void method="setProperty"> 
-        <string>$columnSpecs</string> 
-        <string>0, 191:1.0, 75</string> 
-       </void> 
-       <void method="setProperty"> 
-        <string>$rowSpecs</string> 
-        <string>0:1.0</string> 
-       </void> 
-       <void method="setProperty"> 
-        <string>$hGap</string> 
-        <int>5</int> 
-       </void> 
-       <void method="setProperty"> 
-        <string>$vGap</string> 
-        <int>5</int> 
-       </void> 
-       <void method="setProperty"> 
-        <string>$alignLeft</string> 
-        <boolean>true</boolean> 
-       </void> 
-       <void method="setProperty"> 
-        <string>$alignTop</string> 
-        <boolean>true</boolean> 
-       </void> 
+       <class>java.awt.BorderLayout</class> 
       </object> 
       <void property="name"> 
        <string>this</string> 
@@ -46,12 +22,8 @@
          <class>javax.swing.JSplitPane</class> 
         </object> 
         <void method="setProperty"> 
-         <string>dividerLocation</string> 
-         <int>250</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>resizeWeight</string> 
-         <double>1.0</double> 
+         <string>oneTouchExpandable</string> 
+         <boolean>true</boolean> 
         </void> 
         <void property="name"> 
          <string>splitPane1</string> 
@@ -242,18 +214,10 @@
         </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-        <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+        <class>java.lang.String</class> 
         <void method="setProperty"> 
-         <string>gridwidth</string> 
-         <int>3</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>weightx</string> 
-         <double>1.0</double> 
-        </void> 
-        <void method="setProperty"> 
-         <string>weighty</string> 
-         <double>1.0</double> 
+         <string>value</string> 
+         <string>Center</string> 
         </void> 
        </object> 
       </void> 
