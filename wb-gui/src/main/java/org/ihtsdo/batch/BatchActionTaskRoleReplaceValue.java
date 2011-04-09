@@ -9,7 +9,11 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 public class BatchActionTaskRoleReplaceValue extends BatchActionTask {
 
+    public BatchActionTaskRoleReplaceValue() {
+    }
+
     //
+    
         
     @Override
     public boolean execute(ConceptVersionBI c) {

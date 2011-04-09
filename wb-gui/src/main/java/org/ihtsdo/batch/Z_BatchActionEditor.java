@@ -13,7 +13,7 @@ import org.dwfa.ace.CollectionEditorContainer;
  *
  * @author kec
  */
-public class BatchActionEditor {
+public class Z_BatchActionEditor {
 
     JPanel batchEditorPanel = new JPanel();
     private final CollectionEditorContainer cec;
@@ -21,11 +21,12 @@ public class BatchActionEditor {
     public JPanel getBatchEditorPanel() {
         return batchEditorPanel;
     }
-    public BatchActionEditor(CollectionEditorContainer cec) {
+    public Z_BatchActionEditor(CollectionEditorContainer cec) {
         this.cec = cec;
         
-        // :!!!: BATCH ACTION EDITOR
-        batchEditorPanel.add(new JLabel("Batch editor actions here"));
+        // :!!!: BATCH ACTION PANEL MAIN EDITOR
+        // batchEditorPanel.add(new JLabel("Batch editor actions here"));
+        batchEditorPanel.add(new BatchActionEditPanel());
     }
 
 }

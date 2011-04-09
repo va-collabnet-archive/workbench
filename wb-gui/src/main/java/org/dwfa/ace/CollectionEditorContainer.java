@@ -229,7 +229,8 @@ public class CollectionEditorContainer extends JPanel {
     private JScrollPane batchResultsScroller;
     private JTextArea batchResults;
     
-    private BatchActionEditor batchActionEditor;
+    // private Z_BatchActionEditor batchActionEditor; // :!!!:WAS:E:
+    private BatchActionEditPanel batchActionPanelMain; // :!!!:WAS:E:
 
     public I_ConfigAceFrame getConfig() {
         return ace.getAceFrameConfig();
@@ -241,7 +242,12 @@ public class CollectionEditorContainer extends JPanel {
         this.ace = ace;
         this.list = list;
         this.processBuilder = descListProcessBuilderPanel;
-        batchActionEditor = new BatchActionEditor(this);
+
+        //
+        // :!!!:E:WAS: batchActionEditor = new Z_BatchActionEditor(this);
+        batchActionPanelMain = new BatchActionEditPanel();
+
+        // 
         batchResults = new JTextArea("<html>Batch results here"); // :!!!: BATCH ACTION RESULTS GO HERE
         batchResultsScroller = new JScrollPane(batchResults);
         conceptPanel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_LIST_VIEW, ace.aceFrameConfig, 
@@ -275,7 +281,8 @@ public class CollectionEditorContainer extends JPanel {
         listActionSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         listActionSplit.setLeftComponent(new JScrollPane(list));
         listActionSplit.setDividerLocation(400);
-        listActionSplit.setRightComponent(batchActionEditor.getBatchEditorPanel());
+        // :!!!:E:WAS: listActionSplit.setRightComponent(batchActionEditor.getBatchEditorPanel());
+        listActionSplit.setRightComponent(batchActionPanelMain); // :!!!:E:
         
         
         listDetailSplit.setTopComponent(listActionSplit);

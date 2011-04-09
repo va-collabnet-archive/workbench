@@ -10,6 +10,9 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 public class BatchActionTaskRefsetAddMember extends BatchActionTask {
 
+    public BatchActionTaskRefsetAddMember() {
+    }
+
     //
     
     

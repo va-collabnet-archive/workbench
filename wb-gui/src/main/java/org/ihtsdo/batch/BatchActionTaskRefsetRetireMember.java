@@ -10,6 +10,9 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 public class BatchActionTaskRefsetRetireMember extends BatchActionTask {
 
+    public BatchActionTaskRefsetRetireMember() {
+    }
+
     //
     
     

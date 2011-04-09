@@ -33,7 +33,6 @@ public abstract class BatchActionTask {
     public static void setup(TerminologyConstructorBI tc) throws IOException {
         RETIRED_NID = TermAux.RETIRED.getLenient().getNid();
         CURRENT_NID = TermAux.CURRENT.getLenient().getNid();
-
         termConstructor = tc;
     }
     // 

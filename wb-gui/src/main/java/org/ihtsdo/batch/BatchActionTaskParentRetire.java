@@ -14,6 +14,11 @@ public class BatchActionTaskParentRetire extends BatchActionTask {
     int selectedRoleTypeNid; // Annncestory linkage type
     int selectedDestNid; // Parent concept
 
+    public BatchActionTaskParentRetire() {
+        this.selectedRoleTypeNid = Integer.MAX_VALUE;
+        this.selectedDestNid = Integer.MAX_VALUE;
+    }
+
     public BatchActionTaskParentRetire(int selectedRoleTypeNid, int selectedDestNid) throws Exception {
         this.selectedRoleTypeNid = selectedRoleTypeNid;
         this.selectedDestNid = selectedDestNid;
