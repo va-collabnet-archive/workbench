@@ -18,9 +18,6 @@
 package org.ihtsdo.project.issue.manager;
 
 import java.awt.*;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -83,7 +80,9 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 	public IssuesListPanel2() throws Exception {
 		initComponents();
 		config=Terms.get().getActiveAceFrameConfig();
-//		loadRepos(null);
+		Dimension minimumSize = new Dimension(0, 0);
+		splitPane1.getLeftComponent().setMinimumSize(minimumSize);
+		splitPane1.getRightComponent().setMinimumSize(minimumSize);
 		addListeners();
 	}
 	
@@ -547,16 +546,11 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 		issueCommentsPanel1 = new IssueCommentsPanel();
 
 		//======== this ========
-		setLayout(new GridBagLayout());
-		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 196, 75, 0};
-		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0};
-		((GridBagLayout)getLayout()).columnWeights = new double[] {0.0, 1.0, 0.0, 1.0E-4};
-		((GridBagLayout)getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+		setLayout(new BorderLayout());
 
 		//======== splitPane1 ========
 		{
-			splitPane1.setDividerLocation(250);
-			splitPane1.setResizeWeight(1.0);
+			splitPane1.setOneTouchExpandable(true);
 
 			//======== panel3 ========
 			{
@@ -616,9 +610,7 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 			}
 			splitPane1.setRightComponent(panel4);
 		}
-		add(splitPane1, new GridBagConstraints(0, 0, 3, 1, 1.0, 1.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 0, 0), 0, 0));
+		add(splitPane1, BorderLayout.CENTER);
 		// JFormDesigner - End of component initialization  //GEN-END:initComponents
 	}
 

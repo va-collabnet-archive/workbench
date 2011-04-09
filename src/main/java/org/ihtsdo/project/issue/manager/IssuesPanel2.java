@@ -18,41 +18,24 @@
 package org.ihtsdo.project.issue.manager;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.List;
-import java.util.UUID;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.MutableComboBoxModel;
+import javax.swing.plaf.basic.BasicBorders.SplitPaneBorder;
 
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.Terms;
 import org.ihtsdo.issue.Issue;
 import org.ihtsdo.issue.issuerepository.IssueRepository;
-import org.ihtsdo.issue.manager.IssueRepositoryDAO;
-import org.ihtsdo.issue.manager.implementation.CollabnetIssueManager;
 import org.ihtsdo.issue.manager.implementation.I_IssueManager;
-import org.ihtsdo.project.issuerepository.manager.ListObj;
-import org.ihtsdo.project.panel.TranslationHelperPanel;
 
 /**
  * The Class IssuesPanel.
