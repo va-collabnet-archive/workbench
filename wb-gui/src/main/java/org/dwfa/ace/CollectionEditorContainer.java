@@ -72,7 +72,7 @@ import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.gui.button.Button32x32;
 import org.dwfa.gui.toggle.Toggle32x32;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.batch.BatchActionEditor;
+import org.ihtsdo.batch.BatchActionEditPanel;
 
 public class CollectionEditorContainer extends JPanel {
 
@@ -229,7 +229,6 @@ public class CollectionEditorContainer extends JPanel {
     private JScrollPane batchResultsScroller;
     private JTextArea batchResults;
     
-    // private Z_BatchActionEditor batchActionEditor; // :!!!:WAS:E:
     private BatchActionEditPanel batchActionPanelMain; // :!!!:WAS:E:
 
     public I_ConfigAceFrame getConfig() {
