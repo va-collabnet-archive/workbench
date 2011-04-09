@@ -160,23 +160,36 @@ public class ConceptView extends JPanel {
             positionPanelMap.clear();
             positionOrderedSet.clear();
             seperatorComponents.clear();
-            RelAssertionType relAssertionType = RelAssertionType.INFERRED;
-            if (settings.showStated()) {
-                relAssertionType = RelAssertionType.STATED;
-            }
             pathRowMap.clear();
             layoutConcept = concept;
             if (layoutConcept != null) {
                 coordinate = new ViewCoordinate(config.getViewCoordinate());
-                coordinate.setRelAssertionType(relAssertionType);
+                coordinate.setRelAssertionType(RelAssertionType.STATED);
                 saps = layoutConcept.getAllSapNids();
                 positions = Ts.get().getPositionSet(saps);
                 paths = Ts.get().getPathSetFromPositionSet(positions);
                 positionOrderedSet.addAll(positions);
-                rels = layoutConcept.getSourceRelTuples(config.getAllowedStatus(),
-                        null, config.getViewPositionSetReadOnly(),
-                        config.getPrecedence(), config.getConflictResolutionStrategy(),
-                        coordinate.getClassifierNid(), coordinate.getRelAssertionType());
+                if (settings.getRelAssertionType() != RelAssertionType.INFERRED) {
+                    rels = layoutConcept.getSourceRelTuples(config.getAllowedStatus(),
+                            null, config.getViewPositionSetReadOnly(),
+                            config.getPrecedence(), config.getConflictResolutionStrategy(),
+                            coordinate.getClassifierNid(), coordinate.getRelAssertionType());
+                    if (settings.getRelAssertionType() == RelAssertionType.INFERRED_THEN_STATED) {
+                        coordinate.setRelAssertionType(RelAssertionType.INFERRED);
+                        List infRels = layoutConcept.getSourceRelTuples(config.getAllowedStatus(),
+                                null, config.getViewPositionSetReadOnly(),
+                                config.getPrecedence(), config.getConflictResolutionStrategy(),
+                                coordinate.getClassifierNid(), coordinate.getRelAssertionType());
+                        rels.addAll(infRels);
+                    }
+
+                } else {
+                    coordinate.setRelAssertionType(RelAssertionType.INFERRED);
+                    rels = layoutConcept.getSourceRelTuples(config.getAllowedStatus(),
+                            null, config.getViewPositionSetReadOnly(),
+                            config.getPrecedence(), config.getConflictResolutionStrategy(),
+                            coordinate.getClassifierNid(), coordinate.getRelAssertionType());
+                }
                 cv = Ts.get().getConceptVersion(
                         config.getViewCoordinate(), layoutConcept.getNid());
                 //get refsets
@@ -472,7 +485,7 @@ public class ConceptView extends JPanel {
                     || thingBeingDropped.equals(lastThingBeingDropped) == false) {
                 lastThingBeingDropped = thingBeingDropped;
                 actionList.clear();
-                getKbActions(thingBeingDropped);
+                actionList.addAll(getKbActions(thingBeingDropped));
                 dropComponents.clear();
                 if (actionList.size() > -1) {
                     for (Action a : actionList) {
@@ -834,7 +847,7 @@ public class ConceptView extends JPanel {
         gbc.gridheight = 1;
         CollapsePanel cprg = new CollapsePanel("group:", settings,
                 new CollapsePanelPrefs(prefMap.get(PanelSection.REL_GRP)),
-                PanelSection.REL_GRP);
+                PanelSection.REL_GRP, relGroupPanel.getActionMenuButton(getKbActions(group)));
         cprg.setAlertCount(0);
         cprg.setRefexCount(0);
         cprg.setHistoryCount(0);
@@ -1032,10 +1045,10 @@ public class ConceptView extends JPanel {
         return termLabel;
     }
 
-    private void getKbActions(Object thingToDrop) {
+    private Collection<Action> getKbActions(Object thingToDrop) {
+        ArrayList<Action> actions = new ArrayList<Action>();
         try {
 
-            actionList.clear();
             if (I_GetConceptData.class.isAssignableFrom(thingToDrop.getClass())) {
                 I_GetConceptData conceptToDrop = (I_GetConceptData) thingToDrop;
                 thingToDrop = Ts.get().getConceptVersion(config.getViewCoordinate(),
@@ -1046,7 +1059,7 @@ public class ConceptView extends JPanel {
                     || SpecBI.class.isAssignableFrom(thingToDrop.getClass())) {
 
                 Map<String, Object> globals = new HashMap<String, Object>();
-                globals.put("actions", actionList);
+                globals.put("actions", actions);
                 globals.put("vc", config.getViewCoordinate());
 
                 Collection<Object> facts = new ArrayList<Object>();
@@ -1056,7 +1069,7 @@ public class ConceptView extends JPanel {
                         Ts.get().getConceptVersion(
                         config.getViewCoordinate(), concept.getNid()),
                         config.getViewCoordinate()));
-                
+
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                     AceLog.getAppLog().fine("dropTarget: " + concept);
                     AceLog.getAppLog().fine("thingToDrop: " + thingToDrop);
@@ -1074,6 +1087,7 @@ public class ConceptView extends JPanel {
         } catch (Throwable e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
+        return actions;
     }
 
     public Map<PathBI, Integer> getPathRowMap() {

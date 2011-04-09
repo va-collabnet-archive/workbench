@@ -137,9 +137,14 @@ public class CollapsePanel extends JPanel {
     }
     Set<PanelSection> noMenuSections =
             EnumSet.of(PanelSection.EXTRAS, PanelSection.REL_GRP);
-
     public CollapsePanel(String labelStr, ConceptViewSettings settings,
             CollapsePanelPrefs prefs, PanelSection sectionType) {
+        this(labelStr, settings,
+            prefs, sectionType, null);
+    }
+
+    public CollapsePanel(String labelStr, ConceptViewSettings settings,
+            CollapsePanelPrefs prefs, PanelSection sectionType, JButton menuButton) {
         super();
         this.prefs = prefs;
         this.sectionType = sectionType;
@@ -183,7 +188,9 @@ public class CollapsePanel extends JPanel {
         JPanel toolBar2 = new JPanel();
         toolBar2.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 2));
         toolBar2.setOpaque(false);
-        if (!noMenuSections.contains(sectionType)) {
+        if (menuButton != null) {
+            toolBar2.add(menuButton);
+        } else if (!noMenuSections.contains(sectionType)) {
             toolBar2.add(getDynamicPopupMenuButton());
         } else {
             getDynamicPopupMenuButton();
@@ -279,11 +286,11 @@ public class CollapsePanel extends JPanel {
             AceLog.getAppLog().alertAndLogException(e);
         }
     }
-
-    private JButton getDynamicPopupMenuButton() {
-        dynamicPopupMenuButton = new JButton(new ImageIcon(
+    private static ImageIcon dynamicPopupImage = new ImageIcon(
                 ConceptViewRenderer.class.getResource(
-                "/16x16/plain/dynamic_popup.png")));
+                "/16x16/plain/dynamic_popup.png"));
+    private JButton getDynamicPopupMenuButton() {
+        dynamicPopupMenuButton = new JButton(dynamicPopupImage);
         dynamicPopupMenuButton.setPreferredSize(new Dimension(21, 16));
         dynamicPopupMenuButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         dynamicPopupMenuButton.setToolTipText("contextual editing actions");

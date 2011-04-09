@@ -36,6 +36,7 @@ import org.dwfa.ace.tree.TermTreeHelper;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.ArenaComponentSettings;
 import org.ihtsdo.arena.PreferencesNode;
+import org.ihtsdo.tk.api.RelAssertionType;
 
 public class ConceptViewSettings extends ArenaComponentSettings {
 
@@ -57,7 +58,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
     private ConceptNavigator navigator;
     private JTreeWithDragImage navigatorTree;
     private JToggleButton navButton;
-    private JToggleButton statedToggleButton;
+    private JButton statedInferredButton;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -157,8 +158,8 @@ public class ConceptViewSettings extends ArenaComponentSettings {
         List<AbstractButton> buttons = new ArrayList<AbstractButton>();
         navButton = getNavigatorButton();
         buttons.add(navButton);
-        statedToggleButton = getStatedInferredButton();
-        buttons.add(statedToggleButton);
+        statedInferredButton = getStatedInferredButton();
+        buttons.add(statedInferredButton);
         return buttons;
     }
 
@@ -167,26 +168,46 @@ public class ConceptViewSettings extends ArenaComponentSettings {
             navButton.doClick();
         }
     }
-    
     private static ImageIcon statedView = new ImageIcon(
-                ConceptViewRenderer.class.getResource("/16x16/plain/graph_edge.png"));
+            ConceptViewRenderer.class.getResource("/16x16/plain/graph_edge.png"));
     private static ImageIcon inferredView = new ImageIcon(
-                ConceptViewRenderer.class.getResource("/16x16/plain/chrystal_ball.png"));
-    protected JToggleButton getStatedInferredButton() {
-        JToggleButton button = new JToggleButton(new AbstractAction("", statedView) {
+            ConceptViewRenderer.class.getResource("/16x16/plain/chrystal_ball.png"));
+    private static ImageIcon inferredAndStatedView = new ImageIcon(
+            ConceptViewRenderer.class.getResource("/16x16/plain/inferred-then-stated.png"));
+    RelAssertionType relAssertionType = RelAssertionType.STATED;
+
+    public RelAssertionType getRelAssertionType() {
+        return relAssertionType;
+    }
+
+    protected JButton getStatedInferredButton() {
+        JButton button = new JButton(new AbstractAction("", statedView) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                JToggleButton button = (JToggleButton) e.getSource();
-                if (button.isSelected()) {
-                    button.setIcon(statedView);
-                    button.setToolTipText("showing stated, toggle to show inferred...");
-                    conceptChangedListener.propertyChange(null);
-                } else {
-                    button.setIcon(inferredView);
-                    button.setToolTipText("showing inferred, toggle to show stated...");
-                    conceptChangedListener.propertyChange(null);
-               }
+                JButton button = (JButton) e.getSource();
+                switch (relAssertionType) {
+
+                    case INFERRED:
+                        relAssertionType = RelAssertionType.INFERRED_THEN_STATED;
+                        button.setIcon(inferredAndStatedView);
+                        button.setToolTipText("showing inferred and stated, toggle to show stated...");
+                        conceptChangedListener.propertyChange(null);
+                        break;
+                    case STATED:
+                        relAssertionType = RelAssertionType.INFERRED;
+                        button.setIcon(inferredView);
+                        button.setToolTipText("showing inferred, toggle to show toggle to show inferred and stated...");
+                        conceptChangedListener.propertyChange(null);
+                        break;
+                    case INFERRED_THEN_STATED:
+                        relAssertionType = RelAssertionType.STATED;
+                        button.setIcon(statedView);
+                        button.setToolTipText("showing stated, toggle to show inferred...");
+                        conceptChangedListener.propertyChange(null);
+                        break;
+
+                }
             }
         });
         button.setSelected(true);
@@ -194,11 +215,16 @@ public class ConceptViewSettings extends ArenaComponentSettings {
         button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         button.setOpaque(false);
         button.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+
         return button;
     }
-    
+
     public boolean showStated() {
-        return statedToggleButton.isSelected();
+        return relAssertionType != RelAssertionType.INFERRED;
+    }
+
+    public boolean showInferred() {
+        return relAssertionType != RelAssertionType.STATED;
     }
 
     protected JToggleButton getNavigatorButton() {

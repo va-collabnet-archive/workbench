@@ -167,6 +167,10 @@ public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionA
         add(caseLabel, gbc);
         gbc.gridx++;
 
+        gbc.gridx++;
+
+        add(getComponentActionMenuButton(), gbc);
+
         JButton collapseExpandButton = getCollapseExpandButton();
         add(collapseExpandButton, gbc);
 

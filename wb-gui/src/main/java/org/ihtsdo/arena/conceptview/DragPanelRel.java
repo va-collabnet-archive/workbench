@@ -144,18 +144,22 @@ public class DragPanelRel extends ComponentVersionDragPanel<RelationshipVersionB
                     }
                 });
         add(destLabel, gbc);
-        JButton collapseExpandButton = getCollapseExpandButton();
         gbc.weightx = 0;
+
+
         gbc.gridx++;
         if (getRel().isInferred()) {
             add(new JLabel(getInferredIcon()), gbc);
             gbc.gridx++;
         }
+        add(getComponentActionMenuButton(), gbc);
+        gbc.gridx++;
+        JButton collapseExpandButton = getCollapseExpandButton();
         add(collapseExpandButton, gbc);
         addSubPanels(gbc);
     }
-    
     ImageIcon inferredIcon;
+
     private ImageIcon getInferredIcon() {
         if (inferredIcon == null) {
             inferredIcon = new ImageIcon(DragPanelRel.class.getResource("/16x16/plain/chrystal_ball.png"));

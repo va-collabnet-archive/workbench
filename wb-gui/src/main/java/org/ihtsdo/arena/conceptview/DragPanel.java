@@ -80,6 +80,47 @@ import sun.awt.dnd.SunDragSourceContextPeer;
 
 public abstract class DragPanel<T extends Object> extends JPanel implements Transferable {
 
+    protected Collection<Action> getMenuActions() {
+        return getKbActionsNoSetup(thingToDrag);
+    }
+    private Collection<Action> getKbActionsNoSetup(Object thingToDrop) {
+        ArrayList<Action> list = new ArrayList<Action>();
+        try {
+
+            if (settings.getConcept() != null) {
+                if (I_GetConceptData.class.isAssignableFrom(thingToDrop.getClass())) {
+                    I_GetConceptData conceptToDrop = (I_GetConceptData) thingToDrop;
+                    thingToDrop = Ts.get().getConceptVersion(settings.getConfig().getViewCoordinate(), conceptToDrop.getConceptNid());
+                } else if (ComponentVersionBI.class.isAssignableFrom(thingToDrop.getClass())
+                        || SpecBI.class.isAssignableFrom(thingToDrop.getClass())) {
+                    ViewCoordinate coordinate = settings.getConfig().getViewCoordinate();
+                    Map<String, Object> globals = new HashMap<String, Object>();
+                    globals.put("vc", coordinate);
+                    globals.put("actions", list);
+                    if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                        AceLog.getAppLog().fine("dropTarget: " + thingToDrag);
+                        AceLog.getAppLog().fine("thingToDrop: " + thingToDrop);
+                    }
+
+                    Collection<Object> facts = new ArrayList<Object>();
+                    facts.add(FactFactory.get(Context.DROP_OBJECT, thingToDrop, coordinate));
+                    facts.add(FactFactory.get(Context.DROP_TARGET, thingToDrag, coordinate));
+
+
+                    DroolsExecutionManager.fireAllRules(
+                            DragPanel.class.getCanonicalName(),
+                            kbFiles,
+                            globals,
+                            facts,
+                            false);
+                }
+            }
+        } catch (Throwable e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+        return list;
+    }
+
     private class DragPanelDragSourceListener implements DragSourceListener {
 
         @Override
@@ -516,42 +557,10 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
         super.setBounds(rctngl);
     }
 
-    private void getKbActions(Object thingToDrop) {
+    protected void getKbActions(Object thingToDrop) {
         settings.getView().setupDrop(thingToDrop);
-        try {
-            actionList.clear();
-
-            if (settings.getConcept() != null) {
-                if (I_GetConceptData.class.isAssignableFrom(thingToDrop.getClass())) {
-                    I_GetConceptData conceptToDrop = (I_GetConceptData) thingToDrop;
-                    thingToDrop = Ts.get().getConceptVersion(settings.getConfig().getViewCoordinate(), conceptToDrop.getConceptNid());
-                } else if (ComponentVersionBI.class.isAssignableFrom(thingToDrop.getClass())
-                        || SpecBI.class.isAssignableFrom(thingToDrop.getClass())) {
-                    ViewCoordinate coordinate = settings.getConfig().getViewCoordinate();
-                    Map<String, Object> globals = new HashMap<String, Object>();
-                    globals.put("vc", coordinate);
-                    globals.put("actions", actionList);
-                    if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                        AceLog.getAppLog().fine("dropTarget: " + thingToDrag);
-                        AceLog.getAppLog().fine("thingToDrop: " + thingToDrop);
-                    }
-
-                    Collection<Object> facts = new ArrayList<Object>();
-                    facts.add(FactFactory.get(Context.DROP_OBJECT, thingToDrop, coordinate));
-                    facts.add(FactFactory.get(Context.DROP_TARGET, thingToDrag, coordinate));
-
-
-                    DroolsExecutionManager.fireAllRules(
-                            DragPanel.class.getCanonicalName(),
-                            kbFiles,
-                            globals,
-                            facts,
-                            false);
-                }
-            }
-        } catch (Throwable e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        }
+        actionList.clear();
+        actionList.addAll(getKbActionsNoSetup(thingToDrop));
     }
 
     public T getThingToDrag() {

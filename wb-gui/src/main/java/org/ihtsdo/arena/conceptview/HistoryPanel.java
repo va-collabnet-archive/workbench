@@ -45,6 +45,7 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.hash.Hashcode;
 import org.ihtsdo.util.swing.GuiUtil;
 
@@ -457,6 +458,16 @@ public class HistoryPanel {
                 sb.append("</html>");
                 button.setToolTipText(sb.toString());
             }
+            
+            boolean enableButton = true;
+            if (positionVersion instanceof RelationshipVersionBI) {
+                RelationshipVersionBI rv = (RelationshipVersionBI) positionVersion;
+                if (rv.isInferred()) {
+                    enableButton = false;
+                }
+            }
+            button.setEnabled(enableButton);
+            
             putPanelInButtonMap(button, dragPanel);
             if (group != null) {
                 if (add) {

@@ -210,6 +210,9 @@ public class DragPanelExtension
         }
         
         gbc.weightx = 0;
+        gbc.gridx++;
+
+        add(getComponentActionMenuButton(), gbc);
 
         gbc.gridx++;
 

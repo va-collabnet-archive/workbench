@@ -228,10 +228,12 @@ public class UuidsToNidMapBdb extends ComponentBdb {
     public boolean hasUuid(UUID uuid) {
         r.lock();
         try {
-            if (readOnlyUuidsToNidMap.containsKey(uuid)) {
+            if (readOnlyUuidsToNidMap.containsKey(uuid) &&
+                    Bdb.getNidCNidMap().getCNid(readOnlyUuidsToNidMap.get(uuid)) != Integer.MAX_VALUE) {
                 return true;
             }
-            if (mutableUuidsToNidMap.containsKey(uuid)) {
+            if (mutableUuidsToNidMap.containsKey(uuid) &&
+                    Bdb.getNidCNidMap().getCNid(readOnlyUuidsToNidMap.get(uuid)) != Integer.MAX_VALUE) {
                 return true;
             }
             return false;

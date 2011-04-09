@@ -32,235 +32,231 @@ import org.drools.rule.VariableRestriction.VariableContextEntry;
 import org.drools.spi.Evaluator;
 import org.drools.spi.FieldValue;
 import org.drools.spi.InternalReadAccessor;
-import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidVersionBI;
-import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.drools.facts.DescFact;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-
 
 public class IsGbMemberTypeOfEvaluatorDefinition implements EvaluatorDefinition {
-	public static class IsGbMemberTypeOfEvaluator extends BaseEvaluator  {
 
-	    /**
-		 * 
-		 */
-	    private static final long serialVersionUID = 1L;
+    public static class IsGbMemberTypeOfEvaluator extends BaseEvaluator {
 
-	    private static final int dataVersion = 1;
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+        private static final int dataVersion = 1;
 
-		@Override
-		public void readExternal(ObjectInput in) throws IOException,
-				ClassNotFoundException {
-			init();
-			super.readExternal(in);
-	        int objDataVersion = in.readInt();
-	        if (objDataVersion == dataVersion) {
-	        	// Nothing to do
-	        } else {
-	            throw new IOException("Can't handle dataversion: " + objDataVersion);
-	        }
-		}
+        @Override
+        public void readExternal(ObjectInput in) throws IOException,
+                ClassNotFoundException {
+            init();
+            super.readExternal(in);
+            int objDataVersion = in.readInt();
+            if (objDataVersion == dataVersion) {
+                // Nothing to do
+            } else {
+                throw new IOException("Can't handle dataversion: " + objDataVersion);
+            }
+        }
 
-		@Override
-		public void writeExternal(ObjectOutput out) throws IOException {
-			super.writeExternal(out);
-	        out.writeInt(dataVersion);
-		}
+        @Override
+        public void writeExternal(ObjectOutput out) throws IOException {
+            super.writeExternal(out);
+            out.writeInt(dataVersion);
+        }
 
-	    public IsGbMemberTypeOfEvaluator() {
-	    	super();
-			// No arg constructor for serialization. 
-		}
-		public IsGbMemberTypeOfEvaluator(final ValueType type, final boolean isNegated) {
-			super(type,
-				  isNegated ? IsGbMemberTypeOfEvaluatorDefinition.NOT_IS_GB_MEMBER_TYPE_OF : IsGbMemberTypeOfEvaluatorDefinition.IS_GB_MEMBER_TYPE_OF);
-		}
+        public IsGbMemberTypeOfEvaluator() {
+            super();
+            // No arg constructor for serialization. 
+        }
 
-		@Override
-		public boolean evaluate(InternalWorkingMemory workingMemory,
-				InternalReadAccessor extractor, Object object, FieldValue value) {
-			return testMemberTypeOf(object, value.getValue());
-		}
+        public IsGbMemberTypeOfEvaluator(final ValueType type, final boolean isNegated) {
+            super(type,
+                    isNegated ? IsGbMemberTypeOfEvaluatorDefinition.NOT_IS_GB_MEMBER_TYPE_OF : IsGbMemberTypeOfEvaluatorDefinition.IS_GB_MEMBER_TYPE_OF);
+        }
 
-		@Override
-		public boolean evaluate(InternalWorkingMemory workingMemory,
-				InternalReadAccessor leftExtractor, Object left,
-				InternalReadAccessor rightExtractor, Object right) {
-			final Object value1 = leftExtractor.getValue(workingMemory, left);
-			final Object value2 = rightExtractor.getValue(workingMemory, right);
+        @Override
+        public boolean evaluate(InternalWorkingMemory workingMemory,
+                InternalReadAccessor extractor, Object object, FieldValue value) {
+            return testMemberTypeOf(object, value.getValue());
+        }
 
-			return testMemberTypeOf(value1, value2);
-		}
+        @Override
+        public boolean evaluate(InternalWorkingMemory workingMemory,
+                InternalReadAccessor leftExtractor, Object left,
+                InternalReadAccessor rightExtractor, Object right) {
+            final Object value1 = leftExtractor.getValue(workingMemory, left);
+            final Object value2 = rightExtractor.getValue(workingMemory, right);
 
-		private boolean testMemberTypeOf(final Object value1, final Object value2) { 
-			
-				boolean isMemberType = false;
-				DescFact fact;
-				//value1 (concept) must be in form of DescFact
-				//value2 (refset member type) must be a type as a concept fact (descRefsetMemberTypes.java)
-				
-				if (DescFact.class.isAssignableFrom(value1.getClass())) {
-					fact = (DescFact) value1;
-				}else {
-					throw new UnsupportedOperationException("Can't convert: " + value1);
-				}
-				try{
-					DescriptionVersionBI desc = fact.getComponent();
-					ViewCoordinate vc = fact.getVc();
-					ConceptSpec possibleType = null;
-					int evalRefsetNid = 0;
-					int typeNid = 0;
-					
-					ConceptSpec EN_GB_LANG = 
-						new ConceptSpec("GB English Dialect Subset", 
-										UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd"));
-					evalRefsetNid = EN_GB_LANG.get(vc).getNid();
-					
-					if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
-						possibleType = (ConceptSpec) value2;
-						typeNid = possibleType.get(vc).getNid();
-					} else {
-						throw new UnsupportedOperationException("Can't convert: " + value1);
-					}
-			
-					Collection<? extends RefexChronicleBI> refexes =
-	                    desc.getCurrentRefexes(vc);
-					
-		            if (refexes != null) {
-		                for (RefexChronicleBI refex : refexes) {
-		                	if (refex.getCollectionNid() == evalRefsetNid) {
-		                		//test member type
-		                		if(RefexVersionBI.class.isAssignableFrom(refex.getClass())){
-			                		RefexVersionBI<?> rv = (RefexVersionBI<?>) refex;
-			                		
-			                		if (RefexCnidVersionBI.class.isAssignableFrom(rv.getClass())){
-			                			int cnid = ((RefexCnidVersionBI) rv).getCnid1();
-			                			if(cnid == typeNid){
-			                				isMemberType = true;
-			                			}
-			                		}else{
-				                		throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI:  " + value1);
-				                	}
-			                	}else{
-			                		throw new UnsupportedOperationException("Can't convert: RefexVersionBI:  " + value1);
-			                	}
-		                	}
-		                }
-		            }
-					
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
-				
-				return this.getOperator().isNegated() ^ (isMemberType);
-				
-		}
-		
-		@Override
-		public boolean evaluateCachedLeft(InternalWorkingMemory workingMemory,
-				VariableContextEntry context, Object right) {
-			return testMemberTypeOf(((ObjectVariableContextEntry) context).left, right);
-		}
+            return testMemberTypeOf(value1, value2);
+        }
 
-		@Override
-		public boolean evaluateCachedRight(InternalWorkingMemory workingMemory,
-				VariableContextEntry context, Object left) {
-			return testMemberTypeOf(left, ((ObjectVariableContextEntry) context).right);
-		}
+        private boolean testMemberTypeOf(final Object value1, final Object value2) {
 
-		@Override
-		public String toString() {
-			return "IsGbMemberTypeOf isGbMemberTypeOf";
-		}
+            boolean isMemberType = false;
+            DescFact fact;
+            //value1 (concept) must be in form of DescFact
+            //value2 (refset member type) must be a type as a concept fact (descRefsetMemberTypes.java)
 
-	}
+            if (DescFact.class.isAssignableFrom(value1.getClass())) {
+                fact = (DescFact) value1;
+            } else {
+                throw new UnsupportedOperationException("Can't convert: " + value1);
+            }
+            try {
+                DescriptionVersionBI desc = fact.getComponent();
+                ViewCoordinate vc = fact.getVc();
+                ConceptSpec possibleType = null;
+                int evalRefsetNid = 0;
+                int typeNid = 0;
 
-	public static Operator IS_GB_MEMBER_TYPE_OF = null;
-	public static Operator NOT_IS_GB_MEMBER_TYPE_OF = null;
-	private static String[] SUPPORTED_IDS = null;
-	
-	private static void init() {
-		if (IS_GB_MEMBER_TYPE_OF == null) {
-			IS_GB_MEMBER_TYPE_OF = Operator.addOperatorToRegistry("isGbMemberTypeOf", false);
-			NOT_IS_GB_MEMBER_TYPE_OF = Operator.addOperatorToRegistry(IS_GB_MEMBER_TYPE_OF.getOperatorString(), true);
-			SUPPORTED_IDS = new String[] { IS_GB_MEMBER_TYPE_OF.getOperatorString() };
-		}
-	}
+                UUID enGbLangUuid = UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd");
+                if (!Ts.get().hasUuid(enGbLangUuid)) {
+                    return false;
+                }
+                ConceptSpec EN_GB_LANG = 
+                        new ConceptSpec("GB English Dialect Subset",
+                        enGbLangUuid);
+                evalRefsetNid = EN_GB_LANG.getStrict(vc).getNid();
 
-	static {
-		init();
-	}
-	
-	private Evaluator[] evaluator;
-	@Override
-	public Evaluator getEvaluator(ValueType type, Operator operator) {
-		return this.getEvaluator(type, operator.getOperatorString(), operator.isNegated(), null);
-	}
+                if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
+                    possibleType = (ConceptSpec) value2;
+                    typeNid = possibleType.getStrict(vc).getNid();
+                } else {
+                    throw new UnsupportedOperationException("Can't convert: " + value1);
+                }
 
-	@Override
-	public Evaluator getEvaluator(ValueType type, Operator operator,
-			String parameterText) {
-		return this.getEvaluator(type, operator.getOperatorString(), operator.isNegated(), parameterText);
-	}
+                Collection<? extends RefexChronicleBI> refexes =
+                        desc.getCurrentRefexes(vc);
 
-	@Override
-	public Evaluator getEvaluator(ValueType type, String operatorId,
-			boolean isNegated, String parameterText) {
-		return getEvaluator(type, operatorId, isNegated, parameterText, Target.FACT, Target.FACT);
-	}
+                if (refexes != null) {
+                    for (RefexChronicleBI refex : refexes) {
+                        if (refex.getCollectionNid() == evalRefsetNid) {
+                            //test member type
+                            if (RefexVersionBI.class.isAssignableFrom(refex.getClass())) {
+                                RefexVersionBI<?> rv = (RefexVersionBI<?>) refex;
 
-	@Override
-	public Evaluator getEvaluator(ValueType type, String operatorId,
-			boolean isNegated, String parameterText, Target leftTarget,
-			Target rightTarget) {
-		if (evaluator == null) {
-			evaluator = new Evaluator[2];
-		}
-		int index = isNegated ?  0 : 1;
-		if (evaluator[index] == null) {
-			evaluator[index] = new IsGbMemberTypeOfEvaluator(type, isNegated);
-		}
-		return evaluator[index];
-	}
+                                if (RefexCnidVersionBI.class.isAssignableFrom(rv.getClass())) {
+                                    int cnid = ((RefexCnidVersionBI) rv).getCnid1();
+                                    if (cnid == typeNid) {
+                                        isMemberType = true;
+                                    }
+                                } else {
+                                    throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI:  " + value1);
+                                }
+                            } else {
+                                throw new UnsupportedOperationException("Can't convert: RefexVersionBI:  " + value1);
+                            }
+                        }
+                    }
+                }
 
-	@Override
-	public String[] getEvaluatorIds() {
-		return SUPPORTED_IDS;
-	}
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
-	@Override
-	public Target getTarget() {
-		return Target.FACT;
-	}
+            return this.getOperator().isNegated() ^ (isMemberType);
 
-	@Override
-	public boolean isNegatable() {
-		return true;
-	}
+        }
 
-	@Override
-	public boolean supportsType(ValueType type) {
-		return true;
-	}
+        @Override
+        public boolean evaluateCachedLeft(InternalWorkingMemory workingMemory,
+                VariableContextEntry context, Object right) {
+            return testMemberTypeOf(((ObjectVariableContextEntry) context).left, right);
+        }
 
-	@Override
-	public void readExternal(ObjectInput in) throws IOException,
-			ClassNotFoundException {
-		evaluator = (Evaluator[]) in.readObject();
-	}
+        @Override
+        public boolean evaluateCachedRight(InternalWorkingMemory workingMemory,
+                VariableContextEntry context, Object left) {
+            return testMemberTypeOf(left, ((ObjectVariableContextEntry) context).right);
+        }
 
-	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
-		out.writeObject(evaluator);
-	}
-	
+        @Override
+        public String toString() {
+            return "IsGbMemberTypeOf isGbMemberTypeOf";
+        }
+    }
+    public static Operator IS_GB_MEMBER_TYPE_OF = null;
+    public static Operator NOT_IS_GB_MEMBER_TYPE_OF = null;
+    private static String[] SUPPORTED_IDS = null;
+
+    private static void init() {
+        if (IS_GB_MEMBER_TYPE_OF == null) {
+            IS_GB_MEMBER_TYPE_OF = Operator.addOperatorToRegistry("isGbMemberTypeOf", false);
+            NOT_IS_GB_MEMBER_TYPE_OF = Operator.addOperatorToRegistry(IS_GB_MEMBER_TYPE_OF.getOperatorString(), true);
+            SUPPORTED_IDS = new String[]{IS_GB_MEMBER_TYPE_OF.getOperatorString()};
+        }
+    }
+
+    static {
+        init();
+    }
+    private Evaluator[] evaluator;
+
+    @Override
+    public Evaluator getEvaluator(ValueType type, Operator operator) {
+        return this.getEvaluator(type, operator.getOperatorString(), operator.isNegated(), null);
+    }
+
+    @Override
+    public Evaluator getEvaluator(ValueType type, Operator operator,
+            String parameterText) {
+        return this.getEvaluator(type, operator.getOperatorString(), operator.isNegated(), parameterText);
+    }
+
+    @Override
+    public Evaluator getEvaluator(ValueType type, String operatorId,
+            boolean isNegated, String parameterText) {
+        return getEvaluator(type, operatorId, isNegated, parameterText, Target.FACT, Target.FACT);
+    }
+
+    @Override
+    public Evaluator getEvaluator(ValueType type, String operatorId,
+            boolean isNegated, String parameterText, Target leftTarget,
+            Target rightTarget) {
+        if (evaluator == null) {
+            evaluator = new Evaluator[2];
+        }
+        int index = isNegated ? 0 : 1;
+        if (evaluator[index] == null) {
+            evaluator[index] = new IsGbMemberTypeOfEvaluator(type, isNegated);
+        }
+        return evaluator[index];
+    }
+
+    @Override
+    public String[] getEvaluatorIds() {
+        return SUPPORTED_IDS;
+    }
+
+    @Override
+    public Target getTarget() {
+        return Target.FACT;
+    }
+
+    @Override
+    public boolean isNegatable() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsType(ValueType type) {
+        return true;
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException,
+            ClassNotFoundException {
+        evaluator = (Evaluator[]) in.readObject();
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeObject(evaluator);
+    }
 }

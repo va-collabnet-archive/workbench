@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.ihtsdo.arena.conceptview;
 
 import java.awt.Color;
@@ -33,7 +32,7 @@ public class DragPanelConceptAttributes extends ComponentVersionDragPanel<ConAtt
     private static final long serialVersionUID = 1L;
 
     public DragPanelConceptAttributes(ConceptViewSettings settings,
-            CollapsePanel parentCollapsePanel, 
+            CollapsePanel parentCollapsePanel,
             ConAttrAnalogBI attr)
             throws TerminologyException, IOException {
         super(settings, parentCollapsePanel, attr);
@@ -49,8 +48,9 @@ public class DragPanelConceptAttributes extends ComponentVersionDragPanel<ConAtt
     }
 
     private ConAttrAnalogBI getAttr() {
-       return getComponentVersion();
+        return getComponentVersion();
     }
+
     @Override
     public DataFlavor[] getTransferDataFlavors() {
         return new DataFlavor[]{DragPanelDataFlavors.descVersionFlavor};
@@ -115,7 +115,7 @@ public class DragPanelConceptAttributes extends ComponentVersionDragPanel<ConAtt
         gbc.gridx++;
         gbc.weightx = 1;
 
-        
+
         String statedDefinedStr = "primitive";
         if (getAttr().isDefined()) {
             statedDefinedStr = "defined";
@@ -123,19 +123,21 @@ public class DragPanelConceptAttributes extends ComponentVersionDragPanel<ConAtt
         JLabel statedDefinedLabel = getJLabel(statedDefinedStr);
         statedDefinedLabel.setOpaque(false);
         add(statedDefinedLabel, gbc);
-        gbc.gridx++;
+
         gbc.weightx = 0;
+        gbc.gridx++;
+
+        add(getComponentActionMenuButton(), gbc);
+        gbc.gridx++;
 
         JButton collapseExpandButton = getCollapseExpandButton();
         add(collapseExpandButton, gbc);
-        
+
         addSubPanels(gbc);
-     }
-    
-    
+    }
+
     @Override
-    public Collection<ComponentVersionDragPanel<ConAttrAnalogBI>> 
-            getOtherVersionPanels() 
+    public Collection<ComponentVersionDragPanel<ConAttrAnalogBI>> getOtherVersionPanels()
             throws IOException, TerminologyException {
         Collection<ComponentVersionDragPanel<ConAttrAnalogBI>> panelList =
                 new ArrayList<ComponentVersionDragPanel<ConAttrAnalogBI>>();
@@ -143,7 +145,7 @@ public class DragPanelConceptAttributes extends ComponentVersionDragPanel<ConAtt
         for (ConAttrAnalogBI dav : versions) {
             if (!thingToDrag.equals(dav)) {
                 DragPanelConceptAttributes dpd = new DragPanelConceptAttributes(
-                        new GridBagLayout(), 
+                        new GridBagLayout(),
                         getSettings(),
                         null,
                         dav);
@@ -152,6 +154,4 @@ public class DragPanelConceptAttributes extends ComponentVersionDragPanel<ConAtt
         }
         return panelList;
     }
-
 }
-
