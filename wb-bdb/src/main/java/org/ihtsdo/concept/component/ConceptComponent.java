@@ -275,6 +275,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         @Override
+        public boolean isActive(NidSetBI allowedStatusNids) {
+            if (index >= 0) {
+                return revisions.get(index).isActive(allowedStatusNids);
+            }
+            return ConceptComponent.this.isActive(allowedStatusNids);
+        }
+
+        @Override
         public Collection<? extends RefexChronicleBI<?>> getRefexes()
                 throws IOException {
             return ConceptComponent.this.getRefexes();
@@ -2092,7 +2100,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public ComponentChroncileBI getChronicle() {
         return (ComponentChroncileBI) this;
     }
-    
-    
+
+    @Override
+    public boolean isActive(NidSetBI allowedStatusNids) {
+        return allowedStatusNids.contains(getStatusNid());
+    }
     
 }

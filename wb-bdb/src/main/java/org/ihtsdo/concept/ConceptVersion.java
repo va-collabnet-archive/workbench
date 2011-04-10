@@ -781,4 +781,9 @@ public class ConceptVersion implements ConceptVersionBI {
     public ConceptVersionBI getPrimordialVersion() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    @Override
+    public boolean isActive(NidSetBI allowedStatusNids) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

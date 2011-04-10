@@ -12,6 +12,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 
 import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -230,6 +231,11 @@ public class RelGroupVersion
 
     @Override
     public RelGroupVersionBI getPrimordialVersion() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public boolean isActive(NidSetBI allowedStatusNids) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

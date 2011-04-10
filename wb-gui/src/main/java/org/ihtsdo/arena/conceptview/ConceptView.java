@@ -141,11 +141,15 @@ public class ConceptView extends JPanel {
         private Set<Integer> saps;
         private Set<PositionBI> positions;
         private Set<PathBI> paths;
-        private List<? extends I_RelTuple> rels;
+        private List<? extends I_RelTuple> statedRels;
+        private List<? extends I_RelTuple> inactiveStatedRels;
+        private List<? extends I_RelTuple> inferredRels;
+        private List<? extends I_RelTuple> inactiveInferredRels;
         private ConceptVersionBI cv;
         private Collection<? extends RefexVersionBI<?>> memberRefsets;
         private ViewCoordinate coordinate;
         private Collection<? extends RelGroupVersionBI> relGroups;
+        private Collection<? extends RelGroupVersionBI> inactiveRelGroups;
         private List<? extends I_DescriptionTuple> descriptions;
         private List<? extends I_DescriptionTuple> inactiveDescriptions;
         private I_GetConceptData layoutConcept;
@@ -169,41 +173,49 @@ public class ConceptView extends JPanel {
                 positions = Ts.get().getPositionSet(saps);
                 paths = Ts.get().getPathSetFromPositionSet(positions);
                 positionOrderedSet.addAll(positions);
-                if (settings.getRelAssertionType() != RelAssertionType.INFERRED) {
-                    rels = layoutConcept.getSourceRelTuples(config.getAllowedStatus(),
-                            null, config.getViewPositionSetReadOnly(),
-                            config.getPrecedence(), config.getConflictResolutionStrategy(),
-                            coordinate.getClassifierNid(), coordinate.getRelAssertionType());
-                    if (settings.getRelAssertionType() == RelAssertionType.INFERRED_THEN_STATED) {
-                        coordinate.setRelAssertionType(RelAssertionType.INFERRED);
-                        List infRels = layoutConcept.getSourceRelTuples(config.getAllowedStatus(),
-                                null, config.getViewPositionSetReadOnly(),
-                                config.getPrecedence(), config.getConflictResolutionStrategy(),
-                                coordinate.getClassifierNid(), coordinate.getRelAssertionType());
-                        rels.addAll(infRels);
-                    }
 
-                } else {
-                    coordinate.setRelAssertionType(RelAssertionType.INFERRED);
-                    rels = layoutConcept.getSourceRelTuples(config.getAllowedStatus(),
-                            null, config.getViewPositionSetReadOnly(),
-                            config.getPrecedence(), config.getConflictResolutionStrategy(),
-                            coordinate.getClassifierNid(), coordinate.getRelAssertionType());
-                }
+                coordinate.setRelAssertionType(RelAssertionType.STATED);
+                statedRels = layoutConcept.getSourceRelTuples(config.getAllowedStatus(),
+                        null, config.getViewPositionSetReadOnly(),
+                        config.getPrecedence(), config.getConflictResolutionStrategy(),
+                        coordinate.getClassifierNid(), coordinate.getRelAssertionType());
+                inactiveStatedRels = layoutConcept.getSourceRelTuples(null,
+                        null, config.getViewPositionSetReadOnly(),
+                        config.getPrecedence(), config.getConflictResolutionStrategy(),
+                        coordinate.getClassifierNid(), coordinate.getRelAssertionType());
+                inactiveStatedRels.removeAll(statedRels);
+
+                coordinate.setRelAssertionType(RelAssertionType.INFERRED);
+                inferredRels = layoutConcept.getSourceRelTuples(config.getAllowedStatus(),
+                        null, config.getViewPositionSetReadOnly(),
+                        config.getPrecedence(), config.getConflictResolutionStrategy(),
+                        coordinate.getClassifierNid(), coordinate.getRelAssertionType());
+                inactiveInferredRels = layoutConcept.getSourceRelTuples(null,
+                        null, config.getViewPositionSetReadOnly(),
+                        config.getPrecedence(), config.getConflictResolutionStrategy(),
+                        coordinate.getClassifierNid(), coordinate.getRelAssertionType());
+                inactiveInferredRels.removeAll(inferredRels);
+
                 cv = Ts.get().getConceptVersion(
                         config.getViewCoordinate(), layoutConcept.getNid());
                 //get refsets
                 memberRefsets = cv.getCurrentRefsetMembers();
                 relGroups = Ts.get().getConceptVersion(coordinate, layoutConcept.getNid()).getRelGroups();
+
+
+                // Get active descriptions
                 descriptions = layoutConcept.getDescriptionTuples(config.getAllowedStatus(),
                         null, config.getViewPositionSetReadOnly(),
                         config.getPrecedence(), config.getConflictResolutionStrategy());
+                // get all descriptions
                 List<? extends I_DescriptionTuple> tempDescList = layoutConcept.getDescriptionTuples(null,
                         null, config.getViewPositionSetReadOnly(),
                         config.getPrecedence(), config.getConflictResolutionStrategy());
+
                 HashSet<I_DescriptionTuple> descSet =
                         new HashSet<I_DescriptionTuple>(tempDescList);
                 tempDescList.removeAll(descriptions);
+
                 inactiveDescriptions = new ArrayList<I_DescriptionTuple>(tempDescList);
 
             }
@@ -282,7 +294,7 @@ public class ConceptView extends JPanel {
                         cpd.addPanelsChangedActionListener(pcal);
                         cpd.setAlertCount(0);
                         cpd.setRefexCount(0);
-                        cpd.setHistoryCount(1);
+                        cpd.setHistoryCount(inactiveDescriptions.size());
                         cpd.setTemplateCount(0);
                         add(cpd, gbc);
                         gbc.gridy++;
@@ -299,12 +311,13 @@ public class ConceptView extends JPanel {
                             cpd.setTemplateCount(cpd.templateCount += dc.getTemplateSubpanelCount());
                         }
 
-                        boolean historyIsShown = cpd.isShown(ComponentVersionDragPanel.SubPanelTypes.HISTORY);
+                        boolean descHistoryIsShown = cpd.isShown(ComponentVersionDragPanel.SubPanelTypes.HISTORY);
                         for (I_DescriptionTuple desc : inactiveDescriptions) {
                             DragPanelDescription dc = getDescComponent(desc, cpd);
                             seperatorComponents.add(dc);
-                            dc.setVisible(historyIsShown);
+                            dc.setVisible(descHistoryIsShown);
                             cpd.addToggleComponent(dc);
+                            cpd.getInactiveComponentPanels().add(dc);
                             cpd.getRetiredPanels().add(dc);
                             add(dc, gbc);
                             gbc.gridy++;
@@ -320,26 +333,98 @@ public class ConceptView extends JPanel {
                         cpr.addPanelsChangedActionListener(pcal);
                         cpr.setAlertCount(0);
                         cpr.setRefexCount(0);
-                        cpr.setHistoryCount(0);
+                        if (settings.showInferred()) {
+                            cpr.setHistoryCount(cpr.historyCount + inactiveInferredRels.size());
+                        }
+                        if (settings.showStated()) {
+                            cpr.setHistoryCount(cpr.historyCount + inactiveStatedRels.size());
+                        }
+                        boolean relHistoryIsShown = cpr.isShown(ComponentVersionDragPanel.SubPanelTypes.HISTORY);
                         cpr.setTemplateCount(0);
                         boolean cprAdded = false;
-                        for (I_RelTuple r : rels) {
-                            if (r.getGroup() == 0) {
-                                if (!cprAdded) {
-                                    add(cpr, gbc);
-                                    gbc.gridy++;
-                                    cprAdded = true;
-                                }
-                                DragPanelRel rc = getRelComponent(r, cpr);
-                                seperatorComponents.add(rc);
+                        if (settings.showStated()) {
+                            for (I_RelTuple r : statedRels) {
+                                if (r.getGroup() == 0) {
+                                    if (!cprAdded) {
+                                        add(cpr, gbc);
+                                        gbc.gridy++;
+                                        cprAdded = true;
+                                    }
+                                    DragPanelRel rc = getRelComponent(r, cpr, false);
+                                    seperatorComponents.add(rc);
 
-                                cpr.addToggleComponent(rc);
-                                add(rc, gbc);
-                                gbc.gridy++;
-                                cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
-                                cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
-                                cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
-                                cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
+                                    cpr.addToggleComponent(rc);
+                                    add(rc, gbc);
+                                    gbc.gridy++;
+                                    cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
+                                    cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
+                                    cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
+                                    cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
+                                }
+                            }
+                            for (I_RelTuple r : inactiveStatedRels) {
+                                if (r.getGroup() == 0) {
+                                    if (!cprAdded) {
+                                        add(cpr, gbc);
+                                        gbc.gridy++;
+                                        cprAdded = true;
+                                    }
+                                    DragPanelRel rc = getRelComponent(r, cpr, false);
+                                    rc.setVisible(relHistoryIsShown);
+                                    seperatorComponents.add(rc);
+
+                                    cpr.addToggleComponent(rc);
+                                    cpr.getInactiveComponentPanels().add(rc);
+                                    add(rc, gbc);
+                                    gbc.gridy++;
+                                    cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
+                                    cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
+                                    cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
+                                    cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
+                                }
+                            }
+
+                        }
+                        if (settings.showInferred()) {
+                            for (I_RelTuple r : inferredRels) {
+                                if (r.getGroup() == 0) {
+                                    if (!cprAdded) {
+                                        add(cpr, gbc);
+                                        gbc.gridy++;
+                                        cprAdded = true;
+                                    }
+                                    DragPanelRel rc = getRelComponent(r, cpr, true);
+                                    seperatorComponents.add(rc);
+
+                                    cpr.addToggleComponent(rc);
+                                    add(rc, gbc);
+                                    gbc.gridy++;
+                                    cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
+                                    cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
+                                    cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
+                                    cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
+                                }
+                            }
+                            for (I_RelTuple r : inactiveInferredRels) {
+                                if (r.getGroup() == 0) {
+                                    if (!cprAdded) {
+                                        add(cpr, gbc);
+                                        gbc.gridy++;
+                                        cprAdded = true;
+                                    }
+                                    DragPanelRel rc = getRelComponent(r, cpr, true);
+                                    rc.setVisible(relHistoryIsShown);
+                                    seperatorComponents.add(rc);
+
+                                    cpr.addToggleComponent(rc);
+                                    cpr.getInactiveComponentPanels().add(rc);
+                                    add(rc, gbc);
+                                    gbc.gridy++;
+                                    cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
+                                    cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
+                                    cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
+                                    cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
+                                }
                             }
                         }
 
@@ -355,7 +440,6 @@ public class ConceptView extends JPanel {
                                     }
                                     DragPanelRelGroup rgc = getRelGroupComponent(r, cpr);
                                     seperatorComponents.add(rgc);
-                                    cpr.addToggleComponent(rgc);
                                     add(rgc, gbc);
                                     gbc.gridy++;
                                     cpr.setAlertCount(cpr.alertCount += rgc.getAlertSubpanelCount());
@@ -662,7 +746,7 @@ public class ConceptView extends JPanel {
             this.desc = desc;
             t = new Timer(1000, this);
             t.start();
-            c = Terms.get().getConcept(desc.getConceptSpec().get(config.getViewCoordinate()).getNid());
+            c = Terms.get().getConcept(desc.getConceptSpec().getStrict(config.getViewCoordinate()).getNid());
         }
 
         @Override
@@ -855,7 +939,7 @@ public class ConceptView extends JPanel {
         relGroupPanel.add(cprg, gbc);
         gbc.gridy++;
         for (RelationshipVersionBI r : group.getCurrentRels()) { //TODO getCurrentRels
-            DragPanelRel dpr = getRelComponent(r, parentCollapsePanel);
+            DragPanelRel dpr = getRelComponent(r, parentCollapsePanel, r.isInferred());
             cprg.addToggleComponent(dpr);
             dpr.setInGroup(true);
             relGroupPanel.add(dpr, gbc);
@@ -912,7 +996,7 @@ public class ConceptView extends JPanel {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.gridx++;
         TermComponentLabel typeLabel =
-                getLabel(desc.getDescTypeSpec().get(config.getViewCoordinate()).getNid(), true);
+                getLabel(desc.getDescTypeSpec().getStrict(config.getViewCoordinate()).getNid(), true);
         descPanel.add(typeLabel, gbc);
         typeLabel.addPropertyChangeListener("termComponent",
                 new PropertyChangeListener() {
@@ -969,7 +1053,7 @@ public class ConceptView extends JPanel {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.gridx++;
         TermComponentLabel typeLabel = getLabel(
-                spec.getRelTypeSpec().get(coordinate).getNid(), true);
+                spec.getRelTypeSpec().getStrict(coordinate).getNid(), true);
         relPanel.add(typeLabel, gbc);
         typeLabel.addPropertyChangeListener("termComponent",
                 new PropertyChangeListener() {
@@ -989,7 +1073,7 @@ public class ConceptView extends JPanel {
         gbc.weightx = 1;
         gbc.gridx++;
         TermComponentLabel destLabel = getLabel(
-                spec.getDestinationSpec().get(coordinate).getNid(), true);
+                spec.getDestinationSpec().getStrict(coordinate).getNid(), true);
         relPanel.add(destLabel, gbc);
         destLabel.addPropertyChangeListener("termComponent",
                 new PropertyChangeListener() {
@@ -1009,10 +1093,10 @@ public class ConceptView extends JPanel {
     }
 
     public DragPanelRel getRelComponent(RelationshipVersionBI r,
-            CollapsePanel parentCollapsePanel)
+            CollapsePanel parentCollapsePanel, boolean inferred)
             throws TerminologyException, IOException {
         DragPanelRel relPanel = new DragPanelRel(new GridBagLayout(), settings,
-                parentCollapsePanel, r);
+                parentCollapsePanel, r, inferred);
         addToPositionPanelMap(relPanel);
 
 

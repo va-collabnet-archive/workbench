@@ -33,18 +33,22 @@ public class DragPanelRel extends ComponentVersionDragPanel<RelationshipVersionB
      */
     private static final long serialVersionUID = 1L;
     private JLabel relLabel;
+    private boolean inferred;
 
     public DragPanelRel(ConceptViewSettings settings,
-            CollapsePanel parentCollapsePanel, RelationshipVersionBI rel)
+            CollapsePanel parentCollapsePanel, RelationshipVersionBI rel,
+            boolean inferred)
             throws TerminologyException, IOException {
         super(settings, parentCollapsePanel, rel);
         layoutRel();
     }
 
     public DragPanelRel(LayoutManager layout, ConceptViewSettings settings,
-            CollapsePanel parentCollapsePanel, RelationshipVersionBI rel)
+            CollapsePanel parentCollapsePanel, RelationshipVersionBI rel,
+            boolean inferred)
             throws TerminologyException, IOException {
         super(layout, settings, parentCollapsePanel, rel);
+        this.inferred = inferred;
         layoutRel();
     }
 
@@ -55,12 +59,21 @@ public class DragPanelRel extends ComponentVersionDragPanel<RelationshipVersionB
                 new ArrayList<ComponentVersionDragPanel<RelationshipVersionBI>>();
         Collection<RelationshipVersionBI> versions = thingToDrag.getChronicle().getVersions();
         for (RelationshipVersionBI dav : versions) {
+            if (inferred) {
+                if (!dav.isInferred()) {
+                    continue;
+                }
+            } else {
+                if (dav.isInferred()) {
+                    continue;
+                }
+            }
             if (!thingToDrag.equals(dav)) {
                 DragPanelRel dpd = new DragPanelRel(
                         new GridBagLayout(),
                         getSettings(),
                         null,
-                        dav);
+                        dav, inferred);
                 dpd.setInactiveBackground();
                 panelList.add(dpd);
             }
@@ -91,6 +104,11 @@ public class DragPanelRel extends ComponentVersionDragPanel<RelationshipVersionB
         gbc.gridx = 0;
         gbc.gridy = 0;
         add(relLabel, gbc);
+        if (!getThingToDrag().isActive(getSettings().getConfig().getAllowedStatus())) {
+            add(new JLabel(getGhostIcon()));
+            gbc.gridx++;
+        }
+
         gbc.weightx = 1;
         gbc.gridx++;
         TermComponentLabel typeLabel = getLabel(getRel().getTypeNid(), canDrop);

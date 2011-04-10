@@ -115,6 +115,10 @@ public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionA
         gbc.gridx = 0;
         gbc.gridy = 0;
         add(descLabel, gbc);
+        if (!getDesc().isActive(getSettings().getConfig().getAllowedStatus())) {
+            add(new JLabel(getGhostIcon()));
+            gbc.gridx++;
+        }
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.gridx++;
         TermComponentLabel typeLabel = getLabel(getDesc().getTypeNid(), canDrop);
@@ -165,11 +169,13 @@ public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionA
         }
         JLabel caseLabel = getJLabel(caseStr);
         add(caseLabel, gbc);
-        gbc.gridx++;
-
+        
+        
         gbc.gridx++;
 
         add(getComponentActionMenuButton(), gbc);
+
+        gbc.gridx++;
 
         JButton collapseExpandButton = getCollapseExpandButton();
         add(collapseExpandButton, gbc);

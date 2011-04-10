@@ -95,6 +95,7 @@ public class CollapsePanel extends JPanel {
     private List<JComponent> templatePanels = new ArrayList<JComponent>();
     private List<JComponent> historyPanels = new ArrayList<JComponent>();
     private List<JComponent> retiredPanels = new ArrayList<JComponent>();
+    private List<JComponent> inactiveComponentPanels = new ArrayList<JComponent>();
 
     public List<JComponent> getRetiredPanels() {
         return retiredPanels;
@@ -400,6 +401,9 @@ public class CollapsePanel extends JPanel {
                 for (JComponent retiredPanel : retiredPanels) {
                     retiredPanel.setVisible(!shown);
                 }
+                for (JComponent inactiveComponentPanel: inactiveComponentPanels) {
+                    inactiveComponentPanel.setVisible(!shown);
+                }
                 handleToggleAction(subpanelType, e, icon);
             }
         });
@@ -536,6 +540,7 @@ public class CollapsePanel extends JPanel {
     public void addToggleComponent(I_ToggleSubPanels component) {
         components.add(component);
     }
+    
     private static int emptyWidth = 21;
     private static int emptyHeight = 16;
     private Dimension emptyDimension = new Dimension(emptyWidth, emptyHeight);
@@ -632,4 +637,10 @@ public class CollapsePanel extends JPanel {
     public List<JComponent> getHistoryPanels() {
         return historyPanels;
     }
+    
+    public List<JComponent> getInactiveComponentPanels() {
+        return inactiveComponentPanels;
+    }
+
+
 }

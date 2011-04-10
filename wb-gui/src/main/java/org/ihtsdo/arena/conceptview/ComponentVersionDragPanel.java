@@ -36,6 +36,11 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
      */
     private static final long serialVersionUID = 1L;
     private static ImageIcon dynamicPopupImage = new ImageIcon(DragPanelRel.class.getResource("/16x16/plain/dynamic_popup.png"));
+    private static ImageIcon ghostIcon = new ImageIcon(DragPanelRel.class.getResource("/16x16/plain/ghost.png"));
+
+    public static ImageIcon getGhostIcon() {
+        return ghostIcon;
+    }
 
     protected JButton getActionMenuButton(Collection<Action> actionList) {
         JButton popupMenuButton = new JButton(dynamicPopupImage);

@@ -5,6 +5,7 @@ import java.io.IOException;
 
 public interface ComponentVersionBI extends ComponentBI {
 
+    boolean isActive(NidSetBI allowedStatusNids);
     int getStatusNid();
     int getAuthorNid();
     int getPathNid();

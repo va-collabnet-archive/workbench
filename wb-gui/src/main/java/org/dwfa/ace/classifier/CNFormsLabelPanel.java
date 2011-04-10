@@ -70,6 +70,7 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
@@ -403,6 +404,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         public ConceptAttrVersion getPrimordialVersion() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public boolean isActive(NidSetBI allowedStatusNids) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
     }
@@ -846,6 +852,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         @Override
         public RelVersion getPrimordialVersion() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public boolean isActive(NidSetBI allowedStatusNids) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
     }

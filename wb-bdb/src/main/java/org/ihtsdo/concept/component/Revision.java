@@ -26,6 +26,7 @@ import com.sleepycat.bind.tuple.TupleOutput;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 
@@ -412,5 +413,10 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(
             ViewCoordinate xyz) throws IOException {
         return getChronicle().getInactiveRefexes(xyz);
+    }
+
+    @Override
+    public boolean isActive(NidSetBI allowedStatusNids) {
+        return allowedStatusNids.contains(getStatusNid());
     }
 }

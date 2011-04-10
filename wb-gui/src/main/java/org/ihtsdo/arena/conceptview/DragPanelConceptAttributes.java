@@ -110,7 +110,12 @@ public class DragPanelConceptAttributes extends ComponentVersionDragPanel<ConAtt
         gbc.gridwidth = 1;
         gbc.gridx = 0;
         gbc.gridy = 0;
+        
         add(attrLabel, gbc);
+        if (!getThingToDrag().isActive(getSettings().getConfig().getAllowedStatus())) {
+            add(new JLabel(getGhostIcon()));
+            gbc.gridx++;
+        }
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.gridx++;
         gbc.weightx = 1;
