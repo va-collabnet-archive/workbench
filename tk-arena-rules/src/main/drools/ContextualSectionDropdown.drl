@@ -105,7 +105,6 @@ end
 rule "remove if in refset: Non-Human refset"
 	when
 		$c: ConceptFact(this isMemberOf Refsets.NON_HUMAN,
- 						this isParentMemberOf Refsets.NON_HUMAN,
  						context == Context.FOCUS_CONCEPT)
 	then 
 		conceptActions.add(actionFactory.make(
