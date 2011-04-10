@@ -113,27 +113,11 @@ public class IsMemberOfEvaluatorDefinition implements EvaluatorDefinition {
 				}else {
 					throw new UnsupportedOperationException("Can't convert: " + value1);
 				}
-				/*ViewCoordinate vc = possibleMember.getViewCoordinate();
-				ConceptVersionBI possibleRefsetCV = null;
-				ConceptSpec possibleRefset = null;
 				
-				int evalRefsetNid = 0;
-				
-				if (ConceptVersionBI.class.isAssignableFrom(value2.getClass())) {
-					possibleRefsetCV = (ConceptVersionBI) value2;
-					evalRefsetNid = possibleRefsetCV.getNid();
-				} else if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
-					possibleRefset = (ConceptSpec) value2;
-					evalRefsetNid = possibleRefset.get(vc).getNid();
-				} else if (ConceptFact.class.isAssignableFrom(value2.getClass())) {
-					ConceptFact fact = (ConceptFact) value2;
-					possibleRefsetCV = (ConceptVersionBI) fact.getConcept();
-					evalRefsetNid = possibleRefsetCV.getNid();
-				} */
 				return this.getOperator().isNegated() ^ (isMember);
-				//return this.getOperator().isNegated() ^ (possibleMember.isMember(evalRefsetNid)); 
+				
 		}
-		//TODO
+
 		private boolean testDesc(DescFact dFact, final Object value2){
 			boolean member = false;
 			
@@ -195,12 +179,14 @@ public class IsMemberOfEvaluatorDefinition implements EvaluatorDefinition {
 					evalRefsetNid = possibleRefsetCV.getNid();
 				} 
 				
+				member = possibleMember.isMember(evalRefsetNid);
+				
 				return member;
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		}
-		//TODO
+		
 		@Override
 		public boolean evaluateCachedLeft(InternalWorkingMemory workingMemory,
 				VariableContextEntry context, Object right) {
