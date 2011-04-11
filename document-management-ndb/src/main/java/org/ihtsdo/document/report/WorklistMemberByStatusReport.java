@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.swing.JFrame;
 
@@ -29,13 +30,20 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.AllowDataCheckSuppression;
+import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.panel.WorkListChooser;
+import org.ihtsdo.tk.api.Precedence;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -52,12 +60,18 @@ public class WorklistMemberByStatusReport implements I_Report {
 			WorkList wl = wlChooser.showModalDialog();
 			csvFile = File.createTempFile("workset_member_", ".csv");
 			PrintWriter pw = new PrintWriter(csvFile);
-			pw.append("worklist|status|term|last user");
+			pw.append("worklist|status|term|target preferred|last user");
 			pw.println();
 
 			if (wl != null) {
 				HashMap<String, List<WorkListMember>> wlMembersByStatus = null;
 				List<WorkListMember> wlMembers = TerminologyProjectDAO.getAllWorkListMembers(wl, config);
+				
+				I_TerminologyProject project = TerminologyProjectDAO.getProjectForWorklist(wl, config);
+				int projectId = project.getId();
+				
+				Integer targetLanguage = TerminologyProjectDAO.getTargetLanguageRefsetIdForProjectId(projectId, config);
+				
 				if (wlMembers != null) {
 					wlMembersByStatus = new HashMap<String, List<WorkListMember>>();
 					for (WorkListMember wlMember : wlMembers) {
@@ -79,7 +93,43 @@ public class WorklistMemberByStatusReport implements I_Report {
 								dataFound = true;
 								pw.append(wl.getName() + "|");
 								pw.append(key + "|");
-								pw.append(workListMember.getName() + "|");
+
+								List<UUID> uuids = workListMember.getUids();
+								I_GetConceptData concept = tf.getConcept(uuids);
+								
+								I_IntSet descriptionTypes =  tf.newIntSet();
+								I_IntSet allowedStatus = tf.newIntSet();
+
+								descriptionTypes.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
+								allowedStatus.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
+								allowedStatus.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()));
+
+								List<ContextualizedDescription> descriptions = ContextualizedDescription.getContextualizedDescriptions(concept.getConceptNid(),targetLanguage,allowedStatus,
+										descriptionTypes,config.getViewPositionSetReadOnly(), true);
+								for (ContextualizedDescription desc : descriptions) {
+									if(desc.getLang().equals(ArchitectonicAuxiliary.LANG_CODE.EN.getFormatedLanguageCode())){
+										pw.append(desc.getText()+ "|");
+									}
+								}
+								
+								descriptionTypes = tf.newIntSet();
+								allowedStatus = tf.newIntSet();
+								
+								descriptionTypes.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()));
+								allowedStatus.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
+								allowedStatus.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()));
+								
+								descriptions = ContextualizedDescription.getContextualizedDescriptions(concept.getConceptNid(),targetLanguage,allowedStatus,
+										descriptionTypes,config.getViewPositionSetReadOnly(), true);
+								String targetPreferred = "";
+								for (ContextualizedDescription desc : descriptions) {
+									if(desc.getLanguageRefsetId() == targetLanguage){
+										if(desc.getTypeId() == tf.uuidToNative(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids())){
+											targetPreferred = desc.getText()+ "|";
+										}
+									}
+								}
+								pw.append(targetPreferred);
 								pw.append(workListMember.getLastAuthorName());
 								pw.println();
 							}
