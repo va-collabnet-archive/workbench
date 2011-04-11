@@ -165,7 +165,7 @@ public class ReportPanel extends JPanel {
 
 			if (chooser.showOpenDialog(this) == JFileChooser.OPEN_DIALOG) {
 				File selectedFolder = chooser.getSelectedFile();
-				SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-hh-mm");
+				SimpleDateFormat sdf = new SimpleDateFormat("MMM-dd-hh-mm");
 				File result = new File(selectedFolder, sdf.format(new Date()) + "_" + report.toString().replace(' ', '_') + ".csv");
 				try {
 					File csvFile = report.getCsv();
@@ -176,10 +176,11 @@ public class ReportPanel extends JPanel {
 					}
 				} catch (IOException e1) {
 					e1.printStackTrace();
+					showError(EXCEPTION);
 				} catch (Exception e2) {
 					e2.printStackTrace();
-				}finally{
 					showError(EXCEPTION);
+				}finally{
 					progressBar1.setVisible(false);
 					chooser.setVisible(false);
 				}
