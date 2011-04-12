@@ -236,7 +236,7 @@ public class ExportDescrAndLangSubsetPanel extends JPanel {
 						}else{
 
 							JOptionPane.showMessageDialog(ExportDescrAndLangSubsetPanel.this,
-									"Refset exported!", 
+									"Language exported!", 
 									"Message", JOptionPane.INFORMATION_MESSAGE);
 
 						}

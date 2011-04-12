@@ -1,8 +1,11 @@
 package org.ihtsdo.project.refset;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
@@ -80,11 +83,9 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 
 			snomedRoot = Terms.get().getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
 
-
-			reportFileWriter = new PrintWriter(new FileWriter(reportFile));
-			outputDescFileWriter = new PrintWriter(new FileWriter(exportDescFile));
-			outputSubsFileWriter = new PrintWriter(new FileWriter(exportSubsFile));
-
+			reportFileWriter = new PrintWriter(new OutputStreamWriter(new FileOutputStream(reportFile),"UTF8"));
+			outputDescFileWriter = new PrintWriter(new OutputStreamWriter(new FileOutputStream(exportDescFile),"UTF8"));
+			outputSubsFileWriter = new PrintWriter(new OutputStreamWriter(new FileOutputStream(exportSubsFile),"UTF8"));
 
 			Set<? extends I_GetConceptData> promRefsets = termFactory.getRefsetHelper(config).getPromotionRefsetForRefset(refsetConcept, config);
 			promoRefset = promRefsets.iterator().next();
