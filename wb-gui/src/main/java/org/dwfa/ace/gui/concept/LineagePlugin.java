@@ -86,6 +86,14 @@ public class LineagePlugin extends AbstractPlugin implements HierarchyListener {
 
     public LineagePlugin(boolean shownByDefault, int sequence) {
         super(shownByDefault, sequence);
+        if (statedView == null) {
+            statedView = new ImageIcon(
+            LineagePlugin.class.getResource("/16x16/plain/graph_edge.png"));
+        }
+        if (inferredView == null) {
+            inferredView = new ImageIcon(
+            LineagePlugin.class.getResource("/16x16/plain/chrystal_ball.png"));
+        }
     }
 
     @Override
@@ -115,10 +123,9 @@ public class LineagePlugin extends AbstractPlugin implements HierarchyListener {
         }
         return lineagePanel;
     }
-    private static ImageIcon statedView = new ImageIcon(
-            LineagePlugin.class.getResource("/16x16/plain/graph_edge.png"));
-    private static ImageIcon inferredView = new ImageIcon(
-            LineagePlugin.class.getResource("/16x16/plain/chrystal_ball.png"));
+    private static ImageIcon statedView = null;
+    private static ImageIcon inferredView = null;
+    
 
     private JComponent getLineagePanel(I_HostConceptPlugins host) throws IOException, TerminologyException {
         setHost(host);

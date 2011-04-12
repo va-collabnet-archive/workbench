@@ -117,10 +117,10 @@ public class DomainModelUncommittedTestCheck extends TestCase {
 			config = tf.newAceFrameConfig();
 			config.addViewPosition(tf.newPosition(
 					tf.getPath(new UUID[] {UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66")}), 
-					Integer.MAX_VALUE));
+					Long.MAX_VALUE));
 			config.addViewPosition(tf.newPosition(
 					tf.getPath(new UUID[] {UUID.fromString("d638b00c-eda1-4f99-9440-5c22bf93f601")}), 
-					Integer.MAX_VALUE));
+					Long.MAX_VALUE));
 			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
 			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());
 			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.localize().getNid());

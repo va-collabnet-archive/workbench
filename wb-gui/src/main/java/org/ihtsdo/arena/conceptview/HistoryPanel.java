@@ -25,8 +25,6 @@ import java.util.TreeSet;
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
 import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -36,6 +34,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.dwfa.ace.log.AceLog;
@@ -56,6 +55,7 @@ import org.ihtsdo.util.swing.GuiUtil;
 public class HistoryPanel {
 
     private static final int HISTORY_LABEL_WIDTH = 11;
+    private final ConceptNavigator navigator;
 
     private JLabel setupLabel(String hxString, int locX) {
         JLabel historyLabel = new JLabel("");
@@ -92,6 +92,7 @@ public class HistoryPanel {
         @Override
         public void stateChanged(ChangeEvent ce) {
             JRadioButton button = (JRadioButton) ce.getSource();
+            int changedCount = changedSelections.size();
             if (button.isSelected()) {
                 if (originalButtonSelections.contains(button)) {
                     // back to original state
@@ -106,12 +107,22 @@ public class HistoryPanel {
                 button.setOpaque(false);
                 changedSelections.remove(button);
             }
-            if (changedSelections.size() > 0) {
-                applyButton.setVisible(true);
-                applyButton.setEnabled(true);
-            } else {
-                applyButton.setVisible(false);
-                applyButton.setEnabled(false);
+            if (changedCount != changedSelections.size()) {
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        if (changedSelections.size() > 0) {
+                            navigator.getImplementButton().setVisible(true);
+                            navigator.getImplementButton().setEnabled(true);
+                            //GuiUtil.tickle(navigator.getImplementButton().getParent());
+                        } else {
+                            navigator.getImplementButton().setVisible(false);
+                            navigator.getImplementButton().setEnabled(false);
+                            //GuiUtil.tickle(navigator.getImplementButton().getParent());
+                        }
+                    }
+                });
             }
         }
     }
@@ -160,6 +171,7 @@ public class HistoryPanel {
     int hxWidth = 0;
     private final Map<PositionBI, Collection<ComponentVersionDragPanel<?>>> positionPanelMap;
     private final Map<Integer, ButtonGroup> nidGroupMap = new HashMap<Integer, ButtonGroup>();
+    private final Map<Integer, ButtonGroup> inferredNidGroupMap = new HashMap<Integer, ButtonGroup>();
     private final Map<NidSapNid, JRadioButton> nidSapNidButtonMap = new HashMap<NidSapNid, JRadioButton>();
     private final Map<JRadioButton, Integer> buttonSapMap = new HashMap<JRadioButton, Integer>();
     private final Map<JRadioButton, Set<JComponent>> buttonPanelSetMap =
@@ -169,7 +181,6 @@ public class HistoryPanel {
     private final Set<JRadioButton> originalButtonSelections = new HashSet<JRadioButton>();
     private final Set<JRadioButton> changedSelections = new HashSet<JRadioButton>();
     private final SelectedVersionChangedListener svcl = new SelectedVersionChangedListener();
-    private final JButton applyButton = new JButton();
 
     private static class NidSapNid {
 
@@ -305,13 +316,12 @@ public class HistoryPanel {
         }
     }
 
-    public HistoryPanel(ConceptView view, JScrollPane historyScroller) throws IOException {
+    public HistoryPanel(ConceptView view, JScrollPane historyScroller,
+            ConceptNavigator navigator) throws IOException {
         this.view = view;
         positionPanelMap = view.getPositionPanelMap();
-        applyButton.setToolTipText("apply selected version changes");
-        applyButton.setIcon(new ImageIcon(
-                HistoryPanel.class.getResource("/16x16/plain/magic-wand.png")));
-        applyButton.addActionListener(new ApplyVersionChangesListener());
+        this.navigator = navigator;
+        navigator.getImplementButton().addActionListener(new ApplyVersionChangesListener());
 
         TreeSet<PositionBI> positionOrderedSet = view.getPositionOrderedSet();
         if (view.getPathRowMap() != null && positionOrderedSet != null) {
@@ -366,7 +376,15 @@ public class HistoryPanel {
         }
     }
 
-    private ButtonGroup getButtonGroup(int componentNid) {
+    private ButtonGroup getButtonGroup(int componentNid, boolean inferred) {
+        if (inferred) {
+            ButtonGroup group = inferredNidGroupMap.get(componentNid);
+            if (group == null) {
+                group = new ButtonGroup();
+                inferredNidGroupMap.put(componentNid, group);
+            }
+            return group;
+        }
         ButtonGroup group = nidGroupMap.get(componentNid);
         if (group == null) {
             group = new ButtonGroup();
@@ -384,7 +402,11 @@ public class HistoryPanel {
         if (versionPanels.isEmpty()) {
             processAllPositions(version, dragPanel);
         } else {
-            ButtonGroup group = getButtonGroup(version.getNid());
+            boolean inferred = false;
+            if (version instanceof RelationshipVersionBI) {
+                inferred = ((RelationshipVersionBI) version).isInferred();
+            }
+            ButtonGroup group = getButtonGroup(version.getNid(), inferred);
             processPosition(group,
                     version, version, dragPanel);
             for (ComponentVersionDragPanel panel : versionPanels) {
@@ -398,10 +420,21 @@ public class HistoryPanel {
     }
 
     private void processAllPositions(ComponentVersionBI version, ComponentVersionDragPanel<?> dragPanel) throws IOException {
-        Collection<ComponentVersionBI> positionVersions = version.getChronicle().getVersions();
-        ButtonGroup group = getButtonGroup(version.getNid());
-        for (ComponentVersionBI positionVersion : positionVersions) {
-            processPosition(group, version, positionVersion, dragPanel);
+        if (version instanceof RelationshipVersionBI) {
+            RelationshipVersionBI rv = (RelationshipVersionBI) version;
+            Collection<RelationshipVersionBI> positionVersions = rv.getChronicle().getVersions();
+            ButtonGroup group = getButtonGroup(version.getNid(), rv.isInferred());
+            for (RelationshipVersionBI positionVersion : positionVersions) {
+                if (positionVersion.isInferred() == rv.isInferred()) {
+                    processPosition(group, version, positionVersion, dragPanel);
+                }
+            }
+        } else {
+            Collection<ComponentVersionBI> positionVersions = version.getChronicle().getVersions();
+            ButtonGroup group = getButtonGroup(version.getNid(), false);
+            for (ComponentVersionBI positionVersion : positionVersions) {
+                processPosition(group, version, positionVersion, dragPanel);
+            }
         }
     }
 
@@ -458,7 +491,7 @@ public class HistoryPanel {
                 sb.append("</html>");
                 button.setToolTipText(sb.toString());
             }
-            
+
             boolean enableButton = true;
             if (positionVersion instanceof RelationshipVersionBI) {
                 RelationshipVersionBI rv = (RelationshipVersionBI) positionVersion;
@@ -467,7 +500,7 @@ public class HistoryPanel {
                 }
             }
             button.setEnabled(enableButton);
-            
+
             putPanelInButtonMap(button, dragPanel);
             if (group != null) {
                 if (add) {
@@ -545,22 +578,17 @@ public class HistoryPanel {
         historyHeaderScroller.setLocation(0, 0);
         historyHeaderScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         historyHeaderScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        historyHeaderScroller.setSize(topHistoryPanel.getWidth(), view.getHistoryPanel().getHeight());
+        historyHeaderScroller.setSize(topHistoryPanel.getWidth(), 
+                view.getHistoryPanel().getHeight());
         historyHeaderScroller.setLocation(0, 0);
         topHistoryPanel.add(versionScroller);
-        versionScroller.setSize(topHistoryPanel.getWidth(), view.getParent().getHeight() + insetAdjustment);
+        versionScroller.setSize(topHistoryPanel.getWidth(), view.getParent().getHeight()  + insetAdjustment);
         versionScroller.setLocation(0, historyHeaderPanel.getHeight() + 1);
         versionScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         versionPanel.setLocation(0, 0);
-        versionPanel.setSize(hxWidth, view.getHeight());
+        versionPanel.setSize(hxWidth, view.getParent().getParent().getHeight()  + 
+                (view.getHistoryPanel().getHeight() + view.getHistoryPanel().getY()) + 50);
         versionPanel.setPreferredSize(versionPanel.getPreferredSize());
-
-        topHistoryPanel.add(applyButton);
-        applyButton.setBorder(BorderFactory.createEmptyBorder());
-        applyButton.setSize(30, 20);
-        applyButton.setLocation((topHistoryPanel.getWidth() / 2)
-                - (applyButton.getWidth() / 2),
-                topHistoryPanel.getHeight() - applyButton.getHeight() - 1);
         syncVerticalLayout();
     }
     private static final int xStartLoc = 5;

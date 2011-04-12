@@ -198,7 +198,7 @@ public class SnoRocketTabPanel extends JPanel implements ActionListener {
             if (cClassPathObj != null) {
                 PathBI cClassIPath = tf.getPath(cClassPathObj.getUids());
                 cClassPositionBIList = new ArrayList<PositionBI>();
-                cClassPositionBIList.add(new Position(Integer.MAX_VALUE, cClassIPath));
+                cClassPositionBIList.add(new Position(Long.MAX_VALUE, cClassIPath));
                 addPathOrigins(cClassPositionBIList, cClassIPath);
             } else {
                 if (config.getViewPositionSet() == null) {

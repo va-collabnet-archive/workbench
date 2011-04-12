@@ -146,7 +146,7 @@ public class TestEnums extends TestCase {
 			config = tf.newAceFrameConfig();
 			config.addViewPosition(tf.newPosition(
 					tf.getPath(new UUID[] {UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66")}), 
-					Integer.MAX_VALUE));
+					Long.MAX_VALUE));
 			config.addEditingPath( tf.getPath(new UUID[] {UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66")}));
 			config.addPromotionPath( tf.getPath(new UUID[] {UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66")}));
 

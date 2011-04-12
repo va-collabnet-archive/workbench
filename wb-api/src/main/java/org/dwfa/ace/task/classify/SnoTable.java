@@ -211,7 +211,7 @@ public class SnoTable {
         }
         PathBI cEditPathBI = config.getEditingPathSet().iterator().next();
         cEditPath = new ArrayList<PositionBI>();
-        cEditPath.add(tf.newPosition(cEditPathBI, Integer.MAX_VALUE));
+        cEditPath.add(tf.newPosition(cEditPathBI, Long.MAX_VALUE));
         addPathOrigins(cEditPath, cEditPathBI);
                 
         // GET ALL CLASSIFER_PATH ORIGINS

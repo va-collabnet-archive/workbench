@@ -186,6 +186,9 @@ public class ConceptViewSettings extends ArenaComponentSettings {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JButton button = (JButton) e.getSource();
+                if (relAssertionType == null) {
+                    relAssertionType = RelAssertionType.STATED;
+                }
                 switch (relAssertionType) {
 
                     case INFERRED:

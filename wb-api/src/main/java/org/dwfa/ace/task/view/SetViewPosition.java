@@ -90,15 +90,15 @@ public class SetViewPosition extends AbstractTask {
             I_ConfigAceFrame profile = (I_ConfigAceFrame) process.getProperty(profilePropName);
 
             PathBI path = Terms.get().getPath(viewPathEntry.ids);
-            int version = Integer.MAX_VALUE;
+            long time = Long.MAX_VALUE;
             if (positionStr.equalsIgnoreCase("latest")) {
-                version = Integer.MAX_VALUE;
+                time = Long.MAX_VALUE;
             } else {
                 Date date = dateParser.parse(positionStr);
-                version = Terms.get().convertToThinVersion(date.getTime());
+                time = date.getTime();
             }
 
-            PositionBI position = Terms.get().newPosition(path, version);
+            PositionBI position = Terms.get().newPosition(path, time);
             profile.addViewPosition(position);
 
             return Condition.CONTINUE;

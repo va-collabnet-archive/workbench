@@ -393,7 +393,7 @@ public class ModifyUserRolePanel extends JPanel {
         Set<PathBI> editingPaths = activeProfile.getEditingPathSet();
         Set<PositionBI> allPositions = new HashSet<PositionBI>();
         for (PathBI path : editingPaths) {
-            allPositions.add(termFactory.newPosition(path, Integer.MAX_VALUE));
+            allPositions.add(termFactory.newPosition(path, Long.MAX_VALUE));
             for (PositionBI position : path.getOrigins()) {
                 addOriginPositions(termFactory, position, allPositions);
             }

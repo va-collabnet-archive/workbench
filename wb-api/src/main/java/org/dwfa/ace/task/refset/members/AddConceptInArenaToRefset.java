@@ -91,7 +91,7 @@ public class AddConceptInArenaToRefset extends AbstractTask {
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             Set<PositionBI> positionSet = new HashSet<PositionBI>();
             for (PathBI path : config.getEditingPathSet()) {
-            	positionSet.add(tf.newPosition(path, Integer.MAX_VALUE));
+            	positionSet.add(tf.newPosition(path, Long.MAX_VALUE));
             }
             
             I_HostConceptPlugins host = (I_HostConceptPlugins) 

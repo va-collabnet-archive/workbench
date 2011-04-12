@@ -47,19 +47,17 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 
-@BeanList(specs = { @Spec(directory = "tasks/ide/gui/workflow/detail sheet", type = BeanType.TASK_BEAN) })
+@BeanList(specs = {
+    @Spec(directory = "tasks/ide/gui/workflow/detail sheet", type = BeanType.TASK_BEAN)})
 public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTask {
+
     private static final long serialVersionUID = 1;
-
     private static final int dataVersion = 2;
-
     private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
     private String refsetUuidPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
     private String refsetPositionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
-
-	private String snomedPositionSetPropName = ProcessAttachmentKeys.POSITION_LIST.getAttachmentKey();
+    private String snomedPositionSetPropName = ProcessAttachmentKeys.POSITION_LIST.getAttachmentKey();
     private String clausesToUpdateMemberUuidPropName = ProcessAttachmentKeys.REFSET_MEMBER_UUID.getAttachmentKey();
-    
     private transient Exception ex = null;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -96,7 +94,6 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
         this.profilePropName = profilePropName;
     }
 
-
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
@@ -111,9 +108,8 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
                 SwingUtilities.invokeAndWait(new Runnable() {
 
                     public void run() {
-                        doRun(process, worker); 
+                        doRun(process, worker);
                     }
-
                 });
             }
         } catch (InterruptedException e) {
@@ -122,7 +118,7 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
             throw new TaskFailedException(e);
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
-        } 
+        }
         if (ex != null) {
             throw new TaskFailedException(ex);
         }
@@ -140,38 +136,38 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
             int width = 700;
             int height = 550;
             workflowDetailsSheet.setSize(width, height);
-            workflowDetailsSheet.setLayout(new GridLayout(1,1));
+            workflowDetailsSheet.setLayout(new GridLayout(1, 1));
             I_TermFactory tf = Terms.get();
-            
-           UUID refsetSpecUuid = (UUID) process.getProperty(refsetUuidPropName);
-           Set<UniversalAcePosition> universalRefsetSpecVersionSet = (Set<UniversalAcePosition>) process.getProperty(refsetPositionSetPropName);
-           Set<PositionBI> refsetSpecPositionSet = new HashSet<PositionBI>();
-	        for (UniversalAcePosition univPos: universalRefsetSpecVersionSet) {
-		           PathBI path = tf.getPath(univPos.getPathId());
-		           PositionBI thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
-		           refsetSpecPositionSet.add(thinPos);
-		        }
 
-	        PositionSetReadOnly refsetSpecVersionSet = new PositionSetReadOnly(refsetSpecPositionSet);
-	        Set<UniversalAcePosition> universalSourceTerminologyVersionSet = (Set<UniversalAcePosition>) process.getProperty(snomedPositionSetPropName);
-           Set<PositionBI> sourceTerminologyPositionSet = new HashSet<PositionBI>();
-	        for (UniversalAcePosition univPos: universalSourceTerminologyVersionSet) {
-		           PathBI path = tf.getPath(univPos.getPathId());
-		           PositionBI thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
-		           sourceTerminologyPositionSet.add(thinPos);
-		        }
+            UUID refsetSpecUuid = (UUID) process.getProperty(refsetUuidPropName);
+            Set<UniversalAcePosition> universalRefsetSpecVersionSet = (Set<UniversalAcePosition>) process.getProperty(refsetPositionSetPropName);
+            Set<PositionBI> refsetSpecPositionSet = new HashSet<PositionBI>();
+            for (UniversalAcePosition univPos : universalRefsetSpecVersionSet) {
+                PathBI path = tf.getPath(univPos.getPathId());
+                PositionBI thinPos = tf.newPosition(path, univPos.getTime());
+                refsetSpecPositionSet.add(thinPos);
+            }
 
-	        PositionSetReadOnly sourceTerminologyVersionSet = new PositionSetReadOnly(sourceTerminologyPositionSet);
-           I_ConfigAceFrame frameConfig = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
-           List<Collection<UUID>> clausesToUpdate = (List<Collection<UUID>>) process.getProperty(clausesToUpdateMemberUuidPropName);
+            PositionSetReadOnly refsetSpecVersionSet = new PositionSetReadOnly(refsetSpecPositionSet);
+            Set<UniversalAcePosition> universalSourceTerminologyVersionSet = (Set<UniversalAcePosition>) process.getProperty(snomedPositionSetPropName);
+            Set<PositionBI> sourceTerminologyPositionSet = new HashSet<PositionBI>();
+            for (UniversalAcePosition univPos : universalSourceTerminologyVersionSet) {
+                PathBI path = tf.getPath(univPos.getPathId());
+                PositionBI thinPos = tf.newPosition(path, univPos.getTime());
+                sourceTerminologyPositionSet.add(thinPos);
+            }
 
-           
-           I_GetConceptData refsetSpec = Terms.get().getConcept(refsetSpecUuid);
-           workflowDetailsSheet.add(new RefreshSpecClausePanel(refsetSpec,
-                                                                refsetSpecVersionSet, 
-                                                                sourceTerminologyVersionSet,
-                                                                clausesToUpdate,
-                                                                frameConfig));
+            PositionSetReadOnly sourceTerminologyVersionSet = new PositionSetReadOnly(sourceTerminologyPositionSet);
+            I_ConfigAceFrame frameConfig = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
+            List<Collection<UUID>> clausesToUpdate = (List<Collection<UUID>>) process.getProperty(clausesToUpdateMemberUuidPropName);
+
+
+            I_GetConceptData refsetSpec = Terms.get().getConcept(refsetSpecUuid);
+            workflowDetailsSheet.add(new RefreshSpecClausePanel(refsetSpec,
+                    refsetSpecVersionSet,
+                    sourceTerminologyVersionSet,
+                    clausesToUpdate,
+                    frameConfig));
         } catch (Exception e) {
             ex = e;
         }
@@ -184,45 +180,45 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
     public void complete(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         // Nothing to do
-
     }
+
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
      */
     public Collection<Condition> getConditions() {
         return AbstractTask.CONTINUE_CONDITION;
     }
-    
+
     public String getRefsetUuidPropName() {
-		return refsetUuidPropName;
-	}
+        return refsetUuidPropName;
+    }
 
-	public void setRefsetUuidPropName(String refsetUuidPropName) {
-		this.refsetUuidPropName = refsetUuidPropName;
-	}
+    public void setRefsetUuidPropName(String refsetUuidPropName) {
+        this.refsetUuidPropName = refsetUuidPropName;
+    }
 
-	public String getRefsetPositionSetPropName() {
-		return refsetPositionSetPropName;
-	}
+    public String getRefsetPositionSetPropName() {
+        return refsetPositionSetPropName;
+    }
 
-	public void setRefsetPositionSetPropName(String refsetPositionSetPropName) {
-		this.refsetPositionSetPropName = refsetPositionSetPropName;
-	}
+    public void setRefsetPositionSetPropName(String refsetPositionSetPropName) {
+        this.refsetPositionSetPropName = refsetPositionSetPropName;
+    }
 
-	public String getSnomedPositionSetPropName() {
-		return snomedPositionSetPropName;
-	}
+    public String getSnomedPositionSetPropName() {
+        return snomedPositionSetPropName;
+    }
 
-	public void setSnomedPositionSetPropName(String snomedPositionSetPropName) {
-		this.snomedPositionSetPropName = snomedPositionSetPropName;
-	}
+    public void setSnomedPositionSetPropName(String snomedPositionSetPropName) {
+        this.snomedPositionSetPropName = snomedPositionSetPropName;
+    }
 
-	public String getClausesToUpdateMemberUuidPropName() {
-		return clausesToUpdateMemberUuidPropName;
-	}
+    public String getClausesToUpdateMemberUuidPropName() {
+        return clausesToUpdateMemberUuidPropName;
+    }
 
-	public void setClausesToUpdateMemberUuidPropName(
-			String clauseToUpdateMemberUuidPropName) {
-		this.clausesToUpdateMemberUuidPropName = clauseToUpdateMemberUuidPropName;
-	}
+    public void setClausesToUpdateMemberUuidPropName(
+            String clauseToUpdateMemberUuidPropName) {
+        this.clausesToUpdateMemberUuidPropName = clauseToUpdateMemberUuidPropName;
+    }
 }

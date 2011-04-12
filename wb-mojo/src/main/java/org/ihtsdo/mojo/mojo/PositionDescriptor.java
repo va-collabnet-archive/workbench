@@ -45,10 +45,10 @@ public class PositionDescriptor {
     public PositionBI getPosition() throws Exception {
         I_GetConceptData pathConcept = path.getVerifiedConcept();
         PathBI pathForPosition = Terms.get().getPath(pathConcept.getUids());
-        int version = ThinVersionHelper.convert(timeString);
-        return Terms.get().newPosition(pathForPosition, version);
+        return Terms.get().newPosition(pathForPosition, ThinVersionHelper.convert(timeString));
     }
 
+    @Override
     public String toString() {
         return "Path: " + path + " position: " + timeString;
     }

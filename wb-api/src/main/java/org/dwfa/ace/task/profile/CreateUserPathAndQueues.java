@@ -405,7 +405,7 @@ public class CreateUserPathAndQueues extends AbstractTask {
         config.addEditingPath(userPath);
         I_GetConceptData userPathConcept = Terms.get().getConcept(userPath.getConceptNid());
         config.setClassifierInputPath(userPathConcept);
-        config.getViewPositionSet().add(Terms.get().newPosition(userPath, Integer.MAX_VALUE));
+        config.getViewPositionSet().add(Terms.get().newPosition(userPath, Long.MAX_VALUE));
         config.getDbConfig().setUserPath(userPathConcept);
     }
 

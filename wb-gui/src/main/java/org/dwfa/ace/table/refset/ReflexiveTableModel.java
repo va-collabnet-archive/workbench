@@ -90,10 +90,12 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
 
         private class TextFieldFocusListener implements FocusListener {
 
+            @Override
             public void focusGained(FocusEvent e) {
                 // nothing to do
             }
 
+            @Override
             public void focusLost(FocusEvent e) {
                 delegate.stopCellEditing();
             }
@@ -113,6 +115,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
             delegate = new EditorDelegate() {
                 private static final long serialVersionUID = 1L;
 
+                @Override
                 public void setValue(Object value) {
                     if (StringWithExtTuple.class.isAssignableFrom(value.getClass())) {
                         StringWithExtTuple swet = (StringWithExtTuple) value;
@@ -122,6 +125,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                     }
                 }
 
+                @Override
                 public Object getCellEditorValue() {
                     return textField.getText();
                 }
@@ -129,6 +133,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
             textField.addActionListener(delegate);
         }
 
+        @Override
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
             ((JComponent) getComponent()).setBorder(new LineBorder(Color.black));
             return super.getTableCellEditorComponent(table, value, isSelected, row, column);
@@ -361,6 +366,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         this.progress = progress;
     }
 
+    @Override
     public int getColumnCount() {
         if (checkBoxColumn) {
             return columns.length + 1;
@@ -372,6 +378,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         return columns.length;
     }
 
+    @Override
     public String getColumnName(int col) {
         if (col >= columns.length) {
             return "";
@@ -379,6 +386,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         return columns[col].getColumnName();
     }
 
+    @Override
     public void setComponentId(int componentId) throws Exception {
         this.tableComponentId = componentId;
         this.allTuples = null;
@@ -401,6 +409,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         this.promotionFilterId = promotionFilterId;
     }
 
+    @Override
     public int getRowCount() {
         if (allTuples == null) {
             allTuples = new ArrayList<I_ExtendByRefVersion>();
@@ -485,6 +494,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
     	}
     }
 
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
     	if (values != null) {
     		Object value = values.get(rowColumnToLong(rowIndex, columnIndex));
@@ -661,7 +671,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                                 I_DescriptionTuple refsetDesc =
                                         componentRefset.getDescTuple(host.getConfig().getTableDescPreferenceList(),
                                             host.getConfig());
-                                StringBuffer buff = new StringBuffer();
+                                StringBuilder buff = new StringBuilder();
                                 buff.append("<html>");
                                 buff.append(refsetDesc.getText());
                                 buff.append(" member: ");
@@ -738,6 +748,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         return columns;
     }
 
+    @Override
     public boolean isCellEditable(int row, int col) {
         if (ACE.editMode == false || allTuples == null) {
             return false;
@@ -748,7 +759,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         if (columns[col].isCreationEditable() == false) {
             return false;
         }
-        if (allTuples.size() == 0) {
+        if (allTuples.isEmpty()) {
             return false;
         }
         if (allTuples.get(row).getTime() == Long.MAX_VALUE) {
@@ -765,6 +776,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         return false;
     }
 
+    @Override
     public void setValueAt(Object value, int row, int col) {
         if (col >= columns.length) {
             if (Boolean.class.isAssignableFrom(value.getClass())) {
@@ -833,6 +845,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         public void run() {
             if (isActive()) {
                 SwingUtilities.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         if (isActive()) {
                             I_ExtendByRefVersion tuple = allTuples.get(row);
@@ -865,6 +878,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
 
     }
 
+    @Override
     public Class<?> getColumnClass(int c) {
         if (c >= columns.length) {
             return Boolean.class;

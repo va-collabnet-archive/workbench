@@ -1241,12 +1241,12 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 			cEditPathNid = cEditPathObj.getConceptNid();
 			cEditIPath = tf.getPath(cEditPathObj.getUids());
 			cEditPosSet = new PositionSetReadOnly(tf.newPosition(cEditIPath,
-					Integer.MAX_VALUE));
+					Long.MAX_VALUE));
 			// cEditPosSet = new
 			// PositionSetReadOnly(cEditIPath.getOrigins().get(0));
 
 			cEditPathPos = new ArrayList<PositionBI>();
-			cEditPathPos.add(tf.newPosition(cEditIPath, Integer.MAX_VALUE));
+			cEditPathPos.add(tf.newPosition(cEditIPath, Long.MAX_VALUE));
 			setupPathOrigins(cEditPathPos, cEditIPath);
 
 			// GET ALL CLASSIFER_PATH ORIGINS
@@ -1260,12 +1260,12 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 			cClassPathNid = cClassPathObj.getConceptNid();
 			cClassIPath = tf.getPath(cClassPathObj.getUids());
 			cClassPosSet = new PositionSetReadOnly(tf.newPosition(cClassIPath,
-					Integer.MAX_VALUE));
+					Long.MAX_VALUE));
 			// cClassPosSet = new
 			// PositionSetReadOnly(cClassIPath.getOrigins().get(0));
 
 			cClassPathPos = new ArrayList<PositionBI>();
-			cClassPathPos.add(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
+			cClassPathPos.add(tf.newPosition(cClassIPath, Long.MAX_VALUE));
 			setupPathOrigins(cClassPathPos, cClassIPath);
 
 		} catch (TerminologyException e) {

@@ -241,16 +241,16 @@ public class InstructAndWaitDo extends AbstractTask {
                 termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
         Set<PositionBI> positionSet = new HashSet<PositionBI>();
         for (PathBI path : config.getEditingPathSet()) {
-            positionSet.add(termFactory.newPosition(path, Integer.MAX_VALUE));
+            positionSet.add(termFactory.newPosition(path, Long.MAX_VALUE));
         }
         PositionSetReadOnly clonePositions = new PositionSetReadOnly(positionSet);
         for (I_DescriptionTuple desc : con.getDescriptionTuples(null, null, clonePositions, config.getPrecedence(),
             config.getConflictResolutionStrategy())) {
             // Description is current
-            if (desc.getStatusId() != current_status.getConceptNid())
+            if (desc.getStatusNid() != current_status.getConceptNid())
                 continue;
             // Description is FSN
-            if (desc.getTypeId() != fully_specified_description_type.getConceptNid())
+            if (desc.getTypeNid() != fully_specified_description_type.getConceptNid())
                 continue;
             // Get the substring starting at the last left paren
             String fsn = desc.getText();
@@ -291,7 +291,7 @@ public class InstructAndWaitDo extends AbstractTask {
                 I_TermFactory termFactory = Terms.get();
                 Set<PositionBI> positionSet = new HashSet<PositionBI>();
                 for (PathBI path : config.getEditingPathSet()) {
-                    positionSet.add(termFactory.newPosition(path, Integer.MAX_VALUE));
+                    positionSet.add(termFactory.newPosition(path, Long.MAX_VALUE));
                 }
                 PositionSetReadOnly clonePositions = new PositionSetReadOnly(positionSet);
                 for (I_RelTuple rel : con.getSourceRelTuples(config.getAllowedStatus(), null, clonePositions, config

@@ -966,10 +966,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
         return Terms.get().getConcept(Arrays.asList(ids));
     }
 
-    public I_Position newPosition(PathBI path, int version) {
-        return new Position(version, path);
-    }
-
     public I_IntSet newIntSet() {
         return new IntSet();
     }

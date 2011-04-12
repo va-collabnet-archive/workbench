@@ -228,7 +228,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
             time = mutableArray.commitTimes[getReadWriteIndex(sapNid)];
         }
         PathBI path = Bdb.getPathManager().get(pathNid);
-        return new Position(ThinVersionHelper.convert(time), path);
+        return new Position(time, path);
     }
 
     public int getPathNid(int index) {

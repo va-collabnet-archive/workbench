@@ -1326,10 +1326,10 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             }
             cEditPathBI = config.getEditingPathSet().iterator().next();
             cEditPathNid = cEditPathBI.getConceptNid();
-            cEditPosSet = new PositionSetReadOnly(tf.newPosition(cEditPathBI, Integer.MAX_VALUE));
+            cEditPosSet = new PositionSetReadOnly(tf.newPosition(cEditPathBI, Long.MAX_VALUE));
 
             cEditPathListPositionBI = new ArrayList<PositionBI>();
-            cEditPathListPositionBI.add(tf.newPosition(cEditPathBI, Integer.MAX_VALUE));
+            cEditPathListPositionBI.add(tf.newPosition(cEditPathBI, Long.MAX_VALUE));
             getPathOrigins(cEditPathListPositionBI, cEditPathBI);
 
             // GET ALL CLASSIFER_PATH ORIGINS
@@ -1347,10 +1347,10 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             }
             cViewPathBI = config.getViewPositionSet().iterator().next().getPath();
             cViewPathNid = cViewPathBI.getConceptNid();
-            cViewPosSet = new PositionSetReadOnly(tf.newPosition(cViewPathBI, Integer.MAX_VALUE));
+            cViewPosSet = new PositionSetReadOnly(tf.newPosition(cViewPathBI, Long.MAX_VALUE));
 
             cViewPathListPositionBI = new ArrayList<PositionBI>();
-            cViewPathListPositionBI.add(tf.newPosition(cViewPathBI, Integer.MAX_VALUE));
+            cViewPathListPositionBI.add(tf.newPosition(cViewPathBI, Long.MAX_VALUE));
             getPathOrigins(cViewPathListPositionBI, cViewPathBI);
 
         } catch (TerminologyException e) {

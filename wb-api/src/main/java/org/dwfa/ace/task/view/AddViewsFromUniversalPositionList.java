@@ -89,14 +89,14 @@ public class AddViewsFromUniversalPositionList extends AbstractTask {
             for (UniversalAcePosition univPos : positionList) {
             	PathBI path = tf.getPath(univPos.getPathId());
                 if (profile.getEditingPathSet().contains(path.getConceptNid())) {
-                	PositionBI thinPos = tf.newPosition(path, tf.convertToThinVersion(Integer.MAX_VALUE));
+                	PositionBI thinPos = tf.newPosition(path, Long.MAX_VALUE);
                     profile.addViewPosition(thinPos);
                 } else {
-                    int version = tf.convertToThinVersion(univPos.getTime());
-                    if (version < Integer.MAX_VALUE) {
-                        version++;
+                    long time = univPos.getTime();
+                    if (time < Long.MAX_VALUE) {
+                        time++;
                     }
-                    PositionBI thinPos = tf.newPosition(path, version);
+                    PositionBI thinPos = tf.newPosition(path, time);
                     profile.addViewPosition(thinPos);
                 }
             }

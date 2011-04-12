@@ -43,7 +43,6 @@ import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.process.Condition;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.SuppressDataChecks;
@@ -230,7 +229,7 @@ public interface I_TermFactory {
     PathBI newPath(Collection<? extends PositionBI> positionSet, I_GetConceptData pathConcept, I_ConfigAceFrame commitConfig)
             throws TerminologyException, IOException;
 
-    PositionBI newPosition(PathBI path, int version) throws TerminologyException, IOException;
+    PositionBI newPosition(PathBI path, long time) throws TerminologyException, IOException;
 
     I_IntSet newIntSet();
 
@@ -383,6 +382,7 @@ public interface I_TermFactory {
     int convertToThinVersion(long time);
 
     int convertToThinVersion(String dateStr) throws java.text.ParseException;
+    long convertToThickVersion(String dateStr) throws ParseException;
 
     long convertToThickVersion(int version);
 

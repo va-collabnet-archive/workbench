@@ -429,23 +429,37 @@ public class ConceptView extends JPanel {
                         }
 
                         try {
-                            for (RelGroupVersionBI r : relGroups) {
+                            for (RelGroupVersionBI rg : relGroups) {
                                 Collection<? extends RelationshipVersionBI> currentRels =
-                                        r.getCurrentRels(); //TODO getCurrentRels
+                                        rg.getCurrentRels(); //TODO getCurrentRels
                                 if (!currentRels.isEmpty()) {
                                     if (!cprAdded) {
                                         add(cpr, gbc);
                                         gbc.gridy++;
                                         cprAdded = true;
                                     }
-                                    DragPanelRelGroup rgc = getRelGroupComponent(r, cpr);
-                                    seperatorComponents.add(rgc);
-                                    add(rgc, gbc);
-                                    gbc.gridy++;
-                                    cpr.setAlertCount(cpr.alertCount += rgc.getAlertSubpanelCount());
-                                    cpr.setRefexCount(cpr.refexCount += rgc.getRefexSubpanelCount());
-                                    cpr.setHistoryCount(cpr.historyCount += rgc.getHistorySubpanelCount());
-                                    cpr.setTemplateCount(cpr.templateCount += rgc.getTemplateSubpanelCount());
+                                    boolean show = false;
+                                    for (RelationshipVersionBI rv : rg.getCurrentRels()) {
+                                        if (rv.isStated() && settings.showStated()) {
+                                            show = true;
+                                            break;
+                                        } else if (rv.isInferred() && settings.showInferred()) {
+                                            show = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (show) {
+                                        DragPanelRelGroup rgc = getRelGroupComponent(rg, cpr);
+                                        seperatorComponents.add(rgc);
+                                        add(rgc, gbc);
+                                        gbc.gridy++;
+                                        cpr.setAlertCount(cpr.alertCount += rgc.getAlertSubpanelCount());
+                                        cpr.setRefexCount(cpr.refexCount += rgc.getRefexSubpanelCount());
+                                        cpr.setHistoryCount(cpr.historyCount += rgc.getHistorySubpanelCount());
+                                        cpr.setTemplateCount(cpr.templateCount += rgc.getTemplateSubpanelCount());
+                                    }
+
                                 }
                             }
                         } catch (ContraditionException e) {

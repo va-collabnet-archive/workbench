@@ -24,7 +24,13 @@ import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.ihtsdo.arena.conceptview.ConceptViewSettings.SIDE;
 
 public class ConceptNavigator extends JPanel {
+
     private HistoryPanel historyPanel;
+    private JButton implementButton;
+
+    public JButton getImplementButton() {
+        return implementButton;
+    }
 
     public class ConceptChangeListener implements PropertyChangeListener {
 
@@ -81,6 +87,13 @@ public class ConceptNavigator extends JPanel {
             historyScroller.setVisible(false);
             view.setHistoryShown(false);
             statedInferredScroller.setVisible(true);
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    updateHistoryPanel();
+                }
+            });
         }
     }
     /**
@@ -118,7 +131,7 @@ public class ConceptNavigator extends JPanel {
     protected void updateHistoryPanel() {
         try {
             if (historyPanel == null) {
-                historyPanel = new HistoryPanel(view, historyScroller);
+                historyPanel = new HistoryPanel(view, historyScroller, this);
             } else {
                 historyPanel.resizeIfNeeded();
             }
@@ -192,6 +205,14 @@ public class ConceptNavigator extends JPanel {
         gbc.gridx++;
         gbc.weightx = 0;
         gbc.fill = GridBagConstraints.NONE;
+        implementButton  = new JButton(new ImageIcon(
+                ConceptViewRenderer.class.getResource("/16x16/plain/magic-wand.png")));
+        implementButton.setBorder(BorderFactory.createEmptyBorder(2, 20, 2, 20));
+        implementButton.setToolTipText("apply selected version changes");
+        implementButton.setVisible(true);
+        implementButton.setEnabled(false);
+        topPanel.add(implementButton, gbc);
+        gbc.gridx++;
         JButton taxonomyButton = new JButton(new ImageIcon(
                 ConceptViewRenderer.class.getResource("/16x16/plain/text_tree.png")));
         taxonomyButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));

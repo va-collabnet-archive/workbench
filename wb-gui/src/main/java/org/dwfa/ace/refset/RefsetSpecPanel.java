@@ -785,7 +785,7 @@ public class RefsetSpecPanel extends JPanel {
                                         analog.setC1id(newStatus.getNid());
 
                                         extForMember.addVersion(analog);
-                                        extForMember.promote(new Position(Integer.MAX_VALUE, p), promotionPath, currentSet,
+                                        extForMember.promote(new Position(Long.MAX_VALUE, p), promotionPath, currentSet,
                                             aceFrameConfig.getPrecedence());
                                     }
                                 }

@@ -83,7 +83,7 @@ public class ConceptAttributesVersionTest {
 		addDescription("P-0", p0Concept);
 
 		p0 = Terms.get().newPath(config.getViewPositionSet(), p0Concept, config);
-		PositionBI firstOrigin = Terms.get().newPosition(p0, Integer.MAX_VALUE);
+		PositionBI firstOrigin = Terms.get().newPosition(p0, Long.MAX_VALUE);
         Terms.get().commit();
 		Set<PositionBI> firstOriginSet = new HashSet<PositionBI>();
 		firstOriginSet.add(firstOrigin);
@@ -99,8 +99,8 @@ public class ConceptAttributesVersionTest {
         Concept p2_concept = (Concept) Terms.get().newConcept(UUID.randomUUID(), false, config);
         addDescription("P-2", p2_concept);
         Set<PositionBI> secondOriginSet = new HashSet<PositionBI>();
-        secondOriginSet.add(Terms.get().newPosition(p1_1, Integer.MAX_VALUE));
-        secondOriginSet.add(Terms.get().newPosition(p1_2, Integer.MAX_VALUE));
+        secondOriginSet.add(Terms.get().newPosition(p1_1, Long.MAX_VALUE));
+        secondOriginSet.add(Terms.get().newPosition(p1_2, Long.MAX_VALUE));
 
         p2 = Terms.get().newPath(secondOriginSet, p2_concept, config);
 
@@ -158,11 +158,11 @@ public class ConceptAttributesVersionTest {
             Concept c = Concept.get(testConcept);
             
             IntSet allowedStatus = null;
-            List<Version> tuples = c.getConceptAttributes().getTuples(allowedStatus, new PositionSetReadOnly(Terms.get().newPosition(p1_1, Integer.MAX_VALUE)), Precedence.PATH, config.getConflictResolutionStrategy());
+            List<Version> tuples = c.getConceptAttributes().getTuples(allowedStatus, new PositionSetReadOnly(Terms.get().newPosition(p1_1, Long.MAX_VALUE)), Precedence.PATH, config.getConflictResolutionStrategy());
             assertEquals(1, tuples.size());
             assertTrue(tuples.get(0).getTime() == t2);
             
-            tuples = c.getConceptAttributes().getTuples(allowedStatus, new PositionSetReadOnly(Terms.get().newPosition(p1_1, Integer.MAX_VALUE)), Precedence.TIME, config.getConflictResolutionStrategy());
+            tuples = c.getConceptAttributes().getTuples(allowedStatus, new PositionSetReadOnly(Terms.get().newPosition(p1_1, Long.MAX_VALUE)), Precedence.TIME, config.getConflictResolutionStrategy());
             assertEquals(1, tuples.size());
             assertTrue(tuples.get(0).getTime() == t2);
             

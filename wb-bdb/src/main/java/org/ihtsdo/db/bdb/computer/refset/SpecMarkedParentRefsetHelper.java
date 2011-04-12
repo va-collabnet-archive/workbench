@@ -18,6 +18,7 @@ package org.ihtsdo.db.bdb.computer.refset;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -215,16 +216,16 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
         allowedType.add(Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids()).getConceptNid());
 
         Set<? extends I_GetConceptData> targetParentRefsets =
-                memberRefset.getSourceRelTargets(getAllowedStatuses(), allowedType, null,
+                memberRefset.getSourceRelTargets(getAllowedStatuses(), allowedType, getViewPositions(),
                     getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
 
-        if (targetParentRefsets == null || targetParentRefsets.size() == 0) {
+        if (targetParentRefsets == null || targetParentRefsets.isEmpty()) {
             throw new TerminologyException("Unable to locate parent member refset for '"
                 + memberRefset.getInitialText() + "'");
         }
         if (targetParentRefsets.size() > 1) {
-            logger.warning("More than one parent member refset found for '" + memberRefset.getInitialText() + "'"
-                + "Defaulting to the first one found!");
+            logger.log(Level.WARNING,"More than one parent member refset found for ''{0}" + "''"
+                + "Defaulting to the first one found!", memberRefset.getInitialText());
         }
         I_GetConceptData parentRefset = targetParentRefsets.iterator().next();
         return parentRefset.getConceptNid();

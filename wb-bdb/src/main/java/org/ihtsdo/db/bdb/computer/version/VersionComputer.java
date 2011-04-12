@@ -175,7 +175,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
             List<V> versions, Precedence precedencePolicy,
             ContradictionManagerBI contradictionManager) {
         if (positions == null || positions.isEmpty()) {
-            addSpecifiedVersionsNullPositions(allowedStatus, null,
+            addSpecifiedVersionsNullPositions(allowedStatus, allowedTypes,
                     matchingTuples, versions, precedencePolicy,
                     contradictionManager, null);
         } else {

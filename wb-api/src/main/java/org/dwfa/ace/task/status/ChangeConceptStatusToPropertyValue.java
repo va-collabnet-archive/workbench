@@ -94,7 +94,7 @@ public class ChangeConceptStatusToPropertyValue extends AbstractTask {
 
             Set<PositionBI> positionSet = new HashSet<PositionBI>();
             for (PathBI editPath : config.getEditingPathSet()) {
-                positionSet.add(Terms.get().newPosition(editPath, Integer.MAX_VALUE));
+                positionSet.add(Terms.get().newPosition(editPath, Long.MAX_VALUE));
             }
             PositionSetReadOnly positionsForEdit = new PositionSetReadOnly(positionSet);
             I_GetConceptData newStatusConcept = (I_GetConceptData) process.getProperty(newStatusPropName);

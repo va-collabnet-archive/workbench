@@ -20,6 +20,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
 
     ViewCoordinate getViewCoordinate();
 
+    @Override
     ConceptChronicleBI getChronicle();
 
     ConAttrVersionBI getConAttrsActive() throws IOException, ContraditionException;

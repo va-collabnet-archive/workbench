@@ -96,10 +96,10 @@ public class SetViewPositionFromProperty extends AbstractTask {
             I_TermFactory tf = Terms.get();
             PathBI viewPath = tf.getPath(viewPathConcept.getUids());
 
-            int version = Integer.MAX_VALUE;
+            long version = Long.MAX_VALUE;
             if (!positionStr.equalsIgnoreCase("latest")) {
                 Date date = dateParser.parse(positionStr);
-                version = tf.convertToThinVersion(date.getTime());
+                version = date.getTime();
             }
 
             PositionBI newPosition = tf.newPosition(viewPath, version);

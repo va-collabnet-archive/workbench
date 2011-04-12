@@ -63,7 +63,7 @@ public class VodbExampleChange extends AbstractMojo {
             I_ConceptAttributeVersioned conceptAttributes = architectonicRoot.getConceptAttributes();
             I_GetConceptData architectonicBranch = termFactory.getConcept(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
             PathBI architectonicPath = termFactory.getPath(architectonicBranch.getUids());
-            PositionBI latestOnArchitectonicPath = termFactory.newPosition(architectonicPath, Integer.MAX_VALUE);
+            PositionBI latestOnArchitectonicPath = termFactory.newPosition(architectonicPath, Long.MAX_VALUE);
             Set<PositionBI> positions = new HashSet<PositionBI>();
             positions.add(latestOnArchitectonicPath);
             I_GetConceptData flaggedStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.FLAGGED_FOR_REVIEW.getUids());

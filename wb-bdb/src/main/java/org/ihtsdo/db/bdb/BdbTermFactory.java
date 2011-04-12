@@ -281,6 +281,10 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         throw new UnsupportedOperationException();
     }
 
+     public long convertToThickVersion(String dateStr)  {
+        throw new UnsupportedOperationException();
+    }
+
     @Override
     public SearchResult doLuceneSearch(String query) throws IOException, org.apache.lucene.queryParser.ParseException {
         Query q =
@@ -1180,9 +1184,11 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         return newPath;
     }
 
+
+
     @Override
-    public Position newPosition(PathBI path, int version) throws TerminologyException, IOException {
-        return new Position(version, path);
+    public Position newPosition(PathBI path, long time) throws TerminologyException, IOException {
+        return new Position(time, path);
     }
 
     @Override

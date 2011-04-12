@@ -92,13 +92,13 @@ public class ChangeRelsOfTypeToStatusFromProperties extends AbstractTask {
             I_GetConceptData concept = (I_GetConceptData) process.getProperty(activeConceptPropName);
             I_GetConceptData relTypeConcept = (I_GetConceptData) process.getProperty(relTypePropName);
             I_GetConceptData newStatusConcept = (I_GetConceptData) process.getProperty(newStatusPropName);
-            if (config.getEditingPathSet().size() == 0) {
+            if (config.getEditingPathSet().isEmpty()) {
                 throw new TaskFailedException("You must select at least one editing path. ");
             }
 
             Set<PositionBI> positionSet = new HashSet<PositionBI>();
             for (PathBI editPath : config.getEditingPathSet()) {
-                positionSet.add(Terms.get().newPosition(editPath, Integer.MAX_VALUE));
+                positionSet.add(Terms.get().newPosition(editPath, Long.MAX_VALUE));
             }
             PositionSetReadOnly positionsForEdit = new PositionSetReadOnly(positionSet);
             I_IntSet typeSet = Terms.get().newIntSet();

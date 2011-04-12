@@ -348,7 +348,7 @@ public class Position implements I_Position {
             I_GetConceptData pathConcept = Terms.get().getConcept(
                     position.getPath().getConceptNid());
             PathBI path = Terms.get().getPath(pathConcept.getUids());
-            positions.add(Terms.get().newPosition(path, position.getVersion()));
+            positions.add(Terms.get().newPosition(path, position.getTime()));
          } catch (IOException ex) {
             if (ex.getCause() != null && NoMappingException.class.isAssignableFrom(ex.getCause().getClass())) {
                AceLog.getAppLog().alertAndLogException(ex.getCause());

@@ -69,7 +69,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
             PathBI viewPath = new Path(getNidForUuids(
                     ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()),
                     null);
-            PositionBI viewPosition = new Position(Integer.MAX_VALUE, viewPath);
+            PositionBI viewPosition = new Position(Long.MAX_VALUE, viewPath);
             PositionSetBI positionSet = new PositionSetReadOnly(viewPosition);
 
             NidSet allowedStatusNids = new NidSet();

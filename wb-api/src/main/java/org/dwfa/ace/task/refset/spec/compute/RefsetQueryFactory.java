@@ -252,10 +252,10 @@ public class RefsetQueryFactory {
 							if (part.getC2id() == RefsetAuxiliary.Concept.DIFFERENCE_V1_IS
 									.localize().getNid()) {
 								query.setV1Is(new PositionSetReadOnly(Terms.get().newPosition(path,
-										Integer.parseInt(v_str))));
+										Long.parseLong(v_str))));
 							} else {
 								query.setV2Is(new PositionSetReadOnly(Terms.get().newPosition(path,
-										Integer.parseInt(v_str))));
+										Long.parseLong(v_str))));
 							}
 						} else {
                         throw new TerminologyException(

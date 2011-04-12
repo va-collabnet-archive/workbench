@@ -74,26 +74,28 @@ public class SetViewToPositionOnEditPathSet extends AbstractTask {
 
     }
 
+    @Override
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
 
     }
 
+    @Override
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             I_ConfigAceFrame profile = (I_ConfigAceFrame) process.getProperty(profilePropName);
             profile.getViewPositionSet().clear();
 
             for (PathBI path : profile.getEditingPathSet()) {
-                int version = Integer.MAX_VALUE;
+                long time = Long.MAX_VALUE;
                 if (positionStr.equalsIgnoreCase("latest")) {
-                    version = Integer.MAX_VALUE;
+                    time = Long.MAX_VALUE;
                 } else {
                     Date date = dateParser.parse(positionStr);
-                    version = Terms.get().convertToThinVersion(date.getTime());
+                    time = date.getTime();
                 }
 
-                PositionBI position = Terms.get().newPosition(path, version);
+                PositionBI position = Terms.get().newPosition(path, time);
                 profile.addViewPosition(position);
             }
 

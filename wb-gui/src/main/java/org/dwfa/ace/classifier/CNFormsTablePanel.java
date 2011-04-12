@@ -199,7 +199,7 @@ public class CNFormsTablePanel extends JPanel implements ActionListener {
             if (cClassPathObj != null) {
             	PathBI cClassIPath = tf.getPath(cClassPathObj.getUids());
                 cClassPositionBI = new ArrayList<PositionBI>();
-                cClassPositionBI.add(new Position(Integer.MAX_VALUE, cClassIPath));
+                cClassPositionBI.add(new Position(Long.MAX_VALUE, cClassIPath));
                 addPathOrigins(cClassPositionBI, cClassIPath);
             } else {
                 if (config.getViewPositionSet() == null) {

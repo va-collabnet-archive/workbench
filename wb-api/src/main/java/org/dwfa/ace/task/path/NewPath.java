@@ -132,7 +132,7 @@ public class NewPath extends AbstractTask {
                 profile.getEditingPathSet().clear();
                 profile.addEditingPath(editPath);
                 profile.getViewPositionSet().clear();
-                profile.addViewPosition(tf.newPosition(editPath, Integer.MAX_VALUE));
+                profile.addViewPosition(tf.newPosition(editPath, Long.MAX_VALUE));
             }
 
             tf.commit();

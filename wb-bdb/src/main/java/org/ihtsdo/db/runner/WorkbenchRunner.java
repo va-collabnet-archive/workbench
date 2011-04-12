@@ -663,11 +663,11 @@ public class WorkbenchRunner {
                         Set<PositionBI> viewPositions = new HashSet<PositionBI>();
 
                         viewPositions.add(new Position(
-                                Integer.MAX_VALUE,
+                                Long.MAX_VALUE,
                                 Bdb.getPathManager().get(
                                 ArchitectonicAuxiliary.Concept.SNOMED_CORE.localize().getNid())));
                         viewPositions.add(new Position(
-                                Integer.MAX_VALUE,
+                                Long.MAX_VALUE,
                                 Bdb.getPathManager().get(
                                 ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize().getNid())));
                         ace.setViewPositions(viewPositions);
