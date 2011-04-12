@@ -269,7 +269,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
             // get origins
             PathBI originPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
 
-            PositionBI originPosition = termFactory.newPosition(originPath, Integer.MAX_VALUE);
+            PositionBI originPosition = termFactory.newPosition(originPath, Long.MAX_VALUE);
 
             Set<PositionBI> origins = new HashSet<PositionBI>();
             origins.add(originPosition);
@@ -280,7 +280,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
             // get concept/path/position of the branch being copied
             PathBI oldPath = termFactory.getPath(viewingBranch.getUids());
 
-            PositionBI oldPosition = termFactory.newPosition(oldPath, Integer.MAX_VALUE);
+            PositionBI oldPosition = termFactory.newPosition(oldPath, Long.MAX_VALUE);
             Set<PositionBI> positionsToCheck = new HashSet<PositionBI>();
             positionsToCheck.add(oldPosition);
 

@@ -582,8 +582,8 @@ public class DiffBase extends AbstractMojo {
 		I_TermFactory tf = Terms.get();
 		PathBI path1 = tf.getPath(Arrays.asList(UUID.fromString(path1_uuid)));
 		PathBI path2 = tf.getPath(Arrays.asList(UUID.fromString(path2_uuid)));
-		Integer v1_id = ThinVersionHelper.convertTz(this.v1);
-		Integer v2_id = ThinVersionHelper.convertTz(this.v2);
+		long v1_id = ThinVersionHelper.convert(this.v1);
+		long v2_id = ThinVersionHelper.convert(this.v2);
 		pos1 = tf.newPosition(path1, v1_id);
 		pos2 = tf.newPosition(path2, v2_id);
 		allowed_position1 = new PositionSetReadOnly(pos1);

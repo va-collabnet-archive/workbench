@@ -109,11 +109,12 @@ public class VodbCheckChildCount extends AbstractMojo {
             origins = new HashSet<PositionBI>();
         }
 
+        @Override
         public void processConcept(I_GetConceptData concept) throws Exception {
             // get origins
             PathBI architectonicPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
 
-            PositionBI latestOnArchitectonicPath = termFactory.newPosition(architectonicPath, Integer.MAX_VALUE);
+            PositionBI latestOnArchitectonicPath = termFactory.newPosition(architectonicPath, Long.MAX_VALUE);
 
             origins.add(latestOnArchitectonicPath);
 
@@ -129,7 +130,7 @@ public class VodbCheckChildCount extends AbstractMojo {
                 for (ConceptDescriptor branch : branches) {
                     I_GetConceptData currentConcept = branch.getVerifiedConcept();
                     PathBI currentPath = termFactory.getPath(currentConcept.getUids());
-                    PositionBI currentPosition = termFactory.newPosition(currentPath, Integer.MAX_VALUE);
+                    PositionBI currentPosition = termFactory.newPosition(currentPath, Long.MAX_VALUE);
                     branchPositions.add(currentPosition);
                 }
             }
