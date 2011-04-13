@@ -11,7 +11,12 @@
 
 package org.ihtsdo.batch;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 /**
@@ -36,40 +41,65 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jComboBox1 = new javax.swing.JComboBox();
+        jComboBoxExistingRoles = new javax.swing.JComboBox();
+        jPanelDndRoleValueNew = new javax.swing.JPanel();
+        jLabelExistingRole = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(218, 67));
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Existing Role" }));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+        jComboBoxExistingRoles.setModel(jComboBoxExistingRoles.getModel());
+        jComboBoxExistingRoles.setRenderer(new org.ihtsdo.batch.JComboBoxExistingRolesRender());
+        jComboBoxExistingRoles.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+                jComboBoxExistingRolesActionPerformed(evt);
             }
         });
+
+        jPanelDndRoleValueNew.setBorder(javax.swing.BorderFactory.createTitledBorder("New Role Value:"));
+
+        javax.swing.GroupLayout jPanelDndRoleValueNewLayout = new javax.swing.GroupLayout(jPanelDndRoleValueNew);
+        jPanelDndRoleValueNew.setLayout(jPanelDndRoleValueNewLayout);
+        jPanelDndRoleValueNewLayout.setHorizontalGroup(
+            jPanelDndRoleValueNewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 206, Short.MAX_VALUE)
+        );
+        jPanelDndRoleValueNewLayout.setVerticalGroup(
+            jPanelDndRoleValueNewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 38, Short.MAX_VALUE)
+        );
+
+        jLabelExistingRole.setText("Existing Role:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(80, Short.MAX_VALUE))
+                .addComponent(jLabelExistingRole)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jComboBoxExistingRoles, 0, 127, Short.MAX_VALUE))
+            .addComponent(jPanelDndRoleValueNew, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(40, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jComboBoxExistingRoles, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabelExistingRole))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanelDndRoleValueNew, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+    private void jComboBoxExistingRolesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxExistingRolesActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+    }//GEN-LAST:event_jComboBoxExistingRolesActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox jComboBox1;
+    private javax.swing.JComboBox jComboBoxExistingRoles;
+    private javax.swing.JLabel jLabelExistingRole;
+    private javax.swing.JPanel jPanelDndRoleValueNew;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -80,6 +110,56 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
     @Override
     public JPanel getPanel() {
         return this;
+    }
+
+    @Override
+    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
+        DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingRoles.getModel();
+        ComponentVersionBI selectedItem = (ComponentVersionBI) dcbm.getSelectedItem();
+
+        // Sort existing parents by name.
+        Comparator<ComponentVersionBI> cmp = new Comparator<ComponentVersionBI>() {
+
+            @Override
+            public int compare(ComponentVersionBI o1, ComponentVersionBI o2) {
+                return o1.toUserString().compareToIgnoreCase(o2.toUserString());
+            }
+        };
+
+        // Add exitings parents to JComboBox model.
+        Collections.sort(existingRoles, cmp);
+        dcbm.removeAllElements();
+        for (ComponentVersionBI componentVersionBI : existingRoles) {
+            dcbm.addElement(componentVersionBI);
+        }
+
+        if (dcbm.getSize() == 0) {
+            // empty list
+        } else if (selectedItem == null) {
+            // no prior selection
+            dcbm.setSelectedItem(dcbm.getElementAt(0));
+        } else {
+            // Search by nid
+            int selectedIdx = -1;
+            for (int i = 0; i < dcbm.getSize(); i++) {
+                ComponentVersionBI cvbi = (ComponentVersionBI) dcbm.getElementAt(i);
+                if (cvbi.getNid() == selectedItem.getNid()) {
+                    selectedIdx = i;
+                    selectedItem = cvbi;
+                    break;
+                }
+            }
+
+            if (selectedIdx >= 0) {
+                // prior selection exists in new list
+                dcbm.setSelectedItem(selectedItem);
+                jComboBoxExistingRoles.setSelectedIndex(selectedIdx);
+            } else {
+                // prior selection does not exist in new list
+                dcbm.setSelectedItem(dcbm.getElementAt(0));
+                jComboBoxExistingRoles.setSelectedIndex(0);
+            }
+        }
     }
 
 }

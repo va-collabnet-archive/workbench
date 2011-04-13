@@ -8,24 +8,29 @@
  *
  * Created on Mar 31, 2011, 7:32:05 AM
  */
-
 package org.ihtsdo.batch;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 /**
  *
  * @author marc
  */
-public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel  implements I_BatchActionTask {
+public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implements I_BatchActionTask {
+
     BatchActionTask task;
 
     /** Creates new form BatchActionTaskParentReplaceUI */
     public BatchActionTaskParentReplaceUI() {
         initComponents();
         this.task = new BatchActionTaskParentReplace();
-   }
+    }
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -36,15 +41,14 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel  implemen
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jComboBoxParentsExisting = new javax.swing.JComboBox();
+        jComboBoxExistingParents = new javax.swing.JComboBox();
         jPanelDndParentNew = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox();
 
-        jComboBoxParentsExisting.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Existing Parent" }));
+        jComboBoxExistingParents.setModel(jComboBoxExistingParents.getModel());
+        jComboBoxExistingParents.setRenderer(new org.ihtsdo.batch.JComboBoxExistingParentsRender());
 
-        jPanelDndParentNew.setBorder(javax.swing.BorderFactory.createTitledBorder("New Parent"));
+        jPanelDndParentNew.setBorder(javax.swing.BorderFactory.createTitledBorder("With Parent:"));
 
         javax.swing.GroupLayout jPanelDndParentNewLayout = new javax.swing.GroupLayout(jPanelDndParentNew);
         jPanelDndParentNew.setLayout(jPanelDndParentNewLayout);
@@ -54,14 +58,10 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel  implemen
         );
         jPanelDndParentNewLayout.setVerticalGroup(
             jPanelDndParentNewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 30, Short.MAX_VALUE)
+            .addGap(0, 39, Short.MAX_VALUE)
         );
 
         jLabel1.setText("Replace:");
-
-        jLabel2.setText("With:");
-
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Is a (SNOMED)", "is a" }));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -69,14 +69,9 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel  implemen
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBoxParentsExisting, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(127, Short.MAX_VALUE))
+                .addComponent(jComboBoxExistingParents, 0, 277, Short.MAX_VALUE))
             .addComponent(jPanelDndParentNew, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -84,22 +79,14 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel  implemen
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jComboBoxParentsExisting, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jComboBoxExistingParents, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanelDndParentNew, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox jComboBox1;
-    private javax.swing.JComboBox jComboBoxParentsExisting;
+    private javax.swing.JComboBox jComboBoxExistingParents;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanelDndParentNew;
     // End of variables declaration//GEN-END:variables
 
@@ -113,4 +100,54 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel  implemen
         return this;
     }
 
+    @Override
+    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
+        DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingParents.getModel();
+        ComponentVersionBI selectedItem = (ComponentVersionBI) dcbm.getSelectedItem();
+
+        // Sort existing parents by name.
+        Comparator<ComponentVersionBI> cmp = new Comparator<ComponentVersionBI>() {
+
+            @Override
+            public int compare(ComponentVersionBI o1, ComponentVersionBI o2) {
+                return o1.toUserString().compareToIgnoreCase(o2.toUserString());
+            }
+        };
+
+        // Add exitings parents to JComboBox model.
+        Collections.sort(existingParents, cmp);
+        dcbm.removeAllElements();
+        for (ComponentVersionBI componentVersionBI : existingParents) {
+            dcbm.addElement(componentVersionBI);
+        }
+
+        if (dcbm.getSize() == 0) {
+            // empty list
+        } else if (selectedItem == null) {
+            // no prior selection
+            dcbm.setSelectedItem(dcbm.getElementAt(0));
+        } else {
+            // Search by nid
+            int selectedIdx = -1;
+            for (int i = 0; i < dcbm.getSize(); i++) {
+                ComponentVersionBI cvbi = (ComponentVersionBI) dcbm.getElementAt(i);
+                if (cvbi.getNid() == selectedItem.getNid()) {
+                    selectedIdx = i;
+                    selectedItem = cvbi;
+                    break;
+                }
+            }
+
+            if (selectedIdx >= 0) {
+                // prior selection exists in new list
+                dcbm.setSelectedItem(selectedItem);
+                jComboBoxExistingParents.setSelectedIndex(selectedIdx);
+            } else {
+                // prior selection does not exist in new list
+                dcbm.setSelectedItem(dcbm.getElementAt(0));
+                jComboBoxExistingParents.setSelectedIndex(0);
+            }
+        }
+
+    }
 }

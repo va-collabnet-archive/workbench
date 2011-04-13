@@ -8,10 +8,14 @@
  *
  * Created on Apr 8, 2011, 10:05:31 PM
  */
-
 package org.ihtsdo.batch;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 /**
@@ -19,6 +23,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
  * @author marc
  */
 public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel implements I_BatchActionTask {
+
     BatchActionTask task;
 
     /** Creates new form BatchActionTaskRefsetReplaceValueUI */
@@ -36,31 +41,54 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jComboBox1 = new javax.swing.JComboBox();
+        jComboBoxExistingRefsets = new javax.swing.JComboBox();
+        jPanelValueReplacement = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(218, 67));
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Existing Refset" }));
+        jComboBoxExistingRefsets.setModel(jComboBoxExistingRefsets.getModel());
+        jComboBoxExistingRefsets.setRenderer(new org.ihtsdo.batch.JComboBoxExistingRefsetsRender());
+
+        jPanelValueReplacement.setBorder(javax.swing.BorderFactory.createTitledBorder("Replace Value With:"));
+
+        javax.swing.GroupLayout jPanelValueReplacementLayout = new javax.swing.GroupLayout(jPanelValueReplacement);
+        jPanelValueReplacement.setLayout(jPanelValueReplacementLayout);
+        jPanelValueReplacementLayout.setHorizontalGroup(
+            jPanelValueReplacementLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 206, Short.MAX_VALUE)
+        );
+        jPanelValueReplacementLayout.setVerticalGroup(
+            jPanelValueReplacementLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 6, Short.MAX_VALUE)
+        );
+
+        jLabel1.setText("In Refset:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(68, Short.MAX_VALUE))
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jComboBoxExistingRefsets, 0, 154, Short.MAX_VALUE))
+            .addComponent(jPanelValueReplacement, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(40, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jComboBoxExistingRefsets, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanelValueReplacement, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox jComboBox1;
+    private javax.swing.JComboBox jComboBoxExistingRefsets;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanelValueReplacement;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -73,4 +101,53 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
         return this;
     }
 
+    @Override
+    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
+        DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingRefsets.getModel();
+        ComponentVersionBI selectedItem = (ComponentVersionBI) dcbm.getSelectedItem();
+
+        // Sort existing parents by name.
+        Comparator<ComponentVersionBI> cmp = new Comparator<ComponentVersionBI>() {
+
+            @Override
+            public int compare(ComponentVersionBI o1, ComponentVersionBI o2) {
+                return o1.toUserString().compareToIgnoreCase(o2.toUserString());
+            }
+        };
+
+        // Add exitings parents to JComboBox model.
+        Collections.sort(existingRefsets, cmp);
+        dcbm.removeAllElements();
+        for (ComponentVersionBI componentVersionBI : existingRefsets) {
+            dcbm.addElement(componentVersionBI);
+        }
+
+        if (dcbm.getSize() == 0) {
+            // empty list
+        } else if (selectedItem == null) {
+            // no prior selection
+            dcbm.setSelectedItem(dcbm.getElementAt(0));
+        } else {
+            // Search by nid
+            int selectedIdx = -1;
+            for (int i = 0; i < dcbm.getSize(); i++) {
+                ComponentVersionBI cvbi = (ComponentVersionBI) dcbm.getElementAt(i);
+                if (cvbi.getNid() == selectedItem.getNid()) {
+                    selectedIdx = i;
+                    selectedItem = cvbi;
+                    break;
+                }
+            }
+
+            if (selectedIdx >= 0) {
+                // prior selection exists in new list
+                dcbm.setSelectedItem(selectedItem);
+                jComboBoxExistingRefsets.setSelectedIndex(selectedIdx);
+            } else {
+                // prior selection does not exist in new list
+                dcbm.setSelectedItem(dcbm.getElementAt(0));
+                jComboBoxExistingRefsets.setSelectedIndex(0);
+            }
+        }
+    }
 }

@@ -1,32 +1,49 @@
 /*
- * BatchActionEditTask.java
+ * BatchActionTaskBase.java
  *
  * Created on Mar 28, 2011, 4:18:54 PM
  */
 package org.ihtsdo.batch;
 
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
+import javax.swing.JPanel;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.list.TerminologyList;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 
 /**
  *
  * @author marc
  */
-public class BatchActionEditTask extends javax.swing.JPanel {
+public class BatchActionTaskBase extends javax.swing.JPanel {
 
-    private I_BatchActionTask taskUI;
+    private BatchActionEditorPanel editor;
+    private JPanel taskParentUI;
+
+    public void setTaskParentUI(JPanel taskParentUI) {
+        this.taskParentUI = taskParentUI;
+    }
+    private I_BatchActionTask taskDetailUI;
     private BatchActionTaskType actionTaskType;
 
-    /** Creates new form BatchActionEditTask */
-    public BatchActionEditTask() {
+    /** Creates new form BatchActionTaskBase */
+    public BatchActionTaskBase(BatchActionEditorPanel batchActionEditorPanel) {
+        this.editor = batchActionEditorPanel;
+
         initComponents();
 
-        this.taskUI = new BatchActionTaskParentAddNewUI();
+        // INITIALIZE DEFAULT TASK
+        this.taskDetailUI = new BatchActionTaskParentAddNewUI();
         this.actionTaskType = BatchActionTaskType.PARENT_ADD_NEW;
 
-        this.setEnabled(true);
-        this.setOpaque(true);
-        this.setVisible(true);
+        // INITIALIZE DETAIL PANEL
+        GroupLayout layout = (GroupLayout) this.getLayout();
+        layout.replace(jPanelTaskDetail, taskDetailUI.getPanel());
+        jPanelTaskDetail = taskDetailUI.getPanel();
         this.invalidate();
     }
 
@@ -44,7 +61,7 @@ public class BatchActionEditTask extends javax.swing.JPanel {
         jComboTaskType = new javax.swing.JComboBox();
         jPanelTaskDetail = new javax.swing.JPanel();
 
-        setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
 
         btnAddTask.setIcon(new javax.swing.ImageIcon(getClass().getResource("/add2.png"))); // NOI18N
         btnAddTask.addActionListener(new java.awt.event.ActionListener() {
@@ -71,11 +88,11 @@ public class BatchActionEditTask extends javax.swing.JPanel {
         jPanelTaskDetail.setLayout(jPanelTaskDetailLayout);
         jPanelTaskDetailLayout.setHorizontalGroup(
             jPanelTaskDetailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 242, Short.MAX_VALUE)
+            .addGap(0, 350, Short.MAX_VALUE)
         );
         jPanelTaskDetailLayout.setVerticalGroup(
             jPanelTaskDetailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 59, Short.MAX_VALUE)
+            .addGap(0, 91, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -83,99 +100,102 @@ public class BatchActionEditTask extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addComponent(btnAddTask)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnDeleteTask)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jComboTaskType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanelTaskDetail, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+            .addComponent(jPanelTaskDetail, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jComboTaskType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnDeleteTask)
                     .addComponent(btnAddTask))
-                .addContainerGap())
-            .addComponent(jPanelTaskDetail, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanelTaskDetail, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void actionSelectTaskType(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionSelectTaskType
-        // :!!!: EditTask: actionSelectTaskType
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
         switch (idx) {
             case 0: // PARENT_ADD_NEW
                 if (actionTaskType.compareTo(BatchActionTaskType.PARENT_ADD_NEW) != 0) {
                     actionTaskType = BatchActionTaskType.PARENT_ADD_NEW;
-                    taskUI = new BatchActionTaskParentAddNewUI();
+                    taskDetailUI = new BatchActionTaskParentAddNewUI();
                 }
                 break;
             case 1: // PARENT_REPLACE
                 if (actionTaskType.compareTo(BatchActionTaskType.PARENT_REPLACE) != 0) {
                     actionTaskType = BatchActionTaskType.PARENT_REPLACE;
-                    taskUI = new BatchActionTaskParentReplaceUI();
+                    taskDetailUI = new BatchActionTaskParentReplaceUI();
                 }
                 break;
             case 2: // PARENT_RETIRE
                 if (actionTaskType.compareTo(BatchActionTaskType.PARENT_RETIRE) != 0) {
                     actionTaskType = BatchActionTaskType.PARENT_RETIRE;
-                    taskUI = new BatchActionTaskParentRetireUI();
+                    taskDetailUI = new BatchActionTaskParentRetireUI();
                 }
                 break;
             case 3: // REFSET_ADD_MEMBER
                 if (actionTaskType.compareTo(BatchActionTaskType.REFSET_ADD_MEMBER) != 0) {
                     actionTaskType = BatchActionTaskType.REFSET_ADD_MEMBER;
-                    taskUI = new BatchActionTaskParentAddNewUI();
+                    taskDetailUI = new BatchActionTaskRefsetAddMemberUI();
                 }
                 break;
             case 4: // REFSET_MOVE_MEMBER
                 if (actionTaskType.compareTo(BatchActionTaskType.REFSET_MOVE_MEMBER) != 0) {
                     actionTaskType = BatchActionTaskType.REFSET_MOVE_MEMBER;
-                    taskUI = new BatchActionTaskParentAddNewUI();
+                    taskDetailUI = new BatchActionTaskRefsetMoveMemberUI();
                 }
                 break;
             case 5: // REFSET_REPLACE_VALUE
                 if (actionTaskType.compareTo(BatchActionTaskType.REFSET_REPLACE_VALUE) != 0) {
                     actionTaskType = BatchActionTaskType.REFSET_REPLACE_VALUE;
-                    taskUI = new BatchActionTaskParentAddNewUI();
+                    taskDetailUI = new BatchActionTaskRefsetReplaceValueUI();
                 }
                 break;
             case 6: // REFSET_RETIRE_MEMBER
                 if (actionTaskType.compareTo(BatchActionTaskType.REFSET_RETIRE_MEMBER) != 0) {
                     actionTaskType = BatchActionTaskType.REFSET_RETIRE_MEMBER;
-                    taskUI = new BatchActionTaskParentAddNewUI();
+                    taskDetailUI = new BatchActionTaskRefsetRetireMemberUI();
                 }
                 break;
             case 7: // ROLE_REPLACE_VALUE
                 if (actionTaskType.compareTo(BatchActionTaskType.ROLE_REPLACE_VALUE) != 0) {
                     actionTaskType = BatchActionTaskType.ROLE_REPLACE_VALUE;
-                    taskUI = new BatchActionTaskParentAddNewUI();
+                    taskDetailUI = new BatchActionTaskRoleReplaceValueUI();
                 }
                 break;
             default:
                 ; // NOTHING TO DO
         }
 
-        jPanelTaskDetail.removeAll();
-        jPanelTaskDetail.add(taskUI.getPanel());
-        jPanelTaskDetail.invalidate();
+        // INITIALIZE DETAIL PANEL
+        taskDetailUI.updateExisting(editor.getExistingParents(), editor.getExistingRefsets(), editor.getExistingRoles());
+        GroupLayout layout = (GroupLayout) this.getLayout();
+        layout.replace(jPanelTaskDetail, taskDetailUI.getPanel());
+        jPanelTaskDetail = taskDetailUI.getPanel();
 
+        this.invalidate();
+        this.validate();
+        this.doLayout();
+        taskParentUI.invalidate();
+        taskParentUI.validate();
+        taskParentUI.doLayout();
         System.out.println(":!!:-).. actionSelectTaskType");
     }//GEN-LAST:event_actionSelectTaskType
 
     private void actionAddAnotherTask(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionAddAnotherTask
-        // :!!!: EditTask: actionAddAnotherTask
-        System.out.println(":!!:-) actionAddAnotherTask" + evt);
+        editor.actionAddAnotherTask();
     }//GEN-LAST:event_actionAddAnotherTask
 
     private void actionDeleteThisTask(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionDeleteThisTask
-        // :!!!: EditTask: actionDeleteThisTask
-        System.out.println(":!!:-) actionDeleteThisTask" + evt);
+        editor.actionDeleteTask(this);
     }//GEN-LAST:event_actionDeleteThisTask
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddTask;
@@ -183,4 +203,8 @@ public class BatchActionEditTask extends javax.swing.JPanel {
     private javax.swing.JComboBox jComboTaskType;
     private javax.swing.JPanel jPanelTaskDetail;
     // End of variables declaration//GEN-END:variables
+
+    void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
+        taskDetailUI.updateExisting(existingParents, existingRefsets, existingRoles);
+    }
 }

@@ -8,10 +8,11 @@
  *
  * Created on Mar 31, 2011, 7:31:07 AM
  */
-
 package org.ihtsdo.batch;
 
+import java.util.List;
 import javax.swing.JPanel;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 /**
@@ -19,6 +20,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
  * @author marc
  */
 public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements I_BatchActionTask {
+
     BatchActionTask task;
 
     /** Creates new form BatchActionTaskParentAddNewUI */
@@ -37,9 +39,8 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
     private void initComponents() {
 
         jPanelDndParentNew = new javax.swing.JPanel();
-        jComboBox1 = new javax.swing.JComboBox();
 
-        jPanelDndParentNew.setBorder(javax.swing.BorderFactory.createTitledBorder("New Parent"));
+        jPanelDndParentNew.setBorder(javax.swing.BorderFactory.createTitledBorder("New Parent:"));
 
         javax.swing.GroupLayout jPanelDndParentNewLayout = new javax.swing.GroupLayout(jPanelDndParentNew);
         jPanelDndParentNew.setLayout(jPanelDndParentNewLayout);
@@ -49,30 +50,21 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
         );
         jPanelDndParentNewLayout.setVerticalGroup(
             jPanelDndParentNewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 25, Short.MAX_VALUE)
+            .addGap(0, 32, Short.MAX_VALUE)
         );
-
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Is a", "is a" }));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanelDndParentNew, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jComboBox1, 0, 222, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanelDndParentNew, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(jPanelDndParentNew, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox jComboBox1;
     private javax.swing.JPanel jPanelDndParentNew;
     // End of variables declaration//GEN-END:variables
 
@@ -86,4 +78,9 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
         return this;
     }
 
+    @Override
+    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
+        System.out.println("\r\n!!! BatchActionTaskParentRetireUI.updateExisting() \r\n!!! existingParents! " + existingParents + "\r\n!!! existingRefsets! " + existingRoles + "\r\n!!! existingRoles! " + existingRoles);
+
+    }
 }
