@@ -289,7 +289,8 @@ public class Position implements I_Position {
             }*/
             
             catch(NullPointerException npe){
-            	AceLog.getAppLog().alertAndLogException(npe.getCause());
+            	AceLog.getAppLog().severe("readPositionSet position not found");
+            	//AceLog.getAppLog().alertAndLogException(npe.getCause());
             }
             
             catch (IOException ex) {
