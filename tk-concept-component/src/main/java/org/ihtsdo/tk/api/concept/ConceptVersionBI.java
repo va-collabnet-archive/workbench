@@ -77,7 +77,6 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
 
     Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActiveIsa() throws IOException, ContraditionException;
 
-    @Override
     Collection<? extends RelGroupVersionBI> getRelGroups() throws IOException, ContraditionException;
 
     Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers()

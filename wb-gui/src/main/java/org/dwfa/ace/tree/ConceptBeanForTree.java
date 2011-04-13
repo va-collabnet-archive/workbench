@@ -189,9 +189,9 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 		return bean.getPrimUuid();
 	}
 
-	public Collection<? extends RelGroupChronicleBI> getRelGroups()
+	public Collection<? extends RelGroupChronicleBI> getRelGroups(ViewCoordinate vc)
 			throws IOException, ContraditionException {
-		return bean.getRelGroups();
+		return bean.getRelGroups(vc);
 	}
 
 	public List<UUID> getUUIDs() {

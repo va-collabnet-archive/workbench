@@ -702,7 +702,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
          return getRefsetMember(nid);
       }
 
-      for (RelGroupChronicleBI group : enclosingConcept.getRelGroups()) {
+      for (RelGroupChronicleBI group : enclosingConcept.getAllRelGroups()) {
          if (group.getNid() == nid) {
             return group;
          }

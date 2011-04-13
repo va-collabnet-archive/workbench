@@ -17,20 +17,11 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
-import org.ihtsdo.tk.drools.facts.ComponentFact;
 import org.ihtsdo.tk.drools.facts.RelFact;
-import org.ihtsdo.tk.drools.facts.RelGroupFact;
-import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.dwfa.ace.api.I_AmPart;
-import org.dwfa.ace.api.I_RelPart;
-import org.ihtsdo.tk.api.PositionBI;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 
 
@@ -57,7 +48,7 @@ public class GroupRelsAction extends AbstractAction {
 		
 				//get group numbers in target concept
 				ConceptChronicleBI target = (ConceptChronicleBI) concept; 
-				Collection targetGroups = target.getRelGroups();
+				Collection targetGroups = target.getRelGroups(config.getViewCoordinate());
 				int max = 0;
 				for (Object groupObject : targetGroups) {
 					RelGroupVersionBI rg = (RelGroupVersionBI) groupObject;

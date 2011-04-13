@@ -29,7 +29,7 @@ public interface ConceptChronicleBI extends
 
     Collection<? extends MediaChronicleBI> getMedia() throws IOException;
 
-    Collection<? extends RelGroupChronicleBI> getRelGroups() throws IOException, ContraditionException;
+    Collection<? extends RelGroupChronicleBI> getRelGroups(ViewCoordinate vc) throws IOException, ContraditionException;
 
     boolean isAnnotationStyleRefex() throws IOException;
 
@@ -46,6 +46,7 @@ public interface ConceptChronicleBI extends
 
     void cancel() throws IOException;
     
+    @Override
     ConceptVersionBI getVersion(ViewCoordinate vc);
     
    /**

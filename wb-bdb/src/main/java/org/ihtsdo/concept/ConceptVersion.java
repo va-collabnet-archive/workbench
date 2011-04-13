@@ -56,6 +56,11 @@ import org.ihtsdo.tk.spec.ConceptSpec;
 public class ConceptVersion implements ConceptVersionBI {
 
     private Concept concept;
+
+    @Override
+    public Collection<? extends RelGroupChronicleBI> getRelGroups(ViewCoordinate vc) throws IOException, ContraditionException {
+        return concept.getRelGroups(vc);
+    }
     private ViewCoordinate vc;
 
     public ConceptVersion(Concept concept, ViewCoordinate coordinate) {
@@ -493,7 +498,7 @@ public class ConceptVersion implements ConceptVersionBI {
     public Collection<? extends RelGroupVersionBI> getRelGroups()
             throws IOException, ContraditionException {
         ArrayList<RelGroupVersionBI> results = new ArrayList<RelGroupVersionBI>();
-        for (RelGroupChronicleBI rgc : concept.getRelGroups()) {
+        for (RelGroupChronicleBI rgc : concept.getRelGroups(vc)) {
             RelGroupVersionBI rgv = new RelGroupVersion(rgc, vc);
             if (rgv.getRels().size() > 0) {
                 results.add(rgv);
