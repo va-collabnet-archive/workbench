@@ -58,7 +58,7 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel  imp
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jComboBoxExistingRefsets, 0, 153, Short.MAX_VALUE))
+                .addComponent(jComboBoxExistingRefsets, 0, 56, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

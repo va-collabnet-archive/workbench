@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.GroupLayout;
 import javax.swing.JPanel;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -30,6 +31,12 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
     public BatchActionTaskParentReplaceUI() {
         initComponents();
         this.task = new BatchActionTaskParentReplace();
+
+        // Setup DnD Panel
+        BatchActionTaskDndConcept tmp = new BatchActionTaskDndConcept("With Parent:");
+        GroupLayout layout = (GroupLayout) this.getLayout();
+        layout.replace(jPanelDndParentReplace, tmp.getPanel());
+        jPanelDndParentReplace = tmp.getPanel();
     }
 
     /** This method is called from within the constructor to
@@ -42,22 +49,22 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
     private void initComponents() {
 
         jComboBoxExistingParents = new javax.swing.JComboBox();
-        jPanelDndParentNew = new javax.swing.JPanel();
+        jPanelDndParentReplace = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
 
         jComboBoxExistingParents.setModel(jComboBoxExistingParents.getModel());
         jComboBoxExistingParents.setRenderer(new org.ihtsdo.batch.JComboBoxExistingParentsRender());
 
-        jPanelDndParentNew.setBorder(javax.swing.BorderFactory.createTitledBorder("With Parent:"));
+        jPanelDndParentReplace.setBorder(javax.swing.BorderFactory.createTitledBorder("With Parent:"));
 
-        javax.swing.GroupLayout jPanelDndParentNewLayout = new javax.swing.GroupLayout(jPanelDndParentNew);
-        jPanelDndParentNew.setLayout(jPanelDndParentNewLayout);
-        jPanelDndParentNewLayout.setHorizontalGroup(
-            jPanelDndParentNewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout jPanelDndParentReplaceLayout = new javax.swing.GroupLayout(jPanelDndParentReplace);
+        jPanelDndParentReplace.setLayout(jPanelDndParentReplaceLayout);
+        jPanelDndParentReplaceLayout.setHorizontalGroup(
+            jPanelDndParentReplaceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 342, Short.MAX_VALUE)
         );
-        jPanelDndParentNewLayout.setVerticalGroup(
-            jPanelDndParentNewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        jPanelDndParentReplaceLayout.setVerticalGroup(
+            jPanelDndParentReplaceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 39, Short.MAX_VALUE)
         );
 
@@ -72,7 +79,7 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jComboBoxExistingParents, 0, 277, Short.MAX_VALUE))
-            .addComponent(jPanelDndParentNew, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanelDndParentReplace, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -81,13 +88,13 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
                     .addComponent(jLabel1)
                     .addComponent(jComboBoxExistingParents, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanelDndParentNew, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanelDndParentReplace, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBoxExistingParents;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanelDndParentNew;
+    private javax.swing.JPanel jPanelDndParentReplace;
     // End of variables declaration//GEN-END:variables
 
     @Override

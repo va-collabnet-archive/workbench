@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.GroupLayout;
 import javax.swing.JPanel;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -30,6 +31,12 @@ public class BatchActionTaskRefsetAddMemberUI extends javax.swing.JPanel impleme
     public BatchActionTaskRefsetAddMemberUI() {
         initComponents();
         this.task = new BatchActionTaskRefsetAddMember();
+
+        // Setup DnD Panel
+        BatchActionTaskDndConcept tmp = new BatchActionTaskDndConcept("New Value:");
+        GroupLayout layout = (GroupLayout) this.getLayout();
+        layout.replace(jPanelDndNewValue, tmp.getPanel());
+        jPanelDndNewValue = tmp.getPanel();
     }
 
     /** This method is called from within the constructor to

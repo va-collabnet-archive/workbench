@@ -80,8 +80,8 @@
             <StringItem index="2" value="Parent, Retire"/>
             <StringItem index="3" value="Refset, Add Member"/>
             <StringItem index="4" value="Refset, Move Member"/>
-            <StringItem index="5" value="Refset, Retire Member"/>
-            <StringItem index="6" value="Refset, Replace Value"/>
+            <StringItem index="5" value="Refset, Replace Value"/>
+            <StringItem index="6" value="Refset, Retire Member"/>
             <StringItem index="7" value="Role, Replace Value"/>
           </StringArray>
         </Property>

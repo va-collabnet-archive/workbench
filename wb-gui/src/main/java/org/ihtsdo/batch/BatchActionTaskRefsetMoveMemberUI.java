@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.GroupLayout;
 import javax.swing.JPanel;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -30,6 +31,13 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
     public BatchActionTaskRefsetMoveMemberUI() {
         initComponents();
         this.task = new BatchActionTaskRefsetMoveMember();
+
+        // Setup DnD Panel
+        BatchActionTaskDndConcept tmp = new BatchActionTaskDndConcept("Move To:");
+        GroupLayout layout = (GroupLayout) this.getLayout();
+        layout.replace(jPanelDndRefsetMoveTo, tmp.getPanel());
+        jPanelDndRefsetMoveTo = tmp.getPanel();
+
     }
 
     /** This method is called from within the constructor to
@@ -43,7 +51,7 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
 
         jComboBoxExistingRefsets = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
-        jPanelRefsetMoveTo = new javax.swing.JPanel();
+        jPanelDndRefsetMoveTo = new javax.swing.JPanel();
 
         setPreferredSize(new java.awt.Dimension(218, 67));
 
@@ -52,16 +60,16 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
 
         jLabel1.setText("Move From:");
 
-        jPanelRefsetMoveTo.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createTitledBorder(""), "Move To:"));
+        jPanelDndRefsetMoveTo.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createTitledBorder(""), "Move To:"));
 
-        javax.swing.GroupLayout jPanelRefsetMoveToLayout = new javax.swing.GroupLayout(jPanelRefsetMoveTo);
-        jPanelRefsetMoveTo.setLayout(jPanelRefsetMoveToLayout);
-        jPanelRefsetMoveToLayout.setHorizontalGroup(
-            jPanelRefsetMoveToLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout jPanelDndRefsetMoveToLayout = new javax.swing.GroupLayout(jPanelDndRefsetMoveTo);
+        jPanelDndRefsetMoveTo.setLayout(jPanelDndRefsetMoveToLayout);
+        jPanelDndRefsetMoveToLayout.setHorizontalGroup(
+            jPanelDndRefsetMoveToLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 198, Short.MAX_VALUE)
         );
-        jPanelRefsetMoveToLayout.setVerticalGroup(
-            jPanelRefsetMoveToLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        jPanelDndRefsetMoveToLayout.setVerticalGroup(
+            jPanelDndRefsetMoveToLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
@@ -73,7 +81,7 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jComboBoxExistingRefsets, 0, 140, Short.MAX_VALUE))
-            .addComponent(jPanelRefsetMoveTo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanelDndRefsetMoveTo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -82,13 +90,13 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
                     .addComponent(jLabel1)
                     .addComponent(jComboBoxExistingRefsets, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanelRefsetMoveTo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanelDndRefsetMoveTo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBoxExistingRefsets;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanelRefsetMoveTo;
+    private javax.swing.JPanel jPanelDndRefsetMoveTo;
     // End of variables declaration//GEN-END:variables
 
     @Override

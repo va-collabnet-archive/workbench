@@ -77,7 +77,7 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
             }
         });
 
-        jComboTaskType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Parent, Add New", "Parent, Replace", "Parent, Retire", "Refset, Add Member", "Refset, Move Member", "Refset, Retire Member", "Refset, Replace Value", "Role, Replace Value" }));
+        jComboTaskType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Parent, Add New", "Parent, Replace", "Parent, Retire", "Refset, Add Member", "Refset, Move Member", "Refset, Replace Value", "Refset, Retire Member", "Role, Replace Value" }));
         jComboTaskType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 actionSelectTaskType(evt);

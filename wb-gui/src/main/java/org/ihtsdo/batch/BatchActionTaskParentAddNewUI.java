@@ -11,7 +11,9 @@
 package org.ihtsdo.batch;
 
 import java.util.List;
+import javax.swing.GroupLayout;
 import javax.swing.JPanel;
+import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
@@ -27,6 +29,12 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
     public BatchActionTaskParentAddNewUI() {
         initComponents();
         this.task = new BatchActionTaskParentAddNew();
+
+        // Setup DnD Panel
+        BatchActionTaskDndConcept tmp = new BatchActionTaskDndConcept("New Parent:");
+        GroupLayout layout = (GroupLayout) this.getLayout();
+        layout.replace(jPanelDndNewParent, tmp.getPanel());
+        jPanelDndNewParent = tmp.getPanel();
     }
 
     /** This method is called from within the constructor to
@@ -38,34 +46,32 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanelDndParentNew = new javax.swing.JPanel();
+        jPanelDndNewParent = new javax.swing.JPanel();
 
-        jPanelDndParentNew.setBorder(javax.swing.BorderFactory.createTitledBorder("New Parent:"));
-
-        javax.swing.GroupLayout jPanelDndParentNewLayout = new javax.swing.GroupLayout(jPanelDndParentNew);
-        jPanelDndParentNew.setLayout(jPanelDndParentNewLayout);
-        jPanelDndParentNewLayout.setHorizontalGroup(
-            jPanelDndParentNewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 210, Short.MAX_VALUE)
+        javax.swing.GroupLayout jPanelDndNewParentLayout = new javax.swing.GroupLayout(jPanelDndNewParent);
+        jPanelDndNewParent.setLayout(jPanelDndNewParentLayout);
+        jPanelDndNewParentLayout.setHorizontalGroup(
+            jPanelDndNewParentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 239, Short.MAX_VALUE)
         );
-        jPanelDndParentNewLayout.setVerticalGroup(
-            jPanelDndParentNewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 32, Short.MAX_VALUE)
+        jPanelDndNewParentLayout.setVerticalGroup(
+            jPanelDndNewParentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 53, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanelDndParentNew, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanelDndNewParent, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanelDndParentNew, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanelDndNewParent, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanelDndParentNew;
+    private javax.swing.JPanel jPanelDndNewParent;
     // End of variables declaration//GEN-END:variables
 
     @Override

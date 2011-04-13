@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.GroupLayout;
 import javax.swing.JPanel;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -30,6 +31,13 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
     public BatchActionTaskRoleReplaceValueUI() {
         initComponents();
         this.task = new BatchActionTaskRoleReplaceValue();
+
+        // Setup DnD Panel
+        BatchActionTaskDndConcept tmp = new BatchActionTaskDndConcept("New Role Value:");
+        GroupLayout layout = (GroupLayout) this.getLayout();
+        layout.replace(jPanelDndRoleValueNew, tmp.getPanel());
+        jPanelDndRoleValueNew = tmp.getPanel();
+
     }
 
     /** This method is called from within the constructor to

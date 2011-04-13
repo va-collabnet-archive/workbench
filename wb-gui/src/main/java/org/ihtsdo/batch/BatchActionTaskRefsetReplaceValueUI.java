@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.GroupLayout;
 import javax.swing.JPanel;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -30,6 +31,12 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
     public BatchActionTaskRefsetReplaceValueUI() {
         initComponents();
         this.task = new BatchActionTaskRefsetReplaceValue();
+
+        // Setup DnD Panel
+        BatchActionTaskDndConcept tmp = new BatchActionTaskDndConcept("Replace Value With:");
+        GroupLayout layout = (GroupLayout) this.getLayout();
+        layout.replace(jPanelDndValueReplacement, tmp.getPanel());
+        jPanelDndValueReplacement = tmp.getPanel();
     }
 
     /** This method is called from within the constructor to
@@ -42,7 +49,7 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
     private void initComponents() {
 
         jComboBoxExistingRefsets = new javax.swing.JComboBox();
-        jPanelValueReplacement = new javax.swing.JPanel();
+        jPanelDndValueReplacement = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(218, 67));
@@ -50,16 +57,16 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
         jComboBoxExistingRefsets.setModel(jComboBoxExistingRefsets.getModel());
         jComboBoxExistingRefsets.setRenderer(new org.ihtsdo.batch.JComboBoxExistingRefsetsRender());
 
-        jPanelValueReplacement.setBorder(javax.swing.BorderFactory.createTitledBorder("Replace Value With:"));
+        jPanelDndValueReplacement.setBorder(javax.swing.BorderFactory.createTitledBorder("Replace Value With:"));
 
-        javax.swing.GroupLayout jPanelValueReplacementLayout = new javax.swing.GroupLayout(jPanelValueReplacement);
-        jPanelValueReplacement.setLayout(jPanelValueReplacementLayout);
-        jPanelValueReplacementLayout.setHorizontalGroup(
-            jPanelValueReplacementLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout jPanelDndValueReplacementLayout = new javax.swing.GroupLayout(jPanelDndValueReplacement);
+        jPanelDndValueReplacement.setLayout(jPanelDndValueReplacementLayout);
+        jPanelDndValueReplacementLayout.setHorizontalGroup(
+            jPanelDndValueReplacementLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 206, Short.MAX_VALUE)
         );
-        jPanelValueReplacementLayout.setVerticalGroup(
-            jPanelValueReplacementLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        jPanelDndValueReplacementLayout.setVerticalGroup(
+            jPanelDndValueReplacementLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 6, Short.MAX_VALUE)
         );
 
@@ -73,7 +80,7 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jComboBoxExistingRefsets, 0, 154, Short.MAX_VALUE))
-            .addComponent(jPanelValueReplacement, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanelDndValueReplacement, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -82,13 +89,13 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
                     .addComponent(jComboBoxExistingRefsets, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanelValueReplacement, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanelDndValueReplacement, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBoxExistingRefsets;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanelValueReplacement;
+    private javax.swing.JPanel jPanelDndValueReplacement;
     // End of variables declaration//GEN-END:variables
 
     @Override
