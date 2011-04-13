@@ -407,7 +407,6 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
-        @Override
         public boolean isActive(NidSetBI allowedStatusNids) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
@@ -855,7 +854,6 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
-        @Override
         public boolean isActive(NidSetBI allowedStatusNids) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
