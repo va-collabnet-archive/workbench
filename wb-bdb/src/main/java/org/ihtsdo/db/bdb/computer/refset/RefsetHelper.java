@@ -163,16 +163,16 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
                         + Bdb.getConceptForComponent(componentNid).toLongString()));
             }
             if (extension != null && extension.getRefsetId() == refsetId) {
-            	AceLog.getAppLog().info("extension = "+extension);
+            	//AceLog.getAppLog().info("extension = "+extension);
                 // get the latest version
                 I_ExtendByRefPart latestPart = null;
-                AceLog.getAppLog().info("extension.getMutableParts() size = "+extension.getMutableParts().size());
+                //AceLog.getAppLog().info("extension.getMutableParts() size = "+extension.getMutableParts().size());
                 for (I_ExtendByRefPart part : extension.getMutableParts()) {
                     if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
                         latestPart = part;
                     }
                 }
-                AceLog.getAppLog().info("RefsetHelper hasRefsetExtension latestPart = "+latestPart);
+                //AceLog.getAppLog().info("RefsetHelper hasRefsetExtension latestPart = "+latestPart);
                 if(latestPart != null){
                 if (extProps.validate(latestPart)) {
                     return true;
