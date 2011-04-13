@@ -34,7 +34,7 @@ import org.dwfa.tapi.TerminologyException;
 public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_HelpMarkedParentRefset {
 
 
-    private Logger logger = Logger.getLogger(SpecMarkedParentRefsetHelper.class.getName());
+    private static final Logger logger = Logger.getLogger(SpecMarkedParentRefsetHelper.class.getName());
 
     private int refsetId;
     private int memberTypeId;
@@ -53,6 +53,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
     /* (non-Javadoc)
 	 * @see org.dwfa.ace.refset.spec.I_HelpMarkedParentRefset#addParentMembers(java.lang.Integer)
 	 */
+    @Override
     public void addParentMembers(Integer... conceptIds) throws Exception {
 
     	LineageCondition[] traversingConditions = new LineageCondition[] { new NotAlreadyVisited() };
@@ -70,6 +71,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
     /* (non-Javadoc)
 	 * @see org.dwfa.ace.refset.spec.I_HelpMarkedParentRefset#addDescriptionParentMembers(java.lang.Integer)
 	 */
+    @Override
     public void addDescriptionParentMembers(Integer... descriptionIds) throws Exception {
 
     	LineageCondition[] traversingConditions = new LineageCondition[] { new NotAlreadyVisited() };
@@ -90,6 +92,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
     /* (non-Javadoc)
 	 * @see org.dwfa.ace.refset.spec.I_HelpMarkedParentRefset#removeParentMembers(java.lang.Integer)
 	 */
+    @Override
     public void removeParentMembers(Integer... conceptIds) throws Exception {
     	LineageCondition[] traversingConditions =
                 new LineageCondition[] { new HasExtension(parentRefsetId, parentMemberTypeId), new NotAlreadyVisited() };
@@ -142,6 +145,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
     /* (non-Javadoc)
 	 * @see org.dwfa.ace.refset.spec.I_HelpMarkedParentRefset#removeDescriptionParentMembers(java.lang.Integer)
 	 */
+    @Override
     public void removeDescriptionParentMembers(Integer... descriptionIds) throws Exception {
     	LineageCondition[] traversingConditions =
                 new LineageCondition[] { new HasExtension(parentRefsetId, parentMemberTypeId), new NotAlreadyVisited() };
@@ -197,6 +201,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
     /* (non-Javadoc)
 	 * @see org.dwfa.ace.refset.spec.I_HelpMarkedParentRefset#isMarkedParent(int)
 	 */
+    @Override
     public boolean isMarkedParent(int conceptId) throws Exception {
         return hasCurrentRefsetExtension(parentRefsetId, conceptId, parentMemberTypeId);
     }
@@ -208,6 +213,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
     /* (non-Javadoc)
 	 * @see org.dwfa.ace.refset.spec.I_HelpMarkedParentRefset#getParentRefset()
 	 */
+    @Override
     public int getParentRefset() throws Exception {
 
         I_GetConceptData memberRefset = Terms.get().getConcept(refsetId);
@@ -280,6 +286,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
     /* (non-Javadoc)
 	 * @see org.dwfa.ace.refset.spec.I_HelpMarkedParentRefset#hasCurrentMarkedParentExtension(int)
 	 */
+    @Override
     public boolean hasCurrentMarkedParentExtension(int conceptId) throws Exception {
         return super.hasCurrentRefsetExtension(parentRefsetId, conceptId, parentMemberTypeId);
     }
@@ -294,6 +301,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
             this.memberTypeId = memberTypeId;
         }
 
+        @Override
         public boolean evaluate(I_GetConceptData concept) throws Exception {
             return hasCurrentRefsetExtension(this.refsetId, concept.getConceptNid(), this.memberTypeId);
         }
@@ -302,6 +310,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
     private class NotAlreadyVisited implements LineageCondition {
         private HashSet<Integer> visited = new HashSet<Integer>();
 
+        @Override
         public boolean evaluate(I_GetConceptData concept) throws Exception {
             return visited.add(concept.getConceptNid());
         }
