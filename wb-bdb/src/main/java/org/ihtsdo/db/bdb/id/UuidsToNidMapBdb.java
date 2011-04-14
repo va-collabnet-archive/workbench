@@ -229,11 +229,13 @@ public class UuidsToNidMapBdb extends ComponentBdb {
         r.lock();
         try {
             if (readOnlyUuidsToNidMap.containsKey(uuid) &&
+                    readOnlyUuidsToNidMap.get(uuid) != Integer.MAX_VALUE &&
                     Bdb.getNidCNidMap().getCNid(readOnlyUuidsToNidMap.get(uuid)) != Integer.MAX_VALUE) {
                 return true;
             }
             if (mutableUuidsToNidMap.containsKey(uuid) &&
-                    Bdb.getNidCNidMap().getCNid(readOnlyUuidsToNidMap.get(uuid)) != Integer.MAX_VALUE) {
+                    mutableUuidsToNidMap.get(uuid) != Integer.MAX_VALUE &&
+                     Bdb.getNidCNidMap().getCNid(mutableUuidsToNidMap.get(uuid)) != Integer.MAX_VALUE) {
                 return true;
             }
             return false;
