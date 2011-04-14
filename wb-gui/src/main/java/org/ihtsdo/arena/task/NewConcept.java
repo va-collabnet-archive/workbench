@@ -126,6 +126,8 @@ public class NewConcept extends PreviousNextOrCancel {
     private DescCAB descSpecUsPref;
     private RefexCAB refexSpecGbPref;
     private RefexCAB refexSpecUsPref;
+    private RefexCAB refexSpecUsAcct;
+    private RefexCAB refexSpecGbAcct;
     private TerminologyConstructorBI tc;
     private ConceptChronicleBI newConcept;
     private String lang;
@@ -219,10 +221,12 @@ public class NewConcept extends PreviousNextOrCancel {
                 if (addUsDescPref) {
                 	createBlueprintUsPrefDesc();
                 	createBlueprintUsPrefRefex(descSpecUsPref.getComponentNid());
+                	createBlueprintGbAcctRefex(descSpecUsPref.getComponentNid());
                 }
                 if (addGbDescPref) {
                 	createBlueprintGbPrefDesc();
                 	createBlueprintGbPrefRefex(descSpecGbPref.getComponentNid());
+                	createBlueprintUsAcctRefex(descSpecGbPref.getComponentNid());
                 }
                 if(lang.equals("en")){
                 	createBlueprintUsFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
@@ -233,10 +237,12 @@ public class NewConcept extends PreviousNextOrCancel {
                 if(lang.equals("en-us")){
                 	createBlueprintUsFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
                 	createBlueprintUsPrefRefex(conceptSpec.getPreferredCAB().getComponentNid());
+                	createBlueprintGbAcctRefex(conceptSpec.getPreferredCAB().getComponentNid());
                 }
                 if(lang.equals("en-gb")){
                 	createBlueprintGbFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
                 	createBlueprintGbPrefRefex(conceptSpec.getPreferredCAB().getComponentNid());
+                	createBlueprintUsAcctRefex(conceptSpec.getPreferredCAB().getComponentNid());
                 }
                 Ts.get().addUncommitted(newConcept);
 
@@ -331,18 +337,17 @@ public class NewConcept extends PreviousNextOrCancel {
                 fsn.setEditable(true);
                 fsn.getDocument().addDocumentListener(new CopyTextDocumentListener());
                 wizardPanel.add(fsn, c);
-                //TODO
+                
                 c.gridwidth = 4;
                 c.gridx += c.gridwidth;
                 c.gridwidth = 2;
                 c.weightx = 0.0;
-                inputFsnLabel = new JLabel("fsn"); //TODO ########TEST##########
+                inputFsnLabel = new JLabel("fsn"); 
                 inputFsnLabel.setVisible(false);
                 wizardPanel.add(inputFsnLabel, c);
                 c.gridy++;
                 c.gridx = 0;
                 c.weightx = 0.0;
-                //TODO to here
 
                 c.gridy++;
                 c.weightx = 0.0;
@@ -354,18 +359,18 @@ public class NewConcept extends PreviousNextOrCancel {
                 pref.setFixedWidth(300);
                 pref.setEditable(true);
                 wizardPanel.add(pref, c);
-                //TODO
+                
                 c.gridwidth = 4;
                 c.gridx += c.gridwidth;
                 c.gridwidth = 2;
                 c.weightx = 0.0;
-                inputPrefLabel = new JLabel("pref"); //TODO ########TEST##########
+                inputPrefLabel = new JLabel("pref");
                 inputPrefLabel.setVisible(false);
                 wizardPanel.add(inputPrefLabel, c);
                 c.gridy++;
                 c.gridx = 0;
                 c.weightx = 0.0;
-                //TODO to here
+                
 
 
                 c.gridy++;
@@ -379,7 +384,7 @@ public class NewConcept extends PreviousNextOrCancel {
                 c.weighty = 0.0;
 
                 c.gridy++;
-                c.gridx = 0; //TODO THIS
+                c.gridx = 0; 
                 c.gridwidth = 10;
                 wizardPanel.add(new JSeparator(), c);
                 c.gridy++;
@@ -643,7 +648,7 @@ public class NewConcept extends PreviousNextOrCancel {
                 this.gbLabelFsn.setVisible(false);
                 
                 this.usBoxFsn.setVisible(false);
-                this.usBoxFsn.setSelected(false);
+                this.usBoxFsn.setSelected(true);
                 this.usFsn.setVisible(false);
                 this.usLabelFsn.setVisible(false);
             } else if (th.checkTermSpelling(prefText, us)) { //check if lang is en-us
@@ -779,7 +784,7 @@ public class NewConcept extends PreviousNextOrCancel {
             descSpecGbPref = new DescCAB(
                     conceptSpec.getComponentUuid(),
                     WbDescType.SYNONYM.getLenient().getPrimUuid(),
-                    "en",
+                    "en-gb",
                     gbPref.extractText(),
                     false);
 
@@ -800,9 +805,28 @@ public class NewConcept extends PreviousNextOrCancel {
                     TK_REFSET_TYPE.CID,
                     componentNid,
                     Ts.get().getNidForUuids(gbUuid));
-            refexSpecGbPref.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid())); //WbDescType.SYNONYM.getLenient().getPrimUuid())
+            refexSpecGbPref.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid()));
             
             tc.construct(refexSpecGbPref);
+        } catch (IOException ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        } catch (InvalidCAB ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        }
+    }
+    
+    private void createBlueprintGbAcctRefex(int componentNid){
+        try {
+            UUID gbUuid = UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd");
+            refexSpecGbAcct = new RefexCAB(
+                    TK_REFSET_TYPE.CID,
+                    componentNid,
+                    Ts.get().getNidForUuids(gbUuid));
+            refexSpecGbAcct.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.ACCEPTABLE.getLenient().getPrimUuid()));
+            
+            tc.construct(refexSpecGbAcct);
         } catch (IOException ex) {
             // TODO Auto-generated catch block
             ex.printStackTrace();
@@ -856,7 +880,7 @@ public class NewConcept extends PreviousNextOrCancel {
             descSpecUsPref = new DescCAB(
                     conceptSpec.getComponentUuid(),
                     WbDescType.SYNONYM.getLenient().getPrimUuid(),
-                    "en",
+                    "en-us",
                     usPref.extractText(),
                     false);
 
@@ -881,6 +905,26 @@ public class NewConcept extends PreviousNextOrCancel {
             refexSpecUsPref.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid()));
             
             tc.construct(refexSpecUsPref);
+        } catch (IOException ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        } catch (InvalidCAB ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        }
+    }
+    
+    private void createBlueprintUsAcctRefex(int componentNid){
+        try {
+           UUID usUuid = UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6");
+            refexSpecUsAcct = new RefexCAB(
+                    TK_REFSET_TYPE.CID,
+                    componentNid,
+                    Ts.get().getNidForUuids(usUuid));
+            
+            refexSpecUsAcct.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.ACCEPTABLE.getLenient().getPrimUuid()));
+            
+            tc.construct(refexSpecUsAcct);
         } catch (IOException ex) {
             // TODO Auto-generated catch block
             ex.printStackTrace();
