@@ -74,13 +74,13 @@ import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.id.Type3UuidFactory;
+import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.rules.testmodel.DrComponentHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.rules.testmodel.TerminologyHelperDroolsWorkbench;
 import org.ihtsdo.testmodel.DrConcept;
-import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.KindOfCacheBI;
@@ -265,7 +265,7 @@ public class RulesLibrary {
 		}
 		long endTime = System.currentTimeMillis();
 		long elapsed = endTime - startTime;
-		String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+		String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
 		String result = "Done";
 		activity.setProgressInfoUpper("<html>Performed QA check on concept: " + concept.toString() + 
 					" for " + context.toString());
@@ -585,7 +585,7 @@ public class RulesLibrary {
 		
 		long endTime = System.currentTimeMillis();
 		long elapsed = endTime - startTime;
-		String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+		String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
 		String result = "";
 		if (kbase != null) {
 			result = "Sucess...";
@@ -639,7 +639,7 @@ public class RulesLibrary {
 		}
 		long endTime = System.currentTimeMillis();
 		long elapsed = endTime - startTime;
-		String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+		String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
 		String result = "";
 		if (kbase != null) {
 			result = "Sucess...";
