@@ -159,4 +159,9 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
         }
 
     }
+
+    @Override // I_BatchActionTask
+    public BatchActionTask getTask() {
+        return task;
+    }
 }

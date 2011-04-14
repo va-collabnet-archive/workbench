@@ -19,6 +19,14 @@ public class BatchActionTaskParentAddNew extends BatchActionTask {
     UUID selectedRoleTypeUuid; // Ancestory linkage type
     UUID selectedDestUuid; // Parent concept
 
+    public void setSelectedDestUuid(UUID selectedDestUuid) {
+        this.selectedDestUuid = selectedDestUuid;
+    }
+
+    public void setSelectedRoleTypeUuid(UUID selectedRoleTypeUuid) {
+        this.selectedRoleTypeUuid = selectedRoleTypeUuid;
+    }
+
     public BatchActionTaskParentAddNew() {
         this.selectedRoleTypeUuid = null;
         this.selectedDestUuid = null;

@@ -8,7 +8,6 @@
  *
  * Created on Apr 8, 2011, 10:04:35 PM
  */
-
 package org.ihtsdo.batch;
 
 import java.util.Collections;
@@ -25,6 +24,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
  * @author marc
  */
 public class BatchActionTaskRefsetAddMemberUI extends javax.swing.JPanel implements I_BatchActionTask {
+
     BatchActionTask task;
 
     /** Creates new form BatchActionTaskRefsetAddMemberUI */
@@ -92,8 +92,6 @@ public class BatchActionTaskRefsetAddMemberUI extends javax.swing.JPanel impleme
                 .addComponent(jPanelDndNewValue, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBoxExistingRefsets;
     private javax.swing.JLabel jLabel1;
@@ -160,4 +158,8 @@ public class BatchActionTaskRefsetAddMemberUI extends javax.swing.JPanel impleme
         }
     }
 
+    @Override // I_BatchActionTask
+    public BatchActionTask getTask() {
+        return task;
+    }
 }

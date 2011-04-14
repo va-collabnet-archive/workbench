@@ -204,6 +204,10 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
     private javax.swing.JPanel jPanelTaskDetail;
     // End of variables declaration//GEN-END:variables
 
+    BatchActionTask getTask() {
+        return taskDetailUI.getTask();
+    }
+
     void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
         taskDetailUI.updateExisting(existingParents, existingRefsets, existingRoles);
     }

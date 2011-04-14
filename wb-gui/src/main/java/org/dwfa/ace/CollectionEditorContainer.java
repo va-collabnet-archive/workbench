@@ -242,12 +242,10 @@ public class CollectionEditorContainer extends JPanel {
         this.list = list;
         this.processBuilder = descListProcessBuilderPanel;
 
-        //
-        // :!!!:E:WAS: batchActionEditor = new Z_BatchActionEditor(this);
-        batchActionPanelMain = new BatchActionEditorPanel(ace, list);
+        // SET UP BATCH ACTION PANELS
+        batchResults = new JTextArea("Batch results will show here."); // :!!!: BATCH ACTION RESULTS GO HERE
+        batchActionPanelMain = new BatchActionEditorPanel(ace, list, batchResults);
 
-        // 
-        batchResults = new JTextArea("<html>Batch results here"); // :!!!: BATCH ACTION RESULTS GO HERE
         batchResultsScroller = new JScrollPane(batchResults);
         conceptPanel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_LIST_VIEW, ace.aceFrameConfig, 
         		LINK_TYPE.LIST_LINK, true,

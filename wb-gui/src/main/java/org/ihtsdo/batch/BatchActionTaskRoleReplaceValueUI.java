@@ -8,7 +8,6 @@
  *
  * Created on Apr 8, 2011, 10:06:04 PM
  */
-
 package org.ihtsdo.batch;
 
 import java.util.Collections;
@@ -25,6 +24,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
  * @author marc
  */
 public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implements I_BatchActionTask {
+
     BatchActionTask task;
 
     /** Creates new form BatchActionTaskRoleReplaceValueUI */
@@ -37,7 +37,6 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelDndRoleValueNew, tmp.getPanel());
         jPanelDndRoleValueNew = tmp.getPanel();
-
     }
 
     /** This method is called from within the constructor to
@@ -102,8 +101,6 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
     private void jComboBoxExistingRolesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxExistingRolesActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jComboBoxExistingRolesActionPerformed
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBoxExistingRoles;
     private javax.swing.JLabel jLabelExistingRole;
@@ -170,4 +167,8 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
         }
     }
 
+    @Override // I_BatchActionTask
+    public BatchActionTask getTask() {
+        return task;
+    }
 }

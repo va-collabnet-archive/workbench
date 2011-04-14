@@ -11,11 +11,14 @@
 package org.ihtsdo.batch;
 
 import java.util.List;
+import java.util.UUID;
 import javax.swing.GroupLayout;
 import javax.swing.JPanel;
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.example.binding.TermAux;
 
 /**
  *
@@ -88,5 +91,20 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
     public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
         System.out.println("\r\n!!! BatchActionTaskParentRetireUI.updateExisting() \r\n!!! existingParents! " + existingParents + "\r\n!!! existingRefsets! " + existingRoles + "\r\n!!! existingRoles! " + existingRoles);
 
+    }
+
+    @Override
+    public BatchActionTask getTask() {
+        // UUID isaUuid = TermAux.IS_A.getUuids()[0];
+        UUID uuidIsa = UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25");
+        I_AmTermComponent termNewParent = ((BatchActionTaskDndConcept) jPanelDndNewParent).getTermComponent();
+        if (termNewParent != null && termNewParent.getUUIDs().size() > 0) {
+            UUID uuidNewParent = termNewParent.getUUIDs().get(0);
+            ((BatchActionTaskParentAddNew) task).setSelectedRoleTypeUuid(uuidIsa);
+            ((BatchActionTaskParentAddNew) task).setSelectedDestUuid(uuidNewParent);
+            return task;
+        } else {
+            return null;
+        }
     }
 }

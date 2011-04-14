@@ -36,7 +36,7 @@
                   <Component id="btnAdd" min="-2" pref="27" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jScrollBatchActionTasks" pref="261" max="32767" attributes="0"/>
+              <Component id="jScrollBatchActionTasks" pref="273" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>

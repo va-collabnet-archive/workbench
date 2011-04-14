@@ -8,7 +8,6 @@
  *
  * Created on Apr 8, 2011, 10:05:48 PM
  */
-
 package org.ihtsdo.batch;
 
 import java.util.Collections;
@@ -23,7 +22,8 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
  *
  * @author marc
  */
-public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel  implements I_BatchActionTask{
+public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel implements I_BatchActionTask {
+
     BatchActionTask task;
 
     /** Creates new form BatchActionTaskRefsetRetireMemberUI */
@@ -67,8 +67,6 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel  imp
                 .addComponent(jComboBoxExistingRefsets, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBoxExistingRefsets;
     private javax.swing.JLabel jLabel1;
@@ -134,4 +132,8 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel  imp
         }
     }
 
+    @Override // I_BatchActionTask
+    public BatchActionTask getTask() {
+        return task;
+    }
 }

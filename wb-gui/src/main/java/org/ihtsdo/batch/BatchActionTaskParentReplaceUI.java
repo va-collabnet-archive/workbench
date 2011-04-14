@@ -10,12 +10,20 @@
  */
 package org.ihtsdo.batch;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JPanel;
+import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.cement.SNOMED;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
@@ -156,5 +164,35 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
             }
         }
 
+    }
+
+    @Override // I_BatchActionTask
+    public BatchActionTask getTask() {
+        UUID uuidIsa = UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25");
+
+        // MOVE FROM
+        DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingParents.getModel();
+        ComponentVersionBI fromParentBI = (ComponentVersionBI) dcbm.getSelectedItem();
+
+        // MOVE TO
+        I_AmTermComponent termParentTo = ((BatchActionTaskDndConcept) jPanelDndParentReplace).getTermComponent();
+
+        if (fromParentBI != null && termParentTo != null && termParentTo.getUUIDs().size() > 0) {
+            try {
+                int nidOldParent = fromParentBI.getNid();
+                UUID uuidNewParent = termParentTo.getUUIDs().get(0);
+                int nidIsa = Ts.get().getConcept(SNOMED.Concept.IS_A.getUids()).getNid();
+                ((BatchActionTaskParentReplace) task).moveFromRoleTypeNid = nidIsa;
+                ((BatchActionTaskParentReplace) task).moveFromDestNid = nidOldParent;
+                ((BatchActionTaskParentReplace) task).moveToRoleTypeUuid = uuidIsa;
+                ((BatchActionTaskParentReplace) task).moveToDestUuid = uuidNewParent;
+                return task;
+            } catch (IOException ex) {
+                Logger.getLogger(BatchActionTaskParentReplaceUI.class.getName()).log(Level.SEVERE, null, ex);
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 }

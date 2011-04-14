@@ -18,6 +18,22 @@ public class BatchActionTaskParentReplace extends BatchActionTask {
     UUID moveToRoleTypeUuid; // Annncestory linkage type
     UUID moveToDestUuid; // Parent concept
 
+    public void setMoveToDestUuid(UUID moveToDestUuid) {
+        this.moveToDestUuid = moveToDestUuid;
+    }
+
+    public void setMoveToRoleTypeUuid(UUID moveToRoleTypeUuid) {
+        this.moveToRoleTypeUuid = moveToRoleTypeUuid;
+    }
+
+    public void setMoveFromDestNid(int moveFromDestNid) {
+        this.moveFromDestNid = moveFromDestNid;
+    }
+
+    public void setMoveFromRoleTypeNid(int moveFromRoleTypeNid) {
+        this.moveFromRoleTypeNid = moveFromRoleTypeNid;
+    }
+    
     public BatchActionTaskParentReplace() {
         this.moveFromRoleTypeNid = Integer.MAX_VALUE;
         this.moveFromDestNid = Integer.MAX_VALUE;

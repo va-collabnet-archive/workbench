@@ -10,11 +10,17 @@
  */
 package org.ihtsdo.batch;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
+import org.dwfa.cement.SNOMED;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
@@ -132,5 +138,28 @@ public class BatchActionTaskParentRetireUI extends javax.swing.JPanel implements
             }
         }
 
+    }
+
+    @Override // I_BatchActionTask
+    public BatchActionTask getTask() {
+        // RETIRE PARENT
+        DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingParents.getModel();
+        ComponentVersionBI fromParentBI = (ComponentVersionBI) dcbm.getSelectedItem();
+
+        if (fromParentBI != null) {
+            try {
+                int nidIsa = Ts.get().getConcept(SNOMED.Concept.IS_A.getUids()).getNid();
+                int nidParent = fromParentBI.getNid();
+                ((BatchActionTaskParentRetire) task).selectedRoleTypeNid = nidIsa;
+                ((BatchActionTaskParentRetire) task).selectedDestNid = nidParent;
+                return task;
+
+            } catch (IOException ex) {
+                Logger.getLogger(BatchActionTaskParentRetireUI.class.getName()).log(Level.SEVERE, null, ex);
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 }

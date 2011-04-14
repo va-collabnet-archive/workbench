@@ -19,7 +19,9 @@ public class BatchActionTaskRefsetAddMember extends BatchActionTask {
     @Override
     public boolean execute(ConceptVersionBI c) throws Exception {
         System.out.println("## BatchActionTaskRefsetAddMember concept: " + c);
-        
+
+        BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.REFSET_ADD_MEMBER));
+
         return true;
     }
 

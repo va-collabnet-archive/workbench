@@ -83,4 +83,55 @@ public class BatchActionEventReporter {
 
         return sb.toString();
     }
+
+    /**
+     * generates Tab Separated value report.
+     * @return
+     */
+    public static String createReportHTML() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<HTML>");
+        try {
+            for (BatchActionEvent bae : batchActionEventList) {
+                switch (bae.actionType) {
+                    case PARENT_ADD_NEW:
+                        sb.append("PARENT_ADD_NEW");
+                        break;
+                    case PARENT_REPLACE:
+                        sb.append("PARENT_REPLACE");
+                        break;
+                    case PARENT_RETIRE:
+                        sb.append("PARENT_RETIRE");
+                        break;
+                    case REFSET_ADD_MEMBER:
+                        sb.append("REFSET_ADD_MEMBER");
+                        break;
+                    case REFSET_MOVE_MEMBER:
+                        sb.append("REFSET_MOVE_MEMBER");
+                        break;
+                    case REFSET_REPLACE_VALUE:
+                        sb.append("REFSET_REPLACE_VALUE");
+                        break;
+                    case REFSET_RETIRE_MEMBER:
+                        sb.append("REFSET_RETIRE_MEMBER");
+                        break;
+                    case ROLE_REPLACE_VALUE:
+                        sb.append("ROLE_REPLACE_VALUE");
+                        break;
+                    case SIMPLE:
+                        sb.append("SIMPLE");
+                        break;
+                }
+                sb.append(" : ");
+                sb.append(bae.conceptA.getPreferredDescription().getText());
+                sb.append("<br>");
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(BatchActionEvent.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ContraditionException ex) {
+            Logger.getLogger(BatchActionEvent.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return sb.toString();
+    }
 }

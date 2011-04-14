@@ -157,4 +157,9 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
             }
         }
     }
+
+    @Override // I_BatchActionTask
+    public BatchActionTask getTask() {
+        return task;
+    }
 }

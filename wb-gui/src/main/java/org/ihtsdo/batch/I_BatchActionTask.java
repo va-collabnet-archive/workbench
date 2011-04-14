@@ -20,5 +20,7 @@ public interface I_BatchActionTask {
 
     JPanel getPanel();
 
+    BatchActionTask getTask();
+
     void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles);
 }
