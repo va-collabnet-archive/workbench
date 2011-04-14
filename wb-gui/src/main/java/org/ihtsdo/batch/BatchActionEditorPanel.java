@@ -39,6 +39,7 @@ import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.util.swing.GuiUtil;
 
 /**
  *
@@ -375,6 +376,7 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
         jScrollBatchActionTasks.doLayout();
         this.invalidate();
         this.validate();
+        GuiUtil.tickle(this);
     }//GEN-LAST:event_actionClearAll
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
