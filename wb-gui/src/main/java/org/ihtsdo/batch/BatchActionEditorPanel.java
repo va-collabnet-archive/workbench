@@ -216,11 +216,14 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         btnExecuteAllTasks = new javax.swing.JButton();
         btnAdd = new javax.swing.JButton();
         btnClearAll = new javax.swing.JButton();
         jScrollBatchActionTasks = new javax.swing.JScrollPane();
+
+        setLayout(new java.awt.GridBagLayout());
 
         btnExecuteAllTasks.setText("Execute");
         btnExecuteAllTasks.addActionListener(new java.awt.event.ActionListener() {
@@ -228,6 +231,12 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                 actionExecuteAllTasks(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.weightx = 1.0;
+        add(btnExecuteAllTasks, gridBagConstraints);
 
         btnAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/add2.png"))); // NOI18N
         btnAdd.addActionListener(new java.awt.event.ActionListener() {
@@ -235,6 +244,12 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                 actionAddAnotherTask(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
+        add(btnAdd, gridBagConstraints);
 
         btnClearAll.setText("Clear All");
         btnClearAll.addActionListener(new java.awt.event.ActionListener() {
@@ -242,30 +257,21 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                 actionClearAll(evt);
             }
         });
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(btnExecuteAllTasks)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 340, Short.MAX_VALUE)
-                .addComponent(btnAdd)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnClearAll)
-                .addContainerGap())
-            .addComponent(jScrollBatchActionTasks, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnExecuteAllTasks)
-                    .addComponent(btnClearAll)
-                    .addComponent(btnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollBatchActionTasks, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE))
-        );
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.weightx = 1.0;
+        add(btnClearAll, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        add(jScrollBatchActionTasks, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     // actionExecuteAllTask ... dispatch engine approach
