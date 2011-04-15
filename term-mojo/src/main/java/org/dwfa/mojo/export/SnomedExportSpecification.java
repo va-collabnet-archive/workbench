@@ -207,7 +207,7 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
         Set<I_DescriptionTuple> latestPostionMatchingDescriptionTuples = new HashSet<I_DescriptionTuple>();
         Set<I_RelTuple> latestPostionMatchingRelationshipTuples = new HashSet<I_RelTuple>();
 
-        if (isExportableConcept(concept)) {
+        if (isExportableConcept(concept)) {//concept = termFactory.getConcept(java.util.UUID.fromString("341db6ef-7198-3143-be09-71452f0ef0ba"));
             componentDto = new ComponentDto();
             for (Position position : positions) {
                 if (position.isLastest()) {
@@ -303,6 +303,13 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
                         if (getLangaugeType(currentDescription.getTypeId()) == rf2PreferredDescriptionTypeNid){
                             if (currentDescription.getDescId() != latestPreferredTerm.getDescId()) {
                                 retireExtension(currentLanguageExtensions, latestPart);
+                            // is the latest preferred term check current extension language type
+                            } else if (latestPart.getC1id() != getLangaugeType(currentDescription.getTypeId())) {
+                                I_ThinExtByRefPartConcept updatedPart = (I_ThinExtByRefPartConcept) latestPart.duplicate();
+                                currentLanguageExtensions.addVersion(updatedPart);
+                                updatedPart.setC1id(getLangaugeType(currentDescription.getTypeId()));
+                                updatedPart.setPathId(releasePart.getPathId());
+                                updatedPart.setVersion(releasePart.getVersion());
                             }
                         } else if(getLangaugeType(currentDescription.getTypeId()) == rf2AcceptableDescriptionTypeNid) {
                             if (currentDescription.getLang().equals(EN_US)) {
@@ -349,7 +356,7 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
         //If update preferred term if new available
         if (latestPreferredTerm != null) {
             I_ThinExtByRefVersioned currentLanguageExtensions = extensionSet.get(latestPreferredTerm.getDescId());
-            if(currentLanguageExtensions == null){
+            if (currentLanguageExtensions == null) {
                 setAdrsExtension(componentDto, latestPreferredTerm, rf2PreferredDescriptionTypeNid);
             }
         }
@@ -357,7 +364,7 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
         List<I_DescriptionTuple> acceptableDescriptions = (!latestSynonyms.isEmpty()) ? latestSynonyms : latestUnSpecifiedDescriptionTypes;
         for (I_DescriptionTuple acceptableDescriptionTuple : acceptableDescriptions) {
             I_ThinExtByRefVersioned currentLanguageExtensions = extensionSet.get(acceptableDescriptionTuple.getDescId());
-            if(currentLanguageExtensions == null){
+            if (currentLanguageExtensions == null) {
                 setAdrsExtension(componentDto, acceptableDescriptionTuple, rf2AcceptableDescriptionTypeNid);
             }
         }
