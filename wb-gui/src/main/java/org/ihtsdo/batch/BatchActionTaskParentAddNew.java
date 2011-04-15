@@ -54,7 +54,7 @@ public class BatchActionTaskParentAddNew extends BatchActionTask {
         // Check if parent already exists and is active.
         Collection<? extends RelationshipVersionBI> checkParents = c.getRelsOutgoingActive();
         for (RelationshipVersionBI rvbi : checkParents) {
-            if (rvbi.getDestinationNid() == selectedDestNid && rvbi.getTypeNid() == selectedRoleTypeNid) {
+            if (rvbi.getDestinationNid() == selectedDestNid && rvbi.getTypeNid() == selectedRoleTypeNid & rvbi.isStated()) {
                 BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.PARENT_ADD_NEW, BatchActionEventType.EVENT_NOOP, "already has parent: " + nidToName(selectedDestNid)));
                 return false;
             }
