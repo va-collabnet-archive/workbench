@@ -25,6 +25,7 @@ import org.dwfa.ace.list.TerminologyListModel;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -280,6 +281,8 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
 
             // SETUP TASK LIST
             ViewCoordinate vc = ace.aceFrameConfig.getViewCoordinate();
+            vc = new ViewCoordinate(vc);
+            vc.setRelAssertionType(RelAssertionType.STATED);
             EditCoordinate ec = ace.aceFrameConfig.getEditCoordinate();
 
             BatchActionTask.setup(ec, vc);
