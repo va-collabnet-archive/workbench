@@ -18,6 +18,8 @@ import javax.swing.GroupLayout;
 import javax.swing.JPanel;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
  *
@@ -99,11 +101,6 @@ public class BatchActionTaskRefsetAddMemberUI extends javax.swing.JPanel impleme
     // End of variables declaration//GEN-END:variables
 
     @Override
-    public void doTaskExecution(ConceptVersionBI c) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
     public JPanel getPanel() {
         return this;
     }
@@ -159,7 +156,7 @@ public class BatchActionTaskRefsetAddMemberUI extends javax.swing.JPanel impleme
     }
 
     @Override // I_BatchActionTask
-    public BatchActionTask getTask() {
+    public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) {
         return task;
     }
 }

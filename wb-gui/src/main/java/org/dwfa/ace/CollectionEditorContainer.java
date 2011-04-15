@@ -47,6 +47,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
@@ -227,9 +228,9 @@ public class CollectionEditorContainer extends JPanel {
     private TerminologyList list;
     private JTabbedPane bottomTabs = new JTabbedPane();
     private JScrollPane batchResultsScroller;
-    private JTextArea batchResults;
+    private JTextPane batchResults;
     
-    private BatchActionEditorPanel batchActionPanelMain; // :!!!:WAS:E:
+    private BatchActionEditorPanel batchActionPanelMain;
 
     public I_ConfigAceFrame getConfig() {
         return ace.getAceFrameConfig();
@@ -243,7 +244,10 @@ public class CollectionEditorContainer extends JPanel {
         this.processBuilder = descListProcessBuilderPanel;
 
         // SET UP BATCH ACTION PANELS
-        batchResults = new JTextArea("Batch results will show here."); // :!!!: BATCH ACTION RESULTS GO HERE
+        batchResults = new JTextPane();
+        batchResults.setEditable(false);
+        batchResults.setContentType("text/html");
+        batchResults.setText("<html>Batch Action Task results will show here.");
         batchActionPanelMain = new BatchActionEditorPanel(ace, list, batchResults);
 
         batchResultsScroller = new JScrollPane(batchResults);
@@ -254,7 +258,7 @@ public class CollectionEditorContainer extends JPanel {
         conceptPanel.setLinkedList(list);
         conceptPanel.changeLinkListener(LINK_TYPE.LIST_LINK);
         bottomTabs.addTab("concept details", conceptPanel);
-        bottomTabs.addTab("batch action results", batchResultsScroller);  // :!!!: BATCH RESULTS TAB
+        bottomTabs.addTab("batch action results", batchResultsScroller);
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
@@ -278,10 +282,8 @@ public class CollectionEditorContainer extends JPanel {
         listActionSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         listActionSplit.setLeftComponent(new JScrollPane(list));
         listActionSplit.setDividerLocation(400);
-        // :!!!:E:WAS: listActionSplit.setRightComponent(batchActionEditor.getBatchEditorPanel());
-        listActionSplit.setRightComponent(batchActionPanelMain); // :!!!:E:
-        
-        
+        listActionSplit.setRightComponent(batchActionPanelMain);
+                
         listDetailSplit.setTopComponent(listActionSplit);
         listDetailSplit.setBottomComponent(bottomTabs);
         listDetailSplit.setDividerLocation(3000);

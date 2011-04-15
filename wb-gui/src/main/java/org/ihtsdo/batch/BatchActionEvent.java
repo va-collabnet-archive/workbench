@@ -17,46 +17,66 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
  */
 public class BatchActionEvent implements Comparable<BatchActionEvent> {
 
-    ConceptVersionBI conceptA; // main concept of operation 
-    BatchActionTaskType actionType;
+    public static enum BatchActionEventType {
 
-    public BatchActionEvent(ConceptVersionBI conceptA, BatchActionTaskType actionType) {
+        EVENT_ERROR,
+        EVENT_NOOP,
+        EVENT_SUCCESS
+    }
+    private ConceptVersionBI conceptA; // main concept of operation
+    private BatchActionTaskType actionTaskType;
+    private BatchActionEventType eventType;
+    private String eventNote;
+
+    public BatchActionEvent(ConceptVersionBI conceptA, BatchActionTaskType actionType, BatchActionEventType eventType, String eventNote) {
         this.conceptA = conceptA;
-        this.actionType = actionType;
-
+        this.actionTaskType = actionType;
+        this.eventType = eventType;
+        this.eventNote = eventNote;
+        System.out.println("!!! BatchActionEvent " + this);
     }
 
     @Override
     public int compareTo(BatchActionEvent t) {
-        if (this.actionType.compareTo(t.actionType) > 0) {
+        if (this.actionTaskType.compareTo(t.actionTaskType) > 0) {
             return 1; // this is greater than recieved
-        } else if (this.actionType.compareTo(t.actionType) < 0) {
+        } else if (this.actionTaskType.compareTo(t.actionTaskType) < 0) {
             return -1;
         } else {
             return 0;
         }
     }
 
+    public BatchActionTaskType getActionTaskType() {
+        return actionTaskType;
+    }
+
+    public ConceptVersionBI getConceptA() {
+        return conceptA;
+    }
+
+    public String getEventNote() {
+        return eventNote;
+    }
+
+    public BatchActionEventType getEventType() {
+        return eventType;
+    }
+
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         try {
 
-            switch (actionType) {
-                case PARENT_RETIRE:
-                    sb.append("PARENT_RETIRE");
-                    break;
-
-                case PARENT_REPLACE:
-                    sb.append("PARENT_REPLACE");
-                    break;
-
-                case PARENT_ADD_NEW:
-                    sb.append("PARENT_ADD_NEW");
-                    break;
-            }
+            sb.append(actionTaskType.toString());
             sb.append("\t");
             sb.append(conceptA.getPreferredDescription().getText());
-            sb.append("\r\n");
+            sb.append("\t");
+            sb.append(eventType);
+            sb.append("\t");
+            if (eventNote != null) {
+                sb.append(eventNote);
+            }
 
         } catch (IOException ex) {
             Logger.getLogger(BatchActionEvent.class.getName()).log(Level.SEVERE, null, ex);

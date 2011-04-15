@@ -26,6 +26,8 @@ import org.dwfa.cement.SNOMED;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
  *
@@ -106,11 +108,6 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
     // End of variables declaration//GEN-END:variables
 
     @Override
-    public void doTaskExecution(ConceptVersionBI c) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
     public JPanel getPanel() {
         return this;
     }
@@ -167,7 +164,7 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
     }
 
     @Override // I_BatchActionTask
-    public BatchActionTask getTask() {
+    public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) throws IOException {
         UUID uuidIsa = UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25");
 
         // MOVE FROM
@@ -178,19 +175,14 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
         I_AmTermComponent termParentTo = ((BatchActionTaskDndConcept) jPanelDndParentReplace).getTermComponent();
 
         if (fromParentBI != null && termParentTo != null && termParentTo.getUUIDs().size() > 0) {
-            try {
-                int nidOldParent = fromParentBI.getNid();
-                UUID uuidNewParent = termParentTo.getUUIDs().get(0);
-                int nidIsa = Ts.get().getConcept(SNOMED.Concept.IS_A.getUids()).getNid();
-                ((BatchActionTaskParentReplace) task).moveFromRoleTypeNid = nidIsa;
-                ((BatchActionTaskParentReplace) task).moveFromDestNid = nidOldParent;
-                ((BatchActionTaskParentReplace) task).moveToRoleTypeUuid = uuidIsa;
-                ((BatchActionTaskParentReplace) task).moveToDestUuid = uuidNewParent;
-                return task;
-            } catch (IOException ex) {
-                Logger.getLogger(BatchActionTaskParentReplaceUI.class.getName()).log(Level.SEVERE, null, ex);
-                return null;
-            }
+            int nidOldParent = fromParentBI.getNid();
+            UUID uuidNewParent = termParentTo.getUUIDs().get(0);
+            int nidIsa = Ts.get().getConcept(SNOMED.Concept.IS_A.getUids()).getNid();
+            ((BatchActionTaskParentReplace) task).setMoveFromRoleTypeNid(nidIsa);
+            ((BatchActionTaskParentReplace) task).setMoveFromDestNid(nidOldParent);
+            ((BatchActionTaskParentReplace) task).setMoveToRoleTypeUuid(uuidIsa);
+            ((BatchActionTaskParentReplace) task).setMoveToDestUuid(uuidNewParent);
+            return task;
         } else {
             return null;
         }

@@ -1,8 +1,11 @@
 package org.ihtsdo.batch;
 
 import java.util.UUID;
+import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 /**
@@ -11,8 +14,16 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
  */
 public class BatchActionTaskParentRetire extends BatchActionTask {
 
-    int selectedRoleTypeNid; // Annncestory linkage type
-    int selectedDestNid; // Parent concept
+    private int selectedRoleTypeNid; // Ancestory linkage type
+    private int selectedDestNid; // Parent concept
+
+    public void setSelectedDestNid(int selectedDestNid) {
+        this.selectedDestNid = selectedDestNid;
+    }
+
+    public void setSelectedRoleTypeNid(int selectedRoleTypeNid) {
+        this.selectedRoleTypeNid = selectedRoleTypeNid;
+    }
 
     public BatchActionTaskParentRetire() {
         this.selectedRoleTypeNid = Integer.MAX_VALUE;
@@ -30,16 +41,18 @@ public class BatchActionTaskParentRetire extends BatchActionTask {
     }
 
     @Override
-    public boolean execute(ConceptVersionBI c) throws Exception {
-        System.out.println("## ## BatchActionTaskParentRetire concept: " + c);
-
+    public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws Exception {
         boolean changed = false;
         for (RelationshipVersionBI r : c.getRelsOutgoingActive()) {
             if (r.getDestinationNid() == selectedDestNid && r.getTypeNid() == selectedRoleTypeNid) {
-                r.makeAnalog(CURRENT_NID, r.getAuthorNid(), r.getPathNid(), Long.MAX_VALUE);
+                r.makeAnalog(RETIRED_NID, ec.getAuthorNid(), r.getPathNid(), Long.MAX_VALUE);
                 changed = true;
-                BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.PARENT_RETIRE));
+                BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.PARENT_RETIRE, BatchActionEventType.EVENT_SUCCESS, "retired: " + nidToName(selectedDestNid)));
             }
+        }
+
+        if (!changed) {
+            BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.PARENT_RETIRE, BatchActionEventType.EVENT_NOOP, "does not have parent: " + nidToName(selectedDestNid)));
         }
 
         return changed;

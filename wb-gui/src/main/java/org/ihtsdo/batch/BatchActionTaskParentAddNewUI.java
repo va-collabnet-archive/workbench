@@ -10,14 +10,18 @@
  */
 package org.ihtsdo.batch;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import javax.swing.GroupLayout;
 import javax.swing.JPanel;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.example.binding.TermAux;
 
 /**
@@ -78,23 +82,17 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
     // End of variables declaration//GEN-END:variables
 
     @Override
-    public void doTaskExecution(ConceptVersionBI c) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
     public JPanel getPanel() {
         return this;
     }
 
     @Override
     public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
-        System.out.println("\r\n!!! BatchActionTaskParentRetireUI.updateExisting() \r\n!!! existingParents! " + existingParents + "\r\n!!! existingRefsets! " + existingRoles + "\r\n!!! existingRoles! " + existingRoles);
-
+        // nothing to do.
     }
 
     @Override
-    public BatchActionTask getTask() {
+    public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) throws IOException {
         // UUID isaUuid = TermAux.IS_A.getUuids()[0];
         UUID uuidIsa = UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25");
         I_AmTermComponent termNewParent = ((BatchActionTaskDndConcept) jPanelDndNewParent).getTermComponent();

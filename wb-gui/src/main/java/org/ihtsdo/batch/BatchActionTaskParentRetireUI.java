@@ -23,6 +23,8 @@ import org.dwfa.cement.SNOMED;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
  *
@@ -75,12 +77,6 @@ public class BatchActionTaskParentRetireUI extends javax.swing.JPanel implements
     private javax.swing.JComboBox jComboBoxExistingParents;
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
-
-    // I_BatchActionTask
-    @Override
-    public void doTaskExecution(ConceptVersionBI c) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 
     // I_BatchActionTask
     @Override
@@ -141,23 +137,17 @@ public class BatchActionTaskParentRetireUI extends javax.swing.JPanel implements
     }
 
     @Override // I_BatchActionTask
-    public BatchActionTask getTask() {
+    public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) throws IOException {
         // RETIRE PARENT
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingParents.getModel();
         ComponentVersionBI fromParentBI = (ComponentVersionBI) dcbm.getSelectedItem();
 
         if (fromParentBI != null) {
-            try {
-                int nidIsa = Ts.get().getConcept(SNOMED.Concept.IS_A.getUids()).getNid();
-                int nidParent = fromParentBI.getNid();
-                ((BatchActionTaskParentRetire) task).selectedRoleTypeNid = nidIsa;
-                ((BatchActionTaskParentRetire) task).selectedDestNid = nidParent;
-                return task;
-
-            } catch (IOException ex) {
-                Logger.getLogger(BatchActionTaskParentRetireUI.class.getName()).log(Level.SEVERE, null, ex);
-                return null;
-            }
+            int nidIsa = Ts.get().getConcept(SNOMED.Concept.IS_A.getUids()).getNid();
+            int nidParent = fromParentBI.getNid();
+            ((BatchActionTaskParentRetire) task).setSelectedRoleTypeNid(nidIsa);
+            ((BatchActionTaskParentRetire) task).setSelectedDestNid(nidParent);
+            return task;
         } else {
             return null;
         }

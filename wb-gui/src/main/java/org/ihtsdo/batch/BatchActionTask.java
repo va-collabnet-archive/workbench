@@ -1,8 +1,13 @@
 package org.ihtsdo.batch;
 
 import java.io.IOException;
+import java.util.UUID;
+import org.eclipse.jdt.core.dom.ThisExpression;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.example.binding.TermAux;
 
 // :!!!: should BatchActionTask be abstract or interface?
@@ -28,12 +33,24 @@ public abstract class BatchActionTask {
     public BatchActionTask() {
     }
 
-    public abstract boolean execute(ConceptVersionBI c) throws Exception;
+    public abstract boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws Exception;
 
-    public static void setup(TerminologyConstructorBI tc) throws IOException {
+    /**
+     * Call once prior to execution of task to setup common values used to process all tasks.
+     * @param tc
+     * @throws IOException 
+     */
+    public static void setup(EditCoordinate ec, ViewCoordinate vc) throws IOException {
         RETIRED_NID = TermAux.RETIRED.getLenient().getNid();
         CURRENT_NID = TermAux.CURRENT.getLenient().getNid();
-        termConstructor = tc;
+        termConstructor = Ts.get().getTerminologyConstructor(ec, vc);
     }
-    // 
+
+    public static String nidToName(int nid) throws IOException {
+        return Ts.get().getComponent(nid).toUserString();
+    }
+
+    public static String uuidToName(UUID uuid) throws IOException {
+        return Ts.get().getComponent(uuid).toUserString();
+    }
 }

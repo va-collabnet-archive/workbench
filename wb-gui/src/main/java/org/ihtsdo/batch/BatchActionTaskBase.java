@@ -14,6 +14,8 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.list.TerminologyList;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
 import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
  *
@@ -204,8 +206,8 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
     private javax.swing.JPanel jPanelTaskDetail;
     // End of variables declaration//GEN-END:variables
 
-    BatchActionTask getTask() {
-        return taskDetailUI.getTask();
+    BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) throws Exception {
+        return taskDetailUI.getTask(ec, vc);
     }
 
     void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {

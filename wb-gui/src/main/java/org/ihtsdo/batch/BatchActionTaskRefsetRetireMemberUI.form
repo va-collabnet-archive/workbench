@@ -24,7 +24,7 @@
           <Group type="102" alignment="0" attributes="0">
               <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="jComboBoxExistingRefsets" pref="56" max="32767" attributes="0"/>
+              <Component id="jComboBoxExistingRefsets" pref="146" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -50,7 +50,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Retire Membership From:"/>
+        <Property name="text" type="java.lang.String" value="Retire From:"/>
       </Properties>
     </Component>
   </SubComponents>

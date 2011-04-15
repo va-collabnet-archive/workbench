@@ -14,21 +14,20 @@ import java.util.logging.Logger;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -48,11 +47,11 @@ import org.ihtsdo.util.swing.GuiUtil;
 public final class BatchActionEditorPanel extends javax.swing.JPanel {
 
     private final ACE ace;
-    private final TerminologyStoreDI termStore;
+    private final TerminologyStoreDI ts;
     private final TerminologyList batchConceptList;
     private List<BatchActionTaskBase> batchActionEditTaskList;
     private JPanel batchActionTaskViewPanel;
-    private JTextArea resultsTextArea;
+    private JTextPane resultsTextArea;
     private List<ComponentVersionBI> existingParents;
     private List<ComponentVersionBI> existingRefsets;
     private List<ComponentVersionBI> existingRoles;
@@ -133,21 +132,21 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
             }
             // CONVERT SET TO LIST
             for (Integer nid : setParents) {
-                ComponentVersionBI cvbi = termStore.getComponentVersion(vc, nid);
+                ComponentVersionBI cvbi = ts.getComponentVersion(vc, nid);
                 if (cvbi != null) {
                     existingParents.add(cvbi);
                 }
             }
 
             for (Integer nid : setRefsets) {
-                ComponentVersionBI cvbi = termStore.getComponentVersion(vc, nid);
+                ComponentVersionBI cvbi = ts.getComponentVersion(vc, nid);
                 if (cvbi != null) {
                     existingRefsets.add(cvbi);
                 }
             }
 
             for (Integer nid : setRoles) {
-                ComponentVersionBI cvbi = termStore.getComponentVersion(vc, nid);
+                ComponentVersionBI cvbi = ts.getComponentVersion(vc, nid);
                 if (cvbi != null) {
                     existingRoles.add(cvbi);
                 }
@@ -190,9 +189,9 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
     }
 
     /** Creates new form BatchActionEditorPanel */
-    public BatchActionEditorPanel(ACE ace, TerminologyList list, JTextArea results) {
+    public BatchActionEditorPanel(ACE ace, TerminologyList list, JTextPane results) {
         this.ace = ace;
-        this.termStore = Ts.get();
+        this.ts = Ts.get();
         this.batchConceptList = list;
         this.batchConceptList.getModel().addListDataListener(new ExistingListDataListener(this));
         this.batchActionEditTaskList = new ArrayList<BatchActionTaskBase>();
@@ -276,26 +275,31 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
             ListModel termList = batchConceptList.getModel();
             for (int i = 0; i < termList.getSize(); i++) {
                 I_GetConceptData cb = (I_GetConceptData) termList.getElementAt(i);
-                concepts.add(termStore.getConcept(cb.getConceptNid()));
+                concepts.add(ts.getConcept(cb.getConceptNid()));
             }
+
+            // SETUP TASK LIST
+            ViewCoordinate vc = ace.aceFrameConfig.getViewCoordinate();
+            EditCoordinate ec = ace.aceFrameConfig.getEditCoordinate();
+
+            BatchActionTask.setup(ec, vc);
+            BatchActionEventReporter.reset();
 
             List<BatchActionTask> tasks = new ArrayList<BatchActionTask>();
             for (BatchActionTaskBase taskBase : batchActionEditTaskList) {
-                BatchActionTask tmpTask = taskBase.getTask();
+                BatchActionTask tmpTask = taskBase.getTask(ec, vc);
                 if (tmpTask != null) {
                     tasks.add(tmpTask);
                 }
             }
 
-            ViewCoordinate vc = ace.aceFrameConfig.getViewCoordinate();
-            EditCoordinate ec = ace.aceFrameConfig.getEditCoordinate();
             BatchActionProcessor bap = new BatchActionProcessor(concepts, tasks, ec, vc);
-            termStore.iterateConceptDataInParallel(bap);
+            ts.iterateConceptDataInParallel(bap);
 
             System.out.println("\r\n!!! BATCH ACTION TASK REPORT\r\n" + BatchActionEventReporter.createReportTSV());
 
-            // resultsTextArea.setText(BatchActionEventReporter.createReportHTML());
-            resultsTextArea.setText(BatchActionEventReporter.createReportTSV());
+            // resultsTextArea.setText(BatchActionEventReporter.createReportTSV());
+            resultsTextArea.setText(BatchActionEventReporter.createReportHTML());
         } catch (Exception ex) {
             Logger.getLogger(BatchActionEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         }

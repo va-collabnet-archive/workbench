@@ -6,9 +6,11 @@ package org.ihtsdo.batch;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.tk.api.ContraditionException;
 
 /**
@@ -39,41 +41,33 @@ public class BatchActionEventReporter {
      * @return 
      */
     public static String createReportTSV() {
+        EnumSet<BatchActionEventType> reportEvents = EnumSet.of(BatchActionEventType.EVENT_ERROR, BatchActionEventType.EVENT_NOOP, BatchActionEventType.EVENT_SUCCESS);
+        return createReportTSV(reportEvents);
+    }
+
+    public static String createReportTSV(EnumSet<BatchActionEventType> reportEvents) {
         StringBuilder sb = new StringBuilder();
         try {
             for (BatchActionEvent bae : batchActionEventList) {
-                switch (bae.actionType) {
-                    case PARENT_ADD_NEW:
-                        sb.append("PARENT_ADD_NEW");
-                        break;
-                    case PARENT_REPLACE:
-                        sb.append("PARENT_REPLACE");
-                        break;
-                    case PARENT_RETIRE:
-                        sb.append("PARENT_RETIRE");
-                        break;
-                    case REFSET_ADD_MEMBER:
-                        sb.append("REFSET_ADD_MEMBER");
-                        break;
-                    case REFSET_MOVE_MEMBER:
-                        sb.append("REFSET_MOVE_MEMBER");
-                        break;
-                    case REFSET_REPLACE_VALUE:
-                        sb.append("REFSET_REPLACE_VALUE");
-                        break;
-                    case REFSET_RETIRE_MEMBER:
-                        sb.append("REFSET_RETIRE_MEMBER");
-                        break;
-                    case ROLE_REPLACE_VALUE:
-                        sb.append("ROLE_REPLACE_VALUE");
-                        break;
-                    case SIMPLE:
-                        sb.append("SIMPLE");
-                        break;
+                if (reportEvents.contains(bae.getEventType())) {
+                    // ACTION TYPE
+                    sb.append(bae.getActionTaskType());
+                    // EVENT TYPE
+                    sb.append("\t");
+                    sb.append(bae.getEventType());
+                    // EVENT CONCEPT
+                    sb.append("\t");
+                    sb.append(bae.getConceptA().getPreferredDescription().getText());
+                    // EVENT NOTE
+                    sb.append("\t");
+                    if (bae.getEventNote() != null) {
+                        sb.append(bae.getEventNote());
+                    } else {
+                        sb.append("");
+                    }
+                    sb.append("\r\n");
                 }
-                sb.append("\t");
-                sb.append(bae.conceptA.getPreferredDescription().getText());
-                sb.append("\r\n");
+
             }
         } catch (IOException ex) {
             Logger.getLogger(BatchActionEvent.class.getName()).log(Level.SEVERE, null, ex);
@@ -89,48 +83,42 @@ public class BatchActionEventReporter {
      * @return
      */
     public static String createReportHTML() {
+        EnumSet<BatchActionEventType> reportEvents = EnumSet.of(BatchActionEventType.EVENT_ERROR, BatchActionEventType.EVENT_NOOP, BatchActionEventType.EVENT_SUCCESS);
+        return createReportHTML(reportEvents);
+    }
+
+    public static String createReportHTML(EnumSet<BatchActionEventType> reportEvents) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<HTML>");
+        sb.append("<html><table><tr><th>Action</th><th>Status</th><th>Concept</th><th>Result</th></tr>");
         try {
             for (BatchActionEvent bae : batchActionEventList) {
-                switch (bae.actionType) {
-                    case PARENT_ADD_NEW:
-                        sb.append("PARENT_ADD_NEW");
-                        break;
-                    case PARENT_REPLACE:
-                        sb.append("PARENT_REPLACE");
-                        break;
-                    case PARENT_RETIRE:
-                        sb.append("PARENT_RETIRE");
-                        break;
-                    case REFSET_ADD_MEMBER:
-                        sb.append("REFSET_ADD_MEMBER");
-                        break;
-                    case REFSET_MOVE_MEMBER:
-                        sb.append("REFSET_MOVE_MEMBER");
-                        break;
-                    case REFSET_REPLACE_VALUE:
-                        sb.append("REFSET_REPLACE_VALUE");
-                        break;
-                    case REFSET_RETIRE_MEMBER:
-                        sb.append("REFSET_RETIRE_MEMBER");
-                        break;
-                    case ROLE_REPLACE_VALUE:
-                        sb.append("ROLE_REPLACE_VALUE");
-                        break;
-                    case SIMPLE:
-                        sb.append("SIMPLE");
-                        break;
+                if (reportEvents.contains(bae.getEventType())) {
+                    // ACTION TYPE
+                    sb.append("<tr><td>");
+                    sb.append(bae.getActionTaskType());
+                    // EVENT TYPE
+                    sb.append("</td><td>");
+                    sb.append(bae.getEventType());
+                    // EVENT CONCEPT
+                    sb.append("</td><td>");
+                    sb.append(bae.getConceptA().getPreferredDescription().getText());
+                    // EVENT NOTE
+                    sb.append("</td><td>");
+                    if (bae.getEventNote() != null) {
+                        sb.append(bae.getEventNote());
+                    } else {
+                        sb.append("");
+                    }
+                    sb.append("</td></tr>");
                 }
-                sb.append(" : ");
-                sb.append(bae.conceptA.getPreferredDescription().getText());
-                sb.append("<br>");
             }
+            sb.append("</table></html>");
         } catch (IOException ex) {
             Logger.getLogger(BatchActionEvent.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ContraditionException ex) {
             Logger.getLogger(BatchActionEvent.class.getName()).log(Level.SEVERE, null, ex);
         }
+
 
         return sb.toString();
     }

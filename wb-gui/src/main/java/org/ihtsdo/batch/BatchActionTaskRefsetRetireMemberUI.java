@@ -16,7 +16,8 @@ import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
  *
@@ -49,7 +50,7 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel impl
         jComboBoxExistingRefsets.setModel(jComboBoxExistingRefsets.getModel());
         jComboBoxExistingRefsets.setRenderer(new org.ihtsdo.batch.JComboBoxExistingRefsetsRender());
 
-        jLabel1.setText("Retire Membership From:");
+        jLabel1.setText("Retire From:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -58,7 +59,7 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel impl
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jComboBoxExistingRefsets, 0, 56, Short.MAX_VALUE))
+                .addComponent(jComboBoxExistingRefsets, 0, 146, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -71,11 +72,6 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel impl
     private javax.swing.JComboBox jComboBoxExistingRefsets;
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
-
-    @Override
-    public void doTaskExecution(ConceptVersionBI c) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 
     @Override
     public JPanel getPanel() {
@@ -133,7 +129,17 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel impl
     }
 
     @Override // I_BatchActionTask
-    public BatchActionTask getTask() {
-        return task;
+    public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) {
+        DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingRefsets.getModel();
+        ComponentVersionBI memberRefsetBI = (ComponentVersionBI) dcbm.getSelectedItem();
+
+        if (memberRefsetBI != null) {
+            int memberRefset = memberRefsetBI.getNid();
+            ((BatchActionTaskRefsetRetireMember) task).setSelectedCollectionNid(memberRefset);
+            return task;
+        } else {
+            return null;
+        }
+
     }
 }
