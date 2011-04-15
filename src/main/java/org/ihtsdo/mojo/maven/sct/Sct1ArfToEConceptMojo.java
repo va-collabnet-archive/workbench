@@ -3126,6 +3126,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         EConceptAttributes ca = new EConceptAttributes();
         ca.primordialUuid = theConUUID;
         ca.setDefined(cRec0.isprimitive == 0 ? true : false);
+        ca.setAuthorUuid(uuidUser);
 
         ArrayList<TkIdentifier> tmpAdditionalIds = new ArrayList<TkIdentifier>();
 
