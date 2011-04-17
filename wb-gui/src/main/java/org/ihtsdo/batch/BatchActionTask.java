@@ -26,7 +26,9 @@ public abstract class BatchActionTask {
         REFSET_MOVE_MEMBER,
         REFSET_REPLACE_VALUE,
         REFSET_RETIRE_MEMBER,
+        ROLE_ADD,
         ROLE_REPLACE_VALUE,
+        ROLE_RETIRE,
         SIMPLE
     }
 

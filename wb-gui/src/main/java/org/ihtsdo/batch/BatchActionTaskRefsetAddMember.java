@@ -13,6 +13,9 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public class BatchActionTaskRefsetAddMember extends BatchActionTask {
 
+    // :!!!: Refset Collection
+    // :!!!: Refset Value
+
     public BatchActionTaskRefsetAddMember() {
     }
 

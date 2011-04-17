@@ -4,7 +4,7 @@
  */
 
 /*
- * BatchActionTaskDndConcept.java
+ * ValueConceptDndUI.java
  *
  * Created on Apr 13, 2011, 8:31:46 AM
  */
@@ -13,10 +13,6 @@ package org.ihtsdo.batch;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.Transferable;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DragSource;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -29,15 +25,12 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
-import javax.swing.UIManager;
-import javax.swing.border.Border;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 
@@ -47,10 +40,10 @@ import org.dwfa.tapi.TerminologyException;
  *
  * See also: TermComponentLabel.java, TransporterLabel.java
  */
-public class BatchActionTaskDndConcept extends javax.swing.JPanel implements /*FocusListener,*/ I_ContainTermComponent, ClipboardOwner {
+public class ValueConceptDndUI extends javax.swing.JPanel implements /*FocusListener,*/ I_ContainTermComponent, ClipboardOwner {
 
-    /** Creates new form BatchActionTaskDndConcept */
-    public BatchActionTaskDndConcept(String title) {
+    /** Creates new form ValueConceptDndUI */
+    public ValueConceptDndUI(String title) {
         initComponents();
 
         setBorder(BorderFactory.createTitledBorder(title));
@@ -59,10 +52,10 @@ public class BatchActionTaskDndConcept extends javax.swing.JPanel implements /*F
         try {
             config = Terms.get().getActiveAceFrameConfig();
         } catch (TerminologyException ex) {
-            Logger.getLogger(BatchActionTaskDndConcept.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ValueConceptDndUI.class.getName()).log(Level.SEVERE, null, ex);
             jLabelComponentName.setText("config error");
         } catch (IOException ex) {
-            Logger.getLogger(BatchActionTaskDndConcept.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ValueConceptDndUI.class.getName()).log(Level.SEVERE, null, ex);
             jLabelComponentName.setText("config error");
         }
 
@@ -117,19 +110,17 @@ public class BatchActionTaskDndConcept extends javax.swing.JPanel implements /*F
 
         jLabelComponentName = new javax.swing.JLabel();
 
-        setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createTitledBorder(""), "Title:"));
-
-        jLabelComponentName.setText("(drop concept here)");
+        setBorder(javax.swing.BorderFactory.createTitledBorder("Title:"));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabelComponentName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE)
+            .addComponent(jLabelComponentName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabelComponentName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jLabelComponentName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 24, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables

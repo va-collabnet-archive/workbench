@@ -38,7 +38,7 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
         this.task = new BatchActionTaskParentAddNew();
 
         // Setup DnD Panel
-        BatchActionTaskDndConcept tmp = new BatchActionTaskDndConcept("New Parent:");
+        ValueConceptDndUI tmp = new ValueConceptDndUI("New Parent:");
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelDndNewParent, tmp.getPanel());
         jPanelDndNewParent = tmp.getPanel();
@@ -81,21 +81,21 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
     private javax.swing.JPanel jPanelDndNewParent;
     // End of variables declaration//GEN-END:variables
 
-    @Override
+    @Override // I_BatchActionTask
     public JPanel getPanel() {
         return this;
     }
 
-    @Override
+    @Override // I_BatchActionTask
     public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
         // nothing to do.
     }
 
-    @Override
+    @Override // I_BatchActionTask
     public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) throws IOException {
         // UUID isaUuid = TermAux.IS_A.getUuids()[0];
         UUID uuidIsa = UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25");
-        I_AmTermComponent termNewParent = ((BatchActionTaskDndConcept) jPanelDndNewParent).getTermComponent();
+        I_AmTermComponent termNewParent = ((ValueConceptDndUI) jPanelDndNewParent).getTermComponent();
         if (termNewParent != null && termNewParent.getUUIDs().size() > 0) {
             UUID uuidNewParent = termNewParent.getUUIDs().get(0);
             ((BatchActionTaskParentAddNew) task).setSelectedRoleTypeUuid(uuidIsa);

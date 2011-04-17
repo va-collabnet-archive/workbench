@@ -43,7 +43,7 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
         this.task = new BatchActionTaskParentReplace();
 
         // Setup DnD Panel
-        BatchActionTaskDndConcept tmp = new BatchActionTaskDndConcept("With Parent:");
+        ValueConceptDndUI tmp = new ValueConceptDndUI("With Parent:");
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelDndParentReplace, tmp.getPanel());
         jPanelDndParentReplace = tmp.getPanel();
@@ -107,12 +107,12 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
     private javax.swing.JPanel jPanelDndParentReplace;
     // End of variables declaration//GEN-END:variables
 
-    @Override
+    @Override // I_BatchActionTask
     public JPanel getPanel() {
         return this;
     }
 
-    @Override
+    @Override  // I_BatchActionTask
     public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingParents.getModel();
         ComponentVersionBI selectedItem = (ComponentVersionBI) dcbm.getSelectedItem();
@@ -172,7 +172,7 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
         ComponentVersionBI fromParentBI = (ComponentVersionBI) dcbm.getSelectedItem();
 
         // MOVE TO
-        I_AmTermComponent termParentTo = ((BatchActionTaskDndConcept) jPanelDndParentReplace).getTermComponent();
+        I_AmTermComponent termParentTo = ((ValueConceptDndUI) jPanelDndParentReplace).getTermComponent();
 
         if (fromParentBI != null && termParentTo != null && termParentTo.getUUIDs().size() > 0) {
             int nidOldParent = fromParentBI.getNid();

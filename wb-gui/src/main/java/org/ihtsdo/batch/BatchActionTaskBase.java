@@ -5,13 +5,10 @@
  */
 package org.ihtsdo.batch;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.list.TerminologyList;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -79,7 +76,7 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
             }
         });
 
-        jComboTaskType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Parent, Add New", "Parent, Replace", "Parent, Retire", "Refset, Add Member", "Refset, Move Member", "Refset, Replace Value", "Refset, Retire Member", "Role, Replace Value" }));
+        jComboTaskType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Parent, Add New", "Parent, Replace", "Parent, Retire", "Refset, Add Member", "Refset, Move Member", "Refset, Replace Value", "Refset, Retire Member", "Role, Add", "Role, Replace Value", "Role, Retire" }));
         jComboTaskType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 actionSelectTaskType(evt);
@@ -167,10 +164,22 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
                     taskDetailUI = new BatchActionTaskRefsetRetireMemberUI();
                 }
                 break;
-            case 7: // ROLE_REPLACE_VALUE
+            case 7: // ROLE_ADD
+                if (actionTaskType.compareTo(BatchActionTaskType.ROLE_ADD) != 0) {
+                    actionTaskType = BatchActionTaskType.ROLE_ADD;
+                    taskDetailUI = new BatchActionTaskRoleAddUI();
+                }
+                break;
+            case 8: // ROLE_REPLACE_VALUE
                 if (actionTaskType.compareTo(BatchActionTaskType.ROLE_REPLACE_VALUE) != 0) {
                     actionTaskType = BatchActionTaskType.ROLE_REPLACE_VALUE;
                     taskDetailUI = new BatchActionTaskRoleReplaceValueUI();
+                }
+                break;
+            case 9: // ROLE_RETIRE
+                if (actionTaskType.compareTo(BatchActionTaskType.ROLE_RETIRE) != 0) {
+                    actionTaskType = BatchActionTaskType.ROLE_RETIRE;
+                    taskDetailUI = new BatchActionTaskRoleRetireUI();
                 }
                 break;
             default:
@@ -189,7 +198,6 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
         taskParentUI.invalidate();
         taskParentUI.validate();
         taskParentUI.doLayout();
-        System.out.println(":!!:-).. actionSelectTaskType");
     }//GEN-LAST:event_actionSelectTaskType
 
     private void actionAddAnotherTask(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionAddAnotherTask

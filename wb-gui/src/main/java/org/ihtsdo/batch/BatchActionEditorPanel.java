@@ -91,13 +91,16 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
 
                 // EXISTING PARENTS
                 for (RelationshipChronicleBI rel : cb.getRelsOutgoing()) {
-                    setParents.add(rel.getDestinationNid());
+                    RelationshipVersionBI rv = rel.getVersion(vc);
+                    if (rv != null && rv.isStated()) {
+                        setParents.add(rel.getDestinationNid());
+                    }
                 }
 
                 // EXISTING ROLES
                 for (RelationshipChronicleBI rel : cb.getRelsIncoming()) {
                     RelationshipVersionBI rv = rel.getVersion(vc);
-                    if (rv != null) {
+                    if (rv != null && rv.isStated() /* :!!!: && rv.isActive(ace.getAceFrameConfig().getAllowedStatus())*/) {
                         setRoles.add(rv.getTypeNid());
                     }
                 }

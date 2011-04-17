@@ -5,11 +5,13 @@
 package org.ihtsdo.batch;
 
 import java.awt.Component;
+import java.io.IOException;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
-import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 /**
  *
@@ -24,7 +26,6 @@ class JComboBoxExistingRefsetsRender extends JLabel implements ListCellRenderer 
 
     @Override
     public Component getListCellRendererComponent(JList jlist, Object o, int index, boolean isSelected, boolean cellHasFocus) {
-        ComponentVersionBI cvbi;
         if (jlist.getModel().getSize() == 0) {
             // EMPTY CONCEPT LIST
             setText("(add concept with refset to list)");
@@ -32,7 +33,6 @@ class JComboBoxExistingRefsetsRender extends JLabel implements ListCellRenderer 
         }
 
         // CONCEPT LIST NOT EMPTY
-        cvbi = (ComponentVersionBI) o;
         if (index == -1) {
             // If JComboBox selection value request is -1
             // then find out the current selection index from the list.
@@ -44,8 +44,14 @@ class JComboBoxExistingRefsetsRender extends JLabel implements ListCellRenderer 
             }
         }
         DefaultComboBoxModel model = (DefaultComboBoxModel) jlist.getModel();
-        cvbi = (ComponentVersionBI) model.getElementAt(index);
-        setText(cvbi.toUserString());
+        ConceptVersionBI cvbi = (ConceptVersionBI) model.getElementAt(index);
+        try {
+            setText(cvbi.getFullySpecifiedDescription().getText());
+        } catch (IOException ex) {
+            setText(cvbi.toUserString() + " -- FSN missing");
+        } catch (ContraditionException ex) {
+            setText(cvbi.toUserString() + " -- FSN missing");
+        }
 
         if (isSelected) {
             setBackground(jlist.getSelectionBackground());

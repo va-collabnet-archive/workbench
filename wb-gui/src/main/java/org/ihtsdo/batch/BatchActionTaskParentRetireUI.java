@@ -78,14 +78,12 @@ public class BatchActionTaskParentRetireUI extends javax.swing.JPanel implements
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 
-    // I_BatchActionTask
-    @Override
+    @Override // I_BatchActionTask
     public JPanel getPanel() {
         return this;
     }
 
-    // I_BatchActionTask
-    @Override
+    @Override // I_BatchActionTask
     public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingParents.getModel();
         ComponentVersionBI selectedItem = (ComponentVersionBI) dcbm.getSelectedItem();
@@ -93,7 +91,7 @@ public class BatchActionTaskParentRetireUI extends javax.swing.JPanel implements
         // Sort existing parents by name.
         Comparator<ComponentVersionBI> cmp = new Comparator<ComponentVersionBI>() {
 
-            @Override
+            @Override // Comparator
             public int compare(ComponentVersionBI o1, ComponentVersionBI o2) {
                 return o1.toUserString().compareToIgnoreCase(o2.toUserString());
             }

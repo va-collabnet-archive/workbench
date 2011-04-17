@@ -35,7 +35,7 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
         this.task = new BatchActionTaskRoleReplaceValue();
 
         // Setup DnD Panel
-        BatchActionTaskDndConcept tmp = new BatchActionTaskDndConcept("New Role Value:");
+        ValueConceptDndUI tmp = new ValueConceptDndUI("New Role Value:");
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelDndRoleValueNew, tmp.getPanel());
         jPanelDndRoleValueNew = tmp.getPanel();
@@ -109,12 +109,12 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
     private javax.swing.JPanel jPanelDndRoleValueNew;
     // End of variables declaration//GEN-END:variables
 
-    @Override
+    @Override // I_BatchActionTask
     public JPanel getPanel() {
         return this;
     }
 
-    @Override
+    @Override // I_BatchActionTask
     public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingRoles.getModel();
         ComponentVersionBI selectedItem = (ComponentVersionBI) dcbm.getSelectedItem();
