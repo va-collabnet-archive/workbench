@@ -76,6 +76,8 @@ public class TranslationProjectDialog extends JDialog {
 	private void initCustomComponents() {
 		try {
 			
+			this.getRootPane().setDefaultButton(okButton);
+			
 			loadProjects();
 			
 			TreeSelectionListener tl = new TreeSelectionListener() {
@@ -86,20 +88,6 @@ public class TranslationProjectDialog extends JDialog {
 			};
 			
 			jTree1.addTreeSelectionListener(tl);
-			
-			okButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					DefaultMutableTreeNode node = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
-					if (node == null) {
-						errorLabel.setForeground(Color.RED);
-						errorLabel.setText("Select a project to continue");
-						return;
-					}
-					Object nodeInfo = node.getUserObject();
-					TreeObj proj = (TreeObj)nodeInfo;
-					close((TranslationProject)proj.getAtrValue());
-				}
-			});
 			
 			cancelButton.addActionListener(new ActionListener() {
 				@Override
@@ -112,6 +100,18 @@ public class TranslationProjectDialog extends JDialog {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	private void okButtonActionPerformed(ActionEvent e) {
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
+		if (node == null) {
+			errorLabel.setForeground(Color.RED);
+			errorLabel.setText("Select a project to continue");
+			return;
+		}
+		Object nodeInfo = node.getUserObject();
+		TreeObj proj = (TreeObj)nodeInfo;
+		close((TranslationProject)proj.getAtrValue());
 	}
 
 	private void initComponents() {
@@ -135,6 +135,12 @@ public class TranslationProjectDialog extends JDialog {
 
 			//---- okButton ----
 			okButton.setText("Ok");
+			okButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					okButtonActionPerformed(e);
+				}
+			});
 			panel1.add(okButton);
 
 			//---- cancelButton ----
