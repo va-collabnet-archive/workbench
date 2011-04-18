@@ -115,6 +115,8 @@ public class ProjectDetailsPanel extends JPanel {
 		try {
 			label18.setIcon(IconUtilities.helpIcon);
 			label18.setText("");
+			issuesHelpLbl.setIcon(IconUtilities.helpIcon);
+			issuesHelpLbl.setText("");
 			ExportDescrAndLangSubsetPanel expPanel=new ExportDescrAndLangSubsetPanel(project);
 			expPanel.revalidate();
 			tabbedPane1.addTab("Export Target Language", expPanel);
@@ -1110,6 +1112,16 @@ public class ProjectDetailsPanel extends JPanel {
 		}
 	}
 
+	private void issuesHelpLblMouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("ISSUES_HELP");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
+
 
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -1124,10 +1136,10 @@ public class ProjectDetailsPanel extends JPanel {
 		button1 = new JButton();
 		button2 = new JButton();
 		panel9 = new JPanel();
+		label18 = new JLabel();
 		label7 = new JLabel();
 		panel12 = new JPanel();
 		button3 = new JButton();
-		label18 = new JLabel();
 		panel5 = new JPanel();
 		label3 = new JLabel();
 		scrollPane4 = new JScrollPane();
@@ -1186,6 +1198,7 @@ public class ProjectDetailsPanel extends JPanel {
 		panel26 = new JPanel();
 		button12 = new JButton();
 		panel27 = new JPanel();
+		issuesHelpLbl = new JLabel();
 		label19 = new JLabel();
 		label20 = new JLabel();
 		panel28 = new JPanel();
@@ -1329,24 +1342,36 @@ public class ProjectDetailsPanel extends JPanel {
 				//======== panel9 ========
 				{
 					panel9.setLayout(new GridBagLayout());
-					((GridBagLayout)panel9.getLayout()).columnWidths = new int[] {230, 0};
-					((GridBagLayout)panel9.getLayout()).rowHeights = new int[] {0, 0, 0};
-					((GridBagLayout)panel9.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-					((GridBagLayout)panel9.getLayout()).rowWeights = new double[] {1.0, 0.0, 1.0E-4};
+					((GridBagLayout)panel9.getLayout()).columnWidths = new int[] {235, 0, 0};
+					((GridBagLayout)panel9.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0};
+					((GridBagLayout)panel9.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
+					((GridBagLayout)panel9.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0, 0.0, 1.0E-4};
+
+					//---- label18 ----
+					label18.setText("text");
+					label18.addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							label18MouseClicked(e);
+						}
+					});
+					panel9.add(label18, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
 
 					//---- label7 ----
 					label7.setText("<html><body>\nEnter translation project name<br><br>\n\nPress \u2018New Workset\u2019  for creating a new workset for this project<br><br>\n\nPress \u2018Save\u2019 for persisting changes<br><br>\n\nPress \u2018Retire project\u2019  to retire this project. Project needs to be empty or retiring will not succeed\n</html>");
 					label7.setBackground(new Color(238, 238, 238));
-					panel9.add(label7, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					panel9.add(label7, new GridBagConstraints(0, 1, 2, 1, 0.0, 0.0,
 						GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
 						new Insets(0, 0, 5, 0), 0, 0));
 
 					//======== panel12 ========
 					{
 						panel12.setLayout(new GridBagLayout());
-						((GridBagLayout)panel12.getLayout()).columnWidths = new int[] {0, 0, 0};
+						((GridBagLayout)panel12.getLayout()).columnWidths = new int[] {0, 0};
 						((GridBagLayout)panel12.getLayout()).rowHeights = new int[] {0, 0};
-						((GridBagLayout)panel12.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0E-4};
+						((GridBagLayout)panel12.getLayout()).columnWeights = new double[] {0.0, 1.0E-4};
 						((GridBagLayout)panel12.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 						//---- button3 ----
@@ -1360,23 +1385,11 @@ public class ProjectDetailsPanel extends JPanel {
 						});
 						panel12.add(button3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 5), 0, 0));
-
-						//---- label18 ----
-						label18.setText("text");
-						label18.addMouseListener(new MouseAdapter() {
-							@Override
-							public void mouseClicked(MouseEvent e) {
-								label18MouseClicked(e);
-							}
-						});
-						panel12.add(label18, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 0, 0), 0, 0));
 					}
-					panel9.add(panel12, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+					panel9.add(panel12, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
 						GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-						new Insets(0, 0, 0, 0), 0, 0));
+						new Insets(0, 0, 0, 5), 0, 0));
 				}
 				panel0.add(panel9, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -1944,24 +1957,36 @@ public class ProjectDetailsPanel extends JPanel {
 			//======== panel27 ========
 			{
 				panel27.setLayout(new GridBagLayout());
-				((GridBagLayout)panel27.getLayout()).columnWidths = new int[] {305, 300, 0};
-				((GridBagLayout)panel27.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0};
-				((GridBagLayout)panel27.getLayout()).columnWeights = new double[] {1.0, 1.0, 1.0E-4};
-				((GridBagLayout)panel27.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel27.getLayout()).columnWidths = new int[] {305, 305, 0, 0};
+				((GridBagLayout)panel27.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0};
+				((GridBagLayout)panel27.getLayout()).columnWeights = new double[] {1.0, 1.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel27.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4};
+
+				//---- issuesHelpLbl ----
+				issuesHelpLbl.setText("text");
+				issuesHelpLbl.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						issuesHelpLblMouseClicked(e);
+					}
+				});
+				panel27.add(issuesHelpLbl, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 0), 0, 0));
 
 				//---- label19 ----
 				label19.setText("Source Defects Issue Repository");
 				label19.setFont(new Font("Lucida Grande", Font.BOLD, 13));
-				panel27.add(label19, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				panel27.add(label19, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
 
 				//---- label20 ----
 				label20.setText("Project Issue repository");
 				label20.setFont(new Font("Lucida Grande", Font.BOLD, 13));
-				panel27.add(label20, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+				panel27.add(label20, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 0), 0, 0));
+					new Insets(0, 0, 5, 5), 0, 0));
 
 				//======== panel28 ========
 				{
@@ -2031,7 +2056,7 @@ public class ProjectDetailsPanel extends JPanel {
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 0, 0), 0, 0));
 				}
-				panel27.add(panel28, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				panel27.add(panel28, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
 
@@ -2103,7 +2128,7 @@ public class ProjectDetailsPanel extends JPanel {
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 0, 0), 0, 0));
 				}
-				panel27.add(panel29, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+				panel27.add(panel29, new GridBagConstraints(1, 2, 2, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 0), 0, 0));
 
@@ -2154,7 +2179,7 @@ public class ProjectDetailsPanel extends JPanel {
 						GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
 						new Insets(0, 0, 0, 0), 0, 0));
 				}
-				panel27.add(panel31, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+				panel27.add(panel31, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
 
@@ -2179,9 +2204,9 @@ public class ProjectDetailsPanel extends JPanel {
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 0, 0), 0, 0));
 				}
-				panel27.add(panel30, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
+				panel27.add(panel30, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0,
 					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 0, 0), 0, 0));
+					new Insets(0, 0, 0, 5), 0, 0));
 			}
 			tabbedPane1.addTab("Issues", panel27);
 
@@ -2204,10 +2229,10 @@ public class ProjectDetailsPanel extends JPanel {
 	private JButton button1;
 	private JButton button2;
 	private JPanel panel9;
+	private JLabel label18;
 	private JLabel label7;
 	private JPanel panel12;
 	private JButton button3;
-	private JLabel label18;
 	private JPanel panel5;
 	private JLabel label3;
 	private JScrollPane scrollPane4;
@@ -2266,6 +2291,7 @@ public class ProjectDetailsPanel extends JPanel {
 	private JPanel panel26;
 	private JButton button12;
 	private JPanel panel27;
+	private JLabel issuesHelpLbl;
 	private JLabel label19;
 	private JLabel label20;
 	private JPanel panel28;
