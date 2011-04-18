@@ -8,11 +8,12 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashSet;
+import javax.swing.*;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -34,10 +35,12 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.panel.dnd.I_GetItemForModel;
 import org.ihtsdo.project.panel.dnd.ObjectTransferHandler;
 import org.ihtsdo.project.refset.ExportDescriptionAndLanguageSubset;
+import org.ihtsdo.project.util.IconUtilities;
 import org.ihtsdo.tk.api.Precedence;
 
 /**
@@ -64,6 +67,8 @@ public class ExportDescrAndLangSubsetPanel extends JPanel {
 
 	public ExportDescrAndLangSubsetPanel(TranslationProject project) {
 		initComponents();
+		exportTargetLangHelpLbl.setIcon(IconUtilities.helpIcon);
+		exportTargetLangHelpLbl.setText("");
 		try {
 			this.languageRefset=project.getTargetLanguageRefset();
 			DefaultListModel lModel=new DefaultListModel();
@@ -302,6 +307,16 @@ public class ExportDescrAndLangSubsetPanel extends JPanel {
 		}
 	}
 
+	private void exportTargetLangHelpLblMouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("EXPORT_DESC_LANGUAGE");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
+
 	class GetConceptForLabel implements I_GetItemForModel{
 
 		private String labelTarget;
@@ -324,6 +339,7 @@ public class ExportDescrAndLangSubsetPanel extends JPanel {
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		panel2 = new JPanel();
+		exportTargetLangHelpLbl = new JLabel();
 		label3 = new JLabel();
 		label5 = new JLabel();
 		scrollPane2 = new JScrollPane();
@@ -358,20 +374,32 @@ public class ExportDescrAndLangSubsetPanel extends JPanel {
 		//======== panel2 ========
 		{
 			panel2.setLayout(new GridBagLayout());
-			((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {15, 125, 0, 125, 15, 0, 0, 0, 0};
-			((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 90, 0};
-			((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4};
-			((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
+			((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {15, 125, 0, 125, 15, 0, 0, 0, 0, 0};
+			((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 90, 0};
+			((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
+
+			//---- exportTargetLangHelpLbl ----
+			exportTargetLangHelpLbl.setText("text");
+			exportTargetLangHelpLbl.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					exportTargetLangHelpLblMouseClicked(e);
+				}
+			});
+			panel2.add(exportTargetLangHelpLbl, new GridBagConstraints(8, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 
 			//---- label3 ----
 			label3.setText("Included status");
-			panel2.add(label3, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+			panel2.add(label3, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
 
 			//---- label5 ----
 			label5.setText("Excluded status");
-			panel2.add(label5, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+			panel2.add(label5, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
 
@@ -379,7 +407,7 @@ public class ExportDescrAndLangSubsetPanel extends JPanel {
 			{
 				scrollPane2.setViewportView(list1);
 			}
-			panel2.add(scrollPane2, new GridBagConstraints(1, 1, 1, 6, 0.0, 0.0,
+			panel2.add(scrollPane2, new GridBagConstraints(1, 2, 1, 6, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
 
@@ -387,16 +415,16 @@ public class ExportDescrAndLangSubsetPanel extends JPanel {
 			{
 				scrollPane3.setViewportView(list2);
 			}
-			panel2.add(scrollPane3, new GridBagConstraints(3, 1, 1, 6, 0.0, 0.0,
+			panel2.add(scrollPane3, new GridBagConstraints(3, 2, 1, 6, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
 
 			//---- label6 ----
 			label6.setText("Release date:");
-			panel2.add(label6, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0,
+			panel2.add(label6, new GridBagConstraints(5, 2, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
-			panel2.add(txtRelDate, new GridBagConstraints(6, 1, 1, 1, 0.0, 0.0,
+			panel2.add(txtRelDate, new GridBagConstraints(6, 2, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
 
@@ -408,16 +436,16 @@ public class ExportDescrAndLangSubsetPanel extends JPanel {
 					button1ActionPerformed(e);
 				}
 			});
-			panel2.add(button1, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0,
+			panel2.add(button1, new GridBagConstraints(2, 3, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
 
 			//---- label1 ----
 			label1.setText("Export to folder:");
-			panel2.add(label1, new GridBagConstraints(5, 2, 1, 1, 0.0, 0.0,
+			panel2.add(label1, new GridBagConstraints(5, 3, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
-			panel2.add(txtFileExp, new GridBagConstraints(6, 2, 1, 1, 0.0, 0.0,
+			panel2.add(txtFileExp, new GridBagConstraints(6, 3, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
 
@@ -429,7 +457,7 @@ public class ExportDescrAndLangSubsetPanel extends JPanel {
 					browsExpFileActionPerformed();
 				}
 			});
-			panel2.add(browsExpFile, new GridBagConstraints(7, 2, 1, 1, 0.0, 0.0,
+			panel2.add(browsExpFile, new GridBagConstraints(7, 3, 2, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 0), 0, 0));
 
@@ -441,16 +469,16 @@ public class ExportDescrAndLangSubsetPanel extends JPanel {
 					button2ActionPerformed(e);
 				}
 			});
-			panel2.add(button2, new GridBagConstraints(2, 3, 1, 1, 0.0, 0.0,
+			panel2.add(button2, new GridBagConstraints(2, 4, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
 
 			//---- label2 ----
 			label2.setText("Log file:");
-			panel2.add(label2, new GridBagConstraints(5, 3, 1, 1, 0.0, 0.0,
+			panel2.add(label2, new GridBagConstraints(5, 4, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
-			panel2.add(txtExplogFile, new GridBagConstraints(6, 3, 1, 1, 0.0, 0.0,
+			panel2.add(txtExplogFile, new GridBagConstraints(6, 4, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
 
@@ -462,7 +490,7 @@ public class ExportDescrAndLangSubsetPanel extends JPanel {
 					browLogFileActionPerformed();
 				}
 			});
-			panel2.add(browLogFile, new GridBagConstraints(7, 3, 1, 1, 0.0, 0.0,
+			panel2.add(browLogFile, new GridBagConstraints(7, 4, 2, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 0), 0, 0));
 
@@ -474,22 +502,22 @@ public class ExportDescrAndLangSubsetPanel extends JPanel {
 					chkNotTransActionPerformed();
 				}
 			});
-			panel2.add(chkNotTrans, new GridBagConstraints(1, 7, 4, 1, 0.0, 0.0,
+			panel2.add(chkNotTrans, new GridBagConstraints(1, 8, 4, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
-			panel2.add(label7, new GridBagConstraints(5, 7, 2, 1, 0.0, 0.0,
+			panel2.add(label7, new GridBagConstraints(5, 8, 2, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
 
 			//---- label4 ----
 			label4.setText("Results:");
-			panel2.add(label4, new GridBagConstraints(1, 8, 1, 1, 0.0, 0.0,
+			panel2.add(label4, new GridBagConstraints(1, 9, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
 
 			//---- pBarE ----
 			pBarE.setIndeterminate(true);
-			panel2.add(pBarE, new GridBagConstraints(3, 8, 3, 1, 0.0, 0.0,
+			panel2.add(pBarE, new GridBagConstraints(3, 9, 3, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
 
@@ -502,7 +530,7 @@ public class ExportDescrAndLangSubsetPanel extends JPanel {
 					bExportActionPerformed();
 				}
 			});
-			panel2.add(bExport, new GridBagConstraints(6, 8, 1, 1, 0.0, 0.0,
+			panel2.add(bExport, new GridBagConstraints(6, 9, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
 
@@ -510,7 +538,7 @@ public class ExportDescrAndLangSubsetPanel extends JPanel {
 			{
 				scrollPane1.setViewportView(txtERes);
 			}
-			panel2.add(scrollPane1, new GridBagConstraints(1, 9, 7, 1, 0.0, 0.0,
+			panel2.add(scrollPane1, new GridBagConstraints(1, 10, 8, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 0), 0, 0));
 		}
@@ -522,6 +550,7 @@ public class ExportDescrAndLangSubsetPanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
 	private JPanel panel2;
+	private JLabel exportTargetLangHelpLbl;
 	private JLabel label3;
 	private JLabel label5;
 	private JScrollPane scrollPane2;
