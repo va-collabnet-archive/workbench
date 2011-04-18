@@ -716,8 +716,10 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener, Prope
                     spec = this.propTableModel.getProcess().getExternalSpec(spec);
                 }
                 this.propDocSplit.setBottomComponent(makePropertySpecEditPanel(pdwt, spec));
+                propDocSplit.setDividerLocation(0.25);
             } else {
                 this.propDocSplit.setBottomComponent(new JLabel("<html>No property selected"));
+                propDocSplit.setDividerLocation(0.90);
             }
         }
     }
