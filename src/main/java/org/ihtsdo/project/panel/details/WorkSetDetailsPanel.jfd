@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_22" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_24" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void method="setProperty"> 
    <string>i18n.bundlePackage</string> 
@@ -114,11 +114,11 @@
              <class>java.awt.GridBagLayout</class> 
              <void method="setProperty"> 
               <string>$columnSpecs</string> 
-              <string>0:1.0, 0:1.0</string> 
+              <string>0:1.0, 0:1.0, 0</string> 
              </void> 
              <void method="setProperty"> 
               <string>$rowSpecs</string> 
-              <string>0:1.0</string> 
+              <string>0, 0:1.0</string> 
              </void> 
              <void method="setProperty"> 
               <string>$hGap</string> 
@@ -139,6 +139,83 @@
             </object> 
             <void property="name"> 
              <string>panel1</string> 
+            </void> 
+            <void method="add"> 
+             <object class="com.jformdesigner.model.FormComponent"> 
+              <string>javax.swing.JLabel</string> 
+              <void method="setProperty"> 
+               <string>text</string> 
+               <string>WorkSet details</string> 
+              </void> 
+              <void method="setProperty"> 
+               <string>font</string> 
+               <object class="java.awt.Font"> 
+                <string>Lucida Grande</string> 
+                <int>1</int> 
+                <int>14</int> 
+               </object> 
+              </void> 
+              <void property="name"> 
+               <string>label1</string> 
+              </void> 
+             </object> 
+             <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+              <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+             </object> 
+            </void> 
+            <void method="add"> 
+             <object class="com.jformdesigner.model.FormComponent"> 
+              <string>javax.swing.JLabel</string> 
+              <void method="setProperty"> 
+               <string>text</string> 
+               <string>&lt;html&gt;&lt;body&gt; Enter WorkSet name&lt;br&gt;&lt;br&gt;  Press ‘Save’ for persisting changes&lt;br&gt;&lt;br&gt;  Press ‘Retire WorkSet’ to retire this WorkSet. Workset must have no partitions, or retiring will not succeed&lt;br&gt;&lt;br&gt;  Press ‘New partition scheme’  to start a new partition process for this workset&lt;br&gt;&lt;br&gt;  Press ‘Create one click partition’  to create a new partition scheme, containing all the members of this workset, in just one step&lt;/html&gt;</string> 
+              </void> 
+              <void property="name"> 
+               <string>label11</string> 
+              </void> 
+             </object> 
+             <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+              <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+              <void method="setProperty"> 
+               <string>vAlign</string> 
+               <int>1</int> 
+              </void> 
+              <void method="setProperty"> 
+               <string>gridx</string> 
+               <int>1</int> 
+              </void> 
+              <void method="setProperty"> 
+               <string>gridheight</string> 
+               <int>2</int> 
+              </void> 
+             </object> 
+            </void> 
+            <void method="add"> 
+             <object class="com.jformdesigner.model.FormComponent"> 
+              <string>javax.swing.JLabel</string> 
+              <void method="setProperty"> 
+               <string>text</string> 
+               <string>text</string> 
+              </void> 
+              <void property="name"> 
+               <string>label15</string> 
+              </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.MouseListener</string> 
+                <string>mouseClicked</string> 
+                <string>label15MouseClicked</string> 
+                <boolean>true</boolean> 
+               </object> 
+              </void> 
+             </object> 
+             <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+              <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+              <void method="setProperty"> 
+               <string>gridx</string> 
+               <int>2</int> 
+              </void> 
+             </object> 
             </void> 
             <void method="add"> 
              <object class="com.jformdesigner.model.FormContainer"> 
@@ -172,29 +249,6 @@
               </object> 
               <void property="name"> 
                <string>panel2</string> 
-              </void> 
-              <void method="add"> 
-               <object class="com.jformdesigner.model.FormComponent"> 
-                <string>javax.swing.JLabel</string> 
-                <void method="setProperty"> 
-                 <string>text</string> 
-                 <string>WorkSet details</string> 
-                </void> 
-                <void method="setProperty"> 
-                 <string>font</string> 
-                 <object class="java.awt.Font"> 
-                  <string>Lucida Grande</string> 
-                  <int>1</int> 
-                  <int>14</int> 
-                 </object> 
-                </void> 
-                <void property="name"> 
-                 <string>label1</string> 
-                </void> 
-               </object> 
-               <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-                <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-               </object> 
               </void> 
               <void method="add"> 
                <object class="com.jformdesigner.model.FormContainer"> 
@@ -312,10 +366,6 @@
                </object> 
                <object class="com.jformdesigner.model.FormLayoutConstraints"> 
                 <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-                <void method="setProperty"> 
-                 <string>gridy</string> 
-                 <int>1</int> 
-                </void> 
                </object> 
               </void> 
               <void method="add"> 
@@ -367,6 +417,10 @@
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
               <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+              <void method="setProperty"> 
+               <string>gridy</string> 
+               <int>1</int> 
+              </void> 
              </object> 
             </void> 
             <void method="add"> 
@@ -402,25 +456,6 @@
               <void property="name"> 
                <string>panel16</string> 
               </void> 
-              <void method="add"> 
-               <object class="com.jformdesigner.model.FormComponent"> 
-                <string>javax.swing.JLabel</string> 
-                <void method="setProperty"> 
-                 <string>text</string> 
-                 <string>&lt;html&gt;&lt;body&gt; Enter WorkSet name&lt;br&gt;&lt;br&gt;  Press ‘Save’ for persisting changes&lt;br&gt;&lt;br&gt;  Press ‘Retire WorkSet’ to retire this WorkSet. Workset must have no partitions, or retiring will not succeed&lt;br&gt;&lt;br&gt;  Press ‘New partition scheme’  to start a new partition process for this workset&lt;br&gt;&lt;br&gt;  Press ‘Create one click partition’  to create a new partition scheme, containing all the members of this workset, in just one step&lt;/html&gt;</string> 
-                </void> 
-                <void property="name"> 
-                 <string>label11</string> 
-                </void> 
-               </object> 
-               <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-                <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-                <void method="setProperty"> 
-                 <string>vAlign</string> 
-                 <int>1</int> 
-                </void> 
-               </object> 
-              </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
               <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
@@ -431,6 +466,10 @@
               <void method="setProperty"> 
                <string>hAlign</string> 
                <int>2</int> 
+              </void> 
+              <void method="setProperty"> 
+               <string>gridy</string> 
+               <int>1</int> 
               </void> 
              </object> 
             </void> 
@@ -624,33 +663,6 @@
               <void method="setProperty"> 
                <string>gridx</string> 
                <int>4</int> 
-              </void> 
-             </object> 
-            </void> 
-            <void method="add"> 
-             <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JLabel</string> 
-              <void method="setProperty"> 
-               <string>text</string> 
-               <string>text</string> 
-              </void> 
-              <void property="name"> 
-               <string>label15</string> 
-              </void> 
-              <void method="addEvent"> 
-               <object class="com.jformdesigner.model.FormEvent"> 
-                <string>java.awt.event.MouseListener</string> 
-                <string>mouseClicked</string> 
-                <string>label15MouseClicked</string> 
-                <boolean>true</boolean> 
-               </object> 
-              </void> 
-             </object> 
-             <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-              <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-              <void method="setProperty"> 
-               <string>gridx</string> 
-               <int>5</int> 
               </void> 
              </object> 
             </void> 

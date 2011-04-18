@@ -669,8 +669,10 @@ public class WorkSetDetailsPanel extends JPanel {
 		jTabbedPane1 = new JTabbedPane();
 		panel0 = new JPanel();
 		panel1 = new JPanel();
-		panel2 = new JPanel();
 		label1 = new JLabel();
+		label11 = new JLabel();
+		label15 = new JLabel();
+		panel2 = new JPanel();
 		panel17 = new JPanel();
 		label2 = new JLabel();
 		textField1 = new JTextField();
@@ -678,14 +680,12 @@ public class WorkSetDetailsPanel extends JPanel {
 		label6 = new JLabel();
 		panel21 = new JPanel();
 		panel16 = new JPanel();
-		label11 = new JLabel();
 		panel7 = new JPanel();
 		button2 = new JButton();
 		button3 = new JButton();
 		button4 = new JButton();
 		button7 = new JButton();
 		pBarW = new JProgressBar();
-		label15 = new JLabel();
 		panel4 = new JPanel();
 		panel8 = new JPanel();
 		panel13 = new JPanel();
@@ -753,10 +753,35 @@ public class WorkSetDetailsPanel extends JPanel {
 				//======== panel1 ========
 				{
 					panel1.setLayout(new GridBagLayout());
-					((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0, 0};
-					((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0};
-					((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 1.0, 1.0E-4};
-					((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+					((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
+					((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0};
+					((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 1.0, 0.0, 1.0E-4};
+					((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
+
+					//---- label1 ----
+					label1.setText("WorkSet details");
+					label1.setFont(new Font("Lucida Grande", Font.BOLD, 14));
+					panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
+
+					//---- label11 ----
+					label11.setText("<html><body> Enter WorkSet name<br><br>  Press \u2018Save\u2019 for persisting changes<br><br>  Press \u2018Retire WorkSet\u2019 to retire this WorkSet. Workset must have no partitions, or retiring will not succeed<br><br>  Press \u2018New partition scheme\u2019  to start a new partition process for this workset<br><br>  Press \u2018Create one click partition\u2019  to create a new partition scheme, containing all the members of this workset, in just one step</html>");
+					panel1.add(label11, new GridBagConstraints(1, 0, 1, 2, 0.0, 0.0,
+						GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+						new Insets(0, 0, 0, 5), 0, 0));
+
+					//---- label15 ----
+					label15.setText("text");
+					label15.addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							label15MouseClicked(e);
+						}
+					});
+					panel1.add(label15, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
 
 					//======== panel2 ========
 					{
@@ -765,13 +790,6 @@ public class WorkSetDetailsPanel extends JPanel {
 						((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0, 0, 24, 0};
 						((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
 						((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0, 0.0, 1.0E-4};
-
-						//---- label1 ----
-						label1.setText("WorkSet details");
-						label1.setFont(new Font("Lucida Grande", Font.BOLD, 14));
-						panel2.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 5, 0), 0, 0));
 
 						//======== panel17 ========
 						{
@@ -810,7 +828,7 @@ public class WorkSetDetailsPanel extends JPanel {
 								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 								new Insets(0, 0, 0, 0), 0, 0));
 						}
-						panel2.add(panel17, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+						panel2.add(panel17, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 0), 0, 0));
 
@@ -826,7 +844,7 @@ public class WorkSetDetailsPanel extends JPanel {
 							GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
 							new Insets(0, 0, 0, 0), 0, 0));
 					}
-					panel1.add(panel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					panel1.add(panel2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 0, 5), 0, 0));
 
@@ -837,16 +855,10 @@ public class WorkSetDetailsPanel extends JPanel {
 						((GridBagLayout)panel16.getLayout()).rowHeights = new int[] {0, 0, 0};
 						((GridBagLayout)panel16.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
 						((GridBagLayout)panel16.getLayout()).rowWeights = new double[] {1.0, 0.0, 1.0E-4};
-
-						//---- label11 ----
-						label11.setText("<html><body> Enter WorkSet name<br><br>  Press \u2018Save\u2019 for persisting changes<br><br>  Press \u2018Retire WorkSet\u2019 to retire this WorkSet. Workset must have no partitions, or retiring will not succeed<br><br>  Press \u2018New partition scheme\u2019  to start a new partition process for this workset<br><br>  Press \u2018Create one click partition\u2019  to create a new partition scheme, containing all the members of this workset, in just one step</html>");
-						panel16.add(label11, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
-							new Insets(0, 0, 5, 0), 0, 0));
 					}
-					panel1.add(panel16, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					panel1.add(panel16, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
 						GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-						new Insets(0, 0, 0, 0), 0, 0));
+						new Insets(0, 0, 0, 5), 0, 0));
 				}
 				panel0.add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -917,18 +929,6 @@ public class WorkSetDetailsPanel extends JPanel {
 					panel7.add(pBarW, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 0, 5), 0, 0));
-
-					//---- label15 ----
-					label15.setText("text");
-					label15.addMouseListener(new MouseAdapter() {
-						@Override
-						public void mouseClicked(MouseEvent e) {
-							label15MouseClicked(e);
-						}
-					});
-					panel7.add(label15, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 0), 0, 0));
 				}
 				panel0.add(panel7, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -1314,8 +1314,10 @@ public class WorkSetDetailsPanel extends JPanel {
 	private JTabbedPane jTabbedPane1;
 	private JPanel panel0;
 	private JPanel panel1;
-	private JPanel panel2;
 	private JLabel label1;
+	private JLabel label11;
+	private JLabel label15;
+	private JPanel panel2;
 	private JPanel panel17;
 	private JLabel label2;
 	private JTextField textField1;
@@ -1323,14 +1325,12 @@ public class WorkSetDetailsPanel extends JPanel {
 	private JLabel label6;
 	private JPanel panel21;
 	private JPanel panel16;
-	private JLabel label11;
 	private JPanel panel7;
 	private JButton button2;
 	private JButton button3;
 	private JButton button4;
 	private JButton button7;
 	private JProgressBar pBarW;
-	private JLabel label15;
 	private JPanel panel4;
 	private JPanel panel8;
 	private JPanel panel13;
