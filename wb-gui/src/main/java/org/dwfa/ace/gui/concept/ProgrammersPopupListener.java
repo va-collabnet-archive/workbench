@@ -3,7 +3,6 @@
  */
 package org.dwfa.ace.gui.concept;
 
-import java.awt.FileDialog;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
@@ -13,7 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -92,7 +90,7 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
 
    private void maybeShowPopup(MouseEvent e) {
       if (e.isPopupTrigger()) {
-         if (e.isAltDown()) {
+         if (e.isAltDown() || e.isControlDown()) {
             popup.show(e.getComponent(),
                     e.getX(), e.getY());
          }
