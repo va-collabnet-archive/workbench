@@ -11,8 +11,12 @@
 package org.ihtsdo.batch;
 
 import java.util.List;
+import java.util.UUID;
 import javax.swing.GroupLayout;
 import javax.swing.JPanel;
+import org.dwfa.ace.api.I_AmTermComponent;
+import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
+import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -103,7 +107,27 @@ public class BatchActionTaskRoleAddUI extends javax.swing.JPanel implements I_Ba
 
     @Override
     public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) throws Exception {
-        return null; // :!!!: RoleRetireUI.getTask()
+        // SET ROLE TYPE
+        I_AmTermComponent termRoleType = ((ValueConceptDndUI) jPanelDndNewRoleType).getTermComponent();
+        if (termRoleType != null) {
+            ((BatchActionTaskRoleAdd) task).setRoleNid(termRoleType.getNid());
+        } else {
+            BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.ROLE_ADD,
+                    BatchActionEventType.TASK_INVALID, "role not set"));
+            return null;
+        }
+
+        // SET ROLE VALUE
+        I_AmTermComponent termRoleValue = ((ValueConceptDndUI) jPanelDndNewRoleValue).getTermComponent();
+        if (termRoleValue != null) {
+            ((BatchActionTaskRoleAdd) task).setRoleNid(termRoleValue.getNid());
+        } else {
+            BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.ROLE_ADD,
+                    BatchActionEventType.TASK_INVALID, "value not set"));
+            return null;
+        }
+
+        return task;
     }
 
     @Override

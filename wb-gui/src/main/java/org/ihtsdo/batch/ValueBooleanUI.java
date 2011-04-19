@@ -36,12 +36,14 @@ public class ValueBooleanUI extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        buttonGroup1 = new javax.swing.ButtonGroup();
+        buttonGroupTF = new javax.swing.ButtonGroup();
         jRadioTrue = new javax.swing.JRadioButton();
         jRadioFalse = new javax.swing.JRadioButton();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Title:"));
 
+        buttonGroupTF.add(jRadioTrue);
+        jRadioTrue.setSelected(true);
         jRadioTrue.setText("True");
         jRadioTrue.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -49,6 +51,7 @@ public class ValueBooleanUI extends javax.swing.JPanel {
             }
         });
 
+        buttonGroupTF.add(jRadioFalse);
         jRadioFalse.setText("False");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -73,12 +76,16 @@ public class ValueBooleanUI extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_jRadioTrueActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.ButtonGroup buttonGroupTF;
     private javax.swing.JRadioButton jRadioFalse;
     private javax.swing.JRadioButton jRadioTrue;
     // End of variables declaration//GEN-END:variables
 
     public JPanel getPanel() {
         return this;
+    }
+
+    public Boolean getValue() {
+        return jRadioTrue.isSelected();
     }
 }

@@ -16,6 +16,9 @@ import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JPanel;
+import org.dwfa.ace.api.I_AmTermComponent;
+import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
+import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -166,6 +169,18 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
 
     @Override // I_BatchActionTask
     public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) {
+
+
+        // SET ROLE VALUE
+        I_AmTermComponent termRoleValue = ((ValueConceptDndUI) jPanelDndRoleValueNew).getTermComponent();
+        if (termRoleValue != null) {
+            ((BatchActionTaskRoleAdd) task).setRoleNid(termRoleValue.getNid());
+        } else {
+            BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.ROLE_REPLACE_VALUE,
+                    BatchActionEventType.TASK_INVALID, "value not set"));
+            return null;
+        }
+
         return task;
     }
 }

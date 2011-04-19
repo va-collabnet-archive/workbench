@@ -21,7 +21,8 @@ public class BatchActionEvent implements Comparable<BatchActionEvent> {
 
         EVENT_ERROR,
         EVENT_NOOP,
-        EVENT_SUCCESS
+        EVENT_SUCCESS,
+        TASK_INVALID
     }
     private ConceptVersionBI conceptA; // main concept of operation
     private BatchActionTaskType actionTaskType;

@@ -18,10 +18,13 @@ import javax.swing.GroupLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
+import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
 /**
  *
@@ -47,16 +50,16 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
         jPanelValueReplace = tmp.getPanel();
 
         // Setup Filter Value Panel
-        tmp = new ValueConceptDndUI("Filter Concept Value:");
-        layout.replace(jPanelFilter, tmp.getPanel());
-        jPanelFilter = tmp.getPanel();
+        tmp = new ValueConceptDndUI("Concept Match Value:");
+        layout.replace(jPanelValueMatch, tmp.getPanel());
+        jPanelValueMatch = tmp.getPanel();
 
         currentValueTypeIdx = 1; // concept
 
         useFilter = false;
-        jCheckBoxFilter.setSelected(useFilter);
-        jPanelFilter.setEnabled(useFilter);
-        jPanelFilter.setVisible(useFilter);
+        jCheckBoxMatch.setSelected(useFilter);
+        jPanelValueMatch.setEnabled(useFilter);
+        jPanelValueMatch.setVisible(useFilter);
     }
 
     /** This method is called from within the constructor to
@@ -72,8 +75,8 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
         jComboBoxExistingRefsets = new javax.swing.JComboBox();
         jComboBoxType = new javax.swing.JComboBox();
         jPanelValueReplace = new javax.swing.JPanel();
-        jCheckBoxFilter = new javax.swing.JCheckBox();
-        jPanelFilter = new javax.swing.JPanel();
+        jCheckBoxMatch = new javax.swing.JCheckBox();
+        jPanelValueMatch = new javax.swing.JPanel();
 
         setPreferredSize(new java.awt.Dimension(218, 120));
 
@@ -102,22 +105,22 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
             .addGap(0, 39, Short.MAX_VALUE)
         );
 
-        jCheckBoxFilter.setText("Filter On Value:");
-        jCheckBoxFilter.addActionListener(new java.awt.event.ActionListener() {
+        jCheckBoxMatch.setText("Filter On Value:");
+        jCheckBoxMatch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBoxFilterActionPerformed(evt);
+                jCheckBoxMatchActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout jPanelFilterLayout = new javax.swing.GroupLayout(jPanelFilter);
-        jPanelFilter.setLayout(jPanelFilterLayout);
-        jPanelFilterLayout.setHorizontalGroup(
-            jPanelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout jPanelValueMatchLayout = new javax.swing.GroupLayout(jPanelValueMatch);
+        jPanelValueMatch.setLayout(jPanelValueMatchLayout);
+        jPanelValueMatchLayout.setHorizontalGroup(
+            jPanelValueMatchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 218, Short.MAX_VALUE)
         );
-        jPanelFilterLayout.setVerticalGroup(
-            jPanelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 33, Short.MAX_VALUE)
+        jPanelValueMatchLayout.setVerticalGroup(
+            jPanelValueMatchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -133,9 +136,9 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
                 .addContainerGap())
             .addComponent(jPanelValueReplace, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jCheckBoxFilter)
+                .addComponent(jCheckBoxMatch)
                 .addContainerGap())
-            .addComponent(jPanelFilter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanelValueMatch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -148,17 +151,17 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanelValueReplace, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jCheckBoxFilter)
+                .addComponent(jCheckBoxMatch)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanelFilter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanelValueMatch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jCheckBoxFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxFilterActionPerformed
+    private void jCheckBoxMatchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMatchActionPerformed
         useFilter = ((JCheckBox) evt.getSource()).getModel().isSelected();
-        jPanelFilter.setEnabled(useFilter);
-        jPanelFilter.setVisible(useFilter);
-    }//GEN-LAST:event_jCheckBoxFilterActionPerformed
+        jPanelValueMatch.setEnabled(useFilter);
+        jPanelValueMatch.setVisible(useFilter);
+    }//GEN-LAST:event_jCheckBoxMatchActionPerformed
 
     private void jComboBoxTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxTypeActionPerformed
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
@@ -172,9 +175,9 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
                     layout.replace(jPanelValueReplace, tmpB.getPanel());
                     jPanelValueReplace = tmpB.getPanel();
                     // FILTER PANEL
-                    tmpB = new ValueBooleanUI("Filter Boolean Value:");
-                    layout.replace(jPanelFilter, tmpB.getPanel());
-                    jPanelFilter = tmpB.getPanel();
+                    tmpB = new ValueBooleanUI("Boolean Match Value:");
+                    layout.replace(jPanelValueMatch, tmpB.getPanel());
+                    jPanelValueMatch = tmpB.getPanel();
                     break;
                 case 1: // concept
                     // MEMBER VALUE PANEL
@@ -182,9 +185,9 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
                     layout.replace(jPanelValueReplace, tmpC.getPanel());
                     jPanelValueReplace = tmpC.getPanel();
                     // FILTER PANEL
-                    tmpC = new ValueConceptDndUI("Filter Concept Value:");
-                    layout.replace(jPanelFilter, tmpC.getPanel());
-                    jPanelFilter = tmpC.getPanel();
+                    tmpC = new ValueConceptDndUI("Concept Match Value:");
+                    layout.replace(jPanelValueMatch, tmpC.getPanel());
+                    jPanelValueMatch = tmpC.getPanel();
                     break;
                 case 2: // integer
                     // MEMBER VALUE PANEL
@@ -192,9 +195,9 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
                     layout.replace(jPanelValueReplace, tmpI.getPanel());
                     jPanelValueReplace = tmpI.getPanel();
                     // FILTER PANEL
-                    tmpI = new ValueIntegerUI("Filter Integer Value:");
-                    layout.replace(jPanelFilter, tmpI.getPanel());
-                    jPanelFilter = tmpI.getPanel();
+                    tmpI = new ValueIntegerUI("Integer Match Value:");
+                    layout.replace(jPanelValueMatch, tmpI.getPanel());
+                    jPanelValueMatch = tmpI.getPanel();
                     break;
                 case 3: // string
                     // MEMBER VALUE PANEL
@@ -202,9 +205,9 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
                     layout.replace(jPanelValueReplace, tmpS.getPanel());
                     jPanelValueReplace = tmpS.getPanel();
                     // FILTER PANEL
-                    tmpS = new ValueStringUI("Filter String Value:");
-                    layout.replace(jPanelFilter, tmpS.getPanel());
-                    jPanelFilter = tmpS.getPanel();
+                    tmpS = new ValueStringUI("String Match Value:");
+                    layout.replace(jPanelValueMatch, tmpS.getPanel());
+                    jPanelValueMatch = tmpS.getPanel();
                     break;
                 default:
                     throw new AssertionError();
@@ -215,13 +218,12 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
             this.doLayout();
         }
     }//GEN-LAST:event_jComboBoxTypeActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JCheckBox jCheckBoxFilter;
+    private javax.swing.JCheckBox jCheckBoxMatch;
     private javax.swing.JComboBox jComboBoxExistingRefsets;
     private javax.swing.JComboBox jComboBoxType;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanelFilter;
+    private javax.swing.JPanel jPanelValueMatch;
     private javax.swing.JPanel jPanelValueReplace;
     // End of variables declaration//GEN-END:variables
 
@@ -282,6 +284,112 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
 
     @Override // I_BatchActionTask
     public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) {
-        return task;
+        // referenced component provided at execution time
+
+        // SET REFSET EXITING COLLECTION NID
+        DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingRefsets.getModel();
+        ComponentVersionBI refsetBI = (ComponentVersionBI) dcbm.getSelectedItem();
+        if (refsetBI != null) {
+            int refsetNid = refsetBI.getNid();
+            ((BatchActionTaskRefsetReplaceValue) task).setCollectionNid(refsetNid);
+        } else {
+            BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.REFSET_REPLACE_VALUE,
+                    BatchActionEventType.TASK_INVALID, "no selected refset"));
+            return null;
+        }
+
+        // SET VALUE TYPE
+        switch (jComboBoxType.getSelectedIndex()) {
+            case 0:
+                ((BatchActionTaskRefsetReplaceValue) task).setRefsetType(TK_REFSET_TYPE.BOOLEAN);
+                Boolean valBoolean = ((ValueBooleanUI) jPanelValueReplace).getValue();
+                if (valBoolean != null) {
+                    ((BatchActionTaskRefsetReplaceValue) task).setRefsetValue(valBoolean);
+                } else {
+                    BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.REFSET_REPLACE_VALUE,
+                            BatchActionEventType.TASK_INVALID, "replace value not set"));
+                    return null;
+                }
+                break;
+            case 1:
+                ((BatchActionTaskRefsetReplaceValue) task).setRefsetType(TK_REFSET_TYPE.CID);
+                Integer valConcept = ((ValueConceptDndUI) jPanelValueReplace).getValue();
+                if (valConcept != null) {
+                    ((BatchActionTaskRefsetReplaceValue) task).setRefsetValue(valConcept);
+                } else {
+                    BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.REFSET_REPLACE_VALUE,
+                            BatchActionEventType.TASK_INVALID, "replace value not set"));
+                    return null;
+                }
+                break;
+            case 2:
+                ((BatchActionTaskRefsetReplaceValue) task).setRefsetType(TK_REFSET_TYPE.INT);
+                Integer valInt = ((ValueIntegerUI) jPanelValueReplace).getValue();
+                if (valInt != null) {
+                    ((BatchActionTaskRefsetReplaceValue) task).setMatchValue(valInt);
+                } else {
+                    BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.REFSET_REPLACE_VALUE,
+                            BatchActionEventType.TASK_INVALID, "replace value not set"));
+                    return null;
+                }
+                break;
+            case 3:
+                ((BatchActionTaskRefsetReplaceValue) task).setRefsetType(TK_REFSET_TYPE.STR);
+                String valStr = ((ValueStringUI) jPanelValueReplace).getValue();
+                if (valStr != null) {
+                    ((BatchActionTaskRefsetReplaceValue) task).setMatchValue(valStr);
+                } else {
+                    BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.REFSET_REPLACE_VALUE,
+                            BatchActionEventType.TASK_INVALID, "replace value not set"));
+                    return null;
+                }
+                break;
+            default:
+                throw new AssertionError();
+        }
+
+        // CHECK MATCH FILTER
+        if (jCheckBoxMatch.isSelected() == false) {
+            ((BatchActionTaskRefsetReplaceValue) task).setMatchValue(null);
+            return task;
+        }
+
+        // SET MATCH VALUE
+        switch (jComboBoxType.getSelectedIndex()) {
+            case 0:
+                Boolean valBoolean = ((ValueBooleanUI) jPanelValueMatch).getValue();
+                if (valBoolean != null) {
+                    ((BatchActionTaskRefsetReplaceValue) task).setMatchValue(valBoolean);
+                    return task;
+                }
+                break;
+            case 1:
+                Integer valConcept = ((ValueConceptDndUI) jPanelValueMatch).getValue();
+                if (valConcept != null) {
+                    ((BatchActionTaskRefsetReplaceValue) task).setMatchValue(valConcept);
+                    return task;
+                }
+                break;
+            case 2:
+                Integer valInt = ((ValueIntegerUI) jPanelValueMatch).getValue();
+                if (valInt != null) {
+                    ((BatchActionTaskRefsetReplaceValue) task).setMatchValue(valInt);
+                    return task;
+                }
+                break;
+            case 3:
+                String valStr = ((ValueStringUI) jPanelValueMatch).getValue();
+                if (valStr != null) {
+                    ((BatchActionTaskRefsetReplaceValue) task).setMatchValue(valStr);
+                    return task;
+                }
+                break;
+            default:
+                throw new AssertionError();
+        }
+
+        BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.REFSET_REPLACE_VALUE,
+                BatchActionEventType.TASK_INVALID, "match value not set"));
+        return null;
     }
 }

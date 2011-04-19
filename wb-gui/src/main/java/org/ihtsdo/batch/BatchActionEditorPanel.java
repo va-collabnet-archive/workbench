@@ -308,9 +308,10 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
             BatchActionProcessor bap = new BatchActionProcessor(concepts, tasks, ec, vc);
             ts.iterateConceptDataInParallel(bap);
 
-            System.out.println("\r\n!!! BATCH ACTION TASK REPORT\r\n" + BatchActionEventReporter.createReportTSV());
+            StringBuilder sb = new StringBuilder("\r\n!!! BATCH ACTION TASK REPORT\r\n");
+            sb.append(BatchActionEventReporter.createReportTSV());
+            Logger.getLogger(BatchActionEditorPanel.class.getName()).log(Level.INFO, sb.toString());
 
-            // resultsTextArea.setText(BatchActionEventReporter.createReportTSV());
             resultsTextArea.setText(BatchActionEventReporter.createReportHTML());
         } catch (Exception ex) {
             Logger.getLogger(BatchActionEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -373,6 +374,8 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                 batchActionTaskViewPanel.add(b, gc);
                 gc.gridy++;
             }
+            gc.weighty = 0.5;
+            batchActionTaskViewPanel.add(new JLabel(""), gc);
             jScrollBatchActionTasks.setViewportView(batchActionTaskViewPanel);
 
             jScrollBatchActionTasks.invalidate();

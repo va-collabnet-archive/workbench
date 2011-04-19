@@ -61,9 +61,9 @@ public class BatchActionTaskParentAddNew extends BatchActionTask {
         }
 
         // If parent does not already exist, than add a new parent record.
-        if (c.getPrimUuid() == null) { // :!!!:???: is this really needed ?
-            System.out.println("found bad: " + c.getPrimUuid());
-        }
+//        if (c.getPrimUuid() == null) { // :!!!:???: is this really needed ?
+//            System.out.println("found bad: " + c.getPrimUuid());
+//        }
         RelCAB rc = new RelCAB(c.getPrimUuid(), selectedRoleTypeUuid, selectedDestUuid, 0, TkRelType.STATED_HIERARCHY);
         termConstructor.construct(rc);
 

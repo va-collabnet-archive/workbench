@@ -28,12 +28,12 @@
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Component id="jComboBoxExistingRefsets" pref="120" max="32767" attributes="0"/>
                   </Group>
-                  <Component id="jCheckBoxFilter" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="jCheckBoxMatch" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="jComboBoxType" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
-          <Component id="jPanelFilter" alignment="0" max="32767" attributes="0"/>
+          <Component id="jPanelValueMatch" alignment="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -44,11 +44,11 @@
                   <Component id="jComboBoxExistingRefsets" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="jCheckBoxFilter" min="-2" max="-2" attributes="0"/>
+              <Component id="jCheckBoxMatch" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jComboBoxType" min="-2" max="-2" attributes="1"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jPanelFilter" max="32767" attributes="1"/>
+              <Component id="jPanelValueMatch" max="32767" attributes="1"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -72,12 +72,12 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jComboBoxExistingRefsetsActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JCheckBox" name="jCheckBoxFilter">
+    <Component class="javax.swing.JCheckBox" name="jCheckBoxMatch">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Filter On Value:"/>
+        <Property name="text" type="java.lang.String" value="If Matches Value:"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jCheckBoxFilterActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jCheckBoxMatchActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JComboBox" name="jComboBoxType">
@@ -101,7 +101,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jComboBoxTypeActionPerformed"/>
       </Events>
     </Component>
-    <Container class="javax.swing.JPanel" name="jPanelFilter">
+    <Container class="javax.swing.JPanel" name="jPanelValueMatch">
 
       <Layout>
         <DimensionLayout dim="0">
@@ -111,7 +111,7 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="33" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>

@@ -58,4 +58,11 @@ public class ValueStringUI extends javax.swing.JPanel {
     public JPanel getPanel() {
         return this;
     }
+
+    public String getValue() {
+        String valStr = jTextFieldValueString.getText();
+        if (valStr == null || valStr.equalsIgnoreCase(""))
+            return null;
+        return valStr;
+    }
 }

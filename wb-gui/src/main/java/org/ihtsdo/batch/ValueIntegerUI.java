@@ -69,4 +69,17 @@ public class ValueIntegerUI extends javax.swing.JPanel {
     public JPanel getPanel() {
         return this;
     }
+
+    public Integer getValue() {
+        String text = jTextFieldValueInteger.getText();
+        if (text == null || text.equalsIgnoreCase("")) {
+            return null;
+        }
+
+        try {
+            return Integer.valueOf(text);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

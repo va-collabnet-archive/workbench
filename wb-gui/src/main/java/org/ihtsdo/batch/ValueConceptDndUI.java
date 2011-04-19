@@ -210,4 +210,12 @@ public class ValueConceptDndUI extends javax.swing.JPanel implements /*FocusList
     public void lostOwnership(Clipboard clpbrd, Transferable t) {
         // nothing to do. :!!!: is ClipBoardOwner needed ???
     }
+
+    public Integer getValue() {
+        if (termComponent == null) {
+            return null;
+        }
+
+        return termComponent.getNid();
+    }
 }
