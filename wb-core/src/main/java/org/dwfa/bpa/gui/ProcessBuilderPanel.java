@@ -707,6 +707,7 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener, Prope
             this.propTableModel = propTableModel;
         }
 
+        @Override
         public void valueChanged(ListSelectionEvent e) {
             if ((propertiesPane.getSelectedRow() >= 0)
                 && propertiesPane.getSelectedRow() < propertiesPane.getRowCount()) {

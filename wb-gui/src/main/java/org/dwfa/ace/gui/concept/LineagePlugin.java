@@ -28,6 +28,7 @@ import java.awt.event.HierarchyListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -83,18 +84,25 @@ public class LineagePlugin extends AbstractPlugin implements HierarchyListener {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
+    private static ImageIcon statedViewIcon = null;
+    private static ImageIcon inferredViewIcon = null;
+    
 
+    private ImageIcon getStatedIcon() {
+        if (statedViewIcon == null) {
+            statedViewIcon = new ImageIcon(LineagePlugin.class.getResource("/16x16/plain/graph_edge.png"));
+        }
+        return statedViewIcon;
+    }
+    private ImageIcon getInferredIcon() {
+        if (inferredViewIcon == null) {
+            inferredViewIcon = new ImageIcon(LineagePlugin.class.getResource("/16x16/plain/chrystal_ball.png"));
+        }
+        return inferredViewIcon;
+    }
     public LineagePlugin(boolean shownByDefault, int sequence) {
         super(shownByDefault, sequence);
-        if (statedView == null) {
-            statedView = new ImageIcon(
-            LineagePlugin.class.getResource("/16x16/plain/graph_edge.png"));
-        }
-        if (inferredView == null) {
-            inferredView = new ImageIcon(
-            LineagePlugin.class.getResource("/16x16/plain/chrystal_ball.png"));
-        }
-    }
+     }
 
     @Override
     protected ImageIcon getImageIcon() {
@@ -123,9 +131,6 @@ public class LineagePlugin extends AbstractPlugin implements HierarchyListener {
         }
         return lineagePanel;
     }
-    private static ImageIcon statedView = null;
-    private static ImageIcon inferredView = null;
-    
 
     private JComponent getLineagePanel(I_HostConceptPlugins host) throws IOException, TerminologyException {
         setHost(host);
@@ -142,13 +147,13 @@ public class LineagePlugin extends AbstractPlugin implements HierarchyListener {
         newLineagePanel.add(lineageLabel, c);
         c.gridwidth = 1;
 
-        statedInferredButton = new JToggleButton(new AbstractAction("", statedView) {
+        statedInferredButton = new JToggleButton(new AbstractAction("", getStatedIcon()) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 JToggleButton button = (JToggleButton) e.getSource();
                 if (button.isSelected()) {
-                    button.setIcon(statedView);
+                    button.setIcon(getStatedIcon());
                     button.setToolTipText("showing stated, toggle to show inferred...");
                     try {
                         update();
@@ -156,7 +161,7 @@ public class LineagePlugin extends AbstractPlugin implements HierarchyListener {
                         AceLog.getAppLog().alertAndLogException(ex);
                     }
                 } else {
-                    button.setIcon(inferredView);
+                    button.setIcon(getInferredIcon());
                     button.setToolTipText("showing inferred, toggle to show stated...");
                     try {
                         update();
