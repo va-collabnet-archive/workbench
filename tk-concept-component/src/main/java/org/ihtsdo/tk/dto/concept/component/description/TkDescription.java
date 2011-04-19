@@ -3,6 +3,7 @@ package org.ihtsdo.tk.dto.concept.component.description;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -38,7 +39,20 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
         conceptUuid = new UUID(in.readLong(), in.readLong());
         initialCaseSignificant = in.readBoolean();
         lang = in.readUTF();
-        text = in.readUTF();
+        if (dataVersion < 6) {
+            text = in.readUTF();
+        } else {
+            int textlength =  in.readInt();
+            if (textlength > 64000) {
+                int textBytesLength = in.readInt();
+                byte[] textBytes = new byte[textBytesLength];
+                in.readFully(textBytes);
+                text = new String(textBytes, "UTF-8");
+            } else {
+                text = in.readUTF();
+            }
+            
+        }
         typeUuid = new UUID(in.readLong(), in.readLong());
         int versionLength = in.readInt();
         if (versionLength > 0) {
@@ -56,7 +70,14 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
         out.writeLong(conceptUuid.getLeastSignificantBits());
         out.writeBoolean(initialCaseSignificant);
         out.writeUTF(lang);
-        out.writeUTF(text);
+        out.writeInt(text.length()); 
+        if (text.length() > 64000) {
+            byte[] textBytes = text.getBytes("UTF-8");
+            out.writeInt(textBytes.length);
+            out.write(textBytes);
+        } else {
+            out.writeUTF(text);
+        }
         out.writeLong(typeUuid.getMostSignificantBits());
         out.writeLong(typeUuid.getLeastSignificantBits());
         if (revisions == null) {

@@ -30,7 +30,7 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 public class TkConcept {
 
     public static final long serialVersionUID = 1;
-    public static final int dataVersion = 5;
+    public static final int dataVersion = 6;
     public TkConceptAttributes conceptAttributes;
     public List<TkDescription> descriptions;
     public List<TkRelationship> relationships;

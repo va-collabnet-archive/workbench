@@ -27,7 +27,21 @@ public class TkRefsetStrMember extends TkRefsetAbstractMember<TkRefsetStrRevisio
 	@Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super.readExternal(in, dataVersion);
-        strValue = in.readUTF();
+        
+        if (dataVersion < 6) {
+            strValue = in.readUTF();
+        } else {
+            int textlength =  in.readInt();
+            if (textlength > 64000) {
+                int textBytesLength = in.readInt();
+                byte[] textBytes = new byte[textBytesLength];
+                in.readFully(textBytes);
+                strValue = new String(textBytes, "UTF-8");
+            } else {
+                strValue = in.readUTF();
+            }
+            
+        }
         int versionSize = in.readInt();
         if (versionSize > 0) {
             revisions = new ArrayList<TkRefsetStrRevision>(versionSize);
@@ -40,10 +54,14 @@ public class TkRefsetStrMember extends TkRefsetAbstractMember<TkRefsetStrRevisio
     @Override
     public void writeExternal(DataOutput out) throws IOException {
         super.writeExternal(out);
-        if (strValue == null) {
-            
+        out.writeInt(strValue.length()); 
+        if (strValue.length() > 64000) {
+            byte[] textBytes = strValue.getBytes("UTF-8");
+            out.writeInt(textBytes.length);
+            out.write(textBytes);
+        } else {
+            out.writeUTF(strValue);
         }
-        out.writeUTF(strValue);
         if (revisions == null) {
             out.writeInt(0);
         } else {
