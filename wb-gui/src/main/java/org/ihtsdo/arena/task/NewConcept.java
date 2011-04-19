@@ -648,7 +648,7 @@ public class NewConcept extends PreviousNextOrCancel {
                 this.gbLabelFsn.setVisible(false);
                 
                 this.usBoxFsn.setVisible(false);
-                this.usBoxFsn.setSelected(true);
+                this.usBoxFsn.setSelected(false);
                 this.usFsn.setVisible(false);
                 this.usLabelFsn.setVisible(false);
             } else if (th.checkTermSpelling(prefText, us)) { //check if lang is en-us
@@ -947,7 +947,7 @@ public class NewConcept extends PreviousNextOrCancel {
             	JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                         "please enter the fsn", "",
                         JOptionPane.ERROR_MESSAGE);
-            }else if(fsn.extractText().length() != 0 && fsn.extractText().indexOf("(") == -1){
+            }else if((fsn.extractText().length() != 0) && (fsn.extractText().indexOf("(") == -1 || fsn.extractText().indexOf(")") == -1)){
             	//test for semantic tag
             	JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                         "please enter the semtaic tag", "",
@@ -962,10 +962,6 @@ public class NewConcept extends PreviousNextOrCancel {
                 returnCondition = Condition.CONTINUE;
                 done = true;
                 NewConcept.this.notifyTaskDone();
-            }else {
-            	JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                        "you're missing something", "",
-                        JOptionPane.ERROR_MESSAGE);
             }
             }
         }
