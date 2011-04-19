@@ -170,11 +170,14 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
     @Override // I_BatchActionTask
     public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) {
 
+        // SET ROLE TYPE
 
-        // SET ROLE VALUE
+        // SET OLD ROLE VALUE
+
+        // SET NEW ROLE VALUE
         I_AmTermComponent termRoleValue = ((ValueConceptDndUI) jPanelDndRoleValueNew).getTermComponent();
         if (termRoleValue != null) {
-            ((BatchActionTaskRoleAdd) task).setRoleNid(termRoleValue.getNid());
+            ((BatchActionTaskRoleReplaceValue) task).setValueNewNid(termRoleValue.getNid());
         } else {
             BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.ROLE_REPLACE_VALUE,
                     BatchActionEventType.TASK_INVALID, "value not set"));

@@ -20,6 +20,8 @@ import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 import org.dwfa.cement.SNOMED;
+import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
+import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -147,6 +149,8 @@ public class BatchActionTaskParentRetireUI extends javax.swing.JPanel implements
             ((BatchActionTaskParentRetire) task).setSelectedDestNid(nidParent);
             return task;
         } else {
+            BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.PARENT_RETIRE,
+                    BatchActionEventType.TASK_INVALID, "value not set"));
             return null;
         }
     }

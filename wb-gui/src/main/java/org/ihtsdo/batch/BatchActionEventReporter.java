@@ -41,7 +41,9 @@ public class BatchActionEventReporter {
      * @return 
      */
     public static String createReportTSV() {
-        EnumSet<BatchActionEventType> reportEvents = EnumSet.of(BatchActionEventType.EVENT_ERROR, BatchActionEventType.EVENT_NOOP, BatchActionEventType.EVENT_SUCCESS);
+        EnumSet<BatchActionEventType> reportEvents = EnumSet.of(BatchActionEventType.EVENT_ERROR,
+                BatchActionEventType.EVENT_NOOP, BatchActionEventType.EVENT_SUCCESS,
+                BatchActionEventType.TASK_INVALID);
         return createReportTSV(reportEvents);
     }
 
@@ -57,7 +59,9 @@ public class BatchActionEventReporter {
                     sb.append(bae.getEventType());
                     // EVENT CONCEPT
                     sb.append("\t");
-                    sb.append(bae.getConceptA().getPreferredDescription().getText());
+                    if (bae.getConceptA() != null) {
+                        sb.append(bae.getConceptA().getPreferredDescription().getText());
+                    }
                     // EVENT NOTE
                     sb.append("\t");
                     if (bae.getEventNote() != null) {
@@ -83,7 +87,9 @@ public class BatchActionEventReporter {
      * @return
      */
     public static String createReportHTML() {
-        EnumSet<BatchActionEventType> reportEvents = EnumSet.of(BatchActionEventType.EVENT_ERROR, BatchActionEventType.EVENT_NOOP, BatchActionEventType.EVENT_SUCCESS);
+        EnumSet<BatchActionEventType> reportEvents = EnumSet.of(BatchActionEventType.EVENT_ERROR,
+                BatchActionEventType.EVENT_NOOP, BatchActionEventType.EVENT_SUCCESS,
+                BatchActionEventType.TASK_INVALID);
         return createReportHTML(reportEvents);
     }
 
@@ -101,7 +107,9 @@ public class BatchActionEventReporter {
                     sb.append(bae.getEventType());
                     // EVENT CONCEPT
                     sb.append("</td><td>");
-                    sb.append(bae.getConceptA().getPreferredDescription().getText());
+                    if (bae.getConceptA() != null) {
+                        sb.append(bae.getConceptA().getPreferredDescription().getText());
+                    }
                     // EVENT NOTE
                     sb.append("</td><td>");
                     if (bae.getEventNote() != null) {
@@ -121,5 +129,9 @@ public class BatchActionEventReporter {
 
 
         return sb.toString();
+    }
+
+    public static int getSize() {
+        return batchActionEventList.size();
     }
 }

@@ -7,12 +7,15 @@ package org.ihtsdo.batch;
 
 import java.awt.Component;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 /**
  *
@@ -29,7 +32,7 @@ class JComboBoxExistingRolesRender extends JLabel implements ListCellRenderer {
     public Component getListCellRendererComponent(JList jlist, Object o, int index, boolean isSelected, boolean cellHasFocus) {
         if (jlist.getModel().getSize() == 0) {
             // EMPTY CONCEPT LIST
-            setText("(add concept to list)");
+            setText("(add role-value to list)");
             return this;
         }
 
@@ -45,14 +48,24 @@ class JComboBoxExistingRolesRender extends JLabel implements ListCellRenderer {
             }
         }
         DefaultComboBoxModel model = (DefaultComboBoxModel) jlist.getModel();
-        ConceptVersionBI cvbi = (ConceptVersionBI) model.getElementAt(index);
+        RelationshipVersionBI rvbi = (RelationshipVersionBI) model.getElementAt(index);
+        int roleTypeNid = rvbi.getTypeNid();
+        int roleValueNid = rvbi.getDestinationNid();
+
+        String roleTypeStr;
         try {
-            setText(cvbi.getFullySpecifiedDescription().getText());
+            roleTypeStr = Ts.get().getComponent(roleTypeNid).toUserString();
         } catch (IOException ex) {
-            setText(cvbi.toUserString() + " -- FSN missing");
-        } catch (ContraditionException ex) {
-            setText(cvbi.toUserString() + " -- FSN missing");
+            roleTypeStr = "role_type_error";
         }
+        String roleValueStr;
+        try {
+            roleValueStr = Ts.get().getComponent(roleValueNid).toUserString();
+        } catch (IOException ex) {
+            roleValueStr = "role_value_error";
+        }
+
+        setText(roleTypeStr + " :: " + roleValueStr);
 
         if (isSelected) {
             setBackground(jlist.getSelectionBackground());

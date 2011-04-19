@@ -22,6 +22,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
+import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
@@ -110,26 +111,20 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                 for (RefexVersionBI<?> rvbi : cr) {
                     int refexNid = rvbi.getCollectionNid();
                     existingRefsetTypes.put(refexNid, RefexStrVersionBI.class);
-                    System.out.println("!!! updateExistingLists CURRENT_REFEX UserString // " + rvbi.toUserString());
                     if (RefexStrVersionBI.class.isAssignableFrom(rvbi.getClass())) {
                         RefexStrVersionBI r = (RefexStrVersionBI) rvbi;
-                        System.out.println("!!! updateExistingLists CURRENT_REFEX getStr1: " + r.getStr1());
                     } else if (RefexBooleanVersionBI.class.isAssignableFrom(rvbi.getClass())) {
                         RefexBooleanVersionBI r = (RefexBooleanVersionBI) rvbi;
-                        System.out.println("!!! updateExistingLists CURRENT_REFEX getBoolean1: " + r.getBoolean1());
 
                         // rvbi.getRefexEditSpec() throws exception on internal index = -1
                         // RefexBooleanAnalogBI ra = (RefexBooleanAnalogBI) r.makeAnalog(r.getStatusNid(), r.getAuthorNid(), r.getPathNid(), Long.MAX_VALUE);
                         // ra.setBoolean1(true);
                     } else if (RefexCnidVersionBI.class.isAssignableFrom(rvbi.getClass())) {
                         RefexCnidVersionBI r = (RefexCnidVersionBI) rvbi;
-                        System.out.println("!!! updateExistingLists CURRENT_REFEX getCnid1: " + r.getCnid1());
                     } else if (RefexIntVersionBI.class.isAssignableFrom(rvbi.getClass())) {
                         RefexIntVersionBI r = (RefexIntVersionBI) rvbi;
-                        System.out.println("!!! updateExistingLists CURRENT_REFEX getInt1: " + r.getInt1());
                     } else if (RefexLongVersionBI.class.isAssignableFrom(rvbi.getClass())) {
                         RefexLongVersionBI r = (RefexLongVersionBI) rvbi;
-                        System.out.println("!!! updateExistingLists CURRENT_REFEX getLong1: " + r.getLong1());
                     }
                     setRefsets.add(refexNid);
                 }
@@ -303,6 +298,18 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                 if (tmpTask != null) {
                     tasks.add(tmpTask);
                 }
+            }
+
+            if (BatchActionEventReporter.getSize() > 0) {
+                StringBuilder sb = new StringBuilder("\r\n!!! BATCH ACTION TASK LAUNCH ERROR\r\n");
+                sb.append(BatchActionEventReporter.createReportTSV());
+                Logger.getLogger(BatchActionEditorPanel.class.getName()).log(Level.INFO, sb.toString());
+
+                resultsTextArea.setText(BatchActionEventReporter.createReportHTML());
+
+                String errStr = "Incomplete Batch Action Task parameters.  See results listing.";
+                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
+                return;
             }
 
             BatchActionProcessor bap = new BatchActionProcessor(concepts, tasks, ec, vc);

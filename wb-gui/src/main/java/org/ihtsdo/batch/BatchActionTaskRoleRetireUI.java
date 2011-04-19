@@ -84,6 +84,12 @@ public class BatchActionTaskRoleRetireUI extends javax.swing.JPanel implements I
 
     @Override
     public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) throws Exception {
+        // SET ROLE TYPE
+        
+
+        // SET ROLE VALUE
+        
+
         return null; // :!!!: RoleAdd.getTask
     }
 

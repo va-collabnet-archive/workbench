@@ -17,6 +17,8 @@ import javax.swing.GroupLayout;
 import javax.swing.JPanel;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
+import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
+import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -102,6 +104,8 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
             ((BatchActionTaskParentAddNew) task).setSelectedDestUuid(uuidNewParent);
             return task;
         } else {
+            BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.PARENT_ADD_NEW,
+                    BatchActionEventType.TASK_INVALID, "value not set"));
             return null;
         }
     }

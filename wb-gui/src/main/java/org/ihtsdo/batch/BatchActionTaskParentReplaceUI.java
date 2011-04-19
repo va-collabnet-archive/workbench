@@ -23,6 +23,8 @@ import javax.swing.JPanel;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.SNOMED;
+import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
+import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -184,6 +186,8 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
             ((BatchActionTaskParentReplace) task).setMoveToDestUuid(uuidNewParent);
             return task;
         } else {
+            BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.PARENT_REPLACE,
+                    BatchActionEventType.TASK_INVALID, "some value not set"));
             return null;
         }
     }

@@ -34,7 +34,6 @@ public class BatchActionEvent implements Comparable<BatchActionEvent> {
         this.actionTaskType = actionType;
         this.eventType = eventType;
         this.eventNote = eventNote;
-        System.out.println("!!! BatchActionEvent " + this);
     }
 
     @Override
