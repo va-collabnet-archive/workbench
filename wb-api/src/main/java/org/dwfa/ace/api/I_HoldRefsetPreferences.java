@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.api;
 
+import org.dwfa.ace.refset.I_RefsetDefaults;
 import org.dwfa.ace.refset.I_RefsetDefaultsBoolean;
 import org.dwfa.ace.refset.I_RefsetDefaultsConInt;
 import org.dwfa.ace.refset.I_RefsetDefaultsConcept;
@@ -28,6 +29,7 @@ import org.dwfa.ace.refset.I_RefsetDefaultsMeasurement;
 import org.dwfa.ace.refset.I_RefsetDefaultsString;
 import org.dwfa.ace.refset.I_RefsetDefaultsTemplate;
 import org.dwfa.ace.refset.I_RefsetDefaultsTemplateForRel;
+import org.dwfa.ace.refset.I_RefsetsDefaultsConConCon;
 
 public interface I_HoldRefsetPreferences {
     public I_RefsetDefaultsBoolean getBooleanPreferences();
@@ -53,5 +55,7 @@ public interface I_HoldRefsetPreferences {
     public I_RefsetDefaultsTemplate getTemplatePreferences();
 
     public I_RefsetDefaultsTemplateForRel getTemplateForRelPreferences();
+
+    public I_RefsetsDefaultsConConCon getCidCidCidPreferences();
 
 }

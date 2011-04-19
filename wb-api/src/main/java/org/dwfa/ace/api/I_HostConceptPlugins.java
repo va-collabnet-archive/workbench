@@ -21,6 +21,7 @@ import java.util.UUID;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
@@ -94,7 +95,8 @@ public interface I_HostConceptPlugins extends I_ContainTermComponent {
         CONCEPT("concept", I_ExtendByRefPartCid.class), 
         CON_INT("con int", I_ExtendByRefPartCidInt.class), 
         STRING("string", I_ExtendByRefPartStr.class), 
-        INTEGER("integer", I_ExtendByRefPartInt.class);
+        INTEGER("integer", I_ExtendByRefPartInt.class),
+        CID_CID_CID("con con con", I_ExtendByRefPartCidCidCid.class);
 
         private String interfaceName;
 

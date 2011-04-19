@@ -36,6 +36,7 @@ import org.dwfa.ace.refset.I_RefsetDefaultsMeasurement;
 import org.dwfa.ace.refset.I_RefsetDefaultsString;
 import org.dwfa.ace.refset.I_RefsetDefaultsTemplate;
 import org.dwfa.ace.refset.I_RefsetDefaultsTemplateForRel;
+import org.dwfa.ace.refset.I_RefsetsDefaultsConConCon;
 import org.dwfa.tapi.TerminologyException;
 
 public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable {
@@ -45,7 +46,7 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 4;
+    private static final int dataVersion = 5;
 
     private I_RefsetDefaultsBoolean booleanPreferences = new RefsetDefaultsBoolean();
 
@@ -70,6 +71,8 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
     private I_RefsetDefaultsTemplate templatePreferences = new RefsetDefaultsTemplate();
 
     private I_RefsetDefaultsTemplateForRel templateForRelPreferences = new RefsetDefaultsTemplateForRel();
+    
+    private I_RefsetsDefaultsConConCon conConConPreferences = new RefsetDefaultsConConCon();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -85,6 +88,7 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
         out.writeObject(templatePreferences);
         out.writeObject(templateForRelPreferences);
         out.writeObject(stringPreferences);
+        out.writeObject(conConConPreferences);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -125,6 +129,15 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
             } else {
                 try {
                     stringPreferences = new RefsetDefaultsString();
+                } catch (TerminologyException e) {
+                    throw new ToIoException(e);
+                }
+            }
+            if (objDataVersion > 4) {
+                conConConPreferences = (I_RefsetsDefaultsConConCon) in.readObject();
+            } else {
+                try {
+                    conConConPreferences = new RefsetDefaultsConConCon();
                 } catch (TerminologyException e) {
                     throw new ToIoException(e);
                 }
@@ -257,6 +270,11 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
 
     public I_RefsetDefaultsTemplateForRel getTemplateForRelPreferences() {
         return templateForRelPreferences;
+    }
+
+    @Override
+    public I_RefsetsDefaultsConConCon getCidCidCidPreferences() {
+        return conConConPreferences;
     }
 
 }

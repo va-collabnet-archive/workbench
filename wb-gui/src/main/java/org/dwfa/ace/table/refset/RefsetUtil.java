@@ -223,6 +223,29 @@ public class RefsetUtil {
                 .getConceptPopupIds());
 
             break;
+        case CID_CID_CID:
+            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, (IntList) host.getConfig()
+                .getRefsetPreferencesForToggle(toggle)
+                .getCidCidCidPreferences()
+                .getRefsetPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STATUS, (IntList) host.getConfig()
+                .getRefsetPreferencesForToggle(toggle)
+                .getCidCidCidPreferences()
+                .getStatusPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.CONCEPT_ID, (IntList) host.getConfig()
+                .getRefsetPreferencesForToggle(toggle)
+                .getCidCidCidPreferences()
+                .getConceptPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.CONCEPT_ID2, (IntList) host.getConfig()
+                .getRefsetPreferencesForToggle(toggle)
+                .getCidCidCidPreferences()
+                .getConceptPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.CONCEPT_ID3, (IntList) host.getConfig()
+                .getRefsetPreferencesForToggle(toggle)
+                .getCidCidCidPreferences()
+                .getConceptPopupIds());
+
+            break;
         case CON_INT:
             setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, (IntList) host.getConfig()
                 .getRefsetPreferencesForToggle(toggle)
