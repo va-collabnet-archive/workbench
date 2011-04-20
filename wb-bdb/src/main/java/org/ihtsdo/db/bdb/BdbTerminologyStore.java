@@ -441,7 +441,9 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         HashSet<PositionBI> positions = new HashSet<PositionBI>(sapNids.size());
         for (int sap : sapNids) {
             try {
-                positions.add(Bdb.getSapDb().getPosition(sap));
+                if (sap >= 0) {
+                    positions.add(Bdb.getSapDb().getPosition(sap));
+                }
             } catch (PathNotExistsException ex) {
                 throw new IOException(ex);
             } catch (TerminologyException ex) {
