@@ -14,6 +14,7 @@ import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
@@ -39,13 +40,13 @@ public class BatchActionTaskRefsetAddMemberUI extends javax.swing.JPanel impleme
         this.task = new BatchActionTaskRefsetAddMember();
 
         // Setup DnD Add Value Panel
-        ValueConceptDndUI tmp = new ValueConceptDndUI("To Refset:");
+        ValueDndConceptUI tmp = new ValueDndConceptUI("To Refset:");
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelDndRefsetAddTo, tmp.getPanel());
         jPanelDndRefsetAddTo = tmp.getPanel();
 
         // Setup Add Value Panel
-        tmp = new ValueConceptDndUI("Add Concept Value:");
+        tmp = new ValueDndConceptUI("Add Concept Value:");
         layout.replace(jPanelValueNew, tmp.getPanel());
         jPanelValueNew = tmp.getPanel();
 
@@ -136,7 +137,7 @@ public class BatchActionTaskRefsetAddMemberUI extends javax.swing.JPanel impleme
                     break;
                 case 1: // concept
                     // MEMBER VALUE PANEL
-                    ValueConceptDndUI tmpC = new ValueConceptDndUI("Add Concept Value:");
+                    ValueDndConceptUI tmpC = new ValueDndConceptUI("Add Concept Value:");
                     layout.replace(jPanelValueNew, tmpC.getPanel());
                     jPanelValueNew = tmpC.getPanel();
                     break;
@@ -173,7 +174,7 @@ public class BatchActionTaskRefsetAddMemberUI extends javax.swing.JPanel impleme
     }
 
     @Override // I_BatchActionTask
-    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
+    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
         // nothing to do
     }
 
@@ -182,7 +183,7 @@ public class BatchActionTaskRefsetAddMemberUI extends javax.swing.JPanel impleme
         // referenced component provided at execution time
 
         // SET REFSET DND COLLECTION NID
-        I_AmTermComponent refsetAddToCB = ((ValueConceptDndUI) jPanelDndRefsetAddTo).getTermComponent();
+        I_AmTermComponent refsetAddToCB = ((ValueDndConceptUI) jPanelDndRefsetAddTo).getTermComponent();
         if (refsetAddToCB != null) {
             ((BatchActionTaskRefsetAddMember) task).setCollectionNid(refsetAddToCB.getConceptNid());
         } else {
@@ -212,7 +213,7 @@ public class BatchActionTaskRefsetAddMemberUI extends javax.swing.JPanel impleme
 
 
         // SET DND MEMBER VALUE
-        I_AmTermComponent memberValueCB = ((ValueConceptDndUI) jPanelValueNew).getTermComponent();
+        I_AmTermComponent memberValueCB = ((ValueDndConceptUI) jPanelValueNew).getTermComponent();
         if (memberValueCB != null) {
             // :!!!: ((BatchActionTaskRefsetAddMember) task).(memberValueCB.getConceptNid());
         } else {

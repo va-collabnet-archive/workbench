@@ -111,7 +111,6 @@ public class BatchActionTaskTest {
             concepts.add(c4);
 
             // SETUP BatchActionTaskList
-            // :!!!:NYI: CREATE BatchActionTaskListParents
             List<BatchActionTask> batl = new ArrayList<BatchActionTask>();
             batl.add(new BatchActionTaskParentAddNew(isaUuid, parentToAddUuid));
             batl.add(new BatchActionTaskParentRetire(isaUuid, parentToDelUuid));

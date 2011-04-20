@@ -18,6 +18,7 @@ import javax.swing.GroupLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import org.dwfa.ace.ACE;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
 import org.ihtsdo.tk.api.ComponentVersionBI;
@@ -43,7 +44,7 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel impl
         this.task = new BatchActionTaskRefsetRetireMember();
 
         // Setup Filter Value Panel
-        ValueConceptDndUI tmp = new ValueConceptDndUI("Concept Match Value:");
+        ValueDndConceptUI tmp = new ValueDndConceptUI("Concept Match Value:");
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelValueMatch, tmp.getPanel());
         jPanelValueMatch = tmp.getPanel();
@@ -168,7 +169,7 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel impl
                     break;
                 case 1: // concept
                     // FILTER PANEL
-                    ValueConceptDndUI tmpC = new ValueConceptDndUI("Concept Match Value:");
+                    ValueDndConceptUI tmpC = new ValueDndConceptUI("Concept Match Value:");
                     layout.replace(jPanelValueMatch, tmpC.getPanel());
                     jPanelValueMatch = tmpC.getPanel();
                     break;
@@ -207,7 +208,7 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel impl
     }
 
     @Override // I_BatchActionTask
-    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
+    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingRefsets.getModel();
         ComponentVersionBI selectedItem = (ComponentVersionBI) dcbm.getSelectedItem();
 
@@ -291,7 +292,7 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel impl
                 break;
             case 1:
                 ((BatchActionTaskRefsetRetireMember) task).setRefsetType(TK_REFSET_TYPE.CID);
-                Integer valConcept = ((ValueConceptDndUI) jPanelValueMatch).getValue();
+                Integer valConcept = ((ValueDndConceptUI) jPanelValueMatch).getValue();
                 if (valConcept != null) {
                     ((BatchActionTaskRefsetRetireMember) task).setMatchValue(valConcept);
                     return task;

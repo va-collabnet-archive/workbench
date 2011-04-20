@@ -9,6 +9,7 @@ import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import org.dwfa.ace.ACE;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -187,7 +188,7 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
         }
 
         // INITIALIZE DETAIL PANEL
-        taskDetailUI.updateExisting(editor.getExistingParents(), editor.getExistingRefsets(), editor.getExistingRoles());
+        taskDetailUI.updateExisting(editor.getExistingParents(), editor.getExistingRefsets(), editor.getExistingRoles(), editor.getParentLinkages());
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelTaskDetail, taskDetailUI.getPanel());
         jPanelTaskDetail = taskDetailUI.getPanel();
@@ -218,7 +219,7 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
         return taskDetailUI.getTask(ec, vc);
     }
 
-    void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
-        taskDetailUI.updateExisting(existingParents, existingRefsets, existingRoles);
+    void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
+        taskDetailUI.updateExisting(existingParents, existingRefsets, existingRoles, parentLinkages);
     }
 }

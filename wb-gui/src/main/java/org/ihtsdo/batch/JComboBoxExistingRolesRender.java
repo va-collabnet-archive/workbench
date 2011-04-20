@@ -7,14 +7,11 @@ package org.ihtsdo.batch;
 
 import java.awt.Component;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 /**
@@ -32,7 +29,7 @@ class JComboBoxExistingRolesRender extends JLabel implements ListCellRenderer {
     public Component getListCellRendererComponent(JList jlist, Object o, int index, boolean isSelected, boolean cellHasFocus) {
         if (jlist.getModel().getSize() == 0) {
             // EMPTY CONCEPT LIST
-            setText("(add role-value to list)");
+            setText("(add relationship to list)");
             return this;
         }
 

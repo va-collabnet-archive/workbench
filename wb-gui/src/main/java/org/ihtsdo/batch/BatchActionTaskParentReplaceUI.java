@@ -15,21 +15,20 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JPanel;
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_AmTermComponent;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.SNOMED;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.dto.concept.component.TkComponent;
 
 /**
  *
@@ -45,7 +44,7 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
         this.task = new BatchActionTaskParentReplace();
 
         // Setup DnD Panel
-        ValueConceptDndUI tmp = new ValueConceptDndUI("With Parent:");
+        ValueDndConceptUI tmp = new ValueDndConceptUI("With Parent:");
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelDndParentReplace, tmp.getPanel());
         jPanelDndParentReplace = tmp.getPanel();
@@ -115,7 +114,7 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
     }
 
     @Override  // I_BatchActionTask
-    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
+    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingParents.getModel();
         ComponentVersionBI selectedItem = (ComponentVersionBI) dcbm.getSelectedItem();
 
@@ -167,22 +166,23 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
 
     @Override // I_BatchActionTask
     public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) throws IOException {
-        UUID uuidIsa = UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25");
 
         // MOVE FROM
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingParents.getModel();
-        ComponentVersionBI fromParentBI = (ComponentVersionBI) dcbm.getSelectedItem();
+        RelationshipVersionBI fromParentBI = (RelationshipVersionBI) dcbm.getSelectedItem();
 
         // MOVE TO
-        I_AmTermComponent termParentTo = ((ValueConceptDndUI) jPanelDndParentReplace).getTermComponent();
+        I_AmTermComponent termParentTo = ((ValueDndConceptUI) jPanelDndParentReplace).getTermComponent();
 
         if (fromParentBI != null && termParentTo != null && termParentTo.getUUIDs().size() > 0) {
-            int nidOldParent = fromParentBI.getNid();
+            int nidOldParent = fromParentBI.getDestinationNid();
             UUID uuidNewParent = termParentTo.getUUIDs().get(0);
-            int nidIsa = Ts.get().getConcept(SNOMED.Concept.IS_A.getUids()).getNid();
-            ((BatchActionTaskParentReplace) task).setMoveFromRoleTypeNid(nidIsa);
+            int nidLinkage = fromParentBI.getTypeNid();
+            UUID uuidLinkage = Ts.get().getConcept(nidLinkage).getPrimUuid();
+
+            ((BatchActionTaskParentReplace) task).setMoveFromRoleTypeNid(nidLinkage);
             ((BatchActionTaskParentReplace) task).setMoveFromDestNid(nidOldParent);
-            ((BatchActionTaskParentReplace) task).setMoveToRoleTypeUuid(uuidIsa);
+            ((BatchActionTaskParentReplace) task).setMoveToRoleTypeUuid(uuidLinkage);
             ((BatchActionTaskParentReplace) task).setMoveToDestUuid(uuidNewParent);
             return task;
         } else {

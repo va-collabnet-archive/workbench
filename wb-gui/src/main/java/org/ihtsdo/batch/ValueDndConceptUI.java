@@ -4,7 +4,7 @@
  */
 
 /*
- * ValueConceptDndUI.java
+ * ValueDndConceptUI.java
  *
  * Created on Apr 13, 2011, 8:31:46 AM
  */
@@ -40,10 +40,10 @@ import org.dwfa.tapi.TerminologyException;
  *
  * See also: TermComponentLabel.java, TransporterLabel.java
  */
-public class ValueConceptDndUI extends javax.swing.JPanel implements /*FocusListener,*/ I_ContainTermComponent, ClipboardOwner {
+public class ValueDndConceptUI extends javax.swing.JPanel implements /*FocusListener,*/ I_ContainTermComponent, ClipboardOwner {
 
-    /** Creates new form ValueConceptDndUI */
-    public ValueConceptDndUI(String title) {
+    /** Creates new form ValueDndConceptUI */
+    public ValueDndConceptUI(String title) {
         initComponents();
 
         setBorder(BorderFactory.createTitledBorder(title));
@@ -52,10 +52,10 @@ public class ValueConceptDndUI extends javax.swing.JPanel implements /*FocusList
         try {
             config = Terms.get().getActiveAceFrameConfig();
         } catch (TerminologyException ex) {
-            Logger.getLogger(ValueConceptDndUI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ValueDndConceptUI.class.getName()).log(Level.SEVERE, null, ex);
             jLabelComponentName.setText("config error");
         } catch (IOException ex) {
-            Logger.getLogger(ValueConceptDndUI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ValueDndConceptUI.class.getName()).log(Level.SEVERE, null, ex);
             jLabelComponentName.setText("config error");
         }
 

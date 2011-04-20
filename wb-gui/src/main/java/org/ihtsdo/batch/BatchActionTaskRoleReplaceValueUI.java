@@ -16,11 +16,11 @@ import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JPanel;
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
@@ -38,7 +38,7 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
         this.task = new BatchActionTaskRoleReplaceValue();
 
         // Setup DnD Panel
-        ValueConceptDndUI tmp = new ValueConceptDndUI("New Role Value:");
+        ValueDndConceptUI tmp = new ValueDndConceptUI("New Role Value:");
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelDndRoleValueNew, tmp.getPanel());
         jPanelDndRoleValueNew = tmp.getPanel();
@@ -118,7 +118,7 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
     }
 
     @Override // I_BatchActionTask
-    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
+    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingRoles.getModel();
         ComponentVersionBI selectedItem = (ComponentVersionBI) dcbm.getSelectedItem();
 
@@ -175,7 +175,7 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
         // SET OLD ROLE VALUE
 
         // SET NEW ROLE VALUE
-        I_AmTermComponent termRoleValue = ((ValueConceptDndUI) jPanelDndRoleValueNew).getTermComponent();
+        I_AmTermComponent termRoleValue = ((ValueDndConceptUI) jPanelDndRoleValueNew).getTermComponent();
         if (termRoleValue != null) {
             ((BatchActionTaskRoleReplaceValue) task).setValueNewNid(termRoleValue.getNid());
         } else {

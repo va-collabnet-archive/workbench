@@ -95,29 +95,45 @@ public class BatchActionEventReporter {
 
     public static String createReportHTML(EnumSet<BatchActionEventType> reportEvents) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<html><table><tr><th>Action</th><th>Status</th><th>Concept</th><th>Result</th></tr>");
+        sb.append("<html><table><font color='black' face='Dialog' size='3'>");
+        sb.append("<tr><td>Action</td><td>Status</td><td>Concept</td><td>Result</td></tr>");
+        sb.append("</font>");
         try {
             for (BatchActionEvent bae : batchActionEventList) {
                 if (reportEvents.contains(bae.getEventType())) {
                     // ACTION TYPE
-                    sb.append("<tr><td>");
+                    sb.append("<tr><td><font color='black' face='Dialog' size='3'>");
                     sb.append(bae.getActionTaskType());
                     // EVENT TYPE
-                    sb.append("</td><td>");
+                    BatchActionEventType eventType = bae.getEventType();
+                    switch (eventType) {
+                        case EVENT_ERROR:
+                        case TASK_INVALID:
+                            sb.append("</font></td><td><font color='red' face='Dialog' size='3'>");
+                            break;
+                        case EVENT_NOOP:
+                            sb.append("</font></td><td><font color='blue' face='Dialog' size='3'>");
+                            break;
+                        case EVENT_SUCCESS:
+                            sb.append("</font></td><td><font color='blue' face='Dialog' size='3'>");
+                            break;
+                        default:
+                            sb.append("</font></td><td><font color='blue' face='Dialog' size='3'>");
+                    }
                     sb.append(bae.getEventType());
                     // EVENT CONCEPT
-                    sb.append("</td><td>");
+                    sb.append("</font></td><td><font color='black' face='Dialog' size='3'>");
                     if (bae.getConceptA() != null) {
                         sb.append(bae.getConceptA().getPreferredDescription().getText());
                     }
                     // EVENT NOTE
-                    sb.append("</td><td>");
+                    sb.append("</font></td><td><font color='black' face='Dialog' size='3'>");
                     if (bae.getEventNote() != null) {
                         sb.append(bae.getEventNote());
                     } else {
                         sb.append("");
                     }
-                    sb.append("</td></tr>");
+                    sb.append("</font></td></tr>");
                 }
             }
             sb.append("</table></html>");

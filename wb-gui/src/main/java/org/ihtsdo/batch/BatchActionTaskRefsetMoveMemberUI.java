@@ -18,11 +18,11 @@ import javax.swing.GroupLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
@@ -45,13 +45,13 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
         this.task = new BatchActionTaskRefsetMoveMember();
 
         // Setup DnD Move To Panel
-        ValueConceptDndUI tmp = new ValueConceptDndUI("Move To:");
+        ValueDndConceptUI tmp = new ValueDndConceptUI("Move To:");
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelDndRefsetMoveTo, tmp.getPanel());
         jPanelDndRefsetMoveTo = tmp.getPanel();
 
         // Setup Filter Value Panel
-        tmp = new ValueConceptDndUI("Concept Match Value:");
+        tmp = new ValueDndConceptUI("Concept Match Value:");
         layout.replace(jPanelValueMatch, tmp.getPanel());
         jPanelValueMatch = tmp.getPanel();
 
@@ -182,7 +182,7 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
                     break;
                 case 1: // concept
                     // FILTER PANEL
-                    ValueConceptDndUI tmpC = new ValueConceptDndUI("Concept Match Value:");
+                    ValueDndConceptUI tmpC = new ValueDndConceptUI("Concept Match Value:");
                     layout.replace(jPanelValueMatch, tmpC.getPanel());
                     jPanelValueMatch = tmpC.getPanel();
                     break;
@@ -222,7 +222,7 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
     }
 
     @Override // I_BatchActionTask
-    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
+    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingRefsets.getModel();
         ComponentVersionBI selectedItem = (ComponentVersionBI) dcbm.getSelectedItem();
 
@@ -289,7 +289,7 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
         }
 
         // SET REFSET DND COLLECTION NID
-        I_AmTermComponent refsetMoveToCB = ((ValueConceptDndUI) jPanelDndRefsetMoveTo).getTermComponent();
+        I_AmTermComponent refsetMoveToCB = ((ValueDndConceptUI) jPanelDndRefsetMoveTo).getTermComponent();
         if (refsetMoveToCB != null) {
             ((BatchActionTaskRefsetMoveMember) task).setCollectionToNid(refsetMoveToCB.getConceptNid());
         } else {
@@ -317,7 +317,7 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
                 break;
             case 1:
                 ((BatchActionTaskRefsetMoveMember) task).setRefsetType(TK_REFSET_TYPE.CID);
-                Integer valConcept = ((ValueConceptDndUI) jPanelValueMatch).getValue();
+                Integer valConcept = ((ValueDndConceptUI) jPanelValueMatch).getValue();
                 if (valConcept != null) {
                     ((BatchActionTaskRefsetMoveMember) task).setMatchValue(valConcept);
                     return task;

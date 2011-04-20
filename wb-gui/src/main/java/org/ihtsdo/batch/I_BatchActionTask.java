@@ -6,6 +6,7 @@ package org.ihtsdo.batch;
 
 import java.util.List;
 import javax.swing.JPanel;
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -39,5 +40,5 @@ public interface I_BatchActionTask {
      * @param existingRefsets
      * @param existingRoles
      */
-    void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles);
+    void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages);
 }

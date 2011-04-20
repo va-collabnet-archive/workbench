@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.swing.GroupLayout;
 import javax.swing.JPanel;
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
@@ -35,13 +36,13 @@ public class BatchActionTaskRoleAddUI extends javax.swing.JPanel implements I_Ba
         this.task = new BatchActionTaskRoleAdd();
 
         // Setup DnD Add Role Type Panel
-        ValueConceptDndUI tmp = new ValueConceptDndUI("New Role Type:");
+        ValueDndConceptUI tmp = new ValueDndConceptUI("New Role Type:");
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelDndNewRoleType, tmp.getPanel());
         jPanelDndNewRoleType = tmp.getPanel();
 
         // Setup DnD Add Role Type Panel
-        tmp = new ValueConceptDndUI("New Role Value:");
+        tmp = new ValueDndConceptUI("New Role Value:");
         layout.replace(jPanelDndNewRoleValue, tmp.getPanel());
         jPanelDndNewRoleValue = tmp.getPanel();
 }
@@ -108,7 +109,7 @@ public class BatchActionTaskRoleAddUI extends javax.swing.JPanel implements I_Ba
     @Override
     public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) throws Exception {
         // SET ROLE TYPE
-        I_AmTermComponent termRoleType = ((ValueConceptDndUI) jPanelDndNewRoleType).getTermComponent();
+        I_AmTermComponent termRoleType = ((ValueDndConceptUI) jPanelDndNewRoleType).getTermComponent();
         if (termRoleType != null) {
             ((BatchActionTaskRoleAdd) task).setRoleNid(termRoleType.getNid());
         } else {
@@ -118,9 +119,9 @@ public class BatchActionTaskRoleAddUI extends javax.swing.JPanel implements I_Ba
         }
 
         // SET ROLE VALUE
-        I_AmTermComponent termRoleValue = ((ValueConceptDndUI) jPanelDndNewRoleValue).getTermComponent();
+        I_AmTermComponent termRoleValue = ((ValueDndConceptUI) jPanelDndNewRoleValue).getTermComponent();
         if (termRoleValue != null) {
-            ((BatchActionTaskRoleAdd) task).setRoleNid(termRoleValue.getNid());
+            ((BatchActionTaskRoleAdd) task).setValueNid(termRoleValue.getNid());
         } else {
             BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.ROLE_ADD,
                     BatchActionEventType.TASK_INVALID, "value not set"));
@@ -131,7 +132,7 @@ public class BatchActionTaskRoleAddUI extends javax.swing.JPanel implements I_Ba
     }
 
     @Override
-    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
+    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
         // nothing to do
     }
 }

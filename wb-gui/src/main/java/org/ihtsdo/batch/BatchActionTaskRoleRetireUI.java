@@ -8,12 +8,15 @@
  *
  * Created on Apr 16, 2011, 11:01:14 PM
  */
-
 package org.ihtsdo.batch;
 
 import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.JPanel;
+import org.dwfa.ace.ACE;
+import org.dwfa.ace.api.I_AmTermComponent;
+import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
+import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -22,7 +25,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
  *
  * @author marc
  */
-public class BatchActionTaskRoleRetireUI extends javax.swing.JPanel implements I_BatchActionTask{
+public class BatchActionTaskRoleRetireUI extends javax.swing.JPanel implements I_BatchActionTask {
 
     BatchActionTask task;
 
@@ -31,11 +34,16 @@ public class BatchActionTaskRoleRetireUI extends javax.swing.JPanel implements I
         initComponents();
         task = new BatchActionTaskRoleRetire();
 
-        // Setup DnD Add Role Type Panel
-        ValueConceptDndUI tmp = new ValueConceptDndUI("Role To Retire:");
+        // Setup DnD Retire Role Type Panel
+        ValueDndConceptUI tmp = new ValueDndConceptUI("Role Type:");
         GroupLayout layout = (GroupLayout) this.getLayout();
-        layout.replace(jPanelDndRoleRetire, tmp.getPanel());
-        jPanelDndRoleRetire = tmp.getPanel();
+        layout.replace(jPanelDndRetireRoleType, tmp.getPanel());
+        jPanelDndRetireRoleType = tmp.getPanel();
+
+        // Setup DnD Retire Role Type Panel
+        tmp = new ValueDndConceptUI("Role Value:");
+        layout.replace(jPanelDndRetireRoleValue, tmp.getPanel());
+        jPanelDndRetireRoleValue = tmp.getPanel();
     }
 
     /** This method is called from within the constructor to
@@ -47,34 +55,49 @@ public class BatchActionTaskRoleRetireUI extends javax.swing.JPanel implements I
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanelDndRoleRetire = new javax.swing.JPanel();
+        jPanelDndRetireRoleType = new javax.swing.JPanel();
+        jPanelDndRetireRoleValue = new javax.swing.JPanel();
 
-        javax.swing.GroupLayout jPanelDndRoleRetireLayout = new javax.swing.GroupLayout(jPanelDndRoleRetire);
-        jPanelDndRoleRetire.setLayout(jPanelDndRoleRetireLayout);
-        jPanelDndRoleRetireLayout.setHorizontalGroup(
-            jPanelDndRoleRetireLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout jPanelDndRetireRoleTypeLayout = new javax.swing.GroupLayout(jPanelDndRetireRoleType);
+        jPanelDndRetireRoleType.setLayout(jPanelDndRetireRoleTypeLayout);
+        jPanelDndRetireRoleTypeLayout.setHorizontalGroup(
+            jPanelDndRetireRoleTypeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 400, Short.MAX_VALUE)
         );
-        jPanelDndRoleRetireLayout.setVerticalGroup(
-            jPanelDndRoleRetireLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        jPanelDndRetireRoleTypeLayout.setVerticalGroup(
+            jPanelDndRetireRoleTypeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 39, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanelDndRetireRoleValueLayout = new javax.swing.GroupLayout(jPanelDndRetireRoleValue);
+        jPanelDndRetireRoleValue.setLayout(jPanelDndRetireRoleValueLayout);
+        jPanelDndRetireRoleValueLayout.setHorizontalGroup(
+            jPanelDndRetireRoleValueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        jPanelDndRetireRoleValueLayout.setVerticalGroup(
+            jPanelDndRetireRoleValueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 37, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanelDndRoleRetire, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanelDndRetireRoleType, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanelDndRetireRoleValue, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanelDndRoleRetire, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanelDndRetireRoleType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanelDndRetireRoleValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanelDndRoleRetire;
+    private javax.swing.JPanel jPanelDndRetireRoleType;
+    private javax.swing.JPanel jPanelDndRetireRoleValue;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -85,17 +108,30 @@ public class BatchActionTaskRoleRetireUI extends javax.swing.JPanel implements I
     @Override
     public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) throws Exception {
         // SET ROLE TYPE
-        
+        I_AmTermComponent termRoleType = ((ValueDndConceptUI) jPanelDndRetireRoleType).getTermComponent();
+        if (termRoleType != null) {
+            ((BatchActionTaskRoleRetire) task).setRoleNid(termRoleType.getNid());
+        } else {
+            BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.ROLE_RETIRE,
+                    BatchActionEventType.TASK_INVALID, "role type not set"));
+            return null;
+        }
 
         // SET ROLE VALUE
-        
+        I_AmTermComponent termRoleValue = ((ValueDndConceptUI) jPanelDndRetireRoleValue).getTermComponent();
+        if (termRoleValue != null) {
+            ((BatchActionTaskRoleRetire) task).setValueNid(termRoleValue.getNid());
+        } else {
+            BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.ROLE_RETIRE,
+                    BatchActionEventType.TASK_INVALID, "role value not set"));
+            return null;
+        }
 
-        return null; // :!!!: RoleAdd.getTask
+        return task;
     }
 
     @Override
-    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
+    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
         // nothing to do
     }
-
 }

@@ -13,9 +13,12 @@ package org.ihtsdo.batch;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JPanel;
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
@@ -39,8 +42,10 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
         initComponents();
         this.task = new BatchActionTaskParentAddNew();
 
+        // Setup Linkage Types
+
         // Setup DnD Panel
-        ValueConceptDndUI tmp = new ValueConceptDndUI("New Parent:");
+        ValueDndConceptUI tmp = new ValueDndConceptUI("New Parent:");
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelDndNewParent, tmp.getPanel());
         jPanelDndNewParent = tmp.getPanel();
@@ -55,7 +60,11 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jComboBoxLinkage = new javax.swing.JComboBox();
         jPanelDndNewParent = new javax.swing.JPanel();
+
+        jComboBoxLinkage.setModel(jComboBoxLinkage.getModel());
+        jComboBoxLinkage.setRenderer(new org.ihtsdo.batch.JComboBoxExistingParentsRender());
 
         javax.swing.GroupLayout jPanelDndNewParentLayout = new javax.swing.GroupLayout(jPanelDndNewParent);
         jPanelDndNewParent.setLayout(jPanelDndNewParentLayout);
@@ -65,21 +74,28 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
         );
         jPanelDndNewParentLayout.setVerticalGroup(
             jPanelDndNewParentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 53, Short.MAX_VALUE)
+            .addGap(0, 41, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanelDndNewParent, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jComboBoxLinkage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+            .addComponent(jPanelDndNewParent, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanelDndNewParent, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jComboBoxLinkage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanelDndNewParent, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox jComboBoxLinkage;
     private javax.swing.JPanel jPanelDndNewParent;
     // End of variables declaration//GEN-END:variables
 
@@ -89,15 +105,52 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
     }
 
     @Override // I_BatchActionTask
-    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
-        // nothing to do.
+    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
+        DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxLinkage.getModel();
+        ComponentVersionBI selectedItem = (ComponentVersionBI) dcbm.getSelectedItem();
+
+        dcbm.removeAllElements();
+        for (ComponentVersionBI componentVersionBI : parentLinkages) {
+            dcbm.addElement(componentVersionBI);
+        }
+
+                if (dcbm.getSize() == 0) {
+            // empty list
+        } else if (selectedItem == null) {
+            // no prior selection
+            dcbm.setSelectedItem(dcbm.getElementAt(0));
+        } else {
+            // Search by nid
+            int selectedIdx = -1;
+            for (int i = 0; i < dcbm.getSize(); i++) {
+                ComponentVersionBI cvbi = (ComponentVersionBI) dcbm.getElementAt(i);
+                if (cvbi.getNid() == selectedItem.getNid()) {
+                    selectedIdx = i;
+                    selectedItem = cvbi;
+                    break;
+                }
+            }
+
+            if (selectedIdx >= 0) {
+                // prior selection exists in new list
+                dcbm.setSelectedItem(selectedItem);
+                jComboBoxLinkage.setSelectedIndex(selectedIdx);
+            } else {
+                // prior selection does not exist in new list
+                dcbm.setSelectedItem(dcbm.getElementAt(0));
+                jComboBoxLinkage.setSelectedIndex(0);
+            }
+        }
     }
 
     @Override // I_BatchActionTask
     public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) throws IOException {
-        // UUID isaUuid = TermAux.IS_A.getUuids()[0];
-        UUID uuidIsa = UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25");
-        I_AmTermComponent termNewParent = ((ValueConceptDndUI) jPanelDndNewParent).getTermComponent();
+
+        DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxLinkage.getModel();
+        ConceptVersionBI fromParentBI = (ConceptVersionBI) dcbm.getSelectedItem();
+        UUID uuidIsa = fromParentBI.getPrimUuid();
+
+        I_AmTermComponent termNewParent = ((ValueDndConceptUI) jPanelDndNewParent).getTermComponent();
         if (termNewParent != null && termNewParent.getUUIDs().size() > 0) {
             UUID uuidNewParent = termNewParent.getUUIDs().get(0);
             ((BatchActionTaskParentAddNew) task).setSelectedRoleTypeUuid(uuidIsa);

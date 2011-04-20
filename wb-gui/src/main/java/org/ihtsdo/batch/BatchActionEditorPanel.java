@@ -13,7 +13,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
@@ -27,7 +26,6 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.RelAssertionType;
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -57,6 +55,7 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
     private List<ComponentVersionBI> existingParents;
     private List<ComponentVersionBI> existingRefsets;
     private List<ComponentVersionBI> existingRoles;
+    private List<ComponentVersionBI> parentLinkages;
     private Map<Integer, Class> existingRefsetTypes;
 
     public List<ComponentVersionBI> getExistingParents() {
@@ -75,11 +74,16 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
         return existingRoles;
     }
 
+    public List<ComponentVersionBI> getParentLinkages() {
+        return parentLinkages;
+    }
+
     public void updateExistingLists(ListModel termList) {
         existingParents = new ArrayList<ComponentVersionBI>();
         existingRefsets = new ArrayList<ComponentVersionBI>();
         existingRoles = new ArrayList<ComponentVersionBI>();
         existingRefsetTypes = new HashMap<Integer, Class>();
+        parentLinkages = new ArrayList<ComponentVersionBI>();
 
         LinkedHashSet<Integer> setParents = new LinkedHashSet<Integer>();
         LinkedHashSet<Integer> setRefsets = new LinkedHashSet<Integer>();
@@ -102,11 +106,11 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                 for (RelationshipChronicleBI rel : cb.getRelsIncoming()) {
                     RelationshipVersionBI rv = rel.getVersion(vc);
                     if (rv != null && rv.isStated() /* :!!!: && rv.isActive(ace.getAceFrameConfig().getAllowedStatus())*/) {
-                        setRoles.add(rv.getTypeNid());
+                        setRoles.add(rv.getNid());
                     }
                 }
 
-                // :!!!: EXISTING REFSETS
+                //
                 Collection<? extends RefexVersionBI<?>> cr = cb.getCurrentRefexes(vc);
                 for (RefexVersionBI<?> rvbi : cr) {
                     int refexNid = rvbi.getCollectionNid();
@@ -151,9 +155,15 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                 }
             }
 
+            int[] types = ace.aceFrameConfig.getDestRelTypes().getSetValues();
+            for (int typeNid : types) {
+                ComponentVersionBI cvbi = ts.getComponentVersion(vc, typeNid);
+                parentLinkages.add(cvbi);
+            }
+
             // UPDATE TASK DETAILS
             for (BatchActionTaskBase baet : batchActionEditTaskList) {
-                baet.updateExisting(existingParents, existingRefsets, existingRoles);
+                baet.updateExisting(existingParents, existingRefsets, existingRoles, parentLinkages);
             }
 
         } catch (ContraditionException ex) {
@@ -333,7 +343,7 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
         // CREATE NEW TASK
         BatchActionTaskBase batb = new BatchActionTaskBase(this);
         batb.setTaskParentUI(this);
-        batb.updateExisting(existingParents, existingRefsets, existingRoles);
+        batb.updateExisting(existingParents, existingRefsets, existingRoles, parentLinkages);
         batb.setEnabled(true);
         batb.setVisible(true);
         batb.invalidate();

@@ -14,19 +14,15 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
-import org.dwfa.cement.SNOMED;
+import org.dwfa.ace.ACE;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
-import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 /**
  *
@@ -86,7 +82,7 @@ public class BatchActionTaskParentRetireUI extends javax.swing.JPanel implements
     }
 
     @Override // I_BatchActionTask
-    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles) {
+    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingParents.getModel();
         ComponentVersionBI selectedItem = (ComponentVersionBI) dcbm.getSelectedItem();
 
@@ -133,19 +129,19 @@ public class BatchActionTaskParentRetireUI extends javax.swing.JPanel implements
                 jComboBoxExistingParents.setSelectedIndex(0);
             }
         }
-
     }
 
     @Override // I_BatchActionTask
     public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) throws IOException {
         // RETIRE PARENT
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingParents.getModel();
-        ComponentVersionBI fromParentBI = (ComponentVersionBI) dcbm.getSelectedItem();
+        RelationshipVersionBI fromParentBI = (RelationshipVersionBI) dcbm.getSelectedItem();
 
         if (fromParentBI != null) {
-            int nidIsa = Ts.get().getConcept(SNOMED.Concept.IS_A.getUids()).getNid();
-            int nidParent = fromParentBI.getNid();
-            ((BatchActionTaskParentRetire) task).setSelectedRoleTypeNid(nidIsa);
+            int nidLinkage = fromParentBI.getTypeNid();
+            int nidParent = fromParentBI.getDestinationNid();
+
+            ((BatchActionTaskParentRetire) task).setSelectedRoleTypeNid(nidLinkage);
             ((BatchActionTaskParentRetire) task).setSelectedDestNid(nidParent);
             return task;
         } else {
