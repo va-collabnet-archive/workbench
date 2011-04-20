@@ -117,6 +117,7 @@ public class LoadBdbMulti extends AbstractMojo {
             new NamedThreadFactory(loadBdbMultiDbThreadGroup, "converter "));
     LinkedBlockingQueue<I_ProcessEConcept> converters = new LinkedBlockingQueue<I_ProcessEConcept>();
     private int runtimeConverterSize = Runtime.getRuntime().availableProcessors() * 2;
+    private int converterSize = 1;
 
     @Override
     public void execute() throws MojoExecutionException {
@@ -127,7 +128,7 @@ public class LoadBdbMulti extends AbstractMojo {
     void executeMojo(String[] conceptsFileNames, String generatedResources,
             File berkeleyDir) throws MojoExecutionException {
         try {
-            for (int i = 0; i < runtimeConverterSize; i++) {
+            for (int i = 0; i < converterSize; i++) {
                 converters.put(new ConvertConcept());
             }
 
