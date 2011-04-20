@@ -517,8 +517,8 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 									new I_ConceptualizeUniversally[] {EN_TEXT_WITH_DIALECT_VARIANTS}),
 					 EN_NZ_TEXT_VARIANTS(new String[] { "New Zealand English text variants", "en-NZ text variants" }, 
 									new I_ConceptualizeUniversally[] {EN_TEXT_WITH_DIALECT_VARIANTS}),
-			//synonymy refset
-			SYNONYMY (new String[] { "Degree of Synonmy", "Degree of Synonmy" }, 
+			
+			SYNONYMY (new String[] { "Degree of Synonymy", "Degree of Synonymy" }, 
 						new I_ConceptualizeUniversally[] { REFSET_IDENTITY }), 
 									
 			INTERNATIONAL_RELEASE(new String[] { "International Release Refsets", "International Release Refsets" }, 
