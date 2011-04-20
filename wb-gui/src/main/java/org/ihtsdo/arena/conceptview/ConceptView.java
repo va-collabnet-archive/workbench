@@ -148,8 +148,8 @@ public class ConceptView extends JPanel {
         private ConceptVersionBI cv;
         private Collection<? extends RefexVersionBI<?>> memberRefsets;
         private ViewCoordinate coordinate;
-        private Collection<? extends RelGroupVersionBI> relGroups;
-        private Collection<? extends RelGroupVersionBI> inactiveRelGroups;
+        private Collection<RelGroupVersionBI> statedRelGroups;
+        private Collection<RelGroupVersionBI> inferredRelGroups;
         private List<? extends I_DescriptionTuple> descriptions;
         private List<? extends I_DescriptionTuple> inactiveDescriptions;
         private I_GetConceptData layoutConcept;
@@ -184,6 +184,7 @@ public class ConceptView extends JPanel {
                         config.getPrecedence(), config.getConflictResolutionStrategy(),
                         coordinate.getClassifierNid(), coordinate.getRelAssertionType());
                 inactiveStatedRels.removeAll(statedRels);
+                statedRelGroups = (Collection<RelGroupVersionBI>) Ts.get().getConceptVersion(coordinate, layoutConcept.getNid()).getRelGroups();
 
                 coordinate.setRelAssertionType(RelAssertionType.INFERRED);
                 inferredRels = layoutConcept.getSourceRelTuples(config.getAllowedStatus(),
@@ -195,12 +196,14 @@ public class ConceptView extends JPanel {
                         config.getPrecedence(), config.getConflictResolutionStrategy(),
                         coordinate.getClassifierNid(), coordinate.getRelAssertionType());
                 inactiveInferredRels.removeAll(inferredRels);
+                inferredRelGroups = (Collection<RelGroupVersionBI>) Ts.get().getConceptVersion(coordinate, layoutConcept.getNid()).getRelGroups();
+
 
                 cv = Ts.get().getConceptVersion(
                         config.getViewCoordinate(), layoutConcept.getNid());
                 //get refsets
                 memberRefsets = cv.getCurrentRefsetMembers();
-                relGroups = Ts.get().getConceptVersion(coordinate, layoutConcept.getNid()).getRelGroups();
+
 
 
                 // Get active descriptions
@@ -429,38 +432,11 @@ public class ConceptView extends JPanel {
                         }
 
                         try {
-                            for (RelGroupVersionBI rg : relGroups) {
-                                Collection<? extends RelationshipVersionBI> currentRels =
-                                        rg.getCurrentRels(); //TODO getCurrentRels
-                                if (!currentRels.isEmpty()) {
-                                    if (!cprAdded) {
-                                        add(cpr, gbc);
-                                        gbc.gridy++;
-                                        cprAdded = true;
-                                    }
-                                    boolean show = false;
-                                    for (RelationshipVersionBI rv : rg.getCurrentRels()) {
-                                        if (rv.isStated() && settings.showStated()) {
-                                            show = true;
-                                            break;
-                                        } else if (rv.isInferred() && settings.showInferred()) {
-                                            show = true;
-                                            break;
-                                        }
-                                    }
-
-                                    if (show) {
-                                        DragPanelRelGroup rgc = getRelGroupComponent(rg, cpr);
-                                        seperatorComponents.add(rgc);
-                                        add(rgc, gbc);
-                                        gbc.gridy++;
-                                        cpr.setAlertCount(cpr.alertCount += rgc.getAlertSubpanelCount());
-                                        cpr.setRefexCount(cpr.refexCount += rgc.getRefexSubpanelCount());
-                                        cpr.setHistoryCount(cpr.historyCount += rgc.getHistorySubpanelCount());
-                                        cpr.setTemplateCount(cpr.templateCount += rgc.getTemplateSubpanelCount());
-                                    }
-
-                                }
+                            if (settings.showStated()) {
+                                addRelGroups(statedRelGroups, cprAdded, cpr, gbc);
+                            }
+                            if (settings.showInferred()) {
+                                addRelGroups(inferredRelGroups, cprAdded, cpr, gbc);
                             }
                         } catch (ContraditionException e) {
                             AceLog.getAppLog().alertAndLogException(e);
@@ -519,6 +495,31 @@ public class ConceptView extends JPanel {
                         settings.getNavigator().updateHistoryPanel();
                     }
                 });
+            }
+        }
+
+        private void addRelGroups(Collection<RelGroupVersionBI> relGroups, 
+                boolean cprAdded, CollapsePanel cpr, 
+                GridBagConstraints gbc) throws IOException, TerminologyException, ContraditionException {
+            for (RelGroupVersionBI rg : relGroups) {
+                Collection<? extends RelationshipVersionBI> currentRels =
+                        rg.getCurrentRels(); //TODO getCurrentRels
+                if (!currentRels.isEmpty()) {
+                    if (!cprAdded) {
+                        add(cpr, gbc);
+                        gbc.gridy++;
+                        cprAdded = true;
+                    }
+
+                    DragPanelRelGroup rgc = getRelGroupComponent(rg, cpr);
+                    seperatorComponents.add(rgc);
+                    add(rgc, gbc);
+                    gbc.gridy++;
+                    cpr.setAlertCount(cpr.alertCount += rgc.getAlertSubpanelCount());
+                    cpr.setRefexCount(cpr.refexCount += rgc.getRefexSubpanelCount());
+                    cpr.setHistoryCount(cpr.historyCount += rgc.getHistorySubpanelCount());
+                    cpr.setTemplateCount(cpr.templateCount += rgc.getTemplateSubpanelCount());
+                }
             }
         }
 

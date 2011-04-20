@@ -78,7 +78,7 @@ public class RelGroupVersion
         assert rg != null;
         assert coordinate != null;
         this.rg = rg;
-        this.coordinate = coordinate;
+        this.coordinate = new ViewCoordinate(coordinate);
         setupLatest();
     }
 

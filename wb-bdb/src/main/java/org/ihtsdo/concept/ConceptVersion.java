@@ -66,7 +66,7 @@ public class ConceptVersion implements ConceptVersionBI {
     public ConceptVersion(Concept concept, ViewCoordinate coordinate) {
         super();
         this.concept = concept;
-        this.vc = coordinate;
+        this.vc = new ViewCoordinate(coordinate);
     }
 
     @Override
