@@ -40,6 +40,7 @@ import org.ihtsdo.arena.context.action.MakeAcceptableAction;
 import org.ihtsdo.arena.context.action.MakeNotAcceptableAction;
 import org.ihtsdo.arena.context.action.MakePreferredAction;
 import org.ihtsdo.arena.context.action.GroupRelsAction;
+import org.ihtsdo.arena.context.action.SetSynonymyAction;
 
 
 import org.ihtsdo.tk.drools.facts.ComponentFact;
@@ -68,6 +69,7 @@ import org.ihtsdo.tk.example.binding.TermAux;
 import org.ihtsdo.tk.example.binding.WbDescType;
 import org.ihtsdo.arena.spec.Refsets; 
 import org.ihtsdo.arena.spec.AcceptabilityType;
+import org.ihtsdo.arena.spec.SynonymyType;
 
 
 
@@ -369,4 +371,49 @@ rule "rule 21" #rel (w/o group) onto rel (w/o group): create new rel group"
 
    then
       actions.add(new GroupRelsAction("group rels", $dropObject, $dropTarget));
+end
+
+rule "rule 22" #set degree of synonymy if not set
+	when
+		$dropTarget: DescFact(this not isMemberOf Refsets.DEGREE_OF_SYNONYMY,
+							  this.component.typeNid == WbDescType.SYNONYM.lenient.nid,
+							  context == Context.DROP_TARGET)
+		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new SetSynonymyAction("synonymous", $dropTarget, SynonymyType.SYNONYM, false));
+		actions.add(new SetSynonymyAction("near synonym", $dropTarget, SynonymyType.NEAR_SYNONYMOUS, false));
+		actions.add(new SetSynonymyAction("non synonymous", $dropTarget, SynonymyType.NON_SYNONYMOUS, false));
+end
+
+rule "rule 23" #change synonymy from synonymous
+	when
+		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.SYNONYM,
+							  this.component.typeNid == WbDescType.SYNONYM.lenient.nid,
+							  context == Context.DROP_TARGET)
+		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new SetSynonymyAction("near synonym", $dropTarget, SynonymyType.NEAR_SYNONYMOUS, true));
+		actions.add(new SetSynonymyAction("non synonymous", $dropTarget, SynonymyType.NON_SYNONYMOUS, true));
+end
+
+rule "rule 24" #change synonymy from near synonymous
+	when
+		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.NEAR_SYNONYMOUS,
+							  this.component.typeNid == WbDescType.SYNONYM.lenient.nid,
+							  context == Context.DROP_TARGET)
+		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new SetSynonymyAction("synonym", $dropTarget, SynonymyType.SYNONYM, true));
+		actions.add(new SetSynonymyAction("non synonymous", $dropTarget, SynonymyType.NON_SYNONYMOUS, true));
+end
+
+rule "rule 25" #change synonymy from non synonymous
+	when
+		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.NON_SYNONYMOUS,
+							  this.component.typeNid == WbDescType.SYNONYM.lenient.nid,
+							  context == Context.DROP_TARGET)
+		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new SetSynonymyAction("synonym", $dropTarget, SynonymyType.SYNONYM, true));
+		actions.add(new SetSynonymyAction("near synonymous", $dropTarget, SynonymyType.NEAR_SYNONYMOUS, true));
 end
