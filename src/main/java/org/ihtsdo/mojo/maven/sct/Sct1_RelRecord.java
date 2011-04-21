@@ -145,6 +145,7 @@ class Sct1_RelRecord implements Comparable<Object>, Serializable {
     // method required for object to be sortable (comparable) in arrays
     // SORT ORDER MATTERS WHEN ATTACHING IDS
     // THIS SORT MUST RETAIN UUID AT THE PRIMARY SORT ORDER
+    @Override
     public int compareTo(Object obj) {
         Sct1_RelRecord tmp = (Sct1_RelRecord) obj;
         // :yyy: return this.uuid.compareTo(tmp.uuid);
@@ -184,6 +185,7 @@ class Sct1_RelRecord implements Comparable<Object>, Serializable {
     }
 
     // Create string to show some input fields for exception reporting
+    @Override
     public String toString() {
         UUID uuid = new UUID(relUuidMsb, relUuidLsb); // :yyy:
         return uuid + TAB_CHARACTER + relSnoId + TAB_CHARACTER + status + TAB_CHARACTER
