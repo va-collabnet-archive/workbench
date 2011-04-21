@@ -47,9 +47,11 @@ import org.ihtsdo.tk.drools.IsKindOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsMemberOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsMissingDescForDialectEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsParentMemberOfEvaluatorDefinition;
+import org.ihtsdo.tk.drools.IsSynonymMemberTypeOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsUsMemberTypeOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.SatisfiesConstraintEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsGbMemberTypeOfEvaluatorDefinition;
+
 
 /**
  *
@@ -67,7 +69,7 @@ public class DroolsExecutionManager {
         IS_KIND_OF, SAFISFIES_CONSTRAINT,
         IS_MEMBER_OF, IS_PARENT_MEMBER_OF,
         IS_MISSING_DESC_FOR, IS_GB_MEMBER_TYPE_OF,
-        IS_US_MEMBER_TYPE_OF;
+        IS_US_MEMBER_TYPE_OF, IS_SYNONYM_MEMBER_TYPE_OF;
     }
     private boolean failed = false;
     Collection<KnowledgePackage> kpkgs = null;
@@ -165,6 +167,12 @@ public class DroolsExecutionManager {
             builderConfig.setOption(EvaluatorOption.get(
                     IsUsMemberTypeOfEvaluatorDefinition.IS_US_MEMBER_TYPE_OF.getOperatorString(),
                     new IsUsMemberTypeOfEvaluatorDefinition()));
+        }
+        
+        if (extraEvaluators.contains(ExtraEvaluators.IS_SYNONYM_MEMBER_TYPE_OF)) {
+            builderConfig.setOption(EvaluatorOption.get(
+                    IsSynonymMemberTypeOfEvaluatorDefinition.IS_SYNONYM_MEMBER_TYPE_OF.getOperatorString(),
+                    new IsSynonymMemberTypeOfEvaluatorDefinition()));
         }
 
 
