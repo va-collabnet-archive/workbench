@@ -176,7 +176,7 @@ public class ConceptCB extends CreateOrAmendBlueprint {
     public DescCAB getPreferredCAB() throws IOException {
         return new DescCAB(
                 getComponentUuid(),
-                WbDescType.PREFERRED.getLenient().getPrimUuid(),
+                WbDescType.SYNONYM.getLenient().getPrimUuid(), //from PREFERRED
                 getLang(),
                 getPreferredName(),
                 isInitialCaseSensitive());
