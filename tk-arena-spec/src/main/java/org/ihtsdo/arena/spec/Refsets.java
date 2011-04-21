@@ -33,6 +33,10 @@ public class Refsets {
 	public static ConceptSpec VTM = 
 		new ConceptSpec("VTM refset", 
 						UUID.fromString("e65ea362-72d4-3641-bfba-fe4429eea6f9"));
+	
+	public static ConceptSpec DEGREE_OF_SYNONYMY = 
+		new ConceptSpec("Degree of Synonymy", 
+						UUID.fromString("a8dd0021-4994-36b2-a0f5-567b7e007847"));
 	/*
 	public static ConceptSpec CONCEPT_INACTIVATION = 
 		new ConceptSpec("Concept inactivation refset", 
