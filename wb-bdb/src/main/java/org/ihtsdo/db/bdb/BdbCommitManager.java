@@ -54,6 +54,7 @@ import org.dwfa.svn.Svn;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.concept.Concept;
+import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.concept.component.description.Description;
@@ -67,9 +68,13 @@ import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.thread.NamedThreadFactory;
+import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
 
 public class BdbCommitManager {
@@ -829,6 +834,8 @@ public class BdbCommitManager {
     public static void forget(I_ExtendByRef extension) throws IOException {
         RefsetMember m = (RefsetMember) extension;
         Concept c = Bdb.getConcept(m.getRefsetId());
+        ComponentBI component = Bdb.getComponent(m.getComponentNid());
+        ConceptComponent comp = (ConceptComponent) component;
         if (m.getTime() != Long.MAX_VALUE) {
             // Only need to forget additional versions;
             if (m.revisions == null) {
@@ -852,8 +859,12 @@ public class BdbCommitManager {
             }
         } else {
             // have to forget "all" references to component...
-            c.getRefsetMembers().remove(m);
-            c.getData().getMemberNids().remove(m.getMemberId());
+        	if (c.isAnnotationStyleRefex()) {
+        		comp.getAnnotationsMod().remove(m);
+        	} else {
+                c.getRefsetMembers().remove(m);
+                c.getData().getMemberNids().remove(m.getMemberId());
+        	}
             m.setStatusAtPositionNid(-1);
         }
         c.modified();
