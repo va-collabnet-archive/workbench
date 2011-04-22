@@ -875,6 +875,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
         return Collections.unmodifiableCollection(annotations);
     }
+	
+	
+	public ConcurrentSkipListSet<RefexChronicleBI<?>> getAnnotationsMod() {
+		return annotations; 
+	}
 
     /**
      * Call when data has changed, so concept updates it's version.
