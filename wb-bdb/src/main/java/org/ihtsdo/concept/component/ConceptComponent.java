@@ -293,13 +293,13 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 ViewCoordinate xyz) throws IOException {
             return ConceptComponent.this.getCurrentRefexes(xyz);
         }
-        
+
         @Override
         public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(
                 ViewCoordinate xyz) throws IOException {
             return ConceptComponent.this.getInactiveRefexes(xyz);
         }
-        
+
         @Override
         public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
                 ViewCoordinate xyz) throws IOException {
@@ -351,17 +351,17 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         public List<? extends I_IdPart> getMutableIdParts() {
             return ConceptComponent.this.getMutableIdParts();
         }
-        
+
         @Override
         public List<? extends I_IdPart> getVisibleIds(PositionSet viewpointSet, int... authorityNids) {
-        	return ConceptComponent.this.getVisibleIds(viewpointSet, authorityNids);
+            return ConceptComponent.this.getVisibleIds(viewpointSet, authorityNids);
         }
-        
+
         @Override
         public List<? extends I_IdPart> getVisibleIds(PositionSet viewpointSet) {
-        	return ConceptComponent.this.getVisibleIds(viewpointSet);
+            return ConceptComponent.this.getVisibleIds(viewpointSet);
         }
-        
+
         @Override
         @Deprecated
         public Set<TimePathId> getTimePathSet() {
@@ -854,20 +854,20 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     @Override
     public List<? extends I_IdPart> getVisibleIds(PositionSet viewpointSet,
-    		int... authorityNids) {
-    	List<I_IdPart> visibleIdParts = new ArrayList<I_IdPart>();
-		VersionComputer versionComputer = new VersionComputer();
-		visibleIdParts.addAll(versionComputer.getSpecifiedIdParts(viewpointSet, getMutableIdParts(), authorityNids));
-		
-		return visibleIdParts;
-    }
-    
-    @Override
-    public List<? extends I_IdPart> getVisibleIds(PositionSet viewpointSet) {
-    	return getVisibleIds(viewpointSet, new int[] {});
+            int... authorityNids) {
+        List<I_IdPart> visibleIdParts = new ArrayList<I_IdPart>();
+        VersionComputer versionComputer = new VersionComputer();
+        visibleIdParts.addAll(versionComputer.getSpecifiedIdParts(viewpointSet, getMutableIdParts(), authorityNids));
+
+        return visibleIdParts;
     }
 
-	@Override
+    @Override
+    public List<? extends I_IdPart> getVisibleIds(PositionSet viewpointSet) {
+        return getVisibleIds(viewpointSet, new int[]{});
+    }
+
+    @Override
     public Collection<? extends RefexChronicleBI<?>> getAnnotations() {
         if (annotations == null) {
             return Collections.unmodifiableCollection(
@@ -2030,8 +2030,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             component = ((Concept) component).getConceptAttributes();
         }
         ComponentChroncileBI<?> cc = (ComponentChroncileBI<?>) component;
-        for (RefexChronicleBI<?> annotation : cc.getAnnotations()) {
-            returnValues.add(annotation);
+        Collection<? extends RefexChronicleBI<?>> annotations = cc.getAnnotations();
+        if (annotations != null) {
+            for (RefexChronicleBI<?> annotation : annotations) {
+                returnValues.add(annotation);
+            }
         }
         return Collections.unmodifiableCollection(returnValues);
     }
@@ -2110,5 +2113,4 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public boolean isActive(NidSetBI allowedStatusNids) {
         return allowedStatusNids.contains(getStatusNid());
     }
-    
 }
