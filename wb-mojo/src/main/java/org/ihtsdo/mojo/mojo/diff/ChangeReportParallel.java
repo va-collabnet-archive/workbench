@@ -34,36 +34,37 @@ import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
  */
 public class ChangeReportParallel extends ChangeReportBase {
 
-	protected void processConcepts() throws Exception {
-		Ts.get().iterateConceptDataInSequence(new Processor());
-	}
+    @Override
+    protected void processConcepts() throws Exception {
+        Ts.get().iterateConceptDataInSequence(new Processor());
+    }
 
-	private class Processor implements ProcessUnfetchedConceptDataBI {
+    private class Processor implements ProcessUnfetchedConceptDataBI {
 
-		AtomicInteger i = new AtomicInteger();
-		NidBitSetBI allConcepts;
-		long beg;
+        AtomicInteger i = new AtomicInteger();
+        NidBitSetBI allConcepts;
+        long beg;
 
-		public Processor() throws IOException {
-			allConcepts = Ts.get().getAllConceptNids();
-			beg = System.currentTimeMillis();
-		}
+        public Processor() throws IOException {
+            allConcepts = Ts.get().getAllConceptNids();
+            beg = System.currentTimeMillis();
+        }
 
-		@Override
-		public void processUnfetchedConceptData(int cNid,
-				ConceptFetcherBI fetcher) throws Exception {
-			I_GetConceptData c = (I_GetConceptData) fetcher.fetch();
-			processConcept(c, i.incrementAndGet(), beg);
-		}
+        @Override
+        public void processUnfetchedConceptData(int cNid,
+                ConceptFetcherBI fetcher) throws Exception {
+            I_GetConceptData c = (I_GetConceptData) fetcher.fetch();
+            processConcept(c, i.incrementAndGet(), beg);
+        }
 
-		@Override
-		public NidBitSetBI getNidSet() throws IOException {
-			return allConcepts;
-		}
+        @Override
+        public NidBitSetBI getNidSet() throws IOException {
+            return allConcepts;
+        }
 
-		@Override
-		public boolean continueWork() {
-			return true;
-		}
-	}
+        @Override
+        public boolean continueWork() {
+            return true;
+        }
+    }
 }
