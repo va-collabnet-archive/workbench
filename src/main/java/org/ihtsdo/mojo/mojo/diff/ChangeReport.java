@@ -32,18 +32,18 @@ import org.dwfa.ace.api.Terms;
  */
 public class ChangeReport extends ChangeReportBase {
 
-	protected void processConcepts() throws Exception {
-		I_TermFactory tf = Terms.get();
-		getLog().info("Getting concepts in DFS order.");
-		ArrayList<Integer> all_concepts = getAllConcepts();
-		getLog().info("Processing: " + all_concepts.size());
-		long beg = System.currentTimeMillis();
-		int i = 0;
-		for (int id : all_concepts) {
-			I_GetConceptData c = tf.getConcept(id);
-			i++;
-			processConcept(c, i, beg);
-		}
-	}
-
+    @Override
+    protected void processConcepts() throws Exception {
+        I_TermFactory tf = Terms.get();
+        getLog().info("Getting concepts in DFS order.");
+        ArrayList<Integer> all_concepts = getAllConcepts();
+        getLog().info("Processing: " + all_concepts.size());
+        long beg = System.currentTimeMillis();
+        int i = 0;
+        for (int id : all_concepts) {
+            I_GetConceptData c = tf.getConcept(id);
+            i++;
+            processConcept(c, i, beg);
+        }
+    }
 }
