@@ -121,6 +121,21 @@ public class ConceptViewSettings extends ArenaComponentSettings {
         return "empty";
     }
 
+       
+    public boolean isNavigatorSetup() {
+        if (navigator == null) {
+            return false;
+        }
+        if (getConfig() == null) {
+            return false;
+        }
+        
+        if (getConfig().getConceptViewer(linkedTab) == null) {
+            return false;
+        }
+        return true;
+    }
+
     @Override
     public I_HostConceptPlugins getHost() {
         if (linkedTab != null && linkedTab != -1) {
@@ -290,6 +305,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
         layers.add(getNavigator(), JLayeredPane.PALETTE_LAYER);
     }
 
+ 
     protected ConceptNavigator getNavigator() {
         if (navigator == null) {
             try {

@@ -2000,6 +2000,18 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public I_HostConceptPlugins getConceptViewer(int index) {
+        if (aceFrame == null) {
+            return null;
+        }
+        if (aceFrame.getCdePanel() == null) {
+            return null;
+        }
+        if (aceFrame.getCdePanel().getConceptPanels() == null) {
+            return null;
+        }
+        if (index > aceFrame.getCdePanel().getConceptPanels().size()) {
+            return null;
+        }
         if (index == 0) {
             return aceFrame.getCdePanel().getConceptPanels().get(index);
         }

@@ -281,7 +281,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         throw new UnsupportedOperationException();
     }
 
-     public long convertToThickVersion(String dateStr)  {
+    public long convertToThickVersion(String dateStr) {
         throw new UnsupportedOperationException();
     }
 
@@ -1176,15 +1176,29 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         assert pathConcept != null && pathConcept.getConceptNid() != 0;
         ArrayList<PositionBI> originList = new ArrayList<PositionBI>();
         if (origins != null) {
+            if (origins.size() > 1) {
+                // find any duplicates
+                HashMap<Integer, PositionBI> originMap = new HashMap<Integer, PositionBI>();
+                for (PositionBI p: origins) {
+                    if (originMap.containsKey(p.getPath().getConceptNid())) {
+                        PositionBI first = originMap.get(p.getPath().getConceptNid());
+                        if (first.getTime() < p.getTime()) {
+                            originMap.put(p.getPath().getConceptNid(), p);
+                        }
+                    } else {
+                        originMap.put(p.getPath().getConceptNid(), p);
+                    }
+                }
+                origins = originMap.values();
+            }
             originList.addAll(origins);
+
         }
         Path newPath = new Path(pathConcept.getConceptNid(), originList);
         AceLog.getEditLog().fine("writing new path: \n" + newPath);
         pathManager.write(newPath, commitConfig);
         return newPath;
     }
-
-
 
     @Override
     public Position newPosition(PathBI path, long time) throws TerminologyException, IOException {

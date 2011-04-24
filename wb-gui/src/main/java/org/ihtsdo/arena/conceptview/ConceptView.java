@@ -108,7 +108,10 @@ public class ConceptView extends JPanel {
 
                         @Override
                         public void run() {
-                            settings.getNavigator().updateHistoryPanel();
+                            if (settings.isNavigatorSetup()) {
+                                settings.getNavigator().updateHistoryPanel();
+                            }
+                            
                         }
                     });
                 }
