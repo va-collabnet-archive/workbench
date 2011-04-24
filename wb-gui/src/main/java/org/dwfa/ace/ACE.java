@@ -1339,16 +1339,23 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         menuItem.setActionCommand("Copy XML");
         menuItem.addActionListener(actionListener);
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
-                + java.awt.event.InputEvent.SHIFT_MASK));
+                + java.awt.event.InputEvent.SHIFT_DOWN_MASK));
         editMenu.add(menuItem);
 
         menuItem = new JMenuItem("Copy Tab Delimited Text");
         menuItem.setActionCommand("Copy TDT");
         menuItem.addActionListener(actionListener);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
-                + java.awt.event.InputEvent.ALT_MASK));
         editMenu.add(menuItem);
 
+        menuItem = new JMenuItem("Copy SCT ID");
+        menuItem.setActionCommand("Copy SCT ID");
+        menuItem.addActionListener(actionListener);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
+                + java.awt.event.InputEvent.ALT_DOWN_MASK));
+        editMenu.add(menuItem);
+
+
+        
         menuBar.add(editMenu);
     }
 

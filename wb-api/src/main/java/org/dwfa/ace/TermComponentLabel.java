@@ -70,6 +70,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 import sun.awt.dnd.SunDragSourceContextPeer;
@@ -265,6 +266,41 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
         }
     }
 
+    private class CopySctId extends AbstractAction {
+
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                StringBuffer buff = new StringBuffer();
+                if (getTermComponent() == null) {
+                } else {
+                    I_GetConceptData concept = (I_GetConceptData) getTermComponent();
+                    for (I_IdVersion idv: concept.getIdentifier().getIdVersions()) {
+                        if (idv.getAuthorityNid() == 
+                                ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid()) {
+                            writeIdentifiersToBuff(buff, idv);
+                        }
+                    }
+                 }
+                StringSelection transferable = new StringSelection(buff.toString());
+
+                clipboard.setContents(transferable, TermComponentLabel.this);
+            } catch (Exception ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
+
+        private void writeIdentifiersToBuff(StringBuffer buff, I_IdVersion idt) throws IOException {
+            buff.append(idt.getDenotation().toString());
+        }
+    }
+
     private class DragGestureListenerWithImage implements DragGestureListener {
 
         DragSourceListener dsl;
@@ -339,6 +375,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
         map.put("deleteTask", new DeleteAction());
         map.put("Copy TDT", new CopyTDT());
         map.put("Copy XML", new CopyXML());
+        map.put("Copy SCT ID", new CopySctId());
         setBorder(noFocusBorder);
     }
     private static final Border hasFocusBorder = UIManager.getBorder("List.focusCellHighlightBorder");

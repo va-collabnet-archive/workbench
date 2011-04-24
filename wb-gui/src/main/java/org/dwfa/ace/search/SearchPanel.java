@@ -101,10 +101,11 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
             searchPhraseField.selectAll();
             searchPhraseField.requestFocusInWindow();
         }
-
     }
 
     private class FilterSearchActionListener implements ActionListener {
+
+        @Override
         public void actionPerformed(ActionEvent e) {
             config.setSearchWithDescTypeFilter(searchWithDescTypeFilter.isSelected());
         }
@@ -112,6 +113,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
     public class MaximizeSearchListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             JToggleButton toggle = (JToggleButton) e.getSource();
             criterion.setVisible(!toggle.isSelected());
@@ -121,13 +123,13 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
             saveButton.setVisible(!toggle.isSelected());
             searchButton.setVisible(!toggle.isSelected());
             searchPhraseField.setVisible(!toggle.isSelected());
-			if (searchTypeCombo.getSelectedItem().equals(REFSET_QUERY)) {
-				searchPhraseField.setVisible(false);
-				refsetIdentityField.setVisible(!toggle.isSelected());
-			} else {
-				searchPhraseField.setVisible(!toggle.isSelected());
-				refsetIdentityField.setVisible(false);
-			}
+            if (searchTypeCombo.getSelectedItem().equals(REFSET_QUERY)) {
+                searchPhraseField.setVisible(false);
+                refsetIdentityField.setVisible(!toggle.isSelected());
+            } else {
+                searchPhraseField.setVisible(!toggle.isSelected());
+                refsetIdentityField.setVisible(false);
+            }
             searchTypeCombo.setVisible(!toggle.isSelected());
             addButton.setVisible(!toggle.isSelected());
             removeButton.setVisible(!toggle.isSelected());
@@ -139,11 +141,11 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
                 test.setVisible(toggle.isSelected());
             }
         }
-
     }
 
     public class AddToList implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 JList conceptList = config.getBatchConceptList();
@@ -162,11 +164,11 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
         }
-
     }
 
     public class SaveQuery implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 // Create a file dialog box to prompt for a new file to display
@@ -174,7 +176,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
                 QueryBean qb = new QueryBean(searchPhraseField.getText(), extraCriterion);
                 FileDialog f =
                         new FileDialog((Frame) SearchPanel.this.getTopLevelAncestor(), "Save query (.query)",
-                            FileDialog.SAVE);
+                        FileDialog.SAVE);
                 File searchFolder = new File("search");
                 f.setDirectory(searchFolder.getAbsolutePath());
                 f.setVisible(true); // Display dialog and wait for response
@@ -194,17 +196,19 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
         }
-
     }
 
     public class LoadQuery implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 FileDialog dialog = new FileDialog(new Frame(), "Select query");
                 File searchFolder = new File("search");
                 dialog.setDirectory(searchFolder.getAbsolutePath());
                 dialog.setFilenameFilter(new FilenameFilter() {
+
+                    @Override
                     public boolean accept(File dir, String name) {
                         return name.endsWith(".query");
                     }
@@ -230,11 +234,13 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
     private class SearchSelectionListener implements ListSelectionListener {
 
+        @Override
         public void valueChanged(ListSelectionEvent e) {
             try {
                 // Ignore extra messages.
-                if (e.getValueIsAdjusting())
+                if (e.getValueIsAdjusting()) {
                     return;
+                }
 
                 ListSelectionModel lsm = (ListSelectionModel) e.getSource();
                 if (lsm.isSelectionEmpty()) {
@@ -251,7 +257,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
                     if (linkType == LINK_TYPE.TREE_LINK) {
                         try {
                             new ExpandPathToNodeStateListener((JTreeWithDragImage) config.getTreeInTaxonomyPanel(), config,
-                                cb);
+                                    cb);
                             config.setHierarchySelection(cb);
                         } catch (IOException e1) {
                             AceLog.getAppLog().alertAndLogException(e1);
@@ -264,12 +270,11 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
                 AceLog.getAppLog().alertAndLogException(e1);
             }
         }
-
     }
 
     private class LinkListModel extends AbstractSpinnerModel {
-        ImageIcon[] items;
 
+        ImageIcon[] items;
         int currentSelection = 0;
 
         public LinkListModel(ImageIcon[] items) {
@@ -282,6 +287,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
             this.currentSelection = currentSelection;
         }
 
+        @Override
         public Object getNextValue() {
             currentSelection++;
             if (currentSelection >= items.length) {
@@ -290,6 +296,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
             return getValue();
         }
 
+        @Override
         public Object getPreviousValue() {
             currentSelection--;
             if (currentSelection < 0) {
@@ -298,10 +305,12 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
             return getValue();
         }
 
+        @Override
         public Object getValue() {
             return items[currentSelection];
         }
 
+        @Override
         public void setValue(Object value) {
             for (int i = 0; i < items.length; i++) {
                 if (items[i] == value) {
@@ -312,13 +321,13 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
             }
             fireStateChanged();
         }
-
     }
 
     private class LinkEditor extends JLabel implements ChangeListener {
+
         /**
-		 * 
-		 */
+         * 
+         */
         private static final long serialVersionUID = 1L;
 
         public LinkEditor(JSpinner spinner) {
@@ -360,6 +369,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
             }
         }
 
+        @Override
         public void stateChanged(ChangeEvent e) {
             JSpinner mySpinner = (JSpinner) (e.getSource());
             LinkListModel myModel = (LinkListModel) (mySpinner.getModel());
@@ -367,64 +377,40 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
             updateToolTipText(mySpinner);
         }
     }
-
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
-
     private JTextField searchPhraseField;
     private TermComponentLabel refsetIdentityField;
-
     private DescriptionsFromCollectionTableModel model;
-
     private JButton searchButton;
-
     private static final String LUCENE_QUERY = "lucene query";
     private static final String REGEX_QUERY = "regex query";
     private static final String REFSET_QUERY = "refset query";
-    private static final String[] QUERY_TYPES = { LUCENE_QUERY, REGEX_QUERY, REFSET_QUERY };
-
+    private static final String[] QUERY_TYPES = {LUCENE_QUERY, REGEX_QUERY, REFSET_QUERY};
     private JComboBox searchTypeCombo;
-
     private JButton searchSetting;
-
     private JButton stopButton;
-
     private JProgressBar progressBar;
-
     private JTableWithDragImage descTable;
-
     private Set<I_ContainTermComponent> linkedComponents = new HashSet<I_ContainTermComponent>();
-
     private I_ConfigAceFrame config;
-
     List<CriterionPanel> criterionPanels = new ArrayList<CriterionPanel>();
-
     private JPanel criterion = new JPanel();
-
     private JButton loadButton;
-
     private JButton saveButton;
-
     private JToggleButton showHistory;
-
-    private JToggleButton searchWithDescTypeFilter;;
+    private JToggleButton searchWithDescTypeFilter;
+    ;
 
     private List<I_TestSearchResults> extraCriterion;
-
     private JButton addToList;
-
     private JButton addButton;
-
     private JButton removeButton;
-
     private JButton eraseButton;
-
     private LINK_TYPE linkType = LINK_TYPE.UNLINKED;
-
     private JSpinner linkSpinner;
-
     private int lastSelectedRow = -1;
 
     public SearchPanel(I_ConfigAceFrame config, ACE ace) throws TerminologyException, IOException {
@@ -433,11 +419,13 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "search");
         this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "search");
         this.getActionMap().put("search", new AbstractAction("Search on enter") {
+
             /**
              * 
              */
             private static final long serialVersionUID = 1L;
 
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 startSearch();
             }
@@ -469,9 +457,10 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
         gbc.fill = GridBagConstraints.BOTH;
         searchTypeCombo = new JComboBox(QUERY_TYPES) {
+
             /**
-			 * 
-			 */
+             * 
+             */
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -502,27 +491,26 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
                 d.width = getMinimumSize().width;
                 return d;
             }
-
         };
         searchTypeCombo.setSelectedItem(LUCENE_QUERY);
         searchTypeCombo.setMinimumSize(new Dimension(175, 20));
         add(searchTypeCombo, gbc);
         searchTypeCombo.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (searchTypeCombo.getSelectedItem().equals(REFSET_QUERY)) {
-					searchPhraseField.setVisible(false);
-					refsetIdentityField.setVisible(true);
-					refsetIdentityField.revalidate();
-					revalidate();
-				} else {
-					searchPhraseField.setVisible(true);
-					refsetIdentityField.setVisible(false);
-				}
-				
-			}
-		});
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (searchTypeCombo.getSelectedItem().equals(REFSET_QUERY)) {
+                    searchPhraseField.setVisible(false);
+                    refsetIdentityField.setVisible(true);
+                    refsetIdentityField.revalidate();
+                    revalidate();
+                } else {
+                    searchPhraseField.setVisible(true);
+                    refsetIdentityField.setVisible(false);
+                }
+
+            }
+        });
 
         gbc.weightx = 1;
         gbc.gridx++;
@@ -531,7 +519,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         this.searchPhraseField.setMinimumSize(new Dimension(400, 20));
         this.searchPhraseField.setText("search");
         add(searchPhraseField, gbc);
-        
+
         refsetIdentityField = new TermComponentLabel();
         refsetIdentityField.setVisible(false);
         refsetIdentityField.setMinimumSize(new Dimension(400, 20));
@@ -607,8 +595,8 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         gbc.gridx++;
         showHistory = new JToggleButton(new ImageIcon(ACE.class.getResource("/24x24/plain/history.png")));
         showHistory.setToolTipText("<html>when selected, shows descriptions with any status value (including"
-            + "<br>historical descriptions). When not selected, shows only the descriptions "
-            + "<br>with the allowed status values set in the preferences.");
+                + "<br>historical descriptions). When not selected, shows only the descriptions "
+                + "<br>with the allowed status values set in the preferences.");
         add(showHistory, gbc);
         gbc.gridx++;
 
@@ -654,8 +642,8 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         gbc.gridheight = 1;
 
         model =
-                new DescriptionsFromCollectionTableModel(new DESC_FIELD[] { DESC_FIELD.SCORE, DESC_FIELD.STATUS,
-                                                                           DESC_FIELD.TEXT, DESC_FIELD.TYPE }, config);
+                new DescriptionsFromCollectionTableModel(new DESC_FIELD[]{DESC_FIELD.SCORE, DESC_FIELD.STATUS,
+                    DESC_FIELD.TEXT, DESC_FIELD.TYPE}, config);
         descTable = new JTableWithDragImage(model);
         descTable.setAutoCreateColumnsFromModel(true);
         SortClickListener.setupSorter(descTable);
@@ -702,12 +690,13 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
     public void setQuery(QueryBean qb) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         searchPhraseField.setText(qb.getQueryString());
         criterionPanels.clear();
-        for (I_TestSearchResults criterion : qb.getExtraCriterion()) {
-            criterionPanels.add(new CriterionPanel(this, criterion));
+        for (I_TestSearchResults queryCriterion : qb.getExtraCriterion()) {
+            criterionPanels.add(new CriterionPanel(this, queryCriterion));
         }
         layoutCriterion();
     }
 
+    @Override
     public void layoutCriterion() {
         criterion.removeAll();
         criterion.setLayout(new GridBagLayout());
@@ -737,6 +726,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         this.doLayout();
     }
 
+    @Override
     public CriterionPanel makeCriterionPanel() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         return new CriterionPanel(this);
     }
@@ -752,22 +742,22 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
     private void startSearch() {
         lastSelectedRow = -1;
         updateExtraCriterion();
-        
+
         if (searchTypeCombo.getSelectedItem().equals(REFSET_QUERY)) {
-        	if (refsetIdentityField.getTermComponent() == null) {
-        		return;
-        	}
+            if (refsetIdentityField.getTermComponent() == null) {
+                return;
+            }
             setShowProgress(true);
             model.setDescriptions(new ArrayList<I_DescriptionVersioned<?>>());
-            ACE.threadPool.execute(new SearchRefsetWorker(this, model, 
-            		(I_GetConceptData) refsetIdentityField.getTermComponent(), config));
-        	
+            ACE.threadPool.execute(new SearchRefsetWorker(this, model,
+                    (I_GetConceptData) refsetIdentityField.getTermComponent(), config));
+
         } else if (searchPhraseField.getText().length() > 1) {
             if (checkLuceneQuery(searchPhraseField.getText())) {
                 setShowProgress(true);
                 model.setDescriptions(new ArrayList<I_DescriptionVersioned<?>>());
                 ACE.threadPool.execute(new SearchStringWorker(this, model, searchPhraseField.getText(), config,
-                    searchTypeCombo.getSelectedItem().equals(LUCENE_QUERY)));
+                        searchTypeCombo.getSelectedItem().equals(LUCENE_QUERY)));
             }
         } else if (searchPhraseField.getText().length() == 0) {
             if (this.extraCriterion.size() > 0) {
@@ -776,12 +766,12 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
                 ACE.threadPool.execute(new SearchAllWorker(this, model, config));
             } else {
                 JOptionPane.showMessageDialog(getRootPane(),
-                    "<html>Unindexed search (a search with an empty query string),<br>"
+                        "<html>Unindexed search (a search with an empty query string),<br>"
                         + "requires at least one advanced search criterion. ", "Search Error", JOptionPane.ERROR_MESSAGE);
             }
         } else {
             JOptionPane.showMessageDialog(getRootPane(), "The search string must be longer than 1 character: "
-                + searchPhraseField.getText(), "Search Error", JOptionPane.ERROR_MESSAGE);
+                    + searchPhraseField.getText(), "Search Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -855,7 +845,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
                     if (queryParts[i].contains("*")) {
                         if (queryParts[i].length() < 4) {
                             JOptionPane.showMessageDialog(this, "The wildcard clause '" + queryParts[i]
-                                + "' must start with at least 3 characters before the *.");
+                                    + "' must start with at least 3 characters before the *.");
                             return false;
                         }
                     }
@@ -883,14 +873,15 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
             selectedRow = descTable.getSelectedRow();
         }
         if (selectedRow >= 0) {
-        int modelRow = descTable.convertRowIndexToModel(selectedRow);
-        I_DescriptionTuple tuple = model.getDescription(modelRow);
-        return tuple;
+            int modelRow = descTable.convertRowIndexToModel(selectedRow);
+            I_DescriptionTuple tuple = model.getDescription(modelRow);
+            return tuple;
         } else {
             return null;
-    }
+        }
     }
 
+    @Override
     public List<CriterionPanel> getCriterionPanels() {
         return criterionPanels;
     }
@@ -900,12 +891,11 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
             @Override
             public void run() {
-            	if (searchPhraseField.isVisible()) {
-            		searchPhraseField.selectAll();
-                	searchPhraseField.requestFocusInWindow();
-            	}
+                if (searchPhraseField.isVisible()) {
+                    searchPhraseField.selectAll();
+                    searchPhraseField.requestFocusInWindow();
+                }
             }
         });
     }
-
 }
