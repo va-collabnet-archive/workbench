@@ -88,6 +88,7 @@ class Sct1_DesRecord implements Comparable<Object>, Serializable {
     }
 
     // method required for object to be sortable (comparable) in arrays
+    @Override
     public int compareTo(Object obj) {
         Sct1_DesRecord o2 = (Sct1_DesRecord) obj;
         int thisMore = 1;
@@ -180,6 +181,7 @@ class Sct1_DesRecord implements Comparable<Object>, Serializable {
     }
 
     // Create string to show some input fields for exception reporting
+    @Override
     public String toString() {
         return desSnoId + TAB_CHARACTER + status + TAB_CHARACTER + conSnoId + TAB_CHARACTER
                 + termText + TAB_CHARACTER + capStatus + TAB_CHARACTER + descriptionType

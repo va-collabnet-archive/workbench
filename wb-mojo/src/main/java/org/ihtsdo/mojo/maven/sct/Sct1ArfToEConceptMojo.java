@@ -113,6 +113,8 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
  * &lt;dateStop&gt;        yyyy.mm.dd -- filter excludes files after stopDate
  * &lt;uuidSnorocket&gt;   uuid -- Snorocket User UUID for defining inferred relationships
  * &lt;uuidUser&gt;        uuid -- User UUID if not a defining inferred relationship
+ * &lt;rf2Mapping&gt;        true= maps preferred description type to synomym like RF2
+ *                     false=retains strict RF1 description type
  * &lt;includeCTV3ID&gt;     true | false
  * &lt;includeSNOMEDRTID&gt; true | false
  * 
@@ -4777,7 +4779,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                             // MAKE CURRENT NEW USER
                             a2[r2].revTime = revTime;
                             oos.writeUnshared(a2[r2]);
-                            
+
                             // Update master via pointer assignment
                             a1[r1] = a2[r2];
                             r1++;
@@ -4829,7 +4831,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                             break;
 
                         case 8: // MODIFIED LOGICAL RELATIONSHIP, CHANGED SNOMED_ID, CHANGED USER
-                             // RETIRE PREVIOUS USER
+                            // RETIRE PREVIOUS USER
                             a1[r1].status = 1; // RETIRE OLD USER
                             a1[r1].revTime = revTime;
                             oos.writeUnshared(a1[r1]);
@@ -5065,7 +5067,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             return false;
         }
         if (older != 0 && newer != 0) // both not defining
+        {
             return false;
+        }
         return true;
     }
 

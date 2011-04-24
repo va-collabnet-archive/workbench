@@ -41,7 +41,13 @@ import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.mojo.maven.rf1.Rf1Dir;
 
 /**
- * 
+ * <b>INPUTS:</b>
+ * <pre>
+ * &lt;targetSubDir&gt;    subdirname -- working sub directly under build directory
+ * &lt;rf2Mapping&gt;        true= maps preferred description type to synomym like RF2
+ *                     false=retains strict RF1 description type
+ * </pre>
+
  * @author marc
  *
  * @goal sct1-descriptions-to-refset
