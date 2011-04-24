@@ -71,7 +71,9 @@ public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
         }
 
         public IsKindOfEvaluator(final ValueType type, final boolean isNegated) {
-            super(type, isNegated ? IsKindOfEvaluatorDefinition.NOT_IS_KIND_OF : IsKindOfEvaluatorDefinition.IS_KIND_OF);
+            super(type, isNegated ? 
+                    IsKindOfEvaluatorDefinition.NOT_IS_KIND_OF : 
+                    IsKindOfEvaluatorDefinition.IS_KIND_OF);
         }
 
         @Override
