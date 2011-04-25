@@ -2024,15 +2024,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             }
         }
 
-        ComponentBI component =
-                Bdb.getComponent(nid);
+        ComponentBI component = this;
         if (component instanceof Concept) {
             component = ((Concept) component).getConceptAttributes();
         }
         ComponentChroncileBI<?> cc = (ComponentChroncileBI<?>) component;
-        Collection<? extends RefexChronicleBI<?>> annotations = cc.getAnnotations();
-        if (annotations != null) {
-            for (RefexChronicleBI<?> annotation : annotations) {
+        Collection<? extends RefexChronicleBI<?>> fetchedAnnotations = cc.getAnnotations();
+        if (fetchedAnnotations != null) {
+            for (RefexChronicleBI<?> annotation : fetchedAnnotations) {
                 returnValues.add(annotation);
             }
         }
