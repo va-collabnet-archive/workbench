@@ -2024,6 +2024,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             }
         }
 
+        ComponentBI c1 = Bdb.getComponent(nid);
+        if (c1 == null) {
+            c1 = Bdb.getComponent(nid);
+        }
         ComponentBI component = this;
         if (component instanceof Concept) {
             component = ((Concept) component).getConceptAttributes();
