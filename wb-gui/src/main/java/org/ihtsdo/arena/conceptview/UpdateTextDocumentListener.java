@@ -27,6 +27,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.spec.AcceptabilityType;
+import org.ihtsdo.arena.spec.Refsets;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
@@ -62,25 +63,39 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
          super();
          this.editorPane = editorPane;
          this.desc = desc;
-         t = new Timer(10000, this);
-         t.start();
+         t = new Timer(20000, this);
          c = Terms.get().getConcept(desc.getConceptNid());
          
       }
       
       @Override
       public void insertUpdate(DocumentEvent e) {
-         update = true;
+    	  if(t.isRunning()){
+    		  t.restart();
+    	  }else{
+    		  t.start();
+    	  }
+          update = true;
       }
       
       @Override
       public void removeUpdate(DocumentEvent e) {
-         update = true;
+    	  if(t.isRunning()){
+    		  t.restart();
+    	  }else{
+    		  t.start();
+    	  }
+          update = true;
       }
       
       @Override
       public void changedUpdate(DocumentEvent e) {
-         update = true;
+    	  if(t.isRunning()){
+    		  t.restart();
+    	  }else{
+    		  t.start();
+    	  }
+          update = true;
       }
       
       @Override
@@ -220,7 +235,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
       	                    TK_REFSET_TYPE.CID,
       	                    desc.getNid(),
       	                    Ts.get().getNidForUuids(UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd")));
-      	           refexSpecGb.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.ACCEPTABLE.getLenient().getPrimUuid()));
+      	           refexSpecGb.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
       	           RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
     	           
     	           I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getConceptNid());
@@ -232,7 +247,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
      	                    TK_REFSET_TYPE.CID,
      	                    desc.getNid(),
      	                    Ts.get().getNidForUuids(UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6")));
-     	           refexSpecUs.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.ACCEPTABLE.getLenient().getPrimUuid()));
+     	           refexSpecUs.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
      	           RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
      	           
          	       RefexCAB refexSpecGb = new RefexCAB(
