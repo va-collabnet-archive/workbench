@@ -49,38 +49,38 @@ import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
-public class EConcept extends  TkConcept implements I_AmChangeSetObject {
+public class EConcept extends TkConcept implements I_AmChangeSetObject {
+
     public static final long serialVersionUID = 1;
-    
+
     protected static Collection<? extends I_ExtendByRef> getRefsetMembers(int nid) throws TerminologyException, IOException {
         return Terms.get().getRefsetExtensionMembers(nid);
     }
-
 
     public static TkRefsetAbstractMember<?> convertRefsetMember(I_ExtendByRef m) throws TerminologyException, IOException {
         REFSET_TYPES type = REFSET_TYPES.nidToType(m.getTypeNid());
         if (type != null) {
             switch (type) {
-            case CID:
-                return new ERefsetCidMember(m);
-            case CID_CID:
-                return new ERefsetCidCidMember(m);
-            case CID_CID_CID:
-                return new ERefsetCidCidCidMember(m);
-            case CID_CID_STR:
-                return new ERefsetCidCidStrMember(m);
-            case INT:
-                return new ERefsetIntMember(m);
-            case MEMBER:
-                return new ERefsetMemberMember(m);
-            case STR:
-                return new ERefsetStrMember(m);
-            case CID_INT:
-                return new ERefsetCidIntMember(m);
-            case LONG:
-                return new ERefsetCidLongMember(m);
-            default:
-                throw new UnsupportedOperationException("Cannot handle: " + type);
+                case CID:
+                    return new ERefsetCidMember(m);
+                case CID_CID:
+                    return new ERefsetCidCidMember(m);
+                case CID_CID_CID:
+                    return new ERefsetCidCidCidMember(m);
+                case CID_CID_STR:
+                    return new ERefsetCidCidStrMember(m);
+                case INT:
+                    return new ERefsetIntMember(m);
+                case MEMBER:
+                    return new ERefsetMemberMember(m);
+                case STR:
+                    return new ERefsetStrMember(m);
+                case CID_INT:
+                    return new ERefsetCidIntMember(m);
+                case LONG:
+                    return new ERefsetCidLongMember(m);
+                default:
+                    throw new UnsupportedOperationException("Cannot handle: " + type);
             }
         } else {
             AceLog.getAppLog().severe("Can't handle refset type: " + m);
@@ -88,39 +88,37 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
         return null;
     }
 
-
     public static void convertId(I_Identify id, TkComponent<?> component) throws TerminologyException, IOException {
         boolean primordialWritten = false;
         int partCount = id.getMutableIdParts().size() - 1;
         if (partCount > 0) {
-        	component.additionalIds = new ArrayList<TkIdentifier>(partCount);
+            component.additionalIds = new ArrayList<TkIdentifier>(partCount);
             for (I_IdPart idp : id.getMutableIdParts()) {
                 Object denotation = idp.getDenotation();
                 switch (IDENTIFIER_PART_TYPES.getType(denotation.getClass())) {
-                case LONG:
-                	component.additionalIds.add(new EIdentifierLong(idp));
-                    break;
-                case STRING:
-                	component.additionalIds.add(new EIdentifierString(idp));
-                    break;
-                case UUID:
-                    if (primordialWritten) {
-                    	component.additionalIds.add(new EIdentifierUuid(idp));
-                    } else {
-                    	component.primordialUuid = (UUID) idp.getDenotation();
-                        primordialWritten = true;
-                    }
-                    break;
-                default:
-                    throw new UnsupportedOperationException();
+                    case LONG:
+                        component.additionalIds.add(new EIdentifierLong(idp));
+                        break;
+                    case STRING:
+                        component.additionalIds.add(new EIdentifierString(idp));
+                        break;
+                    case UUID:
+                        if (primordialWritten) {
+                            component.additionalIds.add(new EIdentifierUuid(idp));
+                        } else {
+                            component.primordialUuid = (UUID) idp.getDenotation();
+                            primordialWritten = true;
+                        }
+                        break;
+                    default:
+                        throw new UnsupportedOperationException();
                 }
 
             }
         } else {
-        	component.primordialUuid = (UUID) id.getUUIDs().get(0);
+            component.primordialUuid = (UUID) id.getUUIDs().get(0);
         }
     }
-
 
     /**
      * CID = Component IDentifier
@@ -129,62 +127,62 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
      * 
      */
     public enum REFSET_TYPES {
-        MEMBER(1, RefsetAuxiliary.Concept.MEMBER_TYPE, I_ExtendByRefPart.class), 
-        CID(2, RefsetAuxiliary.Concept.CONCEPT_EXTENSION, I_ExtendByRefPartCid.class), 
-        CID_CID(3, RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION, I_ExtendByRefPartCidCid.class), 
-        CID_CID_CID(4, RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION, I_ExtendByRefPartCidCidCid.class), 
-        CID_CID_STR(5, RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION, I_ExtendByRefPartCidCidString.class), 
-        STR(6, RefsetAuxiliary.Concept.STRING_EXTENSION, I_ExtendByRefPartStr.class), 
-        INT(7, RefsetAuxiliary.Concept.INT_EXTENSION, I_ExtendByRefPartInt.class), 
-        CID_INT(8, RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION, I_ExtendByRefPartCidInt.class), 
-        BOOLEAN(9, RefsetAuxiliary.Concept.BOOLEAN_EXTENSION, I_ExtendByRefPartBoolean.class), 
-        CID_STR(10, RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION, I_ExtendByRefPartStr.class), 
-        CID_FLOAT(11, RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION, I_ExtendByRefPartCidFloat.class), 
-        CID_LONG(12, RefsetAuxiliary.Concept.CID_LONG_EXTENSION, I_ExtendByRefPartCidLong.class), 
-        LONG(13, RefsetAuxiliary.Concept.LONG_EXTENSION, I_ExtendByRefPartLong.class); 
 
+        MEMBER(1, RefsetAuxiliary.Concept.MEMBER_TYPE, I_ExtendByRefPart.class),
+        CID(2, RefsetAuxiliary.Concept.CONCEPT_EXTENSION, I_ExtendByRefPartCid.class),
+        CID_CID(3, RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION, I_ExtendByRefPartCidCid.class),
+        CID_CID_CID(4, RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION, I_ExtendByRefPartCidCidCid.class),
+        CID_CID_STR(5, RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION, I_ExtendByRefPartCidCidString.class),
+        STR(6, RefsetAuxiliary.Concept.STRING_EXTENSION, I_ExtendByRefPartStr.class),
+        INT(7, RefsetAuxiliary.Concept.INT_EXTENSION, I_ExtendByRefPartInt.class),
+        CID_INT(8, RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION, I_ExtendByRefPartCidInt.class),
+        BOOLEAN(9, RefsetAuxiliary.Concept.BOOLEAN_EXTENSION, I_ExtendByRefPartBoolean.class),
+        CID_STR(10, RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION, I_ExtendByRefPartStr.class),
+        CID_FLOAT(11, RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION, I_ExtendByRefPartCidFloat.class),
+        CID_LONG(12, RefsetAuxiliary.Concept.CID_LONG_EXTENSION, I_ExtendByRefPartCidLong.class),
+        LONG(13, RefsetAuxiliary.Concept.LONG_EXTENSION, I_ExtendByRefPartLong.class);
         private int externalizedToken;
         private int typeNid;
         private RefsetAuxiliary.Concept typeConcept;
         private static Map<Integer, REFSET_TYPES> nidTypeMap;
         private Class<? extends I_ExtendByRefPart> partClass;
-        
-        REFSET_TYPES(int externalizedToken, RefsetAuxiliary.Concept typeConcept, 
-        		Class<? extends I_ExtendByRefPart> partClass) {
+
+        REFSET_TYPES(int externalizedToken, RefsetAuxiliary.Concept typeConcept,
+                Class<? extends I_ExtendByRefPart> partClass) {
             this.externalizedToken = externalizedToken;
             this.typeConcept = typeConcept;
             this.partClass = partClass;
         }
-        
+
         public static REFSET_TYPES classToType(Class<? extends I_ExtendByRefPart> partType) {
-        	if (I_ExtendByRefPartCidCidCid.class.isAssignableFrom(partType)) {
-        		return CID_CID_CID;
-        	} else if (I_ExtendByRefPartCidCidString.class.isAssignableFrom(partType)) {
-        		return CID_CID_STR;
-        	} else if (I_ExtendByRefPartCidLong.class.isAssignableFrom(partType)) {
-        		return CID_LONG;
-        	} else if (I_ExtendByRefPartCidLong.class.isAssignableFrom(partType)) {
-        		return CID_LONG;
-        	} else if (I_ExtendByRefPartCidCid.class.isAssignableFrom(partType)) {
-        		return CID_CID;
-        	} else if (I_ExtendByRefPartCidInt.class.isAssignableFrom(partType)) {
-        		return CID_INT;
-        	} else if (I_ExtendByRefPartCidString.class.isAssignableFrom(partType)) {
-        		return CID_STR;
-        	} else if (I_ExtendByRefPartCidFloat.class.isAssignableFrom(partType)) {
-        		return CID_FLOAT;
-        	} else if (I_ExtendByRefPartBoolean.class.isAssignableFrom(partType)) {
-        		return BOOLEAN;
-        	} else if (I_ExtendByRefPartCid.class.isAssignableFrom(partType)) {
-        		return CID;
-        	} else if (I_ExtendByRefPartInt.class.isAssignableFrom(partType)) {
-        		return INT;
-        	} else if (I_ExtendByRefPartLong.class.isAssignableFrom(partType)) {
-        		return LONG;
-        	} else if (I_ExtendByRefPartStr.class.isAssignableFrom(partType)) {
-        		return STR;
-        	} 
-        	throw new UnsupportedOperationException("Unsupported refset type: " + partType);
+            if (I_ExtendByRefPartCidCidCid.class.isAssignableFrom(partType)) {
+                return CID_CID_CID;
+            } else if (I_ExtendByRefPartCidCidString.class.isAssignableFrom(partType)) {
+                return CID_CID_STR;
+            } else if (I_ExtendByRefPartCidLong.class.isAssignableFrom(partType)) {
+                return CID_LONG;
+            } else if (I_ExtendByRefPartCidLong.class.isAssignableFrom(partType)) {
+                return CID_LONG;
+            } else if (I_ExtendByRefPartCidCid.class.isAssignableFrom(partType)) {
+                return CID_CID;
+            } else if (I_ExtendByRefPartCidInt.class.isAssignableFrom(partType)) {
+                return CID_INT;
+            } else if (I_ExtendByRefPartCidString.class.isAssignableFrom(partType)) {
+                return CID_STR;
+            } else if (I_ExtendByRefPartCidFloat.class.isAssignableFrom(partType)) {
+                return CID_FLOAT;
+            } else if (I_ExtendByRefPartBoolean.class.isAssignableFrom(partType)) {
+                return BOOLEAN;
+            } else if (I_ExtendByRefPartCid.class.isAssignableFrom(partType)) {
+                return CID;
+            } else if (I_ExtendByRefPartInt.class.isAssignableFrom(partType)) {
+                return INT;
+            } else if (I_ExtendByRefPartLong.class.isAssignableFrom(partType)) {
+                return LONG;
+            } else if (I_ExtendByRefPartStr.class.isAssignableFrom(partType)) {
+                return STR;
+            }
+            throw new UnsupportedOperationException("Unsupported refset type: " + partType);
         }
 
         public static REFSET_TYPES nidToType(int nid) throws IOException {
@@ -192,24 +190,24 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
             if (nidTypeMap.containsKey(nid)) {
                 return nidTypeMap.get(nid);
             } else {
-            	if (Terms.get().hasConcept(nid)) {
-                	I_GetConceptData typeConcept;
-					try {
-						typeConcept = Terms.get().getConcept(nid);
-					} catch (TerminologyException e) {
-						throw new IOException(e);
-					}
-                	throw new IOException("Unknown refset type: " + nid + 
-                			" concept: " + typeConcept.getInitialText());
-            	} else {
-                	throw new IOException("Unknown refset type: " + nid);
-            	}
+                if (Terms.get().hasConcept(nid)) {
+                    I_GetConceptData typeConcept;
+                    try {
+                        typeConcept = Terms.get().getConcept(nid);
+                    } catch (TerminologyException e) {
+                        throw new IOException(e);
+                    }
+                    throw new IOException("Unknown refset type: " + nid
+                            + " concept: " + typeConcept.getInitialText());
+                } else {
+                    throw new IOException("Unknown refset type: " + nid);
+                }
             }
         }
 
-		private static void setupNids() {
-			if (nidTypeMap == null) {
-			    HashMap<Integer, REFSET_TYPES> temp  = new HashMap<Integer, REFSET_TYPES>();
+        private static void setupNids() {
+            if (nidTypeMap == null) {
+                HashMap<Integer, REFSET_TYPES> temp = new HashMap<Integer, REFSET_TYPES>();
                 for (REFSET_TYPES type : REFSET_TYPES.values()) {
                     try {
                         type.typeNid = Terms.get().uuidToNative(type.typeConcept.getUids());
@@ -220,7 +218,7 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
                 }
                 nidTypeMap = temp;
             }
-		}
+        }
 
         public void writeType(DataOutput output) throws IOException {
             output.writeByte(externalizedToken);
@@ -228,32 +226,32 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
 
         public static REFSET_TYPES readType(DataInput input) throws IOException {
             switch (input.readByte()) {
-            case 1:
-                return MEMBER;
-            case 2:
-                return CID;
-            case 3:
-                return CID_CID;
-            case 4:
-                return CID_CID_CID;
-            case 5:
-                return CID_CID_STR;
-            case 6:
-                return STR;
-            case 7:
-                return INT;
-            case 8:
-                return CID_INT;
-            case 9:
-                return BOOLEAN;
-            case 10:
-                return CID_STR;
-            case 11:
-                return CID_FLOAT;
-            case 12:
-                return CID_LONG;
-            case 13:
-                return LONG;
+                case 1:
+                    return MEMBER;
+                case 2:
+                    return CID;
+                case 3:
+                    return CID_CID;
+                case 4:
+                    return CID_CID_CID;
+                case 5:
+                    return CID_CID_STR;
+                case 6:
+                    return STR;
+                case 7:
+                    return INT;
+                case 8:
+                    return CID_INT;
+                case 9:
+                    return BOOLEAN;
+                case 10:
+                    return CID_STR;
+                case 11:
+                    return CID_FLOAT;
+                case 12:
+                    return CID_LONG;
+                case 13:
+                    return LONG;
             }
             throw new UnsupportedOperationException();
         }
@@ -263,79 +261,84 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
             return typeNid;
         }
 
-		public Class<? extends I_ExtendByRefPart> getPartClass() {
-			return partClass;
-		}
+        public Class<? extends I_ExtendByRefPart> getPartClass() {
+            return partClass;
+        }
     };
 
-    
     public EConcept(DataInput in) throws IOException, ClassNotFoundException {
         super(in);
     }
 
-
     public EConcept() {
         super();
     }
-    
-    public EConcept(I_ConceptualizeLocally cNoHx, 
-    		I_StoreLocalFixedTerminology mts) throws IOException, TerminologyException {
-    	UUID currentUuid = ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid();
-       	UUID pathUuid = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getPrimoridalUid();
-       	long time = System.currentTimeMillis();
-       	primordialUuid = cNoHx.getUids().iterator().next();
+
+    public EConcept(I_ConceptualizeLocally cNoHx,
+            I_StoreLocalFixedTerminology mts) throws IOException, TerminologyException {
+        UUID currentUuid = ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid();
+        UUID pathUuid = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getPrimoridalUid();
+        long time = System.currentTimeMillis();
+        primordialUuid = cNoHx.getUids().iterator().next();
         conceptAttributes = new EConceptAttributes();
         conceptAttributes.defined = false;
-    	conceptAttributes.primordialUuid = primordialUuid;
-    	conceptAttributes.statusUuid = currentUuid;
-    	conceptAttributes.setPathUuid(pathUuid);
-    	conceptAttributes.setTime(time);
-    	
-        descriptions = new ArrayList<TkDescription>(cNoHx.getDescriptions().size());
-    	for (I_DescribeConceptLocally descNoHx: cNoHx.getDescriptions()) {
+        conceptAttributes.primordialUuid = primordialUuid;
+        conceptAttributes.statusUuid = currentUuid;
+        conceptAttributes.setPathUuid(pathUuid);
+        conceptAttributes.setTime(time);
+
+        if (cNoHx.getDescriptions() == null) {
+            AceLog.getAppLog().warning("cNoHx has null descriptions: " + cNoHx);
+        } else {
+            descriptions = new ArrayList<TkDescription>(cNoHx.getDescriptions().size());
+            for (I_DescribeConceptLocally descNoHx : cNoHx.getDescriptions()) {
                 assert descNoHx != null;
-                assert descNoHx.getUids() != null: descNoHx;
-                assert descNoHx.getUids().iterator() != null: descNoHx;
-    		EDescription desc  = new EDescription();
-    		desc.primordialUuid = descNoHx.getUids().iterator().next();
-    		desc.statusUuid = currentUuid;
-    		desc.setPathUuid(pathUuid);
-    		desc.setTime(time);
+                assert descNoHx.getUids() != null : descNoHx;
+                assert descNoHx.getUids().iterator() != null : descNoHx;
+                EDescription desc = new EDescription();
+                desc.primordialUuid = descNoHx.getUids().iterator().next();
+                desc.statusUuid = currentUuid;
+                desc.setPathUuid(pathUuid);
+                desc.setTime(time);
 
-        	desc.conceptUuid = conceptAttributes.primordialUuid;
-        	desc.initialCaseSignificant = descNoHx.isInitialCapSig();
-        	desc.lang = descNoHx.getLangCode();
-        	desc.text = descNoHx.getText();
-        	desc.typeUuid = descNoHx.getDescType().getUids().iterator().next();
-        	descriptions.add(desc);
-    	}
-    	
-    	relationships = new ArrayList<TkRelationship>(cNoHx.getSourceRels().size());
-    	for (I_RelateConceptsLocally relNoHx: cNoHx.getSourceRels()) {
-    		ERelationship rel  = new ERelationship();
-    		rel.primordialUuid = relNoHx.getUids().iterator().next();
-    		rel.statusUuid = currentUuid;
-    		rel.setPathUuid(pathUuid);
-    		rel.setTime(time);
-    		
-    		rel.c1Uuid = conceptAttributes.primordialUuid;
-    		rel.c2Uuid = relNoHx.getC2().getUids().iterator().next();
-    		rel.characteristicUuid = relNoHx.getCharacteristic().getUids().iterator().next();
-    		rel.refinabilityUuid = relNoHx.getRefinability().getUids().iterator().next();
-    		rel.relGroup = relNoHx.getRelGrp();
-    		rel.typeUuid = relNoHx.getRelType().getUids().iterator().next();
-    		relationships.add(rel);
-    		
-    	}
-    	
-	}
+                desc.conceptUuid = conceptAttributes.primordialUuid;
+                desc.initialCaseSignificant = descNoHx.isInitialCapSig();
+                desc.lang = descNoHx.getLangCode();
+                desc.text = descNoHx.getText();
+                desc.typeUuid = descNoHx.getDescType().getUids().iterator().next();
+                descriptions.add(desc);
+            }
+        }
 
-	/**
-	 * @TODO remove componentRefsetMap added to get around bug in current database implementation!
-	 * @param c
-	 * @throws IOException
-	 * @throws TerminologyException
-	 */
+        if (cNoHx.getSourceRels() == null) {
+            AceLog.getAppLog().warning("cNoHx has null rels: " + cNoHx);
+        } else {
+            relationships = new ArrayList<TkRelationship>(cNoHx.getSourceRels().size());
+            for (I_RelateConceptsLocally relNoHx : cNoHx.getSourceRels()) {
+                ERelationship rel = new ERelationship();
+                rel.primordialUuid = relNoHx.getUids().iterator().next();
+                rel.statusUuid = currentUuid;
+                rel.setPathUuid(pathUuid);
+                rel.setTime(time);
+
+                rel.c1Uuid = conceptAttributes.primordialUuid;
+                rel.c2Uuid = relNoHx.getC2().getUids().iterator().next();
+                rel.characteristicUuid = relNoHx.getCharacteristic().getUids().iterator().next();
+                rel.refinabilityUuid = relNoHx.getRefinability().getUids().iterator().next();
+                rel.relGroup = relNoHx.getRelGrp();
+                rel.typeUuid = relNoHx.getRelType().getUids().iterator().next();
+                relationships.add(rel);
+
+            }
+        }
+    }
+
+    /**
+     * @TODO remove componentRefsetMap added to get around bug in current database implementation!
+     * @param c
+     * @throws IOException
+     * @throws TerminologyException
+     */
     public EConcept(I_GetConceptData c) throws IOException, TerminologyException {
         conceptAttributes = new EConceptAttributes(c.getConceptAttributes());
         EConcept.convertId(c.getIdentifier(), conceptAttributes);
@@ -369,9 +372,9 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
             }
         }
     }
-    
+
     @Override
-	public List<TkMedia> getImages() {
+    public List<TkMedia> getImages() {
         return media;
     }
 
@@ -406,7 +409,7 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
         buff.append(this.media);
         return buff.toString();
     }
-	
+
     /**
      * Returns a hash code for this <code>EConcept</code>.
      * 
@@ -428,16 +431,17 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
      *         <code>false</code> otherwise.
      */
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return false;
+        }
         return super.equals(obj);
     }
 
-	public UUID getPrimordialUuid() {
-		return primordialUuid;
-	}
+    public UUID getPrimordialUuid() {
+        return primordialUuid;
+    }
 
-	public void setPrimordialUuid(UUID primordialUuid) {
-		this.primordialUuid = primordialUuid;
-	}
+    public void setPrimordialUuid(UUID primordialUuid) {
+        this.primordialUuid = primordialUuid;
+    }
 }
