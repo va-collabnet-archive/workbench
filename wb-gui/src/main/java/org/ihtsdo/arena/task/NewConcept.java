@@ -824,7 +824,7 @@ public class NewConcept extends PreviousNextOrCancel {
                     TK_REFSET_TYPE.CID,
                     componentNid,
                     Ts.get().getNidForUuids(gbUuid));
-            refexSpecGbAcct.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.ACCEPTABLE.getLenient().getPrimUuid()));
+            refexSpecGbAcct.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
             
             tc.construct(refexSpecGbAcct);
         } catch (IOException ex) {
@@ -922,7 +922,7 @@ public class NewConcept extends PreviousNextOrCancel {
                     componentNid,
                     Ts.get().getNidForUuids(usUuid));
             
-            refexSpecUsAcct.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.ACCEPTABLE.getLenient().getPrimUuid()));
+            refexSpecUsAcct.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
             
             tc.construct(refexSpecUsAcct);
         } catch (IOException ex) {
