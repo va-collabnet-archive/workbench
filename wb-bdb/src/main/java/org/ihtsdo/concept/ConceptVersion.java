@@ -631,11 +631,13 @@ public class ConceptVersion implements ConceptVersionBI {
             for (ConceptSpec historicalType : historicalTypes) {
                 for (RelationshipChronicleBI outRel : outRels) {
                     RelationshipVersionBI<?> vOutRel = outRel.getVersion(c);
-                    int typeNid = vOutRel.getTypeNid();
-                    UUID[] compUuids = historicalType.getUuids();
-                    for (UUID compUuid : compUuids) {
-                        if (tf.nidToUuid(typeNid).compareTo(compUuid) == 0) {
-                            history = true;
+                    if(vOutRel != null){
+                    	int typeNid = vOutRel.getTypeNid();
+                        UUID[] compUuids = historicalType.getUuids();
+                        for (UUID compUuid : compUuids) {
+                            if (tf.nidToUuid(typeNid).compareTo(compUuid) == 0) {
+                                history = true;
+                            }
                         }
                     }
                 }
