@@ -63,6 +63,15 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
                "AUTHOR IS KIND OF", "author is kind of"}, SPEC_QUERY_TOKEN), 
             AUTHOR_IS_MEMBER_OF(new String[]{
                "AUTHOR IS MEMBER OF", "author is member of"}, SPEC_QUERY_TOKEN), 
+            PATH_IS(new String[]{"PATH IS", "path is"}, SPEC_QUERY_TOKEN), 
+            PATH_IS_CHILD_OF(new String[]{"PATH IS CHILD OF",
+                "path is child of"}, SPEC_QUERY_TOKEN), 
+            PATH_IS_DESCENDENT_OF(new String[]{
+                "PATH IS DESCENDENT OF", "path is descendent of"}, SPEC_QUERY_TOKEN), 
+            PATH_IS_KIND_OF(new String[]{
+               "PATH IS KIND OF", "path is kind of"}, SPEC_QUERY_TOKEN), 
+            PATH_IS_MEMBER_OF(new String[]{
+               "PATH IS MEMBER OF", "path is member of"}, SPEC_QUERY_TOKEN), 
             CONCEPT_IS_MEMBER_OF(new String[]{"CONCEPT IS MEMBER OF", 
                 "concept is member of"}, SPEC_QUERY_TOKEN),
             CONCEPT_STATUS_IS(new String[]{"CONCEPT STATUS IS", 
