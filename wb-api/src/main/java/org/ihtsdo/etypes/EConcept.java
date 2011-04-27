@@ -430,6 +430,7 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
      * @return <code>true</code> if the objects are the same; 
      *         <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
@@ -437,10 +438,12 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
         return super.equals(obj);
     }
 
+    @Override
     public UUID getPrimordialUuid() {
         return primordialUuid;
     }
 
+    @Override
     public void setPrimordialUuid(UUID primordialUuid) {
         this.primordialUuid = primordialUuid;
     }
