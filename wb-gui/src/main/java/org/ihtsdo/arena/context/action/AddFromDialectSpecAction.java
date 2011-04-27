@@ -99,12 +99,17 @@ public class AddFromDialectSpecAction extends AbstractAction {
 	                    TK_REFSET_TYPE.CID,
 	                    descSpecPref.getComponentNid(),
 	                    Ts.get().getNidForUuids(UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd")));
-	            refexSpecPrefGb.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.ACCEPTABLE.getLenient().getPrimUuid()));
 	            RefexCAB refexSpecPrefUs = new RefexCAB(
 	                    TK_REFSET_TYPE.CID,
 	                    descSpecPref.getComponentNid(),
 	                    Ts.get().getNidForUuids(UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6")));
-	            refexSpecPrefUs.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.ACCEPTABLE.getLenient().getPrimUuid()));
+	            if(dialect.equals("en-gb")){
+	            	refexSpecPrefGb.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.ACCEPTABLE.getLenient().getPrimUuid()));
+	            	refexSpecPrefUs.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
+	            }else {
+	            	refexSpecPrefGb.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
+	            	refexSpecPrefUs.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.ACCEPTABLE.getLenient().getPrimUuid()));
+	            }
 	            newDesc =  tc.construct(descSpecPref);
 	            newRefex = tc.construct(refexSpecPrefGb);
 	            newRefex = tc.construct(refexSpecPrefUs);
