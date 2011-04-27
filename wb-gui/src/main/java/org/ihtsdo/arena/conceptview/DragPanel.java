@@ -43,7 +43,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TooManyListenersException;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -56,6 +58,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.TransferHandler;
 
@@ -83,6 +86,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
     protected Collection<Action> getMenuActions() {
         return getKbActionsNoSetup(thingToDrag);
     }
+
     private Collection<Action> getKbActionsNoSetup(Object thingToDrop) {
         ArrayList<Action> list = new ArrayList<Action>();
         try {
@@ -170,6 +174,49 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
 
     public class DropPanelActionManager implements ActionListener, I_DispatchDragStatus {
 
+        private class DragStarter extends SwingWorker<String, String> {
+
+            @Override
+            protected String doInBackground() throws Exception {
+                return getUserString(thingToDrag);
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    String userString = get();
+                    LayoutManager layout = new FlowLayout(FlowLayout.LEADING, 5, 5);
+                    sfp = new ScrollablePanel(layout, ScrollDirection.LEFT_TO_RIGHT);
+                    if (gridLayout) {
+                        layout = new GridLayout(1, 0, 5, 5);
+                        sfp = new JPanel(layout);
+                    }
+                    sfp.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+                    dropPanel = new JPanel(new BorderLayout());
+                    JPanel dropTargetPanels = new JPanel(new GridLayout(1, 1));
+                    JLabel dropPanelLabel = new JLabel("    " + userString);
+                    dropPanelLabel.setFont(dropPanelLabel.getFont().deriveFont(settings.getFontSize()));
+                    dropPanelLabel.setOpaque(true);
+                    dropPanelLabel.setBackground(ConceptViewTitle.TITLE_COLOR);
+                    if (dropPanel == null) return;
+                    dropPanel.add(dropPanelLabel, BorderLayout.PAGE_START);
+                    if (dropPanel == null) return;
+                    dropPanel.add(dropTargetPanels, BorderLayout.CENTER);
+                    sfpScroller = new JScrollPane(sfp);
+                    sfpScroller.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+                    sfpScroller.setAutoscrolls(true);
+                    sfpScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+                    sfpScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+                    dropTargetPanels.add(sfpScroller);
+                    dragging = true;
+                    timer.start();
+                } catch (InterruptedException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                } catch (ExecutionException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                }
+            }
+        }
         private Timer timer;
         private boolean dragging = false;
         private JComponent dropPanel = new JLabel("dropPanel");
@@ -179,11 +226,13 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
         private JPanel sfp;
         private Collection<JComponent> addedDropComponents = new ArrayList<JComponent>();
         private JLayeredPane rootLayers;
+        private DropPanelProxy dpp;
 
         public DropPanelActionManager() {
             super();
-            new DropPanelProxy(this);
-            timer = new Timer(50, this);
+            this.dpp = new DropPanelProxy(this);
+            DragPanel.this.addHierarchyListener(this.dpp);
+            timer = new Timer(250, this);
         }
 
         @Override
@@ -192,29 +241,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
             if (thingToDrag == null) {
                 return;
             }
-            LayoutManager layout = new FlowLayout(FlowLayout.LEADING, 5, 5);
-            sfp = new ScrollablePanel(layout, ScrollDirection.LEFT_TO_RIGHT);
-            if (gridLayout) {
-                layout = new GridLayout(1, 0, 5, 5);
-                sfp = new JPanel(layout);
-            }
-            sfp.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-            dropPanel = new JPanel(new BorderLayout());
-            JPanel dropTargetPanels = new JPanel(new GridLayout(1, 1));
-            JLabel dropPanelLabel = new JLabel("    " + getUserString(thingToDrag));
-            dropPanelLabel.setFont(dropPanelLabel.getFont().deriveFont(settings.getFontSize()));
-            dropPanelLabel.setOpaque(true);
-            dropPanelLabel.setBackground(ConceptViewTitle.TITLE_COLOR);
-            dropPanel.add(dropPanelLabel, BorderLayout.PAGE_START);
-            dropPanel.add(dropTargetPanels, BorderLayout.CENTER);
-            sfpScroller = new JScrollPane(sfp);
-            sfpScroller.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-            sfpScroller.setAutoscrolls(true);
-            sfpScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-            sfpScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-            dropTargetPanels.add(sfpScroller);
-            dragging = true;
-            timer.start();
+            (new DragStarter()).execute();
         }
 
         @Override
@@ -271,7 +298,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
                             BoundedRangeModel scrollerModel = sfpScroller.getHorizontalScrollBar().getModel();
                             scrollerModel.setExtent(1);
                             if (scrollerModel.getValue() > scrollerModel.getMinimum()) {
-                                int newValue = Math.max(scrollerModel.getValue() - 5, 0);
+                                int newValue = Math.max(scrollerModel.getValue() - 20, 0);
                                 //AceLog.getAppLog().info("setting 1: " + newValue + " max: " + scrollerModel.getMaximum());
                                 scrollerModel.setValue(newValue);
                             }
@@ -279,7 +306,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
                             BoundedRangeModel scrollerModel = sfpScroller.getHorizontalScrollBar().getModel();
                             scrollerModel.setExtent(1);
                             if (scrollerModel.getValue() < scrollerModel.getMaximum()) {
-                                int newValue = Math.min(scrollerModel.getValue() + 5, scrollerModel.getMaximum());
+                                int newValue = Math.min(scrollerModel.getValue() + 20, scrollerModel.getMaximum());
                                 //AceLog.getAppLog().info("setting 2: " + newValue + " max: " + scrollerModel.getMaximum());
                                 scrollerModel.setValue(newValue);
                             }
@@ -287,7 +314,6 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
                     } else {
                         setDragPanelVisible(false);
                     }
-
                 }
             } else {
                 setDragPanelVisible(false);
@@ -433,7 +459,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
     private static final long serialVersionUID = 1L;
     protected T thingToDrag;
     private boolean dragEnabled;
-    private I_DispatchDragStatus dropPanelMgr = new DropPanelActionManager();
+    private I_DispatchDragStatus dropPanelMgr;
     private ConceptViewSettings settings;
     private Collection<Action> actionList = Collections.synchronizedCollection(new ArrayList<Action>());
     private Collection<JComponent> dropComponents = Collections.synchronizedList(new ArrayList<JComponent>());
@@ -466,6 +492,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
     }
 
     private void setup(ConceptViewSettings settings) {
+        dropPanelMgr = new DropPanelActionManager();
         this.settings = settings;
         this.setMinimumSize(new Dimension(minSize, minSize));
         this.kbFiles.add(new File("drools-rules/ContextualDropActions.drl"));

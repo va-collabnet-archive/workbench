@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -111,7 +112,7 @@ public class ConceptView extends JPanel {
                             if (settings.isNavigatorSetup()) {
                                 settings.getNavigator().updateHistoryPanel();
                             }
-                            
+
                         }
                     });
                 }
@@ -501,8 +502,8 @@ public class ConceptView extends JPanel {
             }
         }
 
-        private void addRelGroups(Collection<RelGroupVersionBI> relGroups, 
-                boolean cprAdded, CollapsePanel cpr, 
+        private void addRelGroups(Collection<RelGroupVersionBI> relGroups,
+                boolean cprAdded, CollapsePanel cpr,
                 GridBagConstraints gbc) throws IOException, TerminologyException, ContraditionException {
             for (RelGroupVersionBI rg : relGroups) {
                 Collection<? extends RelationshipVersionBI> currentRels =
@@ -611,6 +612,44 @@ public class ConceptView extends JPanel {
 
     public class DropPanelActionManager implements ActionListener, I_DispatchDragStatus {
 
+        private class DragStarter extends SwingWorker<Object, Object> {
+
+            @Override
+            protected Object doInBackground() throws Exception {
+                LayoutManager layout = new FlowLayout(FlowLayout.LEADING, 5, 5);
+                sfp = new ScrollablePanel(layout);
+                if (gridLayout) {
+                    layout = new GridLayout(0, 1, 5, 5);
+                    sfp = new JPanel(layout);
+                }
+
+                sfp.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+                dropPanel = new JPanel(new GridLayout(1, 1));
+                sfpScroller = new JScrollPane(sfp);
+                sfpScroller.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                sfpScroller.setAutoscrolls(true);
+                sfpScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+                sfpScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+                if (dropPanel == null) {
+                    return null;
+                }
+                dropPanel.add(sfpScroller);
+                dragging = true;
+                timer.start();
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    get();
+                } catch (InterruptedException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                } catch (ExecutionException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                }
+            }
+        }
         private Timer timer;
         private boolean dragging = false;
         private JComponent dropPanel = new JLabel("dropPanel");
@@ -619,11 +658,13 @@ public class ConceptView extends JPanel {
         private boolean gridLayout = true;
         private JPanel sfp;
         private Collection<JComponent> addedDropComponents = new ArrayList<JComponent>();
+        private DropPanelProxy dpp;
 
         public DropPanelActionManager() {
             super();
-            new DropPanelProxy(this);
-            timer = new Timer(50, this);
+            dpp = new DropPanelProxy(this);
+            ConceptView.this.addHierarchyListener(this.dpp);
+            timer = new Timer(250, this);
         }
         /* (non-Javadoc)
          * @see org.ihtsdo.arena.conceptview.I_DispatchDragStatus#dragStarted()
@@ -631,24 +672,7 @@ public class ConceptView extends JPanel {
 
         @Override
         public void dragStarted() {
-
-            LayoutManager layout = new FlowLayout(FlowLayout.LEADING, 5, 5);
-            sfp = new ScrollablePanel(layout);
-            if (gridLayout) {
-                layout = new GridLayout(0, 1, 5, 5);
-                sfp = new JPanel(layout);
-            }
-
-            sfp.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-            dropPanel = new JPanel(new GridLayout(1, 1));
-            sfpScroller = new JScrollPane(sfp);
-            sfpScroller.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-            sfpScroller.setAutoscrolls(true);
-            sfpScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-            sfpScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-            dropPanel.add(sfpScroller);
-            dragging = true;
-            timer.start();
+            (new DragStarter()).execute();
         }
         /* (non-Javadoc)
          * @see org.ihtsdo.arena.conceptview.I_DispatchDragStatus#dragFinished()
@@ -703,13 +727,13 @@ public class ConceptView extends JPanel {
                             BoundedRangeModel scrollerModel = sfpScroller.getVerticalScrollBar().getModel();
                             scrollerModel.setExtent(1);
                             if (scrollerModel.getValue() < scrollerModel.getMaximum()) {
-                                scrollerModel.setValue(scrollerModel.getValue() - 5);
+                                scrollerModel.setValue(scrollerModel.getValue() - 20);
                             }
                         } else if (dropPanel.getHeight() - mouseLocationForDropPanel.y < 10) {
                             BoundedRangeModel scrollerModel = sfpScroller.getVerticalScrollBar().getModel();
                             scrollerModel.setExtent(1);
                             if (scrollerModel.getValue() < scrollerModel.getMaximum()) {
-                                scrollerModel.setValue(scrollerModel.getValue() + 5);
+                                scrollerModel.setValue(scrollerModel.getValue() + 20);
                             }
                         }
                     } else {
@@ -797,7 +821,7 @@ public class ConceptView extends JPanel {
     private I_ConfigAceFrame config;
     private ConceptViewSettings settings;
     private EditPanelKb kb;
-    private I_DispatchDragStatus dropPanelMgr = new DropPanelActionManager();
+    private I_DispatchDragStatus dropPanelMgr;
     private Collection<Action> actionList =
             Collections.synchronizedCollection(new ArrayList<Action>());
     private I_GetConceptData concept;
@@ -845,6 +869,7 @@ public class ConceptView extends JPanel {
         addCommitListener(settings);
         settings.getConfig().addPropertyChangeListener("commit", pcal);
         setupPrefMap();
+        dropPanelMgr = new DropPanelActionManager();
     }
 
     public Map<Integer, JCheckBox> getRowToPathCheckMap() {

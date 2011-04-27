@@ -3,6 +3,8 @@
  */
 package org.ihtsdo.arena.conceptview;
 
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.WeakReference;
@@ -10,14 +12,13 @@ import java.lang.ref.WeakReference;
 import org.dwfa.ace.dnd.DragMonitor;
 import org.dwfa.ace.log.AceLog;
 
-class DropPanelProxy implements PropertyChangeListener {
+class DropPanelProxy implements PropertyChangeListener, HierarchyListener {
 
     WeakReference<I_DispatchDragStatus> dpmr;
 
     public DropPanelProxy(I_DispatchDragStatus dpm) {
         super();
         this.dpmr = new WeakReference<I_DispatchDragStatus>(dpm);
-        DragMonitor.addDragListener(this);
     }
 
     @Override
@@ -35,6 +36,20 @@ class DropPanelProxy implements PropertyChangeListener {
                 }
             } else {
                 dpm.dragFinished();
+            }
+        }
+    }
+
+    @Override
+    public void hierarchyChanged(HierarchyEvent e) {
+        long flags = e.getChangeFlags();
+        boolean displayability = (flags & HierarchyEvent.DISPLAYABILITY_CHANGED) != 0;
+        boolean showing = (flags & HierarchyEvent.SHOWING_CHANGED) != 0;
+        if (displayability || showing) {
+            if (e.getChanged().isDisplayable()) {
+                DragMonitor.addDragListener(this);
+            } else {
+                 DragMonitor.removeDragListener(this);
             }
         }
     }
