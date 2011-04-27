@@ -89,7 +89,7 @@ rule "rule 1" #concept onto different SNOMED concept
       actions.add(new CreateRelAction("Is-a", $dropTarget, Snomed.IS_A, $dropObject));
 end
 
-
+/*
 rule "rule 2" #concept onto SNOMED clinical finiding concpet
 
    when
@@ -100,7 +100,7 @@ rule "rule 2" #concept onto SNOMED clinical finiding concpet
    then
       actions.add(new CreateRelAction("finding-site", $dropTarget, Snomed.FINDING_SITE, $dropObject));
 end
-
+*/
 
 rule "rule 3" #concept onto NOT snomed concept
 
@@ -111,7 +111,7 @@ rule "rule 3" #concept onto NOT snomed concept
       )
    then
       actions.add(new CreateRelAction("is-a", $dropTarget, TermAux.IS_A, $dropObject));
-end
+end 
 
 
 rule "rule 4" #concept onto same concept
@@ -416,4 +416,346 @@ rule "rule 25" #change synonymy from non synonymous
 	then
 		actions.add(new SetSynonymyAction("synonym", $dropTarget, SynonymyType.SYNONYM, true));
 		actions.add(new SetSynonymyAction("near synonymous", $dropTarget, SynonymyType.NEAR_SYNONYMOUS, true));
+end
+
+rule "rule 26" #proceedure and decendants onto body structure
+
+   when
+      (and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.BODY_STRUCTURE, this not isKindOf Snomed.MORPHOLOGIC_ABNORMALITY,
+         							 context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+   then
+      actions.add(new CreateRelAction("Proceedure Site", $dropTarget, Snomed.PROCEDURE_SITE, $dropObject));
+      actions.add(new CreateRelAction("Proceedure Site - Direct", $dropTarget, Snomed.PROCEDURE_SITE_DIRECT, $dropObject));
+      actions.add(new CreateRelAction("Proceedure Site - Indirect", $dropTarget, Snomed.PROCEDURE_SITE_INDIRECT, $dropObject));
+end
+
+rule "rule 27" #proceedure onto morphologic abnormality
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.MORPHOLOGIC_ABNORMALITY,
+         						   context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Proceedure Morphology", $dropTarget, Snomed.PROCEDURE_MORPHOLOGY, $dropObject));
+      	actions.add(new CreateRelAction("Proceedure Morphology - Direct", $dropTarget, Snomed.PROCEDURE_MORPHOLOGY_DIRECT, $dropObject));
+      	actions.add(new CreateRelAction("Proceedure Morphology - Indirect", $dropTarget, Snomed.PROCEDURE_INDIRECT_MORPHOLOGY, $dropObject));
+end
+
+rule "rule 28" #proceedure onto physical object
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_OBJECT, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Proceedure Device", $dropTarget, Snomed.PROCEDURE_DEVICE, $dropObject));
+      	actions.add(new CreateRelAction("Proceedure Device - Direct", $dropTarget, Snomed.PROCEDURE_DEVICE_DIRECT, $dropObject));
+      	actions.add(new CreateRelAction("Proceedure Device - Indirect", $dropTarget, Snomed.PROCEDURE_INDIRECT_DEVICE, $dropObject));
+      	actions.add(new CreateRelAction("Proceedure Device - using access device", $dropTarget, Snomed.PROCCEDURE_ACCESS_DEVICE, $dropObject));
+      	actions.add(new CreateRelAction("Proceedure Device - using device", $dropTarget, Snomed.PROCEDURE_INDIRECT_DEVICE, $dropObject));
+end
+
+rule "rule 29" #proceedure onto substance
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.SUBSTANCE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Direct Substance", $dropTarget, Snomed.DIRECT_SUBSTANCE, $dropObject));
+      	actions.add(new CreateRelAction("Using Substance", $dropTarget, Snomed.USING_SUBSTANCE, $dropObject));
+      	actions.add(new CreateRelAction("Component", $dropTarget, Snomed.COMPONENT, $dropObject));
+end
+
+rule "rule 29.1" #proceedure onto clinical finding
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Has Focus", $dropTarget, Snomed.HAS_FOCUS, $dropObject));
+end
+
+rule "rule 30" #proceedure onto specimen
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Has Specimen", $dropTarget, Snomed.HAS_SPECIMEN, $dropObject));
+end
+
+rule "rule 30.1" #proceedure onto procedure
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Measurement Method", $dropTarget, Snomed.MEASUREMENT_METHOD, $dropObject));
+end
+
+rule "rule 31" #proceedure onto social concept
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.SOCIAL_CONTEXT, this not isKindOf Snomed.PERSON,
+         							 context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Recipient Category", $dropTarget, Snomed.RECIPIENT_CATEGORY, $dropObject));
+end
+
+rule "rule 31.1" #proceedure onto physical force
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_FORCE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Using Energy", $dropTarget, Snomed.USING_ENERGY, $dropObject));
+end
+
+rule "rule 32" #proceedure onto qualifier value
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Has Intent", $dropTarget, Snomed.HAS_INTENT, $dropObject));
+		actions.add(new CreateRelAction("Method", $dropTarget, Snomed.METHOD, $dropObject));
+		actions.add(new CreateRelAction("Priority", $dropTarget, Snomed.PRIORITY, $dropObject));
+		actions.add(new CreateRelAction("Property", $dropTarget, Snomed.PROPERTY, $dropObject));
+		actions.add(new CreateRelAction("Revision Status", $dropTarget, Snomed.REVISION_STATUS, $dropObject));
+		actions.add(new CreateRelAction("Route of Administration", $dropTarget, Snomed.ROUTE_OF_ADMIN, $dropObject));
+		actions.add(new CreateRelAction("Scale Type", $dropTarget, Snomed.SCALE_TYPE, $dropObject));
+		actions.add(new CreateRelAction("Time Aspect", $dropTarget, Snomed.TIME_ASPECT, $dropObject));
+		actions.add(new CreateRelAction("Access", $dropTarget, Snomed.ACCESS, $dropObject));
+		actions.add(new CreateRelAction("Approach", $dropTarget, Snomed.APPROACH, $dropObject));
+end
+
+rule "rule 33" #clinical finding onto body structure
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.BODY_STRUCTURE, this not isKindOf Snomed.MORPHOLOGIC_ABNORMALITY,
+         							context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Finding Site", $dropTarget, Snomed.FINDING_SITE, $dropObject));
+end
+
+rule "rule 34" #clinical finding onto morphologic abnormality
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.MORPHOLOGIC_ABNORMALITY, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Associated Morphology", $dropTarget, Snomed.ASSOCIATED_MORPHOLOGY, $dropObject));
+end
+
+rule "rule 35" #clinical finding onto procedure
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Associated With - after", $dropTarget, Snomed.ASSOCIATED_WITH_AFTER, $dropObject));
+		actions.add(new CreateRelAction("Associated With", $dropTarget, Snomed.ASSOCIATED_WITH, $dropObject));
+		actions.add(new CreateRelAction("Finding Method", $dropTarget, Snomed.FINDING_METHOD, $dropObject));
+end
+
+rule "rule 36" #clinical finding onto clinical finding
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Associated With - due to", $dropTarget, Snomed.ASSOCIATED_WITH_DUE, $dropObject));
+		actions.add(new CreateRelAction("Has Definitional Manifestation", $dropTarget, Snomed.HAS_DEFINITIONAL_MANIFESTATION, $dropObject));
+end
+
+rule "rule 37" #clinical finding onto qualifier value
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Clinical Course", $dropTarget, Snomed.CLINICAL_COURSE, $dropObject));
+		actions.add(new CreateRelAction("Has Interpretation", $dropTarget, Snomed.HAS_INTERPRETATION, $dropObject));
+		actions.add(new CreateRelAction("Occurrence", $dropTarget, Snomed.OCCURRENCE, $dropObject));
+		actions.add(new CreateRelAction("Pathological Process", $dropTarget, Snomed.PATHOLOGICAL_PROCESS, $dropObject));
+end
+
+rule "rule 38" #clinical finding onto person
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PERSON, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Finding Informer", $dropTarget, Snomed.FINDING_INFORMER, $dropObject));
+end
+
+rule "rule 39" #clinical finding onto observable entity
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.OBSERVABLE_ENTITY, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Interprets", $dropTarget, Snomed.OBSERVABLE_ENTITY, $dropObject));
+end
+
+rule "rule 40" #clinical finding onto substance
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.SUBSTANCE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject));
+end
+
+rule "rule 41" #clinical finding onto organism
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.ORGANISM, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject));
+end
+
+rule "rule 42" #Specimen onto procedure
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Specimen Procedure", $dropTarget, Snomed.SPECIMEN_PROCEDURE, $dropObject));
+end
+
+rule "rule 43" #Specimen onto person
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PERSON, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Specimen Source Identity", $dropTarget, Snomed.SPECIMEN_SOURCE_ID, $dropObject));
+end
+
+rule "rule 44" #Specimen onto physical object
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_OBJECT, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Specimen Source Identity", $dropTarget, Snomed.SPECIMEN_SOURCE_ID, $dropObject));
+end
+
+rule "rule 45" #Specimen onto environment
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.ENVIRONMENT, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Specimen Source Identity", $dropTarget, Snomed.SPECIMEN_SOURCE_ID, $dropObject));
+end
+
+rule "rule 46" #Specimen onto morphologic abnormality
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.MORPHOLOGIC_ABNORMALITY, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Specimen Source Morphology", $dropTarget, Snomed.SPECIMEN_SOURCE_MORPHOLOGY, $dropObject));
+end
+
+rule "rule 47" #Specimen onto body structure
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.BODY_STRUCTURE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Specimen Source Topography", $dropTarget, Snomed.SPECIMEN_SOURCE_TOPOGRAPHY, $dropObject));
+end
+
+rule "rule 48" #Specimen onto substance
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.SUBSTANCE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Specimen Substance", $dropTarget, Snomed.SPECIMEN_SUBSTANCE, $dropObject));
+end
+
+rule "rule 49" #Product onto substance
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PRODUCT, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.SUBSTANCE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Has Active Ingredient", $dropTarget, Snomed.HAS_ACTIVE_INGREDIENT, $dropObject));
+end
+
+rule "rule 50" #Product onto qualifier value
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PRODUCT, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Has Dose Form", $dropTarget, Snomed.HAS_DOSE_FORM, $dropObject));
+end
+
+rule "rule 51" #Situation with explicit context onto qualifier value
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SITUATION_WITH_EXPLICIT_CONTEXT, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Finding Context", $dropTarget, Snomed.FINDING_CONTEXT, $dropObject));
+		actions.add(new CreateRelAction("Procedure Context", $dropTarget, Snomed.PROCEDURE_CONTEXT, $dropObject));
+		actions.add(new CreateRelAction("Temporal Context", $dropTarget, Snomed.TEMPORAL_CONTEXT, $dropObject));
+end
+
+rule "rule 52" #Situation with explicit context onto person
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SITUATION_WITH_EXPLICIT_CONTEXT, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PERSON, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Subject Relationship Context", $dropTarget, Snomed.SUBJECT_REL_CONTEXT, $dropObject));
+end
+
+rule "rule 53" #Body structure onto qualifier value
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.BODY_STRUCTURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Laterality", $dropTarget, Snomed.LATERALITY, $dropObject));
 end
