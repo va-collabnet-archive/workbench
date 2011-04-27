@@ -349,6 +349,13 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             // SETUP ROLE NID ARRAY
             int[] rNidArray = setupRoleNids();
             int nextRIdx = rNidArray.length;
+            if (rNidArray.length > 100) {
+                String errStr = "Role types exceeds 100. This will cause a memory issue. " +
+                        "Please check that role root is set to 'Concept mode attribute'";
+                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
+                        new TaskFailedException(errStr));
+                return Condition.STOP;
+            }
 
             // GET EDIT_PATH CONCEPTS AND RELATIONSHIPS
             cEditSnoCons = new ArrayList<SnoCon>();
@@ -513,8 +520,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 logger.info("\r\n::: [SnorocketTask] \"Never-Grouped\" Added");
             }
 
-            logger.log(Level.INFO,"\r\n::: [SnorocketTask] SORTED & ADDED CONs, RELs" +
-                    " *** LAPSE TIME = {0} ***", toStringLapseSec(startTime));
+            logger.log(Level.INFO, "\r\n::: [SnorocketTask] SORTED & ADDED CONs, RELs"
+                    + " *** LAPSE TIME = {0} ***", toStringLapseSec(startTime));
 
             // ** GUI: 1. LOAD DATA -- done **
             if (continueThisAction) {
