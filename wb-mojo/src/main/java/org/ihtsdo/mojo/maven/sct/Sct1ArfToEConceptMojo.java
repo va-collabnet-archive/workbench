@@ -285,6 +285,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     /**
      * @parameter default-value="false"
      */
+    private boolean useSctRelId;
+    /**
+     * @parameter default-value="false"
+     */
     private boolean rf2Mapping;
     /**
      * @parameter default-value="false"
@@ -394,6 +398,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             this.file = f;
         }
 
+        @Override
         public String toString() {
             return " :: " + file.getPath();
         }
@@ -406,8 +411,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         //        String pathUuidStr;
         String sourceUuid;
         Boolean isStated;
-        Boolean hasSnomedId;
-        Boolean mapSctIdInferredToStated; // Cross map inferred id to stated.
+        Boolean hasStatedSctRelId;
+        Boolean mapSctIdInferredToStated; // :DEPRECIATED: Cross map inferred id to stated.
         Boolean keepQualifier; // 1
         Boolean keepHistorical; // 2
         Boolean keepAdditional; // 3
@@ -451,24 +456,34 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             boolean doCrossMap = false;
             boolean hasSnomedId = true;
             this.isStated = false;
-            if (f.getName().toUpperCase().contains("STATED")) {
-                this.isStated = true;
-                if (sctDir.doMapSctIdInferredToStated()) {
-                    doCrossMap = true;
-                    hasSnomedId = false;
+            if (useSctRelId) {
+                if (f.getName().toUpperCase().contains("STATED")) {
+                    this.isStated = true;
                 }
-            } else if (f.getName().toUpperCase().contains("INFERRED")
-                    && sctDir.doMapSctIdInferredToStated()) {
-                doCrossMap = true;
-                hasSnomedId = true;
+                doCrossMap = false;
+                hasSnomedId = sctDir.isStatedSctRelIdPresent();
+            } else {
+                if (f.getName().toUpperCase().contains("STATED")) {
+                    this.isStated = true;
+                    if (sctDir.doMapSctIdInferredToStated()) {
+                        doCrossMap = true;
+                        hasSnomedId = false;
+                    }
+                } else if (f.getName().toUpperCase().contains("INFERRED")
+                        && sctDir.doMapSctIdInferredToStated()) {
+                    doCrossMap = true;
+                    hasSnomedId = true;
+                }
             }
-            this.hasSnomedId = hasSnomedId;
+
+            this.hasStatedSctRelId = hasSnomedId;
             this.mapSctIdInferredToStated = doCrossMap;
 
-            // setup PATH UUID (puuid), hasSnomedId, doCrossMap
+            // setup PATH UUID (puuid), hasStatedSctRelId, doCrossMap
             getLog().info("           " + f.getName() + " QUEUED");
         }
 
+        @Override
         public String toString() {
             return file.getPath();
         }
@@ -741,7 +756,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             zIdSrcSystemList.add(new IdSrcSystemEntry(ArchitectonicAuxiliary.Concept.ICD_9.getUids().iterator().next(), IdDataType.STRING));
 
         } catch (Exception e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("FAILED: Sct1ArfToEConcept -- setupLookupPartA()");
         }
 
@@ -1047,7 +1062,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             System.gc();
         } catch (Exception e1) {
             getLog().info("FAILED: processConceptsFiles()");
-            e1.printStackTrace();
+            getLog().info(e1);
             throw new MojoFailureException("FAILED: processConceptsFiles()", e1);
         }
 
@@ -1060,7 +1075,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             System.gc();
         } catch (Exception e1) {
             getLog().info("FAILED: processDescriptionsFiles()");
-            e1.printStackTrace();
+            getLog().info(e1);
             throw new MojoFailureException("FAILED: processDescriptionsFiles()", e1);
         }
 
@@ -1092,7 +1107,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             erw.close(); // Need to be sure to the close file!
         } catch (Exception e1) {
             getLog().info("FAILED: processRelationshipsFiles()");
-            e1.printStackTrace();
+            getLog().info(e1);
             throw new MojoFailureException("FAILED: processRelationshipsFiles()", e1);
         }
 
@@ -1173,12 +1188,12 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
         } catch (MojoFailureException e1) {
             getLog().info("FAILED: processArfIdFiles()");
-            e1.printStackTrace();
+            getLog().info(e1);
         } catch (IOException e) {
-            e.printStackTrace();
+            getLog().info(e);
         } catch (ParseException e) {
             getLog().info("FAILED: ParseException");
-            e.printStackTrace();
+            getLog().info(e);
         }
 
         getLog().info(
@@ -1311,7 +1326,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             try {
                 oos.writeUnshared(tmpDesRec);
             } catch (Exception e) {
-                e.printStackTrace();
+                getLog().info(e);
             }
         }
 
@@ -1676,7 +1691,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             } catch (EOFException ex) {
                 getLog().info(" relationship count = " + count + " @EOF\r\n");
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                getLog().info(e);
                 throw new MojoFailureException("ClassNotFoundException -- Step 2 reading file");
             }
             ois.close();
@@ -1685,6 +1700,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // SORT BY [C2-RoleType]
             Comparator<Sct1_RelRecord> compRelDest = new Comparator<Sct1_RelRecord>() {
 
+                @Override
                 public int compare(Sct1_RelRecord o1, Sct1_RelRecord o2) {
                     int thisMore = 1;
                     int thisLess = -1;
@@ -1737,9 +1753,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             System.gc();
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            getLog().info(e);
         } catch (IOException e) {
-            e.printStackTrace();
+            getLog().info(e);
         }
 
         getLog().info(
@@ -1999,13 +2015,13 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             aRel = null;
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("FileNotFoundException");
         } catch (IOException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("IOException");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("ClassNotFoundException");
         }
 
@@ -2294,6 +2310,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             ArrayList<Sct1_RefSetRecord> bRs = new ArrayList<Sct1_RefSetRecord>(aRs);
             Comparator<Sct1_RefSetRecord> compRsByRs = new Comparator<Sct1_RefSetRecord>() {
 
+                @Override
                 public int compare(Sct1_RefSetRecord o1, Sct1_RefSetRecord o2) {
                     int thisMore = 1;
                     int thisLess = -1;
@@ -2367,6 +2384,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // SAVE FILE SORTED BY "ENVELOP eConcept" UUID, path, revision
             Comparator<Sct1_RefSetRecord> compRsByCon = new Comparator<Sct1_RefSetRecord>() {
 
+                @Override
                 public int compare(Sct1_RefSetRecord o1, Sct1_RefSetRecord o2) {
                     int thisMore = 1;
                     int thisLess = -1;
@@ -2425,11 +2443,11 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             System.gc();
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            getLog().info(e);
         } catch (IOException e) {
-            e.printStackTrace();
+            getLog().info(e);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            getLog().info(e);
         }
 
         getLog().info(
@@ -2488,6 +2506,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // SORT BY [CONCEPTID, Path, Revision]
             Comparator<Sct1_ConRecord> compCon = new Comparator<Sct1_ConRecord>() {
 
+                @Override
                 public int compare(Sct1_ConRecord o1, Sct1_ConRecord o2) {
                     int thisMore = 1;
                     int thisLess = -1;
@@ -2559,6 +2578,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // SORT BY [CONCEPTID, DESCRIPTIONID, Path, Revision]
             Comparator<Sct1_DesRecord> compDes = new Comparator<Sct1_DesRecord>() {
 
+                @Override
                 public int compare(Sct1_DesRecord o1, Sct1_DesRecord o2) {
                     int thisMore = 1;
                     int thisLess = -1;
@@ -2643,6 +2663,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // SORT BY [C1-Group-RoleType-Path-RevisionVersion]
             Comparator<Sct1_RelRecord> compRel = new Comparator<Sct1_RelRecord>() {
 
+                @Override
                 public int compare(Sct1_RelRecord o1, Sct1_RelRecord o2) {
                     int thisMore = 1;
                     int thisLess = -1;
@@ -2740,6 +2761,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // SORT BY [C2-RoleType]
             Comparator<Sct1_RelDestRecord> compRelDest = new Comparator<Sct1_RelDestRecord>() {
 
+                @Override
                 public int compare(Sct1_RelDestRecord o1, Sct1_RelDestRecord o2) {
                     int thisMore = 1;
                     int thisLess = -1;
@@ -2780,13 +2802,13 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             System.gc();
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("File Not Found -- Step 6 Sort");
         } catch (IOException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("IO Exception -- Step 6 Sort");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("ClassNotFoundException -- Step 6 Sort");
         }
         getLog().info(
@@ -2855,10 +2877,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             dos = new DataOutputStream(new BufferedOutputStream(
                     new FileOutputStream(fNameStep7ECon)));
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("File Not Found -- Step #7");
         } catch (IOException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("IO Exception -- Step #7");
         }
 
@@ -2885,10 +2907,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         //                    readMoreBug = false;
         //                    
         //            } catch (IOException e) {
-        //                e.printStackTrace();
+        //                getLog().info(e);
         //                readMoreBug = false;
         //            } catch (ClassNotFoundException e) {
-        //                e.printStackTrace();
+        //                getLog().info(e);
         //                readMoreBug = false;
         //            }
         //            bugCount++;
@@ -2923,7 +2945,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
             while (theDes.compareTo(theCon) == IS_LESS) {
                 desNext = readNextDes(oisDes, desList, desNext);
-                if (desNext == null && desList.size() == 0) {
+                if (desNext == null && desList.isEmpty()) {
                     theDes = new UUID(Long.MAX_VALUE, Long.MAX_VALUE);
                 } else {
                     Sct1_DesRecord tmpDes = desList.get(0);
@@ -2937,7 +2959,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
             while (theRel.compareTo(theCon) == IS_LESS) {
                 relNext = readNextRel(oisRel, relList, relNext);
-                if (relNext == null && relList.size() == 0) {
+                if (relNext == null && relList.isEmpty()) {
                     theRel = new UUID(Long.MAX_VALUE, Long.MAX_VALUE);
                 } else {
                     // theRel = relList.get(0).c1SnoId;
@@ -2954,7 +2976,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
             while (theRelDest.compareTo(theCon) == IS_LESS) {
                 relDestNext = readNextRelDest(oisRelDest, relDestList, relDestNext);
-                if (relDestNext == null && relDestList.size() == 0) {
+                if (relDestNext == null && relDestList.isEmpty()) {
                     theRelDest = new UUID(Long.MAX_VALUE, Long.MAX_VALUE);
                 } else {
                     // theRelDest = relDestList.get(0).c2SnoId;
@@ -2975,7 +2997,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             while (theRsByCon.compareTo(theCon) == IS_LESS) {
                 rsByConNext = readNextRsByCon(oisRsByCon, rsByConList, rsByConNext);
 
-                if (rsByConNext == null && rsByConList.size() == 0) {
+                if (rsByConNext == null && rsByConList.isEmpty()) {
                     theRsByCon = new UUID(Long.MAX_VALUE, Long.MAX_VALUE);
                 } else {
                     Sct1_RefSetRecord tmpRsByCon = rsByConList.get(0);
@@ -2995,7 +3017,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 // :DEBUG:
                 //                UUID debugUuidRsByCon111 = UUID.fromString("ccbd4a65-9b1a-5df3-94d1-4a1085f3c758");
 
-                if (rsByRsNext == null && rsByRsList.size() == 0) {
+                if (rsByRsNext == null && rsByRsList.isEmpty()) {
                     theRsByRs = new UUID(Long.MAX_VALUE, Long.MAX_VALUE);
                 } else {
                     Sct1_RefSetRecord tmpRsByRs = rsByRsList.get(0);
@@ -3129,7 +3151,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             oisRsByRs.close();
             dos.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("IO Exception -- Step 4, closing files");
         }
         getLog().info(
@@ -3784,7 +3806,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 getLog().info("  ... econcepts written " + countEConWritten);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            getLog().info(e);
         }
 
     }
@@ -3806,10 +3828,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             } catch (EOFException ex) {
                 return null;
             } catch (IOException e) {
-                e.printStackTrace();
+                getLog().info(e);
                 throw new MojoFailureException("IO Exception - readNextCon()");
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                getLog().info(e);
                 throw new MojoFailureException("ClassNotFoundException - readNextCon()");
             }
         }
@@ -3833,10 +3855,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             conNext = null;
             return null; // end reached, no more records
         } catch (IOException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("IO Exception -- readNextCon()");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("ClassNotFoundException -- readNextCon()");
         }
 
@@ -3860,10 +3882,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             } catch (EOFException ex) {
                 return null;
             } catch (IOException e) {
-                e.printStackTrace();
+                getLog().info(e);
                 throw new MojoFailureException("IO Exception - readNextDes()");
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                getLog().info(e);
                 throw new MojoFailureException("ClassNotFoundException - readNextDes()");
             }
         }
@@ -3888,10 +3910,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             desNext = null;
             return null; // end reached, no more records
         } catch (IOException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("IO Exception -- readNextDes()");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("ClassNotFoundException -- readNextDes()");
         }
 
@@ -3915,10 +3937,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             } catch (EOFException ex) {
                 return null;
             } catch (IOException e) {
-                e.printStackTrace();
+                getLog().info(e);
                 throw new MojoFailureException("IO Exception - readNextRel()");
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                getLog().info(e);
                 throw new MojoFailureException("ClassNotFoundException - readNextRel()");
             }
         }
@@ -3941,10 +3963,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             relNext = null;
             return null; // end reached, no more records
         } catch (IOException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("IO Exception -- readNextRel()");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("ClassNotFoundException -- readNextRel()");
         }
 
@@ -3969,10 +3991,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             } catch (EOFException ex) {
                 return null;
             } catch (IOException e) {
-                e.printStackTrace();
+                getLog().info(e);
                 throw new MojoFailureException("IO Exception - readNextRelDest()");
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                getLog().info(e);
                 throw new MojoFailureException("ClassNotFoundException - readNextRelDest()");
             }
         }
@@ -3997,10 +4019,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             relDestNext = null;
             return null; // end reached, no more records
         } catch (IOException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("IO Exception -- readNextRelDest()");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("ClassNotFoundException -- readNextRelDest()");
         }
 
@@ -4025,10 +4047,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             } catch (EOFException ex) {
                 return null;
             } catch (IOException e) {
-                e.printStackTrace();
+                getLog().info(e);
                 throw new MojoFailureException("IO Exception - readNextRsByCon()");
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                getLog().info(e);
                 throw new MojoFailureException("ClassNotFoundException - readNextRsByCon()");
             }
         }
@@ -4052,10 +4074,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             rsByConNext = null;
             return null; // end reached, no more records
         } catch (IOException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("IO Exception -- readNextRsByCon()");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("ClassNotFoundException -- readNextRsByCon()");
         }
 
@@ -4080,10 +4102,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             } catch (EOFException ex) {
                 return null;
             } catch (IOException e) {
-                e.printStackTrace();
+                getLog().info(e);
                 throw new MojoFailureException("IO Exception - readNextRsByRs()");
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                getLog().info(e);
                 throw new MojoFailureException("ClassNotFoundException - readNextRsByRs()");
             }
         }
@@ -4107,10 +4129,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             rsByRsNext = null;
             return null; // end reached, no more records
         } catch (IOException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("IO Exception -- readNextRsByRs()");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("ClassNotFoundException -- readNextRsByRs()");
         }
 
@@ -4179,10 +4201,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             getLog().info("SNOMED RT id UUID      = " + uuidSourceSnomedRt);
 
         } catch (NoSuchAlgorithmException e2) {
-            e2.printStackTrace();
+            getLog().info(e2);
             throw new MojoFailureException("FAILED: SNOMED Core Stated/Inferred Path", e2);
         } catch (UnsupportedEncodingException e2) {
-            e2.printStackTrace();
+            getLog().info(e2);
             throw new MojoFailureException("FAILED: SNOMED Core Stated/Inferred Path", e2);
         }
     }
@@ -4210,6 +4232,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
             FileFilter filter = new FileFilter() {
 
+                @Override
                 public boolean accept(File pathname) {
                     if (inputFilters == null || inputFilters.length == 0) {
                         return true;
@@ -4260,6 +4283,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
             FileFilter filter = new FileFilter() {
 
+                @Override
                 public boolean accept(File pathname) {
                     if (inputFilters == null || inputFilters.length == 0) {
                         return true;
@@ -4287,11 +4311,11 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                             listOfFiles.add(fo);
                             getLog().info(
                                     "::: FILE : " + f2.getName() + " " + revDate + " hasSnomedId="
-                                    + fo.hasSnomedId + " doCrossMap="
+                                    + fo.hasStatedSctRelId + " doCrossMap="
                                     + fo.mapSctIdInferredToStated);
                         }
                     } catch (ParseException e) {
-                        e.printStackTrace();
+                        getLog().info(e);
                         getLog().info(
                                 "::: Date format missing or not supported : " + f2.getName() + " "
                                 + revDate);
@@ -4329,7 +4353,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         try {
             this.dateStartObj = formatter.parse(sStart + " 00:00:00");
         } catch (ParseException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("SimpleDateFormat yyyy.MM.dd dateStart parse error: "
                     + sStart);
         }
@@ -4346,7 +4370,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         try {
             this.dateStopObj = formatter.parse(sStop + " 23:59:59");
         } catch (ParseException e) {
-            e.printStackTrace();
+            getLog().info(e);
             throw new MojoFailureException("SimpleDateFormat yyyy.MM.dd dateStop parse error: "
                     + sStop);
         }
@@ -4361,7 +4385,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
      * 
      * IGNORE: FULLYSPECIFIEDNAME CTV3ID SNOMEDID
      */
-    protected void processConceptsFiles(String wDir, List<List<SCTFile>> sctv, boolean ctv3idTF,
+    private void processConceptsFiles(String wDir, List<List<SCTFile>> sctv, boolean ctv3idTF,
             boolean snomedrtTF, ObjectOutputStream oos) throws Exception {
         int count1, count2; // records in arrays 1 & 2
         String fName1, fName2; // file path name
@@ -4501,7 +4525,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         } // WHILE (EACH CONCEPTS DIRECTORY) *
     }
 
-    protected void processDescriptionsFiles(String wDir, List<List<SCTFile>> sctv,
+    private void processDescriptionsFiles(String wDir, List<List<SCTFile>> sctv,
             ObjectOutputStream oos) throws Exception {
         int count1, count2; // records in arrays 1 & 2
         String fName1, fName2; // file path name
@@ -5073,7 +5097,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         return true;
     }
 
-    protected void parseConcepts(String fName, Sct1_ConRecord[] a, int count, boolean ctv3idTF,
+    private void parseConcepts(String fName, Sct1_ConRecord[] a, int count, boolean ctv3idTF,
             boolean snomedrtTF) throws Exception {
 
         String ctv3Str;
@@ -5123,7 +5147,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 + (System.currentTimeMillis() - start) + " milliseconds");
     }
 
-    protected void parseDescriptions(String fName, Sct1_DesRecord[] a, int count) throws Exception {
+    private void parseDescriptions(String fName, Sct1_DesRecord[] a, int count) throws Exception {
 
         long start = System.currentTimeMillis();
 
@@ -5180,7 +5204,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 + (System.currentTimeMillis() - start) + " milliseconds");
     }
 
-    protected Sct1_RelRecord[] parseRelationships(String fName, Sct1_RelRecord[] a, int count,
+    private Sct1_RelRecord[] parseRelationships(String fName, Sct1_RelRecord[] a, int count,
             SCTFile f) throws Exception {
 
         long start = System.currentTimeMillis();
@@ -5205,7 +5229,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
             // RELATIONSHIPID
             long relID = Long.MAX_VALUE;
-            if (f.hasSnomedId) {
+            if ((f.isStated == true && f.hasStatedSctRelId) || f.isStated == false) {
                 relID = Long.parseLong(line[RELATIONSHIPID]);
             }
             // ADD STATUS VALUE: see ArchitectonicAuxiliary.getStatusFromId()
@@ -5256,7 +5280,12 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
 
         a = Arrays.copyOf(a, relationships);
-        computeRelationshipUuids(a, f.hasSnomedId, f.mapSctIdInferredToStated);
+        if (useSctRelId) {
+            computeRelationshipUuids(a, f.isStated, f.hasStatedSctRelId);
+        } else {
+            // :DEPRECIATED:
+            computeRelationshipUuids_Old(a, f.hasStatedSctRelId, f.mapSctIdInferredToStated);
+        }
         Arrays.sort(a);
 
         getLog().info(
@@ -5298,11 +5327,83 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
     }
 
-    private void computeRelationshipUuids(Sct1_RelRecord[] a, boolean hasSnomedId,
+    private void computeRelationshipUuids(Sct1_RelRecord[] a,
+            boolean isStated,
+            boolean isStatedSctRelIdPresent)
+            throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        // SORT BY [C1-Group-RoleType-C2]
+        Comparator<Sct1_RelRecord> comp = new Comparator<Sct1_RelRecord>() {
+
+            @Override
+            public int compare(Sct1_RelRecord o1, Sct1_RelRecord o2) {
+                int thisMore = 1;
+                int thisLess = -1;
+                // C1
+                if (o1.c1SnoId > o2.c1SnoId) {
+                    return thisMore;
+                } else if (o1.c1SnoId < o2.c1SnoId) {
+                    return thisLess;
+                } else {
+                    // GROUP
+                    if (o1.group > o2.group) {
+                        return thisMore;
+                    } else if (o1.group < o2.group) {
+                        return thisLess;
+                    } else {
+                        // ROLE TYPE
+                        if (o1.roleTypeSnoId > o2.roleTypeSnoId) {
+                            return thisMore;
+                        } else if (o1.roleTypeSnoId < o2.roleTypeSnoId) {
+                            return thisLess;
+                        } else {
+                            // C2
+                            if (o1.c2SnoId > o2.c2SnoId) {
+                                return thisMore;
+                            } else if (o1.c2SnoId < o2.c2SnoId) {
+                                return thisLess;
+                            } else {
+                                return 0; // EQUAL
+                            }
+                        }
+                    }
+                }
+            } // compare()
+        };
+        Arrays.sort(a, comp);
+
+        long lastC1 = a[0].c1SnoId;
+        int lastGroup = a[0].group;
+        String GroupListStr = getGroupListString(a, 0);
+        int max = a.length;
+        for (int i = 0; i < max; i++) {
+            // DETERMINE IF NEW GroupListStr IS NEEDED
+            if (lastC1 != a[i].c1SnoId || lastGroup != a[i].group) {
+                GroupListStr = getGroupListString(a, i);
+            }
+
+            // SET RELATIONSHIP UUID
+            if (isStated == true && isStatedSctRelIdPresent == false) {
+                UUID uuid = Type5UuidFactory.get(REL_ID_NAMESPACE_UUID_TYPE1 + a[i].c1SnoId
+                        + a[i].roleTypeSnoId + a[i].c2SnoId + GroupListStr);
+                a[i].relUuidMsb = uuid.getMostSignificantBits();
+                a[i].relUuidLsb = uuid.getLeastSignificantBits();
+            } else {
+                UUID uuid = Type3UuidFactory.fromSNOMED(a[i].relSnoId);
+                a[i].relUuidMsb = uuid.getMostSignificantBits();
+                a[i].relUuidLsb = uuid.getLeastSignificantBits();
+            }
+
+            lastC1 = a[i].c1SnoId;
+            lastGroup = a[i].group;
+        }
+    }
+
+    private void computeRelationshipUuids_Old(Sct1_RelRecord[] a, boolean hasSnomedId,
             boolean doCrossMap) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         // SORT BY [C1-Group-RoleType-C2]
         Comparator<Sct1_RelRecord> comp = new Comparator<Sct1_RelRecord>() {
 
+            @Override
             public int compare(Sct1_RelRecord o1, Sct1_RelRecord o2) {
                 int thisMore = 1;
                 int thisLess = -1;
@@ -5356,13 +5457,13 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             a[i].relUuidLsb = uuid.getLeastSignificantBits();
 
             // :DEBUG
-            //            if (uuid.toString().compareToIgnoreCase("8003f34d-e069-57a5-b7db-919fec994ced") == 0)
-            //                getLog().info("!!!:PARSE: 8003f34d-e069-57a5-b7db-919fec994ced... Rel="
-            //                        + a[i].relSnoId + ":" + a[i].c1SnoId + "-" + a[i].roleTypeSnoId + "-"
-            //                        + a[i].c2SnoId + " G" + a[i].group + " RG(" + GroupListStr + ")");
-            //            if (a[i].c1SnoId == 391181005 && a[i].roleTypeSnoId == 116680003 && a[i].c2SnoId == 6254007) {
-            //                getLog().info(":DEBUG: found 391181005-116680003-6254007 (compute uuids)");
-            //            }
+            // if (uuid.toString().compareToIgnoreCase("8003f34d-e069-57a5-b7db-919fec994ced") == 0)
+            //     getLog().info("!!!:PARSE: 8003f34d-e069-57a5-b7db-919fec994ced... Rel="
+            //             + a[i].relSnoId + ":" + a[i].c1SnoId + "-" + a[i].roleTypeSnoId + "-"
+            //             + a[i].c2SnoId + " G" + a[i].group + " RG(" + GroupListStr + ")");
+            // if (a[i].c1SnoId == 391181005 && a[i].roleTypeSnoId == 116680003 && a[i].c2SnoId == 6254007) {
+            //     getLog().info(":DEBUG: found 391181005-116680003-6254007 (compute uuids)");
+            // }
 
             // UPDATE SNOMED ID
             if (doCrossMap) {
@@ -5394,14 +5495,16 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             int keepGroup = a[startIdx].group;
             int i = startIdx;
             while ((i < max - 1) && (a[i].c1SnoId == keepC1) && (a[i].group == keepGroup)) {
-                sb.append(a[i].c1SnoId + "-" + a[i].roleTypeSnoId + "-" + a[i].c2SnoId + ";");
+                sb.append(a[i].c1SnoId).append("-");
+                sb.append(a[i].roleTypeSnoId).append("-");
+                sb.append(a[i].c2SnoId).append(";");
                 i++;
             }
         }
         return sb.toString();
     }
 
-    protected void writeConcepts(ObjectOutputStream oos, Sct1_ConRecord[] a, int count,
+    private void writeConcepts(ObjectOutputStream oos, Sct1_ConRecord[] a, int count,
             long releaseDateTime, int pathIdx) throws Exception {
 
         long start = System.currentTimeMillis();
@@ -5422,7 +5525,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 + " milliseconds");
     }
 
-    protected void writeDescriptions(ObjectOutputStream oos, Sct1_DesRecord[] a, int count,
+    private void writeDescriptions(ObjectOutputStream oos, Sct1_DesRecord[] a, int count,
             long releaseDateTime, int pathIdx) throws Exception {
 
         long start = System.currentTimeMillis();
@@ -5443,7 +5546,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 + " milliseconds");
     }
 
-    protected void writeRelationships(ObjectOutputStream oos, ObjectOutputStream oosIds,
+    private void writeRelationships(ObjectOutputStream oos, ObjectOutputStream oosIds,
             Sct1_RelRecord[] a, int count, long releaseDateTime, int user) throws Exception {
 
         long start = System.currentTimeMillis();
@@ -5491,7 +5594,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
             oos.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            getLog().info(e);
         }
     }
 
@@ -5516,7 +5619,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
             ois.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            getLog().info(e);
         }
 
     }
@@ -5597,13 +5700,11 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     lineCount++;
                 }
             } catch (IOException ex) {
-                ex.printStackTrace();
                 throw new MojoFailureException("FAILED: error counting lines in " + fileName, ex);
             } finally {
                 br.close();
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
             throw new MojoFailureException("FAILED: error open BufferedReader for " + fileName, ex);
         }
 
