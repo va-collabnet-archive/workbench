@@ -291,7 +291,7 @@ public class Rf1ToArfHistoryTableReferenceMojo extends AbstractMojo implements S
 
         Rf1HistoryTableReference[] a1, a2, a3 = null;
 
-        getLog().info("START RF1 SUBSETS PROCESSING...");
+        getLog().info("START RF1 HISTORY TABLE PROCESSING...");
 
         Iterator<List<RF1File>> dit = fileListList.iterator(); // Directory Iterator
         while (dit.hasNext()) {
