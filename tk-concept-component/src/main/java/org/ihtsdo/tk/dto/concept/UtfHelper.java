@@ -23,9 +23,14 @@ import java.io.IOException;
  * Handle writing of UTF data, considering that data may sometimes be
  * > than the 64K limit. 
  * 
+ * Note that we are using max #of characters for the default read/write UTF
+ * as 24000 (~64K/3 since there are a max of 3 bytes per UTF-8 character).
+ * 
  * @author kec
  */
 public class UtfHelper {
+    
+    private static int MAX_CHARS = 21000;
     
      public static String readUtfV7(DataInput in, int dataVersion)
             throws IOException {
@@ -34,7 +39,7 @@ public class UtfHelper {
             return in.readUTF();
         } else {
             int textlength =  in.readInt();
-            if (textlength > 32000) {
+            if (textlength > MAX_CHARS) {
                 int textBytesLength = in.readInt();
                 byte[] textBytes = new byte[textBytesLength];
                 in.readFully(textBytes);
@@ -63,7 +68,7 @@ public class UtfHelper {
             
         } else {
             int textlength =  in.readInt();
-            if (textlength > 32000) {
+            if (textlength > MAX_CHARS) {
                 int textBytesLength = in.readInt();
                 byte[] textBytes = new byte[textBytesLength];
                 in.readFully(textBytes);
@@ -78,7 +83,7 @@ public class UtfHelper {
     public static void writeUtf(DataOutput out, String utfData) 
             throws IOException {
         out.writeInt(utfData.length()); 
-        if (utfData.length() > 32000) {
+        if (utfData.length() > MAX_CHARS) {
             byte[] textBytes = utfData.getBytes("UTF-8");
             out.writeInt(textBytes.length);
             out.write(textBytes);
