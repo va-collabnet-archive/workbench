@@ -3,6 +3,7 @@ package org.ihtsdo.tk.dto.concept.component.refset.str;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import org.ihtsdo.tk.dto.concept.UtfHelper;
 
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
@@ -22,15 +23,15 @@ public class TkRefsetStrRevision extends TkRevision {
     }
 
     @Override
-    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+    public final void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super.readExternal(in, dataVersion);
-        stringValue = in.readUTF();
+        stringValue = UtfHelper.readUtfV7(in, dataVersion);
     }
 
     @Override
     public void writeExternal(DataOutput out) throws IOException {
         super.writeExternal(out);
-        out.writeUTF(stringValue);
+        UtfHelper.writeUtf(out, stringValue);
     }
 
     public String getStringValue() {
@@ -44,11 +45,12 @@ public class TkRefsetStrRevision extends TkRevision {
     /**
      * Returns a string representation of the object.
      */
+    @Override
     public String toString() {
-        StringBuffer buff = new StringBuffer();
-        buff.append(this.getClass().getSimpleName() + ": ");
+        StringBuilder buff = new StringBuilder();
+        buff.append(this.getClass().getSimpleName()).append(": ");
         buff.append(" stringValue:");
-        buff.append("'" + this.stringValue + "'");
+        buff.append("'").append(this.stringValue).append("'");
         buff.append("; ");
         buff.append(super.toString());
         return buff.toString();

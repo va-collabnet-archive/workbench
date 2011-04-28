@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.UUID;
+import org.ihtsdo.tk.dto.concept.UtfHelper;
 
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
@@ -25,11 +26,11 @@ public class TkRefsetCidCidStrRevision extends TkRevision {
     }
 
     @Override
-    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+    public final void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super.readExternal(in, dataVersion);
         c1Uuid = new UUID(in.readLong(), in.readLong());
         c2Uuid = new UUID(in.readLong(), in.readLong());
-        stringValue = in.readUTF();
+        stringValue = UtfHelper.readUtfV7(in, dataVersion);
     }
 
     @Override
@@ -39,7 +40,7 @@ public class TkRefsetCidCidStrRevision extends TkRevision {
         out.writeLong(c1Uuid.getLeastSignificantBits());
         out.writeLong(c2Uuid.getMostSignificantBits());
         out.writeLong(c2Uuid.getLeastSignificantBits());
-        out.writeUTF(stringValue);
+        UtfHelper.writeUtf(out, stringValue);
     }
 
     public UUID getC1Uuid() {

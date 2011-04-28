@@ -5,6 +5,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.ihtsdo.tk.dto.concept.UtfHelper;
 
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
@@ -25,23 +26,10 @@ public class TkRefsetStrMember extends TkRefsetAbstractMember<TkRefsetStrRevisio
     }
 
 	@Override
-    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+    public final void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super.readExternal(in, dataVersion);
         
-        if (dataVersion < 6) {
-            strValue = in.readUTF();
-        } else {
-            int textlength =  in.readInt();
-            if (textlength > 64000) {
-                int textBytesLength = in.readInt();
-                byte[] textBytes = new byte[textBytesLength];
-                in.readFully(textBytes);
-                strValue = new String(textBytes, "UTF-8");
-            } else {
-                strValue = in.readUTF();
-            }
-            
-        }
+        strValue = UtfHelper.readUtfV6(in, dataVersion);
         int versionSize = in.readInt();
         if (versionSize > 0) {
             revisions = new ArrayList<TkRefsetStrRevision>(versionSize);
@@ -54,14 +42,7 @@ public class TkRefsetStrMember extends TkRefsetAbstractMember<TkRefsetStrRevisio
     @Override
     public void writeExternal(DataOutput out) throws IOException {
         super.writeExternal(out);
-        out.writeInt(strValue.length()); 
-        if (strValue.length() > 64000) {
-            byte[] textBytes = strValue.getBytes("UTF-8");
-            out.writeInt(textBytes.length);
-            out.write(textBytes);
-        } else {
-            out.writeUTF(strValue);
-        }
+        UtfHelper.writeUtf(out, strValue);
         if (revisions == null) {
             out.writeInt(0);
         } else {
@@ -77,6 +58,7 @@ public class TkRefsetStrMember extends TkRefsetAbstractMember<TkRefsetStrRevisio
         return TK_REFSET_TYPE.STR;
     }
 
+    @Override
     public List<TkRefsetStrRevision> getRevisionList() {
         return revisions;
     }
@@ -92,11 +74,12 @@ public class TkRefsetStrMember extends TkRefsetAbstractMember<TkRefsetStrRevisio
     /**
      * Returns a string representation of the object.
      */
+    @Override
     public String toString() {
-        StringBuffer buff = new StringBuffer();
-        buff.append(this.getClass().getSimpleName() + ": ");
+        StringBuilder buff = new StringBuilder();
+        buff.append(this.getClass().getSimpleName()).append(": ");
         buff.append(" strValue:");
-        buff.append("'" + this.strValue + "'");
+        buff.append("'").append(this.strValue).append("'");
         buff.append("; ");
         buff.append(super.toString());
         return buff.toString();
@@ -107,6 +90,7 @@ public class TkRefsetStrMember extends TkRefsetAbstractMember<TkRefsetStrRevisio
      * 
      * @return a hash code value for this <tt>ERefsetStrMember</tt>.
      */
+    @Override
     public int hashCode() {
         return this.primordialUuid.hashCode();
     }
@@ -121,6 +105,7 @@ public class TkRefsetStrMember extends TkRefsetAbstractMember<TkRefsetStrRevisio
      * @return <code>true</code> if the objects are the same; 
      *         <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;

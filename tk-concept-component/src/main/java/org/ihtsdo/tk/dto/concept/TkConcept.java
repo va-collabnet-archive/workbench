@@ -30,7 +30,7 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 public class TkConcept {
 
     public static final long serialVersionUID = 1;
-    public static final int dataVersion = 6;
+    public static final int dataVersion = 7;
     public TkConceptAttributes conceptAttributes;
     public List<TkDescription> descriptions;
     public List<TkRelationship> relationships;
@@ -44,7 +44,7 @@ public class TkConcept {
         readExternal(in);
     }
 
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
+    public final void readExternal(DataInput in) throws IOException, ClassNotFoundException {
         int readDataVersion = in.readInt();
         if (readDataVersion > dataVersion) {
             throw new IOException("Unsupported dataVersion: " + readDataVersion);

@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.UUID;
+import org.ihtsdo.tk.dto.concept.UtfHelper;
 
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
@@ -24,10 +25,10 @@ public class TkRefsetCidStrRevision extends TkRevision {
     }
 
     @Override
-    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+    public final void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super.readExternal(in, dataVersion);
         c1Uuid = new UUID(in.readLong(), in.readLong());
-        strValue = in.readUTF();
+        strValue = UtfHelper.readUtfV7(in, dataVersion);
     }
 
     @Override
@@ -57,13 +58,14 @@ public class TkRefsetCidStrRevision extends TkRevision {
     /**
      * Returns a string representation of the object.
      */
+    @Override
     public String toString() {
-        StringBuffer buff = new StringBuffer();
-        buff.append(this.getClass().getSimpleName() + ": ");
+        StringBuilder buff = new StringBuilder();
+        buff.append(this.getClass().getSimpleName()).append(": ");
         buff.append(" c1Uuid:");
         buff.append(this.c1Uuid);
         buff.append(" strValue:");
-        buff.append("'" + this.strValue + "'");
+        buff.append("'").append(this.strValue).append("'");
         buff.append("; ");
         buff.append(super.toString());
         return buff.toString();
@@ -79,6 +81,7 @@ public class TkRefsetCidStrRevision extends TkRevision {
      * @return <code>true</code> if the objects are the same; 
      *         <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;

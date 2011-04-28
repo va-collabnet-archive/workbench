@@ -29,11 +29,24 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
     }
 
     @Override
-    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+    public final void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super.readExternal(in, dataVersion);
         initialCaseSignificant = in.readBoolean();
         lang = in.readUTF();
-        text = in.readUTF();
+        if (dataVersion < 7) {
+            text = in.readUTF();
+        } else {
+            int textlength =  in.readInt();
+            if (textlength > 32000) {
+                int textBytesLength = in.readInt();
+                byte[] textBytes = new byte[textBytesLength];
+                in.readFully(textBytes);
+                text = new String(textBytes, "UTF-8");
+            } else {
+                text = in.readUTF();
+            }
+            
+        }
         typeUuid = new UUID(in.readLong(), in.readLong());
     }
 
@@ -42,7 +55,14 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
         super.writeExternal(out);
         out.writeBoolean(initialCaseSignificant);
         out.writeUTF(lang);
-        out.writeUTF(text);
+        out.writeInt(text.length()); 
+        if (text.length() > 32000) {
+            byte[] textBytes = text.getBytes("UTF-8");
+            out.writeInt(textBytes.length);
+            out.write(textBytes);
+        } else {
+            out.writeUTF(text);
+        }
         out.writeLong(typeUuid.getMostSignificantBits());
         out.writeLong(typeUuid.getLeastSignificantBits());
     }
@@ -52,6 +72,7 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
      * 
      * @see org.ihtsdo.etypes.I_DescribeExternally#isInitialCaseSignificant()
      */
+    @Override
     public boolean isInitialCaseSignificant() {
         return initialCaseSignificant;
     }
@@ -65,6 +86,7 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
      * 
      * @see org.ihtsdo.etypes.I_DescribeExternally#getLang()
      */
+    @Override
     public String getLang() {
         return lang;
     }
@@ -78,6 +100,7 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
      * 
      * @see org.ihtsdo.etypes.I_DescribeExternally#getText()
      */
+    @Override
     public String getText() {
         return text;
     }
@@ -86,6 +109,7 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
         this.text = text;
     }
 
+    @Override
     public UUID getTypeUuid() {
         return typeUuid;
     }
@@ -97,15 +121,16 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
     /**
      * Returns a string representation of the object.
      */
+    @Override
     public String toString() {
-        StringBuffer buff = new StringBuffer();
-        buff.append(this.getClass().getSimpleName() + ": ");
+        StringBuilder buff = new StringBuilder();
+        buff.append(this.getClass().getSimpleName()).append(": ");
         buff.append(" initialCaseSignificant:");
         buff.append(this.initialCaseSignificant);
         buff.append(" lang:");
-        buff.append("'" + this.lang + "'");
+        buff.append("'").append(this.lang).append("'");
         buff.append(" text:");
-        buff.append("'" + this.text + "'");
+        buff.append("'").append(this.text).append("'");
         buff.append(" typeUuid:");
         buff.append(this.typeUuid);
         buff.append("; ");
@@ -124,6 +149,7 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
      * @return <code>true</code> if the objects are the same; 
      *         <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;

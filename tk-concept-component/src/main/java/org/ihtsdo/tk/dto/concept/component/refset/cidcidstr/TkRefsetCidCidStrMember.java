@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.ihtsdo.tk.dto.concept.UtfHelper;
 
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
@@ -28,11 +29,11 @@ public class TkRefsetCidCidStrMember extends TkRefsetAbstractMember<TkRefsetCidC
     }
     
 	@Override
-    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+    public final void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super.readExternal(in, dataVersion);
         c1Uuid = new UUID(in.readLong(), in.readLong());
         c2Uuid = new UUID(in.readLong(), in.readLong());
-        strValue = in.readUTF();
+        strValue = UtfHelper.readUtfV7(in, dataVersion);
         int versionSize = in.readInt();
         if (versionSize > 0) {
             revisions = new ArrayList<TkRefsetCidCidStrRevision>(versionSize);
@@ -49,7 +50,7 @@ public class TkRefsetCidCidStrMember extends TkRefsetAbstractMember<TkRefsetCidC
         out.writeLong(c1Uuid.getLeastSignificantBits());
         out.writeLong(c2Uuid.getMostSignificantBits());
         out.writeLong(c2Uuid.getLeastSignificantBits());
-        out.writeUTF(strValue);
+        UtfHelper.writeUtf(out, strValue);
         if (revisions == null) {
             out.writeInt(0);
         } else {
