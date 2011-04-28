@@ -41,6 +41,11 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
+import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
+import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/arena", type = BeanType.TASK_BEAN) })
 public class SetActiveConceptToPrimitive extends AbstractTask {
@@ -77,30 +82,38 @@ public class SetActiveConceptToPrimitive extends AbstractTask {
     
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            
         	I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-
             I_GetConceptData concept = (I_GetConceptData) process.getProperty(activeConceptPropName);
+            ConceptChronicleBI cc = (ConceptChronicleBI) concept;
+            ConAttrChronicleBI ca = cc.getConAttrs();
+            ConAttrVersionBI cv = (ConAttrVersionBI) ca;
             
-            if (I_AmPart.class.isAssignableFrom(concept.getClass())) {
-            	I_AmPart part = (I_AmPart) concept;
-            	//make analog
+            if(cv.isDefined() == true){
+        		//make analog
 	            for (PathBI ep: config.getEditingPathSet()) {
-					AnalogBI newAnalog = part.makeAnalog(
-							ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), 
+					AnalogBI newAnalog = cv.makeAnalog(
+							ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), 
 							config.getDbConfig().getUserConcept().getNid(),
 							ep.getConceptNid(), 
 							Long.MAX_VALUE);
 					
 					I_ConceptAttributePart newAnalogAttr = (I_ConceptAttributePart) newAnalog;
 					newAnalogAttr.setDefined(false);
+					
+					cv.makeAnalog(
+							ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), 
+							config.getDbConfig().getUserConcept().getNid(),
+							ep.getConceptNid(), 
+							Long.MAX_VALUE);
+					I_GetConceptData retireConcept = Terms.get().getConceptForNid(cv.getNid());
+    	            Terms.get().addUncommitted(retireConcept);
 					}
-	            }
-            Terms.get().addUncommitted(concept);
-
-            return Condition.CONTINUE;
-            	
-            }catch (IllegalArgumentException e) {
+	            Terms.get().addUncommitted(concept);
+        	} else{
+        		return Condition.CONTINUE;
+        	}
+           return Condition.CONTINUE;
+        }catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
         } catch (IntrospectionException e) {
             throw new TaskFailedException(e);
