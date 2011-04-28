@@ -238,10 +238,16 @@ public class ConceptViewSettings extends ArenaComponentSettings {
     }
 
     public boolean showStated() {
+        if (relAssertionType == null) {
+            relAssertionType = RelAssertionType.STATED;
+        }
         return relAssertionType != RelAssertionType.INFERRED;
     }
 
     public boolean showInferred() {
+        if (relAssertionType == null) {
+            relAssertionType = RelAssertionType.STATED;
+        }
         return relAssertionType != RelAssertionType.STATED;
     }
 
