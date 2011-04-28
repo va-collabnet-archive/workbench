@@ -154,10 +154,7 @@ public class ConceptAttributes
                 return rev.makeAnalog(statusNid, authorNid, pathNid, time);
             }
             try {
-                return new ConceptAttributesRevision(ConceptAttributes.this,
-                        statusNid,
-                        authorNid,
-                        pathNid, time, ConceptAttributes.this);
+                return ConceptAttributes.this.makeAnalog(statusNid, authorNid, pathNid, time);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
