@@ -38,8 +38,8 @@ public class UtfHelper {
         if (dataVersion < 7) {
             return in.readUTF();
         } else {
-            int textlength =  in.readInt();
-            if (textlength > MAX_CHARS) {
+            boolean isBig = in.readBoolean();
+            if (isBig) {
                 int textBytesLength = in.readInt();
                 byte[] textBytes = new byte[textBytesLength];
                 in.readFully(textBytes);
@@ -48,6 +48,7 @@ public class UtfHelper {
                 return in.readUTF();
             }
         }
+        
     }
 
     public static String readUtfV6(DataInput in, int dataVersion)
@@ -67,8 +68,8 @@ public class UtfHelper {
             }
             
         } else {
-            int textlength =  in.readInt();
-            if (textlength > MAX_CHARS) {
+            boolean isBig = in.readBoolean();
+            if (isBig) {
                 int textBytesLength = in.readInt();
                 byte[] textBytes = new byte[textBytesLength];
                 in.readFully(textBytes);
@@ -82,8 +83,9 @@ public class UtfHelper {
     
     public static void writeUtf(DataOutput out, String utfData) 
             throws IOException {
-        out.writeInt(utfData.length()); 
-        if (utfData.length() > MAX_CHARS) {
+        boolean isBig = utfData.length() > MAX_CHARS;
+        out.writeBoolean(isBig);
+        if (isBig) {
             byte[] textBytes = utfData.getBytes("UTF-8");
             out.writeInt(textBytes.length);
             out.write(textBytes);
