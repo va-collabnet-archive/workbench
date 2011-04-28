@@ -617,15 +617,15 @@ public class ConceptView extends JPanel {
             @Override
             protected Object doInBackground() throws Exception {
                 LayoutManager layout = new FlowLayout(FlowLayout.LEADING, 5, 5);
-                sfp = new ScrollablePanel(layout);
+                JPanel sfp = new ScrollablePanel(layout);
                 if (gridLayout) {
                     layout = new GridLayout(0, 1, 5, 5);
                     sfp = new JPanel(layout);
                 }
 
                 sfp.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-                dropPanel = new JPanel(new GridLayout(1, 1));
-                sfpScroller = new JScrollPane(sfp);
+                JPanel dropPanel = new JPanel(new GridLayout(1, 1));
+                JScrollPane sfpScroller = new JScrollPane(sfp);
                 sfpScroller.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
                 sfpScroller.setAutoscrolls(true);
                 sfpScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
@@ -634,6 +634,9 @@ public class ConceptView extends JPanel {
                     return null;
                 }
                 dropPanel.add(sfpScroller);
+                DropPanelActionManager.this.dropPanel = dropPanel;
+                DropPanelActionManager.this.sfpScroller = sfpScroller;
+                DropPanelActionManager.this.sfp = sfp;
                 dragging = true;
                 timer.start();
                 return null;

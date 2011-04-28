@@ -186,13 +186,13 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
                 try {
                     String userString = get();
                     LayoutManager layout = new FlowLayout(FlowLayout.LEADING, 5, 5);
-                    sfp = new ScrollablePanel(layout, ScrollDirection.LEFT_TO_RIGHT);
+                    JPanel sfp = new ScrollablePanel(layout, ScrollDirection.LEFT_TO_RIGHT);
                     if (gridLayout) {
                         layout = new GridLayout(1, 0, 5, 5);
                         sfp = new JPanel(layout);
                     }
                     sfp.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-                    dropPanel = new JPanel(new BorderLayout());
+                    JPanel dropPanel = new JPanel(new BorderLayout());
                     JPanel dropTargetPanels = new JPanel(new GridLayout(1, 1));
                     JLabel dropPanelLabel = new JLabel("    " + userString);
                     dropPanelLabel.setFont(dropPanelLabel.getFont().deriveFont(settings.getFontSize()));
@@ -202,12 +202,15 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
                     dropPanel.add(dropPanelLabel, BorderLayout.PAGE_START);
                     if (dropPanel == null) return;
                     dropPanel.add(dropTargetPanels, BorderLayout.CENTER);
-                    sfpScroller = new JScrollPane(sfp);
+                    JScrollPane sfpScroller = new JScrollPane(sfp);
                     sfpScroller.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
                     sfpScroller.setAutoscrolls(true);
                     sfpScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
                     sfpScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
                     dropTargetPanels.add(sfpScroller);
+                    DropPanelActionManager.this.dropPanel = dropPanel;
+                    DropPanelActionManager.this.sfpScroller = sfpScroller;
+                    DropPanelActionManager.this.sfp = sfp;                    
                     dragging = true;
                     timer.start();
                 } catch (InterruptedException ex) {
