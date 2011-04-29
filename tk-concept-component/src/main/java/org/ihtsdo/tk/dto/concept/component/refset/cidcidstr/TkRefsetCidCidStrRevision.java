@@ -70,16 +70,16 @@ public class TkRefsetCidCidStrRevision extends TkRevision {
     /**
      * Returns a string representation of the object.
      */
+    @Override
     public String toString() {
-        StringBuffer buff = new StringBuffer();
-        buff.append(this.getClass().getSimpleName() + ": ");
+        StringBuilder buff = new StringBuilder();
+        buff.append(this.getClass().getSimpleName()).append(": ");
         buff.append(" c1Uuid:");
         buff.append(this.c1Uuid);
         buff.append(" c2Uuid:");
         buff.append(this.c2Uuid);
         buff.append(" stringValue:");
-        buff.append("'" + this.stringValue + "'");
-        buff.append("; ");
+        buff.append("'").append(this.stringValue).append("' ");
         buff.append(super.toString());
         return buff.toString();
     }
@@ -94,6 +94,7 @@ public class TkRefsetCidCidStrRevision extends TkRevision {
      * @return <code>true</code> if the objects are the same; 
      *         <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;

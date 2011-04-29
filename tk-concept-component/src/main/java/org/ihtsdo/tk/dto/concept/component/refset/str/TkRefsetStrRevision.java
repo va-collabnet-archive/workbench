@@ -50,8 +50,7 @@ public class TkRefsetStrRevision extends TkRevision {
         StringBuilder buff = new StringBuilder();
         buff.append(this.getClass().getSimpleName()).append(": ");
         buff.append(" stringValue:");
-        buff.append("'").append(this.stringValue).append("'");
-        buff.append("; ");
+        buff.append("'").append(this.stringValue).append("' ");
         buff.append(super.toString());
         return buff.toString();
     }

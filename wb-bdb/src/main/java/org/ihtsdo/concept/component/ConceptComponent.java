@@ -2032,7 +2032,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         Collection<? extends RefexChronicleBI<?>> fetchedAnnotations = cc.getAnnotations();
         if (fetchedAnnotations != null) {
             for (RefexChronicleBI<?> annotation : fetchedAnnotations) {
-                returnValues.add(annotation);
+                if (addedMembers.contains(annotation.getNid()) == false) {
+                    returnValues.add(annotation);
+                    addedMembers.add(annotation.getNid());
+                }
             }
         }
         return Collections.unmodifiableCollection(returnValues);
