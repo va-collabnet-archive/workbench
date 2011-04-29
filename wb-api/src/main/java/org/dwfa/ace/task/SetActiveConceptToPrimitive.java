@@ -99,15 +99,7 @@ public class SetActiveConceptToPrimitive extends AbstractTask {
 					
 					I_ConceptAttributePart newAnalogAttr = (I_ConceptAttributePart) newAnalog;
 					newAnalogAttr.setDefined(false);
-					
-					cv.makeAnalog(
-							ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), 
-							config.getDbConfig().getUserConcept().getNid(),
-							ep.getConceptNid(), 
-							Long.MAX_VALUE);
-					I_GetConceptData retireConcept = Terms.get().getConceptForNid(cv.getNid());
-    	            Terms.get().addUncommitted(retireConcept);
-					}
+				}
 	            Terms.get().addUncommitted(concept);
         	} else{
         		return Condition.CONTINUE;
