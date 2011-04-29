@@ -198,7 +198,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
                     JPanel dropPanel = new JPanel(new BorderLayout());
                     JPanel dropTargetPanels = new JPanel(new GridLayout(1, 1));
                     JLabel dropPanelLabel = new JLabel("    " + userString);
-                    AceLog.getAppLog().info("Setting up drag panel for: " + id + " " + userString);
+//                    AceLog.getAppLog().info("Setting up drag panel for: " + id + " " + userString);
                     dropPanelLabel.setFont(dropPanelLabel.getFont().deriveFont(settings.getFontSize()));
                     dropPanelLabel.setOpaque(true);
                     dropPanelLabel.setBackground(ConceptViewTitle.TITLE_COLOR);
@@ -262,7 +262,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
 
         @Override
         public void dragStarted() {
-            AceLog.getAppLog().info("starting drag for: " + id);
+//            AceLog.getAppLog().info("starting drag for: " + id);
             if (thingToDrag == null || DragPanel.this.isVisible() == false) {
                 return;
             }
@@ -271,7 +271,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
 
         @Override
         public void dragFinished() {
-            AceLog.getAppLog().info("stopping drag for: " + id);
+//            AceLog.getAppLog().info("stopping drag for: " + id);
             timer.stop();
             dragging = false;
             setDragPanelVisible(false);
@@ -350,7 +350,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
         }
 
         private void setDragPanelVisible(boolean visible) {
-            AceLog.getAppLog().info("set drag visible: " + visible + " for: "+ id);
+//            AceLog.getAppLog().info("set drag visible: " + visible + " for: "+ id);
             if (visible) {
                 if (!panelAdded) {
                     if (DragPanel.this.isReallyVisible()) {
