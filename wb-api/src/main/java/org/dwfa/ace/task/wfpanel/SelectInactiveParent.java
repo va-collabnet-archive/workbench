@@ -46,7 +46,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.tk.example.binding.ConceptInactivation;
+import org.ihtsdo.tk.example.binding.ConceptInactivationType;
 
 import org.ihtsdo.tk.api.WizardBI;
 import javax.swing.JPanel;
@@ -225,13 +225,13 @@ public class SelectInactiveParent extends PreviousNextOrCancel {
             c.gridy = 0;
             I_GetConceptData parentList[] = new I_GetConceptData[7];
             try {
-            	parentList[0] = Terms.get().getConcept(ConceptInactivation.AMBIGUOUS_CONCEPT.getUuids());
-            	parentList[1] = Terms.get().getConcept(ConceptInactivation.DUPLICATE_CONCEPT.getUuids());
-            	parentList[2] = Terms.get().getConcept(ConceptInactivation.ERRONEOUS_CONCEPT.getUuids());
-            	parentList[3] = Terms.get().getConcept(ConceptInactivation.LIMITED_STATUS_CONCEPT.getUuids());
-            	parentList[4] = Terms.get().getConcept(ConceptInactivation.MOVED_ELSEWHERE.getUuids());
-            	parentList[5] = Terms.get().getConcept(ConceptInactivation.OUTDATED_CONCEPT.getUuids());
-            	parentList[6] = Terms.get().getConcept(ConceptInactivation.REASON_NOT_STATED_CONCEPT.getUuids());
+            	parentList[0] = Terms.get().getConcept(ConceptInactivationType.AMBIGUOUS_CONCEPT.getUuids());
+            	parentList[1] = Terms.get().getConcept(ConceptInactivationType.DUPLICATE_CONCEPT.getUuids());
+            	parentList[2] = Terms.get().getConcept(ConceptInactivationType.ERRONEOUS_CONCEPT.getUuids());
+            	parentList[3] = Terms.get().getConcept(ConceptInactivationType.LIMITED_STATUS_CONCEPT.getUuids());
+            	parentList[4] = Terms.get().getConcept(ConceptInactivationType.MOVED_ELSEWHERE.getUuids());
+            	parentList[5] = Terms.get().getConcept(ConceptInactivationType.OUTDATED_CONCEPT.getUuids());
+            	parentList[6] = Terms.get().getConcept(ConceptInactivationType.REASON_NOT_STATED_CONCEPT.getUuids());
             } catch (TerminologyException e) {
                 e.printStackTrace();
             } catch (IOException e) {
