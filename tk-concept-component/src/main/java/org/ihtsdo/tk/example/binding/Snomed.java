@@ -36,14 +36,13 @@ public class Snomed {
     public static ConceptSpec PRODUCT =
             new ConceptSpec("Pharmaceutical / biologic product (product)",
             UUID.fromString("5032532f-6b58-31f9-84c1-4a365dde4449"));
+    public static ConceptSpec INACTIVE_CONCEPT =
+        new ConceptSpec("Inactive concept (inactive concept)",
+        UUID.fromString("f267fc6f-7c4d-3a79-9f17-88b82b42709a"));
+    
     
     //Concept Specs for context sensitive role relationships
 
-    /* 
-    public static ConceptSpec =
-		new ConceptSpec("",
-		UUID.fromString(""));
-    */
     public static ConceptSpec ACCESS =
 		new ConceptSpec("Access (attribute)",
 		UUID.fromString("3f5a4b8c-923b-3df5-9362-67881b729394"));
