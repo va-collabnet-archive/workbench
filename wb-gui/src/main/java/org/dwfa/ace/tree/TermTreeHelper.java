@@ -113,7 +113,7 @@ public class TermTreeHelper implements PropertyChangeListener {
         tree.setTransferHandler(new TerminologyTransferHandler(tree));
         tree.setDragEnabled(true);
         ToolTipManager.sharedInstance().registerComponent(tree);
-        renderer = new TermTreeCellRenderer(aceFrameConfig);
+        renderer = new TermTreeCellRenderer(aceFrameConfig, this);
         tree.setCellRenderer(renderer);
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
@@ -232,6 +232,10 @@ public class TermTreeHelper implements PropertyChangeListener {
     private static ImageIcon inferredThenStatedView = new ImageIcon(
             ConceptViewRenderer.class.getResource("/16x16/plain/inferred-then-stated.png"));
     private RelAssertionType assertionType;
+
+    public RelAssertionType getAssertionType() {
+        return assertionType;
+    }
 
     public TermTreeCellRenderer getRenderer() {
         return renderer;
