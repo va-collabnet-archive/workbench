@@ -360,7 +360,10 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
         while (br.ready()) {
             String[] line = br.readLine().split(TAB_CHARACTER);
             long conceptId = Long.parseLong(line[MAPCONCEPTID]);
-            int priority = Integer.parseInt(line[MAPPRIORITY]);
+            int priority = 0;
+            if ("".equalsIgnoreCase(line[MAPPRIORITY]) == false) {
+                priority = Integer.parseInt(line[MAPPRIORITY]);
+            }
             long targetId = Long.parseLong(line[MAPTARGETID]);
 
             String targetCode = mapTargetidTargetcode.get(targetId);
