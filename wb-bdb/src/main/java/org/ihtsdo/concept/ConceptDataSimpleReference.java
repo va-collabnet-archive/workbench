@@ -148,6 +148,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             cc.cancel();
             return true;
         }
+        cc.cancel();
         return false;
     }
 
