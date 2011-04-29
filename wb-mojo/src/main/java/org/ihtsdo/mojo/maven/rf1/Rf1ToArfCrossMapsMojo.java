@@ -306,7 +306,11 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
         } else if (r1.sctId == r2.sctId) {
             int comp = r1.targetCode.compareTo(r2.targetCode);
             if (comp == 0) {
-                return 1; // SAME
+                if (r1.status == r2.status) {
+                    return 1; // SAME
+                } else {
+                    return 2; // MODIFIED
+                }
             } else if (comp > 0) {
                 return 3; // ADDED
             } else if (comp < 0) {
@@ -488,7 +492,7 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
             a3 = new CrossMapRecord[count2];
             while ((r1 < count1) && (r2 < count2)) {
 
-                switch (compareCrossMapRecord(a1[r1], a2[r2])) {
+                switch (compareCrossMapRecord(a1[r1], a2[r2])) {                    
                     case 1: // SAME CROSSMAP, skip to next
                         r1++;
                         r2++;
