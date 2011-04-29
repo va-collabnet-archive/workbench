@@ -85,15 +85,6 @@ public class SetDefinedAction extends AbstractAction {
     	            I_GetConceptData concept = Terms.get().getConceptForNid(newAnalogAttr.getNid());
     	            Terms.get().addUncommitted(concept);
             	}
-            	for (PathBI ep: config.getEditingPathSet()) {
-					part.makeAnalog(
-							ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), 
-							config.getDbConfig().getUserConcept().getNid(),
-							ep.getConceptNid(), 
-							Long.MAX_VALUE);
-					I_GetConceptData retireConcept = Terms.get().getConceptForNid(part.getNid());
-    	            Terms.get().addUncommitted(retireConcept);
-            	}
             }
         } catch (TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
