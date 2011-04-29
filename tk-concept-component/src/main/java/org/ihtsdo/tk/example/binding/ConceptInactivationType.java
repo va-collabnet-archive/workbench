@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import org.ihtsdo.tk.spec.ConceptSpec;
 
-public class ConceptInactivation {
+public class ConceptInactivationType {
 	
 	public static ConceptSpec AMBIGUOUS_CONCEPT = 
 		new ConceptSpec("Ambiguous concept (inactive concept)", 
