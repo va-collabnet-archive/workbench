@@ -351,7 +351,11 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         }
         ComponentChroncileBI<?> cc = (ComponentChroncileBI<?>) component;
         for (RefexChronicleBI annotation : cc.getAnnotations()) {
-            returnValues.add((I_ExtendByRef) annotation);
+            if (addedMembers.contains(annotation.getNid()) == false) {
+                returnValues.add((I_ExtendByRef) annotation);
+                addedMembers.add(annotation.getNid());
+            }
+            
         }
         return returnValues;
     }
