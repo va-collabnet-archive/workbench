@@ -8,16 +8,20 @@ import java.awt.event.HierarchyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.dwfa.ace.dnd.DragMonitor;
 import org.dwfa.ace.log.AceLog;
 
-class DropPanelProxy implements PropertyChangeListener, HierarchyListener {
+class DropPanelProxy implements PropertyChangeListener, HierarchyListener, Comparable<DropPanelProxy> {
 
+    private static AtomicInteger count = new AtomicInteger();
     WeakReference<I_DispatchDragStatus> dpmr;
+    int id;
 
     public DropPanelProxy(I_DispatchDragStatus dpm) {
         super();
+        this.id = count.incrementAndGet();
         this.dpmr = new WeakReference<I_DispatchDragStatus>(dpm);
     }
 
@@ -46,11 +50,25 @@ class DropPanelProxy implements PropertyChangeListener, HierarchyListener {
         boolean displayability = (flags & HierarchyEvent.DISPLAYABILITY_CHANGED) != 0;
         boolean showing = (flags & HierarchyEvent.SHOWING_CHANGED) != 0;
         if (displayability || showing) {
-            if (e.getChanged().isDisplayable()) {
+            if (e.getChanged().isShowing()) {
                 DragMonitor.addDragListener(this);
             } else {
-                 DragMonitor.removeDragListener(this);
+                DragMonitor.removeDragListener(this);
+                I_DispatchDragStatus dpm = dpmr.get();
+                if (dpm != null) {
+                    dpm.dragFinished();
+                }
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return "DPP: " + id;
+    }
+
+    @Override
+    public int compareTo(DropPanelProxy o) {
+        return id - o.id;
     }
 }

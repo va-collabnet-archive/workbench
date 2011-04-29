@@ -7,8 +7,9 @@ import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -34,7 +35,7 @@ public class DragMonitor implements AWTEventListener {
 
                         @Override
                         public void run() {
-                            pcs.firePropertyChange("dragging", true, false);
+                            firePropertyChange("dragging", true, false);
                         }
                     });
                 } catch (InvalidDnDOperationException e1) {
@@ -50,15 +51,21 @@ public class DragMonitor implements AWTEventListener {
     boolean dragging = false;
     private static long eventMask = AWTEvent.MOUSE_MOTION_EVENT_MASK + AWTEvent.MOUSE_EVENT_MASK;
     private static DragMonitor singleton = new DragMonitor();
-    private static PropertyChangeSupport pcs;
+    private static ConcurrentSkipListSet<PropertyChangeListener> listeners = new ConcurrentSkipListSet<PropertyChangeListener>();
     private Timer endTimer = new Timer(1000, new DragEndMonitor());
 
     public static void addDragListener(PropertyChangeListener listener) {
-        pcs.addPropertyChangeListener(listener);
+        listeners.add(listener);
+//        AceLog.getAppLog().info("added listener: " + listener + " ("
+//                + listeners.size()
+//                + ")" + listeners);
     }
 
     public static void removeDragListener(PropertyChangeListener listener) {
-        pcs.removePropertyChangeListener(listener);
+        listeners.remove(listener);
+//        AceLog.getAppLog().info("removed listener: " + listener + " ("
+//                + listeners.size()
+//                + ")" + listeners);
     }
 
     public static void setup() {
@@ -67,11 +74,21 @@ public class DragMonitor implements AWTEventListener {
         }
     }
 
+    public static boolean isDragging() {
+        return singleton.dragging;
+    }
+
     private DragMonitor() {
         super();
         endTimer.stop();
-        pcs = new PropertyChangeSupport(this);
         Toolkit.getDefaultToolkit().addAWTEventListener(this, eventMask);
+    }
+
+    private void firePropertyChange(String string, boolean from, boolean to) {
+        PropertyChangeEvent pce = new PropertyChangeEvent(singleton, string, from, to);
+        for (PropertyChangeListener pcl: listeners) {
+            pcl.propertyChange(pce);
+        }
     }
 
     @Override
@@ -84,7 +101,7 @@ public class DragMonitor implements AWTEventListener {
 
                     @Override
                     public void run() {
-                        pcs.firePropertyChange("dragging", false, true);
+                        firePropertyChange("dragging", false, true);
                     }
                 });
             }
@@ -96,7 +113,7 @@ public class DragMonitor implements AWTEventListener {
 
                     @Override
                     public void run() {
-                        pcs.firePropertyChange("dragging", true, false);
+                        firePropertyChange("dragging", true, false);
                     }
                 });
             }
@@ -108,7 +125,7 @@ public class DragMonitor implements AWTEventListener {
 
                     @Override
                     public void run() {
-                        pcs.firePropertyChange("dragging", true, false);
+                        firePropertyChange("dragging", true, false);
                     }
                 });
             }
@@ -120,7 +137,7 @@ public class DragMonitor implements AWTEventListener {
 
                     @Override
                     public void run() {
-                        pcs.firePropertyChange("dragging", true, false);
+                        firePropertyChange("dragging", true, false);
                     }
                 });
             }
@@ -132,7 +149,7 @@ public class DragMonitor implements AWTEventListener {
 
                     @Override
                     public void run() {
-                        pcs.firePropertyChange("dragging", true, false);
+                        firePropertyChange("dragging", true, false);
                     }
                 });
             }
@@ -144,7 +161,7 @@ public class DragMonitor implements AWTEventListener {
 
                     @Override
                     public void run() {
-                        pcs.firePropertyChange("dragging", true, false);
+                        firePropertyChange("dragging", true, false);
                     }
                 });
             }

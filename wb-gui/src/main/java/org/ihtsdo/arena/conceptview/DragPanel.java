@@ -44,8 +44,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TooManyListenersException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -64,6 +64,7 @@ import javax.swing.TransferHandler;
 
 import org.dwfa.ace.TermLabelMaker;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.dnd.DragMonitor;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.arena.ScrollablePanel;
 import org.ihtsdo.arena.ScrollablePanel.ScrollDirection;
@@ -82,6 +83,8 @@ import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 import sun.awt.dnd.SunDragSourceContextPeer;
 
 public abstract class DragPanel<T extends Object> extends JPanel implements Transferable {
+    
+    private static final AtomicInteger atomicInt = new AtomicInteger();
 
     protected Collection<Action> getMenuActions() {
         return getKbActionsNoSetup(thingToDrag);
@@ -195,12 +198,17 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
                     JPanel dropPanel = new JPanel(new BorderLayout());
                     JPanel dropTargetPanels = new JPanel(new GridLayout(1, 1));
                     JLabel dropPanelLabel = new JLabel("    " + userString);
+                    AceLog.getAppLog().info("Setting up drag panel for: " + id + " " + userString);
                     dropPanelLabel.setFont(dropPanelLabel.getFont().deriveFont(settings.getFontSize()));
                     dropPanelLabel.setOpaque(true);
                     dropPanelLabel.setBackground(ConceptViewTitle.TITLE_COLOR);
-                    if (dropPanel == null) return;
+                    if (dropPanel == null) {
+                        return;
+                    }
                     dropPanel.add(dropPanelLabel, BorderLayout.PAGE_START);
-                    if (dropPanel == null) return;
+                    if (dropPanel == null) {
+                        return;
+                    }
                     dropPanel.add(dropTargetPanels, BorderLayout.CENTER);
                     JScrollPane sfpScroller = new JScrollPane(sfp);
                     sfpScroller.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
@@ -210,13 +218,27 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
                     dropTargetPanels.add(sfpScroller);
                     DropPanelActionManager.this.dropPanel = dropPanel;
                     DropPanelActionManager.this.sfpScroller = sfpScroller;
-                    DropPanelActionManager.this.sfp = sfp;                    
+                    DropPanelActionManager.this.sfp = sfp;
                     dragging = true;
                     timer.start();
                 } catch (InterruptedException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
                 } catch (ExecutionException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
+                }
+
+                if (!DragMonitor.isDragging()) {
+                    timer.stop();
+                    dragging = false;
+                    anotherDragging = false;
+                    panelAdded = false;
+                    if (dropPanel != null) {
+                        dropPanel.setVisible(false);
+                        if (rootLayers != null) {
+                            rootLayers.remove(dropPanel);
+                        }
+                        dropPanel = null;
+                    }
                 }
             }
         }
@@ -240,8 +262,8 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
 
         @Override
         public void dragStarted() {
-
-            if (thingToDrag == null) {
+            AceLog.getAppLog().info("starting drag for: " + id);
+            if (thingToDrag == null || DragPanel.this.isVisible() == false) {
                 return;
             }
             (new DragStarter()).execute();
@@ -249,10 +271,16 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
 
         @Override
         public void dragFinished() {
+            AceLog.getAppLog().info("stopping drag for: " + id);
             timer.stop();
             dragging = false;
             setDragPanelVisible(false);
-            dropPanel = null;
+            if (dropPanel != null) {
+                if (rootLayers != null) {
+                    rootLayers.remove(dropPanel);
+                }
+                dropPanel = null;
+            }
             anotherDragging = false;
             addedDropComponents.clear();
             dropComponents.clear();
@@ -291,8 +319,6 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
                     } else if (DragPanelRelGroup.class.isAssignableFrom(DragPanel.this.getClass())) {
                         setDragPanelVisible(true);
                     }
-
-
                 } else {
                     Point mouseLocationForDropPanel = mouseLocation.getLocation();
                     SwingUtilities.convertPointFromScreen(mouseLocationForDropPanel, dropPanel);
@@ -324,6 +350,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
         }
 
         private void setDragPanelVisible(boolean visible) {
+            AceLog.getAppLog().info("set drag visible: " + visible + " for: "+ id);
             if (visible) {
                 if (!panelAdded) {
                     if (DragPanel.this.isReallyVisible()) {
@@ -352,9 +379,6 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
                     }
                     panelAdded = false;
                     dropPanel.setVisible(false);
-                    if (rootLayers != null) {
-                        rootLayers.remove(dropPanel);
-                    }
                 }
             }
         }
@@ -472,6 +496,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
     private Set<DataFlavor> supportedImportFlavors = null;
     protected boolean inGroup;
     private Set<File> kbFiles = new HashSet<File>();
+    private int id;
 
     public boolean isInGroup() {
         return inGroup;
@@ -484,6 +509,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
     public DragPanel(ConceptViewSettings settings, T component) {
         super();
         this.thingToDrag = component;
+        this.id = atomicInt.incrementAndGet();
         setup(settings);
     }
 
@@ -491,6 +517,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
             ConceptViewSettings settings, T component) {
         super(layout);
         this.thingToDrag = component;
+        this.id = atomicInt.incrementAndGet();
         setup(settings);
     }
 

@@ -26,7 +26,8 @@ import java.io.IOException;
  * Note that we are using max #of characters for the default read/write UTF
  * as 24000 (~64K/3 since there are a max of 3 bytes per UTF-8 character).
  * 
- * @author kec, Jack Hahn
+ * @author kec
+ * @author Jack Hahn
  */
 public class UtfHelper {
     

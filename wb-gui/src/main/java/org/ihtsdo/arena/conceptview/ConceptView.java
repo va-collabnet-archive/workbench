@@ -61,6 +61,7 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.dnd.DragMonitor;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.ScrollablePanel;
@@ -646,6 +647,19 @@ public class ConceptView extends JPanel {
             protected void done() {
                 try {
                     get();
+                    if (!DragMonitor.isDragging()) {
+                        timer.stop();
+                        dragging = false;
+                        panelAdded = false;
+                        if (dropPanel != null) {
+                            dropPanel.setVisible(false);
+                            JLayeredPane rootLayers = ConceptView.this.getRootPane().getLayeredPane();
+                            if (rootLayers != null) {
+                                rootLayers.remove(dropPanel);
+                            }
+                        }
+                        dropPanel = null;
+                    }
                 } catch (InterruptedException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
                 } catch (ExecutionException ex) {
@@ -655,7 +669,7 @@ public class ConceptView extends JPanel {
         }
         private Timer timer;
         private boolean dragging = false;
-        private JComponent dropPanel = new JLabel("dropPanel");
+        private JComponent dropPanel = null;
         private boolean panelAdded = false;
         private JScrollPane sfpScroller;
         private boolean gridLayout = true;
@@ -686,7 +700,11 @@ public class ConceptView extends JPanel {
             timer.stop();
             dragging = false;
             setDragPanelVisible(false);
-            dropPanel = null;
+            if (dropPanel != null) {
+                JLayeredPane rootLayers = ConceptView.this.getRootPane().getLayeredPane();
+                rootLayers.remove(dropPanel);
+                dropPanel = null;
+            }
             addedDropComponents.clear();
             actionList.clear();
             dropComponents.clear();
@@ -767,9 +785,7 @@ public class ConceptView extends JPanel {
             } else {
                 if (panelAdded) {
                     panelAdded = false;
-                    JLayeredPane rootLayers = ConceptView.this.getRootPane().getLayeredPane();
                     dropPanel.setVisible(false);
-                    rootLayers.remove(dropPanel);
                 }
             }
         }
