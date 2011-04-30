@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.EventObject;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -47,6 +48,7 @@ import org.ihtsdo.arena.conceptview.ConceptViewRenderer;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.handler.mxCellHandler;
+import com.mxgraph.swing.view.mxICellEditor;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxGraph;
 
@@ -113,6 +115,24 @@ public abstract class ArenaComponentSettings implements Serializable,
         this.config = config;
         this.cell = cell;
         this.graphContainer = graphContainer;
+        this.graphContainer.setCellEditor(new mxICellEditor() {
+
+            @Override
+            public Object getEditingCell() {
+                return new JPanel();
+            }
+
+            @Override
+            public void startEditing(Object o, EventObject eo) {
+                stopEditing(true);
+            }
+
+            @Override
+            public void stopEditing(boolean cancel) {
+                // Nothing to do...
+            }
+        });
+        //this.graphContainer.addListener(String eventName, mxIEventListener listener);
         this.graph = graph;
         this.renderer = renderer;
         this.prefRoot = new DefaultMutableTreeNode("PrefRoot");

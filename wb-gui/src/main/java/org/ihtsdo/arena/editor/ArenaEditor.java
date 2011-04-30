@@ -93,6 +93,7 @@ public class ArenaEditor extends BasicGraphEditor {
                 mxRectangle bounds = settings.getBounds();
                 mxCell v1 = (mxCell) graph.insertVertex(parent, null, settings.getTitle(),
                         bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());
+                
                 v1.getGeometry().setAlternateBounds(settings.getAlternateBounds());
                 v1.setValue(settings);
             }
