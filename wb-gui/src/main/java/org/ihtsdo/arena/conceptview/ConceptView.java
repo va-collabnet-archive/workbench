@@ -258,6 +258,9 @@ public class ConceptView extends JPanel {
                         I_TermFactory tf = Terms.get();
                         ConAttrAnalogBI cav =
                                 (ConAttrAnalogBI) cv.getConAttrsActive();
+                        if (cav == null) {
+                            cav = (ConAttrAnalogBI) cv.getConAttrs().getVersion(coordinate.getVcWithAllStatusValues());
+                        }
                         DragPanelConceptAttributes cac = getConAttrComponent(
                                 (ConAttrAnalogBI) cav, cpe);
                         seperatorComponents.add(cac);

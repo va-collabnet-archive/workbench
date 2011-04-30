@@ -42,6 +42,16 @@ public class ViewCoordinate {
     private RelAssertionType relAssertionType;
     private NidListBI langPrefList;
     private LANGUAGE_SORT langSort;
+    
+    private ViewCoordinate vcWithAllStatusValues;
+
+    public ViewCoordinate getVcWithAllStatusValues() {
+        if (vcWithAllStatusValues == null) {
+            vcWithAllStatusValues = new ViewCoordinate(this);
+            vcWithAllStatusValues.allowedStatusNids = null;
+        }
+        return vcWithAllStatusValues;
+    }
 
     public ViewCoordinate(Precedence precedence, PositionSetBI positionSet,
             NidSetBI allowedStatusNids, NidSetBI isaTypeNids,
@@ -93,6 +103,7 @@ public class ViewCoordinate {
     }
 
     public void setPositionSet(PositionSetBI positionSet) {
+        this.vcWithAllStatusValues = null;
         this.positionSet = positionSet;
     }
 
@@ -121,6 +132,7 @@ public class ViewCoordinate {
     }
 
     public void setClassifierNid(int classifierNid) {
+        this.vcWithAllStatusValues = null;
         this.classifierNid = classifierNid;
     }
 
@@ -129,6 +141,7 @@ public class ViewCoordinate {
     }
 
     public void setRelAssertionType(RelAssertionType relAssertionType) {
+        this.vcWithAllStatusValues = null;
         this.relAssertionType = relAssertionType;
     }
 
