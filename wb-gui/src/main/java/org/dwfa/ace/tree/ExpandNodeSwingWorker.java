@@ -59,7 +59,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
     private static int workerCount = 0;
     private static boolean logTimingInfo = false;
     private int workerId = workerCount++;
-    private static final Logger logger = 
+    private static final Logger logger =
             Logger.getLogger(ExpandNodeSwingWorker.class.getName());
     private final RelAssertionType relAssertionType;
 
@@ -101,8 +101,8 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
         @Override
         public void actionPerformed(ActionEvent e) {
             if (lowerProgressMessage.startsWith("counting")) {
-                activity.setProgressInfoLower(lowerProgressMessage + 
-                        " continueWork:" + continueWork + " "
+                activity.setProgressInfoLower(lowerProgressMessage
+                        + " continueWork:" + continueWork + " "
                         + activity.nextSpinner());
             }
             activity.setIndeterminate(maxChildren == -1);
@@ -110,8 +110,8 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
                 int processed = (int) (maxChildren - completeLatch.getCount());
                 activity.setValue(processed);
                 activity.setMaximum(maxChildren);
-                activity.setProgressInfoLower(lowerProgressMessage + 
-                        processed + "/" + maxChildren + " "
+                activity.setProgressInfoLower(lowerProgressMessage
+                        + processed + "/" + maxChildren + " "
                         + activity.nextSpinner());
             } else {
                 activity.setProgressInfoLower(lowerProgressMessage);
@@ -135,8 +135,8 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
                         activity.removeActivityFromViewer();
                     }
                     if (lowerProgressMessage.startsWith("counting")) {
-                        activity.setProgressInfoLower(lowerProgressMessage + 
-                                " continueWork:" + continueWork + " "
+                        activity.setProgressInfoLower(lowerProgressMessage
+                                + " continueWork:" + continueWork + " "
                                 + activity.nextSpinner());
                     }
                 }
@@ -164,8 +164,8 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
                 if (lastCheck == completeLatch.getCount()) {
                     stuckCount++;
                     if (logger.isLoggable(Level.INFO)) {
-                        logger.log(Level.INFO, 
-                                "ChildrenUpdator stuck at: {0} ({1})", 
+                        logger.log(Level.INFO,
+                                "ChildrenUpdator stuck at: {0} ({1})",
                                 new Object[]{lastCheck, stuckCount});
                     }
                     if (stuckCount > allowableSticks) {
@@ -173,9 +173,9 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
                             logger.info(
                                     "ChildrenUpdator stuck count exceeds allowable.");
                         }
-                        lowerProgressMessage = 
-                                "stopped because ChildrenUpdator stuck at: " + 
-                                lastCheck + " (" + stuckCount + ") ";
+                        lowerProgressMessage =
+                                "stopped because ChildrenUpdator stuck at: "
+                                + lastCheck + " (" + stuckCount + ") ";
                         stop();
                     }
                 } else {
@@ -212,18 +212,18 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
         public void run() {
             try {
                 if (logger.isLoggable(Level.FINEST)) {
-                    logger.log(Level.FINEST, 
-                            "ExpandNodeSwingWorker {0} AddChildWorker: {1} starting", 
+                    logger.log(Level.FINEST,
+                            "ExpandNodeSwingWorker {0} AddChildWorker: {1} starting",
                             new Object[]{workerId, conceptId});
                 }
                 DefaultMutableTreeNode child = null;
                 if (checkContinueWork("checking in add child worker")) {
                     if (Terms.get().hasConcept(conceptId)) {
-                        I_GetConceptData cb = ConceptBeanForTree.get(conceptId, 
+                        I_GetConceptData cb = ConceptBeanForTree.get(conceptId,
                                 relId, 0, false,
                                 ExpandNodeSwingWorker.this.config);
                         boolean leaf = cb.isLeaf(config, false);
-                        
+
                         child = new DefaultMutableTreeNode(cb, !leaf);
                         sortedNodes.add(child);
                     }
@@ -233,8 +233,8 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
                 AceLog.getAppLog().alertAndLogException(ex);
             }
             if (logger.isLoggable(Level.FINEST)) {
-                logger.log(Level.FINEST, 
-                        "ExpandNodeSwingWorker {0} AddChildWorker: {1} finished", 
+                logger.log(Level.FINEST,
+                        "ExpandNodeSwingWorker {0} AddChildWorker: {1} finished",
                         new Object[]{workerId, conceptId});
             }
         }
@@ -306,15 +306,15 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
         }
 
         lowerProgressMessage = "getting destination rels ";
-        
+
         destRels = cb.getDestRelTuples(allowedStatus, destRelTypes, positions,
                 config.getPrecedence(), config.getConflictResolutionStrategy(),
                 config.getClassifierConcept().getNid(), relAssertionType);
         lowerProgressMessage = "getting source rels ";
         if (sourceRelTypes.size() > 0) {
-         srcRels = cb.getSourceRelTuples(allowedStatus, sourceRelTypes, positions,
-                config.getPrecedence(), config.getConflictResolutionStrategy(),
-                config.getClassifierConcept().getNid(), relAssertionType);
+            srcRels = cb.getSourceRelTuples(allowedStatus, sourceRelTypes, positions,
+                    config.getPrecedence(), config.getConflictResolutionStrategy(),
+                    config.getClassifierConcept().getNid(), relAssertionType);
         } else {
             srcRels = new ArrayList<I_RelTuple>(0);
         }
@@ -350,10 +350,12 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
                     completeLatch = null;
                     lowerProgressMessage = "Fetched " + node.getChildCount() + " children in "
                             + TimeUtil.getElapsedTimeString(elapsedTime);
-                    if (node.getChildCount() != maxChildren) {
-                        upperProgressMessage = "<html><font color=red>Warning for " + node + " expected children = "
-                                + maxChildren + " actual: " + node.getChildCount() + workerIdStr;
-                        AceLog.getAppLog().info(upperProgressMessage);
+                    if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                        if (node.getChildCount() != maxChildren) {
+                            upperProgressMessage = "<html><font color=red>Warning for " + node + " expected children = "
+                                    + maxChildren + " actual: " + node.getChildCount() + workerIdStr;
+                            AceLog.getAppLog().fine(upperProgressMessage);
+                        }
                     }
                     stopWorkAndRemove("worker finished");
                     expandIfInList();
@@ -372,12 +374,12 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
             elapsedTime = System.currentTimeMillis() - expansionStart;
         }
         if (logger.isLoggable(Level.FINE)) {
-            logger.log(Level.FINE, "ExpandNodeSwingWorker {0} for {1} finished in {2}", 
+            logger.log(Level.FINE, "ExpandNodeSwingWorker {0} for {1} finished in {2}",
                     new Object[]{workerId, node, TimeUtil.getElapsedTimeString(elapsedTime)});
         } else if (logTimingInfo) {
             if (elapsedTime > 1000) {
-            logger.log(Level.INFO, "ExpandNodeSwingWorker {0} for {1} finished in {2}", 
-                    new Object[]{workerId, node, TimeUtil.getElapsedTimeString(elapsedTime)});
+                logger.log(Level.INFO, "ExpandNodeSwingWorker {0} for {1} finished in {2}",
+                        new Object[]{workerId, node, TimeUtil.getElapsedTimeString(elapsedTime)});
             }
         }
         tree.workerFinished(this);
@@ -448,11 +450,11 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
     private I_ConfigAceFrame config;
     private static Map<Object, ExpandNodeSwingWorker> workers = new TreeMap<Object, ExpandNodeSwingWorker>();
 
-    public ExpandNodeSwingWorker(DefaultTreeModel model, JTreeWithDragImage tree, 
+    public ExpandNodeSwingWorker(DefaultTreeModel model, JTreeWithDragImage tree,
             DefaultMutableTreeNode node,
-            Comparator<I_GetConceptDataForTree> conceptBeanComparator, 
-            TermTreeHelper acePanel, 
-            I_ConfigAceFrame config, 
+            Comparator<I_GetConceptDataForTree> conceptBeanComparator,
+            TermTreeHelper acePanel,
+            I_ConfigAceFrame config,
             RelAssertionType relAssertionType) {
         super();
         this.relAssertionType = relAssertionType;
@@ -486,9 +488,9 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
         if (continueWork) {
             continueWork = false;
             canceled = true;
-            lowerProgressMessage = 
-                    "<html><font color=blue>Action programatically stopped: " + 
-                    message;
+            lowerProgressMessage =
+                    "<html><font color=blue>Action programatically stopped: "
+                    + message;
         }
         if (completeLatch != null) {
             while (completeLatch.getCount() > 0) {
