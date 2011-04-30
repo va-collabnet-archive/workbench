@@ -163,8 +163,8 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
             if (completeLatch != null) {
                 if (lastCheck == completeLatch.getCount()) {
                     stuckCount++;
-                    if (logger.isLoggable(Level.FINE)) {
-                        logger.log(Level.FINE, 
+                    if (logger.isLoggable(Level.INFO)) {
+                        logger.log(Level.INFO, 
                                 "ChildrenUpdator stuck at: {0} ({1})", 
                                 new Object[]{lastCheck, stuckCount});
                     }
@@ -353,6 +353,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
                     if (node.getChildCount() != maxChildren) {
                         upperProgressMessage = "<html><font color=red>Warning for " + node + " expected children = "
                                 + maxChildren + " actual: " + node.getChildCount() + workerIdStr;
+                        AceLog.getAppLog().info(upperProgressMessage);
                     }
                     stopWorkAndRemove("worker finished");
                     expandIfInList();

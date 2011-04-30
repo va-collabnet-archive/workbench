@@ -23,7 +23,7 @@ public class FixedWidthJEditorPane extends JEditorPane {
             setSize(wrapSize);
         }
     }
-    
+
     private class DCL implements DocumentListener {
 
         @Override
@@ -39,16 +39,14 @@ public class FixedWidthJEditorPane extends JEditorPane {
         @Override
         public void changedUpdate(DocumentEvent de) {
             resetSize();
-        }  
+        }
     }
-
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
     int fixedWidth = 150;
-    
-	Dimension wrapSize = new Dimension();
+    Dimension wrapSize = new Dimension();
 
     public String getHtmlPrefix() {
         StringBuilder buff = new StringBuilder();
@@ -70,27 +68,26 @@ public class FixedWidthJEditorPane extends JEditorPane {
         super("text/html", "<html>");
         getDocument().addDocumentListener(new DCL());
     }
-    
 
     @Override
     public void setSize(Dimension d) {
         setSize(d.width, d.height);
     }
-
     private static int MIN_SIZE = 20;
+
     @Override
     public void setSize(int width, int height) {
-    	if (height < MIN_SIZE) {
-    		height = MIN_SIZE;
-    	}
+        if (height < MIN_SIZE) {
+            height = MIN_SIZE;
+        }
         super.setSize(fixedWidth, height);
     }
 
     @Override
     public void setBounds(int x, int y, int width, int height) {
-       	if (wrapSize.height < MIN_SIZE) {
-       		wrapSize.height = MIN_SIZE;
-    	}
+        if (wrapSize.height < MIN_SIZE) {
+            wrapSize.height = MIN_SIZE;
+        }
         super.setBounds(x, y, wrapSize.width, wrapSize.height);
     }
 
@@ -134,13 +131,12 @@ public class FixedWidthJEditorPane extends JEditorPane {
         text = text.trim();
         return text;
     }
-    
+
     public int getFixedWidth() {
-		return fixedWidth;
-	}
+        return fixedWidth;
+    }
 
-	public void setFixedWidth(int fixedWidth) {
-		this.fixedWidth = fixedWidth;
-	}
-
+    public void setFixedWidth(int fixedWidth) {
+        this.fixedWidth = fixedWidth;
+    }
 }
