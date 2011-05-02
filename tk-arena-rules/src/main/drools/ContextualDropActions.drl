@@ -41,7 +41,7 @@ import org.ihtsdo.arena.context.action.MakeNotAcceptableAction;
 import org.ihtsdo.arena.context.action.MakePreferredAction;
 import org.ihtsdo.arena.context.action.GroupRelsAction;
 import org.ihtsdo.arena.context.action.SetSynonymyAction;
-
+import org.ihtsdo.arena.context.action.SetDefinedAction;
 
 import org.ihtsdo.tk.drools.facts.ComponentFact;
 import org.ihtsdo.tk.drools.facts.ConAttrFact;
@@ -89,19 +89,6 @@ rule "rule 1" #concept onto different SNOMED concept
       actions.add(new CreateRelAction("Is-a", $dropTarget, Snomed.IS_A, $dropObject));
 end
 
-/*
-rule "rule 2" #concept onto SNOMED clinical finiding concpet
-
-   when
-      (and
-         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
-      )
-   then
-      actions.add(new CreateRelAction("finding-site", $dropTarget, Snomed.FINDING_SITE, $dropObject));
-end
-*/
-
 rule "rule 3" #concept onto NOT snomed concept
 
    when
@@ -121,6 +108,7 @@ rule "rule 4" #concept onto same concept
          $dropObject: ComponentFact(context == Context.DROP_OBJECT, component == $dropTarget.component,
             component.time != Long.MAX_VALUE)
          not $groupConcept: RelGroupFact(context == Context.DROP_TARGET)
+         not $conceptAttr: ConAttrFact(context == Context.DROP_TARGET)
 
 
    then
@@ -758,4 +746,24 @@ rule "rule 53" #Body structure onto qualifier value
       )
 	then
 		actions.add(new CreateRelAction("Laterality", $dropTarget, Snomed.LATERALITY, $dropObject));
+end
+
+rule "rule 54" #change from primitve to defined
+	when
+	(and
+         ($dropTarget: ConAttrFact(context == Context.DROP_TARGET, component.isDefined == true))
+         ($dropObject: ConAttrFact(context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE, component == $dropTarget.component))
+      )
+	then
+		actions.add(new SetDefinedAction("make primitive", $dropTarget));
+end
+
+rule "rule 55" #change from defined to primitive
+	when
+	(and
+         ($dropTarget: ConAttrFact(context == Context.DROP_TARGET, component.isDefined == false))
+         ($dropObject: ConAttrFact(context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE, component == $dropTarget.component))
+      )
+	then
+		actions.add(new SetDefinedAction("make defined", $dropTarget));
 end
