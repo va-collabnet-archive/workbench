@@ -187,6 +187,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import sun.tools.java.Environment;
 
 public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActions {
 
@@ -1035,7 +1036,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private CdePalette historyPalette;
     private JToggleButton showSearchToggle;
     public static ExecutorService threadPool =
-            Executors.newFixedThreadPool(9, new NamedThreadFactory(new ThreadGroup("ACE "), "tree expansion "));
+            Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2, 
+            new NamedThreadFactory(new ThreadGroup("ACE "), "GUI Background "));
     public AceFrameConfig aceFrameConfig;
     public static AceConfig aceConfig;
     public static boolean editMode = true;

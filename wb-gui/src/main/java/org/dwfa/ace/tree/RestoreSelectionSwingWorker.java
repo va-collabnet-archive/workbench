@@ -69,27 +69,35 @@ public class RestoreSelectionSwingWorker extends SwingWorker<Object> implements 
         try {
             get();
             if (lastPropagationId.equals(tree.getLastPropagationId())) {
-                if (helper.getExpansionWorkers().size() == 0) {
+                if (helper.getExpansionWorkers().isEmpty()) {
                     if (selelectionPath != null && selelectionPath.getPathCount() > 0) {
-                        Object[] nodesToMatch = selelectionPath.getPath();
-                        TreePath pathToSelect = new TreePath(tree.getModel().getRoot());
-                        for (int pathNode = 1; pathNode < nodesToMatch.length; pathNode++) {
-                            DefaultMutableTreeNode parent = (DefaultMutableTreeNode) pathToSelect.getLastPathComponent();
-                            I_GetConceptData nodeToMatchObject = (I_GetConceptData) ((DefaultMutableTreeNode) nodesToMatch[pathNode]).getUserObject();
-                            for (int childNode = 0; childNode < parent.getChildCount(); childNode++) {
-                                DefaultMutableTreeNode child = (DefaultMutableTreeNode) parent.getChildAt(childNode);
-                                I_GetConceptData childObject = (I_GetConceptData) child.getUserObject();
-                                if (nodeToMatchObject.getConceptNid() == childObject.getConceptNid()) {
-                                    pathToSelect = pathToSelect.pathByAddingChild(child);
-                                    break;
-                                }
-                            }
-                        }
-                        tree.getSelectionModel().setSelectionPath(pathToSelect);
+                        
+                            //tree.getSelectionModel().setSelectionPath(selelectionPath);
+                            JScrollPane scroller = tree.getScroller();
+                            scroller.getHorizontalScrollBar().setValue(horizValue);
+                            scroller.getVerticalScrollBar().setValue(vertValue);
+                        
+//                        Object[] nodesToMatch = selelectionPath.getPath();
+//                        TreePath pathToSelect = new TreePath(tree.getModel().getRoot());
+//                        for (int pathNode = 1; pathNode < nodesToMatch.length; pathNode++) {
+//                            DefaultMutableTreeNode parent = (DefaultMutableTreeNode) pathToSelect.getLastPathComponent();
+//                            I_GetConceptData nodeToMatchObject = (I_GetConceptData) ((DefaultMutableTreeNode) nodesToMatch[pathNode]).getUserObject();
+//                            for (int childNode = 0; childNode < parent.getChildCount(); childNode++) {
+//                                DefaultMutableTreeNode child = (DefaultMutableTreeNode) parent.getChildAt(childNode);
+//                                I_GetConceptData childObject = (I_GetConceptData) child.getUserObject();
+//                                if (nodeToMatchObject.getConceptNid() == childObject.getConceptNid()) {
+//                                    pathToSelect = pathToSelect.pathByAddingChild(child);
+//                                    break;
+//                                }
+//                            }
+//                        }
+//                        if (nodesToMatch.length == pathToSelect.getPathCount()) {
+//                            tree.getSelectionModel().setSelectionPath(pathToSelect);
+//                            JScrollPane scroller = tree.getScroller();
+//                            scroller.getHorizontalScrollBar().setValue(horizValue);
+//                            scroller.getVerticalScrollBar().setValue(vertValue);
+//                        }
                     }
-                    JScrollPane scroller = tree.getScroller();
-                    scroller.getHorizontalScrollBar().setValue(horizValue);
-                    scroller.getVerticalScrollBar().setValue(vertValue);
                 } else {
                     helper.getTreeExpandThread().execute(new RestoreSelectionSwingWorker(this));
                     helper.removeStaleExpansionWorker(helper.getExpansionWorkers().keySet().iterator().next());
@@ -97,7 +105,7 @@ public class RestoreSelectionSwingWorker extends SwingWorker<Object> implements 
             } else {
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                     AceLog.getAppLog().fine(
-                        "RestoreSelectionSwingWorker ending secondary to inequal propigationId: " + lastPropagationId
+                            "RestoreSelectionSwingWorker ending secondary to inequal propigationId: " + lastPropagationId
                             + " " + tree.getLastPropagationId());
                 }
             }

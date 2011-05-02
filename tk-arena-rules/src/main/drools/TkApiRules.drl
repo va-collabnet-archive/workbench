@@ -39,15 +39,6 @@ global ViewCoordinate vc;
 
 // Parameters for satisfiesConstraint: x = don't care, e = equals, k = kind of, r = regex
 
-rule "isKindOf refset concept"
-	
-	when
-		$c : ConceptVersionBI(
-				this isKindOf Taxonomies.REFSET_AUX);
-	then 
-   		System.out.println("isKindOf refset concept found: \n" + $c.toString());
-end
-
 rule "not satisfies FINDING_SITE_OUT constraint"
 	
 	when
@@ -55,7 +46,6 @@ rule "not satisfies FINDING_SITE_OUT constraint"
 				this isKindOf Snomed.FINDING_SITE,
 				this not satisfiesConstraint[k,e,k] SnomedConstraints.FINDING_SITE_OUT);
 	then 
-   		System.out.println("concept failing FINDING_SITE_OUT constraint found: \n" + $c.toString());
    		templates.put(SnomedRelSpec.FINDING_SITE, $c.getNid());	
 end
 
@@ -74,8 +64,6 @@ rule "FSN not satisfies desc constraint"
    		    									  $d.getText() + " (ADD TAG)"), 
    		    									  $d.getNid());
 		   } 	
-		
-   		System.out.println("concept failing FS_SEMANTIC_TAG constraint found: \n" + $c.toString());
 end
 
 rule "no FSN"
@@ -92,7 +80,6 @@ rule "no FSN"
    		    									  $d.getText() + " (ADD TAG (NO FSN))"), 
    		    									  $c.getNid());
 		} 	
-   		System.out.println("concept failing FS_SEMANTIC_TAG constraint found: \n" + $c.toString());
 end
 
 rule "missing Dialect description EN_UK"
@@ -129,7 +116,6 @@ rule "isKindOf refset concept and not satisfies FINDING_SITE_OUT constraint"
 		$c : ConceptVersionBI(this isKindOf Taxonomies.REFSET_AUX,
 							  this not satisfiesConstraint[x,e,k] SnomedConstraints.FINDING_SITE_OUT);
 	then 
-   		System.out.println("isKindOf refset concept failing FINDING_SITE_OUT constraint found: \n" + $c.toString());
    		templates.put(SnomedRelSpec.FINDING_SITE, $c.getNid());
 end
 
@@ -142,34 +128,10 @@ rule "isKindOf inactive status"
 	then
 			ArrayList<RelSpec> relSpecs = new RelSpecFromConcept($c).getRelSpecs();
 			for (RelSpec relSpec: relSpecs){
-			templates.put(relSpec, $c.getNid());
+                            templates.put(relSpec, $c.getNid());
 			}
 end
 
-
-rule "isKindOf workbench auxiliary concept"
-	
-	when
-		$c : ConceptVersionBI(this isKindOf Taxonomies.WB_AUX);
-	then 
-   		System.out.println("isKindOf workbench auxiliary concept found: \n" + $c.toString());
-end
-
-rule "isKindOf queue type concept"
-	
-	when
-		$c : ConceptVersionBI(this isKindOf Taxonomies.QUEUE_TYPE);
-	then 
-   		System.out.println("isKindOf queue type concept found: \n" + $c.toString());
-end
-
-rule "isKindOf SNOMED concept"
-	
-	when
-		$c : ConceptVersionBI(this isKindOf Taxonomies.SNOMED);
-	then 
-   		System.out.println("isKindOf SNOMED concept found: \n" + $c.toString());
-end
 
 rule "double spaces"
 	
@@ -177,7 +139,6 @@ rule "double spaces"
 		$c : ConceptVersionBI(this isKindOf Taxonomies.SNOMED);
 		$d : DescriptionVersionBI(text matches ".*garbage to disable this rule match \\s\\s.*") from $c.descsActive
 	then 
-   		System.out.println("Double spaces found: \n" + $c.toString());
    		DescriptionSpec dSpec = SpecFactory.get($d, vc);
    		dSpec.setDescText($d.getText().replace("  ", " "));
    		templates.put(dSpec, $c.getNid());

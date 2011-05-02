@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -20,8 +23,10 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingWorker;
 import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.ArenaComponentSettings;
 
@@ -42,17 +47,13 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
         return ghostIcon;
     }
 
-    protected JButton getActionMenuButton(Collection<Action> actionList) {
+    protected JButton getActionMenuButton() {
         JButton popupMenuButton = new JButton(dynamicPopupImage);
         popupMenuButton.setPreferredSize(new Dimension(21, 16));
         popupMenuButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         popupMenuButton.setToolTipText("contextual editing actions");
         popupMenuButton.setOpaque(false);
         popupMenuButton.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 6));
-        popupMenuButton.addActionListener(new DoDynamicPopup(actionList));
-        if (actionList == null || actionList.isEmpty()) {
-            popupMenuButton.setVisible(false);
-        }
         return popupMenuButton;
     }
 
@@ -123,36 +124,39 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
         }
     }
 
-    private class DoDynamicPopup implements ActionListener {
+    private class GetActionListWorker extends SwingWorker<Collection<Action>, Collection<Action>> {
 
-        Collection<Action> actionList;
+        private JButton actionButton;
 
-        public DoDynamicPopup(Collection<Action> actionList) {
-            this.actionList = actionList;
+        public GetActionListWorker(JButton actionButton) {
+            this.actionButton = actionButton;
         }
 
         @Override
-        public void actionPerformed(ActionEvent ae) {
-            JButton popupButton = (JButton) ae.getSource();
-            JPopupMenu popup = new JPopupMenu();
-            popup.add(new JMenuItem(" "));
-            for (Action a : actionList) {
-                popup.add(new JMenuItem(a));
-            }
+        protected Collection<Action> doInBackground() throws Exception {
+            return getMenuActions();
+        }
 
-            int x = popupButton.getX();
-            int width = popupButton.getWidth();
-            int menuWidth = popup.getPreferredSize().width;
-            popup.show(popupButton,
-                    width
-                    - menuWidth,
-                    0);
+        @Override
+        protected void done() {
+            try {
+                Collection<Action> actions = get();
+                actionButton.addActionListener(new DoDynamicPopup(actions));
+                if (actions == null || actions.isEmpty()) {
+                    actionButton.setVisible(false);
+                }
+            } catch (InterruptedException ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            } catch (ExecutionException ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
         }
     }
 
     protected JButton getComponentActionMenuButton() {
-        Collection<Action> actionList = getMenuActions();
-        return getActionMenuButton(actionList);
+        JButton actionButton = getActionMenuButton();
+        (new GetActionListWorker(actionButton)).execute();
+        return actionButton;
     }
 
     public enum SubPanelTypes {

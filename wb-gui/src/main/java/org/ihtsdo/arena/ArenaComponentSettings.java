@@ -132,7 +132,6 @@ public abstract class ArenaComponentSettings implements Serializable,
                 // Nothing to do...
             }
         });
-        //this.graphContainer.addListener(String eventName, mxIEventListener listener);
         this.graph = graph;
         this.renderer = renderer;
         this.prefRoot = new DefaultMutableTreeNode("PrefRoot");

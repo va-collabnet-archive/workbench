@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,6 +37,7 @@ import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -52,6 +54,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.dwfa.ace.ACE;
 
 import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -141,6 +144,94 @@ public class ConceptView extends JPanel {
 
     }
 
+    private class SetupDescriptions implements Runnable {
+
+        CountDownLatch latch;
+        Collection<? extends I_DescriptionTuple> descs;
+        Collection<DragPanelDescription> panels;
+        CollapsePanel cp;
+
+        public SetupDescriptions(CountDownLatch latch,
+                Collection<? extends I_DescriptionTuple> descs,
+                Collection<DragPanelDescription> panels,
+                CollapsePanel cp) {
+            this.latch = latch;
+            this.descs = descs;
+            this.panels = panels;
+            this.cp = cp;
+        }
+
+        @Override
+        public void run() {
+            for (I_DescriptionTuple desc : descs) {
+                DragPanelDescription dc;
+                try {
+                    dc = getDescComponent(desc, cp);
+                    panels.add(dc);
+                } catch (TerminologyException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                } catch (IOException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                }
+            }
+            latch.countDown();
+        }
+    }
+
+    private void setupDescriptions(CountDownLatch latch,
+            Collection<? extends I_DescriptionTuple> descs,
+            Collection<DragPanelDescription> panels,
+            CollapsePanel cp) throws TerminologyException, IOException {
+        SetupDescriptions setterUpper = new SetupDescriptions(latch, descs, panels, cp);
+        ACE.threadPool.execute(setterUpper);
+    }
+
+    private class SetupRels implements Runnable {
+
+        CountDownLatch latch;
+        Collection<? extends I_RelTuple> rels;
+        Collection<DragPanelRel> panels;
+        CollapsePanel cp;
+        boolean inferred;
+
+        public SetupRels(CountDownLatch latch, 
+                Collection<? extends I_RelTuple> rels, 
+                Collection<DragPanelRel> panels, 
+                CollapsePanel cp,
+                boolean inferred) {
+            this.latch = latch;
+            this.rels = rels;
+            this.panels = panels;
+            this.cp = cp;
+            this.inferred = inferred;
+        }
+
+        @Override
+        public void run() {
+            for (I_RelTuple r : rels) {
+                DragPanelRel rc;try {
+                    rc = getRelComponent(r, cp, inferred);
+                    panels.add(rc);
+                } catch (TerminologyException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                } catch (IOException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                }
+            }
+            latch.countDown();
+        }
+    }
+
+    private void setupRels(CountDownLatch latch,
+            Collection<? extends I_RelTuple> rels,
+            Collection<DragPanelRel> panels,
+            CollapsePanel cp,
+            boolean inferred) throws TerminologyException, IOException {
+        SetupRels setterUpper = new SetupRels(latch, rels, panels, cp, inferred);
+        ACE.threadPool.execute(setterUpper);
+        
+    }
+
     public class LayoutConceptWorker extends SwingWorker<Map<SpecBI, Integer>, Boolean> {
 
         private Set<Integer> saps;
@@ -158,6 +249,14 @@ public class ConceptView extends JPanel {
         private List<? extends I_DescriptionTuple> descriptions;
         private List<? extends I_DescriptionTuple> inactiveDescriptions;
         private I_GetConceptData layoutConcept;
+        private List<DragPanelDescription> inactiveDescriptionPanels;
+        private List<DragPanelDescription> activeDescriptionPanels;
+        private List<DragPanelRel> inactiveStatedRelPanels;
+        private List<DragPanelRel> activeStatedRelPanels;
+        private List<DragPanelRel> inactiveInferredRelPanels;
+        private List<DragPanelRel> activeInferredRelPanels;
+        private CollapsePanel cpd;
+        private CollapsePanel cpr;
 
         public LayoutConceptWorker() {
             super();
@@ -172,6 +271,12 @@ public class ConceptView extends JPanel {
             pathRowMap.clear();
             layoutConcept = concept;
             if (layoutConcept != null) {
+                CountDownLatch latch = new CountDownLatch(6);
+                cpd = new CollapsePanel("descriptions:", settings,
+                        prefMap.get(PanelSection.DESC), PanelSection.DESC);
+                cpr = new CollapsePanel("relationships:", settings,
+                        prefMap.get(PanelSection.REL), PanelSection.REL);
+
                 coordinate = new ViewCoordinate(config.getViewCoordinate());
                 coordinate.setRelAssertionType(RelAssertionType.STATED);
                 saps = layoutConcept.getAllSapNids();
@@ -184,11 +289,19 @@ public class ConceptView extends JPanel {
                         null, config.getViewPositionSetReadOnly(),
                         config.getPrecedence(), config.getConflictResolutionStrategy(),
                         coordinate.getClassifierNid(), coordinate.getRelAssertionType());
+                activeStatedRelPanels = new ArrayList<DragPanelRel>(statedRels.size());
+                setupRels(latch, statedRels,
+                        activeStatedRelPanels,
+                        cpr, false);
                 inactiveStatedRels = layoutConcept.getSourceRelTuples(null,
                         null, config.getViewPositionSetReadOnly(),
                         config.getPrecedence(), config.getConflictResolutionStrategy(),
                         coordinate.getClassifierNid(), coordinate.getRelAssertionType());
                 inactiveStatedRels.removeAll(statedRels);
+                inactiveStatedRelPanels = new ArrayList<DragPanelRel>(inactiveStatedRels.size());
+                setupRels(latch, inactiveStatedRels,
+                        inactiveStatedRelPanels,
+                        cpr, false);
                 statedRelGroups = (Collection<RelGroupVersionBI>) Ts.get().getConceptVersion(coordinate, layoutConcept.getNid()).getRelGroups();
 
                 coordinate.setRelAssertionType(RelAssertionType.INFERRED);
@@ -196,11 +309,19 @@ public class ConceptView extends JPanel {
                         null, config.getViewPositionSetReadOnly(),
                         config.getPrecedence(), config.getConflictResolutionStrategy(),
                         coordinate.getClassifierNid(), coordinate.getRelAssertionType());
+                activeInferredRelPanels = new ArrayList<DragPanelRel>(inferredRels.size());
+                setupRels(latch, inferredRels,
+                        activeInferredRelPanels,
+                        cpr, true);
                 inactiveInferredRels = layoutConcept.getSourceRelTuples(null,
                         null, config.getViewPositionSetReadOnly(),
                         config.getPrecedence(), config.getConflictResolutionStrategy(),
                         coordinate.getClassifierNid(), coordinate.getRelAssertionType());
                 inactiveInferredRels.removeAll(inferredRels);
+                inactiveInferredRelPanels = new ArrayList<DragPanelRel>(inactiveInferredRels.size());
+                setupRels(latch, inactiveInferredRels,
+                        inactiveInferredRelPanels,
+                        cpr, true);
                 inferredRelGroups = (Collection<RelGroupVersionBI>) Ts.get().getConceptVersion(coordinate, layoutConcept.getNid()).getRelGroups();
 
 
@@ -215,6 +336,8 @@ public class ConceptView extends JPanel {
                 descriptions = layoutConcept.getDescriptionTuples(config.getAllowedStatus(),
                         null, config.getViewPositionSetReadOnly(),
                         config.getPrecedence(), config.getConflictResolutionStrategy());
+                activeDescriptionPanels = new ArrayList<DragPanelDescription>(descriptions.size());
+                setupDescriptions(latch, descriptions, activeDescriptionPanels, cpd);
                 // get all descriptions
                 List<? extends I_DescriptionTuple> tempDescList = layoutConcept.getDescriptionTuples(null,
                         null, config.getViewPositionSetReadOnly(),
@@ -225,6 +348,18 @@ public class ConceptView extends JPanel {
                 tempDescList.removeAll(descriptions);
 
                 inactiveDescriptions = new ArrayList<I_DescriptionTuple>(tempDescList);
+                inactiveDescriptionPanels = new ArrayList<DragPanelDescription>(inactiveDescriptions.size());
+                setupDescriptions(latch, inactiveDescriptions, inactiveDescriptionPanels, cpd);
+
+                ///
+
+
+
+
+
+
+                latch.await();
+
 
             }
             return kb.setConcept(layoutConcept);
@@ -300,8 +435,6 @@ public class ConceptView extends JPanel {
                             }
                         }
 
-                        CollapsePanel cpd = new CollapsePanel("descriptions:", settings,
-                                prefMap.get(PanelSection.DESC), PanelSection.DESC);
                         cpd.addPanelsChangedActionListener(pcal);
                         cpd.setAlertCount(0);
                         cpd.setRefexCount(0);
@@ -309,10 +442,8 @@ public class ConceptView extends JPanel {
                         cpd.setTemplateCount(0);
                         add(cpd, gbc);
                         gbc.gridy++;
-                        for (I_DescriptionTuple desc : descriptions) {
-                            DragPanelDescription dc = getDescComponent(desc, cpd);
+                        for (DragPanelDescription dc : activeDescriptionPanels) {
                             seperatorComponents.add(dc);
-
                             cpd.addToggleComponent(dc);
                             add(dc, gbc);
                             gbc.gridy++;
@@ -323,13 +454,12 @@ public class ConceptView extends JPanel {
                         }
 
                         boolean descHistoryIsShown = cpd.isShown(ComponentVersionDragPanel.SubPanelTypes.HISTORY);
-                        for (I_DescriptionTuple desc : inactiveDescriptions) {
-                            DragPanelDescription dc = getDescComponent(desc, cpd);
+                        for (DragPanelDescription dc : inactiveDescriptionPanels) {
                             seperatorComponents.add(dc);
                             dc.setVisible(descHistoryIsShown);
-                            cpd.addToggleComponent(dc);
                             cpd.getInactiveComponentPanels().add(dc);
                             cpd.getRetiredPanels().add(dc);
+                            cpd.addToggleComponent(dc);
                             add(dc, gbc);
                             gbc.gridy++;
                             cpd.setAlertCount(cpd.alertCount += dc.getAlertSubpanelCount());
@@ -339,8 +469,6 @@ public class ConceptView extends JPanel {
                         }
 
 
-                        CollapsePanel cpr = new CollapsePanel("relationships:", settings,
-                                prefMap.get(PanelSection.REL), PanelSection.REL);
                         cpr.addPanelsChangedActionListener(pcal);
                         cpr.setAlertCount(0);
                         cpr.setRefexCount(0);
@@ -354,88 +482,84 @@ public class ConceptView extends JPanel {
                         cpr.setTemplateCount(0);
                         boolean cprAdded = false;
                         if (settings.showStated()) {
-                            for (I_RelTuple r : statedRels) {
-                                if (r.getGroup() == 0) {
-                                    if (!cprAdded) {
-                                        add(cpr, gbc);
-                                        gbc.gridy++;
-                                        cprAdded = true;
-                                    }
-                                    DragPanelRel rc = getRelComponent(r, cpr, false);
-                                    seperatorComponents.add(rc);
+                            for (DragPanelRel rc : activeStatedRelPanels) {
 
-                                    cpr.addToggleComponent(rc);
-                                    add(rc, gbc);
+                                if (!cprAdded) {
+                                    add(cpr, gbc);
                                     gbc.gridy++;
-                                    cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
-                                    cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
-                                    cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
-                                    cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
+                                    cprAdded = true;
                                 }
+                                seperatorComponents.add(rc);
+
+                                cpr.addToggleComponent(rc);
+                                add(rc, gbc);
+                                gbc.gridy++;
+                                cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
+                                cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
+                                cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
+                                cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
+
                             }
-                            for (I_RelTuple r : inactiveStatedRels) {
-                                if (r.getGroup() == 0) {
-                                    if (!cprAdded) {
-                                        add(cpr, gbc);
-                                        gbc.gridy++;
-                                        cprAdded = true;
-                                    }
-                                    DragPanelRel rc = getRelComponent(r, cpr, false);
-                                    rc.setVisible(relHistoryIsShown);
-                                    seperatorComponents.add(rc);
-
-                                    cpr.addToggleComponent(rc);
-                                    cpr.getInactiveComponentPanels().add(rc);
-                                    add(rc, gbc);
+                            for (DragPanelRel rc : inactiveStatedRelPanels) {
+                                if (!cprAdded) {
+                                    add(cpr, gbc);
                                     gbc.gridy++;
-                                    cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
-                                    cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
-                                    cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
-                                    cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
+                                    cprAdded = true;
                                 }
+                                rc.setVisible(relHistoryIsShown);
+                                seperatorComponents.add(rc);
+
+                                cpr.addToggleComponent(rc);
+                                cpr.getInactiveComponentPanels().add(rc);
+                                add(rc, gbc);
+                                gbc.gridy++;
+                                cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
+                                cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
+                                cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
+                                cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
+
                             }
 
                         }
                         if (settings.showInferred()) {
-                            for (I_RelTuple r : inferredRels) {
-                                if (r.getGroup() == 0) {
-                                    if (!cprAdded) {
-                                        add(cpr, gbc);
-                                        gbc.gridy++;
-                                        cprAdded = true;
-                                    }
-                                    DragPanelRel rc = getRelComponent(r, cpr, true);
-                                    seperatorComponents.add(rc);
-
-                                    cpr.addToggleComponent(rc);
-                                    add(rc, gbc);
+                            for (DragPanelRel rc : activeInferredRelPanels) {
+                                if (!cprAdded) {
+                                    add(cpr, gbc);
                                     gbc.gridy++;
-                                    cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
-                                    cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
-                                    cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
-                                    cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
+                                    cprAdded = true;
                                 }
+
+                                seperatorComponents.add(rc);
+
+                                cpr.addToggleComponent(rc);
+                                add(rc, gbc);
+                                gbc.gridy++;
+                                cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
+                                cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
+                                cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
+                                cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
+
                             }
-                            for (I_RelTuple r : inactiveInferredRels) {
-                                if (r.getGroup() == 0) {
-                                    if (!cprAdded) {
-                                        add(cpr, gbc);
-                                        gbc.gridy++;
-                                        cprAdded = true;
-                                    }
-                                    DragPanelRel rc = getRelComponent(r, cpr, true);
-                                    rc.setVisible(relHistoryIsShown);
-                                    seperatorComponents.add(rc);
+                            for (DragPanelRel rc : inactiveInferredRelPanels) {
 
-                                    cpr.addToggleComponent(rc);
-                                    cpr.getInactiveComponentPanels().add(rc);
-                                    add(rc, gbc);
+                                if (!cprAdded) {
+                                    add(cpr, gbc);
                                     gbc.gridy++;
-                                    cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
-                                    cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
-                                    cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
-                                    cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
+                                    cprAdded = true;
                                 }
+
+                                rc.setVisible(relHistoryIsShown);
+                                seperatorComponents.add(rc);
+
+                                cpr.addToggleComponent(rc);
+                                cpr.getInactiveComponentPanels().add(rc);
+                                add(rc, gbc);
+                                gbc.gridy++;
+                                cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
+                                cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
+                                cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
+                                cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
+
                             }
                         }
 
@@ -994,9 +1118,11 @@ public class ConceptView extends JPanel {
         gbc.gridx = 1;
         gbc.weightx = 1;
         gbc.gridheight = 1;
+        JButton actionMenuButton = relGroupPanel.getActionMenuButton();
+        (new GetActionsSwingWorker(actionMenuButton, group)).execute();
         CollapsePanel cprg = new CollapsePanel("group:", settings,
                 new CollapsePanelPrefs(prefMap.get(PanelSection.REL_GRP)),
-                PanelSection.REL_GRP, relGroupPanel.getActionMenuButton(getKbActions(group)));
+                PanelSection.REL_GRP, actionMenuButton);
         cprg.setAlertCount(0);
         cprg.setRefexCount(0);
         cprg.setHistoryCount(0);
@@ -1017,6 +1143,38 @@ public class ConceptView extends JPanel {
 
         return relGroupPanel;
 
+    }
+
+    private class GetActionsSwingWorker extends SwingWorker<Collection<Action>, Collection<Action>> {
+
+        JButton actionMenuButton;
+        RelGroupVersionBI group;
+
+        public GetActionsSwingWorker(JButton actionMenuButton,
+                RelGroupVersionBI group) {
+            this.actionMenuButton = actionMenuButton;
+            this.group = group;
+        }
+
+        @Override
+        protected Collection<Action> doInBackground() throws Exception {
+            return getKbActions(group);
+        }
+
+        @Override
+        protected void done() {
+            try {
+                Collection<Action> actions = get();
+                actionMenuButton.addActionListener(new DoDynamicPopup(actions));
+                if (actions == null || actions.isEmpty()) {
+                    actionMenuButton.setVisible(false);
+                }
+            } catch (InterruptedException ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            } catch (ExecutionException ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
     }
 
     public DragPanelConceptAttributes getConAttrComponent(ConAttrAnalogBI conAttr,

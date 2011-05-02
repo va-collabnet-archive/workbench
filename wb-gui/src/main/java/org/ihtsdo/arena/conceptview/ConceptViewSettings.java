@@ -121,7 +121,6 @@ public class ConceptViewSettings extends ArenaComponentSettings {
         return "empty";
     }
 
-       
     public boolean isNavigatorSetup() {
         if (navigator == null) {
             return false;
@@ -129,7 +128,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
         if (getConfig() == null) {
             return false;
         }
-        
+
         if (getConfig().getConceptViewer(linkedTab) == null) {
             return false;
         }
@@ -311,7 +310,6 @@ public class ConceptViewSettings extends ArenaComponentSettings {
         layers.add(getNavigator(), JLayeredPane.PALETTE_LAYER);
     }
 
- 
     protected ConceptNavigator getNavigator() {
         if (navigator == null) {
             try {
@@ -330,14 +328,21 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 
         if (getHost() != null) {
             if (getHost().getTermComponent() != null) {
-                try {
-                    new ExpandPathToNodeStateListener(navigatorTree, config,
-                            (I_GetConceptData) getHost().getTermComponent());
-                } catch (IOException e) {
-                    AceLog.getAppLog().alertAndLogException(e);
-                } catch (TerminologyException e) {
-                    AceLog.getAppLog().alertAndLogException(e);
-                }
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        try {
+                            ExpandPathToNodeStateListener expandPathToNodeStateListener = 
+                                    new ExpandPathToNodeStateListener(navigatorTree, config,
+                                    (I_GetConceptData) getHost().getTermComponent());
+                        } catch (IOException e) {
+                            AceLog.getAppLog().alertAndLogException(e);
+                        } catch (TerminologyException e) {
+                            AceLog.getAppLog().alertAndLogException(e);
+                        }
+                    }
+                });
             }
         }
         return navigator;
