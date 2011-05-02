@@ -187,7 +187,6 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
-import sun.tools.java.Environment;
 
 public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActions {
 
