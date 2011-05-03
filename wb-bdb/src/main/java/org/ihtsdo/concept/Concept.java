@@ -211,9 +211,14 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             }
         }
     	} catch(IOException ioe){
-    		AceLog.getAppLog().severe(" Err thrown in Concept.mergeWithEConcept eConcept = "+eConcept.toString() +"\n c = "+c.toLongString(), ioe);
+    		AceLog.getAppLog().severe("IOException Err thrown in Concept.mergeWithEConcept eConcept = "+eConcept.toString() +"\n c = "+c.toLongString(), ioe);
     		throw ioe;
     	}
+    	
+		catch(UnsupportedOperationException ioe){
+		AceLog.getAppLog().severe("UnsupportedOperationException Err thrown in Concept.mergeWithEConcept eConcept = "+eConcept.toString() +"\n c = "+c.toLongString(), ioe);
+		throw ioe;
+	  }
         return c;
     }
 
