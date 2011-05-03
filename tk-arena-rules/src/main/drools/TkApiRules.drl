@@ -120,20 +120,6 @@ rule "isKindOf refset concept and not satisfies FINDING_SITE_OUT constraint"
    		templates.put(SnomedRelSpec.FINDING_SITE, $c.getNid());
 end
 
-
-/*rule "isKindOf inactive status"
-	when
-		$c : ConceptVersionBI(this isKindOf Snomed.INACTIVE_CONCEPT,
-				this not isKindOf TermAux.MOVED_TO,
-				hasHistoricalRels == false);
-	then
-			ArrayList<RelSpec> relSpecs = new RelSpecFromConcept($c).getRelSpecs();
-			for (RelSpec relSpec: relSpecs){
-                            templates.put(relSpec, $c.getNid());
-			}
-end*/
-
-
 rule "isKindOf duplicate"
 	when
 		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.DUPLICATE_CONCEPT,
