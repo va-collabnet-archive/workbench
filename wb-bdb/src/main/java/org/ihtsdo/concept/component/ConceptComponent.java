@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -982,6 +983,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             	}catch (UnsupportedOperationException uoe){
             		AceLog.getAppLog().severe("ConceptComponent merge v.getSapNid() = "+v.getSapNid()+ " currentSapNids size = "+currentSapNids.size()
             				+" another = "+another.toString() +"\n c = "+this.toString(), uoe);
+            			for (final Iterator<Integer> it1 = currentSapNids.iterator(); it1.hasNext();) {
+            	            final int id = it1.next();
+            	            AceLog.getAppLog().severe("ConceptComponent currentSapNid ="+id);  
+            			}
             	}
             }
         }
