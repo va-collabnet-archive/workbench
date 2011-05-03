@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -117,7 +118,7 @@ public class TestCommentsRefset extends TestCase {
 
 			System.out.println(langSpecRefset.getCommentsRefset(config).getRefsetConcept().toLongString());
 
-			List<String> comments = langSpecRefset.getCommentsRefset(config).getComments(concept.getConceptNid());
+			HashMap<I_ExtendByRef, String> comments = langSpecRefset.getCommentsRefset(config).getComments(concept.getConceptNid());
 			assertTrue(comments.get(0).startsWith("Test comment number one"));
 			assertTrue(comments.get(1).startsWith("Test comment number two"));
 
