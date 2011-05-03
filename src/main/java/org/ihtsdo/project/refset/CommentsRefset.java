@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,9 +18,10 @@ import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
@@ -29,6 +29,8 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
 
 public class CommentsRefset extends Refset {
@@ -48,10 +50,10 @@ public class CommentsRefset extends Refset {
 		termFactory = Terms.get();
 	}
 
-	public List<String> getComments(int componentId) throws IOException, TerminologyException {
+	public HashMap<I_ExtendByRef, String> getComments(int componentId) throws IOException, TerminologyException {
 		// TODO: move config to parameter
 		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
-		List<String> comments = new ArrayList<String>();
+		HashMap<I_ExtendByRef, String> comments = new HashMap<I_ExtendByRef, String>();
 		for (I_ExtendByRef commentsMember : termFactory.getAllExtensionsForComponent(componentId, true)) {
 			if (commentsMember.getRefsetId() == this.refsetId) {
 				long lastVersion = Long.MIN_VALUE;
@@ -65,18 +67,44 @@ public class CommentsRefset extends Refset {
 				}
 				// TODO: convert time from int to readable time
 				if (commentsExtensionPart != null) {
-					comments.add(commentsExtensionPart.getStringValue() + " - Time: " + commentsExtensionPart.getTime());
+					comments.put(commentsMember, commentsExtensionPart.getStringValue() + " - Time: " + commentsExtensionPart.getTime());
 				}
 			}
 		}
 		return comments;
 	}
 
+	public static void retireCommentsMember(I_ExtendByRef commentstMember) {
+		try {
+			I_TermFactory termFactory = Terms.get();
+			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+			I_ExtendByRefPart lastPart = TerminologyProjectDAO.getLastExtensionPart(commentstMember);
+			for (PathBI editPath : config.getEditingPathSet()) {
+				I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) 
+				lastPart.makeAnalog(
+						ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+						editPath.getConceptNid(),
+						Long.MAX_VALUE);
+				commentstMember.addVersion(part);
+			}
+			termFactory.addUncommittedNoChecks(commentstMember);
+			termFactory.commit();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return;
+	}
+
 	public static List<I_GetConceptData> getCommentTypes() {
 		List<I_GetConceptData> descendants = new ArrayList<I_GetConceptData>();
 		return getCommentTypes(descendants);
 	}
-	
+
 	public static List<I_GetConceptData> getCommentTypes(List<I_GetConceptData> descendants) {
 		try {
 			I_TermFactory termFactory = Terms.get();
@@ -88,9 +116,9 @@ public class CommentsRefset extends Refset {
 			childrenSet.addAll(comment.getDestRelOrigins(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config
 					.getConflictResolutionStrategy()));
 			descendants.addAll(childrenSet);
-//			for (I_GetConceptData loopConcept : childrenSet) {
-//				descendants = getCommentSubTypes(descendants, loopConcept);
-//			}
+			//			for (I_GetConceptData loopConcept : childrenSet) {
+			//				descendants = getCommentSubTypes(descendants, loopConcept);
+			//			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (TerminologyException e) {
@@ -125,7 +153,7 @@ public class CommentsRefset extends Refset {
 		Collections.sort(comments, new CommentComparator());
 		return comments;
 	}
-	
+
 	public static List<I_GetConceptData> getCommentSubTypes(I_GetConceptData type) {
 		List<I_GetConceptData> descendants = new ArrayList<I_GetConceptData>();
 		return getCommentSubTypes(descendants, type);
@@ -141,9 +169,9 @@ public class CommentsRefset extends Refset {
 			childrenSet.addAll(type.getDestRelOrigins(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config
 					.getConflictResolutionStrategy()));
 			descendants.addAll(childrenSet);
-//			for (I_GetConceptData loopConcept : childrenSet) {
-//				descendants = getCommentSubTypes(descendants, loopConcept);
-//			}
+			//			for (I_GetConceptData loopConcept : childrenSet) {
+			//				descendants = getCommentSubTypes(descendants, loopConcept);
+			//			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (TerminologyException e) {
@@ -195,8 +223,8 @@ public class CommentsRefset extends Refset {
 	 */
 	public HashMap<URL, String> getUrls(int componentId) throws IOException, TerminologyException {
 		HashMap<URL, String> urls = new HashMap<URL, String>();
-		List<String> comments = getComments(componentId);
-		for (String comment : comments) {
+		HashMap<I_ExtendByRef, String> comments = getComments(componentId);
+		for (String comment : comments.values()) {
 			Matcher matcher = HTTP_PATTERN.matcher(comment);
 			while (matcher.find()) {
 				try {
