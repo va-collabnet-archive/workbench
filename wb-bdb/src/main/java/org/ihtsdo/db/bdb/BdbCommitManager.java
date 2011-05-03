@@ -344,7 +344,7 @@ public class BdbCommitManager {
         Svn.rwl.acquireUninterruptibly();
         boolean passedRelease = false;
 		
-		AceLog.getAppLog().info("BDBCommitManager commit called");
+		AceLog.getAppLog().info("BDBCommitManager commit called performCommit = "+performCommit +" writeChangeSets = "+writeChangeSets);
         try {
             synchronized (uncommittedCNids) {
                 synchronized (uncommittedCNidsNoChecks) {
@@ -444,6 +444,7 @@ public class BdbCommitManager {
                                 case MUTABLE_ONLY:
                                     uncommittedCNidsNoChecks.or(uncommittedCNids);
                                     if (uncommittedCNidsNoChecks.cardinality() > 0) {
+                                    	AceLog.getAppLog().info("BDBCommitManager commit about to changeSetWriterService.execute(handler)");	
                                     final ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
                                                 uncommittedCNidsNoChecks, commitTime,
                                                 sapNidsFromCommit, changeSetPolicy.convert(),

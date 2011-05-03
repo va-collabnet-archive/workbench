@@ -60,7 +60,7 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
 
     private boolean initialized = false;
 
-    private Long nextCommit;
+    public Long nextCommit;
     private String nextCommitStr;
 
     private transient List<I_ValidateChangeSetChanges> validators = new ArrayList<I_ValidateChangeSetChanges>();
@@ -92,9 +92,12 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
                 "Reading from log " + changeSetFile.getName() + " until " + 
                 TimeUtil.getFileDateFormat().format(new Date(endTime)));
         }
+        AceLog.getEditLog().info("readUntil called nextCommitTime() = "+nextCommitTime()+" endTime = "+endTime +" Long.MAX_VALUE = "+Long.MAX_VALUE);
         while ((nextCommitTime() <= endTime) && (nextCommitTime() != Long.MAX_VALUE)) {
+      //  while ((nextCommitTime() <= endTime)) {
             try {
                 EConcept eConcept = new EConcept(dataStream);
+                
                 if (csreOut != null) {
                     csreOut.append("\n*******************************\n");
                     csreOut.append(TimeUtil.formatDateForFile(nextCommitTime()));
@@ -103,6 +106,7 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
                 }
                 //AceLog.getEditLog().info("Reading change set entry: \n" + eConcept);
                 count++;
+                AceLog.getEditLog().info("eConcept found count = "+count);
                 if (counter != null) {
                     counter.increment();
                 }

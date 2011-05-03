@@ -613,7 +613,7 @@ public class Description
     @Override
     public DescriptionRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
         if (getTime() == time && getPathNid() == pathNid) {
-            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
+            throw new UnsupportedOperationException("Cannot make an analog on same time and path... time = "+time +" pathNid = "+pathNid);
         }
         DescriptionRevision newR;
         newR = new DescriptionRevision(this, statusNid,

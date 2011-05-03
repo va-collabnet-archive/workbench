@@ -127,7 +127,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
 	private static Concept mergeWithEConcept(EConcept eConcept, Concept c, boolean updateLucene)
-            throws IOException {
+    throws IOException {
+    	try{
         c.setAnnotationStyleRefex(eConcept.isAnnotationStyleRefex());
         TkConceptAttributes eAttr = eConcept.getConceptAttributes();
         if (eAttr != null) {
@@ -209,6 +210,10 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 }
             }
         }
+    	} catch(IOException ioe){
+    		AceLog.getAppLog().severe(" Err thrown in Concept.mergeWithEConcept eConcept = "+eConcept.toString() +"\n c = "+c.toLongString(), ioe);
+    		throw ioe;
+    	}
         return c;
     }
 

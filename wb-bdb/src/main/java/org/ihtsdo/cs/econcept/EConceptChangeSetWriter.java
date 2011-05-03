@@ -60,6 +60,12 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
     public EConceptChangeSetWriter(File changeSetFile, File tempFile, 
     		ChangeSetGenerationPolicy policy, boolean timeStampEnabled) {
         super();
+        try {
+			AceLog.getAppLog().info("EConceptChangeSetWriter boolean timeStampEnabled  " + changeSetFile.getCanonicalPath());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         this.changeSetFile = changeSetFile;
         this.tempFile = tempFile;
         this.policy = policy;
@@ -76,6 +82,7 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
 	@Override
 	public void open(NidSetBI commitSapNids) throws IOException {
 		if (changeSetFile.exists()) {
+			 AceLog.getAppLog().info("EConceptChangeSetWriter open cs exists and =  " + changeSetFile.getCanonicalPath());
 		   Terms.get().setProperty(changeSetFile.getName(),
 		                Long.toString(changeSetFile.length()));
 		} else {
@@ -105,6 +112,7 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
 
 	@Override
 	public void commit() throws IOException {
+		AceLog.getAppLog().info("EConceptChangeSetWriter commit()");
         if (tempOut != null) {
             tempOut.flush();
             tempOut.close();
@@ -127,13 +135,18 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
             }
             String canonicalFileString = tempFile.getCanonicalPath();
             if (tempFile.exists()) {
+            	AceLog.getAppLog().info(" tempfile = "+canonicalFileString);
             	if (tempFile.length() > 0) {
                     if (tempFile.renameTo(changeSetFile) == false) {
                         AceLog.getAppLog().warning("tempFile.renameTo failed. Attempting FileIO.copyFile...");
                         FileIO.copyFile(tempFile.getCanonicalPath(), changeSetFile.getCanonicalPath());
                     }
+                    AceLog.getAppLog().info("EConceptChangeSetWriter commit() line 144 where the MAGIC happens");
                     tempFile = new File(canonicalFileString);
             	}
+            	
+            	//test exist CS file if exists and tempFile is exists & then the post temp2cs file.
+            	AceLog.getAppLog().info("EConceptChangeSetWriter commit() line 149 where tempFile.delete()s");
                 tempFile.delete();
             }
             if (changeSetFile.length() == 0) {

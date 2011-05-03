@@ -55,7 +55,10 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 		super();
 		assert commitTime != Long.MAX_VALUE;
 		assert commitTime != Long.MIN_VALUE;
-		this.permit = permit;
+		//this.permit = permit;
+		
+		this.permit = new Semaphore(1, true);
+		
 		this.cNidsToWrite = cNidsToWrite;
 		changedCount = cNidsToWrite.cardinality();
 		
@@ -86,6 +89,16 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 
 	@Override
 	public void run() {
+		AceLog.getAppLog().info("ChangeSetWriterHandler run");
+		if (permit != null) {
+			AceLog.getAppLog().info("run permit != null avail = "+permit.availablePermits());	
+			try {
+				permit.acquire();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		try {
 	        conceptCount = Bdb.getConceptDb().getCount();
 
@@ -119,7 +132,9 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
             }
 
             activity.setProgressInfoLower("Committing change set writers...");
+            AceLog.getAppLog().info("About to writer.commit() writerListForHandler size = "+writerListForHandler.size());
             for (ChangeSetGeneratorBI writer : writerListForHandler) {
+            	AceLog.getAppLog().info("writer.commit()");	
                 writer.commit();
             }
             long endTime = System.currentTimeMillis();
