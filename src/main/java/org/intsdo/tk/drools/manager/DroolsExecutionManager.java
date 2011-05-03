@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseConfiguration;
 import org.drools.KnowledgeBaseFactory;
@@ -73,12 +75,15 @@ public class DroolsExecutionManager {
     }
     private boolean failed = false;
     Collection<KnowledgePackage> kpkgs = null;
+    
+    private static ConcurrentHashMap<String, Semaphore> packageLocks = new ConcurrentHashMap<String, Semaphore>();
 
     public DroolsExecutionManager(Set<File> kbFiles, String kbKey) throws IOException {
         this(EnumSet.allOf(ExtraEvaluators.class),
                 kbFiles, kbKey);
     }
 
+    
     public DroolsExecutionManager(EnumSet<ExtraEvaluators> extraEvaluators,
             Set<File> kbFiles, String kbKey) throws IOException {
 
@@ -87,15 +92,28 @@ public class DroolsExecutionManager {
         ruleDirectory.mkdirs();
         this.kbFiles = kbFiles;
         drlPkgFile = new File(ruleDirectory, kbKey + ".kpkgs");
+        
+        Semaphore s = new Semaphore(1);
+        Semaphore s2 = packageLocks.putIfAbsent(drlPkgFile.getCanonicalPath(), s);
+        if (s2 != null) {
+            s = s2;
+        }
+        
         for (File f : this.kbFiles) {
             if (!drlPkgFile.exists() || drlPkgFile.lastModified() < f.lastModified()) {
-                buildKb = true;
-                break;
+                s.acquireUninterruptibly();
+                if (!drlPkgFile.exists() || drlPkgFile.lastModified() < f.lastModified()) {
+                    buildKb = true;
+                    break;
+                } else {
+                    s.release();
+                }
             }
         }
 
         if (buildKb) {
             loadKnowledgePackages(kbFiles, extraEvaluators, drlPkgFile);
+            s.release();
         } else {
             ObjectInputStream in = new ObjectInputStream(new FileInputStream(drlPkgFile));
             try {
@@ -124,6 +142,7 @@ public class DroolsExecutionManager {
     }
 
     public final void loadKnowledgePackages(Set<File> kbFiles, EnumSet<ExtraEvaluators> extraEvaluators, File drlPkgFile) throws RuntimeException, IOException {
+        System.out.println("Writing: " + drlPkgFile.getCanonicalPath());
         HashMap<Resource, ResourceType> resources = new HashMap<Resource, ResourceType>();
         for (File f : kbFiles) {
             resources.put(ResourceFactory.newFileResource(f), ResourceType.DRL);
