@@ -19,11 +19,11 @@ public class ConceptInactivationType {
 						UUID.fromString("d4227098-db7a-331e-8f00-9d1e27626fc5"));
 	
 	public static ConceptSpec LIMITED_STATUS_CONCEPT = 
-		new ConceptSpec("Limited Status concept (inactive concept)", 
+		new ConceptSpec("Limited status concept (inactive concept)", 
 						UUID.fromString("0c7b717a-3e41-372b-be57-621befb9b3ee"));
 	
 	public static ConceptSpec MOVED_ELSEWHERE = 
-		new ConceptSpec("Move Elsewhere (inactive concept)", 
+		new ConceptSpec("Moved elsewhere (inactive concept)", 
 						UUID.fromString("e730d11f-e155-3482-a423-9637db3bc1a2"));
 	
 	public static ConceptSpec OUTDATED_CONCEPT = 
