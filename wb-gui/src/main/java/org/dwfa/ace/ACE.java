@@ -183,6 +183,7 @@ import org.ihtsdo.arena.Arena;
 import org.ihtsdo.custom.statics.CustomStatics;
 import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.thread.NamedThreadFactory;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -544,7 +545,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             aceFrameConfig.setTogglesInComponentPanelVisible(t, button.isSelected());
         }
     }
-    private static Set<I_Transact> uncommitted = Collections.synchronizedSet(new HashSet<I_Transact>());
+    private static Set<? extends I_Transact> uncommitted = Collections.synchronizedSet(new HashSet<I_Transact>());
     private static Map<I_GetConceptData, Collection<AlertToDataConstraintFailure>> dataCheckMap =
             new HashMap<I_GetConceptData, Collection<AlertToDataConstraintFailure>>();
     private static int maxHistoryListSize = 100;
@@ -3210,12 +3211,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 AceLog.getAppLog().alertAndLogException(e);
             }
         }
-
         return true;
     }
 
     public boolean okToClose() {
-        if (uncommitted.size() > 0) {
+        if (Ts.get().hasUncommittedChanges()) {
             AceLog.getAppLog().info("Uncommitted: " + uncommitted);
             if (aceConfig != null) {
                 for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
