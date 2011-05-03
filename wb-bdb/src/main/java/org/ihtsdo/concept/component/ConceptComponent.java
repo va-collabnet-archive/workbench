@@ -977,7 +977,12 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         // merge versions
         for (ConceptComponent<R, C>.Version v : another.getVersions()) {
             if (!currentSapNids.contains(v.getSapNid())) {
+            	try{
                 addRevision((R) v.getRevision());
+            	}catch (UnsupportedOperationException uoe){
+            		AceLog.getAppLog().severe("ConceptComponent merge v.getSapNid() = "+v.getSapNid()+ " currentSapNids size = "+currentSapNids.size()
+            				+" another = "+another.toString() +"\n c = "+this.toString(), uoe);
+            	}
             }
         }
 

@@ -149,12 +149,12 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                     int dNid = Bdb.uuidToNid(ed.primordialUuid);
                     if (currentDNids.contains(dNid)) {
                         Description d = c.getDescription(dNid);
-                        try{
+                       // try{
                         d.merge(new Description(ed, c));
-                        }catch(UnsupportedOperationException ioe){
+                        /*}catch(UnsupportedOperationException ioe){
                         	AceLog.getAppLog().severe("d.merge UnsupportedOperationException Err thrown in Concept.mergeWithEConcept dNid ="+dNid
                         	+" eConcept = "+eConcept.toString() +"\n c = "+c.toLongString(), ioe);
-                        	}
+                        	} */
                     } else {
                         c.getDescriptions().add(new Description(ed, c));
                     }
