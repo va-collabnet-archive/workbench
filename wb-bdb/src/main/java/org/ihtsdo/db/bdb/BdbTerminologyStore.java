@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -502,5 +503,11 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         return new ContradictionIdentifier();
     }
     
-    
+    @Override
+    public boolean hasUncommittedChanges(){
+    	if(Terms.get().getUncommitted().size() > 0){
+    		return true;
+    	}
+    	return false;
+    }
 }
