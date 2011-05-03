@@ -77,4 +77,5 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
     
     ContradictionIdentifierBI getConflictIdentifier();
     
+    boolean hasUncommittedChanges();
 }
