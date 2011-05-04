@@ -319,14 +319,6 @@ public class TranslationConceptViewer extends JPanel {
 		try {
 			populateTargetTree();
 			getPreviousComments();
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-		            Timer timer = new Timer(1100, new setInboxPanelFocus());
-		            timer.setRepeats(false);
-		            timer.start();
-				}
-
-			});
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

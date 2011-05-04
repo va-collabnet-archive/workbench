@@ -816,9 +816,6 @@ public class SpecialInboxPanel extends JPanel {
 				refreshItemsTable();
 				setByCode = false;
 
-				Timer timer = new Timer(1100, new setInboxPanelFocus());
-				timer.setRepeats(false);
-				timer.start();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
