@@ -174,7 +174,7 @@ public class SimilarityPanel extends JPanel {
 
 		try {
 			String results = LanguageUtil.getLinguisticGuidelines(concept);
-			setLingGuidelinesHitsCount(results.split("<br><br>").length);
+			setLingGuidelinesHitsCount(results.split("<br><br>").length -1);
 			// if (!results.isEmpty()){
 			// tabbedPane1.setTitleAt(2,
 			// "<html>Linguistic Guidelines<b><font color='red'>*</font></b></html>");
@@ -796,4 +796,9 @@ public class SimilarityPanel extends JPanel {
 	public void setLingGuidelinesHitsCount(int lingGuidelinesHitsCount) {
 		this.lingGuidelinesHitsCount = lingGuidelinesHitsCount;
 	}
+	
+	public ZebraJTable getSimilarityTable() {
+		return similarityTable;
+	}
+	
 }
