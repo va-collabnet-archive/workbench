@@ -1517,21 +1517,21 @@ public class TranslationConceptEditor6 extends JPanel {
 				new Insets(0, 0, 0, 5), 0, 0));
 
 			//---- label14 ----
-			label14.setText("S:0");
+			label14.setText("S:-");
 			label14.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			panel1.add(label14, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
 
 			//---- label15 ----
-			label15.setText("TM:0");
+			label15.setText("TM:-");
 			label15.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			panel1.add(label15, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
 
 			//---- label16 ----
-			label16.setText("LG:0");
+			label16.setText("LG:-");
 			label16.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			panel1.add(label16, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
