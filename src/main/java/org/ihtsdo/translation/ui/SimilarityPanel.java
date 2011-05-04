@@ -80,6 +80,9 @@ public class SimilarityPanel extends JPanel {
 	private TranslationProject project;
 	private WorkListMember worklistMember;
 	private JDialog similarityDialog;
+	private int similarityHitsCount = 0;
+	private int transMemoryHitsCount = 0;
+	private int lingGuidelinesHitsCount = 0;
 
 	public SimilarityPanel() {
 		initComponents();
@@ -169,6 +172,7 @@ public class SimilarityPanel extends JPanel {
 
 		try {
 			String results = LanguageUtil.getLinguisticGuidelines(concept);
+			setLingGuidelinesHitsCount(results.split("<br><br>").length);
 			// if (!results.isEmpty()){
 			// tabbedPane1.setTitleAt(2,
 			// "<html>Linguistic Guidelines<b><font color='red'>*</font></b></html>");
@@ -197,6 +201,7 @@ public class SimilarityPanel extends JPanel {
 		// TODO fix language parameters
 
 		HashMap<String, String> results = DocumentManager.matchTranslationMemory(query);
+		setTransMemoryHitsCount(results.entrySet().size());
 		String[] columnNames = { "Pattern Text", "Translated to.." };
 		String[][] data = null;
 		DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
@@ -241,6 +246,7 @@ public class SimilarityPanel extends JPanel {
 		}
 
 		List<SimilarityMatchedItem> results = LanguageUtil.getSimilarityResults(query, sourceIds, targetId, types);
+		setSimilarityHitsCount(results.size());
 		String[] columnNames;
 		columnNames = new String[] { "Source Text", "Target Text", "Status", "Item" };
 		String[][] data = null;
@@ -476,38 +482,42 @@ public class SimilarityPanel extends JPanel {
 		scrollPane4 = new JScrollPane();
 		editorPane1 = new JEditorPane();
 
-		// ======== this ========
+		//======== this ========
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new GridBagLayout());
-		((GridBagLayout) getLayout()).columnWidths = new int[] { 0, 0 };
-		((GridBagLayout) getLayout()).rowHeights = new int[] { 255, 255, 250, 0 };
-		((GridBagLayout) getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-		((GridBagLayout) getLayout()).rowWeights = new double[] { 1.0, 1.0, 1.0, 1.0E-4 };
+		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
+		((GridBagLayout)getLayout()).rowHeights = new int[] {255, 255, 250, 0};
+		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+		((GridBagLayout)getLayout()).rowWeights = new double[] {1.0, 1.0, 1.0, 1.0E-4};
 
-		// ======== similarityPanel ========
+		//======== similarityPanel ========
 		{
 			similarityPanel.setBackground(new Color(238, 238, 238));
-			similarityPanel.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(5, 5, 5, 5)));
+			similarityPanel.setBorder(new CompoundBorder(
+				new EtchedBorder(),
+				new EmptyBorder(5, 5, 5, 5)));
 			similarityPanel.setLayout(new GridBagLayout());
-			((GridBagLayout) similarityPanel.getLayout()).columnWidths = new int[] { 0, 0 };
-			((GridBagLayout) similarityPanel.getLayout()).rowHeights = new int[] { 0, 0, 0, 0, 0 };
-			((GridBagLayout) similarityPanel.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-			((GridBagLayout) similarityPanel.getLayout()).rowWeights = new double[] { 0.0, 0.0, 1.0, 0.0, 1.0E-4 };
+			((GridBagLayout)similarityPanel.getLayout()).columnWidths = new int[] {0, 0};
+			((GridBagLayout)similarityPanel.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0};
+			((GridBagLayout)similarityPanel.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+			((GridBagLayout)similarityPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0, 0.0, 1.0E-4};
 
-			// ======== panel2 ========
+			//======== panel2 ========
 			{
 				panel2.setLayout(new GridBagLayout());
-				((GridBagLayout) panel2.getLayout()).columnWidths = new int[] { 0, 0, 0 };
-				((GridBagLayout) panel2.getLayout()).rowHeights = new int[] { 0, 0 };
-				((GridBagLayout) panel2.getLayout()).columnWeights = new double[] { 1.0, 0.0, 1.0E-4 };
-				((GridBagLayout) panel2.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+				((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0, 0};
+				((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0};
+				((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-				// ---- label1 ----
+				//---- label1 ----
 				label1.setText("Similarity");
 				label1.setHorizontalAlignment(SwingConstants.LEFT);
-				panel2.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel2.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ---- label4 ----
+				//---- label4 ----
 				label4.setText("text");
 				label4.addMouseListener(new MouseAdapter() {
 					@Override
@@ -515,33 +525,43 @@ public class SimilarityPanel extends JPanel {
 						label4MouseClicked(e);
 					}
 				});
-				panel2.add(label4, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+				panel2.add(label4, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 			}
-			similarityPanel.add(panel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+			similarityPanel.add(panel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 
-			// ======== refinePanel ========
+			//======== refinePanel ========
 			{
 				refinePanel.setBackground(new Color(238, 238, 238));
 				refinePanel.setLayout(new GridBagLayout());
-				((GridBagLayout) refinePanel.getLayout()).columnWidths = new int[] { 233, 0, 0 };
-				((GridBagLayout) refinePanel.getLayout()).rowHeights = new int[] { 0, 0 };
-				((GridBagLayout) refinePanel.getLayout()).columnWeights = new double[] { 0.0, 0.0, 1.0E-4 };
-				((GridBagLayout) refinePanel.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+				((GridBagLayout)refinePanel.getLayout()).columnWidths = new int[] {233, 0, 0};
+				((GridBagLayout)refinePanel.getLayout()).rowHeights = new int[] {0, 0};
+				((GridBagLayout)refinePanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0E-4};
+				((GridBagLayout)refinePanel.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 				refinePanel.setVisible(false);
-				refinePanel.add(searchTextField, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				refinePanel.add(searchTextField, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ---- searchButton ----
+				//---- searchButton ----
 				searchButton.setAction(null);
 				searchButton.setText("Sea[r]ch");
 				searchButton.setMnemonic('R');
-				refinePanel.add(searchButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+				refinePanel.add(searchButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 			}
-			similarityPanel.add(refinePanel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+			similarityPanel.add(refinePanel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 
-			// ======== scrollPane2 ========
+			//======== scrollPane2 ========
 			{
 
-				// ---- similarityTable ----
+				//---- similarityTable ----
 				similarityTable.setPreferredScrollableViewportSize(new Dimension(180, 200));
 				similarityTable.setFont(new Font("Verdana", Font.PLAIN, 12));
 				similarityTable.setModel(new DefaultTableModel());
@@ -554,18 +574,20 @@ public class SimilarityPanel extends JPanel {
 				});
 				scrollPane2.setViewportView(similarityTable);
 			}
-			similarityPanel.add(scrollPane2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+			similarityPanel.add(scrollPane2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 
-			// ======== panel13 ========
+			//======== panel13 ========
 			{
 				panel13.setBackground(new Color(238, 238, 238));
 				panel13.setLayout(new GridBagLayout());
-				((GridBagLayout) panel13.getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 0, 0 };
-				((GridBagLayout) panel13.getLayout()).rowHeights = new int[] { 0, 0 };
-				((GridBagLayout) panel13.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4 };
-				((GridBagLayout) panel13.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+				((GridBagLayout)panel13.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0};
+				((GridBagLayout)panel13.getLayout()).rowHeights = new int[] {0, 0};
+				((GridBagLayout)panel13.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
+				((GridBagLayout)panel13.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-				// ---- rbFSN ----
+				//---- rbFSN ----
 				rbFSN.setText("FSN");
 				rbFSN.setSelected(true);
 				rbFSN.setBackground(new Color(238, 238, 238));
@@ -575,9 +597,11 @@ public class SimilarityPanel extends JPanel {
 						rbFSNActionPerformed(e);
 					}
 				});
-				panel13.add(rbFSN, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel13.add(rbFSN, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ---- rbPref ----
+				//---- rbPref ----
 				rbPref.setText("Preferred");
 				rbPref.setBackground(new Color(238, 238, 238));
 				rbPref.addActionListener(new ActionListener() {
@@ -586,9 +610,11 @@ public class SimilarityPanel extends JPanel {
 						rbPrefActionPerformed(e);
 					}
 				});
-				panel13.add(rbPref, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel13.add(rbPref, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ---- radioButton2 ----
+				//---- radioButton2 ----
 				radioButton2.setText("Both");
 				radioButton2.setBackground(new Color(238, 238, 238));
 				radioButton2.addActionListener(new ActionListener() {
@@ -597,13 +623,17 @@ public class SimilarityPanel extends JPanel {
 						radioButton2ActionPerformed(e);
 					}
 				});
-				panel13.add(radioButton2, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel13.add(radioButton2, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ---- refineCheckBox ----
+				//---- refineCheckBox ----
 				refineCheckBox.setText("Refine");
-				panel13.add(refineCheckBox, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel13.add(refineCheckBox, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ---- expandButton ----
+				//---- expandButton ----
 				expandButton.setText("E[x]pand");
 				expandButton.setMnemonic('X');
 				expandButton.addActionListener(new ActionListener() {
@@ -612,67 +642,88 @@ public class SimilarityPanel extends JPanel {
 						expandButtonActionPerformed(e);
 					}
 				});
-				panel13.add(expandButton, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
+				panel13.add(expandButton, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+					new Insets(0, 0, 0, 0), 0, 0));
 			}
-			similarityPanel.add(panel13, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+			similarityPanel.add(panel13, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(similarityPanel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+		add(similarityPanel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 5, 0), 0, 0));
 
-		// ======== panel1 ========
+		//======== panel1 ========
 		{
-			panel1.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(5, 5, 5, 5)));
+			panel1.setBorder(new CompoundBorder(
+				new EtchedBorder(),
+				new EmptyBorder(5, 5, 5, 5)));
 			panel1.setLayout(new GridBagLayout());
-			((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 0, 0 };
-			((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 0, 0, 0 };
-			((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-			((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 1.0, 1.0E-4 };
+			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0};
+			((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0};
+			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
 
-			// ---- label2 ----
+			//---- label2 ----
 			label2.setText("Translation Memory");
-			panel1.add(label2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+			panel1.add(label2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 
-			// ======== scrollPane3 ========
+			//======== scrollPane3 ========
 			{
 
-				// ---- table2 ----
+				//---- table2 ----
 				table2.setPreferredScrollableViewportSize(new Dimension(180, 200));
 				table2.setFont(new Font("Verdana", Font.PLAIN, 12));
 				scrollPane3.setViewportView(table2);
 			}
-			panel1.add(scrollPane3, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+			panel1.add(scrollPane3, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+		add(panel1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 5, 0), 0, 0));
 
-		// ======== panel15 ========
+		//======== panel15 ========
 		{
-			panel15.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(5, 5, 5, 5)));
+			panel15.setBorder(new CompoundBorder(
+				new EtchedBorder(),
+				new EmptyBorder(5, 5, 5, 5)));
 			panel15.setLayout(new GridBagLayout());
-			((GridBagLayout) panel15.getLayout()).columnWidths = new int[] { 0, 0 };
-			((GridBagLayout) panel15.getLayout()).rowHeights = new int[] { 0, 0, 0 };
-			((GridBagLayout) panel15.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-			((GridBagLayout) panel15.getLayout()).rowWeights = new double[] { 0.0, 1.0, 1.0E-4 };
+			((GridBagLayout)panel15.getLayout()).columnWidths = new int[] {0, 0};
+			((GridBagLayout)panel15.getLayout()).rowHeights = new int[] {0, 0, 0};
+			((GridBagLayout)panel15.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+			((GridBagLayout)panel15.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
 
-			// ---- label3 ----
+			//---- label3 ----
 			label3.setText("Editorial Guidelines");
-			panel15.add(label3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+			panel15.add(label3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 
-			// ======== scrollPane4 ========
+			//======== scrollPane4 ========
 			{
 
-				// ---- editorPane1 ----
+				//---- editorPane1 ----
 				editorPane1.setContentType("text/html");
 				scrollPane4.setViewportView(editorPane1);
 			}
-			panel15.add(scrollPane4, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+			panel15.add(scrollPane4, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel15, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+		add(panel15, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 0, 0), 0, 0));
 
-		// ---- buttonGroup2 ----
+		//---- buttonGroup2 ----
 		ButtonGroup buttonGroup2 = new ButtonGroup();
 		buttonGroup2.add(rbFSN);
 		buttonGroup2.add(rbPref);
 		buttonGroup2.add(radioButton2);
-		// JFormDesigner - End of component initialization
 		// //GEN-END:initComponents
 	}
 
@@ -702,4 +753,28 @@ public class SimilarityPanel extends JPanel {
 	private JScrollPane scrollPane4;
 	private JEditorPane editorPane1;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
+
+	public int getSimilarityHitsCount() {
+		return similarityHitsCount;
+	}
+
+	public void setSimilarityHitsCount(int similarityHitsCount) {
+		this.similarityHitsCount = similarityHitsCount;
+	}
+
+	public int getTransMemoryHitsCount() {
+		return transMemoryHitsCount;
+	}
+
+	public void setTransMemoryHitsCount(int transMemoryHitsCount) {
+		this.transMemoryHitsCount = transMemoryHitsCount;
+	}
+
+	public int getLingGuidelinesHitsCount() {
+		return lingGuidelinesHitsCount;
+	}
+
+	public void setLingGuidelinesHitsCount(int lingGuidelinesHitsCount) {
+		this.lingGuidelinesHitsCount = lingGuidelinesHitsCount;
+	}
 }

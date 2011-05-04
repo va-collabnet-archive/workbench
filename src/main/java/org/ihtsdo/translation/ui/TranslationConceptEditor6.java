@@ -1298,6 +1298,9 @@ public class TranslationConceptEditor6 extends JPanel {
 		menu2 = new JMenu();
 		mHist = new JMenuItem();
 		mLog = new JMenuItem();
+		label14 = new JLabel();
+		label15 = new JLabel();
+		label16 = new JLabel();
 		label10 = new JLabel();
 		panel10 = new JPanel();
 		splitPane2 = new JSplitPane();
@@ -1367,9 +1370,9 @@ public class TranslationConceptEditor6 extends JPanel {
 		//======== panel1 ========
 		{
 			panel1.setLayout(new GridBagLayout());
-			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0, 0};
+			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0};
 			((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {30, 0};
-			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 			//======== menuBar1 ========
@@ -1480,6 +1483,24 @@ public class TranslationConceptEditor6 extends JPanel {
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
 
+			//---- label14 ----
+			label14.setText("S:0");
+			panel1.add(label14, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- label15 ----
+			label15.setText("TM:0");
+			panel1.add(label15, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- label16 ----
+			label16.setText("LG:0");
+			panel1.add(label16, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
 			//---- label10 ----
 			label10.setText("text");
 			label10.addMouseListener(new MouseAdapter() {
@@ -1488,7 +1509,7 @@ public class TranslationConceptEditor6 extends JPanel {
 					label10MouseClicked(e);
 				}
 			});
-			panel1.add(label10, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+			panel1.add(label10, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 0), 0, 0));
 		}
@@ -1981,6 +2002,9 @@ public class TranslationConceptEditor6 extends JPanel {
 	private JMenu menu2;
 	private JMenuItem mHist;
 	private JMenuItem mLog;
+	private JLabel label14;
+	private JLabel label15;
+	private JLabel label16;
 	private JLabel label10;
 	private JPanel panel10;
 	private JSplitPane splitPane2;
@@ -2192,6 +2216,12 @@ public class TranslationConceptEditor6 extends JPanel {
 									Runnable simil = new Runnable() {
 										public void run() {
 											similPanel.updateTabs(sourceFSN, concept, sourceIds, targetId, translationProject, worklistMember);
+											label14.setText("S:" + similPanel.getSimilarityHitsCount());
+											label14.revalidate();
+											label15.setText("TM:" + similPanel.getTransMemoryHitsCount());
+											label15.revalidate();
+											label16.setText("LG:" + similPanel.getLingGuidelinesHitsCount());
+											label16.revalidate();
 										}
 									};
 									updateUIThread = new Thread(simil);
