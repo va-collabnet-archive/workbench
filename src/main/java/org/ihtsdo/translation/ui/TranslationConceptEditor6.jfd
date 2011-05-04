@@ -439,6 +439,14 @@
            <string>text</string> 
            <string>S:0</string> 
           </void> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object id="Font0" class="java.awt.Font"> 
+            <string>Lucida Grande</string> 
+            <int>0</int> 
+            <int>11</int> 
+           </object> 
+          </void> 
           <void property="name"> 
            <string>label14</string> 
           </void> 
@@ -458,6 +466,10 @@
            <string>text</string> 
            <string>TM:0</string> 
           </void> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object idref="Font0"/> 
+          </void> 
           <void property="name"> 
            <string>label15</string> 
           </void> 
@@ -476,6 +488,10 @@
           <void method="setProperty"> 
            <string>text</string> 
            <string>LG:0</string> 
+          </void> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object idref="Font0"/> 
           </void> 
           <void property="name"> 
            <string>label16</string> 
