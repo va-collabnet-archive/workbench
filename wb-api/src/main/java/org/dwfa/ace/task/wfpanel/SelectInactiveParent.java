@@ -223,15 +223,14 @@ public class SelectInactiveParent extends PreviousNextOrCancel {
             // Add the Refset Purpose List ComboBox
             c.gridx++;
             c.gridy = 0;
-            I_GetConceptData parentList[] = new I_GetConceptData[7];
+            I_GetConceptData parentList[] = new I_GetConceptData[6];
             try {
             	parentList[0] = Terms.get().getConcept(ConceptInactivationType.AMBIGUOUS_CONCEPT.getUuids());
             	parentList[1] = Terms.get().getConcept(ConceptInactivationType.DUPLICATE_CONCEPT.getUuids());
             	parentList[2] = Terms.get().getConcept(ConceptInactivationType.ERRONEOUS_CONCEPT.getUuids());
             	parentList[3] = Terms.get().getConcept(ConceptInactivationType.LIMITED_STATUS_CONCEPT.getUuids());
-            	parentList[4] = Terms.get().getConcept(ConceptInactivationType.MOVED_ELSEWHERE.getUuids());
-            	parentList[5] = Terms.get().getConcept(ConceptInactivationType.OUTDATED_CONCEPT.getUuids());
-            	parentList[6] = Terms.get().getConcept(ConceptInactivationType.REASON_NOT_STATED_CONCEPT.getUuids());
+            	parentList[4] = Terms.get().getConcept(ConceptInactivationType.OUTDATED_CONCEPT.getUuids());
+            	parentList[5] = Terms.get().getConcept(ConceptInactivationType.REASON_NOT_STATED_CONCEPT.getUuids());
             } catch (TerminologyException e) {
                 e.printStackTrace();
             } catch (IOException e) {
