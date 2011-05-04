@@ -17,6 +17,7 @@
 
 package org.ihtsdo.translation.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
@@ -105,12 +106,15 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.EntryID;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.NoMatchingEntryException;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.document.DocumentManager;
+import org.ihtsdo.document.DocumentsSearchPanel;
 import org.ihtsdo.issue.IssueRepoRegistration;
 import org.ihtsdo.issue.issuerepository.IssueRepository;
 import org.ihtsdo.issue.manager.IssueRepositoryDAO;
@@ -510,7 +514,7 @@ public class TranslationConceptEditor6 extends JPanel {
 						&& descriptionInEditor.getAcceptabilityId() == ((I_GetConceptData) cmbAccep.getSelectedItem()).getConceptNid()
 						&& ((descriptionInEditor.getExtensionStatusId() == active.getConceptNid() && rbAct.isSelected()) || (descriptionInEditor.getExtensionStatusId() != active
 								.getConceptNid() && !rbAct.isSelected())) && ((descriptionInEditor.getTypeId() == fsn.getConceptNid() && fsn.equals((I_GetConceptData) comboBox1
-						.getSelectedItem())) || (descriptionInEditor.getTypeId() != fsn.getConceptNid() && !fsn.equals((I_GetConceptData) comboBox1.getSelectedItem()))))) {
+										.getSelectedItem())) || (descriptionInEditor.getTypeId() != fsn.getConceptNid() && !fsn.equals((I_GetConceptData) comboBox1.getSelectedItem()))))) {
 					bPendTerm = false;
 				}
 			} else {
@@ -526,7 +530,7 @@ public class TranslationConceptEditor6 extends JPanel {
 				}
 				int n = JOptionPane.showOptionDialog(null, message1, "Unsaved data", JOptionPane.YES_NO_OPTION,
 						JOptionPane.WARNING_MESSAGE, null, // do not use a
-															// custom Icon
+						// custom Icon
 						options, // the titles of buttons
 						options[1]); // default button title
 				if (n == 0) {
@@ -908,14 +912,14 @@ public class TranslationConceptEditor6 extends JPanel {
 
 		try {
 			populateTargetTree();
-//			SwingUtilities.invokeLater(new Runnable() {
-//				public void run() {
-//					Timer timer = new Timer(1100, new setInboxPanelFocus());
-//					timer.setRepeats(false);
-//					timer.start();
-//				}
-//
-//			});
+			//			SwingUtilities.invokeLater(new Runnable() {
+			//				public void run() {
+			//					Timer timer = new Timer(1100, new setInboxPanelFocus());
+			//					timer.setRepeats(false);
+			//					timer.start();
+			//				}
+			//
+			//			});
 		} catch (Exception e1) {
 
 			e1.printStackTrace();
@@ -1236,6 +1240,32 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	private void searchDocumentsActionPerformed(ActionEvent e) {
+		try {
+			TranslationHelperPanel thp=PanelHelperFactory.getTranslationHelperPanel();
+			JTabbedPane tp=thp.getTabbedPanel();
+			if (tp!=null){
+				int tabCount=tp.getTabCount();
+				for (int i=0;i<tabCount;i++){
+					if (tp.getTitleAt(i).equals(TranslationHelperPanel.SEARCH_DOCS_TAB_NAME)){
+						tp.setSelectedIndex(i);
+						thp.showTabbedPanel();
+					}
+				}
+				JPanel panel=new JPanel();
+				panel.setLayout(new BorderLayout());
+				panel.add(new DocumentsSearchPanel(""), BorderLayout.CENTER);
+				tp.addTab(TranslationHelperPanel.SEARCH_DOCS_TAB_NAME, panel);
+				tp.setSelectedIndex(tp.getTabCount()-1);
+				thp.showTabbedPanel();
+			}
+		} catch (TerminologyException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+	}
+
 	class SelectionListener implements ListSelectionListener {
 
 		/** The table. */
@@ -1299,6 +1329,7 @@ public class TranslationConceptEditor6 extends JPanel {
 		mAddPref = new JMenuItem();
 		mAddDesc = new JMenuItem();
 		menu3 = new JMenu();
+		menuItem1 = new JMenuItem();
 		mSpellChk = new JMenuItem();
 		menu2 = new JMenu();
 		mHist = new JMenuItem();
@@ -1437,6 +1468,17 @@ public class TranslationConceptEditor6 extends JPanel {
 					menu3.setFont(new Font("Verdana", Font.PLAIN, 14));
 					menu3.setMnemonic('T');
 
+					//---- menuItem1 ----
+					menuItem1.setText("Search Documents");
+					menuItem1.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.META_MASK|KeyEvent.SHIFT_MASK));
+					menuItem1.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							searchDocumentsActionPerformed(e);
+						}
+					});
+					menu3.add(menuItem1);
+
 					//---- mSpellChk ----
 					mSpellChk.setText("Spellcheck");
 					mSpellChk.setFont(new Font("Verdana", Font.PLAIN, 14));
@@ -1485,26 +1527,26 @@ public class TranslationConceptEditor6 extends JPanel {
 				menuBar1.add(menu2);
 			}
 			panel1.add(menuBar1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			//---- label14 ----
 			label14.setText("S:0");
 			panel1.add(label14, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			//---- label15 ----
 			label15.setText("TM:0");
 			panel1.add(label15, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			//---- label16 ----
 			label16.setText("LG:0");
 			panel1.add(label16, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			//---- label10 ----
 			label10.setText("text");
@@ -1515,12 +1557,12 @@ public class TranslationConceptEditor6 extends JPanel {
 				}
 			});
 			panel1.add(label10, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 5, 0), 0, 0));
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 
 		//======== panel10 ========
 		{
@@ -1554,8 +1596,8 @@ public class TranslationConceptEditor6 extends JPanel {
 						//---- label9 ----
 						label9.setText("Source Language");
 						panel9.add(label9, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 5, 0), 0, 0));
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+								new Insets(0, 0, 5, 0), 0, 0));
 
 						//======== scrollPane1 ========
 						{
@@ -1567,8 +1609,8 @@ public class TranslationConceptEditor6 extends JPanel {
 							scrollPane1.setViewportView(tabSou);
 						}
 						panel9.add(scrollPane1, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 0), 0, 0));
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+								new Insets(0, 0, 0, 0), 0, 0));
 					}
 					splitPane4.setTopComponent(panel9);
 
@@ -1601,15 +1643,15 @@ public class TranslationConceptEditor6 extends JPanel {
 									}
 								});
 								panel17.add(bAddComent, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-									new Insets(0, 0, 0, 5), 0, 0));
+										GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+										new Insets(0, 0, 0, 5), 0, 0));
 								panel17.add(cmbTarComm, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-									new Insets(0, 0, 0, 5), 0, 0));
+										GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+										new Insets(0, 0, 0, 5), 0, 0));
 							}
 							panel16.add(panel17, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 0), 0, 0));
+									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+									new Insets(0, 0, 5, 0), 0, 0));
 
 							//======== tabbedPane1 ========
 							{
@@ -1647,8 +1689,8 @@ public class TranslationConceptEditor6 extends JPanel {
 
 							}
 							panel16.add(tabbedPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 0, 0), 0, 0));
+									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+									new Insets(0, 0, 0, 0), 0, 0));
 						}
 						tabbedPane2.addTab("Comments", panel16);
 
@@ -1687,8 +1729,8 @@ public class TranslationConceptEditor6 extends JPanel {
 						label11.setText("Target Language");
 						label11.setBackground(new Color(238, 238, 238));
 						panel8.add(label11, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 5, 0), 0, 0));
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+								new Insets(0, 0, 5, 0), 0, 0));
 
 						//======== scrollPane6 ========
 						{
@@ -1701,8 +1743,8 @@ public class TranslationConceptEditor6 extends JPanel {
 							scrollPane6.setViewportView(tabTar);
 						}
 						panel8.add(scrollPane6, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 5, 0), 0, 0));
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+								new Insets(0, 0, 5, 0), 0, 0));
 
 						//======== panel2 ========
 						{
@@ -1718,8 +1760,8 @@ public class TranslationConceptEditor6 extends JPanel {
 							label2.setText("Term:");
 							label2.setFont(new Font("Verdana", Font.PLAIN, 13));
 							panel2.add(label2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 10, 5, 5), 0, 0));
+									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+									new Insets(0, 10, 5, 5), 0, 0));
 
 							//======== scrollPane5 ========
 							{
@@ -1729,15 +1771,15 @@ public class TranslationConceptEditor6 extends JPanel {
 								scrollPane5.setViewportView(targetTextField);
 							}
 							panel2.add(scrollPane5, new GridBagConstraints(1, 1, 3, 3, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+									new Insets(0, 0, 5, 5), 0, 0));
 
 							//---- label1 ----
 							label1.setText("Term Type:");
 							label1.setFont(new Font("Verdana", Font.PLAIN, 13));
 							panel2.add(label1, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 10, 5, 5), 0, 0));
+									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+									new Insets(0, 10, 5, 5), 0, 0));
 
 							//======== panel7 ========
 							{
@@ -1747,8 +1789,8 @@ public class TranslationConceptEditor6 extends JPanel {
 								panel7.add(comboBox1);
 							}
 							panel2.add(panel7, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 0, 5, 5), 0, 0));
+									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+									new Insets(0, 0, 5, 5), 0, 0));
 
 							//======== panel5 ========
 							{
@@ -1762,22 +1804,22 @@ public class TranslationConceptEditor6 extends JPanel {
 								//---- label5 ----
 								label5.setText("Acceptability:");
 								panel5.add(label5, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-									new Insets(0, 0, 0, 5), 0, 0));
+										GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+										new Insets(0, 0, 0, 5), 0, 0));
 								panel5.add(cmbAccep, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-									new Insets(0, 0, 0, 0), 0, 0));
+										GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+										new Insets(0, 0, 0, 0), 0, 0));
 							}
 							panel2.add(panel5, new GridBagConstraints(3, 4, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 0, 5, 5), 0, 0));
+									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+									new Insets(0, 0, 5, 5), 0, 0));
 
 							//---- label3 ----
 							label3.setText("Is case significant ?");
 							label3.setFont(new Font("Verdana", Font.PLAIN, 13));
 							panel2.add(label3, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 10, 5, 5), 0, 0));
+									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+									new Insets(0, 10, 5, 5), 0, 0));
 
 							//======== panel4 ========
 							{
@@ -1792,26 +1834,26 @@ public class TranslationConceptEditor6 extends JPanel {
 								rbYes.setText("Yes");
 								rbYes.setBackground(new Color(238, 238, 238));
 								panel4.add(rbYes, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-									new Insets(0, 0, 0, 5), 0, 0));
+										GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+										new Insets(0, 0, 0, 5), 0, 0));
 
 								//---- label6 ----
 								label6.setText("    ");
 								panel4.add(label6, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-									new Insets(0, 0, 0, 5), 0, 0));
+										GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+										new Insets(0, 0, 0, 5), 0, 0));
 
 								//---- rbNo ----
 								rbNo.setSelected(true);
 								rbNo.setText("No");
 								rbNo.setBackground(new Color(238, 238, 238));
 								panel4.add(rbNo, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-									new Insets(0, 0, 0, 0), 0, 0));
+										GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+										new Insets(0, 0, 0, 0), 0, 0));
 							}
 							panel2.add(panel4, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 0, 5, 5), 0, 0));
+									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+									new Insets(0, 0, 5, 5), 0, 0));
 
 							//======== panel14 ========
 							{
@@ -1825,27 +1867,27 @@ public class TranslationConceptEditor6 extends JPanel {
 								//---- label7 ----
 								label7.setText("Status:");
 								panel14.add(label7, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-									new Insets(0, 0, 0, 5), 0, 0));
+										GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+										new Insets(0, 0, 0, 5), 0, 0));
 
 								//---- rbAct ----
 								rbAct.setText("Active");
 								rbAct.setSelected(true);
 								rbAct.setBackground(new Color(238, 238, 238));
 								panel14.add(rbAct, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-									new Insets(0, 0, 0, 5), 0, 0));
+										GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+										new Insets(0, 0, 0, 5), 0, 0));
 
 								//---- rbInact ----
 								rbInact.setText("Inactive");
 								rbInact.setBackground(new Color(238, 238, 238));
 								panel14.add(rbInact, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-									new Insets(0, 0, 0, 0), 0, 0));
+										GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+										new Insets(0, 0, 0, 0), 0, 0));
 							}
 							panel2.add(panel14, new GridBagConstraints(3, 5, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 0, 5, 5), 0, 0));
+									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+									new Insets(0, 0, 5, 5), 0, 0));
 
 							//======== panel3 ========
 							{
@@ -1865,16 +1907,16 @@ public class TranslationConceptEditor6 extends JPanel {
 									}
 								});
 								panel3.add(label13, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-									new Insets(0, 0, 0, 0), 0, 0));
+										GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+										new Insets(0, 0, 0, 0), 0, 0));
 							}
 							panel2.add(panel3, new GridBagConstraints(3, 6, 1, 1, 0.0, 0.0,
-								GridBagConstraints.EAST, GridBagConstraints.NONE,
-								new Insets(0, 0, 0, 5), 0, 0));
+									GridBagConstraints.EAST, GridBagConstraints.NONE,
+									new Insets(0, 0, 0, 5), 0, 0));
 						}
 						panel8.add(panel2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 5, 0), 0, 0));
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+								new Insets(0, 0, 5, 0), 0, 0));
 
 						//======== panel6 ========
 						{
@@ -1899,14 +1941,14 @@ public class TranslationConceptEditor6 extends JPanel {
 									}
 								});
 								buttonPanel.add(label12, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-									new Insets(0, 0, 0, 5), 0, 0));
+										GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+										new Insets(0, 0, 0, 5), 0, 0));
 
 								//---- label8 ----
 								label8.setText("Workflow actions:      ");
 								buttonPanel.add(label8, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-									new Insets(0, 0, 0, 5), 0, 0));
+										GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+										new Insets(0, 0, 0, 5), 0, 0));
 
 								//---- bKeep ----
 								bKeep.setText("Keep in inbox");
@@ -1918,8 +1960,8 @@ public class TranslationConceptEditor6 extends JPanel {
 									}
 								});
 								buttonPanel.add(bKeep, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-									new Insets(0, 0, 0, 5), 0, 0));
+										GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+										new Insets(0, 0, 0, 5), 0, 0));
 
 								//---- bReview ----
 								bReview.setText("Send to reviewer");
@@ -1931,8 +1973,8 @@ public class TranslationConceptEditor6 extends JPanel {
 									}
 								});
 								buttonPanel.add(bReview, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-									new Insets(0, 0, 0, 5), 0, 0));
+										GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+										new Insets(0, 0, 0, 5), 0, 0));
 
 								//---- bEscalate ----
 								bEscalate.setText("Escalate");
@@ -1944,14 +1986,14 @@ public class TranslationConceptEditor6 extends JPanel {
 									}
 								});
 								buttonPanel.add(bEscalate, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-									new Insets(0, 0, 0, 5), 0, 0));
+										GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+										new Insets(0, 0, 0, 5), 0, 0));
 							}
 							panel6.add(buttonPanel);
 						}
 						panel8.add(panel6, new GridBagConstraints(0, 3, 1, 1, 1.0, 1.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 0), 0, 0));
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+								new Insets(0, 0, 0, 0), 0, 0));
 					}
 					splitPane1.setTopComponent(panel8);
 
@@ -1975,12 +2017,12 @@ public class TranslationConceptEditor6 extends JPanel {
 				splitPane2.setRightComponent(splitPane1);
 			}
 			panel10.add(splitPane2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(panel10, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 0, 0), 0, 0));
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 
 		//---- buttonGroup1 ----
 		ButtonGroup buttonGroup1 = new ButtonGroup();
@@ -2003,6 +2045,7 @@ public class TranslationConceptEditor6 extends JPanel {
 	private JMenuItem mAddPref;
 	private JMenuItem mAddDesc;
 	private JMenu menu3;
+	private JMenuItem menuItem1;
 	private JMenuItem mSpellChk;
 	private JMenu menu2;
 	private JMenuItem mHist;
@@ -2713,7 +2756,7 @@ public class TranslationConceptEditor6 extends JPanel {
 					// IconUtilities.PRIMITIVE, attributes.getMutablePart()));
 					//
 				}
-				
+
 				Long concpetID =  null;
 				I_Identify identifier = concept.getIdentifier();
 				List<? extends I_IdPart> parts = identifier.getMutableIdParts();
@@ -2969,14 +3012,14 @@ public class TranslationConceptEditor6 extends JPanel {
 					&& descriptionInEditor.getAcceptabilityId() == ((I_GetConceptData) cmbAccep.getSelectedItem()).getConceptNid()
 					&& ((descriptionInEditor.getExtensionStatusId() == active.getConceptNid() && rbAct.isSelected()) || (descriptionInEditor.getExtensionStatusId() != active.getConceptNid() && !rbAct
 							.isSelected()))
-					&& ((descriptionInEditor.getTypeId() == fsn.getConceptNid() && fsn.equals((I_GetConceptData) comboBox1.getSelectedItem())) || (descriptionInEditor.getTypeId() != fsn
-							.getConceptNid() && !fsn.equals((I_GetConceptData) comboBox1.getSelectedItem())))) {
+							&& ((descriptionInEditor.getTypeId() == fsn.getConceptNid() && fsn.equals((I_GetConceptData) comboBox1.getSelectedItem())) || (descriptionInEditor.getTypeId() != fsn
+									.getConceptNid() && !fsn.equals((I_GetConceptData) comboBox1.getSelectedItem())))) {
 				update = true;
 			} else {
 				Object[] options = { "Discard unsaved data", "Cancel and continue editing" };
 				int n = JOptionPane.showOptionDialog(null, "Do you want to save the change you made to the term in the editor panel?", "Unsaved data", JOptionPane.YES_NO_OPTION,
 						JOptionPane.WARNING_MESSAGE, null, // do not use a
-															// custom Icon
+						// custom Icon
 						options, // the titles of buttons
 						options[1]); // default button title
 				if (n == 0) {
@@ -3334,7 +3377,7 @@ public class TranslationConceptEditor6 extends JPanel {
 				for (int i = commentsList.size() - 1; i > -1; i--) {
 					if (commentsList.get(i).getTypeCid() == commentsList.get(i).getSubTypeCid()) {
 						tableModel
-								.addRow(new Object[] { "Language refset: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "", formatComment(commentsList.get(i).getComment()) });
+						.addRow(new Object[] { "Language refset: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "", formatComment(commentsList.get(i).getComment()) });
 					} else {
 						tableModel.addRow(new Object[] {
 								"Language refset: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "/" + Terms.get().getConcept(commentsList.get(i).getSubTypeCid()),
@@ -3344,7 +3387,7 @@ public class TranslationConceptEditor6 extends JPanel {
 			}
 
 			commentsList = TerminologyProjectDAO.getWorkList(Terms.get().getConcept(worklistMember.getWorkListUUID()), config).getCommentsRefset(config)
-					.getFullComments(this.concept.getConceptNid());
+			.getFullComments(this.concept.getConceptNid());
 
 			for (int i = commentsList.size() - 1; i > -1; i--) {
 				if (commentsList.get(i).getTypeCid() == commentsList.get(i).getSubTypeCid()) {
