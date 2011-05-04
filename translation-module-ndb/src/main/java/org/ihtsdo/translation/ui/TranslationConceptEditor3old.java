@@ -3099,12 +3099,12 @@ public class TranslationConceptEditor3old extends JPanel {
 				}
 			};
 			if (targetLangRefset!=null){
-				comments=targetLangRefset.getCommentsRefset(config).getComments(this.concept.getConceptNid());
+				comments.addAll(targetLangRefset.getCommentsRefset(config).getComments(this.concept.getConceptNid()).values());
 				for (int i=comments.size()-1;i>-1;i--) {
 					tableModel.addRow(new Object[] {formatComment(comments.get(i),"Language refset")});
 				}
 			}
-			comments=TerminologyProjectDAO.getWorkList(Terms.get().getConcept(worklistMember.getWorkListUUID()), config).getCommentsRefset(config).getComments(this.concept.getConceptNid());
+			comments.addAll(TerminologyProjectDAO.getWorkList(Terms.get().getConcept(worklistMember.getWorkListUUID()), config).getCommentsRefset(config).getComments(this.concept.getConceptNid()).values());
 
 			for (int i=comments.size()-1;i>-1;i--) {
 				tableModel.addRow(new Object[] {formatComment(comments.get(i),"Workflow")});
