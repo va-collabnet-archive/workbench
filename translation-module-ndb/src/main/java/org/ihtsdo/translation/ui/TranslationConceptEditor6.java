@@ -172,6 +172,7 @@ public class TranslationConceptEditor6 extends JPanel {
 	private boolean saveDesc;
 	private JButton button5;
 	private Thread updateUIThread;
+	private boolean alreadyVerified;
 
 	/**
 	 * Instantiates a new translation concept editor.
@@ -276,6 +277,7 @@ public class TranslationConceptEditor6 extends JPanel {
 
 		setByCode = false;
 		saveDesc = false;
+		alreadyVerified = false;
 		mSpellChk.setEnabled(false);
 		mAddDesc.setEnabled(true);
 		mAddPref.setEnabled(true);
@@ -392,14 +394,6 @@ public class TranslationConceptEditor6 extends JPanel {
 
 							try {
 								populateTargetTree();
-								SwingUtilities.invokeLater(new Runnable() {
-									public void run() {
-										Timer timer = new Timer(1100, new setInboxPanelFocus());
-										timer.setRepeats(false);
-										timer.start();
-									}
-
-								});
 							} catch (Exception e1) {
 
 								e1.printStackTrace();
@@ -478,13 +472,38 @@ public class TranslationConceptEditor6 extends JPanel {
 		if (updateUIThread != null && updateUIThread.isAlive()) {
 			updateUIThread.interrupt();
 		}
-		verifySavePending();
+		verifySavePending(null);
 		clearForm(true);
 	}
 
-	synchronized public boolean verifySavePending() {
+	/**
+	 * Verifies changes to target description
+	 * @param message <\T> if null 
+	 * @return
+	 */
+	synchronized public boolean verifySavePending(String message) {
 		boolean bPendTerm = true;
 		if (saveDesc) {
+			if(tabTar.getRowCount() <= 0 && !alreadyVerified && message == null){
+				alreadyVerified = true;
+				Object[] options = { "Send empty translation", "Cancel" };
+				int n = JOptionPane.showOptionDialog(null, "There is no translation in target language, would you like to continue?", "Unsaved data", JOptionPane.YES_NO_OPTION,
+						JOptionPane.WARNING_MESSAGE, null, options, options[1]); 
+				bPendTerm = false;
+				if (n == 0) {
+					if (saveDescActionPerformed()) {
+						descriptionInEditor = null;
+						targetTextField.setText("");
+						return true;
+					} else {
+						return false;
+					}
+				} else if (n == 1) {
+					return false;
+				}
+			}else{
+				alreadyVerified = true;
+			}
 			if (descriptionInEditor != null) {
 				if (!(descriptionInEditor.getText().trim().equals(targetTextField.getText().trim())
 						&& (descriptionInEditor.isInitialCaseSignificant() == rbYes.isSelected())
@@ -501,7 +520,11 @@ public class TranslationConceptEditor6 extends JPanel {
 			}
 			if (!bPendTerm) {
 				Object[] options = { "Discard unsaved data", "Save" };
-				int n = JOptionPane.showOptionDialog(null, "Do you want to save the change you made to the term in the editor panel?", "Unsaved data", JOptionPane.YES_NO_OPTION,
+				String message1 = "Do you want to save the change you made to the term in the editor panel?";
+				if(message != null){
+					message1 = message;
+				}
+				int n = JOptionPane.showOptionDialog(null, message1, "Unsaved data", JOptionPane.YES_NO_OPTION,
 						JOptionPane.WARNING_MESSAGE, null, // do not use a
 															// custom Icon
 						options, // the titles of buttons
@@ -624,7 +647,7 @@ public class TranslationConceptEditor6 extends JPanel {
 				JOptionPane.showOptionDialog(this, e1.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
 			}
 			if (fsnDesc == null) {
-				if (verifySavePending()) {
+				if (verifySavePending(null)) {
 					descriptionInEditor = null;
 					targetTextField.setText("");
 					targetTextField.setEnabled(true);
@@ -643,16 +666,6 @@ public class TranslationConceptEditor6 extends JPanel {
 				}
 			} else {
 				populateTargetTree();
-				// getPreviousComments();
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						Timer timer = new Timer(1100, new setInboxPanelFocus());
-						timer.setRepeats(false);
-						timer.start();
-					}
-
-				});
-
 			}
 		} catch (TerminologyException e) {
 			e.printStackTrace();
@@ -707,7 +720,7 @@ public class TranslationConceptEditor6 extends JPanel {
 	}
 
 	private void mAddPrefActionPerformed() {
-		if (verifySavePending()) {
+		if (verifySavePending(null)) {
 			descriptionInEditor = null;
 			targetTextField.setText("");
 			targetTextField.setEnabled(true);
@@ -727,7 +740,7 @@ public class TranslationConceptEditor6 extends JPanel {
 	}
 
 	private void mAddDescActionPerformed() {
-		if (verifySavePending()) {
+		if (verifySavePending(null)) {
 			descriptionInEditor = null;
 			// label4.setText("");
 			// label4.setVisible(false);
@@ -810,14 +823,6 @@ public class TranslationConceptEditor6 extends JPanel {
 
 		try {
 			populateTargetTree();
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					Timer timer = new Timer(1100, new setInboxPanelFocus());
-					timer.setRepeats(false);
-					timer.start();
-				}
-
-			});
 		} catch (Exception e1) {
 
 			e1.printStackTrace();
@@ -903,14 +908,14 @@ public class TranslationConceptEditor6 extends JPanel {
 
 		try {
 			populateTargetTree();
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					Timer timer = new Timer(1100, new setInboxPanelFocus());
-					timer.setRepeats(false);
-					timer.start();
-				}
-
-			});
+//			SwingUtilities.invokeLater(new Runnable() {
+//				public void run() {
+//					Timer timer = new Timer(1100, new setInboxPanelFocus());
+//					timer.setRepeats(false);
+//					timer.start();
+//				}
+//
+//			});
 		} catch (Exception e1) {
 
 			e1.printStackTrace();
@@ -919,7 +924,7 @@ public class TranslationConceptEditor6 extends JPanel {
 	}
 
 	private void thisAncestorRemoved() {
-		verifySavePending();
+		verifySavePending(null);
 		this.AutokeepInInbox();
 	}
 
@@ -3060,6 +3065,7 @@ public class TranslationConceptEditor6 extends JPanel {
 	public void updateUI(TranslationProject translationProject, WorkListMember workListMember, I_GetConceptData role) {
 		// clearForm(true);
 		try {
+			alreadyVerified = false;
 			this.translationProject = translationProject;
 			this.role = role;
 			translConfig = LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());

@@ -285,7 +285,7 @@ public class PropBasedTransWorkFlowStep2Outputs extends AbstractTask {
 				for (int i=0;i<tabCount;i++){
 					if (tp.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)){
 						uiPanel=(TranslationConceptEditor6)tp.getComponentAt(i);
-						if (!uiPanel.verifySavePending()){
+						if (!uiPanel.verifySavePending(null)){
 							uiPanel=null;
 							t.interrupt();
 							return Condition.STOP;
@@ -503,7 +503,7 @@ public class PropBasedTransWorkFlowStep2Outputs extends AbstractTask {
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(ActionEvent e) {
-			if (uiPanel.verifySavePending()) {
+			if (uiPanel.verifySavePending(null)) {
 				returnCondition = Condition.ITEM_COMPLETE;
 				selectedDestination = exit1Destination;
 				selectedNextStatus = exit1NextStatus;
@@ -533,7 +533,7 @@ public class PropBasedTransWorkFlowStep2Outputs extends AbstractTask {
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(ActionEvent e) {
-			if (uiPanel.verifySavePending()) {
+			if (uiPanel.verifySavePending(null)) {
 				returnCondition = Condition.CONTINUE;
 				selectedDestination = exit2Destination;
 				selectedNextStatus = exit2NextStatus;
@@ -552,7 +552,7 @@ public class PropBasedTransWorkFlowStep2Outputs extends AbstractTask {
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(ActionEvent e) {
-			if (uiPanel.verifySavePending()) {
+			if (uiPanel.verifySavePending(null)) {
 				returnCondition = Condition.STOP;
 				uiPanel.setAutoKeepFunction(null);
 				done = true;
@@ -569,7 +569,7 @@ public class PropBasedTransWorkFlowStep2Outputs extends AbstractTask {
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(ActionEvent e) {
-			if (uiPanel.verifySavePending()) {
+			if (uiPanel.verifySavePending("Do you want to save changes befor sending it to your todo folder?")) {
 				returnCondition = Condition.STOP;
 				selectedNextStatus = todoStatus;
 				uiPanel.setAutoKeepFunction(null);

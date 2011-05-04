@@ -431,14 +431,6 @@ public class TranslationConceptEditorRO extends JPanel {
 
 		try {
 			populateTargetTree();
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					Timer timer = new Timer(1100, new setInboxPanelFocus());
-					timer.setRepeats(false);
-					timer.start();
-				}
-
-			});
 		} catch (Exception e1) {
 
 			e1.printStackTrace();

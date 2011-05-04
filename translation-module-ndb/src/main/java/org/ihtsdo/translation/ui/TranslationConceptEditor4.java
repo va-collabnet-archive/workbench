@@ -574,14 +574,6 @@ public class TranslationConceptEditor4 extends JPanel {
 		try {
 			populateTargetTree();
 			getPreviousComments();
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					Timer timer = new Timer(1100, new setInboxPanelFocus());
-					timer.setRepeats(false);
-					timer.start();
-				}
-
-			});
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1004,14 +996,6 @@ public class TranslationConceptEditor4 extends JPanel {
 
 		try {
 			populateTargetTree();
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					Timer timer = new Timer(1100, new setInboxPanelFocus());
-					timer.setRepeats(false);
-					timer.start();
-				}
-
-			});
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

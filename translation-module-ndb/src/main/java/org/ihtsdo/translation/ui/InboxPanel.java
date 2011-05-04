@@ -28,10 +28,12 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.dnd.InvalidDnDOperationException;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.IntrospectionException;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.io.Serializable;
@@ -62,11 +64,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import javax.swing.RowSorter.SortKey;
-import javax.swing.event.*;
+import javax.swing.border.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.text.Position;
@@ -172,7 +176,6 @@ public class InboxPanel extends JPanel {
 	private HashMap<Integer, String> worklistHash;
 
 	private SimpleDateFormat formatter;
-
 	private SelectRevisionProcessCancel revisionProcCancelSelector;
 
 	public InboxPanel(I_Work worker ,String queueName, I_SelectProcesses selector) throws RemoteException, TaskFailedException, LeaseDeniedException, IOException, InterruptedException, PrivilegedActionException, ConfigurationException, TerminologyException{
@@ -1689,7 +1692,7 @@ public class InboxPanel extends JPanel {
 					if (tpc.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)){
 						if (tpc.getComponentAt(i) instanceof TranslationConceptEditor6){
 							TranslationConceptEditor6 uiPanel=(TranslationConceptEditor6)tpc.getComponentAt(i);
-							if (!uiPanel.verifySavePending()){
+							if (!uiPanel.verifySavePending(null)){
 								closing=false;
 								return;
 							}
@@ -1988,14 +1991,14 @@ public class InboxPanel extends JPanel {
 			outboxReadWorker.commitTransactionIfActive();
 //			qto.setTagsArray(tags);
 //			hashAllItems.put(entryID, qto);
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					Timer timer = new Timer(1100, new setInboxPanelFocus());
-					timer.setRepeats(false);
-					timer.start();
-				}
-
-			});
+//			SwingUtilities.invokeLater(new Runnable() {
+//				public void run() {
+//					Timer timer = new Timer(1100, new setInboxPanelFocus());
+//					timer.setRepeats(false);
+//					timer.start();
+//				}
+//
+//			});
 
 		} catch (RemoteException e) {
 
@@ -2385,7 +2388,7 @@ public class InboxPanel extends JPanel {
 								if (tpc.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)){
 									if (tpc.getComponentAt(i) instanceof TranslationConceptEditor6){
 										TranslationConceptEditor6 uiPanel=(TranslationConceptEditor6)tpc.getComponentAt(i);
-										if (!uiPanel.verifySavePending()){
+										if (!uiPanel.verifySavePending(null)){
 											return;
 										}
 										break;
@@ -2638,10 +2641,6 @@ public class InboxPanel extends JPanel {
 				refreshItemsTable(selectedFolder);
 				selectAndExecNextEntry();
 				setByCode=false;
-				
-				Timer timer = new Timer(1100, new setInboxPanelFocus());
-				timer.setRepeats(false);
-				timer.start();
 
 			} catch (RemoteException e) {
 
@@ -2865,10 +2864,11 @@ public class InboxPanel extends JPanel {
 		//======== panel2 ========
 		{
 			panel2.setBackground(new Color(238, 238, 238));
+			panel2.setBorder(new EmptyBorder(5, 15, 5, 5));
 			panel2.setLayout(new GridBagLayout());
-			((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {20, 0, 0};
+			((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0};
 			((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 205, 0, 0, 0};
-			((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0E-4};
+			((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
 			((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0, 1.0E-4};
 
 			//======== panel1 ========
@@ -2907,7 +2907,6 @@ public class InboxPanel extends JPanel {
 					new Insets(0, 0, 5, 5), 0, 0));
 
 				//---- label4 ----
-				label4.setText("text");
 				label4.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseClicked(MouseEvent e) {
@@ -2944,7 +2943,7 @@ public class InboxPanel extends JPanel {
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 0, 5), 0, 0));
 			}
-			panel2.add(panel1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+			panel2.add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 0), 0, 0));
 
@@ -2961,7 +2960,7 @@ public class InboxPanel extends JPanel {
 				});
 				scrollPane1.setViewportView(foldTree);
 			}
-			panel2.add(scrollPane1, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+			panel2.add(scrollPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 0), 0, 0));
 
@@ -2986,7 +2985,7 @@ public class InboxPanel extends JPanel {
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 0, 0), 0, 0));
 			}
-			panel2.add(panel3, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
+			panel2.add(panel3, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 0), 0, 0));
 
@@ -3007,7 +3006,7 @@ public class InboxPanel extends JPanel {
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 0, 0), 0, 0));
 			}
-			panel2.add(panel11, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
+			panel2.add(panel11, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 0), 0, 0));
 		}

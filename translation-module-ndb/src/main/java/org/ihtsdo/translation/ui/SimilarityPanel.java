@@ -122,6 +122,8 @@ public class SimilarityPanel extends JPanel {
 		});
 		similarityTable.setModel(new DefaultTableModel());
 		similarityTable.setCellSelectionEnabled(true);
+		similarityTable.setColumnSelectionAllowed(true);
+		similarityTable.setRowSelectionAllowed(true);
 		table2.setModel(new DefaultTableModel());
 	}
 
@@ -221,6 +223,8 @@ public class SimilarityPanel extends JPanel {
 		}
 		table2.setModel(tableModel);
 		similarityTable.setCellSelectionEnabled(true);
+		similarityTable.setColumnSelectionAllowed(true);
+		similarityTable.setRowSelectionAllowed(true);
 		TableColumnModel cmodel = table2.getColumnModel();
 		TextAreaRenderer textAreaRenderer = new TextAreaRenderer();
 		cmodel.getColumn(0).setCellRenderer(textAreaRenderer);
@@ -259,6 +263,8 @@ public class SimilarityPanel extends JPanel {
 		};
 		similarityTable.setModel(tableModel);
 		similarityTable.setCellSelectionEnabled(true);
+		similarityTable.setColumnSelectionAllowed(true);
+		similarityTable.setRowSelectionAllowed(true);
 		columnModel = new CustomTableColumnModel();
 		similarityTable.setColumnModel(columnModel);
 		similarityTable.createDefaultColumnsFromModel();
@@ -347,6 +353,8 @@ public class SimilarityPanel extends JPanel {
 
 		};
 		similarityTable.setCellSelectionEnabled(true);
+		similarityTable.setColumnSelectionAllowed(true);
+		similarityTable.setRowSelectionAllowed(true);
 		similarityTable.setModel(tableModel);
 		similarityTable.revalidate();
 	}
@@ -369,6 +377,8 @@ public class SimilarityPanel extends JPanel {
 
 		table2.setModel(tableModel);
 		similarityTable.setCellSelectionEnabled(true);
+		similarityTable.setColumnSelectionAllowed(true);
+		similarityTable.setRowSelectionAllowed(true);
 		table2.revalidate();
 	}
 
@@ -564,7 +574,16 @@ public class SimilarityPanel extends JPanel {
 				//---- similarityTable ----
 				similarityTable.setPreferredScrollableViewportSize(new Dimension(180, 200));
 				similarityTable.setFont(new Font("Verdana", Font.PLAIN, 12));
-				similarityTable.setModel(new DefaultTableModel());
+				similarityTable.setModel(new DefaultTableModel(
+					new Object[][] {
+						{"a", "aa"},
+						{"a", "d"},
+						{"d", "w"},
+					},
+					new String[] {
+						null, null
+					}
+				));
 				similarityTable.setCellSelectionEnabled(true);
 				similarityTable.addMouseListener(new MouseAdapter() {
 					@Override
