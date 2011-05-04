@@ -3,10 +3,8 @@ package org.ihtsdo.project.refset;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.List;
@@ -31,8 +29,8 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.KindOfCacheBI;
 
 public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
-	PrintWriter outputDescFileWriter;
-	PrintWriter reportFileWriter;
+	BufferedWriter outputDescFileWriter;
+	BufferedWriter reportFileWriter;
 	int lineCount;
 	I_GetConceptData refsetConcept;
 	UUID refsetUUID;
@@ -40,7 +38,7 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 	I_TermFactory termFactory;
 	I_Identify id;
 	SimpleDateFormat formatter;
-	private PrintWriter outputSubsFileWriter;
+	private BufferedWriter outputSubsFileWriter;
 	private int CONCEPT_RETIRED;
 	private int LIMITED;
 	private int FSN;
@@ -83,14 +81,14 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 
 			snomedRoot = Terms.get().getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
 
-			reportFileWriter = new PrintWriter(new OutputStreamWriter(new FileOutputStream(reportFile),"UTF8"));
-			outputDescFileWriter = new PrintWriter(new OutputStreamWriter(new FileOutputStream(exportDescFile),"UTF8"));
-			outputSubsFileWriter = new PrintWriter(new OutputStreamWriter(new FileOutputStream(exportSubsFile),"UTF8"));
+			reportFileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(reportFile),"UTF8"));
+			outputDescFileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exportDescFile),"UTF8"));
+			outputSubsFileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exportSubsFile),"UTF8"));
 
 			Set<? extends I_GetConceptData> promRefsets = termFactory.getRefsetHelper(config).getPromotionRefsetForRefset(refsetConcept, config);
 			promoRefset = promRefsets.iterator().next();
 			if (promoRefset==null){
-				reportFileWriter.println("The promotion refset concept for target language refset " + refsetConcept + " doesn't exists.");
+				reportFileWriter.write("The promotion refset concept for target language refset " + refsetConcept + " doesn't exists." + "\\r\\n");
 				throw new Exception("The promotion refset concept for target language refset " + refsetConcept + " doesn't exists.");
 			}else{
 
@@ -111,7 +109,7 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 				outputDescFileWriter.append("DescriptionType");
 				outputDescFileWriter.append(sep);
 				outputDescFileWriter.append("LanguageCode");
-				outputDescFileWriter.println(begEnd);
+				outputDescFileWriter.write(begEnd + "\\r\\n");
 				
 
 				outputSubsFileWriter.append(begEnd);
@@ -122,7 +120,7 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 				outputSubsFileWriter.append("MemberStatus");
 				outputSubsFileWriter.append(sep);
 				outputSubsFileWriter.append("LinkedId");
-				outputSubsFileWriter.println(begEnd);
+				outputSubsFileWriter.write(begEnd + "\\r\\n");
 				
 				descLineCount = 0l;
 				subsLineCount = 0l;
@@ -136,16 +134,14 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 					Long.parseLong(refsetSCTID);
 				}catch(NumberFormatException e){
 					refsetSCTID=refsetConcept.getUUIDs().iterator().next().toString();
-					reportFileWriter.println("The refset UUID " + refsetSCTID + " has not Snomed Concept ID, It will be replaced with its UUID.");
+					reportFileWriter.write("The refset UUID " + refsetSCTID + " has not Snomed Concept ID, It will be replaced with its UUID." + "\\r\\n");
 
 				}
 			}
 
 		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -168,7 +164,7 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 			}catch(NumberFormatException e){
 				conceptId=concept.getUUIDs().iterator().next().toString();
 
-				reportFileWriter.println("The concept " + conceptId + " has not Snomed Concept ID, It will be replaced with its UUID.");
+				reportFileWriter.write("The concept " + conceptId + " has not Snomed Concept ID, It will be replaced with its UUID." + "\\r\\n");
 
 			}
 			for (I_ContextualizeDescription cdescription : descriptions) {
@@ -179,7 +175,7 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 						Long.parseLong(did);
 					}catch(NumberFormatException e){
 						did=cdescription.getDescriptionVersioned().getUUIDs().iterator().next().toString();
-						reportFileWriter.println("The description " + did + " has not Snomed Description ID, It will be replaced with its UUID.");
+						reportFileWriter.write("The description " + did + " has not Snomed Description ID, It will be replaced with its UUID." + "\\r\\n");
 
 					}
 					String dStatus="";
@@ -219,12 +215,12 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 					String ics= cdescription.isInitialCaseSignificant()? "1":"0";
 
 
-					outputDescFileWriter.println(begEnd + did + sep + dStatus + sep + conceptId + sep + term + sep + ics + sep + dType + sep + lang + begEnd);
+					outputDescFileWriter.write(begEnd + did + sep + dStatus + sep + conceptId + sep + term + sep + ics + sep + dType + sep + lang + begEnd + "\\r\\n");
 
 					descLineCount++;
 
 					if (dStatus=="0"){
-						outputSubsFileWriter.println(begEnd + refsetSCTID + sep + did + sep + dType + sep + begEnd);
+						outputSubsFileWriter.write(begEnd + refsetSCTID + sep + did + sep + dType + sep + begEnd + "\\r\\n");
 
 						subsLineCount++;
 					}
@@ -232,13 +228,10 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 				}
 			}
 		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return bwrite;
@@ -266,13 +259,17 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 
 	}
 	public void closeFiles(){
-		reportFileWriter.println("Exported to UUID file " + exportDescFile.getName()  + " : " + descLineCount + " lines");
-		reportFileWriter.println("Exported to SCTID file " + exportSubsFile.getName()  + " : " + subsLineCount + " lines");
-		reportFileWriter.flush();
-		reportFileWriter.close();
-		outputDescFileWriter.flush();
-		outputDescFileWriter.close();
-		outputSubsFileWriter.flush();
-		outputSubsFileWriter.close();	
+		try {
+			reportFileWriter.write("Exported to UUID file " + exportDescFile.getName()  + " : " + descLineCount + " lines" + "\\r\\n");
+			reportFileWriter.write("Exported to SCTID file " + exportSubsFile.getName()  + " : " + subsLineCount + " lines" + "\\r\\n");
+			reportFileWriter.flush();
+			reportFileWriter.close();
+			outputDescFileWriter.flush();
+			outputDescFileWriter.close();
+			outputSubsFileWriter.flush();
+			outputSubsFileWriter.close();	
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

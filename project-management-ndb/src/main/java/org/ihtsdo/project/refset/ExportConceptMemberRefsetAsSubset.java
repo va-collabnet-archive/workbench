@@ -1,11 +1,12 @@
 package org.ihtsdo.project.refset;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.OutputStreamWriter;
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -16,17 +17,15 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
-import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.refset.members.RefsetUtilImpl;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
 
 public class ExportConceptMemberRefsetAsSubset {
-	PrintWriter outputFileWriter;
-	PrintWriter reportFileWriter;
+	BufferedWriter outputFileWriter;
+	BufferedWriter reportFileWriter;
 	Long lineCount;
 	ConceptMembershipRefset refsetConcept;
 	UUID refsetUUID;
@@ -39,8 +38,8 @@ public class ExportConceptMemberRefsetAsSubset {
 	}
 	public Long[] exportFile(File exportFile, File reportFile, I_GetConceptData refsetConcept, boolean exportToCsv) throws Exception {
 
-		reportFileWriter = new PrintWriter(new FileWriter(reportFile));
-		outputFileWriter = new PrintWriter(new FileWriter(exportFile));
+		reportFileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(reportFile),"UTF8"));
+		outputFileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exportFile),"UTF8"));
 
 		String begEnd;
 		String sep;
@@ -89,7 +88,7 @@ public class ExportConceptMemberRefsetAsSubset {
 				}
 				if (conceptId ==null){
 
-					reportFileWriter.println("The concept UUID " +  termFactory.getUids(ext.getComponentNid()).iterator().next() + " has not Snomed Concept ID.");
+					reportFileWriter.write("The concept UUID " +  termFactory.getUids(ext.getComponentNid()).iterator().next() + " has not Snomed Concept ID." + "\\r\\n");
 //					reportFileWriter.newLine();
 				}else{
 //				UUID typeUuid = termFactory.getUids(thinTuple.getTypeId()).iterator().next();
@@ -104,13 +103,13 @@ public class ExportConceptMemberRefsetAsSubset {
 //					outputFileWriter.close();
 //					throw new TerminologyException("Non concept ext tuple passed to export concepts to file .");
 //				}
-					outputFileWriter.println(begEnd + subsetId + sep + conceptId + sep + memberStatus + sep + linkedId + begEnd);
+					outputFileWriter.write(begEnd + subsetId + sep + conceptId + sep + memberStatus + sep + linkedId + begEnd + "\\r\\n");
 					lineCount++;
 				}
 			}
 		}
 
-		reportFileWriter.println("Exported to file " + exportFile.getName()  + " : " + lineCount + " lines");
+		reportFileWriter.write("Exported to file " + exportFile.getName()  + " : " + lineCount + " lines" + "\\r\\n");
 		reportFileWriter.flush();
 		reportFileWriter.close();
 		outputFileWriter.flush();

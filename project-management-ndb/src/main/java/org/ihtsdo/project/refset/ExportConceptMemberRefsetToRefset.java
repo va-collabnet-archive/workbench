@@ -1,8 +1,9 @@
 package org.ihtsdo.project.refset;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.UUID;
@@ -21,8 +22,8 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.project.TerminologyProjectDAO;
 
 public class ExportConceptMemberRefsetToRefset {
-	PrintWriter outputFileWriter;
-	PrintWriter reportFileWriter;
+	BufferedWriter outputFileWriter;
+	BufferedWriter reportFileWriter;
 	int lineCount;
 	ConceptMembershipRefset refsetConcept;
 	UUID refsetUUID;
@@ -30,7 +31,7 @@ public class ExportConceptMemberRefsetToRefset {
 	I_TermFactory termFactory;
 	I_Identify id;
 	SimpleDateFormat formatter;
-	private PrintWriter outputFileWriter2;
+	private BufferedWriter outputFileWriter2;
 	
 	public ExportConceptMemberRefsetToRefset(){
 		termFactory = Terms.get();
@@ -39,9 +40,9 @@ public class ExportConceptMemberRefsetToRefset {
 	}
 	public Long[] exportFile(File exportFile, File exportFile2, File reportFile, I_GetConceptData refsetConcept, boolean exportToCsv) throws Exception {
 
-		reportFileWriter = new PrintWriter(new FileWriter(reportFile));
-		outputFileWriter = new PrintWriter(new FileWriter(exportFile));
-		outputFileWriter2 = new PrintWriter(new FileWriter(exportFile2));
+		reportFileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(reportFile),"UTF8"));
+		outputFileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exportFile),"UTF8"));
+		outputFileWriter2 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exportFile2),"UTF8"));
 
 		String begEnd;
 		String sep;
@@ -67,7 +68,8 @@ public class ExportConceptMemberRefsetToRefset {
 			Long.parseLong(refsetSCTID);
 		}catch(NumberFormatException e){
 
-			reportFileWriter.println("The refset UUID " + refsetId + " has not Snomed Concept ID, It will be replaced with its UUID.");
+			reportFileWriter.write("The refset UUID " + refsetId + 
+					" has not Snomed Concept ID, It will be replaced with its UUID." + "\\r\\n");
 
 			refsetSCTID=refsetId;
 		}
@@ -90,7 +92,8 @@ public class ExportConceptMemberRefsetToRefset {
 				String compoID=Terms.get().getConcept(ext.getComponentNid()).getUUIDs().iterator().next().toString();
 				String moduleId = Terms.get().getConcept(lastPart.getPathNid()).getUids().iterator().next().toString();
 			
-				outputFileWriter.println(begEnd + id + sep + effectiveTime + sep + "1" + sep + moduleId + sep + refsetId + sep + compoID + begEnd);
+				outputFileWriter.write(begEnd + id + sep + effectiveTime + sep + "1" + sep + moduleId + sep + refsetId + sep + compoID + begEnd
+						 + "\\r\\n");
 
 				UUIDlineCount++;
 				
@@ -100,7 +103,7 @@ public class ExportConceptMemberRefsetToRefset {
 				try{
 					Long.parseLong(conceptId);
 				}catch(NumberFormatException e){
-					reportFileWriter.println("The concept UUID " + compoID + " has not Snomed Concept ID.");
+					reportFileWriter.write("The concept UUID " + compoID + " has not Snomed Concept ID." + "\\r\\n");
 
 					bSkip=true;
 				}
@@ -117,15 +120,16 @@ public class ExportConceptMemberRefsetToRefset {
 					}catch(NumberFormatException e){
 						sctId_moduleId=moduleId;
 					}
-					outputFileWriter2.println(begEnd + sctId_id + sep + effectiveTime + sep + "1" + sep + sctId_moduleId + sep + refsetSCTID + sep + conceptId + begEnd);
+					outputFileWriter2.write(begEnd + sctId_id + sep + effectiveTime + sep + "1" + sep + sctId_moduleId + sep + refsetSCTID + sep + conceptId + begEnd
+							 + "\\r\\n");
 
 					SCTIDlineCount++;
 					
 				}
 			}
 		}
-		reportFileWriter.println("Exported to UUID file " + exportFile.getName()  + " : " + UUIDlineCount + " lines");
-		reportFileWriter.println("Exported to SCTID file " + exportFile2.getName()  + " : " + SCTIDlineCount + " lines");
+		reportFileWriter.write("Exported to UUID file " + exportFile.getName()  + " : " + UUIDlineCount + " lines" + "\\r\\n");
+		reportFileWriter.write("Exported to SCTID file " + exportFile2.getName()  + " : " + SCTIDlineCount + " lines" + "\\r\\n");
 		reportFileWriter.flush();
 		reportFileWriter.close();
 		outputFileWriter.flush();
