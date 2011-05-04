@@ -1618,7 +1618,8 @@ public class TranslationConceptViewer extends JPanel {
 			I_ConfigAceFrame config;
 			try {
 				config = Terms.get().getActiveAceFrameConfig();
-				List<String>comments=targetLangRefset.getCommentsRefset(config).getComments(this.concept.getConceptNid());
+				List<String>comments = new ArrayList<String>();
+				comments.addAll(targetLangRefset.getCommentsRefset(config).getComments(this.concept.getConceptNid()).values());
 				String[] columnNames = {"Comment"};
 				String[][] data = null;
 				DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {

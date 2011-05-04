@@ -15,6 +15,7 @@ import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +55,6 @@ import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.panel.details.*;
-import org.ihtsdo.project.panel.details.LogObjectContainer;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionRefset;
 
@@ -434,7 +434,7 @@ public class TranslationWlstMemberLogPanel extends JPanel {
 
 			List<String>comments=new ArrayList<String>();
 			if (targetLangRefset!=null){
-				comments=targetLangRefset.getCommentsRefset(config).getComments(this.member.getId());
+				comments.addAll(targetLangRefset.getCommentsRefset(config).getComments(this.member.getId()).values());
 				for (int i=comments.size()-1;i>-1;i--) {
 					thickVer = Long.valueOf(comments.get(i).substring(comments.get(i).trim().lastIndexOf(" ") +1));
 					strDate = formatter.format(thickVer);
@@ -442,7 +442,7 @@ public class TranslationWlstMemberLogPanel extends JPanel {
 
 				}
 			}
-			comments=TerminologyProjectDAO.getWorkList(Terms.get().getConcept(this.member.getWorkListUUID()), config).getCommentsRefset(config).getComments(this.member.getId());
+			comments.addAll(TerminologyProjectDAO.getWorkList(Terms.get().getConcept(this.member.getWorkListUUID()), config).getCommentsRefset(config).getComments(this.member.getId()).values());
 
 			for (int i=comments.size()-1;i>-1;i--) {
 				thickVer = Terms.get().convertToThickVersion(Integer.parseInt(comments.get(i).substring(comments.get(i).trim().lastIndexOf(" ") +1)));
