@@ -982,7 +982,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 addRevision((R) v.getRevision());
             	}catch (UnsupportedOperationException uoe){
             		AceLog.getAppLog().severe("ConceptComponent merge v.getSapNid() = "+v.getSapNid()+ " currentSapNids size = "+currentSapNids.size()
-            				+" another = "+another.toString() +"\n c = "+this.toString(), uoe);
+            				+"\n another = "+another.toString() +"\n c = "+this.toString());
+            		AceLog.getAppLog().severe("ConceptComponent merge StatusNid = "+getStatusNid()+" AuthorNid = "+getAuthorNid()+" PathNid = "+getPathNid() +" time = "+getTime());
             			for (final Iterator<Integer> it1 = currentSapNids.iterator(); it1.hasNext();) {
             	            final int id = it1.next();
             	            AceLog.getAppLog().severe("ConceptComponent currentSapNid ="+id);  
