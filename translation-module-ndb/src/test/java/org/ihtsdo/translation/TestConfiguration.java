@@ -85,7 +85,9 @@ public class TestConfiguration extends TestCase {
 	/** The allowed statuses with retired. */
 	I_IntSet allowedStatusesWithRetired;
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	protected void setUp() throws Exception {
@@ -108,13 +110,13 @@ public class TestConfiguration extends TestCase {
 	 */
 	private void testStateFull() {
 		try {
-			
-			//TODO: Testear la nueva configuracion agregada.!
-			
+
+			// TODO: Testear la nueva configuracion agregada.!
+
 			Date timeStamp = new Date();
-			
+
 			ConfigTranslationModule confTrans = new ConfigTranslationModule();
-			
+
 			assertNull(confTrans.getColumnsDisplayedInInbox());
 			assertNull(confTrans.getSelectedEditorMode());
 			assertNull(confTrans.getSelectedFsnGenStrategy());
@@ -124,18 +126,18 @@ public class TestConfiguration extends TestCase {
 			assertNull(confTrans.getSelectedIcsGenerationStrategy());
 
 			assertFalse(confTrans.isAutoOpenNextInboxItem());
-			
-			//printConfig(confTrans);
-			
+
+			// printConfig(confTrans);
+
 			createConfiguration(confTrans);
-			
-			//printConfig(confTrans);
-			
+
+			// printConfig(confTrans);
+
 			ConfigTranslationModule confTrans2 = new ConfigTranslationModule();
-			confTrans2 = (ConfigTranslationModule)config.getDbConfig().getProperty("TRANSLATION_CONFIG");
-			
+			confTrans2 = (ConfigTranslationModule) config.getDbConfig().getProperty("TRANSLATION_CONFIG");
+
 			printConfig(confTrans2);
-			
+
 			assertNotNull(confTrans2.getColumnsDisplayedInInbox());
 			assertNotNull(confTrans2.getSelectedEditorMode());
 			assertNotNull(confTrans2.getSelectedFsnGenStrategy());
@@ -145,85 +147,80 @@ public class TestConfiguration extends TestCase {
 			assertNotNull(confTrans2.getSelectedIcsGenerationStrategy());
 
 			assertTrue(confTrans2.isAutoOpenNextInboxItem());
-			
-			
-			
-			
+
 			// Esto graba la configuracion
-			//Terms.get().setActiveAceFrameConfig(arg0)
-			
-		
+			// Terms.get().setActiveAceFrameConfig(arg0)
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 
 		ConfigTranslationModule confTrans;
-		ConfigTranslationModule confTrans2; 
+		ConfigTranslationModule confTrans2;
 		try {
 			confTrans = LanguageUtil.getTranslationConfig(config);
 			confTrans.setSelectedEditorMode(EditorMode.PREFERRED_TERM_EDITOR);
-			EditorModePanel editorMode = new EditorModePanel(config,confTrans);
+			EditorModePanel editorMode = new EditorModePanel(config, confTrans);
 
 			Component[] components = editorMode.getComponents();
-			//Finds the Full editor raddio button and selects it
+			// Finds the Full editor raddio button and selects it
 			for (Component component : components) {
-				if(component instanceof JPanel){
+				if (component instanceof JPanel) {
 					Component[] subComp = ((JPanel) component).getComponents();
 					for (Component component2 : subComp) {
-						if(component2 instanceof JRadioButton){
-							JRadioButton button = (JRadioButton)component2;
+						if (component2 instanceof JRadioButton) {
+							JRadioButton button = (JRadioButton) component2;
 							System.out.println(button.getText());
-							if(button.getText().equals(EditorMode.FULL_EDITOR.toString())){
+							if (button.getText().equals(EditorMode.FULL_EDITOR.toString())) {
 								button.doClick();
 							}
 						}
 					}
 				}
 			}
-			
-			//Configuration instance changed
+
+			// Configuration instance changed
 			assertEquals(confTrans.getSelectedEditorMode(), EditorMode.FULL_EDITOR);
-			
-			//Gets the configuration again
+
+			// Gets the configuration again
 			confTrans2 = LanguageUtil.getTranslationConfig(config);
-			//It should not be Full editor mod yet
+			// It should not be Full editor mod yet
 			assertFalse(confTrans2.getSelectedEditorMode().equals(EditorMode.FULL_EDITOR.toString()));
-			
-			//Finds the jbutton and clicks it
+
+			// Finds the jbutton and clicks it
 			for (Component component : components) {
-				if(component instanceof JPanel){
+				if (component instanceof JPanel) {
 					Component[] subComp = ((JPanel) component).getComponents();
 					for (Component component2 : subComp) {
-						if(component2 instanceof JButton){
-							JButton button = (JButton)component2;
+						if (component2 instanceof JButton) {
+							JButton button = (JButton) component2;
 							button.doClick();
 						}
 					}
 				}
 			}
-			
-			//After the click we get the configuration and it should be changed.
+
+			// After the click we get the configuration and it should be
+			// changed.
 			confTrans2 = LanguageUtil.getTranslationConfig(config);
 			assertTrue(confTrans2.getSelectedEditorMode().toString().equals(EditorMode.FULL_EDITOR.toString()));
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
-		}catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	public void testConfigDialog(){
-		
-		
+
+	public void testConfigDialog() {
+
 		ConfigTranslationModule confTrans = new ConfigTranslationModule();
 		createConfiguration(confTrans);
-		
-		ConfigDialog panle = new ConfigDialog(config,confTrans, true,null);
+
+		ConfigDialog panle = new ConfigDialog(config, confTrans, true, null);
 		Thread th = new Thread(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				try {
@@ -239,79 +236,79 @@ public class TestConfiguration extends TestCase {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	private void createConfiguration(ConfigTranslationModule confTrans){
+
+	private void createConfiguration(ConfigTranslationModule confTrans) {
 		confTrans.setAutoOpenNextInboxItem(true);
-		
+
 		LinkedHashSet<InboxColumn> inboxCol = new LinkedHashSet<InboxColumn>();
 		inboxCol.add(InboxColumn.SOURCE_PREFERRED);
 		inboxCol.add(InboxColumn.STATUS);
 		confTrans.setColumnsDisplayedInInbox(inboxCol);
-		
+
 		LinkedHashSet<TreeComponent> sourceTreeComponents = new LinkedHashSet<TreeComponent>();
 		sourceTreeComponents.add(TreeComponent.FSN);
 		sourceTreeComponents.add(TreeComponent.SYNONYM);
 		confTrans.setSourceTreeComponents(sourceTreeComponents);
-		
+
 		LinkedHashSet<TreeComponent> targetTreeComponents = new LinkedHashSet<TreeComponent>();
 		targetTreeComponents.add(TreeComponent.FSN);
 		targetTreeComponents.add(TreeComponent.PREFERRED);
 		confTrans.setTargetTreeComponents(targetTreeComponents);
-		
+
 		confTrans.setSelectedEditorMode(EditorMode.PREFERRED_TERM_EDITOR);
 		confTrans.setSelectedFsnGenStrategy(FsnGenerationStrategy.LINK_SOURCE_LANGUAGE);
 		confTrans.setSelectedIcsGenerationStrategy(IcsGenerationStrategy.NONE);
 		confTrans.setSelectedPrefTermDefault(PreferredTermDefault.SOURCE);
-		
+
 		try {
 			config.getDbConfig().setProperty("TRANSLATION_CONFIG", confTrans);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	private void printConfig(ConfigTranslationModule confTrans){
+
+	private void printConfig(ConfigTranslationModule confTrans) {
 		System.out.println("\nSelected editor mode.");
 		System.out.println("\t" + confTrans.getSelectedEditorMode());
-		
+
 		System.out.println("Fully specified name generation strategy.");
 		System.out.println("\t" + confTrans.getSelectedFsnGenStrategy());
-		
+
 		System.out.println("Selected Preferd term default.");
 		System.out.println("\t" + confTrans.getSelectedPrefTermDefault());
-		
+
 		System.out.println("Selected ICS generation strategy.");
 		System.out.println("\t" + confTrans.getSelectedIcsGenerationStrategy());
-		
-		System.out.println("Auto open next inbox item.");
-		System.out.println("\t" +  confTrans.isAutoOpenNextInboxItem());
 
-		if(confTrans.getColumnsDisplayedInInbox() != null){
+		System.out.println("Auto open next inbox item.");
+		System.out.println("\t" + confTrans.isAutoOpenNextInboxItem());
+
+		if (confTrans.getColumnsDisplayedInInbox() != null) {
 			System.out.println("Columns displayd in inbox.");
 			for (InboxColumn col : confTrans.getColumnsDisplayedInInbox()) {
 				System.out.println("\t" + col.getEditorClass());
 			}
 		}
-		
-		if(confTrans.getSourceTreeComponents() != null){
+
+		if (confTrans.getSourceTreeComponents() != null) {
 			System.out.println("Source tree components.");
 			for (TreeComponent sourceTreeComp : confTrans.getSourceTreeComponents()) {
 				System.out.println("\t" + sourceTreeComp);
 			}
 		}
-		
-		if(confTrans.getTargetTreeComponents() != null){
+
+		if (confTrans.getTargetTreeComponents() != null) {
 			System.out.println("Target tree components.");
 			for (TreeComponent targeTreeComp : confTrans.getTargetTreeComponents()) {
 				System.out.println("\t" + targeTreeComp);
 			}
 		}
-		
+
 	}
 
 	private I_ConfigAceFrame getTestConfig() {
@@ -319,13 +316,9 @@ public class TestConfiguration extends TestCase {
 		try {
 			config = tf.newAceFrameConfig();
 			BdbTermFactory tf2 = (BdbTermFactory) tf;
-			config.addViewPosition(tf.newPosition(
-					tf.getPath(new UUID[] {UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66")}), 
-					Integer.MAX_VALUE));
-			config.addViewPosition(tf.newPosition(
-					tf.getPath(new UUID[] {UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2")}), 
-					Integer.MAX_VALUE));
-			config.addEditingPath(tf.getPath(new UUID[] {UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2")}));
+			config.addViewPosition(tf.newPosition(tf.getPath(new UUID[] { UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66") }), Integer.MAX_VALUE));
+			config.addViewPosition(tf.newPosition(tf.getPath(new UUID[] { UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2") }), Integer.MAX_VALUE));
+			config.addEditingPath(tf.getPath(new UUID[] { UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2") }));
 			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
 			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());
 			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.localize().getNid());
@@ -353,8 +346,7 @@ public class TestConfiguration extends TestCase {
 	}
 
 	// If targetLocation does not exist, it will be created.
-	public void copyDirectory(File sourceLocation , File targetLocation)
-	throws IOException {
+	public void copyDirectory(File sourceLocation, File targetLocation) throws IOException {
 
 		if (sourceLocation.isDirectory()) {
 			if (!targetLocation.exists()) {
@@ -362,9 +354,8 @@ public class TestConfiguration extends TestCase {
 			}
 
 			String[] children = sourceLocation.list();
-			for (int i=0; i<children.length; i++) {
-				copyDirectory(new File(sourceLocation, children[i]),
-						new File(targetLocation, children[i]));
+			for (int i = 0; i < children.length; i++) {
+				copyDirectory(new File(sourceLocation, children[i]), new File(targetLocation, children[i]));
 			}
 		} else {
 
@@ -383,17 +374,16 @@ public class TestConfiguration extends TestCase {
 	}
 
 	public boolean deleteDirectory(File path) {
-		if( path.exists() ) {
+		if (path.exists()) {
 			File[] files = path.listFiles();
-			for(int i=0; i<files.length; i++) {
-				if(files[i].isDirectory()) {
+			for (int i = 0; i < files.length; i++) {
+				if (files[i].isDirectory()) {
 					deleteDirectory(files[i]);
-				}
-				else {
+				} else {
 					files[i].delete();
 				}
 			}
 		}
-		return( path.delete() );
+		return (path.delete());
 	}
 }
