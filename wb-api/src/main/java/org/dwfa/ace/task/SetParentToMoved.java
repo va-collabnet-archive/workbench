@@ -57,6 +57,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 import org.ihtsdo.tk.api.WizardBI;
+import org.ihtsdo.tk.example.binding.ConceptInactivationType;
 
 
 
@@ -109,7 +110,7 @@ public class SetParentToMoved extends AbstractTask{
     	
     	I_GetConceptData parentConcept;
 		try {
-			parentConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.MOVED_ELSEWHERE.getUids());
+			parentConcept = Terms.get().getConcept(ConceptInactivationType.MOVED_ELSEWHERE.getUuids());
 			process.setProperty(relParentPropName, parentConcept);  
 			} catch (TerminologyException e) {
 				throw new TaskFailedException(e);
