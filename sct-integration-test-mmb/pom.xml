@@ -89,5 +89,8 @@
     <modules>
         <module>sct-integration-db</module>
         <module>sct-integration-tests</module>
+        <!--
+        <module>sct-integration-classifier-tests</module>
+        -->
     </modules>
 </project>
