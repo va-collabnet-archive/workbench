@@ -59,7 +59,7 @@ public class TranslationSearchHelper {
 				ListItemBean listItem = new ListItemBean();
 				for (ContextualizedDescription sourceCd : sourceContDescriptions) {
 					if (sourceCd.getLanguageExtension() != null) {
-						if (sourceCd.getTypeId() == fsnType.getNid() && sourceCd.getAcceptabilityId() == preferredType.getNid()) {
+						if (sourceCd.getTypeId() == fsnType.getNid()) {
 							listItem.setSourceFsn(sourceCd);
 						} else if (sourceCd.getAcceptabilityId() == preferredType.getNid() && sourceCd.getTypeId() == preferredType.getNid()) {
 							listItem.setSourcePrefered(sourceCd);
