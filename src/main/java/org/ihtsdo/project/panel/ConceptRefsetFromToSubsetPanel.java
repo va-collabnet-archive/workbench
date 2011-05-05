@@ -8,12 +8,12 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
 
@@ -39,12 +39,14 @@ import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
+import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.panel.dnd.I_GetItemForModel;
 import org.ihtsdo.project.panel.dnd.ObjectTransferHandler;
 import org.ihtsdo.project.refset.ExportConceptMemberRefsetAsSubset;
 import org.ihtsdo.project.refset.ExportConceptMemberRefsetToRefset;
 import org.ihtsdo.project.refset.ImportConceptRefsetAsRefset;
 import org.ihtsdo.project.refset.ImportConceptSubsetAsRefset;
+import org.ihtsdo.project.util.IconUtilities;
 
 /**
  * @author Guillermo Reynoso
@@ -78,6 +80,12 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 	private static final String EFFECTIVETIME_SEPARATOR = "-ET ";
 	public ConceptRefsetFromToSubsetPanel() {
 		initComponents();
+		
+		importHelpLabel.setIcon(IconUtilities.helpIcon);
+		importHelpLabel.setText("");
+		
+		exportHelpPanel.setIcon(IconUtilities.helpIcon);
+		exportHelpPanel.setText("");
 
 		pBarE.setVisible(false);
 		pBarI.setVisible(false);
@@ -485,6 +493,26 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 			e.printStackTrace();
 		}
 	}
+
+	private void importHelpLabelMouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("IMPORT_SUBSET_REFSET");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	private void exportHelpPanelMouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("EXPORT_SUBSET_REFSET");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
 	public class GetConceptForLabel implements I_GetItemForModel{
 
 		private String labelTarget;
@@ -510,6 +538,7 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		tabbedPane1 = new JTabbedPane();
 		panel3 = new JPanel();
+		importHelpLabel = new JLabel();
 		label7 = new JLabel();
 		panel1 = new JPanel();
 		rbIRF1 = new JRadioButton();
@@ -535,6 +564,7 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 		scrollPane2 = new JScrollPane();
 		txtIRes = new JTextPane();
 		panel2 = new JPanel();
+		exportHelpPanel = new JLabel();
 		label8 = new JLabel();
 		panel7 = new JPanel();
 		rbERF1 = new JRadioButton();
@@ -577,6 +607,18 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 				((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 25, 0, 0, 90, 0};
 				((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {0.0, 1.0, 0.0, 1.0E-4};
 				((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
+
+				//---- importHelpLabel ----
+				importHelpLabel.setText("text");
+				importHelpLabel.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						importHelpLabelMouseClicked(e);
+					}
+				});
+				panel3.add(importHelpLabel, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 0), 0, 0));
 
 				//---- label7 ----
 				label7.setText("Format:");
@@ -772,6 +814,18 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 				((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 25, 0, 0, 0, 0, 90, 0};
 				((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {0.0, 1.0, 0.0, 1.0E-4};
 				((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
+
+				//---- exportHelpPanel ----
+				exportHelpPanel.setText("text");
+				exportHelpPanel.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						exportHelpPanelMouseClicked(e);
+					}
+				});
+				panel2.add(exportHelpPanel, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 0), 0, 0));
 
 				//---- label8 ----
 				label8.setText("Format:");
@@ -991,6 +1045,7 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
 	private JTabbedPane tabbedPane1;
 	private JPanel panel3;
+	private JLabel importHelpLabel;
 	private JLabel label7;
 	private JPanel panel1;
 	private JRadioButton rbIRF1;
@@ -1016,6 +1071,7 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 	private JScrollPane scrollPane2;
 	private JTextPane txtIRes;
 	private JPanel panel2;
+	private JLabel exportHelpPanel;
 	private JLabel label8;
 	private JPanel panel7;
 	private JRadioButton rbERF1;

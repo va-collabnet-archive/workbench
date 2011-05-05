@@ -10,6 +10,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.*;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -45,8 +47,10 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.panel.details.ProjectDetailsPanel;
 import org.ihtsdo.project.panel.dnd.ObjectTransferHandler;
+import org.ihtsdo.project.util.IconUtilities;
 
 /**
  * @author Guillermo Reynoso
@@ -63,6 +67,9 @@ public class RefsetViewerPanel extends JPanel {
 	public RefsetViewerPanel(I_ConfigAceFrame config) {
 		initComponents();
 		initCustomComponents();
+		label2.setIcon(IconUtilities.helpIcon);
+		label2.setText("");
+		
 		this.config = config;
 	}
 
@@ -236,6 +243,16 @@ public class RefsetViewerPanel extends JPanel {
 		}
 	}
 
+	private void label2MouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("REFSET_VIEWER");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -243,51 +260,72 @@ public class RefsetViewerPanel extends JPanel {
 		refsetTable = new JTable();
 		actionPanel = new JPanel();
 		label1 = new JLabel();
+		label2 = new JLabel();
 		panel1 = new JPanel();
 		refsetList = new JList();
 		cuantityLable = new JLabel();
 		closeButton = new JButton();
 		progressBar = new JProgressBar();
 
-		// ======== this ========
+		//======== this ========
 		setBorder(new EmptyBorder(10, 5, 5, 5));
 		setLayout(new BorderLayout(10, 10));
 
-		// ======== scrollPane2 ========
+		//======== scrollPane2 ========
 		{
 			scrollPane2.setViewportView(refsetTable);
 		}
 		add(scrollPane2, BorderLayout.CENTER);
 
-		// ======== actionPanel ========
+		//======== actionPanel ========
 		{
 			actionPanel.setLayout(new GridBagLayout());
-			((GridBagLayout) actionPanel.getLayout()).columnWidths = new int[] { 295, 0, 0 };
-			((GridBagLayout) actionPanel.getLayout()).rowHeights = new int[] { 0, 29, 0 };
-			((GridBagLayout) actionPanel.getLayout()).columnWeights = new double[] { 1.0, 0.0, 1.0E-4 };
-			((GridBagLayout) actionPanel.getLayout()).rowWeights = new double[] { 0.0, 0.0, 1.0E-4 };
+			((GridBagLayout)actionPanel.getLayout()).columnWidths = new int[] {295, 0, 0};
+			((GridBagLayout)actionPanel.getLayout()).rowHeights = new int[] {0, 29, 0};
+			((GridBagLayout)actionPanel.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
+			((GridBagLayout)actionPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
 
-			// ---- label1 ----
+			//---- label1 ----
 			label1.setText("Drag and drop a refset here to view the details");
-			actionPanel.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0, 0, 5, 10), 0, 0));
+			actionPanel.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+				new Insets(0, 0, 5, 10), 0, 0));
 
-			// ======== panel1 ========
+			//---- label2 ----
+			label2.setText("text");
+			label2.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					label2MouseClicked(e);
+				}
+			});
+			actionPanel.add(label2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
+
+			//======== panel1 ========
 			{
 				panel1.setLayout(new GridBagLayout());
-				((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 177, 0, 0 };
-				((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 0, 0 };
-				((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 0.0, 0.0, 1.0E-4 };
-				((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+				((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {177, 0, 0};
+				((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0};
+				((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-				// ---- refsetList ----
+				//---- refsetList ----
 				refsetList.setVisibleRowCount(1);
 				refsetList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-				panel1.add(refsetList, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 10), 0, 0));
-				panel1.add(cuantityLable, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+				panel1.add(refsetList, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 10), 0, 0));
+				panel1.add(cuantityLable, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 			}
-			actionPanel.add(panel1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 10), 0, 0));
+			actionPanel.add(panel1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.NONE,
+				new Insets(0, 0, 0, 10), 0, 0));
 
-			// ---- closeButton ----
+			//---- closeButton ----
 			closeButton.setText("Close");
 			closeButton.addActionListener(new ActionListener() {
 				@Override
@@ -295,11 +333,13 @@ public class RefsetViewerPanel extends JPanel {
 					closeButtonActionPerformed(e);
 				}
 			});
-			actionPanel.add(closeButton, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+			actionPanel.add(closeButton, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(actionPanel, BorderLayout.NORTH);
 
-		// ---- progressBar ----
+		//---- progressBar ----
 		progressBar.setIndeterminate(true);
 		add(progressBar, BorderLayout.SOUTH);
 		// //GEN-END:initComponents
@@ -311,6 +351,7 @@ public class RefsetViewerPanel extends JPanel {
 	private JTable refsetTable;
 	private JPanel actionPanel;
 	private JLabel label1;
+	private JLabel label2;
 	private JPanel panel1;
 	private JList refsetList;
 	private JLabel cuantityLable;

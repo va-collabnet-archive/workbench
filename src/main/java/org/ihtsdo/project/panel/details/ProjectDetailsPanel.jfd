@@ -2005,7 +2005,7 @@ The list of worksets is displayed as new worksets are created&lt;br&gt;
               <string>javax.swing.JLabel</string> 
               <void method="setProperty"> 
                <string>text</string> 
-               <string>&lt;html&gt;&lt;body&gt;Maintenance worklists are used to send any concept into a translation workflow. Many different workflows can be configured.</string> 
+               <string>&lt;html&gt;&lt;body&gt;Maintenance worklists are used to send any concept into a translation workflow without the requirement of creating a new workset. Many different workflows can be configured.</string> 
               </void> 
               <void property="name"> 
                <string>label13</string> 
