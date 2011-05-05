@@ -424,7 +424,7 @@ public class BatchQACheck extends AbstractMojo {
 		I_ConfigAceFrame config = null;
 		config = tf.newAceFrameConfig();
 		DateFormat df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
-		config.addViewPosition(tf.newPosition(tf.getPath(new UUID[] { UUID.fromString(test_path_uuid) }), tf.convertToThinVersion(df.parse(test_time).getTime())));
+		config.addViewPosition(tf.newPosition(tf.getPath(new UUID[] { UUID.fromString(test_path_uuid) }), df.parse(test_time).getTime()));
 
 		// Addes inferred promotion template to catch the context relationships [ testing
 		//config.addViewPosition(tf.newPosition(tf.getPath(new UUID[] { UUID.fromString("cb0f6c0d-ebf3-5d84-9e12-d09a937cbffd") }), Integer.MAX_VALUE));

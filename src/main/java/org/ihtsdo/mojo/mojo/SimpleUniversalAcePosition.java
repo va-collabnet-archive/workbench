@@ -49,12 +49,12 @@ public class SimpleUniversalAcePosition {
         this.timeStr = timeStr;
     }
 
-    public int getTime() throws ParseException {
+    public long getTime() throws ParseException {
         if (timeStr == null) {
             return Integer.MAX_VALUE;
         }
         Date date = dateParser.parse(timeStr);
-        return ThinVersionHelper.convert(date.getTime());
+        return date.getTime();
     }
 
     public Collection<UUID> getPathId() throws IOException, Exception {

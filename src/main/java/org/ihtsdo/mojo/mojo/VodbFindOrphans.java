@@ -110,7 +110,7 @@ public class VodbFindOrphans extends AbstractMojo {
 
             // TODO replace with passed in config...
             I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-            PositionBI latestOnArchitectonicPath = termFactory.newPosition(architectonicPath, Integer.MAX_VALUE);
+            PositionBI latestOnArchitectonicPath = termFactory.newPosition(architectonicPath, Long.MAX_VALUE);
 
             origins.add(latestOnArchitectonicPath);
 
@@ -120,7 +120,7 @@ public class VodbFindOrphans extends AbstractMojo {
             for (ConceptDescriptor branch : branches) {
                 I_GetConceptData currentConcept = branch.getVerifiedConcept();
                 PathBI currentPath = termFactory.getPath(currentConcept.getUids());
-                PositionBI currentPosition = termFactory.newPosition(currentPath, Integer.MAX_VALUE);
+                PositionBI currentPosition = termFactory.newPosition(currentPath, Long.MAX_VALUE);
                 branchPositions.add(currentPosition);
             }
 

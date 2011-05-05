@@ -33,7 +33,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -61,15 +60,12 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
      * 
      */
     private static final long serialVersionUID = 1L;
-
     private static final String FILE_SEPARATOR = File.separator;
-
     /**
      * Line terminator is deliberately set to CR-LF which is DOS style
      */
     private static final String LINE_TERMINATOR = "\r\n";
     private static final String TAB_CHARACTER = "\t";
-
     /**
      * Start date (inclusive)
      * 
@@ -77,7 +73,6 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
      */
     private String dateStart;
     private Date dateStartObj;
-
     /**
      * Stop date inclusive
      * 
@@ -85,7 +80,6 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
      */
     private String dateStop;
     private Date dateStopObj;
-
     /**
      * Location of the target directory.
      * 
@@ -93,14 +87,12 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
      * @required
      */
     private File targetDirectory;
-
     /**
      * Applicable input sub directory under the target directory.
      * 
      * @parameter
      */
     private String targetSubDir = "";
-
     /**
      * Input Directories Array. The directory array parameter supported
      * extensions via separate directories in the array.
@@ -108,7 +100,6 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
      * @parameter
      */
     private Rf1Dir[] rf1Dirs;
-
     /**
      * Directory used to output the eConcept format files
      * Default value "/generated-arf" set programmatically due to file separator
@@ -116,53 +107,45 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
      * @parameter default-value="generated-arf"
      */
     private String outputDirectory;
-
     /**
      * @parameter
      * @required
      */
     private String outputInfix;
-
     /**
      * @parameter
      * @required
      */
     private String refsetFsName;
-
     /**
      * @parameter
      * @required
      */
     private String refsetPrefTerm;
-
     /**
      * @parameter
      * @required
      */
     private String refsetPathUuid;
-
     /**
      * @parameter
      * @required
      */
     private String refsetDate;
     private Date refsetDateObj;
-
     /**
      * @parameter
      * @required
      */
     private String refsetParentUuid;
-
     private HashMap<Long, String> mapTargetidTargetcode; // <TARGETID, TARGETCODE>
-
     private String uuidCurrentStr;
     private String uuidRetiredStr;
-
     private UUID refsetUuid;
     private String refsetUuidStr;
 
     private class CrossMapRecord implements Comparable<Object> {
+
         long sctId;
         String targetCode;
         int priority;
@@ -171,29 +154,37 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
         public CrossMapRecord(long id, String code, int p) {
             sctId = id;
             priority = p;
-            if (priority > 0)
-                targetCode = code + " [" + Integer.toString(priority) + "]";
-            else
-                targetCode = code;
+//            if (priority > 0)
+//                targetCode = code + " [" + Integer.toString(priority) + "]";
+//            else
+            targetCode = code;
             status = 0;
         }
 
+        @Override
         public int compareTo(Object obj) {
             CrossMapRecord o2 = (CrossMapRecord) obj;
             int thisMore = 1;
             int thisLess = -1;
 
-            if (this.sctId > o2.sctId)
+            if (this.sctId > o2.sctId) {
                 return thisMore;
-            else if (this.sctId < o2.sctId)
+            } else if (this.sctId < o2.sctId) {
                 return thisLess;
-            else {
-                if (this.targetCode.compareTo(o2.targetCode) > 0)
+            } else {
+                if (this.targetCode.compareTo(o2.targetCode) > 0) {
                     return thisMore;
-                else if (this.targetCode.compareTo(o2.targetCode) < 0)
-                    return thisLess;                
+                } else if (this.targetCode.compareTo(o2.targetCode) < 0) {
+                    return thisLess;
+                }
             }
             return 0; // EQUAL
+        }
+
+        @Override
+        public String toString() {
+            return "sctId=" + sctId + "\ttargetCode=" + targetCode
+                    + "\tpriority=" + priority + "\tstatus=" + status;
         }
     }
 
@@ -211,8 +202,9 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
             getLog().info("    POM: Target Sub Directory: " + targetSubDir);
         }
 
-        if (rf1Dirs == null)
+        if (rf1Dirs == null) {
             rf1Dirs = new Rf1Dir[0];
+        }
         for (int i = 0; i < rf1Dirs.length; i++) {
             rf1Dirs[i].setDirName(rf1Dirs[i].getDirName().replace('/',
                     File.separatorChar));
@@ -231,17 +223,13 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
         try {
             executeMojo(targetDir, targetSubDir, rf1Dirs, outputDirectory);
         } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            getLog().error(e);
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            getLog().error(e);
         } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            getLog().error(e);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            getLog().error(e);
         }
         getLog().info("::: END Rf1CrossMapsToArf");
     }
@@ -252,13 +240,16 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
         getLog().info("::: Target Sub Directory:     " + tSubDir);
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.ss HH:mm:ss");
-        if (dateStartObj != null)
+        if (dateStartObj != null) {
             getLog().info("::: Start date (inclusive) = " + sdf.format(dateStartObj));
-        if (dateStopObj != null)
+        }
+        if (dateStopObj != null) {
             getLog().info(":::  Stop date (inclusive) = " + sdf.format(dateStopObj));
+        }
 
-        for (int i = 0; i < inDirs.length; i++)
+        for (int i = 0; i < inDirs.length; i++) {
             getLog().info("::: Input Directory (" + i + ") = " + inDirs[i].getDirName());
+        }
         getLog().info("::: Output Directory:  " + outDir);
 
         // Setup target (build) directory
@@ -283,8 +274,9 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
         // SETUP OUTPUT FILE
         String fPathOutDir = tDir + FILE_SEPARATOR + tSubDir + FILE_SEPARATOR + outDir;
         boolean success = (new File(fPathOutDir)).mkdirs();
-        if (success)
+        if (success) {
             getLog().info("::: OUTPUT PATH " + fPathOutDir);
+        }
         String fNameSubsetConRefsetArf = fPathOutDir + FILE_SEPARATOR + "string_" + outputInfix
                 + ".refset";
         BufferedWriter bwRefset = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
@@ -307,18 +299,23 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
     }
 
     private int compareCrossMapRecord(CrossMapRecord r1, CrossMapRecord r2) {
-        if (r1.sctId > r2.sctId)
+        if (r1.sctId > r2.sctId) {
             return 3; // ADDED
-        else if (r1.sctId < r2.sctId)
+        } else if (r1.sctId < r2.sctId) {
             return 4; // DROPPED
-        else if (r1.sctId == r2.sctId) {
+        } else if (r1.sctId == r2.sctId) {
             int comp = r1.targetCode.compareTo(r2.targetCode);
-            if (comp == 0)
-                return 1; // SAME
-            else if (comp > 0)
+            if (comp == 0) {
+                if (r1.status == r2.status) {
+                    return 1; // SAME
+                } else {
+                    return 2; // MODIFIED
+                }
+            } else if (comp > 0) {
                 return 3; // ADDED
-            else if (comp < 0)
-                return 4; // DROPPED  
+            } else if (comp < 0) {
+                return 4; // DROPPED
+            }
         }
         return 2; // MODIFIED
     }
@@ -329,22 +326,22 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
         if ((same + modified + dropped) == count1) {
             getLog().info(
                     "PASSED1:: SAME+MODIFIED+DROPPED = " + same + "+" + modified + "+" + dropped
-                            + " = " + (same + modified + dropped) + " == " + count1);
+                    + " = " + (same + modified + dropped) + " == " + count1);
         } else {
             getLog().info(
                     "FAILED1:: SAME+MODIFIED+DROPPED = " + same + "+" + modified + "+" + dropped
-                            + " = " + (same + modified + dropped) + " != " + count1);
+                    + " = " + (same + modified + dropped) + " != " + count1);
         }
 
         // CHECK COUNTS TO UPDATE FILE2 RECORD COUNT
         if ((same + modified + added) == count2) {
             getLog().info(
                     "PASSED2:: SAME+MODIFIED+ADDED   = " + same + "+" + modified + "+" + added
-                            + " = " + (same + modified + added) + " == " + count2);
+                    + " = " + (same + modified + added) + " == " + count2);
         } else {
             getLog().info(
                     "FAILED2:: SAME+MODIFIED+ADDED   = " + same + "+" + modified + "+" + added
-                            + " = " + (same + modified + added) + " != " + count2);
+                    + " = " + (same + modified + added) + " != " + count2);
         }
 
     }
@@ -363,32 +360,72 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
         // Header row
         br.readLine();
 
-        int maps = 0;
+        int mapsIdx = 0;
         while (br.ready()) {
             String[] line = br.readLine().split(TAB_CHARACTER);
             long conceptId = Long.parseLong(line[MAPCONCEPTID]);
-            int priority = Integer.parseInt(line[MAPPRIORITY]);
+            int priority = 0;
+            if ("".equalsIgnoreCase(line[MAPPRIORITY]) == false) {
+                priority = Integer.parseInt(line[MAPPRIORITY]);
+            }
             long targetId = Long.parseLong(line[MAPTARGETID]);
 
             String targetCode = mapTargetidTargetcode.get(targetId);
 
             if (targetCode != null) {
-                a[maps] = new CrossMapRecord(conceptId, targetCode, priority);
-                maps++;
+                a[mapsIdx] = new CrossMapRecord(conceptId, targetCode, priority);
+                mapsIdx++;
             } else {
                 getLog().info(
                         "DATA ERROR: target not present: MAPCONCEPTID=" + line[MAPCONCEPTID]
-                                + " MAPPRIORITY=" + line[MAPPRIORITY] + " MAPTARGETID="
-                                + line[MAPTARGETID]);
-                a[maps] = new CrossMapRecord(conceptId, "TARGET_NOT_PRESENT", priority);
-                maps++;
+                        + " MAPPRIORITY=" + line[MAPPRIORITY] + " MAPTARGETID="
+                        + line[MAPTARGETID]);
+                a[mapsIdx] = new CrossMapRecord(conceptId, "TARGET_NOT_PRESENT", priority);
+                mapsIdx++;
             }
 
         }
         br.close();
 
         Arrays.sort(a);
+
+        // REMOVE DUPLICATES
+        a = removeDuplCrossMapRecords(a);
+
         return a;
+    }
+
+    private CrossMapRecord[] removeDuplCrossMapRecords(CrossMapRecord[] a) {
+
+        // REMOVE DUPLICATES
+        int lenA = a.length;
+        ArrayList<Integer> duplIdxList = new ArrayList<Integer>();
+        for (int idx = 0; idx < lenA - 2; idx++) {
+            if ((a[idx].sctId == a[idx + 1].sctId)
+                    && (a[idx].targetCode.equalsIgnoreCase(a[idx + 1].targetCode))) {
+                duplIdxList.add(Integer.valueOf(idx));
+                getLog().info(
+                        "::: WARNING : REMOVED -- same: sctId and targetCode" + "\r\n::: A:" + a[idx]
+                        + "\r\n::: B:" + a[idx + 1]);
+            }
+        }
+        if (duplIdxList.size() > 0) {
+            CrossMapRecord[] b = new CrossMapRecord[lenA - duplIdxList.size()];
+            int aPos = 0;
+            int bPos = 0;
+            int len;
+            for (int dropIdx : duplIdxList) {
+                len = dropIdx - aPos;
+                System.arraycopy(a, aPos, b, bPos, len);
+                bPos = bPos + len;
+                aPos = aPos + len + 1;
+            }
+            len = lenA - aPos;
+            System.arraycopy(a, aPos, b, bPos, len);
+            return b;
+        } else {
+            return a;
+        }
     }
 
     private void parseCrossMapTargets(RF1File rf1) throws IOException {
@@ -434,8 +471,9 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
         a1 = parseCrossMaps(f1);
         count1 = a1.length;
 
-        for (int i = 0; i < a1.length; i++)
+        for (int i = 0; i < a1.length; i++) {
             writeToArfFile(a1[i], dateStr, uuidPathStr, out);
+        }
 
         while (fit.hasNext()) {
             // SETUP CURRENT CONCEPTS INPUT FILE
@@ -454,50 +492,50 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
             a3 = new CrossMapRecord[count2];
             while ((r1 < count1) && (r2 < count2)) {
 
-                switch (compareCrossMapRecord(a1[r1], a2[r2])) {
-                case 1: // SAME CROSSMAP, skip to next
-                    r1++;
-                    r2++;
-                    nSame++;
-                    break;
+                switch (compareCrossMapRecord(a1[r1], a2[r2])) {                    
+                    case 1: // SAME CROSSMAP, skip to next
+                        r1++;
+                        r2++;
+                        nSame++;
+                        break;
 
-                case 2: // MODIFIED CROSSMAP
-                    // Retire previous
-                    if (a1[r1].status != 1) { // if not RETIRED
-                        a1[r1].status = 1; // set to RETIRED
-                        writeToArfFile(a1[r1], dateStr, uuidPathStr, out);
-                    }
+                    case 2: // MODIFIED CROSSMAP
+                        // Retire previous
+                        if (a1[r1].status != 1) { // if not RETIRED
+                            a1[r1].status = 1; // set to RETIRED
+                            writeToArfFile(a1[r1], dateStr, uuidPathStr, out);
+                        }
 
-                    // Add current
-                    writeToArfFile(a2[r2], dateStr, uuidPathStr, out);
+                        // Add current
+                        writeToArfFile(a2[r2], dateStr, uuidPathStr, out);
 
-                    // Update master via pointer assignment
-                    a1[r1] = a2[r2];
-                    r1++;
-                    r2++;
-                    nMod++;
-                    break;
+                        // Update master via pointer assignment
+                        a1[r1] = a2[r2];
+                        r1++;
+                        r2++;
+                        nMod++;
+                        break;
 
-                case 3: // ADDED CROSSMAP
-                    // Write history
-                    writeToArfFile(a2[r2], dateStr, uuidPathStr, out);
+                    case 3: // ADDED CROSSMAP
+                        // Write history
+                        writeToArfFile(a2[r2], dateStr, uuidPathStr, out);
 
-                    // Hold pointer to append to master
-                    a3[r3] = a2[r2];
-                    r2++;
-                    r3++;
-                    nAdd++;
-                    break;
+                        // Hold pointer to append to master
+                        a3[r3] = a2[r2];
+                        r2++;
+                        r3++;
+                        nAdd++;
+                        break;
 
-                case 4: // DROPPED CROSSMAP
-                    // see ArchitectonicAuxiliary.getStatusFromId()
-                    if (a1[r1].status != 1) { // if not RETIRED
-                        a1[r1].status = 1; // set to RETIRED
-                        writeToArfFile(a1[r1], dateStr, uuidPathStr, out);
-                    }
-                    r1++;
-                    nDrop++;
-                    break;
+                    case 4: // DROPPED CROSSMAP
+                        // see ArchitectonicAuxiliary.getStatusFromId()
+                        if (a1[r1].status != 1) { // if not RETIRED
+                            a1[r1].status = 1; // set to RETIRED
+                            writeToArfFile(a1[r1], dateStr, uuidPathStr, out);
+                        }
+                        r1++;
+                        nDrop++;
+                        break;
 
                 }
             } // WHILE (NOT END OF EITHER A1 OR A2)
@@ -580,7 +618,7 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
             // DESCRIPTION - FULLY SPECIFIED
             descriptions.append(Type5UuidFactory.get(
                     Rf1Dir.SUBSETREFSET_ID_NAMESPACE_UUID_TYPE1 + "Subset Fully Specified Name"
-                            + refsetUuidStr).toString()); // description uuid
+                    + refsetUuidStr).toString()); // description uuid
             descriptions.append("\t");
             descriptions.append(uuidCurrentStr); // status uuid
             descriptions.append("\t");
@@ -590,8 +628,7 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
             descriptions.append("\t");
             descriptions.append("1"); // primitive
             descriptions.append("\t");
-            descriptions.append(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-                    .getUids().iterator().next().toString()); // description type uuid
+            descriptions.append(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids().iterator().next().toString()); // description type uuid
             descriptions.append("\t");
             descriptions.append("en"); // language code
             descriptions.append("\t");
@@ -603,7 +640,7 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
             // DESCRIPTION - FULLY PREFERRED
             descriptions.append(Type5UuidFactory.get(
                     Rf1Dir.SUBSETREFSET_ID_NAMESPACE_UUID_TYPE1 + "ICD-O-3 CrossMap"
-                            + refsetUuidStr).toString()); // description uuid
+                    + refsetUuidStr).toString()); // description uuid
             descriptions.append("\t");
             descriptions.append(uuidCurrentStr); // status uuid
             descriptions.append("\t");
@@ -613,8 +650,7 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
             descriptions.append("\t");
             descriptions.append("1"); // primitive
             descriptions.append("\t");
-            descriptions.append(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()
-                    .iterator().next().toString()); // description type uuid
+            descriptions.append(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids().iterator().next().toString()); // description type uuid
             descriptions.append("\t");
             descriptions.append("en"); // language code
             descriptions.append("\t");
@@ -625,23 +661,19 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
 
             // RELATIONSHIP
             relationships.append(Type5UuidFactory.get(
-                    Rf1Dir.SUBSETREFSET_ID_NAMESPACE_UUID_TYPE1 + "Relationship" + refsetUuidStr)
-                    .toString()); // relationship uuid
+                    Rf1Dir.SUBSETREFSET_ID_NAMESPACE_UUID_TYPE1 + "Relationship" + refsetUuidStr).toString()); // relationship uuid
             relationships.append("\t");
             relationships.append(uuidCurrentStr); // status uuid
             relationships.append("\t");
             relationships.append(refsetUuidStr); // refset source concept uuid
             relationships.append("\t");
-            relationships.append(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids().iterator()
-                    .next().toString()); // relationship type uuid
+            relationships.append(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids().iterator().next().toString()); // relationship type uuid
             relationships.append("\t");
             relationships.append(refsetParentUuid); // destination concept uuid
             relationships.append("\t");
-            relationships.append(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()
-                    .iterator().next().toString()); // characteristic type uuid
+            relationships.append(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids().iterator().next().toString()); // characteristic type uuid
             relationships.append("\t");
-            relationships.append(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids().iterator()
-                    .next().toString()); // refinability uuid
+            relationships.append(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids().iterator().next().toString()); // refinability uuid
             relationships.append("\t");
             relationships.append("0"); // relationship group
             relationships.append("\t");
@@ -655,10 +687,10 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
             relationships.close();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            getLog().error(e);
             throw new MojoFailureException("RefToArfSubsetsMojo IO Error", e);
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            getLog().error(e);
             throw new MojoFailureException("RefToArfSubsetsMojo no such algorithm", e);
         }
 
@@ -675,10 +707,11 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
                 + sctUuid + ":" + r.targetCode);
         bw.write(uuid.toString() + TAB_CHARACTER);
         // STATUS_UUID
-        if (r.status == 0)
+        if (r.status == 0) {
             bw.write(uuidCurrentStr + TAB_CHARACTER);
-        else
+        } else {
             bw.write(uuidRetiredStr + TAB_CHARACTER);
+        }
 
         // COMPONENT_UUID ... of member's referenced (concept, description, ...) component
         bw.write(sctUuid.toString() + TAB_CHARACTER);
@@ -701,7 +734,7 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
         try {
             this.dateStartObj = formatter.parse(sStart + " 00:00:00");
         } catch (ParseException e) {
-            e.printStackTrace();
+            getLog().error(e);
             throw new MojoFailureException("SimpleDateFormat yyyy.MM.dd dateStart parse error: "
                     + sStart);
         }
@@ -718,7 +751,7 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
         try {
             this.dateStopObj = formatter.parse(sStop + " 23:59:59");
         } catch (ParseException e) {
-            e.printStackTrace();
+            getLog().error(e);
             throw new MojoFailureException("SimpleDateFormat yyyy.MM.dd dateStop parse error: "
                     + sStop);
         }
@@ -735,11 +768,10 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
         try {
             this.refsetDateObj = formatter.parse(date + " 00:00:00");
         } catch (ParseException e) {
-            e.printStackTrace();
+            getLog().error(e);
             throw new MojoFailureException("SimpleDateFormat yyyy.MM.dd refsetDate parse error: "
                     + date);
         }
         getLog().info("::: REFSET DATE " + this.refsetDate);
     }
-
 }
