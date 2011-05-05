@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.drools.base.BaseEvaluator;
 import org.drools.base.ValueType;
@@ -154,7 +156,8 @@ public class IsMemberOfEvaluatorDefinition implements EvaluatorDefinition {
 				
 				return member;
 			} catch (IOException e) {
-				throw new RuntimeException(e);
+				Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "refset concept not found", e);
+				return member;
 			}
 		}
 		
@@ -183,7 +186,8 @@ public class IsMemberOfEvaluatorDefinition implements EvaluatorDefinition {
 				
 				return member;
 			} catch (IOException e) {
-				throw new RuntimeException(e);
+				Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "refset concept not found", e);
+				return member;
 			}
 		}
 		
