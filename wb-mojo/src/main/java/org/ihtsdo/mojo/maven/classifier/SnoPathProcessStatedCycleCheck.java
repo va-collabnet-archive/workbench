@@ -1,4 +1,20 @@
-package org.dwfa.ace.task.classify;
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.ihtsdo.mojo.maven.classifier;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,8 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.maven.plugin.logging.Log;
 
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -16,19 +31,21 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.task.classify.SnoGrp;
+import org.dwfa.ace.task.classify.SnoGrpList;
+import org.dwfa.ace.task.classify.SnoRel;
+import org.dwfa.ace.task.classify.SnoTable;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.Precedence;
 
-public class SnoPathProcessStated implements I_ProcessConcepts {
+public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
 
     private List<SnoRel> snorels;
-    private List<SnoCon> snocons;
     // STATISTICS COUNTERS
     private int countConSeen;
     private int countConRoot;
@@ -43,19 +60,18 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
     // CORE CONSTANTS
     private int rootNid;
     private int isaNid;
-    private static int isCh_STATED_RELATIONSHIP = Integer.MIN_VALUE;
-    private static int isCh_DEFINING_CHARACTERISTIC = Integer.MIN_VALUE;
-    private static int isCh_STATED_AND_INFERRED_RELATIONSHIP = Integer.MIN_VALUE;
-    private static int isCh_STATED_AND_SUBSUMED_RELATIONSHIP = Integer.MIN_VALUE;
-    private static int isCh_INFERRED_RELATIONSHIP = Integer.MIN_VALUE;
-    private static int snorocketAuthorNid = Integer.MIN_VALUE;
+    private static int isCh_STATED_RELATIONSHIP = Integer.MAX_VALUE;
+    private static int isCh_DEFINING_CHARACTERISTIC = Integer.MAX_VALUE;
+    private static int isCh_STATED_AND_INFERRED_RELATIONSHIP = Integer.MAX_VALUE;
+    private static int isCh_STATED_AND_SUBSUMED_RELATIONSHIP = Integer.MAX_VALUE;
+    private static int isCh_INFERRED_RELATIONSHIP = Integer.MAX_VALUE;
+    private static int snorocketAuthorNid = Integer.MAX_VALUE;
     private I_IntSet roleTypeSet;
     private I_IntSet statusSet;
     private PositionSetReadOnly fromPathPos;
     private PositionSetReadOnly fromPathPosPriority;
-    // GUI
-    I_ShowActivity gui;
-    private Logger logger;
+    // WORKBENCH
+    private Log logger;
     private Precedence precedence;
     private I_ManageContradiction contradictionMgr;
     private ConcurrentHashMap<Integer, UUID> watchList = null;
@@ -69,68 +85,23 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
         watchList.put(nid, uuid);
     }
 
-    public SnoPathProcessStated(
-            Logger logger,
-            List<SnoCon> snocons,
+    public SnoPathProcessStatedCycleCheck(
+            Log logger,
             List<SnoRel> snorels,
             I_IntSet roleSet,
             I_IntSet statSet,
             PositionSetReadOnly pathPos,
-            PositionSetReadOnly pathOverridePos,
-            I_ShowActivity gui, Precedence precedence,
-            I_ManageContradiction contradictionMgr)
-            throws TerminologyException, IOException {
-        // Has additionof PositionSetReadOnly pathOverridePos parameter
-        this.fromPathPosPriority = pathOverridePos;
-
-        this.logger = logger;
-        this.snocons = snocons;
-        this.snorels = snorels;
-        this.fromPathPos = pathPos;
-        this.roleTypeSet = roleSet;
-        this.statusSet = statSet;
-        //this.doNotCareIfHasSnomedIsa = doNotCareIfHasIsa;
-        this.gui = gui;
-        this.precedence = precedence;
-        this.contradictionMgr = contradictionMgr;
-
-        // STATISTICS COUNTERS
-        countConSeen = 0;
-        countConRoot = 0;
-        countConDuplVersion = 0;
-        countConAdded = 0; // ADDED TO SNOROCKET
-        countRelAdded = 0; // ADDED TO SNOROCKET
-
-        countRelCharStated = 0;
-        countRelCharDefining = 0;
-        countRelCharStatedInferred = 0;
-        countRelCharStatedSubsumed = 0;
-        countRelCharInferred = 0;
-
-        setupCoreNids();
-    }
-
-    public SnoPathProcessStated(
-            Logger logger,
-            List<SnoCon> snocons,
-            List<SnoRel> snorels,
-            I_IntSet roleSet,
-            I_IntSet statSet,
-            PositionSetReadOnly pathPos,
-            I_ShowActivity gui,
             Precedence precedence,
             I_ManageContradiction contradictionMgr)
             throws TerminologyException, IOException {
+        this.logger = logger;
+        this.snorels = snorels;
         this.fromPathPosPriority = null;
 
-        this.logger = logger;
-        this.snocons = snocons;
-        this.snorels = snorels;
         this.fromPathPos = pathPos;
         this.roleTypeSet = roleSet;
         this.statusSet = statSet;
         //this.doNotCareIfHasSnomedIsa = doNotCareIfHasIsa;
-        this.gui = gui;
         this.precedence = precedence;
         this.contradictionMgr = contradictionMgr;
 
@@ -148,6 +119,7 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
         countRelCharInferred = 0;
 
         setupCoreNids();
+        SnoTable.updatePrefs(false);
     }
 
     private void setupCoreNids() throws TerminologyException, IOException {
@@ -179,14 +151,10 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
 
         if (++countConSeen % 25000 == 0) {
             if (logger != null) {
-                logger.log(Level.INFO, "::: [SnoPathProcess] Concepts viewed:\t{0}", countConSeen);
+                logger.info("::: [SnoPathProcessStatedCycleCheck] Concepts viewed:\t" + countConSeen);
             }
         }
         if (cNid == rootNid) {
-            if (snocons != null) {
-                snocons.add(new SnoCon(cNid, false));
-            }
-
             countConAdded++;
             countConRoot++;
             return;
@@ -228,22 +196,17 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
             }
 
             if (snorelListA.size() > 0) { // "Is a" found if size > 0
-                if (snocons != null) {
-                    snocons.add(new SnoCon(cNid, attribs.get(0).isDefined()));
-                }
                 countConAdded++;
-
-                if (snorels != null) {
-                    snorels.addAll(snorelListA);
-                }
-
                 countRelAdded += snorelListA.size();
 
-                if (gui != null && countRelAdded % 25000 < snorels.size()) {
-                    // ** GUI: ProcessPath
-                    gui.setValue(countRelAdded);
-                    gui.setProgressInfoLower("rels processed " + countRelAdded);
+                for (int i = 0; i < snorelListA.size(); i++) {
+                    if (snorelListA.get(i).typeId == isaNid) {
+                        if (SnoTable.findIsaCycle(cNid, isaNid, snorelListA.get(i).c2Id, true)) {
+                            snorels.add(snorelListA.get(i));
+                        }
+                    }
                 }
+
             } // isaFound
         } // pass to compare
     }
@@ -603,7 +566,7 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
     // STATS FROM PROCESS CONCEPTS (CLASSIFIER INPUT)
     public String getStats(long startTime) {
         StringBuilder s = new StringBuilder(1500);
-        s.append("\r\n::: [SnoPathProcess] ProcessPath()");
+        s.append("\r\n::: [SnoPathProcessStatedCycleCheck] getStats()");
         if (startTime > 0) {
             long lapseTime = System.currentTimeMillis() - startTime;
             s.append("\r\n::: [Time] get vodb data: \t").append(lapseTime).append("\t(mS)\t");

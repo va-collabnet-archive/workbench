@@ -49,47 +49,38 @@ public class SnoTable {
     private final static int lcfFlag = 0x00000080;
     private final static int totalColFlags = 6; // !! 7 SF, S, I, DN, AN, SC, LC
     private final static int totalCol = 8;
-
     // private final static int isaProxFlag = 0x00010000;
     // private final static int isaProxPrimFlag = 0x00020000;
     // private final static int roleProxFlag = 0x00100000;
     // private final static int roleDiffFromRootFlag = 0x00200000;
     // private final static int roleDiffFromProxFlag = 0x00400000;
     // private final static int roleDiffFromProxPrimFlag = 0x00800000;
-
     // INFERRED GROUP LISTS
     SnoGrpList isaProxSnoGrpList = null; // USE: Distribution, Authoring Normal
     SnoGrpList isaProxPrimSnoGrpList = null; // USE: Short, Long Canonical
-
     SnoGrpList roleDiffFromRootList = null;
     SnoGrpList roleDiffFromProxList = null;
     SnoGrpList roleDiffFromProxPrimList = null;
-
     // STATED GROUP LISTS
     SnoGrpList isaStatedSnoGrpList = null; // USE: Stated
     SnoGrpList roleStatedSnoGrpList = null; // USE: Stated
-
     // ROWS OF DATA IN TABLE
     String cBeanStr;
     boolean cBeanDef;
     ArrayList<SnoTableRow> snoTableRows = null;
-
     // ** WORKBENCH PARTICULARS **
     static private I_TermFactory tf;
-
     // ** CORE CONSTANTS **
     private static int isaNid = Integer.MIN_VALUE;
     private static int isCURRENT = Integer.MIN_VALUE;
     private static int rootNid = Integer.MIN_VALUE;
     private static int roleRootNid = Integer.MIN_VALUE;
-
     // STATED & INFERRED PATHS
     static List<PositionBI> cEditPath = null; // Classifier Stated Path
     static List<PositionBI> cViewPath = null; // Classifier Inferred Path
     private static int snorocketAuthorNid;
     private static final boolean USER_STATED = true;
     private static final boolean USER_SNOROCKET = true;
-
     // ** STATISTICS **
     // :NYI: need reset statistics routine
     // private int countFindIsaProxDuplPart = 0;
@@ -100,19 +91,18 @@ public class SnoTable {
     private int countFindRoleProxDuplPartGE2 = 0;
     // private int countFindSelfDuplPartGE2 = 0;
     private int countIsCDefinedDuplPartGE2 = 0;
-
     // Setup Strings
     String xStr = new String(String.valueOf('\u2022')); // &bull; U+2022 (8226)
     String bStr = new String(" ");
     String errStr = new String("*");
     String typeFont = "<font face='Dialog' size='3' color='#000066'>";
     String valueFont = "<font face='Dialog' size='3' color='#006600'>";
-
     // INTERNAL
     private boolean debug = false; // :DEBUG:
 
     @SuppressWarnings("serial")
     private class SnoTableRow extends SnoGrp {
+
         int flags;
         int rowHeight;
 
@@ -121,8 +111,9 @@ public class SnoTable {
         }
 
         public SnoTableRow(SnoGrp sg, int flag) {
-            for (SnoRel rel : sg)
+            for (SnoRel rel : sg) {
                 this.add(rel);
+            }
             flags = flag;
             rowHeight = 18;
         }
@@ -130,7 +121,6 @@ public class SnoTable {
         void setFlag(int flag) {
             flags = flags | flag;
         }
-
     }
 
     public SnoTable() {
@@ -146,9 +136,11 @@ public class SnoTable {
     private static boolean prefsNotSet() {
         if (isaNid == Integer.MIN_VALUE || isCURRENT == Integer.MIN_VALUE
                 || rootNid == Integer.MIN_VALUE || roleRootNid == Integer.MIN_VALUE
-                || cEditPath == null || cViewPath == null)
+                || cEditPath == null || cViewPath == null) {
             return true;
-        else return false;
+        } else {
+            return false;
+        }
     }
 
     public static String updatePrefs(boolean showDialogs) throws TerminologyException, IOException {
@@ -161,25 +153,27 @@ public class SnoTable {
     private static String updatePrefs(boolean showDialogs, I_ConfigAceFrame config) throws TerminologyException,
             IOException {
         // Setup core constants
-        if (config.getClassifierIsaType() != null)
+        if (config.getClassifierIsaType() != null) {
             isaNid = config.getClassifierIsaType().getConceptNid();
-        else {
+        } else {
             String errStr = "'Is a' -- not set in Classifier preferences tab!";
-            if (showDialogs)
+            if (showDialogs) {
                 AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
-            else
+            } else {
                 AceLog.getAppLog().log(Level.SEVERE, errStr, new Exception(errStr));
+            }
             return errStr;
         }
 
-        if (config.getClassificationRoleRoot() != null)
+        if (config.getClassificationRoleRoot() != null) {
             roleRootNid = config.getClassificationRoleRoot().getConceptNid();
-        else {
+        } else {
             String errStr = "Classifier Role Root -- not set in Classifier preferences tab!";
-            if (showDialogs)
-            AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
-            else
+            if (showDialogs) {
+                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
+            } else {
                 AceLog.getAppLog().log(Level.SEVERE, errStr, new Exception(errStr));
+            }
             return errStr;
         }
 
@@ -189,10 +183,11 @@ public class SnoTable {
             rootNid = tf.uuidToNative(config.getClassificationRoot().getUids());
         } else {
             String errStr = "Classification Root not set!";
-            if (showDialogs)
-            AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
-            else
+            if (showDialogs) {
+                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
+            } else {
                 AceLog.getAppLog().log(Level.SEVERE, errStr, new Exception(errStr));
+            }
             return errStr;
         }
 
@@ -213,7 +208,7 @@ public class SnoTable {
         cEditPath = new ArrayList<PositionBI>();
         cEditPath.add(tf.newPosition(cEditPathBI, Long.MAX_VALUE));
         addPathOrigins(cEditPath, cEditPathBI);
-                
+
         // GET ALL CLASSIFER_PATH ORIGINS
         if (config.getViewPositionSet() == null) {
             String errStr = "(SnoTable error) View path is not set.";
@@ -227,13 +222,12 @@ public class SnoTable {
                     new TaskFailedException(errStr));
             return errStr;
         }
-         PositionBI cViewPositionBI = config.getViewPositionSet().iterator().next();
+        PositionBI cViewPositionBI = config.getViewPositionSet().iterator().next();
         cViewPath = new ArrayList<PositionBI>();
         cViewPath.add(cViewPositionBI);
         addPathOrigins(cViewPath, cViewPositionBI.getPath());
-        
-        snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET
-                .getUids());
+
+        snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET.getUids());
 
         return null;
     }
@@ -252,13 +246,16 @@ public class SnoTable {
         ArrayList<SnoRel> isaStatedList = null;
 
         try {
-            if (cEditPath == null || cViewPath == null)
+            if (cEditPath == null || cViewPath == null) {
                 updatePrefs(false);
-            if (cEditPath == null || cViewPath == null)
+            }
+            if (cEditPath == null || cViewPath == null) {
                 return false;
-            
-            if (tf == null)
+            }
+
+            if (tf == null) {
                 Terms.get();
+            }
             CLASSIFIER_INPUT_MODE_PREF inputMode = tf.getActiveAceFrameConfig().getClassifierInputMode();
 
             List<PositionBI> statedPath = null;
@@ -273,15 +270,16 @@ public class SnoTable {
                 statedPath = cViewPath;
                 inferredPath = cViewPath;
             }
-            
+
             cBeanStr = cBean.getInitialText(); // Remember concept name
             cBeanDef = isCDefined(cBean, statedPath);
 
             // GET STATED DATA
             isaStatedList = findIsaProximal(cBean, statedPath, USER_STATED);
             isaStatedSnoGrpList = new SnoGrpList();
-            for (SnoRel sr : isaStatedList)
+            for (SnoRel sr : isaStatedList) {
                 isaStatedSnoGrpList.add(new SnoGrp(sr));
+            }
 
             roleStatedSnoGrpList = findRoleGrpProximal(cBean, statedPath, USER_STATED);
 
@@ -289,14 +287,16 @@ public class SnoTable {
             // USE: Distribution Normal, Authoring Normal
             isaProxList = findIsaProximal(cBean, inferredPath, USER_SNOROCKET);
             isaProxSnoGrpList = new SnoGrpList();
-            for (SnoRel sr : isaProxList)
+            for (SnoRel sr : isaProxList) {
                 isaProxSnoGrpList.add(new SnoGrp(sr));
+            }
 
             // USE: Short Canonical Form, Long Canonical Form
             isaProxPrimList = findIsaProximalPrim(cBean, inferredPath, USER_SNOROCKET);
             isaProxPrimSnoGrpList = new SnoGrpList();
-            for (SnoRel sr : isaProxPrimList)
+            for (SnoRel sr : isaProxPrimList) {
                 isaProxPrimSnoGrpList.add(new SnoGrp(sr));
+            }
 
             // USE: Distribution Normal Form, Long Canonical Form
             roleDiffFromRootList = findRoleGrpDiffFromRoot(cBean, inferredPath, USER_SNOROCKET);
@@ -320,11 +320,9 @@ public class SnoTable {
     } // gatherFormData
 
     // sort SnoGrpList (use SnoGrpList)
-
     // merge SnoGrpLists with flags
-
     // build data array
-    public SnoGrpList markRows(SnoGrpList grpListA, ArrayList<SnoTableRow> rowListB, int flag) {
+    private SnoGrpList markRows(SnoGrpList grpListA, ArrayList<SnoTableRow> rowListB, int flag) {
         SnoGrpList sg = new SnoGrpList();
         for (SnoGrp groupA : grpListA) {
             boolean foundEqual = false;
@@ -387,42 +385,49 @@ public class SnoTable {
         // IS-A
         flags = stateFlag;
         diff = markRows(isaStatedSnoGrpList, snoTableRows, flags);
-        for (SnoGrp sg : diff)
+        for (SnoGrp sg : diff) {
             snoTableRows.add(new SnoTableRow(sg, flags));
+        }
 
         flags = dnfFlag | anfFlag | inferFlag;
         diff = markRows(isaProxSnoGrpList, snoTableRows, flags);
-        for (SnoGrp sg : diff)
+        for (SnoGrp sg : diff) {
             snoTableRows.add(new SnoTableRow(sg, flags));
+        }
 
         flags = lcfFlag | scfFlag | inferFlag;
         diff = markRows(isaProxPrimSnoGrpList, snoTableRows, flags);
-        for (SnoGrp sg : diff)
+        for (SnoGrp sg : diff) {
             snoTableRows.add(new SnoTableRow(sg, flags));
+        }
 
         // ROLE VALUES: STATED
         flags = stateFlag;
         diff = markRows(roleStatedSnoGrpList, snoTableRows, flags);
-        for (SnoGrp sg : diff)
+        for (SnoGrp sg : diff) {
             snoTableRows.add(new SnoTableRow(sg, flags));
+        }
 
         // ROLE VALUES: Distribution Normal Form, Long Canonical Form
         flags = dnfFlag | lcfFlag | inferFlag;
         diff = markRows(roleDiffFromRootList, snoTableRows, flags);
-        for (SnoGrp sg : diff)
+        for (SnoGrp sg : diff) {
             snoTableRows.add(new SnoTableRow(sg, flags));
+        }
 
         // ROLE VALUES: Authoring Form
         flags = anfFlag | inferFlag;
         diff = markRows(roleDiffFromProxList, snoTableRows, flags);
-        for (SnoGrp sg : diff)
+        for (SnoGrp sg : diff) {
             snoTableRows.add(new SnoTableRow(sg, flags));
+        }
 
         // ROLE VALUES: Short Canonical Form
         flags = scfFlag | inferFlag;
         diff = markRows(roleDiffFromProxPrimList, snoTableRows, flags);
-        for (SnoGrp sg : diff)
+        for (SnoGrp sg : diff) {
             snoTableRows.add(new SnoTableRow(sg, flags));
+        }
 
         int totalRows = snoTableRows.size();
         String tableStrings[][] = new String[totalRows][totalCol];
@@ -432,8 +437,9 @@ public class SnoTable {
             int snoRelCount = row.size();
             if (snoRelCount <= 0) {
                 // empty row
-                for (int j = 0; j < 7; j++)
+                for (int j = 0; j < 7; j++) {
                     tableStrings[i][j] = errStr;
+                }
                 continue;
             }
 
@@ -450,37 +456,36 @@ public class SnoTable {
             SnoRel sr = row.get(0);
             // TYPE STRING
             I_GetConceptData typeBean = tf.getConcept(sr.typeId);
-            str.append(typeFont + typeBean.getInitialText());
+            str.append(typeFont).append(typeBean.getInitialText());
             // VALUE STRING
             I_GetConceptData valueBean = tf.getConcept(sr.c2Id);
-            str.append(": </font>" + valueFont + valueBean.getInitialText());
+            str.append(": </font>").append(valueFont).append(valueBean.getInitialText());
 
             // Add addition in group
             for (int j = 1; j < snoRelCount; j++) {
                 sr = row.get(j);
                 // TYPE STRING
                 typeBean = tf.getConcept(sr.typeId);
-                str.append("</font><br>" + typeFont + typeBean.getInitialText());
+                str.append("</font><br>").append(typeFont).append(typeBean.getInitialText());
                 // VALUE STRING
                 valueBean = tf.getConcept(sr.c2Id);
-                str.append(": </font>" + valueFont + valueBean.getInitialText());
+                str.append(": </font>").append(valueFont).append(valueBean.getInitialText());
             }
             tableStrings[i][6] = str.toString();
         }
 
-        if (debug)
+        if (debug) {
             logTable(tableStrings);
+        }
 
         return tableStrings;
     }
 
     // show stats
-
     /**
      * List<SnoRel> --> ArrayList<SnoRel>
      * 
      */
-
     private static ArrayList<SnoRel> findIsaProximal(I_GetConceptData cBean,
             List<PositionBI> posList, boolean isStatedUser) {
         ArrayList<SnoRel> returnSnoRels = new ArrayList<SnoRel>();
@@ -493,11 +498,11 @@ public class SnoTable {
                     // FIND MOST CURRENT
                     int tmpCountDupl = 0;
                     for (I_RelPart rp : rel.getMutableParts()) {
-                        if (isStatedUser && rp.getAuthorNid() == snorocketAuthorNid)
+                        if (isStatedUser && rp.getAuthorNid() == snorocketAuthorNid) {
                             continue; // filter stated vs. inferred
-                        else if (!isStatedUser && rp.getAuthorNid() != snorocketAuthorNid)
+                        } else if (!isStatedUser && rp.getAuthorNid() != snorocketAuthorNid) {
                             continue; // filter stated vs. inferred
-                        
+                        }
                         if (rp.getPathId() == pos.getPath().getConceptNid()) {
                             if (rp1 == null) {
                                 rp1 = rp; // ... KEEP FIRST_INSTANCE PART
@@ -532,12 +537,15 @@ public class SnoTable {
     public static boolean findIsaCycle(int c1, int type, int c2, boolean isStatedUser) throws TerminologyException,
             IOException {
 
-        if (cEditPath == null)
+        if (cEditPath == null) {
             updatePrefs(true);
-        if (cEditPath == null)
+        }
+        if (cEditPath == null) {
             return false;
-        if (type != isaNid)
+        }
+        if (type != isaNid) {
             return false;
+        }
 
         // Does starting at C2 ever end up a C1?
         // If yes, then C1-Type-C2 will create a cycle.
@@ -570,8 +578,9 @@ public class SnoTable {
             isaSnoRelProx = new ArrayList<SnoRel>();
             for (I_GetConceptData cbNext : isaCBNext) {
                 List<SnoRel> nextSnoRelList = findIsaProximal(cbNext, posList, isStatedUser);
-                if (nextSnoRelList.size() > 0)
+                if (nextSnoRelList.size() > 0) {
                     isaSnoRelProx.addAll(nextSnoRelList);
+                }
             }
 
             // RESET NEXT LEVEL SEARCH LIST
@@ -580,17 +589,20 @@ public class SnoTable {
         return false;
     }
 
-    public static int testIsRole(int cid, boolean isStatedUser) {        
+    public static int testIsRole(int cid, boolean isStatedUser) {
         try {
-            if (prefsNotSet())
-                updatePrefs(true); 
-            if (prefsNotSet())
+            if (prefsNotSet()) {
+                updatePrefs(true);
+            }
+            if (prefsNotSet()) {
                 return -1; // can not confirm as role
+            }
             int[] parents = {isaNid, roleRootNid};
-            if (testIsaChildOf(parents, isaNid, cid, isStatedUser))
+            if (testIsaChildOf(parents, isaNid, cid, isStatedUser)) {
                 return 1;
-            else 
-            return 0;
+            } else {
+                return 0;
+            }
         } catch (TerminologyException e) {
             e.printStackTrace();
             return -1;
@@ -604,16 +616,19 @@ public class SnoTable {
      * Determine test if concept "is-a" child of given concepts.<br>
      * Does starting at C2 ever end up at C1?<br>
      * If yes, then C2 is a child of at least one of the provided C1.<br>
-     */    
+     */
     public static boolean testIsaChildOf(int[] parents, int type, int c1, boolean isStatedUser)
             throws TerminologyException, IOException {
 
-        if (cEditPath == null)
+        if (cEditPath == null) {
             updatePrefs(true);
-        if (cEditPath == null)
+        }
+        if (cEditPath == null) {
             return false;
-        if (type != isaNid)
+        }
+        if (type != isaNid) {
             return false;
+        }
 
         // Does starting at C1 ever end up as child of a PARENT[]?
         int startNid = c1;
@@ -632,9 +647,11 @@ public class SnoTable {
                 int theNid = isaSnoRel.c2Id;
                 I_GetConceptData isaCB = tf.getConcept(theNid);
                 boolean isChildOf = false;
-                for (int nid : testNids)
-                    if (theNid == nid)
+                for (int nid : testNids) {
+                    if (theNid == nid) {
                         isChildOf = true;
+                    }
+                }
                 if (theNid == rootNid) { // i.e. not primitive
                     // search no more on this branch
                 } else if (isChildOf) {
@@ -648,8 +665,9 @@ public class SnoTable {
             isaSnoRelProx = new ArrayList<SnoRel>();
             for (I_GetConceptData cbNext : isaCBNext) {
                 List<SnoRel> nextSnoRelList = findIsaProximal(cbNext, posList, isStatedUser);
-                if (nextSnoRelList.size() > 0)
+                if (nextSnoRelList.size() > 0) {
                     isaSnoRelProx.addAll(nextSnoRelList);
+                }
             }
 
             // RESET NEXT LEVEL SEARCH LIST
@@ -689,8 +707,9 @@ public class SnoTable {
             isaSnoRelProx = new ArrayList<SnoRel>();
             for (I_GetConceptData cbNext : isaCBNext) {
                 List<SnoRel> nextSnoRelList = findIsaProximal(cbNext, posList, isStatedUser);
-                if (nextSnoRelList.size() > 0)
+                if (nextSnoRelList.size() > 0) {
                     isaSnoRelProx.addAll(nextSnoRelList);
+                }
             }
 
             // RESET NEXT LEVEL SEARCH LIST
@@ -773,11 +792,11 @@ public class SnoTable {
                     // FIND MOST CURRENT
                     int tmpCountDupl = 0;
                     for (I_RelPart rp : rel.getMutableParts()) {
-                        if (isStatedUser && rp.getAuthorNid() == snorocketAuthorNid)
+                        if (isStatedUser && rp.getAuthorNid() == snorocketAuthorNid) {
                             continue; // filter stated vs. inferred
-                        else if (!isStatedUser && rp.getAuthorNid() != snorocketAuthorNid)
+                        } else if (!isStatedUser && rp.getAuthorNid() != snorocketAuthorNid) {
                             continue; // filter stated vs. inferred
-                            
+                        }
                         if (rp.getPathId() == pos.getPath().getConceptNid()) {
                             if (rp1 == null) {
                                 rp1 = rp; // ... KEEP FIRST_INSTANCE PART
@@ -817,13 +836,15 @@ public class SnoTable {
 
         // Step 1: Segment
         List<SnoRel> srl = new ArrayList<SnoRel>();
-        for (SnoRel r : relsIn)
-            if (r.group != 0)
+        for (SnoRel r : relsIn) {
+            if (r.group != 0) {
                 srl.add(r);
+            }
+        }
 
-        if (srl.size() == 0)
+        if (srl.isEmpty()) {
             return sg; // this is an empty set.
-
+        }
         Collections.sort(srl);
 
         int i = 0;
@@ -839,8 +860,9 @@ public class SnoTable {
             groupList.add(thisSnoRel);
             lastGroupId = thisSnoRel.group;
         }
-        if (groupList.size() > 0)
+        if (groupList.size() > 0) {
             sg.add(groupList);
+        }
 
         // Step 2: Get non-Redundant set
         sg = sg.whichNonRedundant(isStatedUser);
@@ -850,9 +872,11 @@ public class SnoTable {
 
     private SnoGrp splitNonGrouped(List<SnoRel> relsIn, boolean isStatedUser) {
         List<SnoRel> relsOut = new ArrayList<SnoRel>();
-        for (SnoRel r : relsIn)
-            if (r.group == 0)
+        for (SnoRel r : relsIn) {
+            if (r.group == 0) {
                 relsOut.add(r);
+            }
+        }
         SnoGrp sgOut = new SnoGrp(relsOut, true);
         sgOut = sgOut.whichRoleValAreNonRedundant(isStatedUser);
         return sgOut; // returns as sorted.
@@ -907,7 +931,9 @@ public class SnoTable {
         // FIND IMMEDIATE ROLES OF *THIS*CONCEPT*
         SnoGrpList grpListA = findRoleGrpProximal(cBean, posList, isStatedUser);
         if (grpListA.size() == 0) // NOTHING TO DIFFERENTIATE
+        {
             return grpListA;
+        }
 
         // FIND NON-REDUNDANT ROLE SET OF PROXIMATE ISA
         SnoGrpList grpListB = new SnoGrpList();
@@ -916,8 +942,9 @@ public class SnoTable {
             SnoGrpList tmpGrpList = findRoleGrpDiffFromRoot(isaCB, posList, isStatedUser);
 
             // IF EMPTY LIST, SKIP TO NEXT
-            if (tmpGrpList.size() == 0)
+            if (tmpGrpList.size() == 0) {
                 break;
+            }
 
             // keep role-groups which continue to differentiate
             grpListB = grpListB.whichDifferentiateFrom(tmpGrpList, isStatedUser);
@@ -937,7 +964,9 @@ public class SnoTable {
         // FIND ALL NON-REDUNDANT INHERITED ROLES OF *THIS*CONCEPT*
         SnoGrpList grpListA = findRoleGrpDiffFromRoot(cBean, posList, isStatedUser);
         if (grpListA.size() == 0) // NOTHING TO DIFFERENTIATE
+        {
             return grpListA;
+        }
 
         // FIND ROLE SET OF MOST PROXIMATE PRIMITIVE
         SnoGrpList grpListB = new SnoGrpList();
@@ -946,8 +975,9 @@ public class SnoTable {
             SnoGrpList tmpGrpList = findRoleGrpDiffFromRoot(isaCB, posList, isStatedUser);
 
             // IF EMPTY LIST, SKIP TO NEXT
-            if (tmpGrpList.size() == 0)
+            if (tmpGrpList.size() == 0) {
                 break;
+            }
 
             // keep role-groups which continue to differentiate
             grpListB = grpListB.whichDifferentiateFrom(tmpGrpList, isStatedUser);
@@ -963,8 +993,8 @@ public class SnoTable {
 
     private void logTable(String[][] data) {
         StringBuilder s = new StringBuilder();
-        s.append("\r\n::: TABLE -- \"" + cBeanStr + "\" "
-                + ((cBeanDef == true) ? "(( DEFINED ))" : "(( PRIMITIVE ))"));
+        s.append("\r\n::: TABLE -- \"").append(cBeanStr).append("\" ");
+        s.append((cBeanDef == true) ? "(( DEFINED ))" : "(( PRIMITIVE ))");
 
         s.append("\r\n::: \tSF\tI \tDN\tAN\tSC\tLC");
 
@@ -982,7 +1012,7 @@ public class SnoTable {
             s1 = s1.replace("<html>", "");
             s1 = s1.replace("</font>", "");
             s1 = s1.replace("<br>", " || ");
-            s.append("\t " + s1);
+            s.append("\t ").append(s1);
         }
         AceLog.getAppLog().log(Level.INFO, s.toString());
     }
@@ -996,7 +1026,7 @@ public class SnoTable {
         StringBuilder sb = new StringBuilder(512);
         sb.insert(0, String.valueOf(conceptNid));
 
-        if (tf == null)
+        if (tf == null) {
             try {
                 updatePrefs(true);
             } catch (TerminologyException e1) {
@@ -1006,6 +1036,7 @@ public class SnoTable {
                 e1.printStackTrace();
                 return null;
             }
+        }
 
         try {
             // tf.getConcept(int) may create an exception
@@ -1016,8 +1047,9 @@ public class SnoTable {
             while (isaSnoRelProx.size() > 0) {
 
                 // ADD THIS LEVEL RELS TO STRING
-                if (isaSnoRelProx.size() > 1)
+                if (isaSnoRelProx.size() > 1) {
                     delimStr = barStr;
+                }
                 for (SnoRel isaSnoRel : isaSnoRelProx) {
                     sb.insert(0, String.valueOf(isaSnoRel.c2Id) + delimStr);
                     delimStr = commaStr;
@@ -1032,8 +1064,9 @@ public class SnoTable {
                 isaSnoRelProx = new ArrayList<SnoRel>();
                 for (I_GetConceptData cbNext : isaCBNext) {
                     List<SnoRel> nextSnoRelList = findIsaProximal(cbNext, posList, isStatedUser);
-                    if (nextSnoRelList.size() > 0)
+                    if (nextSnoRelList.size() > 0) {
                         isaSnoRelProx.addAll(nextSnoRelList);
+                    }
                 }
 
                 // RESET NEXT LEVEL SEARCH LIST
@@ -1053,10 +1086,11 @@ public class SnoTable {
     static public String toString(int nid) {
         StringBuilder sb = new StringBuilder();
         try {
-            if (tf == null)
+            if (tf == null) {
                 updatePrefs(false);
+            }
             I_GetConceptData cb = tf.getConcept(nid);
-            sb.append(String.valueOf(nid) + "\t" + cb.getInitialText() + "\r\n");
+            sb.append(String.valueOf(nid)).append("\t").append(cb.getInitialText()).append("\r\n");
         } catch (TerminologyException e) {
             e.printStackTrace();
             return null;
@@ -1070,8 +1104,9 @@ public class SnoTable {
     static public String toString(SnoRel sr) {
         StringBuilder sb = new StringBuilder();
         try {
-            if (tf == null)
+            if (tf == null) {
                 updatePrefs(false);
+            }
         } catch (TerminologyException e) {
             e.printStackTrace();
             return null;
@@ -1081,5 +1116,4 @@ public class SnoTable {
         }
         return sb.toString();
     }
-
 }

@@ -2,6 +2,7 @@ package org.dwfa.ace.task.classify;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
@@ -20,41 +21,35 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.Precedence;
 
 public class SnoPathProcessInferred implements I_ProcessConcepts {
+
     private List<SnoRel> snorels;
     private List<SnoCon> snocons;
     // Do not filter 'Is a' on classifier path
     // The classifier itself is a "filter" what gets dropped.
-
     // STATISTICS COUNTERS
     private int countConSeen;
     private int countConRoot;
     private int countConDuplVersion;
     private int countConAdded; // ADDED TO LIST
     public int countRelAdded; // ADDED TO LIST
-
     private int countRelCharStated;
     private int countRelCharDefining;
     private int countRelCharStatedInferred;
     private int countRelCharStatedSubsumed;
     private int countRelCharInferred;
-
     // CORE CONSTANTS
     private int rootNid;
     private int isaNid;
-
     private static int isCh_STATED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int isCh_DEFINING_CHARACTERISTIC = Integer.MIN_VALUE;
     private static int isCh_STATED_AND_INFERRED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int isCh_STATED_AND_SUBSUMED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int isCh_INFERRED_RELATIONSHIP = Integer.MIN_VALUE;
-
     private static int snorocketAuthorNid = Integer.MIN_VALUE;
-
     private I_IntSet roleTypeSet;
     private I_IntSet statusSet;
     private PositionSetReadOnly fromPathPos;
     private PositionSetReadOnly fromPathPosEditSide;
-
     // GUI
     I_ShowActivity gui;
     private Logger logger;
@@ -99,37 +94,28 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
         rootNid = tf.uuidToNative(SNOMED.Concept.ROOT.getUids());
 
         // Characteristic
-        isCh_STATED_RELATIONSHIP = tf
-                .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
-        isCh_DEFINING_CHARACTERISTIC = tf
-                .uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
-        isCh_STATED_AND_INFERRED_RELATIONSHIP = tf
-                .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP
-                        .getUids());
-        isCh_STATED_AND_SUBSUMED_RELATIONSHIP = tf
-                .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP
-                        .getUids());
-        isCh_INFERRED_RELATIONSHIP = tf
-                .uuidToNative(ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids());
+        isCh_STATED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
+        isCh_DEFINING_CHARACTERISTIC = tf.uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
+        isCh_STATED_AND_INFERRED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP.getUids());
+        isCh_STATED_AND_SUBSUMED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP.getUids());
+        isCh_INFERRED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids());
 
-        snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET
-                .getUids());
+        snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET.getUids());
     }
 
     // :TODO: have concept attributes for user created concepts go on the common path.
-
     // :TODO: then, simple this routine to not look at both the stated and inferred.
-
     @Override
     public void processConcept(I_GetConceptData concept) throws Exception {
         // processUnfetchedConceptData(int cNid, I_FetchConceptFromCursor fcfc)
         int cNid = concept.getNid();
-        if (++countConSeen % 25000 == 0) {
-            logger.info("::: [SnoPathProcess] Concepts viewed:\t" + countConSeen);
+        if (++countConSeen % 25000 == 0 && logger != null) {
+            logger.log(Level.INFO, "::: [SnoPathProcess] Concepts viewed:\t{0}", countConSeen);
         }
         if (cNid == rootNid) {
-            if (snocons != null)
+            if (snocons != null) {
                 snocons.add(new SnoCon(cNid, false));
+            }
 
             countConAdded++;
             countConRoot++;
@@ -140,14 +126,15 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
         List<? extends I_ConceptAttributeTuple> attribs = concept.getConceptAttributeTuples(
                 statusSet, fromPathPos, precedence, contradictionMgr);
 
-        if (attribs.size() == 1)
+        if (attribs.size() == 1) {
             passToCompare = true;
-        else if (attribs.size() == 0) {
+        } else if (attribs.isEmpty()) {
             // check to see if attribute is only on edit path
             attribs = concept.getConceptAttributeTuples(statusSet, fromPathPosEditSide, precedence,
                     contradictionMgr);
-            if (attribs.size() == 1)
+            if (attribs.size() == 1) {
                 passToCompare = true;
+            }
         }
 
         if (passToCompare) {
@@ -158,9 +145,9 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
 
             for (I_RelTuple rt : relTupList) {
                 int authorNid = rt.getAuthorNid();
-                if (authorNid != snorocketAuthorNid) 
+                if (authorNid != snorocketAuthorNid) {
                     continue; // SKIP IF NOT INFERRED
-                
+                }
                 int charId = rt.getCharacteristicId();
                 boolean keep = false;
                 if (charId == isCh_DEFINING_CHARACTERISTIC) {
@@ -181,9 +168,9 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
                 }
 
                 if (keep == true) {
-                    if (snorels != null)
-                        snorels.add(new SnoRel(rt.getC1Id(), rt.getC2Id(), rt.getTypeNid(), rt
-                                .getGroup(), rt.getNid()));
+                    if (snorels != null) {
+                        snorels.add(new SnoRel(rt.getC1Id(), rt.getC2Id(), rt.getTypeNid(), rt.getGroup(), rt.getNid()));
+                    }
                     countRelAdded++;
 
                     if (gui != null && countRelAdded % 25000 == 0) {
@@ -197,36 +184,36 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
             countConDuplVersion++;
         }
     }
-    
+
     // STATS FROM PROCESS CONCEPTS (CLASSIFIER INPUT)
     public String getStats(long startTime) {
-        StringBuffer s = new StringBuffer(1500);
+        StringBuilder s = new StringBuilder(1500);
         s.append("\r\n::: [SnoPathProcess] ProcessPath()");
         if (startTime > 0) {
             long lapseTime = System.currentTimeMillis() - startTime;
-            s.append("\r\n::: [Time] get vodb data: \t" + lapseTime + "\t(mS)\t"
-                    + (((float) lapseTime / 1000) / 60) + "\t(min)");
+            s.append("\r\n::: [Time] get vodb data: \t").append(lapseTime).append("\t(mS)\t");
+            s.append(((float) lapseTime / 1000) / 60).append("\t(min)");
             s.append("\r\n:::");
         }
 
-        s.append("\r\n::: concepts viewed:       \t" + countConSeen);
-        s.append("\r\n::: concepts added:        \t" + countConAdded);
-        s.append("\r\n::: relationships added:   \t" + countRelAdded);
+        s.append("\r\n::: concepts viewed:       \t").append(countConSeen);
+        s.append("\r\n::: concepts added:        \t").append(countConAdded);
+        s.append("\r\n::: relationships added:   \t").append(countRelAdded);
         s.append("\r\n:::");
 
         s.append("\r\n::: ");
-        s.append("\r\n::: concept root added:  \t" + countConRoot);
-        s.append("\r\n::: con version conflict:\t" + countConDuplVersion
-                + "\t # attribs.size() > 1");
+        s.append("\r\n::: concept root added:  \t").append(countConRoot);
+        s.append("\r\n::: con version conflict:\t").append(countConDuplVersion);
+        s.append("\t # attribs.size() > 1");
         s.append("\r\n::: ");
-        s.append("\r\n::: Defining:         \t" + countRelCharDefining);
-        s.append("\r\n::: Stated:           \t" + countRelCharStated);
-        s.append("\r\n::: Stated & Inferred:\t" + countRelCharStatedInferred);
-        s.append("\r\n::: Stated & Subsumed:\t" + countRelCharStatedSubsumed);
-        s.append("\r\n::: Inferred:         \t" + countRelCharInferred);
+        s.append("\r\n::: Defining:         \t").append(countRelCharDefining);
+        s.append("\r\n::: Stated:           \t").append(countRelCharStated);
+        s.append("\r\n::: Stated & Inferred:\t").append(countRelCharStatedInferred);
+        s.append("\r\n::: Stated & Subsumed:\t").append(countRelCharStatedSubsumed);
+        s.append("\r\n::: Inferred:         \t").append(countRelCharInferred);
         int total = countRelCharStated + countRelCharDefining + countRelCharStatedInferred
                 + countRelCharStatedSubsumed + countRelCharInferred;
-        s.append("\r\n:::            TOTAL=\t" + total);
+        s.append("\r\n:::            TOTAL=\t").append(total);
 
         s.append("\r\n::: ");
         s.append("\r\n");
