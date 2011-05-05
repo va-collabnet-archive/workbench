@@ -10,7 +10,7 @@
     <groupId>org.ihtsdo.mojo.maven.classifiertest</groupId>
     <artifactId>sct-integration-classifier-tests</artifactId>
     <packaging>pom</packaging>
-    <name>sct-integration-classifier-tests</name>
+    <name>${branch}: sct-integration-classifier-tests</name>
     
     <properties>
         <!-- SNOMED Core path -->
