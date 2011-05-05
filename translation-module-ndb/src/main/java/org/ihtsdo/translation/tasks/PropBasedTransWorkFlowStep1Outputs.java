@@ -328,7 +328,7 @@ public class PropBasedTransWorkFlowStep1Outputs extends AbstractTask {
 
 					//---- exit2Button ----
 					JButton exit2Button=new JButton();
-					exit2Button.setText("Close");
+					exit2Button.setText("Keep in inbox");
 					exit2Button.addActionListener(new Exit2ActionListener());
 
 					buttons.add(exit2Button);
