@@ -288,14 +288,20 @@ public class SimilarityPanel extends JPanel {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				tableModel.addRow(new Object[] { item.getSourceText(), item.getTargetText(), transStatus, item });
+				String highlightedSourceText = "<html>" + item.getSourceText().toLowerCase();
+				
+				for (String word : query.toLowerCase().split("\\W")) {
+					highlightedSourceText = highlightedSourceText.replace(word, "<font style='background-color: yellow;'>" + word + "</font>");
+				}
+				
+				tableModel.addRow(new Object[] { highlightedSourceText, item.getTargetText(), transStatus, item });
 			}
 		}
 
-		TableColumnModel cmodel = similarityTable.getColumnModel();
-		TextAreaRenderer textAreaRenderer = new TextAreaRenderer();
-		cmodel.getColumn(0).setCellRenderer(textAreaRenderer);
-		cmodel.getColumn(1).setCellRenderer(textAreaRenderer);
+//		TableColumnModel cmodel = similarityTable.getColumnModel();
+//		TextAreaRenderer textAreaRenderer = new TextAreaRenderer();
+//		cmodel.getColumn(0).setCellRenderer(textAreaRenderer);
+//		cmodel.getColumn(1).setCellRenderer(textAreaRenderer);
 
 		similarityTable.revalidate();
 	}
