@@ -30,6 +30,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * 
@@ -67,7 +68,10 @@ public class VodbSetViewPoints extends AbstractMojo {
 			}
 			PathBI viewPath = tf.getPath(path.getVerifiedConcept().getUids());
 			DateFormat df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
-			activeConfig.addViewPosition(tf.newPosition(viewPath, tf.convertToThinVersion(df.parse(time).getTime())));
+			Long convertToThinVersion = df.parse(time).getTime();
+			PositionBI newPosition = tf.newPosition(viewPath,df.parse(time).getTime());
+			PositionBI newPosition2 = tf.newPosition(viewPath, Long.MAX_VALUE);
+			activeConfig.addViewPosition(newPosition);
 		} catch (TerminologyException e) {
 			throw new MojoExecutionException(e.getLocalizedMessage(), e);
 		} catch (IOException e) {

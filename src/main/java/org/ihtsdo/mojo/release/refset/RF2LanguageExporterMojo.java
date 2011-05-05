@@ -3,10 +3,10 @@ package org.ihtsdo.mojo.release.refset;
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.ihtsdo.mojo.maven.MojoUtil;
-import org.ihtsdo.rf2.mojo.ConfigMojo;
 import org.ihtsdo.rf2.refset.factory.RF2LanguageRefsetFactory;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
@@ -19,7 +19,7 @@ import org.ihtsdo.rf2.util.JAXBUtil;
  * @requiresDependencyResolution compile
  */
 
-public class RF2LanguageExporterMojo extends ConfigMojo {
+public class RF2LanguageExporterMojo extends AbstractMojo {
 
 	/**
 	 * Location of the build directory.
@@ -29,6 +29,22 @@ public class RF2LanguageExporterMojo extends ConfigMojo {
 	 */
 	private File targetDirectory;
 
+	/**
+	 * release date.
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String releaseDate;
+
+	/**
+	 * Location of the exportFoler.
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String exportFolder;
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.setProperty("java.awt.headless", "true");
 		try {
@@ -42,8 +58,13 @@ public class RF2LanguageExporterMojo extends ConfigMojo {
 
 			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/languageRefset.xml");
 
+
 			// set all the values passed via mojo
-			setConfig(config);
+			config.setOutputFolderName(exportFolder);
+			config.setReleaseDate(releaseDate);
+			config.setFlushCount(10000);
+			config.setInvokeDroolRules("false");
+			config.setFileExtension("txt");
 
 			// initialize ace framwork and meta hierarchy
 			ExportUtil.init();
