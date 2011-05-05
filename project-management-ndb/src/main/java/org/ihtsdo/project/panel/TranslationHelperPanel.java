@@ -124,7 +124,7 @@ public class TranslationHelperPanel {
 
 	public static final String TRANSLATION_LEFT_MENU = "Inbox";
 	
-	public static final String ARCHIVAL_ITEMS_LEFT_MENU = "Sp Translation Menu";
+	public static final String ARCHIVAL_ITEMS_LEFT_MENU = "Archival Queue Viewer";
 	
 	public static final String QA_MANAGER = "QA Manager";
 	
