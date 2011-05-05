@@ -30,6 +30,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import javax.swing.*;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -430,7 +431,22 @@ public class SimilarityPanel extends JPanel {
 					}
 				}
 			}
+		} else if (e.getButton() == MouseEvent.BUTTON3) {
+			int r = similarityTable.rowAtPoint(e.getPoint());
+			if (r >= 0 && r < similarityTable.getRowCount()) {
+				similarityTable.setRowSelectionInterval(r, r);
+			} else {
+				similarityTable.clearSelection();
+			}
+
+			int rowindex = similarityTable.getSelectedRow();
+			if (rowindex < 0) {
+				return;
+			}
+			similPopUp.show(e.getComponent(), e.getX(), e.getY());
+
 		}
+
 	}
 
 	public static Object copy(Object orig) {
@@ -454,8 +470,18 @@ public class SimilarityPanel extends JPanel {
 		}
 		return obj;
 	}
+	
+	private void copySourceItemActionPerformed(ActionEvent e) {
+		int selectedRow = similarityTable.getSelectedRow();
+		if (selectedRow >= 0) {
+			String target = similarityTable.getValueAt(selectedRow, 0).toString();
+			StringSelection strSel = new StringSelection(target);
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			clipboard.setContents(strSel, strSel);
+		}
+	}
 
-	private void copyTargetButtonActionPerformed(ActionEvent e) {
+	private void copyTargetItemActionPerformed(ActionEvent e) {
 		int selectedRow = similarityTable.getSelectedRow();
 		if (selectedRow >= 0) {
 			String target = similarityTable.getValueAt(selectedRow, 1).toString();
@@ -464,7 +490,6 @@ public class SimilarityPanel extends JPanel {
 			clipboard.setContents(strSel, strSel);
 		}
 	}
-
 	private void label4MouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("SIMILARITY");
@@ -562,6 +587,9 @@ public class SimilarityPanel extends JPanel {
 		label6 = new JLabel();
 		scrollPane4 = new JScrollPane();
 		editorPane1 = new JEditorPane();
+		similPopUp = new JPopupMenu();
+		copySourceItem = new JMenuItem();
+		copyTargetItem = new JMenuItem();
 
 		//======== this ========
 		setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -658,16 +686,7 @@ public class SimilarityPanel extends JPanel {
 				//---- similarityTable ----
 				similarityTable.setPreferredScrollableViewportSize(new Dimension(180, 200));
 				similarityTable.setFont(new Font("Verdana", Font.PLAIN, 12));
-				similarityTable.setModel(new DefaultTableModel(
-					new Object[][] {
-						{"a", "aa"},
-						{"a", "d"},
-						{"d", "w"},
-					},
-					new String[] {
-						null, null
-					}
-				));
+				similarityTable.setModel(new DefaultTableModel());
 				similarityTable.setCellSelectionEnabled(true);
 				similarityTable.addMouseListener(new MouseAdapter() {
 					@Override
@@ -896,6 +915,30 @@ public class SimilarityPanel extends JPanel {
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 0, 0), 0, 0));
 
+		//======== similPopUp ========
+		{
+
+			//---- copySourceItem ----
+			copySourceItem.setText("Copy source to clipboard");
+			copySourceItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					copySourceItemActionPerformed(e);
+				}
+			});
+			similPopUp.add(copySourceItem);
+
+			//---- copyTargetItem ----
+			copyTargetItem.setText("Copy target to clipboard");
+			copyTargetItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					copyTargetItemActionPerformed(e);
+				}
+			});
+			similPopUp.add(copyTargetItem);
+		}
+
 		//---- buttonGroup2 ----
 		ButtonGroup buttonGroup2 = new ButtonGroup();
 		buttonGroup2.add(rbFSN);
@@ -936,6 +979,9 @@ public class SimilarityPanel extends JPanel {
 	private JLabel label6;
 	private JScrollPane scrollPane4;
 	private JEditorPane editorPane1;
+	private JPopupMenu similPopUp;
+	private JMenuItem copySourceItem;
+	private JMenuItem copyTargetItem;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
 	public int getSimilarityHitsCount() {
