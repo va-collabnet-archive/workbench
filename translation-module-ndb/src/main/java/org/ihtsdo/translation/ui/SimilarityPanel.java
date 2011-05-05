@@ -495,12 +495,47 @@ public class SimilarityPanel extends JPanel {
 		}
 	}
 
+	private void button1ActionPerformed(ActionEvent e) {
+		if (button1.getText().equals("Hide")) {
+			button1.setText("Show");
+			refinePanel.setVisible(false);
+			scrollPane2.setVisible(false);
+			panel13.setVisible(false);
+		} else {
+			button1.setText("Hide");
+			refinePanel.setVisible(true);
+			scrollPane2.setVisible(true);
+			panel13.setVisible(true);
+		}
+	}
+
+	private void button2ActionPerformed(ActionEvent e) {
+		if (button2.getText().equals("Hide")) {
+			button2.setText("Show");
+			scrollPane3.setVisible(false);
+		} else {
+			button2.setText("Hide");
+			scrollPane3.setVisible(true);
+		}
+	}
+
+	private void button3ActionPerformed(ActionEvent e) {
+		if (button3.getText().equals("Hide")) {
+			button3.setText("Show");
+			scrollPane4.setVisible(false);
+		} else {
+			button3.setText("Hide");
+			scrollPane4.setVisible(true);
+		}
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
 		similarityPanel = new JPanel();
 		panel2 = new JPanel();
 		label1 = new JLabel();
+		button1 = new JButton();
 		label4 = new JLabel();
 		refinePanel = new JPanel();
 		searchTextField = new JTextField();
@@ -516,12 +551,14 @@ public class SimilarityPanel extends JPanel {
 		panel1 = new JPanel();
 		panel3 = new JPanel();
 		label2 = new JLabel();
+		button2 = new JButton();
 		label5 = new JLabel();
 		scrollPane3 = new JScrollPane();
 		table2 = new ZebraJTable();
 		panel15 = new JPanel();
 		panel4 = new JPanel();
 		label3 = new JLabel();
+		button3 = new JButton();
 		label6 = new JLabel();
 		scrollPane4 = new JScrollPane();
 		editorPane1 = new JEditorPane();
@@ -530,7 +567,7 @@ public class SimilarityPanel extends JPanel {
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new GridBagLayout());
 		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
-		((GridBagLayout)getLayout()).rowHeights = new int[] {255, 255, 250, 0};
+		((GridBagLayout)getLayout()).rowHeights = new int[] {30, 30, 25, 0};
 		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
 		((GridBagLayout)getLayout()).rowWeights = new double[] {1.0, 1.0, 1.0, 1.0E-4};
 
@@ -549,15 +586,28 @@ public class SimilarityPanel extends JPanel {
 			//======== panel2 ========
 			{
 				panel2.setLayout(new GridBagLayout());
-				((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0, 0};
+				((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
 				((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0};
-				((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0, 1.0E-4};
 				((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 				//---- label1 ----
 				label1.setText("Similarity");
 				label1.setHorizontalAlignment(SwingConstants.LEFT);
 				panel2.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
+
+				//---- button1 ----
+				button1.setText("Hide");
+				button1.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+				button1.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						button1ActionPerformed(e);
+					}
+				});
+				panel2.add(button1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 0, 5), 0, 0));
 
@@ -569,7 +619,7 @@ public class SimilarityPanel extends JPanel {
 						label4MouseClicked(e);
 					}
 				});
-				panel2.add(label4, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+				panel2.add(label4, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 0, 0), 0, 0));
 			}
@@ -721,14 +771,27 @@ public class SimilarityPanel extends JPanel {
 			//======== panel3 ========
 			{
 				panel3.setLayout(new GridBagLayout());
-				((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {0, 0, 0};
+				((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
 				((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {0, 0};
-				((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0, 1.0E-4};
 				((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 				//---- label2 ----
 				label2.setText("Translation Memory");
 				panel3.add(label2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
+
+				//---- button2 ----
+				button2.setText("Hide");
+				button2.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+				button2.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						button2ActionPerformed(e);
+					}
+				});
+				panel3.add(button2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 0, 5), 0, 0));
 
@@ -740,7 +803,7 @@ public class SimilarityPanel extends JPanel {
 						label5MouseClicked(e);
 					}
 				});
-				panel3.add(label5, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+				panel3.add(label5, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 0, 0), 0, 0));
 			}
@@ -778,14 +841,27 @@ public class SimilarityPanel extends JPanel {
 			//======== panel4 ========
 			{
 				panel4.setLayout(new GridBagLayout());
-				((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {0, 0, 0};
+				((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
 				((GridBagLayout)panel4.getLayout()).rowHeights = new int[] {0, 0};
-				((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0, 1.0E-4};
 				((GridBagLayout)panel4.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 				//---- label3 ----
 				label3.setText("Editorial Guidelines");
 				panel4.add(label3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
+
+				//---- button3 ----
+				button3.setText("Hide");
+				button3.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+				button3.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						button3ActionPerformed(e);
+					}
+				});
+				panel4.add(button3, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 0, 5), 0, 0));
 
@@ -797,7 +873,7 @@ public class SimilarityPanel extends JPanel {
 						label6MouseClicked(e);
 					}
 				});
-				panel4.add(label6, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+				panel4.add(label6, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 0, 0), 0, 0));
 			}
@@ -833,6 +909,7 @@ public class SimilarityPanel extends JPanel {
 	private JPanel similarityPanel;
 	private JPanel panel2;
 	private JLabel label1;
+	private JButton button1;
 	private JLabel label4;
 	private JPanel refinePanel;
 	private JTextField searchTextField;
@@ -848,12 +925,14 @@ public class SimilarityPanel extends JPanel {
 	private JPanel panel1;
 	private JPanel panel3;
 	private JLabel label2;
+	private JButton button2;
 	private JLabel label5;
 	private JScrollPane scrollPane3;
 	private ZebraJTable table2;
 	private JPanel panel15;
 	private JPanel panel4;
 	private JLabel label3;
+	private JButton button3;
 	private JLabel label6;
 	private JScrollPane scrollPane4;
 	private JEditorPane editorPane1;
