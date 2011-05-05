@@ -98,6 +98,10 @@ public class SimilarityPanel extends JPanel {
 
 		label4.setIcon(IconUtilities.helpIcon);
 		label4.setText("");
+		label5.setIcon(IconUtilities.helpIcon);
+		label5.setText("");
+		label6.setIcon(IconUtilities.helpIcon);
+		label6.setText("");
 
 		refineCheckBox.addItemListener(new ItemListener() {
 
@@ -457,7 +461,27 @@ public class SimilarityPanel extends JPanel {
 
 	private void label4MouseClicked(MouseEvent e) {
 		try {
-			HelpApi.openHelpForComponent("TRANSLATION_INFO");
+			HelpApi.openHelpForComponent("SIMILARITY");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	private void label5MouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("TRANSLATION_MEMORY");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	private void label6MouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("EDITORIAL_GUIDELINES");
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		} catch (URISyntaxException e1) {
@@ -484,11 +508,15 @@ public class SimilarityPanel extends JPanel {
 		refineCheckBox = new JCheckBox();
 		expandButton = new JButton();
 		panel1 = new JPanel();
+		panel3 = new JPanel();
 		label2 = new JLabel();
+		label5 = new JLabel();
 		scrollPane3 = new JScrollPane();
 		table2 = new ZebraJTable();
 		panel15 = new JPanel();
+		panel4 = new JPanel();
 		label3 = new JLabel();
+		label6 = new JLabel();
 		scrollPane4 = new JScrollPane();
 		editorPane1 = new JEditorPane();
 
@@ -684,9 +712,33 @@ public class SimilarityPanel extends JPanel {
 			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
 			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
 
-			//---- label2 ----
-			label2.setText("Translation Memory");
-			panel1.add(label2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+			//======== panel3 ========
+			{
+				panel3.setLayout(new GridBagLayout());
+				((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {0, 0, 0};
+				((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {0, 0};
+				((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+
+				//---- label2 ----
+				label2.setText("Translation Memory");
+				panel3.add(label2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
+
+				//---- label5 ----
+				label5.setText("text");
+				label5.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						label5MouseClicked(e);
+					}
+				});
+				panel3.add(label5, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
+			}
+			panel1.add(panel3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 0), 0, 0));
 
@@ -717,9 +769,33 @@ public class SimilarityPanel extends JPanel {
 			((GridBagLayout)panel15.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
 			((GridBagLayout)panel15.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
 
-			//---- label3 ----
-			label3.setText("Editorial Guidelines");
-			panel15.add(label3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+			//======== panel4 ========
+			{
+				panel4.setLayout(new GridBagLayout());
+				((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {0, 0, 0};
+				((GridBagLayout)panel4.getLayout()).rowHeights = new int[] {0, 0};
+				((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel4.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+
+				//---- label3 ----
+				label3.setText("Editorial Guidelines");
+				panel4.add(label3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
+
+				//---- label6 ----
+				label6.setText("text");
+				label6.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						label6MouseClicked(e);
+					}
+				});
+				panel4.add(label6, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
+			}
+			panel15.add(panel4, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 0), 0, 0));
 
@@ -764,11 +840,15 @@ public class SimilarityPanel extends JPanel {
 	private JCheckBox refineCheckBox;
 	private JButton expandButton;
 	private JPanel panel1;
+	private JPanel panel3;
 	private JLabel label2;
+	private JLabel label5;
 	private JScrollPane scrollPane3;
 	private ZebraJTable table2;
 	private JPanel panel15;
+	private JPanel panel4;
 	private JLabel label3;
+	private JLabel label6;
 	private JScrollPane scrollPane4;
 	private JEditorPane editorPane1;
 	// JFormDesigner - End of variables declaration //GEN-END:variables

@@ -16,6 +16,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 import java.security.PrivilegedActionException;
 import java.text.SimpleDateFormat;
@@ -81,6 +82,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.I_ContextualizeDescription;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
@@ -134,6 +136,10 @@ public class SpecialInboxPanel extends JPanel {
 	public SpecialInboxPanel(I_Work worker, String userName, I_SelectProcesses selector) throws TerminologyException, IOException {
 
 		initComponents();
+		
+		label2.setIcon(IconUtilities.helpIcon);
+		label2.setText("");
+		
 		this.selector = selector;
 		this.worker = (Worker) worker;
 		queueName = userName;
@@ -936,6 +942,16 @@ public class SpecialInboxPanel extends JPanel {
 		}
 	}
 
+	private void label2MouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("ARCHIVAL_QUEUE");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
+
 	private int processInExecution;
 
 	private void initComponents() {
@@ -945,34 +961,37 @@ public class SpecialInboxPanel extends JPanel {
 		panel1 = new JPanel();
 		label1 = new JLabel();
 		closeButton = new JButton();
+		label2 = new JLabel();
 		scrollPane1 = new JScrollPane();
 		itemsTable = new JTable();
 
-		// ======== this ========
+		//======== this ========
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new BorderLayout());
 
-		// ======== containerPanel ========
+		//======== containerPanel ========
 		{
 			containerPanel.setLayout(new GridBagLayout());
-			((GridBagLayout) containerPanel.getLayout()).columnWidths = new int[] { 247, 0 };
-			((GridBagLayout) containerPanel.getLayout()).rowHeights = new int[] { 0, 93, 0 };
-			((GridBagLayout) containerPanel.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-			((GridBagLayout) containerPanel.getLayout()).rowWeights = new double[] { 0.0, 1.0, 1.0E-4 };
+			((GridBagLayout)containerPanel.getLayout()).columnWidths = new int[] {247, 0};
+			((GridBagLayout)containerPanel.getLayout()).rowHeights = new int[] {0, 93, 0};
+			((GridBagLayout)containerPanel.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+			((GridBagLayout)containerPanel.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
 
-			// ======== panel1 ========
+			//======== panel1 ========
 			{
 				panel1.setLayout(new GridBagLayout());
-				((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 0, 0, 0 };
-				((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 0, 0 };
-				((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 1.0, 0.0, 1.0E-4 };
-				((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+				((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
+				((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0};
+				((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-				// ---- label1 ----
+				//---- label1 ----
 				label1.setText("Archival items");
-				panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ---- closeButton ----
+				//---- closeButton ----
 				closeButton.setText("Close");
 				closeButton.addActionListener(new ActionListener() {
 					@Override
@@ -980,15 +999,33 @@ public class SpecialInboxPanel extends JPanel {
 						closeButtonActionPerformed(e);
 					}
 				});
-				panel1.add(closeButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
-			}
-			containerPanel.add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+				panel1.add(closeButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-			// ======== scrollPane1 ========
+				//---- label2 ----
+				label2.setText("text");
+				label2.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						label2MouseClicked(e);
+					}
+				});
+				panel1.add(label2, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
+			}
+			containerPanel.add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
+
+			//======== scrollPane1 ========
 			{
 				scrollPane1.setViewportView(itemsTable);
 			}
-			containerPanel.add(scrollPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+			containerPanel.add(scrollPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(containerPanel, BorderLayout.CENTER);
 		// //GEN-END:initComponents
@@ -1000,6 +1037,7 @@ public class SpecialInboxPanel extends JPanel {
 	private JPanel panel1;
 	private JLabel label1;
 	private JButton closeButton;
+	private JLabel label2;
 	private JScrollPane scrollPane1;
 	private JTable itemsTable;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
