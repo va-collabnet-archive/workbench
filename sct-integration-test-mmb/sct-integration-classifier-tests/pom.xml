@@ -1,0 +1,98 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.ihtsdo</groupId>
+        <artifactId>sct-integration-test-mmb</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <groupId>org.ihtsdo.mojo.maven.classifiertest</groupId>
+    <artifactId>sct-integration-classifier-tests</artifactId>
+    <packaging>pom</packaging>
+    <name>sct-integration-classifier-tests</name>
+    
+    <properties>
+        <!-- SNOMED Core path -->
+        <bdb.edit.path>8c230474-9f11-30ce-9cad-185a96fd03a2</bdb.edit.path>
+        <wb.mojo.version>2.6.0-trek-14-SNAPSHOT</wb.mojo.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.ihtsdo</groupId>
+            <artifactId>sct-integration-db</artifactId>
+            <version>${project.parent.version}</version>
+            <type>zip</type>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>extract-dependencies</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.ihtsdo</groupId>
+                                    <artifactId>sct-integration-db</artifactId>
+                                    <type>zip</type>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>
+                                ${project.build.directory}/generated-resources/
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.ihtsdo</groupId>
+                <artifactId>wb-mojo</artifactId>
+                <!--
+                <version>${wb.mojo.version}</version>
+                -->
+                <executions>
+
+                    <execution>
+                        <id>run-cycle-check</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>run-cycle-check</goal>
+                        </goals>
+                        <configuration>
+                            <uuidEditPath>${bdb.edit.path}</uuidEditPath>
+                            <dateTimeStr>2011.01.31 00:00:00</dateTimeStr>
+                            <reportCycles>ReportCycles</reportCycles>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>run-snorocket</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>run-snorocket</goal>
+                        </goals>
+                        <configuration>
+                            <uuidEditPath>${bdb.edit.path}</uuidEditPath>
+                            <dateTimeStr>2011.01.31 00:00:00</dateTimeStr>
+                            <reportChanges>ReportChanges</reportChanges>
+                            <reportEquivalences>ReportEquivalences</reportEquivalences>
+                        </configuration>
+                    </execution>
+
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
