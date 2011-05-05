@@ -1881,7 +1881,7 @@ public class ProjectDetailsPanel extends JPanel {
 					((GridBagLayout)panel21.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
 
 					//---- label13 ----
-					label13.setText("<html><body>Maintenance worklists are used to send any concept into a translation workflow. Many different workflows can be configured.");
+					label13.setText("<html><body>Maintenance worklists are used to send any concept into a translation workflow without the requirement of creating a new workset. Many different workflows can be configured.");
 					panel21.add(label13, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 5, 0), 0, 0));
