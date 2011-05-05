@@ -2388,7 +2388,7 @@ public class InboxPanel extends JPanel {
 								if (tpc.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)){
 									if (tpc.getComponentAt(i) instanceof TranslationConceptEditor6){
 										TranslationConceptEditor6 uiPanel=(TranslationConceptEditor6)tpc.getComponentAt(i);
-										if (!uiPanel.verifySavePending(null)){
+										if (!uiPanel.getDescriptionInEditor().getText().trim().equals("") && !uiPanel.verifySavePending(null)){
 											return;
 										}
 										break;
