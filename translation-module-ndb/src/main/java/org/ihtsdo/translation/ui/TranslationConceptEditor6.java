@@ -80,13 +80,9 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.plaf.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
@@ -548,6 +544,12 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 		return bPendTerm;
 
+	}
+
+	
+	
+	public ContextualizedDescription getDescriptionInEditor() {
+		return descriptionInEditor;
 	}
 
 	private void setReadOnlyMode(boolean readOnly) {
