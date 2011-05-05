@@ -51,9 +51,9 @@ import org.ihtsdo.project.refset.PromotionRefset;
 	/**
 	 * Status concept for the term component to test.
 	 */
-	private TermEntry langRefsetTerm;
-	private TermEntry descTypeTerm;
-	private TermEntry acceptabilityTerm;
+	private TermEntry langRefsetTerm = new TermEntry(RefsetAuxiliary.Concept.LANGUAGE_REFSET_EN_US.getUids());
+	private TermEntry descTypeTerm = new TermEntry(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+	private TermEntry acceptabilityTerm = new TermEntry(ArchitectonicAuxiliary.Concept.PREFERRED_ACCEPTABILITY.getUids());
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
