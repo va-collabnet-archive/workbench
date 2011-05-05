@@ -22,8 +22,11 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -40,6 +43,8 @@ import javax.swing.table.DefaultTableModel;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.project.help.HelpApi;
+import org.ihtsdo.project.util.IconUtilities;
 
 /**
  * The Class DictionaryResultsPanel.
@@ -67,6 +72,8 @@ public class DictionaryResultsPanel extends JPanel implements ActionListener {
 	private String langCode;
 
 	private JComboBox cmbLangs;
+	
+	private JLabel helpLabel;
 
 	/**
 	 * Instantiates a new dictionary results panel.
@@ -101,6 +108,22 @@ public class DictionaryResultsPanel extends JPanel implements ActionListener {
 				}
 			}
 		}
+		
+		helpLabel = new JLabel();
+		helpLabel.setIcon(IconUtilities.helpIcon);
+		helpLabel.setText("");
+		helpLabel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				try {
+					HelpApi.openHelpForComponent("SEARCH_DICTIONARY");
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				} catch (URISyntaxException e1) {
+					e1.printStackTrace();
+				};
+			}
+		});
 
 		topContainer.add(new JLabel("Search dictionary:"));
 		resultLabel = new JLabel("<html>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp");
@@ -120,6 +143,8 @@ public class DictionaryResultsPanel extends JPanel implements ActionListener {
 		addButton.addActionListener(this);
 		addButton.setAlignmentY(Component.CENTER_ALIGNMENT);
 		topContainer.add(addButton);
+		
+		topContainer.add(helpLabel);
 
 		Box leftContainer = new Box(BoxLayout.Y_AXIS);
 		leftContainer.add(topContainer);

@@ -20,12 +20,21 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+
+import org.ihtsdo.project.help.HelpApi;
+import org.ihtsdo.project.util.IconUtilities;
 
 /**
  * The Class DocumentsIndexPanel.
@@ -43,6 +52,8 @@ public class DocumentsIndexPanel extends JPanel  implements ActionListener {
 	
 	/** The index button. */
 	JButton indexButton;
+	
+	private JLabel helpLabel;
 
 	
 	/**
@@ -61,11 +72,33 @@ public class DocumentsIndexPanel extends JPanel  implements ActionListener {
 		indexButton.setActionCommand("index");
 		indexButton.addActionListener(this);
 		
+		helpLabel = new JLabel();
+		helpLabel.setIcon(IconUtilities.helpIcon);
+		helpLabel.setText("");
+		helpLabel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				try {
+					HelpApi.openHelpForComponent("INDEX_DOCUMENTS");
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				} catch (URISyntaxException e1) {
+					e1.printStackTrace();
+				};
+			}
+		});
+		
 		Container centerContainer = new Container();
 		centerContainer.setLayout(new BorderLayout());
 		centerContainer.add(browserPane, BorderLayout.CENTER);
 		this.add(centerContainer, BorderLayout.CENTER);
-		this.add(indexButton, BorderLayout.PAGE_END);
+
+		Container bottomContainer = new Container();
+		bottomContainer.setLayout(new BoxLayout(bottomContainer, BoxLayout.X_AXIS));
+		bottomContainer.add(indexButton);
+		bottomContainer.add(helpLabel);
+		
+		this.add(bottomContainer, BorderLayout.PAGE_END);
 		
 	}
 	

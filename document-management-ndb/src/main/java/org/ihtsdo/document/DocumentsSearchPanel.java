@@ -23,6 +23,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -39,6 +41,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+
+import org.ihtsdo.project.help.HelpApi;
+import org.ihtsdo.project.util.IconUtilities;
 
 /**
  * The Class DocumentsSearchPanel.
@@ -59,6 +64,8 @@ public class DocumentsSearchPanel extends JPanel implements ActionListener {
 
 	/** The browser pane. */
 	JScrollPane browserPane;
+	
+	private JLabel helpLabel;
 
 	/**
 	 * Instantiates a new documents search panel.
@@ -67,6 +74,23 @@ public class DocumentsSearchPanel extends JPanel implements ActionListener {
 	 */
 	public DocumentsSearchPanel(String query) {
 		this.setLayout(new BorderLayout());
+		
+		helpLabel = new JLabel();
+		helpLabel.setIcon(IconUtilities.helpIcon);
+		helpLabel.setText("");
+		helpLabel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				try {
+					HelpApi.openHelpForComponent("SEARCH_DOCUMENTS");
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				} catch (URISyntaxException e1) {
+					e1.printStackTrace();
+				};
+			}
+		});
+		
 		Box topContainer = new Box(BoxLayout.X_AXIS);
 		topContainer.add(new JLabel("Search documents:"));
 		queryField = new JTextField(30);
@@ -76,6 +100,9 @@ public class DocumentsSearchPanel extends JPanel implements ActionListener {
 		searchButton.setActionCommand("search");
 		searchButton.addActionListener(this);
 		topContainer.add(searchButton);
+
+		topContainer.add(helpLabel);
+		
 		queryField.addKeyListener
 	      (new KeyAdapter() {
 	          public void keyPressed(KeyEvent e) {
@@ -93,6 +120,7 @@ public class DocumentsSearchPanel extends JPanel implements ActionListener {
 		if (query != null && !query.isEmpty()) {
 			results = DocumentManager.searchDocuments(query);
 		}
+		
 		htmlPane = new JEditorPane("text/html", results);
 		htmlPane.setEditable(false);  
 		htmlPane.setOpaque(false);

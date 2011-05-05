@@ -13,10 +13,10 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -38,8 +38,10 @@ import javax.swing.event.ListSelectionListener;
 
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.document.report.I_Report.Reports;
+import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.panel.PanelHelperFactory;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
+import org.ihtsdo.project.util.IconUtilities;
 
 /**
  * @author Guillermo Reynoso
@@ -59,6 +61,10 @@ public class ReportPanel extends JPanel {
 	public ReportPanel() {
 		initComponents();
 		initCustomComponents();
+		
+		label3.setIcon(IconUtilities.helpIcon);
+		label3.setText("");
+		
 	}
 
 	private void initCustomComponents() {
@@ -209,6 +215,16 @@ public class ReportPanel extends JPanel {
 		}
 	}
 
+	private void label3MouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("REPORTS_PANEL");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -217,6 +233,7 @@ public class ReportPanel extends JPanel {
 		excelReport = new JButton();
 		csvFile = new JButton();
 		closeButton = new JButton();
+		label3 = new JLabel();
 		panel2 = new JPanel();
 		scrollPane1 = new JScrollPane();
 		reportList = new JList();
@@ -274,6 +291,16 @@ public class ReportPanel extends JPanel {
 				}
 			});
 			panel1.add(closeButton);
+
+			//---- label3 ----
+			label3.setText("text");
+			label3.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					label3MouseClicked(e);
+				}
+			});
+			panel1.add(label3);
 		}
 		add(panel1, BorderLayout.SOUTH);
 
@@ -321,6 +348,7 @@ public class ReportPanel extends JPanel {
 	private JButton excelReport;
 	private JButton csvFile;
 	private JButton closeButton;
+	private JLabel label3;
 	private JPanel panel2;
 	private JScrollPane scrollPane1;
 	private JList reportList;

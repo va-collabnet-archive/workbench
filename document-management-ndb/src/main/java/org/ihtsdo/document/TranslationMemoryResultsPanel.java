@@ -21,6 +21,10 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 
 import javax.swing.Box;
@@ -33,6 +37,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+
+import org.ihtsdo.project.help.HelpApi;
+import org.ihtsdo.project.util.IconUtilities;
 
 /**
  * The Class TranslationMemoryResultsPanel.
@@ -47,6 +54,8 @@ public class TranslationMemoryResultsPanel extends JPanel implements ActionListe
 	
 	/** The table model. */
 	DefaultTableModel tableModel;
+	
+	private JLabel helpLabel;
 	
 	/**
 	 * Instantiates a new translation memory results panel.
@@ -64,10 +73,28 @@ public class TranslationMemoryResultsPanel extends JPanel implements ActionListe
 		if (query == null) query = "*";
 		if (query.equals("")) query = "*";
 		
+		helpLabel = new JLabel();
+		helpLabel.setIcon(IconUtilities.helpIcon);
+		helpLabel.setText("");
+		helpLabel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				try {
+					HelpApi.openHelpForComponent("SEARCH_TRANSLATION_MEMORY");
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				} catch (URISyntaxException e1) {
+					e1.printStackTrace();
+				};
+			}
+		});
+		
 		JButton searchButton = new JButton("Search");
 		searchButton.setActionCommand("search");
 		searchButton.addActionListener(this);
 		topContainer.add(searchButton);
+		
+		topContainer.add(helpLabel);
 
 		String[] columnNames = {"Source Text",
                 "Translation"};

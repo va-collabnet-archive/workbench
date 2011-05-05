@@ -20,8 +20,11 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.NoSuchElementException;
 
 import javax.swing.BoxLayout;
@@ -30,6 +33,7 @@ import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -38,6 +42,8 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.LANG_CODE;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.project.help.HelpApi;
+import org.ihtsdo.project.util.IconUtilities;
 
 /**
  * The Class DictionaryIndexPanel.
@@ -60,6 +66,8 @@ public class DictionaryIndexPanel extends JPanel  implements ActionListener {
 	JButton indexWBButton;
 
 	private JComboBox cmbLangs;
+	
+	private JLabel helpLabel;
 
 	
 	/**
@@ -96,6 +104,22 @@ public class DictionaryIndexPanel extends JPanel  implements ActionListener {
 		indexFileButton.setActionCommand("indexFromFile");
 		indexFileButton.addActionListener(this);
 		
+		helpLabel = new JLabel();
+		helpLabel.setIcon(IconUtilities.helpIcon);
+		helpLabel.setText("");
+		helpLabel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				try {
+					HelpApi.openHelpForComponent("INDEX_DICTIONARY");
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				} catch (URISyntaxException e1) {
+					e1.printStackTrace();
+				};
+			}
+		});
+		
 //		indexWBButton = new JButton("Index dictionary from current workbench database");
 //		indexWBButton.setActionCommand("indexFromWBDB");
 //		indexWBButton.addActionListener(this);
@@ -109,6 +133,8 @@ public class DictionaryIndexPanel extends JPanel  implements ActionListener {
 		bottomContainer.setLayout(new BoxLayout(bottomContainer, BoxLayout.X_AXIS));
 		bottomContainer.add(cmbLangs);
 		bottomContainer.add(indexFileButton);
+		bottomContainer.add(helpLabel);
+		
 //		bottomContainer.add(indexWBButton);
 		
 		this.add(bottomContainer, BorderLayout.PAGE_END);
