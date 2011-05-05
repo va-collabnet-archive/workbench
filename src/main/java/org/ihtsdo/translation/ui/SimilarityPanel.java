@@ -30,7 +30,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import javax.swing.*;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -38,7 +37,9 @@ import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -522,11 +523,13 @@ public class SimilarityPanel extends JPanel {
 
 	private void button1ActionPerformed(ActionEvent e) {
 		if (button1.getText().equals("Hide")) {
+			((GridBagLayout)getLayout()).rowWeights[0] = 0.0;
 			button1.setText("Show");
 			refinePanel.setVisible(false);
 			scrollPane2.setVisible(false);
 			panel13.setVisible(false);
 		} else {
+			((GridBagLayout)getLayout()).rowWeights[0] = 1.0;
 			button1.setText("Hide");
 			refinePanel.setVisible(true);
 			scrollPane2.setVisible(true);
@@ -536,9 +539,11 @@ public class SimilarityPanel extends JPanel {
 
 	private void button2ActionPerformed(ActionEvent e) {
 		if (button2.getText().equals("Hide")) {
+			((GridBagLayout)getLayout()).rowWeights[1] = 0.0;
 			button2.setText("Show");
 			scrollPane3.setVisible(false);
 		} else {
+			((GridBagLayout)getLayout()).rowWeights[1] = 1.0;
 			button2.setText("Hide");
 			scrollPane3.setVisible(true);
 		}
@@ -546,9 +551,12 @@ public class SimilarityPanel extends JPanel {
 
 	private void button3ActionPerformed(ActionEvent e) {
 		if (button3.getText().equals("Hide")) {
+			((GridBagLayout)getLayout()).rowWeights[2] = 0.0;
 			button3.setText("Show");
 			scrollPane4.setVisible(false);
+			
 		} else {
+			((GridBagLayout)getLayout()).rowWeights[2] = 1.0;
 			button3.setText("Hide");
 			scrollPane4.setVisible(true);
 		}
@@ -595,9 +603,9 @@ public class SimilarityPanel extends JPanel {
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new GridBagLayout());
 		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
-		((GridBagLayout)getLayout()).rowHeights = new int[] {30, 30, 25, 0};
+		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0, 0, 0};
 		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-		((GridBagLayout)getLayout()).rowWeights = new double[] {1.0, 1.0, 1.0, 1.0E-4};
+		((GridBagLayout)getLayout()).rowWeights = new double[] {1.0, 1.0, 0.0, 1.0E-4};
 
 		//======== similarityPanel ========
 		{
