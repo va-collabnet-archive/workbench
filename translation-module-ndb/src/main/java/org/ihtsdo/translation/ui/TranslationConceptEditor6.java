@@ -224,6 +224,8 @@ public class TranslationConceptEditor6 extends JPanel {
 		label12.setText("");
 		label13.setIcon(IconUtilities.helpIcon);
 		label13.setText("");
+		label17.setIcon(IconUtilities.helpIcon);
+		label17.setText("");
 
 		tblComm.setSelectionBackground(Color.YELLOW);
 		formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
@@ -1252,6 +1254,16 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	private void label17MouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("COMMENTS");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
+
 	class SelectionListener implements ListSelectionListener {
 
 		/** The table. */
@@ -1336,6 +1348,7 @@ public class TranslationConceptEditor6 extends JPanel {
 		panel17 = new JPanel();
 		bAddComent = new JButton();
 		cmbTarComm = new JComboBox();
+		label17 = new JLabel();
 		tabbedPane1 = new JTabbedPane();
 		scrollPane9 = new JScrollPane();
 		tblComm = new ZebraJTable();
@@ -1637,6 +1650,18 @@ public class TranslationConceptEditor6 extends JPanel {
 								panel17.add(cmbTarComm, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 									new Insets(0, 0, 0, 5), 0, 0));
+
+								//---- label17 ----
+								label17.setText("text");
+								label17.addMouseListener(new MouseAdapter() {
+									@Override
+									public void mouseClicked(MouseEvent e) {
+										label17MouseClicked(e);
+									}
+								});
+								panel17.add(label17, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+									new Insets(0, 0, 0, 0), 0, 0));
 							}
 							panel16.add(panel17, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -2055,6 +2080,7 @@ public class TranslationConceptEditor6 extends JPanel {
 	private JPanel panel17;
 	private JButton bAddComent;
 	private JComboBox cmbTarComm;
+	private JLabel label17;
 	private JTabbedPane tabbedPane1;
 	private JScrollPane scrollPane9;
 	private ZebraJTable tblComm;

@@ -12,10 +12,9 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -34,6 +33,8 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.ihtsdo.project.help.HelpApi;
+import org.ihtsdo.project.util.IconUtilities;
 import org.ihtsdo.translation.ui.ConfigTranslationModule;
 
 /**
@@ -78,6 +79,9 @@ public class ConfigDialog extends JDialog {
 		// ================Initialize Configuration Panels=============
 		initComponents();
 		initCustomComponents();
+		
+		label1.setIcon(IconUtilities.helpIcon);
+		label1.setText("");
 
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
@@ -258,6 +262,16 @@ public class ConfigDialog extends JDialog {
 
 	}
 
+	private void label1MouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("TRANSLATION_CONFIG");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -270,58 +284,73 @@ public class ConfigDialog extends JDialog {
 		panel1 = new JPanel();
 		titlePanel = new JPanel();
 		title = new JLabel();
+		label1 = new JLabel();
 		contentPanel = new JPanel();
 
-		// ======== this ========
+		//======== this ========
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
 
-		// ======== panel2 ========
+		//======== panel2 ========
 		{
 			panel2.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-			// ---- acceptButton ----
+			//---- acceptButton ----
 			acceptButton.setText("Accept");
 			panel2.add(acceptButton);
 
-			// ---- configCancelButton ----
+			//---- configCancelButton ----
 			configCancelButton.setText("Close");
 			panel2.add(configCancelButton);
 		}
 		contentPane.add(panel2, BorderLayout.SOUTH);
 
-		// ======== splitPane1 ========
+		//======== splitPane1 ========
 		{
 			splitPane1.setEnabled(false);
 
-			// ======== scrollPane1 ========
+			//======== scrollPane1 ========
 			{
 				scrollPane1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-				// ---- configTree ----
+				//---- configTree ----
 				configTree.setRootVisible(false);
 				configTree.setShowsRootHandles(true);
 				scrollPane1.setViewportView(configTree);
 			}
 			splitPane1.setLeftComponent(scrollPane1);
 
-			// ======== panel1 ========
+			//======== panel1 ========
 			{
 				panel1.setLayout(new BorderLayout());
 
-				// ======== titlePanel ========
+				//======== titlePanel ========
 				{
 					titlePanel.setBorder(new EtchedBorder());
 					titlePanel.setLayout(new GridBagLayout());
-					((GridBagLayout) titlePanel.getLayout()).columnWidths = new int[] { 0, 0 };
-					((GridBagLayout) titlePanel.getLayout()).rowHeights = new int[] { 29, 0 };
-					((GridBagLayout) titlePanel.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-					((GridBagLayout) titlePanel.getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
-					titlePanel.add(title, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+					((GridBagLayout)titlePanel.getLayout()).columnWidths = new int[] {0, 0, 0};
+					((GridBagLayout)titlePanel.getLayout()).rowHeights = new int[] {29, 0};
+					((GridBagLayout)titlePanel.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
+					((GridBagLayout)titlePanel.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+					titlePanel.add(title, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 0), 0, 0));
+
+					//---- label1 ----
+					label1.setText("text");
+					label1.addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							label1MouseClicked(e);
+						}
+					});
+					titlePanel.add(label1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 0), 0, 0));
 				}
 				panel1.add(titlePanel, BorderLayout.NORTH);
 
-				// ======== contentPanel ========
+				//======== contentPanel ========
 				{
 					contentPanel.setBorder(new EtchedBorder());
 					contentPanel.setLayout(new CardLayout());
@@ -347,8 +376,8 @@ public class ConfigDialog extends JDialog {
 	private JPanel panel1;
 	private JPanel titlePanel;
 	private JLabel title;
+	private JLabel label1;
 	private JPanel contentPanel;
-
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
 	private void createNodes(DefaultMutableTreeNode top) {
