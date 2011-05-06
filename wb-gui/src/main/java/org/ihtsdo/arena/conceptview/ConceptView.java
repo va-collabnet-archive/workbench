@@ -194,9 +194,9 @@ public class ConceptView extends JPanel {
         CollapsePanel cp;
         boolean inferred;
 
-        public SetupRels(CountDownLatch latch, 
-                Collection<? extends I_RelTuple> rels, 
-                Collection<DragPanelRel> panels, 
+        public SetupRels(CountDownLatch latch,
+                Collection<? extends I_RelTuple> rels,
+                Collection<DragPanelRel> panels,
                 CollapsePanel cp,
                 boolean inferred) {
             this.latch = latch;
@@ -209,9 +209,12 @@ public class ConceptView extends JPanel {
         @Override
         public void run() {
             for (I_RelTuple r : rels) {
-                DragPanelRel rc;try {
-                    rc = getRelComponent(r, cp, inferred);
-                    panels.add(rc);
+                DragPanelRel rc;
+                try {
+                    if (r.getGroup() == 0) {
+                        rc = getRelComponent(r, cp, inferred);
+                        panels.add(rc);
+                    }
                 } catch (TerminologyException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
                 } catch (IOException ex) {
@@ -229,7 +232,7 @@ public class ConceptView extends JPanel {
             boolean inferred) throws TerminologyException, IOException {
         SetupRels setterUpper = new SetupRels(latch, rels, panels, cp, inferred);
         ACE.threadPool.execute(setterUpper);
-        
+
     }
 
     public class LayoutConceptWorker extends SwingWorker<Map<SpecBI, Integer>, Boolean> {
@@ -350,13 +353,6 @@ public class ConceptView extends JPanel {
                 inactiveDescriptions = new ArrayList<I_DescriptionTuple>(tempDescList);
                 inactiveDescriptionPanels = new ArrayList<DragPanelDescription>(inactiveDescriptions.size());
                 setupDescriptions(latch, inactiveDescriptions, inactiveDescriptionPanels, cpd);
-
-                ///
-
-
-
-
-
 
                 latch.await();
 
