@@ -603,9 +603,9 @@ public class SimilarityPanel extends JPanel {
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new GridBagLayout());
 		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
-		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0, 0, 0};
+		((GridBagLayout)getLayout()).rowHeights = new int[] {30, 30, 25, 0};
 		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-		((GridBagLayout)getLayout()).rowWeights = new double[] {1.0, 1.0, 0.0, 1.0E-4};
+		((GridBagLayout)getLayout()).rowWeights = new double[] {1.0, 1.0, 1.0, 1.0E-4};
 
 		//======== similarityPanel ========
 		{
@@ -861,7 +861,7 @@ public class SimilarityPanel extends JPanel {
 				new EmptyBorder(5, 5, 5, 5)));
 			panel15.setLayout(new GridBagLayout());
 			((GridBagLayout)panel15.getLayout()).columnWidths = new int[] {0, 0};
-			((GridBagLayout)panel15.getLayout()).rowHeights = new int[] {0, 0, 0};
+			((GridBagLayout)panel15.getLayout()).rowHeights = new int[] {0, 200, 0};
 			((GridBagLayout)panel15.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
 			((GridBagLayout)panel15.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
 
