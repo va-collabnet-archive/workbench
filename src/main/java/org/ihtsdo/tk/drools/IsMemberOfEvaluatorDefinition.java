@@ -33,7 +33,6 @@ import org.drools.rule.VariableRestriction.VariableContextEntry;
 import org.drools.spi.Evaluator;
 import org.drools.spi.FieldValue;
 import org.drools.spi.InternalReadAccessor;
-import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
@@ -42,251 +41,248 @@ import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.drools.facts.DescFact;
 
-
 public class IsMemberOfEvaluatorDefinition implements EvaluatorDefinition {
-	public static class IsMemberOfEvaluator extends BaseEvaluator  {
 
-	    /**
-		 * 
-		 */
-	    private static final long serialVersionUID = 1L;
+    public static class IsMemberOfEvaluator extends BaseEvaluator {
 
-	    private static final int dataVersion = 1;
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+        private static final int dataVersion = 1;
 
-		@Override
-		public void readExternal(ObjectInput in) throws IOException,
-				ClassNotFoundException {
-			init();
-			super.readExternal(in);
-	        int objDataVersion = in.readInt();
-	        if (objDataVersion == dataVersion) {
-	        	// Nothing to do
-	        } else {
-	            throw new IOException("Can't handle dataversion: " + objDataVersion);
-	        }
-		}
+        @Override
+        public void readExternal(ObjectInput in) throws IOException,
+                ClassNotFoundException {
+            init();
+            super.readExternal(in);
+            int objDataVersion = in.readInt();
+            if (objDataVersion == dataVersion) {
+                // Nothing to do
+            } else {
+                throw new IOException("Can't handle dataversion: " + objDataVersion);
+            }
+        }
 
-		@Override
-		public void writeExternal(ObjectOutput out) throws IOException {
-			super.writeExternal(out);
-	        out.writeInt(dataVersion);
-		}
+        @Override
+        public void writeExternal(ObjectOutput out) throws IOException {
+            super.writeExternal(out);
+            out.writeInt(dataVersion);
+        }
 
-	    public IsMemberOfEvaluator() {
-	    	super();
-			// No arg constructor for serialization. 
-		}
-		public IsMemberOfEvaluator(final ValueType type, final boolean isNegated) {
-			super(type, isNegated ? IsMemberOfEvaluatorDefinition.NOT_IS_MEMBER_OF : IsMemberOfEvaluatorDefinition.IS_MEMBER_OF);
-		}
+        public IsMemberOfEvaluator() {
+            super();
+            // No arg constructor for serialization. 
+        }
 
-		@Override
-		public boolean evaluate(InternalWorkingMemory workingMemory,
-				InternalReadAccessor extractor, Object object, FieldValue value) {
-			return testMemberOf(object, value.getValue());
-		}
+        public IsMemberOfEvaluator(final ValueType type, final boolean isNegated) {
+            super(type, isNegated ? IsMemberOfEvaluatorDefinition.NOT_IS_MEMBER_OF : IsMemberOfEvaluatorDefinition.IS_MEMBER_OF);
+        }
 
-		@Override
-		public boolean evaluate(InternalWorkingMemory workingMemory,
-				InternalReadAccessor leftExtractor, Object left,
-				InternalReadAccessor rightExtractor, Object right) {
-			final Object value1 = leftExtractor.getValue(workingMemory, left);
-			final Object value2 = rightExtractor.getValue(workingMemory, right);
+        @Override
+        public boolean evaluate(InternalWorkingMemory workingMemory,
+                InternalReadAccessor extractor, Object object, FieldValue value) {
+            return testMemberOf(object, value.getValue());
+        }
 
-			return testMemberOf(value1, value2);
-		}
+        @Override
+        public boolean evaluate(InternalWorkingMemory workingMemory,
+                InternalReadAccessor leftExtractor, Object left,
+                InternalReadAccessor rightExtractor, Object right) {
+            final Object value1 = leftExtractor.getValue(workingMemory, left);
+            final Object value2 = rightExtractor.getValue(workingMemory, right);
 
-		private boolean testMemberOf(final Object value1, final Object value2) { 
-			
-				boolean isMember = false;
-				//value1 (concept): this could be concept VersionBI or conceptFact
-				//value2 (refset): this will be put in Refset.java (tk-arena-rules) as a ConceptSpec
-				
-				ConceptVersionBI possibleMember = null;
-				if (ConceptVersionBI.class.isAssignableFrom(value1.getClass())) {
-					possibleMember = (ConceptVersionBI) value1;
-					isMember = testConcept(possibleMember, value2);
-				} else if (ConceptFact.class.isAssignableFrom(value1.getClass())) {
-					possibleMember = ((ConceptFact) value1).getConcept();
-					isMember = testConcept(possibleMember, value2);
-				} else if (DescFact.class.isAssignableFrom(value1.getClass())) {
-					DescFact dFact = (DescFact) value1;
-					isMember = testDesc(dFact, value2);
-				}else {
-					throw new UnsupportedOperationException("Can't convert: " + value1);
-				}
-				
-				return this.getOperator().isNegated() ^ (isMember);
-				
-		}
+            return testMemberOf(value1, value2);
+        }
 
-		private boolean testDesc(DescFact dFact, final Object value2){
-			boolean member = false;
-			
-			try{
-				DescriptionVersionBI desc = dFact.getComponent();
-				ViewCoordinate vc = dFact.getVc();
-				ConceptVersionBI possibleRefsetCV = null;
-				ConceptSpec possibleRefset = null;
-				
-				int evalRefsetNid = 0;
-				
-				if (ConceptVersionBI.class.isAssignableFrom(value2.getClass())) {
-					possibleRefsetCV = (ConceptVersionBI) value2;
-					evalRefsetNid = possibleRefsetCV.getNid();
-				} else if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
-					possibleRefset = (ConceptSpec) value2;
-					evalRefsetNid = possibleRefset.get(vc).getNid();
-				} else if (ConceptFact.class.isAssignableFrom(value2.getClass())) {
-					ConceptFact fact = (ConceptFact) value2;
-					possibleRefsetCV = (ConceptVersionBI) fact.getConcept();
-					evalRefsetNid = possibleRefsetCV.getNid();
-				} 
-		
-			            Collection<? extends RefexChronicleBI<?>> refexes =
-			                    desc.getCurrentRefexes(vc);
+        private boolean testMemberOf(final Object value1, final Object value2) {
 
-			            if (refexes != null) {
-			                for (RefexChronicleBI<?> refex : refexes) {
-			                    if (refex.getCollectionNid() == evalRefsetNid) {
-			                        member = true;
-			                    }
-			                }
-			            }
-				
-				return member;
-			} catch (IOException e) {
-				Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "refset concept not found", e);
-				return member;
-			}
-		}
-		
-		private boolean testConcept(ConceptVersionBI possibleMember, final Object value2){
-			boolean member = false;
-			try{
-				ViewCoordinate vc = possibleMember.getViewCoordinate();
-				ConceptVersionBI possibleRefsetCV = null;
-				ConceptSpec possibleRefset = null;
-				
-				int evalRefsetNid = 0;
-				
-				if (ConceptVersionBI.class.isAssignableFrom(value2.getClass())) {
-					possibleRefsetCV = (ConceptVersionBI) value2;
-					evalRefsetNid = possibleRefsetCV.getNid();
-				} else if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
-					possibleRefset = (ConceptSpec) value2;
-					evalRefsetNid = possibleRefset.get(vc).getNid();
-				} else if (ConceptFact.class.isAssignableFrom(value2.getClass())) {
-					ConceptFact fact = (ConceptFact) value2;
-					possibleRefsetCV = (ConceptVersionBI) fact.getConcept();
-					evalRefsetNid = possibleRefsetCV.getNid();
-				} 
-				
-				member = possibleMember.isMember(evalRefsetNid);
-				
-				return member;
-			} catch (IOException e) {
-				Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "refset concept not found", e);
-				return member;
-			}
-		}
-		
-		@Override
-		public boolean evaluateCachedLeft(InternalWorkingMemory workingMemory,
-				VariableContextEntry context, Object right) {
-			return testMemberOf(((ObjectVariableContextEntry) context).left, right);
-		}
+            boolean isMember = false;
+            //value1 (concept): this could be concept VersionBI or conceptFact
+            //value2 (refset): this will be put in Refset.java (tk-arena-rules) as a ConceptSpec
 
-		@Override
-		public boolean evaluateCachedRight(InternalWorkingMemory workingMemory,
-				VariableContextEntry context, Object left) {
-			return testMemberOf(left, ((ObjectVariableContextEntry) context).right);
-		}
+            ConceptVersionBI possibleMember = null;
+            if (ConceptVersionBI.class.isAssignableFrom(value1.getClass())) {
+                possibleMember = (ConceptVersionBI) value1;
+                isMember = testConcept(possibleMember, value2);
+            } else if (ConceptFact.class.isAssignableFrom(value1.getClass())) {
+                possibleMember = ((ConceptFact) value1).getConcept();
+                isMember = testConcept(possibleMember, value2);
+            } else if (DescFact.class.isAssignableFrom(value1.getClass())) {
+                DescFact dFact = (DescFact) value1;
+                isMember = testDesc(dFact, value2);
+            } else {
+                throw new UnsupportedOperationException("Can't convert: " + value1);
+            }
 
-		@Override
-		public String toString() {
-			return "IsMemberOf isMemberOf";
-		}
+            return this.getOperator().isNegated() ^ (isMember);
 
-	}
+        }
 
-	public static Operator IS_MEMBER_OF = null;
-	public static Operator NOT_IS_MEMBER_OF = null;
-	private static String[] SUPPORTED_IDS = null;
-	
-	private static void init() {
-		if (IS_MEMBER_OF == null) {
-			IS_MEMBER_OF = Operator.addOperatorToRegistry("isMemberOf", false);
-			NOT_IS_MEMBER_OF = Operator.addOperatorToRegistry(IS_MEMBER_OF.getOperatorString(), true);
-			SUPPORTED_IDS = new String[] { IS_MEMBER_OF.getOperatorString() };
-		}
-	}
+        private boolean testDesc(DescFact dFact, final Object value2) {
+            boolean member = false;
 
-	static {
-		init();
-	}
-	
-	private Evaluator[] evaluator;
-	@Override
-	public Evaluator getEvaluator(ValueType type, Operator operator) {
-		return this.getEvaluator(type, operator.getOperatorString(), operator.isNegated(), null);
-	}
+            try {
+                DescriptionVersionBI desc = dFact.getComponent();
+                ViewCoordinate vc = dFact.getVc();
+                ConceptVersionBI possibleRefsetCV = null;
+                ConceptSpec possibleRefset = null;
 
-	@Override
-	public Evaluator getEvaluator(ValueType type, Operator operator,
-			String parameterText) {
-		return this.getEvaluator(type, operator.getOperatorString(), operator.isNegated(), parameterText);
-	}
+                int evalRefsetNid = 0;
 
-	@Override
-	public Evaluator getEvaluator(ValueType type, String operatorId,
-			boolean isNegated, String parameterText) {
-		return getEvaluator(type, operatorId, isNegated, parameterText, Target.FACT, Target.FACT);
-	}
+                if (ConceptVersionBI.class.isAssignableFrom(value2.getClass())) {
+                    possibleRefsetCV = (ConceptVersionBI) value2;
+                    evalRefsetNid = possibleRefsetCV.getNid();
+                } else if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
+                    possibleRefset = (ConceptSpec) value2;
+                    evalRefsetNid = possibleRefset.get(vc).getNid();
+                } else if (ConceptFact.class.isAssignableFrom(value2.getClass())) {
+                    ConceptFact fact = (ConceptFact) value2;
+                    possibleRefsetCV = (ConceptVersionBI) fact.getConcept();
+                    evalRefsetNid = possibleRefsetCV.getNid();
+                }
 
-	@Override
-	public Evaluator getEvaluator(ValueType type, String operatorId,
-			boolean isNegated, String parameterText, Target leftTarget,
-			Target rightTarget) {
-		if (evaluator == null) {
-			evaluator = new Evaluator[2];
-		}
-		int index = isNegated ?  0 : 1;
-		if (evaluator[index] == null) {
-			evaluator[index] = new IsMemberOfEvaluator(type, isNegated);
-		}
-		return evaluator[index];
-	}
+                Collection<? extends RefexChronicleBI<?>> refexes =
+                        desc.getCurrentRefexes(vc);
 
-	@Override
-	public String[] getEvaluatorIds() {
-		return SUPPORTED_IDS;
-	}
+                if (refexes != null) {
+                    for (RefexChronicleBI<?> refex : refexes) {
+                        if (refex.getCollectionNid() == evalRefsetNid) {
+                            member = true;
+                        }
+                    }
+                }
 
-	@Override
-	public Target getTarget() {
-		return Target.FACT;
-	}
+                return member;
+            } catch (IOException e) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "refset concept not found", e);
+                return member;
+            }
+        }
 
-	@Override
-	public boolean isNegatable() {
-		return true;
-	}
+        private boolean testConcept(ConceptVersionBI possibleMember, final Object value2) {
+            boolean member = false;
+            try {
+                ViewCoordinate vc = possibleMember.getViewCoordinate();
+                ConceptVersionBI possibleRefsetCV = null;
+                ConceptSpec possibleRefset = null;
 
-	@Override
-	public boolean supportsType(ValueType type) {
-		return true;
-	}
+                int evalRefsetNid = 0;
 
-	@Override
-	public void readExternal(ObjectInput in) throws IOException,
-			ClassNotFoundException {
-		evaluator = (Evaluator[]) in.readObject();
-	}
+                if (ConceptVersionBI.class.isAssignableFrom(value2.getClass())) {
+                    possibleRefsetCV = (ConceptVersionBI) value2;
+                    evalRefsetNid = possibleRefsetCV.getNid();
+                } else if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
+                    possibleRefset = (ConceptSpec) value2;
+                    evalRefsetNid = possibleRefset.get(vc).getNid();
+                } else if (ConceptFact.class.isAssignableFrom(value2.getClass())) {
+                    ConceptFact fact = (ConceptFact) value2;
+                    possibleRefsetCV = (ConceptVersionBI) fact.getConcept();
+                    evalRefsetNid = possibleRefsetCV.getNid();
+                }
 
-	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
-		out.writeObject(evaluator);
-	}
-	
+                member = possibleMember.isMember(evalRefsetNid);
+
+                return member;
+            } catch (IOException e) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "refset concept not found", e);
+                return member;
+            }
+        }
+
+        @Override
+        public boolean evaluateCachedLeft(InternalWorkingMemory workingMemory,
+                VariableContextEntry context, Object right) {
+            return testMemberOf(((ObjectVariableContextEntry) context).left, right);
+        }
+
+        @Override
+        public boolean evaluateCachedRight(InternalWorkingMemory workingMemory,
+                VariableContextEntry context, Object left) {
+            return testMemberOf(left, ((ObjectVariableContextEntry) context).right);
+        }
+
+        @Override
+        public String toString() {
+            return "IsMemberOf isMemberOf";
+        }
+    }
+    public static Operator IS_MEMBER_OF = null;
+    public static Operator NOT_IS_MEMBER_OF = null;
+    private static String[] SUPPORTED_IDS = null;
+
+    private static void init() {
+        if (IS_MEMBER_OF == null) {
+            IS_MEMBER_OF = Operator.addOperatorToRegistry("isMemberOf", false);
+            NOT_IS_MEMBER_OF = Operator.addOperatorToRegistry(IS_MEMBER_OF.getOperatorString(), true);
+            SUPPORTED_IDS = new String[]{IS_MEMBER_OF.getOperatorString()};
+        }
+    }
+
+    static {
+        init();
+    }
+    private Evaluator[] evaluator;
+
+    @Override
+    public Evaluator getEvaluator(ValueType type, Operator operator) {
+        return this.getEvaluator(type, operator.getOperatorString(), operator.isNegated(), null);
+    }
+
+    @Override
+    public Evaluator getEvaluator(ValueType type, Operator operator,
+            String parameterText) {
+        return this.getEvaluator(type, operator.getOperatorString(), operator.isNegated(), parameterText);
+    }
+
+    @Override
+    public Evaluator getEvaluator(ValueType type, String operatorId,
+            boolean isNegated, String parameterText) {
+        return getEvaluator(type, operatorId, isNegated, parameterText, Target.FACT, Target.FACT);
+    }
+
+    @Override
+    public Evaluator getEvaluator(ValueType type, String operatorId,
+            boolean isNegated, String parameterText, Target leftTarget,
+            Target rightTarget) {
+        if (evaluator == null) {
+            evaluator = new Evaluator[2];
+        }
+        int index = isNegated ? 0 : 1;
+        if (evaluator[index] == null) {
+            evaluator[index] = new IsMemberOfEvaluator(type, isNegated);
+        }
+        return evaluator[index];
+    }
+
+    @Override
+    public String[] getEvaluatorIds() {
+        return SUPPORTED_IDS;
+    }
+
+    @Override
+    public Target getTarget() {
+        return Target.FACT;
+    }
+
+    @Override
+    public boolean isNegatable() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsType(ValueType type) {
+        return true;
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException,
+            ClassNotFoundException {
+        evaluator = (Evaluator[]) in.readObject();
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeObject(evaluator);
+    }
 }
