@@ -115,6 +115,8 @@ public class ProjectDetailsPanel extends JPanel {
 		try {
 			label18.setIcon(IconUtilities.helpIcon);
 			label18.setText("");
+			label38.setIcon(IconUtilities.helpIcon);
+			label38.setText("");
 			issuesHelpLbl.setIcon(IconUtilities.helpIcon);
 			issuesHelpLbl.setText("");
 			ExportDescrAndLangSubsetPanel expPanel=new ExportDescrAndLangSubsetPanel(project);
@@ -1122,6 +1124,16 @@ public class ProjectDetailsPanel extends JPanel {
 		}
 	}
 
+	private void label38MouseClicked(MouseEvent e) {
+		try {
+			HelpApi.openHelpForComponent("MAINTENANCE_WORKFLOW");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
+
 
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -1185,6 +1197,7 @@ public class ProjectDetailsPanel extends JPanel {
 		button7 = new JButton();
 		panel3 = new JPanel();
 		label14 = new JLabel();
+		label38 = new JLabel();
 		scrollPane1 = new JScrollPane();
 		list1 = new JList();
 		panel21 = new JPanel();
@@ -1864,6 +1877,18 @@ public class ProjectDetailsPanel extends JPanel {
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
 
+				//---- label38 ----
+				label38.setText("text");
+				label38.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						label38MouseClicked(e);
+					}
+				});
+				panel3.add(label38, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+					new Insets(0, 0, 5, 0), 0, 0));
+
 				//======== scrollPane1 ========
 				{
 					scrollPane1.setViewportView(list1);
@@ -1971,7 +1996,7 @@ public class ProjectDetailsPanel extends JPanel {
 					}
 				});
 				panel27.add(issuesHelpLbl, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
 					new Insets(0, 0, 5, 0), 0, 0));
 
 				//---- label19 ----
@@ -2278,6 +2303,7 @@ public class ProjectDetailsPanel extends JPanel {
 	private JButton button7;
 	private JPanel panel3;
 	private JLabel label14;
+	private JLabel label38;
 	private JScrollPane scrollPane1;
 	private JList list1;
 	private JPanel panel21;
