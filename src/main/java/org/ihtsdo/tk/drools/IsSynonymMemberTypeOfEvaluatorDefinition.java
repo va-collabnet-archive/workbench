@@ -120,7 +120,7 @@ public class IsSynonymMemberTypeOfEvaluatorDefinition implements EvaluatorDefini
                 }
 
                 ConceptSpec SYNONYMY =
-                        new ConceptSpec("Degree of Synonymy",
+                        new ConceptSpec("Degree of Synonymy Refset",
                         		synonymyRefset);
                 evalRefsetNid = SYNONYMY.get(vc).getNid();
 
