@@ -539,6 +539,7 @@ public class RulesLibrary {
 			}
 		}
 
+		if (kbase == null) throw new Exception("Can't retrieve database...");
 		return kbase;
 	}
 
