@@ -467,7 +467,7 @@ public class CollectionEditorContainer extends JPanel {
                     }
 
                 };
-                new Thread(r).start();
+                new Thread(r, "Collection editor container").start();
             } catch (Exception e1) {
                 getConfig().setStatusMessage("Exception during execution.");
                 AceLog.getAppLog().alertAndLogException(e1);

@@ -341,13 +341,12 @@ public class ConceptView extends JPanel {
                         config.getPrecedence(), config.getConflictResolutionStrategy());
                 activeDescriptionPanels = new ArrayList<DragPanelDescription>(descriptions.size());
                 setupDescriptions(latch, descriptions, activeDescriptionPanels, cpd);
+                
                 // get all descriptions
                 List<? extends I_DescriptionTuple> tempDescList = layoutConcept.getDescriptionTuples(null,
                         null, config.getViewPositionSetReadOnly(),
                         config.getPrecedence(), config.getConflictResolutionStrategy());
 
-                HashSet<I_DescriptionTuple> descSet =
-                        new HashSet<I_DescriptionTuple>(tempDescList);
                 tempDescList.removeAll(descriptions);
 
                 inactiveDescriptions = new ArrayList<I_DescriptionTuple>(tempDescList);

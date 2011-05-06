@@ -891,7 +891,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                     }
 
                 };
-                new Thread(r).start();
+                new Thread(r, this.getClass().getCanonicalName()).start();
             } catch (Exception e1) {
                 getConfig().setStatusMessage("Exception during execution.");
                 AceLog.getAppLog().alertAndLogException(e1);

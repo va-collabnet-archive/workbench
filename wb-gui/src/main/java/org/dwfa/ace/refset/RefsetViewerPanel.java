@@ -34,7 +34,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.bpa.util.SwingWorker;
+import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
 
 public class RefsetViewerPanel extends JPanel {

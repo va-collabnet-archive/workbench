@@ -135,7 +135,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             AceLog.getAppLog().
                     warning("Memory low. Percent used: " + percentageUsed
                     + " Concept trying to recover memory by dieting concepts. ");
-            new Thread(new Diet(maxMemory)).start();
+            new Thread(new Diet(maxMemory), "Diet").start();
 
         }
     }

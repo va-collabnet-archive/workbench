@@ -753,7 +753,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
                         });
                     }
                 };
-                new Thread(r).start();
+                new Thread(r, "Concept panel").start();
             } catch (Exception e1) {
                 getConfig().setStatusMessage("Exception during execution.");
                 AceLog.getAppLog().alertAndLogException(e1);

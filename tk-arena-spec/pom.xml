@@ -1,3 +1,4 @@
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<!--
 		! Copyright (c) 2010 International Health Terminology Standards
@@ -12,19 +13,19 @@
 		limitations under the License.
 	-->
 
-	<parent>
-		<groupId>org.ihtsdo</groupId>
-		<artifactId>wb-mmb</artifactId>
-		<version>2.6.0-trek-14-SNAPSHOT</version>
-	</parent>
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>tk-arena-spec</artifactId>
-	<name>${branch}: Toolkit Arena DROOLS Rules Spec</name>
+    <parent>
+        <groupId>org.ihtsdo</groupId>
+        <artifactId>wb-mmb</artifactId>
+        <version>2.6.0-trek-14-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>tk-arena-spec</artifactId>
+    <name>${branch}: Toolkit Arena DROOLS Rules Spec</name>
     <dependencies>
-	    <dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>tk-concept-component</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>tk-concept-component</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>    

@@ -519,7 +519,7 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener, Prope
                 }
 
             };
-            new Thread(r).start();
+            new Thread(r, this.getClass().getCanonicalName()).start();
         }
 
     }

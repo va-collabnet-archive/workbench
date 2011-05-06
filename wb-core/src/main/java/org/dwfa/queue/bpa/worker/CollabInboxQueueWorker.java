@@ -185,7 +185,8 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
      */
     public void start(I_QueueProcesses queue) {
         this.queue = queue;
-        this.workerThread = new Thread(this, "Worker " + this.getWorkerDesc());
+        this.workerThread = new Thread(this, 
+                "Worker " + this.getWorkerDesc());
         this.workerThread.start();
     }
 

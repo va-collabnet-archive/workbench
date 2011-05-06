@@ -259,7 +259,7 @@ public class WorkbenchRunner {
             long loadTime = System.currentTimeMillis() - startTime;
             AceLog.getAppLog().info("### Load time: " + loadTime + " ms");
             AceLog.getAppLog().info("Adding bdb shutdown hook. ");
-            Runtime.getRuntime().addShutdownHook(new Thread() {
+            Runtime.getRuntime().addShutdownHook(new Thread(this.getClass().getCanonicalName()) {
 
                 /**
                  * TODO For some reason, this thread does not seem to run in

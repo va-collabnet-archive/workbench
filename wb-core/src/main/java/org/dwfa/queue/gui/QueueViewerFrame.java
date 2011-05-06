@@ -97,7 +97,7 @@ public class QueueViewerFrame extends ComponentFrame {
         public void actionPerformed(ActionEvent arg0) {
             try {
                 worker = viewer.getWorker();
-                new Thread(this).start();
+                new Thread(this, this.getClass().getCanonicalName()).start();
             } catch (Exception ex) {
                 logger.log(Level.WARNING, ex.toString(), ex);
             }

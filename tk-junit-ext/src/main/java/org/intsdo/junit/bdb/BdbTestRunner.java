@@ -79,7 +79,7 @@ public class BdbTestRunner extends BlockJUnit4ClassRunner {
                         Logger.getLogger(BdbTestRunner.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-            }));
+            }, "Shutdown hook"));
         }
     }
 }

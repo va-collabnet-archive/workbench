@@ -1036,7 +1036,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private CdePalette historyPalette;
     private JToggleButton showSearchToggle;
     public static ExecutorService threadPool =
-            Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2, 
+            Executors.newCachedThreadPool(
             new NamedThreadFactory(new ThreadGroup("ACE "), "GUI Background "));
     public AceFrameConfig aceFrameConfig;
     public static AceConfig aceConfig;
@@ -2832,7 +2832,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                         });
                     }
                 };
-                new Thread(r).start();
+                new Thread(r, "ACE-a").start();
             } catch (Exception e1) {
                 aceFrameConfig.setStatusMessage("Exception during execution.");
                 AceLog.getAppLog().alertAndLogException(e1);
