@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseConfiguration;
@@ -54,7 +53,6 @@ import org.ihtsdo.tk.drools.IsUsMemberTypeOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.SatisfiesConstraintEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsGbMemberTypeOfEvaluatorDefinition;
 
-
 /**
  *
  * @author kec
@@ -75,7 +73,6 @@ public class DroolsExecutionManager {
     }
     private boolean failed = false;
     Collection<KnowledgePackage> kpkgs = null;
-    
     private static ConcurrentHashMap<String, Semaphore> packageLocks = new ConcurrentHashMap<String, Semaphore>();
 
     public DroolsExecutionManager(Set<File> kbFiles, String kbKey) throws IOException {
@@ -83,7 +80,6 @@ public class DroolsExecutionManager {
                 kbFiles, kbKey);
     }
 
-    
     public DroolsExecutionManager(EnumSet<ExtraEvaluators> extraEvaluators,
             Set<File> kbFiles, String kbKey) throws IOException {
 
@@ -92,13 +88,13 @@ public class DroolsExecutionManager {
         ruleDirectory.mkdirs();
         this.kbFiles = kbFiles;
         drlPkgFile = new File(ruleDirectory, kbKey + ".kpkgs");
-        
+
         Semaphore s = new Semaphore(1);
         Semaphore s2 = packageLocks.putIfAbsent(drlPkgFile.getCanonicalPath(), s);
         if (s2 != null) {
             s = s2;
         }
-        
+
         for (File f : this.kbFiles) {
             if (!drlPkgFile.exists() || drlPkgFile.lastModified() < f.lastModified()) {
                 s.acquireUninterruptibly();
@@ -175,19 +171,19 @@ public class DroolsExecutionManager {
                     IsMissingDescForDialectEvaluatorDefinition.IS_MISSING_DESC_FOR.getOperatorString(),
                     new IsMissingDescForDialectEvaluatorDefinition()));
         }
-        
+
         if (extraEvaluators.contains(ExtraEvaluators.IS_GB_MEMBER_TYPE_OF)) {
             builderConfig.setOption(EvaluatorOption.get(
                     IsGbMemberTypeOfEvaluatorDefinition.IS_GB_MEMBER_TYPE_OF.getOperatorString(),
                     new IsGbMemberTypeOfEvaluatorDefinition()));
         }
-        
+
         if (extraEvaluators.contains(ExtraEvaluators.IS_US_MEMBER_TYPE_OF)) {
             builderConfig.setOption(EvaluatorOption.get(
                     IsUsMemberTypeOfEvaluatorDefinition.IS_US_MEMBER_TYPE_OF.getOperatorString(),
                     new IsUsMemberTypeOfEvaluatorDefinition()));
         }
-        
+
         if (extraEvaluators.contains(ExtraEvaluators.IS_SYNONYM_MEMBER_TYPE_OF)) {
             builderConfig.setOption(EvaluatorOption.get(
                     IsSynonymMemberTypeOfEvaluatorDefinition.IS_SYNONYM_MEMBER_TYPE_OF.getOperatorString(),
@@ -234,16 +230,20 @@ public class DroolsExecutionManager {
             }
 
             StatefulKnowledgeSession ksession = mgr.kbase.newStatefulKnowledgeSession();
-            if (useLogger) {
-                logger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+            try {
+                if (useLogger) {
+                    logger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+                }
+                for (Map.Entry<String, Object> e : globals.entrySet()) {
+                    ksession.setGlobal(e.getKey(), e.getValue());
+                }
+                for (Object fact : facts) {
+                    ksession.insert(fact);
+                }
+                ksession.fireAllRules();
+            } finally {
+                ksession.dispose();
             }
-            for (Map.Entry<String, Object> e : globals.entrySet()) {
-                ksession.setGlobal(e.getKey(), e.getValue());
-            }
-            for (Object fact : facts) {
-                ksession.insert(fact);
-            }
-            ksession.fireAllRules();
         } catch (Throwable ex) {
             if (mgr != null) {
                 mgr.failed = true;
