@@ -44,6 +44,7 @@ import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -111,21 +112,23 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                 I_GetConceptData cb = (I_GetConceptData) termList.getElementAt(i);
 
                 // EXISTING PARENTS
-                for (RelationshipChronicleBI rel : cb.getRelsOutgoing()) {
-                    RelationshipVersionBI rv = rel.getVersion(vc);
-                    if (rv != null && rv.isStated()) {
-                        setParents.add(rel.getDestinationNid());
+                for (ConceptVersionBI cvbi : cb.getVersions(vc)) {
+                    for (RelationshipVersionBI rvbi : cvbi.getRelsOutgoingActive()) {
+                        if (rvbi.isStated() ) {
+                            setParents.add(rvbi.getDestinationNid());
+                        }
                     }
                 }
 
                 // EXISTING ROLES
-                for (RelationshipChronicleBI rel : cb.getRelsIncoming()) {
-                    RelationshipVersionBI rv = rel.getVersion(vc);
-                    if (rv != null && rv.isStated() /* :!!!: && rv.isActive(ace.getAceFrameConfig().getAllowedStatus())*/) {
-                        setRoles.add(rv.getNid());
+                for (ConceptVersionBI cvbi : cb.getVersions(vc)) {
+                    for (RelationshipVersionBI rvbi : cvbi.getRelsOutgoingActive()) {
+                        if (rvbi.isStated()) {
+                            setRoles.add(rvbi.getNid());
+                        }
                     }
                 }
-
+                
                 //
                 Collection<? extends RefexVersionBI<?>> cr = cb.getCurrentRefexes(vc);
                 for (RefexVersionBI<?> rvbi : cr) {
