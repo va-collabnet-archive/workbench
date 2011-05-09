@@ -122,6 +122,9 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
  
     // transient
     private transient File profileFile;
+    
+    // Max CS FIle Size 
+    private int maxCSFileSize = 512000;
 
     public AceConfig() throws TerminologyException, IOException {
         super();
@@ -458,11 +461,11 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         }
         File changeSetFile = new File(getChangeSetRoot(), getChangeSetWriterFileName());
         if (changeSetFile.exists()) {
-            int maxSize = 512000;
-            if (changeSetFile.length() > maxSize) {
+            //int maxSize = 512000;
+            if (changeSetFile.length() > maxCSFileSize) {
                 renameChangeSetFile();
                 AceLog.getAppLog().info(
-                    "change set exceeds " + maxSize + " bytes. Incrementing file to: " + getChangeSetWriterFileName());
+                    "change set exceeds " + maxCSFileSize + " bytes. Incrementing file to: " + getChangeSetWriterFileName());
             }
         }
         FileOutputStream fos = new FileOutputStream(profileFile);
@@ -623,6 +626,14 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 
 	public void setUserpath_UUIDs(List<UUID> userpath_UUIDs) {
 		this.userpath_UUIDs = userpath_UUIDs;
+	}
+
+	public int getMaxCSFileSize() {
+		return maxCSFileSize;
+	}
+
+	public void setMaxCSFileSize(int maxCSFileSize) {
+		this.maxCSFileSize = maxCSFileSize;
 	}
 
 
