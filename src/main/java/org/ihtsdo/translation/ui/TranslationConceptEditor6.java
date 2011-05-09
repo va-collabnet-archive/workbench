@@ -80,6 +80,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
@@ -1036,6 +1037,28 @@ public class TranslationConceptEditor6 extends JPanel {
 		if (e.getClickCount() == 2) {
 			viewComment();
 		}
+		
+		if ( SwingUtilities.isLeftMouseButton( e ) )
+		{
+			// Do something
+		}
+		// Right mouse click
+		else if ( SwingUtilities.isRightMouseButton( e ) )
+		{
+			// get the coordinates of the mouse click
+			Point p = e.getPoint();
+ 
+			// get the row index that contains that coordinate
+			int rowNumber = tblComm.rowAtPoint( p );
+ 
+			// Get the ListSelectionModel of the JTable
+			ListSelectionModel model = tblComm.getSelectionModel();
+ 
+			// set the selected interval of rows. Using the "rowNumber"
+			// variable for the beginning and end selects only that one row.
+			model.setSelectionInterval( rowNumber, rowNumber );
+			popupMenu1.show(e.getComponent(), e.getX(), e.getY());
+		}
 	}
 
 	private void viewComment() {
@@ -1266,6 +1289,14 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	private void deleteCommentActionPerformed(ActionEvent e) {
+		tblComm.getModel().getValueAt(tblComm.getSelectedRow(), tblComm.getSelectedColumn());
+	}
+
+	private void viewCommentActionPerformed(ActionEvent e) {
+		viewComment();
+	}
+
 	class SelectionListener implements ListSelectionListener {
 
 		/** The table. */
@@ -1395,6 +1426,9 @@ public class TranslationConceptEditor6 extends JPanel {
 		scrollPane7 = new JScrollPane();
 		tree3 = new JTree();
 		hierarchyNavigator1 = new HierarchyNavigator();
+		popupMenu1 = new JPopupMenu();
+		menuItem2 = new JMenuItem();
+		menuItem3 = new JMenuItem();
 
 		//======== this ========
 		setBackground(new Color(238, 238, 238));
@@ -2040,6 +2074,30 @@ public class TranslationConceptEditor6 extends JPanel {
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 0, 0), 0, 0));
 
+		//======== popupMenu1 ========
+		{
+
+			//---- menuItem2 ----
+			menuItem2.setText("Delete");
+			menuItem2.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					deleteCommentActionPerformed(e);
+				}
+			});
+			popupMenu1.add(menuItem2);
+
+			//---- menuItem3 ----
+			menuItem3.setText("View Comment");
+			menuItem3.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					viewCommentActionPerformed(e);
+				}
+			});
+			popupMenu1.add(menuItem3);
+		}
+
 		//---- buttonGroup1 ----
 		ButtonGroup buttonGroup1 = new ButtonGroup();
 		buttonGroup1.add(rbYes);
@@ -2127,6 +2185,9 @@ public class TranslationConceptEditor6 extends JPanel {
 	private JScrollPane scrollPane7;
 	private JTree tree3;
 	private HierarchyNavigator hierarchyNavigator1;
+	private JPopupMenu popupMenu1;
+	private JMenuItem menuItem2;
+	private JMenuItem menuItem3;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
 	/** The concept. */
@@ -3427,7 +3488,7 @@ public class TranslationConceptEditor6 extends JPanel {
 					} else {
 						tableModel.addRow(new Object[] {
 								"Language refset: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "/" + Terms.get().getConcept(commentsList.get(i).getSubTypeCid()),
-								formatComment(commentsList.get(i).getComment()) });
+								commentsList.get(i).getComment() });
 					}
 				}
 			}
@@ -3441,7 +3502,7 @@ public class TranslationConceptEditor6 extends JPanel {
 				} else {
 					tableModel.addRow(new Object[] {
 							"Worklist: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "/" + Terms.get().getConcept(commentsList.get(i).getSubTypeCid()),
-							formatComment(commentsList.get(i).getComment()) });
+							commentsList.get(i).getComment() });
 				}
 			}
 
