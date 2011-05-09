@@ -1,15 +1,17 @@
 package org.ihtsdo.project.refset;
 
-public class Comment {
+public class Comment implements Comparable<Comment> {
 	private int typeCid;
 	private int subTypeCid;
 	private String comment;
+	private Long time;
 
-	public Comment(int typeCid, int subTypeCid, String comment) {
+	public Comment(int typeCid, int subTypeCid, String comment, Long time) {
 		super();
 		this.typeCid = typeCid;
 		this.subTypeCid = subTypeCid;
 		this.comment = comment;
+		this.time = time;
 	}
 
 	public int getTypeCid() {
@@ -35,21 +37,17 @@ public class Comment {
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
-	
-}
-	
-class CommentComparator implements java.util.Comparator<Comment> {
 
-	@Override
-	public int compare(Comment comment1, Comment comment2) {
-		String[] splitedComment1 = comment1.getComment().split(" ");
-		String[] splitedComment2 = comment2.getComment().split(" ");
-		
-		Long commentTime1 = Long.valueOf(splitedComment1[splitedComment1.length -1]);
-		Long commentTime2 = Long.valueOf(splitedComment2[splitedComment2.length -1]);
-		
-		return commentTime1.compareTo(commentTime2);
-		
+	public Long getTime() {
+		return time;
 	}
-	
+
+	public void setTime(Long time) {
+		this.time = time;
+	}
+
+	public int compareTo(Comment comment2) {
+		return this.getTime().compareTo(comment2.getTime());
+	}
+
 }

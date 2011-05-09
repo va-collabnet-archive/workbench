@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -127,10 +128,10 @@ public class CommentsRefset extends Refset {
 		return descendants;
 	}
 
-	public List<Comment> getFullComments(int componentId) throws IOException, TerminologyException {
+	public LinkedList<Comment> getFullComments(int componentId) throws IOException, TerminologyException {
 		// TODO: move config to parameter
 		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
-		List<Comment> comments = new ArrayList<Comment>();
+		LinkedList<Comment> comments = new LinkedList<Comment>();
 		for (I_ExtendByRef commentsMember : termFactory.getAllExtensionsForComponent(componentId, true)) {
 			if (commentsMember.getRefsetId() == this.refsetId) {
 				long lastVersion = Long.MIN_VALUE;
@@ -145,12 +146,13 @@ public class CommentsRefset extends Refset {
 				// TODO: convert time from int to readable time
 				if (commentsExtensionPart != null) {
 					Comment comment = new Comment(commentsExtensionPart.getC1id(), commentsExtensionPart.getC2id(), 
-							commentsExtensionPart.getStringValue() + " - Time: " + commentsExtensionPart.getTime());
+							commentsExtensionPart.getStringValue() + " - Time: " + commentsExtensionPart.getTime(),
+							commentsExtensionPart.getTime());
 					comments.add(comment);
 				}
 			}
 		}
-		Collections.sort(comments, new CommentComparator());
+		Collections.sort(comments);
 		return comments;
 	}
 
