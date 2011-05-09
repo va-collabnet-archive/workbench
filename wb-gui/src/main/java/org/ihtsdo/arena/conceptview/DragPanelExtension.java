@@ -37,17 +37,17 @@ public class DragPanelExtension
     private static final long serialVersionUID = 1L;
     private JLabel extensionLabel;
 
-    public DragPanelExtension(ConceptViewSettings settings,
+    public DragPanelExtension(ConceptViewLayout viewLayout,
             CollapsePanel parentCollapsePanel, RefexVersionBI<?> refex)
             throws IOException, TerminologyException {
-        super(settings, parentCollapsePanel, refex);
+        super(viewLayout, parentCollapsePanel, refex);
         layoutExtension();
     }
 
-    public DragPanelExtension(LayoutManager layout, ConceptViewSettings settings,
+    public DragPanelExtension(LayoutManager layout, ConceptViewLayout viewLayout,
             CollapsePanel parentCollapsePanel, RefexVersionBI<?> refex)
             throws IOException, TerminologyException {
-        super(layout, settings, parentCollapsePanel, refex);
+        super(layout, viewLayout, parentCollapsePanel, refex);
         layoutExtension();
     }
 
@@ -61,7 +61,7 @@ public class DragPanelExtension
             if (!thingToDrag.equals(dav)) {
                 DragPanelExtension dpd = new DragPanelExtension(
                         new GridBagLayout(),
-                        getSettings(),
+                        viewLayout,
                         null,
                         dav);
                 dpd.setInactiveBackground();

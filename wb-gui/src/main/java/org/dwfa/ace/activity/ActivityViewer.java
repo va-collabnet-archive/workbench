@@ -63,10 +63,9 @@ public class ActivityViewer implements ActionListener {
     private static boolean resort = false;
 
     private static class CompleteListener implements I_ShowActivity {
-        
+
         @SuppressWarnings("unused")
-		I_ShowActivity source;
-        
+        I_ShowActivity source;
 
         private CompleteListener(I_ShowActivity source) {
             super();
@@ -79,82 +78,102 @@ public class ActivityViewer implements ActionListener {
             updateActivity.set(true);
         }
 
+        @Override
         public void addRefreshActionListener(ActionListener l) {
         }
 
+        @Override
         public void addShowActivityListener(I_ShowActivity listener) {
         }
 
+        @Override
         public void complete() {
-        	resort = true;
-         }
+            resort = true;
+        }
 
+        @Override
         public int getMaximum() {
             return 0;
         }
 
+        @Override
         public long getStartTime() {
             return 0;
         }
 
+        @Override
         public int getValue() {
             return 0;
         }
 
+        @Override
         public JPanel getViewPanel(boolean shotBorder) {
             return null;
         }
 
+        @Override
         public boolean isComplete() {
             return false;
         }
 
+        @Override
         public boolean isIndeterminate() {
             return false;
         }
 
+        @Override
         public void removeRefreshActionListener(ActionListener l) {
         }
 
+        @Override
         public void removeShowActivityListener(I_ShowActivity listener) {
         }
 
+        @Override
         public void setIndeterminate(boolean newValue) {
             resort = true;
         }
 
+        @Override
         public void setMaximum(int n) {
         }
 
+        @Override
         public void setProgressInfoLower(String text) {
         }
 
+        @Override
         public void setProgressInfoUpper(String text) {
         }
 
+        @Override
         public void setStartTime(long time) {
         }
 
+        @Override
         public void setValue(int n) {
         }
 
- 
+        @Override
         public void setStringPainted(boolean stringPainted) {
         }
 
-
+        @Override
         public I_ConfigAceFrame getAceFrameConfig() {
             return null;
         }
 
+        @Override
         public String getProgressInfoLower() {
             return null;
         }
 
+        @Override
         public String getProgressInfoUpper() {
             return null;
         }
 
+        @Override
         public boolean isStringPainted() {
             return false;
         }
@@ -199,17 +218,17 @@ public class ActivityViewer implements ActionListener {
             return false;
         }
 
-		@Override
-		public void cancel() {
-	        // Nothing to do
-		}
-
+        @Override
+        public void cancel() {
+            // Nothing to do
+        }
     }
 
     private class ActivityViewerFrame extends ComponentFrame {
+
         /**
-		 *
-		 */
+         *
+         */
         private static final long serialVersionUID = 1L;
 
         public ActivityViewerFrame() throws Exception {
@@ -224,7 +243,6 @@ public class ActivityViewer implements ActionListener {
             // Nothing to do
         }
 
-        
         @Override
         public int getCount() {
             return 0;
@@ -245,42 +263,37 @@ public class ActivityViewer implements ActionListener {
             return null;
         }
 
+        @Override
         public void addInternalFrames(JMenu menu) {
             // nothing to do...
         }
-
     }
-
     private ComponentFrame viewerFrame;
-
     private List<I_ShowActivity> activitiesList = new CopyOnWriteArrayList<I_ShowActivity>();
-    private Set<I_ShowActivity> activitiesSet = new ConcurrentSkipListSet<I_ShowActivity>(new Comparator<I_ShowActivity>() {
+    private final Set<I_ShowActivity> activitiesSet = new ConcurrentSkipListSet<I_ShowActivity>(new Comparator<I_ShowActivity>() {
 
-		@Override
-		public int compare(I_ShowActivity o1, I_ShowActivity o2) {
-			return o1.hashCode() - o2.hashCode();
-		}
-	});
-    
-    private static Timer resortTimer = new Timer(500, null);
-    private static Timer updateTimer = new Timer(200, null);
-    static {
-        updateTimer.start();
-        resortTimer.start();
-    }
-   
+        @Override
+        public int compare(I_ShowActivity o1, I_ShowActivity o2) {
+            return o1.hashCode() - o2.hashCode();
+        }
+    });
+    private static final Timer resortTimer = new Timer(1000, null);
+    private static final Timer updateTimer = new Timer(500, null);
+
+
     public static void removeFromUpdateTimer(ActionListener l) {
         updateTimer.removeActionListener(l);
     }
- 
+
     public static void addToUpdateTimer(ActionListener l) {
         updateTimer.addActionListener(l);
     }
- 
+
     private ActivityViewer() throws Exception {
         super();
-        viewer = this;
         if (DwfaEnv.isHeadless() == false) {
+            updateTimer.start();
+            resortTimer.start();
             viewerFrame = new ActivityViewerFrame();
             JScrollPane scroller = new JScrollPane();
             scroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -293,12 +306,11 @@ public class ActivityViewer implements ActionListener {
         }
 
     }
-
-
     private static ActivityComparator activityComparator = new ActivityComparator();
 
     private static class ActivityComparator implements Comparator<I_ShowActivity> {
 
+        @Override
         public int compare(I_ShowActivity a1, I_ShowActivity a2) {
             if (a1.isCompleteForComparison() && a2.isCompleteForComparison()) {
                 if (a1.getStartTime() < a2.getStartTime()) {
@@ -337,15 +349,15 @@ public class ActivityViewer implements ActionListener {
             }
             return -1;
         }
-
     }
 
     public static void addActivity(final I_ShowActivity activity) throws Exception {
         if (DwfaEnv.isHeadless() == false) {
-           
+
             activity.addShowActivityListener(new CompleteListener(activity));
             SwingUtilities.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     try {
                         if (viewer == null) {
@@ -360,22 +372,19 @@ public class ActivityViewer implements ActionListener {
                             ActivityViewer.updateTimer.addActionListener(activity);
                             resort = true;
                         }
-                        
+
                         updateActivities();
                     } catch (HeadlessException e) {
                         AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
                     }
                 }
-
- 
             });
         }
     }
 
     private static void updateActivities() {
-    	updateActivity.set(true);
+        updateActivity.set(true);
     }
-
 
     private static void linkToSourceFrameActivityPanel() {
         for (I_ShowActivity a : viewer.activitiesList) {
@@ -410,7 +419,7 @@ public class ActivityViewer implements ActionListener {
                     viewer.activitiesList.remove(60);
                 }
             }
-            viewer.activitiesList = new CopyOnWriteArrayList<I_ShowActivity>(listToSort); 
+            viewer.activitiesList = new CopyOnWriteArrayList<I_ShowActivity>(listToSort);
             return true;
         }
 
@@ -427,13 +436,13 @@ public class ActivityViewer implements ActionListener {
                 AceLog.getAppLog().alertAndLogException(e);
             }
         }
-        
     }
-    
+
     public static void removeActivity(final I_ShowActivity activity) {
         if (DwfaEnv.isHeadless() == false) {
             SwingUtilities.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     updateTimer.removeActionListener(activity);
                     viewer.activitiesList.remove(activity);
@@ -452,7 +461,7 @@ public class ActivityViewer implements ActionListener {
             }
         } else {
             SwingUtilities.invokeLater(new Runnable() {
-                
+
                 @Override
                 public void run() {
                     if (viewer != null) {
@@ -465,11 +474,12 @@ public class ActivityViewer implements ActionListener {
     }
 
     public static void toBack() {
-         if (SwingUtilities.isEventDispatchThread()) {
-             viewer.viewerFrame.toBack();
+        if (SwingUtilities.isEventDispatchThread()) {
+            viewer.viewerFrame.toBack();
         } else {
             SwingUtilities.invokeLater(new Runnable() {
-                 @Override
+
+                @Override
                 public void run() {
                     viewer.viewerFrame.toBack();
                 }
@@ -483,78 +493,75 @@ public class ActivityViewer implements ActionListener {
         }
         return viewer.viewerFrame;
     }
-
     static AtomicBoolean updateActivity = new AtomicBoolean(false);
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (resort) {
-			resort = false;
-	        if (DwfaEnv.isHeadless() == false) {
-	            new ActivitySorter().execute();
-	         }
-		}
-		
-		synchronized (this) {
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (resort) {
+            resort = false;
+            if (DwfaEnv.isHeadless() == false) {
+                new ActivitySorter().execute();
+            }
+        }
+
+        synchronized (this) {
             boolean update = updateActivity.getAndSet(false);
             if (update) {
                 new UpdateActivities().execute();
             }
         }
-	}
-	
-	   private static class UpdateActivities extends SwingWorker<JPanel, Object> {
+    }
 
-	        @Override
-	        protected JPanel doInBackground() throws Exception {
-	        		JPanel newPanel = new JPanel(new GridBagLayout());
-	                GridBagConstraints gbc = new GridBagConstraints();
-	                gbc.gridx = 0;
-	                gbc.gridy = 0;
-	                gbc.weightx = 1;
-	                gbc.weighty = 0;
-	                gbc.fill = GridBagConstraints.HORIZONTAL;
-	                gbc.anchor = GridBagConstraints.NORTHWEST;
-	                gbc.gridwidth = 1;
-	                gbc.gridheight = 1;
-	                linkToSourceFrameActivityPanel();
-	                for (I_ShowActivity a : viewer.activitiesList) {
-	                    newPanel.add(a.getViewPanel(true), gbc);
-	                    gbc.gridy++;
-	                }
-	                JPanel activitiesAndFillerPanel = new JPanel(new GridBagLayout());
-	                gbc = new GridBagConstraints();
-	                gbc.fill = GridBagConstraints.HORIZONTAL;
-	                gbc.gridx = 0;
-	                gbc.gridy = 0;
-	                gbc.gridheight = 1;
-	                gbc.weightx = 1.0;
-	                gbc.weighty = 0;
-	                gbc.anchor = GridBagConstraints.NORTHWEST;
-	                activitiesAndFillerPanel.add(newPanel, gbc);
+    private static class UpdateActivities extends SwingWorker<JPanel, Object> {
 
-	                gbc.gridy++;
-	                gbc.weighty = 1;
-	                gbc.fill = GridBagConstraints.BOTH;
-	                activitiesAndFillerPanel.add(new JPanel(), gbc);
-	         	                return activitiesAndFillerPanel;
-	        }
+        @Override
+        protected JPanel doInBackground() throws Exception {
+            JPanel newPanel = new JPanel(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.weightx = 1;
+            gbc.weighty = 0;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.anchor = GridBagConstraints.NORTHWEST;
+            gbc.gridwidth = 1;
+            gbc.gridheight = 1;
+            linkToSourceFrameActivityPanel();
+            for (I_ShowActivity a : viewer.activitiesList) {
+                newPanel.add(a.getViewPanel(true), gbc);
+                gbc.gridy++;
+            }
+            JPanel activitiesAndFillerPanel = new JPanel(new GridBagLayout());
+            gbc = new GridBagConstraints();
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.gridheight = 1;
+            gbc.weightx = 1.0;
+            gbc.weighty = 0;
+            gbc.anchor = GridBagConstraints.NORTHWEST;
+            activitiesAndFillerPanel.add(newPanel, gbc);
 
-	        @Override
-	        protected void done() {
-	        	try {
-	                viewer.viewerFrame.setContentPane(new JScrollPane(get()));
-					boolean tickle = true;
-					if (tickle) {
-						GuiUtil.tickle(viewer.viewerFrame);
-					}
-				} catch (InterruptedException e) {
-					AceLog.getAppLog().alertAndLogException(e);
-				} catch (ExecutionException e) {
-					AceLog.getAppLog().alertAndLogException(e);
-				}
-	        }
+            gbc.gridy++;
+            gbc.weighty = 1;
+            gbc.fill = GridBagConstraints.BOTH;
+            activitiesAndFillerPanel.add(new JPanel(), gbc);
+            return activitiesAndFillerPanel;
+        }
 
-	        
-	    }
-
+        @Override
+        protected void done() {
+            try {
+                viewer.viewerFrame.setContentPane(new JScrollPane(get()));
+                boolean tickle = true;
+                if (tickle) {
+                    GuiUtil.tickle(viewer.viewerFrame);
+                }
+            } catch (InterruptedException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            } catch (ExecutionException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
+        }
+    }
 }

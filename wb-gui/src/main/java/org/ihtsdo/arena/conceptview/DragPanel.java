@@ -94,13 +94,13 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
         ArrayList<Action> list = new ArrayList<Action>();
         try {
 
-            if (settings.getConcept() != null) {
+            if (getSettings().getConcept() != null) {
                 if (I_GetConceptData.class.isAssignableFrom(thingToDrop.getClass())) {
                     I_GetConceptData conceptToDrop = (I_GetConceptData) thingToDrop;
-                    thingToDrop = Ts.get().getConceptVersion(settings.getConfig().getViewCoordinate(), conceptToDrop.getConceptNid());
+                    thingToDrop = Ts.get().getConceptVersion(getSettings().getConfig().getViewCoordinate(), conceptToDrop.getConceptNid());
                 } else if (ComponentVersionBI.class.isAssignableFrom(thingToDrop.getClass())
                         || SpecBI.class.isAssignableFrom(thingToDrop.getClass())) {
-                    ViewCoordinate coordinate = settings.getConfig().getViewCoordinate();
+                    ViewCoordinate coordinate = getSettings().getConfig().getViewCoordinate();
                     Map<String, Object> globals = new HashMap<String, Object>();
                     globals.put("vc", coordinate);
                     globals.put("actions", list);
@@ -175,7 +175,8 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
         }
     }
 
-    public class DropPanelActionManager implements ActionListener, I_DispatchDragStatus {
+    public class DropPanelActionManager implements ActionListener, I_DispatchDragStatus, Comparable<DropPanelActionManager> {
+
 
         private class DragStarter extends SwingWorker<String, String> {
 
@@ -199,7 +200,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
                     JPanel dropTargetPanels = new JPanel(new GridLayout(1, 1));
                     JLabel dropPanelLabel = new JLabel("    " + userString);
 //                    AceLog.getAppLog().info("Setting up drag panel for: " + id + " " + userString);
-                    dropPanelLabel.setFont(dropPanelLabel.getFont().deriveFont(settings.getFontSize()));
+                    dropPanelLabel.setFont(dropPanelLabel.getFont().deriveFont(getSettings().getFontSize()));
                     dropPanelLabel.setOpaque(true);
                     dropPanelLabel.setBackground(ConceptViewTitle.TITLE_COLOR);
                     if (dropPanel == null) {
@@ -252,12 +253,29 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
         private Collection<JComponent> addedDropComponents = new ArrayList<JComponent>();
         private JLayeredPane rootLayers;
         private DropPanelProxy dpp;
+        private int dpamId = atomicInt.incrementAndGet();
+
+        @Override
+        public int compareTo(DropPanelActionManager o) {
+            return this.dpamId - o.dpamId;
+        }
 
         public DropPanelActionManager() {
             super();
             this.dpp = new DropPanelProxy(this);
             DragPanel.this.addHierarchyListener(this.dpp);
             timer = new Timer(250, this);
+            viewLayout.getDropPanelActionManagers().add(this);
+//            AceLog.getAppLog().info("Setting up DropPanelActionManager for: " + id + " " + thingToDrag.toString());
+        }
+        
+        public void removeReferences() {
+            if (viewLayout.stop) {
+                timer.stop();
+                timer.removeActionListener(this);
+                DragMonitor.removeDragListener(dpp);
+//                AceLog.getAppLog().info("Removing DropPanelActionManager for: " + id + " " + thingToDrag.toString());
+            }
         }
 
         @Override
@@ -486,8 +504,8 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
     private static final long serialVersionUID = 1L;
     protected T thingToDrag;
     private boolean dragEnabled;
-    private I_DispatchDragStatus dropPanelMgr;
-    private ConceptViewSettings settings;
+    private DropPanelActionManager dropPanelMgr;
+    protected ConceptViewLayout viewLayout;
     private Collection<Action> actionList = Collections.synchronizedCollection(new ArrayList<Action>());
     private Collection<JComponent> dropComponents = Collections.synchronizedList(new ArrayList<JComponent>());
     private Object lastThingBeingDropped;
@@ -506,27 +524,32 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
         this.inGroup = inGroup;
     }
 
-    public DragPanel(ConceptViewSettings settings, T component) {
+     public DragPanel(ConceptViewLayout viewLayout, T component) {
         super();
         this.thingToDrag = component;
         this.id = atomicInt.incrementAndGet();
-        setup(settings);
+        setup(viewLayout);
     }
 
     public DragPanel(LayoutManager layout,
-            ConceptViewSettings settings, T component) {
+            ConceptViewLayout viewLayout, T component) {
         super(layout);
         this.thingToDrag = component;
         this.id = atomicInt.incrementAndGet();
-        setup(settings);
+        setup(viewLayout);
     }
 
-    private void setup(ConceptViewSettings settings) {
-        dropPanelMgr = new DropPanelActionManager();
-        this.settings = settings;
+
+    public void removeReferences() {
+        dropPanelMgr.removeReferences();
+    }
+
+    private void setup(ConceptViewLayout viewLayout) {
+        this.viewLayout = viewLayout;
         this.setMinimumSize(new Dimension(minSize, minSize));
         this.kbFiles.add(new File("drools-rules/ContextualDropActions.drl"));
-
+        dropPanelMgr = new DropPanelActionManager();
+ 
         try {
             DroolsExecutionManager.setup(DragPanel.class.getCanonicalName(), kbFiles);
         } catch (IOException e1) {
@@ -615,7 +638,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
     }
 
     protected void getKbActions(Object thingToDrop) {
-        settings.getView().setupDrop(thingToDrop);
+        getSettings().getView().setupDrop(thingToDrop);
         actionList.clear();
         actionList.addAll(getKbActionsNoSetup(thingToDrop));
     }
@@ -706,7 +729,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
     }
 
     public ConceptViewSettings getSettings() {
-        return settings;
+        return viewLayout.getSettings();
     }
 
     public abstract String getUserString(T obj);

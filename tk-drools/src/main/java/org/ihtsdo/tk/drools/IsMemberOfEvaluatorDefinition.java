@@ -40,6 +40,7 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.drools.facts.DescFact;
+import org.ihtsdo.tk.spec.ValidationException;
 
 public class IsMemberOfEvaluatorDefinition implements EvaluatorDefinition {
 
@@ -135,7 +136,12 @@ public class IsMemberOfEvaluatorDefinition implements EvaluatorDefinition {
                     evalRefsetNid = possibleRefsetCV.getNid();
                 } else if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
                     possibleRefset = (ConceptSpec) value2;
-                    evalRefsetNid = possibleRefset.get(vc).getNid();
+                    try {
+                        evalRefsetNid = possibleRefset.getStrict(vc).getNid();
+                    } catch (ValidationException ve) {
+                        ve.printStackTrace();
+                        return false;
+                    }
                 } else if (ConceptFact.class.isAssignableFrom(value2.getClass())) {
                     ConceptFact fact = (ConceptFact) value2;
                     possibleRefsetCV = (ConceptVersionBI) fact.getConcept();
@@ -173,8 +179,15 @@ public class IsMemberOfEvaluatorDefinition implements EvaluatorDefinition {
                     possibleRefsetCV = (ConceptVersionBI) value2;
                     evalRefsetNid = possibleRefsetCV.getNid();
                 } else if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
+                    
                     possibleRefset = (ConceptSpec) value2;
-                    evalRefsetNid = possibleRefset.get(vc).getNid();
+                    try {
+                        evalRefsetNid = possibleRefset.getStrict(vc).getNid();
+                    } catch (ValidationException ve) {
+                        ve.printStackTrace();
+                        return false;
+                    }
+                                        
                 } else if (ConceptFact.class.isAssignableFrom(value2.getClass())) {
                     ConceptFact fact = (ConceptFact) value2;
                     possibleRefsetCV = (ConceptVersionBI) fact.getConcept();

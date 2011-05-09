@@ -32,19 +32,19 @@ public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionA
      */
     private static final long serialVersionUID = 1L;
 
-    public DragPanelDescription(ConceptViewSettings settings,
+    public DragPanelDescription(ConceptViewLayout viewLayout,
             CollapsePanel parentCollapsePanel,
             DescriptionAnalogBI desc)
             throws TerminologyException, IOException {
-        super(settings, parentCollapsePanel, desc);
+        super(viewLayout, parentCollapsePanel, desc);
         layoutDescription();
     }
 
-    public DragPanelDescription(LayoutManager layout, ConceptViewSettings settings,
+    public DragPanelDescription(LayoutManager layout, ConceptViewLayout viewLayout,
             CollapsePanel parentCollapsePanel,
             DescriptionAnalogBI desc)
             throws TerminologyException, IOException {
-        super(layout, settings, parentCollapsePanel, desc);
+        super(layout, viewLayout, parentCollapsePanel, desc);
         layoutDescription();
     }
 
@@ -197,7 +197,7 @@ public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionA
             if (!thingToDrag.equals(dav)) {
                 DragPanelDescription dpd = new DragPanelDescription(
                         new GridBagLayout(),
-                        getSettings(),
+                        viewLayout,
                         null,
                         dav);
                 panelList.add(dpd);

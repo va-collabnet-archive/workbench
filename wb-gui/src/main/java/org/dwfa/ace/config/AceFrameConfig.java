@@ -1811,6 +1811,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * (non-Javadoc)
      * @see org.dwfa.ace.config.I_ConfigAceFrame#setTreeTermDividerLoc(int)
      */
+    @Override
     public void setTreeTermDividerLoc(int termTreeDividerLoc) {
         this.termTreeDividerLoc = termTreeDividerLoc;
     }
@@ -1819,20 +1820,24 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * (non-Javadoc)
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getHierarchySelection()
      */
+    @Override
     public I_GetConceptData getHierarchySelection() {
         return hierarchySelection;
     }
 
+    @Override
     public void setHierarchySelection(I_GetConceptData hierarchySelection) {
         Object old = this.hierarchySelection;
         this.hierarchySelection = hierarchySelection;
         this.changeSupport.firePropertyChange("hierarchySelection", old, hierarchySelection);
     }
 
+    @Override
     public void setHierarchySelectionAndExpand(I_GetConceptData hierarchySelection) throws IOException {
         setHierarchySelection(hierarchySelection);
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     new ExpandPathToNodeStateListener(getAceFrame().getCdePanel().getTree(), AceFrameConfig.this,

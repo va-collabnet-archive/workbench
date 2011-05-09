@@ -328,12 +328,13 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 
         if (getHost() != null) {
             if (getHost().getTermComponent() != null) {
+
                 SwingUtilities.invokeLater(new Runnable() {
 
                     @Override
                     public void run() {
                         try {
-                            ExpandPathToNodeStateListener expandPathToNodeStateListener = 
+                            ExpandPathToNodeStateListener expandPathToNodeStateListener =
                                     new ExpandPathToNodeStateListener(navigatorTree, config,
                                     (I_GetConceptData) getHost().getTermComponent());
                         } catch (IOException e) {

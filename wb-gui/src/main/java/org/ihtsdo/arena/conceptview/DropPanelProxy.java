@@ -13,7 +13,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.dwfa.ace.dnd.DragMonitor;
 import org.dwfa.ace.log.AceLog;
 
-class DropPanelProxy implements PropertyChangeListener, HierarchyListener, Comparable<DropPanelProxy> {
+class DropPanelProxy implements PropertyChangeListener, 
+        HierarchyListener, 
+        Comparable<DropPanelProxy> {
 
     private static AtomicInteger count = new AtomicInteger();
     WeakReference<I_DispatchDragStatus> dpmr;

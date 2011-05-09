@@ -81,7 +81,6 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         }
     }
 
-
     private class ActivityPanelImpl extends JPanel {
 
         /**
@@ -189,34 +188,41 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
                 }
             }
 
-            if (max != progressBar.getMaximum()) {
-                if (progressBar.isVisible() == false) {
-                    progressBar.setVisible(true);
+            JProgressBar localProgress = progressBar;
+            if (localProgress != null) {
+                if (max != localProgress.getMaximum()) {
+                    if (localProgress.isVisible() == false) {
+                        localProgress.setVisible(true);
+                    }
+                    localProgress.setMaximum(max);
                 }
-                progressBar.setMaximum(max);
-            }
-            if (value != progressBar.getValue()) {
-                if (progressBar.isVisible() == false) {
-                    progressBar.setVisible(true);
+                if (value != localProgress.getValue()) {
+                    if (localProgress.isVisible() == false) {
+                        localProgress.setVisible(true);
+                    }
+                    localProgress.setValue(value);
                 }
-                progressBar.setValue(value);
-            }
-            if (indeterminate != progressBar.isIndeterminate()) {
-                progressBar.setIndeterminate(indeterminate);
+                if (indeterminate != progressBar.isIndeterminate()) {
+                    progressBar.setIndeterminate(indeterminate);
+                }
+
+                if (stringPainted != progressBar.isStringPainted()) {
+                    progressBar.setStringPainted(stringPainted);
+                }
             }
 
-            if (stringPainted != progressBar.isStringPainted()) {
-                progressBar.setStringPainted(stringPainted);
-            }
-
-            if (stopButtonVisible != stopButton.isVisible()) {
-                stopButton.setVisible(stopButtonVisible);
+            JButton localStopButton = stopButton;
+            if (localStopButton != null) {
+                if (stopButtonVisible != localStopButton.isVisible()) {
+                    localStopButton.setVisible(stopButtonVisible);
+                }
             }
             if (complete && !stopped) {
                 ActivityViewer.addToUpdateTimer(new ShowStopAndProgress());
             }
         }
     }
+    
     private long startTime = System.currentTimeMillis();
     private I_ConfigAceFrame aceFrameConfig;
     private boolean eraseWhenFinishedEnabled = false;
@@ -238,6 +244,19 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         }
         if (complete) {
             ActivityViewer.removeFromUpdateTimer(this);
+            stopActionListeners.clear();
+            panels.clear();
+            listeners.clear();
+            showActivityListeners.clear();
+            for (ActivityPanelImpl panel : panels.keySet()) {
+                panel.remove(panel.progressBar);
+                panel.progressBar = null;
+                panel.remove(panel.stopButton);
+                for (ActionListener l : panel.stopButton.getActionListeners()) {
+                    panel.stopButton.removeActionListener(l);
+                }
+                panel.stopButton = null;
+            }
         }
     }
 
@@ -250,7 +269,7 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
     public void setStartTime(long startTime) {
         this.startTime = startTime;
     }
-    char[] spinners = new char[]{'|', '\\', '-', '/'};
+    static char[] spinners = new char[]{'|', '\\', '-', '/'};
     int spinnerIndex = 0;
 
     public char nextSpinner() {
@@ -261,7 +280,6 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
     }
 
     private class ActivityProgress extends JProgressBar {
-
 
         /**
          *

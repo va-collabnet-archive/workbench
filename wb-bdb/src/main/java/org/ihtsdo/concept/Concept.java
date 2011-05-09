@@ -858,6 +858,13 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 config.getPrecedence(), config.getConflictResolutionStrategy());
     }
 
+    NidSetBI allowedStatus;
+    NidSetBI allowedTypes;
+    PositionSetBI positions;
+    Precedence precedencePolicy;
+    ContradictionManagerBI contradictionManager;
+    
+    
     @Override
     public List<I_DescriptionTuple<DescriptionRevision>> getDescriptionTuples(
             NidSetBI allowedStatus, NidSetBI allowedTypes,

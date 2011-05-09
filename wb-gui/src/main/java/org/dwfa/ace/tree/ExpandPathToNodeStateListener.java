@@ -99,6 +99,7 @@ public class ExpandPathToNodeStateListener implements ChangeListener {
         }
     }
 
+    @Override
     public void stateChanged(ChangeEvent e) {
         DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) tree.getModel().getRoot();
 

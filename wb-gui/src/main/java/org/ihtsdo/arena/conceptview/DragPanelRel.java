@@ -35,19 +35,19 @@ public class DragPanelRel extends ComponentVersionDragPanel<RelationshipVersionB
     private JLabel relLabel;
     private boolean inferred;
 
-    public DragPanelRel(ConceptViewSettings settings,
+    public DragPanelRel(ConceptViewLayout viewLayout,
             CollapsePanel parentCollapsePanel, RelationshipVersionBI rel,
             boolean inferred)
             throws TerminologyException, IOException {
-        super(settings, parentCollapsePanel, rel);
+        super(viewLayout, parentCollapsePanel, rel);
         layoutRel();
     }
 
-    public DragPanelRel(LayoutManager layout, ConceptViewSettings settings,
+    public DragPanelRel(LayoutManager layout, ConceptViewLayout viewLayout,
             CollapsePanel parentCollapsePanel, RelationshipVersionBI rel,
             boolean inferred)
             throws TerminologyException, IOException {
-        super(layout, settings, parentCollapsePanel, rel);
+        super(layout, viewLayout, parentCollapsePanel, rel);
         this.inferred = inferred;
         layoutRel();
     }
@@ -71,7 +71,7 @@ public class DragPanelRel extends ComponentVersionDragPanel<RelationshipVersionB
             if (!thingToDrag.equals(dav)) {
                 DragPanelRel dpd = new DragPanelRel(
                         new GridBagLayout(),
-                        getSettings(),
+                        viewLayout,
                         null,
                         dav, inferred);
                 dpd.setInactiveBackground();

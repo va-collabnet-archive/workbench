@@ -31,19 +31,19 @@ public class DragPanelConceptAttributes extends ComponentVersionDragPanel<ConAtt
      */
     private static final long serialVersionUID = 1L;
 
-    public DragPanelConceptAttributes(ConceptViewSettings settings,
+    public DragPanelConceptAttributes(ConceptViewLayout viewLayout,
             CollapsePanel parentCollapsePanel,
             ConAttrAnalogBI attr)
             throws TerminologyException, IOException {
-        super(settings, parentCollapsePanel, attr);
+        super(viewLayout, parentCollapsePanel, attr);
         layoutConceptAttrs();
     }
 
-    public DragPanelConceptAttributes(LayoutManager layout, ConceptViewSettings settings,
+    public DragPanelConceptAttributes(LayoutManager layout, ConceptViewLayout viewLayout,
             CollapsePanel parentCollapsePanel,
             ConAttrAnalogBI attr)
             throws TerminologyException, IOException {
-        super(layout, settings, parentCollapsePanel, attr);
+        super(layout, viewLayout, parentCollapsePanel, attr);
         layoutConceptAttrs();
     }
 
@@ -151,7 +151,7 @@ public class DragPanelConceptAttributes extends ComponentVersionDragPanel<ConAtt
             if (!thingToDrag.equals(dav)) {
                 DragPanelConceptAttributes dpd = new DragPanelConceptAttributes(
                         new GridBagLayout(),
-                        getSettings(),
+                        viewLayout,
                         null,
                         dav);
                 panelList.add(dpd);

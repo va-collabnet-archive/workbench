@@ -12,8 +12,6 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -21,8 +19,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 import javax.swing.SwingWorker;
 import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.Terms;
@@ -176,17 +172,17 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
         return parentCollapsePanel;
     }
 
-    public ComponentVersionDragPanel(ConceptViewSettings settings,
+    public ComponentVersionDragPanel(ConceptViewLayout viewLayout,
             CollapsePanel parentCollapsePanel, T component) {
-        super(settings, component);
+        super(viewLayout, component);
         this.parentCollapsePanel = parentCollapsePanel;
         setupCollapseExpandButton();
     }
 
     public ComponentVersionDragPanel(LayoutManager layout,
-            ConceptViewSettings settings,
+            ConceptViewLayout viewLayout,
             CollapsePanel parentCollapsePanel, T component) {
-        super(layout, settings, component);
+        super(layout, viewLayout, component);
         this.parentCollapsePanel = parentCollapsePanel;
         setupCollapseExpandButton();
     }
@@ -390,7 +386,7 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
                 getSettings().getConfig().getViewCoordinate());
         for (RefexVersionBI<?> rx : refexes) {
             DragPanelExtension dpe =
-                    new DragPanelExtension(getSettings(), getParentCollapsePanel(), rx);
+                    new DragPanelExtension(viewLayout, getParentCollapsePanel(), rx);
             getSettings().getView().getSeperatorComponents().add(dpe);
             dpe.setBorder(BorderFactory.createEtchedBorder());
             dpe.setVisible(parentCollapsePanel.isShown(SubPanelTypes.REFEX)
@@ -406,7 +402,7 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
 
         for (RefexVersionBI<?> rx : tempRefexList) {
             DragPanelExtension dpe =
-                    new DragPanelExtension(getSettings(), getParentCollapsePanel(), rx);
+                    new DragPanelExtension(viewLayout, getParentCollapsePanel(), rx);
             getSettings().getView().getSeperatorComponents().add(dpe);
             dpe.setInactiveBackground();
             dpe.setBorder(BorderFactory.createEtchedBorder());

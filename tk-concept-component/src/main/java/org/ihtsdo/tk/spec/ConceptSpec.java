@@ -93,8 +93,18 @@ public class ConceptSpec implements SpecBI {
         this.relSpecs = relSpecs;
     }
 
-    public ConceptChronicleBI getLenient() throws IOException {
+    public ConceptChronicleBI getLenient() throws ValidationException, IOException {
         try {
+            boolean found = false;
+            for (UUID uuid : uuids) {
+                if (Ts.get().hasUuid(uuid)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+               throw new ValidationException("No matching ids in db: " + this.toString());
+            }
             ConceptChronicleBI local = Ts.get().getConcept(uuids);
             validateDescription(local);
             validateRelationships(local);
@@ -104,8 +114,19 @@ public class ConceptSpec implements SpecBI {
         }
     }
 
-    public ConceptVersionBI getStrict(ViewCoordinate c) throws IOException {
+    public ConceptVersionBI getStrict(ViewCoordinate c) throws ValidationException, IOException {
         try {
+            boolean found = false;
+            for (UUID uuid : uuids) {
+                if (Ts.get().hasUuid(uuid)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+               throw new ValidationException("No matching ids in db: " + this.toString());
+            }
+
             ConceptVersionBI local = Ts.get().getConceptVersion(c, uuids);
             validateDescription(local, c);
             validateRelationships(local, c);
@@ -114,7 +135,6 @@ public class ConceptSpec implements SpecBI {
             throw new ValidationException(e);
         }
     }
-
 
     /**
      * 
@@ -133,9 +153,9 @@ public class ConceptSpec implements SpecBI {
             return;
         }
 
-        next: 
+        next:
         for (RelSpec relSpec : relSpecs) {
-            
+
             ConceptVersionBI relType = relSpec.getRelTypeSpec().getStrict(c);
             ConceptVersionBI destination = relSpec.getDestinationSpec().getStrict(c);
             NidSetBI typeNids = new NidSet();
@@ -155,18 +175,18 @@ public class ConceptSpec implements SpecBI {
             return;
         }
 
-        next: 
+        next:
         for (RelSpec relSpec : relSpecs) {
-            
+
             ConceptChronicleBI relType = relSpec.getRelTypeSpec().getLenient();
             ConceptChronicleBI destination = relSpec.getDestinationSpec().getLenient();
             NidSetBI typeNids = new NidSet();
             typeNids.add(relType.getNid());
 
-            for (RelationshipChronicleBI rel: local.getRelsOutgoing()) {
-                for (RelationshipVersionBI rv: rel.getVersions()) {
-                    if (rv.getTypeNid() == relType.getNid() &&
-                            rv.getDestinationNid() == destination.getNid()) {
+            for (RelationshipChronicleBI rel : local.getRelsOutgoing()) {
+                for (RelationshipVersionBI rv : rel.getVersions()) {
+                    if (rv.getTypeNid() == relType.getNid()
+                            && rv.getDestinationNid() == destination.getNid()) {
                         continue next;
                     }
                 }
@@ -175,22 +195,21 @@ public class ConceptSpec implements SpecBI {
         }
     }
 
-    
     private void validateDescription(ConceptChronicleBI local) throws IOException, ContraditionException {
         boolean found = false;
         for (DescriptionChronicleBI desc : local.getDescs()) {
-            for (DescriptionVersionBI descv: desc.getVersions()) {
-           if (descv.getText().equals(description)) {
-                found = true;
-                break;
+            for (DescriptionVersionBI descv : desc.getVersions()) {
+                if (descv.getText().equals(description)) {
+                    found = true;
+                    break;
+                }
             }
-            }
-         }
+        }
         if (found == false) {
-            
-            throw new ValidationException("No description matching: '" + 
-                    description + "' found for:\n" + 
-                    local);
+
+            throw new ValidationException("No description matching: '"
+                    + description + "' found for:\n"
+                    + local);
         }
     }
 
@@ -203,10 +222,10 @@ public class ConceptSpec implements SpecBI {
             }
         }
         if (found == false) {
-            
-            throw new ValidationException("No description matching: '" + 
-                    description + "' found for:\n" + 
-                    local);
+
+            throw new ValidationException("No description matching: '"
+                    + description + "' found for:\n"
+                    + local);
         }
     }
 

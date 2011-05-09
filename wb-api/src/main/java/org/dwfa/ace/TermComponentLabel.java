@@ -39,6 +39,8 @@ import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -82,7 +84,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if (termComponent != null
-                    &&  I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
+                    && I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
                 try {
                     I_GetConceptData igcd = (I_GetConceptData) termComponent;
                     if (igcd.isCanceled()) {
@@ -281,13 +283,13 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
                 if (getTermComponent() == null) {
                 } else {
                     I_GetConceptData concept = (I_GetConceptData) getTermComponent();
-                    for (I_IdVersion idv: concept.getIdentifier().getIdVersions()) {
-                        if (idv.getAuthorityNid() == 
-                                ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid()) {
+                    for (I_IdVersion idv : concept.getIdentifier().getIdVersions()) {
+                        if (idv.getAuthorityNid()
+                                == ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid()) {
                             writeIdentifiersToBuff(buff, idv);
                         }
                     }
-                 }
+                }
                 StringSelection transferable = new StringSelection(buff.toString());
 
                 clipboard.setContents(transferable, TermComponentLabel.this);
@@ -327,10 +329,29 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
             }
         }
     }
+
+    private class LabelHierarchyListener implements HierarchyListener {
+
+        @Override
+        public void hierarchyChanged(HierarchyEvent e) {
+            long flags = e.getChangeFlags();
+            boolean displayability = (flags & HierarchyEvent.DISPLAYABILITY_CHANGED) != 0;
+            boolean showing = (flags & HierarchyEvent.SHOWING_CHANGED) != 0;
+            if (displayability || showing) {
+                if (e.getChanged().isShowing()) {
+                    TermComponentLabel.this.config.addPropertyChangeListener("commit", commitListener);
+                } else {
+                    TermComponentLabel.this.config.removePropertyChangeListener("commit", commitListener);
+                }
+            }
+        }
+    }
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
+    
+    CommitListener commitListener = new CommitListener();
 
     public TermComponentLabel() throws TerminologyException, IOException {
         this(Terms.get().getActiveAceFrameConfig());
@@ -342,15 +363,15 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
         this.setVerticalAlignment(TOP);
         this.config = config;
         addFocusListener(this);
-        this.config.addPropertyChangeListener("commit", new CommitListener());
         setTransferHandler(Terms.get().makeTerminologyTransferHandler(this));
-        DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(this, 
+        DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(this,
                 DnDConstants.ACTION_COPY,
                 new DragGestureListenerWithImage(new TermLabelDragSourceListener()));
 
         setFocusable(true);
         setEnabled(true);
-
+        
+        this.addHierarchyListener(new LabelHierarchyListener());
 
 
         this.addMouseListener(new MouseAdapter() {
@@ -545,7 +566,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
         } else {
             setBounds(r.x, r.y, r.width, r.height);
         }
-        
+
     }
 
     @Override
