@@ -23,14 +23,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dwfa</groupId>
     <artifactId>term-mojo</artifactId>
-    <version>1.39.5</version>
+    <version>1.39.6</version>
     <packaging>maven-plugin</packaging>
     <name>ACE mojo</name>
     <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/ace-mojo/site/index.html</url>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/term-mojo/tags/term-mojo-1.39.5</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/term-mojo/tags/term-mojo-1.39.5</developerConnection>
-        <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm/tags/term-mojo-1.39.5</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta/term-mojo-1.39.6</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta/term-mojo-1.39.6</developerConnection>
+        <url>https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta/term-mojo-1.39.6</url>
     </scm>
     <organization>
         <name>Informatics, Inc.</name>
