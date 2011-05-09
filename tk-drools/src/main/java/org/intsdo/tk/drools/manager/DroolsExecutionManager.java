@@ -88,16 +88,16 @@ public class DroolsExecutionManager {
         ruleDirectory.mkdirs();
         this.kbFiles = kbFiles;
         if (kbKey.contains(":")) {
-            kbKey.replace(':', '.');
+            kbKey = kbKey.replace(':', '.');
         }
         if (kbKey.contains("/")) {
-            kbKey.replace('/', '.');
+            kbKey = kbKey.replace('/', '.');
         }
         if (kbKey.contains("*")) {
-            kbKey.replace('*', '.');
+            kbKey = kbKey.replace('*', '.');
         }
         if (kbKey.contains("\\")) {
-            kbKey.replace('\\', '.');
+            kbKey = kbKey.replace('\\', '.');
         }
         drlPkgFile = new File(ruleDirectory, kbKey + ".kpkgs");
 
