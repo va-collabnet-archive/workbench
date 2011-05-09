@@ -87,6 +87,18 @@ public class DroolsExecutionManager {
         File ruleDirectory = new File("rules");
         ruleDirectory.mkdirs();
         this.kbFiles = kbFiles;
+        if (kbKey.contains(":")) {
+            kbKey.replace(':', '.');
+        }
+        if (kbKey.contains("/")) {
+            kbKey.replace('/', '.');
+        }
+        if (kbKey.contains("*")) {
+            kbKey.replace('*', '.');
+        }
+        if (kbKey.contains("\\")) {
+            kbKey.replace('\\', '.');
+        }
         drlPkgFile = new File(ruleDirectory, kbKey + ".kpkgs");
 
         Semaphore s = new Semaphore(1);
