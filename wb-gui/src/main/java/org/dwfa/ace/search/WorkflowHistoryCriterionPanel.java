@@ -48,7 +48,7 @@ import javax.swing.JLabel;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.gui.TaskPanel.EditorGlue;
-import org.ihtsdo.ace.task.search.I_TestWorkflowHistorySearchResults;
+import org.ihtsdo.ace.api.I_TestWorkflowHistorySearchResults;
 
 public class WorkflowHistoryCriterionPanel extends CriterionPanel {
 

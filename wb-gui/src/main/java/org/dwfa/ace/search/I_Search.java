@@ -14,7 +14,7 @@ import org.dwfa.ace.api.I_TrackContinuation;
 import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
 import org.dwfa.ace.search.SearchWfHistoryStringWorker.WfHxProgressUpdator;
 import org.dwfa.ace.task.search.I_TestSearchResults;
-import org.ihtsdo.ace.task.search.I_TestWorkflowHistorySearchResults;
+import org.ihtsdo.ace.api.I_TestWorkflowHistorySearchResults;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 
 public interface I_Search {

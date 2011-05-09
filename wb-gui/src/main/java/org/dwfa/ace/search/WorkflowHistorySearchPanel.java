@@ -77,10 +77,10 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.bpa.util.SortClickListener;
+import org.ihtsdo.ace.api.I_TestWorkflowHistorySearchResults;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel;
 import org.ihtsdo.ace.table.WorkflowHistoryTableRenderer;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WORKFLOW_FIELD;
-import org.ihtsdo.ace.task.search.I_TestWorkflowHistorySearchResults;
 
 public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterionPanel {
 

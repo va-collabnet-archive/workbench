@@ -8,8 +8,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.search.SearchWfHistoryStringWorker.WfHxProgressUpdator;
-import org.dwfa.bpa.process.TaskFailedException;
-import org.ihtsdo.ace.task.search.I_TestWorkflowHistorySearchResults;
+import org.ihtsdo.ace.api.I_TestWorkflowHistorySearchResults;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 
 public class CheckAndProcessWorkflowHistoryMatch implements Runnable {
