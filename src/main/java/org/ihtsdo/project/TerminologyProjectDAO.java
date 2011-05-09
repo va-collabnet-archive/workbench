@@ -2525,7 +2525,10 @@ public class TerminologyProjectDAO {
 					int dnid = Integer.parseInt(doc.get("dnid"));
 					//System.out.println(doc);
 					I_DescriptionVersioned<?> foundDescription = tf.getDescription(dnid);
-					if (foundDescription.getTuples(config.getConflictResolutionStrategy()).iterator().next().getText().equals(description)) {
+					I_GetConceptData foundConcept = tf.getConcept(foundDescription.getConceptNid());
+					if (foundDescription.getTuples(config.getConflictResolutionStrategy()).iterator().next().getText().equals(description) &&
+							foundConcept.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getStatusNid() == 
+								tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids())) {
 						result = true;
 					}
 				}catch(Exception e){
