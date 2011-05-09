@@ -74,7 +74,7 @@ public class TerminologyListModel extends AbstractListModel implements I_ModelTe
                 SwingUtilities.invokeAndWait(new Runnable() {
                     @Override
                     public void run() {
-                        fireIntervalAdded(this, elements.size() - 1, elements.size() - 1);
+                        fireIntervalAdded(TerminologyListModel.this, elements.size() - 1, elements.size() - 1);
                     }
                 });
             } catch (InterruptedException e) {
@@ -96,7 +96,7 @@ public class TerminologyListModel extends AbstractListModel implements I_ModelTe
                 SwingUtilities.invokeAndWait(new Runnable() {
                     @Override
                     public void run() {
-                        fireIntervalAdded(this, index, index);
+                        fireIntervalAdded(TerminologyListModel.this, index, index);
                     }
                 });
             } catch (InterruptedException e) {
@@ -111,7 +111,7 @@ public class TerminologyListModel extends AbstractListModel implements I_ModelTe
     public I_GetConceptData removeElement(final int index) {
         I_GetConceptData rv = elements.remove(index);
         if (SwingUtilities.isEventDispatchThread()) {
-            fireIntervalRemoved(this, index, index);
+            fireIntervalRemoved(TerminologyListModel.this, index, index);
         } else {
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
@@ -140,7 +140,7 @@ public class TerminologyListModel extends AbstractListModel implements I_ModelTe
                 SwingUtilities.invokeAndWait(new Runnable() {
                     @Override
                     public void run() {
-                        fireIntervalRemoved(this, 0, oldSize);
+                        fireIntervalRemoved(TerminologyListModel.this, 0, oldSize);
                     }
                 });
             } catch (InterruptedException e) {
