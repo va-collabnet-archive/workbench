@@ -147,7 +147,7 @@ public class CommentsRefset extends Refset {
 				if (commentsExtensionPart != null) {
 					Comment comment = new Comment(commentsExtensionPart.getC1id(), commentsExtensionPart.getC2id(), 
 							commentsExtensionPart.getStringValue() + " - Time: " + commentsExtensionPart.getTime(),
-							commentsExtensionPart.getTime());
+							commentsExtensionPart.getTime(), commentsMember);
 					comments.add(comment);
 				}
 			}
