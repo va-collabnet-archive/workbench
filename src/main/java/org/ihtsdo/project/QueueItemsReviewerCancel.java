@@ -1,6 +1,5 @@
 package org.ihtsdo.project;
 
-import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.security.PrivilegedActionException;
@@ -10,10 +9,8 @@ import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
-import javax.security.auth.login.LoginException;
 import javax.swing.SwingUtilities;
 
-import net.jini.config.ConfigurationException;
 import net.jini.core.entry.Entry;
 import net.jini.core.lease.LeaseDeniedException;
 import net.jini.core.lookup.ServiceID;
@@ -24,26 +21,18 @@ import net.jini.core.transaction.TransactionException;
 import net.jini.lookup.ServiceItemFilter;
 import net.jini.lookup.entry.Name;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
-import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.process.I_DescribeBusinessProcess;
-import org.dwfa.bpa.process.I_DescribeObject;
 import org.dwfa.bpa.process.I_DescribeQueueEntry;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_QueueProcesses;
 import org.dwfa.bpa.process.I_SelectProcesses;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.NoMatchingEntryException;
-import org.dwfa.bpa.process.ProcessID;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.bpa.util.SwingWorker;
 import org.dwfa.queue.ObjectServerCore;
 import org.dwfa.queue.SelectAll;
-import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.project.model.WorkListMember;
-import org.ihtsdo.project.panel.TranslationHelperPanel;
+import org.dwfa.swing.SwingWorker;
 
 public class QueueItemsReviewerCancel {
 
