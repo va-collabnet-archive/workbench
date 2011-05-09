@@ -87,18 +87,7 @@ public class DroolsExecutionManager {
         File ruleDirectory = new File("rules");
         ruleDirectory.mkdirs();
         this.kbFiles = kbFiles;
-        if (kbKey.contains(":")) {
-            kbKey = kbKey.replace(':', '.');
-        }
-        if (kbKey.contains("/")) {
-            kbKey = kbKey.replace('/', '.');
-        }
-        if (kbKey.contains("*")) {
-            kbKey = kbKey.replace('*', '.');
-        }
-        if (kbKey.contains("\\")) {
-            kbKey = kbKey.replace('\\', '.');
-        }
+        kbKey = sanatizeKey(kbKey);
         drlPkgFile = new File(ruleDirectory, kbKey + ".kpkgs");
 
         Semaphore s = new Semaphore(1);
@@ -147,6 +136,22 @@ public class DroolsExecutionManager {
         if (kpkgs != null) {
             kbase.addKnowledgePackages(kpkgs);
         }
+    }
+
+    private static String sanatizeKey(String kbKey) {
+        if (kbKey.contains(":")) {
+            kbKey = kbKey.replace(':', '.');
+        }
+        if (kbKey.contains("/")) {
+            kbKey = kbKey.replace('/', '.');
+        }
+        if (kbKey.contains("*")) {
+            kbKey = kbKey.replace('*', '.');
+        }
+        if (kbKey.contains("\\")) {
+            kbKey = kbKey.replace('\\', '.');
+        }
+        return kbKey;
     }
 
     public final void loadKnowledgePackages(Set<File> kbFiles, EnumSet<ExtraEvaluators> extraEvaluators, File drlPkgFile) throws RuntimeException, IOException {
@@ -221,6 +226,7 @@ public class DroolsExecutionManager {
             new ConcurrentHashMap<String, DroolsExecutionManager>();
 
     public static void setup(String kbKey, Set<File> kbFiles) throws IOException {
+        kbKey = sanatizeKey(kbKey);
         if (!managerMap.containsKey(kbKey)) {
             managerMap.put(kbKey, new DroolsExecutionManager(kbFiles, kbKey));
         }
@@ -230,6 +236,7 @@ public class DroolsExecutionManager {
     public static boolean fireAllRules(String kbKey, Set<File> kbFiles,
             Map<String, Object> globals, Collection<Object> facts, boolean useLogger)
             throws IOException, DroolsException {
+        kbKey = sanatizeKey(kbKey);
         KnowledgeRuntimeLogger logger = null;
         DroolsExecutionManager mgr = managerMap.get(kbKey);
         try {
