@@ -80,7 +80,6 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.plaf.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
@@ -458,40 +457,59 @@ public class TranslationConceptEditor6 extends JPanel {
 	}
 
 	public void unloadData() {
+		// ---- label14 ----
+		label14.setText("S:-");
+		label14.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+		panel1.add(label14, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+
+		// ---- label15 ----
+		label15.setText("TM:-");
+		label15.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+		panel1.add(label15, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+
+		// ---- label16 ----
+		label16.setText("LG:-");
+		label16.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+		panel1.add(label16, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+		
 		if (updateUIThread != null && updateUIThread.isAlive()) {
 			updateUIThread.interrupt();
 		}
-		verifySavePending(null);
+		verifySavePending(null, false);
 		clearForm(true);
 	}
 
 	/**
 	 * Verifies changes to target description
-	 * @param message <\T> if null 
+	 * 
+	 * @param message
+	 *            <\T> if null
 	 * @return
 	 */
-	synchronized public boolean verifySavePending(String message) {
+	synchronized public boolean verifySavePending(String message, boolean doVerify) {
 		boolean bPendTerm = true;
 		if (saveDesc) {
-			if(tabTar.getRowCount() <= 0 && !alreadyVerified && message == null){
-				alreadyVerified = true;
-				Object[] options = { "Send empty translation", "Cancel" };
-				int n = JOptionPane.showOptionDialog(null, "There is no translation in target language, would you like to continue?", "Unsaved data", JOptionPane.YES_NO_OPTION,
-						JOptionPane.WARNING_MESSAGE, null, options, options[1]); 
-				bPendTerm = false;
-				if (n == 0) {
-					if (saveDescActionPerformed()) {
-						descriptionInEditor = null;
-						targetTextField.setText("");
-						return true;
-					} else {
+			if (doVerify) {
+				if (tabTar.getRowCount() <= 0 && !alreadyVerified && message == null) {
+					alreadyVerified = true;
+					Object[] options = { "Send empty translation", "Cancel" };
+					int n = JOptionPane.showOptionDialog(null, "There is no translation in target language, would you like to continue?", "Unsaved data", JOptionPane.YES_NO_OPTION,
+							JOptionPane.WARNING_MESSAGE, null, options, options[1]);
+					bPendTerm = false;
+					if (n == 0) {
+						if (saveDescActionPerformed()) {
+							descriptionInEditor = null;
+							targetTextField.setText("");
+							return true;
+						} else {
+							return false;
+						}
+					} else if (n == 1) {
 						return false;
 					}
-				} else if (n == 1) {
-					return false;
+				} else {
+					alreadyVerified = true;
 				}
-			}else{
-				alreadyVerified = true;
 			}
 			if (descriptionInEditor != null) {
 				if (!(descriptionInEditor.getText().trim().equals(targetTextField.getText().trim())
@@ -499,7 +517,7 @@ public class TranslationConceptEditor6 extends JPanel {
 						&& descriptionInEditor.getAcceptabilityId() == ((I_GetConceptData) cmbAccep.getSelectedItem()).getConceptNid()
 						&& ((descriptionInEditor.getExtensionStatusId() == active.getConceptNid() && rbAct.isSelected()) || (descriptionInEditor.getExtensionStatusId() != active
 								.getConceptNid() && !rbAct.isSelected())) && ((descriptionInEditor.getTypeId() == fsn.getConceptNid() && fsn.equals((I_GetConceptData) comboBox1
-										.getSelectedItem())) || (descriptionInEditor.getTypeId() != fsn.getConceptNid() && !fsn.equals((I_GetConceptData) comboBox1.getSelectedItem()))))) {
+						.getSelectedItem())) || (descriptionInEditor.getTypeId() != fsn.getConceptNid() && !fsn.equals((I_GetConceptData) comboBox1.getSelectedItem()))))) {
 					bPendTerm = false;
 				}
 			} else {
@@ -508,13 +526,16 @@ public class TranslationConceptEditor6 extends JPanel {
 				}
 			}
 			if (!bPendTerm) {
+
 				Object[] options = { "Discard unsaved data", "Save" };
 				String message1 = "Do you want to save the change you made to the term in the editor panel?";
-				if(message != null){
+				if (message != null) {
 					message1 = message;
 				}
-				int n = JOptionPane.showOptionDialog(null, message1, "Unsaved data", JOptionPane.YES_NO_OPTION,
-						JOptionPane.WARNING_MESSAGE, null, // do not use a
+				int n = JOptionPane.showOptionDialog(null, message1, "Unsaved data", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, // do
+																																					// not
+																																					// use
+																																					// a
 						// custom Icon
 						options, // the titles of buttons
 						options[1]); // default button title
@@ -544,11 +565,8 @@ public class TranslationConceptEditor6 extends JPanel {
 			}
 		}
 		return bPendTerm;
-
 	}
 
-	
-	
 	public ContextualizedDescription getDescriptionInEditor() {
 		return descriptionInEditor;
 	}
@@ -642,7 +660,7 @@ public class TranslationConceptEditor6 extends JPanel {
 				JOptionPane.showOptionDialog(this, e1.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
 			}
 			if (fsnDesc == null) {
-				if (verifySavePending(null)) {
+				if (verifySavePending(null, false)) {
 					descriptionInEditor = null;
 					targetTextField.setText("");
 					targetTextField.setEnabled(true);
@@ -715,7 +733,7 @@ public class TranslationConceptEditor6 extends JPanel {
 	}
 
 	private void mAddPrefActionPerformed() {
-		if (verifySavePending(null)) {
+		if (verifySavePending(null, false)) {
 			descriptionInEditor = null;
 			targetTextField.setText("");
 			targetTextField.setEnabled(true);
@@ -735,7 +753,7 @@ public class TranslationConceptEditor6 extends JPanel {
 	}
 
 	private void mAddDescActionPerformed() {
-		if (verifySavePending(null)) {
+		if (verifySavePending(null, false)) {
 			descriptionInEditor = null;
 			// label4.setText("");
 			// label4.setVisible(false);
@@ -861,11 +879,12 @@ public class TranslationConceptEditor6 extends JPanel {
 				// if some is wrong then all to retire
 				if ((((I_GetConceptData) cmbAccep.getSelectedItem()).equals(notAcceptable)) || (rbInact.isSelected())) {
 					descriptionInEditor.setExtensionStatusId(inactive.getConceptNid());
-					//descriptionInEditor.(retired.getConceptNid());
+					// descriptionInEditor.(retired.getConceptNid());
 					descriptionInEditor.setAcceptabilityId(notAcceptable.getConceptNid());
 
 				} else {
-					// TODO: Discuss how to handle retirement and re-activation in liked descriptions form source language
+					// TODO: Discuss how to handle retirement and re-activation
+					// in liked descriptions form source language
 					// if all current
 					descriptionInEditor.setAcceptabilityId(((I_GetConceptData) cmbAccep.getSelectedItem()).getConceptNid());
 					descriptionInEditor.setDescriptionStatusId(current.getConceptNid());
@@ -903,24 +922,19 @@ public class TranslationConceptEditor6 extends JPanel {
 
 		try {
 			populateTargetTree();
-			//			SwingUtilities.invokeLater(new Runnable() {
-			//				public void run() {
-			//					Timer timer = new Timer(1100, new setInboxPanelFocus());
-			//					timer.setRepeats(false);
-			//					timer.start();
-			//				}
+			// SwingUtilities.invokeLater(new Runnable() {
+			// public void run() {
+			// Timer timer = new Timer(1100, new setInboxPanelFocus());
+			// timer.setRepeats(false);
+			// timer.start();
+			// }
 			//
-			//			});
+			// });
 		} catch (Exception e1) {
 
 			e1.printStackTrace();
 		}
 		return result;
-	}
-
-	private void thisAncestorRemoved() {
-		verifySavePending(null);
-		this.AutokeepInInbox();
 	}
 
 	private void mHistActionPerformed() {
@@ -1036,28 +1050,6 @@ public class TranslationConceptEditor6 extends JPanel {
 	private void tblCommMouseClicked(MouseEvent e) {
 		if (e.getClickCount() == 2) {
 			viewComment();
-		}
-		
-		if ( SwingUtilities.isLeftMouseButton( e ) )
-		{
-			// Do something
-		}
-		// Right mouse click
-		else if ( SwingUtilities.isRightMouseButton( e ) )
-		{
-			// get the coordinates of the mouse click
-			Point p = e.getPoint();
- 
-			// get the row index that contains that coordinate
-			int rowNumber = tblComm.rowAtPoint( p );
- 
-			// Get the ListSelectionModel of the JTable
-			ListSelectionModel model = tblComm.getSelectionModel();
- 
-			// set the selected interval of rows. Using the "rowNumber"
-			// variable for the beginning and end selects only that one row.
-			model.setSelectionInterval( rowNumber, rowNumber );
-			popupMenu1.show(e.getComponent(), e.getX(), e.getY());
 		}
 	}
 
@@ -1255,21 +1247,21 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	private void searchDocumentsActionPerformed(ActionEvent e) {
 		try {
-			TranslationHelperPanel thp=PanelHelperFactory.getTranslationHelperPanel();
-			JTabbedPane tp=thp.getTabbedPanel();
-			if (tp!=null){
-				int tabCount=tp.getTabCount();
-				for (int i=0;i<tabCount;i++){
-					if (tp.getTitleAt(i).equals(TranslationHelperPanel.SEARCH_DOCS_TAB_NAME)){
+			TranslationHelperPanel thp = PanelHelperFactory.getTranslationHelperPanel();
+			JTabbedPane tp = thp.getTabbedPanel();
+			if (tp != null) {
+				int tabCount = tp.getTabCount();
+				for (int i = 0; i < tabCount; i++) {
+					if (tp.getTitleAt(i).equals(TranslationHelperPanel.SEARCH_DOCS_TAB_NAME)) {
 						tp.setSelectedIndex(i);
 						thp.showTabbedPanel();
 					}
 				}
-				JPanel panel=new JPanel();
+				JPanel panel = new JPanel();
 				panel.setLayout(new BorderLayout());
 				panel.add(new DocumentsSearchPanel(""), BorderLayout.CENTER);
 				tp.addTab(TranslationHelperPanel.SEARCH_DOCS_TAB_NAME, panel);
-				tp.setSelectedIndex(tp.getTabCount()-1);
+				tp.setSelectedIndex(tp.getTabCount() - 1);
 				thp.showTabbedPanel();
 			}
 		} catch (TerminologyException e1) {
@@ -1287,14 +1279,6 @@ public class TranslationConceptEditor6 extends JPanel {
 		} catch (URISyntaxException e1) {
 			e1.printStackTrace();
 		}
-	}
-
-	private void deleteCommentActionPerformed(ActionEvent e) {
-		tblComm.getModel().getValueAt(tblComm.getSelectedRow(), tblComm.getSelectedColumn());
-	}
-
-	private void viewCommentActionPerformed(ActionEvent e) {
-		viewComment();
 	}
 
 	class SelectionListener implements ListSelectionListener {
@@ -1426,40 +1410,37 @@ public class TranslationConceptEditor6 extends JPanel {
 		scrollPane7 = new JScrollPane();
 		tree3 = new JTree();
 		hierarchyNavigator1 = new HierarchyNavigator();
-		popupMenu1 = new JPopupMenu();
-		menuItem2 = new JMenuItem();
-		menuItem3 = new JMenuItem();
 
-		//======== this ========
+		// ======== this ========
 		setBackground(new Color(238, 238, 238));
 		setLayout(new GridBagLayout());
-		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
-		((GridBagLayout)getLayout()).rowHeights = new int[] {35, 0, 0};
-		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-		((GridBagLayout)getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
+		((GridBagLayout) getLayout()).columnWidths = new int[] { 0, 0 };
+		((GridBagLayout) getLayout()).rowHeights = new int[] { 35, 0, 0 };
+		((GridBagLayout) getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+		((GridBagLayout) getLayout()).rowWeights = new double[] { 0.0, 1.0, 1.0E-4 };
 
-		//======== panel1 ========
+		// ======== panel1 ========
 		{
 			panel1.setLayout(new GridBagLayout());
-			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0};
-			((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {30, 0};
-			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
-			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+			((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 0, 0 };
+			((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 30, 0 };
+			((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 1.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
+			((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
 
-			//======== menuBar1 ========
+			// ======== menuBar1 ========
 			{
 
-				//======== menu1 ========
+				// ======== menu1 ========
 				{
 					menu1.setText("E[d]it");
 					menu1.setFont(new Font("Verdana", Font.PLAIN, 14));
 					menu1.setMnemonic('D');
 
-					//---- bAddFSN ----
+					// ---- bAddFSN ----
 					bAddFSN.setText("Add Concept FSN");
 					bAddFSN.setFont(new Font("Verdana", Font.PLAIN, 14));
 					bAddFSN.setMnemonic('F');
-					bAddFSN.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					bAddFSN.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
 					bAddFSN.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -1468,11 +1449,11 @@ public class TranslationConceptEditor6 extends JPanel {
 					});
 					menu1.add(bAddFSN);
 
-					//---- mAddPref ----
+					// ---- mAddPref ----
 					mAddPref.setText("Add Concept Preferred");
 					mAddPref.setFont(new Font("Verdana", Font.PLAIN, 14));
 					mAddPref.setMnemonic('P');
-					mAddPref.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					mAddPref.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
 					mAddPref.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -1481,11 +1462,11 @@ public class TranslationConceptEditor6 extends JPanel {
 					});
 					menu1.add(mAddPref);
 
-					//---- mAddDesc ----
+					// ---- mAddDesc ----
 					mAddDesc.setText("Add Concept Description");
 					mAddDesc.setFont(new Font("Verdana", Font.PLAIN, 14));
 					mAddDesc.setMnemonic('D');
-					mAddDesc.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					mAddDesc.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
 					mAddDesc.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -1496,16 +1477,16 @@ public class TranslationConceptEditor6 extends JPanel {
 				}
 				menuBar1.add(menu1);
 
-				//======== menu3 ========
+				// ======== menu3 ========
 				{
 					menu3.setText("[T]ools");
 					menu3.setSelectedIcon(null);
 					menu3.setFont(new Font("Verdana", Font.PLAIN, 14));
 					menu3.setMnemonic('T');
 
-					//---- menuItem1 ----
+					// ---- menuItem1 ----
 					menuItem1.setText("Search Documents");
-					menuItem1.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.META_MASK|KeyEvent.SHIFT_MASK));
+					menuItem1.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.META_MASK | KeyEvent.SHIFT_MASK));
 					menuItem1.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -1514,10 +1495,10 @@ public class TranslationConceptEditor6 extends JPanel {
 					});
 					menu3.add(menuItem1);
 
-					//---- mSpellChk ----
+					// ---- mSpellChk ----
 					mSpellChk.setText("Spellcheck");
 					mSpellChk.setFont(new Font("Verdana", Font.PLAIN, 14));
-					mSpellChk.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					mSpellChk.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
 					mSpellChk.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -1528,16 +1509,16 @@ public class TranslationConceptEditor6 extends JPanel {
 				}
 				menuBar1.add(menu3);
 
-				//======== menu2 ========
+				// ======== menu2 ========
 				{
 					menu2.setText("[V]iew");
 					menu2.setFont(new Font("Verdana", Font.PLAIN, 14));
 					menu2.setMnemonic('V');
 
-					//---- mHist ----
+					// ---- mHist ----
 					mHist.setText("History");
 					mHist.setMnemonic('Y');
-					mHist.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					mHist.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
 					mHist.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -1546,11 +1527,11 @@ public class TranslationConceptEditor6 extends JPanel {
 					});
 					menu2.add(mHist);
 
-					//---- mLog ----
+					// ---- mLog ----
 					mLog.setText("Log");
 					mLog.setMnemonic('G');
 					mLog.setIcon(null);
-					mLog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					mLog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
 					mLog.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -1561,32 +1542,24 @@ public class TranslationConceptEditor6 extends JPanel {
 				}
 				menuBar1.add(menu2);
 			}
-			panel1.add(menuBar1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(menuBar1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- label14 ----
+			// ---- label14 ----
 			label14.setText("S:-");
 			label14.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel1.add(label14, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(label14, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- label15 ----
+			// ---- label15 ----
 			label15.setText("TM:-");
 			label15.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel1.add(label15, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(label15, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- label16 ----
+			// ---- label16 ----
 			label16.setText("LG:-");
 			label16.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel1.add(label16, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(label16, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- label10 ----
+			// ---- label10 ----
 			label10.setText("text");
 			label10.addMouseListener(new MouseAdapter() {
 				@Override
@@ -1594,84 +1567,76 @@ public class TranslationConceptEditor6 extends JPanel {
 					label10MouseClicked(e);
 				}
 			});
-			panel1.add(label10, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+			panel1.add(label10, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 5, 0), 0, 0));
+		add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-		//======== panel10 ========
+		// ======== panel10 ========
 		{
 			panel10.setLayout(new GridBagLayout());
-			((GridBagLayout)panel10.getLayout()).columnWidths = new int[] {0, 0};
-			((GridBagLayout)panel10.getLayout()).rowHeights = new int[] {0, 0};
-			((GridBagLayout)panel10.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-			((GridBagLayout)panel10.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+			((GridBagLayout) panel10.getLayout()).columnWidths = new int[] { 0, 0 };
+			((GridBagLayout) panel10.getLayout()).rowHeights = new int[] { 0, 0 };
+			((GridBagLayout) panel10.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+			((GridBagLayout) panel10.getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
 
-			//======== splitPane2 ========
+			// ======== splitPane2 ========
 			{
 				splitPane2.setToolTipText("Drag to resize");
 				splitPane2.setBackground(new Color(238, 238, 238));
 				splitPane2.setResizeWeight(1.0);
 				splitPane2.setOneTouchExpandable(true);
 
-				//======== splitPane4 ========
+				// ======== splitPane4 ========
 				{
 					splitPane4.setOrientation(JSplitPane.VERTICAL_SPLIT);
 					splitPane4.setOneTouchExpandable(true);
 
-					//======== panel9 ========
+					// ======== panel9 ========
 					{
 						panel9.setBackground(new Color(238, 238, 238));
 						panel9.setLayout(new GridBagLayout());
-						((GridBagLayout)panel9.getLayout()).columnWidths = new int[] {0, 0};
-						((GridBagLayout)panel9.getLayout()).rowHeights = new int[] {20, 90, 0};
-						((GridBagLayout)panel9.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-						((GridBagLayout)panel9.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
+						((GridBagLayout) panel9.getLayout()).columnWidths = new int[] { 0, 0 };
+						((GridBagLayout) panel9.getLayout()).rowHeights = new int[] { 20, 90, 0 };
+						((GridBagLayout) panel9.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+						((GridBagLayout) panel9.getLayout()).rowWeights = new double[] { 0.0, 1.0, 1.0E-4 };
 
-						//---- label9 ----
+						// ---- label9 ----
 						label9.setText("Source Language");
-						panel9.add(label9, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 5, 0), 0, 0));
+						panel9.add(label9, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-						//======== scrollPane1 ========
+						// ======== scrollPane1 ========
 						{
 
-							//---- tabSou ----
+							// ---- tabSou ----
 							tabSou.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 							tabSou.setBorder(LineBorder.createBlackLineBorder());
 							tabSou.setAutoCreateRowSorter(true);
 							scrollPane1.setViewportView(tabSou);
 						}
-						panel9.add(scrollPane1, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 0), 0, 0));
+						panel9.add(scrollPane1, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 					}
 					splitPane4.setTopComponent(panel9);
 
-					//======== tabbedPane2 ========
+					// ======== tabbedPane2 ========
 					{
 
-						//======== panel16 ========
+						// ======== panel16 ========
 						{
 							panel16.setLayout(new GridBagLayout());
-							((GridBagLayout)panel16.getLayout()).columnWidths = new int[] {0, 0};
-							((GridBagLayout)panel16.getLayout()).rowHeights = new int[] {0, 0, 0};
-							((GridBagLayout)panel16.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-							((GridBagLayout)panel16.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
+							((GridBagLayout) panel16.getLayout()).columnWidths = new int[] { 0, 0 };
+							((GridBagLayout) panel16.getLayout()).rowHeights = new int[] { 0, 0, 0 };
+							((GridBagLayout) panel16.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+							((GridBagLayout) panel16.getLayout()).rowWeights = new double[] { 0.0, 1.0, 1.0E-4 };
 
-							//======== panel17 ========
+							// ======== panel17 ========
 							{
 								panel17.setLayout(new GridBagLayout());
-								((GridBagLayout)panel17.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
-								((GridBagLayout)panel17.getLayout()).rowHeights = new int[] {0, 0};
-								((GridBagLayout)panel17.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0, 1.0E-4};
-								((GridBagLayout)panel17.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+								((GridBagLayout) panel17.getLayout()).columnWidths = new int[] { 0, 0, 0, 0 };
+								((GridBagLayout) panel17.getLayout()).rowHeights = new int[] { 0, 0 };
+								((GridBagLayout) panel17.getLayout()).columnWeights = new double[] { 0.0, 0.0, 1.0, 1.0E-4 };
+								((GridBagLayout) panel17.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
 
-								//---- bAddComent ----
+								// ---- bAddComent ----
 								bAddComent.setText("[A]dd Comment");
 								bAddComent.setMnemonic('A');
 								bAddComent.addActionListener(new ActionListener() {
@@ -1680,14 +1645,10 @@ public class TranslationConceptEditor6 extends JPanel {
 										bAddComentActionPerformed();
 									}
 								});
-								panel17.add(bAddComent, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-									new Insets(0, 0, 0, 5), 0, 0));
-								panel17.add(cmbTarComm, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-									new Insets(0, 0, 0, 5), 0, 0));
+								panel17.add(bAddComent, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+								panel17.add(cmbTarComm, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-								//---- label17 ----
+								// ---- label17 ----
 								label17.setText("text");
 								label17.addMouseListener(new MouseAdapter() {
 									@Override
@@ -1695,21 +1656,17 @@ public class TranslationConceptEditor6 extends JPanel {
 										label17MouseClicked(e);
 									}
 								});
-								panel17.add(label17, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-									new Insets(0, 0, 0, 0), 0, 0));
+								panel17.add(label17, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
 							}
-							panel16.add(panel17, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 0), 0, 0));
+							panel16.add(panel17, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-							//======== tabbedPane1 ========
+							// ======== tabbedPane1 ========
 							{
 
-								//======== scrollPane9 ========
+								// ======== scrollPane9 ========
 								{
 
-									//---- tblComm ----
+									// ---- tblComm ----
 									tblComm.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 									tblComm.addMouseListener(new MouseAdapter() {
 										@Override
@@ -1721,11 +1678,10 @@ public class TranslationConceptEditor6 extends JPanel {
 								}
 								tabbedPane1.addTab("Comments", scrollPane9);
 
-
-								//======== scrollPane8 ========
+								// ======== scrollPane8 ========
 								{
 
-									//---- refTable ----
+									// ---- refTable ----
 									refTable.setEditable(false);
 									refTable.addHyperlinkListener(new HyperlinkListener() {
 										@Override
@@ -1738,21 +1694,18 @@ public class TranslationConceptEditor6 extends JPanel {
 								tabbedPane1.addTab("Web references", scrollPane8);
 
 							}
-							panel16.add(tabbedPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 0, 0), 0, 0));
+							panel16.add(tabbedPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 						}
 						tabbedPane2.addTab("Comments", panel16);
 
-
-						//======== panel11 ========
+						// ======== panel11 ========
 						{
 							panel11.setBackground(Color.white);
 							panel11.setLayout(new GridBagLayout());
-							((GridBagLayout)panel11.getLayout()).columnWidths = new int[] {0, 0};
-							((GridBagLayout)panel11.getLayout()).rowHeights = new int[] {0, 0};
-							((GridBagLayout)panel11.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-							((GridBagLayout)panel11.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+							((GridBagLayout) panel11.getLayout()).columnWidths = new int[] { 0, 0 };
+							((GridBagLayout) panel11.getLayout()).rowHeights = new int[] { 0, 0 };
+							((GridBagLayout) panel11.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+							((GridBagLayout) panel11.getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
 						}
 						tabbedPane2.addTab("Issues", panel11);
 						tabbedPane2.setMnemonicAt(1, 'U');
@@ -1761,194 +1714,158 @@ public class TranslationConceptEditor6 extends JPanel {
 				}
 				splitPane2.setLeftComponent(splitPane4);
 
-				//======== splitPane1 ========
+				// ======== splitPane1 ========
 				{
 					splitPane1.setOrientation(JSplitPane.VERTICAL_SPLIT);
 					splitPane1.setOneTouchExpandable(true);
 
-					//======== panel8 ========
+					// ======== panel8 ========
 					{
 						panel8.setBackground(new Color(238, 238, 238));
 						panel8.setLayout(new GridBagLayout());
-						((GridBagLayout)panel8.getLayout()).columnWidths = new int[] {0, 0};
-						((GridBagLayout)panel8.getLayout()).rowHeights = new int[] {0, 105, 0, 34, 0};
-						((GridBagLayout)panel8.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-						((GridBagLayout)panel8.getLayout()).rowWeights = new double[] {0.0, 1.0, 0.0, 0.0, 1.0E-4};
+						((GridBagLayout) panel8.getLayout()).columnWidths = new int[] { 0, 0 };
+						((GridBagLayout) panel8.getLayout()).rowHeights = new int[] { 0, 105, 0, 34, 0 };
+						((GridBagLayout) panel8.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+						((GridBagLayout) panel8.getLayout()).rowWeights = new double[] { 0.0, 1.0, 0.0, 0.0, 1.0E-4 };
 
-						//---- label11 ----
+						// ---- label11 ----
 						label11.setText("Target Language");
 						label11.setBackground(new Color(238, 238, 238));
-						panel8.add(label11, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 5, 0), 0, 0));
+						panel8.add(label11, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-						//======== scrollPane6 ========
+						// ======== scrollPane6 ========
 						{
 
-							//---- tabTar ----
+							// ---- tabTar ----
 							tabTar.setAutoCreateRowSorter(true);
 							tabTar.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 							tabTar.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 							tabTar.setBorder(LineBorder.createBlackLineBorder());
 							scrollPane6.setViewportView(tabTar);
 						}
-						panel8.add(scrollPane6, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 5, 0), 0, 0));
+						panel8.add(scrollPane6, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-						//======== panel2 ========
+						// ======== panel2 ========
 						{
 							panel2.setBorder(LineBorder.createBlackLineBorder());
 							panel2.setBackground(new Color(238, 238, 238));
 							panel2.setLayout(new GridBagLayout());
-							((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 5, 0};
-							((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {13, 26, 23, 23, 33, 0, 0, 0};
-							((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0, 1.0, 0.0, 1.0E-4};
-							((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+							((GridBagLayout) panel2.getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 5, 0 };
+							((GridBagLayout) panel2.getLayout()).rowHeights = new int[] { 13, 26, 23, 23, 33, 0, 0, 0 };
+							((GridBagLayout) panel2.getLayout()).columnWeights = new double[] { 0.0, 0.0, 1.0, 1.0, 0.0, 1.0E-4 };
+							((GridBagLayout) panel2.getLayout()).rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
 
-							//---- label2 ----
+							// ---- label2 ----
 							label2.setText("Term:");
 							label2.setFont(new Font("Verdana", Font.PLAIN, 13));
-							panel2.add(label2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 10, 5, 5), 0, 0));
+							panel2.add(label2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 10, 5, 5), 0, 0));
 
-							//======== scrollPane5 ========
+							// ======== scrollPane5 ========
 							{
 
-								//---- targetTextField ----
+								// ---- targetTextField ----
 								targetTextField.setRows(2);
 								scrollPane5.setViewportView(targetTextField);
 							}
-							panel2.add(scrollPane5, new GridBagConstraints(1, 1, 3, 3, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+							panel2.add(scrollPane5, new GridBagConstraints(1, 1, 3, 3, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-							//---- label1 ----
+							// ---- label1 ----
 							label1.setText("Term Type:");
 							label1.setFont(new Font("Verdana", Font.PLAIN, 13));
-							panel2.add(label1, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 10, 5, 5), 0, 0));
+							panel2.add(label1, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 10, 5, 5), 0, 0));
 
-							//======== panel7 ========
+							// ======== panel7 ========
 							{
 								panel7.setBackground(new Color(238, 238, 238));
 								panel7.setLayout(new FlowLayout(FlowLayout.LEFT));
 								panel7.add(label4);
 								panel7.add(comboBox1);
 							}
-							panel2.add(panel7, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 0, 5, 5), 0, 0));
+							panel2.add(panel7, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 5, 5), 0, 0));
 
-							//======== panel5 ========
+							// ======== panel5 ========
 							{
 								panel5.setBackground(new Color(238, 238, 238));
 								panel5.setLayout(new GridBagLayout());
-								((GridBagLayout)panel5.getLayout()).columnWidths = new int[] {15, 0, 0, 0};
-								((GridBagLayout)panel5.getLayout()).rowHeights = new int[] {0, 0};
-								((GridBagLayout)panel5.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
-								((GridBagLayout)panel5.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+								((GridBagLayout) panel5.getLayout()).columnWidths = new int[] { 15, 0, 0, 0 };
+								((GridBagLayout) panel5.getLayout()).rowHeights = new int[] { 0, 0 };
+								((GridBagLayout) panel5.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 1.0E-4 };
+								((GridBagLayout) panel5.getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
 
-								//---- label5 ----
+								// ---- label5 ----
 								label5.setText("Acceptability:");
-								panel5.add(label5, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-									new Insets(0, 0, 0, 5), 0, 0));
-								panel5.add(cmbAccep, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-									new Insets(0, 0, 0, 0), 0, 0));
+								panel5.add(label5, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+								panel5.add(cmbAccep, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 							}
-							panel2.add(panel5, new GridBagConstraints(3, 4, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 0, 5, 5), 0, 0));
+							panel2.add(panel5, new GridBagConstraints(3, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 5, 5), 0, 0));
 
-							//---- label3 ----
+							// ---- label3 ----
 							label3.setText("Is case significant ?");
 							label3.setFont(new Font("Verdana", Font.PLAIN, 13));
-							panel2.add(label3, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 10, 5, 5), 0, 0));
+							panel2.add(label3, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 10, 5, 5), 0, 0));
 
-							//======== panel4 ========
+							// ======== panel4 ========
 							{
 								panel4.setBackground(new Color(238, 238, 238));
 								panel4.setLayout(new GridBagLayout());
-								((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0};
-								((GridBagLayout)panel4.getLayout()).rowHeights = new int[] {0, 0};
-								((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
-								((GridBagLayout)panel4.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+								((GridBagLayout) panel4.getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 0, 0 };
+								((GridBagLayout) panel4.getLayout()).rowHeights = new int[] { 0, 0 };
+								((GridBagLayout) panel4.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
+								((GridBagLayout) panel4.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
 
-								//---- rbYes ----
+								// ---- rbYes ----
 								rbYes.setText("Yes");
 								rbYes.setBackground(new Color(238, 238, 238));
-								panel4.add(rbYes, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-									new Insets(0, 0, 0, 5), 0, 0));
+								panel4.add(rbYes, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 5), 0, 0));
 
-								//---- label6 ----
+								// ---- label6 ----
 								label6.setText("    ");
-								panel4.add(label6, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-									new Insets(0, 0, 0, 5), 0, 0));
+								panel4.add(label6, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 5), 0, 0));
 
-								//---- rbNo ----
+								// ---- rbNo ----
 								rbNo.setSelected(true);
 								rbNo.setText("No");
 								rbNo.setBackground(new Color(238, 238, 238));
-								panel4.add(rbNo, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-									new Insets(0, 0, 0, 0), 0, 0));
+								panel4.add(rbNo, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 							}
-							panel2.add(panel4, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 0, 5, 5), 0, 0));
+							panel2.add(panel4, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 5, 5), 0, 0));
 
-							//======== panel14 ========
+							// ======== panel14 ========
 							{
 								panel14.setBackground(new Color(238, 238, 238));
 								panel14.setLayout(new GridBagLayout());
-								((GridBagLayout)panel14.getLayout()).columnWidths = new int[] {15, 0, 0, 0, 0, 0, 0};
-								((GridBagLayout)panel14.getLayout()).rowHeights = new int[] {0, 0};
-								((GridBagLayout)panel14.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
-								((GridBagLayout)panel14.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+								((GridBagLayout) panel14.getLayout()).columnWidths = new int[] { 15, 0, 0, 0, 0, 0, 0 };
+								((GridBagLayout) panel14.getLayout()).rowHeights = new int[] { 0, 0 };
+								((GridBagLayout) panel14.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
+								((GridBagLayout) panel14.getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
 
-								//---- label7 ----
+								// ---- label7 ----
 								label7.setText("Status:");
-								panel14.add(label7, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-									new Insets(0, 0, 0, 5), 0, 0));
+								panel14.add(label7, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 5), 0, 0));
 
-								//---- rbAct ----
+								// ---- rbAct ----
 								rbAct.setText("Active");
 								rbAct.setSelected(true);
 								rbAct.setBackground(new Color(238, 238, 238));
-								panel14.add(rbAct, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-									new Insets(0, 0, 0, 5), 0, 0));
+								panel14.add(rbAct, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 5), 0, 0));
 
-								//---- rbInact ----
+								// ---- rbInact ----
 								rbInact.setText("Inactive");
 								rbInact.setBackground(new Color(238, 238, 238));
-								panel14.add(rbInact, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-									new Insets(0, 0, 0, 0), 0, 0));
+								panel14.add(rbInact, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 							}
-							panel2.add(panel14, new GridBagConstraints(3, 5, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 0, 5, 5), 0, 0));
+							panel2.add(panel14, new GridBagConstraints(3, 5, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 5, 5), 0, 0));
 
-							//======== panel3 ========
+							// ======== panel3 ========
 							{
 								panel3.setBackground(new Color(238, 238, 238));
 								panel3.setLayout(new GridBagLayout());
-								((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
-								((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {0, 0};
-								((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
-								((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+								((GridBagLayout) panel3.getLayout()).columnWidths = new int[] { 0, 0, 0, 0 };
+								((GridBagLayout) panel3.getLayout()).rowHeights = new int[] { 0, 0 };
+								((GridBagLayout) panel3.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 1.0E-4 };
+								((GridBagLayout) panel3.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
 
-								//---- label13 ----
+								// ---- label13 ----
 								label13.setText("text");
 								label13.addMouseListener(new MouseAdapter() {
 									@Override
@@ -1956,33 +1873,27 @@ public class TranslationConceptEditor6 extends JPanel {
 										label13MouseClicked(e);
 									}
 								});
-								panel3.add(label13, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-									new Insets(0, 0, 0, 0), 0, 0));
+								panel3.add(label13, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 							}
-							panel2.add(panel3, new GridBagConstraints(3, 6, 1, 1, 0.0, 0.0,
-								GridBagConstraints.EAST, GridBagConstraints.NONE,
-								new Insets(0, 0, 0, 5), 0, 0));
+							panel2.add(panel3, new GridBagConstraints(3, 6, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 5), 0, 0));
 						}
-						panel8.add(panel2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 5, 0), 0, 0));
+						panel8.add(panel2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-						//======== panel6 ========
+						// ======== panel6 ========
 						{
 							panel6.setBorder(LineBorder.createBlackLineBorder());
 							panel6.setLayout(new BoxLayout(panel6, BoxLayout.Y_AXIS));
 
-							//======== buttonPanel ========
+							// ======== buttonPanel ========
 							{
 								buttonPanel.setBackground(new Color(238, 238, 238));
 								buttonPanel.setLayout(new GridBagLayout());
-								((GridBagLayout)buttonPanel.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0};
-								((GridBagLayout)buttonPanel.getLayout()).rowHeights = new int[] {0, 0};
-								((GridBagLayout)buttonPanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
-								((GridBagLayout)buttonPanel.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+								((GridBagLayout) buttonPanel.getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+								((GridBagLayout) buttonPanel.getLayout()).rowHeights = new int[] { 0, 0 };
+								((GridBagLayout) buttonPanel.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4 };
+								((GridBagLayout) buttonPanel.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
 
-								//---- label12 ----
+								// ---- label12 ----
 								label12.setText("text");
 								label12.addMouseListener(new MouseAdapter() {
 									@Override
@@ -1990,17 +1901,13 @@ public class TranslationConceptEditor6 extends JPanel {
 										label12MouseClicked(e);
 									}
 								});
-								buttonPanel.add(label12, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-									new Insets(0, 0, 0, 5), 0, 0));
+								buttonPanel.add(label12, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-								//---- label8 ----
+								// ---- label8 ----
 								label8.setText("Workflow actions:      ");
-								buttonPanel.add(label8, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-									new Insets(0, 0, 0, 5), 0, 0));
+								buttonPanel.add(label8, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 5), 0, 0));
 
-								//---- bKeep ----
+								// ---- bKeep ----
 								bKeep.setText("Keep in inbox");
 								bKeep.setIcon(new ImageIcon("icons/cabinet.gif"));
 								bKeep.addActionListener(new ActionListener() {
@@ -2009,11 +1916,9 @@ public class TranslationConceptEditor6 extends JPanel {
 										bKeepActionPerformed();
 									}
 								});
-								buttonPanel.add(bKeep, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-									new Insets(0, 0, 0, 5), 0, 0));
+								buttonPanel.add(bKeep, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 5), 0, 0));
 
-								//---- bReview ----
+								// ---- bReview ----
 								bReview.setText("Send to reviewer");
 								bReview.setIcon(new ImageIcon("icons/reviewer.gif"));
 								bReview.addActionListener(new ActionListener() {
@@ -2022,11 +1927,9 @@ public class TranslationConceptEditor6 extends JPanel {
 										bReviewActionPerformed();
 									}
 								});
-								buttonPanel.add(bReview, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-									new Insets(0, 0, 0, 5), 0, 0));
+								buttonPanel.add(bReview, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 5), 0, 0));
 
-								//---- bEscalate ----
+								// ---- bEscalate ----
 								bEscalate.setText("Escalate");
 								bEscalate.setIcon(new ImageIcon("icons/editor.gif"));
 								bEscalate.addActionListener(new ActionListener() {
@@ -2035,25 +1938,21 @@ public class TranslationConceptEditor6 extends JPanel {
 										bEscalateActionPerformed();
 									}
 								});
-								buttonPanel.add(bEscalate, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-									new Insets(0, 0, 0, 5), 0, 0));
+								buttonPanel.add(bEscalate, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 5), 0, 0));
 							}
 							panel6.add(buttonPanel);
 						}
-						panel8.add(panel6, new GridBagConstraints(0, 3, 1, 1, 1.0, 1.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 0), 0, 0));
+						panel8.add(panel6, new GridBagConstraints(0, 3, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 					}
 					splitPane1.setTopComponent(panel8);
 
-					//======== tabbedPane3 ========
+					// ======== tabbedPane3 ========
 					{
 
-						//======== scrollPane7 ========
+						// ======== scrollPane7 ========
 						{
 
-							//---- tree3 ----
+							// ---- tree3 ----
 							tree3.setVisibleRowCount(4);
 							scrollPane7.setViewportView(tree3);
 						}
@@ -2066,44 +1965,16 @@ public class TranslationConceptEditor6 extends JPanel {
 				}
 				splitPane2.setRightComponent(splitPane1);
 			}
-			panel10.add(splitPane2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+			panel10.add(splitPane2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel10, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 0, 0), 0, 0));
+		add(panel10, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
-		//======== popupMenu1 ========
-		{
-
-			//---- menuItem2 ----
-			menuItem2.setText("Delete");
-			menuItem2.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					deleteCommentActionPerformed(e);
-				}
-			});
-			popupMenu1.add(menuItem2);
-
-			//---- menuItem3 ----
-			menuItem3.setText("View Comment");
-			menuItem3.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					viewCommentActionPerformed(e);
-				}
-			});
-			popupMenu1.add(menuItem3);
-		}
-
-		//---- buttonGroup1 ----
+		// ---- buttonGroup1 ----
 		ButtonGroup buttonGroup1 = new ButtonGroup();
 		buttonGroup1.add(rbYes);
 		buttonGroup1.add(rbNo);
 
-		//---- buttonGroup3 ----
+		// ---- buttonGroup3 ----
 		ButtonGroup buttonGroup3 = new ButtonGroup();
 		buttonGroup3.add(rbAct);
 		buttonGroup3.add(rbInact);
@@ -2185,9 +2056,6 @@ public class TranslationConceptEditor6 extends JPanel {
 	private JScrollPane scrollPane7;
 	private JTree tree3;
 	private HierarchyNavigator hierarchyNavigator1;
-	private JPopupMenu popupMenu1;
-	private JMenuItem menuItem2;
-	private JMenuItem menuItem3;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
 	/** The concept. */
@@ -2338,15 +2206,17 @@ public class TranslationConceptEditor6 extends JPanel {
 									sourceFSN = description.getText().substring(0, semtagLocation);
 
 									final SimilarityPanel similPanel = getSimilarityPanel();
-//									similPanel.getSimilarityTable().getModel().addTableModelListener(new TableModelListener() {
-//										@Override
-//										public void tableChanged(
-//												TableModelEvent ev) {
-//											label14.setText("S:" + similPanel.getSimilarityHitsCount());
-//											label14.revalidate();
-//										}
-//										
-//									});
+									// similPanel.getSimilarityTable().getModel().addTableModelListener(new
+									// TableModelListener() {
+									// @Override
+									// public void tableChanged(
+									// TableModelEvent ev) {
+									// label14.setText("S:" +
+									// similPanel.getSimilarityHitsCount());
+									// label14.revalidate();
+									// }
+									//
+									// });
 									// similPanel.updateTabs(sourceFSN,concept,sourceIds,targetId,translationProject,worklistMember);
 									Runnable simil = new Runnable() {
 										public void run() {
@@ -2359,7 +2229,7 @@ public class TranslationConceptEditor6 extends JPanel {
 											}
 											label14.setText("S:" + scount);
 											label14.revalidate();
-											
+
 											int tmcount = similPanel.getTransMemoryHitsCount();
 											if (tmcount > 0) {
 												label15.setForeground(Color.red);
@@ -2368,7 +2238,7 @@ public class TranslationConceptEditor6 extends JPanel {
 											}
 											label15.setText("TM:" + tmcount);
 											label15.revalidate();
-											
+
 											int lgcount = similPanel.getLingGuidelinesHitsCount();
 											if (lgcount > 0) {
 												label16.setForeground(Color.red);
@@ -2864,15 +2734,14 @@ public class TranslationConceptEditor6 extends JPanel {
 					//
 				}
 
-				Long concpetID =  null;
+				Long concpetID = null;
 				I_Identify identifier = concept.getIdentifier();
 				List<? extends I_IdPart> parts = identifier.getMutableIdParts();
 				Long lastTime = Long.MIN_VALUE;
 				for (I_IdPart i_IdPart : parts) {
-					if(i_IdPart.getAuthorityNid() == tf.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids()) && 
-							i_IdPart.getTime() > lastTime){
+					if (i_IdPart.getAuthorityNid() == tf.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids()) && i_IdPart.getTime() > lastTime) {
 						lastTime = i_IdPart.getTime();
-						concpetID = (Long)i_IdPart.getDenotation();
+						concpetID = (Long) i_IdPart.getDenotation();
 					}
 				}
 				DefaultMutableTreeNode conceptIdNode = new DefaultMutableTreeNode(new TreeEditorObjectWrapper("Concept ID: " + concpetID, IconUtilities.ID, concpetID));
@@ -3119,8 +2988,8 @@ public class TranslationConceptEditor6 extends JPanel {
 					&& descriptionInEditor.getAcceptabilityId() == ((I_GetConceptData) cmbAccep.getSelectedItem()).getConceptNid()
 					&& ((descriptionInEditor.getExtensionStatusId() == active.getConceptNid() && rbAct.isSelected()) || (descriptionInEditor.getExtensionStatusId() != active.getConceptNid() && !rbAct
 							.isSelected()))
-							&& ((descriptionInEditor.getTypeId() == fsn.getConceptNid() && fsn.equals((I_GetConceptData) comboBox1.getSelectedItem())) || (descriptionInEditor.getTypeId() != fsn
-									.getConceptNid() && !fsn.equals((I_GetConceptData) comboBox1.getSelectedItem())))) {
+					&& ((descriptionInEditor.getTypeId() == fsn.getConceptNid() && fsn.equals((I_GetConceptData) comboBox1.getSelectedItem())) || (descriptionInEditor.getTypeId() != fsn
+							.getConceptNid() && !fsn.equals((I_GetConceptData) comboBox1.getSelectedItem())))) {
 				update = true;
 			} else {
 				Object[] options = { "Discard unsaved data", "Cancel and continue editing" };
@@ -3484,17 +3353,17 @@ public class TranslationConceptEditor6 extends JPanel {
 				for (int i = commentsList.size() - 1; i > -1; i--) {
 					if (commentsList.get(i).getTypeCid() == commentsList.get(i).getSubTypeCid()) {
 						tableModel
-						.addRow(new Object[] { "Language refset: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "", formatComment(commentsList.get(i).getComment()) });
+								.addRow(new Object[] { "Language refset: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "", formatComment(commentsList.get(i).getComment()) });
 					} else {
 						tableModel.addRow(new Object[] {
 								"Language refset: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "/" + Terms.get().getConcept(commentsList.get(i).getSubTypeCid()),
-								commentsList.get(i).getComment() });
+								formatComment(commentsList.get(i).getComment()) });
 					}
 				}
 			}
 
 			commentsList = TerminologyProjectDAO.getWorkList(Terms.get().getConcept(worklistMember.getWorkListUUID()), config).getCommentsRefset(config)
-			.getFullComments(this.concept.getConceptNid());
+					.getFullComments(this.concept.getConceptNid());
 
 			for (int i = commentsList.size() - 1; i > -1; i--) {
 				if (commentsList.get(i).getTypeCid() == commentsList.get(i).getSubTypeCid()) {
@@ -3502,7 +3371,7 @@ public class TranslationConceptEditor6 extends JPanel {
 				} else {
 					tableModel.addRow(new Object[] {
 							"Worklist: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "/" + Terms.get().getConcept(commentsList.get(i).getSubTypeCid()),
-							commentsList.get(i).getComment() });
+							formatComment(commentsList.get(i).getComment()) });
 				}
 			}
 
