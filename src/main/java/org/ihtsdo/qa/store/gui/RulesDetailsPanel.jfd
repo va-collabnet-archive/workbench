@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_22" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_24" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -858,6 +858,14 @@
               <void property="name"> 
                <string>whiteListAllowed</string> 
               </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.ItemListener</string> 
+                <string>itemStateChanged</string> 
+                <string>whiteListAllowedItemStateChanged</string> 
+                <boolean>true</boolean> 
+               </object> 
+              </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
               <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
@@ -881,6 +889,14 @@
               <void property="name"> 
                <string>whiteListResetAllowed</string> 
               </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.ItemListener</string> 
+                <string>itemStateChanged</string> 
+                <string>whiteListResetAllowedItemStateChanged</string> 
+                <boolean>true</boolean> 
+               </object> 
+              </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
               <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
@@ -903,6 +919,14 @@
               </void> 
               <void property="name"> 
                <string>whiteLIstWhenClosedAllowed</string> 
+              </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.ItemListener</string> 
+                <string>itemStateChanged</string> 
+                <string>whiteLIstWhenClosedAllowedItemStateChanged</string> 
+                <boolean>true</boolean> 
+               </object> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 

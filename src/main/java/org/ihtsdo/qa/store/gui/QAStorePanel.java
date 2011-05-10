@@ -10,6 +10,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.*;
 
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -34,9 +35,9 @@ public class QAStorePanel extends JPanel {
 		initComponents();
 		
 		resultsPanel = new QAResultsBrowser(store, tabbedPane1);
-		panel2.add(resultsPanel, BorderLayout.CENTER);
+		rulesContentPanel.add(resultsPanel, BorderLayout.CENTER);
 		casesPanel = new QACasesBrowser(store, resultsPanel, tabbedPane2);
-		panel3.add(casesPanel, BorderLayout.CENTER);
+		casesContentPanel.add(casesPanel, BorderLayout.CENTER);
 		
 		resultsPanel.getTable().addMouseListener(new MouseAdapter() {
 			@Override
@@ -54,53 +55,60 @@ public class QAStorePanel extends JPanel {
 
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+		splitPane1 = new JSplitPane();
 		tabbedPane1 = new JTabbedPane();
-		panel2 = new JPanel();
+		rulesContentPanel = new JPanel();
 		tabbedPane2 = new JTabbedPane();
-		panel3 = new JPanel();
+		casesContentPanel = new JPanel();
 
 		//======== this ========
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new GridBagLayout());
 		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
-		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0, 0};
+		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0};
 		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-		((GridBagLayout)getLayout()).rowWeights = new double[] {1.0, 1.0, 1.0E-4};
+		((GridBagLayout)getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
 
-		//======== tabbedPane1 ========
+		//======== splitPane1 ========
 		{
+			splitPane1.setOrientation(JSplitPane.VERTICAL_SPLIT);
+			splitPane1.setResizeWeight(0.5);
 
-			//======== panel2 ========
+			//======== tabbedPane1 ========
 			{
-				panel2.setLayout(new BorderLayout());
+
+				//======== rulesContentPanel ========
+				{
+					rulesContentPanel.setLayout(new BorderLayout());
+				}
+				tabbedPane1.addTab("QA Rules", rulesContentPanel);
+
 			}
-			tabbedPane1.addTab("QA Rules", panel2);
+			splitPane1.setTopComponent(tabbedPane1);
 
-		}
-		add(tabbedPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 5, 0), 0, 0));
-
-		//======== tabbedPane2 ========
-		{
-
-			//======== panel3 ========
+			//======== tabbedPane2 ========
 			{
-				panel3.setLayout(new BorderLayout());
-			}
-			tabbedPane2.addTab("Cases", panel3);
 
+				//======== casesContentPanel ========
+				{
+					casesContentPanel.setLayout(new BorderLayout());
+				}
+				tabbedPane2.addTab("Cases", casesContentPanel);
+
+			}
+			splitPane1.setBottomComponent(tabbedPane2);
 		}
-		add(tabbedPane2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+		add(splitPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 0, 0), 0, 0));
 		// JFormDesigner - End of component initialization  //GEN-END:initComponents
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	private JSplitPane splitPane1;
 	private JTabbedPane tabbedPane1;
-	private JPanel panel2;
+	private JPanel rulesContentPanel;
 	private JTabbedPane tabbedPane2;
-	private JPanel panel3;
+	private JPanel casesContentPanel;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }
