@@ -65,6 +65,7 @@ import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.project.refset.PromotionRefset;
+import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.ui.I_KeepTaskInInbox;
 import org.ihtsdo.translation.ui.TranslationConceptEditor6;
 /**
@@ -260,7 +261,7 @@ public class PropBasedTransWorkFlowStep1Outputs extends AbstractTask {
 				for (int i=0;i<tabCount;i++){
 					if (tp.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)){
 						uiPanel=(TranslationConceptEditor6)tp.getComponentAt(i);
-						if (!uiPanel.verifySavePending(null)){
+						if (!uiPanel.verifySavePending(null,false)){
 							uiPanel=null;
 							t.interrupt();
 							return Condition.STOP;
@@ -459,7 +460,7 @@ public class PropBasedTransWorkFlowStep1Outputs extends AbstractTask {
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(ActionEvent e) {
-			if (uiPanel.verifySavePending(null)) {
+			if (uiPanel.verifySavePending(null,LanguageUtil.isItemBeingSent(e))) {
 				returnCondition = Condition.ITEM_COMPLETE;
 				selectedDestination = exit1Destination;
 				selectedNextStatus = exit1NextStatus;
@@ -479,7 +480,7 @@ public class PropBasedTransWorkFlowStep1Outputs extends AbstractTask {
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(ActionEvent e) {
-			if (uiPanel.verifySavePending(null)) {
+			if (uiPanel.verifySavePending(null,LanguageUtil.isItemBeingSent(e))) {
 				returnCondition = Condition.STOP;
 				uiPanel.setAutoKeepFunction(null);
 				done = true;
@@ -495,7 +496,7 @@ public class PropBasedTransWorkFlowStep1Outputs extends AbstractTask {
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(ActionEvent e) {
-			if (uiPanel.verifySavePending("Do you want to save changes befor sending it to your todo folder?")) {
+			if (uiPanel.verifySavePending("Do you want to save changes befor sending it to your todo folder?", LanguageUtil.isItemBeingSent(e))) {
 				returnCondition = Condition.STOP;
 				selectedNextStatus = todoStatus;
 				uiPanel.setAutoKeepFunction(null);
