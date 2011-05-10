@@ -63,8 +63,8 @@ public class TestEnums extends TestCase {
 		System.out.println("Deleting test fixture");
 		deleteDirectory(new File("berkeley-db"));
 		System.out.println("Creating test fixture");
-		copyDirectory(new File("src/test/java/org/ihtsdo/rules/test/context/berkeley-db"), new File("berkeley-db"));
-		vodbDirectory = new File("berkeley-db");
+		//copyDirectory(new File("src/test/java/org/ihtsdo/rules/test/context/berkeley-db"), new File("berkeley-db"));
+		vodbDirectory = new File("/workspaces/Translation Module/project-management-ndb/berkeley-db");
 		dbSetupConfig = new DatabaseSetupConfig();
 		System.out.println("Opening database");
 		Terms.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig);
