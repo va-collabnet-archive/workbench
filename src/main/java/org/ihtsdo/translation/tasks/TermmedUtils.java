@@ -16,6 +16,7 @@
  */
 package org.ihtsdo.translation.tasks;
 
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -23,6 +24,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import javax.swing.JButton;
 
 import org.dwfa.ace.api.DatabaseSetupConfig;
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -318,4 +321,5 @@ public class TermmedUtils
 //		termFactory.commit();
 
 	}
+	
 }
