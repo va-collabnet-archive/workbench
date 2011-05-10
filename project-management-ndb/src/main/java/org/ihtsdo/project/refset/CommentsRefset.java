@@ -79,6 +79,7 @@ public class CommentsRefset extends Refset {
 		try {
 			I_TermFactory termFactory = Terms.get();
 			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+			I_GetConceptData concept = termFactory.getConcept(commentstMember.getRefsetId());
 			I_ExtendByRefPart lastPart = TerminologyProjectDAO.getLastExtensionPart(commentstMember);
 			for (PathBI editPath : config.getEditingPathSet()) {
 				I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) 
@@ -88,6 +89,7 @@ public class CommentsRefset extends Refset {
 						Long.MAX_VALUE);
 				commentstMember.addVersion(part);
 			}
+			termFactory.addUncommittedNoChecks(concept);
 			termFactory.addUncommittedNoChecks(commentstMember);
 			termFactory.commit();
 		} catch (TerminologyException e) {
