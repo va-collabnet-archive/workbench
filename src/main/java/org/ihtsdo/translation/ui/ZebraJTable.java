@@ -140,4 +140,17 @@ public class ZebraJTable extends javax.swing.JTable
 						0.1f * selHSB[1] + 0.9f * bgHSB[1],
 						bgHSB[2] + ((bgHSB[2]<0.5f) ? 0.05f : -0.05f) );
 	}
+	
+	@Override
+	public Object getValueAt(int row, int column) {
+		//System.out.println("ZebraJTable rowcount: " + getRowCount() + " Row: " + row);
+		try {
+			if (row < getRowCount()) {
+				return super.getValueAt(row, column);
+			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			// Do Nothing
+		}
+		return null;
+	}
 }
