@@ -16,12 +16,19 @@
  */
 package org.ihtsdo.project;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import junit.framework.TestCase;
@@ -32,14 +39,20 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.project.refset.LanguageMembershipRefset;
+import org.ihtsdo.project.refset.LanguageSpecRefset;
+import org.ihtsdo.project.refset.Refset;
+import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
 
 /**
  * The Class TestContextualizedDescriptions.
  */
-public class TestPromotion extends TestCase {
+public class TestParseFile extends TestCase {
 
 	/** The vodb directory. */
 	File vodbDirectory;
@@ -71,6 +84,7 @@ public class TestPromotion extends TestCase {
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	protected void setUp() throws Exception {
+		super.setUp();
 		System.out.println("Deleting test fixture");
 		deleteDirectory(new File("berkeley-db"));
 		System.out.println("Creating test fixture");
@@ -84,14 +98,70 @@ public class TestPromotion extends TestCase {
 		tf.setActiveAceFrameConfig(config);
 	}
 
+	/**
+	 * Test state full.
+	 */
+	public void testStateFull() {
+		try {
+			File folder = new File("testFiles");
+			File[] files = folder.listFiles();
+			for (File file : files) {
+				FileInputStream fis = new FileInputStream(file);
+				InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
+				BufferedReader br1 = new BufferedReader(isr);
+				
+				File result = new File("testFiles", file.getName().split("\\.")[0]+ "-(Result).txt");
+				FileOutputStream fos = new FileOutputStream(result);
+				OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+				BufferedWriter bw = new BufferedWriter(osw);
+
+				while (br1.ready()) {
+					String line = br1.readLine();
+					bw.write(line + "\n");
+					String[] uuids = line.split("\t");
+					for (String uuid : uuids) {
+						try{
+							UUID resUuid = UUID.fromString(uuid);
+							I_GetConceptData concept = tf.getConcept(resUuid);
+							bw.append(concept.getInitialText());
+							if(uuid.equals(uuids[uuids.length-1])){
+								bw.append("\n");
+							}else{
+								bw.append("\t");
+							}
+						}catch (Exception e) {
+							// Not UUID
+							bw.append(uuid);
+							if(uuid.equals(uuids[uuids.length-1])){
+								bw.append("\n");
+							}else{
+								bw.append("\t");
+							}
+						}
+					}
+				}
+				
+				bw.close();
+				br1.close();
+				
+			}
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	private I_ConfigAceFrame getTestConfig() {
 		I_ConfigAceFrame config = null;
 		try {
 			config = tf.newAceFrameConfig();
 			config.addViewPosition(tf.newPosition(tf.getPath(new UUID[] { UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66") }), Integer.MAX_VALUE));
 			config.addViewPosition(tf.newPosition(tf.getPath(new UUID[] { UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2") }), Integer.MAX_VALUE));
-			config.addEditingPath(tf.getPath(new UUID[] { UUID.fromString("e0c9b55a-f349-420e-a85e-3957c4c81b82") }));
-			config.addPromotionPath(tf.getPath(new UUID[] { UUID.fromString("3416c77c-1a90-43f3-86ec-3a7bc2c07b63") }));
+			config.addViewPosition(tf.newPosition(tf.getPath(new UUID[] { UUID.fromString("60a8bbda-0c9b-4f61-b41e-8d2786c881a8") }), Integer.MAX_VALUE));
+			config.addEditingPath(tf.getPath(new UUID[] { UUID.fromString("60a8bbda-0c9b-4f61-b41e-8d2786c881a8") }));
+			config.addPromotionPath(tf.getPath(new UUID[] { UUID.fromString("60a8bbda-0c9b-4f61-b41e-8d2786c881a8") }));
 			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
 			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());
 			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.localize().getNid());

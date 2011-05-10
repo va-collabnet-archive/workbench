@@ -124,7 +124,6 @@ public class GetTranslationProject extends AbstractTask {
 			TranslationProjectDialog dialog = new TranslationProjectDialog();
 			TranslationProject project = dialog.showModalDialog();
 			if(project != null){
-				System.out.println("Project ID: " + project.getId());
 				process.setProperty(projectPropName, project);
 			}else{
 				JOptionPane.showMessageDialog(dialog,"Process terminated, no projects where selected.","Process end", JOptionPane.CLOSED_OPTION);
