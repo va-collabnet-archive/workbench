@@ -73,6 +73,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.border.LineBorder;
@@ -80,10 +82,11 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.plaf.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
@@ -3495,6 +3498,16 @@ public class TranslationConceptEditor6 extends JPanel {
 				public boolean isCellEditable(int x, int y) {
 					return false;
 				}
+
+				public Class getColumnClass(int column) {
+					Class returnValue;
+					if ((column >= 0) && (column < getColumnCount())) {
+						returnValue = getValueAt(0, column).getClass();
+					} else {
+						returnValue = Object.class;
+					}
+					return returnValue;
+				}
 			};
 
 			if (targetLangRefset != null) {
@@ -3525,6 +3538,12 @@ public class TranslationConceptEditor6 extends JPanel {
 			}
 
 			tblComm.setModel(tableModel);
+			RowSorter<TableModel> sorter =
+				new TableRowSorter<TableModel>(tableModel);
+			List sortKeys = new ArrayList();
+			sortKeys.add(new RowSorter.SortKey(1, SortOrder.DESCENDING));
+			sorter.setSortKeys(sortKeys);
+			tblComm.setRowSorter(sorter);
 			TableColumnModel cmodel = tblComm.getColumnModel();
 			cmodel.getColumn(0).setMinWidth(120);
 			cmodel.getColumn(0).setMaxWidth(145);
