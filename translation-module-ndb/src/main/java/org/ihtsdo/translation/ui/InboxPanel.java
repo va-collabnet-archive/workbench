@@ -1691,7 +1691,7 @@ public class InboxPanel extends JPanel {
 					if (tpc.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)){
 						if (tpc.getComponentAt(i) instanceof TranslationConceptEditor6){
 							TranslationConceptEditor6 uiPanel=(TranslationConceptEditor6)tpc.getComponentAt(i);
-							if (!uiPanel.verifySavePending(null)){
+							if (!uiPanel.verifySavePending(null, false)){
 								closing=false;
 								return;
 							}
@@ -2387,9 +2387,11 @@ public class InboxPanel extends JPanel {
 								if (tpc.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)){
 									if (tpc.getComponentAt(i) instanceof TranslationConceptEditor6){
 										TranslationConceptEditor6 uiPanel=(TranslationConceptEditor6)tpc.getComponentAt(i);
-										if ((uiPanel.getDescriptionInEditor() == null) || 
-												(!uiPanel.getDescriptionInEditor().getText().trim().equals("") && !uiPanel.verifySavePending(null))){
-											return;
+										ContextualizedDescription descriptionInEditor = uiPanel.getDescriptionInEditor();
+										if (descriptionInEditor != null && !descriptionInEditor.getText().trim().equals("")){
+											if(!uiPanel.verifySavePending(null,false)){
+												return;
+											}
 										}
 										break;
 									}
