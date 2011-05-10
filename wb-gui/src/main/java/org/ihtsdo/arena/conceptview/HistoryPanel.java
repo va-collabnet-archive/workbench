@@ -7,6 +7,7 @@ package org.ihtsdo.arena.conceptview;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -573,21 +574,24 @@ public class HistoryPanel {
 
         historyHeaderPanel.setSize(hxWidth,
                 view.getHistoryPanel().getHeight() - insetAdjustment);
+        historyHeaderPanel.setBorder(BorderFactory.createEmptyBorder());
         historyHeaderPanel.setPreferredSize(historyHeaderPanel.getSize());
         topHistoryPanel.add(historyHeaderScroller);
         historyHeaderScroller.setLocation(0, 0);
+        historyHeaderScroller.setBorder(BorderFactory.createEmptyBorder());
         historyHeaderScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         historyHeaderScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        historyHeaderScroller.setSize(topHistoryPanel.getWidth(), 
+        historyHeaderScroller.setSize(topHistoryPanel.getWidth(),
                 view.getHistoryPanel().getHeight());
         historyHeaderScroller.setLocation(0, 0);
         topHistoryPanel.add(versionScroller);
-        versionScroller.setSize(topHistoryPanel.getWidth(), view.getParent().getHeight()  + insetAdjustment);
+        versionScroller.setSize(topHistoryPanel.getWidth(), view.getParent().getHeight() + insetAdjustment);
         versionScroller.setLocation(0, historyHeaderPanel.getHeight() + 1);
         versionScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        versionScroller.setBorder(BorderFactory.createEmptyBorder(1, 0, 0, 0));
         versionPanel.setLocation(0, 0);
-        versionPanel.setSize(hxWidth, view.getParent().getParent().getHeight()  + 
-                (view.getHistoryPanel().getHeight() + view.getHistoryPanel().getY()) + 50);
+        versionPanel.setSize(hxWidth, view.getParent().getParent().getHeight()
+                + (view.getHistoryPanel().getHeight() + view.getHistoryPanel().getY()));
         versionPanel.setPreferredSize(versionPanel.getPreferredSize());
         syncVerticalLayout();
     }
@@ -596,6 +600,7 @@ public class HistoryPanel {
     private void redoLayout() {
 
         int currentX = xStartLoc;
+        //int yAdjust = -historyHeaderPanel.getHeight();
         next:
         for (JCheckBox positionCheck : positionCheckList) {
             PositionBI position = checkPositionMap.get(positionCheck);
@@ -608,18 +613,37 @@ public class HistoryPanel {
             }
 
             JCheckBox rowCheck = view.getRowToPathCheckMap().get(row);
-            positionCheck.setVisible(rowCheck.isSelected());
+            boolean showPosition = rowCheck.isSelected();
+            positionCheck.setVisible(showPosition);
             positionCheck.setLocation(currentX, positionCheck.getY());
             for (JComponent componentInColumn : checkComponentMap.get(positionCheck)) {
-                boolean visible = positionCheck.isVisible();
-                if (visible && componentInColumn instanceof JRadioButton) {
+                if (componentInColumn instanceof JRadioButton) {
                     JRadioButton radioButton = (JRadioButton) componentInColumn;
-                    visible = isPanelVisibleForButton(radioButton);
+                    if (showPosition) {
+                        if (isPanelVisibleForButton(radioButton)) {
+                            componentInColumn.setVisible(true);
+                            int maxY = 0;
+                            Point location = new Point();
+                            for (JComponent panel : buttonPanelSetMap.get(radioButton)) {
+                                if (panel.getParent() != null && panel.isVisible()) {
+                                    location = panel.getLocation();
+                                    SwingUtilities.convertPointToScreen(location, panel.getParent());
+                                    maxY = Math.max(maxY, location.y);
+                                }
+                            }
+                            location.y = maxY;
+                            SwingUtilities.convertPointFromScreen(location, componentInColumn.getParent());
+                            componentInColumn.setLocation(currentX, location.y);
+                        } else {
+                            componentInColumn.setVisible(false);
+                        }
+                    }
+                } else {
+                    componentInColumn.setVisible(showPosition);
                 }
-                componentInColumn.setVisible(visible);
                 componentInColumn.setLocation(currentX, componentInColumn.getY());
             }
-            if (positionCheck.isVisible()) {
+            if (showPosition) {
                 currentX += positionCheck.getWidth();
             }
 
@@ -713,6 +737,6 @@ public class HistoryPanel {
             positionCheck.addActionListener(
                     new UpdateHistoryBorder(historyLabel, versionHistoryLabel));
         }
-        hxWidth = locX + 400;
+        hxWidth = locX;
     }
 }

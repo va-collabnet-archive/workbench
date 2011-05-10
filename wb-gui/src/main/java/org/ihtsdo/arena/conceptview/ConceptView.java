@@ -12,11 +12,9 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,8 +22,6 @@ import java.util.Map;
 import java.util.TooManyListenersException;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
@@ -43,13 +39,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
-import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.dnd.DragMonitor;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.ScrollablePanel;
 import org.ihtsdo.arena.context.action.DropActionPanel;
 import org.ihtsdo.arena.drools.EditPanelKb;
@@ -316,8 +309,6 @@ public class ConceptView extends JPanel {
     public Map<PanelSection, CollapsePanelPrefs> getPrefMap() {
         return prefMap;
     }
-    private TreeSet<PositionBI> positionOrderedSet = new TreeSet(new PositionComparator());
-    private Map<PathBI, Integer> pathRowMap = new ConcurrentHashMap<PathBI, Integer>();
 
     public I_GetConceptData getConcept() {
         return concept;
@@ -329,16 +320,6 @@ public class ConceptView extends JPanel {
     private Collection<JComponent> dropComponents =
             Collections.synchronizedList(new ArrayList<JComponent>());
     private boolean historyShown = false;
-    private Map<PositionBI, Collection<ComponentVersionDragPanel<?>>> positionPanelMap =
-            new ConcurrentHashMap<PositionBI, Collection<ComponentVersionDragPanel<?>>>();
-    private Collection<JComponent> seperatorComponents = new ConcurrentSkipListSet<JComponent>(new Comparator<JComponent>() {
-
-        @Override
-        public int compare(JComponent o1, JComponent o2) {
-            return o1.toString().compareTo(o2.toString());
-        }
-        
-    });
     private Set<File> kbFiles = new HashSet<File>();
 
     public ConceptView(I_ConfigAceFrame config,
@@ -360,7 +341,7 @@ public class ConceptView extends JPanel {
     }
 
     public Map<PositionBI, Collection<ComponentVersionDragPanel<?>>> getPositionPanelMap() {
-        return positionPanelMap;
+        return cvLayout.getPositionPanelMap();
     }
 
     public void addHostListener(PropertyChangeListener l) {
@@ -370,7 +351,7 @@ public class ConceptView extends JPanel {
     }
 
     public JPanel getHistoryPanel() {
-        return cvRenderer.getHistoryPanel();
+        return cvLayout.getHistoryPanel();
     }
 
     public boolean isHistoryShown() {
@@ -414,7 +395,7 @@ public class ConceptView extends JPanel {
         return cvLayout;
     }
 
-    public PanelsChangedActionListener getPanelsChangedActionListener() {
+    public ActionListener getPanelsChangedActionListener() {
         return cvLayout.getPanelsChangedActionListener();
     }
     public void layoutConcept(I_GetConceptData concept) {
@@ -423,7 +404,7 @@ public class ConceptView extends JPanel {
         if (cvLayout != null) {
             cvLayout.stop();
         }
-        seperatorComponents.clear();
+        this.settings.getNavigator().resetHistoryPanel();
         cvLayout = new ConceptViewLayout(this, concept);
         cvLayout.execute();
     }
@@ -440,18 +421,6 @@ public class ConceptView extends JPanel {
         check.setFont(check.getFont().deriveFont(settings.getFontSize()));
         check.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
         return check;
-    }
-
-    private TermComponentLabel getLabel(int nid, boolean canDrop)
-            throws TerminologyException, IOException {
-        TermComponentLabel termLabel = new TermComponentLabel();
-        termLabel.setLineWrapEnabled(true);
-        termLabel.getDropTarget().setActive(canDrop);
-        termLabel.setFixedWidth(100);
-        termLabel.setFont(termLabel.getFont().deriveFont(settings.getFontSize()));
-        termLabel.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
-        termLabel.setTermComponent(Terms.get().getConcept(nid));
-        return termLabel;
     }
 
     protected Collection<Action> getKbActions(Object thingToDrop) {
@@ -500,16 +469,11 @@ public class ConceptView extends JPanel {
     }
 
     public Map<PathBI, Integer> getPathRowMap() {
-        return pathRowMap;
+        return cvLayout.getPathRowMap();
     }
 
     public TreeSet<PositionBI> getPositionOrderedSet() {
-
-        TreeSet positionSet = new TreeSet(new PositionComparator());
-        if (positionOrderedSet != null) {
-            positionSet.addAll(positionOrderedSet);
-        }
-        return positionSet;
+        return cvLayout.getPositionOrderedSet();
     }
 
     public ConceptViewRenderer getCvRenderer() {
@@ -521,6 +485,6 @@ public class ConceptView extends JPanel {
     }
 
     public Collection<JComponent> getSeperatorComponents() {
-        return seperatorComponents;
+        return cvLayout.getSeperatorComponents();
     }
 }

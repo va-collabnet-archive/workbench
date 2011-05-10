@@ -128,10 +128,21 @@ public class ConceptNavigator extends JPanel {
         layoutNavigator();
     }
 
+    protected void resetHistoryPanel() {
+        historyPanel = null;
+    }
+
     protected void updateHistoryPanel() {
         try {
             if (historyPanel == null) {
                 historyPanel = new HistoryPanel(view, historyScroller, this);
+                if (view.isHistoryShown()) {
+                    treeScroller.setVisible(false);
+                    focusDrop.setVisible(false);
+                    historyScroller.setVisible(true);
+                    statedInferredScroller.setVisible(false);
+                    historyPanel.resizeIfNeeded();
+                }
             } else {
                 historyPanel.resizeIfNeeded();
             }
@@ -205,7 +216,7 @@ public class ConceptNavigator extends JPanel {
         gbc.gridx++;
         gbc.weightx = 0;
         gbc.fill = GridBagConstraints.NONE;
-        implementButton  = new JButton(new ImageIcon(
+        implementButton = new JButton(new ImageIcon(
                 ConceptViewRenderer.class.getResource("/16x16/plain/magic-wand.png")));
         implementButton.setBorder(BorderFactory.createEmptyBorder(2, 20, 2, 20));
         implementButton.setToolTipText("apply selected version changes");

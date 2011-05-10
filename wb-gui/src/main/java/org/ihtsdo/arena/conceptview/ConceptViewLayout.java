@@ -14,6 +14,7 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -116,9 +117,27 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     // 
     private Map<PositionBI, Collection<ComponentVersionDragPanel<?>>> positionPanelMap =
             new ConcurrentHashMap<PositionBI, Collection<ComponentVersionDragPanel<?>>>();
+
+    public Map<PositionBI, Collection<ComponentVersionDragPanel<?>>> getPositionPanelMap() {
+        return positionPanelMap;
+    }
     private Map<PathBI, Integer> pathRowMap = new ConcurrentHashMap<PathBI, Integer>();
+
+    public Map<PathBI, Integer> getPathRowMap() {
+        return pathRowMap;
+    }
     private TreeSet<PositionBI> positionOrderedSet = new TreeSet(new PositionComparator());
-    private List<JComponent> seperatorComponents = new ArrayList<JComponent>();
+    private Collection<JComponent> seperatorComponents = new ConcurrentSkipListSet<JComponent>(new Comparator<JComponent>() {
+
+        @Override
+        public int compare(JComponent o1, JComponent o2) {
+            return o1.toString().compareTo(o2.toString());
+        }
+    });
+
+    public Collection<JComponent> getSeperatorComponents() {
+        return seperatorComponents;
+    }
     private Map<PanelSection, CollapsePanelPrefs> prefMap;
     private JPanel historyPanel = new JPanel(new GridBagLayout());
     private Map<Integer, JCheckBox> rowToPathCheckMap = new ConcurrentHashMap<Integer, JCheckBox>();
@@ -130,7 +149,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             dramsLock.lock();
             try {
                 if (dpamsRef == null) {
-                    AtomicReference<Collection<DragPanel.DropPanelActionManager>> tempRef = 
+                    AtomicReference<Collection<DragPanel.DropPanelActionManager>> tempRef =
                             new AtomicReference<Collection<DragPanel.DropPanelActionManager>>();
                     tempRef.compareAndSet(null, new ConcurrentSkipListSet<DragPanel.DropPanelActionManager>());
                     dpamsRef = tempRef;
@@ -157,7 +176,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         this.prefMap = conceptView.getPrefMap();
     }
 
-    public PanelsChangedActionListener getPanelsChangedActionListener() {
+    public ActionListener getPanelsChangedActionListener() {
         return pcal;
     }
 
@@ -325,7 +344,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     gbc.gridwidth = 1;
                     gbc.gridx = 1;
                     gbc.gridy = 0;
-                    setupHistoryPane();
+                    cView.add(historyPanel, gbc);
+                    gbc.gridy++;
                     gbc.anchor = GridBagConstraints.NORTHWEST;
                     if (stop) {
                         return;
@@ -599,6 +619,10 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     AceLog.getAppLog().alertAndLogException(e);
                 }
             }
+            if (stop) {
+                return;
+            }
+            setupHistoryPane();
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
@@ -608,7 +632,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         settings.getConfig().addPropertyChangeListener("commit", pcal);
         GuiUtil.tickle(cView);
         if (settings.getNavigator() != null
-                && settings.getNavigatorButton().isSelected()) {
+                && settings.getNavButton().isSelected()) {
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
@@ -620,6 +644,10 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                 }
             });
         }
+    }
+
+    public JPanel getHistoryPanel() {
+        return historyPanel;
     }
 
     private void addRelGroups(Collection<RelGroupVersionBI> relGroups,
@@ -1143,5 +1171,14 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             dpam.removeReferences();
         }
         getDropPanelActionManagers().clear();
+    }
+
+    public TreeSet<PositionBI> getPositionOrderedSet() {
+
+        TreeSet positionSet = new TreeSet(new PositionComparator());
+        if (positionOrderedSet != null) {
+            positionSet.addAll(positionOrderedSet);
+        }
+        return positionSet;
     }
 }

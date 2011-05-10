@@ -177,6 +177,10 @@ public class ConceptViewSettings extends ArenaComponentSettings {
         return buttons;
     }
 
+    public JToggleButton getNavButton() {
+        return navButton;
+    }
+
     public void hideNavigator() {
         if (navButton.isSelected()) {
             navButton.doClick();
@@ -250,7 +254,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
         return relAssertionType != RelAssertionType.STATED;
     }
 
-    protected JToggleButton getNavigatorButton() {
+    private JToggleButton getNavigatorButton() {
         JToggleButton button = new JToggleButton(new AbstractAction("", new ImageIcon(
                 ConceptViewRenderer.class.getResource("/16x16/plain/compass.png"))) {
 
