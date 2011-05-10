@@ -10,7 +10,9 @@ public interface I_Report {
 	public enum Reports implements Serializable{
 		WORKLIST_MEMBERS_BY_STATUS_REPORT(new WorklistMemberByStatusReport()), 
 		WORKLIST_STATE_TOTALS_REPORT(new WorklistStateTotalsReport()),
-		PROJECT_HISTORICAL_REPORT(new ProjectHistoricalReport());
+		PROJECT_HISTORICAL_REPORT(new ProjectHistoricalReport()),
+		//STATUS_CHANGES_REPORT(new StatusChangesReport()),
+		ACCUMULATED_STATUS_CHANGES_REPORT(new AccumulatedStatusChanges());
 
 		private final Object report;
 

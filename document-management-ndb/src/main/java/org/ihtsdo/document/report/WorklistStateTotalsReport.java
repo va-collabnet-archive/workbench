@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -33,9 +34,11 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
+import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.model.WorkSet;
+import org.ihtsdo.project.panel.TranslationProjectListDialog;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -53,48 +56,51 @@ public class WorklistStateTotalsReport implements I_Report {
 			writer.append("Project|WorkSet|WorkList|Status|Total");
 			writer.println();
 
-			List<I_TerminologyProject> projects = TerminologyProjectDAO.getAllProjects(config);
-			for (I_TerminologyProject iTerminologyProject : projects) {
-				String projectName = iTerminologyProject.getName();
+			TranslationProjectListDialog dialog = new TranslationProjectListDialog();
+			ArrayList<I_TerminologyProject> projects = dialog.showModalDialog();
+			if (projects != null) {
+				for (I_TerminologyProject iTerminologyProject : projects) {
+					String projectName = iTerminologyProject.getName();
 
-				List<WorkSet> worksets = TerminologyProjectDAO.getAllWorkSetsForProject(iTerminologyProject, config);
-				for (WorkSet workSet : worksets) {
-					String worksetName = workSet.getName();
-					List<WorkList> worklists = TerminologyProjectDAO.getAllWorklistForWorkset(workSet, config);
-					for (WorkList workList : worklists) {
-						if (workList != null) {
-							String worklistName = workList.getName();
+					List<WorkSet> worksets = TerminologyProjectDAO.getAllWorkSetsForProject(iTerminologyProject, config);
+					for (WorkSet workSet : worksets) {
+						String worksetName = workSet.getName();
+						List<WorkList> worklists = TerminologyProjectDAO.getAllWorklistForWorkset(workSet, config);
+						for (WorkList workList : worklists) {
+							if (workList != null) {
+								String worklistName = workList.getName();
 
-							HashMap<String, Integer> statusMembers = new HashMap<String, Integer>();
-							List<WorkListMember> wlMembList = TerminologyProjectDAO.getAllWorkListMembers(workList, config);
-							for (WorkListMember workListMember : wlMembList) {
-								I_GetConceptData activitiStatus = tf.getConcept(workListMember.getActivityStatus());
-								if (statusMembers.containsKey(activitiStatus.toString())) {
-									Integer subTotal = statusMembers.get(activitiStatus.toString());
-									statusMembers.put(activitiStatus.toString(), subTotal + 1);
-								} else {
-									statusMembers.put(activitiStatus.toString(), 1);
+								HashMap<String, Integer> statusMembers = new HashMap<String, Integer>();
+								List<WorkListMember> wlMembList = TerminologyProjectDAO.getAllWorkListMembers(workList, config);
+								for (WorkListMember workListMember : wlMembList) {
+									I_GetConceptData activitiStatus = tf.getConcept(workListMember.getActivityStatus());
+									if (statusMembers.containsKey(activitiStatus.toString())) {
+										Integer subTotal = statusMembers.get(activitiStatus.toString());
+										statusMembers.put(activitiStatus.toString(), subTotal + 1);
+									} else {
+										statusMembers.put(activitiStatus.toString(), 1);
+									}
 								}
-							}
 
-							Set<String> keySet = statusMembers.keySet();
-							for (Iterator<String> iterator = keySet.iterator(); iterator.hasNext();) {
-								dataFound = true;
-								String key = (String) iterator.next();
-								Integer total = statusMembers.get(key);
-								writer.append(projectName + '|');
-								writer.append(worksetName + '|');
-								writer.append(worklistName + '|');
-								writer.append(key + '|');
-								writer.append("" + total);
-								writer.println();
+								Set<String> keySet = statusMembers.keySet();
+								for (Iterator<String> iterator = keySet.iterator(); iterator.hasNext();) {
+									dataFound = true;
+									String key = (String) iterator.next();
+									Integer total = statusMembers.get(key);
+									writer.append(projectName + '|');
+									writer.append(worksetName + '|');
+									writer.append(worklistName + '|');
+									writer.append(key + '|');
+									writer.append("" + total);
+									writer.println();
+								}
 							}
 						}
 					}
 				}
+				writer.flush();
+				writer.close();
 			}
-			writer.flush();
-			writer.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
@@ -116,7 +122,7 @@ public class WorklistStateTotalsReport implements I_Report {
 	public File getExcelSourceWorkbook() throws Exception {
 		File csvFile;
 		csvFile = this.getCsv();
-		if(csvFile == null){
+		if (csvFile == null) {
 			return null;
 		}
 
@@ -183,11 +189,11 @@ public class WorklistStateTotalsReport implements I_Report {
 			e.printStackTrace();
 			throw e;
 		}
-		
+
 		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-hh-mm");
 		Date date = new Date();
 		File reportCopy = new File("reports/" + sdf.format(date) + "_worklist_state_totals.xls");
-		
+
 		try {
 			ExcelReportUtil.copyFile(excelRep, reportCopy);
 		} catch (IOException e) {
@@ -202,7 +208,7 @@ public class WorklistStateTotalsReport implements I_Report {
 	public JFrame getReportPanel() throws Exception {
 		JasperViewer jviewer = null;
 		File csvFile = this.getCsv();
-		if(csvFile == null){
+		if (csvFile == null) {
 			return null;
 		}
 		try {

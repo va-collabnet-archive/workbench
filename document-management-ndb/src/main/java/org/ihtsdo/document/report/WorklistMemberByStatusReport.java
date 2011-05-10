@@ -30,20 +30,17 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.panel.WorkListChooser;
-import org.ihtsdo.tk.api.Precedence;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -60,7 +57,7 @@ public class WorklistMemberByStatusReport implements I_Report {
 			WorkList wl = wlChooser.showModalDialog();
 			csvFile = File.createTempFile("workset_member_", ".csv");
 			PrintWriter pw = new PrintWriter(csvFile);
-			pw.append("worklist|status|term|target preferred|last user");
+			pw.append("worklist|status|term|target prefered|last user");
 			pw.println();
 
 			if (wl != null) {
@@ -106,11 +103,13 @@ public class WorklistMemberByStatusReport implements I_Report {
 
 								List<ContextualizedDescription> descriptions = ContextualizedDescription.getContextualizedDescriptions(concept.getConceptNid(),targetLanguage,allowedStatus,
 										descriptionTypes,config.getViewPositionSetReadOnly(), true);
+								String sourceDesc = "";
 								for (ContextualizedDescription desc : descriptions) {
 									if(desc.getLang().equals(ArchitectonicAuxiliary.LANG_CODE.EN.getFormatedLanguageCode())){
-										pw.append(desc.getText()+ "|");
+										sourceDesc = desc.getText();
 									}
 								}
+								pw.append(sourceDesc+ "|");
 								
 								descriptionTypes = tf.newIntSet();
 								allowedStatus = tf.newIntSet();
@@ -125,11 +124,11 @@ public class WorklistMemberByStatusReport implements I_Report {
 								for (ContextualizedDescription desc : descriptions) {
 									if(desc.getLanguageRefsetId() == targetLanguage){
 										if(desc.getTypeId() == tf.uuidToNative(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids())){
-											targetPreferred = desc.getText()+ "|";
+											targetPreferred = desc.getText();
 										}
 									}
 								}
-								pw.append(targetPreferred);
+								pw.append(targetPreferred +"|");
 								pw.append(workListMember.getLastAuthorName());
 								pw.println();
 							}
