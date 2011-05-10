@@ -1,5 +1,5 @@
 
-package org.ihtsdo.ace.task.contradiction;
+package org.ihtsdo.contradiction;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;

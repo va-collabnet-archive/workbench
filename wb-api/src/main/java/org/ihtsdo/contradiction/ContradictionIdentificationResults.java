@@ -1,4 +1,4 @@
-package org.ihtsdo.ace.task.contradiction;
+package org.ihtsdo.contradiction;
 
 import java.util.Set;
 import java.util.TreeSet;

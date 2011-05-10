@@ -15,7 +15,7 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.ace.task.contradiction.ContradictionConceptProcessor;
+import org.ihtsdo.contradiction.ContradictionConceptProcessor;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PositionBI;
 
