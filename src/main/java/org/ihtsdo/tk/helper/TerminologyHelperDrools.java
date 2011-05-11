@@ -418,6 +418,11 @@ public class TerminologyHelperDrools {
 		return false;
 	}
 	
+	//Mock implementation
+	public boolean isDescriptionTextNotUniqueInHierarchy(String fsn, String conceptUuid) throws Exception{
+		return false;
+	}
+	
 	
 	//Mock implementation
 	public boolean isValidSemtag(String semtag){

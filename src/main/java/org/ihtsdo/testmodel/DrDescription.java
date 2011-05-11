@@ -22,6 +22,7 @@ public class DrDescription extends DrComponent{
 	private String caseSignificantCategory = "";
 	private boolean variantGenerationCandidate = false;
 	private boolean uniqueInConcept = true;
+	private boolean uniqueInHierarchy = true;
 	
 	
 	public DrDescription() {
@@ -140,6 +141,14 @@ public class DrDescription extends DrComponent{
 
 	public void setUniqueInConcept(boolean uniqueInConcept) {
 		this.uniqueInConcept = uniqueInConcept;
+	}
+
+	public boolean isUniqueInHierarchy() {
+		return uniqueInHierarchy;
+	}
+
+	public void setUniqueInHierarchy(boolean uniqueInHierarchy) {
+		this.uniqueInHierarchy = uniqueInHierarchy;
 	}
 
 }
