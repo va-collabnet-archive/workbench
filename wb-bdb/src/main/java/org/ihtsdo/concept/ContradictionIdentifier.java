@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.Terms;
@@ -47,20 +49,17 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
      // Class Variables
     private PositionMapper conflictMapper;
 
-	private int viewPathNid = 0;
-	private int commonOriginPathNid = 0;
-	private int workflowRefsetNid = 0;
+	private AtomicInteger viewPathNid = null;
+	private AtomicInteger commonOriginPathNid = null;
+	private AtomicInteger workflowRefsetNid = null;
+
 	private ViewCoordinate viewCoord;
 	
     public ContradictionIdentifier(ViewCoordinate vc) 
     {
-		try 
-		{
-			viewCoord = vc;
+		viewCoord = vc;
 
-        } catch (Exception e) {
-            AceLog.getAppLog().log(Level.WARNING, "Failure to get Active Ace Frame", e);
-        }
+
     }
 
 	// For a given concept, look at a set of components at a time.
@@ -242,7 +241,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 			
         	if (refsetResult != ContradictionResult.CONTRADICTION)
 			{
-				PathBI originPath = Terms.get().getPath(commonOriginPathNid);
+				PathBI originPath = Terms.get().getPath(commonOriginPathNid.get());
 	
 				latestAdjudicatedVersion = identifyLatestAdjudicationVersion(comp);
 				latestOriginVersion = identifyLatestOriginVersion(comp, originPath);
@@ -394,7 +393,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
      	for (ComponentVersionBI part : comp.getVersions())
  		{
  			// Identify Adjudication versions and find latest 
- 			if (part.getPathNid() == viewPathNid)
+ 			if (part.getPathNid() == viewPathNid.get())
  			
  			{
  				if (latestAdjudicatedVersion  == null || part.getTime() > latestAdjudicatedVersion.getTime())
@@ -413,7 +412,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
      	for (ComponentVersionBI part : comp.getVersions())
  		{
 			// Identify Origins versions and find latest
-			if ((part.getPathNid() == commonOriginPathNid) || (isOriginVersion(originPath, part))) {
+			if ((part.getPathNid() == commonOriginPathNid.get()) || (isOriginVersion(originPath, part))) {
  				if (latestOriginVersion  == null || part.getTime() > latestOriginVersion.getTime()) {
  					latestOriginVersion = part;
  				}
@@ -430,8 +429,8 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	    	boolean putIntoMap = false;
 	    	Integer pathNidObj = null;
 	    	
-	    	if ((part.getPathNid() != viewPathNid) &&
-				(part.getPathNid() != commonOriginPathNid) &&
+	    	if ((part.getPathNid() != viewPathNid.get()) &&
+				(part.getPathNid() != commonOriginPathNid.get()) &&
 				(!isOriginVersion(originPath, part))) 
 			{
 				// Identify Developer versions
@@ -792,14 +791,14 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	    Map<Integer, ComponentVersionBI> latestDeveloperVersionMap = new HashMap<Integer, ComponentVersionBI>();
 	    Set<ComponentVersionBI> developerVersions = new HashSet<ComponentVersionBI>();
 
-	    PathBI originPath = Terms.get().getPath(commonOriginPathNid);
+	    PathBI originPath = Terms.get().getPath(commonOriginPathNid.get());
         List<? extends I_ExtendByRef> members = Terms.get().getAllExtensionsForComponent(componentNid);
 
         for (I_ExtendByRef member : members) 
         {
  			// Identify Adjudication versions and find latest 
          	for (ComponentVersionBI part : member.getMutableParts()) {
-     			if (part.getPathNid() == viewPathNid) {
+     			if (part.getPathNid() == viewPathNid.get()) {
      				if (latestAdjudicatedVersion  == null || part.getTime() > latestAdjudicatedVersion.getTime()) {
      					latestAdjudicatedVersion = part;
                     }
@@ -808,7 +807,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
 			// Identify Origins versions and find latest
          	for (ComponentVersionBI part : member.getMutableParts()) {
-    			if ((part.getPathNid() == commonOriginPathNid) || (isOriginVersion(originPath, part))) {
+    			if ((part.getPathNid() == commonOriginPathNid.get()) || (isOriginVersion(originPath, part))) {
      				if (latestOriginVersion  == null || part.getTime() > latestOriginVersion.getTime()) {
      					latestOriginVersion = part;
 		            }
@@ -821,8 +820,8 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
     	    	boolean putIntoMap = false;
     	    	Integer pathNidObj = null;
 
-    	    	if ((part.getPathNid() != viewPathNid) &&
-    				(part.getPathNid() != commonOriginPathNid) &&
+    	    	if ((part.getPathNid() != viewPathNid.get()) &&
+    				(part.getPathNid() != commonOriginPathNid.get()) &&
     				(!isOriginVersion(originPath, part))) 
     	    	{
     				// Identify Latest Developer version
@@ -838,7 +837,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	            }
 
     	    	// If going to put into map, ensure that version doesn't represent a commit wf action
-				if (putIntoMap && member.getRefsetId() == workflowRefsetNid && identifyIsCommitWfRefsetAction(part)) {
+				if (putIntoMap && member.getRefsetId() == workflowRefsetNid.get() && identifyIsCommitWfRefsetAction(part)) {
 					putIntoMap = false;
 				}
 				
@@ -909,17 +908,17 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		return false;
 	}
 
-	private PositionBI determineLeastCommonAncestor(Set<HashSet<PositionBI>> groupedOriginsOfOrigins)
+	private PositionBI determineLeastCommonAncestor(Set<HashSet<PositionBI>> originsByVersion)
 	{
 		Set<PositionBI> testingAncestors = new HashSet<PositionBI>(); 
 
-		HashSet<PositionBI> testingSet = groupedOriginsOfOrigins.iterator().next();
-		groupedOriginsOfOrigins.remove(testingSet);
+		HashSet<PositionBI> testingSet = originsByVersion.iterator().next();
+		originsByVersion.remove(testingSet);
 		
 		for (PositionBI testingPos : testingSet)
 		{ 
 			boolean success = true;
-			for (HashSet<PositionBI> originSet : groupedOriginsOfOrigins)
+			for (HashSet<PositionBI> originSet : originsByVersion)
 			{
 				if (!originSet.contains(testingPos))
 					success = false;
