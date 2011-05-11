@@ -1889,9 +1889,9 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 	@Override
 	public FoundContradictionVersions getVersionsInContradiction(
 			ViewCoordinate vc) {
-		ContradictionIdentifier identifier = new ContradictionIdentifier(vc, true);
-		ContradictionResult result = identifier.isConceptInConflict(this);
-		Collection<? extends ComponentVersionBI> versions = identifier.getReturnVersions();
+//		ContradictionIdentifier identifier = new ContradictionIdentifier(vc, true);
+//		ContradictionResult result = identifier.isConceptInConflict(this);
+//		Collection<? extends ComponentVersionBI> versions = identifier.getReturnVersions();
 		
 		return new FoundContradictionVersions(result, versions);
 	}
