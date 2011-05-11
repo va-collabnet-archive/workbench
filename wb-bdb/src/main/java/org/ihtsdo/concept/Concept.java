@@ -1893,6 +1893,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 //		ContradictionResult result = identifier.isConceptInConflict(this);
 //		Collection<? extends ComponentVersionBI> versions = identifier.getReturnVersions();
 		
-		return new FoundContradictionVersions(result, versions);
+//		return new FoundContradictionVersions(result, versions);
+			return null;
 	}
 }
