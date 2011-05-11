@@ -30,10 +30,8 @@ import org.ihtsdo.db.bdb.computer.version.PositionMapper.RELATIVE_POSITION;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -47,67 +45,23 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
      // Class Variables
-    private static PositionMapper conflictMapper = null;
+    private PositionMapper conflictMapper;
 
 	private int viewPathNid = 0;
 	private int commonOriginPathNid = 0;
 	private int workflowRefsetNid = 0;
-    public ContradictionIdentifier() 
+	private ViewCoordinate viewCoord;
+	
+    public ContradictionIdentifier(ViewCoordinate vc) 
     {
 		try 
 		{
-            // Initialize View Coordinate with RETIRED status
-			initializeGlobals();
+			viewCoord = vc;
 
-			// find the least common ancestor based on view position
-			commonOriginPathNid = identifyCommonOriginPosition().getPath().getConceptNid();
-
-			// Initialize the PositionMapper used for identifying contradictions
-            conflictMapper = Bdb.getSapDb().getMapper(Terms.get().getActiveAceFrameConfig().getViewPositionSet().iterator().next());
-            conflictMapper.queueForSetup();
         } catch (Exception e) {
             AceLog.getAppLog().log(Level.WARNING, "Failure to get Active Ace Frame", e);
         }
     }
-
-	private void initializeGlobals() {
-		try 
-		{
-	        NidSetBI allowedStatusNids = Terms.get().getActiveAceFrameConfig().getViewCoordinate().getAllowedStatusNids();
-	        allowedStatusNids.add(Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getPrimoridalUid()));
-			workflowRefsetNid = Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid());
-        } catch (Exception e) {
-            AceLog.getAppLog().log(Level.WARNING, "Failure to Initialize Globals", e);
-        }
-	}
-
-	@Override
-	public void setViewPos(PositionBI position) {
-		// Note, adjudications are assumed to be based on view Path
-		viewPathNid = position.getPath().getConceptNid();
-	}
-
-    private PositionBI identifyCommonOriginPosition() throws TerminologyException, IOException {
-        // Identify leastCommonAncestor of View Position from Origins of view position 
-        Set<HashSet<PositionBI>> sortedOrigins = new HashSet<HashSet<PositionBI>>();
-
-		PositionSetBI positions = Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly();
-		
-		for (PositionBI viewPosParent : positions) {
-			// Ignoring actual viewPos as that will always be leastCommonAncestor by definition
-			for (PositionBI viewPos : viewPosParent.getPath().getOrigins()) {
-				if (!viewPos.equals(viewPosParent)) {
-					HashSet<PositionBI> s = new HashSet<PositionBI>();
-					s.add(viewPos);
-					s.addAll(viewPos.getPath().getInheritedOrigins());
-					sortedOrigins.add(s);
-				}
-			}
-		}
-		
-		// Filter out anything origin of LCA
-		return determineLeastCommonAncestor(sortedOrigins);
-	}
 
 	// For a given concept, look at a set of components at a time.
     // If contradiction found, return immediatly.  
@@ -116,34 +70,49 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
     public ContradictionResult isConceptInConflict(ConceptChronicleBI conceptChronicle) {
         boolean isSingleEdit = false;
         boolean isDuplicateEdit = false;
+        boolean isDuplicateNew = false;
+        
         Map<PositionForSet, HashMap<Integer, ComponentVersionBI>> foundPositionsMap = new HashMap<PositionForSet, HashMap<Integer, ComponentVersionBI>>();
 
-		try {
+        for (PositionBI pos : viewCoord.getPositionSet())
+        {
+        	try {
+            	initializeViewPos(pos);
+            
 		        ContradictionResult result = analyzeContradictionPerComponent((Concept)conceptChronicle, foundPositionsMap);
 	    
-	        if (result == ContradictionResult.CONTRADICTION) {
-	        	return result;
-	        } else {
-	            // Ensure new changes are visible to one another.  
-	            // Otherwise, is a contradiction or possible duplicate new component
-		        ContradictionResult foundPosResult = areFoundPositionsReachable((Concept)conceptChronicle, foundPositionsMap);
-		
-		        if (foundPosResult.equals(ContradictionResult.CONTRADICTION)) {
-		            return ContradictionResult.CONTRADICTION;
-		        } else if (isDuplicateEdit || result == ContradictionResult.DUPLICATE_EDIT) {
-		            return ContradictionResult.DUPLICATE_EDIT;
-		        } else if (foundPosResult.equals(ContradictionResult.DUPLICATE_NEW_COMPONENT)) {
-		            return ContradictionResult.DUPLICATE_NEW_COMPONENT;
-		        } else if (isSingleEdit || result == ContradictionResult.SINGLE_MODELER_CHANGE) {
-		            return ContradictionResult.SINGLE_MODELER_CHANGE;
-		        }
+		        if (result == ContradictionResult.CONTRADICTION) {
+		        	return result;
+		        } else {
+		            // Ensure new changes are visible to one another.  
+		            // Otherwise, is a contradiction or possible duplicate new component
+			        ContradictionResult foundPosResult = areFoundPositionsReachable((Concept)conceptChronicle, foundPositionsMap);
+			
+			        if (foundPosResult.equals(ContradictionResult.CONTRADICTION)) {
+			            return ContradictionResult.CONTRADICTION;
+				        } else if (result == ContradictionResult.DUPLICATE_EDIT) {
+				            isDuplicateEdit = true;
+			        } else if (foundPosResult.equals(ContradictionResult.DUPLICATE_NEW_COMPONENT)) {
+				            isDuplicateNew = true;
+				        } else if (result == ContradictionResult.SINGLE_MODELER_CHANGE) {
+				            isSingleEdit = true;
+			        }
+			    }
+			} catch (Exception e) {
+		    	AceLog.getAppLog().log(Level.WARNING, "Failure in detecting conflict on concept: " + conceptChronicle.getPrimUuid());
+		    	return ContradictionResult.ERROR;
 		    }
-		} catch (Exception e) {
-	    	AceLog.getAppLog().log(Level.WARNING, "Failure in detecting conflict on concept: " + conceptChronicle.getPrimUuid());
-	    	return ContradictionResult.ERROR;
-	    }
+        }
 
+        if (isDuplicateEdit) {
+            return ContradictionResult.DUPLICATE_EDIT;
+        } else if (isDuplicateNew) {
+            return ContradictionResult.DUPLICATE_NEW_COMPONENT;
+        } else if (isSingleEdit) {
+            return ContradictionResult.SINGLE_MODELER_CHANGE;
+        } else {
 		return ContradictionResult.NONE;
+    }
     }
     
     private ContradictionResult analyzeContradictionPerComponent(Concept concept, Map<PositionForSet, HashMap<Integer, ComponentVersionBI>> foundPositionsMap) throws Exception 
@@ -338,7 +307,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 			if (initialVersion == null) {
 				initialVersion = version;
 			} else {
-				RELATIVE_POSITION relPosition = conflictMapper.fastRelativePosition((Version)initialVersion, (Version)version, Terms.get().getActiveAceFrameConfig().getPrecedence());
+				RELATIVE_POSITION relPosition = conflictMapper.fastRelativePosition((Version)initialVersion, (Version)version, viewCoord.getPrecedence());
 				if (relPosition == RELATIVE_POSITION.CONTRADICTION) {
 					isContradiction = true;
 				}
@@ -374,7 +343,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 					testingVersion = getCurrentVersion(concept, compType, version);
 				}
 
-				RELATIVE_POSITION relPosition = conflictMapper.fastRelativePosition((Version)adjudicatorVersion, (Version)testingVersion, Terms.get().getActiveAceFrameConfig().getPrecedence());
+				RELATIVE_POSITION relPosition = conflictMapper.fastRelativePosition((Version)adjudicatorVersion, (Version)testingVersion, viewCoord.getPrecedence());
 
 				if (relPosition != RELATIVE_POSITION.EQUAL) 
 				{
@@ -567,7 +536,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 						HashMap<Integer, ComponentVersionBI> testingVersionMap = foundPositionsMap.get(testingPositionKey);
 						testingVersion = testingVersionMap.get(testingVersionMap.keySet().iterator().next());
 	
-						RELATIVE_POSITION retPosition = conflictMapper.fastRelativePosition((Version)currentVersion, (Version)testingVersion, Terms.get().getActiveAceFrameConfig().getPrecedence());
+						RELATIVE_POSITION retPosition = conflictMapper.fastRelativePosition((Version)currentVersion, (Version)testingVersion, viewCoord.getPrecedence());
 						
 						if (retPosition == RELATIVE_POSITION.CONTRADICTION)
 						{
@@ -698,8 +667,6 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
 		try
 		{
-			ViewCoordinate viewCoord = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
-
 			if (compType == ComponentType.ATTRIBUTE)
 			{
 				ConceptAttributes attr = concept.getConceptAttributes();
@@ -942,17 +909,17 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		return false;
 	}
 
-	private PositionBI determineLeastCommonAncestor(Set<HashSet<PositionBI>> originsByVersion)
+	private PositionBI determineLeastCommonAncestor(Set<HashSet<PositionBI>> groupedOriginsOfOrigins)
 	{
 		Set<PositionBI> testingAncestors = new HashSet<PositionBI>(); 
 
-		HashSet<PositionBI> testingSet = originsByVersion.iterator().next();
-		originsByVersion.remove(testingSet);
+		HashSet<PositionBI> testingSet = groupedOriginsOfOrigins.iterator().next();
+		groupedOriginsOfOrigins.remove(testingSet);
 		
 		for (PositionBI testingPos : testingSet)
 		{ 
 			boolean success = true;
-			for (HashSet<PositionBI> originSet : originsByVersion)
+			for (HashSet<PositionBI> originSet : groupedOriginsOfOrigins)
 			{
 				if (!originSet.contains(testingPos))
 					success = false;
@@ -984,6 +951,52 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		}
 		
 		return null;
+	}
+
+
+	// Initialize the PositionMapper used for identifying contradictions
+	private void initializeViewPos(PositionBI pos) {
+		try 
+		{
+        	setViewPos(pos);
+        	
+            conflictMapper = Bdb.getSapDb().getMapper(pos);
+
+            if (!conflictMapper.isSetup()) {
+            	conflictMapper.queueForSetup();
+            }
+            
+            // find the least common ancestor based on view position
+			commonOriginPathNid = identifyCommonOriginPosition(pos).getPath().getConceptNid();
+
+			workflowRefsetNid = Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid());
+        } catch (Exception e) {
+            AceLog.getAppLog().log(Level.WARNING, "Failure to Initialize Globals", e);
+        }
+	}
+
+    private PositionBI identifyCommonOriginPosition(PositionBI viewPos) throws TerminologyException, IOException {
+        // Identify leastCommonAncestor of View Position from Origins of view position 
+        Set<HashSet<PositionBI>> groupedOriginsOfOrigins = new HashSet<HashSet<PositionBI>>();
+
+		// Ignoring actual viewPos as that will always be leastCommonAncestor by definition
+		for (PositionBI origin : viewPos.getPath().getOrigins()) {
+			if (!origin.equals(viewPos)) {
+				HashSet<PositionBI> s = new HashSet<PositionBI>();
+				s.add(origin);
+				s.addAll(origin.getPath().getInheritedOrigins());
+				groupedOriginsOfOrigins.add(s);
+			}
+		}
+		
+		// Filter out anything origin of LCA
+		return determineLeastCommonAncestor(groupedOriginsOfOrigins);
+	}
+
+
+	private void setViewPos(PositionBI position) {
+		// Note, adjudications are assumed to be based on view Path
+		viewPathNid = position.getPath().getConceptNid();
 	}
 }
 

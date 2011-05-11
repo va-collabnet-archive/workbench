@@ -27,6 +27,4 @@ public interface ContradictionIdentifierBI {
 
 
     ContradictionResult isConceptInConflict(ConceptChronicleBI concept) throws Exception;
-
-    void setViewPos(PositionBI viewPos);
 }

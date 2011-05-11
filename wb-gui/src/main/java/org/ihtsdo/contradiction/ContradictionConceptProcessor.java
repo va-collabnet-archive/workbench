@@ -14,25 +14,13 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
-import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
 import org.ihtsdo.tk.contradiction.ContradictionResult;
 
 public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDataBI {
-
-    private void buildInvestigationSet() {
-        I_RepresentIdSet set = new IdentifierSet();
-
-		try
-		{
-			buildSet3(set);
-        } catch (Exception e) {
-            AceLog.getAppLog().log(Level.WARNING, "Error in intializing Contradiction Concept Processor", e);
-        }
-        setNidSet(set);
-    }
 
     NidBitSetBI cNids = new IdentifierSet();
     private ContradictionIdentifierBI detector = null;
@@ -41,34 +29,39 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
     private AtomicInteger count = new AtomicInteger();
     private AtomicInteger found = new AtomicInteger();
 
-    public ContradictionConceptProcessor(PositionBI position) {
+    public ContradictionConceptProcessor(ViewCoordinate viewCoord, I_ShowActivity actvityPanel) {
         // Via Task
-        buildInvestigationSet();
+
         results = new ContradictionIdentificationResults();
-        detector = Ts.get().getConflictIdentifier();
-        detector.setViewPos(position);
+        detector = Ts.get().getConflictIdentifier(viewCoord);
+
+        this.cNids = buildInvestigationSet();
+
+        actvityPanel.setMaximum(cNids.cardinality());
+        actvityPanel.setValue(count.get());
+        actvityPanel.setIndeterminate(false);
+        
+        this.activityMonitor = actvityPanel;
     }
 
-    public ContradictionConceptProcessor(PositionBI position,
-            NidBitSetBI cNids) {
-        this.cNids = cNids;
+    public ContradictionConceptProcessor(ViewCoordinate viewCoord, NidBitSetBI nidBitSetBI, I_ShowActivity actvityPanel) {
+        // Via Task
+
         results = new ContradictionIdentificationResults();
-        detector = Ts.get().getConflictIdentifier();
-        detector.setViewPos(position);
+        detector = Ts.get().getConflictIdentifier(viewCoord);
+
+        this.cNids = nidBitSetBI;
+
+        actvityPanel.setMaximum(cNids.cardinality()); 
+        actvityPanel.setValue(count.get());
+        actvityPanel.setIndeterminate(false);
+        
+        this.activityMonitor = actvityPanel;
     }
 
-    public ContradictionConceptProcessor(PositionBI position,
-            NidBitSetBI cNids, I_ShowActivity activityMonitor) {
-        this.cNids = cNids;
-        results = new ContradictionIdentificationResults();
-        detector = Ts.get().getConflictIdentifier();
-        detector.setViewPos(position);
-        this.activityMonitor = activityMonitor;
-        activityMonitor.setMaximum(cNids.cardinality());
-        activityMonitor.setValue(count.get());
-        activityMonitor.setIndeterminate(false);
-    }
 
+
+    
     @Override
     public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fcfc) throws Exception {
         int currentCount = count.incrementAndGet();
@@ -108,6 +101,18 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
     }
 
 
+    private NidBitSetBI buildInvestigationSet() {
+        I_RepresentIdSet set = new IdentifierSet();
+
+		try
+		{
+			buildSet3(set);
+        } catch (Exception e) {
+            AceLog.getAppLog().log(Level.WARNING, "Error in intializing Contradiction Concept Processor", e);
+        }
+
+        return set;
+    }
 
 
 	private void buildSet1(I_RepresentIdSet set) throws TerminologyException, IOException {
@@ -348,9 +353,25 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
     	set.setMember(Terms.get().getConcept(UUID.fromString("77e33983-b911-3099-bac2-6107ee48065d")).getConceptNid());
 	}
 
+
+    
     private void buildRefset1(I_RepresentIdSet set) throws TerminologyException, IOException {
     	set.setMember(Terms.get().getConcept(UUID.fromString("aa4052f3-0faa-39dd-b838-a4d1802ccd59")).getConceptNid());
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     public ContradictionIdentificationResults getResults() {
         return results;
     }

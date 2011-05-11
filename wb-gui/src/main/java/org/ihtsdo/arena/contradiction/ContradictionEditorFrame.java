@@ -37,6 +37,7 @@ import org.dwfa.bpa.util.ComponentFrame;
 import org.dwfa.bpa.util.OpenFramesWindowListener;
 import org.ihtsdo.arena.Arena;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
  *
@@ -51,6 +52,7 @@ public class ContradictionEditorFrame extends ComponentFrame {
     private JTabbedPane conceptTabs = new JTabbedPane();
     private ConceptPanel c1Panel;
     private final TerminologyList batchConceptList;
+	private ViewCoordinate viewCoord;
 
     public ConceptPanel getC1Panel() {
         return c1Panel;
@@ -62,7 +64,8 @@ public class ContradictionEditorFrame extends ComponentFrame {
         // Set the title for the frame
         setTitle(getNextFrameName());
         this.newFrameConfig = new ContradictionConfig(this, origConfig);
-
+        this.viewCoord = this.newFrameConfig.getViewCoordinate();
+        
         // Set the position and size of frame
         setBounds(10, 10, 500, 500);
 
@@ -109,7 +112,7 @@ public class ContradictionEditorFrame extends ComponentFrame {
             Set<PositionBI> viewPositions = newFrameConfig.getViewPositionSet();
             for (PositionBI p : viewPositions) {
                 ContradictionFinderSwingWorker worker =
-                        new ContradictionFinderSwingWorker(p,
+                        new ContradictionFinderSwingWorker(viewCoord, p,
                         (TerminologyListModel) batchConceptList.getModel());
                 worker.execute();
             }

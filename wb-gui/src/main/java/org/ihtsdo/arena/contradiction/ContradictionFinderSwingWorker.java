@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.logging.Level;
 import javax.swing.SwingWorker;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ShowActivity;
@@ -18,6 +19,7 @@ import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.contradiction.ContradictionConceptProcessor;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
  *
@@ -26,23 +28,24 @@ import org.ihtsdo.tk.api.PositionBI;
 public class ContradictionFinderSwingWorker 
 extends SwingWorker<Set<Integer>, Integer> {
     
-    private PositionBI viewPosition;
     private TerminologyListModel conflicts;
     private final I_ShowActivity actvityPanel;
+	private ViewCoordinate viewCoord;
 
-    public ContradictionFinderSwingWorker(PositionBI viewPosition,
+    public ContradictionFinderSwingWorker(ViewCoordinate vc, 
             TerminologyListModel conflicts) {
-        this.viewPosition = viewPosition;
         this.conflicts = conflicts;
-        actvityPanel = Terms.get().newActivityPanel(true, null, "Identifying conflicts", true);
+        this.viewCoord = vc;
+        this.actvityPanel = Terms.get().newActivityPanel(true, null, "Identifying conflicts", true);
     }
 
     @Override
     protected Set<Integer> doInBackground() throws Exception {
         ContradictionConceptProcessor ccp 
-                = new ContradictionConceptProcessor(viewPosition, 
+                = new ContradictionConceptProcessor(viewCoord, 
                 Ts.get().getAllConceptNids(),
                 actvityPanel);
+        
         Ts.get().iterateConceptDataInParallel(ccp);
         
         Set<Integer> returnSet = new HashSet<Integer>();

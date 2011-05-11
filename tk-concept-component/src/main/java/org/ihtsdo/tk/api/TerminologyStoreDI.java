@@ -75,7 +75,7 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
 
     NidBitSetBI getEmptyNidSet() throws IOException;
     
-    ContradictionIdentifierBI getConflictIdentifier();
+    ContradictionIdentifierBI getConflictIdentifier(ViewCoordinate viewCoord);
     
     boolean hasUncommittedChanges();
 }
