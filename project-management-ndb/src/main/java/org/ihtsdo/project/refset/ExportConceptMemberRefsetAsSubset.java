@@ -88,7 +88,7 @@ public class ExportConceptMemberRefsetAsSubset {
 				}
 				if (conceptId ==null){
 
-					reportFileWriter.write("The concept UUID " +  termFactory.getUids(ext.getComponentNid()).iterator().next() + " has not Snomed Concept ID." + "\\r\\n");
+					reportFileWriter.append("The concept UUID " +  termFactory.getUids(ext.getComponentNid()).iterator().next() + " has not Snomed Concept ID." + "\r\n");
 //					reportFileWriter.newLine();
 				}else{
 //				UUID typeUuid = termFactory.getUids(thinTuple.getTypeId()).iterator().next();
@@ -103,13 +103,13 @@ public class ExportConceptMemberRefsetAsSubset {
 //					outputFileWriter.close();
 //					throw new TerminologyException("Non concept ext tuple passed to export concepts to file .");
 //				}
-					outputFileWriter.write(begEnd + subsetId + sep + conceptId + sep + memberStatus + sep + linkedId + begEnd + "\\r\\n");
+					outputFileWriter.append(begEnd + subsetId + sep + conceptId + sep + memberStatus + sep + linkedId + begEnd + "\r\n");
 					lineCount++;
 				}
 			}
 		}
 
-		reportFileWriter.write("Exported to file " + exportFile.getName()  + " : " + lineCount + " lines" + "\\r\\n");
+		reportFileWriter.append("Exported to file " + exportFile.getName()  + " : " + lineCount + " lines" + "\r\n");
 		reportFileWriter.flush();
 		reportFileWriter.close();
 		outputFileWriter.flush();
