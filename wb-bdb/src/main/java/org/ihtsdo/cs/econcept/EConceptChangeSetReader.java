@@ -106,7 +106,7 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
                 }
                 //AceLog.getEditLog().info("Reading change set entry: \n" + eConcept);
                 count++;
-                AceLog.getEditLog().info("eConcept found count = "+count);
+                //AceLog.getEditLog().info("eConcept found count = "+count);
                 if (counter != null) {
                     counter.increment();
                 }

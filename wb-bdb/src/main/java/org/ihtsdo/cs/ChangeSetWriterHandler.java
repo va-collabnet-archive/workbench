@@ -47,13 +47,26 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
     private Timer timer;
 	private Semaphore permit;
 	private List<ChangeSetGeneratorBI> writerListForHandler;
+	
+	
+	public ChangeSetWriterHandler(I_RepresentIdSet cNidsToWrite,
+			long commitTime, IntSet sapNidsFromCommit, ChangeSetGenerationPolicy changeSetPolicy, 
+			ChangeSetWriterThreading changeSetWriterThreading) {	
+		
+		super();
+		Semaphore permit1 = new Semaphore(1, true);
+		//ChangeSetWriterHandler(cNidsToWrite,commitTime,sapNidsFromCommit,changeSetPolicy,changeSetWriterThreading,permit1);
+		init(cNidsToWrite,commitTime,sapNidsFromCommit,changeSetPolicy,changeSetWriterThreading,permit1);
+		
+	}
 
 	public ChangeSetWriterHandler(I_RepresentIdSet cNidsToWrite,
 			long commitTime, IntSet sapNidsFromCommit, ChangeSetGenerationPolicy changeSetPolicy, 
 			ChangeSetWriterThreading changeSetWriterThreading, 
-			Semaphore permit) {
+			Semaphore permitIn) {
 		super();
-		assert commitTime != Long.MAX_VALUE;
+		init(cNidsToWrite,commitTime,sapNidsFromCommit,changeSetPolicy,changeSetWriterThreading,permitIn);
+		/*assert commitTime != Long.MAX_VALUE;
 		assert commitTime != Long.MIN_VALUE;
 		//this.permit = permit;
 		
@@ -61,6 +74,8 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 		
 		this.cNidsToWrite = cNidsToWrite;
 		changedCount = cNidsToWrite.cardinality();
+		
+		AceLog.getAppLog().info("ChangeSetWriterHandler permitIn availablePermits"+permitIn.availablePermits());
 		
 		if(changedCount > 0) {
 			try {
@@ -84,7 +99,47 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 		this.changeSetWriterThreading = changeSetWriterThreading;
 		changeSetWriters.incrementAndGet();
 		this.changeSetPolicy = changeSetPolicy;
+		writerListForHandler = new ArrayList<ChangeSetGeneratorBI>(writerMap.values()); */
+	}
+	
+	private void init(I_RepresentIdSet cNidsToWrite,
+			long commitTime, IntSet sapNidsFromCommit, ChangeSetGenerationPolicy changeSetPolicy, 
+			ChangeSetWriterThreading changeSetWriterThreading, 
+			Semaphore permitIn){
+		
+		assert commitTime != Long.MAX_VALUE;
+		assert commitTime != Long.MIN_VALUE;
+		//this.permit = permit;
+		
+		this.permit = permitIn;
+		
+		this.cNidsToWrite = cNidsToWrite;
+		changedCount = cNidsToWrite.cardinality();
+		
+		AceLog.getAppLog().info("ChangeSetWriterHandler permitIn availablePermits"+permitIn.availablePermits());
+		
+		if(changedCount > 0) {
+			try {
+            NidBitSetItrBI uncommittedCNidItr2 = this.cNidsToWrite.iterator();
+            while (uncommittedCNidItr2.next()) {
+            	Concept concept = Concept.get(uncommittedCNidItr2.nid());
+               // AceLog.getAppLog().info("ChangeSetWriterHandler contructor changed concept = "+concept.toLongString());
+            }
+			}catch(Exception e) {
+				AceLog.getAppLog().severe("ChangeSetWriterHandler init", e);
+			}
+        }
+		
+		this.commitTime = commitTime;
+		this.commitTimeStr = TimeUtil.formatDate(commitTime) + 
+		    "; gVer: " + Bdb.gVersion.incrementAndGet() + 
+		    " (" + cNidsToWrite.cardinality() + " concepts)";
+		this.sapNidsFromCommit = sapNidsFromCommit;
+		this.changeSetWriterThreading = changeSetWriterThreading;
+		changeSetWriters.incrementAndGet();
+		this.changeSetPolicy = changeSetPolicy;
 		writerListForHandler = new ArrayList<ChangeSetGeneratorBI>(writerMap.values());
+		
 	}
 
 	@Override

@@ -341,7 +341,7 @@ public class BdbCommitManager {
     public static void commit(ChangeSetPolicy changeSetPolicy,
             ChangeSetWriterThreading changeSetWriterThreading) {
         lastCommit = Bdb.gVersion.incrementAndGet();
-        Svn.rwl.acquireUninterruptibly();
+        //Svn.rwl.acquireUninterruptibly();
         boolean passedRelease = false;
 		
 		AceLog.getAppLog().info("BDBCommitManager commit called performCommit = "+performCommit +" writeChangeSets = "+writeChangeSets);
@@ -445,11 +445,15 @@ public class BdbCommitManager {
                                     uncommittedCNidsNoChecks.or(uncommittedCNids);
                                     if (uncommittedCNidsNoChecks.cardinality() > 0) {
                                     	AceLog.getAppLog().info("BDBCommitManager commit about to changeSetWriterService.execute(handler)");	
-                                    final ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
+                                    /*final ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
                                                 uncommittedCNidsNoChecks, commitTime,
                                                 sapNidsFromCommit, changeSetPolicy.convert(),
                                                 changeSetWriterThreading,
-                                                Svn.rwl);
+                                                Svn.rwl);*/
+                                    	final ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
+                                                uncommittedCNidsNoChecks, commitTime,
+                                                sapNidsFromCommit, changeSetPolicy.convert(),
+                                                changeSetWriterThreading);
                                         changeSetWriterService.execute(handler);
                                         passedRelease = true;
                                     }
