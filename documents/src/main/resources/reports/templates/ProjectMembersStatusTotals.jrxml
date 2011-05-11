@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ProjectMembersStatusTotals" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="0">
-	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="208"/>
 	<style name="Title" fontName="Arial" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
 	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
 	<style name="Column header" forecolor="#FFFFFF" fontName="Arial" fontSize="12" isBold="true"/>
@@ -14,7 +14,21 @@
 	<field name="WorkSet" class="java.lang.String"/>
 	<field name="WorkList" class="java.lang.String"/>
 	<field name="Status" class="java.lang.String"/>
-	<field name="Total" class="java.lang.String"/>
+	<field name="Total" class="java.lang.Integer"/>
+	<field name="wlStatusTotal" class="java.lang.Integer"/>
+	<field name="projStatusTotal" class="java.lang.Integer"/>
+	<variable name="worklistTotal" class="java.lang.Integer" resetType="Group" resetGroup="WorkList" calculation="Sum">
+		<variableExpression><![CDATA[$F{Total}]]></variableExpression>
+	</variable>
+	<variable name="wsTotal" class="java.lang.Integer" resetType="Group" resetGroup="WorkSet" calculation="Sum">
+		<variableExpression><![CDATA[$F{Total}]]></variableExpression>
+	</variable>
+	<variable name="projTotal" class="java.lang.Integer" resetType="Group" resetGroup="Project" calculation="Sum">
+		<variableExpression><![CDATA[$F{Total}]]></variableExpression>
+	</variable>
+	<variable name="status_COUNT" class="java.lang.Integer" resetType="Group" resetGroup="WorkList" calculation="Count">
+		<variableExpression><![CDATA[$F{Status}]]></variableExpression>
+	</variable>
 	<group name="Project">
 		<groupExpression><![CDATA[$F{Project}]]></groupExpression>
 		<groupHeader>
@@ -42,7 +56,66 @@
 			</band>
 		</groupHeader>
 		<groupFooter>
-			<band height="30"/>
+			<band height="373">
+				<rectangle>
+					<reportElement x="87" y="4" width="466" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC"/>
+				</rectangle>
+				<staticText>
+					<reportElement x="90" y="4" width="100" height="15"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Project summary:]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="455" y="4" width="100" height="15"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{projTotal}]]></textFieldExpression>
+				</textField>
+				<barChart>
+					<chart>
+						<reportElement x="87" y="19" width="466" height="347"/>
+						<chartTitle>
+							<titleExpression><![CDATA["Project status totals"]]></titleExpression>
+						</chartTitle>
+						<chartSubtitle/>
+						<chartLegend position="Left"/>
+					</chart>
+					<categoryDataset>
+						<dataset resetType="Group" resetGroup="Project"/>
+						<categorySeries>
+							<seriesExpression><![CDATA[$F{Status}]]></seriesExpression>
+							<categoryExpression><![CDATA[$F{Project}]]></categoryExpression>
+							<valueExpression><![CDATA[$F{projStatusTotal}]]></valueExpression>
+						</categorySeries>
+					</categoryDataset>
+					<barPlot isShowLabels="true" isShowTickLabels="true" isShowTickMarks="true">
+						<plot/>
+						<itemLabel color="#000000" backgroundColor="#FFFFFF"/>
+						<categoryAxisFormat>
+							<axisFormat verticalTickLabels="true">
+								<labelFont/>
+								<tickLabelFont/>
+							</axisFormat>
+						</categoryAxisFormat>
+						<valueAxisFormat>
+							<axisFormat verticalTickLabels="false">
+								<labelFont/>
+								<tickLabelFont/>
+							</axisFormat>
+						</valueAxisFormat>
+					</barPlot>
+				</barChart>
+				<staticText>
+					<reportElement x="404" y="4" width="51" height="15"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Total:]]></text>
+				</staticText>
+			</band>
 		</groupFooter>
 	</group>
 	<group name="WorkSet">
@@ -57,7 +130,7 @@
 					<textFieldExpression class="java.lang.String"><![CDATA[$F{WorkSet}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement x="96" y="4" width="68" height="20" forecolor="#2F1869"/>
+					<reportElement x="100" y="4" width="68" height="20" forecolor="#2F1869"/>
 					<textElement verticalAlignment="Middle">
 						<font size="15" isBold="true"/>
 					</textElement>
@@ -65,11 +138,74 @@
 				</staticText>
 			</band>
 		</groupHeader>
+		<groupFooter>
+			<band height="322">
+				<rectangle>
+					<reportElement x="96" y="4" width="457" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC"/>
+				</rectangle>
+				<staticText>
+					<reportElement x="100" y="4" width="100" height="15"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[WorkSet summary]]></text>
+				</staticText>
+				<barChart>
+					<chart isShowLegend="true">
+						<reportElement isPrintRepeatedValues="false" x="99" y="19" width="457" height="303"/>
+						<chartTitle>
+							<titleExpression><![CDATA["Workset status totals"]]></titleExpression>
+						</chartTitle>
+						<chartSubtitle/>
+						<chartLegend position="Left"/>
+					</chart>
+					<categoryDataset>
+						<dataset resetType="Group" resetGroup="WorkSet"/>
+						<categorySeries>
+							<seriesExpression><![CDATA[$F{Status}]]></seriesExpression>
+							<categoryExpression><![CDATA[$F{WorkSet}]]></categoryExpression>
+							<valueExpression><![CDATA[$F{wlStatusTotal}]]></valueExpression>
+						</categorySeries>
+					</categoryDataset>
+					<barPlot isShowLabels="true" isShowTickLabels="true" isShowTickMarks="true">
+						<plot/>
+						<itemLabel color="#000000" backgroundColor="#FFFFFF"/>
+						<categoryAxisFormat>
+							<axisFormat verticalTickLabels="true">
+								<labelFont/>
+								<tickLabelFont/>
+							</axisFormat>
+						</categoryAxisFormat>
+						<valueAxisFormat>
+							<axisFormat verticalTickLabels="false">
+								<labelFont/>
+								<tickLabelFont/>
+							</axisFormat>
+						</valueAxisFormat>
+					</barPlot>
+				</barChart>
+				<textField>
+					<reportElement x="453" y="4" width="100" height="15"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{wsTotal}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="404" y="4" width="49" height="15"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Total:]]></text>
+				</staticText>
+			</band>
+			<band height="50"/>
+		</groupFooter>
 	</group>
 	<group name="WorkList">
 		<groupExpression><![CDATA[$F{WorkList}]]></groupExpression>
 		<groupHeader>
-			<band height="35">
+			<band height="35" splitType="Prevent">
 				<textField>
 					<reportElement x="187" y="0" width="153" height="15" forecolor="#666666"/>
 					<textElement>
@@ -93,13 +229,78 @@
 			</band>
 		</groupHeader>
 		<groupFooter>
-			<band height="14">
+			<band height="322" splitType="Prevent">
+				<rectangle>
+					<reportElement x="187" y="14" width="366" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC"/>
+				</rectangle>
 				<line>
 					<reportElement positionType="FixRelativeToBottom" x="187" y="0" width="366" height="1" forecolor="#2F7BD0"/>
 					<graphicElement>
 						<pen lineWidth="1.0" lineColor="#999999"/>
 					</graphicElement>
 				</line>
+				<textField>
+					<reportElement x="494" y="14" width="59" height="15"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{worklistTotal}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="187" y="14" width="100" height="15"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[WorkList summary]]></text>
+				</staticText>
+				<barChart>
+					<chart isShowLegend="true">
+						<reportElement x="187" y="29" width="369" height="292"/>
+						<chartTitle position="Top">
+							<titleExpression><![CDATA["Worklist status totals"]]></titleExpression>
+						</chartTitle>
+						<chartSubtitle>
+							<font size="9"/>
+						</chartSubtitle>
+						<chartLegend position="Left"/>
+					</chart>
+					<categoryDataset>
+						<dataset resetType="Group" resetGroup="WorkList"/>
+						<categorySeries>
+							<seriesExpression><![CDATA[$F{Status}]]></seriesExpression>
+							<categoryExpression><![CDATA[$F{WorkList}]]></categoryExpression>
+							<valueExpression><![CDATA[$F{Total}]]></valueExpression>
+						</categorySeries>
+					</categoryDataset>
+					<barPlot isShowLabels="true">
+						<plot/>
+						<itemLabel color="#000000" backgroundColor="#FFFFFF">
+							<font size="8"/>
+						</itemLabel>
+						<categoryAxisFormat>
+							<axisFormat verticalTickLabels="true">
+								<labelFont/>
+								<tickLabelFont/>
+							</axisFormat>
+						</categoryAxisFormat>
+						<valueAxisFormat>
+							<axisFormat>
+								<labelFont/>
+								<tickLabelFont/>
+							</axisFormat>
+						</valueAxisFormat>
+					</barPlot>
+				</barChart>
+				<break>
+					<reportElement x="0" y="321" width="100" height="1"/>
+				</break>
+				<staticText>
+					<reportElement x="453" y="14" width="41" height="15"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Total:]]></text>
+				</staticText>
 			</band>
 		</groupFooter>
 	</group>
@@ -194,9 +395,11 @@
 		<band height="30" splitType="Stretch"/>
 	</columnHeader>
 	<detail>
-		<band height="16" splitType="Stretch">
+		<band height="16" splitType="Prevent">
 			<frame>
-				<reportElement mode="Opaque" x="187" y="0" width="366" height="16" forecolor="#E3E8FF" backcolor="#E3E8FF"/>
+				<reportElement mode="Opaque" x="187" y="0" width="366" height="16" forecolor="#E3E8FF" backcolor="#E3E8FF">
+					<printWhenExpression><![CDATA[new Boolean( $V{status_COUNT}.intValue() % 2 ==0 )]]></printWhenExpression>
+				</reportElement>
 			</frame>
 			<textField>
 				<reportElement style="Detail" x="225" y="0" width="218" height="15"/>
@@ -214,7 +417,7 @@
 		<band splitType="Stretch"/>
 	</columnFooter>
 	<pageFooter>
-		<band height="100" splitType="Stretch">
+		<band height="63" splitType="Stretch">
 			<textField pattern="EEEEE dd MMMMM yyyy">
 				<reportElement style="Column header" x="424" y="0" width="131" height="20" forecolor="#000000"/>
 				<textElement textAlignment="Right">
@@ -231,7 +434,4 @@
 			</staticText>
 		</band>
 	</pageFooter>
-	<summary>
-		<band splitType="Stretch"/>
-	</summary>
 </jasperReport>
