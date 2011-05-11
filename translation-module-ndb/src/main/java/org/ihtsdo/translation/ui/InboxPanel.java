@@ -2820,7 +2820,7 @@ public class InboxPanel extends JPanel {
 		for (Worker worktmp: lWorker){
 			if (OnDemandOutboxQueueWorker.class.isAssignableFrom(worktmp.getClass())){
 				oWorker=(OnDemandOutboxQueueWorker) worktmp;
-				oWorker.run();
+				oWorker.send();
 			}
 		}
 
