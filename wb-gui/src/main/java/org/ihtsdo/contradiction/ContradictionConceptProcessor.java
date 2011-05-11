@@ -86,16 +86,14 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
                 results.addConflict(c.getConceptNid());
                 found.incrementAndGet();
             } else if (position.equals(ContradictionResult.DUPLICATE_EDIT)) {
-                results.addConflictingWithSameValueSameCompId(c.getConceptNid());
+                results.addConflictingDuplicateEditConcepts(c.getConceptNid());
                 found.incrementAndGet();
 	        } else if (position.equals(ContradictionResult.DUPLICATE_NEW_COMPONENT)) {
-	            results.addConflictingWithSameValueDifferentCompId(c.getConceptNid());
+	            results.addConflictingDuplicateNewConcepts(c.getConceptNid());
 	            found.incrementAndGet();
 	        } else if (position.equals(ContradictionResult.ERROR)) {
 	        	throw new Exception("Failure in detecting contradictions on concept: " + c.getPrimUuid());
 	        }
-            // else if (position.equals(CONTRADICTION_RESULT.UNREACHABLE))
-            //		results.addUnreachable(c.getConceptNid());
             else if (position.equals(ContradictionResult.SINGLE_MODELER_CHANGE)) {
                 results.addSingle(c.getConceptNid());
             } else {

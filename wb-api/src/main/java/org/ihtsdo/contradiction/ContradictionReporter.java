@@ -58,19 +58,19 @@ public class ContradictionReporter {
 		System.out.println("*********End Of Conflicts*********\n\n\n\n");
 	}
 
-	public void printConflictingWithSameValueDifferentCompId(TreeSet<I_GetConceptData> conflictingWithSameValueDifferentCompId) {
-		System.out.println("\n\n*********Conflictings With Same Values for different CompId with count of: " + conflictingWithSameValueDifferentCompId.size() + "*********");
+	public void printDuplicateNewConcepts(TreeSet<I_GetConceptData> conflictingDuplicateNewConcepts) {
+		System.out.println("\n\n*********Conflictings With Same Values for different CompId with count of: " + conflictingDuplicateNewConcepts.size() + "*********");
 
-		for (I_GetConceptData c : conflictingWithSameValueDifferentCompId) {
+		for (I_GetConceptData c : conflictingDuplicateNewConcepts) {
 			System.out.println(WorkflowHelper.identifyFSN(c));
 		}
 		System.out.println("*********End Of Conflicts*********\n\n\n\n");
 	}
 
-	public void printConflictingWithSameValueSameCompId(TreeSet<I_GetConceptData> conflictingWithSameValueSameComponentId) {
-		System.out.println("\n\n*********Conflictings With Same Values for same CompIdwith count of: " + conflictingWithSameValueSameComponentId.size() + "*********");
+	public void printDuplicateEditConcepts(TreeSet<I_GetConceptData> conflictingDuplicateEditConcepts) {
+		System.out.println("\n\n*********Conflictings With Same Values for same CompIdwith count of: " + conflictingDuplicateEditConcepts.size() + "*********");
 
-		for (I_GetConceptData c : conflictingWithSameValueSameComponentId) {
+		for (I_GetConceptData c : conflictingDuplicateEditConcepts) {
 			System.out.println(WorkflowHelper.identifyFSN(c));
 		}
 		System.out.println("*********End Of Conflicts*********\n\n\n\n");

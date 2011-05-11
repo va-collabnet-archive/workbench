@@ -22,10 +22,10 @@ public class ContradictionIdentificationResults {
         conflictingConcepts.add(nid);
     }
 
-    public void addConflictingWithSameValueSameCompId(Integer nid) {
+    public void addConflictingDuplicateEditConcepts(Integer nid) {
     	duplicateEdit.add(nid);
     }
-    public void addConflictingWithSameValueDifferentCompId(Integer nid) {
+    public void addConflictingDuplicateNewConcepts(Integer nid) {
     	duplicateNew.add(nid);
     }
 
