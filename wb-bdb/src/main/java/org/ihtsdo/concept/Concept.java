@@ -70,6 +70,7 @@ import org.ihtsdo.db.util.ReferenceType;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSet;
@@ -93,6 +94,8 @@ import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
+import org.ihtsdo.tk.contradiction.ContradictionResult;
+import org.ihtsdo.tk.contradiction.FoundContradictionVersions;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
@@ -1882,4 +1885,14 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     public Set<PositionBI> getPositions() throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+	@Override
+	public FoundContradictionVersions getVersionsInContradiction(
+			ViewCoordinate vc) {
+		ContradictionIdentifier identifier = new ContradictionIdentifier(vc, true);
+		ContradictionResult result = identifier.isConceptInConflict(this);
+		Collection<? extends ComponentVersionBI> versions = identifier.getReturnVersions();
+		
+		return new FoundContradictionVersions(result, versions);
+	}
 }

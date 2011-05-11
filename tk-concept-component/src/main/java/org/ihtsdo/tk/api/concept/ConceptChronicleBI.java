@@ -15,6 +15,7 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
+import org.ihtsdo.tk.contradiction.FoundContradictionVersions;
 
 public interface ConceptChronicleBI extends
         ComponentChroncileBI<ConceptVersionBI> {
@@ -48,6 +49,8 @@ public interface ConceptChronicleBI extends
     
     @Override
     ConceptVersionBI getVersion(ViewCoordinate vc);
+    
+    FoundContradictionVersions getVersionsInContradiction(ViewCoordinate vc);
     
    /**
     * Returns a longer - more complete - string representation of the chronicle. 

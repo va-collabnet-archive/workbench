@@ -50,6 +50,7 @@ import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.contradiction.FoundContradictionVersions;
 import org.ihtsdo.tk.example.binding.HistoricalRelType;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
@@ -793,4 +794,10 @@ public class ConceptVersion implements ConceptVersionBI {
     public boolean isActive(NidSetBI allowedStatusNids) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+	@Override
+	public FoundContradictionVersions getVersionsInContradiction(
+			ViewCoordinate vc) {
+        throw new UnsupportedOperationException("Not supported yet.");
+	}
 }
