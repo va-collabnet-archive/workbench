@@ -966,9 +966,9 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
             }
             
             // find the least common ancestor based on view position
-			commonOriginPathNid = identifyCommonOriginPosition(pos).getPath().getConceptNid();
+			commonOriginPathNid = new AtomicInteger((pos).getPath().getConceptNid());
 
-			workflowRefsetNid = Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid());
+			workflowRefsetNid = new AtomicInteger(Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid()));
         } catch (Exception e) {
             AceLog.getAppLog().log(Level.WARNING, "Failure to Initialize Globals", e);
         }
@@ -995,7 +995,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
 	private void setViewPos(PositionBI position) {
 		// Note, adjudications are assumed to be based on view Path
-		viewPathNid = position.getPath().getConceptNid();
+		viewPathNid = new AtomicInteger(position.getPath().getConceptNid());
 	}
 }
 
