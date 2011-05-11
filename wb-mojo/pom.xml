@@ -204,7 +204,7 @@
 					<artifactId>tools</artifactId>
 					<version>any</version>
 					<scope>system</scope>
-					<systemPath>C:\SoftwareApps\Java\jdk1.6.0_20\lib\tools.jar</systemPath>
+					<systemPath>${java.home}/../lib/tools.jar</systemPath>
 				</dependency>
 			</dependencies>
 		</profile>
