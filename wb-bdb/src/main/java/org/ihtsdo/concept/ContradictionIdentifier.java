@@ -110,8 +110,8 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
         } else if (isSingleEdit) {
             return ContradictionResult.SINGLE_MODELER_CHANGE;
         } else {
-		return ContradictionResult.NONE;
-    }
+			return ContradictionResult.NONE;
+	    }
     }
     
     private ContradictionResult analyzeContradictionPerComponent(Concept concept, Map<PositionForSet, HashMap<Integer, ComponentVersionBI>> foundPositionsMap) throws Exception 
@@ -306,7 +306,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 			if (initialVersion == null) {
 				initialVersion = version;
 			} else {
-				RELATIVE_POSITION relPosition = conflictMapper.fastRelativePosition((Version)initialVersion, (Version)version, viewCoord.getPrecedence());
+				RELATIVE_POSITION relPosition = conflictMapper.fastRelativePosition((Version)initialVersion, (Version)version, Terms.get().getActiveAceFrameConfig().getPrecedence());
 				if (relPosition == RELATIVE_POSITION.CONTRADICTION) {
 					isContradiction = true;
 				}
@@ -342,7 +342,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 					testingVersion = getCurrentVersion(concept, compType, version);
 				}
 
-				RELATIVE_POSITION relPosition = conflictMapper.fastRelativePosition((Version)adjudicatorVersion, (Version)testingVersion, viewCoord.getPrecedence());
+				RELATIVE_POSITION relPosition = conflictMapper.fastRelativePosition((Version)adjudicatorVersion, (Version)testingVersion, Terms.get().getActiveAceFrameConfig().getPrecedence());
 
 				if (relPosition != RELATIVE_POSITION.EQUAL) 
 				{
@@ -535,7 +535,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 						HashMap<Integer, ComponentVersionBI> testingVersionMap = foundPositionsMap.get(testingPositionKey);
 						testingVersion = testingVersionMap.get(testingVersionMap.keySet().iterator().next());
 	
-						RELATIVE_POSITION retPosition = conflictMapper.fastRelativePosition((Version)currentVersion, (Version)testingVersion, viewCoord.getPrecedence());
+						RELATIVE_POSITION retPosition = conflictMapper.fastRelativePosition((Version)currentVersion, (Version)testingVersion, Terms.get().getActiveAceFrameConfig().getPrecedence());
 						
 						if (retPosition == RELATIVE_POSITION.CONTRADICTION)
 						{
@@ -666,6 +666,8 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
 		try
 		{
+			ViewCoordinate viewCoord = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
+
 			if (compType == ComponentType.ATTRIBUTE)
 			{
 				ConceptAttributes attr = concept.getConceptAttributes();
