@@ -27,6 +27,7 @@ public class ConceptNavigator extends JPanel {
 
     private HistoryPanel historyPanel;
     private JButton implementButton;
+    private final JPanel topPanel;
 
     public JButton getImplementButton() {
         return implementButton;
@@ -125,6 +126,7 @@ public class ConceptNavigator extends JPanel {
         navigatorTree = (JTreeWithDragImage) treeScroller.getViewport().getView();
         focusDrop = new FocusDrop(new ImageIcon(ACE.class.getResource("/16x16/plain/flash.png")),
                 navigatorTree, config);
+        topPanel = setupTopPanel();
         layoutNavigator();
     }
 
@@ -172,7 +174,7 @@ public class ConceptNavigator extends JPanel {
         gbc.weightx = 1;
         gbc.weighty = 0;
 
-        add(setupTopPanel(), gbc);
+        add(topPanel, gbc);
 
         gbc.gridwidth = 1;
         gbc.gridx = 1;
@@ -195,7 +197,7 @@ public class ConceptNavigator extends JPanel {
     }
 
     private JPanel setupTopPanel() {
-        JPanel topPanel = new JPanel(new GridBagLayout());
+        JPanel thePanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.weightx = 0;
         gbc.weighty = 0;
@@ -206,12 +208,12 @@ public class ConceptNavigator extends JPanel {
 
         JLabel navIcon = new JLabel(new ImageIcon(
                 ConceptViewRenderer.class.getResource("/16x16/plain/compass.png")));
-        topPanel.add(navIcon, gbc);
+        thePanel.add(navIcon, gbc);
         navIcon.setVisible(false);
         gbc.weightx = 1;
         gbc.gridx++;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        topPanel.add(new JLabel(" "), gbc);
+        thePanel.add(new JLabel(" "), gbc);
 
         gbc.gridx++;
         gbc.weightx = 0;
@@ -222,30 +224,30 @@ public class ConceptNavigator extends JPanel {
         implementButton.setToolTipText("apply selected version changes");
         implementButton.setVisible(true);
         implementButton.setEnabled(false);
-        topPanel.add(implementButton, gbc);
+        thePanel.add(implementButton, gbc);
         gbc.gridx++;
         JButton taxonomyButton = new JButton(new ImageIcon(
                 ConceptViewRenderer.class.getResource("/16x16/plain/text_tree.png")));
         taxonomyButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         taxonomyButton.addActionListener(new TaxonomyAction());
-        topPanel.add(taxonomyButton, gbc);
+        thePanel.add(taxonomyButton, gbc);
         gbc.gridx++;
         JButton historyButton = new JButton(new ImageIcon(
                 ConceptViewRenderer.class.getResource("/16x16/plain/radar-chart.png")));
         historyButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         historyButton.addActionListener(new HistoryAction());
-        topPanel.add(historyButton, gbc);
+        thePanel.add(historyButton, gbc);
         gbc.gridx++;
         JButton statedInferredButton = new JButton(new ImageIcon(
                 ConceptViewRenderer.class.getResource("/16x16/plain/chrystal_ball.png")));
         statedInferredButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         statedInferredButton.addActionListener(new StatedInferredAction());
-        topPanel.add(statedInferredButton, gbc);
+        thePanel.add(statedInferredButton, gbc);
 
 
-        topPanel.setBackground(ConceptViewTitle.TITLE_COLOR);
-        topPanel.setOpaque(true);
-        topPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.LIGHT_GRAY));
-        return topPanel;
+        thePanel.setBackground(ConceptViewTitle.TITLE_COLOR);
+        thePanel.setOpaque(true);
+        thePanel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.LIGHT_GRAY));
+        return thePanel;
     }
 }

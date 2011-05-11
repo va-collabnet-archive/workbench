@@ -114,13 +114,9 @@ public class HistoryPanel {
                     @Override
                     public void run() {
                         if (changedSelections.size() > 0) {
-                            navigator.getImplementButton().setVisible(true);
                             navigator.getImplementButton().setEnabled(true);
-                            //GuiUtil.tickle(navigator.getImplementButton().getParent());
                         } else {
-                            navigator.getImplementButton().setVisible(false);
                             navigator.getImplementButton().setEnabled(false);
-                            //GuiUtil.tickle(navigator.getImplementButton().getParent());
                         }
                     }
                 });
@@ -317,12 +313,13 @@ public class HistoryPanel {
         }
     }
 
+    private ApplyVersionChangesListener avcl = new ApplyVersionChangesListener();
     public HistoryPanel(ConceptView view, JScrollPane historyScroller,
             ConceptNavigator navigator) throws IOException {
         this.view = view;
         positionPanelMap = view.getPositionPanelMap();
         this.navigator = navigator;
-        navigator.getImplementButton().addActionListener(new ApplyVersionChangesListener());
+        navigator.getImplementButton().addActionListener(avcl);
 
         TreeSet<PositionBI> positionOrderedSet = view.getPositionOrderedSet();
         if (view.getPathRowMap() != null && positionOrderedSet != null) {
