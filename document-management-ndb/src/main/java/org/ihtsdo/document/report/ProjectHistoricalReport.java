@@ -228,7 +228,6 @@ public class ProjectHistoricalReport implements I_Report {
 
 	private I_ConfigAceFrame getVersionedConfig(I_ConfigAceFrame con, Long thickVer) throws Exception {
 		I_ConfigAceFrame verConfig = null;
-		int thinVer = tf.convertToThinVersion(thickVer);
 		verConfig = tf.newAceFrameConfig();
 
 		ObjectOutputStream oos = null;
@@ -250,7 +249,7 @@ public class ProjectHistoricalReport implements I_Report {
 
 			Set<PathBI> a = con.getEditingPathSet();
 			for (PathBI pathBI : a) {
-				verConfig.addViewPosition(tf.newPosition(pathBI, thinVer));
+				verConfig.addViewPosition(tf.newPosition(pathBI, thickVer));
 			}
 
 		} catch (Exception e) {

@@ -5,6 +5,7 @@
 package org.ihtsdo.document.report;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -32,7 +33,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -82,7 +82,9 @@ public class ReportPanel extends JPanel {
 				if (reportList.getSelectedValue() != null) {
 					if (reportList.getSelectedValue() instanceof ProjectHistoricalReport) {
 						previewButton.setEnabled(false);
-					} else {
+					} else if(reportList.getSelectedValue() instanceof AccumulatedStatusChanges) {
+						previewButton.setEnabled(false);
+					}else{
 						previewButton.setEnabled(true);
 					}
 					showMessage("");
@@ -167,13 +169,28 @@ public class ReportPanel extends JPanel {
 		}
 	}
 
-	private void getReportActionPerformed(ActionEvent e) {
+	private void getReportActionPerformed(final ActionEvent e) {
 		if (previewButton.isSelected()) {
-			pdfReportActionPerformed(e);
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					pdfReportActionPerformed(e);
+				}
+			});
 		} else if (csvButton.isSelected()) {
-			csvFileActionPerformed(e);
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					csvFileActionPerformed(e);
+				}
+			});
 		} else if (excelButton.isSelected()) {
-			excelReportActionPerformed(e);
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					excelReportActionPerformed(e);
+				}
+			});
 		}
 	}
 
@@ -187,7 +204,7 @@ public class ReportPanel extends JPanel {
 
 			chooser.setAcceptAllFileFilterUsed(false);
 
-			if (chooser.showOpenDialog(this) == JFileChooser.OPEN_DIALOG) {
+			if (chooser.showOpenDialog(getFrame(this)) == JFileChooser.OPEN_DIALOG) {
 				File selectedFolder = chooser.getSelectedFile();
 				SimpleDateFormat sdf = new SimpleDateFormat("MMM-dd-hh-mm");
 				File result = new File(selectedFolder, sdf.format(new Date()) + "_" + report.toString().replace(' ', '_') + ".csv");
@@ -209,6 +226,16 @@ public class ReportPanel extends JPanel {
 				}
 			}
 		}
+	}
+
+	private Component getFrame(Component component) {
+		Component result = null;
+		if(component instanceof JFrame){
+			result = component;
+		}else{
+			result = getFrame(component.getParent());
+		}
+		return result;
 	}
 
 	private void closeButtonActionPerformed(ActionEvent e) {

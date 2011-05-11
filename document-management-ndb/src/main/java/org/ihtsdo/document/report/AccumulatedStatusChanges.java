@@ -72,11 +72,10 @@ public class AccumulatedStatusChanges implements I_Report {
 			if (excelRep.exists()) {
 				Workbook wb = ExcelReportUtil.readFile(excelRep);
 				FileOutputStream out = new FileOutputStream(excelRep);
-
-				wb.removeSheetAt(1);
+				wb.getSheetIndex("Data");
+				wb.removeSheetAt(wb.getSheetIndex("Data"));
 				wb.createSheet("Data");
-				Sheet s = wb.getSheetAt(1);
-
+				Sheet s = wb.getSheet("Data");
 				Row r = null;
 				Cell cell = null;
 
@@ -109,7 +108,18 @@ public class AccumulatedStatusChanges implements I_Report {
 						} else {
 							cell.setCellStyle(cs2);
 						}
-						cell.setCellValue(nextLine[cellnum]);
+						if(cellnum == nextLine.length - 1){
+							cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+						}
+						Integer num = null;
+						try{
+							num = Integer.valueOf(nextLine[cellnum]);
+						}catch (Exception e) {}
+						if(num != null){
+							cell.setCellValue(num);
+						}else{
+							cell.setCellValue(nextLine[cellnum]);
+						}
 						if (s.getColumnWidth(cellnum) < 3000 + nextLine[cellnum].length() * 200) {
 							s.setColumnWidth((short) (cellnum), (short) (3000 + nextLine[cellnum].length() * 200));
 						}

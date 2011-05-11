@@ -53,17 +53,19 @@ public class WorklistStateTotalsReport implements I_Report {
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 			csvFile = File.createTempFile("workset_worklist_st_totals", ".csv");
 			PrintWriter writer = new PrintWriter(csvFile);
-			writer.append("Project|WorkSet|WorkList|Status|Total");
+			writer.append("Project|WorkSet|WorkList|Status|Total|wlStatusTotal|projStatusTotal");
 			writer.println();
 
 			TranslationProjectListDialog dialog = new TranslationProjectListDialog();
 			ArrayList<I_TerminologyProject> projects = dialog.showModalDialog();
 			if (projects != null) {
 				for (I_TerminologyProject iTerminologyProject : projects) {
+					HashMap<String, Integer> projectTotals = new HashMap<String, Integer>();
 					String projectName = iTerminologyProject.getName();
 
 					List<WorkSet> worksets = TerminologyProjectDAO.getAllWorkSetsForProject(iTerminologyProject, config);
 					for (WorkSet workSet : worksets) {
+						HashMap<String, Integer> worksetTotals = new HashMap<String, Integer>();
 						String worksetName = workSet.getName();
 						List<WorkList> worklists = TerminologyProjectDAO.getAllWorklistForWorkset(workSet, config);
 						for (WorkList workList : worklists) {
@@ -76,9 +78,26 @@ public class WorklistStateTotalsReport implements I_Report {
 									I_GetConceptData activitiStatus = tf.getConcept(workListMember.getActivityStatus());
 									if (statusMembers.containsKey(activitiStatus.toString())) {
 										Integer subTotal = statusMembers.get(activitiStatus.toString());
+										Integer projectSubTotal = projectTotals.get(activitiStatus.toString());
+										Integer worksetSubTotals = worksetTotals.get(activitiStatus.toString());
+										
 										statusMembers.put(activitiStatus.toString(), subTotal + 1);
+										projectTotals.put(activitiStatus.toString(), projectSubTotal + 1);
+										worksetTotals.put(activitiStatus.toString(), worksetSubTotals + 1);
 									} else {
 										statusMembers.put(activitiStatus.toString(), 1);
+										if(!projectTotals.containsKey(activitiStatus.toString())){
+											projectTotals.put(activitiStatus.toString(), 1);
+										}else{
+											Integer projectSubTotal = projectTotals.get(activitiStatus.toString());
+											projectTotals.put(activitiStatus.toString(), projectSubTotal + 1);
+										}
+										if(!worksetTotals.containsKey(activitiStatus.toString())){
+											worksetTotals.put(activitiStatus.toString(), 1);
+										}else{
+											Integer worksetSubTotals = worksetTotals.get(activitiStatus.toString());
+											worksetTotals.put(activitiStatus.toString(), worksetSubTotals + 1);
+										}
 									}
 								}
 
@@ -87,11 +106,15 @@ public class WorklistStateTotalsReport implements I_Report {
 									dataFound = true;
 									String key = (String) iterator.next();
 									Integer total = statusMembers.get(key);
+									Integer projTotal = projectTotals.get(key);
+									Integer wsTotal = worksetTotals.get(key);
 									writer.append(projectName + '|');
 									writer.append(worksetName + '|');
 									writer.append(worklistName + '|');
 									writer.append(key + '|');
-									writer.append("" + total);
+									writer.append(total + "|");
+									writer.append(wsTotal + "|");
+									writer.append(projTotal + "");
 									writer.println();
 								}
 							}
