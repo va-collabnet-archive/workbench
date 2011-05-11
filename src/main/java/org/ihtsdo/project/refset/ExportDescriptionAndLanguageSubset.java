@@ -88,7 +88,7 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 			Set<? extends I_GetConceptData> promRefsets = termFactory.getRefsetHelper(config).getPromotionRefsetForRefset(refsetConcept, config);
 			promoRefset = promRefsets.iterator().next();
 			if (promoRefset==null){
-				reportFileWriter.write("The promotion refset concept for target language refset " + refsetConcept + " doesn't exists." + "\\r\\n");
+				reportFileWriter.append("The promotion refset concept for target language refset " + refsetConcept + " doesn't exists." + "\r\n");
 				throw new Exception("The promotion refset concept for target language refset " + refsetConcept + " doesn't exists.");
 			}else{
 
@@ -109,7 +109,7 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 				outputDescFileWriter.append("DescriptionType");
 				outputDescFileWriter.append(sep);
 				outputDescFileWriter.append("LanguageCode");
-				outputDescFileWriter.write(begEnd + "\\r\\n");
+				outputDescFileWriter.append(begEnd + "\r\n");
 				
 
 				outputSubsFileWriter.append(begEnd);
@@ -120,7 +120,7 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 				outputSubsFileWriter.append("MemberStatus");
 				outputSubsFileWriter.append(sep);
 				outputSubsFileWriter.append("LinkedId");
-				outputSubsFileWriter.write(begEnd + "\\r\\n");
+				outputSubsFileWriter.append(begEnd + "\r\n");
 				
 				descLineCount = 0l;
 				subsLineCount = 0l;
@@ -134,7 +134,7 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 					Long.parseLong(refsetSCTID);
 				}catch(NumberFormatException e){
 					refsetSCTID=refsetConcept.getUUIDs().iterator().next().toString();
-					reportFileWriter.write("The refset UUID " + refsetSCTID + " has not Snomed Concept ID, It will be replaced with its UUID." + "\\r\\n");
+					reportFileWriter.append("The refset UUID " + refsetSCTID + " has not Snomed Concept ID, It will be replaced with its UUID." + "\r\n");
 
 				}
 			}
@@ -164,7 +164,7 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 			}catch(NumberFormatException e){
 				conceptId=concept.getUUIDs().iterator().next().toString();
 
-				reportFileWriter.write("The concept " + conceptId + " has not Snomed Concept ID, It will be replaced with its UUID." + "\\r\\n");
+				reportFileWriter.append("The concept " + conceptId + " has not Snomed Concept ID, It will be replaced with its UUID." + "\r\n");
 
 			}
 			for (I_ContextualizeDescription cdescription : descriptions) {
@@ -175,7 +175,7 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 						Long.parseLong(did);
 					}catch(NumberFormatException e){
 						did=cdescription.getDescriptionVersioned().getUUIDs().iterator().next().toString();
-						reportFileWriter.write("The description " + did + " has not Snomed Description ID, It will be replaced with its UUID." + "\\r\\n");
+						reportFileWriter.append("The description " + did + " has not Snomed Description ID, It will be replaced with its UUID." + "\r\n");
 
 					}
 					String dStatus="";
@@ -215,12 +215,12 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 					String ics= cdescription.isInitialCaseSignificant()? "1":"0";
 
 
-					outputDescFileWriter.write(begEnd + did + sep + dStatus + sep + conceptId + sep + term + sep + ics + sep + dType + sep + lang + begEnd + "\\r\\n");
+					outputDescFileWriter.append(begEnd + did + sep + dStatus + sep + conceptId + sep + term + sep + ics + sep + dType + sep + lang + begEnd + "\r\n");
 
 					descLineCount++;
 
 					if (dStatus=="0"){
-						outputSubsFileWriter.write(begEnd + refsetSCTID + sep + did + sep + dType + sep + begEnd + "\\r\\n");
+						outputSubsFileWriter.append(begEnd + refsetSCTID + sep + did + sep + dType + sep + begEnd + "\r\n");
 
 						subsLineCount++;
 					}
@@ -260,8 +260,8 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 	}
 	public void closeFiles(){
 		try {
-			reportFileWriter.write("Exported to UUID file " + exportDescFile.getName()  + " : " + descLineCount + " lines" + "\\r\\n");
-			reportFileWriter.write("Exported to SCTID file " + exportSubsFile.getName()  + " : " + subsLineCount + " lines" + "\\r\\n");
+			reportFileWriter.append("Exported to UUID file " + exportDescFile.getName()  + " : " + descLineCount + " lines" + "\r\n");
+			reportFileWriter.append("Exported to SCTID file " + exportSubsFile.getName()  + " : " + subsLineCount + " lines" + "\r\n");
 			reportFileWriter.flush();
 			reportFileWriter.close();
 			outputDescFileWriter.flush();

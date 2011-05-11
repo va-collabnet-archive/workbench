@@ -68,8 +68,8 @@ public class ExportConceptMemberRefsetToRefset {
 			Long.parseLong(refsetSCTID);
 		}catch(NumberFormatException e){
 
-			reportFileWriter.write("The refset UUID " + refsetId + 
-					" has not Snomed Concept ID, It will be replaced with its UUID." + "\\r\\n");
+			reportFileWriter.append("The refset UUID " + refsetId + 
+					" has not Snomed Concept ID, It will be replaced with its UUID." + "\r\n");
 
 			refsetSCTID=refsetId;
 		}
@@ -92,8 +92,8 @@ public class ExportConceptMemberRefsetToRefset {
 				String compoID=Terms.get().getConcept(ext.getComponentNid()).getUUIDs().iterator().next().toString();
 				String moduleId = Terms.get().getConcept(lastPart.getPathNid()).getUids().iterator().next().toString();
 			
-				outputFileWriter.write(begEnd + id + sep + effectiveTime + sep + "1" + sep + moduleId + sep + refsetId + sep + compoID + begEnd
-						 + "\\r\\n");
+				outputFileWriter.append(begEnd + id + sep + effectiveTime + sep + "1" + sep + moduleId + sep + refsetId + sep + compoID + begEnd
+						 + "\r\n");
 
 				UUIDlineCount++;
 				
@@ -103,7 +103,7 @@ public class ExportConceptMemberRefsetToRefset {
 				try{
 					Long.parseLong(conceptId);
 				}catch(NumberFormatException e){
-					reportFileWriter.write("The concept UUID " + compoID + " has not Snomed Concept ID." + "\\r\\n");
+					reportFileWriter.append("The concept UUID " + compoID + " has not Snomed Concept ID." + "\r\n");
 
 					bSkip=true;
 				}
@@ -120,16 +120,16 @@ public class ExportConceptMemberRefsetToRefset {
 					}catch(NumberFormatException e){
 						sctId_moduleId=moduleId;
 					}
-					outputFileWriter2.write(begEnd + sctId_id + sep + effectiveTime + sep + "1" + sep + sctId_moduleId + sep + refsetSCTID + sep + conceptId + begEnd
-							 + "\\r\\n");
+					outputFileWriter2.append(begEnd + sctId_id + sep + effectiveTime + sep + "1" + sep + sctId_moduleId + sep + refsetSCTID + sep + conceptId + begEnd
+							 + "\r\n");
 
 					SCTIDlineCount++;
 					
 				}
 			}
 		}
-		reportFileWriter.write("Exported to UUID file " + exportFile.getName()  + " : " + UUIDlineCount + " lines" + "\\r\\n");
-		reportFileWriter.write("Exported to SCTID file " + exportFile2.getName()  + " : " + SCTIDlineCount + " lines" + "\\r\\n");
+		reportFileWriter.append("Exported to UUID file " + exportFile.getName()  + " : " + UUIDlineCount + " lines" + "\r\n");
+		reportFileWriter.append("Exported to SCTID file " + exportFile2.getName()  + " : " + SCTIDlineCount + " lines" + "\r\n");
 		reportFileWriter.flush();
 		reportFileWriter.close();
 		outputFileWriter.flush();
