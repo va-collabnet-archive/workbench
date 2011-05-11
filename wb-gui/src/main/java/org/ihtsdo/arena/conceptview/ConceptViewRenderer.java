@@ -298,7 +298,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                 }
 
             	// Advancing Workflow
-                File wfBpFile = new File(advanceWorkflowActionPath + File.separator + advanceWorkflowActionFile);
+                File wfBpFile = new File("plugins" + File.separator + advanceWorkflowActionPath + File.separator + advanceWorkflowActionFile);
                 boolean capWorkflow = wfBpFile.exists();
 
                 if (capWorkflow)
