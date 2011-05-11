@@ -174,7 +174,19 @@
 		</plugins>
 	</reporting>
 	<profiles>
-	<profile>
+		<profile>
+			<id>add-tools</id> <!-- should work on windows and linux systems -->
+			<dependencies>
+				<dependency>
+					<groupId>sun.jdk</groupId>
+					<artifactId>tools</artifactId>
+					<version>any</version>
+					<scope>system</scope>
+					<systemPath>${java.home}/../lib/tools.jar</systemPath>
+				</dependency>
+			</dependencies>
+		</profile>
+		<!-- <profile>
 		<id>add-tools-on-windows</id>
 			<activation>
 				<os>
@@ -207,7 +219,7 @@
 					<systemPath>${java.home}/../lib/tools.jar</systemPath>
 				</dependency>
 			</dependencies>
-		</profile>
+		</profile> -->
 		<profile>
 			<id>genweb</id>
 			<activation>
