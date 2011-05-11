@@ -419,7 +419,7 @@ public class TerminologyHelperDrools {
 	}
 	
 	//Mock implementation
-	public boolean isDescriptionTextNotUniqueInHierarchy(String fsn, String conceptUuid) throws Exception{
+	public boolean isDescriptionTextNotUniqueInHierarchy(String description, String conceptUuid) throws Exception{
 		return false;
 	}
 	
