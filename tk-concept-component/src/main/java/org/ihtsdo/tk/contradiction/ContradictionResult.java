@@ -26,8 +26,6 @@ public enum ContradictionResult {
     
     SINGLE_MODELER_CHANGE, 		// Single change by a single modeler on a concept, be it a edit on an existing component, a new component, or the creation of a new concept
 
-    UNREACHABLE, 				// DEPRECATED?
-
     DUPLICATE_EDIT,				// An edit by two or more developers on a given component where all developers have made the same exact modification to the component 
 
     DUPLICATE_NEW_COMPONENT, 	// A creation of a new component on a given concept by two or more developers where all developers have made the same component type with the same values
