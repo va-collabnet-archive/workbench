@@ -1038,6 +1038,11 @@ public class ProjectDetailsPanel extends JPanel {
 						"Error, check logs", 
 						"Error", JOptionPane.ERROR_MESSAGE);
 				e1.printStackTrace();
+			} catch (Exception e2) {
+				JOptionPane.showMessageDialog(this,
+						"Error, check logs", 
+						"Error", JOptionPane.ERROR_MESSAGE);
+				e2.printStackTrace();
 			}
 			updateList1Content();
 			textField2.setText("");
