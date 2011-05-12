@@ -28,9 +28,9 @@ public enum ContradictionResult {
 
     DUPLICATE_EDIT,				// An edit by two or more developers on a given component where all developers have made the same exact modification to the component 
 
-    DUPLICATE_NEW_COMPONENT, 	// A creation of a new component on a given concept by two or more developers where all developers have made the same component type with the same values
+    DUPLICATE_NEW, 	// A creation of a new component on a given concept by two or more developers where all developers have made the same component type with the same values
 
-    CONTRADICTION, 				// Two or more modelers make changes to the same concept such that the change doesn't isn't of type DUPLICATE_EDIT nor DUPLICATE_NEW_COMPONENT 
+    CONTRADICTION, 				// Two or more modelers make changes to the same concept such that the change doesn't isn't of type DUPLICATE_EDIT nor DUPLICATE_NEW
 
 	ERROR;						// An Error in detection
 

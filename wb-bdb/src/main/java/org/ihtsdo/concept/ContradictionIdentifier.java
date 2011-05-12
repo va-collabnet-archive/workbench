@@ -91,7 +91,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 			            return ContradictionResult.CONTRADICTION;
 				        } else if (result == ContradictionResult.DUPLICATE_EDIT) {
 				            isDuplicateEdit = true;
-			        } else if (foundPosResult.equals(ContradictionResult.DUPLICATE_NEW_COMPONENT)) {
+			        } else if (foundPosResult.equals(ContradictionResult.DUPLICATE_NEW)) {
 				            isDuplicateNew = true;
 				        } else if (result == ContradictionResult.SINGLE_MODELER_CHANGE) {
 				            isSingleEdit = true;
@@ -106,7 +106,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
         if (isDuplicateEdit) {
             return ContradictionResult.DUPLICATE_EDIT;
         } else if (isDuplicateNew) {
-            return ContradictionResult.DUPLICATE_NEW_COMPONENT;
+            return ContradictionResult.DUPLICATE_NEW;
         } else if (isSingleEdit) {
             return ContradictionResult.SINGLE_MODELER_CHANGE;
         } else {
@@ -154,7 +154,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		} else if (isDuplicateEdit) {
 			return ContradictionResult.DUPLICATE_EDIT;
 	    } else if (isDuplicateNew) {
-	        return ContradictionResult.DUPLICATE_NEW_COMPONENT;
+	        return ContradictionResult.DUPLICATE_NEW;
 	    } else if (isSingleEdit) {
 			return ContradictionResult.SINGLE_MODELER_CHANGE;
 	    }  else {
@@ -540,7 +540,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 						if (retPosition == RELATIVE_POSITION.CONTRADICTION)
 						{
 							if (isSameVersionValues(currentVersion, testingVersion)) {
-								return ContradictionResult.DUPLICATE_NEW_COMPONENT;
+								return ContradictionResult.DUPLICATE_NEW;
 							} else {
 								return ContradictionResult.CONTRADICTION;
 							}

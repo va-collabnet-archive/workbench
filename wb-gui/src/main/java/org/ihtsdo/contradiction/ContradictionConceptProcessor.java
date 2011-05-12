@@ -81,7 +81,7 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
             } else if (position.equals(ContradictionResult.DUPLICATE_EDIT)) {
                 results.addConflictingDuplicateEditConcepts(c.getConceptNid());
                 found.incrementAndGet();
-	        } else if (position.equals(ContradictionResult.DUPLICATE_NEW_COMPONENT)) {
+	        } else if (position.equals(ContradictionResult.DUPLICATE_NEW)) {
 	            results.addConflictingDuplicateNewConcepts(c.getConceptNid());
 	            found.incrementAndGet();
 	        } else if (position.equals(ContradictionResult.ERROR)) {
