@@ -117,6 +117,78 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	}
 
 	@Override
+	public boolean isDescriptionTextNotUniqueInHierarchy(String descText, String conceptUuid) throws Exception{
+		boolean result = false;
+		I_TermFactory tf = Terms.get();
+		try {
+			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
+			int fsnTypeNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+			String originalDescText = descText;
+			String originalSemTag = "";
+			String potentialMatchSemtag = "";
+
+			descText = "+\"" + QueryParser.escape(descText) + "\"";
+			SearchResult results = tf.doLuceneSearch(descText);
+			TopDocs topDocs = results.topDocs;
+			ScoreDoc[] docs = topDocs.scoreDocs;
+			if (docs.length > 0) {
+				I_GetConceptData originalConcept = Terms.get().getConcept(UUID.fromString(conceptUuid));
+				I_DescriptionTuple originalFsn = null;
+				
+				for (I_DescriptionTuple loopDescription : originalConcept.getDescriptionTuples(config.getAllowedStatus(), 
+						config.getDescTypes(), config.getViewPositionSetReadOnly(), 
+						config.getPrecedence(), config.getConflictResolutionStrategy())) {
+					if (loopDescription.getTypeNid() == fsnTypeNid && loopDescription.getLang().toLowerCase().startsWith("en")) {
+						originalFsn = loopDescription;
+						originalSemTag = originalFsn.getText().substring(originalFsn.getText().lastIndexOf("(")).trim();
+					}
+				}
+				for (int i = 0 ; i < docs.length  ; i++) {
+					try{
+						Document doc = results.searcher.doc(i);
+						int cnid = Integer.parseInt(doc.get("cnid"));
+						int dnid = Integer.parseInt(doc.get("dnid"));
+						
+						I_GetConceptData potentialMatchConcept = Terms.get().getConcept(Integer.parseInt(doc.get("cnid")));
+						
+						I_DescriptionTuple potentialMatchFsn = null;
+						
+						for (I_DescriptionTuple loopDescription : potentialMatchConcept.getDescriptionTuples(config.getAllowedStatus(), 
+								config.getDescTypes(), config.getViewPositionSetReadOnly(), 
+								config.getPrecedence(), config.getConflictResolutionStrategy())) {
+							if (loopDescription.getTypeNid() == fsnTypeNid && loopDescription.getLang().toLowerCase().startsWith("en")) {
+								potentialMatchFsn = loopDescription;
+								potentialMatchSemtag = potentialMatchFsn.getText().substring(potentialMatchFsn.getText().lastIndexOf("(")).trim();
+							}
+						}
+						
+						I_DescriptionVersioned potential_match = Terms.get().getDescription(dnid, cnid);
+						if (potential_match != null) {
+
+							DescriptionVersionBI description = (DescriptionVersionBI) 
+							Ts.get().getComponentVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), dnid);
+
+							if (description.getText() == originalDescText && 
+									originalSemTag.equals(potentialMatchSemtag)) {
+								result = true;
+							}
+						}
+					}catch(Exception e){
+						//Do Nothing
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	@Override
 	public boolean isFsnTextNotUnique(String fsn, String conceptUuid) throws Exception{
 		boolean result = false;
 		I_TermFactory tf = Terms.get();
