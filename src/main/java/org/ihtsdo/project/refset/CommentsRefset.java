@@ -203,6 +203,17 @@ public class CommentsRefset extends Refset {
 		rfPropMap.put(REFSET_PROPERTY.CID_ONE, commentType);
 		rfPropMap.put(REFSET_PROPERTY.CID_TWO, commentSubType);
 		rfPropMap.put(REFSET_PROPERTY.STRING_VALUE, comment);
+		
+		// hack for easy solution of duplicated comment text preventing a new comment add
+		int count = 0;
+		while (refsetHelper.hasRefsetExtension(this.refsetId, componentId, rfPropMap)) {
+			rfPropMap.put(REFSET_PROPERTY.STRING_VALUE, comment + ".");
+			if (count > 20) {
+				// Security check: there is some problem here, exiting loop
+				break;
+			}
+			count++;
+		}
 
 		refsetHelper.newRefsetExtension(this.refsetId, componentId, EConcept.REFSET_TYPES.CID_CID_STR, rfPropMap, config);
 
