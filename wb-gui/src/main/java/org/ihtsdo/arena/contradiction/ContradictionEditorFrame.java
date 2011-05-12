@@ -109,9 +109,9 @@ public class ContradictionEditorFrame extends ComponentFrame {
 
         @Override
         public void actionPerformed(ActionEvent ae) {
-        ContradictionFinderSwingWorker worker =
-                new ContradictionFinderSwingWorker(viewCoord,
-                (TerminologyListModel) batchConceptList.getModel());
+        	ContradictionFinderSwingWorker worker =
+                new ContradictionFinderSwingWorker(viewCoord, (TerminologyListModel) batchConceptList.getModel());
+        	   worker.execute();
         }
     }
 
