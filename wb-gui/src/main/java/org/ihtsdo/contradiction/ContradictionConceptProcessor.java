@@ -33,7 +33,7 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
         // Via Task
 
         results = new ContradictionIdentificationResults();
-        detector = Ts.get().getConflictIdentifier(viewCoord);
+        detector = Ts.get().getConflictIdentifier(viewCoord, false);
 
         this.cNids = buildInvestigationSet();
 
@@ -48,7 +48,7 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
         // Via Task
 
         results = new ContradictionIdentificationResults();
-        detector = Ts.get().getConflictIdentifier(viewCoord);
+        detector = Ts.get().getConflictIdentifier(viewCoord, false);
 
         this.cNids = nidBitSetBI;
 
@@ -106,7 +106,7 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
 
 		try
 		{
-			buildSet3(set);
+			buildSet1(set);
         } catch (Exception e) {
             AceLog.getAppLog().log(Level.WARNING, "Error in intializing Contradiction Concept Processor", e);
         }

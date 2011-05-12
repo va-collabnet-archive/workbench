@@ -1887,13 +1887,14 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     }
 
 	@Override
-	public FoundContradictionVersions getVersionsInContradiction(
-			ViewCoordinate vc) {
-//		ContradictionIdentifier identifier = new ContradictionIdentifier(vc, true);
-//		ContradictionResult result = identifier.isConceptInConflict(this);
-//		Collection<? extends ComponentVersionBI> versions = identifier.getReturnVersions();
-		
-//		return new FoundContradictionVersions(result, versions);
+	public FoundContradictionVersions getVersionsInContradiction(ViewCoordinate vc) {
+		try {
+			ContradictionIdentifier identifier = new ContradictionIdentifier(vc, true);
+			ContradictionResult result = identifier.isConceptInConflict(this);
+			
+			return new FoundContradictionVersions(result, identifier.getReturnVersions());
+		} catch (Exception e) {
 			return null;
+		}
 	}
 }

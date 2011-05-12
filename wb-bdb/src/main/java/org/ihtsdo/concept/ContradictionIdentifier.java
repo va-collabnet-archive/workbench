@@ -34,7 +34,6 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.contradiction.ComponentType;
@@ -50,18 +49,19 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
     private PositionMapper conflictMapper;
 
 	private AtomicInteger viewPathNid = null;
-	private AtomicInteger commonOriginPathNid = null;
-	private AtomicInteger workflowRefsetNid = null;
-
+	private AtomicInteger commonOriginPathNid;
+	private AtomicInteger workflowRefsetNid;
+	private AtomicBoolean isReturnVersionsUseCase;
 	private ViewCoordinate viewCoord;
+	private Set<ComponentVersionBI> returnVersionCollection;
+
+	private ComponentVersionBI singleVersion;
 	
-    public ContradictionIdentifier(ViewCoordinate vc) 
-    {
+	public ContradictionIdentifier(ViewCoordinate vc, boolean useCase) {
 		viewCoord = vc;
-
-
-    }
-
+		isReturnVersionsUseCase = new AtomicBoolean(useCase);
+	}
+	
 	// For a given concept, look at a set of components at a time.
     // If contradiction found, return immediatly.  
     // If single change found, save state and only return state if no contradiction found in each concept's component type
@@ -89,12 +89,12 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 			
 			        if (foundPosResult.equals(ContradictionResult.CONTRADICTION)) {
 			            return ContradictionResult.CONTRADICTION;
-				        } else if (result == ContradictionResult.DUPLICATE_EDIT) {
+				    } else if (result == ContradictionResult.DUPLICATE_EDIT) {
 				            isDuplicateEdit = true;
 			        } else if (foundPosResult.equals(ContradictionResult.DUPLICATE_NEW)) {
-				            isDuplicateNew = true;
-				        } else if (result == ContradictionResult.SINGLE_MODELER_CHANGE) {
-				            isSingleEdit = true;
+				    	isDuplicateNew = true;
+				    } else if (result == ContradictionResult.SINGLE_MODELER_CHANGE) {
+				        isSingleEdit = true;
 			        }
 			    }
 			} catch (Exception e) {
@@ -108,6 +108,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
         } else if (isDuplicateNew) {
             return ContradictionResult.DUPLICATE_NEW;
         } else if (isSingleEdit) {
+        	returnVersionCollection.add(singleVersion);
             return ContradictionResult.SINGLE_MODELER_CHANGE;
         } else {
 			return ContradictionResult.NONE;
@@ -258,6 +259,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		
 		        	if (result == ContradictionResult.SINGLE_MODELER_CHANGE) {
 						isSingleEdit = true;
+						singleVersion = developerVersions.iterator().next();
 		        	} else if (result == ContradictionResult.CONTRADICTION)	{
 			        	// Have potential contradiction, unless developers made same changes
 						ComponentVersionBI compareWithVersion = latestOriginVersion;
@@ -266,7 +268,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 						} 
 						
 						// Check if for given CompId, have multiple versions with same changes
-							if (!isContradictionWithSameValues(comparer, compareWithVersion, developerVersions)) {
+						if (!isContradictionWithSameValues(comparer, compareWithVersion, developerVersions)) {
 							// Concept contains contradiction.  No need to update positions as check complete for concept
 							isContradiction = true;
 						} else {
@@ -309,6 +311,11 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 				RELATIVE_POSITION relPosition = conflictMapper.fastRelativePosition((Version)initialVersion, (Version)version, Terms.get().getActiveAceFrameConfig().getPrecedence());
 				if (relPosition == RELATIVE_POSITION.CONTRADICTION) {
 					isContradiction = true;
+					
+					if (isReturnVersionsUseCase.get()) {
+						returnVersionCollection.add(initialVersion);
+						returnVersionCollection.add(version);
+					}
 				}
 			}
 		}
@@ -356,30 +363,36 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 						throw new TerminologyException("My first time here");
 					}
 
-					if (relPosition == RELATIVE_POSITION.AFTER || relPosition == RELATIVE_POSITION.BEFORE) 
+					if (relPosition == RELATIVE_POSITION.AFTER) 
 					{
-						
-						// For Edge Case -- Time-based contradiction Idetifier
-						RELATIVE_POSITION relSecondPosition = conflictMapper.fastRelativePosition((Version)adjudicatorVersion, (Version)testingVersion, Precedence.TIME);
-
-						if (relSecondPosition == RELATIVE_POSITION.CONTRADICTION) {
-							throw new TerminologyException("Can't be contra via adjud path");
-						}				
-
-						if (relSecondPosition != relPosition) 
-						{
+						if (isReturnVersionsUseCase.get()) {
+							returnVersionCollection.add(testingVersion);
+						}
+			/*
+			 * TODO: Unnecessary?			
+			 */
+//						// For Edge Case -- Time-based contradiction Idetifier
+//						RELATIVE_POSITION relSecondPosition = conflictMapper.fastRelativePosition((Version)adjudicatorVersion, (Version)testingVersion, Precedence.TIME);
+//
+//						if (relSecondPosition == RELATIVE_POSITION.CONTRADICTION) {
+//							throw new TerminologyException("Can't be contra via adjud path");
+//						}				
+//
+//						if (relSecondPosition != relPosition) 
+//						{
+							
 							if (!isSingleEdit) {
 								isSingleEdit = true;
 							} else {
 								isContradiction = true;
 							}
-						}
+//						}
 
-						if (relPosition != RELATIVE_POSITION.BEFORE && relSecondPosition != RELATIVE_POSITION.BEFORE)
-						{
-							// Remove Pre-Adjudication Versions from Dev list
-							foundPositionsVersions.remove(testingVersion);
-						}
+//						if (relPosition != RELATIVE_POSITION.BEFORE && relSecondPosition != RELATIVE_POSITION.BEFORE)
+//						{
+//							// Remove Pre-Adjudication Versions from Dev list
+//							foundPositionsVersions.remove(testingVersion);
+//						}
 					}
 				} 
 			}
@@ -539,6 +552,11 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 						
 						if (retPosition == RELATIVE_POSITION.CONTRADICTION)
 						{
+							if (isReturnVersionsUseCase.get()) {
+								returnVersionCollection.add(testingVersion);
+								returnVersionCollection.add(currentVersion);
+							}
+							
 							if (isSameVersionValues(currentVersion, testingVersion)) {
 								return ContradictionResult.DUPLICATE_NEW;
 							} else {
@@ -861,6 +879,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	
 	        	if (result == ContradictionResult.SINGLE_MODELER_CHANGE) {
 					isSingleEdit = true;
+					singleVersion = developerVersions.iterator().next();
 	        	} else if (result == ContradictionResult.CONTRADICTION)	{
 		        	// Have potential contradiction, unless developers made same changes
 					ComponentVersionBI compareWithVersion = latestOriginVersion;
@@ -968,9 +987,14 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
             }
             
             // find the least common ancestor based on view position
-			commonOriginPathNid = new AtomicInteger((pos).getPath().getConceptNid());
+            PathBI commonOriginPath = identifyCommonOriginPosition(pos).getPath();
+			commonOriginPathNid = new AtomicInteger(commonOriginPath.getConceptNid());
 
 			workflowRefsetNid = new AtomicInteger(Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid()));
+			
+			if (isReturnVersionsUseCase.get()) {
+				returnVersionCollection = new HashSet<ComponentVersionBI>();
+			}
         } catch (Exception e) {
             AceLog.getAppLog().log(Level.WARNING, "Failure to Initialize Globals", e);
         }
@@ -998,6 +1022,11 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	private void setViewPos(PositionBI position) {
 		// Note, adjudications are assumed to be based on view Path
 		viewPathNid = new AtomicInteger(position.getPath().getConceptNid());
+	}
+
+	@Override
+	public Collection<? extends ComponentVersionBI> getReturnVersions() {
+		return returnVersionCollection;
 	}
 }
 

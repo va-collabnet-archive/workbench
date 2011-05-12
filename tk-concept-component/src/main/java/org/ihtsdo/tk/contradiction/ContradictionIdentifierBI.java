@@ -16,6 +16,9 @@
 
 package org.ihtsdo.tk.contradiction;
 
+import java.util.Collection;
+
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
@@ -27,4 +30,6 @@ public interface ContradictionIdentifierBI {
 
 
     ContradictionResult isConceptInConflict(ConceptChronicleBI concept) throws Exception;
+
+	Collection<? extends ComponentVersionBI> getReturnVersions();
 }

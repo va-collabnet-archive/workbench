@@ -499,8 +499,8 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
 
     @Override
-    public ContradictionIdentifierBI getConflictIdentifier(ViewCoordinate vc) {
-		return new ContradictionIdentifier(vc);
+    public ContradictionIdentifierBI getConflictIdentifier(ViewCoordinate vc, boolean useCase) {
+		return new ContradictionIdentifier(vc, useCase);
     }
     
     @Override
