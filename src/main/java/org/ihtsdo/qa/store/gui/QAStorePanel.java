@@ -34,7 +34,7 @@ public class QAStorePanel extends JPanel {
 		this.store = store;
 		initComponents();
 		
-		resultsPanel = new QAResultsBrowser(store, tabbedPane1);
+		resultsPanel = new QAResultsBrowser(store, tabbedPane1, this);
 		rulesContentPanel.add(resultsPanel, BorderLayout.CENTER);
 		casesPanel = new QACasesBrowser(store, resultsPanel, tabbedPane2);
 		casesContentPanel.add(casesPanel, BorderLayout.CENTER);
@@ -49,8 +49,12 @@ public class QAStorePanel extends JPanel {
 	
 	private void table1MouseClicked(MouseEvent e) {
 		if(e.getClickCount() == 1){
-			casesPanel.setupPanel(store);
+			updateCasePanel();
 		}
+	}
+
+	public void updateCasePanel() {
+		casesPanel.setupPanel(store);
 	}
 
 	private void initComponents() {

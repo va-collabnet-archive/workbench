@@ -48,14 +48,15 @@ public class RulesDetailsPanel extends JPanel {
 	private Rule rule;
 	private List<Severity> severyties;
 	private List<Category> categories;
-	private boolean isRuleChanged;
 	private JMenuItem menuItem;
+	private QAResultsBrowser qaResultBrowser;
 
-	public RulesDetailsPanel(QAStoreBI store, Rule rule, List<Category> categories, List<Severity> severyties) {
+	public RulesDetailsPanel(QAStoreBI store, Rule rule,
+			List<Category> categories, List<Severity> severyties, QAResultsBrowser qaResultBrowser) {
 		initComponents();
 		this.store = store;
 		this.rule = rule;
-		isRuleChanged = false;
+		this.qaResultBrowser = qaResultBrowser;
 		saveButton.setEnabled(false);
 
 		if (severyties == null) {
@@ -101,7 +102,8 @@ public class RulesDetailsPanel extends JPanel {
 		for (int i = 0; i < comboItemsCount; i++) {
 			if (categoryComboBox.getItemAt(i) instanceof Category) {
 				Category itemAt = (Category) categoryComboBox.getItemAt(i);
-				if (itemAt.getCategoryUuid().toString().equals(rule.getCategory())) {
+				if (itemAt.getCategoryUuid().toString()
+						.equals(rule.getCategory())) {
 					categoryComboBox.setSelectedIndex(i);
 				}
 			}
@@ -110,14 +112,16 @@ public class RulesDetailsPanel extends JPanel {
 		for (int i = 0; i < severityComboItemCount; i++) {
 			if (severityComboBox.getItemAt(i) instanceof Severity) {
 				Severity itemAt = (Severity) severityComboBox.getItemAt(i);
-				if (itemAt.getSeverityUuid().equals(rule.getSeverity().getSeverityUuid())) {
+				if (itemAt.getSeverityUuid().equals(
+						rule.getSeverity().getSeverityUuid())) {
 					severityComboBox.setSelectedIndex(i);
 				}
 			}
 		}
 		whiteListAllowed.setSelected(rule.isWhitelistAllowed());
 		whiteListResetAllowed.setSelected(rule.isWhitelistResetAllowed());
-		whiteLIstWhenClosedAllowed.setSelected(rule.isWhitelistResetWhenClosed());
+		whiteLIstWhenClosedAllowed.setSelected(rule
+				.isWhitelistResetWhenClosed());
 		modifiedByLabel.setText(rule.getModifiedBy());
 		modifiedDateLabel.setText("" + rule.getEffectiveTime());
 		statusLabelText.setText(rule.getStatus() == 0 ? "Inactive" : "Active");
@@ -142,10 +146,12 @@ public class RulesDetailsPanel extends JPanel {
 		}
 		rule.setWhitelistAllowed(whiteListAllowed.isSelected());
 		rule.setWhitelistResetAllowed(whiteListResetAllowed.isSelected());
-		rule.setWhitelistResetWhenClosed(whiteLIstWhenClosedAllowed.isSelected());
+		rule.setWhitelistResetWhenClosed(whiteLIstWhenClosedAllowed
+				.isSelected());
 		store.persistRule(rule);
 
 		saveButton.setEnabled(false);
+		qaResultBrowser.updateRule(rule);
 	}
 
 	private void enableSaveButton() {
@@ -670,7 +676,8 @@ public class RulesDetailsPanel extends JPanel {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-					java.net.URI uri = new java.net.URI(docuUrlTextArea.getText());
+					java.net.URI uri = new java.net.URI(docuUrlTextArea
+							.getText());
 					desktop.browse(uri);
 				} catch (Exception e) {
 					System.err.println(e.getMessage());

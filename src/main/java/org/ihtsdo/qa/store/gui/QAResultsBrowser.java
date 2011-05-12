@@ -4,6 +4,7 @@
 
 package org.ihtsdo.qa.store.gui;
 
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -16,6 +17,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -37,6 +39,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
+import org.eclipse.jdt.core.dom.ThisExpression;
 import org.ihtsdo.qa.store.QAStoreBI;
 import org.ihtsdo.qa.store.model.Category;
 import org.ihtsdo.qa.store.model.DispositionStatus;
@@ -69,9 +72,12 @@ public class QAResultsBrowser extends JPanel {
 	private JTabbedPane parentTabbedPanel = null;
 	private List<Category> allCategories;
 	private Rule rule = null;
+	private boolean firstLoad = true;
+	private QAStorePanel qaStorePanel;
 
-	public QAResultsBrowser(QAStoreBI store, JTabbedPane parentTabbedPane) {
+	public QAResultsBrowser(QAStoreBI store, JTabbedPane parentTabbedPane, QAStorePanel qaStorePanel) {
 		this.store = store;
+		this.qaStorePanel = qaStorePanel;
 		allCategories = new ArrayList<Category>();
 		allCategories = store.getAllCategories();
 		initComponents();
@@ -112,12 +118,12 @@ public class QAResultsBrowser extends JPanel {
 		categoryCol.setPreferredWidth(70);
 		categoryCol.setMinWidth(70);
 		categoryCol.setMaxWidth(150);
-		
+
 		TableColumn severityColumn = table1.getColumnModel().getColumn(3);
 		severityColumn.setPreferredWidth(70);
 		severityColumn.setMinWidth(70);
 		severityColumn.setMaxWidth(150);
-		
+
 		TableColumn openColumn = table1.getColumnModel().getColumn(4);
 		openColumn.setPreferredWidth(50);
 		openColumn.setMinWidth(50);
@@ -142,17 +148,17 @@ public class QAResultsBrowser extends JPanel {
 		indiscutionCol.setPreferredWidth(80);
 		indiscutionCol.setMinWidth(80);
 		indiscutionCol.setMaxWidth(150);
-		
+
 		TableColumn notClear = table1.getColumnModel().getColumn(9);
 		notClear.setPreferredWidth(70);
 		notClear.setMinWidth(70);
 		notClear.setMaxWidth(150);
-		
+
 		TableColumn closedCol = table1.getColumnModel().getColumn(10);
 		closedCol.setPreferredWidth(70);
 		closedCol.setMinWidth(70);
 		closedCol.setMaxWidth(150);
-		
+
 		JTextArea ruleNameField = new JTextArea();
 		ruleNameField.setRows(2);
 
@@ -174,19 +180,20 @@ public class QAResultsBrowser extends JPanel {
 	public Rule getRule() {
 		int selectedRow = table1.getSelectedRow();
 		Object[] rowData = tableModel.getRow(selectedRow);
-		if (rule != null && rule.getRuleUuid().toString().equals(rowData[12].toString())) {
+		if (rule != null
+				&& rule.getRuleUuid().toString().equals(rowData[12].toString())) {
 			return rule;
 		}
 		rule = store.getRule(UUID.fromString(rowData[12].toString()));
 		return rule;
 	}
 
-	private void setupOrderCombo(){
+	private void setupOrderCombo() {
 		orderCombo.removeAllItems();
 		orderCombo.addItem("Ascendent");
 		orderCombo.addItem("Descendent");
 	}
-	
+
 	private void setupSortByCombo() {
 		sortByComboBox.removeAllItems();
 		sortByComboBox.addItem(RulesReportColumn.RULE_NAME);
@@ -207,11 +214,11 @@ public class QAResultsBrowser extends JPanel {
 	}
 
 	private void setupPageLinesCombo() {
-		comboBox4.removeAllItems();
-		comboBox4.addItem("25");
-		comboBox4.addItem("50");
-		comboBox4.addItem("75");
-		comboBox4.addItem("100");
+		showItemsCombo.removeAllItems();
+		showItemsCombo.addItem("25");
+		showItemsCombo.addItem("50");
+		showItemsCombo.addItem("75");
+		showItemsCombo.addItem("100");
 	}
 
 	public JTable getTable() {
@@ -265,7 +272,9 @@ public class QAResultsBrowser extends JPanel {
 	private void setupPathsCombo() {
 		comboBox2.removeAllItems();
 		if (comboBox1.getSelectedItem() != null) {
-			for (TerminologyComponent loopPath : store.getAllPathsForDatabase(((QADatabase) comboBox1.getSelectedItem()).getDatabaseUuid())) {
+			for (TerminologyComponent loopPath : store
+					.getAllPathsForDatabase(((QADatabase) comboBox1
+							.getSelectedItem()).getDatabaseUuid())) {
 				comboBox2.addItem(loopPath);
 			}
 		}
@@ -273,24 +282,37 @@ public class QAResultsBrowser extends JPanel {
 
 	private void setupTimeCombo() {
 		comboBox3.removeAllItems();
-		if (comboBox1.getSelectedItem() != null && comboBox2.getSelectedItem() != null) {
-			for (String loopDate : store.getAllTimesForPath(((QADatabase) comboBox1.getSelectedItem()).getDatabaseUuid(),
-					((TerminologyComponent) comboBox2.getSelectedItem()).getComponentUuid())) {
+		if (comboBox1.getSelectedItem() != null
+				&& comboBox2.getSelectedItem() != null) {
+			for (String loopDate : store.getAllTimesForPath(
+					((QADatabase) comboBox1.getSelectedItem())
+							.getDatabaseUuid(),
+					((TerminologyComponent) comboBox2.getSelectedItem())
+							.getComponentUuid())) {
 				comboBox3.addItem(loopDate);
 			}
 		}
 	}
 
 	private void searchActionPerformed(ActionEvent e) {
-		if (comboBox1.getSelectedItem() != null && comboBox2.getSelectedItem() != null && comboBox3.getSelectedItem() != null) {
+		search();
+	}
+
+	private void search() {
+		firstLoad = false;
+		if (comboBox1.getSelectedItem() != null
+				&& comboBox2.getSelectedItem() != null
+				&& comboBox3.getSelectedItem() != null) {
 			QADatabase database = (QADatabase) comboBox1.getSelectedItem();
-			TerminologyComponent path = (TerminologyComponent) comboBox2.getSelectedItem();
+			TerminologyComponent path = (TerminologyComponent) comboBox2
+					.getSelectedItem();
 			String time = (String) comboBox3.getSelectedItem();
-			coordinate = new QACoordinate(database.getDatabaseUuid(), path.getComponentUuid(), time);
+			coordinate = new QACoordinate(database.getDatabaseUuid(),
+					path.getComponentUuid(), time);
 			if (startLine < 1) {
 				startLine = 1;
 			}
-			if(filterChanged){
+			if (filterChanged) {
 				startLine = 1;
 				filterChanged = false;
 			}
@@ -312,8 +334,10 @@ public class QAResultsBrowser extends JPanel {
 
 			HashMap<RulesReportColumn, Object> filter = new HashMap<RulesReportColumn, Object>();
 			getFilterData(filter);
-			Integer selectedPageLengh = Integer.parseInt((String) comboBox4.getSelectedItem());
-			RulesReportPage page = store.getRulesReportLinesByPage(coordinate, sortBy, filter, startLine, selectedPageLengh);
+			Integer selectedPageLengh = Integer
+					.parseInt((String) showItemsCombo.getSelectedItem());
+			RulesReportPage page = store.getRulesReportLinesByPage(coordinate,
+					sortBy, filter, startLine, selectedPageLengh);
 			List<RulesReportLine> lines = page.getLines();
 			totalLines = page.getTotalLines();
 			startLine = page.getInitialLine();
@@ -327,7 +351,8 @@ public class QAResultsBrowser extends JPanel {
 					row.add(line.getRule());
 					Category rowCategory = new Category();
 					for (Category category : allCategories) {
-						if (category.getCategoryUuid().toString().equals(line.getRule().getCategory())) {
+						if (category.getCategoryUuid().toString()
+								.equals(line.getRule().getCategory())) {
 							rowCategory = category;
 						}
 					}
@@ -335,7 +360,8 @@ public class QAResultsBrowser extends JPanel {
 					row.add(line.getRule().getSeverity());
 					row.add(line.getStatusCount().get(true));
 					for (DispositionStatus loopStatus : dispositionStatuses) {
-						row.add(line.getDispositionStatusCount().get(loopStatus.getDispositionStatusUuid()));
+						row.add(line.getDispositionStatusCount().get(
+								loopStatus.getDispositionStatusUuid()));
 					}
 					row.add(line.getStatusCount().get(false));
 					if (line.getLastExecutionTime() != null) {
@@ -365,15 +391,17 @@ public class QAResultsBrowser extends JPanel {
 			if (ruleNameFilter != null && !ruleNameFilter.trim().equals("")) {
 				filter.put(RulesReportColumn.RULE_NAME, ruleNameFilter);
 			}
-			Object categoryFilter =  categoryComboBox.getSelectedItem();
-			if(categoryFilter != null && categoryFilter instanceof Category){
-				Category category = (Category)categoryFilter;
-				filter.put(RulesReportColumn.CATEGORY, category.getCategoryUuid());
+			Object categoryFilter = categoryComboBox.getSelectedItem();
+			if (categoryFilter != null && categoryFilter instanceof Category) {
+				Category category = (Category) categoryFilter;
+				filter.put(RulesReportColumn.CATEGORY,
+						category.getCategoryUuid());
 			}
 			Object severityObj = severityComboBox.getSelectedItem();
 			if (severityObj != null && severityObj instanceof Severity) {
 				Severity severityFilter = (Severity) severityObj;
-				filter.put(RulesReportColumn.SEVERITY, severityFilter.getSeverityUuid());
+				filter.put(RulesReportColumn.SEVERITY,
+						severityFilter.getSeverityUuid());
 			}
 			String statusFilter = (String) statusComboBox.getSelectedItem();
 			if (!statusFilter.equals("Any")) {
@@ -390,7 +418,8 @@ public class QAResultsBrowser extends JPanel {
 			Object dispoObj = dispositionComboBox.getSelectedItem();
 			if (dispoObj != null && dispoObj instanceof DispositionStatus) {
 				DispositionStatus dispStatus = (DispositionStatus) dispoObj;
-				filter.put(RulesReportColumn.DISPOSITION_STATUS_FILTER, dispStatus.getDispositionStatusUuid().toString());
+				filter.put(RulesReportColumn.DISPOSITION_STATUS_FILTER,
+						dispStatus.getDispositionStatusUuid().toString());
 			}
 
 		}
@@ -432,7 +461,8 @@ public class QAResultsBrowser extends JPanel {
 			String ruleName = rowData[1].toString();
 			boolean tabExists = false;
 			for (int i = 0; i < tabCount; i++) {
-				if (parentTabbedPanel.getTitleAt(i).equals(ruleName.substring(0, 7) + "...")) {
+				if (parentTabbedPanel.getTitleAt(i).equals(
+						ruleName.substring(0, 7) + "...")) {
 					tabExists = true;
 					parentTabbedPanel.setSelectedIndex(i);
 				}
@@ -440,22 +470,27 @@ public class QAResultsBrowser extends JPanel {
 
 			if (!tabExists) {
 				rule = getRule();
-				RulesDetailsPanel rulesDetailsPanel = new RulesDetailsPanel(store, rule, allCategories, severities);
-				parentTabbedPanel.addTab(ruleName.substring(0, 7) + "...", null, rulesDetailsPanel, ruleName);
+				RulesDetailsPanel rulesDetailsPanel = new RulesDetailsPanel(
+						store, rule, allCategories, severities, this);
+				parentTabbedPanel.addTab(ruleName.substring(0, 7) + "...",
+						null, rulesDetailsPanel, ruleName);
 				initTabComponent(parentTabbedPanel.getTabCount() - 1);
-				parentTabbedPanel.setSelectedIndex(parentTabbedPanel.getTabCount() - 1);
+				parentTabbedPanel.setSelectedIndex(parentTabbedPanel
+						.getTabCount() - 1);
 			}
 		}
 
 	}
 
 	private void initTabComponent(int i) {
-		parentTabbedPanel.setTabComponentAt(i, new ButtonTabComponent(parentTabbedPanel));
+		parentTabbedPanel.setTabComponentAt(i, new ButtonTabComponent(
+				parentTabbedPanel));
 	}
 
 	private void previousButtonActionPerformed(ActionEvent e) {
 		// previous page
-		Integer selectedPageLengh = Integer.parseInt((String) comboBox4.getSelectedItem());
+		Integer selectedPageLengh = Integer.parseInt((String) showItemsCombo
+				.getSelectedItem());
 		startLine = startLine - selectedPageLengh;
 		if (startLine < 1) {
 			startLine = 1;
@@ -465,7 +500,8 @@ public class QAResultsBrowser extends JPanel {
 
 	private void nextButtonActionPerformed(ActionEvent e) {
 		// next page
-		Integer selectedPageLengh = Integer.parseInt((String) comboBox4.getSelectedItem());
+		Integer selectedPageLengh = Integer.parseInt((String) showItemsCombo
+				.getSelectedItem());
 		startLine = startLine + selectedPageLengh;
 		updateTable1(coordinate);
 	}
@@ -476,7 +512,8 @@ public class QAResultsBrowser extends JPanel {
 			if (selectedItem instanceof RulesReportColumn) {
 				RulesReportColumn column = (RulesReportColumn) selectedItem;
 				sortBy.clear();
-				sortBy.put(column, orderCombo.getSelectedItem().toString().equals("Ascendent"));
+				sortBy.put(column, orderCombo.getSelectedItem().toString()
+						.equals("Ascendent"));
 			}
 		}
 	}
@@ -511,9 +548,40 @@ public class QAResultsBrowser extends JPanel {
 			if (selectedItem instanceof RulesReportColumn) {
 				RulesReportColumn column = (RulesReportColumn) selectedItem;
 				sortBy.clear();
-				sortBy.put(column, sortByComboBox.getSelectedItem().toString().equals("Ascendent"));
+				sortBy.put(column, sortByComboBox.getSelectedItem().toString()
+						.equals("Ascendent"));
 			}
 		}
+	}
+
+	private void showItemsComboItemStateChanged(ItemEvent e) {
+		if (!firstLoad) {
+			search();
+		}
+	}
+
+	public void updateRule(Rule rule) {
+		if (rule.getRuleUuid().toString().equals(this.rule.getRuleUuid().toString())) {
+			this.rule = rule;
+		}
+		int rowCount = table1.getRowCount();
+		for (int i = 0; i < rowCount; i++) {
+			Object[] rowData = tableModel.getRow(i);
+			if (rule.getRuleUuid().toString().equals(rowData[12].toString())) {
+				rowData[1] = rule;
+				Category selectedCategory = new Category();
+				for (Category category : allCategories) {
+					if (category.getCategoryUuid().toString().equals(rule.getCategory())) {
+						selectedCategory = category;
+					}
+				}
+				rowData[2] = selectedCategory;
+				rowData[3] = rule.getSeverity();
+			}
+		}
+		table1.revalidate();
+		table1.repaint();
+		qaStorePanel.updateCasePanel();
 	}
 
 	private void initComponents() {
@@ -550,7 +618,7 @@ public class QAResultsBrowser extends JPanel {
 		table1 = new JTable();
 		panel3 = new JPanel();
 		label6 = new JLabel();
-		comboBox4 = new JComboBox();
+		showItemsCombo = new JComboBox();
 		label7 = new JLabel();
 		hSpacer1 = new JPanel(null);
 		previousButton = new JButton();
@@ -850,9 +918,15 @@ public class QAResultsBrowser extends JPanel {
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- comboBox4 ----
-			comboBox4.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(comboBox4, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+			//---- showItemsCombo ----
+			showItemsCombo.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			showItemsCombo.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					showItemsComboItemStateChanged(e);
+				}
+			});
+			panel3.add(showItemsCombo, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
 
@@ -966,7 +1040,7 @@ public class QAResultsBrowser extends JPanel {
 	private JTable table1;
 	private JPanel panel3;
 	private JLabel label6;
-	private JComboBox comboBox4;
+	private JComboBox showItemsCombo;
 	private JLabel label7;
 	private JPanel hSpacer1;
 	private JButton previousButton;
@@ -981,8 +1055,9 @@ public class QAResultsBrowser extends JPanel {
 	class ResutlTableModel extends AbstractTableModel {
 		private static final long serialVersionUID = -2582804161676112393L;
 		public static final int ROW_DATA_SIZE = 13;
-		private Object[] columnNames = { "Rule code", "Rule name", "Category", "Severity", "Open", "Cleared", "Escalated", "Deferred", "In Discussion", "Not clear", "Closed", "Last run",
-				"Rule UUID" };
+		private Object[] columnNames = { "Rule code", "Rule name", "Category",
+				"Severity", "Open", "Cleared", "Escalated", "Deferred",
+				"In Discussion", "Not clear", "Closed", "Last run", "Rule UUID" };
 
 		public ResutlTableModel(Object[] columnNames) {
 			super();

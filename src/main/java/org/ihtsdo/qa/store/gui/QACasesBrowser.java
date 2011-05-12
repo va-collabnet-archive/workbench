@@ -10,6 +10,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -85,10 +86,13 @@ public class QACasesBrowser extends JPanel {
 	private TerminologyComponent selectedCaseComponent;
 	private Set<I_GetConceptData> users;
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
+	private boolean firstLoad = true;
 
-	public QACasesBrowser(QAStoreBI store, QAResultsBrowser resultsPanel, JTabbedPane parentTabbedPanel) {
+	public QACasesBrowser(QAStoreBI store, QAResultsBrowser resultsPanel,
+			JTabbedPane parentTabbedPanel) {
 		try {
-			th = new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), null);
+			th = new ObjectTransferHandler(Terms.get()
+					.getActiveAceFrameConfig(), null);
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -120,9 +124,12 @@ public class QACasesBrowser extends JPanel {
 		caseTable.setTransferHandler(th);
 		caseTable.setDragEnabled(true);
 
-		TableColumn conceptUuidCol = caseTable.getColumnModel().getColumn(tableModel.CONCEPT_UUID);
-		TableColumn conceptSctidCol = caseTable.getColumnModel().getColumn(tableModel.CONCEPT_SCTID);
-		TableColumn rowCheckBoxCol = caseTable.getColumnModel().getColumn(tableModel.ROW_CHECKBOX);
+		TableColumn conceptUuidCol = caseTable.getColumnModel().getColumn(
+				tableModel.CONCEPT_UUID);
+		TableColumn conceptSctidCol = caseTable.getColumnModel().getColumn(
+				tableModel.CONCEPT_SCTID);
+		TableColumn rowCheckBoxCol = caseTable.getColumnModel().getColumn(
+				tableModel.ROW_CHECKBOX);
 
 		conceptUuidCol.setPreferredWidth(0);
 		conceptUuidCol.setMinWidth(0);
@@ -149,16 +156,9 @@ public class QACasesBrowser extends JPanel {
 			}
 		});
 
-		batchDispositionStatus.addItem("");
-		for (DispositionStatus dispStatus : dispositionStatuses) {
-			batchDispositionStatus.addItem(dispStatus);
-		}
+		setupBatchDispoStatusCombo();
 
 		batchAssigneTo.addItem("");
-		// batchAssigneTo.addItem("Ale");
-		// batchAssigneTo.addItem("Alo");
-		// batchAssigneTo.addItem("Cesar");
-		// batchAssigneTo.addItem("Manu");
 		for (I_GetConceptData user : users) {
 			batchAssigneTo.addItem(user.toString());
 		}
@@ -172,6 +172,23 @@ public class QACasesBrowser extends JPanel {
 
 	}
 
+	private void setupBatchDispoStatusCombo() {
+		if (rule != null) {
+			batchDispositionStatus.removeAllItems();
+			batchDispositionStatus.addItem("");
+			for (DispositionStatus object : this.dispositionStatuses) {
+				if (rule.isWhitelistAllowed()
+						&& object.getName().equals("Cleared")) {
+					batchDispositionStatus.addItem(object);
+				} else if (!object.getName().equals("Cleared")) {
+					batchDispositionStatus.addItem(object);
+				}
+			}
+			batchDispositionStatus.revalidate();
+			batchDispositionStatus.repaint();
+		}
+	}
+
 	private void setupPageLinesCombo() {
 		comboBox6.removeAllItems();
 		comboBox6.addItem("25");
@@ -181,36 +198,45 @@ public class QACasesBrowser extends JPanel {
 	}
 
 	public void setupPanel(QAStoreBI store) {
-		this.store = store;
-		this.coordinate = resultsPanel.getQACoordinate();
-		this.rule = resultsPanel.getRule();
-
-		panel4.setVisible(false);
-
-		clearTable1();
-
-		QADatabase qaDatabase = getQaDatabase(coordinate.getDatabaseUuid());
-		label7.setText(qaDatabase.getName());
-
-		this.headerComponent = getHeaderComponent(coordinate.getPathUuid());
-		if (headerComponent != null) {
-			label8.setText(headerComponent.getComponentName());
+		if (this.rule != null) {
+			this.rule = resultsPanel.getRule();
+			setupBatchDispoStatusCombo();
 		}
-		label9.setText(coordinate.getViewPointTime());
-		label10.setText(rule.getRuleCode());
-		label13.setText(rule.getName());
+		if (rule == null
+				|| !this.rule.getRuleUuid().equals(
+						resultsPanel.getRule().getRuleUuid())) {
+			this.store = store;
+			this.coordinate = resultsPanel.getQACoordinate();
+			this.rule = resultsPanel.getRule();
+			panel4.setVisible(false);
 
-		setupStatusCombo();
-		setupDispositionCombo();
-		conceptNameTextField.setText("");
-		showFilters = false;
-		filterButton.setText("Show filters");
-		// updateTable1();
-		updatePageCounters();
+			clearTable1();
+
+			QADatabase qaDatabase = getQaDatabase(coordinate.getDatabaseUuid());
+			label7.setText(qaDatabase.getName());
+
+			this.headerComponent = getHeaderComponent(coordinate.getPathUuid());
+			if (headerComponent != null) {
+				label8.setText(headerComponent.getComponentName());
+			}
+			label9.setText(coordinate.getViewPointTime());
+			label10.setText(rule.getRuleCode());
+			label13.setText(rule.getName());
+
+			setupStatusCombo();
+			setupDispositionCombo();
+			setupBatchDispoStatusCombo();
+			conceptNameTextField.setText("");
+			showFilters = false;
+			filterButton.setText("Show filters");
+			// updateTable1();
+			updatePageCounters();
+		}
 	}
 
 	private QADatabase getQaDatabase(UUID databaseUuid) {
-		if (qaDatabase != null && qaDatabase.getDatabaseUuid().equals(databaseUuid)) {
+		if (qaDatabase != null
+				&& qaDatabase.getDatabaseUuid().equals(databaseUuid)) {
 			return qaDatabase;
 		}
 		qaDatabase = store.getQADatabase(databaseUuid);
@@ -218,7 +244,8 @@ public class QACasesBrowser extends JPanel {
 	}
 
 	private TerminologyComponent getHeaderComponent(UUID pathUuid) {
-		if (headerComponent != null && headerComponent.getComponentUuid().equals(pathUuid)) {
+		if (headerComponent != null
+				&& headerComponent.getComponentUuid().equals(pathUuid)) {
 			return headerComponent;
 		}
 		headerComponent = store.getComponent(pathUuid);
@@ -227,7 +254,9 @@ public class QACasesBrowser extends JPanel {
 	}
 
 	public TerminologyComponent getSelectedCaseComponent(UUID componentUuid) {
-		if (selectedCaseComponent != null && selectedCaseComponent.getComponentUuid().equals(componentUuid)) {
+		if (selectedCaseComponent != null
+				&& selectedCaseComponent.getComponentUuid().equals(
+						componentUuid)) {
 			return selectedCaseComponent;
 		}
 		selectedCaseComponent = store.getComponent(componentUuid);
@@ -243,8 +272,11 @@ public class QACasesBrowser extends JPanel {
 
 		updateFilters(filter);
 
-		Integer selectedPageLengh = Integer.parseInt((String) comboBox6.getSelectedItem());
-		QACasesReportPage page = store.getQACasesReportLinesByPage(coordinate, rule.getRuleUuid(), sortBy, filter, startLine, selectedPageLengh);
+		Integer selectedPageLengh = Integer.parseInt((String) comboBox6
+				.getSelectedItem());
+		QACasesReportPage page = store.getQACasesReportLinesByPage(coordinate,
+				rule.getRuleUuid(), sortBy, filter, startLine,
+				selectedPageLengh);
 		List<QACasesReportLine> lines = page.getLines();
 		totalLines = page.getTotalLines();
 		startLine = page.getInitialLine();
@@ -265,7 +297,8 @@ public class QACasesBrowser extends JPanel {
 				}
 				row.add(line.getDisposition().getName());
 				row.add(line.getQaCase().getAssignedTo());
-				row.add(sdf.format(line.getQaCase().getEffectiveTime().getTime()));
+				row.add(sdf.format(line.getQaCase().getEffectiveTime()
+						.getTime()));
 				row.add(line.getQaCase());
 				tableModel.addData(row);
 			}
@@ -278,7 +311,8 @@ public class QACasesBrowser extends JPanel {
 		filter.clear();
 		if (showFilters) {
 			String conceptNameFilter = conceptNameTextField.getText();
-			if (conceptNameFilter != null && !conceptNameFilter.trim().equals("")) {
+			if (conceptNameFilter != null
+					&& !conceptNameFilter.trim().equals("")) {
 				filter.put(QACasesReportColumn.CONCEPT_NAME, conceptNameFilter);
 			}
 			String statusFilter = (String) statusComboBox.getSelectedItem();
@@ -292,7 +326,8 @@ public class QACasesBrowser extends JPanel {
 			Object dispoObj = dispoStatusComboBox.getSelectedItem();
 			if (dispoObj != null && dispoObj instanceof DispositionStatus) {
 				DispositionStatus dispStatus = (DispositionStatus) dispoObj;
-				filter.put(QACasesReportColumn.DISPOSITION, dispStatus.getDispositionStatusUuid().toString());
+				filter.put(QACasesReportColumn.DISPOSITION, dispStatus
+						.getDispositionStatusUuid().toString());
 			}
 
 		} else {
@@ -308,9 +343,9 @@ public class QACasesBrowser extends JPanel {
 
 	private void setupDispositionCombo() {
 		dispoStatusComboBox.removeAllItems();
-		dispoStatusComboBox.addItem("Any");
-		for (DispositionStatus loopStatus : dispositionStatuses) {
-			dispoStatusComboBox.addItem(loopStatus);
+		dispoStatusComboBox.addItem("");
+		for (DispositionStatus object : this.dispositionStatuses) {
+			dispoStatusComboBox.addItem(object);
 		}
 	}
 
@@ -350,17 +385,12 @@ public class QACasesBrowser extends JPanel {
 	}
 
 	private void button3ActionPerformed(ActionEvent e) {
-		// previous page
-		Integer selectedPageLengh = Integer.parseInt((String) comboBox6.getSelectedItem());
-		startLine = startLine - selectedPageLengh;
-		if (startLine < 1) {
-			startLine = 1;
-		}
-		updateTable1();
+		doSearch();
 	}
 
 	private void button4ActionPerformed(ActionEvent e) {
-		Integer selectedPageLengh = Integer.parseInt((String) comboBox6.getSelectedItem());
+		Integer selectedPageLengh = Integer.parseInt((String) comboBox6
+				.getSelectedItem());
 		startLine = startLine + selectedPageLengh;
 		updateTable1();
 	}
@@ -374,7 +404,8 @@ public class QACasesBrowser extends JPanel {
 			boolean tabExists = false;
 			for (int i = 0; i < tabCount; i++) {
 				if (conceptName.length() > 7) {
-					if (parentTabbedPanel.getTitleAt(i).equals(conceptName.substring(0, 7) + "...")) {
+					if (parentTabbedPanel.getTitleAt(i).equals(
+							conceptName.substring(0, 7) + "...")) {
 						tabExists = true;
 						parentTabbedPanel.setSelectedIndex(i);
 					}
@@ -388,24 +419,31 @@ public class QACasesBrowser extends JPanel {
 
 			if (!tabExists) {
 				Rule rule = resultsPanel.getRule();
-				TerminologyComponent component = getSelectedCaseComponent(UUID.fromString(rowData[0].toString()));
+				TerminologyComponent component = getSelectedCaseComponent(UUID
+						.fromString(rowData[0].toString()));
 
 				selectedCase = (QACase) rowData[tableModel.CASE];
 
-				QACaseDetailsPanel rulesDetailsPanel = new QACaseDetailsPanel(rule, component, selectedCase, dispositionStatuses, headerComponent, qaDatabase, store);
+				QACaseDetailsPanel rulesDetailsPanel = new QACaseDetailsPanel(
+						rule, component, selectedCase, dispositionStatuses,
+						headerComponent, qaDatabase, store);
 				if (conceptName.length() > 7) {
-					parentTabbedPanel.addTab(conceptName.substring(0, 7) + "...", null, rulesDetailsPanel, conceptName);
+					parentTabbedPanel.addTab(conceptName.substring(0, 7)
+							+ "...", null, rulesDetailsPanel, conceptName);
 				} else {
-					parentTabbedPanel.addTab(conceptName, null, rulesDetailsPanel, conceptName);
+					parentTabbedPanel.addTab(conceptName, null,
+							rulesDetailsPanel, conceptName);
 				}
 				initTabComponent(parentTabbedPanel.getTabCount() - 1);
-				parentTabbedPanel.setSelectedIndex(parentTabbedPanel.getTabCount() - 1);
+				parentTabbedPanel.setSelectedIndex(parentTabbedPanel
+						.getTabCount() - 1);
 			}
 		}
 	}
 
 	private void initTabComponent(int i) {
-		parentTabbedPanel.setTabComponentAt(i, new ButtonTabComponent(parentTabbedPanel));
+		parentTabbedPanel.setTabComponentAt(i, new ButtonTabComponent(
+				parentTabbedPanel));
 	}
 
 	private void bathcSaveButtonActionPerformed(ActionEvent e) {
@@ -418,21 +456,31 @@ public class QACasesBrowser extends JPanel {
 					Object qaCaseObject = row[tableModel.CASE];
 					if (qaCaseObject != null && qaCaseObject instanceof QACase) {
 						QACase qaCase = (QACase) qaCaseObject;
-						Object selectedBatchDispoStatusObject = batchDispositionStatus.getSelectedItem();
+						Object selectedBatchDispoStatusObject = batchDispositionStatus
+								.getSelectedItem();
 						DispositionStatus selectedDispoStatus = null;
 						if (selectedBatchDispoStatusObject instanceof DispositionStatus) {
 							selectedDispoStatus = (DispositionStatus) selectedBatchDispoStatusObject;
 						}
-						String caseAssignedTo = qaCase.getAssignedTo() == null ? "" : qaCase.getAssignedTo();
-						if ((!caseAssignedTo.equals(batchAssigneTo.getSelectedItem()) && !batchAssigneTo.getSelectedItem().toString().equals(""))
-								|| (selectedDispoStatus != null && !selectedDispoStatus.getDispositionStatusUuid().equals(qaCase.getDispositionStatusUuid()))) {
+						String caseAssignedTo = qaCase.getAssignedTo() == null ? ""
+								: qaCase.getAssignedTo();
+						if ((!caseAssignedTo.equals(batchAssigneTo
+								.getSelectedItem()) && !batchAssigneTo
+								.getSelectedItem().toString().equals(""))
+								|| (selectedDispoStatus != null && !selectedDispoStatus
+										.getDispositionStatusUuid()
+										.equals(qaCase
+												.getDispositionStatusUuid()))) {
 							boolean caseChanged = false;
-							if (!batchAssigneTo.getSelectedItem().toString().equals("")) {
-								qaCase.setAssignedTo(batchAssigneTo.getSelectedItem().toString());
+							if (!batchAssigneTo.getSelectedItem().toString()
+									.equals("")) {
+								qaCase.setAssignedTo(batchAssigneTo
+										.getSelectedItem().toString());
 								caseChanged = true;
 							}
 							if (selectedDispoStatus != null) {
-								qaCase.setDispositionStatusUuid(selectedDispoStatus.getDispositionStatusUuid());
+								qaCase.setDispositionStatusUuid(selectedDispoStatus
+										.getDispositionStatusUuid());
 								caseChanged = true;
 							}
 							if (caseChanged) {
@@ -452,12 +500,16 @@ public class QACasesBrowser extends JPanel {
 				messageLabel.setText("Rows Updated succesfully");
 				for (int i = startLine - 1; i < finalLine; i++) {
 					tableModel.setValueAt(false, i, tableModel.ROW_CHECKBOX);
-					QACase qaCase = (QACase) tableModel.getValueAt(i, tableModel.CASE);
-					tableModel.setValueAt(qaCase.getAssignedTo(), i, tableModel.ASSIGNED_TO);
+					QACase qaCase = (QACase) tableModel.getValueAt(i,
+							tableModel.CASE);
+					tableModel.setValueAt(qaCase.getAssignedTo(), i,
+							tableModel.ASSIGNED_TO);
 
 					for (DispositionStatus currentDisop : dispositionStatuses) {
-						if (qaCase.getDispositionStatusUuid().equals(currentDisop.getDispositionStatusUuid())) {
-							tableModel.setValueAt(currentDisop, i, tableModel.DISPOSITION_STATUS);
+						if (qaCase.getDispositionStatusUuid().equals(
+								currentDisop.getDispositionStatusUuid())) {
+							tableModel.setValueAt(currentDisop, i,
+									tableModel.DISPOSITION_STATUS);
 						}
 					}
 				}
@@ -467,8 +519,28 @@ public class QACasesBrowser extends JPanel {
 					tableModel.setValueAt(false, i, tableModel.ROW_CHECKBOX);
 				}
 				messageLabel.setForeground(Color.RED);
-				messageLabel.setText("Problems updating cases, please try again later.");
+				messageLabel
+						.setText("Problems updating cases, please try again later.");
 			}
+		}
+	}
+
+	private void doSearch() {
+		firstLoad = false;
+		// previous page
+		Integer selectedPageLengh = Integer.parseInt((String) comboBox6
+				.getSelectedItem());
+		startLine = startLine - selectedPageLengh;
+		if (startLine < 1) {
+			startLine = 1;
+		}
+		updateTable1();
+
+	}
+
+	private void comboBox6ItemStateChanged(ItemEvent e) {
+		if (!firstLoad) {
+			doSearch();
 		}
 	}
 
@@ -526,62 +598,93 @@ public class QACasesBrowser extends JPanel {
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new GridBagLayout());
 		((GridBagLayout) getLayout()).columnWidths = new int[] { 0, 0 };
-		((GridBagLayout) getLayout()).rowHeights = new int[] { 0, 12, 0, 0, 0, 9, 22, 0 };
-		((GridBagLayout) getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-		((GridBagLayout) getLayout()).rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0E-4 };
+		((GridBagLayout) getLayout()).rowHeights = new int[] { 0, 12, 0, 0, 0,
+				9, 22, 0 };
+		((GridBagLayout) getLayout()).columnWeights = new double[] { 1.0,
+				1.0E-4 };
+		((GridBagLayout) getLayout()).rowWeights = new double[] { 0.0, 0.0,
+				0.0, 1.0, 0.0, 0.0, 0.0, 1.0E-4 };
 
 		// ======== panel1 ========
 		{
 			panel1.setLayout(new GridBagLayout());
-			((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 99, 52, 88, 0, 96, 0, 0, 0 };
-			((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 0, 0, 0, 0 };
-			((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0E-4 };
-			((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0E-4 };
+			((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 99,
+					52, 88, 0, 96, 0, 0, 0 };
+			((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 0, 0,
+					0, 0 };
+			((GridBagLayout) panel1.getLayout()).columnWeights = new double[] {
+					1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0E-4 };
+			((GridBagLayout) panel1.getLayout()).rowWeights = new double[] {
+					0.0, 0.0, 0.0, 1.0E-4 };
 
 			// ---- label1 ----
 			label1.setText("Database");
-			panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
 			// ---- label2 ----
 			label2.setText("Path");
-			panel1.add(label2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
 			// ---- label3 ----
 			label3.setText("Time");
-			panel1.add(label3, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label3, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
 			// ---- label6 ----
 			label6.setText("Rule code");
-			panel1.add(label6, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label6, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
 			// ---- label12 ----
 			label12.setText("Rule name");
-			panel1.add(label12, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label12, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
 			// ---- label7 ----
 			label7.setText("text");
-			panel1.add(label7, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label7, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
 			// ---- label8 ----
 			label8.setText("text");
-			panel1.add(label8, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label8, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
 			// ---- label9 ----
 			label9.setText("text");
-			panel1.add(label9, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label9, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
 			// ---- label10 ----
 			label10.setText("text");
-			panel1.add(label10, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label10, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
 			// ---- label13 ----
 			label13.setText("text");
-			panel1.add(label13, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label13, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
 			// ---- label14 ----
 			label14.setText("Sort by");
-			panel1.add(label14, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
-			panel1.add(comboBox1, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(label14, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(comboBox1, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			// ---- searchButton ----
 			searchButton.setText("Search");
@@ -592,7 +695,9 @@ public class QACasesBrowser extends JPanel {
 					button3ActionPerformed(e);
 				}
 			});
-			panel1.add(searchButton, new GridBagConstraints(5, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(searchButton, new GridBagConstraints(5, 2, 1, 1, 0.0,
+					0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			// ---- filterButton ----
 			filterButton.setText("Show filters");
@@ -603,43 +708,70 @@ public class QACasesBrowser extends JPanel {
 					button2ActionPerformed(e);
 				}
 			});
-			panel1.add(filterButton, new GridBagConstraints(6, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
+			panel1.add(filterButton, new GridBagConstraints(6, 2, 1, 1, 0.0,
+					0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+					new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 2, 0), 0, 0));
-		add(separator1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 2, 0), 0, 0));
+		add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						0, 0, 2, 0), 0, 0));
+		add(separator1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						0, 0, 2, 0), 0, 0));
 
 		// ======== panel4 ========
 		{
 			panel4.setLayout(new GridBagLayout());
-			((GridBagLayout) panel4.getLayout()).columnWidths = new int[] { 395, 0, 0, 0 };
-			((GridBagLayout) panel4.getLayout()).rowHeights = new int[] { 0, 0, 0 };
-			((GridBagLayout) panel4.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 1.0E-4 };
-			((GridBagLayout) panel4.getLayout()).rowWeights = new double[] { 0.0, 0.0, 1.0E-4 };
+			((GridBagLayout) panel4.getLayout()).columnWidths = new int[] {
+					395, 0, 0, 0 };
+			((GridBagLayout) panel4.getLayout()).rowHeights = new int[] { 0, 0,
+					0 };
+			((GridBagLayout) panel4.getLayout()).columnWeights = new double[] {
+					0.0, 0.0, 0.0, 1.0E-4 };
+			((GridBagLayout) panel4.getLayout()).rowWeights = new double[] {
+					0.0, 0.0, 1.0E-4 };
 
 			// ---- label11 ----
 			label11.setText("Concept name");
-			panel4.add(label11, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 15), 0, 0));
+			panel4.add(label11, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 15), 0, 0));
 
 			// ---- label4 ----
 			label4.setText("Status");
-			panel4.add(label4, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 15), 0, 0));
+			panel4.add(label4, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 15), 0, 0));
 
 			// ---- label5 ----
 			label5.setText("Disposition");
-			panel4.add(label5, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
-			panel4.add(conceptNameTextField, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 15), 0, 0));
-			panel4.add(statusComboBox, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 15), 0, 0));
-			panel4.add(dispoStatusComboBox, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+			panel4.add(label5, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 0), 0, 0));
+			panel4.add(conceptNameTextField, new GridBagConstraints(0, 1, 1, 1,
+					0.0, 0.0, GridBagConstraints.CENTER,
+					GridBagConstraints.BOTH, new Insets(0, 0, 0, 15), 0, 0));
+			panel4.add(statusComboBox, new GridBagConstraints(1, 1, 1, 1, 0.0,
+					0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 15), 0, 0));
+			panel4.add(dispoStatusComboBox, new GridBagConstraints(2, 1, 1, 1,
+					0.0, 0.0, GridBagConstraints.CENTER,
+					GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel4, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 2, 0), 0, 0));
+		add(panel4, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						0, 0, 2, 0), 0, 0));
 
 		// ======== panel2 ========
 		{
 			panel2.setLayout(new GridBagLayout());
-			((GridBagLayout) panel2.getLayout()).columnWidths = new int[] { 0, 0 };
+			((GridBagLayout) panel2.getLayout()).columnWidths = new int[] { 0,
+					0 };
 			((GridBagLayout) panel2.getLayout()).rowHeights = new int[] { 0, 0 };
-			((GridBagLayout) panel2.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-			((GridBagLayout) panel2.getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
+			((GridBagLayout) panel2.getLayout()).columnWeights = new double[] {
+					1.0, 1.0E-4 };
+			((GridBagLayout) panel2.getLayout()).rowWeights = new double[] {
+					1.0, 1.0E-4 };
 
 			// ======== scrollPane1 ========
 			{
@@ -653,32 +785,54 @@ public class QACasesBrowser extends JPanel {
 				});
 				scrollPane1.setViewportView(caseTable);
 			}
-			panel2.add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+			panel2.add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0,
+					0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel2, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 2, 0), 0, 0));
+		add(panel2, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						0, 0, 2, 0), 0, 0));
 
 		// ======== panel3 ========
 		{
 			panel3.setLayout(new GridBagLayout());
-			((GridBagLayout) panel3.getLayout()).columnWidths = new int[] { 0, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 58, 0, 0, 0, 0, 0, 0, 0 };
+			((GridBagLayout) panel3.getLayout()).columnWidths = new int[] { 0,
+					63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 58, 0, 0, 0, 0, 0, 0, 0 };
 			((GridBagLayout) panel3.getLayout()).rowHeights = new int[] { 0, 0 };
-			((GridBagLayout) panel3.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
-			((GridBagLayout) panel3.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+			((GridBagLayout) panel3.getLayout()).columnWeights = new double[] {
+					0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+					0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
+			((GridBagLayout) panel3.getLayout()).rowWeights = new double[] {
+					0.0, 1.0E-4 };
 
 			// ---- label15 ----
 			label15.setText("Show ");
 			label15.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(label15, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(label15, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			// ---- comboBox6 ----
 			comboBox6.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(comboBox6, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			comboBox6.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					comboBox6ItemStateChanged(e);
+				}
+			});
+			panel3.add(comboBox6, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			// ---- label16 ----
 			label16.setText("rows per page");
 			label16.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(label16, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
-			panel3.add(hSpacer1, new GridBagConstraints(3, 0, 9, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(label16, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(hSpacer1, new GridBagConstraints(3, 0, 9, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			// ---- previousButton ----
 			previousButton.setText("<");
@@ -689,32 +843,44 @@ public class QACasesBrowser extends JPanel {
 					button3ActionPerformed(e);
 				}
 			});
-			panel3.add(previousButton, new GridBagConstraints(12, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(previousButton, new GridBagConstraints(12, 0, 1, 1, 0.0,
+					0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			// ---- startLineLabel ----
 			startLineLabel.setText("0");
 			startLineLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(startLineLabel, new GridBagConstraints(13, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(startLineLabel, new GridBagConstraints(13, 0, 1, 1, 0.0,
+					0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			// ---- label18 ----
 			label18.setText("to");
 			label18.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(label18, new GridBagConstraints(14, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(label18, new GridBagConstraints(14, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			// ---- endLineLabel ----
 			endLineLabel.setText("0");
 			endLineLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(endLineLabel, new GridBagConstraints(15, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(endLineLabel, new GridBagConstraints(15, 0, 1, 1, 0.0,
+					0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			// ---- label20 ----
 			label20.setText("of");
 			label20.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(label20, new GridBagConstraints(16, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(label20, new GridBagConstraints(16, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			// ---- totalLinesLabel ----
 			totalLinesLabel.setText("0");
 			totalLinesLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(totalLinesLabel, new GridBagConstraints(17, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(totalLinesLabel, new GridBagConstraints(17, 0, 1, 1,
+					0.0, 0.0, GridBagConstraints.CENTER,
+					GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
 			// ---- nextButton ----
 			nextButton.setText(">");
@@ -725,37 +891,58 @@ public class QACasesBrowser extends JPanel {
 					button4ActionPerformed(e);
 				}
 			});
-			panel3.add(nextButton, new GridBagConstraints(18, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+			panel3.add(nextButton, new GridBagConstraints(18, 0, 1, 1, 0.0,
+					0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel3, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 2, 0), 0, 0));
-		add(separator2, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 2, 0), 0, 0));
+		add(panel3, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						0, 0, 2, 0), 0, 0));
+		add(separator2, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						0, 0, 2, 0), 0, 0));
 
 		// ======== panel5 ========
 		{
 			panel5.setLayout(new GridBagLayout());
-			((GridBagLayout) panel5.getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+			((GridBagLayout) panel5.getLayout()).columnWidths = new int[] { 0,
+					0, 0, 0, 0, 0, 0, 0, 0 };
 			((GridBagLayout) panel5.getLayout()).rowHeights = new int[] { 0, 0 };
-			((GridBagLayout) panel5.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4 };
-			((GridBagLayout) panel5.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+			((GridBagLayout) panel5.getLayout()).columnWeights = new double[] {
+					0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4 };
+			((GridBagLayout) panel5.getLayout()).rowWeights = new double[] {
+					0.0, 1.0E-4 };
 
 			// ---- label17 ----
 			label17.setText("Assign to");
-			panel5.add(label17, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel5.add(label17, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			// ---- batchAssigneTo ----
-			batchAssigneTo.setToolTipText("Select cases from the above table to make multiple assignment");
+			batchAssigneTo
+					.setToolTipText("Select cases from the above table to make multiple assignment");
 			batchAssigneTo.setEnabled(false);
-			panel5.add(batchAssigneTo, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel5.add(batchAssigneTo, new GridBagConstraints(1, 0, 1, 1, 0.0,
+					0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			// ---- label19 ----
 			label19.setText("Disposition status");
-			panel5.add(label19, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel5.add(label19, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			// ---- batchDispositionStatus ----
-			batchDispositionStatus.setToolTipText("Select cases from the above table to change disposition statuces");
+			batchDispositionStatus
+					.setToolTipText("Select cases from the above table to change disposition statuces");
 			batchDispositionStatus.setEnabled(false);
-			panel5.add(batchDispositionStatus, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
-			panel5.add(messageLabel, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel5.add(batchDispositionStatus, new GridBagConstraints(5, 0, 1,
+					1, 0.0, 0.0, GridBagConstraints.CENTER,
+					GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel5.add(messageLabel, new GridBagConstraints(6, 0, 1, 1, 0.0,
+					0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
 			// ---- bathcSaveButton ----
 			bathcSaveButton.setText("Save");
@@ -766,9 +953,13 @@ public class QACasesBrowser extends JPanel {
 					bathcSaveButtonActionPerformed(e);
 				}
 			});
-			panel5.add(bathcSaveButton, new GridBagConstraints(7, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
+			panel5.add(bathcSaveButton, new GridBagConstraints(7, 0, 1, 1, 0.0,
+					0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+					new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel5, new GridBagConstraints(0, 6, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+		add(panel5, new GridBagConstraints(0, 6, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						0, 0, 0, 0), 0, 0));
 		// //GEN-END:initComponents
 	}
 
@@ -836,7 +1027,9 @@ public class QACasesBrowser extends JPanel {
 		public final Integer TIME = 7;
 		public final Integer CASE = 8;
 
-		private String[] columnNames = { "Concept UUID", " ", "Concept Sctid", "Concept Name", "Status", "Disposition", "Assigned to", "Time", "Case" };
+		private String[] columnNames = { "Concept UUID", " ", "Concept Sctid",
+				"Concept Name", "Status", "Disposition", "Assigned to", "Time",
+				"Case" };
 
 		private List<Object[]> dataList = new ArrayList<Object[]>();
 		private Object[][] data = new Object[0][8];
