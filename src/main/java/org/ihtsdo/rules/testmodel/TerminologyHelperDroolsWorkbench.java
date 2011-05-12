@@ -151,6 +151,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 						DescriptionVersionBI description = (DescriptionVersionBI) 
 						Ts.get().getComponentVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), dnid);
+						//System.out.println("Evaluating match: " + description.getText());
 						
 						if (description != null && description.getText().trim().equals(originalDescText.trim())) { 
 
