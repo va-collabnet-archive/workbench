@@ -2281,7 +2281,7 @@ public class TerminologyProjectDAO {
 	}
 
 	public static WorkList createNewNacWorkList(String name, BusinessProcess bp, 
-			I_TerminologyProject project, I_ConfigAceFrame config) throws TerminologyException, IOException {
+			I_TerminologyProject project, I_ConfigAceFrame config) throws Exception {
 		WorkList newNacWorkList = null;
 		WorkSet nacWorkSet = getNonAssignedChangesWorkSet(project, config);
 
@@ -2332,8 +2332,9 @@ public class TerminologyProjectDAO {
 	 * @param config the config
 	 * 
 	 * @return the work list
+	 * @throws Exception 
 	 */
-	public static WorkList createNewWorkList(WorkList workListWithMetadata, I_ConfigAceFrame config) {
+	public static WorkList createNewWorkList(WorkList workListWithMetadata, I_ConfigAceFrame config) throws Exception {
 		I_TermFactory termFactory = Terms.get();
 		WorkList workList = null;
 		I_GetConceptData newConcept = null;
@@ -2343,119 +2344,111 @@ public class TerminologyProjectDAO {
 
 		String worklistName = workListWithMetadata.getName() + " (worklist)";
 
-		try {
-			if(isConceptDuplicate(worklistName)){
-				JOptionPane.showMessageDialog(new JDialog(), "Duplicated worklist name", "Warning", JOptionPane.WARNING_MESSAGE);
-				throw new Exception("Worklist with the same name allready exists.");
-			}
-			I_GetConceptData workListsRoot = termFactory.getConcept(
-					ArchitectonicAuxiliary.Concept.WORKLISTS_ROOT.getUids());
-
-			I_GetConceptData workListRefset = termFactory.getConcept(
-					ArchitectonicAuxiliary.Concept.WORKLISTS_EXTENSION_REFSET.getUids());
-
-			I_GetConceptData includesFromAttribute = termFactory.getConcept(
-					ArchitectonicAuxiliary.Concept.INCLUDES_FROM_ATTRIBUTE.getUids());
-
-			I_GetConceptData commentsRelConcept = termFactory.getConcept(RefsetAuxiliary.Concept.COMMENTS_REL.getUids());
-			I_GetConceptData promotionRelConcept = termFactory.getConcept(RefsetAuxiliary.Concept.PROMOTION_REL.getUids());
-			I_GetConceptData purposeRelConcept = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
-			I_GetConceptData typeRelConcept = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_TYPE_REL.getUids());
-			I_GetConceptData defining = termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
-			I_GetConceptData refinability = termFactory.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
-			I_GetConceptData current = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-
-
-			I_GetConceptData partition = termFactory.getConcept(workListWithMetadata.getPartitionUUID());
-
-			newConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
-
-			termFactory.newDescription(UUID.randomUUID(), newConcept, "en", worklistName,
-					termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid()),
-					config);
-
-			termFactory.newDescription(UUID.randomUUID(), newConcept, "en", worklistName,
-					termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()),
-					config);
-
-			termFactory.newRelationship(UUID.randomUUID(), newConcept, 
-					termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), 
-					workListsRoot, 
-					termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), 
-					termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
-					termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 
-					0, config);
-
-			termFactory.newRelationship(UUID.randomUUID(), newConcept, 
-					includesFromAttribute, 
-					partition, 
-					termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), 
-					termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
-					termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 
-					0, config);
-
-			I_GetConceptData newCommentsConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
-			termFactory.newDescription(UUID.randomUUID(), newCommentsConcept, "en",
-					name + " - comments refset", termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), config);
-			termFactory.newDescription(UUID.randomUUID(), newCommentsConcept, "en",
-					name + " - comments refset", termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), config);
-			termFactory.newRelationship(UUID.randomUUID(), newCommentsConcept, termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), workListsRoot, defining, refinability, 
-					current, 0, config);
-			termFactory.newRelationship(UUID.randomUUID(), newConcept, commentsRelConcept, newCommentsConcept, defining, refinability, 
-					current, 0, config);
-
-			I_GetConceptData newPromotionConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
-			termFactory.newDescription(UUID.randomUUID(), newPromotionConcept, "en",
-					name + " - promotion refset", termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), config);
-			termFactory.newDescription(UUID.randomUUID(), newPromotionConcept, "en",
-					name + " - promotion refset", termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), config);
-			termFactory.newRelationship(UUID.randomUUID(), newPromotionConcept, termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), workListsRoot, defining, refinability, 
-					current, 0, config);
-			termFactory.newRelationship(UUID.randomUUID(), newConcept, promotionRelConcept, newPromotionConcept, defining, refinability, 
-					current, 0, config);
-
-			workList = new WorkList(workListWithMetadata.getName(), newConcept.getConceptNid(), newConcept.getUids(),
-					workListWithMetadata.getPartitionUUID(), 
-					workListWithMetadata.getDestination(), workListWithMetadata.getBusinessProcess());
-
-			String metadata = serialize(workList);
-
-			termFactory.addUncommittedNoChecks(newConcept);
-			termFactory.addUncommittedNoChecks(newCommentsConcept);
-			termFactory.addUncommittedNoChecks(newPromotionConcept);
-			termFactory.commit();
-			//			promote(newConcept, config);
-			//			promote(newCommentsConcept, config);
-			//			promote(newPromotionConcept, config);
-			//			termFactory.addUncommittedNoChecks(newConcept);
-			//			termFactory.addUncommittedNoChecks(newCommentsConcept);
-			//			termFactory.addUncommittedNoChecks(newPromotionConcept);
-			//			termFactory.commit();
-
-			termFactory.getRefsetHelper(config).newRefsetExtension(workListRefset.getConceptNid(), 
-					newConcept.getConceptNid(), EConcept.REFSET_TYPES.STR, 
-					new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, metadata), config);
-
-			for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(workListRefset.getConceptNid())) {
-				if (extension.getComponentNid() == newConcept.getConceptNid() &&
-						extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
-					termFactory.addUncommittedNoChecks(workListRefset);
-					termFactory.addUncommittedNoChecks(extension);
-					termFactory.commit();
-					//					promote(extension, config);
-					//					termFactory.addUncommittedNoChecks(workListRefset);
-					//					termFactory.addUncommittedNoChecks(extension);
-					//					termFactory.commit();
-				}
-			}
-
-		} catch (TerminologyException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
+		if(isConceptDuplicate(worklistName)){
+			JOptionPane.showMessageDialog(new JDialog(), "Duplicated worklist name", "Warning", JOptionPane.WARNING_MESSAGE);
+			throw new Exception("Worklist with the same name allready exists.");
 		}
+		I_GetConceptData workListsRoot = termFactory.getConcept(
+				ArchitectonicAuxiliary.Concept.WORKLISTS_ROOT.getUids());
+
+		I_GetConceptData workListRefset = termFactory.getConcept(
+				ArchitectonicAuxiliary.Concept.WORKLISTS_EXTENSION_REFSET.getUids());
+
+		I_GetConceptData includesFromAttribute = termFactory.getConcept(
+				ArchitectonicAuxiliary.Concept.INCLUDES_FROM_ATTRIBUTE.getUids());
+
+		I_GetConceptData commentsRelConcept = termFactory.getConcept(RefsetAuxiliary.Concept.COMMENTS_REL.getUids());
+		I_GetConceptData promotionRelConcept = termFactory.getConcept(RefsetAuxiliary.Concept.PROMOTION_REL.getUids());
+		I_GetConceptData purposeRelConcept = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
+		I_GetConceptData typeRelConcept = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_TYPE_REL.getUids());
+		I_GetConceptData defining = termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
+		I_GetConceptData refinability = termFactory.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
+		I_GetConceptData current = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+
+
+		I_GetConceptData partition = termFactory.getConcept(workListWithMetadata.getPartitionUUID());
+
+		newConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
+
+		termFactory.newDescription(UUID.randomUUID(), newConcept, "en", worklistName,
+				termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid()),
+				config);
+
+		termFactory.newDescription(UUID.randomUUID(), newConcept, "en", worklistName,
+				termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()),
+				config);
+
+		termFactory.newRelationship(UUID.randomUUID(), newConcept, 
+				termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), 
+				workListsRoot, 
+				termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), 
+				termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+				termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 
+				0, config);
+
+		termFactory.newRelationship(UUID.randomUUID(), newConcept, 
+				includesFromAttribute, 
+				partition, 
+				termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), 
+				termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+				termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 
+				0, config);
+
+		I_GetConceptData newCommentsConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
+		termFactory.newDescription(UUID.randomUUID(), newCommentsConcept, "en",
+				name + " - comments refset", termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), config);
+		termFactory.newDescription(UUID.randomUUID(), newCommentsConcept, "en",
+				name + " - comments refset", termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), config);
+		termFactory.newRelationship(UUID.randomUUID(), newCommentsConcept, termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), workListsRoot, defining, refinability, 
+				current, 0, config);
+		termFactory.newRelationship(UUID.randomUUID(), newConcept, commentsRelConcept, newCommentsConcept, defining, refinability, 
+				current, 0, config);
+
+		I_GetConceptData newPromotionConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
+		termFactory.newDescription(UUID.randomUUID(), newPromotionConcept, "en",
+				name + " - promotion refset", termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), config);
+		termFactory.newDescription(UUID.randomUUID(), newPromotionConcept, "en",
+				name + " - promotion refset", termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), config);
+		termFactory.newRelationship(UUID.randomUUID(), newPromotionConcept, termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), workListsRoot, defining, refinability, 
+				current, 0, config);
+		termFactory.newRelationship(UUID.randomUUID(), newConcept, promotionRelConcept, newPromotionConcept, defining, refinability, 
+				current, 0, config);
+
+		workList = new WorkList(workListWithMetadata.getName(), newConcept.getConceptNid(), newConcept.getUids(),
+				workListWithMetadata.getPartitionUUID(), 
+				workListWithMetadata.getDestination(), workListWithMetadata.getBusinessProcess());
+
+		String metadata = serialize(workList);
+
+		termFactory.addUncommittedNoChecks(newConcept);
+		termFactory.addUncommittedNoChecks(newCommentsConcept);
+		termFactory.addUncommittedNoChecks(newPromotionConcept);
+		termFactory.commit();
+		//			promote(newConcept, config);
+		//			promote(newCommentsConcept, config);
+		//			promote(newPromotionConcept, config);
+		//			termFactory.addUncommittedNoChecks(newConcept);
+		//			termFactory.addUncommittedNoChecks(newCommentsConcept);
+		//			termFactory.addUncommittedNoChecks(newPromotionConcept);
+		//			termFactory.commit();
+
+		termFactory.getRefsetHelper(config).newRefsetExtension(workListRefset.getConceptNid(), 
+				newConcept.getConceptNid(), EConcept.REFSET_TYPES.STR, 
+				new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, metadata), config);
+
+		for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(workListRefset.getConceptNid())) {
+			if (extension.getComponentNid() == newConcept.getConceptNid() &&
+					extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
+				termFactory.addUncommittedNoChecks(workListRefset);
+				termFactory.addUncommittedNoChecks(extension);
+				termFactory.commit();
+				//					promote(extension, config);
+				//					termFactory.addUncommittedNoChecks(workListRefset);
+				//					termFactory.addUncommittedNoChecks(extension);
+				//					termFactory.commit();
+			}
+		}
+
 
 		return workList;
 	}
