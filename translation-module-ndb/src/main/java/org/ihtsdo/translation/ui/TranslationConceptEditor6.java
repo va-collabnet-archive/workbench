@@ -293,8 +293,8 @@ public class TranslationConceptEditor6 extends JPanel {
 		saveDesc = false;
 		alreadyVerified = false;
 		mSpellChk.setEnabled(false);
-		mAddDesc.setEnabled(true);
-		mAddPref.setEnabled(true);
+		mAddDesc.setEnabled(true && !readOnlyMode);
+		mAddPref.setEnabled(true && !readOnlyMode);
 		bKeep.setEnabled(false);
 		bReview.setEnabled(false);
 		bEscalate.setEnabled(false);
@@ -478,8 +478,7 @@ public class TranslationConceptEditor6 extends JPanel {
 	private ConfigTranslationModule getTranslationProjectConfig() {
 		ConfigTranslationModule translProjConfig = null;
 		if (this.translationProject != null) {
-			translProjConfig = LanguageUtil
-					.getDefaultTranslationConfig(this.translationProject);
+			translProjConfig = LanguageUtil.getDefaultTranslationConfig(this.translationProject);
 		}
 
 		if (translProjConfig == null) {
@@ -635,20 +634,8 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	private void setReadOnlyMode(boolean readOnly) {
 		this.readOnlyMode = readOnly;
-		targetTextField.setEnabled(!readOnly);
-		comboBox1.setEnabled(!readOnly);
-		cmbAccep.setEnabled(!readOnly);
-		saveDesc = !readOnly;
-		button5.setEnabled(!readOnly);
-		bAddFSN.setEnabled(!readOnly);
-		mAddPref.setEnabled(!readOnly);
-		mAddDesc.setEnabled(!readOnly);
-		mSpellChk.setEnabled(!readOnly);
-		rbYes.setEnabled(!readOnly);
-		rbNo.setEnabled(!readOnly);
-		rbAct.setEnabled(!readOnly);
-		rbInact.setEnabled(!readOnly);
-
+		 rbInact.setEnabled(true && !readOnlyMode);
+		 rbYes.setEnabled(true && !readOnlyMode);
 	}
 
 	/**
@@ -729,7 +716,7 @@ public class TranslationConceptEditor6 extends JPanel {
 				if (verifySavePending(null, false)) {
 					descriptionInEditor = null;
 					targetTextField.setText("");
-					targetTextField.setEnabled(true);
+					targetTextField.setEnabled(true && !readOnlyMode);
 					panel2.revalidate();
 					saveDesc = true;
 					mSpellChk.setEnabled(true);
@@ -805,7 +792,7 @@ public class TranslationConceptEditor6 extends JPanel {
 		if (verifySavePending(null, false)) {
 			descriptionInEditor = null;
 			targetTextField.setText("");
-			targetTextField.setEnabled(true);
+			targetTextField.setEnabled(true && !readOnlyMode);
 			panel2.revalidate();
 			saveDesc = true;
 			mSpellChk.setEnabled(true);
@@ -827,7 +814,7 @@ public class TranslationConceptEditor6 extends JPanel {
 			// label4.setText("");
 			// label4.setVisible(false);
 			targetTextField.setText("");
-			targetTextField.setEnabled(true);
+			targetTextField.setEnabled(true && !readOnlyMode);
 			panel2.revalidate();
 			saveDesc = true;
 			mSpellChk.setEnabled(true);
@@ -2915,7 +2902,7 @@ public class TranslationConceptEditor6 extends JPanel {
 		// DefaultMutableTreeNode top = null;
 		boolean bHasPref = false;
 		boolean bHasFSN = false;
-		bAddFSN.setEnabled(true);
+		bAddFSN.setEnabled(true && !readOnlyMode);
 		targetPreferred = "";
 		targetFSN = "";
 		targetPreferredICS = false;
@@ -3221,7 +3208,7 @@ public class TranslationConceptEditor6 extends JPanel {
 		tabTar.setUpdateSelectionOnSort(true);
 		tabTar.revalidate();
 
-		bAddFSN.setEnabled(!bHasFSN && bHasPref);
+		bAddFSN.setEnabled(!bHasFSN && bHasPref && !readOnlyMode);
 		comboBox1.setEnabled(false);
 		targetTextField.setVisible(true);
 		targetTextField.setEnabled(false);
@@ -3675,7 +3662,7 @@ public class TranslationConceptEditor6 extends JPanel {
 						} catch (IOException ex) {
 							ex.printStackTrace();
 						}
-						targetTextField.setEnabled(true);
+						targetTextField.setEnabled(true && !readOnlyMode);
 						// bDescIssue.setEnabled(false);
 						descriptionInEditor = descrpt;
 						// label4.setText(Terms.get().getConcept(descriptionInEditor.getTypeId()).toString());
@@ -3728,10 +3715,10 @@ public class TranslationConceptEditor6 extends JPanel {
 				if (currentRoleConfiguration.containsKey(uuid)) {
 					EditorMode selectedEditorModeForCurrentRole = currentRoleConfiguration
 							.get(uuid);
-					if (selectedEditorModeForCurrentRole
-							.equals(EditorMode.READ_ONLY)) {
+					if (selectedEditorModeForCurrentRole.equals(EditorMode.READ_ONLY)) {
 						targetTextField.setEnabled(false);
 						targetTextField.setEditable(false);
+						setReadOnlyMode(true);
 					} else {
 						targetTextField.setEnabled(true);
 					}
@@ -3774,8 +3761,8 @@ public class TranslationConceptEditor6 extends JPanel {
 			else
 				rbNo.setSelected(true);
 
-			comboBox1.setEnabled(true);
-			cmbAccep.setEnabled(true);
+			comboBox1.setEnabled(true && !readOnlyMode);
+			cmbAccep.setEnabled(true && !readOnlyMode);
 			if (translConfig.getSelectedEditorMode().equals(
 					ConfigTranslationModule.EditorMode.PREFERRED_TERM_EDITOR)) {
 				if (targetPreferred.equals("")) {
@@ -3792,7 +3779,7 @@ public class TranslationConceptEditor6 extends JPanel {
 				}
 				bAddFSN.setEnabled(false);
 				mAddDesc.setEnabled(false);
-				mAddPref.setEnabled(true);
+				mAddPref.setEnabled(true && !readOnlyMode);
 				comboBox1.setEnabled(false);
 				cmbAccep.setEnabled(false);
 			} else if (translConfig.getSelectedEditorMode().equals(
@@ -3831,11 +3818,11 @@ public class TranslationConceptEditor6 extends JPanel {
 						}
 					}
 				}
-				bAddFSN.setEnabled(true);
-				mAddDesc.setEnabled(true);
-				mAddPref.setEnabled(true);
-				comboBox1.setEnabled(true);
-				cmbAccep.setEnabled(true);
+				bAddFSN.setEnabled(true && !readOnlyMode);
+				mAddDesc.setEnabled(true && !readOnlyMode);
+				mAddPref.setEnabled(true && !readOnlyMode);
+				comboBox1.setEnabled(true && !readOnlyMode);
+				cmbAccep.setEnabled(true && !readOnlyMode);
 			}
 			getPreviousComments();
 
