@@ -17,7 +17,11 @@
 
 package org.ihtsdo.project.issue.manager;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -26,8 +30,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.*;
 
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -80,9 +84,14 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 	public IssuesListPanel2() throws Exception {
 		initComponents();
 		config=Terms.get().getActiveAceFrameConfig();
-		Dimension minimumSize = new Dimension(0, 0);
+		Dimension minimumSize = new Dimension(3, 3);
+		Dimension maximumSize = new Dimension(350, 350);
 		splitPane1.getLeftComponent().setMinimumSize(minimumSize);
+		splitPane1.getLeftComponent().setPreferredSize(minimumSize);
+		splitPane1.getLeftComponent().setMaximumSize(maximumSize);
 		splitPane1.getRightComponent().setMinimumSize(minimumSize);
+		splitPane1.getRightComponent().setPreferredSize(minimumSize);
+		splitPane1.getRightComponent().setMaximumSize(maximumSize);
 		addListeners();
 	}
 	
@@ -527,6 +536,9 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 		showNewIssuePanel();
 	}
 
+	private void createUIComponents() {
+	}
+
 
 	/**
 	 * Inits the components.
@@ -551,6 +563,7 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 		//======== splitPane1 ========
 		{
 			splitPane1.setOneTouchExpandable(true);
+			splitPane1.setResizeWeight(0.5);
 
 			//======== panel3 ========
 			{
