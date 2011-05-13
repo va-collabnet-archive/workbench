@@ -1095,8 +1095,6 @@ public class LanguageUtil {
 	}
 
 	public static void setTranslationConfig(I_ConfigAceFrame config, ConfigTranslationModule translationConfig) throws IOException {
-		System.out.println("***********config null: " + (config == null));
-		System.out.println("***********translationConfig null: " + (translationConfig == null));
 		config.getDbConfig().setProperty("TRANSLATION_CONFIG", translationConfig);
 	}
 
