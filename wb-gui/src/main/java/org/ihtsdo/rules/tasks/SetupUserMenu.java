@@ -76,7 +76,8 @@ public class SetupUserMenu extends AbstractTask {
 
 			MasterWorker menuWorker = config.getWorker();
 			File menuDir = new File("profiles" + File.separator + config.getUsername() + File.separator + "menu");
-			if (menuDir != null && menuDir.exists() && !menuDir.getName().startsWith(".")) {
+			if (menuDir != null && menuDir.exists() && !menuDir.getName().startsWith(".") &&
+					!menuDir.getName().endsWith("svn") && !menuDir.isHidden()) {
 				ProcessPopupUtil.addProcessMenuItems(ace.getJMenuBar(), menuDir, menuWorker);
 			}
 		} catch (TerminologyException e) {
