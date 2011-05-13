@@ -1036,7 +1036,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private CdePalette historyPalette;
     private JToggleButton showSearchToggle;
     public static ExecutorService threadPool =
-            Executors.newCachedThreadPool(
+            Executors.newFixedThreadPool(Math.min(6, Runtime.getRuntime().availableProcessors() + 1),
             new NamedThreadFactory(new ThreadGroup("ACE "), "GUI Background "));
     public AceFrameConfig aceFrameConfig;
     public static AceConfig aceConfig;

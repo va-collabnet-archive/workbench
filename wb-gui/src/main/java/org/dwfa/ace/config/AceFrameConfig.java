@@ -19,6 +19,7 @@ package org.dwfa.ace.config;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.beans.VetoableChangeSupport;
@@ -43,6 +44,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
@@ -1510,8 +1512,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * (non-Javadoc)
      * @see org.dwfa.ace.config.I_ConfigAceFrame#fireCommit()
      */
+    public static AtomicLong propigationId = new AtomicLong();
     public void fireCommit() {
-        changeSupport.firePropertyChange("commit", null, null);
+        PropertyChangeEvent pce = new PropertyChangeEvent(this, "commit", null, null);
+        pce.setPropagationId(AceFrameConfig.propigationId.incrementAndGet());
+        changeSupport.firePropertyChange(pce);
     }
 
     /*

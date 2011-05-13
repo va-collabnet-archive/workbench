@@ -18,10 +18,11 @@ package org.dwfa.util.bean;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeSupport;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class PropertyChangeSupportWithPropagationId extends PropertyChangeSupport {
 
-    private static long propagationId = 0;
+    private static AtomicLong propagationId = new AtomicLong();
 
     public PropertyChangeSupportWithPropagationId(Object sourceBean) {
         super(sourceBean);
@@ -34,7 +35,7 @@ public class PropertyChangeSupportWithPropagationId extends PropertyChangeSuppor
 
     @Override
     public void firePropertyChange(PropertyChangeEvent evt) {
-        evt.setPropagationId(propagationId++);
+        evt.setPropagationId(propagationId.incrementAndGet());
         super.firePropertyChange(evt);
     }
 

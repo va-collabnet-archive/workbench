@@ -121,7 +121,6 @@ public class ConceptNavigator extends JPanel {
         this.view = view;
         ConceptChangeListener ccl = new ConceptChangeListener();
         this.view.addHostListener(ccl);
-        this.view.getConfig().addPropertyChangeListener("commit", ccl);
 
         navigatorTree = (JTreeWithDragImage) treeScroller.getViewport().getView();
         focusDrop = new FocusDrop(new ImageIcon(ACE.class.getResource("/16x16/plain/flash.png")),

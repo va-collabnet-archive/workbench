@@ -314,9 +314,6 @@ public class ConceptView extends JPanel {
         return concept;
     }
 
-    public void setConcept(I_GetConceptData concept) {
-        this.concept = concept;
-    }
     private Collection<JComponent> dropComponents =
             Collections.synchronizedList(new ArrayList<JComponent>());
     private boolean historyShown = false;
@@ -359,36 +356,43 @@ public class ConceptView extends JPanel {
     }
 
     public void setHistoryShown(boolean historyShown) {
-        if (historyShown != this.historyShown) {
-            this.historyShown = historyShown;
-            for (JComponent hc : getRowToPathCheckMap().values()) {
-                hc.setVisible(historyShown);
-            }
-            if (historyShown) {
-                if (settings.getNavigator() != null) {
-                    SwingUtilities.invokeLater(new Runnable() {
+        this.historyShown = historyShown;
+        for (JComponent hc : getRowToPathCheckMap().values()) {
+            hc.setVisible(historyShown);
+        }
+        if (historyShown) {
+            if (settings.getNavigator() != null) {
+                SwingUtilities.invokeLater(new Runnable() {
 
-                        @Override
-                        public void run() {
-                            settings.getNavigator().updateHistoryPanel();
-                        }
-                    });
-                }
+                    @Override
+                    public void run() {
+                        settings.getNavigator().updateHistoryPanel();
+                    }
+                });
             }
         }
+
     }
 
     private void addCommitListener(ConceptViewSettings settings) {
         settings.getConfig().addPropertyChangeListener("commit",
                 new PropertyChangeListener() {
 
+                    Long lastPropId = Long.MIN_VALUE;
+
                     @Override
                     public void propertyChange(PropertyChangeEvent evt) {
-                        layoutConcept(ConceptView.this.concept);
+                        if (evt.getPropagationId() == null
+                                || (Long) evt.getPropagationId() > lastPropId) {
+                            layoutConcept(ConceptView.this.concept);
+                            if (evt.getPropagationId() != null) {
+                                lastPropId = (Long) evt.getPropagationId();
+                            }
+                        }
+
                     }
                 });
     }
-
     ConceptViewLayout cvLayout;
 
     public ConceptViewLayout getCvLayout() {
@@ -398,6 +402,7 @@ public class ConceptView extends JPanel {
     public ActionListener getPanelsChangedActionListener() {
         return cvLayout.getPanelsChangedActionListener();
     }
+
     public void layoutConcept(I_GetConceptData concept) {
         removeAll();
         this.concept = concept;

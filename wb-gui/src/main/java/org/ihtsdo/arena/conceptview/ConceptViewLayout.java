@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -631,16 +630,15 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         }
         settings.getConfig().addPropertyChangeListener("commit", pcal);
         GuiUtil.tickle(cView);
-        if (settings.getNavigator() != null
-                && settings.getNavButton().isSelected()) {
+        if (settings.getNavigator() != null) {
             SwingUtilities.invokeLater(new Runnable() {
-
                 @Override
                 public void run() {
                     if (stop) {
                         return;
                     }
                     settings.getNavigator().updateHistoryPanel();
+                    
                 }
             });
         }
@@ -1113,7 +1111,14 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         Collection<ComponentVersionDragPanel<?>> panels =
                 positionPanelMap.get(position);
         if (panels == null) {
-            panels = new HashSet<ComponentVersionDragPanel<?>>();
+            panels = new ConcurrentSkipListSet<ComponentVersionDragPanel<?>>(new Comparator<ComponentVersionDragPanel<?>>() {
+
+                @Override
+                public int compare(ComponentVersionDragPanel<?> o1, ComponentVersionDragPanel<?> o2) {
+                    return o1.getId() - o2.getId();
+                }
+                
+            });
             positionPanelMap.put(position, panels);
         }
         panels.add(panel);
@@ -1127,7 +1132,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         Timer t;
         I_GetConceptData c;
         boolean update = false;
-        I_ConfigAceFrame config;
+        I_ConfigAceFrame config; 
 
         public UpdateTextTemplateDocumentListener(FixedWidthJEditorPane editorPane,
                 DescriptionSpec desc, I_ConfigAceFrame config) throws TerminologyException, IOException {

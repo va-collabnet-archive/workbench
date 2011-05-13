@@ -36,7 +36,9 @@ public class NidDataFromBdb implements I_GetNidData {
 	}
 
 	public static void resetExecutorPool() {
-		executorPool = Executors.newCachedThreadPool(new NamedThreadFactory(nidDataThreadGroup,
+		executorPool = Executors.newFixedThreadPool(
+                        Math.min(6, Runtime.getRuntime().availableProcessors() + 1),
+                        new NamedThreadFactory(nidDataThreadGroup,
 				"Nid data service"));
 	}
 	

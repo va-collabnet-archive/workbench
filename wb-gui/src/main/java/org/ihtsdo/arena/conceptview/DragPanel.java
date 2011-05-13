@@ -516,6 +516,10 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
     private Set<File> kbFiles = new HashSet<File>();
     private int id;
 
+    public int getId() {
+        return id;
+    }
+
     public boolean isInGroup() {
         return inGroup;
     }
