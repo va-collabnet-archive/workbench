@@ -453,7 +453,9 @@ public class DocumentManager {
 		SpellChecker spellchecker = new SpellChecker(spellDir);
 		// To index a file containing words:
 		for (File file : sharedFiles) {
-			spellchecker.indexDictionary(new PlainTextDictionary(new InputStreamReader(new FileInputStream(file), "UTF-8")));
+			if (file.exists() && !file.isHidden()) {
+				spellchecker.indexDictionary(new PlainTextDictionary(new InputStreamReader(new FileInputStream(file), "UTF-8")));
+			}
 		}
 		spellDir.close();
 		return output;
