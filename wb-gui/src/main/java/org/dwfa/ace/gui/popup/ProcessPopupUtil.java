@@ -123,7 +123,7 @@ public class ProcessPopupUtil {
             FileNotFoundException, ClassNotFoundException {
         for (File f : getSortedFiles(menuDir)) {
             JMenu newMenu = null;
-            if (f.isDirectory()) {
+            if (f.isDirectory() && !f.isHidden()) {
                 if (f.getName().equals("File")) {
                     for (int i = 0; i < menuBar.getMenuCount(); i++) {
                         if (menuBar.getMenu(i).getText().equalsIgnoreCase("File")) {

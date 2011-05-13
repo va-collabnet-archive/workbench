@@ -690,6 +690,9 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     }
 
     private void setupHistoryPane() throws IOException, ContraditionException {
+    	if (paths == null) {
+            return;
+        }
         int row = 0;
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.weightx = 1;
