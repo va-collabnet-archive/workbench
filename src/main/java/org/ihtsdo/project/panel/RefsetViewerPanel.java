@@ -133,7 +133,8 @@ public class RefsetViewerPanel extends JPanel {
 				List<I_GetConceptData> members = new ArrayList<I_GetConceptData>();
 
 				for (I_ExtendByRef member : tf.getRefsetExtensionMembers(selectedRefset.getNid())) {
-					if (member.getTuples(config.getConflictResolutionStrategy()).iterator().next().getStatusNid() == 
+					if (member.getTuples(null, config.getViewPositionSetReadOnly(), config.getPrecedence(), 
+							config.getConflictResolutionStrategy()).iterator().next().getStatusNid() == 
 						tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids())) {
 						members.add(tf.getConcept(member.getComponentNid()));
 					}
