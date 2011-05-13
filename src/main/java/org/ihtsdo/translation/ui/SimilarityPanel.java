@@ -5,6 +5,7 @@
 package org.ihtsdo.translation.ui;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -23,9 +24,11 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,7 +73,8 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.DefaultSimilaritySearch
 /**
  * @author Guillermo Reynoso
  */
-public class SimilarityPanel extends JPanel {
+public class SimilarityPanel extends JPanel implements Serializable{
+	private static final long serialVersionUID = -1458647596111502234L;
 	private String sourceFSN;
 	private I_GetConceptData fsn;
 	private I_GetConceptData preferred;
@@ -334,13 +338,17 @@ public class SimilarityPanel extends JPanel {
 
 	private void expandButtonActionPerformed(ActionEvent e) {
 		expandButton.setVisible(false);
+		newSimilarityButton.setVisible(false);
+		button1.setVisible(false);
 		similarityDialog = new JDialog();
 		similarityDialog.setContentPane(similarityPanel);
 		similarityDialog.setModal(true);
 		similarityDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		similarityDialog.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
+				newSimilarityButton.setVisible(true);
 				expandButton.setVisible(true);
+				button1.setVisible(true);
 				similarityDialog.dispose();
 				add(similarityPanel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 			}
@@ -568,6 +576,39 @@ public class SimilarityPanel extends JPanel {
 		}
 	}
 
+	public void hideButtonsPanels(boolean fsn, boolean prefered, boolean both, boolean refine){
+		newSimilarityButton.setVisible(false);
+		rbFSN.setSelected(fsn);
+		rbPref.setSelected(prefered);
+		radioButton2.setSelected(both);
+		refineCheckBox.setSelected(refine);
+		expandButton.setVisible(false);
+		button1.setVisible(false);
+		panel1.setVisible(false);
+		((GridBagLayout)getLayout()).rowWeights[1] = 0.0;
+		panel15.setVisible(false);
+		((GridBagLayout)getLayout()).rowWeights[2] = 0.0;
+	}
+	
+	private void newSimilarityButtonActionPerformed(ActionEvent e) {
+		final JDialog similarityDialog = new JDialog();
+		
+		SimilarityPanelClon similarityClon = new SimilarityPanelClon();
+		similarityDialog.setContentPane(similarityClon);
+		similarityDialog.setModal(false);
+		similarityDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		similarityDialog.setSize(new Dimension(700, 550));
+		Dimension pantalla = Toolkit.getDefaultToolkit().getScreenSize();
+		Dimension ventana = similarityDialog.getSize();
+		similarityDialog.setLocation((pantalla.width - ventana.width) / 2, (pantalla.height - ventana.height) / 2);
+
+		similarityDialog.setVisible(true);
+		this.revalidate();
+		this.repaint();
+		similarityClon.hideButtonsPanels(rbFSN.isSelected(),rbPref.isSelected(),radioButton2.isSelected(), refineCheckBox.isSelected());
+		similarityClon.updateTabs(sourceFSN, concept, sourceIds, targetId, project, worklistMember);
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -587,6 +628,7 @@ public class SimilarityPanel extends JPanel {
 		radioButton2 = new JRadioButton();
 		refineCheckBox = new JCheckBox();
 		expandButton = new JButton();
+		newSimilarityButton = new JButton();
 		panel1 = new JPanel();
 		panel3 = new JPanel();
 		label2 = new JLabel();
@@ -609,9 +651,9 @@ public class SimilarityPanel extends JPanel {
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new GridBagLayout());
 		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
-		((GridBagLayout)getLayout()).rowHeights = new int[] {30, 30, 25, 0};
+		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0, 0, 0};
 		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-		((GridBagLayout)getLayout()).rowWeights = new double[] {1.0, 1.0, 1.0, 1.0E-4};
+		((GridBagLayout)getLayout()).rowWeights = new double[] {1.0, 1.0, 0.0, 1.0E-4};
 
 		//======== similarityPanel ========
 		{
@@ -718,10 +760,10 @@ public class SimilarityPanel extends JPanel {
 			{
 				panel13.setBackground(new Color(238, 238, 238));
 				panel13.setLayout(new GridBagLayout());
-				((GridBagLayout)panel13.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0};
-				((GridBagLayout)panel13.getLayout()).rowHeights = new int[] {0, 0};
-				((GridBagLayout)panel13.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
-				((GridBagLayout)panel13.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+				((GridBagLayout)panel13.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0};
+				((GridBagLayout)panel13.getLayout()).rowHeights = new int[] {0, 0, 0};
+				((GridBagLayout)panel13.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel13.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
 
 				//---- rbFSN ----
 				rbFSN.setText("FSN");
@@ -735,7 +777,7 @@ public class SimilarityPanel extends JPanel {
 				});
 				panel13.add(rbFSN, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+					new Insets(0, 0, 5, 5), 0, 0));
 
 				//---- rbPref ----
 				rbPref.setText("Preferred");
@@ -748,7 +790,7 @@ public class SimilarityPanel extends JPanel {
 				});
 				panel13.add(rbPref, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+					new Insets(0, 0, 5, 5), 0, 0));
 
 				//---- radioButton2 ----
 				radioButton2.setText("Both");
@@ -761,13 +803,13 @@ public class SimilarityPanel extends JPanel {
 				});
 				panel13.add(radioButton2, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+					new Insets(0, 0, 5, 5), 0, 0));
 
 				//---- refineCheckBox ----
 				refineCheckBox.setText("Refine");
 				panel13.add(refineCheckBox, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+					new Insets(0, 0, 5, 0), 0, 0));
 
 				//---- expandButton ----
 				expandButton.setText("E[x]pand");
@@ -778,8 +820,20 @@ public class SimilarityPanel extends JPanel {
 						expandButtonActionPerformed(e);
 					}
 				});
-				panel13.add(expandButton, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+				panel13.add(expandButton, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
+
+				//---- newSimilarityButton ----
+				newSimilarityButton.setText("Open new similarity search");
+				newSimilarityButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						newSimilarityButtonActionPerformed(e);
+					}
+				});
+				panel13.add(newSimilarityButton, new GridBagConstraints(1, 1, 3, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 0, 0), 0, 0));
 			}
 			similarityPanel.add(panel13, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
@@ -979,6 +1033,7 @@ public class SimilarityPanel extends JPanel {
 	private JRadioButton radioButton2;
 	private JCheckBox refineCheckBox;
 	private JButton expandButton;
+	private JButton newSimilarityButton;
 	private JPanel panel1;
 	private JPanel panel3;
 	private JLabel label2;
