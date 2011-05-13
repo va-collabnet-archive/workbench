@@ -41,6 +41,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.document.report.I_Report.Reports;
 import org.ihtsdo.project.panel.PanelHelperFactory;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
+import org.ihtsdo.project.util.IconUtilities;
 
 /**
  * @author Guillermo Reynoso
@@ -70,6 +71,9 @@ public class ReportPanel extends JPanel {
 		buttonGroup1.add(excelButton);
 		buttonGroup1.add(csvButton);
 		previewButton.setSelected(true);
+		
+		label2.setIcon(IconUtilities.helpIcon);
+		label2.setText("");
 
 		progressBar1.setVisible(false);
 
@@ -264,10 +268,10 @@ public class ReportPanel extends JPanel {
 		// //GEN-BEGIN:initComponents
 		label1 = new JLabel();
 		label3 = new JLabel();
+		label2 = new JLabel();
 		scrollPane1 = new JScrollPane();
 		reportList = new JList();
 		previewButton = new JRadioButton();
-		label2 = new JLabel();
 		excelButton = new JRadioButton();
 		csvButton = new JRadioButton();
 		panel3 = new JPanel();
@@ -281,7 +285,7 @@ public class ReportPanel extends JPanel {
 		setLayout(new GridBagLayout());
 		((GridBagLayout)getLayout()).columnWidths = new int[] {434, 0, 0, 0};
 		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0};
-		((GridBagLayout)getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0, 1.0E-4};
+		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0, 0.0, 1.0E-4};
 		((GridBagLayout)getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
 		//---- label1 ----
@@ -298,6 +302,12 @@ public class ReportPanel extends JPanel {
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 5, 5), 0, 0));
 
+		//---- label2 ----
+		label2.setVerticalAlignment(SwingConstants.TOP);
+		add(label2, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 5, 0), 0, 0));
+
 		//======== scrollPane1 ========
 		{
 			scrollPane1.setViewportView(reportList);
@@ -311,13 +321,6 @@ public class ReportPanel extends JPanel {
 		add(previewButton, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 5, 5), 0, 0));
-
-		//---- label2 ----
-		label2.setText("<html>Choose an item form the \"Report list\" and<br> the type of report, then click \"Get report\"</html>");
-		label2.setVerticalAlignment(SwingConstants.TOP);
-		add(label2, new GridBagConstraints(2, 1, 1, 4, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 5, 0), 0, 0));
 
 		//---- excelButton ----
 		excelButton.setText("Excel");
@@ -385,10 +388,10 @@ public class ReportPanel extends JPanel {
 	// //GEN-BEGIN:variables
 	private JLabel label1;
 	private JLabel label3;
+	private JLabel label2;
 	private JScrollPane scrollPane1;
 	private JList reportList;
 	private JRadioButton previewButton;
-	private JLabel label2;
 	private JRadioButton excelButton;
 	private JRadioButton csvButton;
 	private JPanel panel3;

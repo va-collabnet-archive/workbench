@@ -13,7 +13,7 @@
        <class>java.awt.GridBagLayout</class> 
        <void method="setProperty"> 
         <string>$columnSpecs</string> 
-        <string>429, 0:1.0, 0:1.0</string> 
+        <string>429:1.0, 0:1.0, 0</string> 
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
@@ -103,6 +103,25 @@
        </object> 
       </void> 
       <void method="add"> 
+       <object class="com.jformdesigner.model.FormComponent"> 
+        <string>javax.swing.JLabel</string> 
+        <void method="setProperty"> 
+         <string>verticalAlignment</string> 
+         <int>1</int> 
+        </void> 
+        <void property="name"> 
+         <string>label2</string> 
+        </void> 
+       </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+        <void method="setProperty"> 
+         <string>gridx</string> 
+         <int>2</int> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
        <object class="com.jformdesigner.model.FormContainer"> 
         <string>javax.swing.JScrollPane</string> 
         <object class="com.jformdesigner.model.FormLayoutManager"> 
@@ -158,37 +177,6 @@
         <void method="setProperty"> 
          <string>gridy</string> 
          <int>1</int> 
-        </void> 
-       </object> 
-      </void> 
-      <void method="add"> 
-       <object class="com.jformdesigner.model.FormComponent"> 
-        <string>javax.swing.JLabel</string> 
-        <void method="setProperty"> 
-         <string>text</string> 
-         <string>&lt;html&gt;Choose an item form the &quot;Report list&quot; and&lt;br&gt; the type of report, then click &quot;Get report&quot;&lt;/html&gt;</string> 
-        </void> 
-        <void method="setProperty"> 
-         <string>verticalAlignment</string> 
-         <int>1</int> 
-        </void> 
-        <void property="name"> 
-         <string>label2</string> 
-        </void> 
-       </object> 
-       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-        <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-        <void method="setProperty"> 
-         <string>gridy</string> 
-         <int>1</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>gridx</string> 
-         <int>2</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>gridheight</string> 
-         <int>4</int> 
         </void> 
        </object> 
       </void> 

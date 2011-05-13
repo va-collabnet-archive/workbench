@@ -207,7 +207,19 @@ public class WorklistMemberByStatusReport implements I_Report {
 						} else {
 							cell.setCellStyle(cs2);
 						}
-						cell.setCellValue(nextLine[cellnum]);
+
+						Integer num = null;
+						try{
+							num = Integer.valueOf(nextLine[cellnum]);
+							cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+						}catch (Exception e) {}
+						
+						if(num != null){
+							cell.setCellValue(num);
+						}else{
+							cell.setCellValue(nextLine[cellnum]);
+						}
+						
 						if (s.getColumnWidth(cellnum) < 3000 + nextLine[cellnum].length() * 200) {
 							s.setColumnWidth((short) (cellnum), (short) (3000 + nextLine[cellnum].length() * 200));
 						}

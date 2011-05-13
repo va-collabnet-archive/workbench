@@ -154,8 +154,8 @@ public class AccumulatedStatusChanges implements I_Report {
 		boolean dataFound = false;
 		try {
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-
-			csvFile = File.createTempFile("project_historical_report", ".csv");
+			SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy-mm-hh-ss");
+			csvFile = File.createTempFile("acumulated_status_changes_"+ sdf.format(new Date()), ".csv");
 			PrintWriter pw = new PrintWriter(csvFile);
 			pw.append("project|workset|worklist|date|author|status|count");
 			pw.println();
@@ -255,6 +255,16 @@ public class AccumulatedStatusChanges implements I_Report {
 								for (UserStatusCount userStatusCount : results) {
 									if (userStatusCount.equals(first)) {
 										count++;
+										if(count == results.size()){
+											pw.append(projectName + "|");
+											pw.append(worksetName + "|");
+											pw.append(worklistName + "|");
+											pw.append(userStatusCount.getDate() + "|");
+											pw.append(userStatusCount.getUserName() + "|");
+											pw.append(userStatusCount.getStatus() + "|");
+											pw.append(count+"");
+											pw.println();
+										}
 									} else {
 										pw.append(projectName + "|");
 										pw.append(worksetName + "|");
