@@ -352,6 +352,7 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 		rbPref.setSelected(prefered);
 		radioButton2.setSelected(both);
 		refineCheckBox.setSelected(refine);
+		updateSimilarityTable(sourceFSN);
 	}
 
 	private void rbFSNStateChanged(ChangeEvent e) {
