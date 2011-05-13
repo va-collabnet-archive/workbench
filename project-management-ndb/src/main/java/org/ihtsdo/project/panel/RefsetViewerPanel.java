@@ -46,6 +46,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.bpa.process.Condition;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.panel.details.ProjectDetailsPanel;
@@ -69,7 +70,7 @@ public class RefsetViewerPanel extends JPanel {
 		initCustomComponents();
 		label2.setIcon(IconUtilities.helpIcon);
 		label2.setText("");
-		
+
 		this.config = config;
 	}
 
@@ -132,7 +133,10 @@ public class RefsetViewerPanel extends JPanel {
 				List<I_GetConceptData> members = new ArrayList<I_GetConceptData>();
 
 				for (I_ExtendByRef member : tf.getRefsetExtensionMembers(selectedRefset.getNid())) {
-					members.add(tf.getConcept(member.getComponentNid()));
+					if (member.getTuples(config.getConflictResolutionStrategy()).iterator().next().getStatusNid() == 
+						tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids())) {
+						members.add(tf.getConcept(member.getComponentNid()));
+					}
 					// System.out.println("*-*-* " +
 					// tf.getConcept(member.getComponentNid()));
 				}
@@ -288,8 +292,8 @@ public class RefsetViewerPanel extends JPanel {
 			//---- label1 ----
 			label1.setText("Drag and drop a refset here to view the details");
 			actionPanel.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-				new Insets(0, 0, 5, 10), 0, 0));
+					GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+					new Insets(0, 0, 5, 10), 0, 0));
 
 			//---- label2 ----
 			label2.setText("text");
@@ -300,8 +304,8 @@ public class RefsetViewerPanel extends JPanel {
 				}
 			});
 			actionPanel.add(label2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 0), 0, 0));
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 0), 0, 0));
 
 			//======== panel1 ========
 			{
@@ -315,15 +319,15 @@ public class RefsetViewerPanel extends JPanel {
 				refsetList.setVisibleRowCount(1);
 				refsetList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 				panel1.add(refsetList, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 10), 0, 0));
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 10), 0, 0));
 				panel1.add(cuantityLable, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 0), 0, 0));
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 0), 0, 0));
 			}
 			actionPanel.add(panel1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.WEST, GridBagConstraints.NONE,
-				new Insets(0, 0, 0, 10), 0, 0));
+					GridBagConstraints.WEST, GridBagConstraints.NONE,
+					new Insets(0, 0, 0, 10), 0, 0));
 
 			//---- closeButton ----
 			closeButton.setText("Close");
@@ -334,8 +338,8 @@ public class RefsetViewerPanel extends JPanel {
 				}
 			});
 			actionPanel.add(closeButton, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-				new Insets(0, 0, 0, 0), 0, 0));
+					GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+					new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(actionPanel, BorderLayout.NORTH);
 
