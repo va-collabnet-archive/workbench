@@ -25,6 +25,10 @@
          <string>oneTouchExpandable</string> 
          <boolean>true</boolean> 
         </void> 
+        <void method="setProperty"> 
+         <string>resizeWeight</string> 
+         <double>0.5</double> 
+        </void> 
         <void property="name"> 
          <string>splitPane1</string> 
         </void> 
