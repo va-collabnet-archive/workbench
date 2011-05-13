@@ -605,8 +605,8 @@ public class SimilarityPanel extends JPanel implements Serializable{
 		similarityDialog.setVisible(true);
 		this.revalidate();
 		this.repaint();
-		similarityClon.hideButtonsPanels(rbFSN.isSelected(),rbPref.isSelected(),radioButton2.isSelected(), refineCheckBox.isSelected());
 		similarityClon.updateTabs(sourceFSN, concept, sourceIds, targetId, project, worklistMember);
+		similarityClon.hideButtonsPanels(rbFSN.isSelected(),rbPref.isSelected(),radioButton2.isSelected(), refineCheckBox.isSelected());
 	}
 
 	private void initComponents() {

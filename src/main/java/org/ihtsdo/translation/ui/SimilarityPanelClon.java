@@ -148,7 +148,6 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 		this.concept = concept;
 		this.sourceIds = sourceIds;
 		this.targetId = targetId;
-		updateSimilarityTable(sourceFSN);
 	}
 
 	/**
@@ -356,18 +355,24 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 	}
 
 	private void rbFSNStateChanged(ChangeEvent e) {
-		updateSimilarityTable(sourceFSN);
-		searchTextField.setText(sourceFSN);
+		if(e.getSource() instanceof JRadioButton && ((JRadioButton)e.getSource()).isSelected()){
+			updateSimilarityTable(sourceFSN);
+			searchTextField.setText(sourceFSN);
+		}
 	}
 
 	private void rbPrefStateChanged(ChangeEvent e) {
-		updateSimilarityTable(sourceFSN);
-		searchTextField.setText(sourceFSN);
+		if(e.getSource() instanceof JRadioButton && ((JRadioButton)e.getSource()).isSelected()){
+			updateSimilarityTable(sourceFSN);
+			searchTextField.setText(sourceFSN);
+		}
 	}
 
 	private void radioButton2StateChanged(ChangeEvent e) {
-		updateSimilarityTable(sourceFSN);
-		searchTextField.setText(sourceFSN);
+		if(e.getSource() instanceof JRadioButton && ((JRadioButton)e.getSource()).isSelected()){
+			updateSimilarityTable(sourceFSN);
+			searchTextField.setText(sourceFSN);
+		}
 	}
 	
 	private void initComponents() {
