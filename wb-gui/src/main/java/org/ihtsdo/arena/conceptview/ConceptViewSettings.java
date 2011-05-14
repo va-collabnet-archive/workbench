@@ -390,7 +390,10 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 
     @Override
     public I_GetConceptData getConcept() {
-        return (I_GetConceptData) getHost().getTermComponent();
+        if (getHost() != null) {
+            return (I_GetConceptData) getHost().getTermComponent(); 
+        }
+        return null;
     }
 
     public Integer getLinkedTab() {
