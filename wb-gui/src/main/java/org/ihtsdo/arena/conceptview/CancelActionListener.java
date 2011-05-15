@@ -8,6 +8,7 @@ import java.io.IOException;
 import javax.swing.JOptionPane;
 
 import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.tk.Ts;
 
 public class CancelActionListener implements ActionListener {
 
@@ -29,6 +30,7 @@ public class CancelActionListener implements ActionListener {
         if (n == JOptionPane.YES_OPTION) {
             try {
                 settings.getConcept().cancel();
+                Ts.get().addUncommitted(settings.getConcept());
             } catch (IOException e1) {
                 AceLog.getAppLog().alertAndLogException(e1);
             }
