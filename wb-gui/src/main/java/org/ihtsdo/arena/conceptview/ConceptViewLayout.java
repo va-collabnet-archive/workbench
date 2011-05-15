@@ -126,15 +126,15 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         return pathRowMap;
     }
     private TreeSet<PositionBI> positionOrderedSet = new TreeSet(new PositionComparator());
-    private Collection<JComponent> seperatorComponents = new ConcurrentSkipListSet<JComponent>(new Comparator<JComponent>() {
+    private Collection<DragPanel> seperatorComponents = new ConcurrentSkipListSet<DragPanel>(new Comparator<DragPanel>() {
 
         @Override
-        public int compare(JComponent o1, JComponent o2) {
-            return o1.toString().compareTo(o2.toString());
+        public int compare(DragPanel o1, DragPanel o2) {
+            return o1.getId() - o2.getId();
         }
     });
 
-    public Collection<JComponent> getSeperatorComponents() {
+    public Collection<DragPanel> getSeperatorComponents() {
         return seperatorComponents;
     }
     private Map<PanelSection, CollapsePanelPrefs> prefMap;

@@ -39,6 +39,7 @@ import org.ihtsdo.arena.PreferencesNode;
 import org.ihtsdo.tk.api.RelAssertionType;
 
 public class ConceptViewSettings extends ArenaComponentSettings {
+    public static final int NAVIGATOR_WIDTH = 350;
 
     /**
      *
@@ -333,7 +334,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
                 navigator = new ConceptNavigator(treeScroller, config, view);
                 //navigator.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, Color.GRAY));
                 navigator.setOpaque(true);
-                navigator.setBounds(0, 0, 350, 20);
+                navigator.setBounds(0, 0, NAVIGATOR_WIDTH, 20);
             } catch (Exception e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }

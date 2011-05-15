@@ -500,7 +500,7 @@ public class ConceptView extends JPanel {
         return config;
     }
 
-    public Collection<JComponent> getSeperatorComponents() {
+    public Collection<DragPanel> getSeperatorComponents() {
         return cvLayout.getSeperatorComponents();
     }
 }

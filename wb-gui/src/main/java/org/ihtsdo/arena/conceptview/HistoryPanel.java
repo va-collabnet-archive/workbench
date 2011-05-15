@@ -696,25 +696,20 @@ public class HistoryPanel {
         }
         seperators.clear();
         for (JComponent comp : view.getSeperatorComponents()) {
-            if (comp.isVisible()) {
-
+            if (comp.getParent() != null) {
                 JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
-                sep.setSize(versionPanel.getWidth(), 6);
+                sep.setSize(Math.max(versionPanel.getWidth(), 
+                        ConceptViewSettings.NAVIGATOR_WIDTH - 3), 6);
 
-                int yLoc = comp.getY();
-                Component parentPanel = comp.getParent();
-                while (parentPanel != null && parentPanel != view) {
-                    yLoc += parentPanel.getY();
-                    parentPanel = parentPanel.getParent();
-                }
+                Point location = comp.getLocation();
+                SwingUtilities.convertPointToScreen(location, comp.getParent());
+                SwingUtilities.convertPointFromScreen(location, versionPanel.getParent());
 
-                sep.setLocation(0, yLoc - 6);
+                sep.setLocation(0, location.y - sep.getHeight());
                 versionPanel.add(sep);
                 seperators.add(sep);
             }
-
         }
-
     }
 
     private void setupHeader(ConceptView view) {
