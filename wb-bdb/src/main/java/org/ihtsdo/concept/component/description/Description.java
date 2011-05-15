@@ -21,7 +21,6 @@ import org.dwfa.ace.utypes.UniversalAceDescription;
 import org.dwfa.tapi.I_DescribeConceptLocally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedDesc;
-import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.Bdb;
@@ -41,6 +40,7 @@ import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import org.ihtsdo.tk.hash.Hashcode;
 
 public class Description
         extends ConceptComponent<DescriptionRevision, Description>
@@ -657,7 +657,7 @@ public class Description
 
     @Override
     public int hashCode() {
-        return HashFunction.hashCode(new int[]{nid});
+        return Hashcode.compute(new int[]{nid});
     }
 
     @Override

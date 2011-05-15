@@ -128,14 +128,16 @@ public class ConceptViewRenderer extends JLayeredPane {
 
         @Override
         public void ancestorMoved(AncestorEvent event) {
-            if (settings.hideNavigator()) {
-                SwingUtilities.invokeLater(new Runnable() {
+            if (event.getAncestor() != ConceptViewRenderer.this.getRootPane().getParent()) {
+                if (settings.hideNavigator()) {
+                    SwingUtilities.invokeLater(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        settings.showNavigator();
-                    }
-                });
+                        @Override
+                        public void run() {
+                            settings.showNavigator();
+                        }
+                    });
+                }
             }
             setDividerLocation();
         }

@@ -71,6 +71,7 @@ import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import org.ihtsdo.tk.hash.Hashcode;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>> implements
         I_AmTermComponent, I_AmPart<R>,
@@ -402,7 +403,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         @Override
         public boolean equals(Object obj) {
             if (Version.class.isAssignableFrom(obj.getClass())) {
-                @SuppressWarnings("unchecked")
                 Version another = (Version) obj;
                 if (this.getNid() == another.getNid() && this.index == another.index) {
                     return true;
@@ -413,7 +413,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public int hashCode() {
-            return index;
+            return Hashcode.compute(new int[] {index, nid});
         }
 
         public Version() {

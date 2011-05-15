@@ -357,6 +357,7 @@ public class HistoryPanel {
         buttonPanelSetMap.clear();
         originalButtonSelections.clear();
         changedSelections.clear();
+        view.getChangedVersionSelections().clear();
     }
 
     public void resizeIfNeeded() {
@@ -463,19 +464,20 @@ public class HistoryPanel {
                     button.setBackground(Color.YELLOW);
                     button.setOpaque(true);
                 }
-
-                if (view.getChangedVersionSelections().contains(viewVersion)) {
-                    button.setSelected(true);
+                if (view.getChangedVersionSelections().contains(positionVersion)) {
                     button.setBackground(Color.ORANGE);
                     button.setOpaque(true);
+                    button.setSelected(true);
                     changedSelections.add(button);
                 }
+
+
                 if (viewVersion == positionVersion) {
                     originalButtonSelections.add(button);
                     if (group.getSelection() == null) {
                         button.setSelected(true);
                     }
-                    
+
                 }
                 nidSapNidButtonMap.put(nidSapNidKey, button);
                 buttonSapMap.put(button, sapNid);
