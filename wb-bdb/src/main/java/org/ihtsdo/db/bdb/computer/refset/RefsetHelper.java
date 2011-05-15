@@ -529,10 +529,10 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
     }
 
     private Set<? extends I_GetConceptData> getDestRelOrigins(I_GetConceptData refsetIdentityConcept,
-            I_ConfigAceFrame config, int refsetIdentityNid) throws IOException, TerminologyException {
+            I_ConfigAceFrame config, int typeNid) throws IOException, TerminologyException {
         access();
         I_IntSet allowedTypes = Terms.get().newIntSet();
-        allowedTypes.add(refsetIdentityNid);
+        allowedTypes.add(typeNid);
         Set<? extends I_GetConceptData> matchingConcepts =
                 refsetIdentityConcept.getDestRelOrigins(config.getAllowedStatus(), allowedTypes, config
                     .getViewPositionSetReadOnly(), getConfig().getPrecedence(), getConfig()

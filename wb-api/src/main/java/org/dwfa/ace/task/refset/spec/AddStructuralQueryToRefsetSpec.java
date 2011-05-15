@@ -19,8 +19,10 @@ package org.dwfa.ace.task.refset.spec;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
@@ -78,8 +80,11 @@ public class AddStructuralQueryToRefsetSpec extends AbstractAddRefsetSpecTask {
             }
         } else {
             if (c3Description == null) {
+                DefaultMutableTreeNode node = 
+                        (DefaultMutableTreeNode) configFrame.getTreeInTaxonomyPanel().getLastSelectedPathComponent();
+                I_GetConceptData c = (I_GetConceptData) node.getUserObject();
             	refsetMap.put(REFSET_PROPERTY.CID_THREE, 
-            			configFrame.getHierarchySelection().getConceptNid());
+            			c.getNid());
             } else {
             	refsetMap.put(REFSET_PROPERTY.CID_THREE, 
             			c3Description.getConceptNid());

@@ -181,10 +181,19 @@ public class ConceptViewSettings extends ArenaComponentSettings {
         return navButton;
     }
 
-    public void hideNavigator() {
+    public boolean hideNavigator() {
         if (navButton.isSelected()) {
             navButton.doClick();
+            return true;
         }
+        return false;
+    }
+    public boolean showNavigator() {
+        if (!navButton.isSelected()) {
+            navButton.doClick();
+            return false;
+        }
+        return true;
     }
     private static ImageIcon statedView = new ImageIcon(
             ConceptViewRenderer.class.getResource("/16x16/plain/graph_edge.png"));
@@ -391,7 +400,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
     @Override
     public I_GetConceptData getConcept() {
         if (getHost() != null) {
-            return (I_GetConceptData) getHost().getTermComponent(); 
+            return (I_GetConceptData) getHost().getTermComponent();
         }
         return null;
     }

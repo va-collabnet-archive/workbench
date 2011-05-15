@@ -79,6 +79,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.SwingUtilities;
 import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 
 /**
@@ -100,18 +101,43 @@ public class ConceptViewRenderer extends JLayeredPane {
 
         @Override
         public void componentMoved(ComponentEvent e) {
-            settings.hideNavigator();
+            if (settings.hideNavigator()) {
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        settings.showNavigator();
+                    }
+                });
+            }
         }
 
         @Override
         public void componentResized(ComponentEvent e) {
-            settings.hideNavigator();
+            if (settings.hideNavigator()) {
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        settings.showNavigator();
+                    }
+                });
+            }
             setDividerLocation();
         }
 
         @Override
         public void ancestorMoved(AncestorEvent event) {
-            settings.hideNavigator();
+            if (settings.hideNavigator()) {
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        settings.showNavigator();
+                    }
+                });
+            }
+            setDividerLocation();
         }
 
         @Override

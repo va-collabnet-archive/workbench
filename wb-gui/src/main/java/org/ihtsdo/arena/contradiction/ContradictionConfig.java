@@ -411,11 +411,11 @@ public class ContradictionConfig implements I_ConfigAceFrame {
     }
 
     public void setHierarchySelectionAndExpand(I_GetConceptData hierarchySelection) throws IOException {
-        config.setHierarchySelectionAndExpand(hierarchySelection);
+        //config.setHierarchySelectionAndExpand(hierarchySelection);
     }
 
     public void setHierarchySelection(I_GetConceptData hierarchySelection) {
-        config.setHierarchySelection(hierarchySelection);
+        //config.setHierarchySelection(hierarchySelection);
     }
 
     public void setFrameVisible(boolean visible) throws Exception {

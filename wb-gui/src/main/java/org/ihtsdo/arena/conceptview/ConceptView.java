@@ -403,8 +403,19 @@ public class ConceptView extends JPanel {
         return cvLayout.getPanelsChangedActionListener();
     }
 
+    private final Set<ComponentVersionBI> changedVersionSelections = new HashSet<ComponentVersionBI>();
+
+    public Set<ComponentVersionBI> getChangedVersionSelections() {
+        return changedVersionSelections;
+    }
+    
     public void layoutConcept(I_GetConceptData concept) {
         removeAll();
+        if (concept == null || 
+                this.concept == null ||
+                this.concept.equals(concept) == false) {
+            changedVersionSelections.clear();
+        }
         this.concept = concept;
         if (cvLayout != null) {
             cvLayout.stop();

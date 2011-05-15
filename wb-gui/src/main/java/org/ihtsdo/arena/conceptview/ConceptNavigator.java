@@ -135,16 +135,12 @@ public class ConceptNavigator extends JPanel {
 
     protected void updateHistoryPanel() {
         try {
-            if (historyPanel == null) {
-                historyPanel = new HistoryPanel(view, historyScroller, this);
-                if (view.isHistoryShown()) {
-                    treeScroller.setVisible(false);
-                    focusDrop.setVisible(false);
-                    historyScroller.setVisible(true);
-                    statedInferredScroller.setVisible(false);
-                    historyPanel.resizeIfNeeded();
-                }
-            } else {
+            historyPanel = new HistoryPanel(view, historyScroller, this);
+            if (view.isHistoryShown()) {
+                treeScroller.setVisible(false);
+                focusDrop.setVisible(false);
+                historyScroller.setVisible(true);
+                statedInferredScroller.setVisible(false);
                 historyPanel.resizeIfNeeded();
             }
         } catch (IOException ex) {

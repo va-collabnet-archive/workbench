@@ -93,20 +93,28 @@ public class HistoryPanel {
         @Override
         public void stateChanged(ChangeEvent ce) {
             JRadioButton button = (JRadioButton) ce.getSource();
+            ComponentVersionBI version = buttonVersionMap.get(button);
             int changedCount = changedSelections.size();
             if (button.isSelected()) {
                 if (originalButtonSelections.contains(button)) {
                     // back to original state
+                    if (version.getTime() == Long.MAX_VALUE) {
+                        button.setBackground(Color.YELLOW);
+                        button.setOpaque(true);
+                    }
+
                 } else {
                     // unimplemented change
-                    button.setBackground(Color.YELLOW);
+                    button.setBackground(Color.ORANGE);
                     button.setOpaque(true);
                     changedSelections.add(button);
+                    view.getChangedVersionSelections().add(version);
                 }
             } else {
                 button.setBackground(versionPanel.getBackground());
                 button.setOpaque(false);
                 changedSelections.remove(button);
+                view.getChangedVersionSelections().remove(version);
             }
             if (changedCount != changedSelections.size()) {
                 SwingUtilities.invokeLater(new Runnable() {
@@ -307,13 +315,14 @@ public class HistoryPanel {
                 }
                 Ts.get().addUncommitted(view.getConcept());
                 reset();
+                navigator.getImplementButton().setEnabled(false);
             } catch (IOException ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
         }
     }
-
     private ApplyVersionChangesListener avcl = new ApplyVersionChangesListener();
+
     public HistoryPanel(ConceptView view, JScrollPane historyScroller,
             ConceptNavigator navigator) throws IOException {
         this.view = view;
@@ -449,9 +458,24 @@ public class HistoryPanel {
                 button = new JRadioButton();
                 button.addChangeListener(svcl);
                 buttonVersionMap.put(button, positionVersion);
+                if (positionVersion.getTime() == Long.MAX_VALUE) {
+                    // unimplemented change
+                    button.setBackground(Color.YELLOW);
+                    button.setOpaque(true);
+                }
+
+                if (view.getChangedVersionSelections().contains(viewVersion)) {
+                    button.setSelected(true);
+                    button.setBackground(Color.ORANGE);
+                    button.setOpaque(true);
+                    changedSelections.add(button);
+                }
                 if (viewVersion == positionVersion) {
                     originalButtonSelections.add(button);
-                    button.setSelected(true);
+                    if (group.getSelection() == null) {
+                        button.setSelected(true);
+                    }
+                    
                 }
                 nidSapNidButtonMap.put(nidSapNidKey, button);
                 buttonSapMap.put(button, sapNid);

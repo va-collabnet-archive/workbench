@@ -821,11 +821,11 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
     }
 
     public void setHierarchySelection(I_GetConceptData hierarchySelection) {
-        frameConfig.setHierarchySelection(hierarchySelection);
+        //frameConfig.setHierarchySelection(hierarchySelection);
     }
 
     public void setHierarchySelectionAndExpand(I_GetConceptData hierarchySelection) throws IOException {
-        frameConfig.setHierarchySelectionAndExpand(hierarchySelection);
+        //frameConfig.setHierarchySelectionAndExpand(hierarchySelection);
     }
 
     public void setHierarchyToggleVisible(boolean visible) {
