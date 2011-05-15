@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,8 +30,10 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.db.bdb.BdbTermFactory;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
 
@@ -215,8 +218,10 @@ public class CommentsRefset extends Refset {
 			count++;
 		}
 
-		refsetHelper.newRefsetExtension(this.refsetId, componentId, EConcept.REFSET_TYPES.CID_CID_STR, rfPropMap, config);
-
+		// Removed to allow duplicate strings creations, using BdbTermFactory.createMember instead
+		//refsetHelper.newRefsetExtension(this.refsetId, componentId, EConcept.REFSET_TYPES.CID_CID_STR, rfPropMap, config);
+		BdbTermFactory.createMember(UUID.randomUUID(), componentId, EConcept.REFSET_TYPES.CID_CID_STR,org.ihtsdo.concept.Concept.get(refsetId),
+	            config, rfPropMap);
 		termFactory.addUncommittedNoChecks(componentConcept);
 		termFactory.addUncommittedNoChecks(refsetConcept);
 		termFactory.commit();
