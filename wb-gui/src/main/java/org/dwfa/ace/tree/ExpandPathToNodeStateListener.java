@@ -46,6 +46,9 @@ public class ExpandPathToNodeStateListener implements ChangeListener {
         super();
         this.tree = tree;
         this.focus = focus;
+        if (focus == null) {
+            return;
+        }
         config.getParentExpandedNodes().clear();
         config.getChildrenExpandedNodes().clear();
         tree.addWorkerFinishedListener(this);
@@ -101,6 +104,9 @@ public class ExpandPathToNodeStateListener implements ChangeListener {
 
     @Override
     public void stateChanged(ChangeEvent e) {
+        if (focus == null) {
+            return;
+        }
         DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) tree.getModel().getRoot();
 
         boolean allFound = true;

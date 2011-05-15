@@ -143,6 +143,9 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
     private boolean cancel(
             ConceptComponent<?, ?> cc) {
+        if (cc == null) {
+            return true;
+        }
         // component
         if (cc.getTime() == Long.MAX_VALUE) {
             cc.cancel();

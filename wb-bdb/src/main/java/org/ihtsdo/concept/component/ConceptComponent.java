@@ -1868,11 +1868,16 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     public void cancel() {
+        if (this.getTime() == Long.MAX_VALUE) {
+            this.primordialSapNid = -1;
+        }
         if (additionalIdVersions != null) {
             List<IdentifierVersion> toRemove = new ArrayList<IdentifierVersion>();
             for (IdentifierVersion idv : additionalIdVersions) {
                 if (idv.getTime() == Long.MAX_VALUE) {
                     toRemove.add(idv);
+                    idv.setTime(Long.MIN_VALUE);
+                    idv.setStatusAtPositionNid(-1);
                 }
             }
             if (toRemove.size() > 0) {
