@@ -270,7 +270,7 @@ public class RulesLibrary {
 		String result = "Done";
 		activity.setProgressInfoUpper("<html>Performed QA check on concept: " + concept.toString() + 
 					" for " + context.toString());
-		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
+		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result + " -  Rules fired:" + results.getResultsItems().size());
 		try {
 			activity.complete();
 		} catch (ComputationCanceled e) {
