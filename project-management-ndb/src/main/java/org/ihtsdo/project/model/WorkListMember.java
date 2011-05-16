@@ -18,6 +18,7 @@ package org.ihtsdo.project.model;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +31,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 
 /**
  * The Class WorkListMember.
@@ -249,9 +251,12 @@ public class WorkListMember implements Serializable {
 				I_ExtendByRefPartCid promotionExtensionPart = null;
 				List<? extends I_ExtendByRefPart> loopParts = promotionMember.getMutableParts();
 				for (I_ExtendByRefPart loopPart : loopParts) {
-					if (loopPart.getVersion() >= lastVersion) {
-						lastVersion = loopPart.getVersion();
-						promotionExtensionPart = (I_ExtendByRefPartCid) loopPart;
+					Collection<ComponentVersionBI> listVersions = loopPart.getVersions(config.getViewCoordinate());
+					for (ComponentVersionBI ver : listVersions) {
+						if(lastVersion >= lastVersion){
+							lastVersion = ver.getTime();
+							promotionExtensionPart = (I_ExtendByRefPartCid) loopPart;
+						}
 					}
 				}
 				name = termFactory.getConcept(promotionExtensionPart.getAuthorNid()).toString();
