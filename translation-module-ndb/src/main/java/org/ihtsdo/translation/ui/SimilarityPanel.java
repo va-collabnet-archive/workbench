@@ -274,9 +274,6 @@ public class SimilarityPanel extends JPanel implements Serializable{
 			}
 		};
 		similarityTable.setModel(tableModel);
-		similarityTable.setCellSelectionEnabled(true);
-		similarityTable.setColumnSelectionAllowed(true);
-		similarityTable.setRowSelectionAllowed(true);
 		columnModel = new CustomTableColumnModel();
 		similarityTable.setColumnModel(columnModel);
 		similarityTable.createDefaultColumnsFromModel();
@@ -305,11 +302,6 @@ public class SimilarityPanel extends JPanel implements Serializable{
 				tableModel.addRow(new Object[] { highlightedSourceText, item.getTargetText(), transStatus, item });
 			}
 		}
-
-//		TableColumnModel cmodel = similarityTable.getColumnModel();
-//		TextAreaRenderer textAreaRenderer = new TextAreaRenderer();
-//		cmodel.getColumn(0).setCellRenderer(textAreaRenderer);
-//		cmodel.getColumn(1).setCellRenderer(textAreaRenderer);
 
 		similarityTable.revalidate();
 	}

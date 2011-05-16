@@ -33,6 +33,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import javax.swing.*;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -82,7 +83,6 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 	private I_GetConceptData preferred;
 	private List<Integer> sourceIds;
 	private int targetId;
-	private I_GetConceptData concept;
 	private I_ConfigAceFrame config;
 	private CustomTableColumnModel columnModel;
 	private TranslationProject project;
@@ -94,6 +94,7 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 
 	public SimilarityPanelClon() {
 		initComponents();
+		progressBar1.setVisible(false);
 		try {
 			this.config = Terms.get().getActiveAceFrameConfig();
 			fsn = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
@@ -145,7 +146,6 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 		this.project = translationProject;
 		this.worklistMember = worklistMember;
 		this.sourceFSN = sourceFSN;
-		this.concept = concept;
 		this.sourceIds = sourceIds;
 		this.targetId = targetId;
 	}
@@ -157,6 +157,9 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 	 *            the query
 	 */
 	private void updateSimilarityTable(final String query) {
+		progressBar1.setVisible(true);
+		progressBar1.revalidate();
+		progressBar1.repaint();
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -213,7 +216,7 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 				}
 			}
 		});
-
+		progressBar1.setVisible(false);
 		similarityTable.revalidate();
 	}
 
@@ -392,6 +395,7 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 		rbPref = new JRadioButton();
 		radioButton2 = new JRadioButton();
 		refineCheckBox = new JCheckBox();
+		progressBar1 = new JProgressBar();
 		similPopUp = new JPopupMenu();
 		copySourceItem = new JMenuItem();
 		copyTargetItem = new JMenuItem();
@@ -496,9 +500,9 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 			{
 				panel13.setBackground(new Color(238, 238, 238));
 				panel13.setLayout(new GridBagLayout());
-				((GridBagLayout)panel13.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0};
+				((GridBagLayout)panel13.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0};
 				((GridBagLayout)panel13.getLayout()).rowHeights = new int[] {0, 0};
-				((GridBagLayout)panel13.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel13.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
 				((GridBagLayout)panel13.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 				//---- rbFSN ----
@@ -544,6 +548,9 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 				//---- refineCheckBox ----
 				refineCheckBox.setText("Refine");
 				panel13.add(refineCheckBox, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
+				panel13.add(progressBar1, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 0, 0), 0, 0));
 			}
@@ -603,6 +610,7 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 	private JRadioButton rbPref;
 	private JRadioButton radioButton2;
 	private JCheckBox refineCheckBox;
+	private JProgressBar progressBar1;
 	private JPopupMenu similPopUp;
 	private JMenuItem copySourceItem;
 	private JMenuItem copyTargetItem;
