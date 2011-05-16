@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -121,6 +122,8 @@ public class RulesContextHelper {
 				in.close();
 				kbCache.put(context.getConceptNid(), kbase);
 				Terms.get().setKnowledgeBaseCache(kbCache);
+			} catch (StreamCorruptedException e0) {
+				serializedKbFile.delete();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {

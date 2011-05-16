@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -474,6 +475,8 @@ public class RulesLibrary {
 					in.close();
 					kbase = KnowledgeBaseFactory.newKnowledgeBase();
 					kbase.addKnowledgePackages(kpkgs);
+				} catch (StreamCorruptedException e0) {
+					serializedKbFile.delete();
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -575,6 +578,8 @@ public class RulesLibrary {
 				// package or a collection.
 				kbase = (KnowledgeBase)in.readObject();
 				in.close();
+			} catch (StreamCorruptedException e0) {
+				serializedKbFile.delete();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -721,6 +726,8 @@ public class RulesLibrary {
 				in.close();
 				kbase = KnowledgeBaseFactory.newKnowledgeBase();
 				kbase.addKnowledgePackages(kpkgs);
+			} catch (StreamCorruptedException e0) {
+				serializedKbFile.delete();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
