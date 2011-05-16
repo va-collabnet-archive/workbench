@@ -36,7 +36,7 @@
 	<field name="worklist" class="java.lang.String"/>
 	<field name="status" class="java.lang.String"/>
 	<field name="term" class="java.lang.String"/>
-	<field name="target prefered" class="java.lang.String"/>
+	<field name="target preferred" class="java.lang.String"/>
 	<field name="last user" class="java.lang.String"/>
 	<group name="worklist">
 		<groupExpression><![CDATA[$F{worklist}]]></groupExpression>
@@ -240,7 +240,7 @@
 			<textField isStretchWithOverflow="true">
 				<reportElement stretchType="RelativeToBandHeight" x="239" y="0" width="195" height="18"/>
 				<textElement verticalAlignment="Middle"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{target prefered}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{target preferred}]]></textFieldExpression>
 			</textField>
 			<line>
 				<reportElement stretchType="RelativeToBandHeight" x="433" y="0" width="1" height="18" forecolor="#CCCCCC"/>
