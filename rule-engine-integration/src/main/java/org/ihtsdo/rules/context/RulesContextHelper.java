@@ -114,7 +114,9 @@ public class RulesContextHelper {
 		File serializedKbFile = new File("rules/" + context.getConceptNid() + ".bkb");
 		if (kbCache.containsKey(context.getConceptNid()) && !recreate) {
 			returnBase = kbCache.get(context.getConceptNid());
-		} else if (serializedKbFile.exists() && !recreate){
+		} 
+
+		if (returnBase == null && serializedKbFile.exists() && !recreate){
 			KnowledgeBase kbase = null;
 			try {
 				ObjectInputStream in = new ObjectInputStream(new FileInputStream(serializedKbFile));
@@ -132,7 +134,9 @@ public class RulesContextHelper {
 				e.printStackTrace();
 			}
 			returnBase = kbase;
-		} else {
+		}
+		
+		if (returnBase == null) {
 			//RulesDeploymentPackageReferenceHelper rulesPackageHelper = new RulesDeploymentPackageReferenceHelper(config);
 
 			KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
