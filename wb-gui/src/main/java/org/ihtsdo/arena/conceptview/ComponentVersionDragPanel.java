@@ -4,6 +4,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.LayoutManager;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -38,6 +40,8 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
     private static final long serialVersionUID = 1L;
     private static ImageIcon dynamicPopupImage = new ImageIcon(DragPanelRel.class.getResource("/16x16/plain/dynamic_popup.png"));
     private static ImageIcon ghostIcon = new ImageIcon(DragPanelRel.class.getResource("/16x16/plain/ghost.png"));
+    private static int MIN_HEIGHT = 22;
+
 
     public static ImageIcon getGhostIcon() {
         return ghostIcon;
@@ -77,7 +81,56 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
                         : "minimize.gif"))));
                 updateCollapseExpandButton();
             }
-        });
+        }) {
+
+            @Override
+            public void setBounds(int x, int y, int width, int height) {
+                super.setBounds(x, y, width, Math.max(MIN_HEIGHT, height));
+            }
+
+            @Override
+            public void setBounds(Rectangle r) {
+                r.height = Math.max(MIN_HEIGHT, r.height);
+                super.setBounds(r);
+            }
+
+            @Override
+            public void resize(int width, int height) {
+                super.resize(width, Math.max(MIN_HEIGHT, height));
+            }
+
+            @Override
+            public void resize(Dimension d) {
+                d.height = Math.max(MIN_HEIGHT, d.height);
+                super.resize(d);
+            }
+
+            @Override
+            public void setSize(int width, int height) {
+                super.setSize(width, Math.max(MIN_HEIGHT, height));
+            }
+
+            @Override
+            public void setSize(Dimension d) {
+                d.height = Math.max(MIN_HEIGHT, d.height);
+                super.setSize(d);
+            }
+
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension d = super.getPreferredSize();
+                d.height = Math.max(MIN_HEIGHT, d.height);
+                return d;
+            }
+
+            @Override
+            public void setMinimumSize(Dimension d) {
+                d.height = Math.max(MIN_HEIGHT, d.height);
+                super.setMinimumSize(d);
+            }
+            
+            
+        };
     }
 
     private void updateCollapseExpandButton() {
@@ -197,6 +250,7 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
         JLabel l = new JLabel(text);
         l.setFont(l.getFont().deriveFont(getSettings().getFontSize()));
         l.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
+        l.setMinimumSize(new Dimension(15, 30));
         return l;
     }
 
