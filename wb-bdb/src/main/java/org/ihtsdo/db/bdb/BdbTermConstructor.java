@@ -113,20 +113,31 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
             throws IOException, InvalidCAB {
         RefsetMember<?, ?> refex = getRefex(blueprint);
         if (refex != null) {
-            boolean current = false;
-            for (RefexVersionBI refexv : refex.getVersions(vc)) {
-                if (blueprint.validate(refexv)) {
-                    current = true;
-                    break;
+            if (refex.getSapNid() == -1 || refex.getTime() != -1) {
+                return reCreateRefex(refex, blueprint);
+            } else {
+                boolean current = false;
+                for (RefexVersionBI refexv : refex.getVersions(vc)) {
+                    if (blueprint.validate(refexv)) {
+                        current = true;
+                        break;
+                    }
                 }
+                if (current) {
+                    return refex;
+                }
+                return updateRefex(refex, blueprint);
             }
-            if (current) {
-                return refex;
-            }
-            return updateRefex(refex, blueprint);
         }
 
         return createRefex(blueprint);
+    }
+
+    
+    private RefexChronicleBI<?> reCreateRefex(RefsetMember<?, ?> refex, 
+            RefexCAB blueprint)
+            throws IOException, InvalidCAB {
+        return RefsetMemberFactory.reCreate(blueprint, refex, ec);
     }
 
     private RefexChronicleBI<?> createRefex(RefexCAB blueprint)

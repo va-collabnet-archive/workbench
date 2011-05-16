@@ -413,7 +413,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public int hashCode() {
-            return Hashcode.compute(new int[] {index, nid});
+            return Hashcode.compute(new int[]{index, nid});
         }
 
         public Version() {
@@ -446,6 +446,15 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 return revisions.get(index);
             }
             return this;
+        }
+
+        @Override
+        public boolean sapIsInRange(int min, int max) {
+            if (index >= 0) {
+                return revisions.get(index).sapNid >= min
+                        && revisions.get(index).sapNid <= max;
+            }
+            return ConceptComponent.this.sapIsInRange(min, max);
         }
 
         @Override
@@ -875,11 +884,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
         return Collections.unmodifiableCollection(annotations);
     }
-	
-	
-	public ConcurrentSkipListSet<RefexChronicleBI<?>> getAnnotationsMod() {
-		return annotations; 
-	}
+
+    public ConcurrentSkipListSet<RefexChronicleBI<?>> getAnnotationsMod() {
+        return annotations;
+    }
 
     /**
      * Call when data has changed, so concept updates it's version.
@@ -2016,16 +2024,15 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public Collection<? extends RefexChronicleBI<?>> getRefexes()
             throws IOException {
         List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
-        if (pairs == null || pairs.isEmpty()) {
-            return new ArrayList<RefexChronicleBI<?>>(0);
-        }
         List<RefexChronicleBI<?>> returnValues = new ArrayList<RefexChronicleBI<?>>(pairs.size());
         HashSet<Integer> addedMembers = new HashSet<Integer>();
-        for (NidPairForRefset pair : pairs) {
-            RefexChronicleBI<?> ext = (RefexChronicleBI<?>) Bdb.getComponent(pair.getMemberNid());
-            if (ext != null && !addedMembers.contains(ext.getNid())) {
-                addedMembers.add(ext.getNid());
-                returnValues.add(ext);
+        if (pairs != null && !pairs.isEmpty()) {
+            for (NidPairForRefset pair : pairs) {
+                RefexChronicleBI<?> ext = (RefexChronicleBI<?>) Bdb.getComponent(pair.getMemberNid());
+                if (ext != null && !addedMembers.contains(ext.getNid())) {
+                    addedMembers.add(ext.getNid());
+                    returnValues.add(ext);
+                }
             }
         }
 
@@ -2119,5 +2126,24 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     @Override
     public boolean isActive(NidSetBI allowedStatusNids) {
         return allowedStatusNids.contains(getStatusNid());
+    }
+
+    @Override
+    public boolean sapIsInRange(int min, int max) {
+        if (primordialSapNid >= min
+                && primordialSapNid <= max) {
+            return true;
+        }
+        if (annotations != null) {
+            for (RefexChronicleBI<?> a : annotations) {
+                for (RefexVersionBI<?> av : a.getVersions()) {
+                    if (av.sapIsInRange(min, max)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }

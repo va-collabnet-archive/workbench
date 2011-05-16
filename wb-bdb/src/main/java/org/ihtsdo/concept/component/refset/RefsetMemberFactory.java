@@ -3,8 +3,6 @@ package org.ihtsdo.concept.component.refset;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.ihtsdo.concept.component.refsetmember.Boolean.BooleanMember;
 import org.ihtsdo.concept.component.refsetmember.Long.LongMember;
@@ -36,10 +34,8 @@ import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetMember;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
-import org.dwfa.ace.api.I_GetConceptData;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
@@ -47,6 +43,45 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 
 public class RefsetMemberFactory {
+
+    public static RefsetMember<?, ?> reCreate(RefexCAB res, RefsetMember<?, ?> member, EditCoordinate ec) throws IOException, InvalidCAB {
+        Concept refexColCon = (Concept) Ts.get().getConcept(res.getRefexColNid());
+        int refexNid = Bdb.uuidToNid(res.getMemberUUID());
+        member.nid = refexNid;
+        if (refexColCon.isAnnotationStyleRefex()) {
+            member.enclosingConceptNid = Ts.get().getConceptNidForNid(res.getRcNid());
+            Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, refexNid);
+            Ts.get().getComponent(res.getRcNid()).addAnnotation(member);
+       } else {
+            member.enclosingConceptNid = refexColCon.getNid();
+            Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, refexNid);
+            refexColCon.getData().add(member);
+        }
+        for (int i = 0; i < ec.getEditPaths().length; i++) {
+            if (i == 0) {
+                member.setStatusAtPositionNid(
+                        Bdb.getSapNid(res.getInt(RefexProperty.STATUS_NID),
+                        ec.getAuthorNid(),
+                        ec.getEditPaths()[i],
+                        Long.MAX_VALUE));
+                member.primordialUNid =
+                        Bdb.getUuidDb().addUuid(res.getMemberUUID());
+                try {
+                    res.setPropertiesExceptSap(member);
+                } catch (PropertyVetoException ex) {
+                    throw new InvalidCAB("RefexAmendmentSpec: " + res, ex);
+                }
+
+            } else {
+                member.makeAnalog(res.getInt(RefexProperty.STATUS_NID),
+                        ec.getAuthorNid(),
+                        ec.getEditPaths()[i],
+                        Long.MAX_VALUE);
+            }
+
+        }
+        return member;
+    }
 
     @SuppressWarnings("rawtypes")
     public RefsetMember create(int nid, int typeNid, int enclosingConceptNid,
@@ -180,42 +215,7 @@ public class RefsetMemberFactory {
             EditCoordinate ec)
             throws IOException, InvalidCAB {
         RefsetMember<?, ?> member = createBlank(res);
-        Concept refexColCon = (Concept) Ts.get().getConcept(res.getRefexColNid());
-        int refexNid = Bdb.uuidToNid(res.getMemberUUID());
-        member.nid = refexNid;
-        if (refexColCon.isAnnotationStyleRefex()) {
-            member.enclosingConceptNid = Ts.get().getConceptNidForNid(res.getRcNid());
-            Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, refexNid);
-            Ts.get().getComponent(res.getRcNid()).addAnnotation(member);
-       } else {
-            member.enclosingConceptNid = refexColCon.getNid();
-            Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, refexNid);
-            refexColCon.getData().add(member);
-        }
-        for (int i = 0; i < ec.getEditPaths().length; i++) {
-            if (i == 0) {
-                member.setStatusAtPositionNid(
-                        Bdb.getSapNid(res.getInt(RefexProperty.STATUS_NID),
-                        ec.getAuthorNid(),
-                        ec.getEditPaths()[i],
-                        Long.MAX_VALUE));
-                member.primordialUNid =
-                        Bdb.getUuidDb().addUuid(res.getMemberUUID());
-                try {
-                    res.setPropertiesExceptSap(member);
-                } catch (PropertyVetoException ex) {
-                    throw new InvalidCAB("RefexAmendmentSpec: " + res, ex);
-                }
-
-            } else {
-                member.makeAnalog(res.getInt(RefexProperty.STATUS_NID),
-                        ec.getAuthorNid(),
-                        ec.getEditPaths()[i],
-                        Long.MAX_VALUE);
-            }
-
-        }
-        return member;
+        return reCreate(res, member, ec);
     }
 
     private static RefsetMember<?, ?> createBlank(RefexCAB res) {

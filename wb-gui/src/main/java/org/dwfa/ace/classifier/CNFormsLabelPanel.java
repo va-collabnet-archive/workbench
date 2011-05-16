@@ -68,7 +68,6 @@ import org.dwfa.ace.task.classify.SnoTable;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
-import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -408,6 +407,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         public boolean isActive(NidSetBI allowedStatusNids) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public boolean sapIsInRange(int min, int max) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
     }
@@ -855,6 +859,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         public boolean isActive(NidSetBI allowedStatusNids) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public boolean sapIsInRange(int min, int max) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
     }

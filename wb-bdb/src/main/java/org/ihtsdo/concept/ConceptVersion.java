@@ -632,8 +632,8 @@ public class ConceptVersion implements ConceptVersionBI {
             for (ConceptSpec historicalType : historicalTypes) {
                 for (RelationshipChronicleBI outRel : outRels) {
                     RelationshipVersionBI<?> vOutRel = outRel.getVersion(c);
-                    if(vOutRel != null){
-                    	int typeNid = vOutRel.getTypeNid();
+                    if (vOutRel != null) {
+                        int typeNid = vOutRel.getTypeNid();
                         UUID[] compUuids = historicalType.getUuids();
                         for (UUID compUuid : compUuids) {
                             if (tf.nidToUuid(typeNid).compareTo(compUuid) == 0) {
@@ -795,9 +795,14 @@ public class ConceptVersion implements ConceptVersionBI {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-	@Override
-	public FoundContradictionVersions getVersionsInContradiction(
-			ViewCoordinate vc) {
+    @Override
+    public FoundContradictionVersions getVersionsInContradiction(
+            ViewCoordinate vc) {
         throw new UnsupportedOperationException("Not supported yet.");
-	}
+    }
+
+    @Override
+    public boolean sapIsInRange(int min, int max) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

@@ -124,7 +124,7 @@ public class ConceptComponentBinder<V extends Revision<V, C>, C extends ConceptC
         List<C> componentListToWrite = new ArrayList<C>(conceptComponentList.size());
         for (C conceptComponent : conceptComponentList) {
             componentsEncountered.incrementAndGet();
-            if (conceptComponent.primordialSapNid > maxReadOnlyStatusAtPositionId
+            if (conceptComponent.sapIsInRange(maxReadOnlyStatusAtPositionId + 1, Integer.MAX_VALUE) 
                     && conceptComponent.getTime() != Long.MIN_VALUE) {
                 componentListToWrite.add(conceptComponent);
             } else {

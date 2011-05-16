@@ -419,4 +419,11 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     public boolean isActive(NidSetBI allowedStatusNids) {
         return allowedStatusNids.contains(getStatusNid());
     }
+
+    @Override
+    public boolean sapIsInRange(int min, int max) {
+        return sapNid >= min
+                && sapNid <= max;
+
+    }
 }

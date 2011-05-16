@@ -11,6 +11,7 @@ public interface ComponentVersionBI extends ComponentBI {
     int getPathNid();
     long getTime();
     int getSapNid();
+    boolean sapIsInRange(int min, int max);
     PositionBI getPosition() throws IOException;
     ComponentChroncileBI getChronicle();
     String toUserString(TerminologySnapshotDI snapshot) 

@@ -239,4 +239,9 @@ public class RelGroupVersion
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    public boolean sapIsInRange(int min, int max) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }
