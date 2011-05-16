@@ -31,6 +31,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.refset.PromotionRefset;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 
 /**
@@ -245,25 +246,26 @@ public class WorkListMember implements Serializable {
 		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 		I_GetConceptData workListConcept = termFactory.getConcept(this.workListUUID);
 		WorkList workList = TerminologyProjectDAO.getWorkList(workListConcept, config);
-		for (I_ExtendByRef promotionMember : termFactory.getAllExtensionsForComponent(id)) {
-			if (promotionMember.getRefsetId() == workList.getPromotionRefset(config).getRefsetId()) {
-				long lastVersion = Long.MIN_VALUE;
-				I_ExtendByRefPartCid promotionExtensionPart = null;
-				List<? extends I_ExtendByRefPart> loopParts = promotionMember.getMutableParts();
-				for (I_ExtendByRefPart loopPart : loopParts) {
-					Collection<ComponentVersionBI> listVersions = loopPart.getVersions(config.getViewCoordinate());
-					for (ComponentVersionBI ver : listVersions) {
-						if(lastVersion >= lastVersion){
-							lastVersion = ver.getTime();
-							promotionExtensionPart = (I_ExtendByRefPartCid) loopPart;
-						}
-					}
-				}
-				name = termFactory.getConcept(promotionExtensionPart.getAuthorNid()).toString();
-			}
-		}
+		I_GetConceptData lastAuthor = workList.getPromotionRefset(config).getLastPromotionAuthor(id, config);
+//		for (I_ExtendByRef promotionMember : termFactory.getAllExtensionsForComponent(id)) {
+//			if (promotionMember.getRefsetId() == workList.getPromotionRefset(config).getRefsetId()) {
+//				long lastVersion = Long.MIN_VALUE;
+//				I_ExtendByRefPartCid promotionExtensionPart = null;
+//				List<? extends I_ExtendByRefPart> loopParts = promotionMember.getMutableParts();
+//				for (I_ExtendByRefPart loopPart : loopParts) {
+//					Collection<ComponentVersionBI> listVersions = loopPart.getVersions(config.getViewCoordinate());
+//					for (ComponentVersionBI ver : listVersions) {
+//						if(lastVersion >= lastVersion){
+//							lastVersion = ver.getTime();
+//							promotionExtensionPart = (I_ExtendByRefPartCid) loopPart;
+//						}
+//					}
+//				}
+//				name = termFactory.getConcept(promotionExtensionPart.getAuthorNid()).toString();
+//			}
+//		}
 		
-		return name;
+		return lastAuthor.toString();
 	}
 
 	public Long getStatusDate() {

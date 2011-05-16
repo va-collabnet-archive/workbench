@@ -33,9 +33,9 @@ public class PromotionRefset extends Refset {
 		List<? extends I_ExtendByRef> members = termFactory.getAllExtensionsForComponent(componentId);
 		for (I_ExtendByRef promotionMember : members) {
 			if (promotionMember.getRefsetId() == this.refsetId) {
-				List<? extends I_ExtendByRefVersion> tuples = promotionMember.getTuples(config.getAllowedStatus(), 
+				List<? extends I_ExtendByRefVersion> tuples = promotionMember.getTuples(null, 
 						config.getViewPositionSetReadOnly(), 
-						Precedence.TIME, 
+						Precedence.PATH, 
 						config.getConflictResolutionStrategy());
 				if (tuples != null && !tuples.isEmpty()) {
 					I_ExtendByRefVersion lastTuple = null;

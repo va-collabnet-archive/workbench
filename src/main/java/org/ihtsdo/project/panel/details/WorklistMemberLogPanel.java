@@ -237,10 +237,8 @@ public class WorklistMemberLogPanel extends JPanel {
 							rowHeight[rowCount]=tmpHeight;
 						}
 					} catch (TerminologyException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					break;
