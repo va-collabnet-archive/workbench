@@ -42,7 +42,7 @@ public class UpdateAllPackagesTask extends SwingWorker<Object, Object> {
 		long elapsed = endTime - startTime;
 		String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
 		String result = "Done";
-		activity.setProgressInfoUpper("<html>Updating knowledge packages...");
+		activity.setProgressInfoUpper("<html>Knowledge packages updated...");
 		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
 		try {
 			activity.complete();
