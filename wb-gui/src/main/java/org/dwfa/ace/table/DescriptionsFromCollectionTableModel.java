@@ -27,6 +27,7 @@ import javax.swing.event.TableModelEvent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.search.LuceneDescriptionMatch;
 import org.dwfa.ace.search.LuceneMatch;
 
 public class DescriptionsFromCollectionTableModel extends DescriptionTableModel {
@@ -68,7 +69,7 @@ public class DescriptionsFromCollectionTableModel extends DescriptionTableModel 
         scoreList = new ArrayList<Float>(matches.size());
         synchronized (matches) {
             for (LuceneMatch m : matches) {
-                descriptionList.add(m.getDesc());
+                descriptionList.add(((LuceneDescriptionMatch)m).getDesc());
                 scoreList.add(m.getScore());
             }
         }

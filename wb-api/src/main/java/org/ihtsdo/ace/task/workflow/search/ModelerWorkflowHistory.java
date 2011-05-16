@@ -4,11 +4,10 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.SortedSet;
 import java.util.UUID;
 import java.util.logging.Level;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -76,22 +75,7 @@ public class ModelerWorkflowHistory extends AbstractWorkflowHistorySearchTest {
    }
 
    @Override
-   public boolean test(WorkflowHistoryJavaBean bean, I_ConfigAceFrame frameConfig) throws TaskFailedException {
-      try {
-         UUID modUUID = validateModeler(testModeler);
-
-         if (modUUID != null && bean.getModeler().equals(modUUID)) {
-            return true;
-         } else {
-            return false;
-         }
-      } catch (Exception e) {
-         // TODO Auto-generated catch block
-         throw new TaskFailedException("Couldn't read search Modeler!");
-      }
-   }
-
-   public boolean test(Set<WorkflowHistoryJavaBean> wfHistory)
+   public boolean test(SortedSet<WorkflowHistoryJavaBean> wfHistory)
            throws TaskFailedException {
 
       try {
@@ -146,6 +130,11 @@ public class ModelerWorkflowHistory extends AbstractWorkflowHistorySearchTest {
       return null;
    }
    
+
+   public UUID getCurrentTestUUID() throws TaskFailedException {
+       return testModeler.getPrimUuid();
+   }
+
    @Override
 	public int getTestType() {
 		return hasModeler;

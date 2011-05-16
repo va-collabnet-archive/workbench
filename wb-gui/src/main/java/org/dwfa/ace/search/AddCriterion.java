@@ -23,6 +23,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.search.workflow.WorkflowHistoryCriterionPanel;
+import org.dwfa.ace.search.workflow.WorkflowHistorySearchPanel;
 
 public class AddCriterion implements ActionListener {
 
@@ -41,7 +43,7 @@ public class AddCriterion implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         try {
         	if (SearchPanel.class.isInstance(searchPanel))
-            searchPanel.getCriterionPanels().add(searchPanel.makeCriterionPanel());
+            	searchPanel.getCriterionPanels().add(searchPanel.makeCriterionPanel());
         	else
         	{
         		WorkflowHistoryCriterionPanel panel = ((WorkflowHistorySearchPanel)searchPanel).makeCriterionPanel();

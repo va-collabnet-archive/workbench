@@ -7,7 +7,6 @@ import org.ihtsdo.tk.contradiction.ComponentType;
 
 public class RefsetAttributeComparer extends AttributeComparer {
 
-	private int memberId = 0;
 	private int compId = 0;
 	private int referencedComponentNid = 0;
 	private int typeId = 0;
@@ -24,8 +23,7 @@ public class RefsetAttributeComparer extends AttributeComparer {
 	boolean hasSameAttributes(ComponentVersionBI v) {
 		I_ExtendByRefVersion  refsetVersion = (I_ExtendByRefVersion )v;
 
-		if ((refsetVersion.getMemberId() != memberId) ||
-			(refsetVersion.getComponentId() != compId) || 
+		if ((refsetVersion.getComponentId() != compId) || 
 			(refsetVersion.getReferencedComponentNid() != referencedComponentNid) || 
 			(refsetVersion.getTypeId() != typeId) ||
 			(refsetVersion.getRefsetId() != refsetId) ||
@@ -41,7 +39,6 @@ public class RefsetAttributeComparer extends AttributeComparer {
 	public void initializeAttributes(ComponentVersionBI v) {
 		I_ExtendByRefVersion refsetVersion = (I_ExtendByRefVersion)v;
 		
-	    memberId = refsetVersion.getMemberId();
 	    compId = refsetVersion.getComponentId();
 		referencedComponentNid = refsetVersion.getReferencedComponentNid();
 	    typeId = refsetVersion.getTypeId();

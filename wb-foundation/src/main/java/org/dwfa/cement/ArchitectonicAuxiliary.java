@@ -496,6 +496,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                     new I_ConceptualizeUniversally[] { RELATIONSHIP }),        
  			SEMANTIC_PARENT_REL("is a Semantic Parent of (terminology constant)",
 		 			new I_ConceptualizeUniversally[] { RELATIONSHIP }),        
+		 	SEMTAG_UUID_REL("semantic tag maps to (terminology constant)",
+				 	new I_ConceptualizeUniversally[] { RELATIONSHIP }),                    
             IS_POT_DUP_REL("is-a potential duplicate rel (terminology constant)",
                     new I_ConceptualizeUniversally[] { DUP_REL_TYPE }),
             IS_NOT_A_DUP_REL("is NOT a dup rel (terminology constant)",

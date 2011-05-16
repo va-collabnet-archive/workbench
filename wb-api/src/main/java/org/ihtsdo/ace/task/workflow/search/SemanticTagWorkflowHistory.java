@@ -2,7 +2,9 @@ package org.ihtsdo.ace.task.workflow.search;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.Set;
+import java.util.Collection;
+import java.util.SortedSet;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -16,18 +18,18 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
-import org.ihtsdo.workflow.refset.semArea.SemanticAreaSearchRefset;
+import org.ihtsdo.workflow.refset.semTag.SemanticTagsRefset;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/search", type = BeanType.TASK_BEAN),
                    @Spec(directory = "search/workflow", type = BeanType.TASK_BEAN) })
 
-public class SemanticHierarchyDropDown extends AbstractWorkflowHistorySearchTest {
+public class SemanticTagWorkflowHistory extends AbstractWorkflowHistorySearchTest {
 
     private static final long serialVersionUID = 1;
 
     private static final int dataVersion = 1;
 
-    private static SemanticAreaSearchRefset refset = null;
+    private static SemanticTagsRefset refset = null;
 
     private static I_ConfigAceFrame frameConfig = null;
     
@@ -55,15 +57,9 @@ public class SemanticHierarchyDropDown extends AbstractWorkflowHistorySearchTest
             
             if (this.testHierarchy == null || this.testHierarchy.length() == 0)
             {
-	            	testHierarchy = "observable_entity";
+	            testHierarchy = "procedure";
             }
         }
-    }
-
-    @Override
-    public boolean test(WorkflowHistoryJavaBean bean, I_ConfigAceFrame frameConfig) throws TaskFailedException {
-    	return false;
-    	
     }
 
     public String getTestHierarchy() {
@@ -75,12 +71,14 @@ public class SemanticHierarchyDropDown extends AbstractWorkflowHistorySearchTest
     }
 
 	private I_GetConceptData translateStringToHierarchy(String testStr) throws Exception {
-		for (I_ExtendByRef extension : Terms.get().getRefsetExtensionMembers(refset.getRefsetId())) 
-		{
+        Collection<? extends I_ExtendByRef> exts = Terms.get().getRefsetExtensionMembers(refset.getRefsetId());
+        
+        for (I_ExtendByRef extension : exts) {
 			I_ExtendByRefPartStr props = (I_ExtendByRefPartStr)extension;
 		
-			if (props.getStringValue().equalsIgnoreCase(testHierarchy))
+			if (props.getStringValue().equalsIgnoreCase(testHierarchy)) {
 				return Terms.get().getConcept(extension.getComponentId());
+			}
         }
 
 		throw new Exception("String not found");
@@ -100,36 +98,41 @@ public class SemanticHierarchyDropDown extends AbstractWorkflowHistorySearchTest
     }
 
 	@Override
-	public boolean test(Set<WorkflowHistoryJavaBean> wfHistory)
+	public boolean test(SortedSet<WorkflowHistoryJavaBean> wfHistory)
 			throws TaskFailedException {
 
+		boolean retVal = false;
 		WorkflowHistoryJavaBean bean = wfHistory.iterator().next();
 		
     	try {
-            if (refset == null)
-        		refset = new SemanticAreaSearchRefset();
-            if (testHierarchy == null || testHierarchy.length() == 0)
-            {
-            	return false;
+            if (!(testHierarchy == null || testHierarchy.length() == 0)) {
+	            if (frameConfig == null) {
+	    			frameConfig = Terms.get().getActiveAceFrameConfig();
+	            }
+	            
+	            if (refset == null) {
+	        		refset = new SemanticTagsRefset();
+            	}
+	            
+	            I_GetConceptData parentHierarchy = translateStringToHierarchy(testHierarchy);    		
+	            I_GetConceptData testConcept = Terms.get().getConcept(bean.getConcept());
+	            
+	    		if (parentHierarchy.isParentOfOrEqualTo(testConcept, frameConfig.getAllowedStatus(), frameConfig.getDestRelTypes(), 
+	    												frameConfig.getViewPositionSetReadOnly(), frameConfig.getPrecedence(), 
+	    												frameConfig.getConflictResolutionStrategy())) { 
+	    			retVal = true; 
+	    		} 
             }
-            I_GetConceptData parentHierarchy = translateStringToHierarchy(testHierarchy);    		
-            I_GetConceptData testConcept = Terms.get().getConcept(bean.getConcept());
-            
-    		if (parentHierarchy.isParentOfOrEqualTo(testConcept, getFrameConfig().getAllowedStatus(), getFrameConfig().getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(), getFrameConfig().getConflictResolutionStrategy())) 
-    			return true;
-    		else
-    			return false;
-
     	} catch (Exception e) {
-			// TODO Auto-generated catch block
-			throw new TaskFailedException("Couldn't read search Hierarchy!");
+			AceLog.getAppLog().log(Level.WARNING, "Unable to get active frame config");
 		}
-
+    	
+    	return retVal;
 	}
 
     @Override
 	public int getTestType() {
-		return hierarchy;
+		return semTag;
 	}
 
 	@Override

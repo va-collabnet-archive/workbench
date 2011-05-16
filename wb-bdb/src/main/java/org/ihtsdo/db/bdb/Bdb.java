@@ -42,6 +42,7 @@ import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRefset;
 import org.ihtsdo.db.util.NidPairForRel;
 import org.ihtsdo.lucene.LuceneManager;
+import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.Ts;
@@ -242,7 +243,9 @@ public class Bdb {
             }
             File bdbDirectory = new File(dbRoot);
             bdbDirectory.mkdirs();
-            LuceneManager.setDbRootDir(bdbDirectory);
+            LuceneManager.setDbRootDir(bdbDirectory, LuceneSearchType.DESCRIPTION);
+            LuceneManager.setDbRootDir(bdbDirectory, LuceneSearchType.WORKFLOW_HISTORY);
+            
             inform(activity, "Setting up database environment...");
             mutable = new Bdb(false, new File(bdbDirectory, "mutable"));
             File readOnlyDir = new File(bdbDirectory, "read-only");
@@ -549,7 +552,8 @@ public class Bdb {
                 activity.setProgressInfoLower("7/11: Starting BdbCommitManager shutdown.");
                 BdbCommitManager.shutdown();
                 activity.setProgressInfoLower("8/11: Starting LuceneManager close.");
-                LuceneManager.close();
+                LuceneManager.close(LuceneSearchType.DESCRIPTION);
+                LuceneManager.close(LuceneSearchType.WORKFLOW_HISTORY);
                 NidDataFromBdb.close();
                 activity.setProgressInfoLower("9/11: Starting mutable.bdbEnv.sync().");
                 mutable.bdbEnv.sync();

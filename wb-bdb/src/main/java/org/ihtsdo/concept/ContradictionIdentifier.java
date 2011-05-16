@@ -963,9 +963,10 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	private WorkflowHistoryJavaBean createWfHxJavaBean(I_ExtendByRefVersion refsetVersion) {
 		try {
 			StrMember.Version stringVersion = (StrMember.Version)refsetVersion;
-			return WorkflowHelper.fillOutWorkflowHistoryJavaBean(Terms.get().nidToUuid(refsetVersion.getReferencedComponentNid()), 
-																					   stringVersion.getStringValue(), 
-																					   refsetVersion.getTime());
+			return WorkflowHelper.populateWorkflowHistoryJavaBean(refsetVersion.getMemberId(),
+					   											  Terms.get().nidToUuid(refsetVersion.getReferencedComponentNid()), 
+															      stringVersion.getStringValue(), 
+															      refsetVersion.getTime());
 		} catch (Exception e) {
             AceLog.getAppLog().log(Level.WARNING, "Failure to read WfHx Java Bean from Refset Version");
 		}

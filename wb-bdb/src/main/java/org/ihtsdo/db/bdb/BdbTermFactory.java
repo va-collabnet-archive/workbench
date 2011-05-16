@@ -30,6 +30,7 @@ import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 import org.drools.KnowledgeBase;
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.activity.UpperInfoOnlyConsoleMonitor;
@@ -85,7 +86,7 @@ import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.search.I_Search;
 import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
-import org.dwfa.ace.search.SearchWfHistoryStringWorker.WfHxProgressUpdator;
+import org.dwfa.ace.search.workflow.SearchWfHxWorker.LuceneWfHxProgressUpdator;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
@@ -104,7 +105,7 @@ import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
-import org.ihtsdo.ace.api.I_TestWorkflowHistorySearchResults;
+import org.ihtsdo.ace.task.workflow.search.AbstractWorkflowHistorySearchTest;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_FetchConceptFromCursor;
 import org.ihtsdo.concept.I_ProcessConceptData;
@@ -146,9 +147,13 @@ import org.ihtsdo.db.runner.WorkbenchRunner;
 import org.ihtsdo.db.util.NidPairForRefset;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
-import org.ihtsdo.lucene.CheckAndProcessLuceneMatch;
+import org.ihtsdo.lucene.DescriptionCheckAndProcessLuceneMatch;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.SearchResult;
+import org.ihtsdo.lucene.WfHxCheckAndProcessLuceneMatch;
+import org.ihtsdo.lucene.WfHxIndexGenerator;
+import org.ihtsdo.lucene.WfHxLuceneManager;
+import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.KindOfCacheBI;
@@ -162,8 +167,6 @@ import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
-import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetSearcher;
 
 import com.sleepycat.je.DatabaseException;
 import org.ihtsdo.concept.ConceptVersion;
@@ -289,7 +292,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     public SearchResult doLuceneSearch(String query) throws IOException, org.apache.lucene.queryParser.ParseException {
         Query q =
                 new QueryParser(LuceneManager.version, "desc", new StandardAnalyzer(LuceneManager.version)).parse(query);
-        return LuceneManager.search(q);
+        return LuceneManager.search(q, LuceneSearchType.DESCRIPTION);
     }
 
     @Override
@@ -433,9 +436,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     public Set<I_GetConceptData> getConcept(String conceptIdStr) throws TerminologyException,
             org.apache.lucene.queryParser.ParseException, IOException {
         Set<I_GetConceptData> matchingConcepts = new HashSet<I_GetConceptData>();
-        Query q = new QueryParser(LuceneManager.version,
-                "desc", new StandardAnalyzer(LuceneManager.version)).parse(conceptIdStr);
-        SearchResult result = LuceneManager.search(q);
+        Query q = new QueryParser(LuceneManager.version, "desc", new StandardAnalyzer(LuceneManager.version)).parse(conceptIdStr);
+        SearchResult result = LuceneManager.search(q, LuceneSearchType.DESCRIPTION);
 
         for (int i = 0; i < result.topDocs.totalHits; i++) {
             Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
@@ -1512,61 +1514,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public //CountDownLatch 
-            void searchWfHx(I_TrackContinuation tracker, Collection<WorkflowHistoryJavaBean> matches,
-            //CountDownLatch latch, 
-            List<I_TestWorkflowHistorySearchResults> checkList, I_ConfigAceFrame config,
-            WfHxProgressUpdator updater)
-            throws Exception {
-        Stopwatch timer = new Stopwatch();
-        ;
-        timer.start();
-
-        WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
-
-        //updater.setIndeterminate(true);
-        //updater.setProgressInfo("Starting StandardAnalyzer lucene query...");
-        long startTime = System.currentTimeMillis();
-        //updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime)
-        //       + " ms.");
-        throw new Exception();
-        /*
-        SortedSet<WorkflowHistoryJavaBean> searchFindings = searcher.getAllWfHxSortedByTime(); 
-        
-        
-        AceLog.getAppLog().info("StandardAnalyzer query returned " + searchFindings.size() + " hits");
-        //        updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime)
-        //                + " ms. Hits: " + searchFindings.size());
-        
-        //CountDownLatch hitLatch = new CountDownLatch(searchFindings.size());
-        //        updater.setHits(searchFindings.size());
-        //        updater.setIndeterminate(false);
-        
-        Iterator<WorkflowHistoryJavaBean> itr = searchFindings.iterator();
-        while (itr.hasNext())
-        {
-        WorkflowHistoryJavaBean bean = (WorkflowHistoryJavaBean)itr.next(); 
-        
-        ACE.threadPool.execute(new CheckAndProcessWorkflowHistoryMatch(//hitLatch, 
-        updater, bean, matches,
-        checkList, config));
-        }
-        
-        if (AceLog.getAppLog().isLoggable(Level.INFO)) {
-        if (tracker.continueWork()) {
-        AceLog.getAppLog().info("Search time 1: " + timer.getElapsedTime());
-        } else {
-        AceLog.getAppLog().info("Search 1 Canceled. Elapsed time: " + timer.getElapsedTime());
-        }
-        }
-        timer.stop();
-        
-         */
-
-        // return hitLatch;
-    }
-
-    @Override
     public void searchConcepts(I_TrackContinuation tracker, I_RepresentIdSet matches, CountDownLatch latch,
             List<I_TestSearchResults> checkList, I_ConfigAceFrame config) throws DatabaseException, IOException,
             org.apache.lucene.queryParser.ParseException {
@@ -1582,41 +1529,43 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     @Override
     public CountDownLatch searchLucene(I_TrackContinuation tracker, String query, Collection<LuceneMatch> matches,
             CountDownLatch latch, List<I_TestSearchResults> checkList, I_ConfigAceFrame config,
-            LuceneProgressUpdator updater) throws DatabaseException, IOException,
-            org.apache.lucene.queryParser.ParseException {
+            I_UpdateProgress updater) throws IOException {
         Stopwatch timer = new Stopwatch();
         ;
+         
+        LuceneProgressUpdator stringUpdater = (LuceneProgressUpdator)updater;
+        
         timer.start();
         try {
             Query q =
                     new QueryParser(LuceneManager.version, "desc", new StandardAnalyzer(LuceneManager.version)).parse(query);
-            if (LuceneManager.indexExists() == false) {
-                updater.setProgressInfo("Making lucene index -- this may take a while...");
-                LuceneManager.createLuceneDescriptionIndex();
+            if (LuceneManager.indexExists(LuceneSearchType.DESCRIPTION) == false) {
+                stringUpdater.setProgressInfo("Making lucene index -- this may take a while...");
+                LuceneManager.createLuceneIndex(LuceneSearchType.DESCRIPTION);
             }
-            updater.setIndeterminate(true);
-            updater.setProgressInfo("Starting StandardAnalyzer lucene query...");
+            stringUpdater.setIndeterminate(true);
+            stringUpdater.setProgressInfo("Starting StandardAnalyzer lucene query...");
             long startTime = System.currentTimeMillis();
-            updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime)
+            stringUpdater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime)
                     + " ms.");
-            SearchResult result = LuceneManager.search(q);
+            SearchResult result = LuceneManager.search(q, LuceneSearchType.DESCRIPTION);
 
             if (result.topDocs.totalHits > 0) {
                 AceLog.getAppLog().info("StandardAnalyzer query returned " + result.topDocs.totalHits + " hits");
             } else {
-                updater.setProgressInfo("Starting WhitespaceAnalyzer lucene query...");
+                stringUpdater.setProgressInfo("Starting WhitespaceAnalyzer lucene query...");
                 AceLog.getAppLog().info(
                         "StandardAnalyzer query returned no results. Now trying WhitespaceAnalyzer query");
                 q = new QueryParser(LuceneManager.version, "desc", new WhitespaceAnalyzer()).parse(query);
-                result = LuceneManager.search(q);
+                result = LuceneManager.search(q, LuceneSearchType.DESCRIPTION);
             }
 
-            updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime)
+            stringUpdater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime)
                     + " ms. Hits: " + result.topDocs.totalHits);
 
             CountDownLatch hitLatch = new CountDownLatch(result.topDocs.totalHits);
-            updater.setHits(result.topDocs.totalHits);
-            updater.setIndeterminate(false);
+            stringUpdater.setHits(result.topDocs.totalHits);
+            stringUpdater.setIndeterminate(false);
 
             for (int i = 0; i < result.topDocs.totalHits; i++) {
                 Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
@@ -1625,7 +1574,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                     AceLog.getAppLog().fine("Hit: " + doc + " Score: " + score);
                 }
 
-                ACE.threadPool.execute(new CheckAndProcessLuceneMatch(hitLatch, updater, doc, score, matches,
+                ACE.threadPool.execute(new DescriptionCheckAndProcessLuceneMatch(hitLatch, stringUpdater, doc, score, matches,
                         checkList, config));
             }
             if (AceLog.getAppLog().isLoggable(Level.INFO)) {
@@ -1640,16 +1589,16 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         } catch (ParseException pe) {
             AceLog.getAppLog().alertAndLogException(pe);
             timer.stop();
-            updater.setProgressInfo("Query malformed: " + query);
-            updater.setIndeterminate(false);
-            updater.setHits(0);
+            stringUpdater.setProgressInfo("Query malformed: " + query);
+            stringUpdater.setIndeterminate(false);
+            stringUpdater.setHits(0);
             return new CountDownLatch(0);
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
             timer.stop();
-            updater.setProgressInfo("Exception during query: " + e.getLocalizedMessage());
-            updater.setIndeterminate(false);
-            updater.setHits(0);
+            stringUpdater.setProgressInfo("Exception during query: " + e.getLocalizedMessage());
+            stringUpdater.setIndeterminate(false);
+            stringUpdater.setHits(0);
             return new CountDownLatch(0);
         }
     }
@@ -1715,6 +1664,72 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         public boolean continueWork() {
             return tracker.continueWork();
         }
+    }
+
+    @Override
+	public CountDownLatch searchWfHx(I_TrackContinuation tracker, 
+			Collection<LuceneMatch> matches, CountDownLatch latch,
+			List<I_TestSearchResults> checkList,
+			I_ConfigAceFrame config, I_UpdateProgress updater,
+			boolean wfInProgress, boolean completedWF)
+			throws Exception {
+        Stopwatch timer = new Stopwatch();
+        timer.start();
+		Map<Document, Float> returnResults = new HashMap<Document, Float>();
+        LuceneWfHxProgressUpdator wfHxUpdater = (LuceneWfHxProgressUpdator)updater;
+        CountDownLatch hitLatch;
+        
+        try {
+            if (LuceneManager.indexExists(LuceneSearchType.WORKFLOW_HISTORY) == false) {
+                wfHxUpdater.setProgressInfo("Making lucene index -- this may take a while...");
+                WfHxIndexGenerator.setSourceInputFile(null);
+                LuceneManager.createLuceneIndex(LuceneSearchType.WORKFLOW_HISTORY);
+            }
+
+            wfHxUpdater.setIndeterminate(true);
+            wfHxUpdater.setProgressInfo("Starting StandardAnalyzer lucene query...");
+            long startTime = System.currentTimeMillis();
+            SearchResult result = WfHxLuceneManager.searchAllWorkflowCriterion(checkList, wfInProgress, completedWF);
+
+			wfHxUpdater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime)
+       														 + " ms. Hits: " + returnResults.size());
+
+            wfHxUpdater.setHits(returnResults.size());
+            wfHxUpdater.setIndeterminate(false);
+            
+            System.out.println("Total results to process: " + returnResults.size());
+
+            hitLatch = new CountDownLatch(result.topDocs.totalHits);
+			
+            for (int i = 0; i < result.topDocs.totalHits; i++) {
+                float score = result.topDocs.scoreDocs[i].score;
+				Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
+            
+                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                    AceLog.getAppLog().fine("Hit: " + doc + " Score: " + score);
+                }
+                
+                ACE.threadPool.execute(new WfHxCheckAndProcessLuceneMatch(hitLatch, wfHxUpdater, doc, score, 
+                														  matches, checkList, config));
+            }
+			if (AceLog.getAppLog().isLoggable(Level.INFO)) {
+                if (tracker.continueWork()) {
+                    AceLog.getAppLog().info("Search time 1: " + timer.getElapsedTime());
+                } else {
+                    AceLog.getAppLog().info("Search 1 Canceled. Elapsed time: " + timer.getElapsedTime());
+                }
+            }
+			timer.stop();
+	        return hitLatch;
+		} catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+            timer.stop();
+            wfHxUpdater.setProgressInfo("Exception during query: " + e.getLocalizedMessage());
+            wfHxUpdater.setIndeterminate(false);
+            wfHxUpdater.setHits(0); 
+            return new CountDownLatch(0);
+        }
+        
     }
 
     @Override
@@ -2120,4 +2135,19 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     public void setKnowledgeBaseCache(HashMap<Integer, KnowledgeBase> kbCache) {
         knowledgeBaseCache = kbCache;
     }
+
+	private boolean identifyIsCurrentCriterion(List<I_TestSearchResults> checkList) {
+		for (I_TestSearchResults test : checkList) {
+			
+        	AbstractWorkflowHistorySearchTest wfHxTest = (AbstractWorkflowHistorySearchTest)test;
+
+        	if ((wfHxTest.getTestType() == AbstractWorkflowHistorySearchTest.currentModeler) || 
+        		(wfHxTest.getTestType() == AbstractWorkflowHistorySearchTest.currentAction) ||
+        		(wfHxTest.getTestType() == AbstractWorkflowHistorySearchTest.currentState)) {
+				return true;
+        	}
+		}
+		
+		return false;
+	}
 }

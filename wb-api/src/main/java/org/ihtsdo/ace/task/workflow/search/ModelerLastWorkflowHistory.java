@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.UUID;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -66,14 +66,7 @@ public class ModelerLastWorkflowHistory extends AbstractWorkflowHistorySearchTes
     }
 
     @Override
-    public boolean test(WorkflowHistoryJavaBean bean, I_ConfigAceFrame frameConfig) throws TaskFailedException {
-    	return false;
-    }
-
-
-
-    @Override
-	public boolean test(Set<WorkflowHistoryJavaBean> wfHistory)
+	public boolean test(SortedSet<WorkflowHistoryJavaBean> wfHistory)
 			throws TaskFailedException {
 
     	 try {
@@ -141,6 +134,10 @@ public class ModelerLastWorkflowHistory extends AbstractWorkflowHistorySearchTes
 		}
 
 		return null;
+    }
+
+    public UUID getCurrentTestUUID() throws TaskFailedException {
+        return testModeler.getPrimUuid();
     }
 
     @Override

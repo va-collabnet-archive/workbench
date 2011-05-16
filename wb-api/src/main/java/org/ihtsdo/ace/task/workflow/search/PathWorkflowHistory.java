@@ -2,10 +2,9 @@ package org.ihtsdo.ace.task.workflow.search;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.Set;
+import java.util.SortedSet;
 import java.util.UUID;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.bpa.process.TaskFailedException;
@@ -51,24 +50,12 @@ public class PathWorkflowHistory extends AbstractWorkflowHistorySearchTest {
         }
     }
 
-    @Override
-    public boolean test(WorkflowHistoryJavaBean bean, I_ConfigAceFrame frameConfig) throws TaskFailedException {
-    	try {
-            I_GetConceptData path = AceTaskUtil.getConceptFromObject(testPath);
-            UUID testUid = path.getUids().get(0);
-
-            if (testUid.equals(bean.getPath()))
-            	return true;
-            else
-            	return false;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			throw new TaskFailedException("Couldn't read search Path!");
-		}
-    }
-
     public TermEntry getTestPath() {
         return testPath;
+    }
+
+    public UUID getCurrentTestUUID() throws TaskFailedException {
+        return testPath.getIds()[0];
     }
 
     public void setTestPath(TermEntry testPath) {
@@ -76,7 +63,7 @@ public class PathWorkflowHistory extends AbstractWorkflowHistorySearchTest {
     }
 
 	@Override
-	public boolean test(Set<WorkflowHistoryJavaBean> wfHistory)
+	public boolean test(SortedSet<WorkflowHistoryJavaBean> wfHistory)
 			throws TaskFailedException {
 
 		try {

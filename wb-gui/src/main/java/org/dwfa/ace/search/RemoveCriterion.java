@@ -24,6 +24,9 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JPanel;
 
+import org.dwfa.ace.search.workflow.WorkflowHistorySearchPanel;
+
+
 public class RemoveCriterion implements ActionListener {
 
     /**
@@ -32,7 +35,7 @@ public class RemoveCriterion implements ActionListener {
     private final I_MakeCriterionPanel searchPanel;
     JPanel criterionPanel;
 
-    RemoveCriterion(I_MakeCriterionPanel searchPanel, JPanel criterionPanel) {
+    public RemoveCriterion(I_MakeCriterionPanel searchPanel, JPanel criterionPanel) {
         super();
         this.searchPanel = searchPanel;
         this.criterionPanel = criterionPanel;

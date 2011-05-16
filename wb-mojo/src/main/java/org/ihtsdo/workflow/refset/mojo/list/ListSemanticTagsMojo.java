@@ -18,16 +18,16 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.workflow.refset.semArea.SemanticAreaSearchRefset;
+import org.ihtsdo.workflow.refset.semTag.SemanticTagsRefset;
 
 /**
  * @author Jesse Efron
  * 
- * @goal list-semantic-area-search-refset
+ * @goal list-semantic-tags-refset
  * @requiresDependencyResolution compile
  */
 
-public class ListSemanticAreaSearchMojo extends AbstractMojo {
+public class ListSemanticTagsMojo extends AbstractMojo {
 
     /**
      * Location of the build directory.
@@ -44,7 +44,7 @@ public class ListSemanticAreaSearchMojo extends AbstractMojo {
     {
         System.setProperty("java.awt.headless", "true");
         try {
-            SemanticAreaSearchRefset refset = new SemanticAreaSearchRefset();
+            SemanticTagsRefset refset = new SemanticTagsRefset();
             HashSet<String> members = getRefsetMembers(refset.getRefsetId());            
             printRefsetMembers(members);
 		} catch (Exception e) {

@@ -8,6 +8,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.tk.api.workflow.WorkflowHistoryJavaBeanBI;
+import org.ihtsdo.tk.hash.Hashcode;
 
 
 
@@ -27,6 +28,7 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 	private Long effectiveTime = null;
 	private boolean autoApproved;
 	private boolean overridden;
+	private int memberId = 0;
 
 	@Override
 	public void setWorkflowId(UUID id ) {
@@ -118,22 +120,37 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 		return workflowTime;
 	}
 	
+	@Override
 	public boolean getAutoApproved() {
 		return autoApproved;
 	}
 	
+	@Override
+	public int getRxMemberId() {
+		return memberId;
+	}
+	
+	@Override
 	public boolean getOverridden() {
 		return overridden;
 	}
 
+	@Override
 	public void setAutoApproved(boolean b) {
 		autoApproved = b;
 	}
 
+	@Override
+	public void setRxMemberId(int id) {
+		memberId = id;
+	}
+
+	@Override
 	public void setOverridden(boolean b) {
 		overridden = b;
 	}
 
+	@Override
 	public String toString() {
 		try {
 			I_TermFactory tf = Terms.get();
@@ -148,7 +165,8 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 				   "\nEffectiveTimestamp = " + effectiveTime +
 				   "\nWorkflow Time = " + workflowTime + 
 				   "\nAutoApproved = " + autoApproved + 
-				   "\nOverridden = " + overridden;
+				   "\nOverridden = " + overridden +
+				   "\nRxMemberId = " + memberId;
 		} catch (IOException io) {
 			return "Failed to identify referencedComponentId or WorkflowHistory" + 
 				   "\nError msg: " + io.getMessage();
@@ -172,15 +190,23 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 			this.getWorkflowTime().equals(o2.getWorkflowTime()) &&
 			this.getWorkflowId().equals(o2.getWorkflowId()) &&
 			this.getAutoApproved() == o2.getAutoApproved() && 
+			this.getRxMemberId() == o2.getRxMemberId() && 
 			this.getOverridden() == o2.getOverridden()
-
-		) 
-			
+		) {
 			return true;
-		else
+		} else {
 			return false;	
 	}
+	}
 
-
+    @Override
+    public int hashCode() {
+    	Integer autoHashCode = (autoApproved) ? Integer.MAX_VALUE : Integer.MIN_VALUE; 
+    	Integer overHashCode = (overridden) ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+    	
+        return Hashcode.compute(new int[]{action.hashCode(), concept.hashCode(), fsn.hashCode(), modeler.hashCode(),
+        								  path.hashCode(), state.hashCode(), effectiveTime.hashCode(), workflowTime.hashCode(), 
+        								  memberId, autoHashCode, overHashCode});
+    }
 
 }

@@ -68,7 +68,7 @@ public class DescSearchResultsTablePopupListener extends MouseAdapter implements
     private ACE ace;
 	private int panelId;
 
-    DescSearchResultsTablePopupListener(I_ConfigAceFrame config, ACE ace, int panelId) {
+    public DescSearchResultsTablePopupListener(I_ConfigAceFrame config, ACE ace, int panelId) {
         super();
         this.config = config;
         this.ace = ace;

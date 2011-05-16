@@ -3,11 +3,11 @@ package org.ihtsdo.ace.task.workflow.search;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Set;
+import java.util.SortedSet;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -67,22 +67,30 @@ public class TimestampAfterWorkflowHistory extends AbstractWorkflowHistorySearch
 
     }
 
-    @Override
-    public boolean test(WorkflowHistoryJavaBean bean, I_ConfigAceFrame frameConfig)  
-    {
-    	return false;
-    }
-
-    public String getTestTimestampAfter() {
+    public String getTimestampAsString() {
         return testTimestampAfter;
     }
 
-    public void setTestTimestampAfter(String testTimestamp) {
-        this.testTimestampAfter = testTimestamp;
+    public void setTestTimestampAfter(String timestamp) {
+        testTimestampAfter = timestamp;
+    }
+
+    public String getTestTimestampAfter() {
+		return getTimestampAsString();
+    }
+
+	public long getTimestampAsLong() {
+     	DateFormat dfm = new SimpleDateFormat(DEFAULT_TIME_STAMP);
+
+     	try {
+			return dfm.parse(testTimestampAfter).getTime();
+		} catch (ParseException e) {
+			return -1;
+		}
     }
 
 	@Override
-	public boolean test(Set<WorkflowHistoryJavaBean> wfHistory)
+	public boolean test(SortedSet<WorkflowHistoryJavaBean> wfHistory)
 			throws TaskFailedException 
 	{
 		try {
@@ -111,6 +119,6 @@ public class TimestampAfterWorkflowHistory extends AbstractWorkflowHistorySearch
 	
 	@Override
 	public Object getTestValue() {
-		return getTestTimestampAfter();
+		return getTimestampAsLong();
 	}
 }

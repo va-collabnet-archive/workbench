@@ -69,6 +69,7 @@ import org.ihtsdo.db.util.NidPairForRel;
 import org.ihtsdo.db.util.ReferenceType;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.LuceneManager;
+import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.NidListBI;
@@ -237,7 +238,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 }
             }
             if (updateLucene) {
-                LuceneManager.writeToLucene(c.getDescriptions());
+            		LuceneManager.writeToLucene(c.getDescriptions(), LuceneSearchType.DESCRIPTION);
             }
         }
         if (eConcept.getRelationships() != null

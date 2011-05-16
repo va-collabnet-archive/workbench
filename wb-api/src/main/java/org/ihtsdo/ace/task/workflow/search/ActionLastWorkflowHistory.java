@@ -3,10 +3,9 @@ package org.ihtsdo.ace.task.workflow.search;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.SortedSet;
 import java.util.UUID;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
@@ -51,10 +50,10 @@ public class ActionLastWorkflowHistory extends AbstractWorkflowHistorySearchTest
         	{
                 try 
                 {
-                    Iterator<? extends I_GetConceptData> wfitr = Terms.get().getActiveAceFrameConfig().getWorkflowActions().iterator();
+                    Iterator<? extends I_GetConceptData> itr = Terms.get().getActiveAceFrameConfig().getWorkflowActions().iterator();
                     
-                    if (wfitr.hasNext()) {
-                        this.testAction = Terms.get().getActiveAceFrameConfig().getWorkflowActions().iterator().next();
+                    if (itr.hasNext()) {
+                        this.testAction = itr.next();
                     }
                 } catch (Exception e) {
                     AceLog.getAppLog().alertAndLogException(e);
@@ -64,20 +63,14 @@ public class ActionLastWorkflowHistory extends AbstractWorkflowHistorySearchTest
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
-
     @Override
-    public boolean test(WorkflowHistoryJavaBean bean, I_ConfigAceFrame frameConfig) throws TaskFailedException {
-        return false;
-    }
-
-    @Override
-    public boolean test(Set<WorkflowHistoryJavaBean> wfHistory) throws TaskFailedException {
+    public boolean test(SortedSet<WorkflowHistoryJavaBean> workflow) throws TaskFailedException {
         UUID testUUID = getCurrentTestUUID();
 
         if (testUUID == null) {
             throw new TaskFailedException("Failed to complete test.  UUID null.");
         }
-        WorkflowHistoryJavaBean bean = getCurrent(wfHistory);
+        WorkflowHistoryJavaBean bean = getCurrent(workflow);
         if (bean.getAction().equals(testUUID)) {
             return true;
         }
@@ -85,7 +78,7 @@ public class ActionLastWorkflowHistory extends AbstractWorkflowHistorySearchTest
         return false;
     }
 
-    public WorkflowHistoryJavaBean getCurrent(Set<WorkflowHistoryJavaBean> wfHistory) {
+    public WorkflowHistoryJavaBean getCurrent(SortedSet<WorkflowHistoryJavaBean> wfHistory) {
 
         WorkflowHistoryJavaBean current = null;
 
@@ -98,7 +91,7 @@ public class ActionLastWorkflowHistory extends AbstractWorkflowHistorySearchTest
         return current;
     }
 
-    private UUID getCurrentTestUUID() throws TaskFailedException {
+    public UUID getCurrentTestUUID() throws TaskFailedException {
         return testAction.getPrimUuid();
     }
 
@@ -119,4 +112,5 @@ public class ActionLastWorkflowHistory extends AbstractWorkflowHistorySearchTest
 	public Object getTestValue() {
 		return getTestAction();
 	}
+
 }

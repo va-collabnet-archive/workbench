@@ -19,16 +19,16 @@ package org.ihtsdo.ace.task.workflow.search;
 import java.beans.BeanDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
-import org.ihtsdo.ace.task.gui.component.SemanticHierarchyEditor;
+import org.ihtsdo.ace.task.gui.component.SemanticTagEditor;
 
-public class SemanticHierarchyDropDownSearchInfo extends AbstractWorkflowHistorySearchTestSearchInfo {
+public class SemanticTagWorkflowHistorySearchInfo extends AbstractWorkflowHistorySearchTestSearchInfo {
 
     @Override
     protected PropertyDescriptor[] getAdditionalPropertyDescriptors() {
         try {
 	        PropertyDescriptor testHierarchy = new PropertyDescriptor("testHierarchy", getBeanDescriptor().getBeanClass());
 	        testHierarchy.setBound(true);
-	        testHierarchy.setPropertyEditorClass(SemanticHierarchyEditor.class);
+	        testHierarchy.setPropertyEditorClass(SemanticTagEditor.class);
 	        testHierarchy.setDisplayName("<html><font color='green'>Semantic Tag:");
 	        testHierarchy.setShortDescription("The concept to test has the proper hierarchy.");
 	
@@ -43,7 +43,7 @@ public class SemanticHierarchyDropDownSearchInfo extends AbstractWorkflowHistory
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(SemanticHierarchyDropDown.class);
+        BeanDescriptor bd = new BeanDescriptor(SemanticTagWorkflowHistory.class);
         bd.setDisplayName("Semantic Tag");
         return bd;
     }

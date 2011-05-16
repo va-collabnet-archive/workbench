@@ -125,13 +125,13 @@ public class CriterionPanel extends JPanel {
 
     Map<I_TestSearchResults, BeanInfo> criterionMap = new HashMap<I_TestSearchResults, BeanInfo>();
 
-    Map<String, BeanInfo> menuInfoMap = new HashMap<String, BeanInfo>();
+    protected Map<String, BeanInfo> menuInfoMap = new HashMap<String, BeanInfo>();
 
     Map<String, I_TestSearchResults> menuBeanMap = new HashMap<String, I_TestSearchResults>();
 
-    List<String> comboItems = new ArrayList<String>();
+    protected List<String> comboItems = new ArrayList<String>();
 
-    JPanel editorPanel = new JPanel();
+    protected JPanel editorPanel = new JPanel();
 
     protected JComboBox criterionCombo;
 

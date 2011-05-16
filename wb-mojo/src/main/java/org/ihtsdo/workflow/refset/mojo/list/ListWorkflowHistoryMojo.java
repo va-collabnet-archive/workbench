@@ -6,7 +6,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetSearcher;
+import org.ihtsdo.workflow.WorkflowHistoryRefsetSearcher;
 
 /**
  * @author Jesse Efron

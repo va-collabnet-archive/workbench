@@ -3,10 +3,9 @@ package org.ihtsdo.ace.task.workflow.search;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.SortedSet;
 import java.util.UUID;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
@@ -50,10 +49,10 @@ public class ActionWorkflowHistory extends AbstractWorkflowHistorySearchTest {
             if (this.testAction == null) 
             {
                 try {
-                    Iterator<? extends I_GetConceptData> wfitr = Terms.get().getActiveAceFrameConfig().getWorkflowActions().iterator();
+                    Iterator<? extends I_GetConceptData> itr = Terms.get().getActiveAceFrameConfig().getWorkflowActions().iterator();
                     
-                    if (wfitr.hasNext()) {
-                        this.testAction = Terms.get().getActiveAceFrameConfig().getWorkflowActions().iterator().next();
+                    if (itr.hasNext()) {
+                        this.testAction = itr.next();
                     }
                 } catch (Exception e) {
                     AceLog.getAppLog().alertAndLogException(e);
@@ -65,18 +64,7 @@ public class ActionWorkflowHistory extends AbstractWorkflowHistorySearchTest {
     }
 
     @Override
-    public boolean test(WorkflowHistoryJavaBean bean, I_ConfigAceFrame frameConfig) throws TaskFailedException {
-        UUID testUUID = testAction.getPrimUuid();
-
-        if (testUUID == null || !bean.getAction().equals(testUUID)) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    @Override
-    public boolean test(Set<WorkflowHistoryJavaBean> wfHistory) throws TaskFailedException {
+    public boolean test(SortedSet<WorkflowHistoryJavaBean> wfHistory) throws TaskFailedException {
         UUID testUUID = getCurrentTestUUID();
 
         if (testUUID == null) {
@@ -93,7 +81,7 @@ public class ActionWorkflowHistory extends AbstractWorkflowHistorySearchTest {
         return false;
     }
 
-    private UUID getCurrentTestUUID() throws TaskFailedException {
+    public UUID getCurrentTestUUID() throws TaskFailedException {
         return testAction.getPrimUuid();
     }
 

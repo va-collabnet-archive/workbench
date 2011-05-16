@@ -75,27 +75,23 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 			String tag = searcher.getConceptHierarchyTagFromEditorCategoryTags(con, hierarchyToCategoryMap.keySet());
 
 			// Find category
-			return identifyModelerCategoryFromTag(modeler, tag);
+			return identifyModelerCategoryFromTag(hierarchyToCategoryMap, tag);
 		}
 
 	}
 
-	private I_GetConceptData identifyModelerCategoryFromTag(I_GetConceptData modeler, String tag) throws Exception {
+	private I_GetConceptData identifyModelerCategoryFromTag(Map<String, I_GetConceptData> hierarchyToCategoryMap, String tag) throws Exception {
 		I_GetConceptData category = null;
-		List<? extends I_ExtendByRef> l = Terms.get().getRefsetExtensionsForComponent(refsetId, modeler.getNid());
 
-		for (int i = 0; i < l.size(); i++)
-		{
-			I_ExtendByRefPartStr props = (I_ExtendByRefPartStr)l.get(i);
-			String key = ((EditorCategoryRefset)refset).getSemanticTag(props.getStringValue());
 
+		for (String key : hierarchyToCategoryMap.keySet()) {
 			if (key.equalsIgnoreCase(tag))
 			{
-				return ((EditorCategoryRefset)refset).getEditorCategory(props.getStringValue());
+				return hierarchyToCategoryMap.get(key);
 			}
 			else if (key.startsWith("SNOMED CT Concept") || key.equalsIgnoreCase("all"))
 			{
-				category = ((EditorCategoryRefset)refset).getEditorCategory(props.getStringValue());
+				category = hierarchyToCategoryMap.get(key);
 			}
 		}
 

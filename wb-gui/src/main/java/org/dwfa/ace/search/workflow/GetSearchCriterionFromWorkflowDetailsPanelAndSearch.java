@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dwfa.ace.search;
+package org.dwfa.ace.search.workflow;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -43,6 +43,8 @@ import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_TrackContinuation;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.search.DifferenceSearchConfig;
+import org.dwfa.ace.search.DifferenceSearchPanel;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.Condition;

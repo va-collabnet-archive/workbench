@@ -3,13 +3,11 @@ package org.ihtsdo.ace.task.workflow.search;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Set;
-import java.util.logging.Level;
+import java.util.SortedSet;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -55,31 +53,30 @@ public class TimestampBeforeWorkflowHistory extends AbstractWorkflowHistorySearc
         }
     }
 
-    @Override
-    public boolean test(WorkflowHistoryJavaBean bean, I_ConfigAceFrame frameConfig) throws TaskFailedException {
-       	try {
-        	DateFormat dfm = new SimpleDateFormat(DEFAULT_TIME_STAMP);
-    		long testTimestampBeforeThisDate = dfm.parse(testTimestampBefore).getTime();
-
-       		if (bean.getEffectiveTime().longValue() < testTimestampBeforeThisDate)
-            	return true;
-		} catch (Exception e) {
-			AceLog.getAppLog().log(Level.WARNING, "Couldn't read search Timestamp Before Than", e);
+    public String getTimestampAsString() {
+        return testTimestampBefore;
 		}
 
-		return false;
+    public void setTestTimestampBefore(String timestamp) {
+        testTimestampBefore = timestamp;
     }
 
     public String getTestTimestampBefore() {
-        return testTimestampBefore;
+		return getTimestampAsString();
     }
 
-    public void setTestTimestampBefore(String testTimestampBefore) {
-        this.testTimestampBefore = testTimestampBefore;
+	public long getTimestampAsLong() {
+     	DateFormat dfm = new SimpleDateFormat(DEFAULT_TIME_STAMP);
+
+     	try {
+			return dfm.parse(testTimestampBefore).getTime();
+		} catch (ParseException e) {
+			return -1;
+		}
     }
 
 	@Override
-	public boolean test(Set<WorkflowHistoryJavaBean> wfHistory)
+	public boolean test(SortedSet<WorkflowHistoryJavaBean> wfHistory)
 			throws TaskFailedException 
 	{
 		try {
@@ -110,6 +107,7 @@ public class TimestampBeforeWorkflowHistory extends AbstractWorkflowHistorySearc
 	
 	@Override
 	public Object getTestValue() {
-		return getTestTimestampBefore();
+		return getTimestampAsString();
 	}
+
 }

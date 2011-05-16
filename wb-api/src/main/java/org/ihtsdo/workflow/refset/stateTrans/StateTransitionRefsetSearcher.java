@@ -14,6 +14,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
 
 
@@ -67,6 +68,9 @@ public  class StateTransitionRefsetSearcher extends WorkflowRefsetSearcher
 		I_ExtendByRefPartStr props = null;
 
 		try {
+			
+			boolean addAutoApproval = Terms.get().getActiveAceFrameConfig().isAutoApproveOn();
+			
 			for (int i = 0; i < l.size(); i++)
 			{
 				props = (I_ExtendByRefPartStr)l.get(i);
@@ -77,9 +81,20 @@ public  class StateTransitionRefsetSearcher extends WorkflowRefsetSearcher
 					I_GetConceptData action =  ((StateTransitionRefset)refset).getAction(props.getStringValue());
 					I_GetConceptData finalState =  ((StateTransitionRefset)refset).getFinalState(props.getStringValue());
 					
+					if (addAutoApproval && action.getPrimUuid().equals(WorkflowHelper.getAcceptAction())) {
+						// On, but already have it, avoid DB hit (till use more UUID and lesse I_GetConceptData)
+						addAutoApproval = false;
+					}
+					
 					results.put(action, finalState);
 				}
 			}
+
+			if (addAutoApproval) {
+				I_GetConceptData action = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACCEPT_ACTION.getPrimoridalUid());
+				I_GetConceptData state = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_APPROVED_STATE.getPrimoridalUid());
+				results.put(action,state);
+            }
 		} catch (Exception e) {
 			StringBuffer str = new StringBuffer();
 			str.append("\ntestInitState: " + matchInitialStateNid);

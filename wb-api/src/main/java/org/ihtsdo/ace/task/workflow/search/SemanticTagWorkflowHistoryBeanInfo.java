@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SemanticHierarchyDropDownBeanInfo extends AbstractWorkflowHistorySearchTestBeanInfo {
-    private static SemanticHierarchyDropDownSearchInfo searchInfo = new SemanticHierarchyDropDownSearchInfo();
+public class SemanticTagWorkflowHistoryBeanInfo extends AbstractWorkflowHistorySearchTestBeanInfo {
+    private static SemanticTagWorkflowHistorySearchInfo searchInfo = new SemanticTagWorkflowHistorySearchInfo();
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         PropertyDescriptor[] parentDescriptors = super.getPropertyDescriptors();

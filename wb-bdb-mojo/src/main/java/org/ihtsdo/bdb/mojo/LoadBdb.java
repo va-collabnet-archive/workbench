@@ -29,7 +29,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.dwfa.ace.log.AceLog;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.attributes.ConceptAttributesBinder;
@@ -40,6 +39,8 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.LuceneManager;
+import org.ihtsdo.lucene.WfHxIndexGenerator;
+import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 
 /**
  * Goal which loads an EConcept.jbin file into a bdb.
@@ -56,7 +57,12 @@ public class LoadBdb extends AbstractMojo {
 	 * @required
 	 */
 	private String conceptsFileName;
-
+	/**
+     * workflow history text file to speed up lucene indexing.
+	 * 
+	 * @required
+	 */
+	private String inputWfHxFilePath;
 	/**
 	 * Generated resources directory.
 	 * 
@@ -148,7 +154,7 @@ public class LoadBdb extends AbstractMojo {
 			getLog().info("Starting db sync.");
 			Bdb.sync();
 			getLog().info("Finished db sync, starting generate lucene index.");
-			createLuceneDescriptionIndex();
+			createLuceneIndices();
 			getLog().info("Finished create index, starting close.");
 			Bdb.close();
 			getLog().info("db closed");
@@ -219,9 +225,12 @@ public class LoadBdb extends AbstractMojo {
 		}
 	}
 
-	
-    public void createLuceneDescriptionIndex() throws Exception {
-        LuceneManager.setDbRootDir(berkeleyDir);
-        LuceneManager.createLuceneDescriptionIndex();
+    public void createLuceneIndices() throws Exception {
+        LuceneManager.setDbRootDir(berkeleyDir, LuceneSearchType.DESCRIPTION);
+        LuceneManager.createLuceneIndex(LuceneSearchType.DESCRIPTION);
+
+        LuceneManager.setDbRootDir(berkeleyDir, LuceneSearchType.WORKFLOW_HISTORY);
+        WfHxIndexGenerator.setSourceInputFile(new File(inputWfHxFilePath));
+        LuceneManager.createLuceneIndex(LuceneSearchType.WORKFLOW_HISTORY);
     }
 }

@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -44,7 +45,8 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 			if (fields.valuesExist())
 			{
 				propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
-				helper.newRefsetExtension(refsetId, fields.getReferencedComponent().getConceptNid(), REFSET_TYPES.STR, propMap, Terms.get().getActiveAceFrameConfig());
+				I_ExtendByRef ref = helper.getOrCreateRefsetExtension(refsetId, fields.getReferencedComponent().getConceptNid(), REFSET_TYPES.STR, propMap, UUID.randomUUID());
+				Terms.get().addUncommitted(ref);
 				retVal = true;
 			} else
 				return false;
@@ -65,8 +67,9 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 			if (fields.valuesExist())
 			{
 				propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
+				I_ExtendByRef ref = helper.getRefsetExtension(refsetId, fields.getReferencedComponent().getConceptNid(), propMap);
 				helper.retireRefsetStrExtension(refsetId, fields.getReferencedComponent().getConceptNid(), propMap);
-	
+				Terms.get().addUncommitted(ref);
 				return true;
 			}
 		} catch (Exception io) {

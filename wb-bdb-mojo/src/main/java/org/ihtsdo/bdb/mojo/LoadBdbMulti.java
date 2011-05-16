@@ -50,6 +50,8 @@ import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.LuceneManager;
+import org.ihtsdo.lucene.WfHxIndexGenerator;
+import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
@@ -85,6 +87,13 @@ public class LoadBdbMulti extends AbstractMojo {
      * @parameter
      */
     private String[] rstaFileNames;
+    /**
+     * workflow history text file to speed up lucene indexing.
+     * 
+     * @parameter
+     * @required
+     */
+    private String inputWfHxFilePath;
     /**
      * Generated resources directory.
      * 
@@ -277,7 +286,7 @@ public class LoadBdbMulti extends AbstractMojo {
             getLog().info("Starting db sync.");
             Bdb.sync();
             getLog().info("Finished db sync, starting generate lucene index.");
-            createLuceneDescriptionIndex();
+            createLuceneIndices();
             BdbCommitManager.commit();
             getLog().info("Finished create index, starting close.");
             Bdb.close();
@@ -462,8 +471,12 @@ public class LoadBdbMulti extends AbstractMojo {
         }
     }
 
-    public void createLuceneDescriptionIndex() throws Exception {
-        LuceneManager.setDbRootDir(berkeleyDir);
-        LuceneManager.createLuceneDescriptionIndex();
-    }
+    public void createLuceneIndices() throws Exception {
+        LuceneManager.setDbRootDir(berkeleyDir, LuceneSearchType.DESCRIPTION);
+        LuceneManager.createLuceneIndex(LuceneSearchType.DESCRIPTION);
+
+        LuceneManager.setDbRootDir(berkeleyDir, LuceneSearchType.WORKFLOW_HISTORY);
+        WfHxIndexGenerator.setSourceInputFile(new File(inputWfHxFilePath));
+        LuceneManager.createLuceneIndex(LuceneSearchType.WORKFLOW_HISTORY);
+}
 }

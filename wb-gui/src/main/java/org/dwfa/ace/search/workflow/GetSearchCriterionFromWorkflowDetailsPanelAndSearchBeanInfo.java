@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dwfa.ace.search;
+package org.dwfa.ace.search.workflow;
 
 import java.beans.BeanDescriptor;
 import java.beans.IntrospectionException;

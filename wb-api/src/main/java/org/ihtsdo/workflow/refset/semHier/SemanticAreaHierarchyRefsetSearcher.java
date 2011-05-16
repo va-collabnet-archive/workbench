@@ -3,19 +3,18 @@ package org.ihtsdo.workflow.refset.semHier;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
-import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
 
 
@@ -27,7 +26,6 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
 public  class SemanticAreaHierarchyRefsetSearcher extends WorkflowRefsetSearcher 
 {
 	private static int currentStatusNid = 0;
-	private static int fullySpecifiedTermDescriptionTypeNid = 0;
 	
 	public SemanticAreaHierarchyRefsetSearcher()
 			throws TerminologyException, IOException 
@@ -35,7 +33,6 @@ public  class SemanticAreaHierarchyRefsetSearcher extends WorkflowRefsetSearcher
 		refset = new SemanticAreaHierarchyRefset();
 		
 		currentStatusNid = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getNid();	
-		fullySpecifiedTermDescriptionTypeNid = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()).getNid();	
 
 		setRefsetName(refset.getRefsetName());
 		setRefsetId(refset.getRefsetId());
@@ -43,7 +40,7 @@ public  class SemanticAreaHierarchyRefsetSearcher extends WorkflowRefsetSearcher
 
 	public String getConceptHierarchyTagFromEditorCategoryTags(I_GetConceptData con, Set<String> possibleTags) throws Exception {
 		try {
-			String semTag = getSemanticTag(con);
+			String semTag = WorkflowHelper.parseSemanticTag(con);
 		
 			return findFirstTag(semTag, possibleTags);
 		} catch (Exception e) {
@@ -69,23 +66,11 @@ public  class SemanticAreaHierarchyRefsetSearcher extends WorkflowRefsetSearcher
 					newCandidates.add(p);
 			}
 			
+			// If newCandidates is empty, then will return 
 			return findFirstTag(semTag, newCandidates);
 		}
 	}
 	
-	private String getSemanticTag(I_GetConceptData con) throws IOException, TerminologyException {
-    	
-   		I_IntList descType = Terms.get().newIntList();
-   		descType.add(fullySpecifiedTermDescriptionTypeNid);
-   		I_DescriptionTuple tuple = con.getDescTuple(descType, Terms.get().getActiveAceFrameConfig());
-
-		String s = tuple.getText();
-		int startIndex = s.lastIndexOf('(');
-		int endIndex = s.lastIndexOf(')');
-		
-		return s.substring(startIndex + 1, endIndex);
-	}
-
 	private Set<String> searchForParentTagBySemTag(String tag) throws Exception 
 	{
 		List<? extends I_ExtendByRef> l = Terms.get().getRefsetExtensionsForComponent(refsetId, ((SemanticAreaHierarchyRefset)refset).getSemanticTagParentRelationship().getConceptNid());
@@ -101,8 +86,8 @@ public  class SemanticAreaHierarchyRefsetSearcher extends WorkflowRefsetSearcher
 				String parentTag = ((SemanticAreaHierarchyRefset)refset).getParentSemanticTag(props.getStringValue());
 				
 				if (!parentTag.equals(childTag) &&
-					!parentTag.equals("inactive_concept") &&
-					!parentTag.equals("SNOMED_RT+CTV3"))
+					!parentTag.equals("inactive concept") &&
+					!parentTag.equals("SNOMED RT+CTV3"))
 				{
 					results.add(parentTag);					
 				}
@@ -110,5 +95,21 @@ public  class SemanticAreaHierarchyRefsetSearcher extends WorkflowRefsetSearcher
 		}
 		
 		return results;
+	}
+
+	public SortedSet<String> getAllSemanticTags() throws IOException {
+		SortedSet<String> retSet = new TreeSet<String>();
+		
+		Collection<? extends I_ExtendByRef> rows = Terms.get().getRefsetExtensionMembers(refsetId);
+		
+		for (I_ExtendByRef row : rows) {
+			String childTag =  ((SemanticAreaHierarchyRefset)refset).getChildSemanticTag(((I_ExtendByRefPartStr)row).getStringValue());
+			String parentTag = ((SemanticAreaHierarchyRefset)refset).getParentSemanticTag(((I_ExtendByRefPartStr)row).getStringValue());			
+
+			retSet.add(childTag);
+			retSet.add(parentTag);
+		}
+
+		return retSet;
 	}
 }

@@ -13,6 +13,9 @@ public interface WorkflowHistoryJavaBeanBI {
 	public void setFSN(String desc);
 	public void setEffectiveTime(Long t);
 	public void setWorkflowTime(Long t);
+	public void setRxMemberId(int id);
+	public void setAutoApproved(boolean b);
+	public void setOverridden(boolean b);
 	
 	public UUID getConcept();
 	public UUID getWorkflowId();
@@ -25,6 +28,7 @@ public interface WorkflowHistoryJavaBeanBI {
 	public Long getWorkflowTime();
 	public boolean getAutoApproved();
 	public boolean getOverridden();
+	public int getRxMemberId();
 	
 	public String toString();
 }

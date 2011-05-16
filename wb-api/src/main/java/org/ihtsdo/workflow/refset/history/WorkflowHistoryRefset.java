@@ -30,10 +30,14 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 		return RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids();
 	}
 
-	
 	// Workflow ID Only a UUID (No Concept)
 	public UUID getWorkflowId(String props) {
 		return getUUID("workflowId", props);
+	}
+
+	// Workflow ID Only a UUID (No Concept)
+	public String getWorkflowIdAsString(String props) {
+		return getProp("workflowId", props);
 	}
 
 	// I_GetConceptData values where appropriate
@@ -70,7 +74,6 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 	public UUID getModelerUid(String props) throws NumberFormatException, TerminologyException, IOException {
 		return getUUID("modeler", props);
 	}
-	
 	public boolean getAutoApproved(String props) throws NumberFormatException, TerminologyException, IOException {
 		
 		try {

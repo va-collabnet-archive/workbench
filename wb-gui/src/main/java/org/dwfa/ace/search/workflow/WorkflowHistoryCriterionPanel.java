@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dwfa.ace.search;
+package org.dwfa.ace.search.workflow;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -47,15 +47,20 @@ import javax.swing.JLabel;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.search.AddCriterion;
+import org.dwfa.ace.search.CriterionPanel;
+import org.dwfa.ace.search.I_MakeCriterionPanel;
+import org.dwfa.ace.search.RemoveCriterion;
+import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.gui.TaskPanel.EditorGlue;
-import org.ihtsdo.ace.api.I_TestWorkflowHistorySearchResults;
+import org.ihtsdo.ace.task.workflow.search.AbstractWorkflowHistorySearchTest;
 
 public class WorkflowHistoryCriterionPanel extends CriterionPanel {
 
 	private static final long serialVersionUID = 1L;
-	private List<I_TestWorkflowHistorySearchResults> criterionOptions;
-    private I_TestWorkflowHistorySearchResults bean;
-	private Map<String, I_TestWorkflowHistorySearchResults> menuBeanMap = new HashMap<String, I_TestWorkflowHistorySearchResults>();
+	private List<AbstractWorkflowHistorySearchTest> criterionOptions;
+    private I_TestSearchResults bean;
+	private Map<String, I_TestSearchResults> menuBeanMap = new HashMap<String, I_TestSearchResults>();
 
 	public class WorkflowCriterionListener implements ActionListener {
 
@@ -118,12 +123,12 @@ public class WorkflowHistoryCriterionPanel extends CriterionPanel {
 
 	    }
 
-    public WorkflowHistoryCriterionPanel(I_MakeCriterionPanel searchPanel, I_TestWorkflowHistorySearchResults beanToSet) {
-        this(searchPanel, beanToSet, new ArrayList<I_TestWorkflowHistorySearchResults>());
+    public WorkflowHistoryCriterionPanel(I_MakeCriterionPanel searchPanel, AbstractWorkflowHistorySearchTest beanToSet) {
+        this(searchPanel, beanToSet, new ArrayList<AbstractWorkflowHistorySearchTest>());
     }
 
-    public WorkflowHistoryCriterionPanel(I_MakeCriterionPanel searchPanel, I_TestWorkflowHistorySearchResults beanToSet,
-            List<I_TestWorkflowHistorySearchResults> criterionOptions) {
+    public WorkflowHistoryCriterionPanel(I_MakeCriterionPanel searchPanel, AbstractWorkflowHistorySearchTest beanToSet,
+            List<AbstractWorkflowHistorySearchTest> criterionOptions) {
     	super(false);
 
         setupWorkflowHistoryCriterionOptions(criterionOptions);
@@ -211,9 +216,9 @@ public class WorkflowHistoryCriterionPanel extends CriterionPanel {
     }
 
     @SuppressWarnings("unchecked")
-    public void setupWorkflowHistoryCriterionOptions(List<I_TestWorkflowHistorySearchResults> criterionOptions) {
+    public void setupWorkflowHistoryCriterionOptions(List<AbstractWorkflowHistorySearchTest> criterionOptions) {
         File searchPluginFolder = new File("search/workflow");
-        this.setCriterionOptions(new ArrayList<I_TestWorkflowHistorySearchResults>());
+        this.setCriterionOptions(new ArrayList<AbstractWorkflowHistorySearchTest>());
         
         if (criterionOptions == null || criterionOptions.isEmpty()) 
         {
@@ -233,8 +238,8 @@ public class WorkflowHistoryCriterionPanel extends CriterionPanel {
                             plugin)));
                         Object pluginObj = ois.readObject();
                         ois.close();
-                        if (I_TestWorkflowHistorySearchResults.class.isAssignableFrom(pluginObj.getClass())) {
-                            criterionOptions.add((I_TestWorkflowHistorySearchResults) pluginObj);
+                        if (AbstractWorkflowHistorySearchTest.class.isAssignableFrom(pluginObj.getClass())) {
+                            criterionOptions.add((AbstractWorkflowHistorySearchTest) pluginObj);
                         }
                     } catch (Exception ex) {
                         AceLog.getAppLog().log(Level.WARNING, "Unable to read InputStream of workflow search plugin: " + plugin.getAbsolutePath());
@@ -245,18 +250,18 @@ public class WorkflowHistoryCriterionPanel extends CriterionPanel {
             }
         }
         
-        for (I_TestWorkflowHistorySearchResults bean : criterionOptions) 
+        for (AbstractWorkflowHistorySearchTest test : criterionOptions) 
         {
         	String searchInfoClassName = null;
             try 
             {
-                searchInfoClassName = bean.getClass().getName() + "SearchInfo";
-                Class<BeanInfo> searchInfoClass = (Class<BeanInfo>) bean.getClass().getClassLoader().loadClass(
+                searchInfoClassName = test.getClass().getName() + "SearchInfo";
+                Class<BeanInfo> searchInfoClass = (Class<BeanInfo>) test.getClass().getClassLoader().loadClass(
                     searchInfoClassName);
                 BeanInfo searchInfo = searchInfoClass.newInstance();
                 comboItems.add(searchInfo.getBeanDescriptor().getDisplayName());
                 menuInfoMap.put(searchInfo.getBeanDescriptor().getDisplayName(), searchInfo);
-                menuBeanMap.put(searchInfo.getBeanDescriptor().getDisplayName(), bean);
+                menuBeanMap.put(searchInfo.getBeanDescriptor().getDisplayName(), (I_TestSearchResults) test);
             } catch (Exception ex) {
                 AceLog.getAppLog().log(Level.WARNING, "Unable to load class info defined in workflow search bean: " + searchInfoClassName);
             }
@@ -264,15 +269,15 @@ public class WorkflowHistoryCriterionPanel extends CriterionPanel {
 
     }
 
-    public I_TestWorkflowHistorySearchResults getBean() {
+    public I_TestSearchResults getBean() {
         return bean;
     }
 
-	public void setCriterionOptions(List<I_TestWorkflowHistorySearchResults> criterionOptions) {
+	public void setCriterionOptions(List<AbstractWorkflowHistorySearchTest> criterionOptions) {
 		this.criterionOptions = criterionOptions;
 	}
 
-	public List<I_TestWorkflowHistorySearchResults> getCriterionOptions() {
+	public List<AbstractWorkflowHistorySearchTest> getCriterionOptions() {
 		return criterionOptions;
 	}
 }

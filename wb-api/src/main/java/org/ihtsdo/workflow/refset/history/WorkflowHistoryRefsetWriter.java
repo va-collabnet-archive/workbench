@@ -156,6 +156,7 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 		public Long effectiveTime = null;
 		public boolean autoApproved = false;
 		public boolean override = false;
+		public Long memberId = null;
 				
 		
 		public void setConceptUid(UUID uid) {

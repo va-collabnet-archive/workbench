@@ -8,14 +8,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ParallelMultiSearcher;
@@ -26,28 +23,50 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.util.Version;
-import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_Identify;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.Stopwatch;
-import org.ihtsdo.concept.Concept;
-import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
 
-public class LuceneManager {
+public abstract class LuceneManager {
 
-    public static Version version = Version.LUCENE_30;
-    public static File luceneMutableDirFile = new File("target/berkeley-db/mutable/lucene");
-    public static File luceneReadOnlyDirFile = new File("target/berkeley-db/read-only/lucene");
-    public static Directory luceneMutableDir;
-    public static Directory luceneReadOnlyDir;
-    private static IndexWriter writer;
-    private static ParallelMultiSearcher searcher;
-    private static int matchLimit = 10000;
+	public enum LuceneSearchType {
+		DESCRIPTION, WORKFLOW_HISTORY;
+	};
+
+    public final static Version version = Version.LUCENE_30;
+    
+    protected static DescriptionIndexGenerator descIndexer = null;
+    protected static WfHxIndexGenerator wfIndexer = null;
+    protected static IndexWriter wfHxWriter;
+    protected static IndexWriter descWriter;
+    protected static ParallelMultiSearcher wfHxSearcher;
+    protected static ParallelMultiSearcher descSearcher;
+
+    public static Directory wfHxLuceneDir;
+    public static Directory descLuceneMutableDir;
+    public static Directory descLuceneReadOnlyDir;
+
+    private static LuceneSearchType currentType = null;
+
     private static ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
 
-    public static void close() {
+    public static void close(LuceneSearchType type) {
+		ParallelMultiSearcher searcher;
+		IndexWriter writer;
+		
+		if (type == LuceneSearchType.DESCRIPTION) {
+			writer = descWriter;
+    		searcher = descSearcher;
+		} else {
+			writer = wfHxWriter;
+    		searcher = wfHxSearcher;
+    	}
+
+        // Only do if not first time called
+    	if (currentType != null)
+    	{
         if (searcher != null) {
             try {
                 searcher.close();
@@ -66,13 +85,24 @@ public class LuceneManager {
             }
         }
     }
+    }
 
-    public static void init() throws IOException {
-        if (luceneReadOnlyDir == null) {
-            luceneReadOnlyDir = initDirectory(luceneReadOnlyDirFile, false);
+    public static void init(LuceneSearchType type) throws IOException {
+		currentType = type;
+
+    	// Only do if not first time
+    	if (type == LuceneSearchType.DESCRIPTION) {
+	    	if (descLuceneReadOnlyDir == null) {
+	    		descLuceneReadOnlyDir = initDirectory(DescriptionLuceneManager.descLuceneReadOnlyDirFile, false);
+        	}
+	
+	    	if (descLuceneMutableDir == null) {
+    	    	descLuceneMutableDir = initDirectory(DescriptionLuceneManager.descLuceneMutableDirFile, true);
+	    	}
+    	} else {
+	    	if (wfHxLuceneDir == null) {
+	    		wfHxLuceneDir = initDirectory(WfHxLuceneManager.wfHxLuceneDirFile, true);
         }
-        if (luceneMutableDir == null) {
-            luceneMutableDir = initDirectory(luceneMutableDirFile, true);
         }
     }
 
@@ -95,13 +125,15 @@ public class LuceneManager {
         return luceneDir;
     }
 
-    private static Directory setupWriter(File luceneDirFile, Directory luceneDir)
+    protected static Directory setupWriter(File luceneDirFile, Directory luceneDir)
             throws IOException, CorruptIndexException,
             LockObtainFailedException {
         if (luceneDir == null) {
             luceneDir = new SimpleFSDirectory(luceneDirFile);
         }
         luceneDir.clearLock("write.lock");
+        
+        IndexWriter writer;
         if (new File(luceneDirFile, "segments.gen").exists()) {
             writer = new IndexWriter(luceneDir, new StandardAnalyzer(version), false,
                     MaxFieldLength.UNLIMITED);
@@ -109,44 +141,33 @@ public class LuceneManager {
             writer = new IndexWriter(luceneDir, new StandardAnalyzer(version), true,
                     MaxFieldLength.UNLIMITED);
         }
+
+        if (currentType == LuceneSearchType.DESCRIPTION) {
+        	descWriter = writer;
+        } else {
+        	wfHxWriter = writer;
+    }
+
         return luceneDir;
-    }
-
-    public static boolean indexExists() {
-        return luceneMutableDirFile.exists();
-    }
-
-    public static void createLuceneDescriptionIndex() throws Exception {
-        init();
-        Stopwatch timer = new Stopwatch();
-        timer.start();
-        luceneMutableDirFile.mkdirs();
-        if (writer == null) {
-            luceneMutableDir = setupWriter(luceneMutableDirFile, luceneMutableDir);
         }
-        writer.setUseCompoundFile(true);
-        writer.setMergeFactor(15);
-        writer.setMaxMergeDocs(Integer.MAX_VALUE);
-        writer.setMaxBufferedDocs(1000);
 
-        IndexGenerator indexer = new IndexGenerator(writer);
-        AceLog.getAppLog().info("Starting index time: " + timer.getElapsedTime());
-        Bdb.getConceptDb().iterateConceptDataInSequence(indexer);
-
-        AceLog.getAppLog().info("\nOptimizing index start time: " + timer.getElapsedTime());
-        writer.optimize();
-        writer.commit();
-        if (AceLog.getAppLog().isLoggable(Level.INFO)) {
-            AceLog.getAppLog().info("Total index time: " + timer.getElapsedTime());
-            timer.stop();
+    public static boolean indexExists(LuceneSearchType type) {
+    	if (type == LuceneSearchType.DESCRIPTION) {
+    		return DescriptionLuceneManager.descLuceneMutableDirFile.exists();
+    	} else {
+    		return WfHxLuceneManager.wfHxLuceneDirFile.exists();
         }
     }
 
-    public static synchronized void writeToLucene(Collection<Description> descriptions) throws IOException {
-        init();
+    public static synchronized void writeToLucene(Collection items, LuceneSearchType type) throws IOException {
+        init(type);
         try {
             rwl.writeLock().lock();
-            writeToLuceneNoLock(descriptions);
+            if (type == LuceneSearchType.DESCRIPTION) {
+            	DescriptionLuceneManager.writeToLuceneNoLock(items);
+            } else {
+            	WfHxLuceneManager.writeToLuceneNoLock(items);
+            }
         } catch (CorruptIndexException e) {
             throw new IOException(e);
         } catch (IOException e) {
@@ -156,96 +177,66 @@ public class LuceneManager {
         }
     }
 
-    private static void writeToLuceneNoLock(Collection<Description> descriptions)
-            throws CorruptIndexException, IOException {
-        if (writer == null) {
-            luceneMutableDir = setupWriter(luceneMutableDirFile, luceneMutableDir);
-            writer.setUseCompoundFile(true);
-            writer.setMergeFactor(15);
-            writer.setMaxMergeDocs(Integer.MAX_VALUE);
-            writer.setMaxBufferedDocs(1000);
-        }
-        IndexWriter writerCopy = writer;
-        if (writerCopy != null) {
-            for (Description desc : descriptions) {
-                if (desc != null) {
-                    writerCopy.deleteDocuments(new Term("dnid", Integer.toString(desc.getDescId())));
-                    writerCopy.addDocument(createDoc(desc));
-                }
-            }
-            writerCopy.commit();
-        }
+    public static SearchResult search(Query q, LuceneSearchType type) throws CorruptIndexException, IOException {
+    	ParallelMultiSearcher searcherCopy; 
+		ParallelMultiSearcher searcher;
 
-        if (searcher != null) {
-            searcher.close();
-            AceLog.getAppLog().info("Closing lucene searcher");
-        }
-        searcher = null;
-    }
-
-    public static Document createDoc(Description desc)
-            throws IOException {
-        Document doc = new Document();
-        doc.add(new Field("dnid", Integer.toString(desc.getDescId()), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("cnid", Integer.toString(desc.getConceptNid()), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        addIdsToIndex(doc, desc);
-        addIdsToIndex(doc, Concept.get(desc.getConceptNid()).getConceptAttributes());
-
-        String lastDesc = null;
-        for (I_DescriptionTuple tuple : desc.getTuples()) {
-            if (lastDesc == null || lastDesc.equals(tuple.getText()) == false) {
-                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                    AceLog.getAppLog().fine(
-                            "Adding to index. dnid:  " + desc.getDescId() + " desc: " + tuple.getText());
-                }
-                doc.add(new Field("desc", tuple.getText(), Field.Store.NO, Field.Index.ANALYZED));
-            }
-        }
-        return doc;
-    }
-
-    private static void addIdsToIndex(Document doc, I_Identify did) {
-        if (did != null) {
-            for (I_IdPart p : did.getMutableIdParts()) {
-                doc.add(new Field("desc", p.getDenotation().toString(), Field.Store.NO,
-                        Field.Index.NOT_ANALYZED));
-            }
-        } else {
-            AceLog.getAppLog().alertAndLogException(new Exception("Identifier is null"));
-        }
-    }
-
-    public static SearchResult search(Query q) throws CorruptIndexException, IOException {
-        init();
+    	init(type);
+		int matchLimit = getMatchLimit(type);
         rwl.readLock().lock();
+
         try {
-            ParallelMultiSearcher searcherCopy = searcher;
+        	if (type == LuceneSearchType.DESCRIPTION) {
+        		searcherCopy = descSearcher;
+        		searcher = descSearcher;
+        } else {
+        		searcherCopy = wfHxSearcher;
+        		searcher = wfHxSearcher;
+    }
+
             if (searcherCopy == null) {
-                IndexSearcher readOnlySearcher = new IndexSearcher(luceneReadOnlyDir, true);
-                IndexSearcher mutableSearcher = new IndexSearcher(luceneMutableDir, true);
+            	if (type == LuceneSearchType.DESCRIPTION) {
+            		IndexSearcher readOnlySearcher = new IndexSearcher(descLuceneReadOnlyDir, true);
+            		IndexSearcher mutableSearcher = new IndexSearcher(descLuceneMutableDir, true);
                 searcherCopy = new ParallelMultiSearcher(readOnlySearcher, mutableSearcher);
-                searcher = searcherCopy;
+                    descSearcher = searcherCopy;
+                } else {
+            		IndexSearcher allHxSearcher = new IndexSearcher(wfHxLuceneDir, true);
+                	searcherCopy = new ParallelMultiSearcher(allHxSearcher);
+                    wfHxSearcher = searcherCopy;
+                }
             }
             TopDocs topDocs = searcherCopy.search(q, null, matchLimit);
 
             // Suppress duplicates in the read-only index 
             List<ScoreDoc> newDocs = new ArrayList<ScoreDoc>(topDocs.scoreDocs.length);
-            HashSet<Integer> dids = new HashSet<Integer>(topDocs.scoreDocs.length);
+            HashSet<Integer> ids = new HashSet<Integer>(topDocs.scoreDocs.length);
+
+            String searchTerm;
+            if (type == LuceneSearchType.DESCRIPTION) {
+            	searchTerm = "dnid"; 
+            } else {
+            	searchTerm = "memberId";
+            }
+
+            searcher = searcherCopy;
             for (ScoreDoc sd : topDocs.scoreDocs) {
                 int index = searcherCopy.subSearcher(sd.doc);
                 if (index == 1) {
                     newDocs.add(sd);
                     Document d = searcher.doc(sd.doc);
-                    int nid = Integer.parseInt(d.get("dnid"));
-                    dids.add(nid);
+
+                    int nid = Integer.parseInt(d.get(searchTerm));
+                    ids.add(nid);
                 }
             }
             for (ScoreDoc sd : topDocs.scoreDocs) {
                 int index = searcherCopy.subSearcher(sd.doc);
                 if (index == 0) {
                     Document d = searcher.doc(sd.doc);
-                    int nid = Integer.parseInt(d.get("dnid"));
-                    if (!dids.contains(nid)) {
+        
+                    int nid = Integer.parseInt(d.get(searchTerm));
+                    if (!ids.contains(nid)) {
                         newDocs.add(sd);
                     }
                 }
@@ -258,17 +249,87 @@ public class LuceneManager {
         }
     }
 
-    public static int getMatchLimit() {
-        return matchLimit;
+    public static int getMatchLimit(LuceneSearchType type) {
+    	if (type == LuceneSearchType.DESCRIPTION) {
+    		return DescriptionLuceneManager.matchLimit;
+    	} else {
+			return WfHxLuceneManager.calculateMatchLimit();
+    	}
     }
 
-    public static void setMatchLimit(int matchLimit) {
-        LuceneManager.matchLimit = matchLimit;
+    public static void setMatchLimit(int limit, LuceneSearchType type) {
+    	if (type == LuceneSearchType.DESCRIPTION) {
+    		DescriptionLuceneManager.matchLimit = limit;
+    	} else {
+
+    	}
+    }
+    
+
+	public static void createLuceneIndex(LuceneSearchType type) throws Exception {
+		IndexWriter writer;
+		
+		init(type);
+        Stopwatch timer = new Stopwatch();
+        timer.start();
+        
+		if (type == LuceneSearchType.DESCRIPTION) {
+			writer = descWriter;
+		} else {
+			writer = wfHxWriter;
+		}
+
+        if (writer == null) {
+        	if (type == LuceneSearchType.DESCRIPTION) {
+        		DescriptionLuceneManager.descLuceneMutableDirFile.mkdirs();
+        		descLuceneMutableDir = setupWriter(DescriptionLuceneManager.descLuceneMutableDirFile, descLuceneMutableDir);
+        	} else {
+        		WfHxLuceneManager.wfHxLuceneDirFile.mkdirs();
+        		wfHxLuceneDir = setupWriter(WfHxLuceneManager.wfHxLuceneDirFile, wfHxLuceneDir);
+        	}
+        }
+
+        writer.setUseCompoundFile(true);
+        writer.setMergeFactor(15);
+        writer.setMaxMergeDocs(Integer.MAX_VALUE);
+        writer.setMaxBufferedDocs(1000);
+
+        if (type == LuceneSearchType.DESCRIPTION) {
+        	descIndexer = new DescriptionIndexGenerator(writer);
+            AceLog.getAppLog().info("Starting index time: " + timer.getElapsedTime());
+            Bdb.getConceptDb().iterateConceptDataInSequence(descIndexer);
+        } else {
+        	wfIndexer = new WfHxIndexGenerator(writer);
+            AceLog.getAppLog().info("Starting index time: " + timer.getElapsedTime());
+        	wfIndexer.initializeWfHxLucene();
     }
 
-    public static void setDbRootDir(File root) {
-        luceneMutableDirFile = new File(root, "mutable/lucene");
-        luceneReadOnlyDirFile = new File(root, "read-only/lucene");
+
+        AceLog.getAppLog().info("\nOptimizing index start time: " + timer.getElapsedTime());
+        writer.optimize();
+        writer.commit();
+        if (AceLog.getAppLog().isLoggable(Level.INFO)) {
+            AceLog.getAppLog().info("Total index time: " + timer.getElapsedTime());
+            timer.stop();
+        }
+	}
+	
+
+	public static void setDbRootDir(File root, LuceneSearchType type) {
+		ParallelMultiSearcher searcher;
+		IndexWriter writer;
+		
+		if (type == LuceneSearchType.DESCRIPTION) {
+			DescriptionLuceneManager.descLuceneMutableDirFile = new File(root, DescriptionLuceneManager.descMutableDirectorySuffix);
+	        DescriptionLuceneManager.descLuceneReadOnlyDirFile = new File(root, DescriptionLuceneManager.descReadOnlyDirectorySuffix);
+			searcher = descSearcher;
+			writer = descWriter;
+		} else {
+			WfHxLuceneManager.wfHxLuceneDirFile = new File(root, WfHxLuceneManager.wfHxDirectorySuffix);
+			searcher = wfHxSearcher;
+			writer = wfHxWriter;
+    }
+
         if (writer != null) {
             try {
                 writer.close(true);
@@ -279,15 +340,21 @@ public class LuceneManager {
             }
             writer = null;
         };
+
         if (searcher != null) {
             try {
                 searcher.close();
             } catch (IOException ex) {
                throw new RuntimeException(ex);
              }
+            searcher = null;
         }
-        searcher = null;
-        luceneMutableDir = null;
-        luceneReadOnlyDir = null;
+
+        if (type == LuceneSearchType.DESCRIPTION) {
+            descLuceneMutableDir = null;
+            descLuceneReadOnlyDir = null;
+    	} else {
+            wfHxLuceneDir = null;
+        }
     }
 }
