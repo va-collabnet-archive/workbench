@@ -57,7 +57,7 @@ public class WorklistMemberByStatusReport implements I_Report {
 			WorkList wl = wlChooser.showModalDialog();
 			csvFile = File.createTempFile("workset_member_", ".csv");
 			PrintWriter pw = new PrintWriter(csvFile);
-			pw.append("worklist|status|term|target prefered|last user");
+			pw.append("worklist|status|term|target preferred|last user");
 			pw.println();
 
 			if (wl != null) {
