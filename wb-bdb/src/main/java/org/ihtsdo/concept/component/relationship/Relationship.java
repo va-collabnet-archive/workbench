@@ -40,7 +40,6 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
-import org.ihtsdo.tk.api.RelAssertionType;
 
 public class Relationship extends ConceptComponent<RelationshipRevision, Relationship>
         implements I_RelVersioned<RelationshipRevision>,

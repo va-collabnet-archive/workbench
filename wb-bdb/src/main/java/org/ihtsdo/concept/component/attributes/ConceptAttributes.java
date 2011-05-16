@@ -489,7 +489,7 @@ public class ConceptAttributes
     public ConceptAttributesRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
         ConceptAttributesRevision newR;
         newR = new ConceptAttributesRevision(this, statusNid,
-                Terms.get().getAuthorNid(),
+                authorNid,
                 pathNid, time, this);
         addRevision(newR);
         return newR;
