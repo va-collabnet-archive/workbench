@@ -382,7 +382,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
     	return null;
     }
     	
-	public static UUID lookupAction(String action) throws TerminologyException, IOException {
+	public  UUID lookupAction(String action) throws TerminologyException, IOException {
 		if (action.equalsIgnoreCase("Accept workflow action")) {
 			return ArchitectonicAuxiliary.Concept.WORKFLOW_ACCEPT_ACTION.getPrimoridalUid();
 		} else if (action.equalsIgnoreCase("Chief Terminologist review workflow action")) {
@@ -405,7 +405,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 				
 	}
 
-	public static UUID lookupState(String state) throws TerminologyException, IOException {
+	public  UUID lookupState(String state) throws TerminologyException, IOException {
 		if (state.equalsIgnoreCase("Approved workflow state")) {
 			return ArchitectonicAuxiliary.Concept.WORKFLOW_APPROVED_STATE.getPrimoridalUid();
 		} else if (state.equalsIgnoreCase("Changed workflow state")) {
