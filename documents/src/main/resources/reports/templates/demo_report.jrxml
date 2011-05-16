@@ -105,7 +105,7 @@
 					<textElement verticalAlignment="Middle">
 						<font size="16" isBold="true"/>
 					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[$F{worklist}]]></textFieldExpression>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{status}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>
@@ -177,24 +177,23 @@
 			<rectangle>
 				<reportElement x="-6" y="513" width="13" height="13" forecolor="#6161F6" backcolor="#6161F6"/>
 			</rectangle>
-			<textField evaluationTime="Report">
-				<reportElement style="Column header" x="-20" y="791" width="72" height="20" forecolor="#000000"/>
-				<box leftPadding="4" rightPadding="4"/>
+			<line>
+				<reportElement x="-9" y="791" width="51" height="1"/>
+			</line>
+			<textField>
+				<reportElement x="-9" y="745" width="51" height="46"/>
 				<textElement textAlignment="Center">
-					<font size="16" isBold="false"/>
+					<font size="32"/>
 				</textElement>
 				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="Column header" x="-21" y="722" width="73" height="69" forecolor="#000000"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="40" isBold="true" pdfFontName="Helvetica-Bold"/>
+				<reportElement x="-9" y="791" width="51" height="30"/>
+				<textElement textAlignment="Center">
+					<font size="18"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_COUNT}]]></textFieldExpression>
 			</textField>
-			<line>
-				<reportElement x="-9" y="791" width="51" height="1"/>
-			</line>
 		</band>
 	</background>
 	<title>
