@@ -91,7 +91,6 @@ public class LoadBdbMulti extends AbstractMojo {
      * workflow history text file to speed up lucene indexing.
      * 
      * @parameter
-     * @required
      */
     private String inputWfHxFilePath;
     /**
@@ -475,8 +474,10 @@ public class LoadBdbMulti extends AbstractMojo {
         LuceneManager.setDbRootDir(berkeleyDir, LuceneSearchType.DESCRIPTION);
         LuceneManager.createLuceneIndex(LuceneSearchType.DESCRIPTION);
 
-        LuceneManager.setDbRootDir(berkeleyDir, LuceneSearchType.WORKFLOW_HISTORY);
-        WfHxIndexGenerator.setSourceInputFile(new File(inputWfHxFilePath));
-        LuceneManager.createLuceneIndex(LuceneSearchType.WORKFLOW_HISTORY);
-}
+        if (inputWfHxFilePath != null) {
+        	LuceneManager.setDbRootDir(berkeleyDir, LuceneSearchType.WORKFLOW_HISTORY);
+        	WfHxIndexGenerator.setSourceInputFile(new File(inputWfHxFilePath));
+        	LuceneManager.createLuceneIndex(LuceneSearchType.WORKFLOW_HISTORY);
+        }
+    }
 }
