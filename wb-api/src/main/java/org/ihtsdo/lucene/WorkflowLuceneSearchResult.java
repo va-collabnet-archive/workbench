@@ -1,7 +1,11 @@
 package org.ihtsdo.lucene;
 
+import java.io.IOException;
 import java.text.ParseException;
+import java.util.UUID;
 
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -29,11 +33,11 @@ public class WorkflowLuceneSearchResult {
 				action = WorkflowHelper.lookupAction(row[WorkflowHelper.actionPosition]).getInitialText();
 				state = WorkflowHelper.lookupState(row[WorkflowHelper.statePosition]).getInitialText();
 				modeler = WorkflowHelper.lookupModeler(row[WorkflowHelper.modelerPosition]).getInitialText();
-//			} else {
-//				// Should only be used when building database
-//				action = lookupAction(row[WorkflowHelper.actionPosition]).toString();
-//	    		state = lookupState(row[WorkflowHelper.statePosition]).toString();
-//	    		modeler = lookupModeler(row[WorkflowHelper.modelerPosition]).toString();
+			} else {
+				// Should only be used when building database
+				action = lookupAction(row[WorkflowHelper.actionPosition]).toString();
+	    		state = lookupState(row[WorkflowHelper.statePosition]).toString();
+	    		modeler = lookupModeler(row[WorkflowHelper.modelerPosition]).toString();
 			}
 			time = parseTimestampFromFile(row[WorkflowHelper.refsetColumnTimeStampPosition]);
     		concept = row[WorkflowHelper.conceptIdPosition];
@@ -66,7 +70,7 @@ public class WorkflowLuceneSearchResult {
 			WorkflowHistoryJavaBean bean) {
 		return new WorkflowLuceneSearchResult(bean);
 	}
-	/*
+	
 
     private UUID lookupModeler(String modeler) throws IOException, TerminologyException {
     	if (modeler.equalsIgnoreCase("IHTSDO")) {
@@ -175,7 +179,7 @@ public class WorkflowLuceneSearchResult {
 			return null;		
 		}
 	}
-*/
+
 	public String getAction() {
 		return action;
 	}
