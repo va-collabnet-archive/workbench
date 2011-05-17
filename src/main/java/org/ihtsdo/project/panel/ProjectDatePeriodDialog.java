@@ -138,10 +138,17 @@ public class ProjectDatePeriodDialog extends JDialog {
 			}
 			try {
 				if(startDate.compareTo(endDate) != 0){
-					p = Long.valueOf(period.getText().trim());
+					try{
+						p = Long.valueOf(period.getText().trim());
+					}catch (Exception ex) {
+						throw new NumberFormatException("Invalid period");
+					} 
+				}
+				if(p < 1){
+					throw new NumberFormatException("Interval should be grater than 0");
 				}
 			} catch (NumberFormatException x) {
-				errorLabel.setText("Invalid period");
+				errorLabel.setText(x.getMessage());
 				return;
 			}
 			if(startDate.compareTo(endDate) > 0){
