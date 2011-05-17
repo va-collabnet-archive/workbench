@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Creation of projects</title>
+  <body>
+    <p>
+      <ul id="ul_ygg_kxm_nb">
+        <li>Open the Translation Workbench and select 'Open' --> 'Project Manager' from the upper
+          left menu. The project manager tab will be displayed:</li>
+      </ul>
+    </p>
+    <p><image href="15_open_pjt_man.PNG" id="image_sva_yxm_nb"/></p>
+    <p/>
+    <p>
+      <ul id="ul_ivl_oxm_nb">
+        <li>The project managment screen will be opened with a left panel displaying a tree view and
+          a right panel with tabs showing the project details:</li>
+      </ul>
+    </p>
+    <p><image href="18_poject_management_screens.PNG" id="image_nne_wxm_nb"/></p>
+    <p/>
+    <p><b>Specifying project features</b></p>
+    <p>
+      <ul id="ul_zdq_mym_nb">
+        <li>Click on the ‘Add project’ button to create a new project:</li>
+      </ul>
+    </p>
+    <p><image href="16_add_project.PNG" id="image_rog_czm_nb"/></p>
+    <p/>
+    <p>
+      <ul id="ul_gsk_szm_nb">
+        <li>A new window is displayed requesting to enter a new project name. Enter a new project
+          name and click “enter”:</li>
+      </ul>
+    </p>
+    <p><image href="17_project_name.PNG" id="image_kve_zan_nb"/></p>
+    <p/>
+    <p>
+      <ul id="ul_ndw_zan_nb">
+        <li>The new project is displayed under the Translation Projects folder on the left.  In
+          order to create your translation worksets, their characteristics must be previously
+          defined, i.e., any exclusion refsets or linked refsets, the source language(s) and the
+          target language. These may be displayed by clicking the respective tabs on the right pane
+          and will be individually described.</li>
+      </ul>
+    </p>
+    <p/>
+    <p><i><b>Exclusion Refsets tab</b></i>:In the Exclusion RefSet Tab you may define any group of
+      concepts you may want to use as exclusions in worksets of this project. Adding them here only
+      creates a shortcut to the refsets, the content will not be automatically excluded from the
+      worksets, that decision is made in a workset by workset basis.</p>
+    <p>
+      <ul id="ul_kej_lbn_nb">
+        <li>Open the taxonomy tab, select the refset you want to exclude from your translation
+          project, drag &amp; drop it into the Exclusion refset panel on the right, and press
+          “Save”.</li>
+        <li>In case you want to delete a refset from your exclusion list, you may select the refset
+          you want to delete and type ‘d’ or right click on the selected refset to remove it. You
+          may also click the “Remove Selected RefSets” button.</li>
+      </ul>
+    </p>
+    <p><image href="19_project_exclusion_refset.PNG" id="image_osu_qbn_nb"/></p>
+    <p/>
+    <p>
+      <ul id="ul_fdi_sbn_nb">
+        <li>Your selection will be saved upon clicking the ‘Save’ button.</li>
+      </ul>
+    </p>
+    <p>
+      <ul id="ul_nmv_ubn_nb">
+        <li>A message is displayed when your specifications have been saved:</li>
+      </ul>
+    </p>
+    <p><image href="20_pjct%20saved.PNG" id="image_umj_xbn_nb"/></p>
+    <p/>
+    <p><i><b>Linked Refsets tab:</b></i> This is a refset repository where refsets related with the
+      project may be kept ‘at hand’, to be translated now or in the future.</p>
+    <p>
+      <ul id="ul_ilm_zcn_nb">
+        <li>Open the taxonomy tab, select the refset you want to link to your translation project,
+          drag &amp; drop it into the Linked refset panel on the right, and press “Save”.</li>
+        <li>In case you want to delete a refset from your linked refset list, type ‘d’ or right
+          click on the selected refset to remove it. You may also click the “Remove Selected
+          RefSets” button.</li>
+      </ul>
+    </p>
+    <p><image href="21_project_linked_refset.PNG" id="image_ipu_edn_nb"/></p>
+    <p/>
+    <p>
+      <ul id="ul_hoz_fdn_nb">
+        <li>Your selection will be saved upon clicking ‘Save’ button.</li>
+        <li>A message is displayed when your specifications have been saved:</li>
+      </ul>
+    </p>
+    <p><image href="20_pjct%20saved.PNG" id="image_jpi_jdn_nb"/></p>
+    <p/>
+    <p><b><i>Source and Target Languages</i></b>: </p>
+    <p>
+      <ul id="ul_msv_ndn_nb">
+        <li>Open the taxonomy tab, select the language refset (s) you will specify as your source
+          language (more than one may be selected), </li>
+        <li>drag &amp; drop it into the Source language pane on the right. </li>
+        <li>Again on the taxonomy tab, select the language refset you will choose as your target
+          language. </li>
+        <li>Drag and drop it in the target language field at the bottom of the right panel. </li>
+        <li>Press “Save”. </li>
+        <li>You may type ‘d’ (or right click on the selected refset or click "Remove selected
+          refsets" button to delete any refset from your language specification.</li>
+      </ul>
+    </p>
+    <p><image href="22_pjct_languages.PNG" id="image_dxa_vdn_nb"/></p>
+    <p/>
+    <p>
+      <ul id="ul_drk_wdn_nb">
+        <li><b>More than one source language may be specified, while only one target language is
+            allowed, as the translation tool allows performing one translation at a time for a given
+            source language(s).</b></li>
+        <li><b><i>Example</i>: English and Swedish may be used as source languages for translation
+            into Danish, but it is not possible to translate from English into Spanish and
+            Portuguese at the same time.</b></li>
+      </ul>
+    </p>
+    <p/>
+    <p>Source languages refsets may be removed from the specifications either by:</p>
+    <p>(a) Selecting them and clicking the ‘Remove selected refsets’ button:</p>
+    <p><image href="23_remove%20selected.PNG" id="image_qas_gen_nb"/></p>
+    <p/>
+    <p>(b) Right clicking on the selected  language to be removed:</p>
+    <p><image href="24_right_click_to_remove.PNG" id="image_eci_len_nb"/></p>
+    <p/>
+    <p>(c) Select a language to be removed and type “d”.</p>
+    <p/>
+    <p>
+      <ul id="ul_ltm_sen_nb">
+        <li>The target language refset may be changed by dragging &amp; dropping another language
+          refset into the Target language window (notice that it cannot be removed but it is
+          replaced by another target language).</li>
+        <li>If all the source languages are inadvertently removed or the user forgots to define at
+          least one, a warning message will appear:</li>
+      </ul>
+    </p>
+    <p><image href="25_source%20empty.PNG" id="image_rnl_yen_nb"/></p>
+    <p/>
+    <p>
+      <ul id="ul_wyt_afn_nb">
+        <li>If an invalid concept is selected as source language, a message will appear and the
+          concept will not be dragged into the Source language window:</li>
+      </ul>
+    </p>
+    <p><image href="26_source_not_valid.PNG" id="image_pvy_cfn_nb"/></p>
+    <p/>
+    <p>
+      <ul id="ul_dxd_efn_nb">
+        <li>Likewise, if an invalid concept is selected as target language, a message will appear
+          and the concept will not be dragged into the Target language window:</li>
+      </ul>
+    </p>
+    <p><image href="27_target_not_valid.PNG" id="image_qwo_ffn_nb"/></p>
+    <p/>
+    <ul id="ul_fqg_hfn_nb">
+      <li>Your selection will be saved upon clicking ‘Save’ button. If you have forgotten to specify
+        a source and/or target language, a warning message is displayed:<p><image
+            href="28_warning_not_saved.PNG" id="image_pbp_lfn_nb"/></p></li>
+    </ul>
+  </body>
+</topic>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Refset creation</title>
+  <body>
+    <p>Open the translation workbench,  log-in as refset manager (peter refm in the testing bundle)
+      and select the Refset Spec tab: </p>
+    <p><image href="images_transl/1_refset_spec_tab.PNG"/></p>
+    <p/>
+    <p>
+      <ul>
+        <li>Press the "refset creation request" button:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/2_refset_creation_button.PNG"/></p>
+    <p/>
+    <p>
+      <ul>
+        <li>A new window is opened requesting for a RefSet name, a RefSet parent, and a deadline.
+          When these mandatory data are completed, click on "<b>></b>" button:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/3_refset_name_and_date.PNG"/></p>
+    <p/>
+    <p>
+      <ul>
+        <li>The Refset parent allows a better organization and visualization of created refsets for
+          further use. The list of refset parents depends on the permissions setup in the project,
+          so it may be different for different users. In this example, the refset created will be
+          displayed in the Taxonomy view under the parent concept “Refset”:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/4_refset%20parent.PNG"/></p>
+    <p/>
+    <p>
+      <ul>
+        <li>The following window will be displayed. However, you should ignore it, as it is related
+          to the refset creation and validation workflow and is not in the scope of this guide. Just
+          click OK:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/5_creation_message.PNG"/></p>
+    <p/>
+    <p>
+      <ul>
+        <li>The refset name you have entered is displayed on the right pane. Now you should populate
+          it with the refset members. As guidance, the member count at the last compute is shown, as
+          well as the time of last compute. In the example shown, the member count is still 0
+          because the refset is still empty:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/6_empty_refset_window.PNG"/></p>
+    <p/>
+    <p><b>Populate your Refset</b></p>
+    <p>
+      <ul>
+        <li>In the RefSet spec tab, click the <image href="images_transl/or_button.PNG"/>  button.
+          Logical “OR” clause will be displayed in the Specification tab. Click on “OR” clause to
+          select it.</li>
+      </ul>
+    </p>
+    <p>
+      <ul>
+        <li>Go to the “TAXONOMY” tab on the left panel and select the SNOMED concepts that will
+          constitute your refset:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/7_defining_refset_members.PNG"/></p>
+    <p/>
+    <p><b>(A)</b> Right click on the selected concept. A new window is displayed.</p>
+    <p><b>(B)</b> Select “concept” to open the clauses window, where you can choose from a spectrum
+      of clauses according to the definition used for creating your refset. In this case, we
+      selected “ADD CONCEPT IS DESCENDANT OF” clause in order to create a refset that will include
+      all the descendants of “Body structure."</p>
+    <p>          If you select “add CONCEPT IS” clause, only the concept “Body structure” will be
+      added to your refset. Likewise, if you select “add  CONCEPT IS CHILD OF” clause (not shown in
+      the figure), only the children of “Body structure” will be added.</p>
+    <p><image href="images_transl/8_is_descendent_of.PNG"/></p>
+    <p>The selected clause is displayed on the right panel.</p>
+    <p>
+      <ul>
+        <li>Click “Commit” to save your selection and then, the <image
+            href="images_transl/compute_button.PNG"/>  button to compute your refset.</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/9_commit.PNG"/></p>
+    <p/>
+    <p>
+      <ul>
+        <li>A message appears when your refset has been computed:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/10_refset_comp_complete.PNG"/></p>
+    <p/>
+    <p>
+      <ul>
+        <li>The refset members are displayed upon clicking “Members” tab on the lower right panel:
+        </li>
+      </ul>
+    </p>
+    <p><image href="images_transl/11_refset_members_list.PNG"/></p>
+    <p/>
+    <p>
+      <ul>
+        <li>Each refset member is represented in a row. The number of rows will indicate the number
+          of refset members. (This functionality is provided by the workbench and is not part of the
+          translation module.)</li>
+      </ul>
+    </p>
+    <p>
+      <ul>
+        <li>Any number of OR clauses may be added and they will displayed in a tree view on the
+          right:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/12_many_or_clauses.PNG"/></p>
+    <p/>
+    <p>
+      <ul>
+        <li><u>Right clicking</u> on a clause may display a Retire option before commiting the
+          refset.</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/13_retiring_or_clauses.PNG"/></p>
+    <p/>
+    <p>
+      <ul>
+        <li>The changes are reflected in the refset specifications window:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/14_changes_in_refset_spec.PNG"/></p>
+  </body>
+</topic>

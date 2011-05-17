@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>File link configuration</title>
+  <body>
+    <p><image href="images_transl/54_proj_config_file_link_config.PNG" id="image_wyp_pmc_hc"/></p>
+    <p>
+      <ul id="ul_zdm_rmc_hc">
+        <li>This feature allows the organization of business process files or any other file into
+          workbench categories. For example, the “translation business process” category is used to
+          identify all the translation workflow files. This feature is used to provide a more
+          intuitive user interface at the moment of generating a worklist and choosing a
+          workflow.</li>
+      </ul>
+    </p>
+  </body>
+</topic>

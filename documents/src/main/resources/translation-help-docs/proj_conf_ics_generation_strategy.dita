@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>ICS generation strategy</title>
+  <body>
+    <p><image href="images_transl/56_ics_generation_strategy.PNG" id="image_kiq_kpc_hc"/></p>
+    <p>
+      <ul id="ul_qln_lpc_hc">
+        <li>Specifies how will the Initial Capital Status will be managed, as there are words that
+          should always be written with uppercase (e.g.,Turner syndrome) or lower case (e.g., pH)
+          regardless the editorial guidelines related to the capitalization status of the translated
+            descriptions:<ul id="ul_hjv_xpc_hc">
+            <li><u>None</u>: ICS is false by default. This means that the initial capital status is
+              not significant.</li>
+            <li><u>Copy from source</u>: defines the default ICS as the same of the source FSN</li>
+            <li><u>Words list</u>: uses a list of case significant words for defining the default
+              ICS. This feature is not yet implemented in this version</li>
+          </ul></li>
+      </ul>
+    </p>
+    <p/>
+    <p/>
+    <p/>
+  </body>
+</topic>

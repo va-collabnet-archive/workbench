@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Translator default editor mode</title>
+  <body>
+    <p><image href="images_transl/59_proj_config_translator_def_ed_mode.PNG" id="image_yna_gwc_hc"
+      /></p>
+    <p>This option enables the project manager to define different actions allowed to each workflow
+      member by selecting an optiong from each combobox.</p>
+  </body>
+</topic>

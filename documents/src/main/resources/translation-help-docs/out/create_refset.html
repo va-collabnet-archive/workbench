@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="copyright" content="(C) Copyright 2005"/>
+<meta name="DC.rights.owner" content="(C) Copyright 2005"/>
+<meta name="DC.Type" content="topic"/>
+<meta name="DC.Title" content="Refset creation"/>
+<meta name="DC.Format" content="XHTML"/>
+<meta name="DC.Identifier" content="topic-1"/>
+<link rel="stylesheet" type="text/css" href="commonltr.css"/>
+<title>Refset creation</title>
+</head>
+<body id="topic-1"><a name="topic-1"><!-- --></a>
+
+
+  <h1 class="title topictitle1">Refset creation</h1>
+
+  <div class="body">
+    <p class="p">Open the translation workbench,  log-in as refset manager (peter refm in the testing bundle)
+      and select the Refset Spec tab: </p>
+
+    <p class="p"><img class="image" src="images_transl/1_refset_spec_tab.PNG"/></p>
+
+    <p class="p"/>
+
+    <div class="p">
+      <ul class="ul">
+        <li class="li">Press the "refset creation request" button:</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><img class="image" src="images_transl/2_refset_creation_button.PNG"/></p>
+
+    <p class="p"/>
+
+    <div class="p">
+      <ul class="ul">
+        <li class="li">A new window is opened requesting for a RefSet name, a RefSet parent, and a deadline.
+          When these mandatory data are completed, click on "<strong class="ph b">&gt;</strong>" button:</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><img class="image" src="images_transl/3_refset_name_and_date.PNG"/></p>
+
+    <p class="p"/>
+
+    <div class="p">
+      <ul class="ul">
+        <li class="li">The Refset parent allows a better organization and visualization of created refsets for
+          further use. The list of refset parents depends on the permissions setup in the project,
+          so it may be different for different users. In this example, the refset created will be
+          displayed in the Taxonomy view under the parent concept “Refset”:</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><img class="image" src="images_transl/4_refset parent.PNG"/></p>
+
+    <p class="p"/>
+
+    <div class="p">
+      <ul class="ul">
+        <li class="li">The following window will be displayed. However, you should ignore it, as it is related
+          to the refset creation and validation workflow and is not in the scope of this guide. Just
+          click OK:</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><img class="image" src="images_transl/5_creation_message.PNG"/></p>
+
+    <p class="p"/>
+
+    <div class="p">
+      <ul class="ul">
+        <li class="li">The refset name you have entered is displayed on the right pane. Now you should populate
+          it with the refset members. As guidance, the member count at the last compute is shown, as
+          well as the time of last compute. In the example shown, the member count is still 0
+          because the refset is still empty:</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><img class="image" src="images_transl/6_empty_refset_window.PNG"/></p>
+
+    <p class="p"/>
+
+    <p class="p"><strong class="ph b">Populate your Refset</strong></p>
+
+    <div class="p">
+      <ul class="ul">
+        <li class="li">In the RefSet spec tab, click the <img class="image" src="images_transl/or_button.PNG"/>  button.
+          Logical “OR” clause will be displayed in the Specification tab. Click on “OR” clause to
+          select it.</li>
+
+      </ul>
+
+    </div>
+
+    <div class="p">
+      <ul class="ul">
+        <li class="li">Go to the “TAXONOMY” tab on the left panel and select the SNOMED concepts that will
+          constitute your refset:</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><img class="image" src="images_transl/7_defining_refset_members.PNG"/></p>
+
+    <p class="p"/>
+
+    <p class="p"><strong class="ph b">(A)</strong> Right click on the selected concept. A new window is displayed.</p>
+
+    <p class="p"><strong class="ph b">(B)</strong> Select “concept” to open the clauses window, where you can choose from a spectrum
+      of clauses according to the definition used for creating your refset. In this case, we
+      selected “ADD CONCEPT IS DESCENDANT OF” clause in order to create a refset that will include
+      all the descendants of “Body structure."</p>
+
+    <p class="p">          If you select “add CONCEPT IS” clause, only the concept “Body structure” will be
+      added to your refset. Likewise, if you select “add  CONCEPT IS CHILD OF” clause (not shown in
+      the figure), only the children of “Body structure” will be added.</p>
+
+    <p class="p"><img class="image" src="images_transl/8_is_descendent_of.PNG"/></p>
+
+    <p class="p">The selected clause is displayed on the right panel.</p>
+
+    <div class="p">
+      <ul class="ul">
+        <li class="li">Click “Commit” to save your selection and then, the <img class="image" src="images_transl/compute_button.PNG"/>  button to compute your refset.</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><img class="image" src="images_transl/9_commit.PNG"/></p>
+
+    <p class="p"/>
+
+    <div class="p">
+      <ul class="ul">
+        <li class="li">A message appears when your refset has been computed:</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><img class="image" src="images_transl/10_refset_comp_complete.PNG"/></p>
+
+    <p class="p"/>
+
+    <div class="p">
+      <ul class="ul">
+        <li class="li">The refset members are displayed upon clicking “Members” tab on the lower right panel:
+        </li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><img class="image" src="images_transl/11_refset_members_list.PNG"/></p>
+
+    <p class="p"/>
+
+    <div class="p">
+      <ul class="ul">
+        <li class="li">Each refset member is represented in a row. The number of rows will indicate the number
+          of refset members. (This functionality is provided by the workbench and is not part of the
+          translation module.)</li>
+
+      </ul>
+
+    </div>
+
+    <div class="p">
+      <ul class="ul">
+        <li class="li">Any number of OR clauses may be added and they will displayed in a tree view on the
+          right:</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><img class="image" src="images_transl/12_many_or_clauses.PNG"/></p>
+
+    <p class="p"/>
+
+    <div class="p">
+      <ul class="ul">
+        <li class="li"><u class="ph u">Right clicking</u> on a clause may display a Retire option before commiting the
+          refset.</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><img class="image" src="images_transl/13_retiring_or_clauses.PNG"/></p>
+
+    <p class="p"/>
+
+    <div class="p">
+      <ul class="ul">
+        <li class="li">The changes are reflected in the refset specifications window:</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><img class="image" src="images_transl/14_changes_in_refset_spec.PNG"/></p>
+
+  </div>
+
+
+</body>
+</html>

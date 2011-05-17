@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Management of repositories for issue reporting</title>
+  <body>
+    <p>The project manager creates repositories for external issue reporting, external issue
+      reporting is useful for facilitating the involvement of external actors into monitoring the
+      project, anyone can see the progress of issues from a web site without accessing to the
+      workbench application.</p>
+    <p>A repository is a reference to an external issues tracker tool. We are using Collabnet
+      trackers to store external issues, so the details about URL and IDs of the repositories are
+      URLs and Ids of existing Collabnet Issues Trackers are displayed on the Collabnet website. For
+      this example we will provide you the details for two demo trackers created for this purpose,
+      but your user must have access to the Translation Tooling Steering Group Collabnet
+      project.</p>
+    <p>Each user has his/her own collabnet username and password for accomplishing this task.</p>
+    <p>Select Project and open “Issues” tab on the right pane, for a translation project, two
+      repositories can be configured, one for reporting “source defects” (problems in the
+      international, or source edition), and other for “project issues”, issues or situations
+      related to the translation projects:</p>
+    <p><image href="images_transl/43_repositories_for_issue_reporting.PNG"/></p>
+    <p/>
+    <p>
+      <ul id="ul_nct_shb_hc">
+        <li><u>Click “Create a new repository” to create a new repository</u>: A new window is
+          displayed requesting to complete the information for the new repository. All the fields
+          must be completed:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/44_new_repository.PNG"/></p>
+    <p>THE HIGHLIGHTED FIELDS ARE MANDATORY:</p>
+    <p>
+      <ul id="ul_jyn_cob_hc">
+        <li>You may enter any name for your repository</li>
+      </ul>
+    </p>
+    <p>
+      <ul id="ul_yik_fob_hc">
+        <li>URL is: <xref href="https://csfe.aceworkspace.net/" format="html" scope="external"/>be
+          sure to include the final bar)</li>
+      </ul>
+    </p>
+    <p>
+      <ul id="ul_dtp_rob_hc">
+        <li>ID: is <b><u>tracker1214</u></b> (no spaces) because any issue will be posted to that
+          tracker in collabnet if related to the Source Defects Issue Repository and is used for
+          reporting issues in the International Edition content reported by translators using the
+          Workbench Translation module.</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/45_tracker.PNG"/></p>
+    <p/>
+    <p>
+      <ul id="ul_wje_vpb_hc">
+        <li>SAVE</li>
+      </ul>
+    </p>
+    <p>The same steps must be followed for creating a repository for issues related to a specific
+      project.  In this case, the URL is the same - <xref href="https://csfe.aceworkspace.net"
+        format="html" scope="external"/> - but repository ID is different, as issues will be
+      exclusively specified for  a given project:</p>
+    <p/>
+    <image href="images_transl/46_issue_for_specific_project.PNG"/>
+    <p/>
+    <p>
+      <ul id="ul_jja_lqb_hc">
+        <li>SAVE</li>
+      </ul>
+    </p>
+    <p>
+      <ul id="ul_pbq_mqb_hc">
+        <li>The available repositories are displayed in a list and must be dragged and dropped into
+          the respective Repository window:</li>
+      </ul>
+    </p>
+    <image href="images_transl/47_drag_and_dorp_repositories.PNG"/>
+    <p/>
+    <p>Finally, user key data must be entered. Each user will have his/her credentials for editing
+      issues in collabnet. Otherwise, the Issue tab will still be inactive:</p>
+    <p/>
+    <p><image href="images_transl/48_issues_user_inactive.PNG"/></p>
+    <p><image href="images_transl/49_issues_repositories_credentials.PNG"/></p>
+    <p/>
+    <p>
+      <ul id="ul_eba_orb_hc">
+        <li>SAVE</li>
+      </ul>
+    </p>
+    <p>
+      <ul id="ul_tbt_orb_hc">
+        <li>A creation message is displayed:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/50_issues_repository_saved.PNG"/></p>
+    <p>Now, Issues tab in the translation interface is no longer inactive (For further information
+      open help hook in "Issue" in the translation interface. </p>
+  </body>
+</topic>

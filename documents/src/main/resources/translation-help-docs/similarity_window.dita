@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Similarity window</title>
+  <body>
+    <p>This window shows similar translations. </p>
+    <p>Previously translated words/terms that match with words contained in the description to be
+      translated are shown highlighted:</p>
+    <p> </p>
+    <p><image href="images_transl/87_help_similarity_window.PNG" id="image_ezq_rjj_hc"/></p>
+    <p/>
+    <p>
+      <ul id="ul_lqg_tjj_hc">
+        <li><b>Hide / Show button</b> allows to collapse or display Similarity window according to
+          user's preferences.</li>
+      </ul>
+    </p>
+    <p>
+      <ul id="ul_bjt_hkj_hc">
+        <li><b>FSN - Preferred - Both</b> buttons allow the user to choose viewing similarity
+          matches by FSNs, PT or both description types.<ul id="ul_qoy_mpj_hc">
+            <li>If the user selects a similarity match by FSN, matching source and target FSN are
+              sought. If the target language has not translated FSNs, no similarity matches will be
+              displayed:</li>
+          </ul></li>
+      </ul>
+    </p>
+    <p><image href="images_transl/90_help_similarity_fsn_match.PNG" id="image_sii_nqj_hc"/></p>
+    <p>
+      <ul id="ul_wez_mrj_hc">
+        <li>If matching criteria are specified by preferred term the list of matches will be
+          displayed:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/91_help_similarity_pt_match.PNG" id="image_tgl_prj_hc"/></p>
+    <p>
+      <ul id="ul_gth_rrj_hc">
+        <li>Similarity matching by FSN and Preferred term ("Both" option) in a target language
+          without translated FSNs: the target descriptions will be shown twice </li>
+      </ul>
+    </p>
+    <p><image href="images_transl/92_help_similarity_both_match.PNG" id="image_pqe_vwj_hc"/></p>
+    <p>
+      <ul id="ul_xyh_pkj_hc">
+        <li><b>Refine</b> allows expanding searches to other words/terms, which will be displayed in
+          the same screen and replace the original matching descriptions. However, clicking again on
+          FSN or PT buttons will return to the original similarity display:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/88_help_similarity_search.PNG" id="image_ceh_amj_hc"/></p>
+    <p>An enlarged view is displayed upon clicking “E[x]pand” button:</p>
+    <p/>
+    <p><image href="images_transl/89_help_similarity_expand.PNG" id="image_lmr_uoj_hc"/></p>
+    <p>All the similarities between source and target descriptions, as well as the status of each
+      one in the translation workflow are displayed (whenever a concept has been included in the
+      current workflow. If a concept has been previously translated, i.e. in other releases, no
+      translation statuses will be shown).</p>
+  </body>
+</topic>

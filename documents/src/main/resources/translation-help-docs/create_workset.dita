@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Creation of worksets</title>
+  <body>
+    <p><b>A workset is a refset “frozen” in a point of time and associated to a project</b></p>
+    <p/>
+    <p><b><u>Specifying workset features</u></b></p>
+    <p>
+      <ul id="ul_rsm_hqn_nb">
+        <li>Open the workset tab on the right panel and click “Create new workset”.  A new window is
+          displayed in order to enter a new workset name.<image
+            href="images_transl/29_creation_of_worksets.png"/></li>
+      </ul>
+    </p>
+    <p/>
+    <p>
+      <ul id="ul_vvs_lqn_nb">
+        <li>A message is displayed upon clicking OK:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/30_workset_saved.PNG"/></p>
+    <p/>
+    <p>
+      <ul id="ul_nld_qqn_nb">
+        <li>You will not be able to create two worksets with the same name. The following message
+          will appear when trying to do so:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/31_duplicated_workset_name.PNG"/></p>
+    <p/>
+    <p>
+      <ul>
+        <li>Once you have entered a new workset name you should define the refset from which you
+          will obtain the concepts to be translated. Once again, the source refset and any
+          additional features may be displayed by clicking the respective tabs on the right
+          panel:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/32_workset%20name.PNG"/></p>
+    <p/>
+    <p>
+      <ul>
+        <li><u>Define your source refset</u>: Open the taxonomy tab on the left pane and select the
+          refset containing the concepts to the translated. Drag and drop it into the Source Refset
+          field in the right panel. Then click “save”.</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/33_workset_source_refset_1.PNG"/></p>
+    <p/>
+    <p>
+      <ul>
+        <li>Save your specifications. If you have forgotten to save your source refset and try to
+          synchronize without saving, an error message will de shown:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/34_source_refset_empty.PNG"/></p>
+    <p/>
+    <p>
+      <ul>
+        <li>Upon saving the source refset, the list and the number of refset members is displayed.
+          However, if you open the Workset members tab, you will see that it is still empty:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/35_workset_still_empty.png"/></p>
+    <p/>
+    <p>
+      <ul>
+        <li>As the screen helps shows, the list of workset members will only be shown after
+          synchronizing the workset with the source refset.</li>
+      </ul>
+    </p>
+    <p/>
+    <p>
+      <ul>
+        <li><u>Define your exclusion refsets (if any)</u>: Whenever you have a refset of concepts
+          that will not be translated, you should specify them as an exclusion refset before
+          synchronizing your refset.  Any exclusion refset must be defined in the project.
+          Otherwise, the refset will not be excluded.</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/36_drag_exclusion_refset.PNG"/></p>
+    <p/>
+    <ul>
+      <li>Save your specifications.<p><image href="images_transl/37_save_specifications.png"
+          /></p><p/><p>A message appears when the specifications have been saved. However, you
+            <b>must</b> synchronize your workset with the source refset in order to ensure they are
+          identical.</p><p/><p><b>A refset is mutable and does not belong to the Translation
+            Process, but a Workset does. Therefore there is a need to keep one or more copies of a
+            set of data consistent with the refset created for the translation
+              process.</b></p><p><b><i>Example</i>: The refset manager created a refset for
+            translation of body structures and submitted them to the Project Manager on May 1st,
+            2010 at 9:00 a.m. Since then, the Body structure hierarchy has been changed and about
+            100 concepts had been added in July 31st release. The project manager created worksets
+            for translation and when he synchronized them the Source refset used was the one
+            submitted on May 1st, which is different to the SNOMED edition released on July 31st.
+             Therefore, the workset that is already in the transaltion workflow does not include the
+            100 new concepts, this separation from the new version of the refset allows the
+            monitoring of the progress to the completion of the workset tasks not to be affected by
+            the recent changes. This is why the definition of worksets states that they are refsets
+              <u>frozen</u> in a point of time and associated to a project. According to this ,
+            synchronization is the “freezing” action: your workset will be an exact copy of the
+            refset created on May 1st.</b></p><p/>Click “Sync” button to synchronize your refset. A
+        confirmation message is displayed:<p><image
+            href="images_transl/38_would_you_synchronize.png"/></p><p/><p>Another message is
+          displayed when synchronization has been completed:</p><p><image
+            href="images_transl/39_workset_synchronized.png"/></p><p/><p>If you open the Members tab
+          now, you will see that the Workset member list is exactly the same as the source
+          refset:</p><p><image href="images_transl/40_workset_populated.png"/></p><p>The source
+          refset members are displayed in alphabetical order, and the workset members will be shown
+          in the members tab.</p><p/></li>
+      <li>
+        <p>But, what would have happened if an Exclusion refset had been specified, as shown in the
+          figure below?</p>
+        <p><image href="images_transl/41_show_excluded.png"/></p>
+        <p/>
+        <p>The Source refset has 734 members, and the Exclusion refset, 505 (any refset details may
+          be seen with the Refset Viewer, see Section 4.3 Refset Viewer). According to your
+          specification, you asked to create a workset with the source refset minus the exclusion
+          refset. Therefore, you will have the following Workset following synchronization:</p>
+        <p/>
+        <p><image href="images_transl/42_workset_with_excluded.png"/></p>
+        <p/>
+        <p>The workset should now be divided in different partitions that will be assigned to
+          translators and reviewers.</p>
+      </li>
+    </ul>
+  </body>
+</topic>

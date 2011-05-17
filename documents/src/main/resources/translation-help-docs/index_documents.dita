@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Index documents</title>
+  <body>
+    <p>
+      <ul id="ul_hvy_mad_hc">
+        <li>Documents must be indexed to be searched. The translation bundle folder contains a
+          folder called "documents" with a few sample documents:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/60_index_doc_doc_folder.PNG" id="image_tqs_xad_hc"/></p>
+    <p>
+      <ul id="ul_rgc_abd_hc">
+        <li>In the translation workbench, select Index Documents option:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/61_index_doc.PNG" id="image_vpb_hbd_hc"/></p>
+    <p>
+      <ul id="ul_mrq_jbd_hc">
+        <li>Indexing window is opened in the lower third of the screen. Click “Index documents
+          folder”. All the documents included in this folder will be indexed (.pdf, . docx, .doc,
+          .xlsx, .xls). The  process may take a longer time when heavy documents are indexed)</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/62_index_doc_button.PNG" id="image_jnw_sbd_hc"/></p>
+    <p>
+      <ul id="ul_uck_vbd_hc">
+        <li>To add a document that is not in the Documents folder you should place it there first
+          and then press Index documents folder:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/63_index_doc_add_doc.PNG" id="image_zss_zbd_hc"/></p>
+  </body>
+</topic>

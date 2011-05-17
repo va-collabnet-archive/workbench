@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Partition scheme details</title>
+  <body>
+    <p><b><u>Workset partitioning</u></b></p>
+    <p>
+      <ul id="ul_e99d0bac-0aa4-4fd3-87ca-0ac7d980f429">
+        <li>Select “Open Project Manager” from the upper left menu and open your translation
+          project. Open your Worksets folder and select a workset.</li>
+      </ul>
+    </p>
+    <p>
+      <ul id="ul_b01a6708-eef8-43c9-b117-0e36e8bc5ce2">
+        <li>The workset details will be displayed in the right panel. You will find that the source
+          refset, the exclusion refsets and members were already defined. Now you must create your
+          partition schemes according to your needs.</li>
+      </ul>
+    </p>
+    <p>• Open the Partition Schemes tab and click “New partition scheme”. A new window is displayed
+      requesting for a partition scheme name. Write a name and press OK:</p>
+    <p><image href="images/partition_scheme_name.PNG" id="image_wzv_lcz_mb"/></p>
+    <p>
+      <ul id="ul_d3a85113-b477-4ce6-93a8-ebaab975af89">
+        <li>You will not be able to create two partitions with the same name. if you try to do so,
+          the following message will appear:</li>
+      </ul>
+    </p>
+    <p><image href="images/duplicate_partition_name.PNG" id="image_jgw_ncz_mb"/></p>
+    <p>
+      <ul>
+        <li>Select your new partition scheme in the left panel. The details of this partition scheme
+          will be opened on the right panel.</li>
+      </ul>
+    </p>
+    <p><b><u>Partition merging</u></b></p>
+    <p>
+      <ul>
+        <li>In this pane, you may also select multiple partitions (control + click) in the
+          Partitions tab and merge them by clicking “Merge selected partitions” button:</li>
+      </ul>
+    </p>
+    <p>
+      <ul>
+        <li>The new partition resulting from merging will be displayed in the Partitions list:</li>
+      </ul>
+    </p>
+    <p><image href="images/partitions_merging.PNG" id="image_eoq_fdz_mb"/></p>
+    <p/>
+    <image href="images/merged_partitions.PNG" id="image_xqc_kdz_mb"/>
+  </body>
+</topic>

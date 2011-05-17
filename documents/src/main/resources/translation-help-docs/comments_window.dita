@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Comments / Issues window</title>
+  <body>
+    <p><b><u>Comments tab</u></b></p>
+    <p>This tab displays comments with date, time, author and text. Upon clicking “[A]dd comment”
+      button, a new window is opened. Some comment options may be chosen according to the type of
+      comment to be made and a box for free text writing is provided:</p>
+    <p/>
+    <p><image href="images_transl/96_comments_add_comm.PNG" id="image_eth_hik_hc"/></p>
+    <p>Upon clicking OK button, the window is closed and the comment is displayed in a list under
+      “Comment type”, ordered by date, time, author and comment text. A red number in brackets is
+      shown in the “Comments” tab indicating the number of comments, for a given description:</p>
+    <p/>
+    <p><image href="images_transl/97_comment_display.PNG" id="image_yiu_ejk_hc"/></p>
+    <p/>
+    <p>Comments may be ordered by ascendent or descendent order, by clicking on the sorter:</p>
+    <p/>
+    <p><image href="images_transl/98_comments_order.PNG" id="image_dsw_vlk_hc"/></p>
+    <p/>
+    <p>Comments may also be deleted by right-clicking on a selected comment:</p>
+    <p><image href="images_transl/99_comments_delete.PNG" id="image_kyr_smk_hc"/></p>
+    <p/>
+    <p><b><u>Issues tab</u></b></p>
+    <p>When issue repositories have not been configured by the project manager this tab is
+      inactive.</p>
+    <p>When the project manager has specified the available repositories the word “Inactive” in
+      brackets disappears when the user has specified his/her own username and password to enable
+      issue posting in collabmet site.</p>
+    <p/>
+    <p><image href="images_transl/100_active_inactive_issues_tab.PNG" id="image_cqq_nhp_hc"/></p>
+    <p/>
+    <p>In order to do this, users must open the project manager, select the project they will be
+      working with and open the “Issues” tab on the right panel:</p>
+    <p/>
+    <p><image href="images_transl/101_posting_issues_config.PNG" id="image_msy_cip_hc"/></p>
+    <p/>
+    <p>Notice that as the project manager has already defined all the mandatory fields and specified
+      the available repositories, the translation workflow users must only write their credentials
+      in the corresponding windows and then click save:</p>
+    <p/>
+    <p><image href="images_transl/102_posting_issues_write_credentials.PNG" id="image_rlq_mip_hc"
+      /></p>
+    <p/>
+    <p>Back in the translation interface, selecting the Issues tab will display the Issues
+      Interface. The size of this window may be changed according to the users preferences by
+      scrolling the lateral bars to both sides or by clicking the expand/reduce icons:</p>
+    <p/>
+    <p><image href="images_transl/103_posting_issues_exp_reduce.PNG" id="image_uva_zip_hc"/></p>
+    <p/>
+    <p>A new issue window is opened upon clicking “Create Issue” button; the user must enter an
+      Issue title and a description of the problem reported:</p>
+    <p/>
+    <p><image href="images_transl/104_posting_issues_issue_issue_window.PNG" id="image_ivf_jjp_hc"
+      /></p>
+    <p/>
+    <p>A message confirming that the issue has been posted is displayed upon clicking OK:</p>
+    <p/>
+    <p><image href="images_transl/105_issue_posted.PNG" id="image_abi_pjp_hc"/></p>
+    <p/>
+    <p>Go to <xref href="https://csfe.aceworkspace.net" format="html" scope="external"/> > IHTSDO
+      Translation Tooling Project > Tracker > Specific Translation project issues (EB) Summaries and
+      you will find the posted issue in an artifact list. The issue title is displayed. You must
+      select this link to view artifact's details:</p>
+    <p/>
+    <p><image href="images_transl/106_issue_tracker_in_collanet.PNG" id="image_mai_fkp_hc"/></p>
+    <p/>
+    <p><image href="images_transl/107_issue_posted_details.PNG" id="image_abb_csp_hc"/></p>
+    <p/>
+    <p>When the issue has been posted, it is shown as a table in the Issues window of the
+      translation interface, with Issue Title, Description, Status and the user who posted it:</p>
+    <p/>
+    <p><image href="images_transl/108_issue_posted_user_view.PNG" id="image_its_isp_hc"/></p>
+    <p/>
+    <p>Notice that there is an ‘Issue Comments’ window on the right. When any other user in the
+      workflow has further comments to the issue, he/she may enter them in this window:</p>
+    <p/>
+    <p><image href="images_transl/109_issue_posted_comment.PNG" id="image_see_tsp_hc"/></p>
+    <p>When adding an issue comment you must select the issue first, otherwise the following message
+      is displayed:</p>
+    <p/>
+    <p><image href="images_transl/110_issue_posted_select_for_comment.PNG" id="image_kdi_itp_hc"
+      /></p>
+  </body>
+</topic>

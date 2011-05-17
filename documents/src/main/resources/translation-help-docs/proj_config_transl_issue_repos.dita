@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Translation issues repositories</title>
+  <body>
+    <p><image href="images_transl/58_proj_config_transl_issue_repos.PNG" id="image_dwt_quc_hc"/></p>
+    <p>
+      <ul id="ul_yav_vuc_hc">
+        <li>This is a view of the current external issues repositories configuration, which are the
+          collabnet trackers that will store the project issues and the source language issues.
+          These settings will be pre-configured in a real environment.</li>
+      </ul>
+    </p>
+  </body>
+</topic>

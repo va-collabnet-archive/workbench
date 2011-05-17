@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Partition details</title>
+  <body>
+    <p>This 3-tabbed pane displays a partition’s details, its members and worklists (if any has been
+      created).</p>
+    <p>The partition details tab allows you to create a new worklist by clicking “Generate worklist”
+      button. </p>
+    <p>Partition members may be removed from any partition by clicking “Retire selected members”
+      button in the Partition members tab:</p>
+    <p><image href="images/partition_details_members_tab.PNG" id="image_cqz_pbz_mb"/></p>
+    <p/>
+    <p>The retired partition member will be seen again in the Refset Partitioner:</p>
+    <p><image href="images/refset_partitioner_with_retired_member.PNG" id="image_gbo_ubz_mb"/></p>
+  </body>
+</topic>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Editorial guidelines</title>
+  <body>
+    <p>This window displays linguistic/editorial rules when applicable. Also, false cognates are
+      shown.</p>
+    <p>Whenever an editorial guideline thas is applicable to a translated concept, it will be
+      highlighted in red in the Translation help viewer in the upper right angle of the menu
+      bar:</p>
+    <p><image href="images_transl/94_ling_guide_available.PNG" id="image_kbn_zek_hc"/></p>
+    <p/>
+    <p>In the example shown below, the source language descriptions have a word included in the
+      linguistic guidelines por Spanish translation. This is automatically recognized and the rule
+      that applies is opened in the Editorial guidelines window in the Translation help panel:</p>
+    <p/>
+    <p><image href="images_transl/95_ling_guide_display.PNG" id="image_esm_ggk_hc"/></p>
+    <p>As was mentioned for the other windows in the Translation help panel, <b>Hide / Show
+        button</b> allows to collapse or display Similarity window according to user's
+      preferences.</p>
+  </body>
+</topic>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Similarity default setting</title>
+  <body>
+    <p><image href="images_transl/57_proj_config_.PNG" id="image_uqx_jrc_hc"/></p>
+    <p>
+      <ul id="ul_vwu_mrc_hc">
+        <li>Establishes preferences for displaying matches in Similarity searches by <u>default</u>
+          (the user will be able to change this options when the Similarity tab is opened)<ul
+            id="ul_xnr_src_hc">
+            <li><u>FSN</u>: indicates that matches between source FSNs and any translated target
+              descriptions will be displayed</li>
+            <li><u>Preferred</u>: indicates that matches between source PTs and any translated
+              target descriptions will be displayed</li>
+            <li><u>Both</u>: indicates that matches between source FSNs + PTs and any translated
+              target descriptions will be displayed</li>
+          </ul></li>
+      </ul>
+    </p>
+    <p/>
+  </body>
+</topic>

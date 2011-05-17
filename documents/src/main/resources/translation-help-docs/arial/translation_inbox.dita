@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Translation inbox</title>
+  <body>
+    <p>The translation inbox displays the worklist items assigned to him/her and delivered to
+      his/her inbox, with the number of each assignment in brackets. It is dividd in two parts:<ul
+        id="ul_8f84dd27-a631-46fd-9d71-1946517030d2">
+        <li>The upper half of the left pane shows the Inbox with a folder containing the worklists
+          assigned (with the numbers of worklist items in brackets). Also, there is another folder
+          that displays the worklist items by status (delivered, to-do, rejected, etc.). A third
+          folder named “Custom” allows the user to drag and drop worklist items from different
+          worklists and/or statuses to work with according to his/her own preferences/priorities. </li>
+        <li>Finally, the Outbox shows in brackets the number of worklist items awaiting to be sent
+          to the following step in the workflow:</li>
+      </ul></p>
+    <p><image href="images/inbox_upper.PNG" id="image_gvq_dgz_mb"/></p>
+    <p>
+      <ul id="ul_75cd2cf9-0fc2-4e65-810a-0c7374634451">
+        <li>Next to the Close button, the number of worklist items contained in the Inbox is
+          displayed in brackets. This number will change as concepts are sent from the Inbox to the
+          Outbox.</li>
+        <li>The number of worklist items in the Outbox will return to zero upon clicking Send
+          button.</li>
+        <li>The lower half displays the worklist members in a table, according to the user’s
+          specifications. Between both sections there is an area That reads “Now viewing: ….”, which
+          displays the worklist member shown in the translation pane.</li>
+      </ul>
+    </p>
+    <p/>
+    <p><b><u><b>Outbox (undo function)</b></u></b></p>
+    <p>Due to the operating features of the workbench this is not an easy option. Therefore, all the
+      concepts sent to the following step in the workflow are kept in a “transient outbox".   </p>
+    <p>At this point, the user may introduce changes to the translated concepts and modify their
+      status (e.g. from “translated” status to “to-do”) by clicking on a given concept and drag and
+      dropping it into the Inbox icon. It will automatically be “reintroduced” into the original
+      worklist, as shown in the figure below.</p>
+    <p><image href="images/inbox_concept_returned.PNG" id="image_myh_igz_mb"/></p>
+    <p>
+      <ul id="ul_e96b001a-4d49-4071-8056-3141b747c942">
+        <li>Notice that the number of worklist members changed when the concept was “returned” to
+          the Inbox and the concept to be modified has now disappeared from the Outbox list.</li>
+        <li>The same action may be performed by right-clicking the selected worklist item.</li>
+      </ul>
+    </p>
+    <p><image href="images/outbox_send_to_inbox.PNG" id="image_xss_kgz_mb"/></p>
+    <p>
+      <ul id="ul_a0253302-a39d-4748-bd69-23abc007b63e">
+        <li>Also, the user may confirm the action done and send the concepts to the following step
+          in the workflow. By clicking upper “Send” button, the concepts will definitively disappear
+          from his/her assignment:</li>
+      </ul>
+    </p>
+    <p><image href="images/outbox_send.PNG" id="image_fmk_mgz_mb"/></p>
+    <ul id="ul_824787f9-00ee-43e4-8a8d-561fc83f9796">
+      <li>If you don't click SEND button, the concepts left in the Outbox will be automatically sent
+        the next time the translation inbox is opened.</li>
+      <li><b>The Outbox is a common feature for all the roles in the workflow, as is intended to
+          provide another revision instance prior to the submission to the following workflow
+          step.</b></li>
+    </ul>
+  </body>
+</topic>

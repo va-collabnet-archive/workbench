@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Translation user interface</title>
+  <body>
+    <p>Double clicking on one assignment will display it on the right panel, where the following
+      windows are shown:</p>
+    <p><image href="images/translation_UI.PNG" id="image_vju_ehz_mb"/></p>
+    <p><b><i>Source language window</i></b></p>
+    <p>This window shows the concept in the source language(s) with the descriptions defined in the
+      configuration options, i.e, fully specified name, preferred term, and acceptable descriptions
+      (synonyms). Retired descriptions may also be shown. The width of each column may be changed by
+      scrolling the lateral border to right or left:</p>
+    <p><image href="images/source_lang_window.PNG" id="image_yed_ohz_mb"/></p>
+    <p>
+      <ul id="ul_2b390706-b234-4d4e-901f-8b620a7c9a55">
+        <li>Any descriptions in the Source language window, i.e., fully specified name, preferred
+          term or synonyms, can be automatically transferred to the target language window by right
+          clicking the selected description:</li>
+      </ul>
+    </p>
+    <p><image href="images/send_as_to_target.PNG" id="image_wzs_phz_mb"/></p>
+    <p>
+      <ul id="ul_10c5e497-d3c5-463f-ad55-9f6f0d51eb1a">
+        <li>You can choose to send your description with acceptability preferred or acceptable. In
+          the example shown, the FSN of the source language has been submitted as preferred FSN to
+          the target language. This function is independent from the specified project configuration
+          options.</li>
+      </ul>
+    </p>
+    <p><image href="images/choose_description_acceptability.PNG" id="image_ukz_qhz_mb"/></p>
+    <p/>
+    <p><b><i>Target language window</i></b></p>
+    <p>Whenever a published translation already exists in the target language, it is displayed in
+      this window. The translator will be able to see whether a change is needed (correction,
+      addition of synonyms, etc.). Scrolling their lateral borders to right or left may also change
+      the width of each column.</p>
+    <p><image href="images/target_language_window.PNG" id="image_ofd_shz_mb"/></p>
+    <p>The items displayed in the source and target languages are defined in the “Translation
+      Configuration” dialog.</p>
+    <p><b><i>Concept details window</i></b></p>
+    <p>This window is divided in two parts. </p>
+    <p><ul id="ul_475c6da3-d24f-49f4-9c2e-7a4d960c7646">
+        <li><i>Concept details tab</i> shows concept features, as its status, whether it is
+          primitive or fully defined, position in hierarchy (IS_A relationship) and attributes
+          (method, procedure site, etc.) (See User Guide for a detailed explanation). This window
+          helps to give some context, preventing translation errors due to term-to-term
+          translation</li>
+      </ul>.</p>
+    <p><image href="images/concept_details_tab.PNG" id="image_qkf_thz_mb"/></p>
+    <p>
+      <ul id="ul_6d81dd85-51fd-4f84-9347-eadc4a78f1af">
+        <li><i>Hierarchy</i> tab shows a concept walker where the concept to be translated is shown
+          as the focus concept, as well as its parents in the upper part and its children, below.
+          All of them may be displayed with further detail by clicking the ‘+’ symbol. The numbers
+          in brackets indicate how many children/parents each concept has. The focus concept can be
+          changed by dropping a parent or a child concept, effectively navigating the
+          hierarchy.</li>
+      </ul>
+    </p>
+    <p><image href="images/UI_concept_walker.PNG" id="image_wei_yhz_mb"/></p>
+    <p>
+      <ul id="ul_bf00ad84-ba45-4c67-9ffb-da48536d7ae8">
+        <li>The concept walker also has two buttons to select the Inferred or the Stated views. This
+          will determine the number of parent and children displayed, as the stated view shows the
+          concepts as the modeler has modeled them, while the inferred view displays them after
+          running the automated classification. In both views, concept relationships will be
+          different and this will determine the concepts displayed.</li>
+      </ul>
+    </p>
+    <p><image href="images/UI_concept_walker_stated.PNG" id="image_hac_fiz_mb"/><image
+        href="images/UI_concept_walker_inferred.PNG" id="image_inm_giz_mb"/></p>
+    <p>Translation window and Translation help windows will be described separately.</p>
+  </body>
+</topic>

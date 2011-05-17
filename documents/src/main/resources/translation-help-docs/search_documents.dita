@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Search documents</title>
+  <body>
+    <p>Indexed documents may be searched.</p>
+    <p>Once you have selected Search Documents option, the following window is opened in the lower
+      third of the screen. You must write your query and then click ‘Search’:</p>
+    <p/>
+    <p><image href="images_transl/75_search_documents.PNG" id="image_eto_oki_hc"/></p>
+    <p>The results obtained and the number of documents are displayed:</p>
+    <p/>
+    <p><image href="images_transl/76_search_docs_results.PNG" id="image_bgp_wki_hc"/></p>
+    <p>You may click on a link to open the desired document:</p>
+    <p/>
+    <p><image href="images_transl/77_search_docs_link.PNG" id="image_afz_pli_hc"/></p>
+  </body>
+</topic>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="copyright" content="(C) Copyright 2005"/>
+<meta name="DC.rights.owner" content="(C) Copyright 2005"/>
+<meta name="DC.Type" content="topic"/>
+<meta name="DC.Title" content="Maintenance workflows"/>
+<meta name="DC.Format" content="XHTML"/>
+<meta name="DC.Identifier" content="topic-1"/>
+<link rel="stylesheet" type="text/css" href="commonltr.css"/>
+<title>Maintenance workflows</title>
+</head>
+<body id="topic-1"><a name="topic-1"><!-- --></a>
+
+
+  <h1 class="title topictitle1">Maintenance workflows</h1>
+
+  <div class="body">
+    <p class="p">In this tab, maintenance worklists are used to send any concept into a translation workflow
+      without the requirement of creating a new workset, e.g., in the case of an already translated
+      concept incidentally found thay may nedd correction.</p>
+
+    <p class="p">Many different workflows can be configured.</p>
+
+    <p class="p">This tool is intended for single concepts only and therefore, worklists of only one concept
+      will be generated.</p>
+
+    <p class="p">You should introduce a name for your maintenance worklist and select a business process from
+      the Workflow Business Process file. Then click “Create new Worklist”. The list of available
+      workflows is configurable for each implementation and can grow according to needs:</p>
+
+    <p class="p"/>
+
+    <p class="p"><a name="topic-1__image_qkz_uvp_hc"><!-- --></a><img class="image" id="topic-1__image_qkz_uvp_hc" src="images_transl/111_maintence_workflows.PNG"/></p>
+
+    <div class="p">
+      <a name="topic-1__ul_tjo_iwp_hc"><!-- --></a><ul class="ul" id="topic-1__ul_tjo_iwp_hc">
+        <li class="li">
+          <p class="p"><strong class="ph b">NOTE</strong>: When “<strong class="ph b">MaintenanceWorkflow.bp</strong>” is chosen, only translator and
+            reviewer are involved: the translator corrects the concept, sends it to the reviewer and
+            then, the concept enters directly to the Archival queue upon reviewer’s approval.</p>
+
+          <p class="p">When “<strong class="ph b">IsolatedEdit.bp</strong>” is chosen, any person with permission may edit, correct
+            and submit the concept to the Archival queue</p>
+
+          <p class="p">In this example, when “<strong class="ph b">Translation Workflow.bp</strong>” is selected, the concept to be
+            changed will follow the standard translation workflow, but other business processes may
+            be configured according to the users needs.</p>
+
+        </li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"/>
+
+    <p class="p">The maintenance worklist automatically generated is displayed on the left panel:</p>
+
+    <p class="p"/>
+
+    <p class="p"><a name="topic-1__image_drl_qwp_hc"><!-- --></a><img class="image" id="topic-1__image_drl_qwp_hc" src="images_transl/112_maintenance_wf_left_panel.PNG"/></p>
+
+    <p class="p"/>
+
+    <p class="p">Now you must specify the concept that will be corrected. Go to the Taxonomy tab and right
+      click on the concept you will want to correct:</p>
+
+    <p class="p"/>
+
+    <p class="p"><a name="topic-1__image_hqe_yaq_hc"><!-- --></a><img class="image" id="topic-1__image_hqe_yaq_hc" src="images_transl/113_maint_to_translate.PNG"/></p>
+
+    <p class="p"/>
+
+    <p class="p">A window showing the Project name and the name of the maintenance worklist is opened. Click
+      “&gt;” button to assign the new worklist:</p>
+
+    <p class="p"/>
+
+    <p class="p"><a name="topic-1__image_axt_ibq_hc"><!-- --></a><img class="image" id="topic-1__image_axt_ibq_hc" src="images_transl/114_choose_maintenance_wl.PNG"/></p>
+
+    <p class="p"/>
+
+    <p class="p">A confirmation message is shown:</p>
+
+    <p class="p"/>
+
+    <p class="p"><a name="topic-1__image_cvo_qbq_hc"><!-- --></a><img class="image" id="topic-1__image_cvo_qbq_hc" src="images_transl/115_maintenance_confirmation_mess.PNG"/></p>
+
+    <p class="p"/>
+
+    <p class="p">Then, a new window is displayed, asking you to select the roles that will take part in the
+      process (A) and the execution options (B):</p>
+
+    <p class="p"/>
+
+    <p class="p"><strong class="ph b">(A)</strong>
+      <a name="topic-1__image_tli_tcq_hc"><!-- --></a><img class="image" id="topic-1__image_tli_tcq_hc" src="images_transl/116_maintenance_choose_roles.PNG"/></p>
+
+    <p class="p"><strong class="ph b">(B)</strong><a name="topic-1__image_ime_keq_hc"><!-- --></a><img class="image" id="topic-1__image_ime_keq_hc" src="images_transl/117_mainetnance_execution.PNG"/></p>
+
+    <p class="p"/>
+
+    <p class="p">If you select to execute the process immediately, the translation interface is opened and you
+      may change the selected concept:</p>
+
+    <p class="p"/>
+
+    <p class="p"><a name="topic-1__image_xlj_req_hc"><!-- --></a><img class="image" id="topic-1__image_xlj_req_hc" src="images_transl/118_maintenance_immediate.PNG"/></p>
+
+    <p class="p"/>
+
+    <p class="p">Once you have made the change and the correction process is complete, you may end your
+      correction by clicking “Approve” button.</p>
+
+    <p class="p">A message indicating that item translation is complete and that it has been sent to the
+      Archival queue of the Release Manager es displayed.</p>
+
+    <p class="p">The screen goes back to the Workset details pane upon clicking OK and the maintenance process
+      is completed.</p>
+
+    <p class="p"><strong class="ph b">NOTE:</strong>
+      <strong class="ph b">Maintenance Workset, partitions and worklists are automatically generated for each project.
+        These are not meant to be maintained by the user; concepts will be added to this component
+        as needed. User changes are disabled for this workset:</strong></p>
+
+    <p class="p"/>
+
+    <p class="p"><a name="topic-1__image_cpf_mfq_hc"><!-- --></a><img class="image" id="topic-1__image_cpf_mfq_hc" src="images_transl/119_maintenance_disabled_functions.PNG"/></p>
+
+  </div>
+
+
+</body>
+</html>

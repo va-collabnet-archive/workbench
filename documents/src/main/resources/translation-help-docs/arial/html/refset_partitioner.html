@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="copyright" content="(C) Copyright 2005"/>
+<meta name="DC.rights.owner" content="(C) Copyright 2005"/>
+<meta name="DC.Type" content="topic"/>
+<meta name="DC.Title" content="Refset partitioner"/>
+<meta name="DC.Format" content="XHTML"/>
+<meta name="DC.Identifier" content="topic-1"/>
+<link rel="stylesheet" type="text/css" href="commonltr.css"/>
+<title>Refset partitioner</title>
+</head>
+<body id="topic-1"><a name="topic-1"><!-- --></a>
+
+
+  <h1 class="title topictitle1">Refset partitioner</h1>
+
+  <div class="body">
+    <p class="p">Once you have selected a partition scheme in the left panel its details will be displayed on
+      the right panel. </p>
+
+    <p class="p">If you click “Edit partitions” button on the bottom, the RefSetPartitioner is opened. </p>
+
+    <p class="p"><a name="topic-1__image_tjr_nez_mb"><!-- --></a><img class="image" id="topic-1__image_tjr_nez_mb" src="images/edit_partitions.PNG"/></p>
+
+    <div class="p">
+      <a name="topic-1__ul_0714474b-fadb-4620-8446-7455fdc28720"><!-- --></a><ul class="ul" id="topic-1__ul_0714474b-fadb-4620-8446-7455fdc28720">
+        <li class="li">The refset partitioner has the following characteristics:</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><a name="topic-1__image_cvb_qez_mb"><!-- --></a><img class="image" id="topic-1__image_cvb_qez_mb" src="images/refset_partitioner_parts.PNG"/></p>
+
+    <p class="p">A) Number of members</p>
+
+    <p class="p">B) Members list in alphabetical order, and options for displaying them</p>
+
+    <p class="p">C) Action buttons: </p>
+
+    <p class="p"> - ADD PARTITION to create new partitions</p>
+
+    <p class="p"> - SPLIT REMAINING MEMBERS to create adittional partitions with any remaining members after
+      new partitions have been created (explained in detail below).</p>
+
+    <p class="p"/>
+
+    <div class="p">
+      <a name="topic-1__ul_27dfa26c-7217-4a5b-80e1-c589bc955d65"><!-- --></a><ul class="ul" id="topic-1__ul_27dfa26c-7217-4a5b-80e1-c589bc955d65">
+        <li class="li">Click “Add partition” button to create a partition</li>
+
+        <li class="li">You may choose to partition your workset according to different criteria: by number,
+          e.g, a partition including 20 concepts; by hierarchy, e.g. a partition including concepts
+          that are descendant of a given concept; by string match, e.g. a partition including
+          concepts with similar strings or dragging indiviual concepts into a new partition.
+          Examples of these are provided in the sections below.</li>
+
+        <li class="li">Whenever you create a partition, you should define a partition name first.</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><strong class="ph b"><u class="ph u">Partition creation: by hierarchy</u></strong></p>
+
+    <div class="p">
+      <a name="topic-1__ul_f98bcdcc-edce-47ac-82ce-779fcf9b5c88"><!-- --></a><ul class="ul" id="topic-1__ul_f98bcdcc-edce-47ac-82ce-779fcf9b5c88">
+        <li class="li">This criterion will allow you to select the concepts that are descendant of a specified
+          parent concept.</li>
+
+        <li class="li">Select “Is descendant of” option in the Partitioning selector combo box (Is descendant
+          of is preconfigured by default)</li>
+
+        <li class="li">A parent concept must be included. In order to do this, you must drag and drop the
+          parent concept from the RefSet Partitioner members window into the Parent concept window.
+          (You may also open the taxonomy tab in the left panel, select the concept that will be the
+          parent of your partition and drag and drop it into the partition editor tab.)</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><a name="topic-1__image_lez_rez_mb"><!-- --></a><img class="image" id="topic-1__image_lez_rez_mb" src="images/partition_by_hierarchy.PNG"/></p>
+
+    <div class="p">
+      <a name="topic-1__ul_5edb752b-3625-455e-97a4-f42cc76abbb5"><!-- --></a><ul class="ul" id="topic-1__ul_5edb752b-3625-455e-97a4-f42cc76abbb5">
+        <li class="li">The SELECTED PARENT and ALL its descendants will be extracted from the workset.</li>
+
+        <li class="li">You may select Preview to see the concepts listed according to your selection
+          criterion.</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><a name="topic-1__image_puy_tez_mb"><!-- --></a><img class="image" id="topic-1__image_puy_tez_mb" src="images/partitioning_by_hierarchy_preview.PNG"/></p>
+
+    <div class="p">
+      <a name="topic-1__ul_600a44ce-d495-49db-af02-fcd69dda81d7"><!-- --></a><ul class="ul" id="topic-1__ul_600a44ce-d495-49db-af02-fcd69dda81d7">
+        <li class="li">Note: When clicking “Preview”, the concepts are listed. However, you must click “Save”
+          to create the partition (this apply to all criteria used for partitioning).</li>
+
+        <li class="li">When the partition is created, it is displayed in the Refset Partitioner screen with the
+          number of members in brackets</li>
+
+        <li class="li">You may click on the check-box to see the members</li>
+
+        <li class="li">Notice that the list of workset members is now 125, because those included in the
+          partition have been removed from it. Once the partition is created you will see that these
+          concepts are no longer in your workset on the left and the number of remaining concepts to
+          be partitioned decreases with each subsequent partition, whichever the criterion used for
+          partition creation is.</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><a name="topic-1__image_blh_wez_mb"><!-- --></a><img class="image" id="topic-1__image_blh_wez_mb" src="images/partition_by_hierarchy_final.PNG"/></p>
+
+    <p class="p"><strong class="ph b"><u class="ph u">Partition creation: by quantity</u></strong></p>
+
+    <div class="p">
+      <a name="topic-1__ul_2e65b573-f232-4a3f-828c-3489c1e5deba"><!-- --></a><ul class="ul" id="topic-1__ul_2e65b573-f232-4a3f-828c-3489c1e5deba">
+        <li class="li">This criterion will randomly extract the specified number of concepts from the
+          workset.</li>
+
+        <li class="li">Select “Quantity” in the Partitioning combo box and define the number of concepts to be
+          included.</li>
+
+        <li class="li">You may click “Preview” to see the selected concepts and then SAVE.</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"/>
+
+    <a name="topic-1__image_yqx_xez_mb"><!-- --></a><img class="image" id="topic-1__image_yqx_xez_mb" src="images/partition_by_number.PNG"/>
+    <div class="p">
+      <a name="topic-1__ul_b2ff7217-8b13-49b4-a694-d81ca4230c7e"><!-- --></a><ul class="ul" id="topic-1__ul_b2ff7217-8b13-49b4-a694-d81ca4230c7e">
+        <li class="li">When the partition is created, it is displayed in the Refset Partitioner screen with the
+          number of members in brackets</li>
+
+        <li class="li">You may click the check-box to see the members.</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"/>
+
+    <p class="p"><strong class="ph b"><u class="ph u">Partition criterion: by string match</u></strong></p>
+
+    <p class="p">• The selection is made according to the identification of concepts that share similar
+      semantic structures.</p>
+
+    <div class="p">
+      <a name="topic-1__ul_87acebef-7f43-4589-96c3-71e064d2d7ae"><!-- --></a><ul class="ul" id="topic-1__ul_87acebef-7f43-4589-96c3-71e064d2d7ae">
+        <li class="li">Select “String match” and define your string. Asterisks may be used as wildcards, so you
+          can write a word between asterisks and all the workset concepts including that word will
+          be retrieved. Click “Preview” to see your selection, then SAVE:</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><a name="topic-1__image_gdr_zez_mb"><!-- --></a><img class="image" id="topic-1__image_gdr_zez_mb" src="images/partition_by_string_match.PNG"/></p>
+
+    <p class="p"><strong class="ph b"><u class="ph u">Partition creation: by concept dropping</u></strong></p>
+
+    <div class="p">
+      <a name="topic-1__ul_2184b16c-d05d-40fd-bc4c-856f48fa0b55"><!-- --></a><ul class="ul" id="topic-1__ul_2184b16c-d05d-40fd-bc4c-856f48fa0b55">
+        <li class="li">With this option, concepts may be directly dragged and dropped from the worklist.</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><a name="topic-1__image_vul_bfz_mb"><!-- --></a><img class="image" id="topic-1__image_vul_bfz_mb" src="images/Partition_by_drag_and_drop.PNG"/></p>
+
+    <div class="p">
+      <a name="topic-1__ul_2e8af9af-3f97-4af3-9e74-abd42a441826"><!-- --></a><ul class="ul" id="topic-1__ul_2e8af9af-3f97-4af3-9e74-abd42a441826">
+        <li class="li">Only one concept or several concepts (continuous or discontinuous in the list of
+          members) may be selected at a time.</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><strong class="ph b"><u class="ph u">Splitting of remaining worklist members</u></strong></p>
+
+    <p class="p">You may split the remaining concepts into pre-specified proportions: </p>
+
+    <p class="p"/>
+
+    <a name="topic-1__image_ecd_dfz_mb"><!-- --></a><img class="image" id="topic-1__image_ecd_dfz_mb" src="images/partition_split_remaining.PNG"/>
+    <div class="p">
+      <a name="topic-1__ul_77e4eaf2-f87f-4082-b0d9-b94cdf186504"><!-- --></a><ul class="ul" id="topic-1__ul_77e4eaf2-f87f-4082-b0d9-b94cdf186504">
+        <li class="li">Click the “Split remaining members”. The refset splitter is displayed on the right. Give
+          a name to the remaining partitions (in this case, BODY STRUCT BY SPLIT REMAINING) and
+          define your split pattern (the sum must be 100%).</li>
+
+        <li class="li">Click “Calculate partitions” to display the number of concepts to be included. Click
+          SAVE.</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><a name="topic-1__image_nvz_efz_mb"><!-- --></a><img class="image" id="topic-1__image_nvz_efz_mb" src="images/partitions_calculate_partitions.PNG"/></p>
+
+    <p class="p"><strong class="ph b"><u class="ph u">Changes in already created partitions</u></strong></p>
+
+    <p class="p">You may display an already created partition, select a concept and drag it back to the RefSet
+      Partitioner. From there, you may drag it into another partition and/or into the original
+      one.</p>
+
+    <p class="p"><a name="topic-1__image_grg_hfz_mb"><!-- --></a><img class="image" id="topic-1__image_grg_hfz_mb" src="images/changes_in_already_created_part.PNG"/></p>
+
+    <p class="p"><strong class="ph b"><u class="ph u">Creation of one partition from a whole workset</u></strong></p>
+
+    <p class="p">You may also create a single partition from the whole workset by clicking the ‘Create one
+      click partition’ button in the Workset details panel.</p>
+
+    <p class="p"><a name="topic-1__image_aup_lfz_mb"><!-- --></a><img class="image" id="topic-1__image_aup_lfz_mb" src="images/one_click_partition.PNG"/></p>
+
+    <div class="p">
+      <a name="topic-1__ul_cf84bb27-24b8-4243-9741-c3adafb6e221"><!-- --></a><ul class="ul" id="topic-1__ul_cf84bb27-24b8-4243-9741-c3adafb6e221">
+        <li class="li">The One click partition will have the same number of members as the workset.</li>
+
+        <li class="li">You should specify a name for your partition first. </li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><a name="topic-1__image_tsd_nfz_mb"><!-- --></a><img class="image" id="topic-1__image_tsd_nfz_mb" src="images/one_click_partition_name.PNG"/></p>
+
+    <div class="p">
+      <a name="topic-1__ul_e83ab22b-cf71-4c7b-81df-ba2459f4fdd0"><!-- --></a><ul class="ul" id="topic-1__ul_e83ab22b-cf71-4c7b-81df-ba2459f4fdd0">
+        <li class="li">The partition scheme and the one click partition are automatically generated. Opening
+          the ‘Members’ tab in the Partition details pane will show the list of members, as well as
+          their number:</li>
+
+      </ul>
+
+    </div>
+
+    <p class="p"><a name="topic-1__image_knm_ofz_mb"><!-- --></a><img class="image" id="topic-1__image_knm_ofz_mb" src="images/one_click_partition_details.PNG"/>
+      <a name="topic-1__image_ekz_qfz_mb"><!-- --></a><img class="image" id="topic-1__image_ekz_qfz_mb" src="images/one_click_partition_members.PNG"/></p>
+
+  </div>
+
+
+</body>
+</html>

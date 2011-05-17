@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Translation edition</title>
+  <body>
+    <p>This is the working window. The translator must choose an option from the upper menu to
+      enable writing in the translation window, according to the configuration options defined by
+      the project manager. Otherwise, writing will not be allowed. In this example, the project
+      manager has configured the project for a full editor translator, so he/she will be able to add
+      FSNs, PTs and synonyms.</p>
+    <p/>
+    <p><image href="images/translation_edition.PNG" id="image_yvr_xfz_mb"/></p>
+    <p>
+      <ul id="ul_06887db7-c731-4206-ab65-68b8e8b3e6f0">
+        <li>The translator writes the new description and decides what to do with it.</li>
+      </ul>
+    </p>
+    <p><image href="images/to_save_or_not_to_save.PNG" id="image_yxf_zfz_mb"/></p>
+    <p>
+      <ul id="ul_9beeac0e-b0a4-4509-a8f8-72355017e4c7">
+        <li>In this case, SAVE option and “Send to TSP review” was selected. A typo was
+          intentionally introduced in the example. The spelling review tool will detect an unknown
+          word upon clicking “Save” button. The unknown word will be displayed in a new window with
+          correct spelling suggestions and a list of possible actions.</li>
+      </ul>
+    </p>
+    <p><image href="images/spelling_review.PNG" id="image_zrs_agz_mb"/></p>
+    <p>
+      <ul id="ul_0ab12ce7-97ae-4f4f-946d-9344efdc5320">
+        <li>When a dictionary option is selected, the spelling tool window disappears, as well as
+          the translated description. The following worklist item will be automatically displayed if
+          this option has been previously select.</li>
+      </ul>
+    </p>
+  </body>
+</topic>

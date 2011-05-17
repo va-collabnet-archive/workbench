@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
+<map title="IHTSDO Workbench Translation Help ">
+    <topicref href="partition_details.dita"/>
+    <topicref href="partition_scheme_details.dita"/>
+    <topicref href="project_details.dita"/>
+    <topicref href="project_left.dita"/>
+    <topicref href="refset_partitioner.dita"/>
+    <topicref href="translation_edition.dita"/>
+    <topicref href="translation_inbox.dita"/>
+    <topicref href="translation_info.dita"/>
+    <topicref href="translation_UI.dita"/>
+    <topicref href="worklist_details.dita"/>
+    <topicref href="workset_details.dita"/>
+</map>
