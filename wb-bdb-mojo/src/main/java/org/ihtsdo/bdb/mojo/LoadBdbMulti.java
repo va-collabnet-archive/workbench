@@ -97,7 +97,6 @@ public class LoadBdbMulti extends AbstractMojo {
      * Generated resources directory.
      * 
      * @parameter expression="${project.build.directory}/generated-resources"
-     * @required
      */
     private String generatedResources;
     /**
