@@ -1,6 +1,7 @@
 package org.ihtsdo.project.help;
 
 import java.awt.Desktop;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -13,7 +14,11 @@ public class HelpApi {
 	public static void openHelpForComponent(String componentId) throws IOException, URISyntaxException {
 		URI url = getComponentURL(componentId);
 		Desktop desktop = java.awt.Desktop.getDesktop();
-		desktop.browse(url);
+		try {
+			desktop.browse(url);
+		} catch (IOException e) {
+			desktop.open(new File(url.toString()));
+		}
 	}
 
 	public static URI getComponentURL(String componentId) throws FileNotFoundException, IOException, URISyntaxException {
