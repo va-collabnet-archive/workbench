@@ -145,7 +145,7 @@ public class ProjectDatePeriodDialog extends JDialog {
 				return;
 			}
 			if(startDate.compareTo(endDate) > 0){
-				errorLabel.setText("Start date must earlyer than end date");
+				errorLabel.setText("Start date must earlier than end date");
 				return;
 			}
 			data = new HashMap<String, Object>();
