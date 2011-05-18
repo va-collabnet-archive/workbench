@@ -24,7 +24,7 @@ import javax.swing.UIManager;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.table.AceTableRenderer;
-import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowTextFieldEditor;
+import org.dwfa.ace.table.ConceptAttributeTableModel.StringWithConceptTuple;
 
 public class WorkflowHistoryTableRenderer extends AceTableRenderer {
 
@@ -72,9 +72,9 @@ public class WorkflowHistoryTableRenderer extends AceTableRenderer {
             return renderComponent;
         }
         
-        if (WorkflowTextFieldEditor.class.isAssignableFrom(value.getClass())) 
+        if (StringWithConceptTuple.class.isAssignableFrom(value.getClass())) 
         {
-        	WorkflowTextFieldEditor textField = (WorkflowTextFieldEditor) value;
+        	StringWithConceptTuple textField = (StringWithConceptTuple) value;
  
         	if (textField == null) 
                 renderComponent.setText("null");

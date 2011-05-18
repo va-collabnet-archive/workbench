@@ -55,7 +55,7 @@ import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowFSNWithConceptTuple;
+import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowStringWithConceptTuple;
 import org.ihtsdo.etypes.EConcept;
 
 public class DescSearchResultsTablePopupListener extends MouseAdapter implements ActionListener {
@@ -128,10 +128,10 @@ public class DescSearchResultsTablePopupListener extends MouseAdapter implements
 		        TableModel wftm = descTable.getModel();
 		        if (descTable.getSelectedRow() >= 0)
 		        {
-	            	WorkflowFSNWithConceptTuple conField = null;
+	            	WorkflowStringWithConceptTuple conField = null;
 
 		        	Object value = wftm.getValueAt(descTable.getSelectedRow(), 0);
-	            	conField = (WorkflowFSNWithConceptTuple)value;
+	            	conField = (WorkflowStringWithConceptTuple)value;
 
 	            	rowConcept = Terms.get().getConcept(conField.getTuple().getConceptNid());
 		        }

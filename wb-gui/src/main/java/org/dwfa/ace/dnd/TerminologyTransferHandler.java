@@ -67,6 +67,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionTableModel;
 import org.dwfa.ace.table.DescriptionsFromCollectionTableModel;
 import org.dwfa.ace.table.RelTableModel;
+import org.dwfa.ace.table.ConceptAttributeTableModel.StringWithConceptTuple;
 import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.ace.table.RelTableModel.REL_FIELD;
@@ -84,8 +85,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.dnd.FixedTerminologyTransferable;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WORKFLOW_FIELD;
-import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowFSNWithConceptTuple;
-import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowTextFieldEditor;
+import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowStringWithConceptTuple;
 import org.ihtsdo.arena.conceptview.ConceptViewTitle;
 import org.ihtsdo.arena.conceptview.FocusDrop;
 import org.ihtsdo.arena.conceptview.I_AcceptConcept;
@@ -324,8 +324,8 @@ public class TerminologyTransferHandler extends TransferHandler {
 			        TableModel wftm = termTable.getModel();
 			        if (termTable.getSelectedRow() >= 0) 
 			        {
-		            	WorkflowTextFieldEditor field = null;
-		            	WorkflowFSNWithConceptTuple conField = null;
+			        	StringWithConceptTuple field = null;
+		            	WorkflowStringWithConceptTuple conField = null;
 
 		            	TableColumn column = termTable.getColumnModel().getColumn(termTable.getSelectedColumn());
 			            WORKFLOW_FIELD columnDesc = (WORKFLOW_FIELD) column.getIdentifier();
@@ -333,12 +333,12 @@ public class TerminologyTransferHandler extends TransferHandler {
 			        	Object value = wftm.getValueAt(termTable.getSelectedRow(), termTable.getSelectedColumn());
         	
 			        	if (columnDesc != WORKFLOW_FIELD.FSN)
-		            		field = (WorkflowTextFieldEditor)value;
+		            		field = (StringWithConceptTuple)value;
 
 			            switch (columnDesc) {
 				            case FSN:
 				            	int descId = 0;
-				            	conField = (WorkflowFSNWithConceptTuple)value;
+				            	conField = (WorkflowStringWithConceptTuple)value;
 				                //return new ConceptTransferable(Terms.get().getConcept(conField.getTuple().getConceptNid()));
 				            	
 				            	I_GetConceptData con = Terms.get().getConcept(conField.getTuple().getConceptNid());

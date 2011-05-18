@@ -171,7 +171,7 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
 *              case PATH:
 *           		I_GetConceptData path = Terms.get().getConcept(bean.getPath());
 *           		I_ConceptAttributeTuple pTuple = path.getConceptAttributes().getTuples().get(0);
-*               	return new WorkflowFSNWithConceptTuple(getPrefText(bean.getPath()), pTuple, false);
+*               	return new WorkflowStringWithConceptTuple(getPrefText(bean.getPath()), pTuple, false);
 */
                 case TIMESTAMP:
                 	Date d = new Date(result.getTime());
@@ -258,7 +258,7 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
         case EDITOR:
             return StringWithConceptTuple.class;
 //        case PATH:
-//            return WorkflowFSNWithConceptTuple.class;
+//            return WorkflowStringWithConceptTuple.class;
         case TIMESTAMP:
             return StringWithConceptTuple.class;
         }
