@@ -176,6 +176,54 @@ public class ProjectPermissionsAPI {
 
 		return returnUsers;
 	}
+	
+	/**
+	 * Gets the descendants.
+	 * 
+	 * @param descendants
+	 *            the descendants
+	 * @param concept
+	 *            the concept
+	 * 
+	 * @return the descendants
+	 */
+	public static Set<I_GetConceptData> getDescendants(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
+		try {
+			I_TermFactory termFactory = Terms.get();
+			// TODO add config as parameter
+			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+			I_IntSet allowedDestRelTypes = termFactory.newIntSet();
+			allowedDestRelTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
+			Set<I_GetConceptData> childrenSet = new HashSet<I_GetConceptData>();
+			childrenSet.addAll(concept.getDestRelOrigins(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(),
+					config.getConflictResolutionStrategy()));
+			descendants.addAll(childrenSet);
+			for (I_GetConceptData loopConcept : childrenSet) {
+				descendants = getDescendants(descendants, loopConcept);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		}
+		return descendants;
+	}
+	
+	public Set<I_GetConceptData> getRolesForUser(I_GetConceptData user, I_GetConceptData project
+	) throws IOException, TerminologyException {
+		
+		Set<I_GetConceptData> returnRoles = new HashSet<I_GetConceptData>();
+		Set<I_GetConceptData> allRoles = new HashSet<I_GetConceptData>();
+		allRoles = getDescendants(allRoles, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_ROLE.getUids()));
+		
+		for (I_GetConceptData role : allRoles) {
+			if (checkPermissionForProject(user, project, role)) {
+				returnRoles.add(role);
+			}
+		}
+		
+		return returnRoles;
+	}
 
 	/**
 	 * Calculates a set of valid users - a user is valid is they are a child of the User concept in the top hierarchy,
