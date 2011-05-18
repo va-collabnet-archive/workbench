@@ -9,6 +9,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanMember;
 import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanRevision;
@@ -28,7 +29,11 @@ public class ERefsetBooleanMember extends TkRefsetBooleanMember {
             EConcept.convertId(Terms.get().getId(m.getMemberId()), this);
         }
         refsetUuid = Terms.get().nidToUuid(m.getRefsetId());
-        componentUuid = Terms.get().nidToUuid(m.getComponentId());
+        if (m.getComponentId() == 0) {
+            componentUuid = ArchitectonicAuxiliary.Concept.ERRONEOUS.getPrimoridalUid();
+        } else {
+            componentUuid = Terms.get().nidToUuid(m.getComponentId());
+        }
         I_ExtendByRefPartBoolean part = (I_ExtendByRefPartBoolean) m.getMutablePart();
         booleanValue = part.getBooleanValue();
         pathUuid = Terms.get().nidToUuid(part.getPathId());

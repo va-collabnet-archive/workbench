@@ -9,6 +9,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidRevision;
@@ -29,7 +30,11 @@ public class ERefsetCidMember extends TkRefsetCidMember {
         }
         int partCount = m.getMutableParts().size();
         refsetUuid = Terms.get().nidToUuid(m.getRefsetId());
-        componentUuid = Terms.get().nidToUuid(m.getComponentNid());
+        if (m.getComponentNid() == 0) {
+            componentUuid = ArchitectonicAuxiliary.Concept.ERRONEOUS.getPrimoridalUid();
+        } else {
+            componentUuid = Terms.get().nidToUuid(m.getComponentNid());
+        }
 
         I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) m.getMutableParts().get(0);
         c1Uuid = Terms.get().nidToUuid(part.getC1id());

@@ -56,6 +56,9 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
         out.writeLong(conceptUuid.getLeastSignificantBits());
         out.writeBoolean(initialCaseSignificant);
         out.writeUTF(lang);
+        if (text == null) {
+            text = "null";
+        }
         out.writeUTF(text);
         out.writeLong(typeUuid.getMostSignificantBits());
         out.writeLong(typeUuid.getLeastSignificantBits());

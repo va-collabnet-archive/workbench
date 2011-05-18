@@ -70,7 +70,7 @@ public class DescriptionTableRenderer extends AceTableRenderer {
             renderComponent.setForeground(UIManager.getColor("Table.selectionForeground"));
         }
 
-        if (StringWithDescTuple.class.isAssignableFrom(value.getClass())) {
+        if (value != null && StringWithDescTuple.class.isAssignableFrom(value.getClass())) {
             StringWithDescTuple swt = (StringWithDescTuple) value;
             if (swt == null || swt.getTuple() == null) {
                 renderComponent.setText("null");

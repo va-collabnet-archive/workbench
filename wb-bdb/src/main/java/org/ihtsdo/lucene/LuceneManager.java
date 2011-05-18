@@ -168,7 +168,7 @@ public class LuceneManager {
 		IndexWriter writerCopy = writer;
 		if (writerCopy != null) {
 		    for (Description desc: descriptions) {
-		        if (desc != null) {
+		        if (desc != null && desc.getText() != null) {
 		            writerCopy.deleteDocuments(new Term("dnid", Integer.toString(desc.getDescId())));
 		            writerCopy.addDocument(createDoc(desc));
 		        }
