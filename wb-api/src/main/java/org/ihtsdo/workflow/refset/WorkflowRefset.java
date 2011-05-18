@@ -19,7 +19,7 @@ import org.dwfa.tapi.TerminologyException;
 public abstract class WorkflowRefset 
 {
 	protected I_GetConceptData refset = null;
-	protected static int refsetId = 0;
+	protected int refsetId = 0;
 	protected WorkflowRefsetFields fields = null;
 	protected String refsetName = null;
 	protected I_HelpRefsets helper = null;
@@ -64,7 +64,7 @@ public abstract class WorkflowRefset
 		return refset;
 	}
 	
-	public static int getRefsetId() {
+	public int getRefsetId() {
 		return refsetId;
 	}
 	

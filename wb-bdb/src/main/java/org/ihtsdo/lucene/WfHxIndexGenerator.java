@@ -55,22 +55,10 @@ public class WfHxIndexGenerator extends IndexGenerator {
         	}
 
         	WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
-	    	WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
-	    	int refsetId = WorkflowHistoryRefset.getRefsetId();
-	    	int searcherId = WorkflowHistoryRefsetSearcher.getRefsetId();
+	    	int searcherId = searcher.getRefsetId();
+			this.refsetId = searcherId;
 	    	
-	    	// @TODO: Don't forget to remove
-	        Set<? extends I_ExtendByRef> membersSearcher = Collections.synchronizedSet(new HashSet<I_ExtendByRef>(Terms.get().getRefsetExtensionMembers(searcherId)));
-	        Set<? extends I_ExtendByRef> membersRefset = Collections.synchronizedSet(new HashSet<I_ExtendByRef>(Terms.get().getRefsetExtensionMembers(refsetId)));
-	        Set<? extends I_ExtendByRef> members;
-			
-			if (membersSearcher.size() > 0) { 
-				this.refsetId = searcherId;
-				members = membersSearcher;
-			} else {
-				this.refsetId = refsetId;
-				members = membersRefset; 
-			}
+	        Set<? extends I_ExtendByRef> members = Collections.synchronizedSet(new HashSet<I_ExtendByRef>(Terms.get().getRefsetExtensionMembers(searcherId)));
 			
 			System.out.println("About to process: " + members.size() + " values");
 			lastBeanInWfMap.clear();
@@ -108,6 +96,7 @@ public class WfHxIndexGenerator extends IndexGenerator {
 					}
 				}
 			} else {
+				WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
 				for (I_ExtendByRef row : members) {
 			    	UUID wfId = UUID.fromString(refset.getWorkflowIdAsString(((I_ExtendByRefPartStr)row).getStringValue()));
 			    	
