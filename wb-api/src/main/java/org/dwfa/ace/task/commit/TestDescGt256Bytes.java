@@ -103,18 +103,20 @@ public class TestDescGt256Bytes extends AbstractConceptTest {
                 if (part.getVersion() == Integer.MAX_VALUE) {
                     if (typesToCheck.contains(part.getTypeId())) {
                         Charset utf8 = Charset.forName("UTF-8");
-                        ByteBuffer bytes = utf8.encode(part.getText());
-                        if (bytes.limit() > 255) {
-                            I_GetConceptData typeBean = termFactory.getConcept(part.getTypeId());
-                            I_DescriptionTuple typeDesc = typeBean.getDescTuple(termFactory.getActiveAceFrameConfig()
-                                .getTableDescPreferenceList(), termFactory.getActiveAceFrameConfig());
-                            alertList.add(new AlertToDataConstraintFailure(
-                                (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
-                                          : AlertToDataConstraintFailure.ALERT_TYPE.WARNING), "<html>"
-                                    + typeDesc.getText() + ":&nbsp;&nbsp;<font color=blue>"
-                                    + part.getText().substring(0, 40) + "</font>..."
-                                    + "<br>exceeds the 255 byte limit by  " + (bytes.limit() - 255) + " bytes.",
-                                concept));
+                        
+                        if (part.getText() != null) {
+                            ByteBuffer bytes = utf8.encode(part.getText());
+                            if (bytes.limit() > 255) {
+                                I_GetConceptData typeBean = termFactory.getConcept(part.getTypeId());
+                                I_DescriptionTuple typeDesc = typeBean.getDescTuple(termFactory.getActiveAceFrameConfig().getTableDescPreferenceList(), termFactory.getActiveAceFrameConfig());
+                                alertList.add(new AlertToDataConstraintFailure(
+                                        (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
+                                        : AlertToDataConstraintFailure.ALERT_TYPE.WARNING), "<html>"
+                                        + typeDesc.getText() + ":&nbsp;&nbsp;<font color=blue>"
+                                        + part.getText().substring(0, 40) + "</font>..."
+                                        + "<br>exceeds the 255 byte limit by  " + (bytes.limit() - 255) + " bytes.",
+                                        concept));
+                            }
                         }
                     }
                 }
