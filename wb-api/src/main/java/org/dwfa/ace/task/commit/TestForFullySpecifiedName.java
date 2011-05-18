@@ -102,6 +102,13 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
             for (I_DescriptionPart part : desc.getMutableParts()) {
                 if (!actives.contains(part.getStatusNid()))
                     continue;
+                if (part.getText() == null) {
+                        alertList.add(new AlertToDataConstraintFailure(
+                            (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
+                                      : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
+                            "<html>Null text in description: " + part, concept));
+                        continue;
+                }
                 if (part.getTypeNid() == fsn_type.getConceptNid()) {
                     if (part.getText().matches(".*\\(\\?+\\).*") && part.getTime() == Long.MAX_VALUE) {
                         alertList.add(new AlertToDataConstraintFailure(
