@@ -16,7 +16,6 @@
  */
 package org.ihtsdo.ace.table;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -41,8 +40,6 @@ import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.ace.search.workflow.LuceneWfHxMatch;
 import org.dwfa.ace.table.StringWithTuple;
 import org.dwfa.ace.table.ConceptAttributeTableModel.StringWithConceptTuple;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.lucene.WorkflowLuceneSearchResult;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
@@ -128,15 +125,6 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
         wfHistoryList = new ArrayList<WorkflowLuceneSearchResult>();
     }
 
-    private String getPrefText(UUID id) throws IOException, TerminologyException {
-        I_GetConceptData cb = Terms.get().getConcept(id);
-        I_DescriptionTuple desc = cb.getDescTuple(config.getTableDescPreferenceList(), config);
-        if (desc != null) {
-            return desc.getText();
-        }
-        return cb.getInitialText() + " null pref desc";
-    }
-
     public Object getValueAt(int rowIndex, int columnIndex) {
         try {
             if (rowIndex >= getRowCount() || rowIndex < 0 || columnIndex < 0 || columnIndex >= getColumnCount()) {
@@ -148,45 +136,59 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
                 return null;
             }
 
-            switch (columns[columnIndex]) {
-            case FSN:
-            	I_GetConceptData concept = Terms.get().getConcept(UUID.fromString(result.getConcept()));
-            	
-            	// Attribute Tuple for drag
-            	I_ConceptAttributeTuple tuple = (I_ConceptAttributeTuple) concept.getConceptAttributes().getTuples().get(0);
-         	 	
-            	// Get Pref to display
-            	I_DescriptionTuple tupleToDisplay = concept.getDescTuple(config.getTableDescPreferenceList(), config);
-            	DescriptionVersionBI versionToDisplay = tupleToDisplay.getVersion(config.getViewCoordinate());
-            	String pref = versionToDisplay.getText();
-            	
-            	return new WorkflowFSNWithConceptTuple(pref, tuple, false);
+        	// Attribute Tuple for drag
+        	I_GetConceptData concept = Terms.get().getConcept(UUID.fromString(result.getConcept()));
+        	I_ConceptAttributeTuple dragTuple = (I_ConceptAttributeTuple) concept.getConceptAttributes().getTuples().get(0);
+        	String term = null;
+        	
+        	switch (columns[columnIndex]) {
+                case FSN:
+                	// Get Pref to display
+                	I_DescriptionTuple tuple = concept.getDescTuple(config.getTableDescPreferenceList(), config);
+                	DescriptionVersionBI version = tuple.getVersion(config.getViewCoordinate());
+                	term = version.getText();
+                	break;
+        /*
+        *          case ACTION:
+        *               return new WorkflowTextFieldEditor(getPrefText(bean.getAction()), false);
+        */
+                case STATE:
+                	// Get State to display
+                	I_GetConceptData con = Terms.get().getConcept(UUID.fromString(result.getState()));
+                	tuple = con.getDescTuple(config.getTableDescPreferenceList(), config);
+                	version = tuple.getVersion(config.getViewCoordinate());
+                	term = version.getText();
+                	break;
+
+                case EDITOR:
+                	con = Terms.get().getConcept(UUID.fromString(result.getModeler()));
+                	tuple = con.getDescTuple(config.getTableDescPreferenceList(), config);
+                	version = tuple.getVersion(config.getViewCoordinate());
+                	term = version.getText();
+                	break;
+	
 /*
- *          case ACTION:
- *               return new WorkflowTextFieldEditor(getPrefText(bean.getAction()), false);
- */
-            case STATE:
-                return new WorkflowTextFieldEditor(getPrefText(UUID.fromString(result.getState())), false);
-            case EDITOR:
-                return new WorkflowTextFieldEditor(getPrefText(UUID.fromString(result.getModeler())), false);
-/*
- *              case PATH:
- *           	I_GetConceptData path = Terms.get().getConcept(bean.getPath());
- *           	I_ConceptAttributeTuple pTuple = path.getConceptAttributes().getTuples().get(0);
- *               return new WorkflowFSNWithConceptTuple(getPrefText(bean.getPath()), pTuple, false);
- */
-            case TIMESTAMP:
-            	Date d = new Date(result.getTime());
-            	String timeStamp = formatter.format(d);
-            	return new WorkflowTextFieldEditor(timeStamp, false);
-            }
-               
-        } catch (Exception e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        }
-        return null;
-    }
-    
+*              case PATH:
+*           		I_GetConceptData path = Terms.get().getConcept(bean.getPath());
+*           		I_ConceptAttributeTuple pTuple = path.getConceptAttributes().getTuples().get(0);
+*               	return new WorkflowFSNWithConceptTuple(getPrefText(bean.getPath()), pTuple, false);
+*/
+                case TIMESTAMP:
+                	Date d = new Date(result.getTime());
+                	term = formatter.format(d);
+                	break;
+                
+            	default:
+            		break;
+	        	}
+	               
+	        	return new WorkflowStringWithConceptTuple(term, dragTuple, false);
+	        } catch (Exception e) {
+	            AceLog.getAppLog().alertAndLogException(e);
+	        }
+	    return null;
+	}    
+
     public WorkflowLuceneSearchResult getBean(int rowIndex) {
         if (rowIndex < 0 || wfHistoryList == null || rowIndex == wfHistoryList.size()) {
             return null;
@@ -247,18 +249,18 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
     public Class<?> getColumnClass(int c) {
         switch (columns[c]) {
         case FSN:
-            return WorkflowFSNWithConceptTuple.class;
+            return StringWithConceptTuple.class;
            
 //        case ACTION:
 //            return WorkflowTextFieldEditor.class;
         case STATE:
-            return WorkflowTextFieldEditor.class;
+            return StringWithConceptTuple.class;
         case EDITOR:
-            return WorkflowTextFieldEditor.class;
+            return StringWithConceptTuple.class;
 //        case PATH:
 //            return WorkflowFSNWithConceptTuple.class;
         case TIMESTAMP:
-            return WorkflowTextFieldEditor.class;
+            return StringWithConceptTuple.class;
         }
         return String.class;
     }
@@ -342,34 +344,16 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
         return wfHistoryList.size();
     }
 
-    public static class WorkflowTextFieldEditor extends CellTextString <WorkflowTextFieldEditor>
-    {
-        boolean wrapLines;
-
-        public WorkflowTextFieldEditor(String cellText, boolean wrapLines) {
-            super(cellText);
-            this.wrapLines = wrapLines;
-        }
-
-        public boolean getWrapLines() {
-            return wrapLines;
-        }
-
-        public void setWrapLines(boolean wrapLines) {
-            this.wrapLines = wrapLines;
-        }
-    }
-
     public WORKFLOW_FIELD[] getColumnEnums() {
         return columns;
     }
 
-    public static class WorkflowFSNWithConceptTuple extends StringWithTuple<StringWithConceptTuple> {
+    public static class WorkflowStringWithConceptTuple extends StringWithTuple<StringWithConceptTuple> {
         String cellText;
 
         I_ConceptAttributeTuple tuple;
 
-        public WorkflowFSNWithConceptTuple(String cellText, I_ConceptAttributeTuple tuple, boolean inConflict) {
+        public WorkflowStringWithConceptTuple(String cellText, I_ConceptAttributeTuple tuple, boolean inConflict) {
             super(cellText, inConflict);
             this.tuple = tuple;
         }
@@ -386,4 +370,7 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
 	public boolean hasMatches() {
 		return searchResults != null;
 	}
+
+
+
 }

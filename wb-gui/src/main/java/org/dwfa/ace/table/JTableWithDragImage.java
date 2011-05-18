@@ -75,7 +75,7 @@ import org.dwfa.ace.table.refset.RefsetMemberTableModel.REFSET_FIELDS;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WORKFLOW_FIELD;
-import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowFSNWithConceptTuple;
+import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowStringWithConceptTuple;
 
 import sun.awt.dnd.SunDragSourceContextPeer;
 
@@ -154,7 +154,7 @@ public class JTableWithDragImage extends JTable {
                     return transferableFromSWImgT(obj, column);
                 } else if (StringWithExtTuple.class.isAssignableFrom(obj.getClass())) {
                     return transferableFromSWExtT(obj, column);
-                } else if (WorkflowFSNWithConceptTuple.class.isAssignableFrom(obj.getClass())) {
+                } else if (WorkflowStringWithConceptTuple.class.isAssignableFrom(obj.getClass())) {
                 	return transferableFromWFExtT(obj, column);
                 }
             } else if (ImageWithImageTuple.class.isAssignableFrom(obj.getClass())) {
@@ -325,7 +325,7 @@ public class JTableWithDragImage extends JTable {
         }
 
         private Transferable transferableFromWFExtT(Object obj, int column) throws TerminologyException, IOException {
-        	WorkflowFSNWithConceptTuple wfct = (WorkflowFSNWithConceptTuple) obj;
+        	WorkflowStringWithConceptTuple wfct = (WorkflowStringWithConceptTuple) obj;
             WORKFLOW_FIELD field = (WORKFLOW_FIELD) getColumnModel().getColumn(column).getIdentifier();
             switch (field) {
             case FSN:
@@ -333,13 +333,13 @@ public class JTableWithDragImage extends JTable {
 //            case ACTION:
 //                return new StringSelection(wfct.getCellText());
             case STATE:
-                return new StringSelection(wfct.getCellText());
+                return new ConceptTransferable(Terms.get().getConcept(wfct.getTuple().getConceptNid()));
             case EDITOR:
-                return new StringSelection(wfct.getCellText());
+                return new ConceptTransferable(Terms.get().getConcept(wfct.getTuple().getConceptNid()));
 //            case PATH:
 //                return new ConceptTransferable(Terms.get().getConcept(wfct.getTuple().getConceptNid()));
             case TIMESTAMP:
-                return new StringSelection(wfct.getCellText());
+                return new ConceptTransferable(Terms.get().getConcept(wfct.getTuple().getConceptNid()));
             default:
                 throw new UnsupportedOperationException("Cana't handle field: " + field);
             }
