@@ -29,223 +29,224 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> implements I_ExtendByRefPartBoolean {
 
-	private static VersionComputer<RefsetMember<BooleanRevision, BooleanMember>.Version> computer = 
-		new VersionComputer<RefsetMember<BooleanRevision, BooleanMember>.Version>();
+    private static VersionComputer<RefsetMember<BooleanRevision, BooleanMember>.Version> computer =
+            new VersionComputer<RefsetMember<BooleanRevision, BooleanMember>.Version>();
 
-	protected VersionComputer<RefsetMember<BooleanRevision, BooleanMember>.Version> getVersionComputer() {
-		return computer;
-	}
+    protected VersionComputer<RefsetMember<BooleanRevision, BooleanMember>.Version> getVersionComputer() {
+        return computer;
+    }
 
-	public class Version 
-	extends RefsetMember<BooleanRevision, BooleanMember>.Version 
-	implements I_ExtendByRefVersion, I_ExtendByRefPartBoolean {
+    public class Version
+            extends RefsetMember<BooleanRevision, BooleanMember>.Version
+            implements I_ExtendByRefVersion, I_ExtendByRefPartBoolean {
 
-		private Version() {
-			super();
-		}
+        private Version() {
+            super();
+        }
 
-		private Version(int index) {
-			super(index);
-		}
+        private Version(int index) {
+            super(index);
+        }
 
-		@Override
-		public ArrayIntList getVariableVersionNids() {
-		    return new ArrayIntList();
-		}
+        @Override
+        public ArrayIntList getVariableVersionNids() {
+            return new ArrayIntList();
+        }
 
-		@Override
-		public int compareTo(I_ExtendByRefPart o) {
-			if (I_ExtendByRefPartBoolean.class.isAssignableFrom(o.getClass())) {
-				I_ExtendByRefPartBoolean another = (I_ExtendByRefPartBoolean) o;
-				if (this.getBooleanValue() == another.getBooleanValue()) {
-					return super.compareTo(another);
-				}
-				if (this.getBooleanValue()) {
-					return 1;
-				}
-				return -1;
-			}
-			return super.compareTo(o);
-		}
+        @Override
+        public int compareTo(I_ExtendByRefPart o) {
+            if (I_ExtendByRefPartBoolean.class.isAssignableFrom(o.getClass())) {
+                I_ExtendByRefPartBoolean another = (I_ExtendByRefPartBoolean) o;
+                if (this.getBooleanValue() == another.getBooleanValue()) {
+                    return super.compareTo(another);
+                }
+                if (this.getBooleanValue()) {
+                    return 1;
+                }
+                return -1;
+            }
+            return super.compareTo(o);
+        }
 
-		@Override
-		public I_ExtendByRefPartStr duplicate() {
-			return (I_ExtendByRefPartStr) super.duplicate();
-		}
+        @Override
+        public I_ExtendByRefPartStr duplicate() {
+            return (I_ExtendByRefPartStr) super.duplicate();
+        }
 
-		@Override
-		public boolean getBooleanValue() {
-			if (index >= 0) {
-				return revisions.get(index).getBooleanValue();
-			}
-			return BooleanMember.this.getBooleanValue();
-		}
+        @Override
+        public boolean getBooleanValue() {
+            if (index >= 0) {
+                return revisions.get(index).getBooleanValue();
+            }
+            return BooleanMember.this.getBooleanValue();
+        }
 
-		@Override
-		public void setBooleanValue(boolean value) {
-			if (index >= 0) {
-				revisions.get(index).setBooleanValue(value);
-			}
-			BooleanMember.this.setBooleanValue(value);
-		}
+        @Override
+        public void setBooleanValue(boolean value) {
+            if (index >= 0) {
+                revisions.get(index).setBooleanValue(value);
+            }
+            BooleanMember.this.setBooleanValue(value);
+        }
 
-		@Override
-		public ERefsetBooleanMember getERefsetMember() throws TerminologyException, IOException {
-			return new ERefsetBooleanMember(this);
-		}
+        @Override
+        public ERefsetBooleanMember getERefsetMember() throws TerminologyException, IOException {
+            return new ERefsetBooleanMember(this);
+        }
 
-		@Override
-		public ERefsetBooleanRevision getERefsetRevision() throws TerminologyException, IOException {
-			return new ERefsetBooleanRevision(this);
-		}
-	}
+        @Override
+        public ERefsetBooleanRevision getERefsetRevision() throws TerminologyException, IOException {
+            return new ERefsetBooleanRevision(this);
+        }
+    }
+    private boolean booleanValue;
 
-	private boolean booleanValue;
+    public BooleanMember(Concept enclosingConcept, TupleInput input) throws IOException {
+        super(enclosingConcept, input);
+    }
 
-	public BooleanMember(Concept enclosingConcept, TupleInput input) throws IOException {
-		super(enclosingConcept, input);
-	}
-
-	public BooleanMember(TkRefsetBooleanMember refsetMember,
-			Concept enclosingConcept) throws IOException {
-		super(refsetMember, enclosingConcept);
-		booleanValue = refsetMember.getBooleanValue();
-		if (refsetMember.getRevisionList() != null) {
-			revisions = new CopyOnWriteArrayList<BooleanRevision>();
-			for (TkRefsetBooleanRevision eVersion : refsetMember
-					.getRevisionList()) {
-				revisions.add(new BooleanRevision(eVersion, this));
-			}
-		}
-	}
+    public BooleanMember(TkRefsetBooleanMember refsetMember,
+            Concept enclosingConcept) throws IOException {
+        super(refsetMember, enclosingConcept);
+        booleanValue = refsetMember.getBooleanValue();
+        if (refsetMember.getRevisionList() != null) {
+            revisions = new CopyOnWriteArrayList<BooleanRevision>();
+            for (TkRefsetBooleanRevision eVersion : refsetMember.getRevisionList()) {
+                revisions.add(new BooleanRevision(eVersion, this));
+            }
+        }
+    }
 
     public BooleanMember() {
-		super();
-	}
+        super();
+    }
 
-    
-	@SuppressWarnings("unchecked")
-	public List<Version> getVersions() {
-		if (versions == null) {
-			int count = 1;
-			if (revisions != null) {
-				count = count + revisions.size();
-			}
-			ArrayList<Version> list = new ArrayList<Version>(count);
-			if (getTime() != Long.MIN_VALUE) {
-				list.add(new Version());
-			}
-			if (revisions != null) {
-				for (int i = 0; i < revisions.size(); i++) {
-					if (revisions.get(i).getTime() != Long.MIN_VALUE) {
-						list.add(new Version(i));
-					}
-				}
-			}
-			versions = list;
-		}
-		return (List<Version>) versions;
-	}
+    @SuppressWarnings("unchecked")
+    public List<Version> getVersions() {
+        if (versions == null) {
+            int count = 1;
+            if (revisions != null) {
+                count = count + revisions.size();
+            }
+            ArrayList<Version> list = new ArrayList<Version>(count);
+            if (getTime() != Long.MIN_VALUE) {
+                list.add(new Version());
+            }
+            if (revisions != null) {
+                for (int i = 0; i < revisions.size(); i++) {
+                    if (revisions.get(i).getTime() != Long.MIN_VALUE) {
+                        list.add(new Version(i));
+                    }
+                }
+            }
+            versions = list;
+        }
+        return (List<Version>) versions;
+    }
 
+    @Override
+    public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
-		throw new UnsupportedOperationException();
-	}
-	
-	public I_ExtendByRefPart duplicate() {
-		throw new UnsupportedOperationException();
-	}
-	
-	@Override
-	protected boolean membersEqual(
-			ConceptComponent<BooleanRevision, BooleanMember> obj) {
-		if (BooleanMember.class.isAssignableFrom(obj.getClass())) {
-			BooleanMember another = (BooleanMember) obj;
-			return this.booleanValue = another.booleanValue;
-		}
-		return false;
-	}
+    public I_ExtendByRefPart duplicate() {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	protected final BooleanRevision readMemberRevision(TupleInput input) {
-		return new BooleanRevision(input, this);
-	}
-	@Override
-	protected void readMemberFields(TupleInput input) {
-		booleanValue = input.readBoolean();
-	}
-	@Override
-	protected void writeMember(TupleOutput output) {
-		output.writeBoolean(booleanValue);
-	}
+    @Override
+    protected boolean membersEqual(
+            ConceptComponent<BooleanRevision, BooleanMember> obj) {
+        if (BooleanMember.class.isAssignableFrom(obj.getClass())) {
+            BooleanMember another = (BooleanMember) obj;
+            return this.booleanValue = another.booleanValue;
+        }
+        return false;
+    }
 
-	@Override
-	protected ArrayIntList getVariableVersionNids() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    protected final BooleanRevision readMemberRevision(TupleInput input) {
+        return new BooleanRevision(input, this);
+    }
 
-	@Override
-	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+    @Override
+    protected void readMemberFields(TupleInput input) {
+        booleanValue = input.readBoolean();
+    }
+
+    @Override
+    protected void writeMember(TupleOutput output) {
+        output.writeBoolean(booleanValue);
+    }
+
+    @Override
+    protected ArrayIntList getVariableVersionNids() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
         if (getTime() == time && getPathNid() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
-		BooleanRevision newR = new BooleanRevision(statusNid, pathNid, time, this);
-		addRevision(newR);
-		return newR;
-	}
+        BooleanRevision newR = new BooleanRevision(statusNid, pathNid, time, this);
+        addRevision(newR);
+        return newR;
+    }
 
-	@Override
-	public I_AmPart makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+    @Override
+    public I_AmPart makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
         if (getTime() == time && getPathNid() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
-		BooleanRevision newR = new BooleanRevision(statusNid, authorNid, pathNid, time, this);
-		addRevision(newR);
-		return newR;
-	}
+        BooleanRevision newR = new BooleanRevision(statusNid, authorNid, pathNid, time, this);
+        addRevision(newR);
+        return newR;
+    }
 
-	@Override
-	public BooleanRevision makeAnalog() {
-	    BooleanRevision newR = new BooleanRevision(getStatusNid(), getPathNid(), getTime(), this);
-	    return newR;
-	}
+    @Override
+    public BooleanRevision makeAnalog() {
+        BooleanRevision newR = new BooleanRevision(getStatusNid(), getPathNid(), getTime(), this);
+        return newR;
+    }
 
+    public boolean getBooleanValue() {
+        return booleanValue;
+    }
 
-	public boolean getBooleanValue() {
-		return booleanValue;
-	}
-
-	public void setBooleanValue(boolean booleanValue) {
-		this.booleanValue = booleanValue;
+    public void setBooleanValue(boolean booleanValue) {
+        this.booleanValue = booleanValue;
         modified();
-	}
+    }
 
-	@Override
-	public int getTypeId() {
-		return REFSET_TYPES.BOOLEAN.getTypeNid();
-	}
-	@Override
-	public int getTypeNid() {
-		return REFSET_TYPES.BOOLEAN.getTypeNid();
-	}
+    @Override
+    public int getTypeId() {
+        return REFSET_TYPES.BOOLEAN.getTypeNid();
+    }
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-	    StringBuffer buf = new StringBuffer();  
-	    buf.append(this.getClass().getSimpleName() + ":{");
-	    buf.append(" booleanValue:" + this.booleanValue);
-	    return buf.toString();
-	}
+    @Override
+    public int getTypeNid() {
+        return REFSET_TYPES.BOOLEAN.getTypeNid();
+    }
 
-	@Override
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder buf = new StringBuilder();
+        buf.append(this.getClass().getSimpleName()).append(":{");
+        buf.append(" ").append(this.booleanValue);
+        buf.append(" ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
+
+    @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return false;
+        }
         if (BooleanMember.class.isAssignableFrom(obj.getClass())) {
             BooleanMember another = (BooleanMember) obj;
             return this.nid == another.nid;
@@ -255,7 +256,6 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
 
     @Override
     public int hashCode() {
-        return HashFunction.hashCode(new int[] { nid });
+        return HashFunction.hashCode(new int[]{nid});
     }
-
 }

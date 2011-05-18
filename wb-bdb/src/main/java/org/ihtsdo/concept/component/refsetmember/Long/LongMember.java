@@ -206,10 +206,10 @@ public class LongMember extends RefsetMember<LongRevision, LongMember> implement
 	 */
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();  
-        buf.append(this.getClass().getSimpleName() + ":{");
-        buf.append(" longValue:" + this.longValue);
-        buf.append(" }=> ");
+        StringBuilder buf = new StringBuilder();  
+        buf.append(this.getClass().getSimpleName()).append(":{");
+        buf.append(" long:").append(this.longValue);
+        buf.append(" ");
         buf.append(super.toString());
         return buf.toString();
     }
