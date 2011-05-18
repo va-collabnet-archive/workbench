@@ -282,8 +282,8 @@ public class BdbCommitManager {
 
             uncommittedCNids.setMember(concept.getNid());
             dbWriterPermit.acquire();
-            dbWriterService.execute(new SetNidsForCid(concept));
-            dbWriterService.execute(new ConceptWriter(concept));
+            (new ConceptWriter(concept)).run();
+            (new SetNidsForCid(concept)).run();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
